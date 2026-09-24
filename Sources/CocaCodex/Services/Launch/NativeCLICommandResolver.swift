@@ -71,8 +71,15 @@ struct NativeCLICommandResolver {
             throw NativeCLICommandError.missingExecutable(executableName)
         }
 
+        var pathDirectories = searchDirectories
+        let resolvedExecutableDirectory = URL(fileURLWithPath: executablePath)
+            .resolvingSymlinksInPath()
+            .deletingLastPathComponent()
+            .path
+        pathDirectories.append(resolvedExecutableDirectory)
+
         var environment = inheritedEnvironment
-        environment["PATH"] = searchDirectories.reduce(into: [String]()) { directories, directory in
+        environment["PATH"] = pathDirectories.reduce(into: [String]()) { directories, directory in
             if !directories.contains(directory) { directories.append(directory) }
         }.joined(separator: ":")
         environment["TERM"] = "xterm-256color"
