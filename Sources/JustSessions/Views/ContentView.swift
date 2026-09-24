@@ -49,7 +49,7 @@ struct ContentView: View {
                 renamingConversation = nil
             }
         } message: {
-            Text("This changes the display name in coca-codex.")
+            Text("This changes the display name in JustSessions.")
         }
         .confirmationDialog("Delete sessions?", isPresented: Binding(
             get: { deletionRequest != nil },

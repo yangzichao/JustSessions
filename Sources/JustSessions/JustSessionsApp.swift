@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct CocaCodexApp: App {
+struct JustSessionsApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

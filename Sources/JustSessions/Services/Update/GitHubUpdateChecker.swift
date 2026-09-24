@@ -39,12 +39,12 @@ private struct GitHubRelease: Decodable {
 }
 
 enum GitHubUpdateChecker {
-    static let latestReleaseURL = URL(string: "https://api.github.com/repos/yangzichao/coca-codex/releases/latest")!
+    static let latestReleaseURL = URL(string: "https://api.github.com/repos/yangzichao/JustSessions/releases/latest")!
 
     static func check(bundledRevision: String) async throws -> GitHubUpdateCheck {
         var request = URLRequest(url: latestReleaseURL, cachePolicy: .reloadIgnoringLocalCacheData)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-        request.setValue("coca-codex", forHTTPHeaderField: "User-Agent")
+        request.setValue("JustSessions", forHTTPHeaderField: "User-Agent")
 
         let (responseData, response) = try await URLSession.shared.data(for: request)
         guard let response = response as? HTTPURLResponse else {
@@ -66,7 +66,7 @@ enum GitHubUpdateChecker {
         }
         let latestRevision = String(release.tagName.dropFirst("build-".count))
         guard latestRevision.count == 40, latestRevision.allSatisfy(\.isHexDigit),
-              let archive = release.assets.first(where: { $0.name == "coca-codex.zip" }),
+              let archive = release.assets.first(where: { $0.name == "JustSessions.zip" }),
               archive.browserDownloadURL.host == "github.com",
               let digest = archive.digest, digest.hasPrefix("sha256:") else {
             throw AppUpdateError("The GitHub app update is incomplete or invalid.")

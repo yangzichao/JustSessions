@@ -1,6 +1,6 @@
 import AppKit
 import Testing
-@testable import CocaCodex
+@testable import JustSessions
 
 @MainActor
 struct TerminalInteractionTests {

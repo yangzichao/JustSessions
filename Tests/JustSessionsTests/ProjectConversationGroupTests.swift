@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import CocaCodex
+@testable import JustSessions
 
 struct ProjectConversationGroupTests {
     @Test func sameFolderCombinesProvidersAndSortsByActivity() {

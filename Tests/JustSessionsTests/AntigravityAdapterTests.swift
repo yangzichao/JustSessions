@@ -1,7 +1,7 @@
 import Foundation
 import SQLite3
 import Testing
-@testable import CocaCodex
+@testable import JustSessions
 
 struct AntigravityAdapterTests {
     @Test func discoversLocalSessionsWithSummaryAndMetadataFallback() throws {

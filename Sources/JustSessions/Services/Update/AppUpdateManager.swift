@@ -19,12 +19,17 @@ final class AppUpdateManager: ObservableObject {
 
     private let resultFile: URL = {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return applicationSupport.appendingPathComponent("JustSessions/update-result.txt")
+    }()
+
+    private let legacyResultFile: URL = {
+        let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return applicationSupport.appendingPathComponent("coca-codex/update-result.txt")
     }()
 
     private let logFile: URL = {
         let logs = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
-        return logs.appendingPathComponent("Logs/coca-codex/update.log")
+        return logs.appendingPathComponent("Logs/JustSessions/update.log")
     }()
 
     func checkForUpdates(automaticallyInstall: Bool = false, hasOpenTerminals: @escaping () -> Bool = { false }) {
@@ -36,7 +41,7 @@ final class AppUpdateManager: ObservableObject {
         isCheckingForUpdates = true
         Task {
             do {
-                guard let bundledRevision = Bundle.main.object(forInfoDictionaryKey: "CocaCodexSourceRevision") as? String else {
+                guard let bundledRevision = Bundle.main.object(forInfoDictionaryKey: "JustSessionsSourceRevision") as? String else {
                     throw AppUpdateError("This app has no build revision. Rebuild it with Scripts/build-app.sh.")
                 }
                 let update = try await GitHubUpdateChecker.check(bundledRevision: bundledRevision)
@@ -49,7 +54,7 @@ final class AppUpdateManager: ObservableObject {
                     }
                     notice = AppUpdateNotice(
                         title: "Update available",
-                        message: "A newer version is ready on GitHub. Update now to download and reopen coca-codex?",
+                        message: "A newer version is ready on GitHub. Update now to download and reopen JustSessions?",
                         canInstall: true
                     )
                 } else if !automaticallyInstall {
@@ -142,13 +147,14 @@ final class AppUpdateManager: ObservableObject {
 
     @discardableResult
     func showPendingResult() -> Bool {
-        guard let result = try? String(contentsOf: resultFile, encoding: .utf8) else { return false }
-        try? FileManager.default.removeItem(at: resultFile)
+        let pendingFile = FileManager.default.fileExists(atPath: resultFile.path) ? resultFile : legacyResultFile
+        guard let result = try? String(contentsOf: pendingFile, encoding: .utf8) else { return false }
+        try? FileManager.default.removeItem(at: pendingFile)
         let lines = result.split(separator: "\n", maxSplits: 1, omittingEmptySubsequences: false)
         let succeeded = lines.first == "success"
         notice = AppUpdateNotice(
             title: succeeded ? "Update complete" : "Update failed",
-            message: lines.count > 1 ? String(lines[1]) : (succeeded ? "coca-codex is up to date." : "See \(logFile.path)"),
+            message: lines.count > 1 ? String(lines[1]) : (succeeded ? "JustSessions is up to date." : "See \(logFile.path)"),
             canInstall: false
         )
         return true

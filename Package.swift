@@ -2,18 +2,18 @@
 import PackageDescription
 
 let package = Package(
-    name: "CocaCodex",
+    name: "JustSessions",
     platforms: [.macOS(.v14)],
-    products: [.executable(name: "CocaCodex", targets: ["CocaCodex"])],
+    products: [.executable(name: "JustSessions", targets: ["JustSessions"])],
     dependencies: [
         .package(url: "https://github.com/migueldeicaza/SwiftTerm.git", exact: "1.15.0"),
     ],
     targets: [
         .executableTarget(
-            name: "CocaCodex",
+            name: "JustSessions",
             dependencies: [.product(name: "SwiftTerm", package: "SwiftTerm")],
             linkerSettings: [.linkedLibrary("sqlite3")]
         ),
-        .testTarget(name: "CocaCodexTests", dependencies: ["CocaCodex"]),
+        .testTarget(name: "JustSessionsTests", dependencies: ["JustSessions"]),
     ]
 )

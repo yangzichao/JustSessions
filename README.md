@@ -1,4 +1,4 @@
-# coca-codex
+# JustSessions
 
 A native macOS launcher for Claude Code, Codex, and Google Antigravity CLI. Start new sessions, or find and resume existing ones in their original CLI inside an embedded terminal. Claude Code and Codex sessions can also be branched. The app does not re-render transcripts.
 
@@ -27,12 +27,12 @@ Branch forks the **conversation**. It does not create a Git branch or worktree.
 
 Requires macOS 14+, Xcode Command Line Tools, and whichever CLI you want to use (`claude`, `codex`, and/or `agy`).
 
-GitHub Actions builds an app archive from every push to `main` and publishes it as a GitHub build release. Updating requires network access and write access to the app folder, but does not need a local source checkout or build tools. The app verifies the downloaded archive's SHA-256 digest, code signature, bundle ID, and source revision before replacing itself. If installation fails, it restores the previous app; details are logged to `~/Library/Logs/coca-codex/update.log`.
+GitHub Actions builds an app archive from every push to `main` and publishes it as a GitHub build release. Updating requires network access and write access to the app folder, but does not need a local source checkout or build tools. The app verifies the downloaded archive's SHA-256 digest, code signature, bundle ID, and source revision before replacing itself. If installation fails, it restores the previous app; details are logged to `~/Library/Logs/JustSessions/update.log`. Releases also include a `coca-codex.zip` compatibility archive so older installations can update to JustSessions. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
 
 ```sh
 swift test
 ./Scripts/build-app.sh
-open "dist/coca-codex.app"
+open "dist/JustSessions.app"
 ```
 
 The app searches `~/.claude/projects`, `~/.codex/sessions`, and `~/.gemini/antigravity-cli/conversations`. It honors `CLAUDE_CONFIG_DIR` and `CODEX_HOME` if those variables are present in the app's environment. It reads metadata from Claude's session index, Codex's session index, and Antigravity CLI's local SQLite files, with fallbacks for unindexed sessions. Antigravity IDE-only history without a local CLI conversation database is not listed. A session whose original project directory no longer exists remains visible, with launch buttons disabled until the directory is restored.
