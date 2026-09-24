@@ -8,13 +8,11 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         applySystemAppearance()
-        allowMouseReporting = false
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         applySystemAppearance()
-        allowMouseReporting = false
     }
 
     override func viewDidChangeEffectiveAppearance() {

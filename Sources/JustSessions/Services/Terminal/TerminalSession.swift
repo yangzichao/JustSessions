@@ -15,7 +15,6 @@ final class TerminalSession: ObservableObject, Identifiable {
 
     @Published private(set) var hasExited = false
     @Published private(set) var exitCode: Int32?
-    @Published private(set) var allowsCLIMouseInput = false
     @Published private(set) var hasSelection = false
 
     private let processObserver: TerminalProcessObserver
@@ -76,11 +75,6 @@ final class TerminalSession: ObservableObject, Identifiable {
     func updateDisplayTitle(_ title: String) {
         guard displayTitle != title else { return }
         displayTitle = title
-    }
-
-    func setCLIMouseInputEnabled(_ enabled: Bool) {
-        allowsCLIMouseInput = enabled
-        terminalView.allowMouseReporting = enabled
     }
 
     func copySelection() {

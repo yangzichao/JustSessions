@@ -12,7 +12,7 @@ struct TerminalInteractionTests {
         terminalView.feed(text: "Terminal output to copy")
         terminalView.selectAll()
 
-        #expect(!terminalView.allowMouseReporting)
+        #expect(terminalView.allowMouseReporting)
         #expect(hasSelection)
         #expect(terminalView.getSelection()?.contains("Terminal output to copy") == true)
 
