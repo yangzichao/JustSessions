@@ -97,7 +97,6 @@ struct ConversationSidebarView: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 14)
         }
-        .frame(width: 248)
         .background(Color(nsColor: .windowBackgroundColor))
         .onAppear { expandProjectsWithOpenTerminals() }
         .onChange(of: store.terminalSessions.map(\.id)) { _, _ in
