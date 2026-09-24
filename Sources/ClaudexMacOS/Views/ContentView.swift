@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 private enum ProviderFilter: String, CaseIterable, Identifiable {
@@ -14,6 +15,7 @@ struct ContentView: View {
     @State private var providerFilter: ProviderFilter = .all
     @State private var renamingConversation: Conversation?
     @State private var editedTitle = ""
+    @State private var hasStartedScan = false
 
     private var filteredConversations: [Conversation] {
         store.conversations.filter { conversation in
@@ -27,9 +29,50 @@ struct ContentView: View {
     }
 
     var body: some View {
+        Group {
+            if let session = store.selectedTerminal {
+                TerminalWorkspaceView(store: store, session: session)
+            } else {
+                browser
+            }
+        }
+        .frame(minWidth: 760, minHeight: 510)
+        .onAppear {
+            if !hasStartedScan {
+                hasStartedScan = true
+                store.refresh()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
+            store.closeAllTerminals()
+        }
+        .alert("Rename conversation", isPresented: Binding(
+            get: { renamingConversation != nil },
+            set: { if !$0 { renamingConversation = nil } }
+        )) {
+            TextField("Name", text: $editedTitle)
+            Button("Cancel", role: .cancel) { renamingConversation = nil }
+            Button("Save") {
+                if let conversation = renamingConversation { store.rename(conversation, to: editedTitle) }
+                renamingConversation = nil
+            }
+        } message: {
+            Text("This changes the display name in claudex-macos.")
+        }
+        .alert("Could not complete action", isPresented: Binding(
+            get: { store.errorMessage != nil },
+            set: { if !$0 { store.dismissError() } }
+        )) {
+            Button("OK") { store.dismissError() }
+        } message: {
+            Text(store.errorMessage ?? "Unknown error")
+        }
+    }
+
+    private var browser: some View {
         let visibleConversations = filteredConversations
         let projectGroups = ProjectConversationGroup.grouped(visibleConversations)
-        VStack(alignment: .leading, spacing: 0) {
+        return VStack(alignment: .leading, spacing: 0) {
             header
             Divider()
 
@@ -64,29 +107,6 @@ struct ContentView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 10)
         }
-        .frame(minWidth: 760, minHeight: 510)
-        .onAppear { store.refresh() }
-        .alert("Rename conversation", isPresented: Binding(
-            get: { renamingConversation != nil },
-            set: { if !$0 { renamingConversation = nil } }
-        )) {
-            TextField("Name", text: $editedTitle)
-            Button("Cancel", role: .cancel) { renamingConversation = nil }
-            Button("Save") {
-                if let conversation = renamingConversation { store.rename(conversation, to: editedTitle) }
-                renamingConversation = nil
-            }
-        } message: {
-            Text("This changes the display name in claudex-macos.")
-        }
-        .alert("Could not complete action", isPresented: Binding(
-            get: { store.errorMessage != nil },
-            set: { if !$0 { store.dismissError() } }
-        )) {
-            Button("OK") { store.dismissError() }
-        } message: {
-            Text(store.errorMessage ?? "Unknown error")
-        }
     }
 
     private var header: some View {
@@ -98,6 +118,15 @@ struct ContentView: View {
                         .font(.subheadline).foregroundStyle(.secondary)
                 }
                 Spacer()
+                if !store.terminalSessions.isEmpty {
+                    Menu {
+                        ForEach(store.terminalSessions) { session in
+                            Button(session.displayTitle) { store.selectTerminal(session.id) }
+                        }
+                    } label: {
+                        Label("Terminals \(store.terminalSessions.count)", systemImage: "terminal")
+                    }
+                }
                 Toggle(isOn: $recentOnly) {
                     Label("Recent", systemImage: "clock")
                 }

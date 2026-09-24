@@ -59,13 +59,33 @@ struct AdapterTests {
         #expect(adapter.arguments(for: conversations[0], action: .branch) == ["fork", conversations[0].sessionID])
     }
 
-    @Test func launchScriptQuotesPathsAndArguments() {
-        let script = TerminalLauncher.script(
-            executable: "/path/with space/codex",
-            arguments: ["resume", "a'bc"],
-            projectPath: "/work/it's here"
+    @Test func nativeCommandUsesExecutableAndProjectDirectoryWithoutShellQuoting() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let binaryDirectory = root.appendingPathComponent("bin with spaces")
+        let projectDirectory = root.appendingPathComponent("it's a project")
+        try FileManager.default.createDirectory(at: binaryDirectory, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: projectDirectory, withIntermediateDirectories: true)
+        let executable = binaryDirectory.appendingPathComponent("claude")
+        try "#!/bin/sh\nexit 0\n".write(to: executable, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: executable.path)
+        let conversation = Conversation(
+            provider: .claude,
+            sessionID: UUID().uuidString,
+            projectPath: projectDirectory.path,
+            suggestedTitle: "Example",
+            updatedAt: .now,
+            sourceFile: root.appendingPathComponent("session.jsonl")
         )
-        #expect(script.contains("cd -- '/work/it'\\''s here'"))
-        #expect(script.contains("exec '/path/with space/codex' 'resume' 'a'\\''bc'"))
+        let resolver = NativeCLICommandResolver(
+            searchDirectories: [binaryDirectory.path],
+            inheritedEnvironment: ["HOME": root.path, "PATH": binaryDirectory.path]
+        )
+
+        let command = try resolver.resolve(conversation: conversation, action: .branch, adapter: ClaudeAdapter())
+        #expect(command.executablePath == executable.path)
+        #expect(command.workingDirectory == projectDirectory.path)
+        #expect(command.arguments == ["--resume", conversation.sessionID, "--fork-session"])
+        #expect(command.environment.contains("TERM=xterm-256color"))
     }
 }

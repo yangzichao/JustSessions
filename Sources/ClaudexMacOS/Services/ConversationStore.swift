@@ -7,9 +7,11 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     @Published private(set) var aliases: [String: String]
+    @Published private(set) var terminalSessions: [TerminalSession] = []
+    @Published private(set) var selectedTerminalID: UUID?
 
     private let adapters: [any ConversationAdapter]
-    private let launcher = TerminalLauncher()
+    private let commandResolver = NativeCLICommandResolver()
     private let aliasesKey = "conversationAliases"
 
     init(adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter()]) {
@@ -53,9 +55,47 @@ final class ConversationStore: ObservableObject {
     }
 
     func launch(_ conversation: Conversation, action: ConversationAction) {
+        if action == .resume,
+           let runningSession = terminalSessions.first(where: {
+               $0.action == .resume && $0.conversation.id == conversation.id && !$0.hasExited
+           }) {
+            selectedTerminalID = runningSession.id
+            return
+        }
         guard let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { return }
-        do { try launcher.open(conversation, action: action, adapter: adapter) }
+        do {
+            let command = try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
+            let session = TerminalSession(
+                conversation: conversation,
+                action: action,
+                displayTitle: title(for: conversation),
+                command: command
+            )
+            terminalSessions.append(session)
+            selectedTerminalID = session.id
+        }
         catch { errorMessage = error.localizedDescription }
+    }
+
+    var selectedTerminal: TerminalSession? {
+        terminalSessions.first { $0.id == selectedTerminalID }
+    }
+
+    func selectTerminal(_ id: UUID?) {
+        selectedTerminalID = id
+    }
+
+    func closeTerminal(_ id: UUID) {
+        guard let index = terminalSessions.firstIndex(where: { $0.id == id }) else { return }
+        terminalSessions[index].close()
+        terminalSessions.remove(at: index)
+        if selectedTerminalID == id { selectedTerminalID = terminalSessions.last?.id }
+    }
+
+    func closeAllTerminals() {
+        for session in terminalSessions { session.close() }
+        terminalSessions = []
+        selectedTerminalID = nil
     }
 
     func dismissError() {
