@@ -20,10 +20,8 @@ struct SidebarResizeHandle: View {
                     .frame(width: 1)
             }
             .contentShape(Rectangle())
-            .onHover { hovering in
-                isHovering = hovering
-                (hovering ? NSCursor.resizeLeftRight : NSCursor.arrow).set()
-            }
+            .background { ResizeCursorRegion() }
+            .onHover { isHovering = $0 }
             .gesture(
                 DragGesture(minimumDistance: 1)
                     .onChanged { gesture in
