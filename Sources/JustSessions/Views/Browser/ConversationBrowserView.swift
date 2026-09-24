@@ -7,6 +7,7 @@ struct ConversationBrowserView: View {
     @Binding var providerFilter: ConversationProviderFilter
     let onRename: (Conversation) -> Void
     let onDelete: (Conversation) -> Void
+    let onRenameProject: (ProjectConversationGroup) -> Void
     let onDeleteProjectSessions: (String) -> Void
 
     @State private var selectedConversationID: String?
@@ -17,20 +18,24 @@ struct ConversationBrowserView: View {
         store.conversations.filter { conversation in
             providerFilter.includes(conversation.provider) && (
                 searchText.isEmpty || [
-                    store.title(for: conversation), conversation.projectPath, conversation.sessionID
+                    store.title(for: conversation),
+                    store.projectDisplayName(forProjectPath: conversation.projectDirectoryKey),
+                    conversation.projectPath,
+                    conversation.sessionID
                 ].contains { $0.localizedCaseInsensitiveContains(searchText) }
             )
         }
     }
 
     private var projectGroups: [ProjectConversationGroup] {
-        ProjectConversationGroup.grouped(store.conversations.filter {
-            providerFilter.includes($0.provider)
-        })
+        ProjectConversationGroup.grouped(
+            store.conversations.filter { providerFilter.includes($0.provider) },
+            displayNames: store.projectDisplayNames
+        )
     }
 
     private var availableProjects: [ProjectConversationGroup] {
-        ProjectConversationGroup.grouped(store.conversations)
+        ProjectConversationGroup.grouped(store.conversations, displayNames: store.projectDisplayNames)
             .filter { $0.conversations.first?.isProjectAvailable == true }
     }
 
@@ -78,6 +83,7 @@ struct ConversationBrowserView: View {
                 },
                 onRenameConversation: onRename,
                 onDeleteConversation: onDelete,
+                onRenameProject: onRenameProject,
                 onDeleteProjectSessions: onDeleteProjectSessions
             )
         } detail: {
@@ -92,10 +98,14 @@ struct ConversationBrowserView: View {
 
                     ForEach(store.terminalSessions) { session in
                         let isActive = store.selectedTerminalID == session.id
-                        TerminalWorkspaceView(session: session, isActive: isActive)
-                            .opacity(isActive ? 1 : 0)
-                            .allowsHitTesting(isActive)
-                            .accessibilityHidden(!isActive)
+                        TerminalWorkspaceView(
+                            session: session,
+                            projectDisplayName: store.projectDisplayName(forProjectPath: session.projectDirectoryKey),
+                            isActive: isActive
+                        )
+                        .opacity(isActive ? 1 : 0)
+                        .allowsHitTesting(isActive)
+                        .accessibilityHidden(!isActive)
                     }
                 }
             }
@@ -167,7 +177,10 @@ struct ConversationBrowserView: View {
                                     conversationRow(conversation)
                                 }
                             } else {
-                                ForEach(ProjectConversationGroup.grouped(displayedConversations)) { project in
+                                ForEach(ProjectConversationGroup.grouped(
+                                    displayedConversations,
+                                    displayNames: store.projectDisplayNames
+                                )) { project in
                                     projectSection(project)
                                 }
                             }
@@ -231,7 +244,7 @@ struct ConversationBrowserView: View {
         switch selection {
         case .all: return "All sessions"
         case .recent: return "Recent"
-        case .project(let path): return URL(fileURLWithPath: path).lastPathComponent
+        case .project(let path): return store.projectDisplayName(forProjectPath: path)
         }
     }
 
@@ -252,7 +265,7 @@ struct ConversationBrowserView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "folder")
                             .foregroundStyle(.secondary)
-                        Text(project.projectName)
+                        Text(project.displayName)
                             .font(.system(size: 14, weight: .semibold))
                             .lineLimit(1)
                         Text("\(project.conversations.count)")
@@ -268,6 +281,9 @@ struct ConversationBrowserView: View {
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .help(project.projectPath)
+                .contextMenu {
+                    Button("Rename project…", systemImage: "pencil") { onRenameProject(project) }
+                }
 
                 ProjectNewSessionMenu(project: project, showsTitle: false) { provider in
                     store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)

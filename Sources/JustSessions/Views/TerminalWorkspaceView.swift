@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TerminalWorkspaceView: View {
     @ObservedObject var session: TerminalSession
+    let projectDisplayName: String
     let isActive: Bool
 
     var body: some View {
@@ -9,7 +10,7 @@ struct TerminalWorkspaceView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(session.displayTitle).font(.headline).lineLimit(1)
-                    Text("\(session.projectName) · \(session.provider.rawValue) · \(actionName)")
+                    Text("\(projectDisplayName) · \(session.provider.rawValue) · \(actionName)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

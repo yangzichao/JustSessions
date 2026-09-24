@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TerminalSidebarRow: View {
     @ObservedObject var session: TerminalSession
+    let projectDisplayName: String
     let isSelected: Bool
     let onSelect: () -> Void
 
@@ -21,7 +22,7 @@ struct TerminalSidebarRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(session.displayTitle)
                         .lineLimit(1)
-                    Text("\(session.projectName) · \(actionName)")
+                    Text("\(projectDisplayName) · \(actionName)")
                         .font(.system(size: 10))
                         .foregroundStyle(.tertiary)
                         .lineLimit(1)

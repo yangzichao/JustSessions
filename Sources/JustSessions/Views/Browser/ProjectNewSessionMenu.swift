@@ -27,6 +27,6 @@ struct ProjectNewSessionMenu: View {
         .help(isProjectAvailable
             ? "Start a new session in \(project.projectPath)"
             : "The project folder no longer exists")
-        .accessibilityLabel("New session in \(project.projectName)")
+        .accessibilityLabel("New session in \(project.displayName)")
     }
 }

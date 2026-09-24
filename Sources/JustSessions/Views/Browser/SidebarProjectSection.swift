@@ -12,6 +12,7 @@ struct SidebarProjectSection: View {
     let onSelectConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onDeleteConversation: (Conversation) -> Void
+    let onRenameProject: () -> Void
     let onDeleteProjectSessions: () -> Void
 
     private var openTerminalCount: Int {
@@ -39,7 +40,7 @@ struct SidebarProjectSection: View {
                             .font(.system(size: 12))
                             .frame(width: 15)
                         VStack(alignment: .leading, spacing: 1) {
-                            Text(project.projectName)
+                            Text(project.displayName)
                                 .lineLimit(1)
                                 .truncationMode(.middle)
                             if let parentLabel {
@@ -68,7 +69,7 @@ struct SidebarProjectSection: View {
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .help(project.projectPath)
-                .accessibilityLabel("\(project.projectName), \(project.conversations.count) \(project.conversations.count == 1 ? "session" : "sessions"), \(openTerminalCount) open")
+                .accessibilityLabel("\(project.displayName), \(project.conversations.count) \(project.conversations.count == 1 ? "session" : "sessions"), \(openTerminalCount) open")
                 .contextMenu {
                     Menu("New session", systemImage: "plus") {
                         ForEach(ConversationProvider.allCases) { provider in
@@ -85,6 +86,7 @@ struct SidebarProjectSection: View {
                     Button("Copy project path", systemImage: "doc.on.doc") {
                         SessionLocationActions.copyProjectPath(project.projectPath)
                     }
+                    Button("Rename project…", systemImage: "pencil", action: onRenameProject)
                     Divider()
                     Button("Delete all deletable sessions (\(deletionPlan.deletableConversations.count))…", systemImage: "trash", role: .destructive) {
                         onDeleteProjectSessions()

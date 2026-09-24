@@ -14,6 +14,7 @@ struct ConversationSidebarView: View {
     let onSelectConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onDeleteConversation: (Conversation) -> Void
+    let onRenameProject: (ProjectConversationGroup) -> Void
     let onDeleteProjectSessions: (String) -> Void
 
     @State private var expandedProjectPaths: Set<String> = []
@@ -22,11 +23,14 @@ struct ConversationSidebarView: View {
     private var visibleProjects: [ProjectConversationGroup] {
         let query = projectSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return projects }
-        return projects.filter { $0.projectPath.localizedCaseInsensitiveContains(query) }
+        return projects.filter {
+            $0.displayName.localizedCaseInsensitiveContains(query)
+                || $0.projectPath.localizedCaseInsensitiveContains(query)
+        }
     }
 
     private var repeatedProjectNames: Set<String> {
-        Set(Dictionary(grouping: projects, by: \.projectName)
+        Set(Dictionary(grouping: projects, by: \.displayName)
             .filter { $0.value.count > 1 }
             .map(\.key))
     }
@@ -69,6 +73,7 @@ struct ConversationSidebarView: View {
                         ForEach(store.terminalSessions) { terminal in
                             TerminalSidebarRow(
                                 session: terminal,
+                                projectDisplayName: store.projectDisplayName(forProjectPath: terminal.projectDirectoryKey),
                                 isSelected: store.selectedTerminalID == terminal.id,
                                 onSelect: { store.selectTerminal(terminal.id) }
                             )
@@ -82,7 +87,7 @@ struct ConversationSidebarView: View {
                     SidebarSearchField(
                         text: $projectSearchText,
                         placeholder: "Search projects",
-                        accessibilityLabel: "Search projects by folder name or path"
+                        accessibilityLabel: "Search projects by name or path"
                     )
                     .padding(.bottom, 8)
 
@@ -98,7 +103,7 @@ struct ConversationSidebarView: View {
                         SidebarProjectSection(
                             store: store,
                             project: project,
-                            parentLabel: repeatedNames.contains(project.projectName)
+                            parentLabel: repeatedNames.contains(project.displayName)
                                 ? projectParentLabel(project.projectPath) : nil,
                             isExpanded: expandedProjectPaths.contains(project.id),
                             isSelected: selection == .project(project.id),
@@ -117,6 +122,7 @@ struct ConversationSidebarView: View {
                             onSelectConversation: onSelectConversation,
                             onRenameConversation: onRenameConversation,
                             onDeleteConversation: onDeleteConversation,
+                            onRenameProject: { onRenameProject(project) },
                             onDeleteProjectSessions: { onDeleteProjectSessions(project.id) }
                         )
                     }

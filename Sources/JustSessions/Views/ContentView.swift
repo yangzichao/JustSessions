@@ -12,6 +12,8 @@ struct ContentView: View {
     @State private var selection: ConversationBrowserSelection = .all
     @State private var providerFilter: ConversationProviderFilter = .all
     @State private var renamingConversation: Conversation?
+    @State private var renamingProject: ProjectConversationGroup?
+    @State private var editedProjectName = ""
     @State private var deletionRequest: DeletionRequest?
     @State private var editedTitle = ""
     @State private var hasStartedScan = false
@@ -27,6 +29,10 @@ struct ContentView: View {
                 renamingConversation = conversation
             },
             onDelete: { deletionRequest = .conversation($0) },
+            onRenameProject: { project in
+                editedProjectName = project.displayName
+                renamingProject = project
+            },
             onDeleteProjectSessions: { deletionRequest = .project($0) }
         )
         .onAppear {
@@ -50,6 +56,19 @@ struct ContentView: View {
             }
         } message: {
             Text("This changes the display name in JustSessions.")
+        }
+        .alert("Rename project", isPresented: Binding(
+            get: { renamingProject != nil },
+            set: { if !$0 { renamingProject = nil } }
+        )) {
+            TextField("Name", text: $editedProjectName)
+            Button("Cancel", role: .cancel) { renamingProject = nil }
+            Button("Save") {
+                if let project = renamingProject { store.renameProject(project.projectPath, to: editedProjectName) }
+                renamingProject = nil
+            }
+        } message: {
+            Text("This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (\(renamingProject?.folderName ?? "")).")
         }
         .confirmationDialog("Delete sessions?", isPresented: Binding(
             get: { deletionRequest != nil },

@@ -22,7 +22,6 @@ final class TerminalSession: ObservableObject, Identifiable {
     private var hasStarted = false
     private var isClosed = false
 
-    var projectName: String { URL(fileURLWithPath: projectPath).lastPathComponent }
     var processID: Int32 { terminalView.process.shellPid }
     var projectDirectoryKey: String {
         URL(fileURLWithPath: projectPath).standardizedFileURL.resolvingSymlinksInPath().path

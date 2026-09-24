@@ -50,7 +50,7 @@ struct NewSessionSheet: View {
                 if !recentProjects.isEmpty {
                     Menu("Recent projects") {
                         ForEach(Array(recentProjects.prefix(12))) { project in
-                            Button("\(project.projectName) — \(project.projectPath)") {
+                            Button("\(project.displayName) — \(project.projectPath)") {
                                 projectPath = project.projectPath
                             }
                         }

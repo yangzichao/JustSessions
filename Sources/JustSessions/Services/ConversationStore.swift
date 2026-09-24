@@ -7,6 +7,7 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     @Published private(set) var aliases: [String: String]
+    @Published private(set) var projectDisplayNames: ProjectDisplayNames
     @Published private(set) var terminalSessions: [TerminalSession] = []
     @Published private(set) var selectedTerminalID: UUID?
     @Published private(set) var deletingConversationID: String?
@@ -19,6 +20,7 @@ final class ConversationStore: ObservableObject {
     init(adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter(), AntigravityAdapter()]) {
         self.adapters = adapters
         self.aliases = UserDefaults.standard.dictionary(forKey: aliasesKey) as? [String: String] ?? [:]
+        self.projectDisplayNames = ProjectDisplayNames.load(from: .standard)
         startClaudeLiveNameSync()
     }
 
@@ -65,6 +67,15 @@ final class ConversationStore: ObservableObject {
         UserDefaults.standard.set(aliases, forKey: aliasesKey)
         synchronizeTerminalTitles()
         if conversation.provider == .codex { associateOpenCodexSessions() }
+    }
+
+    func projectDisplayName(forProjectPath projectPath: String) -> String {
+        projectDisplayNames.displayName(forProjectPath: projectPath)
+    }
+
+    func renameProject(_ projectPath: String, to proposedName: String) {
+        projectDisplayNames.rename(projectPath: projectPath, to: proposedName)
+        projectDisplayNames.save(to: .standard)
     }
 
     func hasTerminal(for conversation: Conversation) -> Bool {
