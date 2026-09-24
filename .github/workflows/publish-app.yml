@@ -27,6 +27,10 @@ jobs:
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
         run: |
           set -euo pipefail
+          if [[ -z "$APPLE_CERTIFICATE_P12_BASE64" || -z "$APPLE_CERTIFICATE_PASSWORD" ]]; then
+            echo "Developer ID certificate secrets are missing." >&2
+            exit 1
+          fi
           keychain_path="$RUNNER_TEMP/justsessions-signing.keychain-db"
           keychain_password="$(openssl rand -hex 32)"
           certificate_path="$RUNNER_TEMP/developer-id.p12"
@@ -88,7 +92,7 @@ jobs:
           ditto dist/JustSessions.app dist/coca-codex.app
           codesign --verify --deep --strict dist/coca-codex.app
           ditto -c -k --sequesterRsrc --keepParent dist/coca-codex.app dist/coca-codex.zip
-          if gh release download latest --repo yangzichao/JustSessions --pattern appcast.xml \
+          if gh release download --repo yangzichao/JustSessions --pattern appcast.xml \
             --dir dist/sparkle-updates; then
             echo "Continuing the existing Sparkle update feed."
           else
@@ -112,6 +116,7 @@ jobs:
         run: |
           set -euo pipefail
           tag="build-$GITHUB_SHA"
+          update_archive="dist/sparkle-updates/JustSessions-$((GITHUB_RUN_NUMBER + 19)).zip"
           if gh release view "$tag" --repo yangzichao/JustSessions >/dev/null 2>&1; then
             echo "Build already published: $tag"
           else
