@@ -78,10 +78,23 @@ struct ConversationBrowserView: View {
                 }
             )
         } detail: {
-            if let session = store.selectedTerminal {
-                TerminalWorkspaceView(store: store, session: session)
-            } else {
-                conversationList
+            VStack(spacing: 0) {
+                WorkspaceTabBar(store: store)
+                Divider()
+                ZStack {
+                    conversationList
+                        .opacity(store.selectedTerminalID == nil ? 1 : 0)
+                        .allowsHitTesting(store.selectedTerminalID == nil)
+                        .accessibilityHidden(store.selectedTerminalID != nil)
+
+                    ForEach(store.terminalSessions) { session in
+                        let isActive = store.selectedTerminalID == session.id
+                        TerminalWorkspaceView(session: session, isActive: isActive)
+                            .opacity(isActive ? 1 : 0)
+                            .allowsHitTesting(isActive)
+                            .accessibilityHidden(!isActive)
+                    }
+                }
             }
         }
         .onChange(of: searchText) { _, newValue in
@@ -206,16 +219,6 @@ struct ConversationBrowserView: View {
                         store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
                     }
                     .buttonStyle(.borderedProminent)
-                }
-                if !store.terminalSessions.isEmpty {
-                    Menu {
-                        ForEach(store.terminalSessions) { session in
-                            Button(session.displayTitle) { store.selectTerminal(session.id) }
-                        }
-                    } label: {
-                        Label("Open \(store.terminalSessions.count)", systemImage: "terminal")
-                    }
-                    .help("Open an active terminal")
                 }
                 Picker("Tool", selection: $providerFilter) {
                     ForEach(ConversationProviderFilter.allCases) { filter in
