@@ -76,7 +76,7 @@ struct NativeCLICommandResolver {
             throw NativeCLICommandError.missingExecutable(executableName)
         }
 
-        var environment = inheritedEnvironment
+        var environment = TerminalColorEnvironment.removingColorDisablingVariables(from: inheritedEnvironment)
         environment["PATH"] = searchDirectories.reduce(into: [String]()) { directories, directory in
             if !directories.contains(directory) { directories.append(directory) }
         }.joined(separator: ":")
