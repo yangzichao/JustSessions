@@ -24,11 +24,15 @@ A native macOS launcher for Claude Code, Codex, and Google Antigravity CLI. Star
 
 Branch forks the **conversation**. It does not create a Git branch or worktree.
 
+## Install
+
+Download `JustSessions.dmg` from the [latest release](https://github.com/yangzichao/JustSessions/releases/latest), open it, and drag **JustSessions** into **Applications**. Launch it from Applications so Sparkle can replace the app in place when an update arrives.
+
 ## Build and run
 
 Requires macOS 14+, Xcode Command Line Tools, and whichever CLI you want to use (`claude`, `codex`, and/or `agy`).
 
-GitHub Actions builds, Developer ID signs, notarizes, and publishes an app archive from every push to `main`. Releases include a Sparkle-signed archive and `appcast.xml`, plus `JustSessions.zip` and `coca-codex.zip` compatibility archives for older installations that still use the original updater. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_KEY_ID`, `APPLE_NOTARY_ISSUER_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
+GitHub Actions builds, Developer ID signs, notarizes, and publishes the app from every push to `main`. Releases include the notarized `JustSessions.dmg` installer, a Sparkle-signed archive and `appcast.xml`, plus `JustSessions.zip` and `coca-codex.zip` compatibility archives for older installations that still use the original updater. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_KEY_ID`, `APPLE_NOTARY_ISSUER_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
 
 ```sh
 swift test

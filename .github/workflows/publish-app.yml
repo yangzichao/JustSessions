@@ -80,6 +80,24 @@ jobs:
           xcrun stapler staple dist/JustSessions.app
           xcrun stapler validate dist/JustSessions.app
 
+      - name: Build, notarize, and staple installer DMG
+        env:
+          APPLE_NOTARY_KEY_ID: ${{ secrets.APPLE_NOTARY_KEY_ID }}
+          APPLE_NOTARY_ISSUER_ID: ${{ secrets.APPLE_NOTARY_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          notary_key_path="$RUNNER_TEMP/AuthKey_${APPLE_NOTARY_KEY_ID}.p8"
+          ./Scripts/build-dmg.sh dist/JustSessions.app dist/JustSessions.dmg
+          codesign --verify --strict dist/JustSessions.dmg
+          xcrun notarytool submit dist/JustSessions.dmg \
+            --key "$notary_key_path" \
+            --key-id "$APPLE_NOTARY_KEY_ID" \
+            --issuer "$APPLE_NOTARY_ISSUER_ID" \
+            --wait
+          xcrun stapler staple dist/JustSessions.dmg
+          xcrun stapler validate dist/JustSessions.dmg
+          spctl --assess --type open --context context:primary-signature --verbose=2 dist/JustSessions.dmg
+
       - name: Package app and generate Sparkle appcast
         env:
           SPARKLE_EDDSA_PRIVATE_KEY: ${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}
@@ -121,6 +139,7 @@ jobs:
             echo "Build already published: $tag"
           else
             gh release create "$tag" \
+              dist/JustSessions.dmg \
               dist/JustSessions.zip \
               dist/coca-codex.zip \
               "$update_archive" \
@@ -128,6 +147,6 @@ jobs:
               --repo yangzichao/JustSessions \
               --target "$GITHUB_SHA" \
               --title "JustSessions ${GITHUB_SHA:0:7}" \
-              --notes "Signed, notarized JustSessions build. The appcast.xml asset powers Sparkle updates; coca-codex.zip supports updates from earlier installs." \
+              --notes "Signed, notarized JustSessions build. To install, open JustSessions.dmg and drag JustSessions into Applications. The appcast.xml asset powers Sparkle updates; JustSessions.zip and coca-codex.zip support updates from earlier installs." \
               --latest
           fi
