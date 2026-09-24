@@ -10,8 +10,6 @@ struct ConversationBrowserView: View {
 
     @State private var selectedConversationID: String?
     @State private var isNewSessionSheetPresented = false
-    @AppStorage("conversationSidebarWidth") private var savedSidebarWidth = 248.0
-    @State private var draggingSidebarWidth: CGFloat?
 
     private var matchingConversations: [Conversation] {
         store.conversations.filter { conversation in
@@ -41,67 +39,44 @@ struct ConversationBrowserView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            let maximumSidebarWidth = max(200, min(480, geometry.size.width - 608))
-            let sidebarWidth = min(
-                max(draggingSidebarWidth ?? CGFloat(savedSidebarWidth), 200),
-                maximumSidebarWidth
-            )
-
-            HStack(spacing: 0) {
-                ConversationSidebarView(
-                    store: store,
-                    searchText: $searchText,
-                    selection: selection,
-                    selectedConversationID: selectedConversationID,
-                    projects: projectGroups,
-                    conversationCount: matchingConversations.count,
-                    recentCount: matchingConversations.filter {
-                        $0.updatedAt >= Date().addingTimeInterval(-7 * 24 * 60 * 60)
-                    }.count,
-                    onNewSession: { isNewSessionSheetPresented = true },
-                    onSelect: { destination in
-                        selection = destination
-                        selectedConversationID = nil
+        ResizableSidebarLayout {
+            ConversationSidebarView(
+                store: store,
+                searchText: $searchText,
+                selection: selection,
+                selectedConversationID: selectedConversationID,
+                projects: projectGroups,
+                conversationCount: matchingConversations.count,
+                recentCount: matchingConversations.filter {
+                    $0.updatedAt >= Date().addingTimeInterval(-7 * 24 * 60 * 60)
+                }.count,
+                onNewSession: { isNewSessionSheetPresented = true },
+                onSelect: { destination in
+                    selection = destination
+                    selectedConversationID = nil
+                    store.selectTerminal(nil)
+                },
+                onSelectConversation: { conversation in
+                    selection = .project(conversation.projectDirectoryKey)
+                    selectedConversationID = conversation.id
+                    if let openTerminal = store.terminalSessions.first(where: {
+                        $0.conversation?.id == conversation.id && $0.action == .resume && !$0.hasExited
+                    }) ?? store.terminalSessions.first(where: {
+                        $0.conversation?.id == conversation.id && $0.action == .resume
+                    }) {
+                        store.selectTerminal(openTerminal.id)
+                    } else {
                         store.selectTerminal(nil)
-                    },
-                    onSelectConversation: { conversation in
-                        selection = .project(conversation.projectDirectoryKey)
-                        selectedConversationID = conversation.id
-                        if let openTerminal = store.terminalSessions.first(where: {
-                            $0.conversation?.id == conversation.id && $0.action == .resume && !$0.hasExited
-                        }) ?? store.terminalSessions.first(where: {
-                            $0.conversation?.id == conversation.id && $0.action == .resume
-                        }) {
-                            store.selectTerminal(openTerminal.id)
-                        } else {
-                            store.selectTerminal(nil)
-                        }
                     }
-                )
-                .frame(width: sidebarWidth)
-
-                SidebarResizeHandle(
-                    width: sidebarWidth,
-                    maximumWidth: maximumSidebarWidth,
-                    onChange: { draggingSidebarWidth = $0 },
-                    onCommit: { newWidth in
-                        savedSidebarWidth = Double(newWidth)
-                        draggingSidebarWidth = nil
-                    }
-                )
-
-                if let session = store.selectedTerminal {
-                    TerminalWorkspaceView(store: store, session: session)
-                        .frame(minWidth: 600, maxWidth: .infinity)
-                } else {
-                    conversationList
-                        .frame(minWidth: 600, maxWidth: .infinity)
                 }
+            )
+        } detail: {
+            if let session = store.selectedTerminal {
+                TerminalWorkspaceView(store: store, session: session)
+            } else {
+                conversationList
             }
-            .frame(width: geometry.size.width, height: geometry.size.height)
         }
-        .frame(minWidth: 940, minHeight: 550)
         .onChange(of: searchText) { _, newValue in
             if !newValue.isEmpty {
                 selection = .all

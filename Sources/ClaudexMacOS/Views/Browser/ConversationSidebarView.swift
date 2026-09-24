@@ -21,6 +21,8 @@ struct ConversationSidebarView: View {
     }
 
     var body: some View {
+        let repeatedNames = repeatedProjectNames
+
         VStack(alignment: .leading, spacing: 0) {
             brand
             searchField
@@ -66,7 +68,7 @@ struct ConversationSidebarView: View {
                         SidebarProjectSection(
                             store: store,
                             project: project,
-                            parentLabel: repeatedProjectNames.contains(project.projectName)
+                            parentLabel: repeatedNames.contains(project.projectName)
                                 ? projectParentLabel(project.projectPath) : nil,
                             isExpanded: expandedProjectPaths.contains(project.id),
                             isSelected: selection == .project(project.id),

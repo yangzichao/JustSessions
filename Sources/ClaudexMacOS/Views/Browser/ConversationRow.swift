@@ -14,6 +14,8 @@ struct ConversationRow: View {
     @State private var isHovered = false
 
     var body: some View {
+        let projectAvailable = conversation.isProjectAvailable
+
         VStack(spacing: 0) {
             HStack(spacing: 12) {
                 Image(systemName: conversation.provider.symbolName)
@@ -28,7 +30,7 @@ struct ConversationRow: View {
                         .lineLimit(1)
                     HStack(spacing: 6) {
                         Text(conversation.provider.rawValue)
-                        if !conversation.isProjectAvailable {
+                        if !projectAvailable {
                             Text("·")
                             Text("Folder missing").foregroundStyle(.red)
                         }
@@ -47,11 +49,11 @@ struct ConversationRow: View {
                 Button("Resume", action: onResume)
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .disabled(!conversation.isProjectAvailable)
+                    .disabled(!projectAvailable)
                 Button("Branch", action: onBranch)
                     .buttonStyle(.borderless)
                     .controlSize(.small)
-                    .disabled(!conversation.isProjectAvailable)
+                    .disabled(!projectAvailable)
                     .help("Fork in the native CLI")
 
                 if isDeleting {
@@ -85,8 +87,8 @@ struct ConversationRow: View {
             Divider().padding(.leading, 52)
         }
         .contextMenu {
-            Button("Resume", action: onResume).disabled(!conversation.isProjectAvailable)
-            Button("Branch", action: onBranch).disabled(!conversation.isProjectAvailable)
+            Button("Resume", action: onResume).disabled(!projectAvailable)
+            Button("Branch", action: onBranch).disabled(!projectAvailable)
             Button("Rename", action: onRename)
             Divider()
             Button("Delete session", role: .destructive, action: onDelete).disabled(!canDelete)

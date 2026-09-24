@@ -5,11 +5,9 @@ struct ProjectNewSessionMenu: View {
     let showsTitle: Bool
     let onStart: (ConversationProvider) -> Void
 
-    private var isProjectAvailable: Bool {
-        project.conversations.first?.isProjectAvailable == true
-    }
-
     var body: some View {
+        let isProjectAvailable = project.conversations.first?.isProjectAvailable == true
+
         Menu {
             Button("Claude Code", systemImage: ConversationProvider.claude.symbolName) {
                 onStart(.claude)
