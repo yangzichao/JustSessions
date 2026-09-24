@@ -4,9 +4,11 @@ struct ConversationRow: View {
     let conversation: Conversation
     let title: String
     let isSelected: Bool
+    let isPinned: Bool
     let onResume: () -> Void
     let onBranch: () -> Void
     let onRename: () -> Void
+    let onTogglePin: () -> Void
     let onDelete: () -> Void
     let canDelete: Bool
     let isDeleting: Bool
@@ -25,9 +27,12 @@ struct ConversationRow: View {
                     .background(providerColor.opacity(0.10), in: RoundedRectangle(cornerRadius: 7))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(.system(size: 13, weight: .medium))
-                        .lineLimit(1)
+                    HStack(spacing: 5) {
+                        Text(title)
+                            .font(.system(size: 13, weight: .medium))
+                            .lineLimit(1)
+                        if isPinned { PinnedIndicator(size: 9) }
+                    }
                     HStack(spacing: 6) {
                         Text(conversation.provider.rawValue)
                         if !projectAvailable {
@@ -46,30 +51,11 @@ struct ConversationRow: View {
                     .foregroundStyle(.secondary)
                     .frame(minWidth: 60, alignment: .trailing)
 
-                Button("Resume", action: onResume)
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .disabled(!projectAvailable)
-                if conversation.provider.supportsBranchFromLauncher {
-                    Button("Branch", action: onBranch)
-                        .buttonStyle(.borderless)
-                        .controlSize(.small)
-                        .disabled(!projectAvailable)
-                        .help("Fork in the native CLI")
-                }
-
                 if isDeleting {
                     ProgressView().controlSize(.mini).frame(width: 24)
                 } else {
                     Menu {
-                        Button(action: onRename) { Label("Rename", systemImage: "pencil") }
-                        if conversation.provider.supportsDeletionFromLauncher {
-                            Divider()
-                            Button(role: .destructive, action: onDelete) {
-                                Label("Delete session", systemImage: "trash")
-                            }
-                            .disabled(!canDelete)
-                        }
+                        actionsMenuContent(projectAvailable: projectAvailable)
                     } label: {
                         Image(systemName: "ellipsis")
                             .frame(width: 24, height: 24)
@@ -82,6 +68,11 @@ struct ConversationRow: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 11)
+            .contentShape(Rectangle())
+            .onTapGesture(count: 2) {
+                if projectAvailable { onResume() }
+            }
+            .help(projectAvailable ? "Double-click to resume" : "Project folder is missing")
             .background(
                 isSelected ? Color.accentColor.opacity(0.12) : isHovered ? Color.primary.opacity(0.045) : .clear,
                 in: RoundedRectangle(cornerRadius: 8)
@@ -91,15 +82,28 @@ struct ConversationRow: View {
             Divider().padding(.leading, 52)
         }
         .contextMenu {
-            Button("Resume", action: onResume).disabled(!projectAvailable)
-            if conversation.provider.supportsBranchFromLauncher {
-                Button("Branch", action: onBranch).disabled(!projectAvailable)
-            }
-            Button("Rename", action: onRename)
-            if conversation.provider.supportsDeletionFromLauncher {
-                Divider()
-                Button("Delete session", role: .destructive, action: onDelete).disabled(!canDelete)
-            }
+            actionsMenuContent(projectAvailable: projectAvailable)
+        }
+    }
+
+    /// Shared by the row's right-click menu and its ⋯ menu.
+    @ViewBuilder
+    private func actionsMenuContent(projectAvailable: Bool) -> some View {
+        Button(action: onResume) { Label("Resume", systemImage: "play") }
+            .disabled(!projectAvailable)
+        if conversation.provider.supportsBranchFromLauncher {
+            Button(action: onBranch) { Label("Branch", systemImage: "arrow.triangle.branch") }
+                .disabled(!projectAvailable)
+        }
+        Divider()
+        Button(action: onRename) { Label("Rename", systemImage: "pencil") }
+        Button(action: onTogglePin) {
+            Label(isPinned ? "Unpin session" : "Pin session", systemImage: isPinned ? "pin.slash" : "pin")
+        }
+        if conversation.provider.supportsDeletionFromLauncher {
+            Divider()
+            Button(role: .destructive, action: onDelete) { Label("Delete session", systemImage: "trash") }
+                .disabled(!canDelete)
         }
     }
 

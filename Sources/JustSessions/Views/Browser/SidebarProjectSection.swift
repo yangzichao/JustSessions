@@ -6,12 +6,15 @@ struct SidebarProjectSection: View {
     let parentLabel: String?
     let isExpanded: Bool
     let isSelected: Bool
-    let selectedConversationID: String?
+    let sessionSelection: SessionMultiSelection
+    let selectedConversations: [Conversation]
     let onToggle: () -> Void
     let onNewSession: (ConversationProvider) -> Void
-    let onSelectConversation: (Conversation) -> Void
+    let onClickConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onDeleteConversation: (Conversation) -> Void
+    let onDeleteSelectedConversations: () -> Void
+    let onClearSessionSelection: () -> Void
     let onRenameProject: () -> Void
     let onDeleteProjectSessions: () -> Void
 
@@ -19,7 +22,7 @@ struct SidebarProjectSection: View {
         store.terminalSessions.filter { $0.projectDirectoryKey == project.id }.count
     }
 
-    private var deletionPlan: ProjectSessionDeletionPlan {
+    private var deletionPlan: SessionDeletionPlan {
         store.deletionPlan(for: project.id)
     }
 
@@ -51,6 +54,7 @@ struct SidebarProjectSection: View {
                             }
                         }
                         Spacer(minLength: 3)
+                        if project.isPinned { PinnedIndicator() }
                         if openTerminalCount > 0 {
                             Image(systemName: "circle.fill")
                                 .font(.system(size: 6))
@@ -69,7 +73,7 @@ struct SidebarProjectSection: View {
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .help(project.projectPath)
-                .accessibilityLabel("\(project.displayName), \(project.conversations.count) \(project.conversations.count == 1 ? "session" : "sessions"), \(openTerminalCount) open")
+                .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(project.conversations.count) \(project.conversations.count == 1 ? "session" : "sessions"), \(openTerminalCount) open")
                 .contextMenu {
                     Menu("New session", systemImage: "plus") {
                         ForEach(ConversationProvider.allCases) { provider in
@@ -87,12 +91,14 @@ struct SidebarProjectSection: View {
                         SessionLocationActions.copyProjectPath(project.projectPath)
                     }
                     Button("Rename project…", systemImage: "pencil", action: onRenameProject)
+                    Button(project.isPinned ? "Unpin project" : "Pin project", systemImage: project.isPinned ? "pin.slash" : "pin") {
+                        store.setPinned(!project.isPinned, projectPath: project.projectPath)
+                    }
                     Divider()
                     Button("Delete all deletable sessions (\(deletionPlan.deletableConversations.count))…", systemImage: "trash", role: .destructive) {
                         onDeleteProjectSessions()
                     }
-                    .disabled(!deletionPlan.hasDeletableConversations || store.isLoading
-                        || store.deletingConversationID != nil || store.deletingProjectPath != nil)
+                    .disabled(!deletionPlan.hasDeletableConversations || store.isLoading || store.isDeletingSessions)
                 }
 
                 ProjectNewSessionMenu(project: project, showsTitle: false, onStart: onNewSession)
@@ -115,11 +121,13 @@ struct SidebarProjectSection: View {
         } ?? store.terminalSessions.first {
             $0.conversation?.id == conversation.id
         }
-        let isHighlighted = selectedConversationID == conversation.id
+        let isHighlighted = sessionSelection.contains(conversation.id)
             || (openTerminal != nil && openTerminal?.id == store.selectedTerminalID)
+        let isInMultipleSelection = sessionSelection.hasMultipleSelected && sessionSelection.contains(conversation.id)
+        let isPinned = store.pinnedItems.isPinned(conversationID: conversation.id)
 
         return Button {
-            onSelectConversation(conversation)
+            onClickConversation(conversation)
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: conversation.provider.symbolName)
@@ -130,6 +138,7 @@ struct SidebarProjectSection: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                 Spacer(minLength: 3)
+                if isPinned { PinnedIndicator() }
                 if let openTerminal {
                     TerminalStatusIndicator(session: openTerminal)
                 }
@@ -144,34 +153,51 @@ struct SidebarProjectSection: View {
         }
         .buttonStyle(.plain)
         .help("\(store.title(for: conversation)) · \(conversation.provider.rawValue)")
-        .accessibilityLabel("\(store.title(for: conversation)), \(conversation.provider.rawValue)\(openTerminal == nil ? "" : ", open terminal")")
+        .accessibilityLabel("\(store.title(for: conversation)), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(openTerminal == nil ? "" : ", open terminal")")
         .contextMenu {
-            Button("Resume", systemImage: "play", action: {
-                store.launch(conversation, action: .resume)
+            if isInMultipleSelection {
+                SelectedSessionsContextMenu(
+                    store: store,
+                    selectedConversations: selectedConversations,
+                    onDelete: onDeleteSelectedConversations,
+                    onClear: onClearSessionSelection
+                )
+            } else {
+                singleSessionMenu(conversation)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func singleSessionMenu(_ conversation: Conversation) -> some View {
+        Button("Resume", systemImage: "play", action: {
+            store.launch(conversation, action: .resume)
+        })
+        .disabled(!store.canLaunch(conversation, action: .resume))
+        if conversation.provider.supportsBranchFromLauncher {
+            Button("Branch", systemImage: "arrow.triangle.branch", action: {
+                store.launch(conversation, action: .branch)
             })
-            .disabled(!conversation.isProjectAvailable || store.deletingProjectPath != nil)
-            if conversation.provider.supportsBranchFromLauncher {
-                Button("Branch", systemImage: "arrow.triangle.branch", action: {
-                    store.launch(conversation, action: .branch)
-                })
-                .disabled(!conversation.isProjectAvailable || store.deletingProjectPath != nil)
-            }
+            .disabled(!store.canLaunch(conversation, action: .branch))
+        }
+        Divider()
+        Button("Rename", systemImage: "pencil") { onRenameConversation(conversation) }
+        let isPinned = store.pinnedItems.isPinned(conversationID: conversation.id)
+        Button(isPinned ? "Unpin session" : "Pin session", systemImage: isPinned ? "pin.slash" : "pin") {
+            store.setPinned(!isPinned, conversation: conversation)
+        }
+        Button("Copy session ID", systemImage: "doc.on.doc") {
+            SessionLocationActions.copySessionID(conversation)
+        }
+        Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
+            SessionLocationActions.revealSessionFile(conversation)
+        }
+        if conversation.provider.supportsDeletionFromLauncher {
             Divider()
-            Button("Rename", systemImage: "pencil") { onRenameConversation(conversation) }
-            Button("Copy session ID", systemImage: "doc.on.doc") {
-                SessionLocationActions.copySessionID(conversation)
+            Button("Delete session…", systemImage: "trash", role: .destructive) {
+                onDeleteConversation(conversation)
             }
-            Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
-                SessionLocationActions.revealSessionFile(conversation)
-            }
-            if conversation.provider.supportsDeletionFromLauncher {
-                Divider()
-                Button("Delete session…", systemImage: "trash", role: .destructive) {
-                    onDeleteConversation(conversation)
-                }
-                .disabled(store.hasTerminal(for: conversation) || store.isLoading
-                    || store.deletingConversationID != nil || store.deletingProjectPath != nil)
-            }
+            .disabled(store.hasTerminal(for: conversation) || store.isLoading || store.isDeletingSessions)
         }
     }
 

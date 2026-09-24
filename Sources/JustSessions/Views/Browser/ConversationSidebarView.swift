@@ -4,7 +4,7 @@ struct ConversationSidebarView: View {
     @ObservedObject var store: ConversationStore
     @Binding var searchText: String
     let selection: ConversationBrowserSelection
-    let selectedConversationID: String?
+    @Binding var sessionSelection: SessionMultiSelection
     let projects: [ProjectConversationGroup]
     let conversationCount: Int
     let recentCount: Int
@@ -14,6 +14,7 @@ struct ConversationSidebarView: View {
     let onSelectConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onDeleteConversation: (Conversation) -> Void
+    let onDeleteConversations: ([Conversation]) -> Void
     let onRenameProject: (ProjectConversationGroup) -> Void
     let onDeleteProjectSessions: (String) -> Void
 
@@ -35,8 +36,20 @@ struct ConversationSidebarView: View {
             .map(\.key))
     }
 
+    /// Session rows in the order they appear in the sidebar, used for Shift-click ranges.
+    private var visibleConversationIDs: [String] {
+        visibleProjects
+            .filter { expandedProjectPaths.contains($0.id) }
+            .flatMap { $0.conversations.map(\.id) }
+    }
+
+    private var selectedConversations: [Conversation] {
+        projects.flatMap(\.conversations).filter { sessionSelection.contains($0.id) }
+    }
+
     var body: some View {
         let repeatedNames = repeatedProjectNames
+        let selectedConversations = selectedConversations
 
         VStack(alignment: .leading, spacing: 0) {
             brand
@@ -107,7 +120,8 @@ struct ConversationSidebarView: View {
                                 ? projectParentLabel(project.projectPath) : nil,
                             isExpanded: expandedProjectPaths.contains(project.id),
                             isSelected: selection == .project(project.id),
-                            selectedConversationID: selectedConversationID,
+                            sessionSelection: sessionSelection,
+                            selectedConversations: selectedConversations,
                             onToggle: {
                                 if expandedProjectPaths.contains(project.id) {
                                     expandedProjectPaths.remove(project.id)
@@ -119,9 +133,11 @@ struct ConversationSidebarView: View {
                             onNewSession: { provider in
                                 store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
                             },
-                            onSelectConversation: onSelectConversation,
+                            onClickConversation: handleConversationClick,
                             onRenameConversation: onRenameConversation,
                             onDeleteConversation: onDeleteConversation,
+                            onDeleteSelectedConversations: { onDeleteConversations(selectedConversations) },
+                            onClearSessionSelection: { sessionSelection.clear() },
                             onRenameProject: { onRenameProject(project) },
                             onDeleteProjectSessions: { onDeleteProjectSessions(project.id) }
                         )
@@ -129,6 +145,16 @@ struct ConversationSidebarView: View {
                     .padding(.horizontal, 8)
                 }
                 .padding(.bottom, 14)
+            }
+
+            if sessionSelection.hasMultipleSelected {
+                Divider()
+                SidebarSelectionActionBar(
+                    selectedCount: sessionSelection.selectedConversationIDs.count,
+                    isDeleteDisabled: store.isLoading || store.isDeletingSessions,
+                    onClear: { sessionSelection.clear() },
+                    onDelete: { onDeleteConversations(selectedConversations) }
+                )
             }
 
             Divider()
@@ -153,6 +179,21 @@ struct ConversationSidebarView: View {
         }
         .onChange(of: selection) { _, newSelection in
             if case .project(let path) = newSelection { expandedProjectPaths.insert(path) }
+        }
+        .onChange(of: visibleConversationIDs) { _, newVisibleConversationIDs in
+            // Collapsed, filtered, or deleted rows leave the selection so a batch delete only touches visible rows.
+            sessionSelection.keepOnly(Set(newVisibleConversationIDs))
+        }
+    }
+
+    private func handleConversationClick(_ conversation: Conversation) {
+        let modifiers = NSEvent.modifierFlags
+        if modifiers.contains(.shift) {
+            sessionSelection.selectRange(to: conversation.id, in: visibleConversationIDs)
+        } else if modifiers.contains(.command) {
+            sessionSelection.toggle(conversation.id)
+        } else {
+            onSelectConversation(conversation)
         }
     }
 

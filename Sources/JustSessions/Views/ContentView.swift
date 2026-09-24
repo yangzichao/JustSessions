@@ -4,6 +4,7 @@ import SwiftUI
 struct ContentView: View {
     private enum DeletionRequest {
         case conversation(Conversation)
+        case conversations([Conversation])
         case project(String)
     }
 
@@ -29,6 +30,7 @@ struct ContentView: View {
                 renamingConversation = conversation
             },
             onDelete: { deletionRequest = .conversation($0) },
+            onDeleteConversations: { deletionRequest = .conversations($0) },
             onRenameProject: { project in
                 editedProjectName = project.displayName
                 renamingProject = project
@@ -80,6 +82,14 @@ struct ContentView: View {
                     store.delete(conversation)
                     deletionRequest = nil
                 }
+            case .conversations(let conversations):
+                let deletionPlan = store.deletionPlan(for: conversations)
+                let deletableCount = deletionPlan.deletableConversations.count
+                Button("Delete \(deletableCount) \(deletableCount == 1 ? "session" : "sessions")", role: .destructive) {
+                    store.deleteConversations(conversations)
+                    deletionRequest = nil
+                }
+                .disabled(!deletionPlan.hasDeletableConversations)
             case .project(let projectPath):
                 let deletionPlan = store.deletionPlan(for: projectPath)
                 Button("Delete \(deletionPlan.deletableConversations.count) sessions", role: .destructive) {
@@ -97,6 +107,12 @@ struct ContentView: View {
                 Text(conversation.provider == .codex
                     ? "Codex will permanently delete this session using its native CLI. This cannot be undone."
                     : "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.")
+            case .conversations(let conversations):
+                let deletionPlan = store.deletionPlan(for: conversations)
+                let skippedSummary = deletionPlan.openTerminalCount + deletionPlan.unsupportedCount == 0
+                    ? ""
+                    : " \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped."
+                Text("Claude Code sessions move to the Trash; Codex sessions are permanently deleted.\(skippedSummary)")
             case .project(let projectPath):
                 let deletionPlan = store.deletionPlan(for: projectPath)
                 Text("This affects all tools in \(projectPath), including sessions hidden by the current filter. Claude Code sessions move to the Trash; Codex sessions are permanently deleted. \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped.")

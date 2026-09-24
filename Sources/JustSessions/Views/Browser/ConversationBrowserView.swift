@@ -7,10 +7,11 @@ struct ConversationBrowserView: View {
     @Binding var providerFilter: ConversationProviderFilter
     let onRename: (Conversation) -> Void
     let onDelete: (Conversation) -> Void
+    let onDeleteConversations: ([Conversation]) -> Void
     let onRenameProject: (ProjectConversationGroup) -> Void
     let onDeleteProjectSessions: (String) -> Void
 
-    @State private var selectedConversationID: String?
+    @State private var sessionSelection = SessionMultiSelection()
     @State private var isNewSessionSheetPresented = false
     @StateObject private var updateManager = SparkleUpdateManager()
 
@@ -30,12 +31,17 @@ struct ConversationBrowserView: View {
     private var projectGroups: [ProjectConversationGroup] {
         ProjectConversationGroup.grouped(
             store.conversations.filter { providerFilter.includes($0.provider) },
-            displayNames: store.projectDisplayNames
+            displayNames: store.projectDisplayNames,
+            pinnedItems: store.pinnedItems
         )
     }
 
     private var availableProjects: [ProjectConversationGroup] {
-        ProjectConversationGroup.grouped(store.conversations, displayNames: store.projectDisplayNames)
+        ProjectConversationGroup.grouped(
+            store.conversations,
+            displayNames: store.projectDisplayNames,
+            pinnedItems: store.pinnedItems
+        )
             .filter { $0.conversations.first?.isProjectAvailable == true }
     }
 
@@ -43,7 +49,8 @@ struct ConversationBrowserView: View {
         switch selection {
         case .all: matchingConversations
         case .recent: matchingConversations.filter { $0.updatedAt >= Date().addingTimeInterval(-7 * 24 * 60 * 60) }
-        case .project(let path): matchingConversations.filter { $0.projectDirectoryKey == path }
+        case .project(let path):
+            store.pinnedItems.pinnedConversationsFirst(matchingConversations.filter { $0.projectDirectoryKey == path })
         }
     }
 
@@ -53,7 +60,7 @@ struct ConversationBrowserView: View {
                 store: store,
                 searchText: $searchText,
                 selection: selection,
-                selectedConversationID: selectedConversationID,
+                sessionSelection: $sessionSelection,
                 projects: projectGroups,
                 conversationCount: matchingConversations.count,
                 recentCount: matchingConversations.filter {
@@ -64,13 +71,13 @@ struct ConversationBrowserView: View {
                 onSelect: { destination in
                     if case .project = destination { searchText = "" }
                     selection = destination
-                    selectedConversationID = nil
+                    sessionSelection.clear()
                     store.selectTerminal(nil)
                 },
                 onSelectConversation: { conversation in
                     searchText = ""
                     selection = .project(conversation.projectDirectoryKey)
-                    selectedConversationID = conversation.id
+                    sessionSelection.selectOnly(conversation.id)
                     if let openTerminal = store.terminalSessions.first(where: {
                         $0.conversation?.id == conversation.id && !$0.hasExited
                     }) ?? store.terminalSessions.first(where: {
@@ -83,6 +90,7 @@ struct ConversationBrowserView: View {
                 },
                 onRenameConversation: onRename,
                 onDeleteConversation: onDelete,
+                onDeleteConversations: onDeleteConversations,
                 onRenameProject: onRenameProject,
                 onDeleteProjectSessions: onDeleteProjectSessions
             )
@@ -113,19 +121,16 @@ struct ConversationBrowserView: View {
         .onChange(of: searchText) { _, newValue in
             if !newValue.isEmpty {
                 selection = .all
-                selectedConversationID = nil
+                sessionSelection.clear()
                 store.selectTerminal(nil)
             }
         }
         .onChange(of: providerFilter) { _, _ in
-            if let selectedConversationID,
-               !matchingConversations.contains(where: { $0.id == selectedConversationID }) {
-                self.selectedConversationID = nil
-            }
+            sessionSelection.keepOnly(Set(matchingConversations.map(\.id)))
             if case .project(let path) = selection,
                !projectGroups.contains(where: { $0.id == path }) {
                 selection = .all
-                selectedConversationID = nil
+                sessionSelection.clear()
             }
         }
         .sheet(isPresented: $isNewSessionSheetPresented) {
@@ -179,7 +184,8 @@ struct ConversationBrowserView: View {
                             } else {
                                 ForEach(ProjectConversationGroup.grouped(
                                     displayedConversations,
-                                    displayNames: store.projectDisplayNames
+                                    displayNames: store.projectDisplayNames,
+                                    pinnedItems: store.pinnedItems
                                 )) { project in
                                     projectSection(project)
                                 }
@@ -189,7 +195,7 @@ struct ConversationBrowserView: View {
                         .padding(.vertical, 22)
                     }
                     .onAppear { scrollToSelectedConversation(using: scrollProxy) }
-                    .onChange(of: selectedConversationID) { _, _ in
+                    .onChange(of: sessionSelection.anchorConversationID) { _, _ in
                         scrollToSelectedConversation(using: scrollProxy)
                     }
                 }
@@ -225,7 +231,7 @@ struct ConversationBrowserView: View {
                     Image(systemName: "arrow.clockwise")
                 }
                 .buttonStyle(.borderless)
-                .disabled(store.isLoading || store.deletingConversationID != nil || store.deletingProjectPath != nil)
+                .disabled(store.isLoading || store.isDeletingSessions)
                 .help("Refresh sessions")
                 .accessibilityLabel("Refresh sessions")
             }
@@ -260,7 +266,7 @@ struct ConversationBrowserView: View {
             HStack(spacing: 8) {
                 Button {
                     selection = .project(project.id)
-                    selectedConversationID = nil
+                    sessionSelection.clear()
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "folder")
@@ -268,6 +274,7 @@ struct ConversationBrowserView: View {
                         Text(project.displayName)
                             .font(.system(size: 14, weight: .semibold))
                             .lineLimit(1)
+                        if project.isPinned { PinnedIndicator(size: 9) }
                         Text("\(project.conversations.count)")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
@@ -283,6 +290,9 @@ struct ConversationBrowserView: View {
                 .help(project.projectPath)
                 .contextMenu {
                     Button("Rename project…", systemImage: "pencil") { onRenameProject(project) }
+                    Button(project.isPinned ? "Unpin project" : "Pin project", systemImage: project.isPinned ? "pin.slash" : "pin") {
+                        store.setPinned(!project.isPinned, projectPath: project.projectPath)
+                    }
                 }
 
                 ProjectNewSessionMenu(project: project, showsTitle: false) { provider in
@@ -302,23 +312,26 @@ struct ConversationBrowserView: View {
         ConversationRow(
             conversation: conversation,
             title: store.title(for: conversation),
-            isSelected: selectedConversationID == conversation.id,
+            isSelected: sessionSelection.contains(conversation.id),
+            isPinned: store.pinnedItems.isPinned(conversationID: conversation.id),
             onResume: { store.launch(conversation, action: .resume) },
             onBranch: { store.launch(conversation, action: .branch) },
             onRename: { onRename(conversation) },
+            onTogglePin: {
+                store.setPinned(!store.pinnedItems.isPinned(conversationID: conversation.id), conversation: conversation)
+            },
             onDelete: { onDelete(conversation) },
-            canDelete: !store.hasTerminal(for: conversation) && !store.isLoading
-                && store.deletingConversationID == nil && store.deletingProjectPath == nil,
+            canDelete: !store.hasTerminal(for: conversation) && !store.isLoading && !store.isDeletingSessions,
             isDeleting: store.deletingConversationID == conversation.id
         )
         .id(conversation.id)
     }
 
     private func scrollToSelectedConversation(using scrollProxy: ScrollViewProxy) {
-        guard let selectedConversationID else { return }
+        guard let focusedConversationID = sessionSelection.anchorConversationID else { return }
         DispatchQueue.main.async {
             withAnimation(.easeInOut(duration: 0.2)) {
-                scrollProxy.scrollTo(selectedConversationID, anchor: .center)
+                scrollProxy.scrollTo(focusedConversationID, anchor: .center)
             }
         }
     }

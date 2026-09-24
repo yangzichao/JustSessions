@@ -1,7 +1,6 @@
 import Foundation
 
-struct ProjectSessionDeletionPlan {
-    let projectPath: String
+struct SessionDeletionPlan {
     let deletableConversations: [Conversation]
     let openTerminalCount: Int
     let unsupportedCount: Int

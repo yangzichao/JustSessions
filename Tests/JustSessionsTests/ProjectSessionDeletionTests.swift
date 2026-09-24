@@ -55,12 +55,63 @@ struct ProjectSessionDeletionTests {
         #expect(deletionPlan.unsupportedCount == 1)
 
         store.deleteSessions(in: selectedProject.path)
-        try await waitUntil { store.deletingProjectPath == nil }
+        try await waitUntil { !store.isDeletingSessions }
         #expect(!FileManager.default.fileExists(atPath: selectedClaude.sourceFile.path))
         #expect(!FileManager.default.fileExists(atPath: selectedCodex.sourceFile.path))
         #expect(FileManager.default.fileExists(atPath: selectedAntigravity.sourceFile.path))
         #expect(FileManager.default.fileExists(atPath: otherClaude.sourceFile.path))
         #expect(store.conversations.map(\.id).sorted() == [selectedAntigravity.id, otherClaude.id].sorted())
+        #expect(store.errorMessage == nil)
+    }
+
+    @Test @MainActor func selectedSessionDeletionSpansProjectsAndSkipsUnsupportedSessions() async throws {
+        let temporaryDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+        let firstProject = temporaryDirectory.appendingPathComponent("first")
+        let secondProject = temporaryDirectory.appendingPathComponent("second")
+        try FileManager.default.createDirectory(at: firstProject, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: secondProject, withIntermediateDirectories: true)
+
+        func conversation(_ provider: ConversationProvider, project: URL) throws -> Conversation {
+            let sessionID = UUID().uuidString
+            let sourceFile = temporaryDirectory.appendingPathComponent("\(sessionID).jsonl")
+            try "session".write(to: sourceFile, atomically: true, encoding: .utf8)
+            return Conversation(
+                provider: provider,
+                sessionID: sessionID,
+                projectPath: project.path,
+                suggestedTitle: sessionID,
+                updatedAt: .now,
+                sourceFile: sourceFile
+            )
+        }
+
+        let selectedFirstClaude = try conversation(.claude, project: firstProject)
+        let unselectedFirstClaude = try conversation(.claude, project: firstProject)
+        let selectedSecondCodex = try conversation(.codex, project: secondProject)
+        let selectedAntigravity = try conversation(.antigravity, project: secondProject)
+        let store = ConversationStore(adapters: [
+            TestDeletionAdapter(provider: .claude, discoveredConversations: [selectedFirstClaude, unselectedFirstClaude]),
+            TestDeletionAdapter(provider: .codex, discoveredConversations: [selectedSecondCodex]),
+            TestDeletionAdapter(provider: .antigravity, discoveredConversations: [selectedAntigravity]),
+        ])
+
+        store.refresh()
+        try await waitUntil { !store.isLoading }
+        let selectedConversations = [selectedFirstClaude, selectedSecondCodex, selectedAntigravity]
+        let deletionPlan = store.deletionPlan(for: selectedConversations)
+        #expect(deletionPlan.deletableConversations.map(\.id).sorted() == [selectedFirstClaude.id, selectedSecondCodex.id].sorted())
+        #expect(deletionPlan.unsupportedCount == 1)
+
+        store.deleteConversations(selectedConversations)
+        #expect(store.isDeletionPending(for: selectedFirstClaude))
+        #expect(!store.isDeletionPending(for: unselectedFirstClaude))
+        try await waitUntil { !store.isDeletingSessions }
+        #expect(!FileManager.default.fileExists(atPath: selectedFirstClaude.sourceFile.path))
+        #expect(!FileManager.default.fileExists(atPath: selectedSecondCodex.sourceFile.path))
+        #expect(FileManager.default.fileExists(atPath: selectedAntigravity.sourceFile.path))
+        #expect(FileManager.default.fileExists(atPath: unselectedFirstClaude.sourceFile.path))
+        #expect(store.conversations.map(\.id).sorted() == [selectedAntigravity.id, unselectedFirstClaude.id].sorted())
         #expect(store.errorMessage == nil)
     }
 

@@ -8,10 +8,12 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var errorMessage: String?
     @Published private(set) var aliases: [String: String]
     @Published private(set) var projectDisplayNames: ProjectDisplayNames
+    @Published private(set) var pinnedItems: PinnedItems
     @Published private(set) var terminalSessions: [TerminalSession] = []
     @Published private(set) var selectedTerminalID: UUID?
     @Published private(set) var deletingConversationID: String?
-    @Published private(set) var deletingProjectPath: String?
+    /// Every conversation queued in the running batch deletion.
+    @Published private(set) var batchDeletionConversationIDs: Set<String> = []
 
     private let adapters: [any ConversationAdapter]
     private let commandResolver = NativeCLICommandResolver()
@@ -21,12 +23,13 @@ final class ConversationStore: ObservableObject {
         self.adapters = adapters
         self.aliases = UserDefaults.standard.dictionary(forKey: aliasesKey) as? [String: String] ?? [:]
         self.projectDisplayNames = ProjectDisplayNames.load(from: .standard)
+        self.pinnedItems = PinnedItems.load(from: .standard)
         LoginShellPathReader.warmUpInBackground()
         startClaudeLiveNameSync()
     }
 
     func refresh() {
-        guard !isLoading && deletingConversationID == nil && deletingProjectPath == nil else { return }
+        guard !isLoading && !isDeletingSessions else { return }
         isLoading = true
         errorMessage = nil
         let adapters = self.adapters
@@ -79,23 +82,38 @@ final class ConversationStore: ObservableObject {
         projectDisplayNames.save(to: .standard)
     }
 
+    func setPinned(_ isPinned: Bool, projectPath: String) {
+        pinnedItems.setPinned(isPinned, projectPath: projectPath)
+        pinnedItems.save(to: .standard)
+    }
+
+    func setPinned(_ isPinned: Bool, conversation: Conversation) {
+        pinnedItems.setPinned(isPinned, conversationID: conversation.id)
+        pinnedItems.save(to: .standard)
+    }
+
     func hasTerminal(for conversation: Conversation) -> Bool {
         terminalSessions.contains { $0.conversation?.id == conversation.id }
     }
 
-    func deletionPlan(for projectPath: String) -> ProjectSessionDeletionPlan {
-        let projectConversations = conversations.filter { $0.projectDirectoryKey == projectPath }
-        let openConversations = projectConversations.filter {
-            $0.provider.supportsDeletionFromLauncher && hasTerminal(for: $0)
-        }
-        let unsupportedConversations = projectConversations.filter { !$0.provider.supportsDeletionFromLauncher }
-        return ProjectSessionDeletionPlan(
-            projectPath: projectPath,
-            deletableConversations: projectConversations.filter {
-                $0.provider.supportsDeletionFromLauncher && !hasTerminal(for: $0)
-            },
-            openTerminalCount: openConversations.count,
-            unsupportedCount: unsupportedConversations.count
+    var isDeletingSessions: Bool {
+        deletingConversationID != nil || !batchDeletionConversationIDs.isEmpty
+    }
+
+    func isDeletionPending(for conversation: Conversation) -> Bool {
+        deletingConversationID == conversation.id || batchDeletionConversationIDs.contains(conversation.id)
+    }
+
+    func deletionPlan(for projectPath: String) -> SessionDeletionPlan {
+        deletionPlan(for: conversations.filter { $0.projectDirectoryKey == projectPath })
+    }
+
+    func deletionPlan(for candidateConversations: [Conversation]) -> SessionDeletionPlan {
+        let supportedConversations = candidateConversations.filter { $0.provider.supportsDeletionFromLauncher }
+        return SessionDeletionPlan(
+            deletableConversations: supportedConversations.filter { !hasTerminal(for: $0) },
+            openTerminalCount: supportedConversations.filter { hasTerminal(for: $0) }.count,
+            unsupportedCount: candidateConversations.count - supportedConversations.count
         )
     }
 
@@ -105,7 +123,7 @@ final class ConversationStore: ObservableObject {
             errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
             return
         }
-        guard !isLoading, deletingConversationID == nil, deletingProjectPath == nil,
+        guard !isLoading, !isDeletingSessions,
               let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { return }
         deletingConversationID = conversation.id
         Task.detached(priority: .userInitiated) {
@@ -128,11 +146,17 @@ final class ConversationStore: ObservableObject {
     }
 
     func deleteSessions(in projectPath: String) {
-        guard !isLoading, deletingConversationID == nil, deletingProjectPath == nil else { return }
-        let deletionPlan = deletionPlan(for: projectPath)
+        deleteConversations(conversations.filter { $0.projectDirectoryKey == projectPath })
+    }
+
+    /// Deletes every deletable conversation in the list; open terminals and unsupported providers are skipped.
+    func deleteConversations(_ candidateConversations: [Conversation]) {
+        guard !isLoading, !isDeletingSessions else { return }
+        let candidateIDs = Set(candidateConversations.map(\.id))
+        let deletionPlan = deletionPlan(for: conversations.filter { candidateIDs.contains($0.id) })
         guard deletionPlan.hasDeletableConversations else { return }
 
-        deletingProjectPath = projectPath
+        batchDeletionConversationIDs = Set(deletionPlan.deletableConversations.map(\.id))
         let adapters = self.adapters
         Task.detached(priority: .userInitiated) {
             var failures: [String] = []
@@ -153,7 +177,7 @@ final class ConversationStore: ObservableObject {
             }
             await MainActor.run {
                 self.deletingConversationID = nil
-                self.deletingProjectPath = nil
+                self.batchDeletionConversationIDs = []
                 if !failures.isEmpty {
                     self.errorMessage = "Some sessions could not be deleted:\n" + failures.joined(separator: "\n")
                 }
@@ -165,11 +189,25 @@ final class ConversationStore: ObservableObject {
         conversations.removeAll { $0.id == conversation.id }
         aliases.removeValue(forKey: conversation.id)
         UserDefaults.standard.set(aliases, forKey: aliasesKey)
+        if pinnedItems.isPinned(conversationID: conversation.id) {
+            setPinned(false, conversation: conversation)
+        }
+    }
+
+    func canLaunch(_ conversation: Conversation, action: ConversationAction) -> Bool {
+        conversation.isProjectAvailable && !isDeletionPending(for: conversation)
+            && (action != .branch || conversation.provider.supportsBranchFromLauncher)
+    }
+
+    /// Opens one terminal tab per launchable conversation, in list order; the last one ends up selected.
+    func launch(_ conversations: [Conversation], action: ConversationAction) {
+        for conversation in conversations where canLaunch(conversation, action: action) {
+            launch(conversation, action: action)
+        }
     }
 
     func launch(_ conversation: Conversation, action: ConversationAction) {
-        guard deletingConversationID != conversation.id,
-              deletingProjectPath != conversation.projectDirectoryKey else { return }
+        guard !isDeletionPending(for: conversation) else { return }
         guard action != .branch || conversation.provider.supportsBranchFromLauncher else { return }
         if action == .resume,
            let runningSession = terminalSessions.first(where: {
