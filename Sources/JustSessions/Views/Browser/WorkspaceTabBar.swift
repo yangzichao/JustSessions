@@ -12,8 +12,7 @@ struct WorkspaceTabBar: View {
                 } label: {
                     Label("Preview", systemImage: "text.bubble")
                 }
-                .buttonStyle(.bordered)
-                .tint(store.selectedTerminalID == nil ? .accentColor : nil)
+                .buttonStyle(WorkspaceTabButtonStyle(isSelected: store.selectedTerminalID == nil))
                 .help("Show the selected session's conversation")
                 .accessibilityLabel("Show session preview")
 
@@ -60,8 +59,7 @@ private struct TerminalTab: View {
                         .frame(maxWidth: 180)
                 }
             }
-            .buttonStyle(.bordered)
-            .tint(isSelected ? .accentColor : nil)
+            .buttonStyle(WorkspaceTabButtonStyle(isSelected: isSelected))
             .help("Show \(session.displayTitle)")
 
             Button(action: onClose) {
