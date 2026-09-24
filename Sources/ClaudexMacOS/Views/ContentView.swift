@@ -27,6 +27,8 @@ struct ContentView: View {
     }
 
     var body: some View {
+        let visibleConversations = filteredConversations
+        let projectGroups = ProjectConversationGroup.grouped(visibleConversations)
         VStack(alignment: .leading, spacing: 0) {
             header
             Divider()
@@ -34,7 +36,7 @@ struct ContentView: View {
             if store.isLoading && store.conversations.isEmpty {
                 ContentUnavailableView("Scanning conversations", systemImage: "magnifyingglass")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if filteredConversations.isEmpty {
+            } else if visibleConversations.isEmpty {
                 ContentUnavailableView(
                     searchText.isEmpty ? "No conversations found" : "No matching conversations",
                     systemImage: "text.bubble"
@@ -43,8 +45,8 @@ struct ContentView: View {
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 24) {
-                        ForEach(ConversationProvider.allCases) { provider in
-                            providerSection(provider)
+                        ForEach(projectGroups) { projectGroup in
+                            projectSection(projectGroup)
                         }
                     }
                     .padding(20)
@@ -53,7 +55,7 @@ struct ContentView: View {
 
             Divider()
             HStack {
-                Text("\(filteredConversations.count) conversations")
+                Text("\(projectGroups.count) projects · \(visibleConversations.count) conversations")
                 Spacer()
                 Text("Names are saved locally. Branch uses the CLI's native fork.")
             }
@@ -92,7 +94,7 @@ struct ContentView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Conversations").font(.largeTitle.bold())
-                    Text("Claude Code and Codex sessions, in their native terminal")
+                    Text("Sessions from Claude Code and Codex, grouped by project folder")
                         .font(.subheadline).foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -121,33 +123,19 @@ struct ContentView: View {
         .padding(20)
     }
 
-    @ViewBuilder
-    private func providerSection(_ provider: ConversationProvider) -> some View {
-        let conversations = filteredConversations.filter { $0.provider == provider }
-        if !conversations.isEmpty {
-            HStack {
-                Image(systemName: provider.symbolName)
-                Text(provider.rawValue)
-                Text("\(conversations.count)").foregroundStyle(.secondary)
+    private func projectSection(_ group: ProjectConversationGroup) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "folder")
+                Text(group.projectName).font(.title3.bold())
+                Text("\(group.conversations.count)").foregroundStyle(.secondary)
             }
-            .font(.title2.bold())
-
-            let projectPaths = Array(Set(conversations.map(\.projectPath))).sorted {
-                latestDate(for: $0, in: conversations) > latestDate(for: $1, in: conversations)
-            }
-            ForEach(projectPaths, id: \.self) { projectPath in
-                projectSection(projectPath, conversations: conversations)
-            }
-        }
-    }
-
-    private func projectSection(_ projectPath: String, conversations: [Conversation]) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(URL(fileURLWithPath: projectPath).lastPathComponent)
-                .font(.subheadline.bold())
+            Text(group.projectPath)
+                .font(.caption)
                 .foregroundStyle(.secondary)
-                .padding(.top, 5)
-            ForEach(conversations.filter { $0.projectPath == projectPath }) { conversation in
+                .lineLimit(1)
+                .truncationMode(.middle)
+            ForEach(group.conversations) { conversation in
                 ConversationRow(
                     conversation: conversation,
                     title: store.title(for: conversation),
@@ -160,9 +148,5 @@ struct ContentView: View {
                 )
             }
         }
-    }
-
-    private func latestDate(for projectPath: String, in conversations: [Conversation]) -> Date {
-        conversations.first { $0.projectPath == projectPath }?.updatedAt ?? .distantPast
     }
 }

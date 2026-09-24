@@ -25,6 +25,9 @@ struct Conversation: Identifiable, Sendable {
     var projectName: String {
         URL(fileURLWithPath: projectPath).lastPathComponent
     }
+    var projectDirectoryKey: String {
+        URL(fileURLWithPath: projectPath).standardizedFileURL.resolvingSymlinksInPath().path
+    }
     var isProjectAvailable: Bool {
         var isDirectory: ObjCBool = false
         return FileManager.default.fileExists(atPath: projectPath, isDirectory: &isDirectory) && isDirectory.boolValue

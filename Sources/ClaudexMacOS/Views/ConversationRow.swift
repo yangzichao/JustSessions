@@ -16,11 +16,9 @@ struct ConversationRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).font(.headline).lineLimit(1)
-                Text(conversation.projectPath)
+                Text(conversation.provider.rawValue)
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
                 if !conversation.isProjectAvailable {
                     Text("Project folder missing")
                         .font(.caption2)

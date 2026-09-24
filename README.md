@@ -4,7 +4,7 @@ A native macOS launcher for Claude Code and Codex history. Find, resume, and bra
 
 ## Features
 
-- Scans existing Claude Code and Codex sessions, grouped by provider and project and sorted by recent activity.
+- Scans existing Claude Code and Codex sessions, grouped by project folder with both tools' sessions together and sorted by recent activity.
 - Search by display name, project path, or session ID, and filter to sessions active in the past seven days.
 - Resume or branch a conversation in Terminal.app using each CLI's native interactive command.
 - Rename a row locally. Aliases are saved in this app's UserDefaults and do not change the CLI's own session title.
