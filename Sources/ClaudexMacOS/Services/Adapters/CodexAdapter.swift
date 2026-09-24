@@ -2,12 +2,14 @@ import Foundation
 
 struct CodexAdapter: ConversationAdapter {
     let codexDirectory: URL
+    let deletionExecutableURL: URL?
     var provider: ConversationProvider { .codex }
 
-    init(codexDirectory: URL? = nil) {
+    init(codexDirectory: URL? = nil, deletionExecutableURL: URL? = nil) {
         let configured = ProcessInfo.processInfo.environment["CODEX_HOME"]
         self.codexDirectory = codexDirectory
             ?? URL(fileURLWithPath: configured ?? NSHomeDirectory() + "/.codex")
+        self.deletionExecutableURL = deletionExecutableURL
     }
 
     func discover() throws -> [Conversation] {
@@ -49,6 +51,13 @@ struct CodexAdapter: ConversationAdapter {
         case .resume: ["resume", conversation.sessionID]
         case .branch: ["fork", conversation.sessionID]
         }
+    }
+
+    func delete(_ conversation: Conversation) throws {
+        try CodexConversationDeletion(
+            codexDirectory: codexDirectory,
+            executableURL: deletionExecutableURL
+        ).delete(conversation)
     }
 
     private func loadTitles() -> [String: (title: String, updatedAt: Date?)] {

@@ -51,7 +51,7 @@ struct NativeCLICommandResolver {
         }
 
         let executableName = conversation.provider == .claude ? "claude" : "codex"
-        guard let executablePath = findExecutable(named: executableName) else {
+        guard let executablePath = executablePath(named: executableName) else {
             throw NativeCLICommandError.missingExecutable(executableName)
         }
 
@@ -71,7 +71,7 @@ struct NativeCLICommandResolver {
         )
     }
 
-    private func findExecutable(named name: String) -> String? {
+    func executablePath(named name: String) -> String? {
         for directory in searchDirectories {
             let path = URL(fileURLWithPath: directory).appendingPathComponent(name).path
             if fileManager.isExecutableFile(atPath: path) { return path }

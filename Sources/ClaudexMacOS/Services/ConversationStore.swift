@@ -9,6 +9,7 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var aliases: [String: String]
     @Published private(set) var terminalSessions: [TerminalSession] = []
     @Published private(set) var selectedTerminalID: UUID?
+    @Published private(set) var deletingConversationID: String?
 
     private let adapters: [any ConversationAdapter]
     private let commandResolver = NativeCLICommandResolver()
@@ -20,7 +21,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func refresh() {
-        guard !isLoading else { return }
+        guard !isLoading && deletingConversationID == nil else { return }
         isLoading = true
         errorMessage = nil
         let adapters = self.adapters
@@ -52,6 +53,39 @@ final class ConversationStore: ObservableObject {
             aliases[conversation.id] = title
         }
         UserDefaults.standard.set(aliases, forKey: aliasesKey)
+    }
+
+    func hasTerminal(for conversation: Conversation) -> Bool {
+        terminalSessions.contains { $0.conversation.id == conversation.id }
+    }
+
+    func delete(_ conversation: Conversation) {
+        guard !hasTerminal(for: conversation) else {
+            errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
+            return
+        }
+        guard !isLoading, deletingConversationID == nil,
+              let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { return }
+        deletingConversationID = conversation.id
+        Task.detached(priority: .userInitiated) {
+            do {
+                try adapter.delete(conversation)
+                await MainActor.run {
+                    self.conversations.removeAll { $0.id == conversation.id }
+                    self.aliases.removeValue(forKey: conversation.id)
+                    UserDefaults.standard.set(self.aliases, forKey: self.aliasesKey)
+                    self.deletingConversationID = nil
+                }
+            } catch {
+                await MainActor.run {
+                    if !FileManager.default.fileExists(atPath: conversation.sourceFile.path) {
+                        self.conversations.removeAll { $0.id == conversation.id }
+                    }
+                    self.errorMessage = error.localizedDescription
+                    self.deletingConversationID = nil
+                }
+            }
+        }
     }
 
     func launch(_ conversation: Conversation, action: ConversationAction) {

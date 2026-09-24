@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var recentOnly = false
     @State private var providerFilter: ProviderFilter = .all
     @State private var renamingConversation: Conversation?
+    @State private var deletingConversation: Conversation?
     @State private var editedTitle = ""
     @State private var hasStartedScan = false
 
@@ -58,6 +59,22 @@ struct ContentView: View {
             }
         } message: {
             Text("This changes the display name in claudex-macos.")
+        }
+        .confirmationDialog("Delete conversation?", isPresented: Binding(
+            get: { deletingConversation != nil },
+            set: { if !$0 { deletingConversation = nil } }
+        )) {
+            Button("Delete conversation", role: .destructive) {
+                if let conversation = deletingConversation { store.delete(conversation) }
+                deletingConversation = nil
+            }
+            Button("Cancel", role: .cancel) { deletingConversation = nil }
+        } message: {
+            if let conversation = deletingConversation {
+                Text(conversation.provider == .codex
+                    ? "Codex will permanently delete this session using its native CLI. This cannot be undone."
+                    : "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.")
+            }
         }
         .alert("Could not complete action", isPresented: Binding(
             get: { store.errorMessage != nil },
@@ -135,7 +152,7 @@ struct ContentView: View {
                 Button { store.refresh() } label: {
                     Label("Refresh", systemImage: "arrow.clockwise")
                 }
-                .disabled(store.isLoading)
+                .disabled(store.isLoading || store.deletingConversationID != nil)
             }
             HStack(spacing: 12) {
                 TextField("Search names, projects, or session IDs", text: $searchText)
@@ -173,7 +190,10 @@ struct ContentView: View {
                     onRename: {
                         editedTitle = store.title(for: conversation)
                         renamingConversation = conversation
-                    }
+                    },
+                    onDelete: { deletingConversation = conversation },
+                    canDelete: !store.hasTerminal(for: conversation) && !store.isLoading && store.deletingConversationID == nil,
+                    isDeleting: store.deletingConversationID == conversation.id
                 )
             }
         }

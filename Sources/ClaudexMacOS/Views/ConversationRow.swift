@@ -6,6 +6,9 @@ struct ConversationRow: View {
     let onResume: () -> Void
     let onBranch: () -> Void
     let onRename: () -> Void
+    let onDelete: () -> Void
+    let canDelete: Bool
+    let isDeleting: Bool
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
@@ -48,6 +51,18 @@ struct ConversationRow: View {
             .buttonStyle(.borderless)
             .help("Rename in claudex-macos")
             .accessibilityLabel("Rename \(title)")
+            Button(action: onDelete) {
+                if isDeleting {
+                    ProgressView().controlSize(.mini)
+                } else {
+                    Image(systemName: "trash")
+                }
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(.red)
+            .disabled(!canDelete || isDeleting)
+            .help(canDelete ? "Delete this conversation" : "Close its terminal tab before deleting")
+            .accessibilityLabel("Delete \(title)")
         }
         .padding(.vertical, 9)
         .padding(.horizontal, 12)

@@ -69,6 +69,10 @@ struct ClaudeAdapter: ConversationAdapter {
         }
     }
 
+    func delete(_ conversation: Conversation) throws {
+        try ClaudeConversationDeletion(configurationDirectory: configurationDirectory).delete(conversation)
+    }
+
     private func loadIndex(in projectDirectory: URL) -> (entries: [String: [String: Any]], originalPath: String?) {
         let file = projectDirectory.appendingPathComponent("sessions-index.json")
         guard let data = try? Data(contentsOf: file),
