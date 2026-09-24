@@ -8,6 +8,7 @@ struct SidebarProjectSection: View {
     let isSelected: Bool
     let selectedConversationID: String?
     let onToggle: () -> Void
+    let onNewSession: (ConversationProvider) -> Void
     let onSelectConversation: (Conversation) -> Void
 
     private var openTerminalCount: Int {
@@ -16,45 +17,53 @@ struct SidebarProjectSection: View {
 
     var body: some View {
         VStack(spacing: 2) {
-            Button(action: onToggle) {
-                HStack(spacing: 8) {
-                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                        .font(.system(size: 9, weight: .semibold))
-                        .foregroundStyle(.tertiary)
-                        .frame(width: 10)
-                    Image(systemName: "folder")
-                        .font(.system(size: 12))
-                        .frame(width: 15)
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(project.projectName)
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                        if let parentLabel {
-                            Text(parentLabel)
-                                .font(.system(size: 10))
-                                .foregroundStyle(.tertiary)
+            HStack(spacing: 0) {
+                Button(action: onToggle) {
+                    HStack(spacing: 8) {
+                        Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundStyle(.tertiary)
+                            .frame(width: 10)
+                        Image(systemName: "folder")
+                            .font(.system(size: 12))
+                            .frame(width: 15)
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(project.projectName)
                                 .lineLimit(1)
+                                .truncationMode(.middle)
+                            if let parentLabel {
+                                Text(parentLabel)
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(.tertiary)
+                                    .lineLimit(1)
+                            }
                         }
+                        Spacer(minLength: 3)
+                        if openTerminalCount > 0 {
+                            Image(systemName: "circle.fill")
+                                .font(.system(size: 6))
+                                .foregroundStyle(Color.accentColor)
+                        }
+                        Text("\(project.conversations.count)")
+                            .foregroundStyle(.secondary)
                     }
-                    Spacer(minLength: 3)
-                    if openTerminalCount > 0 {
-                        Image(systemName: "circle.fill")
-                            .font(.system(size: 6))
-                            .foregroundStyle(Color.accentColor)
-                    }
-                    Text("\(project.conversations.count)")
-                        .foregroundStyle(.secondary)
+                    .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
+                    .foregroundStyle(isSelected ? .primary : .secondary)
+                    .padding(.horizontal, 10)
+                    .frame(height: parentLabel == nil ? 32 : 42)
+                    .contentShape(Rectangle())
+                    .background(isSelected ? Color.accentColor.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 7))
                 }
-                .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
-                .foregroundStyle(isSelected ? .primary : .secondary)
-                .padding(.horizontal, 10)
-                .frame(height: parentLabel == nil ? 32 : 42)
-                .contentShape(Rectangle())
-                .background(isSelected ? Color.accentColor.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 7))
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+                .help(project.projectPath)
+                .accessibilityLabel("\(project.projectName), \(project.conversations.count) \(project.conversations.count == 1 ? "session" : "sessions"), \(openTerminalCount) open")
+
+                ProjectNewSessionMenu(project: project, showsTitle: false, onStart: onNewSession)
+                    .menuStyle(.borderlessButton)
+                    .frame(width: 24)
+                    .padding(.trailing, 4)
             }
-            .buttonStyle(.plain)
-            .help(project.projectPath)
-            .accessibilityLabel("\(project.projectName), \(project.conversations.count) \(project.conversations.count == 1 ? "session" : "sessions"), \(openTerminalCount) open")
 
             if isExpanded {
                 ForEach(project.conversations) { conversation in

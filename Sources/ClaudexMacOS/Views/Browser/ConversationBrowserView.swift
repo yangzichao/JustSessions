@@ -171,6 +171,13 @@ struct ConversationBrowserView: View {
                     .font(.system(size: 23, weight: .semibold))
                     .lineLimit(1)
                 Spacer(minLength: 8)
+                if case .project(let path) = selection,
+                   let project = projectGroups.first(where: { $0.id == path }) {
+                    ProjectNewSessionMenu(project: project, showsTitle: true) { provider in
+                        store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
                 if !store.terminalSessions.isEmpty {
                     Menu {
                         ForEach(store.terminalSessions) { session in
@@ -224,28 +231,36 @@ struct ConversationBrowserView: View {
 
     private func projectSection(_ project: ProjectConversationGroup) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Button {
-                selection = .project(project.id)
-                selectedConversationID = nil
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "folder")
-                        .foregroundStyle(.secondary)
-                    Text(project.projectName)
-                        .font(.system(size: 14, weight: .semibold))
-                        .lineLimit(1)
-                    Text("\(project.conversations.count)")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
+            HStack(spacing: 8) {
+                Button {
+                    selection = .project(project.id)
+                    selectedConversationID = nil
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "folder")
+                            .foregroundStyle(.secondary)
+                        Text(project.projectName)
+                            .font(.system(size: 14, weight: .semibold))
+                            .lineLimit(1)
+                        Text("\(project.conversations.count)")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
                 }
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+                .help(project.projectPath)
+
+                ProjectNewSessionMenu(project: project, showsTitle: false) { provider in
+                    store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
+                }
+                .menuStyle(.borderlessButton)
             }
-            .buttonStyle(.plain)
-            .help(project.projectPath)
             .padding(.bottom, 8)
 
             ForEach(project.conversations) { conversation in

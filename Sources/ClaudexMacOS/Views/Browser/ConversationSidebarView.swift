@@ -79,6 +79,9 @@ struct ConversationSidebarView: View {
                                 }
                                 onSelect(.project(project.id))
                             },
+                            onNewSession: { provider in
+                                store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
+                            },
                             onSelectConversation: onSelectConversation
                         )
                     }

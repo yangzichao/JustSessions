@@ -129,6 +129,14 @@ final class ConversationStore: ObservableObject {
         selectedTerminalID = session.id
     }
 
+    func launchNewSessionFromProject(provider: ConversationProvider, projectPath: String) {
+        do {
+            try launchNewSession(provider: provider, projectPath: projectPath)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     var selectedTerminal: TerminalSession? {
         terminalSessions.first { $0.id == selectedTerminalID }
     }
