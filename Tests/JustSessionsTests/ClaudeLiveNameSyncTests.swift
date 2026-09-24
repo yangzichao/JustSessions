@@ -104,7 +104,7 @@ struct ClaudeLiveNameSyncTests {
     }
 }
 
-private struct StaticConversationAdapter: ConversationAdapter {
+struct StaticConversationAdapter: ConversationAdapter {
     let provider: ConversationProvider = .claude
     let discoveredConversations: [Conversation]
 

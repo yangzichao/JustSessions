@@ -26,6 +26,7 @@ final class ConversationStore: ObservableObject {
         self.pinnedItems = PinnedItems.load(from: .standard)
         LoginShellPathReader.warmUpInBackground()
         startClaudeLiveNameSync()
+        startNewSessionDiscovery()
     }
 
     func refresh() {
@@ -45,6 +46,7 @@ final class ConversationStore: ObservableObject {
                 self.conversations = found
                 self.synchronizeTerminalTitles()
                 self.associateOpenCodexSessions()
+                self.associateOpenClaudeSessions()
                 self.errorMessage = failures.isEmpty ? nil : failures.joined(separator: "\n")
                 self.isLoading = false
             }
