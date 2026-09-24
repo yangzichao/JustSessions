@@ -140,9 +140,6 @@ struct ConversationSidebarView: View {
 
             Divider()
             HStack {
-                Text("Claude Code  ·  Codex")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
                 Spacer()
                 Button(action: onCheckForUpdates) {
                     Label("Update", systemImage: "arrow.down.circle")
