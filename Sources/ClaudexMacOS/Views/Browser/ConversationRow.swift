@@ -3,6 +3,7 @@ import SwiftUI
 struct ConversationRow: View {
     let conversation: Conversation
     let title: String
+    let isSelected: Bool
     let onResume: () -> Void
     let onBranch: () -> Void
     let onRename: () -> Void
@@ -75,7 +76,10 @@ struct ConversationRow: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 11)
-            .background(isHovered ? Color.primary.opacity(0.045) : .clear, in: RoundedRectangle(cornerRadius: 8))
+            .background(
+                isSelected ? Color.accentColor.opacity(0.12) : isHovered ? Color.primary.opacity(0.045) : .clear,
+                in: RoundedRectangle(cornerRadius: 8)
+            )
             .onHover { isHovered = $0 }
 
             Divider().padding(.leading, 52)

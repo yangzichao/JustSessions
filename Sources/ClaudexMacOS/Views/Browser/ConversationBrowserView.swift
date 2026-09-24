@@ -8,6 +8,8 @@ struct ConversationBrowserView: View {
     let onRename: (Conversation) -> Void
     let onDelete: (Conversation) -> Void
 
+    @State private var selectedConversationID: String?
+
     private var matchingConversations: [Conversation] {
         store.conversations.filter { conversation in
             providerFilter.includes(conversation.provider) && (
@@ -33,8 +35,10 @@ struct ConversationBrowserView: View {
     var body: some View {
         HStack(spacing: 0) {
             ConversationSidebarView(
+                store: store,
                 searchText: $searchText,
                 selection: selection,
+                selectedConversationID: selectedConversationID,
                 projects: projectGroups,
                 conversationCount: matchingConversations.count,
                 recentCount: matchingConversations.filter {
@@ -42,7 +46,21 @@ struct ConversationBrowserView: View {
                 }.count,
                 onSelect: { destination in
                     selection = destination
+                    selectedConversationID = nil
                     store.selectTerminal(nil)
+                },
+                onSelectConversation: { conversation in
+                    selection = .project(conversation.projectDirectoryKey)
+                    selectedConversationID = conversation.id
+                    if let openTerminal = store.terminalSessions.first(where: {
+                        $0.conversation.id == conversation.id && $0.action == .resume && !$0.hasExited
+                    }) ?? store.terminalSessions.first(where: {
+                        $0.conversation.id == conversation.id && $0.action == .resume
+                    }) {
+                        store.selectTerminal(openTerminal.id)
+                    } else {
+                        store.selectTerminal(nil)
+                    }
                 }
             )
             Divider()
@@ -56,13 +74,19 @@ struct ConversationBrowserView: View {
         .onChange(of: searchText) { _, newValue in
             if !newValue.isEmpty {
                 selection = .all
+                selectedConversationID = nil
                 store.selectTerminal(nil)
             }
         }
         .onChange(of: providerFilter) { _, _ in
+            if let selectedConversationID,
+               !matchingConversations.contains(where: { $0.id == selectedConversationID }) {
+                self.selectedConversationID = nil
+            }
             if case .project(let path) = selection,
                !projectGroups.contains(where: { $0.id == path }) {
                 selection = .all
+                selectedConversationID = nil
             }
         }
     }
@@ -82,20 +106,26 @@ struct ConversationBrowserView: View {
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 24) {
-                        if case .project = selection {
-                            ForEach(displayedConversations) { conversation in
-                                conversationRow(conversation)
-                            }
-                        } else {
-                            ForEach(ProjectConversationGroup.grouped(displayedConversations)) { project in
-                                projectSection(project)
+                ScrollViewReader { scrollProxy in
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 24) {
+                            if case .project = selection {
+                                ForEach(displayedConversations) { conversation in
+                                    conversationRow(conversation)
+                                }
+                            } else {
+                                ForEach(ProjectConversationGroup.grouped(displayedConversations)) { project in
+                                    projectSection(project)
+                                }
                             }
                         }
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 22)
                     }
-                    .padding(.horizontal, 28)
-                    .padding(.vertical, 22)
+                    .onAppear { scrollToSelectedConversation(using: scrollProxy) }
+                    .onChange(of: selectedConversationID) { _, _ in
+                        scrollToSelectedConversation(using: scrollProxy)
+                    }
                 }
                 .id(selection)
             }
@@ -117,7 +147,7 @@ struct ConversationBrowserView: View {
                             Button(session.displayTitle) { store.selectTerminal(session.id) }
                         }
                     } label: {
-                        Label("Running \(store.terminalSessions.count)", systemImage: "terminal")
+                        Label("Open \(store.terminalSessions.count)", systemImage: "terminal")
                     }
                     .help("Open an active terminal")
                 }
@@ -166,6 +196,7 @@ struct ConversationBrowserView: View {
         VStack(alignment: .leading, spacing: 0) {
             Button {
                 selection = .project(project.id)
+                selectedConversationID = nil
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "folder")
@@ -197,6 +228,7 @@ struct ConversationBrowserView: View {
         ConversationRow(
             conversation: conversation,
             title: store.title(for: conversation),
+            isSelected: selectedConversationID == conversation.id,
             onResume: { store.launch(conversation, action: .resume) },
             onBranch: { store.launch(conversation, action: .branch) },
             onRename: { onRename(conversation) },
@@ -204,5 +236,15 @@ struct ConversationBrowserView: View {
             canDelete: !store.hasTerminal(for: conversation) && !store.isLoading && store.deletingConversationID == nil,
             isDeleting: store.deletingConversationID == conversation.id
         )
+        .id(conversation.id)
+    }
+
+    private func scrollToSelectedConversation(using scrollProxy: ScrollViewProxy) {
+        guard let selectedConversationID else { return }
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                scrollProxy.scrollTo(selectedConversationID, anchor: .center)
+            }
+        }
     }
 }

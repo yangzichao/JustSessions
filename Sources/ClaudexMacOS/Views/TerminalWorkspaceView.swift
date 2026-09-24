@@ -11,7 +11,7 @@ struct TerminalWorkspaceView: View {
                 Button {
                     store.selectTerminal(nil)
                 } label: {
-                    Label("Projects", systemImage: "chevron.left")
+                    Label("Sessions", systemImage: "chevron.left")
                 }
                 .buttonStyle(.bordered)
 
