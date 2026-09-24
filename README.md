@@ -8,7 +8,7 @@ A native macOS launcher for Claude Code and Codex. Start new sessions, or find, 
 - Browse projects in a persistent sidebar, then see all Claude Code and Codex sessions for one folder in a focused list. The sidebar remains visible beside embedded terminals.
 - Drag the divider beside the sidebar to adjust its width while browsing sessions or using a terminal. The app remembers the chosen width.
 - Expand a project in the sidebar to see its sessions. Open terminal tabs appear in a dedicated sidebar section and mark their project and session; selecting one switches back to that terminal. Selecting a closed session focuses its row and Resume action in the main list.
-- Search by display name, project path, or session ID, and filter to sessions active in the past seven days.
+- Search sessions by display name, project path, or session ID. Search projects separately by folder name or path in the sidebar, and filter to sessions active in the past seven days.
 - Resume or branch a conversation in an embedded terminal using each CLI's native interactive command.
 - Use **New session** from the sidebar to choose Claude Code or Codex and a project folder, including one with no history. The CLI starts in that folder with no resume or fork arguments. New CLI sessions appear in the project list after returning from the terminal or closing it.
 - Use **+** beside a project, or **New session** at the top of its page, to start Claude Code or Codex directly in that project's folder without choosing a path.

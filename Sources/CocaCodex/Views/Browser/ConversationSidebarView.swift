@@ -15,6 +15,13 @@ struct ConversationSidebarView: View {
     let onSelectConversation: (Conversation) -> Void
 
     @State private var expandedProjectPaths: Set<String> = []
+    @State private var projectSearchText = ""
+
+    private var visibleProjects: [ProjectConversationGroup] {
+        let query = projectSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return projects }
+        return projects.filter { $0.projectPath.localizedCaseInsensitiveContains(query) }
+    }
 
     private var repeatedProjectNames: Set<String> {
         Set(Dictionary(grouping: projects, by: \.projectName)
@@ -27,7 +34,11 @@ struct ConversationSidebarView: View {
 
         VStack(alignment: .leading, spacing: 0) {
             brand
-            searchField
+            SidebarSearchField(
+                text: $searchText,
+                placeholder: "Search sessions",
+                accessibilityLabel: "Search sessions and projects"
+            )
             Button(action: onNewSession) {
                 Label("New session", systemImage: "plus")
                     .frame(maxWidth: .infinity)
@@ -63,10 +74,25 @@ struct ConversationSidebarView: View {
                         .padding(.horizontal, 8)
                     }
 
-                    sectionHeading("PROJECTS", count: projects.count)
+                    sectionHeading("PROJECTS", count: visibleProjects.count)
                         .padding(.top, store.terminalSessions.isEmpty ? 26 : 22)
 
-                    ForEach(projects) { project in
+                    SidebarSearchField(
+                        text: $projectSearchText,
+                        placeholder: "Search projects",
+                        accessibilityLabel: "Search projects by folder name or path"
+                    )
+                    .padding(.bottom, 8)
+
+                    if visibleProjects.isEmpty {
+                        Text("No matching projects")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 8)
+                    }
+
+                    ForEach(visibleProjects) { project in
                         SidebarProjectSection(
                             store: store,
                             project: project,
@@ -143,29 +169,6 @@ struct ConversationSidebarView: View {
         .padding(.horizontal, 18)
         .padding(.top, 20)
         .padding(.bottom, 18)
-    }
-
-    private var searchField: some View {
-        HStack(spacing: 7) {
-            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-            TextField("Search sessions", text: $searchText)
-                .textFieldStyle(.plain)
-                .accessibilityLabel("Search sessions and projects")
-            if !searchText.isEmpty {
-                Button { searchText = "" } label: {
-                    Image(systemName: "xmark.circle.fill")
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.tertiary)
-                .accessibilityLabel("Clear search")
-            }
-        }
-        .font(.system(size: 12))
-        .padding(.horizontal, 10)
-        .padding(.vertical, 9)
-        .background(.background, in: RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.quaternary))
-        .padding(.horizontal, 12)
     }
 
     private func sectionHeading(_ title: String, count: Int) -> some View {

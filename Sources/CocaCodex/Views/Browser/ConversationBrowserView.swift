@@ -23,7 +23,9 @@ struct ConversationBrowserView: View {
     }
 
     private var projectGroups: [ProjectConversationGroup] {
-        ProjectConversationGroup.grouped(matchingConversations)
+        ProjectConversationGroup.grouped(store.conversations.filter {
+            providerFilter.includes($0.provider)
+        })
     }
 
     private var availableProjects: [ProjectConversationGroup] {
@@ -55,11 +57,13 @@ struct ConversationBrowserView: View {
                 onCheckForUpdates: { updateManager.checkForUpdates() },
                 onNewSession: { isNewSessionSheetPresented = true },
                 onSelect: { destination in
+                    if case .project = destination { searchText = "" }
                     selection = destination
                     selectedConversationID = nil
                     store.selectTerminal(nil)
                 },
                 onSelectConversation: { conversation in
+                    searchText = ""
                     selection = .project(conversation.projectDirectoryKey)
                     selectedConversationID = conversation.id
                     if let openTerminal = store.terminalSessions.first(where: {
