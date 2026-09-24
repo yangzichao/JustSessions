@@ -98,7 +98,7 @@ struct AdapterTests {
         let projectDirectory = root.appendingPathComponent("new project")
         try FileManager.default.createDirectory(at: binaryDirectory, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: projectDirectory, withIntermediateDirectories: true)
-        for executableName in ["claude", "codex"] {
+        for executableName in ["claude", "codex", "agy"] {
             let executable = binaryDirectory.appendingPathComponent(executableName)
             try "#!/bin/sh\nexit 0\n".write(to: executable, atomically: true, encoding: .utf8)
             try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: executable.path)
@@ -109,7 +109,13 @@ struct AdapterTests {
             let command = try resolver.resolveNewSession(provider: provider, projectPath: projectDirectory.path)
             #expect(command.arguments.isEmpty)
             #expect(command.workingDirectory == projectDirectory.path)
-            #expect(command.executablePath == binaryDirectory.appendingPathComponent(provider == .claude ? "claude" : "codex").path)
+            let expectedExecutable: String
+            switch provider {
+            case .claude: expectedExecutable = "claude"
+            case .codex: expectedExecutable = "codex"
+            case .antigravity: expectedExecutable = "agy"
+            }
+            #expect(command.executablePath == binaryDirectory.appendingPathComponent(expectedExecutable).path)
         }
     }
 }

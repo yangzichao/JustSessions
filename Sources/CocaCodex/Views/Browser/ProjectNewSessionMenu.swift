@@ -9,11 +9,10 @@ struct ProjectNewSessionMenu: View {
         let isProjectAvailable = project.conversations.first?.isProjectAvailable == true
 
         Menu {
-            Button("Claude Code", systemImage: ConversationProvider.claude.symbolName) {
-                onStart(.claude)
-            }
-            Button("Codex", systemImage: ConversationProvider.codex.symbolName) {
-                onStart(.codex)
+            ForEach(ConversationProvider.allCases) { provider in
+                Button(provider.rawValue, systemImage: provider.symbolName) {
+                    onStart(provider)
+                }
             }
         } label: {
             if showsTitle {

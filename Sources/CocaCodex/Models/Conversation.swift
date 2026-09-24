@@ -3,14 +3,19 @@ import Foundation
 enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable {
     case claude = "Claude Code"
     case codex = "Codex"
+    case antigravity = "Antigravity"
 
     var id: String { rawValue }
     var symbolName: String {
         switch self {
         case .claude: "sparkle"
         case .codex: "terminal"
+        case .antigravity: "sparkles"
         }
     }
+
+    var supportsBranchFromLauncher: Bool { self != .antigravity }
+    var supportsDeletionFromLauncher: Bool { self != .antigravity }
 }
 
 struct Conversation: Identifiable, Sendable {

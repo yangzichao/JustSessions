@@ -66,7 +66,12 @@ struct NativeCLICommandResolver {
             throw NativeCLICommandError.missingProject(projectPath)
         }
 
-        let executableName = provider == .claude ? "claude" : "codex"
+        let executableName: String
+        switch provider {
+        case .claude: executableName = "claude"
+        case .codex: executableName = "codex"
+        case .antigravity: executableName = "agy"
+        }
         guard let executablePath = executablePath(named: executableName) else {
             throw NativeCLICommandError.missingExecutable(executableName)
         }

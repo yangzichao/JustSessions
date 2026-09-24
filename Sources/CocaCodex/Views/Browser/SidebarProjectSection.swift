@@ -88,7 +88,7 @@ struct SidebarProjectSection: View {
             HStack(spacing: 8) {
                 Image(systemName: conversation.provider.symbolName)
                     .font(.system(size: 11))
-                    .foregroundStyle(conversation.provider == .claude ? .orange : .blue)
+                    .foregroundStyle(providerColor(for: conversation.provider))
                     .frame(width: 14)
                 Text(store.title(for: conversation))
                     .lineLimit(1)
@@ -109,5 +109,13 @@ struct SidebarProjectSection: View {
         .buttonStyle(.plain)
         .help("\(store.title(for: conversation)) · \(conversation.provider.rawValue)")
         .accessibilityLabel("\(store.title(for: conversation)), \(conversation.provider.rawValue)\(openTerminal == nil ? "" : ", open terminal")")
+    }
+
+    private func providerColor(for provider: ConversationProvider) -> Color {
+        switch provider {
+        case .claude: .orange
+        case .codex: .blue
+        case .antigravity: .purple
+        }
     }
 }

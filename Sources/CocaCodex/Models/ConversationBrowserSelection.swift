@@ -8,6 +8,7 @@ enum ConversationProviderFilter: String, CaseIterable, Identifiable {
     case all = "All tools"
     case claude = "Claude Code"
     case codex = "Codex"
+    case antigravity = "Antigravity"
 
     var id: String { rawValue }
 

@@ -11,7 +11,8 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "CocaCodex",
-            dependencies: [.product(name: "SwiftTerm", package: "SwiftTerm")]
+            dependencies: [.product(name: "SwiftTerm", package: "SwiftTerm")],
+            linkerSettings: [.linkedLibrary("sqlite3")]
         ),
         .testTarget(name: "CocaCodexTests", dependencies: ["CocaCodex"]),
     ]

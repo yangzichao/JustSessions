@@ -15,7 +15,7 @@ final class ConversationStore: ObservableObject {
     private let commandResolver = NativeCLICommandResolver()
     private let aliasesKey = "conversationAliases"
 
-    init(adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter()]) {
+    init(adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter(), AntigravityAdapter()]) {
         self.adapters = adapters
         self.aliases = UserDefaults.standard.dictionary(forKey: aliasesKey) as? [String: String] ?? [:]
     }
@@ -60,6 +60,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func delete(_ conversation: Conversation) {
+        guard conversation.provider.supportsDeletionFromLauncher else { return }
         guard !hasTerminal(for: conversation) else {
             errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
             return
@@ -89,6 +90,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func launch(_ conversation: Conversation, action: ConversationAction) {
+        guard action != .branch || conversation.provider.supportsBranchFromLauncher else { return }
         if action == .resume,
            let runningSession = terminalSessions.first(where: {
                $0.action == .resume && $0.conversation?.id == conversation.id && !$0.hasExited

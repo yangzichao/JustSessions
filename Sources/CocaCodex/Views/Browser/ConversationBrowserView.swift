@@ -153,6 +153,7 @@ struct ConversationBrowserView: View {
         if let selectedTerminal = store.selectedTerminal { return selectedTerminal.provider }
         switch providerFilter {
         case .claude: return .claude
+        case .antigravity: return .antigravity
         case .codex, .all: return .codex
         }
     }
@@ -257,7 +258,7 @@ struct ConversationBrowserView: View {
     private var headerSubtitle: String {
         if case .project(let path) = selection { return path }
         let count = displayedConversations.count
-        let source = providerFilter == .all ? "Claude Code and Codex" : providerFilter.rawValue
+        let source = providerFilter == .all ? "All tools" : providerFilter.rawValue
         return "\(count) \(count == 1 ? "session" : "sessions") · \(source)"
     }
 

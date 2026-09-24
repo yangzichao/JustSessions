@@ -50,22 +50,26 @@ struct ConversationRow: View {
                     .buttonStyle(.bordered)
                     .controlSize(.small)
                     .disabled(!projectAvailable)
-                Button("Branch", action: onBranch)
-                    .buttonStyle(.borderless)
-                    .controlSize(.small)
-                    .disabled(!projectAvailable)
-                    .help("Fork in the native CLI")
+                if conversation.provider.supportsBranchFromLauncher {
+                    Button("Branch", action: onBranch)
+                        .buttonStyle(.borderless)
+                        .controlSize(.small)
+                        .disabled(!projectAvailable)
+                        .help("Fork in the native CLI")
+                }
 
                 if isDeleting {
                     ProgressView().controlSize(.mini).frame(width: 24)
                 } else {
                     Menu {
                         Button(action: onRename) { Label("Rename", systemImage: "pencil") }
-                        Divider()
-                        Button(role: .destructive, action: onDelete) {
-                            Label("Delete session", systemImage: "trash")
+                        if conversation.provider.supportsDeletionFromLauncher {
+                            Divider()
+                            Button(role: .destructive, action: onDelete) {
+                                Label("Delete session", systemImage: "trash")
+                            }
+                            .disabled(!canDelete)
                         }
-                        .disabled(!canDelete)
                     } label: {
                         Image(systemName: "ellipsis")
                             .frame(width: 24, height: 24)
@@ -88,14 +92,22 @@ struct ConversationRow: View {
         }
         .contextMenu {
             Button("Resume", action: onResume).disabled(!projectAvailable)
-            Button("Branch", action: onBranch).disabled(!projectAvailable)
+            if conversation.provider.supportsBranchFromLauncher {
+                Button("Branch", action: onBranch).disabled(!projectAvailable)
+            }
             Button("Rename", action: onRename)
-            Divider()
-            Button("Delete session", role: .destructive, action: onDelete).disabled(!canDelete)
+            if conversation.provider.supportsDeletionFromLauncher {
+                Divider()
+                Button("Delete session", role: .destructive, action: onDelete).disabled(!canDelete)
+            }
         }
     }
 
     private var providerColor: Color {
-        conversation.provider == .claude ? .orange : .blue
+        switch conversation.provider {
+        case .claude: .orange
+        case .codex: .blue
+        case .antigravity: .purple
+        }
     }
 }
