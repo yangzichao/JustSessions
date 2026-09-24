@@ -5,6 +5,7 @@ A native macOS launcher for Claude Code and Codex history. Find, resume, and bra
 ## Features
 
 - Scans existing Claude Code and Codex sessions, grouped by project folder with both tools' sessions together and sorted by recent activity.
+- Browse projects in a persistent sidebar, then see all Claude Code and Codex sessions for one folder in a focused list. The sidebar remains visible beside embedded terminals.
 - Search by display name, project path, or session ID, and filter to sessions active in the past seven days.
 - Resume or branch a conversation in an embedded terminal using each CLI's native interactive command.
 - Keep multiple terminal tabs open. Returning to the project list leaves their processes running; Resume reopens an already running tab for that conversation. Closing a tab ends its process.

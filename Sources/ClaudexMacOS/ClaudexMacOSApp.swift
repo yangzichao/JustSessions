@@ -6,6 +6,6 @@ struct ClaudexMacOSApp: App {
         WindowGroup {
             ContentView()
         }
-        .defaultSize(width: 980, height: 680)
+        .defaultSize(width: 1100, height: 720)
     }
 }

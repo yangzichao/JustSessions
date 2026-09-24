@@ -10,62 +10,86 @@ struct ConversationRow: View {
     let canDelete: Bool
     let isDeleting: Bool
 
-    var body: some View {
-        HStack(alignment: .center, spacing: 14) {
-            Image(systemName: conversation.provider.symbolName)
-                .font(.system(size: 17, weight: .medium))
-                .foregroundStyle(conversation.provider == .claude ? .orange : .blue)
-                .frame(width: 28)
+    @State private var isHovered = false
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title).font(.headline).lineLimit(1)
-                Text(conversation.provider.rawValue)
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Image(systemName: conversation.provider.symbolName)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(providerColor)
+                    .frame(width: 30, height: 30)
+                    .background(providerColor.opacity(0.10), in: RoundedRectangle(cornerRadius: 7))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 13, weight: .medium))
+                        .lineLimit(1)
+                    HStack(spacing: 6) {
+                        Text(conversation.provider.rawValue)
+                        if !conversation.isProjectAvailable {
+                            Text("·")
+                            Text("Folder missing").foregroundStyle(.red)
+                        }
+                    }
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                if !conversation.isProjectAvailable {
-                    Text("Project folder missing")
-                        .font(.caption2)
-                        .foregroundStyle(.red)
                 }
-            }
 
-            Spacer(minLength: 12)
+                Spacer(minLength: 10)
 
-            Text(conversation.updatedAt, style: .relative)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(minWidth: 65, alignment: .trailing)
+                Text(conversation.updatedAt, style: .relative)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(minWidth: 60, alignment: .trailing)
 
-            Button("Resume", action: onResume)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .disabled(!conversation.isProjectAvailable)
-            Button("Branch", action: onBranch)
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .disabled(!conversation.isProjectAvailable)
-                .help("Fork this conversation in the native CLI")
-            Button(action: onRename) {
-                Image(systemName: "pencil")
-            }
-            .buttonStyle(.borderless)
-            .help("Rename in claudex-macos")
-            .accessibilityLabel("Rename \(title)")
-            Button(action: onDelete) {
+                Button("Resume", action: onResume)
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .disabled(!conversation.isProjectAvailable)
+                Button("Branch", action: onBranch)
+                    .buttonStyle(.borderless)
+                    .controlSize(.small)
+                    .disabled(!conversation.isProjectAvailable)
+                    .help("Fork in the native CLI")
+
                 if isDeleting {
-                    ProgressView().controlSize(.mini)
+                    ProgressView().controlSize(.mini).frame(width: 24)
                 } else {
-                    Image(systemName: "trash")
+                    Menu {
+                        Button(action: onRename) { Label("Rename", systemImage: "pencil") }
+                        Divider()
+                        Button(role: .destructive, action: onDelete) {
+                            Label("Delete session", systemImage: "trash")
+                        }
+                        .disabled(!canDelete)
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .frame(width: 24, height: 24)
+                    }
+                    .menuStyle(.borderlessButton)
+                    .menuIndicator(.hidden)
+                    .help("More actions")
+                    .accessibilityLabel("More actions for \(title)")
                 }
             }
-            .buttonStyle(.borderless)
-            .foregroundStyle(.red)
-            .disabled(!canDelete || isDeleting)
-            .help(canDelete ? "Delete this conversation" : "Close its terminal tab before deleting")
-            .accessibilityLabel("Delete \(title)")
+            .padding(.horizontal, 10)
+            .padding(.vertical, 11)
+            .background(isHovered ? Color.primary.opacity(0.045) : .clear, in: RoundedRectangle(cornerRadius: 8))
+            .onHover { isHovered = $0 }
+
+            Divider().padding(.leading, 52)
         }
-        .padding(.vertical, 9)
-        .padding(.horizontal, 12)
-        .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 10))
+        .contextMenu {
+            Button("Resume", action: onResume).disabled(!conversation.isProjectAvailable)
+            Button("Branch", action: onBranch).disabled(!conversation.isProjectAvailable)
+            Button("Rename", action: onRename)
+            Divider()
+            Button("Delete session", role: .destructive, action: onDelete).disabled(!canDelete)
+        }
+    }
+
+    private var providerColor: Color {
+        conversation.provider == .claude ? .orange : .blue
     }
 }
