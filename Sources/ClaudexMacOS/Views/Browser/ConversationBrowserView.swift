@@ -10,6 +10,7 @@ struct ConversationBrowserView: View {
 
     @State private var selectedConversationID: String?
     @State private var isNewSessionSheetPresented = false
+    @StateObject private var updateManager = AppUpdateManager()
 
     private var matchingConversations: [Conversation] {
         store.conversations.filter { conversation in
@@ -50,6 +51,8 @@ struct ConversationBrowserView: View {
                 recentCount: matchingConversations.filter {
                     $0.updatedAt >= Date().addingTimeInterval(-7 * 24 * 60 * 60)
                 }.count,
+                isCheckingForUpdates: updateManager.isCheckingForUpdates,
+                onCheckForUpdates: { updateManager.checkForUpdates() },
                 onNewSession: { isNewSessionSheetPresented = true },
                 onSelect: { destination in
                     selection = destination
@@ -104,6 +107,21 @@ struct ConversationBrowserView: View {
                 try store.launchNewSession(provider: provider, projectPath: projectPath)
             }
         }
+        .alert(item: $updateManager.notice) { notice in
+            if notice.canInstall {
+                Alert(
+                    title: Text(notice.title),
+                    message: Text(notice.message),
+                    primaryButton: .default(Text("Update now")) {
+                        updateManager.installUpdate(hasOpenTerminals: store.terminalSessions.contains { !$0.hasExited })
+                    },
+                    secondaryButton: .cancel()
+                )
+            } else {
+                Alert(title: Text(notice.title), message: Text(notice.message), dismissButton: .default(Text("OK")))
+            }
+        }
+        .onAppear { updateManager.showPendingResult() }
     }
 
     private var newSessionProvider: ConversationProvider {

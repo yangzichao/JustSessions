@@ -17,12 +17,15 @@ A native macOS launcher for Claude Code and Codex. Start new sessions, or find, 
 - Delete a session from its row after confirmation. Claude Code history and its session folder move to the macOS Trash, and its local index entry is removed. Codex uses `codex delete --force`, which permanently deletes the native session.
 - Deletion is disabled while that conversation has an open terminal tab in the app.
 - Separate adapters make adding another CLI straightforward.
+- Select **Update** at the bottom of the sidebar to check this repository's GitHub `main` branch. If an update is available, the app downloads it into the original source checkout, builds a replacement app, and reopens it. Close active terminal tabs before updating.
 
 Branch forks the **conversation**. It does not create a Git branch or worktree.
 
 ## Build and run
 
 Requires macOS 14+, Xcode Command Line Tools, and whichever CLI you want to use (`claude` and/or `codex`).
+
+Updating also requires Git, a clean `main` source checkout at its original build location, and write access to the app folder. Build failures leave the installed app in place; details are logged to `~/Library/Logs/claudex-macos/update.log`.
 
 ```sh
 swift test

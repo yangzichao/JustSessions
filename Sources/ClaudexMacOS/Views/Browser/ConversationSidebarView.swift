@@ -8,6 +8,8 @@ struct ConversationSidebarView: View {
     let projects: [ProjectConversationGroup]
     let conversationCount: Int
     let recentCount: Int
+    let isCheckingForUpdates: Bool
+    let onCheckForUpdates: () -> Void
     let onNewSession: () -> Void
     let onSelect: (ConversationBrowserSelection) -> Void
     let onSelectConversation: (Conversation) -> Void
@@ -93,11 +95,24 @@ struct ConversationSidebarView: View {
             }
 
             Divider()
-            Text("Claude Code  ·  Codex")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 18)
-                .padding(.vertical, 14)
+            HStack {
+                Text("Claude Code  ·  Codex")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Button(action: onCheckForUpdates) {
+                    if isCheckingForUpdates {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Label("Update", systemImage: "arrow.down.circle")
+                    }
+                }
+                .buttonStyle(.borderless)
+                .disabled(isCheckingForUpdates)
+                .help("Check GitHub for an app update")
+            }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 14)
         }
         .background(Color(nsColor: .windowBackgroundColor))
         .onAppear { expandProjectsWithOpenTerminals() }
