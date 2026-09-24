@@ -1,4 +1,4 @@
-name: Publish app update
+name: Publish signed JustSessions update
 
 on:
   push:
@@ -17,31 +17,112 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Test
         run: swift test
-      - name: Build app
-        run: ./Scripts/build-app.sh
-      - name: Verify and package
+
+      - name: Import Developer ID certificate
+        env:
+          APPLE_CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
         run: |
+          set -euo pipefail
+          keychain_path="$RUNNER_TEMP/justsessions-signing.keychain-db"
+          keychain_password="$(openssl rand -hex 32)"
+          certificate_path="$RUNNER_TEMP/developer-id.p12"
+          printf '%s' "$APPLE_CERTIFICATE_P12_BASE64" | base64 --decode > "$certificate_path"
+          security create-keychain -p "$keychain_password" "$keychain_path"
+          security set-keychain-settings -lut 21600 "$keychain_path"
+          security unlock-keychain -p "$keychain_password" "$keychain_path"
+          security import "$certificate_path" -k "$keychain_path" -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -T /usr/bin/codesign -T /usr/bin/security
+          security list-keychains -d user -s "$keychain_path"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$keychain_path"
+          identity="$(security find-identity -v -p codesigning "$keychain_path" | awk -F '\"' '/Developer ID Application:/ { print $2; exit }')"
+          if [[ -z "$identity" ]]; then
+            echo "No Developer ID Application identity was imported." >&2
+            exit 1
+          fi
+          printf 'CODE_SIGN_IDENTITY=%s\n' "$identity" >> "$GITHUB_ENV"
+          printf 'SIGNING_KEYCHAIN_PATH=%s\n' "$keychain_path" >> "$GITHUB_ENV"
+
+      - name: Build signed app
+        run: |
+          APP_BUILD_NUMBER=$((GITHUB_RUN_NUMBER + 19)) ./Scripts/build-app.sh
           codesign --verify --deep --strict dist/JustSessions.app
           test "$(plutil -extract JustSessionsSourceRevision raw dist/JustSessions.app/Contents/Info.plist)" = "$GITHUB_SHA"
           test "$(plutil -extract CocaCodexSourceRevision raw dist/JustSessions.app/Contents/Info.plist)" = "$GITHUB_SHA"
           test "$(plutil -extract CFBundleDisplayName raw dist/JustSessions.app/Contents/Info.plist)" = "JustSessions"
+          test "$(plutil -extract CFBundleVersion raw dist/JustSessions.app/Contents/Info.plist)" = "$((GITHUB_RUN_NUMBER + 19))"
+          codesign --display --verbose=2 dist/JustSessions.app 2>&1 | grep -F "Authority=Developer ID Application:"
+
+      - name: Notarize and staple app
+        env:
+          APPLE_NOTARY_KEY: ${{ secrets.APPLE_NOTARY_KEY }}
+          APPLE_NOTARY_KEY_ID: ${{ secrets.APPLE_NOTARY_KEY_ID }}
+          APPLE_NOTARY_ISSUER_ID: ${{ secrets.APPLE_NOTARY_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          notary_key_path="$RUNNER_TEMP/AuthKey_${APPLE_NOTARY_KEY_ID}.p8"
+          notary_archive="$RUNNER_TEMP/JustSessions-notarization.zip"
+          printf '%s' "$APPLE_NOTARY_KEY" > "$notary_key_path"
+          chmod 600 "$notary_key_path"
+          ditto -c -k --sequesterRsrc --keepParent dist/JustSessions.app "$notary_archive"
+          xcrun notarytool submit "$notary_archive" \
+            --key "$notary_key_path" \
+            --key-id "$APPLE_NOTARY_KEY_ID" \
+            --issuer "$APPLE_NOTARY_ISSUER_ID" \
+            --wait
+          xcrun stapler staple dist/JustSessions.app
+          xcrun stapler validate dist/JustSessions.app
+
+      - name: Package app and generate Sparkle appcast
+        env:
+          SPARKLE_EDDSA_PRIVATE_KEY: ${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="build-$GITHUB_SHA"
+          mkdir -p dist/sparkle-updates
           ditto -c -k --sequesterRsrc --keepParent dist/JustSessions.app dist/JustSessions.zip
           ditto dist/JustSessions.app dist/coca-codex.app
           codesign --verify --deep --strict dist/coca-codex.app
           ditto -c -k --sequesterRsrc --keepParent dist/coca-codex.app dist/coca-codex.zip
-      - name: Publish GitHub build
+          if gh release download latest --repo yangzichao/JustSessions --pattern appcast.xml \
+            --dir dist/sparkle-updates; then
+            echo "Continuing the existing Sparkle update feed."
+          else
+            echo "Starting a new Sparkle update feed."
+          fi
+          update_archive="dist/sparkle-updates/JustSessions-$((GITHUB_RUN_NUMBER + 19)).zip"
+          cp dist/JustSessions.zip "$update_archive"
+          download_prefix="https://github.com/yangzichao/JustSessions/releases/download/$tag/"
+          printf '%s' "$SPARKLE_EDDSA_PRIVATE_KEY" | \
+            ./.build/artifacts/Sparkle/Sparkle/bin/generate_appcast \
+              --ed-key-file - \
+              --download-url-prefix "$download_prefix" \
+              --embed-release-notes \
+              dist/sparkle-updates
+          codesign --verify --deep --strict dist/JustSessions.app
+          spctl --assess --type execute --verbose=2 dist/JustSessions.app
+
+      - name: Publish GitHub build release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           tag="build-$GITHUB_SHA"
-          if gh release view "$tag" >/dev/null 2>&1; then
+          if gh release view "$tag" --repo yangzichao/JustSessions >/dev/null 2>&1; then
             echo "Build already published: $tag"
           else
-            gh release create "$tag" dist/JustSessions.zip dist/coca-codex.zip \
+            gh release create "$tag" \
+              dist/JustSessions.zip \
+              dist/coca-codex.zip \
+              "$update_archive" \
+              dist/sparkle-updates/appcast.xml \
+              --repo yangzichao/JustSessions \
               --target "$GITHUB_SHA" \
               --title "JustSessions ${GITHUB_SHA:0:7}" \
-              --notes "Automatic JustSessions build from main. The coca-codex.zip asset supports updates from older installations." \
+              --notes "Signed, notarized JustSessions build. The appcast.xml asset powers Sparkle updates; coca-codex.zip supports updates from earlier installs." \
               --latest
           fi

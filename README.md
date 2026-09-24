@@ -20,7 +20,7 @@ A native macOS launcher for Claude Code, Codex, and Google Antigravity CLI. Star
 - Delete a Claude Code or Codex session from its row after confirmation. Claude Code history and its session folder move to the macOS Trash, and its local index entry is removed. Codex uses `codex delete --force`, which permanently deletes the native session. Antigravity's deletion flow is interactive in its session picker, so its sessions cannot be deleted from this app.
 - Deletion is disabled while that conversation has an open terminal tab in the app.
 - Separate adapters make adding another CLI straightforward.
-- The app checks for a new GitHub build when it opens and automatically downloads, installs, and reopens it. If a native CLI terminal is running, the update waits for you to close that terminal; **Update** at the bottom of the sidebar checks again at any time.
+- Sparkle checks for updates automatically and presents available updates using its standard macOS update dialog. **Update** at the bottom of the sidebar checks immediately.
 
 Branch forks the **conversation**. It does not create a Git branch or worktree.
 
@@ -28,7 +28,7 @@ Branch forks the **conversation**. It does not create a Git branch or worktree.
 
 Requires macOS 14+, Xcode Command Line Tools, and whichever CLI you want to use (`claude`, `codex`, and/or `agy`).
 
-GitHub Actions builds an app archive from every push to `main` and publishes it as a GitHub build release. Updating requires network access and write access to the app folder, but does not need a local source checkout or build tools. The app verifies the downloaded archive's SHA-256 digest, code signature, bundle ID, and source revision before replacing itself. If installation fails, it restores the previous app; details are logged to `~/Library/Logs/JustSessions/update.log`. Releases also include a `coca-codex.zip` compatibility archive so older installations can update to JustSessions. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
+GitHub Actions builds, Developer ID signs, notarizes, and publishes an app archive from every push to `main`. Releases include a Sparkle-signed archive and `appcast.xml`, plus `JustSessions.zip` and `coca-codex.zip` compatibility archives for older installations that still use the original updater. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_KEY_ID`, `APPLE_NOTARY_ISSUER_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
 
 ```sh
 swift test

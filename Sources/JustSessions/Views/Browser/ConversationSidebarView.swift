@@ -8,7 +8,6 @@ struct ConversationSidebarView: View {
     let projects: [ProjectConversationGroup]
     let conversationCount: Int
     let recentCount: Int
-    let isCheckingForUpdates: Bool
     let onCheckForUpdates: () -> Void
     let onNewSession: () -> Void
     let onSelect: (ConversationBrowserSelection) -> Void
@@ -133,15 +132,10 @@ struct ConversationSidebarView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button(action: onCheckForUpdates) {
-                    if isCheckingForUpdates {
-                        ProgressView().controlSize(.small)
-                    } else {
-                        Label("Update", systemImage: "arrow.down.circle")
-                    }
+                    Label("Update", systemImage: "arrow.down.circle")
                 }
                 .buttonStyle(.borderless)
-                .disabled(isCheckingForUpdates)
-                .help("Check GitHub for an app update")
+                .help("Check for updates")
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
