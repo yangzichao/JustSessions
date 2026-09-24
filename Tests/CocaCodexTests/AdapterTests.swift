@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import ClaudexMacOS
+@testable import CocaCodex
 
 struct AdapterTests {
     @Test func claudeDiscoversIndexedAndUnindexedSessions() throws {

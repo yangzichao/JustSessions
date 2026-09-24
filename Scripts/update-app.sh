@@ -30,7 +30,7 @@ finish_update() {
     if [[ -n "$staging_directory" && -d "$staging_directory" ]]; then
         rm -rf "$staging_directory"
     fi
-    if [[ "$(basename "$download_directory")" == claudex-macos-update-* && -d "$download_directory" ]]; then
+    if [[ "$(basename "$download_directory")" == coca-codex-update-* && -d "$download_directory" ]]; then
         rm -rf "$download_directory"
     fi
     exit "$exit_status"
@@ -52,17 +52,17 @@ if [[ "$actual_sha256" != "$expected_sha256" ]]; then
     exit 1
 fi
 
-staging_directory="$(mktemp -d "$(dirname "$application_bundle")/.claudex-update.XXXXXX")"
+staging_directory="$(mktemp -d "$(dirname "$application_bundle")/.coca-codex-update.XXXXXX")"
 /usr/bin/ditto -x -k "$archive" "$staging_directory"
-new_bundle="$staging_directory/claudex-macos.app"
+new_bundle="$staging_directory/coca-codex.app"
 if [[ ! -d "$new_bundle" ]]; then
-    echo "The archive does not contain claudex-macos.app."
+    echo "The archive does not contain coca-codex.app."
     exit 1
 fi
 /usr/bin/codesign --verify --deep --strict "$new_bundle"
 bundle_identifier="$(/usr/bin/plutil -extract CFBundleIdentifier raw "$new_bundle/Contents/Info.plist")"
-archive_revision="$(/usr/bin/plutil -extract ClaudexSourceRevision raw "$new_bundle/Contents/Info.plist")"
-if [[ "$bundle_identifier" != "dev.zichaoyang.claudex-macos" || "$archive_revision" != "$expected_revision" ]]; then
+archive_revision="$(/usr/bin/plutil -extract CocaCodexSourceRevision raw "$new_bundle/Contents/Info.plist")"
+if [[ "$bundle_identifier" != "dev.zichaoyang.coca-codex" || "$archive_revision" != "$expected_revision" ]]; then
     echo "The archive contains an unexpected app or revision."
     exit 1
 fi

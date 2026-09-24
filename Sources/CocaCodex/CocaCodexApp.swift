@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct ClaudexMacOSApp: App {
+struct CocaCodexApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

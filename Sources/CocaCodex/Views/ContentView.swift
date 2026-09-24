@@ -43,7 +43,7 @@ struct ContentView: View {
                 renamingConversation = nil
             }
         } message: {
-            Text("This changes the display name in claudex-macos.")
+            Text("This changes the display name in coca-codex.")
         }
         .confirmationDialog("Delete conversation?", isPresented: Binding(
             get: { deletingConversation != nil },

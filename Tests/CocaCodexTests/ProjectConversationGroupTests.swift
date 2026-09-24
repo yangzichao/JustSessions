@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import ClaudexMacOS
+@testable import CocaCodex
 
 struct ProjectConversationGroupTests {
     @Test func sameFolderCombinesProvidersAndSortsByActivity() {

@@ -132,7 +132,7 @@ struct ConversationSidebarView: View {
                 .frame(width: 30, height: 30)
                 .background(Color.black, in: RoundedRectangle(cornerRadius: 8))
             VStack(alignment: .leading, spacing: 1) {
-                Text("Claudex").font(.system(size: 15, weight: .semibold))
+                Text("coca-codex").font(.system(size: 15, weight: .semibold))
                 Text("SESSION LIBRARY")
                     .font(.system(size: 9, weight: .medium, design: .rounded))
                     .tracking(1.1)

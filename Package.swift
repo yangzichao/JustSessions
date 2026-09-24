@@ -2,17 +2,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "ClaudexMacOS",
+    name: "CocaCodex",
     platforms: [.macOS(.v14)],
-    products: [.executable(name: "ClaudexMacOS", targets: ["ClaudexMacOS"])],
+    products: [.executable(name: "CocaCodex", targets: ["CocaCodex"])],
     dependencies: [
         .package(url: "https://github.com/migueldeicaza/SwiftTerm.git", exact: "1.15.0"),
     ],
     targets: [
         .executableTarget(
-            name: "ClaudexMacOS",
+            name: "CocaCodex",
             dependencies: [.product(name: "SwiftTerm", package: "SwiftTerm")]
         ),
-        .testTarget(name: "ClaudexMacOSTests", dependencies: ["ClaudexMacOS"]),
+        .testTarget(name: "CocaCodexTests", dependencies: ["CocaCodex"]),
     ]
 )

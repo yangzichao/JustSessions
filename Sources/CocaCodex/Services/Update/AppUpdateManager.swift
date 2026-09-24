@@ -19,12 +19,12 @@ final class AppUpdateManager: ObservableObject {
 
     private let resultFile: URL = {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return applicationSupport.appendingPathComponent("claudex-macos/update-result.txt")
+        return applicationSupport.appendingPathComponent("coca-codex/update-result.txt")
     }()
 
     private let logFile: URL = {
         let logs = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
-        return logs.appendingPathComponent("Logs/claudex-macos/update.log")
+        return logs.appendingPathComponent("Logs/coca-codex/update.log")
     }()
 
     func checkForUpdates(automaticallyInstall: Bool = false, hasOpenTerminals: @escaping () -> Bool = { false }) {
@@ -36,7 +36,7 @@ final class AppUpdateManager: ObservableObject {
         isCheckingForUpdates = true
         Task {
             do {
-                guard let bundledRevision = Bundle.main.object(forInfoDictionaryKey: "ClaudexSourceRevision") as? String else {
+                guard let bundledRevision = Bundle.main.object(forInfoDictionaryKey: "CocaCodexSourceRevision") as? String else {
                     throw AppUpdateError("This app has no build revision. Rebuild it with Scripts/build-app.sh.")
                 }
                 let update = try await GitHubUpdateChecker.check(bundledRevision: bundledRevision)
@@ -49,7 +49,7 @@ final class AppUpdateManager: ObservableObject {
                     }
                     notice = AppUpdateNotice(
                         title: "Update available",
-                        message: "A newer version is ready on GitHub. Update now to download and reopen claudex-macos?",
+                        message: "A newer version is ready on GitHub. Update now to download and reopen coca-codex?",
                         canInstall: true
                     )
                 } else if !automaticallyInstall {
@@ -148,7 +148,7 @@ final class AppUpdateManager: ObservableObject {
         let succeeded = lines.first == "success"
         notice = AppUpdateNotice(
             title: succeeded ? "Update complete" : "Update failed",
-            message: lines.count > 1 ? String(lines[1]) : (succeeded ? "claudex-macos is up to date." : "See \(logFile.path)"),
+            message: lines.count > 1 ? String(lines[1]) : (succeeded ? "coca-codex is up to date." : "See \(logFile.path)"),
             canInstall: false
         )
         return true
