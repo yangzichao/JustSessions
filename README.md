@@ -1,25 +1,26 @@
 # JustSessions
 
-A native macOS launcher for Claude Code, Codex, and Google Antigravity CLI. Start new sessions, or find and resume existing ones in their original CLI inside an embedded terminal. Claude Code and Codex sessions can also be branched. The app does not re-render transcripts.
+A native macOS launcher for Claude Code, Codex, and Google Antigravity CLI. Start new sessions, or find and resume existing ones in their original CLI inside an embedded terminal. Claude Code and Codex sessions can also be branched. Selecting a session shows a read-only preview of its conversation; to continue it, resume it in its CLI.
 
 ## Features
 
 - Scans existing Claude Code, Codex, and local Antigravity CLI sessions, grouped by project folder and sorted by recent activity.
-- Browse projects in a persistent sidebar, then see all supported sessions for one folder in a focused list. The sidebar remains visible beside embedded terminals.
+- Browse projects and their sessions in a persistent sidebar. The sidebar remains visible beside the conversation preview and embedded terminals.
 - Drag the divider beside the sidebar to adjust its width while browsing sessions or using a terminal. The app remembers the chosen width.
-- Expand a project in the sidebar to see its sessions. Open terminal tabs appear in a dedicated sidebar section and mark their project and session; selecting one switches back to that terminal. Selecting a closed session focuses its row in the main list.
-- Search sessions by display name, project path, or session ID. Search projects separately by folder name or path in the sidebar, and filter to sessions active in the past seven days.
-- Resume a conversation in an embedded terminal using each CLI's native interactive command: double-click its row in the main list, or use its right-click or ⋯ menu. Claude Code and Codex can also be branched from the same menus. In Antigravity CLI, use `/fork` after resuming to branch a conversation.
+- Expand a project in the sidebar to see its sessions. Open terminal tabs appear in a dedicated sidebar section and mark their project and session; selecting one switches back to that terminal. Selecting a session without an open terminal shows its conversation on the right.
+- The conversation preview reads Claude Code and Codex session files directly. It shows your messages and the CLI's replies, with runs of tool calls collapsed into one expandable row; thinking and tool output are left out. Very long sessions show their newest 2,000 entries. Antigravity sessions have no preview yet.
+- Search in the sidebar filters projects by name or path, and sessions by title or session ID; projects with matches expand while searching. **Recent** limits the sidebar to sessions active in the past seven days, and **Tool** to one CLI.
+- Resume a conversation in an embedded terminal using each CLI's native interactive command: use **Resume** in the preview header, double-click the session in the sidebar, or use its right-click menu. Claude Code and Codex can also be branched from the preview header or the right-click menu. In Antigravity CLI, use `/fork` after resuming to branch a conversation.
 - Use **New session** from the sidebar to choose Claude Code, Codex, or Antigravity and a project folder, including one with no history. The CLI starts in that folder with no resume or fork arguments. New CLI sessions appear in the project list after returning from the terminal or closing it.
-- Use **+** beside a project, or **New session** at the top of its page, to start any supported CLI directly in that project's folder without choosing a path.
-- Keep multiple terminal tabs open in a persistent bar above the session list and terminal. Searching or choosing a project switches to the list while the CLI keeps running; click its tab to return. Resume reopens an already running tab for that conversation. Closing a tab ends its process.
+- Use **+** beside a project to start any supported CLI directly in that project's folder without choosing a path.
+- Keep multiple terminal tabs open in a persistent bar above the preview and terminal. **Preview** switches back to the conversation preview while the CLI keeps running; click its tab to return. Resume reopens an already running tab for that conversation. Closing a tab ends its process.
 - Drag across terminal output to select text, then press **⌘C** or use **Copy selection**. Terminal colors follow the macOS appearance. Turn on **CLI mouse** when an interactive CLI needs mouse clicks; hold Shift while dragging to select text in that mode.
 - Rename a row locally. Aliases are saved in this app's UserDefaults and do not change the CLI's own session title.
 - A name set with `/rename` inside a running Claude Code tab appears in that tab's title and its sidebar row within about a second. A local alias still takes priority.
 - Right-click a session in the sidebar to resume, branch, rename, copy its ID, reveal its file in Finder, or delete it. Right-click a project to start a session, open or copy its folder path, or delete its eligible sessions after a confirmation. Open terminal sessions and Antigravity sessions are skipped by project deletion.
-- Right-click a project or session to pin it. Pinned projects stay at the top of the project list, and pinned sessions stay at the top of their project, in both the sidebar and the main list. Pins are saved in this app's UserDefaults.
+- Right-click a project or session to pin it. Pinned projects stay at the top of the project list, and pinned sessions stay at the top of their project. Pins are saved in this app's UserDefaults.
 - ⌘-click sessions in the sidebar to select several, or ⇧-click to select a range. Right-click any selected row to resume or branch them all, each in its own terminal tab, or to delete them together after a confirmation. The bar at the bottom of the sidebar also offers delete. Selections can span projects; open terminal sessions and Antigravity sessions are skipped.
-- Delete a Claude Code or Codex session from its row after confirmation. Claude Code history and its session folder move to the macOS Trash, and its local index entry is removed. Codex uses `codex delete --force`, which permanently deletes the native session. Antigravity's deletion flow is interactive in its session picker, so its sessions cannot be deleted from this app.
+- Delete a Claude Code or Codex session from its right-click menu or the preview's ⋯ menu after confirmation. Claude Code history and its session folder move to the macOS Trash, and its local index entry is removed. Codex uses `codex delete --force`, which permanently deletes the native session. Antigravity's deletion flow is interactive in its session picker, so its sessions cannot be deleted from this app.
 - Deletion is disabled while that conversation has an open terminal tab in the app.
 - Separate adapters make adding another CLI straightforward.
 - Sparkle checks for updates automatically and presents available updates using its standard macOS update dialog. **Update** at the bottom of the sidebar checks immediately.
@@ -41,7 +42,7 @@ git tag v0.17.0
 git push origin v0.17.0
 ```
 
-Releases include the notarized `JustSessions.dmg` installer, a Sparkle-signed archive and `appcast.xml`, plus `JustSessions.zip` and `coca-codex.zip` compatibility archives for older installations that still use the original updater. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_KEY_ID`, `APPLE_NOTARY_ISSUER_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
+Releases include the notarized `JustSessions.dmg` installer, `appcast.xml`, a single Sparkle-signed `JustSessions.zip` archive also used by older JustSessions installs, and `coca-codex.zip` for installs from before the rename. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_ISSUER_ID`, `APPLE_NOTARY_KEY_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
 
 ```sh
 swift test
@@ -59,4 +60,6 @@ To start a CLI from Finder, the app checks the inherited `PATH` plus `~/.local/b
 - `Services/Adapters/`: provider discovery and native arguments.
 - `Services/Launch/`: CLI executable resolution and process environment.
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
-- `Views/`: SwiftUI project list and embedded terminal tabs.
+- `Services/Transcript/`: read-only conversation readers for the preview.
+- `Views/Browser/`: sidebar, terminal tab bar, and window layout.
+- `Views/Preview/`: conversation preview for the selected session.

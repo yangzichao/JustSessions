@@ -10,11 +10,12 @@ struct WorkspaceTabBar: View {
                 Button {
                     store.selectTerminal(nil)
                 } label: {
-                    Label("Sessions", systemImage: "square.stack")
+                    Label("Preview", systemImage: "text.bubble")
                 }
                 .buttonStyle(.bordered)
                 .tint(store.selectedTerminalID == nil ? .accentColor : nil)
-                .accessibilityLabel("Show sessions")
+                .help("Show the selected session's conversation")
+                .accessibilityLabel("Show session preview")
 
                 ForEach(store.terminalSessions) { session in
                     TerminalTab(

@@ -5,7 +5,6 @@ struct SidebarProjectSection: View {
     let project: ProjectConversationGroup
     let parentLabel: String?
     let isExpanded: Bool
-    let isSelected: Bool
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
     let onToggle: () -> Void
@@ -63,12 +62,11 @@ struct SidebarProjectSection: View {
                         Text("\(project.conversations.count)")
                             .foregroundStyle(.secondary)
                     }
-                    .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? .primary : .secondary)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.primary)
                     .padding(.horizontal, 10)
                     .frame(height: parentLabel == nil ? 32 : 42)
                     .contentShape(Rectangle())
-                    .background(isSelected ? Color.accentColor.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 7))
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
@@ -132,7 +130,7 @@ struct SidebarProjectSection: View {
             HStack(spacing: 8) {
                 Image(systemName: conversation.provider.symbolName)
                     .font(.system(size: 11))
-                    .foregroundStyle(providerColor(for: conversation.provider))
+                    .foregroundStyle(conversation.provider.tintColor)
                     .frame(width: 14)
                 Text(store.title(for: conversation))
                     .lineLimit(1)
@@ -198,14 +196,6 @@ struct SidebarProjectSection: View {
                 onDeleteConversation(conversation)
             }
             .disabled(store.hasTerminal(for: conversation) || store.isLoading || store.isDeletingSessions)
-        }
-    }
-
-    private func providerColor(for provider: ConversationProvider) -> Color {
-        switch provider {
-        case .claude: .orange
-        case .codex: .blue
-        case .antigravity: .purple
         }
     }
 }

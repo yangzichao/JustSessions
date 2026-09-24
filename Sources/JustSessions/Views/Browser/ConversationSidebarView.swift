@@ -3,14 +3,15 @@ import SwiftUI
 struct ConversationSidebarView: View {
     @ObservedObject var store: ConversationStore
     @Binding var searchText: String
-    let selection: ConversationBrowserSelection
+    @Binding var recencyFilter: SessionRecencyFilter
+    @Binding var providerFilter: ConversationProviderFilter
     @Binding var sessionSelection: SessionMultiSelection
+    /// Already narrowed by the tool, recency, and search filters.
     let projects: [ProjectConversationGroup]
-    let conversationCount: Int
-    let recentCount: Int
+    let allSessionCount: Int
+    let recentSessionCount: Int
     let onCheckForUpdates: () -> Void
     let onNewSession: () -> Void
-    let onSelect: (ConversationBrowserSelection) -> Void
     let onSelectConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onDeleteConversation: (Conversation) -> Void
@@ -19,15 +20,9 @@ struct ConversationSidebarView: View {
     let onDeleteProjectSessions: (String) -> Void
 
     @State private var expandedProjectPaths: Set<String> = []
-    @State private var projectSearchText = ""
 
-    private var visibleProjects: [ProjectConversationGroup] {
-        let query = projectSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return projects }
-        return projects.filter {
-            $0.displayName.localizedCaseInsensitiveContains(query)
-                || $0.projectPath.localizedCaseInsensitiveContains(query)
-        }
+    private var isSearching: Bool {
+        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     private var repeatedProjectNames: Set<String> {
@@ -38,9 +33,13 @@ struct ConversationSidebarView: View {
 
     /// Session rows in the order they appear in the sidebar, used for Shift-click ranges.
     private var visibleConversationIDs: [String] {
-        visibleProjects
-            .filter { expandedProjectPaths.contains($0.id) }
+        projects
+            .filter(isExpanded)
             .flatMap { $0.conversations.map(\.id) }
+    }
+
+    private var listedConversationIDs: Set<String> {
+        Set(projects.flatMap { $0.conversations.map(\.id) })
     }
 
     private var selectedConversations: [Conversation] {
@@ -55,8 +54,8 @@ struct ConversationSidebarView: View {
             brand
             SidebarSearchField(
                 text: $searchText,
-                placeholder: "Search sessions",
-                accessibilityLabel: "Search sessions and projects"
+                placeholder: "Search projects and sessions",
+                accessibilityLabel: "Search projects by name or path and sessions by title or ID"
             )
             Button(action: onNewSession) {
                 Label("New session", systemImage: "plus")
@@ -68,12 +67,9 @@ struct ConversationSidebarView: View {
             .padding(.top, 12)
 
             VStack(spacing: 2) {
-                navigationRow("All sessions", symbol: "square.stack", count: conversationCount, isSelected: selection == .all) {
-                    onSelect(.all)
-                }
-                navigationRow("Recent", symbol: "clock", count: recentCount, isSelected: selection == .recent) {
-                    onSelect(.recent)
-                }
+                filterRow("All sessions", symbol: "square.stack", count: allSessionCount, filter: .all)
+                filterRow("Recent", symbol: "clock", count: recentSessionCount, filter: .recent)
+                toolFilterRow
             }
             .padding(.horizontal, 8)
             .padding(.top, 16)
@@ -94,42 +90,27 @@ struct ConversationSidebarView: View {
                         .padding(.horizontal, 8)
                     }
 
-                    sectionHeading("PROJECTS", count: visibleProjects.count)
+                    sectionHeading("PROJECTS", count: projects.count)
                         .padding(.top, store.terminalSessions.isEmpty ? 26 : 22)
 
-                    SidebarSearchField(
-                        text: $projectSearchText,
-                        placeholder: "Search projects",
-                        accessibilityLabel: "Search projects by name or path"
-                    )
-                    .padding(.bottom, 8)
-
-                    if visibleProjects.isEmpty {
-                        Text("No matching projects")
+                    if projects.isEmpty {
+                        Text(emptyProjectsMessage)
                             .font(.system(size: 12))
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 18)
                             .padding(.vertical, 8)
                     }
 
-                    ForEach(visibleProjects) { project in
+                    ForEach(projects) { project in
                         SidebarProjectSection(
                             store: store,
                             project: project,
                             parentLabel: repeatedNames.contains(project.displayName)
                                 ? projectParentLabel(project.projectPath) : nil,
-                            isExpanded: expandedProjectPaths.contains(project.id),
-                            isSelected: selection == .project(project.id),
+                            isExpanded: isExpanded(project),
                             sessionSelection: sessionSelection,
                             selectedConversations: selectedConversations,
-                            onToggle: {
-                                if expandedProjectPaths.contains(project.id) {
-                                    expandedProjectPaths.remove(project.id)
-                                } else {
-                                    expandedProjectPaths.insert(project.id)
-                                }
-                                onSelect(.project(project.id))
-                            },
+                            onToggle: { toggleExpansion(of: project) },
                             onNewSession: { provider in
                                 store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
                             },
@@ -177,24 +158,16 @@ struct ConversationSidebarView: View {
         .onChange(of: store.terminalSessions.map(\.id)) { _, _ in
             expandProjectsWithOpenTerminals()
         }
-        .onChange(of: selection) { _, newSelection in
-            if case .project(let path) = newSelection { expandedProjectPaths.insert(path) }
-        }
-        .onChange(of: visibleConversationIDs) { _, newVisibleConversationIDs in
-            // Collapsed, filtered, or deleted rows leave the selection so a batch delete only touches visible rows.
-            sessionSelection.keepOnly(Set(newVisibleConversationIDs))
+        .onChange(of: listedConversationIDs) { _, newListedConversationIDs in
+            // Rows hidden by a filter or search, or deleted, leave the selection so actions only touch listed rows.
+            sessionSelection.keepOnly(newListedConversationIDs)
         }
     }
 
-    private func handleConversationClick(_ conversation: Conversation) {
-        let modifiers = NSEvent.modifierFlags
-        if modifiers.contains(.shift) {
-            sessionSelection.selectRange(to: conversation.id, in: visibleConversationIDs)
-        } else if modifiers.contains(.command) {
-            sessionSelection.toggle(conversation.id)
-        } else {
-            onSelectConversation(conversation)
-        }
+    private var emptyProjectsMessage: String {
+        if store.isLoading && store.conversations.isEmpty { return "Scanning sessions…" }
+        if isSearching { return "No matching projects or sessions" }
+        return recencyFilter == .recent ? "No sessions in the past seven days" : "No sessions"
     }
 
     private var brand: some View {
@@ -212,6 +185,17 @@ struct ConversationSidebarView: View {
                     .foregroundStyle(.tertiary)
             }
             Spacer()
+            if store.isLoading {
+                ProgressView().controlSize(.small)
+            } else {
+                Button { store.refresh() } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .buttonStyle(.borderless)
+                .disabled(store.isDeletingSessions)
+                .help("Refresh sessions")
+                .accessibilityLabel("Refresh sessions")
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 20)
@@ -230,14 +214,14 @@ struct ConversationSidebarView: View {
         .padding(.bottom, 8)
     }
 
-    private func navigationRow(
+    private func filterRow(
         _ title: String,
         symbol: String,
         count: Int,
-        isSelected: Bool,
-        action: @escaping () -> Void
+        filter: SessionRecencyFilter
     ) -> some View {
-        Button(action: action) {
+        let isSelected = recencyFilter == filter
+        return Button { recencyFilter = filter } label: {
             HStack(spacing: 10) {
                 Image(systemName: symbol).font(.system(size: 13)).frame(width: 17)
                 Text(title)
@@ -252,6 +236,53 @@ struct ConversationSidebarView: View {
             .background(isSelected ? Color.accentColor.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 7))
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private var toolFilterRow: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "line.3.horizontal.decrease").font(.system(size: 13)).frame(width: 17)
+            Text("Tool")
+            Spacer(minLength: 4)
+            Picker("Tool", selection: $providerFilter) {
+                ForEach(ConversationProviderFilter.allCases) { filter in
+                    Text(filter.rawValue).tag(filter)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            .fixedSize()
+        }
+        .font(.system(size: 12))
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 10)
+        .frame(height: 32)
+    }
+
+    private func isExpanded(_ project: ProjectConversationGroup) -> Bool {
+        isSearching || expandedProjectPaths.contains(project.id)
+    }
+
+    private func toggleExpansion(of project: ProjectConversationGroup) {
+        if expandedProjectPaths.contains(project.id) {
+            expandedProjectPaths.remove(project.id)
+        } else {
+            expandedProjectPaths.insert(project.id)
+        }
+    }
+
+    private func handleConversationClick(_ conversation: Conversation) {
+        let modifiers = NSEvent.modifierFlags
+        if modifiers.contains(.shift) {
+            sessionSelection.selectRange(to: conversation.id, in: visibleConversationIDs)
+        } else if modifiers.contains(.command) {
+            sessionSelection.toggle(conversation.id)
+        } else {
+            onSelectConversation(conversation)
+            if NSApp.currentEvent?.clickCount == 2, store.canLaunch(conversation, action: .resume) {
+                store.launch(conversation, action: .resume)
+            }
+        }
     }
 
     private func projectParentLabel(_ projectPath: String) -> String {

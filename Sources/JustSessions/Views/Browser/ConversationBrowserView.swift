@@ -3,7 +3,7 @@ import SwiftUI
 struct ConversationBrowserView: View {
     @ObservedObject var store: ConversationStore
     @Binding var searchText: String
-    @Binding var selection: ConversationBrowserSelection
+    @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
     let onRename: (Conversation) -> Void
     let onDelete: (Conversation) -> Void
@@ -15,25 +15,17 @@ struct ConversationBrowserView: View {
     @State private var isNewSessionSheetPresented = false
     @StateObject private var updateManager = SparkleUpdateManager()
 
-    private var matchingConversations: [Conversation] {
-        store.conversations.filter { conversation in
-            providerFilter.includes(conversation.provider) && (
-                searchText.isEmpty || [
-                    store.title(for: conversation),
-                    store.projectDisplayName(forProjectPath: conversation.projectDirectoryKey),
-                    conversation.projectPath,
-                    conversation.sessionID
-                ].contains { $0.localizedCaseInsensitiveContains(searchText) }
-            )
-        }
+    private var providerConversations: [Conversation] {
+        store.conversations.filter { providerFilter.includes($0.provider) }
     }
 
-    private var projectGroups: [ProjectConversationGroup] {
-        ProjectConversationGroup.grouped(
-            store.conversations.filter { providerFilter.includes($0.provider) },
+    private var sidebarProjects: [ProjectConversationGroup] {
+        let projects = ProjectConversationGroup.grouped(
+            providerConversations.filter { recencyFilter.includes($0) },
             displayNames: store.projectDisplayNames,
             pinnedItems: store.pinnedItems
         )
+        return SidebarProjectFiltering.projects(projects, matching: searchText) { store.title(for: $0) }
     }
 
     private var availableProjects: [ProjectConversationGroup] {
@@ -45,48 +37,35 @@ struct ConversationBrowserView: View {
             .filter { $0.conversations.first?.isProjectAvailable == true }
     }
 
-    private var displayedConversations: [Conversation] {
-        switch selection {
-        case .all: matchingConversations
-        case .recent: matchingConversations.filter { $0.updatedAt >= Date().addingTimeInterval(-7 * 24 * 60 * 60) }
-        case .project(let path):
-            store.pinnedItems.pinnedConversationsFirst(matchingConversations.filter { $0.projectDirectoryKey == path })
-        }
+    private var focusedConversation: Conversation? {
+        guard sessionSelection.selectedConversationIDs.count == 1,
+              let conversationID = sessionSelection.selectedConversationIDs.first else { return nil }
+        return store.conversations.first { $0.id == conversationID }
     }
 
     var body: some View {
+        let providerConversations = providerConversations
+
         ResizableSidebarLayout {
             ConversationSidebarView(
                 store: store,
                 searchText: $searchText,
-                selection: selection,
+                recencyFilter: $recencyFilter,
+                providerFilter: $providerFilter,
                 sessionSelection: $sessionSelection,
-                projects: projectGroups,
-                conversationCount: matchingConversations.count,
-                recentCount: matchingConversations.filter {
-                    $0.updatedAt >= Date().addingTimeInterval(-7 * 24 * 60 * 60)
-                }.count,
+                projects: sidebarProjects,
+                allSessionCount: providerConversations.count,
+                recentSessionCount: providerConversations.filter { SessionRecencyFilter.recent.includes($0) }.count,
                 onCheckForUpdates: { updateManager.checkForUpdates() },
                 onNewSession: { isNewSessionSheetPresented = true },
-                onSelect: { destination in
-                    if case .project = destination { searchText = "" }
-                    selection = destination
-                    sessionSelection.clear()
-                    store.selectTerminal(nil)
-                },
                 onSelectConversation: { conversation in
-                    searchText = ""
-                    selection = .project(conversation.projectDirectoryKey)
                     sessionSelection.selectOnly(conversation.id)
-                    if let openTerminal = store.terminalSessions.first(where: {
+                    let openTerminal = store.terminalSessions.first(where: {
                         $0.conversation?.id == conversation.id && !$0.hasExited
                     }) ?? store.terminalSessions.first(where: {
                         $0.conversation?.id == conversation.id
-                    }) {
-                        store.selectTerminal(openTerminal.id)
-                    } else {
-                        store.selectTerminal(nil)
-                    }
+                    })
+                    store.selectTerminal(openTerminal?.id)
                 },
                 onRenameConversation: onRename,
                 onDeleteConversation: onDelete,
@@ -99,10 +78,15 @@ struct ConversationBrowserView: View {
                 WorkspaceTabBar(store: store)
                 Divider()
                 ZStack {
-                    conversationList
-                        .opacity(store.selectedTerminalID == nil ? 1 : 0)
-                        .allowsHitTesting(store.selectedTerminalID == nil)
-                        .accessibilityHidden(store.selectedTerminalID != nil)
+                    SessionPreviewPane(
+                        store: store,
+                        sessionSelection: sessionSelection,
+                        onRename: onRename,
+                        onDelete: onDelete
+                    )
+                    .opacity(store.selectedTerminalID == nil ? 1 : 0)
+                    .allowsHitTesting(store.selectedTerminalID == nil)
+                    .accessibilityHidden(store.selectedTerminalID != nil)
 
                     ForEach(store.terminalSessions) { session in
                         let isActive = store.selectedTerminalID == session.id
@@ -116,21 +100,6 @@ struct ConversationBrowserView: View {
                         .accessibilityHidden(!isActive)
                     }
                 }
-            }
-        }
-        .onChange(of: searchText) { _, newValue in
-            if !newValue.isEmpty {
-                selection = .all
-                sessionSelection.clear()
-                store.selectTerminal(nil)
-            }
-        }
-        .onChange(of: providerFilter) { _, _ in
-            sessionSelection.keepOnly(Set(matchingConversations.map(\.id)))
-            if case .project(let path) = selection,
-               !projectGroups.contains(where: { $0.id == path }) {
-                selection = .all
-                sessionSelection.clear()
             }
         }
         .sheet(isPresented: $isNewSessionSheetPresented) {
@@ -155,184 +124,7 @@ struct ConversationBrowserView: View {
 
     private var newSessionProjectPath: String {
         if let selectedTerminal = store.selectedTerminal { return selectedTerminal.projectPath }
-        if case .project(let path) = selection { return path }
+        if let focusedConversation { return focusedConversation.projectPath }
         return availableProjects.first?.projectPath ?? ""
-    }
-
-    private var conversationList: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-
-            if store.isLoading && store.conversations.isEmpty {
-                ContentUnavailableView("Scanning conversations", systemImage: "magnifyingglass")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if displayedConversations.isEmpty {
-                ContentUnavailableView(
-                    searchText.isEmpty ? "No conversations here" : "No matching conversations",
-                    systemImage: "text.bubble"
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollViewReader { scrollProxy in
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 24) {
-                            if case .project = selection {
-                                ForEach(displayedConversations) { conversation in
-                                    conversationRow(conversation)
-                                }
-                            } else {
-                                ForEach(ProjectConversationGroup.grouped(
-                                    displayedConversations,
-                                    displayNames: store.projectDisplayNames,
-                                    pinnedItems: store.pinnedItems
-                                )) { project in
-                                    projectSection(project)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 28)
-                        .padding(.vertical, 22)
-                    }
-                    .onAppear { scrollToSelectedConversation(using: scrollProxy) }
-                    .onChange(of: sessionSelection.anchorConversationID) { _, _ in
-                        scrollToSelectedConversation(using: scrollProxy)
-                    }
-                }
-                .id(selection)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(nsColor: .textBackgroundColor))
-    }
-
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack(alignment: .center, spacing: 12) {
-                Text(headerTitle)
-                    .font(.system(size: 23, weight: .semibold))
-                    .lineLimit(1)
-                Spacer(minLength: 8)
-                if case .project(let path) = selection,
-                   let project = projectGroups.first(where: { $0.id == path }) {
-                    ProjectNewSessionMenu(project: project, showsTitle: true) { provider in
-                        store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-                Picker("Tool", selection: $providerFilter) {
-                    ForEach(ConversationProviderFilter.allCases) { filter in
-                        Text(filter.rawValue).tag(filter)
-                    }
-                }
-                .pickerStyle(.menu)
-                .frame(width: 160)
-                Button { store.refresh() } label: {
-                    Image(systemName: "arrow.clockwise")
-                }
-                .buttonStyle(.borderless)
-                .disabled(store.isLoading || store.isDeletingSessions)
-                .help("Refresh sessions")
-                .accessibilityLabel("Refresh sessions")
-            }
-            Text(headerSubtitle)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .truncationMode(.middle)
-        }
-        .padding(.horizontal, 28)
-        .padding(.vertical, 20)
-    }
-
-    private var headerTitle: String {
-        if !searchText.isEmpty { return "Search results" }
-        switch selection {
-        case .all: return "All sessions"
-        case .recent: return "Recent"
-        case .project(let path): return store.projectDisplayName(forProjectPath: path)
-        }
-    }
-
-    private var headerSubtitle: String {
-        if case .project(let path) = selection { return path }
-        let count = displayedConversations.count
-        let source = providerFilter == .all ? "All tools" : providerFilter.rawValue
-        return "\(count) \(count == 1 ? "session" : "sessions") · \(source)"
-    }
-
-    private func projectSection(_ project: ProjectConversationGroup) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 8) {
-                Button {
-                    selection = .project(project.id)
-                    sessionSelection.clear()
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "folder")
-                            .foregroundStyle(.secondary)
-                        Text(project.displayName)
-                            .font(.system(size: 14, weight: .semibold))
-                            .lineLimit(1)
-                        if project.isPinned { PinnedIndicator(size: 9) }
-                        Text("\(project.conversations.count)")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .frame(maxWidth: .infinity)
-                .help(project.projectPath)
-                .contextMenu {
-                    Button("Rename project…", systemImage: "pencil") { onRenameProject(project) }
-                    Button(project.isPinned ? "Unpin project" : "Pin project", systemImage: project.isPinned ? "pin.slash" : "pin") {
-                        store.setPinned(!project.isPinned, projectPath: project.projectPath)
-                    }
-                }
-
-                ProjectNewSessionMenu(project: project, showsTitle: false) { provider in
-                    store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
-                }
-                .menuStyle(.borderlessButton)
-            }
-            .padding(.bottom, 8)
-
-            ForEach(project.conversations) { conversation in
-                conversationRow(conversation)
-            }
-        }
-    }
-
-    private func conversationRow(_ conversation: Conversation) -> some View {
-        ConversationRow(
-            conversation: conversation,
-            title: store.title(for: conversation),
-            isSelected: sessionSelection.contains(conversation.id),
-            isPinned: store.pinnedItems.isPinned(conversationID: conversation.id),
-            onResume: { store.launch(conversation, action: .resume) },
-            onBranch: { store.launch(conversation, action: .branch) },
-            onRename: { onRename(conversation) },
-            onTogglePin: {
-                store.setPinned(!store.pinnedItems.isPinned(conversationID: conversation.id), conversation: conversation)
-            },
-            onDelete: { onDelete(conversation) },
-            canDelete: !store.hasTerminal(for: conversation) && !store.isLoading && !store.isDeletingSessions,
-            isDeleting: store.deletingConversationID == conversation.id
-        )
-        .id(conversation.id)
-    }
-
-    private func scrollToSelectedConversation(using scrollProxy: ScrollViewProxy) {
-        guard let focusedConversationID = sessionSelection.anchorConversationID else { return }
-        DispatchQueue.main.async {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                scrollProxy.scrollTo(focusedConversationID, anchor: .center)
-            }
-        }
     }
 }

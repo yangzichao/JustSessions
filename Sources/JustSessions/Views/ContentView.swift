@@ -10,7 +10,7 @@ struct ContentView: View {
 
     @StateObject private var store = ConversationStore()
     @State private var searchText = ""
-    @State private var selection: ConversationBrowserSelection = .all
+    @State private var recencyFilter: SessionRecencyFilter = .all
     @State private var providerFilter: ConversationProviderFilter = .all
     @State private var renamingConversation: Conversation?
     @State private var renamingProject: ProjectConversationGroup?
@@ -23,7 +23,7 @@ struct ContentView: View {
         ConversationBrowserView(
             store: store,
             searchText: $searchText,
-            selection: $selection,
+            recencyFilter: $recencyFilter,
             providerFilter: $providerFilter,
             onRename: { conversation in
                 editedTitle = store.title(for: conversation)
