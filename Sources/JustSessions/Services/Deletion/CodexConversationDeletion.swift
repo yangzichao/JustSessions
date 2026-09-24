@@ -38,6 +38,7 @@ struct CodexConversationDeletion {
         process.arguments = ["delete", "--force", conversation.sessionID]
         process.currentDirectoryURL = codexDirectory
         var environment = ProcessInfo.processInfo.environment
+        environment["PATH"] = resolver.pathEnvironmentValue
         environment["CODEX_HOME"] = codexDirectory.path
         process.environment = environment
         let output = Pipe()

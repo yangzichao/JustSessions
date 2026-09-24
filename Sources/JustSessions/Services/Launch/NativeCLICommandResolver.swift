@@ -6,7 +6,9 @@ enum NativeCLICommandError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .missingExecutable(let name): "Could not find the \(name) CLI. Install it or add it to your PATH."
+        case .missingExecutable(let name):
+            "Could not find the \(name) CLI in your shell PATH or common install locations. "
+                + "Install it, then check that `\(name)` runs in a new Terminal window."
         case .missingProject(let path): "The project directory no longer exists: \(path)"
         }
     }
@@ -21,8 +23,8 @@ struct NativeCLICommand {
 
 struct NativeCLICommandResolver {
     let fileManager: FileManager
-    let searchDirectories: [String]
     let inheritedEnvironment: [String: String]
+    private let searchDirectoriesOverride: [String]?
 
     init(
         fileManager: FileManager = .default,
@@ -31,12 +33,20 @@ struct NativeCLICommandResolver {
     ) {
         self.fileManager = fileManager
         self.inheritedEnvironment = inheritedEnvironment
-        let pathDirectories = (inheritedEnvironment["PATH"] ?? "")
-            .split(separator: ":")
-            .map(String.init)
-        self.searchDirectories = searchDirectories ?? pathDirectories + [
-            NSHomeDirectory() + "/.local/bin", "/opt/homebrew/bin", "/usr/local/bin", "/usr/bin"
-        ]
+        self.searchDirectoriesOverride = searchDirectories
+    }
+
+    /// Computed per lookup so a CLI installed while the app is running is still found.
+    var searchDirectories: [String] {
+        searchDirectoriesOverride ?? CLISearchDirectories.standard(
+            inheritedEnvironment: inheritedEnvironment,
+            fileManager: fileManager
+        )
+    }
+
+    /// PATH for spawned CLIs, so npm-installed ones can find `node` via `#!/usr/bin/env node`.
+    var pathEnvironmentValue: String {
+        searchDirectories.joined(separator: ":")
     }
 
     func resolve(
@@ -77,9 +87,7 @@ struct NativeCLICommandResolver {
         }
 
         var environment = TerminalColorEnvironment.removingColorDisablingVariables(from: inheritedEnvironment)
-        environment["PATH"] = searchDirectories.reduce(into: [String]()) { directories, directory in
-            if !directories.contains(directory) { directories.append(directory) }
-        }.joined(separator: ":")
+        environment["PATH"] = pathEnvironmentValue
         environment["TERM"] = "xterm-256color"
         environment["COLORTERM"] = "truecolor"
         if environment["LANG"] == nil { environment["LANG"] = "en_US.UTF-8" }
@@ -93,10 +101,8 @@ struct NativeCLICommandResolver {
     }
 
     func executablePath(named name: String) -> String? {
-        for directory in searchDirectories {
-            let path = URL(fileURLWithPath: directory).appendingPathComponent(name).path
-            if fileManager.isExecutableFile(atPath: path) { return path }
-        }
-        return nil
+        let pathCandidates = searchDirectories.map { URL(fileURLWithPath: $0).appendingPathComponent(name).path }
+        let bundledCandidates = searchDirectoriesOverride == nil ? CLISearchDirectories.bundledExecutablePaths(named: name) : []
+        return (pathCandidates + bundledCandidates).first { fileManager.isExecutableFile(atPath: $0) }
     }
 }

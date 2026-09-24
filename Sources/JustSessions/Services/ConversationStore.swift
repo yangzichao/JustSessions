@@ -21,6 +21,7 @@ final class ConversationStore: ObservableObject {
         self.adapters = adapters
         self.aliases = UserDefaults.standard.dictionary(forKey: aliasesKey) as? [String: String] ?? [:]
         self.projectDisplayNames = ProjectDisplayNames.load(from: .standard)
+        LoginShellPathReader.warmUpInBackground()
         startClaudeLiveNameSync()
     }
 
