@@ -22,6 +22,7 @@ enum CLISearchDirectories {
         [
             "\(homeDirectory)/.local/bin",
             "\(homeDirectory)/.claude/local",
+            "\(homeDirectory)/.toolbox/bin",
             "/opt/homebrew/bin",
             "/usr/local/bin",
             "\(homeDirectory)/.npm-global/bin",

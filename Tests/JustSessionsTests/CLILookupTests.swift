@@ -92,6 +92,23 @@ struct CLILookupTests {
         #expect(command.environment.contains { $0.hasPrefix("PATH=") && $0.contains(nvmBinDirectory.path) })
     }
 
+    @Test func findsToolboxCLIEvenWhenLoginShellPathIsUnavailable() throws {
+        let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: home) }
+        let toolboxBinDirectory = home.appendingPathComponent(".toolbox/bin")
+        try FileManager.default.createDirectory(at: toolboxBinDirectory, withIntermediateDirectories: true)
+        let claude = try makeExecutable(at: toolboxBinDirectory.appendingPathComponent("claude"), script: "#!/bin/sh\nexit 0\n")
+        let searchDirectories = CLISearchDirectories.standard(
+            inheritedEnvironment: ["PATH": "/usr/bin:/bin:/usr/sbin:/sbin"],
+            loginShellDirectories: [],
+            homeDirectory: home.path
+        )
+
+        let resolver = NativeCLICommandResolver(searchDirectories: searchDirectories)
+
+        #expect(resolver.executablePath(named: "claude") == claude.path)
+    }
+
     private func makeExecutable(at url: URL, script: String) throws -> URL {
         try script.write(to: url, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: url.path)
