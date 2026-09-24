@@ -48,7 +48,7 @@ struct ConversationRow: View {
                 Image(systemName: "pencil")
             }
             .buttonStyle(.borderless)
-            .help("Rename in Conversation Manager")
+            .help("Rename in claudex-macos")
             .accessibilityLabel("Rename \(title)")
         }
         .padding(.vertical, 9)

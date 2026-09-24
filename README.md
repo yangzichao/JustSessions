@@ -1,6 +1,6 @@
-# Conversation Manager for macOS
+# claudex-macos
 
-A small native macOS app for finding local Claude Code and Codex conversations and opening them in their original CLI. It does not render or alter transcripts.
+A native macOS launcher for Claude Code and Codex history. Find, resume, and branch existing sessions in their original CLI without rendering or altering transcripts.
 
 ## Features
 
@@ -19,7 +19,7 @@ Requires macOS 14+, Xcode Command Line Tools, and whichever CLI you want to use 
 ```sh
 swift test
 ./Scripts/build-app.sh
-open "dist/Conversation Manager.app"
+open "dist/claudex-macos.app"
 ```
 
 The app searches `~/.claude/projects` and `~/.codex/sessions`. It honors `CLAUDE_CONFIG_DIR` and `CODEX_HOME` if those variables are present in the app's environment. It reads metadata from Claude's session index and Codex's session index, with fallbacks for unindexed sessions. A session whose original project directory no longer exists remains visible, with launch buttons disabled until the directory is restored.

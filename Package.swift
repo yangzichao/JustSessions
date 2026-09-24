@@ -2,11 +2,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "ConversationManager",
+    name: "ClaudexMacOS",
     platforms: [.macOS(.v14)],
-    products: [.executable(name: "ConversationManager", targets: ["ConversationManager"])],
+    products: [.executable(name: "ClaudexMacOS", targets: ["ClaudexMacOS"])],
     targets: [
-        .executableTarget(name: "ConversationManager"),
-        .testTarget(name: "ConversationManagerTests", dependencies: ["ConversationManager"]),
+        .executableTarget(name: "ClaudexMacOS"),
+        .testTarget(name: "ClaudexMacOSTests", dependencies: ["ClaudexMacOS"]),
     ]
 )

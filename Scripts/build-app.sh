@@ -5,17 +5,17 @@ project_directory="${0:A:h:h}"
 cd "$project_directory"
 swift build -c release
 
-app_directory="$project_directory/dist/Conversation Manager.app"
+app_directory="$project_directory/dist/claudex-macos.app"
 mkdir -p "$app_directory/Contents/MacOS" "$app_directory/Contents/Resources"
-cp "$project_directory/.build/release/ConversationManager" "$app_directory/Contents/MacOS/ConversationManager"
+cp "$project_directory/.build/release/ClaudexMacOS" "$app_directory/Contents/MacOS/ClaudexMacOS"
 cat > "$app_directory/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-    <key>CFBundleName</key><string>Conversation Manager</string>
-    <key>CFBundleDisplayName</key><string>Conversation Manager</string>
-    <key>CFBundleIdentifier</key><string>dev.zichaoyang.conversation-manager</string>
-    <key>CFBundleExecutable</key><string>ConversationManager</string>
+    <key>CFBundleName</key><string>claudex-macos</string>
+    <key>CFBundleDisplayName</key><string>claudex-macos</string>
+    <key>CFBundleIdentifier</key><string>dev.zichaoyang.claudex-macos</string>
+    <key>CFBundleExecutable</key><string>ClaudexMacOS</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>0.1.0</string>
     <key>CFBundleVersion</key><string>1</string>

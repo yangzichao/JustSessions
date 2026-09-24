@@ -37,7 +37,7 @@ struct TerminalLauncher {
             throw TerminalLaunchError.terminalUnavailable
         }
 
-        let scriptDirectory = fileManager.temporaryDirectory.appendingPathComponent("ConversationManager", isDirectory: true)
+        let scriptDirectory = fileManager.temporaryDirectory.appendingPathComponent("ClaudexMacOS", isDirectory: true)
         try fileManager.createDirectory(at: scriptDirectory, withIntermediateDirectories: true)
         let scriptURL = scriptDirectory.appendingPathComponent(UUID().uuidString + ".command")
         let script = Self.script(
@@ -51,7 +51,7 @@ struct TerminalLauncher {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
         NSWorkspace.shared.open([scriptURL], withApplicationAt: terminalURL, configuration: configuration) { _, error in
-            if let error { NSLog("Conversation Manager failed to open Terminal: %@", error.localizedDescription) }
+            if let error { NSLog("claudex-macos failed to open Terminal: %@", error.localizedDescription) }
         }
     }
 

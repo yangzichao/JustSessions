@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import ConversationManager
+@testable import ClaudexMacOS
 
 struct AdapterTests {
     @Test func claudeDiscoversIndexedAndUnindexedSessions() throws {

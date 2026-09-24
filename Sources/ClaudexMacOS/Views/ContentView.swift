@@ -75,7 +75,7 @@ struct ContentView: View {
                 renamingConversation = nil
             }
         } message: {
-            Text("This changes the display name in Conversation Manager.")
+            Text("This changes the display name in claudex-macos.")
         }
         .alert("Could not complete action", isPresented: Binding(
             get: { store.errorMessage != nil },
