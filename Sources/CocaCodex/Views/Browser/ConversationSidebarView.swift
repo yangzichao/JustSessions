@@ -13,6 +13,9 @@ struct ConversationSidebarView: View {
     let onNewSession: () -> Void
     let onSelect: (ConversationBrowserSelection) -> Void
     let onSelectConversation: (Conversation) -> Void
+    let onRenameConversation: (Conversation) -> Void
+    let onDeleteConversation: (Conversation) -> Void
+    let onDeleteProjectSessions: (String) -> Void
 
     @State private var expandedProjectPaths: Set<String> = []
     @State private var projectSearchText = ""
@@ -112,7 +115,10 @@ struct ConversationSidebarView: View {
                             onNewSession: { provider in
                                 store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
                             },
-                            onSelectConversation: onSelectConversation
+                            onSelectConversation: onSelectConversation,
+                            onRenameConversation: onRenameConversation,
+                            onDeleteConversation: onDeleteConversation,
+                            onDeleteProjectSessions: { onDeleteProjectSessions(project.id) }
                         )
                     }
                     .padding(.horizontal, 8)

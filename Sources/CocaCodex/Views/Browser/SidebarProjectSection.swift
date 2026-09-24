@@ -10,9 +10,20 @@ struct SidebarProjectSection: View {
     let onToggle: () -> Void
     let onNewSession: (ConversationProvider) -> Void
     let onSelectConversation: (Conversation) -> Void
+    let onRenameConversation: (Conversation) -> Void
+    let onDeleteConversation: (Conversation) -> Void
+    let onDeleteProjectSessions: () -> Void
 
     private var openTerminalCount: Int {
         store.terminalSessions.filter { $0.projectDirectoryKey == project.id }.count
+    }
+
+    private var deletionPlan: ProjectSessionDeletionPlan {
+        store.deletionPlan(for: project.id)
+    }
+
+    private var isProjectAvailable: Bool {
+        project.conversations.first?.isProjectAvailable == true
     }
 
     var body: some View {
@@ -58,6 +69,29 @@ struct SidebarProjectSection: View {
                 .frame(maxWidth: .infinity)
                 .help(project.projectPath)
                 .accessibilityLabel("\(project.projectName), \(project.conversations.count) \(project.conversations.count == 1 ? "session" : "sessions"), \(openTerminalCount) open")
+                .contextMenu {
+                    Menu("New session", systemImage: "plus") {
+                        ForEach(ConversationProvider.allCases) { provider in
+                            Button(provider.rawValue, systemImage: provider.symbolName) {
+                                onNewSession(provider)
+                            }
+                        }
+                    }
+                    .disabled(!isProjectAvailable)
+                    Button("Open project in Finder", systemImage: "folder") {
+                        SessionLocationActions.openProjectFolder(project.projectPath)
+                    }
+                    .disabled(!isProjectAvailable)
+                    Button("Copy project path", systemImage: "doc.on.doc") {
+                        SessionLocationActions.copyProjectPath(project.projectPath)
+                    }
+                    Divider()
+                    Button("Delete all deletable sessions (\(deletionPlan.deletableConversations.count))…", systemImage: "trash", role: .destructive) {
+                        onDeleteProjectSessions()
+                    }
+                    .disabled(!deletionPlan.hasDeletableConversations || store.isLoading
+                        || store.deletingConversationID != nil || store.deletingProjectPath != nil)
+                }
 
                 ProjectNewSessionMenu(project: project, showsTitle: false, onStart: onNewSession)
                     .menuStyle(.borderlessButton)
@@ -109,6 +143,34 @@ struct SidebarProjectSection: View {
         .buttonStyle(.plain)
         .help("\(store.title(for: conversation)) · \(conversation.provider.rawValue)")
         .accessibilityLabel("\(store.title(for: conversation)), \(conversation.provider.rawValue)\(openTerminal == nil ? "" : ", open terminal")")
+        .contextMenu {
+            Button("Resume", systemImage: "play", action: {
+                store.launch(conversation, action: .resume)
+            })
+            .disabled(!conversation.isProjectAvailable || store.deletingProjectPath != nil)
+            if conversation.provider.supportsBranchFromLauncher {
+                Button("Branch", systemImage: "arrow.triangle.branch", action: {
+                    store.launch(conversation, action: .branch)
+                })
+                .disabled(!conversation.isProjectAvailable || store.deletingProjectPath != nil)
+            }
+            Divider()
+            Button("Rename", systemImage: "pencil") { onRenameConversation(conversation) }
+            Button("Copy session ID", systemImage: "doc.on.doc") {
+                SessionLocationActions.copySessionID(conversation)
+            }
+            Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
+                SessionLocationActions.revealSessionFile(conversation)
+            }
+            if conversation.provider.supportsDeletionFromLauncher {
+                Divider()
+                Button("Delete session…", systemImage: "trash", role: .destructive) {
+                    onDeleteConversation(conversation)
+                }
+                .disabled(store.hasTerminal(for: conversation) || store.isLoading
+                    || store.deletingConversationID != nil || store.deletingProjectPath != nil)
+            }
+        }
     }
 
     private func providerColor(for provider: ConversationProvider) -> Color {

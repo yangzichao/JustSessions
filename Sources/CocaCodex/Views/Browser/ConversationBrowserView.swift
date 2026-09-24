@@ -7,6 +7,7 @@ struct ConversationBrowserView: View {
     @Binding var providerFilter: ConversationProviderFilter
     let onRename: (Conversation) -> Void
     let onDelete: (Conversation) -> Void
+    let onDeleteProjectSessions: (String) -> Void
 
     @State private var selectedConversationID: String?
     @State private var isNewSessionSheetPresented = false
@@ -75,7 +76,10 @@ struct ConversationBrowserView: View {
                     } else {
                         store.selectTerminal(nil)
                     }
-                }
+                },
+                onRenameConversation: onRename,
+                onDeleteConversation: onDelete,
+                onDeleteProjectSessions: onDeleteProjectSessions
             )
         } detail: {
             VStack(spacing: 0) {
@@ -232,7 +236,7 @@ struct ConversationBrowserView: View {
                     Image(systemName: "arrow.clockwise")
                 }
                 .buttonStyle(.borderless)
-                .disabled(store.isLoading || store.deletingConversationID != nil)
+                .disabled(store.isLoading || store.deletingConversationID != nil || store.deletingProjectPath != nil)
                 .help("Refresh sessions")
                 .accessibilityLabel("Refresh sessions")
             }
@@ -311,7 +315,8 @@ struct ConversationBrowserView: View {
             onBranch: { store.launch(conversation, action: .branch) },
             onRename: { onRename(conversation) },
             onDelete: { onDelete(conversation) },
-            canDelete: !store.hasTerminal(for: conversation) && !store.isLoading && store.deletingConversationID == nil,
+            canDelete: !store.hasTerminal(for: conversation) && !store.isLoading
+                && store.deletingConversationID == nil && store.deletingProjectPath == nil,
             isDeleting: store.deletingConversationID == conversation.id
         )
         .id(conversation.id)

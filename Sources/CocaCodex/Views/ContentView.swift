@@ -2,12 +2,17 @@ import AppKit
 import SwiftUI
 
 struct ContentView: View {
+    private enum DeletionRequest {
+        case conversation(Conversation)
+        case project(String)
+    }
+
     @StateObject private var store = ConversationStore()
     @State private var searchText = ""
     @State private var selection: ConversationBrowserSelection = .all
     @State private var providerFilter: ConversationProviderFilter = .all
     @State private var renamingConversation: Conversation?
-    @State private var deletingConversation: Conversation?
+    @State private var deletionRequest: DeletionRequest?
     @State private var editedTitle = ""
     @State private var hasStartedScan = false
 
@@ -21,7 +26,8 @@ struct ContentView: View {
                 editedTitle = store.title(for: conversation)
                 renamingConversation = conversation
             },
-            onDelete: { deletingConversation = $0 }
+            onDelete: { deletionRequest = .conversation($0) },
+            onDeleteProjectSessions: { deletionRequest = .project($0) }
         )
         .onAppear {
             if !hasStartedScan {
@@ -45,20 +51,38 @@ struct ContentView: View {
         } message: {
             Text("This changes the display name in coca-codex.")
         }
-        .confirmationDialog("Delete conversation?", isPresented: Binding(
-            get: { deletingConversation != nil },
-            set: { if !$0 { deletingConversation = nil } }
+        .confirmationDialog("Delete sessions?", isPresented: Binding(
+            get: { deletionRequest != nil },
+            set: { if !$0 { deletionRequest = nil } }
         )) {
-            Button("Delete conversation", role: .destructive) {
-                if let conversation = deletingConversation { store.delete(conversation) }
-                deletingConversation = nil
+            switch deletionRequest {
+            case .conversation(let conversation):
+                Button("Delete session", role: .destructive) {
+                    store.delete(conversation)
+                    deletionRequest = nil
+                }
+            case .project(let projectPath):
+                let deletionPlan = store.deletionPlan(for: projectPath)
+                Button("Delete \(deletionPlan.deletableConversations.count) sessions", role: .destructive) {
+                    store.deleteSessions(in: projectPath)
+                    deletionRequest = nil
+                }
+                .disabled(!deletionPlan.hasDeletableConversations)
+            case nil:
+                EmptyView()
             }
-            Button("Cancel", role: .cancel) { deletingConversation = nil }
+            Button("Cancel", role: .cancel) { deletionRequest = nil }
         } message: {
-            if let conversation = deletingConversation {
+            switch deletionRequest {
+            case .conversation(let conversation):
                 Text(conversation.provider == .codex
                     ? "Codex will permanently delete this session using its native CLI. This cannot be undone."
                     : "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.")
+            case .project(let projectPath):
+                let deletionPlan = store.deletionPlan(for: projectPath)
+                Text("This affects all tools in \(projectPath), including sessions hidden by the current filter. Claude Code sessions move to the Trash; Codex sessions are permanently deleted. \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped.")
+            case nil:
+                EmptyView()
             }
         }
         .alert("Could not complete action", isPresented: Binding(

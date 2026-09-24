@@ -14,6 +14,7 @@ A native macOS launcher for Claude Code, Codex, and Google Antigravity CLI. Star
 - Use **+** beside a project, or **New session** at the top of its page, to start any supported CLI directly in that project's folder without choosing a path.
 - Keep multiple terminal tabs open in a persistent bar above the session list and terminal. Searching or choosing a project switches to the list while the CLI keeps running; click its tab to return. Resume reopens an already running tab for that conversation. Closing a tab ends its process.
 - Rename a row locally. Aliases are saved in this app's UserDefaults and do not change the CLI's own session title.
+- Right-click a session in the sidebar to resume, branch, rename, copy its ID, reveal its file in Finder, or delete it. Right-click a project to start a session, open or copy its folder path, or delete its eligible sessions after a confirmation. Open terminal sessions and Antigravity sessions are skipped by project deletion.
 - Delete a Claude Code or Codex session from its row after confirmation. Claude Code history and its session folder move to the macOS Trash, and its local index entry is removed. Codex uses `codex delete --force`, which permanently deletes the native session. Antigravity's deletion flow is interactive in its session picker, so its sessions cannot be deleted from this app.
 - Deletion is disabled while that conversation has an open terminal tab in the app.
 - Separate adapters make adding another CLI straightforward.

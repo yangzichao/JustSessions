@@ -10,6 +10,7 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var terminalSessions: [TerminalSession] = []
     @Published private(set) var selectedTerminalID: UUID?
     @Published private(set) var deletingConversationID: String?
+    @Published private(set) var deletingProjectPath: String?
 
     private let adapters: [any ConversationAdapter]
     private let commandResolver = NativeCLICommandResolver()
@@ -21,7 +22,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func refresh() {
-        guard !isLoading && deletingConversationID == nil else { return }
+        guard !isLoading && deletingConversationID == nil && deletingProjectPath == nil else { return }
         isLoading = true
         errorMessage = nil
         let adapters = self.adapters
@@ -63,28 +64,42 @@ final class ConversationStore: ObservableObject {
         terminalSessions.contains { $0.conversation?.id == conversation.id }
     }
 
+    func deletionPlan(for projectPath: String) -> ProjectSessionDeletionPlan {
+        let projectConversations = conversations.filter { $0.projectDirectoryKey == projectPath }
+        let openConversations = projectConversations.filter {
+            $0.provider.supportsDeletionFromLauncher && hasTerminal(for: $0)
+        }
+        let unsupportedConversations = projectConversations.filter { !$0.provider.supportsDeletionFromLauncher }
+        return ProjectSessionDeletionPlan(
+            projectPath: projectPath,
+            deletableConversations: projectConversations.filter {
+                $0.provider.supportsDeletionFromLauncher && !hasTerminal(for: $0)
+            },
+            openTerminalCount: openConversations.count,
+            unsupportedCount: unsupportedConversations.count
+        )
+    }
+
     func delete(_ conversation: Conversation) {
         guard conversation.provider.supportsDeletionFromLauncher else { return }
         guard !hasTerminal(for: conversation) else {
             errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
             return
         }
-        guard !isLoading, deletingConversationID == nil,
+        guard !isLoading, deletingConversationID == nil, deletingProjectPath == nil,
               let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { return }
         deletingConversationID = conversation.id
         Task.detached(priority: .userInitiated) {
             do {
                 try adapter.delete(conversation)
                 await MainActor.run {
-                    self.conversations.removeAll { $0.id == conversation.id }
-                    self.aliases.removeValue(forKey: conversation.id)
-                    UserDefaults.standard.set(self.aliases, forKey: self.aliasesKey)
+                    self.removeDeletedConversation(conversation)
                     self.deletingConversationID = nil
                 }
             } catch {
                 await MainActor.run {
                     if !FileManager.default.fileExists(atPath: conversation.sourceFile.path) {
-                        self.conversations.removeAll { $0.id == conversation.id }
+                        self.removeDeletedConversation(conversation)
                     }
                     self.errorMessage = error.localizedDescription
                     self.deletingConversationID = nil
@@ -93,7 +108,49 @@ final class ConversationStore: ObservableObject {
         }
     }
 
+    func deleteSessions(in projectPath: String) {
+        guard !isLoading, deletingConversationID == nil, deletingProjectPath == nil else { return }
+        let deletionPlan = deletionPlan(for: projectPath)
+        guard deletionPlan.hasDeletableConversations else { return }
+
+        deletingProjectPath = projectPath
+        let adapters = self.adapters
+        Task.detached(priority: .userInitiated) {
+            var failures: [String] = []
+            for conversation in deletionPlan.deletableConversations {
+                guard let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { continue }
+                await MainActor.run { self.deletingConversationID = conversation.id }
+                do {
+                    try adapter.delete(conversation)
+                    await MainActor.run { self.removeDeletedConversation(conversation) }
+                } catch {
+                    await MainActor.run {
+                        if !FileManager.default.fileExists(atPath: conversation.sourceFile.path) {
+                            self.removeDeletedConversation(conversation)
+                        }
+                    }
+                    failures.append("\(conversation.provider.rawValue) · \(conversation.suggestedTitle): \(error.localizedDescription)")
+                }
+            }
+            await MainActor.run {
+                self.deletingConversationID = nil
+                self.deletingProjectPath = nil
+                if !failures.isEmpty {
+                    self.errorMessage = "Some sessions could not be deleted:\n" + failures.joined(separator: "\n")
+                }
+            }
+        }
+    }
+
+    private func removeDeletedConversation(_ conversation: Conversation) {
+        conversations.removeAll { $0.id == conversation.id }
+        aliases.removeValue(forKey: conversation.id)
+        UserDefaults.standard.set(aliases, forKey: aliasesKey)
+    }
+
     func launch(_ conversation: Conversation, action: ConversationAction) {
+        guard deletingConversationID != conversation.id,
+              deletingProjectPath != conversation.projectDirectoryKey else { return }
         guard action != .branch || conversation.provider.supportsBranchFromLauncher else { return }
         if action == .resume,
            let runningSession = terminalSessions.first(where: {
