@@ -27,6 +27,16 @@ struct Conversation: Identifiable, Sendable {
     let sourceFile: URL
 
     var id: String { "\(provider.rawValue):\(sessionID)" }
+    func withSuggestedTitle(_ title: String) -> Conversation {
+        Conversation(
+            provider: provider,
+            sessionID: sessionID,
+            projectPath: projectPath,
+            suggestedTitle: title,
+            updatedAt: updatedAt,
+            sourceFile: sourceFile
+        )
+    }
     var projectName: String {
         URL(fileURLWithPath: projectPath).lastPathComponent
     }

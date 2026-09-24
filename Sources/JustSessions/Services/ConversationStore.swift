@@ -19,6 +19,7 @@ final class ConversationStore: ObservableObject {
     init(adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter(), AntigravityAdapter()]) {
         self.adapters = adapters
         self.aliases = UserDefaults.standard.dictionary(forKey: aliasesKey) as? [String: String] ?? [:]
+        startClaudeLiveNameSync()
     }
 
     func refresh() {
@@ -46,6 +47,12 @@ final class ConversationStore: ObservableObject {
 
     func title(for conversation: Conversation) -> String {
         aliases[conversation.id] ?? conversation.suggestedTitle
+    }
+
+    func applySuggestedTitle(_ title: String, toSessionID sessionID: String, provider: ConversationProvider) {
+        guard let index = conversations.firstIndex(where: { $0.provider == provider && $0.sessionID == sessionID }),
+              conversations[index].suggestedTitle != title else { return }
+        conversations[index] = conversations[index].withSuggestedTitle(title)
     }
 
     func rename(_ conversation: Conversation, to proposedTitle: String) {

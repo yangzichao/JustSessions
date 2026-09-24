@@ -74,6 +74,11 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.displayTitle = displayTitle
     }
 
+    func updateDisplayTitle(_ title: String) {
+        guard displayTitle != title else { return }
+        displayTitle = title
+    }
+
     func setCLIMouseInputEnabled(_ enabled: Bool) {
         allowsCLIMouseInput = enabled
         terminalView.allowMouseReporting = enabled
