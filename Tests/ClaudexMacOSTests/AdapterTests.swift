@@ -29,6 +29,7 @@ struct AdapterTests {
         #expect(conversations.first(where: { $0.sessionID == indexedID })?.suggestedTitle == "Final paper title")
         #expect(conversations.first(where: { $0.sessionID == indexedID })?.updatedAt == ConversationMetadata.date("2026-09-22T10:00:00Z"))
         #expect(conversations.first(where: { $0.sessionID == unindexedID })?.suggestedTitle == "Revise conclusion")
+        #expect(adapter.arguments(for: conversations[0], action: .new).isEmpty)
         #expect(adapter.arguments(for: conversations[0], action: .branch).last == "--fork-session")
     }
 
@@ -55,6 +56,7 @@ struct AdapterTests {
         #expect(conversations.count == 2)
         #expect(conversations.first(where: { $0.sessionID == sessionID })?.suggestedTitle == "Fix API")
         #expect(conversations.first(where: { $0.sessionID == unindexedID })?.suggestedTitle == "Refactor backend")
+        #expect(adapter.arguments(for: conversations[0], action: .new).isEmpty)
         #expect(adapter.arguments(for: conversations[0], action: .resume) == ["resume", conversations[0].sessionID])
         #expect(adapter.arguments(for: conversations[0], action: .branch) == ["fork", conversations[0].sessionID])
     }
@@ -87,5 +89,27 @@ struct AdapterTests {
         #expect(command.workingDirectory == projectDirectory.path)
         #expect(command.arguments == ["--resume", conversation.sessionID, "--fork-session"])
         #expect(command.environment.contains("TERM=xterm-256color"))
+    }
+
+    @Test func newSessionStartsBareNativeCLIInSelectedProject() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let binaryDirectory = root.appendingPathComponent("bin")
+        let projectDirectory = root.appendingPathComponent("new project")
+        try FileManager.default.createDirectory(at: binaryDirectory, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: projectDirectory, withIntermediateDirectories: true)
+        for executableName in ["claude", "codex"] {
+            let executable = binaryDirectory.appendingPathComponent(executableName)
+            try "#!/bin/sh\nexit 0\n".write(to: executable, atomically: true, encoding: .utf8)
+            try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: executable.path)
+        }
+        let resolver = NativeCLICommandResolver(searchDirectories: [binaryDirectory.path])
+
+        for provider in ConversationProvider.allCases {
+            let command = try resolver.resolveNewSession(provider: provider, projectPath: projectDirectory.path)
+            #expect(command.arguments.isEmpty)
+            #expect(command.workingDirectory == projectDirectory.path)
+            #expect(command.executablePath == binaryDirectory.appendingPathComponent(provider == .claude ? "claude" : "codex").path)
+        }
     }
 }

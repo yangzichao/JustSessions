@@ -1,6 +1,6 @@
 # claudex-macos
 
-A native macOS launcher for Claude Code and Codex history. Find, resume, and branch existing sessions in their original CLI, now inside an embedded terminal. The app does not re-render transcripts.
+A native macOS launcher for Claude Code and Codex. Start new sessions, or find, resume, and branch existing ones in their original CLI inside an embedded terminal. The app does not re-render transcripts.
 
 ## Features
 
@@ -9,6 +9,7 @@ A native macOS launcher for Claude Code and Codex history. Find, resume, and bra
 - Expand a project in the sidebar to see its sessions. Open terminal tabs appear in a dedicated sidebar section and mark their project and session; selecting one switches back to that terminal. Selecting a closed session focuses its row and Resume action in the main list.
 - Search by display name, project path, or session ID, and filter to sessions active in the past seven days.
 - Resume or branch a conversation in an embedded terminal using each CLI's native interactive command.
+- Use **New session** from the sidebar to choose Claude Code or Codex and a project folder, including one with no history. The CLI starts in that folder with no resume or fork arguments. New CLI sessions appear in the project list after returning from the terminal or closing it.
 - Keep multiple terminal tabs open. Returning to the project list leaves their processes running; Resume reopens an already running tab for that conversation. Closing a tab ends its process.
 - Rename a row locally. Aliases are saved in this app's UserDefaults and do not change the CLI's own session title.
 - Delete a session from its row after confirmation. Claude Code history and its session folder move to the macOS Trash, and its local index entry is removed. Codex uses `codex delete --force`, which permanently deletes the native session.

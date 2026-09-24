@@ -8,6 +8,7 @@ protocol ConversationAdapter: Sendable {
 }
 
 enum ConversationAction: Sendable {
+    case new
     case resume
     case branch
 }

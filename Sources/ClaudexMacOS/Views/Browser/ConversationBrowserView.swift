@@ -9,6 +9,7 @@ struct ConversationBrowserView: View {
     let onDelete: (Conversation) -> Void
 
     @State private var selectedConversationID: String?
+    @State private var isNewSessionSheetPresented = false
 
     private var matchingConversations: [Conversation] {
         store.conversations.filter { conversation in
@@ -22,6 +23,11 @@ struct ConversationBrowserView: View {
 
     private var projectGroups: [ProjectConversationGroup] {
         ProjectConversationGroup.grouped(matchingConversations)
+    }
+
+    private var availableProjects: [ProjectConversationGroup] {
+        ProjectConversationGroup.grouped(store.conversations)
+            .filter { $0.conversations.first?.isProjectAvailable == true }
     }
 
     private var displayedConversations: [Conversation] {
@@ -44,6 +50,7 @@ struct ConversationBrowserView: View {
                 recentCount: matchingConversations.filter {
                     $0.updatedAt >= Date().addingTimeInterval(-7 * 24 * 60 * 60)
                 }.count,
+                onNewSession: { isNewSessionSheetPresented = true },
                 onSelect: { destination in
                     selection = destination
                     selectedConversationID = nil
@@ -53,9 +60,9 @@ struct ConversationBrowserView: View {
                     selection = .project(conversation.projectDirectoryKey)
                     selectedConversationID = conversation.id
                     if let openTerminal = store.terminalSessions.first(where: {
-                        $0.conversation.id == conversation.id && $0.action == .resume && !$0.hasExited
+                        $0.conversation?.id == conversation.id && $0.action == .resume && !$0.hasExited
                     }) ?? store.terminalSessions.first(where: {
-                        $0.conversation.id == conversation.id && $0.action == .resume
+                        $0.conversation?.id == conversation.id && $0.action == .resume
                     }) {
                         store.selectTerminal(openTerminal.id)
                     } else {
@@ -89,6 +96,29 @@ struct ConversationBrowserView: View {
                 selectedConversationID = nil
             }
         }
+        .sheet(isPresented: $isNewSessionSheetPresented) {
+            NewSessionSheet(
+                initialProvider: newSessionProvider,
+                initialProjectPath: newSessionProjectPath,
+                recentProjects: availableProjects
+            ) { provider, projectPath in
+                try store.launchNewSession(provider: provider, projectPath: projectPath)
+            }
+        }
+    }
+
+    private var newSessionProvider: ConversationProvider {
+        if let selectedTerminal = store.selectedTerminal { return selectedTerminal.provider }
+        switch providerFilter {
+        case .claude: return .claude
+        case .codex, .all: return .codex
+        }
+    }
+
+    private var newSessionProjectPath: String {
+        if let selectedTerminal = store.selectedTerminal { return selectedTerminal.projectPath }
+        if case .project(let path) = selection { return path }
+        return availableProjects.first?.projectPath ?? ""
     }
 
     private var conversationList: some View {

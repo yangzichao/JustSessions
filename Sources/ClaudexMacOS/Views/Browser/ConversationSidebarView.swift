@@ -8,6 +8,7 @@ struct ConversationSidebarView: View {
     let projects: [ProjectConversationGroup]
     let conversationCount: Int
     let recentCount: Int
+    let onNewSession: () -> Void
     let onSelect: (ConversationBrowserSelection) -> Void
     let onSelectConversation: (Conversation) -> Void
 
@@ -23,6 +24,14 @@ struct ConversationSidebarView: View {
         VStack(alignment: .leading, spacing: 0) {
             brand
             searchField
+            Button(action: onNewSession) {
+                Label("New session", systemImage: "plus")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .keyboardShortcut("n", modifiers: .command)
+            .padding(.horizontal, 12)
+            .padding(.top, 12)
 
             VStack(spacing: 2) {
                 navigationRow("All sessions", symbol: "square.stack", count: conversationCount, isSelected: selection == .all) {
@@ -33,7 +42,7 @@ struct ConversationSidebarView: View {
                 }
             }
             .padding(.horizontal, 8)
-            .padding(.top, 18)
+            .padding(.top, 16)
 
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 2) {
@@ -183,7 +192,7 @@ struct ConversationSidebarView: View {
 
     private func expandProjectsWithOpenTerminals() {
         for terminal in store.terminalSessions {
-            expandedProjectPaths.insert(terminal.conversation.projectDirectoryKey)
+            expandedProjectPaths.insert(terminal.projectDirectoryKey)
         }
     }
 }

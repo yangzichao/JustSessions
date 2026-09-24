@@ -5,7 +5,9 @@ import SwiftTerm
 @MainActor
 final class TerminalSession: ObservableObject, Identifiable {
     let id = UUID()
-    let conversation: Conversation
+    let conversation: Conversation?
+    let provider: ConversationProvider
+    let projectPath: String
     let action: ConversationAction
     let displayTitle: String
     let command: NativeCLICommand
@@ -18,8 +20,22 @@ final class TerminalSession: ObservableObject, Identifiable {
     private var hasStarted = false
     private var isClosed = false
 
-    init(conversation: Conversation, action: ConversationAction, displayTitle: String, command: NativeCLICommand) {
+    var projectName: String { URL(fileURLWithPath: projectPath).lastPathComponent }
+    var projectDirectoryKey: String {
+        URL(fileURLWithPath: projectPath).standardizedFileURL.resolvingSymlinksInPath().path
+    }
+
+    init(
+        conversation: Conversation?,
+        provider: ConversationProvider,
+        projectPath: String,
+        action: ConversationAction,
+        displayTitle: String,
+        command: NativeCLICommand
+    ) {
         self.conversation = conversation
+        self.provider = provider
+        self.projectPath = projectPath
         self.action = action
         self.displayTitle = displayTitle
         self.command = command

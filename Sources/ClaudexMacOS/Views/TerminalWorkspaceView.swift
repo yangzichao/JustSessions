@@ -17,7 +17,7 @@ struct TerminalWorkspaceView: View {
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(session.displayTitle).font(.headline).lineLimit(1)
-                    Text("\(session.conversation.projectName) · \(session.conversation.provider.rawValue) · \(actionName)")
+                    Text("\(session.projectName) · \(session.provider.rawValue) · \(actionName)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -75,12 +75,13 @@ struct TerminalWorkspaceView: View {
                 closingSessionID = nil
             }
         } message: {
-            Text("The terminal process will stop. You can resume the conversation again from the project list.")
+            Text("The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.")
         }
     }
 
     private var actionName: String {
         switch session.action {
+        case .new: "New"
         case .resume: "Resume"
         case .branch: "Branch"
         }

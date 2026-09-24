@@ -5,6 +5,14 @@ struct TerminalSidebarRow: View {
     let isSelected: Bool
     let onSelect: () -> Void
 
+    private var actionName: String {
+        switch session.action {
+        case .new: "New"
+        case .resume: "Resume"
+        case .branch: "Branch"
+        }
+    }
+
     var body: some View {
         Button(action: onSelect) {
             HStack(spacing: 9) {
@@ -13,7 +21,7 @@ struct TerminalSidebarRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(session.displayTitle)
                         .lineLimit(1)
-                    Text("\(session.conversation.projectName) · \(session.action == .branch ? "Branch" : "Resume")")
+                    Text("\(session.projectName) · \(actionName)")
                         .font(.system(size: 10))
                         .foregroundStyle(.tertiary)
                         .lineLimit(1)

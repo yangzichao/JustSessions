@@ -11,7 +11,7 @@ struct SidebarProjectSection: View {
     let onSelectConversation: (Conversation) -> Void
 
     private var openTerminalCount: Int {
-        store.terminalSessions.filter { $0.conversation.projectDirectoryKey == project.id }.count
+        store.terminalSessions.filter { $0.projectDirectoryKey == project.id }.count
     }
 
     var body: some View {
@@ -66,9 +66,9 @@ struct SidebarProjectSection: View {
 
     private func sessionRow(_ conversation: Conversation) -> some View {
         let openTerminal = store.terminalSessions.first {
-            $0.conversation.id == conversation.id && $0.action == .resume && $0.id == store.selectedTerminalID
+            $0.conversation?.id == conversation.id && $0.action == .resume && $0.id == store.selectedTerminalID
         } ?? store.terminalSessions.first {
-            $0.conversation.id == conversation.id && $0.action == .resume
+            $0.conversation?.id == conversation.id && $0.action == .resume
         }
         let isHighlighted = selectedConversationID == conversation.id
             || (openTerminal != nil && openTerminal?.id == store.selectedTerminalID)

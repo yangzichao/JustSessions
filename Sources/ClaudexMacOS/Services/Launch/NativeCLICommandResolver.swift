@@ -44,13 +44,29 @@ struct NativeCLICommandResolver {
         action: ConversationAction,
         adapter: any ConversationAdapter
     ) throws -> NativeCLICommand {
+        try resolve(
+            provider: conversation.provider,
+            projectPath: conversation.projectPath,
+            arguments: adapter.arguments(for: conversation, action: action)
+        )
+    }
+
+    func resolveNewSession(provider: ConversationProvider, projectPath: String) throws -> NativeCLICommand {
+        try resolve(provider: provider, projectPath: projectPath, arguments: [])
+    }
+
+    private func resolve(
+        provider: ConversationProvider,
+        projectPath: String,
+        arguments: [String]
+    ) throws -> NativeCLICommand {
         var isDirectory: ObjCBool = false
-        guard fileManager.fileExists(atPath: conversation.projectPath, isDirectory: &isDirectory),
+        guard fileManager.fileExists(atPath: projectPath, isDirectory: &isDirectory),
               isDirectory.boolValue else {
-            throw NativeCLICommandError.missingProject(conversation.projectPath)
+            throw NativeCLICommandError.missingProject(projectPath)
         }
 
-        let executableName = conversation.provider == .claude ? "claude" : "codex"
+        let executableName = provider == .claude ? "claude" : "codex"
         guard let executablePath = executablePath(named: executableName) else {
             throw NativeCLICommandError.missingExecutable(executableName)
         }
@@ -65,8 +81,8 @@ struct NativeCLICommandResolver {
 
         return NativeCLICommand(
             executablePath: executablePath,
-            arguments: adapter.arguments(for: conversation, action: action),
-            workingDirectory: conversation.projectPath,
+            arguments: arguments,
+            workingDirectory: projectPath,
             environment: environment.map { "\($0.key)=\($0.value)" }.sorted()
         )
     }

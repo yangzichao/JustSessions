@@ -48,6 +48,7 @@ struct CodexAdapter: ConversationAdapter {
 
     func arguments(for conversation: Conversation, action: ConversationAction) -> [String] {
         switch action {
+        case .new: []
         case .resume: ["resume", conversation.sessionID]
         case .branch: ["fork", conversation.sessionID]
         }

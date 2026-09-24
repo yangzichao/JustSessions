@@ -56,7 +56,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func hasTerminal(for conversation: Conversation) -> Bool {
-        terminalSessions.contains { $0.conversation.id == conversation.id }
+        terminalSessions.contains { $0.conversation?.id == conversation.id }
     }
 
     func delete(_ conversation: Conversation) {
@@ -91,7 +91,7 @@ final class ConversationStore: ObservableObject {
     func launch(_ conversation: Conversation, action: ConversationAction) {
         if action == .resume,
            let runningSession = terminalSessions.first(where: {
-               $0.action == .resume && $0.conversation.id == conversation.id && !$0.hasExited
+               $0.action == .resume && $0.conversation?.id == conversation.id && !$0.hasExited
            }) {
             selectedTerminalID = runningSession.id
             return
@@ -101,6 +101,8 @@ final class ConversationStore: ObservableObject {
             let command = try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
             let session = TerminalSession(
                 conversation: conversation,
+                provider: conversation.provider,
+                projectPath: conversation.projectPath,
                 action: action,
                 displayTitle: title(for: conversation),
                 command: command
@@ -111,19 +113,39 @@ final class ConversationStore: ObservableObject {
         catch { errorMessage = error.localizedDescription }
     }
 
+    func launchNewSession(provider: ConversationProvider, projectPath: String) throws {
+        let expandedPath = (projectPath as NSString).expandingTildeInPath
+        let standardizedPath = URL(fileURLWithPath: expandedPath).standardizedFileURL.path
+        let command = try commandResolver.resolveNewSession(provider: provider, projectPath: standardizedPath)
+        let session = TerminalSession(
+            conversation: nil,
+            provider: provider,
+            projectPath: standardizedPath,
+            action: .new,
+            displayTitle: "New \(provider.rawValue) session",
+            command: command
+        )
+        terminalSessions.append(session)
+        selectedTerminalID = session.id
+    }
+
     var selectedTerminal: TerminalSession? {
         terminalSessions.first { $0.id == selectedTerminalID }
     }
 
     func selectTerminal(_ id: UUID?) {
+        let shouldRefreshNewSession = selectedTerminal?.action == .new && selectedTerminalID != id
         selectedTerminalID = id
+        if shouldRefreshNewSession { refresh() }
     }
 
     func closeTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }) else { return }
+        let shouldRefreshNewSession = terminalSessions[index].action == .new
         terminalSessions[index].close()
         terminalSessions.remove(at: index)
         if selectedTerminalID == id { selectedTerminalID = terminalSessions.last?.id }
+        if shouldRefreshNewSession { refresh() }
     }
 
     func closeAllTerminals() {
