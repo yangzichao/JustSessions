@@ -13,6 +13,7 @@ if [[ -d "$swiftterm_resources" ]]; then
     ditto "$swiftterm_resources" "$app_directory/Contents/Resources/SwiftTerm_SwiftTerm.bundle"
 fi
 cp -f "$project_directory/.build/checkouts/SwiftTerm/LICENSE" "$app_directory/Contents/Resources/SwiftTerm-LICENSE.txt"
+cp -f "$project_directory/Scripts/update-app.sh" "$app_directory/Contents/Resources/update-app.sh"
 cat > "$app_directory/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -22,8 +23,8 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
     <key>CFBundleIdentifier</key><string>dev.zichaoyang.claudex-macos</string>
     <key>CFBundleExecutable</key><string>ClaudexMacOS</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>0.9.0</string>
-    <key>CFBundleVersion</key><string>10</string>
+    <key>CFBundleShortVersionString</key><string>0.10.0</string>
+    <key>CFBundleVersion</key><string>11</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>NSHighResolutionCapable</key><true/>
 </dict></plist>

@@ -51,7 +51,7 @@ struct ConversationBrowserView: View {
                 recentCount: matchingConversations.filter {
                     $0.updatedAt >= Date().addingTimeInterval(-7 * 24 * 60 * 60)
                 }.count,
-                isCheckingForUpdates: updateManager.isCheckingForUpdates,
+                isCheckingForUpdates: updateManager.isCheckingForUpdates || updateManager.isInstallingUpdate,
                 onCheckForUpdates: { updateManager.checkForUpdates() },
                 onNewSession: { isNewSessionSheetPresented = true },
                 onSelect: { destination in
@@ -113,7 +113,9 @@ struct ConversationBrowserView: View {
                     title: Text(notice.title),
                     message: Text(notice.message),
                     primaryButton: .default(Text("Update now")) {
-                        updateManager.installUpdate(hasOpenTerminals: store.terminalSessions.contains { !$0.hasExited })
+                        updateManager.installUpdate(hasOpenTerminals: {
+                            store.terminalSessions.contains { !$0.hasExited }
+                        })
                     },
                     secondaryButton: .cancel()
                 )
@@ -121,7 +123,13 @@ struct ConversationBrowserView: View {
                 Alert(title: Text(notice.title), message: Text(notice.message), dismissButton: .default(Text("OK")))
             }
         }
-        .onAppear { updateManager.showPendingResult() }
+        .onAppear {
+            if !updateManager.showPendingResult() {
+                updateManager.checkForUpdates(automaticallyInstall: true) {
+                    store.terminalSessions.contains { !$0.hasExited }
+                }
+            }
+        }
     }
 
     private var newSessionProvider: ConversationProvider {

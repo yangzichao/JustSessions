@@ -17,7 +17,7 @@ A native macOS launcher for Claude Code and Codex. Start new sessions, or find, 
 - Delete a session from its row after confirmation. Claude Code history and its session folder move to the macOS Trash, and its local index entry is removed. Codex uses `codex delete --force`, which permanently deletes the native session.
 - Deletion is disabled while that conversation has an open terminal tab in the app.
 - Separate adapters make adding another CLI straightforward.
-- Select **Update** at the bottom of the sidebar to check this repository's GitHub `main` branch. If an update is available, the app downloads it into the original source checkout, builds a replacement app, and reopens it. Close active terminal tabs before updating.
+- The app checks for a new GitHub build when it opens and automatically downloads, installs, and reopens it. If a native CLI terminal is running, the update waits for you to close that terminal; **Update** at the bottom of the sidebar checks again at any time.
 
 Branch forks the **conversation**. It does not create a Git branch or worktree.
 
@@ -25,7 +25,7 @@ Branch forks the **conversation**. It does not create a Git branch or worktree.
 
 Requires macOS 14+, Xcode Command Line Tools, and whichever CLI you want to use (`claude` and/or `codex`).
 
-Updating also requires Git, a clean `main` source checkout at its original build location, and write access to the app folder. Build failures leave the installed app in place; details are logged to `~/Library/Logs/claudex-macos/update.log`.
+GitHub Actions builds an app archive from every push to `main` and publishes it as a GitHub build release. Updating requires network access and write access to the app folder, but does not need a local source checkout or build tools. The app verifies the downloaded archive's SHA-256 digest, code signature, bundle ID, and source revision before replacing itself. If installation fails, it restores the previous app; details are logged to `~/Library/Logs/claudex-macos/update.log`.
 
 ```sh
 swift test

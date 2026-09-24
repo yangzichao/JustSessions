@@ -1,12 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
-source_directory="$1"
+archive="$1"
 application_bundle="$2"
 application_pid="$3"
-repository_url="$4"
-result_file="$5"
-log_file="$6"
+expected_revision="$4"
+expected_sha256="$5"
+result_file="$6"
+log_file="$7"
+download_directory="$8"
 staging_directory=""
 
 mkdir -p "$(dirname "$result_file")" "$(dirname "$log_file")"
@@ -28,6 +30,9 @@ finish_update() {
     if [[ -n "$staging_directory" && -d "$staging_directory" ]]; then
         rm -rf "$staging_directory"
     fi
+    if [[ "$(basename "$download_directory")" == claudex-macos-update-* && -d "$download_directory" ]]; then
+        rm -rf "$download_directory"
+    fi
     exit "$exit_status"
 }
 trap finish_update EXIT
@@ -41,29 +46,28 @@ if kill -0 "$application_pid" 2>/dev/null; then
     exit 1
 fi
 
-cd "$source_directory"
-if [[ "$(/usr/bin/git branch --show-current)" != "main" ]]; then
-    echo "The source checkout is not on main."
+actual_sha256="$(/usr/bin/shasum -a 256 "$archive" | /usr/bin/awk '{print $1}')"
+if [[ "$actual_sha256" != "$expected_sha256" ]]; then
+    echo "The downloaded archive failed its SHA-256 check."
     exit 1
 fi
-if [[ -n "$(/usr/bin/git status --porcelain)" ]]; then
-    echo "The source checkout has uncommitted changes."
-    exit 1
-fi
-
-/usr/bin/git fetch "$repository_url" main
-if ! /usr/bin/git merge-base --is-ancestor HEAD FETCH_HEAD; then
-    echo "The source checkout has commits that are not on GitHub main."
-    exit 1
-fi
-/usr/bin/git merge --ff-only FETCH_HEAD
 
 staging_directory="$(mktemp -d "$(dirname "$application_bundle")/.claudex-update.XXXXXX")"
-./Scripts/build-app.sh "$staging_directory/claudex-macos.app"
-/usr/bin/codesign --verify --deep --strict "$staging_directory/claudex-macos.app"
+/usr/bin/ditto -x -k "$archive" "$staging_directory"
+new_bundle="$staging_directory/claudex-macos.app"
+if [[ ! -d "$new_bundle" ]]; then
+    echo "The archive does not contain claudex-macos.app."
+    exit 1
+fi
+/usr/bin/codesign --verify --deep --strict "$new_bundle"
+bundle_identifier="$(/usr/bin/plutil -extract CFBundleIdentifier raw "$new_bundle/Contents/Info.plist")"
+archive_revision="$(/usr/bin/plutil -extract ClaudexSourceRevision raw "$new_bundle/Contents/Info.plist")"
+if [[ "$bundle_identifier" != "dev.zichaoyang.claudex-macos" || "$archive_revision" != "$expected_revision" ]]; then
+    echo "The archive contains an unexpected app or revision."
+    exit 1
+fi
 
 mv "$application_bundle" "$staging_directory/previous.app"
-mv "$staging_directory/claudex-macos.app" "$application_bundle"
-revision="$(/usr/bin/git rev-parse --short HEAD)"
-printf 'success\nUpdated to GitHub revision %s.\n' "$revision" >"$result_file"
+mv "$new_bundle" "$application_bundle"
+printf 'success\nUpdated to GitHub revision %s.\n' "${expected_revision:0:7}" >"$result_file"
 /usr/bin/open "$application_bundle"
