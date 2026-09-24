@@ -5,11 +5,11 @@ import SwiftTerm
 @MainActor
 final class TerminalSession: ObservableObject, Identifiable {
     let id = UUID()
-    let conversation: Conversation?
+    @Published private(set) var conversation: Conversation?
     let provider: ConversationProvider
     let projectPath: String
     let action: ConversationAction
-    let displayTitle: String
+    @Published private(set) var displayTitle: String
     let command: NativeCLICommand
     let terminalView: LocalProcessTerminalView
 
@@ -21,6 +21,7 @@ final class TerminalSession: ObservableObject, Identifiable {
     private var isClosed = false
 
     var projectName: String { URL(fileURLWithPath: projectPath).lastPathComponent }
+    var processID: Int32 { terminalView.process.shellPid }
     var projectDirectoryKey: String {
         URL(fileURLWithPath: projectPath).standardizedFileURL.resolvingSymlinksInPath().path
     }
@@ -61,6 +62,11 @@ final class TerminalSession: ObservableObject, Identifiable {
         guard !isClosed else { return }
         self.exitCode = exitCode
         hasExited = true
+    }
+
+    func synchronize(conversation: Conversation, displayTitle: String) {
+        self.conversation = conversation
+        self.displayTitle = displayTitle
     }
 
     func close() {

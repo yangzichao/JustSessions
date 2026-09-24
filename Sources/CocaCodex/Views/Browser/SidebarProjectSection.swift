@@ -75,9 +75,9 @@ struct SidebarProjectSection: View {
 
     private func sessionRow(_ conversation: Conversation) -> some View {
         let openTerminal = store.terminalSessions.first {
-            $0.conversation?.id == conversation.id && $0.action == .resume && $0.id == store.selectedTerminalID
+            $0.conversation?.id == conversation.id && $0.id == store.selectedTerminalID
         } ?? store.terminalSessions.first {
-            $0.conversation?.id == conversation.id && $0.action == .resume
+            $0.conversation?.id == conversation.id
         }
         let isHighlighted = selectedConversationID == conversation.id
             || (openTerminal != nil && openTerminal?.id == store.selectedTerminalID)

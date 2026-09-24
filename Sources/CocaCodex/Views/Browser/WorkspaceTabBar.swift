@@ -17,7 +17,12 @@ struct WorkspaceTabBar: View {
                 .accessibilityLabel("Show sessions")
 
                 ForEach(store.terminalSessions) { session in
-                    terminalTab(session)
+                    TerminalTab(
+                        session: session,
+                        isSelected: store.selectedTerminalID == session.id,
+                        onSelect: { store.selectTerminal(session.id) },
+                        onClose: { closingSessionID = session.id }
+                    )
                 }
             }
             .padding(.horizontal, 16)
@@ -36,12 +41,17 @@ struct WorkspaceTabBar: View {
             Text("The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.")
         }
     }
+}
 
-    private func terminalTab(_ session: TerminalSession) -> some View {
+private struct TerminalTab: View {
+    @ObservedObject var session: TerminalSession
+    let isSelected: Bool
+    let onSelect: () -> Void
+    let onClose: () -> Void
+
+    var body: some View {
         HStack(spacing: 2) {
-            Button {
-                store.selectTerminal(session.id)
-            } label: {
+            Button(action: onSelect) {
                 HStack(spacing: 6) {
                     TerminalStatusIndicator(session: session)
                     Text(session.displayTitle)
@@ -50,12 +60,10 @@ struct WorkspaceTabBar: View {
                 }
             }
             .buttonStyle(.bordered)
-            .tint(store.selectedTerminalID == session.id ? .accentColor : nil)
+            .tint(isSelected ? .accentColor : nil)
             .help("Show \(session.displayTitle)")
 
-            Button {
-                closingSessionID = session.id
-            } label: {
+            Button(action: onClose) {
                 Image(systemName: "xmark")
             }
             .buttonStyle(.borderless)

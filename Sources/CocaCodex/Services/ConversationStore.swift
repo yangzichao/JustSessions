@@ -35,6 +35,8 @@ final class ConversationStore: ObservableObject {
             found.sort { $0.updatedAt > $1.updatedAt }
             await MainActor.run {
                 self.conversations = found
+                self.synchronizeTerminalTitles()
+                self.associateOpenCodexSessions()
                 self.errorMessage = failures.isEmpty ? nil : failures.joined(separator: "\n")
                 self.isLoading = false
             }
@@ -53,6 +55,8 @@ final class ConversationStore: ObservableObject {
             aliases[conversation.id] = title
         }
         UserDefaults.standard.set(aliases, forKey: aliasesKey)
+        synchronizeTerminalTitles()
+        if conversation.provider == .codex { associateOpenCodexSessions() }
     }
 
     func hasTerminal(for conversation: Conversation) -> Bool {
@@ -93,7 +97,7 @@ final class ConversationStore: ObservableObject {
         guard action != .branch || conversation.provider.supportsBranchFromLauncher else { return }
         if action == .resume,
            let runningSession = terminalSessions.first(where: {
-               $0.action == .resume && $0.conversation?.id == conversation.id && !$0.hasExited
+               $0.conversation?.id == conversation.id && !$0.hasExited
            }) {
             selectedTerminalID = runningSession.id
             return

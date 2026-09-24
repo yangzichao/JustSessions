@@ -67,9 +67,9 @@ struct ConversationBrowserView: View {
                     selection = .project(conversation.projectDirectoryKey)
                     selectedConversationID = conversation.id
                     if let openTerminal = store.terminalSessions.first(where: {
-                        $0.conversation?.id == conversation.id && $0.action == .resume && !$0.hasExited
+                        $0.conversation?.id == conversation.id && !$0.hasExited
                     }) ?? store.terminalSessions.first(where: {
-                        $0.conversation?.id == conversation.id && $0.action == .resume
+                        $0.conversation?.id == conversation.id
                     }) {
                         store.selectTerminal(openTerminal.id)
                     } else {
