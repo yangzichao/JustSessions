@@ -15,6 +15,7 @@ if [[ -d "$swiftterm_resources" ]]; then
 fi
 cp -f "$project_directory/.build/checkouts/SwiftTerm/LICENSE" "$app_directory/Contents/Resources/SwiftTerm-LICENSE.txt"
 cp -f "$project_directory/Scripts/update-app.sh" "$app_directory/Contents/Resources/update-app.sh"
+cp -f "$project_directory/Branding/AppIcon.icns" "$app_directory/Contents/Resources/AppIcon.icns"
 sparkle_framework="$project_directory/.build/artifacts/Sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
 if [[ ! -d "$sparkle_framework" ]]; then
     print -u2 "Sparkle.framework was not found at $sparkle_framework"
@@ -32,6 +33,7 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
     <key>CFBundleDisplayName</key><string>JustSessions</string>
     <key>CFBundleIdentifier</key><string>dev.zichaoyang.coca-codex</string>
     <key>CFBundleExecutable</key><string>JustSessions</string>
+    <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>0.16.0</string>
     <key>CFBundleVersion</key><string>BUILD_NUMBER_PLACEHOLDER</string>

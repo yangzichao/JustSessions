@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- macOS icon grid: 824px body inset 100px. Hairline keeps the white body visible on white backgrounds. -->
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="#FFFFFF"/>
+  <rect x="101" y="101" width="822" height="822" rx="184" fill="none" stroke="#15171C" stroke-opacity="0.08" stroke-width="2"/>
+  <g transform="translate(232 296)">
+    <path d="M120,0 H440 A120,120 0 0 1 560,120 V272 A120,120 0 0 1 440,392 H186 L84,466 A10,10 0 0 1 68,456 L86,387.1 A120,120 0 0 1 0,272 V120 A120,120 0 0 1 120,0 Z" fill="#15171C"/>
+    <circle cx="156" cy="196" r="46" fill="#FF8A1F"/>
+    <circle cx="280" cy="196" r="46" fill="#2F6BFF"/>
+    <circle cx="404" cy="196" r="46" fill="#A64DF0"/>
+  </g>
+</svg>
