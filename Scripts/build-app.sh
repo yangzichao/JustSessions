@@ -14,7 +14,6 @@ if [[ -d "$swiftterm_resources" ]]; then
     ditto "$swiftterm_resources" "$app_directory/Contents/Resources/SwiftTerm_SwiftTerm.bundle"
 fi
 cp -f "$project_directory/.build/checkouts/SwiftTerm/LICENSE" "$app_directory/Contents/Resources/SwiftTerm-LICENSE.txt"
-cp -f "$project_directory/Scripts/update-app.sh" "$app_directory/Contents/Resources/update-app.sh"
 cp -f "$project_directory/Branding/AppIcon.icns" "$app_directory/Contents/Resources/AppIcon.icns"
 sparkle_framework="$project_directory/.build/artifacts/Sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
 if [[ ! -d "$sparkle_framework" ]]; then
@@ -49,7 +48,6 @@ plutil -replace CFBundleVersion -string "$build_number" "$app_directory/Contents
 plutil -replace CFBundleShortVersionString -string "$app_version" "$app_directory/Contents/Info.plist"
 source_revision="$(git rev-parse HEAD)"
 plutil -insert JustSessionsSourceRevision -string "$source_revision" "$app_directory/Contents/Info.plist"
-plutil -insert CocaCodexSourceRevision -string "$source_revision" "$app_directory/Contents/Info.plist"
 codesign_identity="${CODE_SIGN_IDENTITY:--}"
 if [[ "$codesign_identity" == "-" ]]; then
     codesign --force --deep --sign "$codesign_identity" "$app_directory"

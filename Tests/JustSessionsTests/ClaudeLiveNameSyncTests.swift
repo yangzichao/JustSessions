@@ -53,7 +53,7 @@ struct ClaudeLiveNameSyncTests {
         let session = makeSession(linkedTo: store.conversations.first, action: .resume, displayTitle: "First prompt")
 
         store.applyLiveName(
-            from: Self.record(sessionID: Self.resumedSessionID, name: "coca-codex-03", nameSource: "derived"),
+            from: Self.record(sessionID: Self.resumedSessionID, name: "justsessions-03", nameSource: "derived"),
             to: session
         )
 

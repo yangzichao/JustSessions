@@ -20,7 +20,7 @@ struct ClaudeLiveSessionRegistryTests {
     }
 
     @Test func ignoresNamesTheUserDidNotChoose() throws {
-        let derived = #"{"sessionId":"\#(Self.sessionID)","name":"coca-codex-03","nameSource":"derived"}"#
+        let derived = #"{"sessionId":"\#(Self.sessionID)","name":"justsessions-03","nameSource":"derived"}"#
         let unmarked = #"{"sessionId":"\#(Self.sessionID)","name":"Some desktop title"}"#
         let unnamed = #"{"sessionId":"\#(Self.sessionID)"}"#
 
@@ -67,7 +67,7 @@ struct ClaudeLiveSessionRegistryTests {
         let recordFile = sessionsDirectory.appendingPathComponent("4242.json")
         let registry = ClaudeLiveSessionRegistry(configurationDirectory: root)
 
-        try #"{"sessionId":"\#(Self.sessionID)","name":"coca-codex-03","nameSource":"derived"}"#
+        try #"{"sessionId":"\#(Self.sessionID)","name":"justsessions-03","nameSource":"derived"}"#
             .write(to: recordFile, atomically: true, encoding: .utf8)
         #expect(registry.record(forProcessID: 4242)?.userChosenName == nil)
 

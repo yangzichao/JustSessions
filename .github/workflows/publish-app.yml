@@ -66,7 +66,6 @@ jobs:
           APP_BUILD_NUMBER=$((GITHUB_RUN_NUMBER + 19)) ./Scripts/build-app.sh
           codesign --verify --deep --strict dist/JustSessions.app
           test "$(plutil -extract JustSessionsSourceRevision raw dist/JustSessions.app/Contents/Info.plist)" = "$GITHUB_SHA"
-          test "$(plutil -extract CocaCodexSourceRevision raw dist/JustSessions.app/Contents/Info.plist)" = "$GITHUB_SHA"
           test "$(plutil -extract CFBundleDisplayName raw dist/JustSessions.app/Contents/Info.plist)" = "JustSessions"
           test "$(plutil -extract CFBundleVersion raw dist/JustSessions.app/Contents/Info.plist)" = "$((GITHUB_RUN_NUMBER + 19))"
           test "$(plutil -extract CFBundleShortVersionString raw dist/JustSessions.app/Contents/Info.plist)" = "$APP_VERSION"
@@ -116,14 +115,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag="build-$GITHUB_SHA"
+          tag="$GITHUB_REF_NAME"
           mkdir -p dist/sparkle-updates
-          # Sparkle and older JustSessions installs can use the same archive.
           update_archive="dist/sparkle-updates/JustSessions.zip"
           ditto -c -k --sequesterRsrc --keepParent dist/JustSessions.app "$update_archive"
-          ditto dist/JustSessions.app dist/coca-codex.app
-          codesign --verify --deep --strict dist/coca-codex.app
-          ditto -c -k --sequesterRsrc --keepParent dist/coca-codex.app dist/coca-codex.zip
           if gh release download --repo yangzichao/JustSessions --pattern appcast.xml \
             --dir dist/sparkle-updates; then
             echo "Continuing the existing Sparkle update feed."
@@ -141,26 +136,24 @@ jobs:
           codesign --verify --deep --strict dist/JustSessions.app
           spctl --assess --type execute --verbose=2 dist/JustSessions.app
 
-      # The release keeps the build-<sha> tag because installs from before Sparkle
-      # only accept release tags in that form.
-      - name: Publish GitHub build release
+      # The release is attached to the version tag that started this run.
+      - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag="build-$GITHUB_SHA"
+          tag="$GITHUB_REF_NAME"
           update_archive="dist/sparkle-updates/JustSessions.zip"
           if gh release view "$tag" --repo yangzichao/JustSessions >/dev/null 2>&1; then
-            echo "Build already published: $tag"
+            echo "Release already published: $tag"
           else
             gh release create "$tag" \
               dist/JustSessions.dmg \
-              dist/coca-codex.zip \
               "$update_archive" \
               dist/sparkle-updates/appcast.xml \
               --repo yangzichao/JustSessions \
-              --target "$GITHUB_SHA" \
-              --title "JustSessions $GITHUB_REF_NAME" \
-              --notes "Signed, notarized JustSessions build. To install, open JustSessions.dmg and drag JustSessions into Applications. Sparkle uses appcast.xml and JustSessions.zip; the ZIP archives also support older installations." \
+              --verify-tag \
+              --title "JustSessions $tag" \
+              --notes "Signed, notarized JustSessions build. To install, open JustSessions.dmg and drag JustSessions into Applications. Sparkle updates use appcast.xml and JustSessions.zip." \
               --latest
           fi
