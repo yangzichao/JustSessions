@@ -32,7 +32,14 @@ Download `JustSessions.dmg` from the [latest release](https://github.com/yangzic
 
 Requires macOS 14+, Xcode Command Line Tools, and whichever CLI you want to use (`claude`, `codex`, and/or `agy`).
 
-GitHub Actions builds, Developer ID signs, notarizes, and publishes the app from every push to `main`. Releases include the notarized `JustSessions.dmg` installer, a Sparkle-signed archive and `appcast.xml`, plus `JustSessions.zip` and `coca-codex.zip` compatibility archives for older installations that still use the original updater. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_KEY_ID`, `APPLE_NOTARY_ISSUER_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
+Pushes to `main` and pull requests only run `swift test`. GitHub Actions builds, Developer ID signs, notarizes, and publishes the app only when a version tag is pushed; the tag sets the app version:
+
+```sh
+git tag v0.17.0
+git push origin v0.17.0
+```
+
+Releases include the notarized `JustSessions.dmg` installer, a Sparkle-signed archive and `appcast.xml`, plus `JustSessions.zip` and `coca-codex.zip` compatibility archives for older installations that still use the original updater. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_KEY_ID`, `APPLE_NOTARY_ISSUER_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
 
 ```sh
 swift test

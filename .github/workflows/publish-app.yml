@@ -1,8 +1,10 @@
 name: Publish signed JustSessions update
 
+# Publishes only when a version tag such as v0.17.0 is pushed.
+# A manual run must also be started from a version tag.
 on:
   push:
-    branches: [main]
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -17,6 +19,15 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Read app version from tag
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF_TYPE" != "tag" || ! "$GITHUB_REF_NAME" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Releases must run from a version tag like v0.17.0, not $GITHUB_REF_TYPE '$GITHUB_REF_NAME'." >&2
+            exit 1
+          fi
+          printf 'APP_VERSION=%s\n' "${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
 
       - name: Test
         run: swift test
@@ -58,6 +69,7 @@ jobs:
           test "$(plutil -extract CocaCodexSourceRevision raw dist/JustSessions.app/Contents/Info.plist)" = "$GITHUB_SHA"
           test "$(plutil -extract CFBundleDisplayName raw dist/JustSessions.app/Contents/Info.plist)" = "JustSessions"
           test "$(plutil -extract CFBundleVersion raw dist/JustSessions.app/Contents/Info.plist)" = "$((GITHUB_RUN_NUMBER + 19))"
+          test "$(plutil -extract CFBundleShortVersionString raw dist/JustSessions.app/Contents/Info.plist)" = "$APP_VERSION"
           codesign --display --verbose=2 dist/JustSessions.app 2>&1 | grep -F "Authority=Developer ID Application:"
 
       - name: Notarize and staple app
@@ -128,6 +140,8 @@ jobs:
           codesign --verify --deep --strict dist/JustSessions.app
           spctl --assess --type execute --verbose=2 dist/JustSessions.app
 
+      # The release keeps the build-<sha> tag because installs from before Sparkle
+      # only accept release tags in that form.
       - name: Publish GitHub build release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -146,7 +160,7 @@ jobs:
               dist/sparkle-updates/appcast.xml \
               --repo yangzichao/JustSessions \
               --target "$GITHUB_SHA" \
-              --title "JustSessions ${GITHUB_SHA:0:7}" \
+              --title "JustSessions $GITHUB_REF_NAME" \
               --notes "Signed, notarized JustSessions build. To install, open JustSessions.dmg and drag JustSessions into Applications. The appcast.xml asset powers Sparkle updates; JustSessions.zip and coca-codex.zip support updates from earlier installs." \
               --latest
           fi

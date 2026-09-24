@@ -23,6 +23,7 @@ fi
 ditto "$sparkle_framework" "$app_directory/Contents/Frameworks/Sparkle.framework"
 cp -f "$project_directory/.build/artifacts/Sparkle/Sparkle/LICENSE" "$app_directory/Contents/Resources/Sparkle-LICENSE.txt"
 build_number="${APP_BUILD_NUMBER:-20}"
+app_version="${APP_VERSION:-0.16.0}"
 cat > "$app_directory/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -43,6 +44,7 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
 </dict></plist>
 PLIST
 plutil -replace CFBundleVersion -string "$build_number" "$app_directory/Contents/Info.plist"
+plutil -replace CFBundleShortVersionString -string "$app_version" "$app_directory/Contents/Info.plist"
 source_revision="$(git rev-parse HEAD)"
 plutil -insert JustSessionsSourceRevision -string "$source_revision" "$app_directory/Contents/Info.plist"
 plutil -insert CocaCodexSourceRevision -string "$source_revision" "$app_directory/Contents/Info.plist"
