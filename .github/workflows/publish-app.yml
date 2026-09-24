@@ -118,7 +118,9 @@ jobs:
           set -euo pipefail
           tag="build-$GITHUB_SHA"
           mkdir -p dist/sparkle-updates
-          ditto -c -k --sequesterRsrc --keepParent dist/JustSessions.app dist/JustSessions.zip
+          # Sparkle and older JustSessions installs can use the same archive.
+          update_archive="dist/sparkle-updates/JustSessions.zip"
+          ditto -c -k --sequesterRsrc --keepParent dist/JustSessions.app "$update_archive"
           ditto dist/JustSessions.app dist/coca-codex.app
           codesign --verify --deep --strict dist/coca-codex.app
           ditto -c -k --sequesterRsrc --keepParent dist/coca-codex.app dist/coca-codex.zip
@@ -128,8 +130,6 @@ jobs:
           else
             echo "Starting a new Sparkle update feed."
           fi
-          update_archive="dist/sparkle-updates/JustSessions-$((GITHUB_RUN_NUMBER + 19)).zip"
-          cp dist/JustSessions.zip "$update_archive"
           download_prefix="https://github.com/yangzichao/JustSessions/releases/download/$tag/"
           printf '%s' "$SPARKLE_EDDSA_PRIVATE_KEY" | \
             ./.build/artifacts/Sparkle/Sparkle/bin/generate_appcast \
@@ -137,6 +137,7 @@ jobs:
               --download-url-prefix "$download_prefix" \
               --embed-release-notes \
               dist/sparkle-updates
+          grep -Fq "${download_prefix}JustSessions.zip" dist/sparkle-updates/appcast.xml
           codesign --verify --deep --strict dist/JustSessions.app
           spctl --assess --type execute --verbose=2 dist/JustSessions.app
 
@@ -148,19 +149,18 @@ jobs:
         run: |
           set -euo pipefail
           tag="build-$GITHUB_SHA"
-          update_archive="dist/sparkle-updates/JustSessions-$((GITHUB_RUN_NUMBER + 19)).zip"
+          update_archive="dist/sparkle-updates/JustSessions.zip"
           if gh release view "$tag" --repo yangzichao/JustSessions >/dev/null 2>&1; then
             echo "Build already published: $tag"
           else
             gh release create "$tag" \
               dist/JustSessions.dmg \
-              dist/JustSessions.zip \
               dist/coca-codex.zip \
               "$update_archive" \
               dist/sparkle-updates/appcast.xml \
               --repo yangzichao/JustSessions \
               --target "$GITHUB_SHA" \
               --title "JustSessions $GITHUB_REF_NAME" \
-              --notes "Signed, notarized JustSessions build. To install, open JustSessions.dmg and drag JustSessions into Applications. The appcast.xml asset powers Sparkle updates; JustSessions.zip and coca-codex.zip support updates from earlier installs." \
+              --notes "Signed, notarized JustSessions build. To install, open JustSessions.dmg and drag JustSessions into Applications. Sparkle uses appcast.xml and JustSessions.zip; the ZIP archives also support older installations." \
               --latest
           fi
