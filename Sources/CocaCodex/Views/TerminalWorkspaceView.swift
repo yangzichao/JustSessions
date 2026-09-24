@@ -19,6 +19,22 @@ struct TerminalWorkspaceView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                Button {
+                    session.copySelection()
+                } label: {
+                    Label("Copy selection", systemImage: "doc.on.doc")
+                }
+                .buttonStyle(.borderless)
+                .disabled(!session.hasSelection)
+                .help("Drag to select terminal text, then copy it (⌘C)")
+
+                Toggle("CLI mouse", isOn: Binding(
+                    get: { session.allowsCLIMouseInput },
+                    set: { session.setCLIMouseInputEnabled($0) }
+                ))
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .help("Let the CLI use mouse clicks. Hold Shift while dragging to select text.")
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)

@@ -11,10 +11,12 @@ final class TerminalSession: ObservableObject, Identifiable {
     let action: ConversationAction
     @Published private(set) var displayTitle: String
     let command: NativeCLICommand
-    let terminalView: LocalProcessTerminalView
+    let terminalView: SelectableTerminalView
 
     @Published private(set) var hasExited = false
     @Published private(set) var exitCode: Int32?
+    @Published private(set) var allowsCLIMouseInput = false
+    @Published private(set) var hasSelection = false
 
     private let processObserver: TerminalProcessObserver
     private var hasStarted = false
@@ -40,10 +42,13 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.action = action
         self.displayTitle = displayTitle
         self.command = command
-        self.terminalView = LocalProcessTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
+        self.terminalView = SelectableTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.processObserver = TerminalProcessObserver()
         terminalView.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
         terminalView.processDelegate = processObserver
+        terminalView.onSelectionChanged = { [weak self] hasSelection in
+            self?.hasSelection = hasSelection
+        }
         processObserver.session = self
     }
 
@@ -67,6 +72,16 @@ final class TerminalSession: ObservableObject, Identifiable {
     func synchronize(conversation: Conversation, displayTitle: String) {
         self.conversation = conversation
         self.displayTitle = displayTitle
+    }
+
+    func setCLIMouseInputEnabled(_ enabled: Bool) {
+        allowsCLIMouseInput = enabled
+        terminalView.allowMouseReporting = enabled
+    }
+
+    func copySelection() {
+        guard terminalView.selectionActive else { return }
+        terminalView.copy(self)
     }
 
     func close() {

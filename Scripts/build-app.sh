@@ -23,8 +23,8 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
     <key>CFBundleIdentifier</key><string>dev.zichaoyang.coca-codex</string>
     <key>CFBundleExecutable</key><string>CocaCodex</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>0.14.1</string>
-    <key>CFBundleVersion</key><string>16</string>
+    <key>CFBundleShortVersionString</key><string>0.14.2</string>
+    <key>CFBundleVersion</key><string>17</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>NSHighResolutionCapable</key><true/>
 </dict></plist>
