@@ -30,7 +30,7 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
 <plist version="1.0"><dict>
     <key>CFBundleName</key><string>JustSessions</string>
     <key>CFBundleDisplayName</key><string>JustSessions</string>
-    <key>CFBundleIdentifier</key><string>dev.zichaoyang.coca-codex</string>
+    <key>CFBundleIdentifier</key><string>dev.zichaoyang.justsessions</string>
     <key>CFBundleExecutable</key><string>JustSessions</string>
     <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>

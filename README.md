@@ -42,7 +42,7 @@ git tag v0.17.0
 git push origin v0.17.0
 ```
 
-Each release is attached to its version tag and includes the notarized `JustSessions.dmg` installer, plus `appcast.xml` and the Sparkle-signed `JustSessions.zip` that updates use. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_ISSUER_ID`, `APPLE_NOTARY_KEY_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`. The bundle identifier remains `dev.zichaoyang.coca-codex` to preserve saved session aliases.
+Each release is attached to its version tag and includes the notarized `JustSessions.dmg` installer, plus `appcast.xml` and the Sparkle-signed `JustSessions.zip` that updates use. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_ISSUER_ID`, `APPLE_NOTARY_KEY_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`.
 
 ```sh
 swift test
