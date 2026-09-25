@@ -53,7 +53,7 @@ Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of th
 - Pick up names set with `/rename` in Claude Code within about a second.
 
 **SSH hosts**
-- Click **Add SSH host…** at the end of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code and Codex sessions are listed under its own heading, below this Mac's.
+- Click **Add SSH host…** at the bottom left of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code and Codex sessions are listed under its own heading, below this Mac's.
 - Resume, branch, start, and delete sessions on the host over SSH, just like on this Mac.
 - Refresh updates every host at once. A host that can't be reached shows the error on its heading; the others still list.
 - With tmux on the host, a session there keeps running when the connection drops or the tab closes. Resume to reattach.
@@ -91,7 +91,7 @@ Find it in the sidebar and double-click it. The app runs the CLI's own resume co
 Yes. **Branch** creates a new session from an existing Claude Code or Codex conversation and opens it in a new tab.
 
 **Does it work with sessions on a remote server?**
-Yes, for Claude Code and Codex. Click **Add SSH host…** at the end of the sidebar and enter the host. Its sessions appear under its own heading; hover the heading and click **+** to start a new session there.
+Yes, for Claude Code and Codex. Click **Add SSH host…** at the bottom left of the sidebar and enter the host. Its sessions appear under its own heading; hover the heading and click **+** to start a new session there.
 
 **Is it free?**
 Yes. JustSessions is open source under the MIT license.
@@ -130,8 +130,8 @@ Each release includes the notarized `JustSessions.dmg`, plus `appcast.xml` and t
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.
 - `Views/Browser/`: sidebar, terminal tab bar, and window layout.
-- `Views/Browser/Sidebar/`: sidebar header, filters, and session rows with their tmux status.
-- `Views/Browser/Sidebar/Hosts/`: host headings and the Add SSH host row.
+- `Views/Browser/Sidebar/`: sidebar header, filters, footer, and session rows with their tmux status.
+- `Views/Browser/Sidebar/Hosts/`: host headings and the Add SSH host button in the footer.
 - `Views/Remote/`: Add SSH host sheet.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 - `Views/Preview/`: conversation preview for the selected session.

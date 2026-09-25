@@ -107,9 +107,6 @@ struct ConversationSidebarView: View {
                         }
                         .padding(.horizontal, 8)
                     }
-
-                    SidebarAddRemoteHostButton { isAddRemoteHostSheetPresented = true }
-                        .padding(.top, 12)
                 }
                 .padding(.bottom, 12)
             }
@@ -125,7 +122,10 @@ struct ConversationSidebarView: View {
             }
 
             ThemeDivider()
-            SidebarFooter(onCheckForUpdates: onCheckForUpdates)
+            SidebarFooter(
+                onAddRemoteHost: { isAddRemoteHostSheetPresented = true },
+                onCheckForUpdates: onCheckForUpdates
+            )
         }
         .background(sidebarBackground)
         .sheet(isPresented: $isAddRemoteHostSheetPresented) {
