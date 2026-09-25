@@ -62,6 +62,27 @@ struct RemoteNewSessionTests {
         store.closeAllTerminals()
     }
 
+    @Test @MainActor func branchInRemoteProjectWaitsForItsForkNotTheSessionItForked() throws {
+        let store = ConversationStore(adapters: [StaticConversationAdapter(discoveredConversations: [])])
+        let forked = remoteConversation(.claude, project: "/home/me/paper", minutesAgo: 60)
+        store.replaceConversations(onRemoteHost: "devbox", with: [forked])
+
+        store.launch(forked, action: .branch)
+        let tab = try #require(store.terminalSessions.last)
+        #expect(tab.command.executablePath == "/usr/bin/ssh")
+        #expect(tab.conversation == nil)
+        #expect(tab.pendingNewSession?.projectDirectoryKey == "ssh://devbox/home/me/paper")
+
+        let fork = remoteConversation(.claude, project: "/home/me/paper", minutesAgo: 0)
+        let matches = RemoteNewSessionMatcher.matches(
+            for: [tab.waitingRemoteNewSessionTab],
+            in: [forked, fork],
+            alreadyLinkedConversationIDs: []
+        )
+        #expect(matches[tab.id]?.id == fork.id)
+        store.closeAllTerminals()
+    }
+
     private func remoteConversation(
         _ provider: ConversationProvider,
         project: String,

@@ -1,6 +1,6 @@
 import Foundation
 
-/// A "new session" tab on a remote host, copied out of its `TerminalSession` for matching.
+/// A "New session" or "Branch" tab on a remote host, copied out of its `TerminalSession` for matching.
 struct WaitingRemoteNewSessionTab: Equatable {
     let terminalID: UUID
     let host: String

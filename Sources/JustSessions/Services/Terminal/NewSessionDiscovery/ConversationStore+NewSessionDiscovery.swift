@@ -1,8 +1,9 @@
 import Foundation
 
-/// A tab started with "New session" has no conversation until the CLI writes its session file. The sidebar
-/// lists such a tab under its project right away (`pendingNewSessions`). Meanwhile this finds the file the
-/// tab's CLI is writing, refreshes so the real session shows up, and links the tab to it.
+/// A tab started with "New session" or "Branch" has no conversation until the CLI writes its session file;
+/// a branch runs a fork with an id of its own. The sidebar lists such a tab under its project right away
+/// (`pendingNewSessions`). Meanwhile this finds the file the tab's CLI is writing, refreshes so the real
+/// session shows up, and links the tab to it.
 extension ConversationStore {
     /// Claude Code writes a new transcript before the first prompt, so a freshly listed session can still be
     /// untitled. This many refreshes after its file changes are enough to pick up the first prompt.
@@ -63,7 +64,7 @@ extension ConversationStore {
     }
 
     private func needsRefreshForFirstPromptTitle(_ session: TerminalSession) -> Bool {
-        guard session.action == .new, !session.hasExited, session.remoteHost == nil,
+        guard session.action.startsNewSession, !session.hasExited, session.remoteHost == nil,
               session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
               let conversation = session.conversation,
               conversation.suggestedTitle == ConversationMetadata.untitledConversationTitle else { return false }

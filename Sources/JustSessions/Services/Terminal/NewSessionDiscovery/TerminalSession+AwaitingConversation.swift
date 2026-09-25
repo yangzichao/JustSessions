@@ -1,9 +1,9 @@
 import Foundation
 
 extension TerminalSession {
-    /// A tab started with "New session" that is not linked to its conversation yet.
+    /// A tab started with "New session" or "Branch" that is not linked to its conversation yet.
     var isNewSessionAwaitingConversation: Bool {
-        action == .new && conversation == nil
+        action.startsNewSession && conversation == nil
     }
 
     var waitingNewSessionTab: WaitingNewSessionTab {
@@ -12,6 +12,7 @@ extension TerminalSession {
             provider: provider,
             processID: processID,
             preassignedSessionID: preassignedSessionID,
+            branchedFromSessionID: branchedFromSessionID,
             isRunning: !hasExited
         )
     }

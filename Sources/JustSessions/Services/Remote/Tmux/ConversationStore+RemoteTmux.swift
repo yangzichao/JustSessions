@@ -31,8 +31,8 @@ extension ConversationStore {
         remoteTmuxSessionNamesByHost[host] = names
     }
 
-    /// A new session's tab started under a temporary name; once its session is known, it takes the session's
-    /// own name, so resuming that session later reattaches to it.
+    /// A new session's or branch's tab started under a temporary name; once its session is known, it takes the
+    /// session's own name, so resuming that session later reattaches to it.
     func adoptSessionTmuxName(for session: TerminalSession, runner: RemoteHostCommandRunner = RemoteHostCommandRunner()) {
         guard let host = session.remoteHost,
               let currentName = session.remoteTmuxSessionName,
@@ -88,6 +88,7 @@ extension ConversationStore {
             action: ended.action,
             displayTitle: ended.displayTitle,
             command: reconnectCommand(for: ended),
+            branchedFromSessionID: ended.branchedFromSessionID,
             remoteHost: ended.remoteHost,
             sessionIDsKnownAtLaunch: ended.sessionIDsKnownAtLaunch,
             remoteTmuxSessionName: ended.remoteTmuxSessionName
@@ -96,8 +97,8 @@ extension ConversationStore {
         replaceTerminal(at: index, with: replacement)
     }
 
-    /// A new session's tab that took its session's tmux name must attach under that name, not the one it
-    /// started with. Attaching ignores the CLI arguments, so resume arguments are right whenever tmux still runs it.
+    /// A new session's or branch's tab that took its session's tmux name must attach under that name, not the
+    /// one it started with. Attaching ignores the CLI arguments, so resume arguments are right whenever tmux still runs it.
     private func reconnectCommand(for ended: TerminalSession) -> NativeCLICommand {
         guard let host = ended.remoteHost,
               let conversation = ended.conversation,

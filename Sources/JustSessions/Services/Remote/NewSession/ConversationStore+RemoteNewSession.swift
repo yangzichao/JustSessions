@@ -1,7 +1,7 @@
 import Foundation
 
-/// New sessions started in a project on a remote host. While such a tab runs, its host is copied again every
-/// few seconds until the tab is linked to its session and that session has a title.
+/// New sessions and branches started in a project on a remote host. While such a tab runs, its host is copied
+/// again every few seconds until the tab is linked to its session and that session has a title.
 extension ConversationStore {
     func launchNewRemoteSession(provider: ConversationProvider, host: String, projectPath: String) {
         guard provider.supportsRemoteHosts else { return }
@@ -21,11 +21,17 @@ extension ConversationStore {
             displayTitle: "New \(provider.rawValue) session",
             command: command,
             remoteHost: host,
-            sessionIDsKnownAtLaunch: Set(conversations.filter { $0.remoteHost == host }.map(\.sessionID)),
+            sessionIDsKnownAtLaunch: sessionIDsListed(onRemoteHost: host),
             remoteTmuxSessionName: tmuxSessionName
         )
         session.onProcessFinished = { [weak self] in self?.refreshRemoteHost(host) }
         openTerminal(session)
+    }
+
+    /// A waiting tab on the host takes a session that is not among these; nothing for a local tab.
+    func sessionIDsListed(onRemoteHost host: String?) -> Set<String> {
+        guard let host else { return [] }
+        return Set(conversations.filter { $0.remoteHost == host }.map(\.sessionID))
     }
 
     func startRemoteNewSessionPolling(interval: Duration = .seconds(10)) {
@@ -59,7 +65,7 @@ extension ConversationStore {
 
     private func hostsWithRemoteNewSessionsToFollow() -> Set<String> {
         Set(terminalSessions.compactMap { session -> String? in
-            guard let host = session.remoteHost, session.action == .new, !session.hasExited else { return nil }
+            guard let host = session.remoteHost, session.action.startsNewSession, !session.hasExited else { return nil }
             let needsTitle = session.conversation?.suggestedTitle == ConversationMetadata.untitledConversationTitle
             return session.isNewSessionAwaitingConversation || needsTitle ? host : nil
         })

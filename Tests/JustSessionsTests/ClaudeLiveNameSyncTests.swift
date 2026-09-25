@@ -6,7 +6,7 @@ import Testing
 struct ClaudeLiveNameSyncTests {
     private static let resumedSessionID = "11111111-1111-4111-8111-111111111111"
     private static let newSessionID = "22222222-2222-4222-8222-222222222222"
-    private static let forkedSessionID = "33333333-3333-4333-8333-333333333333"
+    private static let sessionIDAfterClear = "33333333-3333-4333-8333-333333333333"
 
     @Test func renameInsideResumedTabUpdatesTabAndSidebarEntry() async throws {
         let store = try await makeStore(discovering: [Self.conversation(sessionID: Self.resumedSessionID, title: "First prompt")])
@@ -38,11 +38,11 @@ struct ClaudeLiveNameSyncTests {
         #expect(store.conversations.first?.suggestedTitle == "Brand new name")
     }
 
-    @Test func branchTabKeepsItsTitleBecauseItRunsADifferentSession() async throws {
+    @Test func tabKeepsItsTitleOnceItsCLIMovesToAnotherSession() async throws {
         let store = try await makeStore(discovering: [Self.conversation(sessionID: Self.resumedSessionID, title: "Original")])
-        let session = makeSession(linkedTo: store.conversations.first, action: .branch, displayTitle: "Original")
+        let session = makeSession(linkedTo: store.conversations.first, action: .resume, displayTitle: "Original")
 
-        store.applyLiveName(from: Self.record(sessionID: Self.forkedSessionID, name: "Fork name"), to: session)
+        store.applyLiveName(from: Self.record(sessionID: Self.sessionIDAfterClear, name: "Cleared name"), to: session)
 
         #expect(session.displayTitle == "Original")
         #expect(store.conversations.first?.suggestedTitle == "Original")

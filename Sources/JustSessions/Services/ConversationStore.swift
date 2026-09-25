@@ -23,11 +23,15 @@ final class ConversationStore: ObservableObject {
     private var isRefreshQueued = false
 
     private let adapters: [any ConversationAdapter]
-    private let commandResolver = NativeCLICommandResolver()
+    private let commandResolver: NativeCLICommandResolver
     private let aliasesKey = "conversationAliases"
 
-    init(adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter(), AntigravityAdapter()]) {
+    init(
+        adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter(), AntigravityAdapter()],
+        commandResolver: NativeCLICommandResolver = NativeCLICommandResolver()
+    ) {
         self.adapters = adapters
+        self.commandResolver = commandResolver
         self.aliases = UserDefaults.standard.dictionary(forKey: aliasesKey) as? [String: String] ?? [:]
         self.projectDisplayNames = ProjectDisplayNames.load(from: .standard)
         self.pinnedItems = PinnedItems.load(from: .standard)
@@ -268,19 +272,27 @@ final class ConversationStore: ObservableObject {
             } else {
                 try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
             }
+            // A branch runs a fork with a session id of its own, so its tab waits for that session like a
+            // new session's tab does; see new session discovery.
+            let isBranch = action == .branch
             let session = TerminalSession(
-                conversation: conversation,
+                conversation: isBranch ? nil : conversation,
                 provider: conversation.provider,
                 projectPath: conversation.projectPath,
                 action: action,
                 displayTitle: title(for: conversation),
                 command: command,
+                branchedFromSessionID: isBranch ? conversation.sessionID : nil,
                 remoteHost: conversation.remoteHost,
+                sessionIDsKnownAtLaunch: isBranch ? sessionIDsListed(onRemoteHost: conversation.remoteHost) : [],
                 remoteTmuxSessionName: tmuxSessionName
             )
             if let remoteHost = conversation.remoteHost {
                 // Pick up the new messages and title once the remote CLI exits.
                 session.onProcessFinished = { [weak self] in self?.refreshRemoteHost(remoteHost) }
+            } else if isBranch {
+                // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
+                session.onProcessFinished = { [weak self] in self?.refresh() }
             }
             terminalSessions.append(session)
             selectedTerminalID = session.id
@@ -346,14 +358,14 @@ final class ConversationStore: ObservableObject {
     }
 
     func selectTerminal(_ id: UUID?) {
-        let shouldRefreshNewSession = selectedTerminal?.action == .new && selectedTerminalID != id
+        let shouldRefreshNewSession = selectedTerminal?.action.startsNewSession == true && selectedTerminalID != id
         selectedTerminalID = id
         if shouldRefreshNewSession { refresh() }
     }
 
     func closeTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }) else { return }
-        let shouldRefreshNewSession = terminalSessions[index].action == .new
+        let shouldRefreshNewSession = terminalSessions[index].action.startsNewSession
         terminalSessions[index].close()
         terminalSessions.remove(at: index)
         if selectedTerminalID == id { selectedTerminalID = terminalSessions.last?.id }

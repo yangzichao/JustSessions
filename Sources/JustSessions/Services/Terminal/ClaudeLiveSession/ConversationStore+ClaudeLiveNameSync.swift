@@ -22,7 +22,7 @@ extension ConversationStore {
 
     func applyLiveName(from record: ClaudeLiveSessionRecord, to session: TerminalSession) {
         guard let liveName = record.userChosenName else { return }
-        // A branch tab runs a new session id while still pointing at the conversation it forked from.
+        // The CLI can move to another session, e.g. with `/clear`, while the tab still points at the one it was linked to.
         if let linkedConversation = session.conversation, linkedConversation.sessionID != record.sessionID { return }
 
         applySuggestedTitle(liveName, toSessionID: record.sessionID, provider: .claude)
