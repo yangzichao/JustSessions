@@ -70,20 +70,6 @@ struct ConversationSidebarView: View {
 
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 1) {
-                    if !store.terminalSessions.isEmpty {
-                        SidebarSectionHeading(title: "OPEN TERMINALS", count: store.terminalSessions.count)
-                            .padding(.top, 14)
-                        ForEach(store.terminalSessions) { terminal in
-                            TerminalSidebarRow(
-                                session: terminal,
-                                projectDisplayName: store.projectDisplayName(forProjectPath: terminal.projectDirectoryKey),
-                                isSelected: store.selectedTerminalID == terminal.id,
-                                onSelect: { store.selectTerminal(terminal.id) }
-                            )
-                        }
-                        .padding(.horizontal, 8)
-                    }
-
                     SidebarSectionHeading(title: "PROJECTS", count: projects.count)
                         .padding(.top, 14)
 
