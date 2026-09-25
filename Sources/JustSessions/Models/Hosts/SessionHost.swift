@@ -22,6 +22,14 @@ enum SessionHost: Hashable, Sendable, Identifiable {
         }
     }
 
+    /// The name within a sentence: "on this Mac", "on devbox".
+    var nameInSentence: String {
+        switch self {
+        case .thisMac: "this Mac"
+        case .ssh(let destination): destination
+        }
+    }
+
     var symbolName: String {
         switch self {
         case .thisMac: "laptopcomputer"

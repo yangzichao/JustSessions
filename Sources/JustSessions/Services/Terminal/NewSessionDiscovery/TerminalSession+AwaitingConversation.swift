@@ -10,7 +10,7 @@ extension TerminalSession {
         WaitingNewSessionTab(
             terminalID: id,
             provider: provider,
-            processID: processID,
+            processID: cliProcessID,
             preassignedSessionID: preassignedSessionID,
             branchedFromSessionID: branchedFromSessionID,
             isRunning: !hasExited

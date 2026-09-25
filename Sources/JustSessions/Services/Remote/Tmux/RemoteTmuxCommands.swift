@@ -18,12 +18,4 @@ enum RemoteTmuxCommands {
             "tmux kill-session -t \(ShellQuoting.quoted(name)) 2>/dev/null; true"
         )
     }
-
-    /// Session names from `list-sessions`. Lines a shell profile prints, and sessions not started here, are ignored.
-    static func appSessionNames(inListOutput output: String) -> Set<String> {
-        Set(output
-            .split(whereSeparator: \.isNewline)
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { $0.hasPrefix(RemoteTmuxSessionName.prefix) && !$0.contains(" ") })
-    }
 }

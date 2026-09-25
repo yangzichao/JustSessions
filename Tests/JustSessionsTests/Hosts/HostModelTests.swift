@@ -66,6 +66,11 @@ struct HostModelTests {
         #expect(devboxGroup?.newSessionProviders == [.claude, .codex])
     }
 
+    @Test func hostNamesReadWithinASentence() {
+        #expect("End on \(SessionHost.thisMac.nameInSentence)" == "End on this Mac")
+        #expect("End on \(SessionHost.ssh("me@devbox").nameInSentence)" == "End on me@devbox")
+    }
+
     @Test func everyToolRunsOnThisMacAndAntigravityOnlyThere() {
         #expect(ConversationProvider.allCases.filter { $0.runs(on: .thisMac) } == [.claude, .codex, .antigravity])
         #expect(ConversationProvider.allCases.filter { $0.runs(on: .ssh("devbox")) } == [.claude, .codex])

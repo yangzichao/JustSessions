@@ -50,26 +50,19 @@ struct RemoteCLICommandBuilder {
         arguments: [String],
         tmuxSessionName: String? = nil
     ) -> String {
-        let cliInvocation = ([executableName(for: provider)] + arguments.map(ShellQuoting.quoted)).joined(separator: " ")
+        let cliInvocation = ([provider.executableName] + arguments.map(ShellQuoting.quoted)).joined(separator: " ")
         let directCommand = "cd \(ShellQuoting.quoted(projectPath)) && exec \(cliInvocation)"
         guard let tmuxSessionName else { return loginShellCommand(directCommand) }
         // `-A` attaches when the session already runs. The status line and mouse settings make it look and
-        // scroll like the CLI on its own.
+        // scroll like the CLI on its own, and with no prefix key Ctrl-B reaches the CLI. These are options of
+        // this session only; the host's other tmux sessions keep theirs.
         let tmuxCommand = "exec tmux new-session -A -s \(ShellQuoting.quoted(tmuxSessionName)) "
             + ShellQuoting.quoted(loginShellCommand(directCommand))
-            + " \\; set-option status off \\; set-option mouse on"
+            + " \\; set-option status off \\; set-option mouse on \\; set-option prefix None"
         return loginShellCommand("if command -v tmux >/dev/null 2>&1; then \(tmuxCommand); else \(directCommand); fi")
     }
 
     static func loginShellCommand(_ innerCommand: String) -> String {
         "exec \"$SHELL\" -lic \(ShellQuoting.quoted(innerCommand))"
-    }
-
-    static func executableName(for provider: ConversationProvider) -> String {
-        switch provider {
-        case .claude: "claude"
-        case .codex: "codex"
-        case .antigravity: "agy"
-        }
     }
 }

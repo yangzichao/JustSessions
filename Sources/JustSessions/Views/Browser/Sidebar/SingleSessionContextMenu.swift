@@ -20,9 +20,9 @@ struct SingleSessionContextMenu: View {
             }
             .disabled(!store.canLaunch(conversation, action: .branch))
         }
-        if store.isRunningInRemoteTmux(conversation) {
-            Button("End on \(conversation.host.displayName)", systemImage: "stop.circle") {
-                store.endRemoteTmuxSession(for: conversation)
+        if store.isRunningInTmux(conversation) {
+            Button("End on \(conversation.host.nameInSentence)", systemImage: "stop.circle") {
+                store.endTmuxSession(for: conversation)
             }
         }
         Divider()

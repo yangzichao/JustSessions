@@ -49,6 +49,7 @@ Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of th
 - Branch (fork) a Claude Code or Codex conversation into a new session. This forks the conversation, not a Git branch.
 - Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI. It appears in the sidebar right away.
 - Keep several terminal tabs open. Switch between a running CLI and the preview without stopping it.
+- With tmux 3.3 or later installed, a CLI on this Mac runs inside tmux. Closing its tab with **Keep running**, quitting the app, or installing an update leaves it running. Resume the session to reattach, or right-click it and choose **End on this Mac**.
 - Pick up names set with `/rename` in Claude Code within about a second.
 
 **SSH hosts**
@@ -60,7 +61,7 @@ Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of th
 **Clean up**
 - Delete sessions one at a time, in a multi-selection (⌘-click, ⇧-click), or per project, always after a confirmation.
 - Claude Code sessions on this Mac go to the macOS Trash. Codex uses `codex delete --force`. SSH hosts have no Trash, so deletions there are permanent.
-- Sessions with an open terminal tab can't be deleted.
+- Sessions with an open terminal tab, or still running in tmux, can't be deleted.
 
 ## How it works
 
@@ -72,7 +73,9 @@ JustSessions reads session files that already exist on your Mac. It never upload
 | OpenAI Codex CLI | `~/.codex/sessions` (honors `CODEX_HOME`) | Yes | Yes | Yes |
 | Google Antigravity CLI | `~/.gemini/antigravity-cli/conversations` | Not yet | Use `/fork` after resuming | No |
 
-The app launches each CLI directly in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it looks for CLIs in the inherited `PATH` plus `~/.local/bin`, `/opt/homebrew/bin`, and `/usr/local/bin`. No shell command runs during scanning.
+The app runs each CLI in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it looks for CLIs and tmux in the inherited `PATH` plus `~/.local/bin`, `/opt/homebrew/bin`, and `/usr/local/bin`. Scanning reads the session files and runs no shell command; with tmux installed, it also asks tmux for its version and running sessions.
+
+With tmux 3.3 or later, each CLI on this Mac runs in the app's own tmux server, which ignores `~/.tmux.conf` and leaves your other tmux sessions alone. `tmux -L justsessions ls` lists its sessions. Without tmux, the CLI runs directly. In a tmux tab, dragging selects through tmux and copies to the clipboard when you let go; hold Shift while dragging to select the usual way. Shift-Return still adds a new line in Claude Code.
 
 SSH hosts must accept `ssh <host>` without a password prompt and need `rsync`. Their session files are mirrored into a local cache and read by the same code as this Mac's.
 
@@ -119,15 +122,17 @@ Each release includes the notarized `JustSessions.dmg`, plus `appcast.xml` and t
 - `Services/Adapters/`: provider discovery and native arguments. Separate adapters make adding another CLI straightforward.
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
 - `Services/Launch/`: CLI executable resolution and process environment.
-- `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux.
+- `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there.
+- `Services/Tmux/`: tmux session names, and keeping a CLI running after its tab closes, on any host.
+- `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, and finding each tab's CLI process.
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.
 - `Views/Browser/`: sidebar, terminal tab bar, and window layout.
-- `Views/Browser/Sidebar/`: sidebar header, filters, and session rows.
+- `Views/Browser/Sidebar/`: sidebar header, filters, and session rows with their tmux status.
 - `Views/Browser/Sidebar/Hosts/`: host headings and the Add SSH host row.
-- `Views/Remote/`: Add SSH host sheet and tmux status.
+- `Views/Remote/`: Add SSH host sheet.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 - `Views/Preview/`: conversation preview for the selected session.
 

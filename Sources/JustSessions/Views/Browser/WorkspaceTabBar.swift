@@ -5,8 +5,9 @@ struct WorkspaceTabBar: View {
     let onRenameConversation: (Conversation) -> Void
     @State private var closingSessionID: UUID?
 
-    private var closingRemoteHost: String? {
-        store.terminalSessions.first { $0.id == closingSessionID && $0.remoteTmuxSessionName != nil }?.host.sshDestination
+    /// The host whose tmux can keep the closing tab's CLI running, when closing can leave it running.
+    private var closingTabTmuxHost: SessionHost? {
+        store.terminalSessions.first { $0.id == closingSessionID && $0.canKeepCLIRunningAfterClose }?.host
     }
 
     var body: some View {
@@ -35,23 +36,23 @@ struct WorkspaceTabBar: View {
             .padding(.vertical, 8)
         }
         .background(ThemePalette.contentSurface.ignoresSafeArea())
-        .confirmationDialog(closingRemoteHost == nil ? "End this CLI session?" : "Close this remote tab?", isPresented: Binding(
+        .confirmationDialog(closingTabTmuxHost == nil ? "End this CLI session?" : "Close this tab?", isPresented: Binding(
             get: { closingSessionID != nil },
             set: { if !$0 { closingSessionID = nil } }
         )) {
-            if closingRemoteHost != nil {
-                Button("Disconnect") {
-                    if let closingSessionID { store.closeTerminal(closingSessionID, endingRemoteSession: false) }
+            if closingTabTmuxHost != nil {
+                Button("Keep running") {
+                    if let closingSessionID { store.closeTerminal(closingSessionID, endingTmuxSession: false) }
                     closingSessionID = nil
                 }
             }
             Button("End session", role: .destructive) {
-                if let closingSessionID { store.closeTerminal(closingSessionID, endingRemoteSession: true) }
+                if let closingSessionID { store.closeTerminal(closingSessionID, endingTmuxSession: true) }
                 closingSessionID = nil
             }
         } message: {
-            if let closingRemoteHost {
-                Text("Disconnect keeps the CLI running in tmux on \(closingRemoteHost); resume the session to reattach. End session stops it.")
+            if let closingTabTmuxHost {
+                Text("Keep running leaves the CLI running in tmux on \(closingTabTmuxHost.nameInSentence); resume the session to reattach. End session stops it.")
             } else {
                 Text("The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.")
             }

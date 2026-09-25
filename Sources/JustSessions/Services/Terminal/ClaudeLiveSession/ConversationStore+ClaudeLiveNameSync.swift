@@ -15,7 +15,7 @@ extension ConversationStore {
 
     func synchronizeClaudeLiveNames(registry: ClaudeLiveSessionRegistry = ClaudeLiveSessionRegistry()) {
         for session in terminalSessions where session.provider == .claude && !session.hasExited {
-            guard let record = registry.record(forProcessID: session.processID) else { continue }
+            guard let record = registry.record(forProcessID: session.cliProcessID) else { continue }
             applyLiveName(from: record, to: session)
         }
     }

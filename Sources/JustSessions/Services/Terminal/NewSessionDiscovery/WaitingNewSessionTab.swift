@@ -4,6 +4,7 @@ import Foundation
 struct WaitingNewSessionTab: Sendable {
     let terminalID: UUID
     let provider: ConversationProvider
+    /// The CLI's process, or 0 while it is unknown.
     let processID: Int32
     /// The id the app asked the CLI to use (`claude --session-id`), when the CLI accepts one.
     let preassignedSessionID: String?

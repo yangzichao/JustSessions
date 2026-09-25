@@ -10,7 +10,7 @@ struct RemoteTmuxKeepAliveTests {
             .first(where: FileManager.default.isExecutableFile(atPath:)) else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: URL(fileURLWithPath: tmuxPath).deletingLastPathComponent().path)
         defer { sandbox.tearDown() }
-        let tmuxName = RemoteTmuxSessionName.unique(for: .claude)
+        let tmuxName = TmuxSessionName.unique(for: .claude)
         let command = RemoteCLICommandBuilder.remoteCommand(
             provider: .claude,
             projectPath: sandbox.project.path,
@@ -25,12 +25,13 @@ struct RemoteTmuxKeepAliveTests {
         let options = sandbox.run("tmux show-options -t \(ShellQuoting.quoted(tmuxName))")
         #expect(options.contains("status off"))
         #expect(options.contains("mouse on"))
+        #expect(options.contains("prefix None"))
 
         // The connection drops: the client goes away, the CLI stays.
         firstClient.terminate()
         firstClient.waitUntilExit()
         #expect(sandbox.hasTmuxSession(tmuxName))
-        #expect(RemoteTmuxCommands.appSessionNames(inListOutput: sandbox.run(RemoteTmuxCommands.listSessionsCommand)) == [tmuxName])
+        #expect(TmuxSessionName.appSessionNames(inListOutput: sandbox.run(RemoteTmuxCommands.listSessionsCommand)) == [tmuxName])
 
         // Opening it again attaches instead of starting the CLI a second time.
         let secondClient = try sandbox.startClient(command)
@@ -53,7 +54,7 @@ struct RemoteTmuxKeepAliveTests {
             provider: .claude,
             projectPath: sandbox.project.path,
             arguments: ["--resume", "abc"],
-            tmuxSessionName: RemoteTmuxSessionName.unique(for: .claude)
+            tmuxSessionName: TmuxSessionName.unique(for: .claude)
         )
         _ = sandbox.run(command.replacingOccurrences(of: "exec claude", with: "exec claude-once"))
         #expect(sandbox.launchRecord?.hasSuffix("/Bob's paper\n--resume\nabc\n") == true)

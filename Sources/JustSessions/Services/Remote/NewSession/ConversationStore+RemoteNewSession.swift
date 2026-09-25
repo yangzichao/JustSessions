@@ -5,7 +5,7 @@ import Foundation
 extension ConversationStore {
     func launchNewRemoteSession(provider: ConversationProvider, host: String, projectPath: String) {
         guard provider.supportsRemoteHosts else { return }
-        let tmuxSessionName = RemoteTmuxSessionName.unique(for: provider)
+        let tmuxSessionName = TmuxSessionName.unique(for: provider)
         let command = RemoteCLICommandBuilder().command(
             host: host,
             provider: provider,
@@ -22,7 +22,7 @@ extension ConversationStore {
             command: command,
             host: .ssh(host),
             sessionIDsKnownAtLaunch: sessionIDsListed(on: .ssh(host)),
-            remoteTmuxSessionName: tmuxSessionName
+            tmuxSessionName: tmuxSessionName
         )
         session.onProcessFinished = { [weak self] in self?.refreshRemoteHost(host) }
         openTerminal(session)

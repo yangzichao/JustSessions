@@ -2,7 +2,7 @@ import Foundation
 
 /// Finds the session file each waiting "New session" or "Branch" tab is writing, from facts rather than
 /// guesses: the session id the app asked Claude Code to use, Claude Code's per-process registry, and the
-/// files the CLI holds open. Process lookups cover the tab's whole process tree, so a CLI that an install's
+/// files the CLI holds open. Process lookups cover the CLI's whole process tree, so a CLI that an install's
 /// wrapper script starts as a child process still counts.
 struct NewSessionFileFinder: Sendable {
     var claudeTranscripts = ClaudeSessionFileLocator()
@@ -40,7 +40,7 @@ struct NewSessionFileFinder: Sendable {
         )
         for tab in tabs {
             guard let processIDs = processIDsOfTabsNeedingOpenFiles[tab.terminalID] else { continue }
-            // The tab's own process first, then the processes it started.
+            // The CLI's own process first, then the processes it started.
             let openSessionFile = processIDs.lazy
                 .flatMap { openFilePaths[$0] ?? [] }
                 .compactMap { path -> NewSessionFile? in

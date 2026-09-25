@@ -14,6 +14,15 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
         }
     }
 
+    /// The CLI's command name, on this Mac and on SSH hosts.
+    var executableName: String {
+        switch self {
+        case .claude: "claude"
+        case .codex: "codex"
+        case .antigravity: "agy"
+        }
+    }
+
     var supportsBranchFromLauncher: Bool { self != .antigravity }
     var supportsDeletionFromLauncher: Bool { self != .antigravity }
     /// Tools whose sessions are listed and resumed on SSH hosts.

@@ -74,8 +74,8 @@ struct SidebarSessionRow: View {
     private func activityIndicator(openTerminal: TerminalSession?) -> some View {
         if let openTerminal {
             TerminalStatusIndicator(session: openTerminal)
-        } else if store.isRunningInRemoteTmux(conversation) {
-            RemoteTmuxRunningIndicator(host: conversation.host.displayName)
+        } else if store.isRunningInTmux(conversation) {
+            TmuxRunningIndicator(host: conversation.host)
         } else {
             SessionAgeLabel(lastActivity: conversation.updatedAt)
         }

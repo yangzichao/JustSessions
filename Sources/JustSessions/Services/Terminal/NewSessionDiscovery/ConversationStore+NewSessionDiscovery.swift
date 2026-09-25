@@ -58,6 +58,7 @@ extension ConversationStore {
                   $0.provider == session.provider && $0.sessionID == sessionID
               }) else { return false }
         session.synchronize(conversation: conversation, displayTitle: title(for: conversation))
+        adoptSessionTmuxName(for: session)
         // Sidebar rows look up open terminals through the store, which does not see a tab's own changes.
         objectWillChange.send()
         return true

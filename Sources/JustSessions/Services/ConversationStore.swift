@@ -17,14 +17,14 @@ final class ConversationStore: ObservableObject {
     @Published var remoteHostList: RemoteHostList
     /// Each host's last refresh, this Mac's included.
     @Published var hostRefreshStatuses: [SessionHost: HostRefreshStatus] = [:]
-    /// tmux sessions JustSessions started on each SSH host that still run, as of the host's last copy.
-    @Published var remoteTmuxSessionNamesByHost: [String: Set<String>] = [:]
+    /// tmux sessions JustSessions started that still run, per host, as of the host's last refresh.
+    @Published var tmuxSessionNamesByHost: [SessionHost: Set<String>] = [:]
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
     private var isRefreshQueued = false
 
     private let adapters: [any ConversationAdapter]
-    private let commandResolver: NativeCLICommandResolver
+    let commandResolver: NativeCLICommandResolver
     private let aliasesKey = "conversationAliases"
 
     init(
@@ -42,6 +42,7 @@ final class ConversationStore: ObservableObject {
         startClaudeLiveNameSync()
         startNewSessionDiscovery()
         startRemoteNewSessionPolling()
+        startTmuxPaneProcessLookup()
     }
 
     /// Scans the session folders on this Mac. SSH hosts refresh on their own, so a slow host never holds this up.
@@ -54,6 +55,7 @@ final class ConversationStore: ObservableObject {
         hostRefreshStatuses[.thisMac] = .refreshing
         lastRefreshStartedAt = .now
         let adapters = self.adapters
+        let installedTmux = commandResolver.installedTmuxServer()
         Task.detached(priority: .userInitiated) {
             var found: [Conversation] = []
             var failures: [String] = []
@@ -61,7 +63,10 @@ final class ConversationStore: ObservableObject {
                 do { found += try adapter.discover() }
                 catch { failures.append("\(adapter.provider.rawValue): \(error.localizedDescription)") }
             }
+            // The first refresh also checks the tmux version, so tabs can run in tmux from then on.
+            let tmuxSessionNames = installedTmux.map { $0.hasSupportedVersion() ? $0.sessionNames() : [] } ?? []
             await MainActor.run {
+                self.tmuxSessionNamesByHost[.thisMac] = tmuxSessionNames
                 self.replaceConversations(on: .thisMac, with: found)
                 self.hostRefreshStatuses[.thisMac] = failures.isEmpty
                     ? .refreshed(.now)
@@ -123,9 +128,9 @@ final class ConversationStore: ObservableObject {
         pinnedItems.save(to: .standard)
     }
 
-    /// A tab in this window, or for a session on an SSH host, a CLI still running in tmux there.
+    /// A tab in this window, or a CLI still running in tmux on the session's host.
     func hasTerminal(for conversation: Conversation) -> Bool {
-        terminalSessions.contains { $0.conversation?.id == conversation.id } || isRunningInRemoteTmux(conversation)
+        terminalSessions.contains { $0.conversation?.id == conversation.id } || isRunningInTmux(conversation)
     }
 
     var isDeletingSessions: Bool {
@@ -257,11 +262,8 @@ final class ConversationStore: ObservableObject {
             return
         }
         guard let adapter = adapter(for: conversation.provider) else { return }
-        let tmuxSessionName = conversation.host == .thisMac
-            ? nil
-            : remoteTmuxSessionName(forLaunching: conversation, action: action)
         do {
-            let command = try launchCommand(for: conversation, action: action, adapter: adapter, tmuxSessionName: tmuxSessionName)
+            let (command, tmuxSessionName) = try launchCommand(for: conversation, action: action, adapter: adapter)
             // A branch runs a fork with a session id of its own, so its tab waits for that session like a
             // new session's tab does; see new session discovery.
             let isBranch = action == .branch
@@ -275,7 +277,7 @@ final class ConversationStore: ObservableObject {
                 branchedFromSessionID: isBranch ? conversation.sessionID : nil,
                 host: conversation.host,
                 sessionIDsKnownAtLaunch: isBranch ? sessionIDsListed(on: conversation.host) : [],
-                remoteTmuxSessionName: tmuxSessionName
+                tmuxSessionName: tmuxSessionName
             )
             // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
             session.onProcessFinished = { [weak self] in self?.refresh(conversation.host) }
@@ -285,24 +287,27 @@ final class ConversationStore: ObservableObject {
         catch { errorMessage = error.localizedDescription }
     }
 
-    /// The CLI itself on this Mac; on an SSH host, `ssh` into the tmux session the CLI runs in.
+    /// On this Mac, the CLI itself, in tmux when it is installed; on an SSH host, `ssh` into the tmux session the
+    /// CLI runs in. Also returns the name of the tmux session, if any.
     private func launchCommand(
         for conversation: Conversation,
         action: ConversationAction,
-        adapter: any ConversationAdapter,
-        tmuxSessionName: String?
-    ) throws -> NativeCLICommand {
+        adapter: any ConversationAdapter
+    ) throws -> (command: NativeCLICommand, tmuxSessionName: String?) {
+        let tmuxSessionName = tmuxSessionName(forLaunching: conversation, action: action)
         switch conversation.host {
         case .thisMac:
-            try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
+            let command = try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
+            return thisMacTabCommand(running: command, tmuxSessionName: tmuxSessionName)
         case .ssh(let destination):
-            RemoteCLICommandBuilder().command(
+            let command = RemoteCLICommandBuilder().command(
                 host: destination,
                 provider: conversation.provider,
                 projectPath: conversation.projectPath,
                 arguments: adapter.arguments(for: conversation, action: action),
                 tmuxSessionName: tmuxSessionName
             )
+            return (command, tmuxSessionName)
         }
     }
 
@@ -329,17 +334,25 @@ final class ConversationStore: ObservableObject {
         let expandedPath = (projectPath as NSString).expandingTildeInPath
         let standardizedPath = URL(fileURLWithPath: expandedPath).standardizedFileURL.path
         let command = try commandResolver.resolveNewSession(provider: provider, projectPath: standardizedPath)
+        // Before tmux wraps the command: the flag check looks at the CLI's own executable.
         let preassignment = provider == .claude
             ? ClaudeSessionIDFlagSupport.shared.preassigningSessionID(to: command)
             : nil
+        // A session whose id is known up front gets its own tmux name right away.
+        let tabCommand = thisMacTabCommand(
+            running: preassignment?.command ?? command,
+            tmuxSessionName: preassignment.map { TmuxSessionName.forSession(provider: provider, sessionID: $0.sessionID) }
+                ?? TmuxSessionName.unique(for: provider)
+        )
         let session = TerminalSession(
             conversation: nil,
             provider: provider,
             projectPath: standardizedPath,
             action: .new,
             displayTitle: "New \(provider.rawValue) session",
-            command: preassignment?.command ?? command,
-            preassignedSessionID: preassignment?.sessionID
+            command: tabCommand.command,
+            preassignedSessionID: preassignment?.sessionID,
+            tmuxSessionName: tabCommand.tmuxSessionName
         )
         // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
         session.onProcessFinished = { [weak self] in self?.refreshThisMac() }

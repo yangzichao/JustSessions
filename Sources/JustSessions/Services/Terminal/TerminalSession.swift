@@ -22,8 +22,12 @@ final class TerminalSession: ObservableObject, Identifiable {
     /// For a new session or branch on an SSH host: the host's session ids listed when the tab started. The
     /// first session that appears after that in the same project is this tab's.
     let sessionIDsKnownAtLaunch: Set<String>
-    /// The tmux session an SSH host tab's CLI runs in. A new session's or branch's tab renames it once its session is known.
-    var remoteTmuxSessionName: String?
+    /// The tmux session the tab's CLI runs in, on this Mac or an SSH host. A new session's or branch's tab renames
+    /// it once its session is known.
+    var tmuxSessionName: String?
+    /// For a tab whose CLI runs in tmux on this Mac: the CLI's process, which the tmux server started rather than
+    /// the tab. Found once the tmux session runs.
+    var tmuxPaneProcessID: Int32?
     /// Refreshes spent picking up a new session's first prompt as its title; see new session discovery.
     var titleRefreshCount = 0
     var onProcessFinished: (() -> Void)?
@@ -37,6 +41,10 @@ final class TerminalSession: ObservableObject, Identifiable {
     private var isClosed = false
 
     var processID: Int32 { terminalView.process.shellPid }
+    /// The CLI's process on this Mac, or 0 while it is unknown: the tab's own process, unless the CLI runs in tmux.
+    var cliProcessID: Int32 {
+        tmuxSessionName == nil ? processID : tmuxPaneProcessID ?? 0
+    }
     var projectDirectoryKey: String {
         ProjectLocation(host: host, path: projectPath).key
     }
@@ -52,14 +60,14 @@ final class TerminalSession: ObservableObject, Identifiable {
         branchedFromSessionID: String? = nil,
         host: SessionHost = .thisMac,
         sessionIDsKnownAtLaunch: Set<String> = [],
-        remoteTmuxSessionName: String? = nil
+        tmuxSessionName: String? = nil
     ) {
         self.conversation = conversation
         self.provider = provider
         self.projectPath = projectPath
         self.host = host
         self.sessionIDsKnownAtLaunch = sessionIDsKnownAtLaunch
-        self.remoteTmuxSessionName = remoteTmuxSessionName
+        self.tmuxSessionName = tmuxSessionName
         self.action = action
         self.displayTitle = displayTitle
         self.command = command
@@ -68,6 +76,7 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.terminalView = SelectableTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.processObserver = TerminalProcessObserver()
         terminalView.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
+        terminalView.sendsShiftReturnAsCSIu = host == .thisMac && tmuxSessionName != nil
         terminalView.processDelegate = processObserver
         terminalView.onSelectionChanged = { [weak self] hasSelection in
             self?.hasSelection = hasSelection
