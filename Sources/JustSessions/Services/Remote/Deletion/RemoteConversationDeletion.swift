@@ -19,18 +19,10 @@ enum RemoteConversationDeletionError: LocalizedError {
 /// Deletes a session on its remote host over SSH. Remote hosts have no Trash, so this is permanent.
 /// Claude Code sessions lose their transcript, companion folder, and index entry; Codex deletes its own.
 struct RemoteConversationDeletion {
-    /// Runs a command on the host; tests swap in a local shell.
-    let runOnHost: (_ host: String, _ command: String) -> (exitStatus: Int32, output: String)?
+    let runner: RemoteHostCommandRunner
 
-    init(runOnHost: ((_ host: String, _ command: String) -> (exitStatus: Int32, output: String)?)? = nil) {
-        self.runOnHost = runOnHost ?? { host, command in
-            BoundedProcessRunner.result(
-                ofExecutable: "/usr/bin/ssh",
-                arguments: ["-o", "BatchMode=yes", "-o", "ConnectTimeout=10", host, command],
-                includesStandardError: true,
-                timeout: 60
-            )
-        }
+    init(runner: RemoteHostCommandRunner = RemoteHostCommandRunner()) {
+        self.runner = runner
     }
 
     /// Exit status of the Claude Code script when the transcript is already gone.
@@ -55,12 +47,12 @@ struct RemoteConversationDeletion {
             throw ConversationDeletionError.invalidSource
         }
 
-        guard let result = runOnHost(host, command) else { throw RemoteConversationDeletionError.couldNotRun(host: host) }
+        guard let result = runner.run(host, command, 60) else { throw RemoteConversationDeletionError.couldNotRun(host: host) }
         switch result.exitStatus {
         case 0:
             // The mirror would drop it on the next copy; dropping it now keeps the list right until then.
             try? FileManager.default.removeItem(at: conversation.sourceFile)
-        case 255:
+        case RemoteHostCommandRunner.connectionFailureExitStatus:
             throw RemoteConversationDeletionError.sshFailed(host: host)
         case Self.missingTranscriptExitStatus where conversation.provider == .claude:
             throw RemoteConversationDeletionError.missingOnHost(host: host)

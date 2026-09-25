@@ -16,7 +16,8 @@ struct RemoteHostsSheet: View {
             Text("Remote hosts").font(.title3.weight(.semibold))
             Text("Sessions saved by Claude Code and Codex on these hosts are listed with your local ones and open over SSH. "
                 + "Use a Host alias from ~/.ssh/config or user@hostname. `ssh <host>` must work without a password prompt, "
-                + "and the host needs rsync.")
+                + "and the host needs rsync. With tmux on the host, sessions keep running when the connection drops "
+                + "or the tab closes; resume to reattach.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

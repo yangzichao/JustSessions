@@ -94,7 +94,8 @@ struct ConversationBrowserView: View {
                         TerminalWorkspaceView(
                             session: session,
                             projectDisplayName: store.projectDisplayName(forProjectPath: session.projectDirectoryKey),
-                            isActive: isActive
+                            isActive: isActive,
+                            onReconnect: session.remoteHost == nil ? nil : { store.reconnectRemoteTerminal(session.id) }
                         )
                         .opacity(isActive ? 1 : 0)
                         .allowsHitTesting(isActive)

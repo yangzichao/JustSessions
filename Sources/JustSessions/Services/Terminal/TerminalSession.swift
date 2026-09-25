@@ -20,6 +20,8 @@ final class TerminalSession: ObservableObject, Identifiable {
     /// For a new session on a remote host: the host's session ids listed when the tab started. The first
     /// session that appears after that in the same project is this tab's.
     let sessionIDsKnownAtLaunch: Set<String>
+    /// The tmux session a remote tab's CLI runs in. A new session's tab renames it once its session is known.
+    var remoteTmuxSessionName: String?
     /// Refreshes spent picking up a new session's first prompt as its title; see new session discovery.
     var titleRefreshCount = 0
     var onProcessFinished: (() -> Void)?
@@ -47,13 +49,15 @@ final class TerminalSession: ObservableObject, Identifiable {
         command: NativeCLICommand,
         preassignedSessionID: String? = nil,
         remoteHost: String? = nil,
-        sessionIDsKnownAtLaunch: Set<String> = []
+        sessionIDsKnownAtLaunch: Set<String> = [],
+        remoteTmuxSessionName: String? = nil
     ) {
         self.conversation = conversation
         self.provider = provider
         self.projectPath = projectPath
         self.remoteHost = remoteHost
         self.sessionIDsKnownAtLaunch = sessionIDsKnownAtLaunch
+        self.remoteTmuxSessionName = remoteTmuxSessionName
         self.action = action
         self.displayTitle = displayTitle
         self.command = command

@@ -4,6 +4,8 @@ struct TerminalWorkspaceView: View {
     @ObservedObject var session: TerminalSession
     let projectDisplayName: String
     let isActive: Bool
+    /// Shown for a remote tab whose connection ended.
+    let onReconnect: (() -> Void)?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -19,6 +21,11 @@ struct TerminalWorkspaceView: View {
                     Text(session.exitCode.map { "Exited (\($0))" } ?? "Ended")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    if let onReconnect {
+                        Button("Reconnect", systemImage: "arrow.triangle.2.circlepath", action: onReconnect)
+                            .buttonStyle(.bordered)
+                            .help("Connect again; a CLI still running in tmux on the host is reattached")
+                    }
                 }
                 Button {
                     session.copySelection()

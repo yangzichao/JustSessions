@@ -151,6 +151,8 @@ struct SidebarProjectSection: View {
                 if isPinned { PinnedIndicator() }
                 if let openTerminal {
                     TerminalStatusIndicator(session: openTerminal)
+                } else if store.isRunningInRemoteTmux(conversation) {
+                    RemoteTmuxRunningIndicator(host: conversation.remoteHost ?? "")
                 }
             }
             .font(.system(size: 11, weight: isHighlighted ? .medium : .regular))
@@ -189,6 +191,11 @@ struct SidebarProjectSection: View {
                 store.launch(conversation, action: .branch)
             })
             .disabled(!store.canLaunch(conversation, action: .branch))
+        }
+        if store.isRunningInRemoteTmux(conversation) {
+            Button("End on \(conversation.remoteHost ?? "host")", systemImage: "stop.circle") {
+                store.endRemoteTmuxSession(for: conversation)
+            }
         }
         Divider()
         Button("Rename", systemImage: "pencil") { onRenameConversation(conversation) }

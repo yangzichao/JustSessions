@@ -5,6 +5,10 @@ struct WorkspaceTabBar: View {
     let onRenameConversation: (Conversation) -> Void
     @State private var closingSessionID: UUID?
 
+    private var closingRemoteHost: String? {
+        store.terminalSessions.first { $0.id == closingSessionID && $0.remoteTmuxSessionName != nil }?.remoteHost
+    }
+
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 6) {
@@ -31,16 +35,26 @@ struct WorkspaceTabBar: View {
             .padding(.vertical, 8)
         }
         .background(Color(nsColor: .windowBackgroundColor))
-        .confirmationDialog("End this CLI session?", isPresented: Binding(
+        .confirmationDialog(closingRemoteHost == nil ? "End this CLI session?" : "Close this remote tab?", isPresented: Binding(
             get: { closingSessionID != nil },
             set: { if !$0 { closingSessionID = nil } }
         )) {
+            if closingRemoteHost != nil {
+                Button("Disconnect") {
+                    if let closingSessionID { store.closeTerminal(closingSessionID, endingRemoteSession: false) }
+                    closingSessionID = nil
+                }
+            }
             Button("End session", role: .destructive) {
-                if let closingSessionID { store.closeTerminal(closingSessionID) }
+                if let closingSessionID { store.closeTerminal(closingSessionID, endingRemoteSession: true) }
                 closingSessionID = nil
             }
         } message: {
-            Text("The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.")
+            if let closingRemoteHost {
+                Text("Disconnect keeps the CLI running in tmux on \(closingRemoteHost); resume the session to reattach. End session stops it.")
+            } else {
+                Text("The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.")
+            }
         }
     }
 }

@@ -5,11 +5,13 @@ import Foundation
 extension ConversationStore {
     func launchNewRemoteSession(provider: ConversationProvider, host: String, projectPath: String) {
         guard provider.supportsRemoteHosts else { return }
+        let tmuxSessionName = RemoteTmuxSessionName.unique(for: provider)
         let command = RemoteCLICommandBuilder().command(
             host: host,
             provider: provider,
             projectPath: projectPath,
-            arguments: []
+            arguments: [],
+            tmuxSessionName: tmuxSessionName
         )
         let session = TerminalSession(
             conversation: nil,
@@ -19,7 +21,8 @@ extension ConversationStore {
             displayTitle: "New \(provider.rawValue) session",
             command: command,
             remoteHost: host,
-            sessionIDsKnownAtLaunch: Set(conversations.filter { $0.remoteHost == host }.map(\.sessionID))
+            sessionIDsKnownAtLaunch: Set(conversations.filter { $0.remoteHost == host }.map(\.sessionID)),
+            remoteTmuxSessionName: tmuxSessionName
         )
         session.onProcessFinished = { [weak self] in self?.refreshRemoteHost(host) }
         openTerminal(session)
@@ -48,6 +51,7 @@ extension ConversationStore {
         for session in waitingSessions {
             guard let conversation = matches[session.id] else { continue }
             session.synchronize(conversation: conversation, displayTitle: title(for: conversation))
+            adoptSessionTmuxName(for: session)
         }
         // Sidebar rows look up open terminals through the store, which does not see a tab's own changes.
         objectWillChange.send()

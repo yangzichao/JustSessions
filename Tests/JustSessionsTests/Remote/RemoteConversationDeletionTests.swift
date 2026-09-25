@@ -19,7 +19,7 @@ struct RemoteConversationDeletionTests {
         let mirrorFile = root.appendingPathComponent("mirror/projects/-home-me-bob's paper/\(sessionID).jsonl")
         try FileManager.default.createDirectory(at: mirrorFile.deletingLastPathComponent(), withIntermediateDirectories: true)
         try "{}".write(to: mirrorFile, atomically: true, encoding: .utf8)
-        let deletion = RemoteConversationDeletion(runOnHost: localShell(home: root.appendingPathComponent("home")))
+        let deletion = RemoteConversationDeletion(runner: localShell(home: root.appendingPathComponent("home")))
         let conversation = remoteConversation(.claude, sessionID: sessionID, sourceFile: mirrorFile)
 
         try deletion.delete(conversation)
@@ -41,28 +41,25 @@ struct RemoteConversationDeletionTests {
 
     @Test func codexDeletionRunsTheNativeCommandThroughTheLoginShell() throws {
         let sessionID = UUID().uuidString
-        var receivedHost: String?
-        var receivedCommand: String?
-        let deletion = RemoteConversationDeletion { host, command in
-            receivedHost = host
-            receivedCommand = command
-            return (0, "")
-        }
+        let recorder = RemoteCommandRecorder()
+        let deletion = RemoteConversationDeletion(runner: recorder.runner(answering: (0, "")))
 
         try deletion.delete(remoteConversation(.codex, sessionID: sessionID, sourceFile: URL(fileURLWithPath: "/tmp/rollout-\(sessionID).jsonl")))
 
-        #expect(receivedHost == "devbox")
-        #expect(receivedCommand == RemoteCLICommandBuilder.loginShellCommand("codex delete --force '\(sessionID)'"))
+        #expect(recorder.commands.map(\.host) == ["devbox"])
+        #expect(recorder.commands.map(\.command) == [RemoteCLICommandBuilder.loginShellCommand("codex delete --force '\(sessionID)'")])
     }
 
     @Test func unreachableHostIsReportedAsAConnectionProblem() {
-        let deletion = RemoteConversationDeletion { _, _ in (255, "ssh: connect to host devbox port 22: Connection refused") }
+        let deletion = RemoteConversationDeletion(
+            runner: RemoteCommandRecorder().runner(answering: (255, "ssh: connect to host devbox port 22: Connection refused"))
+        )
         let conversation = remoteConversation(.codex, sessionID: UUID().uuidString, sourceFile: URL(fileURLWithPath: "/tmp/x.jsonl"))
         #expect(throws: RemoteConversationDeletionError.self) { try deletion.delete(conversation) }
     }
 
-    private func localShell(home: URL) -> (String, String) -> (exitStatus: Int32, output: String)? {
-        { _, command in
+    private func localShell(home: URL) -> RemoteHostCommandRunner {
+        RemoteHostCommandRunner { _, command, _ in
             BoundedProcessRunner.result(
                 ofExecutable: "/bin/sh",
                 arguments: ["-c", command],

@@ -8,7 +8,8 @@ struct RemoteCLICommandBuilderTests {
             .command(host: "devbox", provider: .codex, projectPath: "/home/me/api", arguments: ["resume", "abc"])
 
         #expect(command.executablePath == "/usr/bin/ssh")
-        #expect(command.arguments.prefix(2) == ["-t", "devbox"])
+        #expect(command.arguments.first == "-t")
+        #expect(command.arguments.dropLast().last == "devbox")
         #expect(command.arguments.last == #"exec "$SHELL" -lic 'cd '\''/home/me/api'\'' && exec codex '\''resume'\'' '\''abc'\'''"#)
         #expect(command.environment.contains("SSH_AUTH_SOCK=/tmp/agent"))
         #expect(command.environment.contains("TERM=xterm-256color"))

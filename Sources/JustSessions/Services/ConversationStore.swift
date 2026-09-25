@@ -16,6 +16,8 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var batchDeletionConversationIDs: Set<String> = []
     @Published var remoteHostList: RemoteHostList
     @Published var remoteHostSyncStatuses: [String: RemoteHostSyncStatus] = [:]
+    /// tmux sessions JustSessions started on each host that still run, as of the host's last copy.
+    @Published var remoteTmuxSessionNamesByHost: [String: Set<String>] = [:]
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
     private var isRefreshQueued = false
@@ -118,8 +120,9 @@ final class ConversationStore: ObservableObject {
         pinnedItems.save(to: .standard)
     }
 
+    /// A tab in this window, or for a remote session, a CLI still running in tmux on its host.
     func hasTerminal(for conversation: Conversation) -> Bool {
-        terminalSessions.contains { $0.conversation?.id == conversation.id }
+        terminalSessions.contains { $0.conversation?.id == conversation.id } || isRunningInRemoteTmux(conversation)
     }
 
     var isDeletingSessions: Bool {
@@ -251,14 +254,16 @@ final class ConversationStore: ObservableObject {
             selectedTerminalID = runningSession.id
             return
         }
-        guard let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { return }
+        guard let adapter = adapter(for: conversation.provider) else { return }
+        let tmuxSessionName = conversation.isRemote ? remoteTmuxSessionName(forLaunching: conversation, action: action) : nil
         do {
             let command = if let remoteHost = conversation.remoteHost {
                 RemoteCLICommandBuilder().command(
                     host: remoteHost,
                     provider: conversation.provider,
                     projectPath: conversation.projectPath,
-                    arguments: adapter.arguments(for: conversation, action: action)
+                    arguments: adapter.arguments(for: conversation, action: action),
+                    tmuxSessionName: tmuxSessionName
                 )
             } else {
                 try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
@@ -270,7 +275,8 @@ final class ConversationStore: ObservableObject {
                 action: action,
                 displayTitle: title(for: conversation),
                 command: command,
-                remoteHost: conversation.remoteHost
+                remoteHost: conversation.remoteHost,
+                remoteTmuxSessionName: tmuxSessionName
             )
             if let remoteHost = conversation.remoteHost {
                 // Pick up the new messages and title once the remote CLI exits.
@@ -315,6 +321,18 @@ final class ConversationStore: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    func adapter(for provider: ConversationProvider) -> (any ConversationAdapter)? {
+        adapters.first { $0.provider == provider }
+    }
+
+    /// Swaps a tab for another in the same place, closing the old one; keeps it selected if it was.
+    func replaceTerminal(at index: Int, with session: TerminalSession) {
+        let replacedID = terminalSessions[index].id
+        terminalSessions[index].close()
+        terminalSessions[index] = session
+        if selectedTerminalID == replacedID { selectedTerminalID = session.id }
     }
 
     /// Adds the tab and shows it.

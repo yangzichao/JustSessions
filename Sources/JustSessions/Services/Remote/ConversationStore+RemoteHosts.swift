@@ -32,6 +32,9 @@ extension ConversationStore {
             do {
                 let hostConversations = try discovery.discover(host: host)
                 await self.applyRemoteHostConversations(hostConversations, host: host)
+                if let tmuxSessionNames = Self.listRemoteTmuxSessions(host: host) {
+                    await self.setRemoteTmuxSessionNames(tmuxSessionNames, host: host)
+                }
                 await self.setRemoteHostSyncStatus(.synced(.now), host: host)
             } catch {
                 await self.setRemoteHostSyncStatus(.failed(error.localizedDescription), host: host)
@@ -52,6 +55,7 @@ extension ConversationStore {
         remoteHostList.remove(host)
         remoteHostList.save(to: .standard)
         remoteHostSyncStatuses.removeValue(forKey: host)
+        remoteTmuxSessionNamesByHost.removeValue(forKey: host)
         replaceConversations(onRemoteHost: host, with: [])
         Task.detached(priority: .utility) { mirror.removeMirror(host: host) }
     }
