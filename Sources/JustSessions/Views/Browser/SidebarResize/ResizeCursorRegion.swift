@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Shows the left/right resize cursor over its whole frame.
-/// Uses an AppKit cursor rect so neighbouring views (terminal, scroll views) cannot override the cursor.
+/// Shows the left/right resize cursor over its whole frame through an AppKit cursor rect.
+/// Only used before macOS 15, which has no SwiftUI pointer style; see `sidebarResizeCursor`.
 struct ResizeCursorRegion: NSViewRepresentable {
     func makeNSView(context: Context) -> ResizeCursorRegionView {
         ResizeCursorRegionView()

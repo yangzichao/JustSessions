@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SidebarResizeHandle: View {
     let width: CGFloat
+    let minimumWidth: CGFloat
     let maximumWidth: CGFloat
     let onChange: (CGFloat) -> Void
     let onCommit: (CGFloat) -> Void
@@ -20,7 +21,7 @@ struct SidebarResizeHandle: View {
                     .frame(width: 1)
             }
             .contentShape(Rectangle())
-            .background { ResizeCursorRegion() }
+            .sidebarResizeCursor(canShrink: width > minimumWidth, canGrow: width < maximumWidth)
             .onHover { isHovering = $0 }
             .gesture(
                 DragGesture(minimumDistance: 1)
@@ -47,6 +48,6 @@ struct SidebarResizeHandle: View {
     }
 
     private func clamped(_ proposedWidth: CGFloat) -> CGFloat {
-        min(max(proposedWidth, 200), maximumWidth)
+        min(max(proposedWidth, minimumWidth), maximumWidth)
     }
 }

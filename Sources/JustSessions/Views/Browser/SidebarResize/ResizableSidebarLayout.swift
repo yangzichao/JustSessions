@@ -4,6 +4,8 @@ struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
     let sidebar: Sidebar
     let detail: Detail
 
+    private let minimumSidebarWidth: CGFloat = 200
+
     @AppStorage("conversationSidebarWidth") private var savedSidebarWidth = 248.0
     @State private var draggingSidebarWidth: CGFloat?
 
@@ -17,9 +19,9 @@ struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let maximumSidebarWidth = max(200, min(480, geometry.size.width - 608))
+            let maximumSidebarWidth = max(minimumSidebarWidth, min(480, geometry.size.width - 608))
             let sidebarWidth = min(
-                max(draggingSidebarWidth ?? CGFloat(savedSidebarWidth), 200),
+                max(draggingSidebarWidth ?? CGFloat(savedSidebarWidth), minimumSidebarWidth),
                 maximumSidebarWidth
             )
 
@@ -28,6 +30,7 @@ struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
 
                 SidebarResizeHandle(
                     width: sidebarWidth,
+                    minimumWidth: minimumSidebarWidth,
                     maximumWidth: maximumSidebarWidth,
                     onChange: { draggingSidebarWidth = $0 },
                     onCommit: { newWidth in
