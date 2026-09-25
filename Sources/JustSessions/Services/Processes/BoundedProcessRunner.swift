@@ -13,6 +13,23 @@ enum BoundedProcessRunner {
         includesStandardError: Bool = false,
         timeout: TimeInterval
     ) -> String? {
+        result(
+            ofExecutable: executablePath,
+            arguments: arguments,
+            environment: environment,
+            includesStandardError: includesStandardError,
+            timeout: timeout
+        )?.output
+    }
+
+    /// The exit status and output, or nil when the process could not start or timed out.
+    static func result(
+        ofExecutable executablePath: String,
+        arguments: [String],
+        environment: [String: String]? = nil,
+        includesStandardError: Bool = false,
+        timeout: TimeInterval
+    ) -> (exitStatus: Int32, output: String)? {
         let outputFile = FileManager.default.temporaryDirectory
             .appendingPathComponent("justsessions-process-output-\(UUID().uuidString)")
         guard FileManager.default.createFile(atPath: outputFile.path, contents: nil),
@@ -38,6 +55,6 @@ enum BoundedProcessRunner {
         }
 
         guard let data = try? Data(contentsOf: outputFile) else { return nil }
-        return String(decoding: data, as: UTF8.self)
+        return (process.terminationStatus, String(decoding: data, as: UTF8.self))
     }
 }

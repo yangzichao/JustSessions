@@ -28,8 +28,12 @@ struct SessionPreviewHeader: View {
                 HStack(spacing: 5) {
                     Text(conversation.provider.rawValue)
                     Text("·")
+                    if let remoteHost = conversation.remoteHost {
+                        Label(remoteHost, systemImage: "network")
+                        Text("·")
+                    }
                     Text(store.projectDisplayName(forProjectPath: conversation.projectDirectoryKey))
-                        .help(conversation.projectPath)
+                        .help(RemoteProjectKey.copyablePath(ofKey: conversation.projectDirectoryKey))
                     Text("·")
                     Text(conversation.updatedAt, style: .relative)
                     if !conversation.isProjectAvailable {
@@ -68,10 +72,12 @@ struct SessionPreviewHeader: View {
             Button("Copy session ID", systemImage: "doc.on.doc") {
                 SessionLocationActions.copySessionID(conversation)
             }
-            Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
-                SessionLocationActions.revealSessionFile(conversation)
+            if !conversation.isRemote {
+                Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
+                    SessionLocationActions.revealSessionFile(conversation)
+                }
             }
-            if conversation.provider.supportsDeletionFromLauncher {
+            if conversation.supportsDeletionFromLauncher {
                 Divider()
                 Button("Delete session…", systemImage: "trash", role: .destructive, action: onDelete)
                     .disabled(store.hasTerminal(for: conversation) || store.isLoading || store.isDeletingSessions)

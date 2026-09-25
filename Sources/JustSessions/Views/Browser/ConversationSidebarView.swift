@@ -20,6 +20,7 @@ struct ConversationSidebarView: View {
     let onDeleteProjectSessions: (String) -> Void
 
     @State private var expandedProjectPaths: Set<String> = []
+    @State private var isRemoteHostsSheetPresented = false
 
     private var isSearching: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -144,6 +145,7 @@ struct ConversationSidebarView: View {
 
             Divider()
             HStack {
+                remoteHostsButton
                 Spacer()
                 Button(action: onCheckForUpdates) {
                     Label("Update", systemImage: "arrow.down.circle")
@@ -155,6 +157,9 @@ struct ConversationSidebarView: View {
             .padding(.vertical, 14)
         }
         .background(Color(nsColor: .windowBackgroundColor))
+        .sheet(isPresented: $isRemoteHostsSheetPresented) {
+            RemoteHostsSheet(store: store)
+        }
         .onAppear { expandProjectsWithOpenTerminals() }
         .onChange(of: store.terminalSessions.map(\.id)) { _, _ in
             expandProjectsWithOpenTerminals()
@@ -169,6 +174,21 @@ struct ConversationSidebarView: View {
         if store.isLoading && store.conversations.isEmpty { return "Scanning sessions…" }
         if isSearching { return "No matching projects or sessions" }
         return recencyFilter == .recent ? "No sessions in the past seven days" : "No sessions"
+    }
+
+    private var remoteHostsButton: some View {
+        Button { isRemoteHostsSheetPresented = true } label: {
+            HStack(spacing: 5) {
+                Label("Remote", systemImage: "network")
+                if store.isSyncingRemoteHosts {
+                    ProgressView().controlSize(.mini)
+                } else if store.hasRemoteHostFailure {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                }
+            }
+        }
+        .buttonStyle(.borderless)
+        .help(store.hasRemoteHostFailure ? "A remote host could not be reached" : "Manage remote hosts")
     }
 
     private var brand: some View {
@@ -189,7 +209,7 @@ struct ConversationSidebarView: View {
             if store.isLoading {
                 ProgressView().controlSize(.small)
             } else {
-                Button { store.refresh() } label: {
+                Button { store.refreshIncludingRemoteHosts() } label: {
                     Image(systemName: "arrow.clockwise")
                 }
                 .buttonStyle(.borderless)
@@ -287,7 +307,8 @@ struct ConversationSidebarView: View {
     }
 
     private func projectParentLabel(_ projectPath: String) -> String {
-        let parent = URL(fileURLWithPath: projectPath).deletingLastPathComponent()
+        let folderPath = RemoteProjectKey.location(ofKey: projectPath)?.projectPath ?? projectPath
+        let parent = URL(fileURLWithPath: folderPath).deletingLastPathComponent()
         return parent.pathComponents.suffix(2).joined(separator: "/")
     }
 

@@ -40,7 +40,7 @@ struct ContentView: View {
         .onAppear {
             if !hasStartedScan {
                 hasStartedScan = true
-                store.refresh()
+                store.refreshIncludingRemoteHosts()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
@@ -111,11 +111,11 @@ struct ContentView: View {
                 let deletionPlan = store.deletionPlan(for: conversations)
                 let skippedSummary = deletionPlan.openTerminalCount + deletionPlan.unsupportedCount == 0
                     ? ""
-                    : " \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped."
+                    : " \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity or remote sessions will be skipped."
                 Text("Claude Code sessions move to the Trash; Codex sessions are permanently deleted.\(skippedSummary)")
             case .project(let projectPath):
                 let deletionPlan = store.deletionPlan(for: projectPath)
-                Text("This affects all tools in \(projectPath), including sessions hidden by the current filter. Claude Code sessions move to the Trash; Codex sessions are permanently deleted. \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped.")
+                Text("This affects all tools in \(projectPath), including sessions hidden by the current filter. Claude Code sessions move to the Trash; Codex sessions are permanently deleted. \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity or remote sessions will be skipped.")
             case nil:
                 EmptyView()
             }

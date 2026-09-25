@@ -19,6 +19,12 @@ struct ProjectConversationGroup: Identifiable {
         )
     }
 
+    /// The SSH host and path of a project on a remote host, or nil for a local project.
+    var remoteLocation: (host: String, projectPath: String)? {
+        RemoteProjectKey.location(ofKey: projectPath)
+    }
+
+    /// Always false for a remote project: its folder cannot be opened or started in from this Mac.
     var isProjectAvailable: Bool {
         var isDirectory: ObjCBool = false
         return FileManager.default.fileExists(atPath: projectPath, isDirectory: &isDirectory) && isDirectory.boolValue

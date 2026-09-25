@@ -123,9 +123,12 @@ struct ConversationBrowserView: View {
         }
     }
 
+    /// New sessions start on this Mac, so a remote tab or session does not suggest its folder.
     private var newSessionProjectPath: String {
-        if let selectedTerminal = store.selectedTerminal { return selectedTerminal.projectPath }
-        if let focusedConversation { return focusedConversation.projectPath }
+        if let selectedTerminal = store.selectedTerminal, selectedTerminal.remoteHost == nil {
+            return selectedTerminal.projectPath
+        }
+        if let focusedConversation, !focusedConversation.isRemote { return focusedConversation.projectPath }
         return availableProjects.first?.projectPath ?? ""
     }
 }

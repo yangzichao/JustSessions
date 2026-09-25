@@ -22,6 +22,12 @@ struct SidebarProjectSection: View {
         store.terminalSessions.filter { $0.projectDirectoryKey == project.id }.count
     }
 
+    /// The host of a remote project, then the parent folder when another project has the same name.
+    private var secondaryLabel: String? {
+        let labels = [project.remoteLocation?.host, parentLabel].compactMap { $0 }
+        return labels.isEmpty ? nil : labels.joined(separator: " · ")
+    }
+
     private var deletionPlan: SessionDeletionPlan {
         store.deletionPlan(for: project.id)
     }
@@ -35,15 +41,15 @@ struct SidebarProjectSection: View {
                             .font(.system(size: 9, weight: .semibold))
                             .foregroundStyle(.tertiary)
                             .frame(width: 10)
-                        Image(systemName: "folder")
+                        Image(systemName: project.remoteLocation == nil ? "folder" : "network")
                             .font(.system(size: 12))
                             .frame(width: 15)
                         VStack(alignment: .leading, spacing: 1) {
                             Text(project.displayName)
                                 .lineLimit(1)
                                 .truncationMode(.middle)
-                            if let parentLabel {
-                                Text(parentLabel)
+                            if let secondaryLabel {
+                                Text(secondaryLabel)
                                     .font(.system(size: 10))
                                     .foregroundStyle(.tertiary)
                                     .lineLimit(1)
@@ -62,12 +68,12 @@ struct SidebarProjectSection: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.primary)
                     .padding(.horizontal, 10)
-                    .frame(height: parentLabel == nil ? 32 : 42)
+                    .frame(height: secondaryLabel == nil ? 32 : 42)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
-                .help(project.projectPath)
+                .help(RemoteProjectKey.copyablePath(ofKey: project.projectPath))
                 .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(project.sessionCount) \(project.sessionCount == 1 ? "session" : "sessions"), \(openTerminalCount) open")
                 .contextMenu {
                     Menu("New session", systemImage: "plus") {
@@ -83,7 +89,7 @@ struct SidebarProjectSection: View {
                     }
                     .disabled(!project.isProjectAvailable)
                     Button("Copy project path", systemImage: "doc.on.doc") {
-                        SessionLocationActions.copyProjectPath(project.projectPath)
+                        SessionLocationActions.copyProjectPath(RemoteProjectKey.copyablePath(ofKey: project.projectPath))
                     }
                     Button("Rename project…", systemImage: "pencil", action: onRenameProject)
                     Button(project.isPinned ? "Unpin project" : "Pin project", systemImage: project.isPinned ? "pin.slash" : "pin") {
@@ -193,10 +199,12 @@ struct SidebarProjectSection: View {
         Button("Copy session ID", systemImage: "doc.on.doc") {
             SessionLocationActions.copySessionID(conversation)
         }
-        Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
-            SessionLocationActions.revealSessionFile(conversation)
+        if !conversation.isRemote {
+            Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
+                SessionLocationActions.revealSessionFile(conversation)
+            }
         }
-        if conversation.provider.supportsDeletionFromLauncher {
+        if conversation.supportsDeletionFromLauncher {
             Divider()
             Button("Delete session…", systemImage: "trash", role: .destructive) {
                 onDeleteConversation(conversation)

@@ -24,9 +24,14 @@ struct ProjectNewSessionMenu: View {
             }
         }
         .disabled(!isProjectAvailable)
-        .help(isProjectAvailable
-            ? "Start a new session in \(project.projectPath)"
-            : "The project folder no longer exists")
+        .help(helpText(isProjectAvailable: isProjectAvailable))
         .accessibilityLabel("New session in \(project.displayName)")
+    }
+
+    private func helpText(isProjectAvailable: Bool) -> String {
+        if project.remoteLocation != nil { return "New sessions on remote hosts are not supported yet" }
+        return isProjectAvailable
+            ? "Start a new session in \(project.projectPath)"
+            : "The project folder no longer exists"
     }
 }

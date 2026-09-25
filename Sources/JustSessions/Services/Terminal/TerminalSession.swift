@@ -8,6 +8,8 @@ final class TerminalSession: ObservableObject, Identifiable {
     @Published private(set) var conversation: Conversation?
     let provider: ConversationProvider
     let projectPath: String
+    /// The SSH host the tab's CLI runs on, or nil for this Mac.
+    let remoteHost: String?
     let action: ConversationAction
     @Published private(set) var displayTitle: String
     let command: NativeCLICommand
@@ -29,7 +31,8 @@ final class TerminalSession: ObservableObject, Identifiable {
 
     var processID: Int32 { terminalView.process.shellPid }
     var projectDirectoryKey: String {
-        URL(fileURLWithPath: projectPath).standardizedFileURL.resolvingSymlinksInPath().path
+        if let remoteHost { return RemoteProjectKey.key(host: remoteHost, projectPath: projectPath) }
+        return URL(fileURLWithPath: projectPath).standardizedFileURL.resolvingSymlinksInPath().path
     }
 
     init(
@@ -39,11 +42,13 @@ final class TerminalSession: ObservableObject, Identifiable {
         action: ConversationAction,
         displayTitle: String,
         command: NativeCLICommand,
-        preassignedSessionID: String? = nil
+        preassignedSessionID: String? = nil,
+        remoteHost: String? = nil
     ) {
         self.conversation = conversation
         self.provider = provider
         self.projectPath = projectPath
+        self.remoteHost = remoteHost
         self.action = action
         self.displayTitle = displayTitle
         self.command = command

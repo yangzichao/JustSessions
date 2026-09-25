@@ -14,6 +14,8 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var deletingConversationID: String?
     /// Every conversation queued in the running batch deletion.
     @Published private(set) var batchDeletionConversationIDs: Set<String> = []
+    @Published var remoteHostList: RemoteHostList
+    @Published var remoteHostSyncStatuses: [String: RemoteHostSyncStatus] = [:]
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
     private var isRefreshQueued = false
@@ -27,6 +29,7 @@ final class ConversationStore: ObservableObject {
         self.aliases = UserDefaults.standard.dictionary(forKey: aliasesKey) as? [String: String] ?? [:]
         self.projectDisplayNames = ProjectDisplayNames.load(from: .standard)
         self.pinnedItems = PinnedItems.load(from: .standard)
+        self.remoteHostList = RemoteHostList.load(from: .standard)
         LoginShellPathReader.warmUpInBackground()
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
         startClaudeLiveNameSync()
@@ -52,7 +55,8 @@ final class ConversationStore: ObservableObject {
             }
             found.sort { $0.updatedAt > $1.updatedAt }
             await MainActor.run {
-                self.conversations = found
+                // Remote hosts are refreshed on their own schedule; keep what they last listed.
+                self.conversations = found + self.conversations.filter(\.isRemote)
                 self.synchronizeTerminalTitles()
                 self.errorMessage = failures.isEmpty ? nil : failures.joined(separator: "\n")
                 self.isLoading = false
@@ -64,6 +68,13 @@ final class ConversationStore: ObservableObject {
                 }
             }
         }
+    }
+
+    /// Swaps in what one remote host lists now, keeping the local sessions and other hosts.
+    func replaceConversations(onRemoteHost host: String, with hostConversations: [Conversation]) {
+        conversations = (conversations.filter { $0.remoteHost != host } + hostConversations)
+            .sorted { $0.updatedAt > $1.updatedAt }
+        synchronizeTerminalTitles()
     }
 
     func title(for conversation: Conversation) -> String {
@@ -123,7 +134,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func deletionPlan(for candidateConversations: [Conversation]) -> SessionDeletionPlan {
-        let supportedConversations = candidateConversations.filter { $0.provider.supportsDeletionFromLauncher }
+        let supportedConversations = candidateConversations.filter(\.supportsDeletionFromLauncher)
         return SessionDeletionPlan(
             deletableConversations: supportedConversations.filter { !hasTerminal(for: $0) },
             openTerminalCount: supportedConversations.filter { hasTerminal(for: $0) }.count,
@@ -132,7 +143,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func delete(_ conversation: Conversation) {
-        guard conversation.provider.supportsDeletionFromLauncher else { return }
+        guard conversation.supportsDeletionFromLauncher else { return }
         guard !hasTerminal(for: conversation) else {
             errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
             return
@@ -232,15 +243,29 @@ final class ConversationStore: ObservableObject {
         }
         guard let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { return }
         do {
-            let command = try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
+            let command = if let remoteHost = conversation.remoteHost {
+                RemoteCLICommandBuilder().command(
+                    host: remoteHost,
+                    provider: conversation.provider,
+                    projectPath: conversation.projectPath,
+                    arguments: adapter.arguments(for: conversation, action: action)
+                )
+            } else {
+                try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
+            }
             let session = TerminalSession(
                 conversation: conversation,
                 provider: conversation.provider,
                 projectPath: conversation.projectPath,
                 action: action,
                 displayTitle: title(for: conversation),
-                command: command
+                command: command,
+                remoteHost: conversation.remoteHost
             )
+            if let remoteHost = conversation.remoteHost {
+                // Pick up the new messages and title once the remote CLI exits.
+                session.onProcessFinished = { [weak self] in self?.refreshRemoteHost(remoteHost) }
+            }
             terminalSessions.append(session)
             selectedTerminalID = session.id
         }
