@@ -60,6 +60,7 @@ extension ConversationStore {
         // The host may have been removed while its copy ran.
         guard remoteHostList.hosts.contains(host) else { return }
         replaceConversations(onRemoteHost: host, with: hostConversations)
+        linkWaitingRemoteNewSessionTabs(onHost: host)
     }
 
     private func setRemoteHostSyncStatus(_ status: RemoteHostSyncStatus, host: String) {

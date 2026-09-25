@@ -33,7 +33,8 @@ extension ConversationStore {
             return
         }
 
-        let waitingTabs = terminalSessions.filter(\.isNewSessionAwaitingConversation)
+        // Remote tabs run `ssh`, whose open files say nothing; see `linkWaitingRemoteNewSessionTabs`.
+        let waitingTabs = terminalSessions.filter { $0.isNewSessionAwaitingConversation && $0.remoteHost == nil }
         guard !waitingTabs.isEmpty else { return }
         let searches = waitingTabs.map(\.waitingNewSessionTab)
         let sessionFiles = await Task.detached(priority: .utility) {
@@ -62,7 +63,7 @@ extension ConversationStore {
     }
 
     private func needsRefreshForFirstPromptTitle(_ session: TerminalSession) -> Bool {
-        guard session.action == .new, !session.hasExited,
+        guard session.action == .new, !session.hasExited, session.remoteHost == nil,
               session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
               let conversation = session.conversation,
               conversation.suggestedTitle == ConversationMetadata.untitledConversationTitle else { return false }

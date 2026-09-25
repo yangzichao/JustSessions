@@ -6,10 +6,10 @@ struct ProjectNewSessionMenu: View {
     let onStart: (ConversationProvider) -> Void
 
     var body: some View {
-        let isProjectAvailable = project.isProjectAvailable
+        let canStartNewSession = project.canStartNewSession
 
         Menu {
-            ForEach(ConversationProvider.allCases) { provider in
+            ForEach(project.newSessionProviders) { provider in
                 Button(provider.rawValue, systemImage: provider.symbolName) {
                     onStart(provider)
                 }
@@ -23,14 +23,16 @@ struct ProjectNewSessionMenu: View {
                     .contentShape(Rectangle())
             }
         }
-        .disabled(!isProjectAvailable)
-        .help(helpText(isProjectAvailable: isProjectAvailable))
+        .disabled(!canStartNewSession)
+        .help(helpText)
         .accessibilityLabel("New session in \(project.displayName)")
     }
 
-    private func helpText(isProjectAvailable: Bool) -> String {
-        if project.remoteLocation != nil { return "New sessions on remote hosts are not supported yet" }
-        return isProjectAvailable
+    private var helpText: String {
+        if let remoteLocation = project.remoteLocation {
+            return "Start a new session in \(remoteLocation.projectPath) on \(remoteLocation.host)"
+        }
+        return project.isProjectAvailable
             ? "Start a new session in \(project.projectPath)"
             : "The project folder no longer exists"
     }

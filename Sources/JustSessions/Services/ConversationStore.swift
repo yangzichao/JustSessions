@@ -34,6 +34,7 @@ final class ConversationStore: ObservableObject {
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
         startClaudeLiveNameSync()
         startNewSessionDiscovery()
+        startRemoteNewSessionPolling()
     }
 
     func refresh() {
@@ -153,7 +154,7 @@ final class ConversationStore: ObservableObject {
         deletingConversationID = conversation.id
         Task.detached(priority: .userInitiated) {
             do {
-                try adapter.delete(conversation)
+                try Self.deleteFromDisk(conversation, adapter: adapter)
                 await MainActor.run {
                     self.removeDeletedConversation(conversation)
                     self.deletingConversationID = nil
@@ -189,7 +190,7 @@ final class ConversationStore: ObservableObject {
                 guard let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { continue }
                 await MainActor.run { self.deletingConversationID = conversation.id }
                 do {
-                    try adapter.delete(conversation)
+                    try Self.deleteFromDisk(conversation, adapter: adapter)
                     await MainActor.run { self.removeDeletedConversation(conversation) }
                 } catch {
                     await MainActor.run {
@@ -207,6 +208,15 @@ final class ConversationStore: ObservableObject {
                     self.errorMessage = "Some sessions could not be deleted:\n" + failures.joined(separator: "\n")
                 }
             }
+        }
+    }
+
+    /// A remote session is deleted on its host; a local one by its tool's adapter.
+    nonisolated private static func deleteFromDisk(_ conversation: Conversation, adapter: any ConversationAdapter) throws {
+        if conversation.isRemote {
+            try RemoteConversationDeletion().delete(conversation)
+        } else {
+            try adapter.delete(conversation)
         }
     }
 
@@ -294,12 +304,23 @@ final class ConversationStore: ObservableObject {
         selectedTerminalID = session.id
     }
 
+    /// `projectPath` is a project's key: a local folder, or a folder on a remote host.
     func launchNewSessionFromProject(provider: ConversationProvider, projectPath: String) {
+        if let remoteLocation = RemoteProjectKey.location(ofKey: projectPath) {
+            launchNewRemoteSession(provider: provider, host: remoteLocation.host, projectPath: remoteLocation.projectPath)
+            return
+        }
         do {
             try launchNewSession(provider: provider, projectPath: projectPath)
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    /// Adds the tab and shows it.
+    func openTerminal(_ session: TerminalSession) {
+        terminalSessions.append(session)
+        selectedTerminalID = session.id
     }
 
     var selectedTerminal: TerminalSession? {

@@ -37,7 +37,7 @@ struct Conversation: Identifiable, Sendable {
         return "\(localID)@\(remoteHost)"
     }
     var isRemote: Bool { remoteHost != nil }
-    var supportsDeletionFromLauncher: Bool { provider.supportsDeletionFromLauncher && !isRemote }
+    var supportsDeletionFromLauncher: Bool { provider.supportsDeletionFromLauncher }
 
     func withSuggestedTitle(_ title: String) -> Conversation {
         Conversation(

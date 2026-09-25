@@ -17,6 +17,9 @@ final class TerminalSession: ObservableObject, Identifiable {
     /// The session id a new Claude Code tab was started with (`--session-id`), when the CLI accepts one.
     let preassignedSessionID: String?
     let launchedAt = Date()
+    /// For a new session on a remote host: the host's session ids listed when the tab started. The first
+    /// session that appears after that in the same project is this tab's.
+    let sessionIDsKnownAtLaunch: Set<String>
     /// Refreshes spent picking up a new session's first prompt as its title; see new session discovery.
     var titleRefreshCount = 0
     var onProcessFinished: (() -> Void)?
@@ -43,12 +46,14 @@ final class TerminalSession: ObservableObject, Identifiable {
         displayTitle: String,
         command: NativeCLICommand,
         preassignedSessionID: String? = nil,
-        remoteHost: String? = nil
+        remoteHost: String? = nil,
+        sessionIDsKnownAtLaunch: Set<String> = []
     ) {
         self.conversation = conversation
         self.provider = provider
         self.projectPath = projectPath
         self.remoteHost = remoteHost
+        self.sessionIDsKnownAtLaunch = sessionIDsKnownAtLaunch
         self.action = action
         self.displayTitle = displayTitle
         self.command = command

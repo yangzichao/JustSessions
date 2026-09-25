@@ -77,13 +77,13 @@ struct SidebarProjectSection: View {
                 .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(project.sessionCount) \(project.sessionCount == 1 ? "session" : "sessions"), \(openTerminalCount) open")
                 .contextMenu {
                     Menu("New session", systemImage: "plus") {
-                        ForEach(ConversationProvider.allCases) { provider in
+                        ForEach(project.newSessionProviders) { provider in
                             Button(provider.rawValue, systemImage: provider.symbolName) {
                                 onNewSession(provider)
                             }
                         }
                     }
-                    .disabled(!project.isProjectAvailable)
+                    .disabled(!project.canStartNewSession)
                     Button("Open project in Finder", systemImage: "folder") {
                         SessionLocationActions.openProjectFolder(project.projectPath)
                     }

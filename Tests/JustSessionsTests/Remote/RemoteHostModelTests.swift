@@ -26,7 +26,7 @@ struct RemoteHostModelTests {
         #expect(RemoteProjectKey.copyablePath(ofKey: "/Users/me/paper") == "/Users/me/paper")
     }
 
-    @Test func remoteConversationsGroupByHostAndCannotBeDeletedHere() {
+    @Test func remoteConversationsGroupByHost() {
         let sessionID = UUID().uuidString
         let local = Conversation(
             provider: .claude,
@@ -41,7 +41,7 @@ struct RemoteHostModelTests {
         #expect(local.id != remote.id)
         #expect(remote.projectDirectoryKey == "ssh://devbox/Users/me/paper")
         #expect(remote.isProjectAvailable)
-        #expect(!remote.supportsDeletionFromLauncher)
+        #expect(remote.supportsDeletionFromLauncher)
         #expect(remote.withSuggestedTitle("Renamed").remoteHost == "devbox")
 
         let groups = ProjectConversationGroup.grouped([local, remote])

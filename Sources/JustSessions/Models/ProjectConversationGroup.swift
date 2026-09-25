@@ -24,7 +24,14 @@ struct ProjectConversationGroup: Identifiable {
         RemoteProjectKey.location(ofKey: projectPath)
     }
 
-    /// Always false for a remote project: its folder cannot be opened or started in from this Mac.
+    /// A remote folder is not checked; the SSH command reports it when it is gone.
+    var canStartNewSession: Bool { remoteLocation != nil || isProjectAvailable }
+
+    var newSessionProviders: [ConversationProvider] {
+        remoteLocation == nil ? ConversationProvider.allCases : ConversationProvider.allCases.filter(\.supportsRemoteHosts)
+    }
+
+    /// Whether the folder exists on this Mac; always false for a remote project.
     var isProjectAvailable: Bool {
         var isDirectory: ObjCBool = false
         return FileManager.default.fileExists(atPath: projectPath, isDirectory: &isDirectory) && isDirectory.boolValue

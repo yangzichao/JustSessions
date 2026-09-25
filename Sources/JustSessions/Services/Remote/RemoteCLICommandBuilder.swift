@@ -31,8 +31,11 @@ struct RemoteCLICommandBuilder {
     /// (for example `~/.local/bin` or an nvm-managed `node`) is in effect.
     static func remoteCommand(provider: ConversationProvider, projectPath: String, arguments: [String]) -> String {
         let cliInvocation = ([executableName(for: provider)] + arguments.map(ShellQuoting.quoted)).joined(separator: " ")
-        let innerCommand = "cd \(ShellQuoting.quoted(projectPath)) && exec \(cliInvocation)"
-        return "exec \"$SHELL\" -lic \(ShellQuoting.quoted(innerCommand))"
+        return loginShellCommand("cd \(ShellQuoting.quoted(projectPath)) && exec \(cliInvocation)")
+    }
+
+    static func loginShellCommand(_ innerCommand: String) -> String {
+        "exec \"$SHELL\" -lic \(ShellQuoting.quoted(innerCommand))"
     }
 
     static func executableName(for provider: ConversationProvider) -> String {
