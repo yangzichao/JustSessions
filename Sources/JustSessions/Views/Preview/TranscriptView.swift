@@ -66,7 +66,11 @@ struct TranscriptView: View {
                         .padding(.bottom, 8)
                 }
                 ForEach(transcript.entries) { entry in
-                    TranscriptEntryView(entry: entry, assistantName: conversation.provider.rawValue)
+                    TranscriptEntryView(
+                        entry: entry,
+                        assistantName: conversation.provider.rawValue,
+                        assistantTint: conversation.provider.tintColor
+                    )
                 }
             }
             .frame(maxWidth: 820, alignment: .leading)

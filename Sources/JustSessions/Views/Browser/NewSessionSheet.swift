@@ -72,7 +72,7 @@ struct NewSessionSheet: View {
                         errorMessage = error.localizedDescription
                     }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(ProviderProminentButtonStyle(tint: selectedProvider.emphasisTintColor))
                 .keyboardShortcut(.defaultAction)
                 .disabled(projectPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }

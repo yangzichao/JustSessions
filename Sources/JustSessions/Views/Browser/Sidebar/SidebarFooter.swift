@@ -14,7 +14,7 @@ struct SidebarFooter: View {
                     if store.isSyncingRemoteHosts {
                         ProgressView().controlSize(.mini)
                     } else if store.hasRemoteHostFailure {
-                        Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                        Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(ThemePalette.warning)
                     }
                 }
             }

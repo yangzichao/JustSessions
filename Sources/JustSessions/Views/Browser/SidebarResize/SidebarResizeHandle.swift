@@ -12,14 +12,16 @@ struct SidebarResizeHandle: View {
     @State private var isHovering = false
 
     var body: some View {
-        Rectangle()
-            .fill(isHovering ? Color.accentColor.opacity(0.12) : Color.clear)
+        // The hairline sits on the sidebar's edge and the rest of the grab area continues the detail's surface.
+        ThemePalette.contentSurface
+            .overlay(isHovering ? ThemePalette.hoverFill : Color.clear)
             .frame(width: 8)
-            .overlay {
+            .overlay(alignment: .leading) {
                 Rectangle()
-                    .fill(Color(nsColor: .separatorColor))
+                    .fill(ThemePalette.hairline)
                     .frame(width: 1)
             }
+            .ignoresSafeArea(edges: .top)
             .contentShape(Rectangle())
             .sidebarResizeCursor(canShrink: width > minimumWidth, canGrow: width < maximumWidth)
             .onHover { isHovering = $0 }

@@ -24,8 +24,8 @@ struct SidebarSearchField: View {
         .font(.system(size: 12))
         .padding(.horizontal, 9)
         .frame(height: 28)
-        .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(Color.primary.opacity(0.1)))
+        .background(ThemePalette.raisedSurface, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(ThemePalette.hairline))
         .padding(.horizontal, 12)
     }
 }

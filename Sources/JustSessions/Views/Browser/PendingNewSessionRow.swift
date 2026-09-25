@@ -26,7 +26,7 @@ struct PendingNewSessionRow: View {
             .padding(.trailing, 10)
             .frame(height: 28)
             .contentShape(Rectangle())
-            .sidebarRowHighlight(isSelected: isSelected)
+            .sidebarRowHighlight(isSelected: isSelected, selectionTint: terminal.provider.tintColor)
         }
         .buttonStyle(.plain)
         .help("\(terminal.provider.rawValue) has not saved this session yet · click to open its terminal")

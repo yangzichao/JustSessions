@@ -9,9 +9,9 @@ struct SidebarNewSessionButton: View {
             HStack(spacing: 9) {
                 Image(systemName: "plus")
                     .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(ThemePalette.inkForeground)
                     .frame(width: 18, height: 18)
-                    .background(Color.accentColor, in: Circle())
+                    .background(ThemePalette.ink, in: Circle())
                 Text("New session")
                     .font(.system(size: 12, weight: .medium))
                 Spacer(minLength: 4)

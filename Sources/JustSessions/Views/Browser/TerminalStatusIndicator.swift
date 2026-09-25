@@ -7,7 +7,7 @@ struct TerminalStatusIndicator: View {
     var body: some View {
         Image(systemName: session.hasExited ? "circle" : "circle.fill")
             .font(.system(size: 7, weight: .semibold))
-            .foregroundStyle(session.hasExited ? Color.secondary : Color.green)
+            .foregroundStyle(session.hasExited ? Color.secondary : ThemePalette.live)
             .accessibilityLabel(session.hasExited ? "Ended" : "Running")
     }
 }

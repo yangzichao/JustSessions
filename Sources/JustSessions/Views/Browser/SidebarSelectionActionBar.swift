@@ -23,7 +23,7 @@ struct SidebarSelectionActionBar: View {
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 10)
-        .background(Color.accentColor.opacity(0.08))
+        .background(ThemePalette.hoverFill)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("\(selectedCount) sessions selected")
     }

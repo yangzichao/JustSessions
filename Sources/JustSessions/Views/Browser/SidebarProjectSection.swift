@@ -71,7 +71,7 @@ struct SidebarProjectSection: View {
     /// A hairline under the chevron that ties the sessions to their project.
     private var indentGuide: some View {
         Rectangle()
-            .fill(Color.primary.opacity(0.1))
+            .fill(ThemePalette.hairline)
             .frame(width: 1)
             .padding(.leading, 15)
             .padding(.vertical, 3)
@@ -108,7 +108,7 @@ struct SidebarProjectSection: View {
                     if openTerminalCount > 0 {
                         Image(systemName: "circle.fill")
                             .font(.system(size: 6))
-                            .foregroundStyle(Color.green)
+                            .foregroundStyle(ThemePalette.live)
                     }
                 }
                 .padding(.leading, 10)

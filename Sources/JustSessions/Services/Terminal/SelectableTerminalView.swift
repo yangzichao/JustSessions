@@ -32,6 +32,8 @@ final class SelectableTerminalView: LocalProcessTerminalView {
 
     private func applySystemAppearance() {
         configureNativeColors()
+        // The paper tint of the preview, so switching between a transcript and a terminal keeps the same surface.
+        nativeBackgroundColor = ThemePalette.contentSurfaceNSColor.resolved(for: effectiveAppearance)
         selectedTextBackgroundColor = .selectedTextBackgroundColor
         selectedTextForegroundColor = .selectedTextColor
         caretColor = .textColor

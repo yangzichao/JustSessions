@@ -3,6 +3,7 @@ import SwiftUI
 struct TranscriptEntryView: View {
     let entry: TranscriptEntry
     let assistantName: String
+    let assistantTint: Color
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -23,7 +24,7 @@ struct TranscriptEntryView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 9)
-                .background(Color.accentColor.opacity(0.08), in: RoundedRectangle(cornerRadius: 9))
+                .background(ThemePalette.userMessageSurface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         case .assistantMessage(let text):
             Text(Self.inlineMarkdown(text))
                 .textSelection(.enabled)
@@ -43,7 +44,7 @@ struct TranscriptEntryView: View {
         return HStack(spacing: 6) {
             Text(isUser ? "You" : assistantName)
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(isUser ? Color.secondary : assistantTint)
             if let timestamp = entry.timestamp {
                 Text(timestamp, format: .dateTime.month(.abbreviated).day().hour().minute())
                     .font(.system(size: 10))

@@ -7,7 +7,7 @@ struct RemoteTmuxRunningIndicator: View {
     var body: some View {
         Image(systemName: "circle.dashed")
             .font(.system(size: 8, weight: .semibold))
-            .foregroundStyle(Color.green)
+            .foregroundStyle(ThemePalette.live)
             .help("Still running on \(host) in tmux; resume to reattach")
             .accessibilityLabel("Running on \(host)")
     }

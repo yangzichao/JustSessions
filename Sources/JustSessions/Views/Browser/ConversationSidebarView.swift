@@ -113,7 +113,7 @@ struct ConversationSidebarView: View {
             }
 
             if sessionSelection.hasMultipleSelected {
-                Divider()
+                ThemeDivider()
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
                     isDeleteDisabled: store.isLoading || store.isDeletingSessions,
@@ -122,7 +122,7 @@ struct ConversationSidebarView: View {
                 )
             }
 
-            Divider()
+            ThemeDivider()
             SidebarFooter(
                 store: store,
                 onManageRemoteHosts: { isRemoteHostsSheetPresented = true },
@@ -143,10 +143,9 @@ struct ConversationSidebarView: View {
         }
     }
 
-    /// A faint tint over the window background sets the sidebar apart from the preview and terminals.
+    /// Warm stone under the sidebar, reaching up behind the title bar, sets it apart from the paper-colored detail.
     private var sidebarBackground: some View {
-        Color(nsColor: .windowBackgroundColor)
-            .overlay(Color.primary.opacity(0.03))
+        ThemePalette.sidebarSurface.ignoresSafeArea()
     }
 
     private var emptyProjectsMessage: String {

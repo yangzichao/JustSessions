@@ -38,8 +38,9 @@ struct TerminalWorkspaceView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
+            .background(ThemePalette.contentSurface)
 
-            Divider()
+            ThemeDivider()
             EmbeddedTerminalView(session: session, isActive: isActive)
                 .id(session.id)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

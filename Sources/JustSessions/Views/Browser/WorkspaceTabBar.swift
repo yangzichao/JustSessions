@@ -34,7 +34,7 @@ struct WorkspaceTabBar: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
         }
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background(ThemePalette.contentSurface.ignoresSafeArea())
         .confirmationDialog(closingRemoteHost == nil ? "End this CLI session?" : "Close this remote tab?", isPresented: Binding(
             get: { closingSessionID != nil },
             set: { if !$0 { closingSessionID = nil } }

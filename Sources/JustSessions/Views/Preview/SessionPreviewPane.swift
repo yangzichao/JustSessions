@@ -29,7 +29,7 @@ struct SessionPreviewPane: View {
                         onRename: { onRename(conversation) },
                         onDelete: { onDelete(conversation) }
                     )
-                    Divider()
+                    ThemeDivider()
                     TranscriptView(conversation: conversation)
                         .id(conversation.id)
                 }
@@ -44,6 +44,6 @@ struct SessionPreviewPane: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(nsColor: .textBackgroundColor))
+        .background(ThemePalette.contentSurface.ignoresSafeArea())
     }
 }

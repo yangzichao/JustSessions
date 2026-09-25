@@ -15,7 +15,7 @@ struct SessionPreviewHeader: View {
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(conversation.provider.tintColor)
                 .frame(width: 34, height: 34)
-                .background(conversation.provider.tintColor.opacity(0.10), in: RoundedRectangle(cornerRadius: 8))
+                .background(conversation.provider.tintColor.opacity(0.14), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
@@ -48,12 +48,12 @@ struct SessionPreviewHeader: View {
 
             Spacer(minLength: 8)
 
-            Button("Resume") { store.launch(conversation, action: .resume) }
-                .buttonStyle(.borderedProminent)
+            Button("Resume", systemImage: "play.fill") { store.launch(conversation, action: .resume) }
+                .buttonStyle(ProviderProminentButtonStyle(tint: conversation.provider.emphasisTintColor))
                 .disabled(!store.canLaunch(conversation, action: .resume))
             if conversation.provider.supportsBranchFromLauncher {
-                Button("Branch") { store.launch(conversation, action: .branch) }
-                    .buttonStyle(.bordered)
+                Button("Branch", systemImage: "arrow.triangle.branch") { store.launch(conversation, action: .branch) }
+                    .buttonStyle(QuietBorderedButtonStyle())
                     .disabled(!store.canLaunch(conversation, action: .branch))
                     .help("Fork in the native CLI")
             }

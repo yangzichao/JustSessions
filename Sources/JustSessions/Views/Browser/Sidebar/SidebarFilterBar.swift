@@ -41,7 +41,7 @@ struct SidebarFilterBar: View {
         .foregroundStyle(filteredProvider?.tintColor ?? Color.secondary)
         .frame(width: 26, height: 26)
         .background(
-            (filteredProvider?.tintColor.opacity(0.15) ?? Color.primary.opacity(0.06)),
+            (filteredProvider?.tintColor.opacity(0.15) ?? ThemePalette.trackFill),
             in: RoundedRectangle(cornerRadius: 7, style: .continuous)
         )
         .help(filteredProvider.map { "Showing \($0.rawValue) sessions only" } ?? "Show one tool's sessions")

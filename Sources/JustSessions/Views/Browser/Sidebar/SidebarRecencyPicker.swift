@@ -1,4 +1,3 @@
-import AppKit
 import SwiftUI
 
 /// All / Recent switch with each option's session count. Neutral colors keep it quieter than
@@ -10,13 +9,6 @@ struct SidebarRecencyPicker: View {
 
     @Namespace private var selectedSegmentNamespace
 
-    /// White in light mode and a translucent light gray in dark mode, like a native selected segment.
-    private static let selectedSegmentFill = Color(nsColor: NSColor(name: nil) { appearance in
-        appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
-            ? NSColor.white.withAlphaComponent(0.16)
-            : NSColor.white
-    })
-
     var body: some View {
         HStack(spacing: 2) {
             segment(.all, title: "All", count: allSessionCount)
@@ -24,7 +16,7 @@ struct SidebarRecencyPicker: View {
                 .help("Sessions active in the past seven days")
         }
         .padding(2)
-        .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .background(ThemePalette.trackFill, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
     }
 
     private func segment(_ filter: SessionRecencyFilter, title: String, count: Int) -> some View {
@@ -48,7 +40,7 @@ struct SidebarRecencyPicker: View {
             .background {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .fill(Self.selectedSegmentFill)
+                        .fill(ThemePalette.raisedSurface)
                         .shadow(color: .black.opacity(0.12), radius: 0.5, y: 0.5)
                         .matchedGeometryEffect(id: "selectedSegment", in: selectedSegmentNamespace)
                 }

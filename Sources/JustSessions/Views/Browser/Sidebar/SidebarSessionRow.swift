@@ -46,7 +46,7 @@ struct SidebarSessionRow: View {
             .padding(.trailing, 10)
             .frame(height: 28)
             .contentShape(Rectangle())
-            .sidebarRowHighlight(isSelected: isHighlighted)
+            .sidebarRowHighlight(isSelected: isHighlighted, selectionTint: conversation.provider.tintColor)
         }
         .buttonStyle(.plain)
         .help("\(title) · \(conversation.provider.rawValue) · \(conversation.updatedAt.formatted(date: .abbreviated, time: .shortened))")
