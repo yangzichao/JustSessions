@@ -8,9 +8,9 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
     var id: String { rawValue }
     var symbolName: String {
         switch self {
-        case .claude: "sparkle"
+        case .claude: "asterisk"
         case .codex: "terminal"
-        case .antigravity: "sparkles"
+        case .antigravity: "sparkle"
         }
     }
 
