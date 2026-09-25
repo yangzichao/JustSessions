@@ -115,6 +115,10 @@ struct ConversationSidebarView: View {
                                 store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
                             },
                             onClickConversation: handleConversationClick,
+                            onSelectPendingNewSession: { terminalID in
+                                sessionSelection.clear()
+                                store.selectTerminal(terminalID)
+                            },
                             onRenameConversation: onRenameConversation,
                             onDeleteConversation: onDeleteConversation,
                             onDeleteSelectedConversations: { onDeleteConversations(selectedConversations) },

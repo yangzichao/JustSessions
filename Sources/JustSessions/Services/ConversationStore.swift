@@ -14,6 +14,9 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var deletingConversationID: String?
     /// Every conversation queued in the running batch deletion.
     @Published private(set) var batchDeletionConversationIDs: Set<String> = []
+    private(set) var lastRefreshStartedAt: Date?
+    /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
+    private var isRefreshQueued = false
 
     private let adapters: [any ConversationAdapter]
     private let commandResolver = NativeCLICommandResolver()
@@ -25,14 +28,20 @@ final class ConversationStore: ObservableObject {
         self.projectDisplayNames = ProjectDisplayNames.load(from: .standard)
         self.pinnedItems = PinnedItems.load(from: .standard)
         LoginShellPathReader.warmUpInBackground()
+        ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
         startClaudeLiveNameSync()
         startNewSessionDiscovery()
     }
 
     func refresh() {
-        guard !isLoading && !isDeletingSessions else { return }
+        guard !isDeletingSessions else { return }
+        guard !isLoading else {
+            isRefreshQueued = true
+            return
+        }
         isLoading = true
         errorMessage = nil
+        lastRefreshStartedAt = .now
         let adapters = self.adapters
         Task.detached(priority: .userInitiated) {
             var found: [Conversation] = []
@@ -45,10 +54,14 @@ final class ConversationStore: ObservableObject {
             await MainActor.run {
                 self.conversations = found
                 self.synchronizeTerminalTitles()
-                self.associateOpenCodexSessions()
-                self.associateOpenClaudeSessions()
                 self.errorMessage = failures.isEmpty ? nil : failures.joined(separator: "\n")
                 self.isLoading = false
+                if self.isRefreshQueued {
+                    self.isRefreshQueued = false
+                    self.refresh()
+                } else {
+                    Task { await self.discoverNewSessions(mayRefresh: false) }
+                }
             }
         }
     }
@@ -72,7 +85,6 @@ final class ConversationStore: ObservableObject {
         }
         UserDefaults.standard.set(aliases, forKey: aliasesKey)
         synchronizeTerminalTitles()
-        if conversation.provider == .codex { associateOpenCodexSessions() }
     }
 
     func projectDisplayName(forProjectPath projectPath: String) -> String {
@@ -239,14 +251,20 @@ final class ConversationStore: ObservableObject {
         let expandedPath = (projectPath as NSString).expandingTildeInPath
         let standardizedPath = URL(fileURLWithPath: expandedPath).standardizedFileURL.path
         let command = try commandResolver.resolveNewSession(provider: provider, projectPath: standardizedPath)
+        let preassignment = provider == .claude
+            ? ClaudeSessionIDFlagSupport.shared.preassigningSessionID(to: command)
+            : nil
         let session = TerminalSession(
             conversation: nil,
             provider: provider,
             projectPath: standardizedPath,
             action: .new,
             displayTitle: "New \(provider.rawValue) session",
-            command: command
+            command: preassignment?.command ?? command,
+            preassignedSessionID: preassignment?.sessionID
         )
+        // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
+        session.onProcessFinished = { [weak self] in self?.refresh() }
         terminalSessions.append(session)
         selectedTerminalID = session.id
     }

@@ -12,6 +12,12 @@ final class TerminalSession: ObservableObject, Identifiable {
     @Published private(set) var displayTitle: String
     let command: NativeCLICommand
     let terminalView: SelectableTerminalView
+    /// The session id a new Claude Code tab was started with (`--session-id`), when the CLI accepts one.
+    let preassignedSessionID: String?
+    let launchedAt = Date()
+    /// Refreshes spent picking up a new session's first prompt as its title; see new session discovery.
+    var titleRefreshCount = 0
+    var onProcessFinished: (() -> Void)?
 
     @Published private(set) var hasExited = false
     @Published private(set) var exitCode: Int32?
@@ -32,7 +38,8 @@ final class TerminalSession: ObservableObject, Identifiable {
         projectPath: String,
         action: ConversationAction,
         displayTitle: String,
-        command: NativeCLICommand
+        command: NativeCLICommand,
+        preassignedSessionID: String? = nil
     ) {
         self.conversation = conversation
         self.provider = provider
@@ -40,6 +47,7 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.action = action
         self.displayTitle = displayTitle
         self.command = command
+        self.preassignedSessionID = preassignedSessionID
         self.terminalView = SelectableTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.processObserver = TerminalProcessObserver()
         terminalView.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
@@ -65,6 +73,7 @@ final class TerminalSession: ObservableObject, Identifiable {
         guard !isClosed else { return }
         self.exitCode = exitCode
         hasExited = true
+        onProcessFinished?()
     }
 
     func synchronize(conversation: Conversation, displayTitle: String) {

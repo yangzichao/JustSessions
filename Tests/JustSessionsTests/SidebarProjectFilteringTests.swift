@@ -21,6 +21,25 @@ struct SidebarProjectFilteringTests {
         #expect(SidebarProjectFiltering.projects(projects, matching: "nothing", title: title).isEmpty)
     }
 
+    @Test func newSessionsAwaitingTheirConversationFollowTheSameRules() {
+        let website = conversation(project: "/tmp/website", title: "Fix header")
+        let newSession = PendingNewSession(
+            terminalID: UUID(),
+            provider: .claude,
+            projectDirectoryKey: website.projectDirectoryKey,
+            title: "New Claude Code session",
+            startedAt: .now
+        )
+        let projects = ProjectConversationGroup.grouped([website], pendingNewSessions: [newSession])
+        let title: (Conversation) -> String = \.suggestedTitle
+
+        #expect(SidebarProjectFiltering.projects(projects, matching: "websi", title: title).first?.pendingNewSessions == [newSession])
+        let newSessionMatch = SidebarProjectFiltering.projects(projects, matching: "new claude", title: title)
+        #expect(newSessionMatch.first?.pendingNewSessions == [newSession])
+        #expect(newSessionMatch.first?.conversations.isEmpty == true)
+        #expect(SidebarProjectFiltering.projects(projects, matching: "header", title: title).first?.pendingNewSessions.isEmpty == true)
+    }
+
     private func conversation(project: String, title: String) -> Conversation {
         let sessionID = UUID().uuidString
         return Conversation(

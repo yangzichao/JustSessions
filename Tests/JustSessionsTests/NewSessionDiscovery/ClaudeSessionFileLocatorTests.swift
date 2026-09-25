@@ -14,21 +14,20 @@ struct ClaudeSessionFileLocatorTests {
         try FileManager.default.createDirectory(at: project, withIntermediateDirectories: true)
         let locator = ClaudeSessionFileLocator(configurationDirectory: root)
 
-        #expect(!locator.transcriptExists(forSessionID: Self.sessionID))
+        #expect(locator.transcriptFile(forSessionID: Self.sessionID) == nil)
 
-        try "{}".write(
-            to: project.appendingPathComponent("\(Self.sessionID).jsonl"),
-            atomically: true,
-            encoding: .utf8
-        )
-        #expect(locator.transcriptExists(forSessionID: Self.sessionID))
+        let transcript = project.appendingPathComponent("\(Self.sessionID).jsonl")
+        try "{}".write(to: transcript, atomically: true, encoding: .utf8)
+        #expect(locator.transcriptFile(forSessionID: Self.sessionID)?.lastPathComponent == transcript.lastPathComponent)
+        #expect(locator.transcriptFile(forSessionID: Self.sessionID)?.deletingLastPathComponent().lastPathComponent
+            == "-Users-example-project")
     }
 
     @Test func rejectsInvalidSessionIDsAndMissingProjectsDirectory() {
         let missingRoot = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let locator = ClaudeSessionFileLocator(configurationDirectory: missingRoot)
 
-        #expect(!locator.transcriptExists(forSessionID: Self.sessionID))
-        #expect(!locator.transcriptExists(forSessionID: "../escape"))
+        #expect(locator.transcriptFile(forSessionID: Self.sessionID) == nil)
+        #expect(locator.transcriptFile(forSessionID: "../escape") == nil)
     }
 }

@@ -6,7 +6,7 @@ struct ProjectNewSessionMenu: View {
     let onStart: (ConversationProvider) -> Void
 
     var body: some View {
-        let isProjectAvailable = project.conversations.first?.isProjectAvailable == true
+        let isProjectAvailable = project.isProjectAvailable
 
         Menu {
             ForEach(ConversationProvider.allCases) { provider in

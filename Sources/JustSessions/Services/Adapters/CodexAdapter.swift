@@ -31,7 +31,7 @@ struct CodexAdapter: ConversationAdapter {
                   let projectPath = payload["cwd"] as? String else { continue }
             let title = ConversationMetadata.cleanTitle(
                 titles[sessionID]?.title ?? firstUserPrompt(in: file),
-                fallback: "Untitled conversation"
+                fallback: ConversationMetadata.untitledConversationTitle
             )
             let updatedAt = max(titles[sessionID]?.updatedAt ?? .distantPast, ConversationMetadata.fileModificationDate(file))
             conversations.append(Conversation(

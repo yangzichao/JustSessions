@@ -18,12 +18,16 @@ enum SidebarProjectFiltering {
             let matchingConversations = project.conversations.filter {
                 title($0).localizedCaseInsensitiveContains(query) || $0.sessionID.localizedCaseInsensitiveContains(query)
             }
-            guard !matchingConversations.isEmpty else { return nil }
+            let matchingPendingNewSessions = project.pendingNewSessions.filter {
+                $0.title.localizedCaseInsensitiveContains(query)
+            }
+            guard !matchingConversations.isEmpty || !matchingPendingNewSessions.isEmpty else { return nil }
             return ProjectConversationGroup(
                 projectPath: project.projectPath,
                 displayName: project.displayName,
                 isPinned: project.isPinned,
-                conversations: matchingConversations
+                conversations: matchingConversations,
+                pendingNewSessions: matchingPendingNewSessions
             )
         }
     }

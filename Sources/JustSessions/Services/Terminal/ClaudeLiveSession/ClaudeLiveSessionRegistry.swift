@@ -15,4 +15,9 @@ struct ClaudeLiveSessionRegistry: Sendable {
         }
         return ClaudeLiveSessionRecord(jsonData: data)
     }
+
+    /// The record of the first process in `processIDs` that has one, e.g. the CLI a wrapper script started.
+    func firstRecord(amongProcessIDs processIDs: [Int32]) -> ClaudeLiveSessionRecord? {
+        processIDs.lazy.compactMap { record(forProcessID: $0) }.first
+    }
 }

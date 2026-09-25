@@ -5,27 +5,49 @@ struct ProjectConversationGroup: Identifiable {
     let displayName: String
     let isPinned: Bool
     let conversations: [Conversation]
+    /// Newest first; listed above the conversations.
+    let pendingNewSessions: [PendingNewSession]
 
     var id: String { projectPath }
     var folderName: String { ProjectDisplayNames.folderName(forProjectPath: projectPath) }
+    var sessionCount: Int { conversations.count + pendingNewSessions.count }
     // Pinned sessions come first, so the newest one is not necessarily `conversations.first`.
-    var latestActivity: Date { conversations.map(\.updatedAt).max() ?? .distantPast }
+    var latestActivity: Date {
+        max(
+            conversations.map(\.updatedAt).max() ?? .distantPast,
+            pendingNewSessions.map(\.startedAt).max() ?? .distantPast
+        )
+    }
+
+    var isProjectAvailable: Bool {
+        var isDirectory: ObjCBool = false
+        return FileManager.default.fileExists(atPath: projectPath, isDirectory: &isDirectory) && isDirectory.boolValue
+    }
 
     static func grouped(
         _ conversations: [Conversation],
+        pendingNewSessions: [PendingNewSession] = [],
         displayNames: ProjectDisplayNames = ProjectDisplayNames(),
         pinnedItems: PinnedItems = PinnedItems()
     ) -> [ProjectConversationGroup] {
-        Dictionary(grouping: conversations, by: \.projectDirectoryKey)
-            .map { projectPath, projectConversations in
+        let conversationsByProject = Dictionary(grouping: conversations, by: \.projectDirectoryKey)
+        let pendingNewSessionsByProject = Dictionary(grouping: pendingNewSessions, by: \.projectDirectoryKey)
+        return Set(conversationsByProject.keys).union(pendingNewSessionsByProject.keys)
+            .map { projectPath in
                 ProjectConversationGroup(
                     projectPath: projectPath,
                     displayName: displayNames.displayName(forProjectPath: projectPath),
                     isPinned: pinnedItems.isPinned(projectPath: projectPath),
-                    conversations: pinnedItems.pinnedConversationsFirst(projectConversations.sorted { first, second in
-                        if first.updatedAt != second.updatedAt { return first.updatedAt > second.updatedAt }
-                        return first.id < second.id
-                    })
+                    conversations: pinnedItems.pinnedConversationsFirst(
+                        (conversationsByProject[projectPath] ?? []).sorted { first, second in
+                            if first.updatedAt != second.updatedAt { return first.updatedAt > second.updatedAt }
+                            return first.id < second.id
+                        }
+                    ),
+                    pendingNewSessions: (pendingNewSessionsByProject[projectPath] ?? []).sorted { first, second in
+                        if first.startedAt != second.startedAt { return first.startedAt > second.startedAt }
+                        return first.terminalID.uuidString < second.terminalID.uuidString
+                    }
                 )
             }
             .sorted { first, second in

@@ -14,6 +14,9 @@ enum ConversationAction: Sendable {
 }
 
 enum ConversationMetadata {
+    /// Title of a session whose first prompt is not known yet.
+    static let untitledConversationTitle = "Untitled conversation"
+
     static func date(_ value: Any?) -> Date? {
         guard let text = value as? String else { return nil }
         let fractional = ISO8601DateFormatter()

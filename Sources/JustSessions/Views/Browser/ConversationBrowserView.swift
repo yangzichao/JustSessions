@@ -22,6 +22,7 @@ struct ConversationBrowserView: View {
     private var sidebarProjects: [ProjectConversationGroup] {
         let projects = ProjectConversationGroup.grouped(
             providerConversations.filter { recencyFilter.includes($0) },
+            pendingNewSessions: store.pendingNewSessions.filter { providerFilter.includes($0.provider) },
             displayNames: store.projectDisplayNames,
             pinnedItems: store.pinnedItems
         )
@@ -34,7 +35,7 @@ struct ConversationBrowserView: View {
             displayNames: store.projectDisplayNames,
             pinnedItems: store.pinnedItems
         )
-            .filter { $0.conversations.first?.isProjectAvailable == true }
+            .filter(\.isProjectAvailable)
     }
 
     private var focusedConversation: Conversation? {

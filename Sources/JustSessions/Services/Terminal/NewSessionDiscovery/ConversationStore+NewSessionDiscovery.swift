@@ -1,72 +1,77 @@
 import Foundation
 
-/// A tab started with "new session" has no conversation until the CLI writes its transcript.
-/// While such a tab is open, this notices the transcript and refreshes, so the session shows up
-/// under its project without waiting for the tab to be closed or switched away from, and then
-/// links the tab to that conversation.
+/// A tab started with "New session" has no conversation until the CLI writes its session file. The sidebar
+/// lists such a tab under its project right away (`pendingNewSessions`). Meanwhile this finds the file the
+/// tab's CLI is writing, refreshes so the real session shows up, and links the tab to it.
 extension ConversationStore {
+    /// Claude Code writes a new transcript before the first prompt, so a freshly listed session can still be
+    /// untitled. This many refreshes after its file changes are enough to pick up the first prompt.
+    static let maximumTitleRefreshesPerNewSession = 3
+
+    var pendingNewSessions: [PendingNewSession] {
+        terminalSessions.compactMap(\.pendingNewSession)
+    }
+
     func startNewSessionDiscovery(interval: Duration = .seconds(2)) {
         Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: interval)
                 guard let self else { return }
-                self.associateOpenClaudeSessions()
-                await self.refreshWhenNewSessionTranscriptAppears()
+                await self.discoverNewSessions(mayRefresh: true)
             }
         }
     }
 
-    func refreshWhenNewSessionTranscriptAppears(
-        registry: ClaudeLiveSessionRegistry = ClaudeLiveSessionRegistry(),
-        claudeLocator: ClaudeSessionFileLocator = ClaudeSessionFileLocator()
-    ) async {
+    /// Links waiting tabs to their conversations. With `mayRefresh` it also refreshes when a tab's session
+    /// file changed since the last refresh started. Only the periodic pass passes it, so these refreshes
+    /// happen at most once per interval.
+    func discoverNewSessions(mayRefresh: Bool, finder: NewSessionFileFinder = NewSessionFileFinder()) async {
         guard !isLoading, !isDeletingSessions else { return }
-        let waitingSessions = terminalSessions.filter {
-            $0.action == .new && $0.conversation == nil && !$0.hasExited && $0.processID > 0
-        }
-        guard !waitingSessions.isEmpty else { return }
-
-        let knownClaudeSessionIDs = Set(conversations.filter { $0.provider == .claude }.map(\.sessionID))
-        let hasUnlistedClaudeSession = waitingSessions.contains { session in
-            guard session.provider == .claude,
-                  let record = registry.record(forProcessID: session.processID),
-                  !knownClaudeSessionIDs.contains(record.sessionID) else { return false }
-            return claudeLocator.transcriptExists(forSessionID: record.sessionID)
-        }
-        if hasUnlistedClaudeSession {
+        if mayRefresh, let untitledTab = terminalSessions.first(where: { needsRefreshForFirstPromptTitle($0) }) {
+            untitledTab.titleRefreshCount += 1
             refresh()
             return
         }
 
-        let codexProcessIDs = waitingSessions.filter { $0.provider == .codex }.map(\.processID)
-        guard !codexProcessIDs.isEmpty else { return }
-        let openCodexFiles = await Task.detached(priority: .utility) {
-            let locator = CodexSessionFileLocator()
-            return codexProcessIDs.compactMap { locator.openSessionFile(for: $0)?.path }
+        let waitingTabs = terminalSessions.filter(\.isNewSessionAwaitingConversation)
+        guard !waitingTabs.isEmpty else { return }
+        let searches = waitingTabs.map(\.waitingNewSessionTab)
+        let sessionFiles = await Task.detached(priority: .utility) {
+            finder.sessionFiles(for: searches, processTree: .ofRunningProcesses())
         }.value
-        let knownCodexFiles = Set(conversations.map { $0.sourceFile.standardizedFileURL.path })
-        if openCodexFiles.contains(where: { !knownCodexFiles.contains($0) }) { refresh() }
-    }
 
-    /// Links each new Claude Code tab to its conversation once the sidebar knows it, using the session id
-    /// Claude Code records for the tab's process.
-    func associateOpenClaudeSessions(registry: ClaudeLiveSessionRegistry = ClaudeLiveSessionRegistry()) {
-        var linkedAnySession = false
-        for session in terminalSessions where session.provider == .claude && session.action == .new
-            && session.conversation == nil && session.processID > 0 {
-            guard let record = registry.record(forProcessID: session.processID) else { continue }
-            if linkNewSession(session, toClaudeRecord: record) { linkedAnySession = true }
+        var hasUnlistedSessionFile = false
+        for tab in waitingTabs {
+            guard let sessionFile = sessionFiles[tab.id],
+                  !linkWaitingNewSessionTab(tab, toSessionID: sessionFile.sessionID) else { continue }
+            if wasModifiedSinceLastRefresh(sessionFile.lastModified) { hasUnlistedSessionFile = true }
         }
-        // Sidebar rows look up open terminals through the store, which does not see a tab's own changes.
-        if linkedAnySession { objectWillChange.send() }
+        if mayRefresh && hasUnlistedSessionFile { refresh() }
     }
 
     @discardableResult
-    func linkNewSession(_ session: TerminalSession, toClaudeRecord record: ClaudeLiveSessionRecord) -> Bool {
-        guard let conversation = conversations.first(where: {
-            $0.provider == .claude && $0.sessionID == record.sessionID
-        }) else { return false }
+    func linkWaitingNewSessionTab(_ session: TerminalSession, toSessionID sessionID: String) -> Bool {
+        guard session.isNewSessionAwaitingConversation,
+              let conversation = conversations.first(where: {
+                  $0.provider == session.provider && $0.sessionID == sessionID
+              }) else { return false }
         session.synchronize(conversation: conversation, displayTitle: title(for: conversation))
+        // Sidebar rows look up open terminals through the store, which does not see a tab's own changes.
+        objectWillChange.send()
         return true
+    }
+
+    private func needsRefreshForFirstPromptTitle(_ session: TerminalSession) -> Bool {
+        guard session.action == .new, !session.hasExited,
+              session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
+              let conversation = session.conversation,
+              conversation.suggestedTitle == ConversationMetadata.untitledConversationTitle else { return false }
+        return wasModifiedSinceLastRefresh(ConversationMetadata.fileModificationDate(conversation.sourceFile))
+    }
+
+    /// A refresh already saw every change made before it started, so only later changes are worth another.
+    private func wasModifiedSinceLastRefresh(_ modificationDate: Date) -> Bool {
+        guard let lastRefreshStartedAt else { return true }
+        return modificationDate > lastRefreshStartedAt
     }
 }

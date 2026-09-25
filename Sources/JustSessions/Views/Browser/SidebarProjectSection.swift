@@ -10,6 +10,7 @@ struct SidebarProjectSection: View {
     let onToggle: () -> Void
     let onNewSession: (ConversationProvider) -> Void
     let onClickConversation: (Conversation) -> Void
+    let onSelectPendingNewSession: (UUID) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onDeleteConversation: (Conversation) -> Void
     let onDeleteSelectedConversations: () -> Void
@@ -23,10 +24,6 @@ struct SidebarProjectSection: View {
 
     private var deletionPlan: SessionDeletionPlan {
         store.deletionPlan(for: project.id)
-    }
-
-    private var isProjectAvailable: Bool {
-        project.conversations.first?.isProjectAvailable == true
     }
 
     var body: some View {
@@ -59,7 +56,7 @@ struct SidebarProjectSection: View {
                                 .font(.system(size: 6))
                                 .foregroundStyle(Color.accentColor)
                         }
-                        Text("\(project.conversations.count)")
+                        Text("\(project.sessionCount)")
                             .foregroundStyle(.secondary)
                     }
                     .font(.system(size: 12, weight: .medium))
@@ -71,7 +68,7 @@ struct SidebarProjectSection: View {
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .help(project.projectPath)
-                .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(project.conversations.count) \(project.conversations.count == 1 ? "session" : "sessions"), \(openTerminalCount) open")
+                .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(project.sessionCount) \(project.sessionCount == 1 ? "session" : "sessions"), \(openTerminalCount) open")
                 .contextMenu {
                     Menu("New session", systemImage: "plus") {
                         ForEach(ConversationProvider.allCases) { provider in
@@ -80,11 +77,11 @@ struct SidebarProjectSection: View {
                             }
                         }
                     }
-                    .disabled(!isProjectAvailable)
+                    .disabled(!project.isProjectAvailable)
                     Button("Open project in Finder", systemImage: "folder") {
                         SessionLocationActions.openProjectFolder(project.projectPath)
                     }
-                    .disabled(!isProjectAvailable)
+                    .disabled(!project.isProjectAvailable)
                     Button("Copy project path", systemImage: "doc.on.doc") {
                         SessionLocationActions.copyProjectPath(project.projectPath)
                     }
@@ -106,6 +103,15 @@ struct SidebarProjectSection: View {
             }
 
             if isExpanded {
+                ForEach(project.pendingNewSessions) { pendingNewSession in
+                    if let terminal = store.terminalSessions.first(where: { $0.id == pendingNewSession.terminalID }) {
+                        PendingNewSessionRow(
+                            terminal: terminal,
+                            isSelected: store.selectedTerminalID == terminal.id,
+                            onSelect: { onSelectPendingNewSession(terminal.id) }
+                        )
+                    }
+                }
                 ForEach(project.conversations) { conversation in
                     sessionRow(conversation)
                 }

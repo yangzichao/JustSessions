@@ -19,6 +19,23 @@ struct NativeCLICommand {
     let arguments: [String]
     let workingDirectory: String
     let environment: [String]
+
+    func appendingArguments(_ extraArguments: [String]) -> NativeCLICommand {
+        NativeCLICommand(
+            executablePath: executablePath,
+            arguments: arguments + extraArguments,
+            workingDirectory: workingDirectory,
+            environment: environment
+        )
+    }
+
+    /// `environment` as a dictionary, for running the same executable outside a terminal.
+    var environmentVariables: [String: String] {
+        environment.reduce(into: [String: String]()) { variables, entry in
+            guard let separator = entry.firstIndex(of: "=") else { return }
+            variables[String(entry[..<separator])] = String(entry[entry.index(after: separator)...])
+        }
+    }
 }
 
 struct NativeCLICommandResolver {

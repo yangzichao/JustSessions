@@ -45,7 +45,7 @@ struct ClaudeAdapter: ConversationAdapter {
                         ?? fileMetadata.customTitle
                         ?? entry?["firstPrompt"] as? String
                         ?? fileMetadata.firstPrompt,
-                    fallback: "Untitled conversation"
+                    fallback: ConversationMetadata.untitledConversationTitle
                 )
                 let modified = ConversationMetadata.date(entry?["modified"])
                 let updatedAt = max(modified ?? .distantPast, lastRecord.updatedAt ?? .distantPast)
