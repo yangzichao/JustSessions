@@ -24,7 +24,7 @@ enum RemoteNewSessionMatcher {
         for tab in waitingTabs.sorted(by: { $0.launchedAt < $1.launchedAt }) {
             let candidate = conversations
                 .filter {
-                    $0.remoteHost == tab.host
+                    $0.host == .ssh(tab.host)
                         && $0.provider == tab.provider
                         && $0.projectPath == tab.projectPath
                         && !tab.sessionIDsKnownAtLaunch.contains($0.sessionID)

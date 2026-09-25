@@ -18,6 +18,6 @@ struct RemoteSessionDiscovery: Sendable {
             ClaudeAdapter(configurationDirectory: mirror.mirrorDirectory(host: host, provider: .claude)),
             CodexAdapter(codexDirectory: mirror.mirrorDirectory(host: host, provider: .codex)),
         ]
-        return try adapters.flatMap { try $0.discover() }.map { $0.onRemoteHost(host) }
+        return try adapters.flatMap { try $0.discover() }.map { $0.onHost(.ssh(host)) }
     }
 }

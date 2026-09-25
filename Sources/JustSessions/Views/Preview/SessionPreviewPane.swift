@@ -33,7 +33,7 @@ struct SessionPreviewPane: View {
                     TranscriptView(conversation: conversation)
                         .id(conversation.id)
                 }
-            } else if store.isLoading && store.conversations.isEmpty {
+            } else if store.isScanningThisMac && store.conversations.isEmpty {
                 ContentUnavailableView("Scanning conversations", systemImage: "magnifyingglass")
             } else {
                 ContentUnavailableView(

@@ -20,18 +20,19 @@ extension ConversationStore {
             action: .new,
             displayTitle: "New \(provider.rawValue) session",
             command: command,
-            remoteHost: host,
-            sessionIDsKnownAtLaunch: sessionIDsListed(onRemoteHost: host),
+            host: .ssh(host),
+            sessionIDsKnownAtLaunch: sessionIDsListed(on: .ssh(host)),
             remoteTmuxSessionName: tmuxSessionName
         )
         session.onProcessFinished = { [weak self] in self?.refreshRemoteHost(host) }
         openTerminal(session)
     }
 
-    /// A waiting tab on the host takes a session that is not among these; nothing for a local tab.
-    func sessionIDsListed(onRemoteHost host: String?) -> Set<String> {
-        guard let host else { return [] }
-        return Set(conversations.filter { $0.remoteHost == host }.map(\.sessionID))
+    /// A waiting tab on an SSH host takes a session that is not among these. A tab on this Mac finds its session
+    /// through the files its CLI opens instead, so it needs none.
+    func sessionIDsListed(on host: SessionHost) -> Set<String> {
+        guard host != .thisMac else { return [] }
+        return Set(conversations.filter { $0.host == host }.map(\.sessionID))
     }
 
     func startRemoteNewSessionPolling(interval: Duration = .seconds(10)) {
@@ -46,7 +47,7 @@ extension ConversationStore {
 
     /// Links waiting new-session tabs on the host to sessions that appeared since they started.
     func linkWaitingRemoteNewSessionTabs(onHost host: String) {
-        let waitingSessions = terminalSessions.filter { $0.remoteHost == host && $0.isNewSessionAwaitingConversation }
+        let waitingSessions = terminalSessions.filter { $0.host == .ssh(host) && $0.isNewSessionAwaitingConversation }
         guard !waitingSessions.isEmpty else { return }
         let matches = RemoteNewSessionMatcher.matches(
             for: waitingSessions.map(\.waitingRemoteNewSessionTab),
@@ -65,7 +66,7 @@ extension ConversationStore {
 
     private func hostsWithRemoteNewSessionsToFollow() -> Set<String> {
         Set(terminalSessions.compactMap { session -> String? in
-            guard let host = session.remoteHost, session.action.startsNewSession, !session.hasExited else { return nil }
+            guard let host = session.host.sshDestination, session.action.startsNewSession, !session.hasExited else { return nil }
             let needsTitle = session.conversation?.suggestedTitle == ConversationMetadata.untitledConversationTitle
             return session.isNewSessionAwaitingConversation || needsTitle ? host : nil
         })
@@ -76,7 +77,7 @@ extension TerminalSession {
     var waitingRemoteNewSessionTab: WaitingRemoteNewSessionTab {
         WaitingRemoteNewSessionTab(
             terminalID: id,
-            host: remoteHost ?? "",
+            host: host.sshDestination ?? "",
             provider: provider,
             projectPath: projectPath,
             launchedAt: launchedAt,

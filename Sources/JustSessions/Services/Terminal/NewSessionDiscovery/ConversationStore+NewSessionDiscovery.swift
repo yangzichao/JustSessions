@@ -27,15 +27,15 @@ extension ConversationStore {
     /// file changed since the last refresh started. Only the periodic pass passes it, so these refreshes
     /// happen at most once per interval.
     func discoverNewSessions(mayRefresh: Bool, finder: NewSessionFileFinder = NewSessionFileFinder()) async {
-        guard !isLoading, !isDeletingSessions else { return }
+        guard !isScanningThisMac, !isDeletingSessions else { return }
         if mayRefresh, let untitledTab = terminalSessions.first(where: { needsRefreshForFirstPromptTitle($0) }) {
             untitledTab.titleRefreshCount += 1
-            refresh()
+            refreshThisMac()
             return
         }
 
-        // Remote tabs run `ssh`, whose open files say nothing; see `linkWaitingRemoteNewSessionTabs`.
-        let waitingTabs = terminalSessions.filter { $0.isNewSessionAwaitingConversation && $0.remoteHost == nil }
+        // Tabs on SSH hosts run `ssh`, whose open files say nothing; see `linkWaitingRemoteNewSessionTabs`.
+        let waitingTabs = terminalSessions.filter { $0.isNewSessionAwaitingConversation && $0.host == .thisMac }
         guard !waitingTabs.isEmpty else { return }
         let searches = waitingTabs.map(\.waitingNewSessionTab)
         let sessionFiles = await Task.detached(priority: .utility) {
@@ -48,7 +48,7 @@ extension ConversationStore {
                   !linkWaitingNewSessionTab(tab, toSessionID: sessionFile.sessionID) else { continue }
             if wasModifiedSinceLastRefresh(sessionFile.lastModified) { hasUnlistedSessionFile = true }
         }
-        if mayRefresh && hasUnlistedSessionFile { refresh() }
+        if mayRefresh && hasUnlistedSessionFile { refreshThisMac() }
     }
 
     @discardableResult
@@ -64,7 +64,7 @@ extension ConversationStore {
     }
 
     private func needsRefreshForFirstPromptTitle(_ session: TerminalSession) -> Bool {
-        guard session.action.startsNewSession, !session.hasExited, session.remoteHost == nil,
+        guard session.action.startsNewSession, !session.hasExited, session.host == .thisMac,
               session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
               let conversation = session.conversation,
               conversation.suggestedTitle == ConversationMetadata.untitledConversationTitle else { return false }

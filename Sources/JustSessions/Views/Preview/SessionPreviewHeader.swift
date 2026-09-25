@@ -28,12 +28,13 @@ struct SessionPreviewHeader: View {
                 HStack(spacing: 5) {
                     Text(conversation.provider.rawValue)
                     Text("·")
-                    if let remoteHost = conversation.remoteHost {
-                        Label(remoteHost, systemImage: "network")
+                    // With SSH hosts added, every session names its host, this Mac included.
+                    if store.hasRemoteHosts {
+                        Label(conversation.host.displayName, systemImage: conversation.host.symbolName)
                         Text("·")
                     }
                     Text(store.projectDisplayName(forProjectPath: conversation.projectDirectoryKey))
-                        .help(RemoteProjectKey.copyablePath(ofKey: conversation.projectDirectoryKey))
+                        .help(conversation.projectLocation.copyablePath)
                     Text("·")
                     Text(conversation.updatedAt, style: .relative)
                     if !conversation.isProjectAvailable {
@@ -72,7 +73,7 @@ struct SessionPreviewHeader: View {
             Button("Copy session ID", systemImage: "doc.on.doc") {
                 SessionLocationActions.copySessionID(conversation)
             }
-            if !conversation.isRemote {
+            if conversation.host == .thisMac {
                 Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
                     SessionLocationActions.revealSessionFile(conversation)
                 }
@@ -80,7 +81,7 @@ struct SessionPreviewHeader: View {
             if conversation.supportsDeletionFromLauncher {
                 Divider()
                 Button("Delete session…", systemImage: "trash", role: .destructive, action: onDelete)
-                    .disabled(store.hasTerminal(for: conversation) || store.isLoading || store.isDeletingSessions)
+                    .disabled(store.hasTerminal(for: conversation) || store.isScanningThisMac || store.isDeletingSessions)
             }
         } label: {
             Image(systemName: "ellipsis")

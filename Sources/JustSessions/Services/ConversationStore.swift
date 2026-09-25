@@ -4,7 +4,6 @@ import Foundation
 @MainActor
 final class ConversationStore: ObservableObject {
     @Published private(set) var conversations: [Conversation] = []
-    @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     @Published private(set) var aliases: [String: String]
     @Published private(set) var projectDisplayNames: ProjectDisplayNames
@@ -14,9 +13,11 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var deletingConversationID: String?
     /// Every conversation queued in the running batch deletion.
     @Published private(set) var batchDeletionConversationIDs: Set<String> = []
+    /// The SSH hosts listed after this Mac.
     @Published var remoteHostList: RemoteHostList
-    @Published var remoteHostSyncStatuses: [String: RemoteHostSyncStatus] = [:]
-    /// tmux sessions JustSessions started on each host that still run, as of the host's last copy.
+    /// Each host's last refresh, this Mac's included.
+    @Published var hostRefreshStatuses: [SessionHost: HostRefreshStatus] = [:]
+    /// tmux sessions JustSessions started on each SSH host that still run, as of the host's last copy.
     @Published var remoteTmuxSessionNamesByHost: [String: Set<String>] = [:]
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
@@ -43,14 +44,14 @@ final class ConversationStore: ObservableObject {
         startRemoteNewSessionPolling()
     }
 
-    func refresh() {
+    /// Scans the session folders on this Mac. SSH hosts refresh on their own, so a slow host never holds this up.
+    func refreshThisMac() {
         guard !isDeletingSessions else { return }
-        guard !isLoading else {
+        guard !isScanningThisMac else {
             isRefreshQueued = true
             return
         }
-        isLoading = true
-        errorMessage = nil
+        hostRefreshStatuses[.thisMac] = .refreshing
         lastRefreshStartedAt = .now
         let adapters = self.adapters
         Task.detached(priority: .userInitiated) {
@@ -60,16 +61,14 @@ final class ConversationStore: ObservableObject {
                 do { found += try adapter.discover() }
                 catch { failures.append("\(adapter.provider.rawValue): \(error.localizedDescription)") }
             }
-            found.sort { $0.updatedAt > $1.updatedAt }
             await MainActor.run {
-                // Remote hosts are refreshed on their own schedule; keep what they last listed.
-                self.conversations = found + self.conversations.filter(\.isRemote)
-                self.synchronizeTerminalTitles()
-                self.errorMessage = failures.isEmpty ? nil : failures.joined(separator: "\n")
-                self.isLoading = false
+                self.replaceConversations(on: .thisMac, with: found)
+                self.hostRefreshStatuses[.thisMac] = failures.isEmpty
+                    ? .refreshed(.now)
+                    : .failed(failures.joined(separator: "\n"))
                 if self.isRefreshQueued {
                     self.isRefreshQueued = false
-                    self.refresh()
+                    self.refreshThisMac()
                 } else {
                     Task { await self.discoverNewSessions(mayRefresh: false) }
                 }
@@ -77,9 +76,9 @@ final class ConversationStore: ObservableObject {
         }
     }
 
-    /// Swaps in what one remote host lists now, keeping the local sessions and other hosts.
-    func replaceConversations(onRemoteHost host: String, with hostConversations: [Conversation]) {
-        conversations = (conversations.filter { $0.remoteHost != host } + hostConversations)
+    /// Swaps in what one host lists now, keeping every other host's sessions.
+    func replaceConversations(on host: SessionHost, with hostConversations: [Conversation]) {
+        conversations = (conversations.filter { $0.host != host } + hostConversations)
             .sorted { $0.updatedAt > $1.updatedAt }
         synchronizeTerminalTitles()
     }
@@ -124,7 +123,7 @@ final class ConversationStore: ObservableObject {
         pinnedItems.save(to: .standard)
     }
 
-    /// A tab in this window, or for a remote session, a CLI still running in tmux on its host.
+    /// A tab in this window, or for a session on an SSH host, a CLI still running in tmux there.
     func hasTerminal(for conversation: Conversation) -> Bool {
         terminalSessions.contains { $0.conversation?.id == conversation.id } || isRunningInRemoteTmux(conversation)
     }
@@ -156,7 +155,7 @@ final class ConversationStore: ObservableObject {
             errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
             return
         }
-        guard !isLoading, !isDeletingSessions,
+        guard !isScanningThisMac, !isDeletingSessions,
               let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { return }
         deletingConversationID = conversation.id
         Task.detached(priority: .userInitiated) {
@@ -184,7 +183,7 @@ final class ConversationStore: ObservableObject {
 
     /// Deletes every deletable conversation in the list; open terminals and unsupported providers are skipped.
     func deleteConversations(_ candidateConversations: [Conversation]) {
-        guard !isLoading, !isDeletingSessions else { return }
+        guard !isScanningThisMac, !isDeletingSessions else { return }
         let candidateIDs = Set(candidateConversations.map(\.id))
         let deletionPlan = deletionPlan(for: conversations.filter { candidateIDs.contains($0.id) })
         guard deletionPlan.hasDeletableConversations else { return }
@@ -218,12 +217,11 @@ final class ConversationStore: ObservableObject {
         }
     }
 
-    /// A remote session is deleted on its host; a local one by its tool's adapter.
+    /// A session on this Mac is deleted by its tool's adapter; one on an SSH host over SSH.
     nonisolated private static func deleteFromDisk(_ conversation: Conversation, adapter: any ConversationAdapter) throws {
-        if conversation.isRemote {
-            try RemoteConversationDeletion().delete(conversation)
-        } else {
-            try adapter.delete(conversation)
+        switch conversation.host {
+        case .thisMac: try adapter.delete(conversation)
+        case .ssh: try RemoteConversationDeletion().delete(conversation)
         }
     }
 
@@ -259,19 +257,11 @@ final class ConversationStore: ObservableObject {
             return
         }
         guard let adapter = adapter(for: conversation.provider) else { return }
-        let tmuxSessionName = conversation.isRemote ? remoteTmuxSessionName(forLaunching: conversation, action: action) : nil
+        let tmuxSessionName = conversation.host == .thisMac
+            ? nil
+            : remoteTmuxSessionName(forLaunching: conversation, action: action)
         do {
-            let command = if let remoteHost = conversation.remoteHost {
-                RemoteCLICommandBuilder().command(
-                    host: remoteHost,
-                    provider: conversation.provider,
-                    projectPath: conversation.projectPath,
-                    arguments: adapter.arguments(for: conversation, action: action),
-                    tmuxSessionName: tmuxSessionName
-                )
-            } else {
-                try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
-            }
+            let command = try launchCommand(for: conversation, action: action, adapter: adapter, tmuxSessionName: tmuxSessionName)
             // A branch runs a fork with a session id of its own, so its tab waits for that session like a
             // new session's tab does; see new session discovery.
             let isBranch = action == .branch
@@ -283,24 +273,59 @@ final class ConversationStore: ObservableObject {
                 displayTitle: title(for: conversation),
                 command: command,
                 branchedFromSessionID: isBranch ? conversation.sessionID : nil,
-                remoteHost: conversation.remoteHost,
-                sessionIDsKnownAtLaunch: isBranch ? sessionIDsListed(onRemoteHost: conversation.remoteHost) : [],
+                host: conversation.host,
+                sessionIDsKnownAtLaunch: isBranch ? sessionIDsListed(on: conversation.host) : [],
                 remoteTmuxSessionName: tmuxSessionName
             )
-            if let remoteHost = conversation.remoteHost {
-                // Pick up the new messages and title once the remote CLI exits.
-                session.onProcessFinished = { [weak self] in self?.refreshRemoteHost(remoteHost) }
-            } else if isBranch {
-                // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
-                session.onProcessFinished = { [weak self] in self?.refresh() }
-            }
+            // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
+            session.onProcessFinished = { [weak self] in self?.refresh(conversation.host) }
             terminalSessions.append(session)
             selectedTerminalID = session.id
         }
         catch { errorMessage = error.localizedDescription }
     }
 
-    func launchNewSession(provider: ConversationProvider, projectPath: String) throws {
+    /// The CLI itself on this Mac; on an SSH host, `ssh` into the tmux session the CLI runs in.
+    private func launchCommand(
+        for conversation: Conversation,
+        action: ConversationAction,
+        adapter: any ConversationAdapter,
+        tmuxSessionName: String?
+    ) throws -> NativeCLICommand {
+        switch conversation.host {
+        case .thisMac:
+            try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
+        case .ssh(let destination):
+            RemoteCLICommandBuilder().command(
+                host: destination,
+                provider: conversation.provider,
+                projectPath: conversation.projectPath,
+                arguments: adapter.arguments(for: conversation, action: action),
+                tmuxSessionName: tmuxSessionName
+            )
+        }
+    }
+
+    /// Opens a tab running a new session of the tool in the folder, on the folder's host.
+    func launchNewSession(provider: ConversationProvider, in location: ProjectLocation) throws {
+        switch location.host {
+        case .thisMac:
+            try launchNewSessionOnThisMac(provider: provider, projectPath: location.path)
+        case .ssh(let destination):
+            launchNewRemoteSession(provider: provider, host: destination, projectPath: location.path)
+        }
+    }
+
+    /// From a project's + menu; `projectPath` is the project's key.
+    func launchNewSessionFromProject(provider: ConversationProvider, projectPath: String) {
+        do {
+            try launchNewSession(provider: provider, in: ProjectLocation(key: projectPath))
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func launchNewSessionOnThisMac(provider: ConversationProvider, projectPath: String) throws {
         let expandedPath = (projectPath as NSString).expandingTildeInPath
         let standardizedPath = URL(fileURLWithPath: expandedPath).standardizedFileURL.path
         let command = try commandResolver.resolveNewSession(provider: provider, projectPath: standardizedPath)
@@ -317,22 +342,9 @@ final class ConversationStore: ObservableObject {
             preassignedSessionID: preassignment?.sessionID
         )
         // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
-        session.onProcessFinished = { [weak self] in self?.refresh() }
+        session.onProcessFinished = { [weak self] in self?.refreshThisMac() }
         terminalSessions.append(session)
         selectedTerminalID = session.id
-    }
-
-    /// `projectPath` is a project's key: a local folder, or a folder on a remote host.
-    func launchNewSessionFromProject(provider: ConversationProvider, projectPath: String) {
-        if let remoteLocation = RemoteProjectKey.location(ofKey: projectPath) {
-            launchNewRemoteSession(provider: provider, host: remoteLocation.host, projectPath: remoteLocation.projectPath)
-            return
-        }
-        do {
-            try launchNewSession(provider: provider, projectPath: projectPath)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
     }
 
     func adapter(for provider: ConversationProvider) -> (any ConversationAdapter)? {
@@ -357,19 +369,20 @@ final class ConversationStore: ObservableObject {
         terminalSessions.first { $0.id == selectedTerminalID }
     }
 
+    /// Leaving a new session's tab refreshes its host, so what its CLI saved so far is listed.
     func selectTerminal(_ id: UUID?) {
-        let shouldRefreshNewSession = selectedTerminal?.action.startsNewSession == true && selectedTerminalID != id
+        let leftNewSessionTab = selectedTerminalID == id ? nil : selectedTerminal.flatMap { $0.action.startsNewSession ? $0 : nil }
         selectedTerminalID = id
-        if shouldRefreshNewSession { refresh() }
+        if let leftNewSessionTab { refresh(leftNewSessionTab.host) }
     }
 
     func closeTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }) else { return }
-        let shouldRefreshNewSession = terminalSessions[index].action.startsNewSession
-        terminalSessions[index].close()
+        let closedTab = terminalSessions[index]
+        closedTab.close()
         terminalSessions.remove(at: index)
         if selectedTerminalID == id { selectedTerminalID = terminalSessions.last?.id }
-        if shouldRefreshNewSession { refresh() }
+        if closedTab.action.startsNewSession { refresh(closedTab.host) }
     }
 
     func closeAllTerminals() {

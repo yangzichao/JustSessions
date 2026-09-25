@@ -29,11 +29,9 @@ struct ProjectNewSessionMenu: View {
     }
 
     private var helpText: String {
-        if let remoteLocation = project.remoteLocation {
-            return "Start a new session in \(remoteLocation.projectPath) on \(remoteLocation.host)"
-        }
-        return project.isProjectAvailable
-            ? "Start a new session in \(project.projectPath)"
-            : "The project folder no longer exists"
+        guard project.canStartNewSession else { return "The project folder no longer exists" }
+        return project.host == .thisMac
+            ? "Start a new session in \(project.location.path)"
+            : "Start a new session in \(project.location.path) on \(project.host.displayName)"
     }
 }

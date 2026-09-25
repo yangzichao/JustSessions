@@ -12,7 +12,7 @@ extension ConversationStore {
 
     /// Whether the session's CLI still runs in tmux on its host, as of the host's last copy.
     func isRunningInRemoteTmux(_ conversation: Conversation) -> Bool {
-        guard let host = conversation.remoteHost else { return false }
+        guard let host = conversation.host.sshDestination else { return false }
         return remoteTmuxSessionNamesByHost[host]?.contains(RemoteTmuxSessionName.forConversation(conversation)) == true
     }
 
@@ -34,7 +34,7 @@ extension ConversationStore {
     /// A new session's or branch's tab started under a temporary name; once its session is known, it takes the
     /// session's own name, so resuming that session later reattaches to it.
     func adoptSessionTmuxName(for session: TerminalSession, runner: RemoteHostCommandRunner = RemoteHostCommandRunner()) {
-        guard let host = session.remoteHost,
+        guard let host = session.host.sshDestination,
               let currentName = session.remoteTmuxSessionName,
               let conversation = session.conversation else { return }
         let sessionName = RemoteTmuxSessionName.forConversation(conversation)
@@ -47,7 +47,7 @@ extension ConversationStore {
 
     /// Stops the session's CLI on its host, whether or not a tab shows it.
     func endRemoteTmuxSession(for conversation: Conversation) {
-        guard let host = conversation.remoteHost else { return }
+        guard let host = conversation.host.sshDestination else { return }
         for session in terminalSessions where session.conversation?.id == conversation.id {
             closeTerminal(session.id)
         }
@@ -65,7 +65,7 @@ extension ConversationStore {
     /// keeps running on the host and resuming reattaches.
     func closeTerminal(_ id: UUID, endingRemoteSession: Bool) {
         guard let session = terminalSessions.first(where: { $0.id == id }) else { return }
-        let remoteHost = session.remoteHost
+        let remoteHost = session.host.sshDestination
         let tmuxName = session.remoteTmuxSessionName
         closeTerminal(id)
         if endingRemoteSession, let remoteHost, let tmuxName {
@@ -78,7 +78,7 @@ extension ConversationStore {
     /// Opens a fresh connection for a remote tab whose connection ended, in its place in the tab bar.
     func reconnectRemoteTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }),
-              terminalSessions[index].remoteHost != nil,
+              terminalSessions[index].host != .thisMac,
               terminalSessions[index].hasExited else { return }
         let ended = terminalSessions[index]
         let replacement = TerminalSession(
@@ -89,7 +89,7 @@ extension ConversationStore {
             displayTitle: ended.displayTitle,
             command: reconnectCommand(for: ended),
             branchedFromSessionID: ended.branchedFromSessionID,
-            remoteHost: ended.remoteHost,
+            host: ended.host,
             sessionIDsKnownAtLaunch: ended.sessionIDsKnownAtLaunch,
             remoteTmuxSessionName: ended.remoteTmuxSessionName
         )
@@ -100,7 +100,7 @@ extension ConversationStore {
     /// A new session's or branch's tab that took its session's tmux name must attach under that name, not the
     /// one it started with. Attaching ignores the CLI arguments, so resume arguments are right whenever tmux still runs it.
     private func reconnectCommand(for ended: TerminalSession) -> NativeCLICommand {
-        guard let host = ended.remoteHost,
+        guard let host = ended.host.sshDestination,
               let conversation = ended.conversation,
               let tmuxName = ended.remoteTmuxSessionName,
               tmuxName == RemoteTmuxSessionName.forConversation(conversation),

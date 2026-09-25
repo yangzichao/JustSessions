@@ -29,7 +29,7 @@ struct RemoteConversationDeletion {
     static let missingTranscriptExitStatus: Int32 = 3
 
     func delete(_ conversation: Conversation) throws {
-        guard let host = conversation.remoteHost,
+        guard let host = conversation.host.sshDestination,
               ConversationMetadata.isValidSessionID(conversation.sessionID) else {
             throw ConversationDeletionError.invalidSource
         }

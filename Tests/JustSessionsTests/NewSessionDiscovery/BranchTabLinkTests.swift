@@ -62,8 +62,8 @@ struct BranchTabLinkTests {
             adapters: [StaticConversationAdapter(discoveredConversations: conversations)],
             commandResolver: NativeCLICommandResolver(searchDirectories: [binaryDirectory.path])
         )
-        store.refresh()
-        for _ in 0..<100 where store.isLoading || store.conversations.isEmpty {
+        store.refreshThisMac()
+        for _ in 0..<100 where store.isScanningThisMac || store.conversations.isEmpty {
             try await Task.sleep(for: .milliseconds(10))
         }
         #expect(store.conversations.count == conversations.count)

@@ -12,6 +12,7 @@ struct ConversationSidebarView: View {
     let recentSessionCount: Int
     let onCheckForUpdates: () -> Void
     let onNewSession: () -> Void
+    let onNewSessionOnHost: (SessionHost) -> Void
     let onSelectConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onDeleteConversation: (Conversation) -> Void
@@ -20,21 +21,20 @@ struct ConversationSidebarView: View {
     let onDeleteProjectSessions: (String) -> Void
 
     @State private var expandedProjectPaths: Set<String> = []
-    @State private var isRemoteHostsSheetPresented = false
+    @State private var isAddRemoteHostSheetPresented = false
 
     private var isSearching: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    private var repeatedProjectNames: Set<String> {
-        Set(Dictionary(grouping: projects, by: \.displayName)
-            .filter { $0.value.count > 1 }
-            .map(\.key))
+    private var hostSections: [HostProjectSection] {
+        HostProjectSection.sections(hosts: store.hosts, projects: projects)
     }
 
     /// Session rows in the order they appear in the sidebar, used for Shift-click ranges.
     private var visibleConversationIDs: [String] {
-        projects
+        hostSections
+            .flatMap(\.projects)
             .filter(isExpanded)
             .flatMap { $0.conversations.map(\.id) }
     }
@@ -48,7 +48,6 @@ struct ConversationSidebarView: View {
     }
 
     var body: some View {
-        let repeatedNames = repeatedProjectNames
         let selectedConversations = selectedConversations
 
         VStack(alignment: .leading, spacing: 0) {
@@ -70,44 +69,47 @@ struct ConversationSidebarView: View {
 
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 1) {
-                    SidebarSectionHeading(title: "PROJECTS", count: projects.count)
-                        .padding(.top, 14)
+                    ForEach(hostSections) { section in
+                        hostHeading(for: section)
+                            .padding(.top, 14)
+                            .padding(.bottom, 4)
 
-                    if projects.isEmpty {
-                        Text(emptyProjectsMessage)
-                            .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, 18)
-                            .padding(.vertical, 8)
+                        if section.projects.isEmpty {
+                            emptyProjectsMessage(for: section.host)
+                        }
+
+                        let repeatedNames = Self.repeatedProjectNames(in: section.projects)
+                        ForEach(section.projects) { project in
+                            SidebarProjectSection(
+                                store: store,
+                                project: project,
+                                parentLabel: repeatedNames.contains(project.displayName)
+                                    ? projectParentLabel(project.location.path) : nil,
+                                isExpanded: isExpanded(project),
+                                sessionSelection: sessionSelection,
+                                selectedConversations: selectedConversations,
+                                onToggle: { toggleExpansion(of: project) },
+                                onNewSession: { provider in
+                                    store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
+                                },
+                                onClickConversation: handleConversationClick,
+                                onSelectPendingNewSession: { terminalID in
+                                    sessionSelection.clear()
+                                    store.selectTerminal(terminalID)
+                                },
+                                onRenameConversation: onRenameConversation,
+                                onDeleteConversation: onDeleteConversation,
+                                onDeleteSelectedConversations: { onDeleteConversations(selectedConversations) },
+                                onClearSessionSelection: { sessionSelection.clear() },
+                                onRenameProject: { onRenameProject(project) },
+                                onDeleteProjectSessions: { onDeleteProjectSessions(project.id) }
+                            )
+                        }
+                        .padding(.horizontal, 8)
                     }
 
-                    ForEach(projects) { project in
-                        SidebarProjectSection(
-                            store: store,
-                            project: project,
-                            parentLabel: repeatedNames.contains(project.displayName)
-                                ? projectParentLabel(project.projectPath) : nil,
-                            isExpanded: isExpanded(project),
-                            sessionSelection: sessionSelection,
-                            selectedConversations: selectedConversations,
-                            onToggle: { toggleExpansion(of: project) },
-                            onNewSession: { provider in
-                                store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
-                            },
-                            onClickConversation: handleConversationClick,
-                            onSelectPendingNewSession: { terminalID in
-                                sessionSelection.clear()
-                                store.selectTerminal(terminalID)
-                            },
-                            onRenameConversation: onRenameConversation,
-                            onDeleteConversation: onDeleteConversation,
-                            onDeleteSelectedConversations: { onDeleteConversations(selectedConversations) },
-                            onClearSessionSelection: { sessionSelection.clear() },
-                            onRenameProject: { onRenameProject(project) },
-                            onDeleteProjectSessions: { onDeleteProjectSessions(project.id) }
-                        )
-                    }
-                    .padding(.horizontal, 8)
+                    SidebarAddRemoteHostButton { isAddRemoteHostSheetPresented = true }
+                        .padding(.top, 12)
                 }
                 .padding(.bottom, 12)
             }
@@ -116,22 +118,18 @@ struct ConversationSidebarView: View {
                 ThemeDivider()
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
-                    isDeleteDisabled: store.isLoading || store.isDeletingSessions,
+                    isDeleteDisabled: store.isScanningThisMac || store.isDeletingSessions,
                     onClear: { sessionSelection.clear() },
                     onDelete: { onDeleteConversations(selectedConversations) }
                 )
             }
 
             ThemeDivider()
-            SidebarFooter(
-                store: store,
-                onManageRemoteHosts: { isRemoteHostsSheetPresented = true },
-                onCheckForUpdates: onCheckForUpdates
-            )
+            SidebarFooter(onCheckForUpdates: onCheckForUpdates)
         }
         .background(sidebarBackground)
-        .sheet(isPresented: $isRemoteHostsSheetPresented) {
-            RemoteHostsSheet(store: store)
+        .sheet(isPresented: $isAddRemoteHostSheetPresented) {
+            AddRemoteHostSheet(store: store)
         }
         .onAppear { expandProjectsWithOpenTerminals() }
         .onChange(of: store.terminalSessions.map(\.id)) { _, _ in
@@ -148,10 +146,47 @@ struct ConversationSidebarView: View {
         ThemePalette.sidebarSurface.ignoresSafeArea()
     }
 
-    private var emptyProjectsMessage: String {
-        if store.isLoading && store.conversations.isEmpty { return "Scanning sessions…" }
+    private func hostHeading(for section: HostProjectSection) -> some View {
+        SidebarHostHeading(
+            host: section.host,
+            isOnlyHost: !store.hasRemoteHosts,
+            refreshStatus: store.hostRefreshStatuses[section.host],
+            projectCount: section.projects.count,
+            onNewSession: { onNewSessionOnHost(section.host) },
+            onRefresh: { store.refresh(section.host) },
+            onRemove: section.host.sshDestination.map { destination in { store.removeRemoteHost(destination) } }
+        )
+    }
+
+    /// Why a host lists no projects: its refresh is running or failed, or the filters left nothing.
+    private func emptyProjectsMessage(for host: SessionHost) -> some View {
+        Group {
+            if case .failed(let message)? = store.hostRefreshStatuses[host] {
+                Text(message).foregroundStyle(ThemePalette.warning)
+            } else {
+                Text(emptyProjectsText(for: host)).foregroundStyle(.secondary)
+            }
+        }
+        .font(.system(size: 12))
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 4)
+    }
+
+    private func emptyProjectsText(for host: SessionHost) -> String {
+        if store.hostRefreshStatuses[host] == .refreshing {
+            return host == .thisMac ? "Scanning sessions…" : "Copying sessions…"
+        }
         if isSearching { return "No matching projects or sessions" }
         return recencyFilter == .recent ? "No sessions in the past seven days" : "No sessions"
+    }
+
+    /// Names shared by two projects on the same host; those rows add their parent folder. The same name on two
+    /// hosts needs nothing, since the headings already tell them apart.
+    private static func repeatedProjectNames(in projects: [ProjectConversationGroup]) -> Set<String> {
+        Set(Dictionary(grouping: projects, by: \.displayName)
+            .filter { $0.value.count > 1 }
+            .map(\.key))
     }
 
     private func isExpanded(_ project: ProjectConversationGroup) -> Bool {
@@ -180,8 +215,7 @@ struct ConversationSidebarView: View {
         }
     }
 
-    private func projectParentLabel(_ projectPath: String) -> String {
-        let folderPath = RemoteProjectKey.location(ofKey: projectPath)?.projectPath ?? projectPath
+    private func projectParentLabel(_ folderPath: String) -> String {
         let parent = URL(fileURLWithPath: folderPath).deletingLastPathComponent()
         return parent.pathComponents.suffix(2).joined(separator: "/")
     }

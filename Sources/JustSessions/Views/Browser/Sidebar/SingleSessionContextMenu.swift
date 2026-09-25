@@ -21,7 +21,7 @@ struct SingleSessionContextMenu: View {
             .disabled(!store.canLaunch(conversation, action: .branch))
         }
         if store.isRunningInRemoteTmux(conversation) {
-            Button("End on \(conversation.remoteHost ?? "host")", systemImage: "stop.circle") {
+            Button("End on \(conversation.host.displayName)", systemImage: "stop.circle") {
                 store.endRemoteTmuxSession(for: conversation)
             }
         }
@@ -33,7 +33,7 @@ struct SingleSessionContextMenu: View {
         Button("Copy session ID", systemImage: "doc.on.doc") {
             SessionLocationActions.copySessionID(conversation)
         }
-        if !conversation.isRemote {
+        if conversation.host == .thisMac {
             Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
                 SessionLocationActions.revealSessionFile(conversation)
             }
@@ -41,7 +41,7 @@ struct SingleSessionContextMenu: View {
         if conversation.supportsDeletionFromLauncher {
             Divider()
             Button("Delete session…", systemImage: "trash", role: .destructive, action: onDelete)
-                .disabled(store.hasTerminal(for: conversation) || store.isLoading || store.isDeletingSessions)
+                .disabled(store.hasTerminal(for: conversation) || store.isScanningThisMac || store.isDeletingSessions)
         }
     }
 }

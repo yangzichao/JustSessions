@@ -78,7 +78,7 @@ struct RemoteConversationDeletionTests {
             suggestedTitle: "Session",
             updatedAt: .now,
             sourceFile: sourceFile,
-            remoteHost: "devbox"
+            host: .ssh("devbox")
         )
     }
 }

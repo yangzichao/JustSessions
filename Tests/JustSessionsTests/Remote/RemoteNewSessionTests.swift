@@ -40,14 +40,14 @@ struct RemoteNewSessionTests {
     @Test @MainActor func newSessionInRemoteProjectOpensOverSSHAndLinksOnceListed() throws {
         let store = ConversationStore(adapters: [])
         let existing = remoteConversation(.claude, project: "/home/me/paper", minutesAgo: 60)
-        store.replaceConversations(onRemoteHost: "devbox", with: [existing])
+        store.replaceConversations(on: .ssh("devbox"), with: [existing])
 
         store.launchNewSessionFromProject(
             provider: .claude,
-            projectPath: RemoteProjectKey.key(host: "devbox", projectPath: "/home/me/paper")
+            projectPath: ProjectLocation(host: .ssh("devbox"), path: "/home/me/paper").key
         )
         let tab = try #require(store.terminalSessions.last)
-        #expect(tab.remoteHost == "devbox")
+        #expect(tab.host == .ssh("devbox"))
         #expect(tab.command.executablePath == "/usr/bin/ssh")
         #expect(tab.command.arguments.last?.contains("exec claude") == true)
         #expect(tab.pendingNewSession?.projectDirectoryKey == "ssh://devbox/home/me/paper")
@@ -56,7 +56,7 @@ struct RemoteNewSessionTests {
         #expect(tab.conversation == nil)
 
         let created = remoteConversation(.claude, project: "/home/me/paper", minutesAgo: 0)
-        store.replaceConversations(onRemoteHost: "devbox", with: [existing, created])
+        store.replaceConversations(on: .ssh("devbox"), with: [existing, created])
         store.linkWaitingRemoteNewSessionTabs(onHost: "devbox")
         #expect(tab.conversation?.id == created.id)
         store.closeAllTerminals()
@@ -65,7 +65,7 @@ struct RemoteNewSessionTests {
     @Test @MainActor func branchInRemoteProjectWaitsForItsForkNotTheSessionItForked() throws {
         let store = ConversationStore(adapters: [StaticConversationAdapter(discoveredConversations: [])])
         let forked = remoteConversation(.claude, project: "/home/me/paper", minutesAgo: 60)
-        store.replaceConversations(onRemoteHost: "devbox", with: [forked])
+        store.replaceConversations(on: .ssh("devbox"), with: [forked])
 
         store.launch(forked, action: .branch)
         let tab = try #require(store.terminalSessions.last)
@@ -97,7 +97,7 @@ struct RemoteNewSessionTests {
             suggestedTitle: sessionID,
             updatedAt: Date(timeIntervalSinceNow: -minutesAgo * 60),
             sourceFile: URL(fileURLWithPath: "/tmp/\(sessionID).jsonl"),
-            remoteHost: host
+            host: .ssh(host)
         )
     }
 

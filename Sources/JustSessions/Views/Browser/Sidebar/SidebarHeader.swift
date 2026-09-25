@@ -21,10 +21,10 @@ struct SidebarHeader: View {
 
     @ViewBuilder
     private var refreshControl: some View {
-        if store.isLoading {
+        if store.isRefreshingAnyHost {
             ProgressView().controlSize(.small)
         } else {
-            Button { store.refreshIncludingRemoteHosts() } label: {
+            Button { store.refreshAllHosts() } label: {
                 Image(systemName: "arrow.clockwise")
             }
             .buttonStyle(.borderless)

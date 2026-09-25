@@ -6,7 +6,7 @@ struct WorkspaceTabBar: View {
     @State private var closingSessionID: UUID?
 
     private var closingRemoteHost: String? {
-        store.terminalSessions.first { $0.id == closingSessionID && $0.remoteTmuxSessionName != nil }?.remoteHost
+        store.terminalSessions.first { $0.id == closingSessionID && $0.remoteTmuxSessionName != nil }?.host.sshDestination
     }
 
     var body: some View {

@@ -40,7 +40,7 @@ struct ContentView: View {
         .onAppear {
             if !hasStartedScan {
                 hasStartedScan = true
-                store.refreshIncludingRemoteHosts()
+                store.refreshAllHosts()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
@@ -104,8 +104,8 @@ struct ContentView: View {
         } message: {
             switch deletionRequest {
             case .conversation(let conversation):
-                if let remoteHost = conversation.remoteHost {
-                    Text("This session will be permanently deleted on \(remoteHost). Remote hosts have no Trash, so this cannot be undone.")
+                if let sshDestination = conversation.host.sshDestination {
+                    Text("This session will be permanently deleted on \(sshDestination). SSH hosts have no Trash, so this cannot be undone.")
                 } else {
                     Text(conversation.provider == .codex
                         ? "Codex will permanently delete this session using its native CLI. This cannot be undone."
@@ -116,10 +116,11 @@ struct ContentView: View {
                 let skippedSummary = deletionPlan.openTerminalCount + deletionPlan.unsupportedCount == 0
                     ? ""
                     : " \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped."
-                Text("Claude Code sessions move to the Trash; Codex sessions and sessions on remote hosts are permanently deleted.\(skippedSummary)")
+                Text("Claude Code sessions on this Mac move to the Trash; Codex sessions and sessions on SSH hosts are permanently deleted.\(skippedSummary)")
             case .project(let projectPath):
                 let deletionPlan = store.deletionPlan(for: projectPath)
-                Text("This affects all tools in \(RemoteProjectKey.copyablePath(ofKey: projectPath)), including sessions hidden by the current filter. \(RemoteProjectKey.location(ofKey: projectPath) == nil ? "Claude Code sessions move to the Trash; Codex sessions are permanently deleted." : "Remote hosts have no Trash, so every session is permanently deleted.") \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped.")
+                let location = ProjectLocation(key: projectPath)
+                Text("This affects all tools in \(location.copyablePath), including sessions hidden by the current filter. \(location.host == .thisMac ? "Claude Code sessions move to the Trash; Codex sessions are permanently deleted." : "SSH hosts have no Trash, so every session is permanently deleted.") \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped.")
             case nil:
                 EmptyView()
             }

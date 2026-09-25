@@ -29,7 +29,7 @@ struct RemoteSessionMirrorTests {
         let conversations = try discovery.discover(host: "devbox")
 
         #expect(Set(conversations.map(\.sessionID)) == [claudeID, codexID])
-        #expect(conversations.allSatisfy { $0.remoteHost == "devbox" })
+        #expect(conversations.allSatisfy { $0.host == .ssh("devbox") })
         #expect(conversations.first { $0.provider == .claude }?.suggestedTitle == "Draft intro")
         #expect(conversations.first { $0.provider == .codex }?.projectDirectoryKey == "ssh://devbox/home/me/api")
 

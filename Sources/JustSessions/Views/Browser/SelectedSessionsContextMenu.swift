@@ -21,7 +21,7 @@ struct SelectedSessionsContextMenu: View {
         .disabled(branchableCount == 0)
         Divider()
         Button("Delete \(sessionCountLabel(selectedConversations.count))…", systemImage: "trash", role: .destructive, action: onDelete)
-            .disabled(store.isLoading || store.isDeletingSessions)
+            .disabled(store.isScanningThisMac || store.isDeletingSessions)
         Button("Clear selection", systemImage: "xmark.circle", action: onClear)
     }
 

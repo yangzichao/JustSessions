@@ -24,11 +24,6 @@ struct SidebarProjectSection: View {
         store.terminalSessions.filter { $0.projectDirectoryKey == project.id }.count
     }
 
-    /// The host of a remote project, then the parent folder when another project has the same name.
-    private var secondaryLabel: String? {
-        let labels = [project.remoteLocation?.host, parentLabel].compactMap { $0 }
-        return labels.isEmpty ? nil : labels.joined(separator: " · ")
-    }
 
     private var deletionPlan: SessionDeletionPlan {
         store.deletionPlan(for: project.id)
@@ -87,7 +82,7 @@ struct SidebarProjectSection: View {
                         .rotationEffect(.degrees(isExpanded ? 90 : 0))
                         .animation(.easeOut(duration: 0.12), value: isExpanded)
                         .frame(width: 10)
-                    Image(systemName: project.remoteLocation == nil ? "folder" : "network")
+                    Image(systemName: "folder")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                         .frame(width: 16)
@@ -96,8 +91,8 @@ struct SidebarProjectSection: View {
                             .font(.system(size: 12, weight: .medium))
                             .lineLimit(1)
                             .truncationMode(.middle)
-                        if let secondaryLabel {
-                            Text(secondaryLabel)
+                        if let parentLabel {
+                            Text(parentLabel)
                                 .font(.system(size: 10))
                                 .foregroundStyle(.tertiary)
                                 .lineLimit(1)
@@ -113,12 +108,12 @@ struct SidebarProjectSection: View {
                 }
                 .padding(.leading, 10)
                 .padding(.trailing, 6)
-                .frame(height: secondaryLabel == nil ? 30 : 40)
+                .frame(height: parentLabel == nil ? 30 : 40)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity)
-            .help(RemoteProjectKey.copyablePath(ofKey: project.projectPath))
+            .help(project.location.copyablePath)
             .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(project.sessionCount) \(project.sessionCount == 1 ? "session" : "sessions"), \(openTerminalCount) open")
             .contextMenu {
                 Menu("New session", systemImage: "plus") {
@@ -129,12 +124,14 @@ struct SidebarProjectSection: View {
                     }
                 }
                 .disabled(!project.canStartNewSession)
-                Button("Open project in Finder", systemImage: "folder") {
-                    SessionLocationActions.openProjectFolder(project.projectPath)
+                if project.host == .thisMac {
+                    Button("Open project in Finder", systemImage: "folder") {
+                        SessionLocationActions.openProjectFolder(project.location.path)
+                    }
+                    .disabled(!project.location.folderExistsOnThisMac)
                 }
-                .disabled(!project.isProjectAvailable)
                 Button("Copy project path", systemImage: "doc.on.doc") {
-                    SessionLocationActions.copyProjectPath(RemoteProjectKey.copyablePath(ofKey: project.projectPath))
+                    SessionLocationActions.copyProjectPath(project.location.copyablePath)
                 }
                 Button("Rename project…", systemImage: "pencil", action: onRenameProject)
                 Button(project.isPinned ? "Unpin project" : "Pin project", systemImage: project.isPinned ? "pin.slash" : "pin") {
@@ -144,7 +141,7 @@ struct SidebarProjectSection: View {
                 Button("Delete all deletable sessions (\(deletionPlan.deletableConversations.count))…", systemImage: "trash", role: .destructive) {
                     onDeleteProjectSessions()
                 }
-                .disabled(!deletionPlan.hasDeletableConversations || store.isLoading || store.isDeletingSessions)
+                .disabled(!deletionPlan.hasDeletableConversations || store.isScanningThisMac || store.isDeletingSessions)
             }
 
             sessionCountOrNewSessionMenu

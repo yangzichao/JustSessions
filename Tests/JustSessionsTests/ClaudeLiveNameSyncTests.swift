@@ -63,8 +63,8 @@ struct ClaudeLiveNameSyncTests {
 
     private func makeStore(discovering conversations: [Conversation]) async throws -> ConversationStore {
         let store = ConversationStore(adapters: [StaticConversationAdapter(discoveredConversations: conversations)])
-        store.refresh()
-        for _ in 0..<100 where store.isLoading || store.conversations.isEmpty {
+        store.refreshThisMac()
+        for _ in 0..<100 where store.isScanningThisMac || store.conversations.isEmpty {
             try await Task.sleep(for: .milliseconds(10))
         }
         #expect(store.conversations.count == conversations.count)

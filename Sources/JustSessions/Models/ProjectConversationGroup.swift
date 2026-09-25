@@ -9,6 +9,8 @@ struct ProjectConversationGroup: Identifiable {
     let pendingNewSessions: [PendingNewSession]
 
     var id: String { projectPath }
+    var location: ProjectLocation { ProjectLocation(key: projectPath) }
+    var host: SessionHost { location.host }
     var folderName: String { ProjectDisplayNames.folderName(forProjectPath: projectPath) }
     var sessionCount: Int { conversations.count + pendingNewSessions.count }
     // Pinned sessions come first, so the newest one is not necessarily `conversations.first`.
@@ -19,22 +21,10 @@ struct ProjectConversationGroup: Identifiable {
         )
     }
 
-    /// The SSH host and path of a project on a remote host, or nil for a local project.
-    var remoteLocation: (host: String, projectPath: String)? {
-        RemoteProjectKey.location(ofKey: projectPath)
-    }
-
-    /// A remote folder is not checked; the SSH command reports it when it is gone.
-    var canStartNewSession: Bool { remoteLocation != nil || isProjectAvailable }
+    var canStartNewSession: Bool { location.canStartSessions }
 
     var newSessionProviders: [ConversationProvider] {
-        remoteLocation == nil ? ConversationProvider.allCases : ConversationProvider.allCases.filter(\.supportsRemoteHosts)
-    }
-
-    /// Whether the folder exists on this Mac; always false for a remote project.
-    var isProjectAvailable: Bool {
-        var isDirectory: ObjCBool = false
-        return FileManager.default.fileExists(atPath: projectPath, isDirectory: &isDirectory) && isDirectory.boolValue
+        ConversationProvider.allCases.filter { $0.runs(on: host) }
     }
 
     static func grouped(

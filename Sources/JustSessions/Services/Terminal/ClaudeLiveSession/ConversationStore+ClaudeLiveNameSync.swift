@@ -1,7 +1,7 @@
 import Foundation
 
 /// Keeps names chosen with `/rename` inside a running Claude Code tab in step with the tab title
-/// and the matching sidebar entry, without waiting for a full `refresh()`.
+/// and the matching sidebar entry, without waiting for a full `refreshThisMac()`.
 extension ConversationStore {
     func startClaudeLiveNameSync(interval: Duration = .seconds(1)) {
         Task { [weak self] in

@@ -23,7 +23,7 @@
 
 ---
 
-Claude Code, Codex, and Antigravity each keep their own session history in hidden folders, and `claude --resume` or `codex resume` only show one CLI and one project at a time. JustSessions scans all of them, groups sessions by project, shows a read-only preview of each conversation, and resumes the one you pick in its own CLI inside an embedded terminal. It also lists sessions from remote machines over SSH.
+Claude Code, Codex, and Antigravity each keep their own session history in hidden folders, and `claude --resume` or `codex resume` only show one CLI and one project at a time. JustSessions scans all of them, groups sessions by project, shows a read-only preview of each conversation, and resumes the one you pick in its own CLI inside an embedded terminal. Machines you reach over SSH are listed the same way as this Mac, each under its own heading.
 
 ## Download
 
@@ -36,7 +36,7 @@ Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of th
 ## Features
 
 **Find any session**
-- All Claude Code, Codex, and Antigravity CLI sessions in one sidebar, grouped by project folder and sorted by recent activity.
+- All Claude Code, Codex, and Antigravity CLI sessions in one sidebar, grouped by project folder and sorted by recent activity. With SSH hosts added, each machine's projects sit under its own heading.
 - Search projects by name or path, and sessions by title or session ID.
 - Filter to sessions from the past seven days, or to one CLI.
 - Pin projects and sessions to keep them at the top. Rename any session locally without touching the CLI's own title.
@@ -47,18 +47,19 @@ Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of th
 **Resume, branch, and start sessions**
 - Resume a session in its native CLI inside an embedded terminal: double-click it, use **Resume**, or right-click.
 - Branch (fork) a Claude Code or Codex conversation into a new session. This forks the conversation, not a Git branch.
-- Start a new session in any project folder with any supported CLI. It appears in the sidebar right away.
+- Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI. It appears in the sidebar right away.
 - Keep several terminal tabs open. Switch between a running CLI and the preview without stopping it.
 - Pick up names set with `/rename` in Claude Code within about a second.
 
-**Remote SSH hosts**
-- Add a host from `~/.ssh/config` or `user@hostname`, and its Claude Code and Codex sessions are listed next to your local ones.
-- Resume, branch, start, and delete remote sessions over SSH.
-- With tmux on the host, a remote session keeps running when the connection drops or the tab closes. Resume to reattach.
+**SSH hosts**
+- Click **Add SSH host…** at the end of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code and Codex sessions are listed under its own heading, below this Mac's.
+- Resume, branch, start, and delete sessions on the host over SSH, just like on this Mac.
+- Refresh updates every host at once. A host that can't be reached shows the error on its heading; the others still list.
+- With tmux on the host, a session there keeps running when the connection drops or the tab closes. Resume to reattach.
 
 **Clean up**
 - Delete sessions one at a time, in a multi-selection (⌘-click, ⇧-click), or per project, always after a confirmation.
-- Local Claude Code sessions go to the macOS Trash. Codex uses `codex delete --force`. Remote deletions are permanent.
+- Claude Code sessions on this Mac go to the macOS Trash. Codex uses `codex delete --force`. SSH hosts have no Trash, so deletions there are permanent.
 - Sessions with an open terminal tab can't be deleted.
 
 ## How it works
@@ -73,7 +74,7 @@ JustSessions reads session files that already exist on your Mac. It never upload
 
 The app launches each CLI directly in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it looks for CLIs in the inherited `PATH` plus `~/.local/bin`, `/opt/homebrew/bin`, and `/usr/local/bin`. No shell command runs during scanning.
 
-Remote hosts must accept `ssh <host>` without a password prompt and need `rsync`. Their session files are mirrored into a local cache and read by the same code as local sessions.
+SSH hosts must accept `ssh <host>` without a password prompt and need `rsync`. Their session files are mirrored into a local cache and read by the same code as this Mac's.
 
 ## FAQ
 
@@ -87,7 +88,7 @@ Find it in the sidebar and double-click it. The app runs the CLI's own resume co
 Yes. **Branch** creates a new session from an existing Claude Code or Codex conversation and opens it in a new tab.
 
 **Does it work with sessions on a remote server?**
-Yes, for Claude Code and Codex. Click **Remote** at the bottom of the sidebar and add the SSH host.
+Yes, for Claude Code and Codex. Click **Add SSH host…** at the end of the sidebar and enter the host. Its sessions appear under its own heading; hover the heading and click **+** to start a new session there.
 
 **Is it free?**
 Yes. JustSessions is open source under the MIT license.
@@ -114,17 +115,19 @@ Each release includes the notarized `JustSessions.dmg`, plus `appcast.xml` and t
 ### Source layout
 
 - `Models/`: shared conversation model.
-- `Models/Remote/`: saved SSH hosts and remote project keys.
+- `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
 - `Services/Adapters/`: provider discovery and native arguments. Separate adapters make adding another CLI straightforward.
+- `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
 - `Services/Launch/`: CLI executable resolution and process environment.
-- `Services/Remote/`: SSH mirroring, remote commands, new sessions, deletion, and tmux.
+- `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux.
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.
 - `Views/Browser/`: sidebar, terminal tab bar, and window layout.
-- `Views/Browser/Sidebar/`: sidebar header, filters, section headings, and session rows.
-- `Views/Remote/`: remote hosts sheet and tmux status.
+- `Views/Browser/Sidebar/`: sidebar header, filters, and session rows.
+- `Views/Browser/Sidebar/Hosts/`: host headings and the Add SSH host row.
+- `Views/Remote/`: Add SSH host sheet and tmux status.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 - `Views/Preview/`: conversation preview for the selected session.
 

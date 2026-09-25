@@ -1,6 +1,6 @@
 import Foundation
 
-/// SSH hosts whose sessions JustSessions lists. Each entry is what you would type after `ssh`:
+/// SSH hosts whose sessions JustSessions lists after this Mac's. Each entry is what you would type after `ssh`:
 /// a `Host` alias from `~/.ssh/config`, or `user@hostname`.
 struct RemoteHostList: Equatable {
     static let userDefaultsKey = "remoteHosts"

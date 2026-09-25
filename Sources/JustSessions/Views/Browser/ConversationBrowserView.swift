@@ -12,7 +12,8 @@ struct ConversationBrowserView: View {
     let onDeleteProjectSessions: (String) -> Void
 
     @State private var sessionSelection = SessionMultiSelection()
-    @State private var isNewSessionSheetPresented = false
+    /// The host the New Session sheet opened on; nil while it is closed.
+    @State private var newSessionSheetHost: SessionHost?
     @StateObject private var updateManager = SparkleUpdateManager()
 
     private var providerConversations: [Conversation] {
@@ -29,13 +30,14 @@ struct ConversationBrowserView: View {
         return SidebarProjectFiltering.projects(projects, matching: searchText) { store.title(for: $0) }
     }
 
-    private var availableProjects: [ProjectConversationGroup] {
+    /// Projects on every host that a new session can start in, most recent first.
+    private var startableProjects: [ProjectConversationGroup] {
         ProjectConversationGroup.grouped(
             store.conversations,
             displayNames: store.projectDisplayNames,
             pinnedItems: store.pinnedItems
         )
-            .filter(\.isProjectAvailable)
+            .filter(\.canStartNewSession)
     }
 
     private var focusedConversation: Conversation? {
@@ -58,7 +60,8 @@ struct ConversationBrowserView: View {
                 allSessionCount: providerConversations.count,
                 recentSessionCount: providerConversations.filter { SessionRecencyFilter.recent.includes($0) }.count,
                 onCheckForUpdates: { updateManager.checkForUpdates() },
-                onNewSession: { isNewSessionSheetPresented = true },
+                onNewSession: { newSessionSheetHost = defaultNewSessionHost },
+                onNewSessionOnHost: { newSessionSheetHost = $0 },
                 onSelectConversation: { conversation in
                     sessionSelection.selectOnly(conversation.id)
                     let openTerminal = store.terminalSessions.first(where: {
@@ -94,8 +97,9 @@ struct ConversationBrowserView: View {
                         TerminalWorkspaceView(
                             session: session,
                             projectDisplayName: store.projectDisplayName(forProjectPath: session.projectDirectoryKey),
+                            hostDisplayName: store.hasRemoteHosts ? session.host.displayName : nil,
                             isActive: isActive,
-                            onReconnect: session.remoteHost == nil ? nil : { store.reconnectRemoteTerminal(session.id) }
+                            onReconnect: session.host == .thisMac ? nil : { store.reconnectRemoteTerminal(session.id) }
                         )
                         .opacity(isActive ? 1 : 0)
                         .allowsHitTesting(isActive)
@@ -104,13 +108,15 @@ struct ConversationBrowserView: View {
                 }
             }
         }
-        .sheet(isPresented: $isNewSessionSheetPresented) {
+        .sheet(item: $newSessionSheetHost) { host in
             NewSessionSheet(
                 initialProvider: newSessionProvider,
-                initialProjectPath: newSessionProjectPath,
-                recentProjects: availableProjects
-            ) { provider, projectPath in
-                try store.launchNewSession(provider: provider, projectPath: projectPath)
+                initialHost: host,
+                initialProjectPath: newSessionProjectPath(on: host),
+                hosts: store.hosts,
+                recentProjects: startableProjects
+            ) { provider, host, folder in
+                try await store.launchNewSession(provider: provider, host: host, folder: folder)
             }
         }
     }
@@ -124,12 +130,18 @@ struct ConversationBrowserView: View {
         }
     }
 
-    /// New sessions start on this Mac, so a remote tab or session does not suggest its folder.
-    private var newSessionProjectPath: String {
-        if let selectedTerminal = store.selectedTerminal, selectedTerminal.remoteHost == nil {
+    /// The host of the selected tab, or else of the selected session, so a new session starts next to it.
+    private var defaultNewSessionHost: SessionHost {
+        let host = store.selectedTerminal?.host ?? focusedConversation?.host ?? .thisMac
+        return store.hosts.contains(host) ? host : .thisMac
+    }
+
+    /// The selected tab's or session's folder when it is on the host, or else the host's most recent project.
+    private func newSessionProjectPath(on host: SessionHost) -> String {
+        if let selectedTerminal = store.selectedTerminal, selectedTerminal.host == host {
             return selectedTerminal.projectPath
         }
-        if let focusedConversation, !focusedConversation.isRemote { return focusedConversation.projectPath }
-        return availableProjects.first?.projectPath ?? ""
+        if let focusedConversation, focusedConversation.host == host { return focusedConversation.projectPath }
+        return startableProjects.first { $0.host == host }?.location.path ?? ""
     }
 }

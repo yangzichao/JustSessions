@@ -4,22 +4,51 @@ import SwiftUI
 struct NewSessionSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedProvider: ConversationProvider
+    @State private var selectedHost: SessionHost
     @State private var projectPath: String
+    @State private var isStarting = false
     @State private var errorMessage: String?
 
+    let hosts: [SessionHost]
+    /// Projects on every host; the menu shows the selected host's.
     let recentProjects: [ProjectConversationGroup]
-    let onStart: (ConversationProvider, String) throws -> Void
+    let onStart: (ConversationProvider, SessionHost, String) async throws -> Void
 
     init(
         initialProvider: ConversationProvider,
+        initialHost: SessionHost,
         initialProjectPath: String,
+        hosts: [SessionHost],
         recentProjects: [ProjectConversationGroup],
-        onStart: @escaping (ConversationProvider, String) throws -> Void
+        onStart: @escaping (ConversationProvider, SessionHost, String) async throws -> Void
     ) {
-        _selectedProvider = State(initialValue: initialProvider)
+        _selectedProvider = State(initialValue: Self.provider(initialProvider, orFirstThatRunsOn: initialHost))
+        _selectedHost = State(initialValue: initialHost)
         _projectPath = State(initialValue: initialProjectPath)
+        self.hosts = hosts
         self.recentProjects = recentProjects
         self.onStart = onStart
+    }
+
+    private var trimmedProjectPath: String {
+        projectPath.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var recentProjectsOnSelectedHost: [ProjectConversationGroup] {
+        recentProjects.filter { $0.host == selectedHost }
+    }
+
+    /// Switching hosts keeps the tool when it runs there and suggests the host's most recent project.
+    private var hostSelection: Binding<SessionHost> {
+        Binding(
+            get: { selectedHost },
+            set: { newHost in
+                guard newHost != selectedHost else { return }
+                selectedHost = newHost
+                selectedProvider = Self.provider(selectedProvider, orFirstThatRunsOn: newHost)
+                projectPath = recentProjects.first { $0.host == newHost }?.location.path ?? ""
+            }
+        )
     }
 
     var body: some View {
@@ -31,50 +60,40 @@ struct NewSessionSheet: View {
                     .foregroundStyle(.secondary)
             }
 
+            // The host comes first: it decides which tools can run and which recent projects are offered.
+            if hosts.count > 1 {
+                Picker("Host", selection: hostSelection) {
+                    ForEach(hosts) { host in
+                        Label(host.displayName, systemImage: host.symbolName).tag(host)
+                    }
+                }
+                .pickerStyle(.menu)
+                .fixedSize()
+            }
+
             Picker("Tool", selection: $selectedProvider) {
-                ForEach(ConversationProvider.allCases) { provider in
+                ForEach(ConversationProvider.allCases.filter { $0.runs(on: selectedHost) }) { provider in
                     Text(provider.rawValue).tag(provider)
                 }
             }
             .pickerStyle(.segmented)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Project folder")
-                    .font(.subheadline.weight(.medium))
-                HStack(spacing: 8) {
-                    TextField("Choose or enter a folder", text: $projectPath)
-                        .textFieldStyle(.roundedBorder)
-                        .accessibilityLabel("Project folder")
-                    Button("Browse…", action: chooseProjectFolder)
-                }
-                if !recentProjects.isEmpty {
-                    Menu("Recent projects") {
-                        ForEach(Array(recentProjects.prefix(12))) { project in
-                            Button("\(project.displayName) — \(project.projectPath)") {
-                                projectPath = project.projectPath
-                            }
-                        }
-                    }
-                    .menuStyle(.borderlessButton)
-                    .fixedSize()
-                }
-            }
+            projectFolderSection
 
-            HStack {
+            HStack(spacing: 8) {
+                if isStarting && selectedHost != .thisMac {
+                    ProgressView().controlSize(.small)
+                    Text("Checking the folder on \(selectedHost.displayName)…")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
                 Spacer()
                 Button("Cancel") { dismiss() }
                     .keyboardShortcut(.cancelAction)
-                Button("Start session") {
-                    do {
-                        try onStart(selectedProvider, projectPath.trimmingCharacters(in: .whitespacesAndNewlines))
-                        dismiss()
-                    } catch {
-                        errorMessage = error.localizedDescription
-                    }
-                }
-                .buttonStyle(ProviderProminentButtonStyle(tint: selectedProvider.emphasisTintColor))
-                .keyboardShortcut(.defaultAction)
-                .disabled(projectPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                Button("Start session", action: start)
+                    .buttonStyle(ProviderProminentButtonStyle(tint: selectedProvider.emphasisTintColor))
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(trimmedProjectPath.isEmpty || isStarting)
             }
         }
         .padding(24)
@@ -86,6 +105,51 @@ struct NewSessionSheet: View {
             Button("OK") { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "Unknown error")
+        }
+    }
+
+    private var projectFolderSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(selectedHost == .thisMac ? "Project folder" : "Project folder on \(selectedHost.displayName)")
+                .font(.subheadline.weight(.medium))
+            HStack(spacing: 8) {
+                TextField(
+                    selectedHost == .thisMac ? "Choose or enter a folder" : "Path on the host, such as ~/code/app",
+                    text: $projectPath
+                )
+                .textFieldStyle(.roundedBorder)
+                .accessibilityLabel("Project folder")
+                if selectedHost == .thisMac {
+                    Button("Browse…", action: chooseProjectFolder)
+                }
+            }
+            if !recentProjectsOnSelectedHost.isEmpty {
+                Menu("Recent projects") {
+                    ForEach(Array(recentProjectsOnSelectedHost.prefix(12))) { project in
+                        Button("\(project.displayName) — \(project.location.path)") {
+                            projectPath = project.location.path
+                        }
+                    }
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+            }
+        }
+    }
+
+    private func start() {
+        let provider = selectedProvider
+        let host = selectedHost
+        let folder = trimmedProjectPath
+        isStarting = true
+        Task {
+            do {
+                try await onStart(provider, host, folder)
+                dismiss()
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+            isStarting = false
         }
     }
 
@@ -103,5 +167,9 @@ struct NewSessionSheet: View {
                 projectPath = selectedFolder.path
             }
         }
+    }
+
+    private static func provider(_ provider: ConversationProvider, orFirstThatRunsOn host: SessionHost) -> ConversationProvider {
+        provider.runs(on: host) ? provider : ConversationProvider.allCases.first { $0.runs(on: host) } ?? provider
     }
 }

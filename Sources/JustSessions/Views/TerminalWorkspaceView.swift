@@ -3,6 +3,8 @@ import SwiftUI
 struct TerminalWorkspaceView: View {
     @ObservedObject var session: TerminalSession
     let projectDisplayName: String
+    /// Named once SSH hosts are added, whichever host the tab runs on.
+    let hostDisplayName: String?
     let isActive: Bool
     /// Shown for a remote tab whose connection ended.
     let onReconnect: (() -> Void)?
@@ -12,7 +14,8 @@ struct TerminalWorkspaceView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(session.displayTitle).font(.headline).lineLimit(1)
-                    Text("\(projectDisplayName) · \(session.provider.rawValue) · \(actionName)")
+                    Text(([projectDisplayName, hostDisplayName].compactMap { $0 } + [session.provider.rawValue, actionName])
+                        .joined(separator: " · "))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

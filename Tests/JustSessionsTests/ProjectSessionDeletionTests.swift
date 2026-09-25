@@ -48,8 +48,8 @@ struct ProjectSessionDeletionTests {
             TestDeletionAdapter(provider: .antigravity, discoveredConversations: [selectedAntigravity]),
         ])
 
-        store.refresh()
-        try await waitUntil { !store.isLoading }
+        store.refreshThisMac()
+        try await waitUntil { !store.isScanningThisMac }
         let deletionPlan = store.deletionPlan(for: selectedProject.path)
         #expect(deletionPlan.deletableConversations.map(\.id).sorted() == [selectedClaude.id, selectedCodex.id].sorted())
         #expect(deletionPlan.unsupportedCount == 1)
@@ -96,8 +96,8 @@ struct ProjectSessionDeletionTests {
             TestDeletionAdapter(provider: .antigravity, discoveredConversations: [selectedAntigravity]),
         ])
 
-        store.refresh()
-        try await waitUntil { !store.isLoading }
+        store.refreshThisMac()
+        try await waitUntil { !store.isScanningThisMac }
         let selectedConversations = [selectedFirstClaude, selectedSecondCodex, selectedAntigravity]
         let deletionPlan = store.deletionPlan(for: selectedConversations)
         #expect(deletionPlan.deletableConversations.map(\.id).sorted() == [selectedFirstClaude.id, selectedSecondCodex.id].sorted())
