@@ -19,6 +19,9 @@ enum ConversationProviderFilter: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    /// The one tool this filter keeps, or nil when it keeps all of them.
+    var provider: ConversationProvider? { ConversationProvider(rawValue: rawValue) }
+
     func includes(_ provider: ConversationProvider) -> Bool {
         self == .all || rawValue == provider.rawValue
     }

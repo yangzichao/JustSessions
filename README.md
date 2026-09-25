@@ -7,12 +7,12 @@ A native macOS launcher for Claude Code, Codex, and Google Antigravity CLI. Star
 - Scans existing Claude Code, Codex, and local Antigravity CLI sessions, grouped by project folder and sorted by recent activity.
 - Browse projects and their sessions in a persistent sidebar. The sidebar remains visible beside the conversation preview and embedded terminals.
 - Drag the divider beside the sidebar to adjust its width while browsing sessions or using a terminal. The app remembers the chosen width.
-- Expand a project in the sidebar to see its sessions. Open terminal tabs appear in a dedicated sidebar section and mark their project and session; selecting one switches back to that terminal. Selecting a session without an open terminal shows its conversation on the right.
+- Expand a project in the sidebar to see its sessions. Open terminal tabs appear in a dedicated sidebar section and mark their project and session; selecting one switches back to that terminal. Selecting a session without an open terminal shows its conversation on the right. Each session row shows how long ago it was last active, or its terminal's status while one is open.
 - The conversation preview reads Claude Code and Codex session files directly. It shows your messages and the CLI's replies, with runs of tool calls collapsed into one expandable row; thinking and tool output are left out. Very long sessions show their newest 2,000 entries. Antigravity sessions have no preview yet.
-- Search in the sidebar filters projects by name or path, and sessions by title or session ID; projects with matches expand while searching. **Recent** limits the sidebar to sessions active in the past seven days, and **Tool** to one CLI.
+- Search in the sidebar filters projects by name or path, and sessions by title or session ID; projects with matches expand while searching. **Recent**, under the search field, limits the sidebar to sessions active in the past seven days, and the filter button beside it to one CLI.
 - Resume a conversation in an embedded terminal using each CLI's native interactive command: use **Resume** in the preview header, double-click the session in the sidebar, or use its right-click menu. Claude Code and Codex can also be branched from the preview header or the right-click menu. In Antigravity CLI, use `/fork` after resuming to branch a conversation.
 - Use **New session** from the sidebar to choose Claude Code, Codex, or Antigravity and a project folder, including one with no history. The CLI starts in that folder with no resume or fork arguments. The new session appears under its project right away, in italics until the CLI saves it. A Claude Code or Codex tab then switches to the saved session's row, which takes the first prompt as its title. This also works when the CLI is installed through a wrapper script that starts the real CLI as a child process. When the installed `claude` lists `--session-id` in its `--help`, which the app checks once per app launch, a new Claude Code session starts with an id chosen by the app so its tab and row are matched exactly.
-- Use **+** beside a project to start any supported CLI directly in that project's folder without choosing a path.
+- Hover over a project and use **+**, which replaces its session count, to start any supported CLI directly in that project's folder without choosing a path.
 - Keep multiple terminal tabs open in a persistent bar above the preview and terminal. **Preview** switches back to the conversation preview while the CLI keeps running; click its tab to return. Resume reopens an already running tab for that conversation. Closing a tab ends its process.
 - Drag across terminal output to select text, then press **⌘C** or use **Copy selection**. Terminal colors follow the macOS appearance. Mouse clicks always go to the CLI when it asks for them; hold Shift while dragging to select text in that case.
 - Rename a row locally. Aliases are saved in this app's UserDefaults and do not change the CLI's own session title.
@@ -64,4 +64,6 @@ To start a CLI from Finder, the app checks the inherited `PATH` plus `~/.local/b
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.
 - `Views/Browser/`: sidebar, terminal tab bar, and window layout.
+- `Views/Browser/Sidebar/`: sidebar header, filters, section headings, and session rows.
+- `Views/Branding/`: the app mark drawn in the sidebar header.
 - `Views/Preview/`: conversation preview for the selected session.

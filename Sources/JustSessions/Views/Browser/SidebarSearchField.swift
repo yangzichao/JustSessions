@@ -6,7 +6,7 @@ struct SidebarSearchField: View {
     let accessibilityLabel: String
 
     var body: some View {
-        HStack(spacing: 7) {
+        HStack(spacing: 6) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
             TextField(placeholder, text: $text)
@@ -22,10 +22,10 @@ struct SidebarSearchField: View {
             }
         }
         .font(.system(size: 12))
-        .padding(.horizontal, 10)
-        .padding(.vertical, 9)
-        .background(.background, in: RoundedRectangle(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.quaternary))
+        .padding(.horizontal, 9)
+        .frame(height: 28)
+        .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(Color.primary.opacity(0.1)))
         .padding(.horizontal, 12)
     }
 }

@@ -16,25 +16,27 @@ struct TerminalSidebarRow: View {
 
     var body: some View {
         Button(action: onSelect) {
-            HStack(spacing: 9) {
-                TerminalStatusIndicator(session: session)
-                    .frame(width: 15)
-                VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 8) {
+                Image(systemName: session.provider.symbolName)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(session.provider.tintColor)
+                    .frame(width: 14)
+                VStack(alignment: .leading, spacing: 1) {
                     Text(session.displayTitle)
+                        .font(.system(size: 12, weight: isSelected ? .medium : .regular))
                         .lineLimit(1)
                     Text("\(projectDisplayName) · \(actionName)")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.tertiary)
+                        .font(.system(size: 10.5))
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                Spacer(minLength: 0)
+                Spacer(minLength: 6)
+                TerminalStatusIndicator(session: session)
             }
-            .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
-            .foregroundStyle(isSelected ? .primary : .secondary)
             .padding(.horizontal, 10)
             .frame(height: 38)
             .contentShape(Rectangle())
-            .background(isSelected ? Color.accentColor.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 7))
+            .sidebarRowHighlight(isSelected: isSelected)
         }
         .buttonStyle(.plain)
         .help(session.hasExited ? "Terminal ended; open its tab to review" : "Switch to open terminal")

@@ -18,6 +18,8 @@ struct SidebarProjectSection: View {
     let onRenameProject: () -> Void
     let onDeleteProjectSessions: () -> Void
 
+    @State private var isHovered = false
+
     private var openTerminalCount: Int {
         store.terminalSessions.filter { $0.projectDirectoryKey == project.id }.count
     }
@@ -33,190 +35,138 @@ struct SidebarProjectSection: View {
     }
 
     var body: some View {
-        VStack(spacing: 2) {
-            HStack(spacing: 0) {
-                Button(action: onToggle) {
-                    HStack(spacing: 8) {
-                        Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                            .font(.system(size: 9, weight: .semibold))
-                            .foregroundStyle(.tertiary)
-                            .frame(width: 10)
-                        Image(systemName: project.remoteLocation == nil ? "folder" : "network")
-                            .font(.system(size: 12))
-                            .frame(width: 15)
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(project.displayName)
-                                .lineLimit(1)
-                                .truncationMode(.middle)
-                            if let secondaryLabel {
-                                Text(secondaryLabel)
-                                    .font(.system(size: 10))
-                                    .foregroundStyle(.tertiary)
-                                    .lineLimit(1)
-                            }
-                        }
-                        Spacer(minLength: 3)
-                        if project.isPinned { PinnedIndicator() }
-                        if openTerminalCount > 0 {
-                            Image(systemName: "circle.fill")
-                                .font(.system(size: 6))
-                                .foregroundStyle(Color.accentColor)
-                        }
-                        Text("\(project.sessionCount)")
-                            .foregroundStyle(.secondary)
-                    }
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.primary)
-                    .padding(.horizontal, 10)
-                    .frame(height: secondaryLabel == nil ? 32 : 42)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .frame(maxWidth: .infinity)
-                .help(RemoteProjectKey.copyablePath(ofKey: project.projectPath))
-                .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(project.sessionCount) \(project.sessionCount == 1 ? "session" : "sessions"), \(openTerminalCount) open")
-                .contextMenu {
-                    Menu("New session", systemImage: "plus") {
-                        ForEach(project.newSessionProviders) { provider in
-                            Button(provider.rawValue, systemImage: provider.symbolName) {
-                                onNewSession(provider)
-                            }
-                        }
-                    }
-                    .disabled(!project.canStartNewSession)
-                    Button("Open project in Finder", systemImage: "folder") {
-                        SessionLocationActions.openProjectFolder(project.projectPath)
-                    }
-                    .disabled(!project.isProjectAvailable)
-                    Button("Copy project path", systemImage: "doc.on.doc") {
-                        SessionLocationActions.copyProjectPath(RemoteProjectKey.copyablePath(ofKey: project.projectPath))
-                    }
-                    Button("Rename project…", systemImage: "pencil", action: onRenameProject)
-                    Button(project.isPinned ? "Unpin project" : "Pin project", systemImage: project.isPinned ? "pin.slash" : "pin") {
-                        store.setPinned(!project.isPinned, projectPath: project.projectPath)
-                    }
-                    Divider()
-                    Button("Delete all deletable sessions (\(deletionPlan.deletableConversations.count))…", systemImage: "trash", role: .destructive) {
-                        onDeleteProjectSessions()
-                    }
-                    .disabled(!deletionPlan.hasDeletableConversations || store.isLoading || store.isDeletingSessions)
-                }
-
-                ProjectNewSessionMenu(project: project, showsTitle: false, onStart: onNewSession)
-                    .menuStyle(.borderlessButton)
-                    .frame(width: 24)
-                    .padding(.trailing, 4)
-            }
+        VStack(spacing: 1) {
+            projectRow
 
             if isExpanded {
-                ForEach(project.pendingNewSessions) { pendingNewSession in
-                    if let terminal = store.terminalSessions.first(where: { $0.id == pendingNewSession.terminalID }) {
-                        PendingNewSessionRow(
-                            terminal: terminal,
-                            isSelected: store.selectedTerminalID == terminal.id,
-                            onSelect: { onSelectPendingNewSession(terminal.id) }
+                VStack(spacing: 1) {
+                    ForEach(project.pendingNewSessions) { pendingNewSession in
+                        if let terminal = store.terminalSessions.first(where: { $0.id == pendingNewSession.terminalID }) {
+                            PendingNewSessionRow(
+                                terminal: terminal,
+                                isSelected: store.selectedTerminalID == terminal.id,
+                                onSelect: { onSelectPendingNewSession(terminal.id) }
+                            )
+                        }
+                    }
+                    ForEach(project.conversations) { conversation in
+                        SidebarSessionRow(
+                            store: store,
+                            conversation: conversation,
+                            sessionSelection: sessionSelection,
+                            selectedConversations: selectedConversations,
+                            onClick: onClickConversation,
+                            onRename: onRenameConversation,
+                            onDelete: onDeleteConversation,
+                            onDeleteSelected: onDeleteSelectedConversations,
+                            onClearSelection: onClearSessionSelection
                         )
                     }
                 }
-                ForEach(project.conversations) { conversation in
-                    sessionRow(conversation)
-                }
+                .background(alignment: .leading) { indentGuide }
             }
         }
     }
 
-    private func sessionRow(_ conversation: Conversation) -> some View {
-        let openTerminal = store.terminalSessions.first {
-            $0.conversation?.id == conversation.id && $0.id == store.selectedTerminalID
-        } ?? store.terminalSessions.first {
-            $0.conversation?.id == conversation.id
-        }
-        let isHighlighted = sessionSelection.contains(conversation.id)
-            || (openTerminal != nil && openTerminal?.id == store.selectedTerminalID)
-        let isInMultipleSelection = sessionSelection.hasMultipleSelected && sessionSelection.contains(conversation.id)
-        let isPinned = store.pinnedItems.isPinned(conversationID: conversation.id)
-
-        return Button {
-            onClickConversation(conversation)
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: conversation.provider.symbolName)
-                    .font(.system(size: 11))
-                    .foregroundStyle(conversation.provider.tintColor)
-                    .frame(width: 14)
-                Text(store.title(for: conversation))
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                Spacer(minLength: 3)
-                if isPinned { PinnedIndicator() }
-                if let openTerminal {
-                    TerminalStatusIndicator(session: openTerminal)
-                } else if store.isRunningInRemoteTmux(conversation) {
-                    RemoteTmuxRunningIndicator(host: conversation.remoteHost ?? "")
-                }
-            }
-            .font(.system(size: 11, weight: isHighlighted ? .medium : .regular))
-            .foregroundStyle(isHighlighted ? .primary : .secondary)
-            .padding(.leading, 32)
-            .padding(.trailing, 10)
-            .frame(height: 28)
-            .contentShape(Rectangle())
-            .background(isHighlighted ? Color.accentColor.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 7))
-        }
-        .buttonStyle(.plain)
-        .help("\(store.title(for: conversation)) · \(conversation.provider.rawValue)")
-        .accessibilityLabel("\(store.title(for: conversation)), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(openTerminal == nil ? "" : ", open terminal")")
-        .contextMenu {
-            if isInMultipleSelection {
-                SelectedSessionsContextMenu(
-                    store: store,
-                    selectedConversations: selectedConversations,
-                    onDelete: onDeleteSelectedConversations,
-                    onClear: onClearSessionSelection
-                )
-            } else {
-                singleSessionMenu(conversation)
-            }
-        }
+    /// A hairline under the chevron that ties the sessions to their project.
+    private var indentGuide: some View {
+        Rectangle()
+            .fill(Color.primary.opacity(0.1))
+            .frame(width: 1)
+            .padding(.leading, 15)
+            .padding(.vertical, 3)
     }
 
-    @ViewBuilder
-    private func singleSessionMenu(_ conversation: Conversation) -> some View {
-        Button("Resume", systemImage: "play", action: {
-            store.launch(conversation, action: .resume)
-        })
-        .disabled(!store.canLaunch(conversation, action: .resume))
-        if conversation.provider.supportsBranchFromLauncher {
-            Button("Branch", systemImage: "arrow.triangle.branch", action: {
-                store.launch(conversation, action: .branch)
-            })
-            .disabled(!store.canLaunch(conversation, action: .branch))
-        }
-        if store.isRunningInRemoteTmux(conversation) {
-            Button("End on \(conversation.remoteHost ?? "host")", systemImage: "stop.circle") {
-                store.endRemoteTmuxSession(for: conversation)
+    private var projectRow: some View {
+        HStack(spacing: 0) {
+            Button(action: onToggle) {
+                HStack(spacing: 7) {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(.tertiary)
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                        .animation(.easeOut(duration: 0.12), value: isExpanded)
+                        .frame(width: 10)
+                    Image(systemName: project.remoteLocation == nil ? "folder" : "network")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 16)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(project.displayName)
+                            .font(.system(size: 12, weight: .medium))
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        if let secondaryLabel {
+                            Text(secondaryLabel)
+                                .font(.system(size: 10))
+                                .foregroundStyle(.tertiary)
+                                .lineLimit(1)
+                        }
+                    }
+                    Spacer(minLength: 4)
+                    if project.isPinned { PinnedIndicator() }
+                    if openTerminalCount > 0 {
+                        Image(systemName: "circle.fill")
+                            .font(.system(size: 6))
+                            .foregroundStyle(Color.green)
+                    }
+                }
+                .padding(.leading, 10)
+                .padding(.trailing, 6)
+                .frame(height: secondaryLabel == nil ? 30 : 40)
+                .contentShape(Rectangle())
             }
-        }
-        Divider()
-        Button("Rename", systemImage: "pencil") { onRenameConversation(conversation) }
-        let isPinned = store.pinnedItems.isPinned(conversationID: conversation.id)
-        Button(isPinned ? "Unpin session" : "Pin session", systemImage: isPinned ? "pin.slash" : "pin") {
-            store.setPinned(!isPinned, conversation: conversation)
-        }
-        Button("Copy session ID", systemImage: "doc.on.doc") {
-            SessionLocationActions.copySessionID(conversation)
-        }
-        if !conversation.isRemote {
-            Button("Reveal session file in Finder", systemImage: "doc.text.magnifyingglass") {
-                SessionLocationActions.revealSessionFile(conversation)
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity)
+            .help(RemoteProjectKey.copyablePath(ofKey: project.projectPath))
+            .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(project.sessionCount) \(project.sessionCount == 1 ? "session" : "sessions"), \(openTerminalCount) open")
+            .contextMenu {
+                Menu("New session", systemImage: "plus") {
+                    ForEach(project.newSessionProviders) { provider in
+                        Button(provider.rawValue, systemImage: provider.symbolName) {
+                            onNewSession(provider)
+                        }
+                    }
+                }
+                .disabled(!project.canStartNewSession)
+                Button("Open project in Finder", systemImage: "folder") {
+                    SessionLocationActions.openProjectFolder(project.projectPath)
+                }
+                .disabled(!project.isProjectAvailable)
+                Button("Copy project path", systemImage: "doc.on.doc") {
+                    SessionLocationActions.copyProjectPath(RemoteProjectKey.copyablePath(ofKey: project.projectPath))
+                }
+                Button("Rename project…", systemImage: "pencil", action: onRenameProject)
+                Button(project.isPinned ? "Unpin project" : "Pin project", systemImage: project.isPinned ? "pin.slash" : "pin") {
+                    store.setPinned(!project.isPinned, projectPath: project.projectPath)
+                }
+                Divider()
+                Button("Delete all deletable sessions (\(deletionPlan.deletableConversations.count))…", systemImage: "trash", role: .destructive) {
+                    onDeleteProjectSessions()
+                }
+                .disabled(!deletionPlan.hasDeletableConversations || store.isLoading || store.isDeletingSessions)
             }
+
+            sessionCountOrNewSessionMenu
+                .padding(.trailing, 8)
         }
-        if conversation.supportsDeletionFromLauncher {
-            Divider()
-            Button("Delete session…", systemImage: "trash", role: .destructive) {
-                onDeleteConversation(conversation)
-            }
-            .disabled(store.hasTerminal(for: conversation) || store.isLoading || store.isDeletingSessions)
+        .background(SidebarRowBackground(isSelected: false, isHovered: isHovered))
+        .onHover { isHovered = $0 }
+    }
+
+    /// The session count, which gives way to the + menu while the pointer is over the row.
+    private var sessionCountOrNewSessionMenu: some View {
+        ZStack(alignment: .trailing) {
+            Text(project.sessionCount.formatted())
+                .font(.system(size: 11).monospacedDigit())
+                .foregroundStyle(.secondary)
+                .opacity(isHovered ? 0 : 1)
+            ProjectNewSessionMenu(project: project, showsTitle: false, onStart: onNewSession)
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
+                .opacity(isHovered ? 1 : 0)
+                .allowsHitTesting(isHovered)
         }
     }
 }

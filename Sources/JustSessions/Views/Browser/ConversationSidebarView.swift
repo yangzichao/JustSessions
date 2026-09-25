@@ -52,34 +52,27 @@ struct ConversationSidebarView: View {
         let selectedConversations = selectedConversations
 
         VStack(alignment: .leading, spacing: 0) {
-            brand
+            SidebarHeader(store: store)
+            SidebarNewSessionButton(action: onNewSession)
             SidebarSearchField(
                 text: $searchText,
                 placeholder: "Search projects and sessions",
                 accessibilityLabel: "Search projects by name or path and sessions by title or ID"
             )
-            Button(action: onNewSession) {
-                Label("New session", systemImage: "plus")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .keyboardShortcut("n", modifiers: .command)
-            .padding(.horizontal, 12)
-            .padding(.top, 12)
-
-            VStack(spacing: 2) {
-                filterRow("All sessions", symbol: "square.stack", count: allSessionCount, filter: .all)
-                filterRow("Recent", symbol: "clock", count: recentSessionCount, filter: .recent)
-                toolFilterRow
-            }
-            .padding(.horizontal, 8)
-            .padding(.top, 16)
+            .padding(.top, 8)
+            SidebarFilterBar(
+                recencyFilter: $recencyFilter,
+                providerFilter: $providerFilter,
+                allSessionCount: allSessionCount,
+                recentSessionCount: recentSessionCount
+            )
+            .padding(.top, 8)
 
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 2) {
+                LazyVStack(alignment: .leading, spacing: 1) {
                     if !store.terminalSessions.isEmpty {
-                        sectionHeading("OPEN TERMINALS", count: store.terminalSessions.count)
-                            .padding(.top, 22)
+                        SidebarSectionHeading(title: "OPEN TERMINALS", count: store.terminalSessions.count)
+                            .padding(.top, 14)
                         ForEach(store.terminalSessions) { terminal in
                             TerminalSidebarRow(
                                 session: terminal,
@@ -91,8 +84,8 @@ struct ConversationSidebarView: View {
                         .padding(.horizontal, 8)
                     }
 
-                    sectionHeading("PROJECTS", count: projects.count)
-                        .padding(.top, store.terminalSessions.isEmpty ? 26 : 22)
+                    SidebarSectionHeading(title: "PROJECTS", count: projects.count)
+                        .padding(.top, 14)
 
                     if projects.isEmpty {
                         Text(emptyProjectsMessage)
@@ -130,7 +123,7 @@ struct ConversationSidebarView: View {
                     }
                     .padding(.horizontal, 8)
                 }
-                .padding(.bottom, 14)
+                .padding(.bottom, 12)
             }
 
             if sessionSelection.hasMultipleSelected {
@@ -144,19 +137,13 @@ struct ConversationSidebarView: View {
             }
 
             Divider()
-            HStack {
-                remoteHostsButton
-                Spacer()
-                Button(action: onCheckForUpdates) {
-                    Label("Update", systemImage: "arrow.down.circle")
-                }
-                .buttonStyle(.borderless)
-                .help("Check for updates")
-            }
-            .padding(.horizontal, 18)
-            .padding(.vertical, 14)
+            SidebarFooter(
+                store: store,
+                onManageRemoteHosts: { isRemoteHostsSheetPresented = true },
+                onCheckForUpdates: onCheckForUpdates
+            )
         }
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background(sidebarBackground)
         .sheet(isPresented: $isRemoteHostsSheetPresented) {
             RemoteHostsSheet(store: store)
         }
@@ -170,114 +157,16 @@ struct ConversationSidebarView: View {
         }
     }
 
+    /// A faint tint over the window background sets the sidebar apart from the preview and terminals.
+    private var sidebarBackground: some View {
+        Color(nsColor: .windowBackgroundColor)
+            .overlay(Color.primary.opacity(0.03))
+    }
+
     private var emptyProjectsMessage: String {
         if store.isLoading && store.conversations.isEmpty { return "Scanning sessions…" }
         if isSearching { return "No matching projects or sessions" }
         return recencyFilter == .recent ? "No sessions in the past seven days" : "No sessions"
-    }
-
-    private var remoteHostsButton: some View {
-        Button { isRemoteHostsSheetPresented = true } label: {
-            HStack(spacing: 5) {
-                Label("Remote", systemImage: "network")
-                if store.isSyncingRemoteHosts {
-                    ProgressView().controlSize(.mini)
-                } else if store.hasRemoteHostFailure {
-                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                }
-            }
-        }
-        .buttonStyle(.borderless)
-        .help(store.hasRemoteHostFailure ? "A remote host could not be reached" : "Manage remote hosts")
-    }
-
-    private var brand: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "square.stack.3d.up.fill")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 30, height: 30)
-                .background(Color.black, in: RoundedRectangle(cornerRadius: 8))
-            VStack(alignment: .leading, spacing: 1) {
-                Text("JustSessions").font(.system(size: 15, weight: .semibold))
-                Text("SESSION LIBRARY")
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .tracking(1.1)
-                    .foregroundStyle(.tertiary)
-            }
-            Spacer()
-            if store.isLoading {
-                ProgressView().controlSize(.small)
-            } else {
-                Button { store.refreshIncludingRemoteHosts() } label: {
-                    Image(systemName: "arrow.clockwise")
-                }
-                .buttonStyle(.borderless)
-                .disabled(store.isDeletingSessions)
-                .help("Refresh sessions")
-                .accessibilityLabel("Refresh sessions")
-            }
-        }
-        .padding(.horizontal, 18)
-        .padding(.top, 20)
-        .padding(.bottom, 18)
-    }
-
-    private func sectionHeading(_ title: String, count: Int) -> some View {
-        HStack {
-            Text(title).tracking(1)
-            Spacer()
-            Text("\(count)")
-        }
-        .font(.system(size: 10, weight: .semibold))
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 18)
-        .padding(.bottom, 8)
-    }
-
-    private func filterRow(
-        _ title: String,
-        symbol: String,
-        count: Int,
-        filter: SessionRecencyFilter
-    ) -> some View {
-        let isSelected = recencyFilter == filter
-        return Button { recencyFilter = filter } label: {
-            HStack(spacing: 10) {
-                Image(systemName: symbol).font(.system(size: 13)).frame(width: 17)
-                Text(title)
-                Spacer(minLength: 4)
-                Text("\(count)").font(.caption).foregroundStyle(.secondary)
-            }
-            .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
-            .foregroundStyle(isSelected ? .primary : .secondary)
-            .padding(.horizontal, 10)
-            .frame(height: 32)
-            .contentShape(Rectangle())
-            .background(isSelected ? Color.accentColor.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 7))
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-
-    private var toolFilterRow: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "line.3.horizontal.decrease").font(.system(size: 13)).frame(width: 17)
-            Text("Tool")
-            Spacer(minLength: 4)
-            Picker("Tool", selection: $providerFilter) {
-                ForEach(ConversationProviderFilter.allCases) { filter in
-                    Text(filter.rawValue).tag(filter)
-                }
-            }
-            .pickerStyle(.menu)
-            .labelsHidden()
-            .fixedSize()
-        }
-        .font(.system(size: 12))
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 10)
-        .frame(height: 32)
     }
 
     private func isExpanded(_ project: ProjectConversationGroup) -> Bool {
