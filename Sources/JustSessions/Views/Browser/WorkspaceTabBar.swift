@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
+    let onRenameConversation: (Conversation) -> Void
     @State private var closingSessionID: UUID?
 
     var body: some View {
@@ -21,6 +22,7 @@ struct WorkspaceTabBar: View {
                         session: session,
                         isSelected: store.selectedTerminalID == session.id,
                         onSelect: { store.selectTerminal(session.id) },
+                        onRename: onRenameConversation,
                         onClose: { closingSessionID = session.id }
                     )
                 }
@@ -47,6 +49,7 @@ private struct TerminalTab: View {
     @ObservedObject var session: TerminalSession
     let isSelected: Bool
     let onSelect: () -> Void
+    let onRename: (Conversation) -> Void
     let onClose: () -> Void
 
     var body: some View {
@@ -61,6 +64,13 @@ private struct TerminalTab: View {
             }
             .buttonStyle(WorkspaceTabButtonStyle(isSelected: isSelected))
             .help("Show \(session.displayTitle)")
+            .contextMenu {
+                Button("Rename", systemImage: "pencil") {
+                    if let conversation = session.conversation { onRename(conversation) }
+                }
+                .disabled(session.conversation == nil)
+                Button("End session…", systemImage: "xmark", role: .destructive, action: onClose)
+            }
 
             Button(action: onClose) {
                 Image(systemName: "xmark")

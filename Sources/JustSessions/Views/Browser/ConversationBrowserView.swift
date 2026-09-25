@@ -76,7 +76,7 @@ struct ConversationBrowserView: View {
             )
         } detail: {
             VStack(spacing: 0) {
-                WorkspaceTabBar(store: store)
+                WorkspaceTabBar(store: store, onRenameConversation: onRename)
                 Divider()
                 ZStack {
                     SessionPreviewPane(
