@@ -20,7 +20,7 @@ struct ClaudeTranscriptReader {
         let timestamp = ConversationMetadata.date(record["timestamp"])
 
         if record["isCompactSummary"] as? Bool == true {
-            builder.append(.note, text: "Earlier messages were compacted", timestamp: timestamp)
+            builder.appendCompactionNote(timestamp: timestamp)
         } else if recordType == "user" {
             builder.append(.userMessage, text: userText(from: message["content"]), timestamp: timestamp)
         } else if record["isApiErrorMessage"] as? Bool == true {

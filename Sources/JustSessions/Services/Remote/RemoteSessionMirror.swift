@@ -35,8 +35,7 @@ struct RemoteSessionMirror: Sendable {
 
     static var defaultCacheRoot: URL {
         let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        let bundleIdentifier = Bundle.main.bundleIdentifier ?? "dev.zichaoyang.justsessions"
-        return caches.appendingPathComponent(bundleIdentifier).appendingPathComponent("RemoteHosts")
+        return caches.appendingPathComponent(AppIdentity.currentBundleIdentifier).appendingPathComponent("RemoteHosts")
     }
 
     func mirrorDirectory(host: String, provider: ConversationProvider) -> URL {
@@ -75,7 +74,8 @@ struct RemoteSessionMirror: Sendable {
         case 23 where result.output.contains("No such file or directory"):
             // The tool was never used on this host.
             try? FileManager.default.removeItem(at: destination)
-        case 255:
+        case RemoteHostCommandRunner.connectionFailureExitStatus:
+            // rsync passes on the exit status of the `ssh` it runs.
             throw RemoteSessionMirrorError.sshFailed(host: host)
         case _ where result.output.contains("rsync: command not found") || result.output.contains("rsync: not found"):
             throw RemoteSessionMirrorError.rsyncMissingOnHost(host: host)
@@ -125,8 +125,11 @@ struct RemoteSessionMirror: Sendable {
         }
     }
 
+    /// One path component inside `cacheRoot`. A name of dots alone, or no name, would stand for `cacheRoot`
+    /// or its parent, so removing that host's mirror would remove every mirror, or more.
     static func directoryName(forHost host: String) -> String {
         let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: ".-_@"))
-        return String(host.unicodeScalars.map { allowed.contains($0) ? Character($0) : "_" })
+        let name = String(host.unicodeScalars.map { allowed.contains($0) ? Character($0) : "_" })
+        return name.allSatisfy { $0 == "." } ? "_" + name : name
     }
 }

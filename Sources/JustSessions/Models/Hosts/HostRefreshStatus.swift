@@ -6,9 +6,4 @@ enum HostRefreshStatus: Equatable {
     case refreshing
     case refreshed(Date)
     case failed(String)
-
-    var isFailure: Bool {
-        if case .failed = self { return true }
-        return false
-    }
 }

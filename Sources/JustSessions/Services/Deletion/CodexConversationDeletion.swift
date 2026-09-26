@@ -1,14 +1,18 @@
 import Foundation
 
+/// Deletes a Codex session through `codex delete`, which also drops it from Codex's own index.
 struct CodexConversationDeletion {
     let codexDirectory: URL
     let executableURL: URL?
     let fileManager: FileManager
+    /// How long `codex delete` may take before it is stopped and the deletion reported as failed.
+    let timeout: TimeInterval
 
-    init(codexDirectory: URL, executableURL: URL? = nil, fileManager: FileManager = .default) {
+    init(codexDirectory: URL, executableURL: URL? = nil, fileManager: FileManager = .default, timeout: TimeInterval = 60) {
         self.codexDirectory = codexDirectory
         self.executableURL = executableURL
         self.fileManager = fileManager
+        self.timeout = timeout
     }
 
     func delete(_ conversation: Conversation) throws {
@@ -33,24 +37,20 @@ struct CodexConversationDeletion {
         guard let executablePath = executableURL?.path ?? resolver.executablePath(named: "codex") else {
             throw NativeCLICommandError.missingExecutable("codex")
         }
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: executablePath)
-        process.arguments = ["delete", "--force", conversation.sessionID]
-        process.currentDirectoryURL = codexDirectory
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = resolver.pathEnvironmentValue
         environment["CODEX_HOME"] = codexDirectory.path
-        process.environment = environment
-        let output = Pipe()
-        process.standardOutput = output
-        process.standardError = output
-        try process.run()
-        let outputData = output.fileHandleForReading.readDataToEndOfFile()
-        process.waitUntilExit()
-        let details = String(data: outputData, encoding: .utf8)?
-            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        guard process.terminationStatus == 0 else {
-            throw ConversationDeletionError.codexFailed(details.isEmpty ? "Exit code \(process.terminationStatus)" : String(details.prefix(500)))
+        guard let result = BoundedProcessRunner.result(
+            ofExecutable: executablePath,
+            arguments: ["delete", "--force", conversation.sessionID],
+            environment: environment,
+            workingDirectory: codexDirectory,
+            includesStandardError: true,
+            timeout: timeout
+        ) else { throw ConversationDeletionError.codexDidNotFinish }
+        let details = result.output.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard result.exitStatus == 0 else {
+            throw ConversationDeletionError.codexFailed(details.isEmpty ? "Exit code \(result.exitStatus)" : String(details.prefix(500)))
         }
         guard !fileManager.fileExists(atPath: sourceFile.path) else {
             throw ConversationDeletionError.sourceStillPresent

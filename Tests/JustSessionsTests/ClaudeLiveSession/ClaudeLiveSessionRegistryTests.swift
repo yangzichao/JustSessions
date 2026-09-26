@@ -45,7 +45,7 @@ struct ClaudeLiveSessionRegistryTests {
     }
 
     @Test func looksUpTheRecordByProcessID() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let sessionsDirectory = root.appendingPathComponent("sessions")
         try FileManager.default.createDirectory(at: sessionsDirectory, withIntermediateDirectories: true)
@@ -60,7 +60,7 @@ struct ClaudeLiveSessionRegistryTests {
     }
 
     @Test func seesARenameWrittenAfterTheFirstRead() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let sessionsDirectory = root.appendingPathComponent("sessions")
         try FileManager.default.createDirectory(at: sessionsDirectory, withIntermediateDirectories: true)

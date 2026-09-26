@@ -76,10 +76,10 @@ private struct TmuxSandbox {
         let bin = root.appendingPathComponent("bin")
         try FileManager.default.createDirectory(at: project, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
-        try Self.writeExecutable("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
+        try writeExecutableScript("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
         let record = "{ pwd -P; printf '%s\\n' \"$@\"; } >> '\(launchLog.path)'"
-        try Self.writeExecutable("#!/bin/sh\n\(record)\nexec sleep 60\n", to: bin.appendingPathComponent("claude"))
-        try Self.writeExecutable("#!/bin/sh\n\(record)\n", to: bin.appendingPathComponent("claude-once"))
+        try writeExecutableScript("#!/bin/sh\n\(record)\nexec sleep 60\n", to: bin.appendingPathComponent("claude"))
+        try writeExecutableScript("#!/bin/sh\n\(record)\n", to: bin.appendingPathComponent("claude-once"))
         environment = [
             "HOME": root.path,
             "SHELL": bin.appendingPathComponent("login-shell").path,
@@ -130,10 +130,4 @@ private struct TmuxSandbox {
     func tearDown() {
         _ = run("tmux kill-server 2>/dev/null; true")
         try? FileManager.default.removeItem(at: root)
-    }
-
-    private static func writeExecutable(_ script: String, to file: URL) throws {
-        try script.write(to: file, atomically: true, encoding: .utf8)
-        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: file.path)
-    }
-}
+    }}

@@ -1,11 +1,13 @@
 import Combine
 import Foundation
 
+/// The listed sessions and open tabs. State changes here; the `ConversationStore+…` extensions build on the
+/// methods below to refresh hosts, launch CLIs, and link new sessions to their tabs.
 @MainActor
 final class ConversationStore: ObservableObject {
     @Published private(set) var conversations: [Conversation] = []
     @Published private(set) var errorMessage: String?
-    @Published private(set) var aliases: [String: String]
+    @Published private(set) var titleAliases: ConversationTitleAliases
     @Published private(set) var projectDisplayNames: ProjectDisplayNames
     @Published private(set) var pinnedItems: PinnedItems
     @Published private(set) var terminalSessions: [TerminalSession] = []
@@ -25,18 +27,21 @@ final class ConversationStore: ObservableObject {
 
     private let adapters: [any ConversationAdapter]
     let commandResolver: NativeCLICommandResolver
-    private let aliasesKey = "conversationAliases"
+    /// Where custom titles, project names, pins, and SSH hosts are kept.
+    let userDefaults: UserDefaults
 
     init(
         adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter(), AntigravityAdapter()],
-        commandResolver: NativeCLICommandResolver = NativeCLICommandResolver()
+        commandResolver: NativeCLICommandResolver = NativeCLICommandResolver(),
+        userDefaults: UserDefaults = .standard
     ) {
         self.adapters = adapters
         self.commandResolver = commandResolver
-        self.aliases = UserDefaults.standard.dictionary(forKey: aliasesKey) as? [String: String] ?? [:]
-        self.projectDisplayNames = ProjectDisplayNames.load(from: .standard)
-        self.pinnedItems = PinnedItems.load(from: .standard)
-        self.remoteHostList = RemoteHostList.load(from: .standard)
+        self.userDefaults = userDefaults
+        self.titleAliases = ConversationTitleAliases.load(from: userDefaults)
+        self.projectDisplayNames = ProjectDisplayNames.load(from: userDefaults)
+        self.pinnedItems = PinnedItems.load(from: userDefaults)
+        self.remoteHostList = RemoteHostList.load(from: userDefaults)
         LoginShellPathReader.warmUpInBackground()
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
         startClaudeLiveNameSync()
@@ -88,8 +93,14 @@ final class ConversationStore: ObservableObject {
         synchronizeTerminalTitles()
     }
 
+    func adapter(for provider: ConversationProvider) -> (any ConversationAdapter)? {
+        adapters.first { $0.provider == provider }
+    }
+
+    // MARK: - Titles, project names, and pins
+
     func title(for conversation: Conversation) -> String {
-        aliases[conversation.id] ?? conversation.suggestedTitle
+        titleAliases.title(for: conversation)
     }
 
     func applySuggestedTitle(_ title: String, toSessionID sessionID: String, provider: ConversationProvider) {
@@ -99,13 +110,8 @@ final class ConversationStore: ObservableObject {
     }
 
     func rename(_ conversation: Conversation, to proposedTitle: String) {
-        let title = proposedTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        if title.isEmpty || title == conversation.suggestedTitle {
-            aliases.removeValue(forKey: conversation.id)
-        } else {
-            aliases[conversation.id] = title
-        }
-        UserDefaults.standard.set(aliases, forKey: aliasesKey)
+        titleAliases.rename(conversation, to: proposedTitle)
+        titleAliases.save(to: userDefaults)
         synchronizeTerminalTitles()
     }
 
@@ -115,18 +121,20 @@ final class ConversationStore: ObservableObject {
 
     func renameProject(_ projectPath: String, to proposedName: String) {
         projectDisplayNames.rename(projectPath: projectPath, to: proposedName)
-        projectDisplayNames.save(to: .standard)
+        projectDisplayNames.save(to: userDefaults)
     }
 
     func setPinned(_ isPinned: Bool, projectPath: String) {
         pinnedItems.setPinned(isPinned, projectPath: projectPath)
-        pinnedItems.save(to: .standard)
+        pinnedItems.save(to: userDefaults)
     }
 
     func setPinned(_ isPinned: Bool, conversation: Conversation) {
         pinnedItems.setPinned(isPinned, conversationID: conversation.id)
-        pinnedItems.save(to: .standard)
+        pinnedItems.save(to: userDefaults)
     }
+
+    // MARK: - Deletion
 
     /// A tab in this window, or a CLI still running in tmux on the session's host.
     func hasTerminal(for conversation: Conversation) -> Bool {
@@ -160,26 +168,9 @@ final class ConversationStore: ObservableObject {
             errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
             return
         }
-        guard !isScanningThisMac, !isDeletingSessions,
-              let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { return }
+        guard !isScanningThisMac, !isDeletingSessions, adapter(for: conversation.provider) != nil else { return }
         deletingConversationID = conversation.id
-        Task.detached(priority: .userInitiated) {
-            do {
-                try Self.deleteFromDisk(conversation, adapter: adapter)
-                await MainActor.run {
-                    self.removeDeletedConversation(conversation)
-                    self.deletingConversationID = nil
-                }
-            } catch {
-                await MainActor.run {
-                    if !FileManager.default.fileExists(atPath: conversation.sourceFile.path) {
-                        self.removeDeletedConversation(conversation)
-                    }
-                    self.errorMessage = error.localizedDescription
-                    self.deletingConversationID = nil
-                }
-            }
-        }
+        deleteInBackground([conversation], failureMessage: ConversationDeletionFailure.messageAfterDeletingOneSession)
     }
 
     func deleteSessions(in projectPath: String) {
@@ -194,30 +185,41 @@ final class ConversationStore: ObservableObject {
         guard deletionPlan.hasDeletableConversations else { return }
 
         batchDeletionConversationIDs = Set(deletionPlan.deletableConversations.map(\.id))
+        deleteInBackground(
+            deletionPlan.deletableConversations,
+            failureMessage: ConversationDeletionFailure.messageAfterDeletingSeveralSessions
+        )
+    }
+
+    /// Deletes the conversations one at a time off the main actor, then shows `failureMessage` for any that failed.
+    /// A conversation whose file is gone leaves the list even when its deletion reported an error.
+    private func deleteInBackground(
+        _ deletableConversations: [Conversation],
+        failureMessage: @escaping @Sendable ([ConversationDeletionFailure]) -> String
+    ) {
         let adapters = self.adapters
         Task.detached(priority: .userInitiated) {
-            var failures: [String] = []
-            for conversation in deletionPlan.deletableConversations {
+            var failures: [ConversationDeletionFailure] = []
+            for conversation in deletableConversations {
                 guard let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { continue }
                 await MainActor.run { self.deletingConversationID = conversation.id }
                 do {
                     try Self.deleteFromDisk(conversation, adapter: adapter)
                     await MainActor.run { self.removeDeletedConversation(conversation) }
                 } catch {
+                    failures.append(ConversationDeletionFailure(conversation: conversation, reason: error.localizedDescription))
                     await MainActor.run {
                         if !FileManager.default.fileExists(atPath: conversation.sourceFile.path) {
                             self.removeDeletedConversation(conversation)
                         }
                     }
-                    failures.append("\(conversation.provider.rawValue) · \(conversation.suggestedTitle): \(error.localizedDescription)")
                 }
             }
+            let finalFailures = failures
             await MainActor.run {
                 self.deletingConversationID = nil
                 self.batchDeletionConversationIDs = []
-                if !failures.isEmpty {
-                    self.errorMessage = "Some sessions could not be deleted:\n" + failures.joined(separator: "\n")
-                }
+                if !finalFailures.isEmpty { self.errorMessage = failureMessage(finalFailures) }
             }
         }
     }
@@ -232,137 +234,14 @@ final class ConversationStore: ObservableObject {
 
     private func removeDeletedConversation(_ conversation: Conversation) {
         conversations.removeAll { $0.id == conversation.id }
-        aliases.removeValue(forKey: conversation.id)
-        UserDefaults.standard.set(aliases, forKey: aliasesKey)
+        titleAliases.removeTitle(forConversationID: conversation.id)
+        titleAliases.save(to: userDefaults)
         if pinnedItems.isPinned(conversationID: conversation.id) {
             setPinned(false, conversation: conversation)
         }
     }
 
-    func canLaunch(_ conversation: Conversation, action: ConversationAction) -> Bool {
-        conversation.isProjectAvailable && !isDeletionPending(for: conversation)
-            && (action != .branch || conversation.provider.supportsBranchFromLauncher)
-    }
-
-    /// Opens one terminal tab per launchable conversation, in list order; the last one ends up selected.
-    func launch(_ conversations: [Conversation], action: ConversationAction) {
-        for conversation in conversations where canLaunch(conversation, action: action) {
-            launch(conversation, action: action)
-        }
-    }
-
-    func launch(_ conversation: Conversation, action: ConversationAction) {
-        guard !isDeletionPending(for: conversation) else { return }
-        guard action != .branch || conversation.provider.supportsBranchFromLauncher else { return }
-        if action == .resume,
-           let runningSession = terminalSessions.first(where: {
-               $0.conversation?.id == conversation.id && !$0.hasExited
-           }) {
-            selectedTerminalID = runningSession.id
-            return
-        }
-        guard let adapter = adapter(for: conversation.provider) else { return }
-        do {
-            let (command, tmuxSessionName) = try launchCommand(for: conversation, action: action, adapter: adapter)
-            // A branch runs a fork with a session id of its own, so its tab waits for that session like a
-            // new session's tab does; see new session discovery.
-            let isBranch = action == .branch
-            let session = TerminalSession(
-                conversation: isBranch ? nil : conversation,
-                provider: conversation.provider,
-                projectPath: conversation.projectPath,
-                action: action,
-                displayTitle: title(for: conversation),
-                command: command,
-                branchedFromSessionID: isBranch ? conversation.sessionID : nil,
-                host: conversation.host,
-                sessionIDsKnownAtLaunch: isBranch ? sessionIDsListed(on: conversation.host) : [],
-                tmuxSessionName: tmuxSessionName
-            )
-            // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
-            session.onProcessFinished = { [weak self] in self?.refresh(conversation.host) }
-            terminalSessions.append(session)
-            selectedTerminalID = session.id
-        }
-        catch { errorMessage = error.localizedDescription }
-    }
-
-    /// On this Mac, the CLI itself, in tmux when it is installed; on an SSH host, `ssh` into the tmux session the
-    /// CLI runs in. Also returns the name of the tmux session, if any.
-    private func launchCommand(
-        for conversation: Conversation,
-        action: ConversationAction,
-        adapter: any ConversationAdapter
-    ) throws -> (command: NativeCLICommand, tmuxSessionName: String?) {
-        let tmuxSessionName = tmuxSessionName(forLaunching: conversation, action: action)
-        switch conversation.host {
-        case .thisMac:
-            let command = try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
-            return thisMacTabCommand(running: command, tmuxSessionName: tmuxSessionName)
-        case .ssh(let destination):
-            let command = RemoteCLICommandBuilder().command(
-                host: destination,
-                provider: conversation.provider,
-                projectPath: conversation.projectPath,
-                arguments: adapter.arguments(for: conversation, action: action),
-                tmuxSessionName: tmuxSessionName
-            )
-            return (command, tmuxSessionName)
-        }
-    }
-
-    /// Opens a tab running a new session of the tool in the folder, on the folder's host.
-    func launchNewSession(provider: ConversationProvider, in location: ProjectLocation) throws {
-        switch location.host {
-        case .thisMac:
-            try launchNewSessionOnThisMac(provider: provider, projectPath: location.path)
-        case .ssh(let destination):
-            launchNewRemoteSession(provider: provider, host: destination, projectPath: location.path)
-        }
-    }
-
-    /// From a project's + menu; `projectPath` is the project's key.
-    func launchNewSessionFromProject(provider: ConversationProvider, projectPath: String) {
-        do {
-            try launchNewSession(provider: provider, in: ProjectLocation(key: projectPath))
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
-    private func launchNewSessionOnThisMac(provider: ConversationProvider, projectPath: String) throws {
-        let expandedPath = (projectPath as NSString).expandingTildeInPath
-        let standardizedPath = URL(fileURLWithPath: expandedPath).standardizedFileURL.path
-        let command = try commandResolver.resolveNewSession(provider: provider, projectPath: standardizedPath)
-        // Before tmux wraps the command: the flag check looks at the CLI's own executable.
-        let preassignment = provider == .claude
-            ? ClaudeSessionIDFlagSupport.shared.preassigningSessionID(to: command)
-            : nil
-        // A session whose id is known up front gets its own tmux name right away.
-        let tabCommand = thisMacTabCommand(
-            running: preassignment?.command ?? command,
-            tmuxSessionName: preassignment.map { TmuxSessionName.forSession(provider: provider, sessionID: $0.sessionID) }
-                ?? TmuxSessionName.unique(for: provider)
-        )
-        let session = TerminalSession(
-            conversation: nil,
-            provider: provider,
-            projectPath: standardizedPath,
-            action: .new,
-            displayTitle: "New \(provider.rawValue) session",
-            command: tabCommand.command,
-            preassignedSessionID: preassignment?.sessionID,
-            tmuxSessionName: tabCommand.tmuxSessionName
-        )
-        // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
-        session.onProcessFinished = { [weak self] in self?.refreshThisMac() }
-        terminalSessions.append(session)
-        selectedTerminalID = session.id
-    }
-
-    func adapter(for provider: ConversationProvider) -> (any ConversationAdapter)? {
-        adapters.first { $0.provider == provider }
-    }
+    // MARK: - Tabs
 
     /// Swaps a tab for another in the same place, closing the old one; keeps it selected if it was.
     func replaceTerminal(at index: Int, with session: TerminalSession) {
@@ -402,6 +281,12 @@ final class ConversationStore: ObservableObject {
         for session in terminalSessions { session.close() }
         terminalSessions = []
         selectedTerminalID = nil
+    }
+
+    // MARK: - Errors
+
+    func showError(_ message: String) {
+        errorMessage = message
     }
 
     func dismissError() {

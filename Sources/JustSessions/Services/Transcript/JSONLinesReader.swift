@@ -13,7 +13,7 @@ enum JSONLinesReader {
             buffer.append(chunk)
             var lineStart = buffer.startIndex
             var searchStart = buffer.startIndex + bytesKnownWithoutNewline
-            while let newline = buffer[searchStart...].firstIndex(of: 10) {
+            while let newline = buffer[searchStart...].firstIndex(of: UInt8(ascii: "\n")) {
                 if newline > lineStart { try body(buffer[lineStart..<newline]) }
                 lineStart = newline + 1
                 searchStart = lineStart

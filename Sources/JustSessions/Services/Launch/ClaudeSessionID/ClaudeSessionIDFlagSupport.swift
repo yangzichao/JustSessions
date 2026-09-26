@@ -48,10 +48,10 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
             timeout: helpTimeout
         )
         let answer = helpText.map(Self.helpTextListsFlag)
-        lock.lock()
-        executablePathsBeingChecked.remove(command.executablePath)
-        if let answer { answersByExecutablePath[command.executablePath] = answer }
-        lock.unlock()
+        lock.withLock {
+            executablePathsBeingChecked.remove(command.executablePath)
+            if let answer { answersByExecutablePath[command.executablePath] = answer }
+        }
         return answer
     }
 
@@ -62,10 +62,7 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
     }
 
     private func isKnownToAcceptFlag(_ command: NativeCLICommand) -> Bool {
-        lock.lock()
-        let answer = answersByExecutablePath[command.executablePath]
-        lock.unlock()
-        if let answer { return answer }
+        if let answer = lock.withLock({ answersByExecutablePath[command.executablePath] }) { return answer }
         if beginCheckIfUnanswered(command) {
             Task.detached(priority: .utility) { [self] in check(command) }
         }
@@ -74,9 +71,9 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
 
     /// Marks the executable as being checked; false when it already has an answer or a running check.
     private func beginCheckIfUnanswered(_ command: NativeCLICommand) -> Bool {
-        lock.lock()
-        defer { lock.unlock() }
-        guard answersByExecutablePath[command.executablePath] == nil else { return false }
-        return executablePathsBeingChecked.insert(command.executablePath).inserted
+        lock.withLock {
+            guard answersByExecutablePath[command.executablePath] == nil else { return false }
+            return executablePathsBeingChecked.insert(command.executablePath).inserted
+        }
     }
 }

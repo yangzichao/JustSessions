@@ -4,8 +4,7 @@ import Testing
 
 struct ConversationLaunchEligibilityTests {
     @Test @MainActor func multiSelectionLaunchSkipsMissingFoldersAndUnsupportedBranches() throws {
-        let existingProject = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: existingProject, withIntermediateDirectories: true)
+        let existingProject = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: existingProject) }
         let missingProject = existingProject.appendingPathComponent("missing")
 

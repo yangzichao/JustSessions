@@ -10,16 +10,15 @@ struct CLILookupTests {
     }
 
     @Test func readsPathFromLoginShell() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         // Stands in for zsh: sets PATH the way an rc file would, then runs the `-c` command ($4).
-        let fakeShell = try makeExecutable(at: root.appendingPathComponent("fake-shell"), script: """
+        let fakeShell = try writeExecutableScript("""
         #!/bin/sh
         PATH="/from/rc/file:/usr/bin"
         export PATH
         eval "$4"
-        """)
+        """, to: root.appendingPathComponent("fake-shell"))
 
         let directories = LoginShellPathReader.readPathDirectories(shellPath: fakeShell.path, timeout: 5)
 
@@ -27,14 +26,13 @@ struct CLILookupTests {
     }
 
     @Test func hungLoginShellTimesOutWithNoDirectories() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        let hungShell = try makeExecutable(at: root.appendingPathComponent("hung-shell"), script: """
+        let hungShell = try writeExecutableScript("""
         #!/bin/sh
         trap '' TERM
         sleep 30
-        """)
+        """, to: root.appendingPathComponent("hung-shell"))
 
         let startedAt = Date()
         let directories = LoginShellPathReader.readPathDirectories(shellPath: hungShell.path, timeout: 0.5)
@@ -44,7 +42,7 @@ struct CLILookupTests {
     }
 
     @Test func standardDirectoriesPutInheritedThenLoginShellThenFallbacks() throws {
-        let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }
         for version in ["v9.11.2", "v22.3.0", "v18.20.1"] {
             try FileManager.default.createDirectory(
@@ -69,13 +67,13 @@ struct CLILookupTests {
     }
 
     @Test func findsCLIThatOnlyTheLoginShellKnowsAbout() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let nvmBinDirectory = root.appendingPathComponent("nvm/bin")
         let projectDirectory = root.appendingPathComponent("project")
         try FileManager.default.createDirectory(at: nvmBinDirectory, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: projectDirectory, withIntermediateDirectories: true)
-        let claude = try makeExecutable(at: nvmBinDirectory.appendingPathComponent("claude"), script: "#!/bin/sh\nexit 0\n")
+        let claude = try writeExecutableScript("#!/bin/sh\nexit 0\n", to: nvmBinDirectory.appendingPathComponent("claude"))
         let searchDirectories = CLISearchDirectories.standard(
             inheritedEnvironment: ["PATH": "/usr/bin:/bin:/usr/sbin:/sbin"],
             loginShellDirectories: [nvmBinDirectory.path],
@@ -93,11 +91,11 @@ struct CLILookupTests {
     }
 
     @Test func findsToolboxCLIEvenWhenLoginShellPathIsUnavailable() throws {
-        let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }
         let toolboxBinDirectory = home.appendingPathComponent(".toolbox/bin")
         try FileManager.default.createDirectory(at: toolboxBinDirectory, withIntermediateDirectories: true)
-        let claude = try makeExecutable(at: toolboxBinDirectory.appendingPathComponent("claude"), script: "#!/bin/sh\nexit 0\n")
+        let claude = try writeExecutableScript("#!/bin/sh\nexit 0\n", to: toolboxBinDirectory.appendingPathComponent("claude"))
         let searchDirectories = CLISearchDirectories.standard(
             inheritedEnvironment: ["PATH": "/usr/bin:/bin:/usr/sbin:/sbin"],
             loginShellDirectories: [],
@@ -107,11 +105,5 @@ struct CLILookupTests {
         let resolver = NativeCLICommandResolver(searchDirectories: searchDirectories)
 
         #expect(resolver.executablePath(named: "claude") == claude.path)
-    }
-
-    private func makeExecutable(at url: URL, script: String) throws -> URL {
-        try script.write(to: url, atomically: true, encoding: .utf8)
-        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: url.path)
-        return url
     }
 }

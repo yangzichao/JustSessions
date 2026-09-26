@@ -6,7 +6,7 @@ struct ClaudeSessionFileLocatorTests {
     private static let sessionID = "70b71200-8814-4822-a2e5-24abf31f7cbd"
 
     @Test func findsTheTranscriptInAnyProjectDirectory() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let otherProject = root.appendingPathComponent("projects/-Users-example-other")
         let project = root.appendingPathComponent("projects/-Users-example-project")

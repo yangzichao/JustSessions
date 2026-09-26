@@ -22,15 +22,14 @@ struct TerminalColorEnvironmentTests {
     }
 
     @Test func spawnedCLIDoesNotInheritNoColorAndStillGetsTruecolorTerm() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let binaryDirectory = root.appendingPathComponent("bin")
         let projectDirectory = root.appendingPathComponent("project")
         try FileManager.default.createDirectory(at: binaryDirectory, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: projectDirectory, withIntermediateDirectories: true)
         let executable = binaryDirectory.appendingPathComponent("claude")
-        try "#!/bin/sh\nexit 0\n".write(to: executable, atomically: true, encoding: .utf8)
-        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: executable.path)
+        try writeExecutableScript("#!/bin/sh\nexit 0\n", to: executable)
         let resolver = NativeCLICommandResolver(
             searchDirectories: [binaryDirectory.path],
             inheritedEnvironment: ["NO_COLOR": "1", "CLICOLOR": "0", "HOME": root.path]

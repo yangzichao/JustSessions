@@ -10,6 +10,7 @@ enum BoundedProcessRunner {
         ofExecutable executablePath: String,
         arguments: [String],
         environment: [String: String]? = nil,
+        workingDirectory: URL? = nil,
         includesStandardError: Bool = false,
         timeout: TimeInterval
     ) -> String? {
@@ -17,6 +18,7 @@ enum BoundedProcessRunner {
             ofExecutable: executablePath,
             arguments: arguments,
             environment: environment,
+            workingDirectory: workingDirectory,
             includesStandardError: includesStandardError,
             timeout: timeout
         )?.output
@@ -27,6 +29,7 @@ enum BoundedProcessRunner {
         ofExecutable executablePath: String,
         arguments: [String],
         environment: [String: String]? = nil,
+        workingDirectory: URL? = nil,
         includesStandardError: Bool = false,
         timeout: TimeInterval
     ) -> (exitStatus: Int32, output: String)? {
@@ -43,6 +46,7 @@ enum BoundedProcessRunner {
         process.executableURL = URL(fileURLWithPath: executablePath)
         process.arguments = arguments
         if let environment { process.environment = environment }
+        if let workingDirectory { process.currentDirectoryURL = workingDirectory }
         process.standardInput = FileHandle.nullDevice
         process.standardOutput = outputHandle
         process.standardError = includesStandardError ? outputHandle : FileHandle.nullDevice

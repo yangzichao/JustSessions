@@ -78,21 +78,20 @@ struct ContentView: View {
         )) {
             switch deletionRequest {
             case .conversation(let conversation):
-                Button("Delete session", role: .destructive) {
+                Button(SessionDeletionConfirmationText.oneSessionButtonTitle, role: .destructive) {
                     store.delete(conversation)
                     deletionRequest = nil
                 }
             case .conversations(let conversations):
                 let deletionPlan = store.deletionPlan(for: conversations)
-                let deletableCount = deletionPlan.deletableConversations.count
-                Button("Delete \(deletableCount) \(deletableCount == 1 ? "session" : "sessions")", role: .destructive) {
+                Button(SessionDeletionConfirmationText.buttonTitle(for: deletionPlan), role: .destructive) {
                     store.deleteConversations(conversations)
                     deletionRequest = nil
                 }
                 .disabled(!deletionPlan.hasDeletableConversations)
             case .project(let projectPath):
                 let deletionPlan = store.deletionPlan(for: projectPath)
-                Button("Delete \(deletionPlan.deletableConversations.count) sessions", role: .destructive) {
+                Button(SessionDeletionConfirmationText.buttonTitle(for: deletionPlan), role: .destructive) {
                     store.deleteSessions(in: projectPath)
                     deletionRequest = nil
                 }
@@ -104,23 +103,14 @@ struct ContentView: View {
         } message: {
             switch deletionRequest {
             case .conversation(let conversation):
-                if let sshDestination = conversation.host.sshDestination {
-                    Text("This session will be permanently deleted on \(sshDestination). SSH hosts have no Trash, so this cannot be undone.")
-                } else {
-                    Text(conversation.provider == .codex
-                        ? "Codex will permanently delete this session using its native CLI. This cannot be undone."
-                        : "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.")
-                }
+                Text(SessionDeletionConfirmationText.message(forDeleting: conversation))
             case .conversations(let conversations):
-                let deletionPlan = store.deletionPlan(for: conversations)
-                let skippedSummary = deletionPlan.openTerminalCount + deletionPlan.unsupportedCount == 0
-                    ? ""
-                    : " \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped."
-                Text("Claude Code sessions on this Mac move to the Trash; Codex sessions and sessions on SSH hosts are permanently deleted.\(skippedSummary)")
+                Text(SessionDeletionConfirmationText.message(forDeletingSelectionWith: store.deletionPlan(for: conversations)))
             case .project(let projectPath):
-                let deletionPlan = store.deletionPlan(for: projectPath)
-                let location = ProjectLocation(key: projectPath)
-                Text("This affects all tools in \(location.copyablePath), including sessions hidden by the current filter. \(location.host == .thisMac ? "Claude Code sessions move to the Trash; Codex sessions are permanently deleted." : "SSH hosts have no Trash, so every session is permanently deleted.") \(deletionPlan.openTerminalCount) with open terminals and \(deletionPlan.unsupportedCount) Antigravity sessions will be skipped.")
+                Text(SessionDeletionConfirmationText.message(
+                    forDeletingProjectAt: ProjectLocation(key: projectPath),
+                    plan: store.deletionPlan(for: projectPath)
+                ))
             case nil:
                 EmptyView()
             }

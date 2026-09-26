@@ -17,12 +17,7 @@ struct RemoteCLICommandBuilder {
         arguments: [String],
         tmuxSessionName: String? = nil
     ) -> NativeCLICommand {
-        var environment = TerminalColorEnvironment.removingColorDisablingVariables(from: inheritedEnvironment)
-        environment["TERM"] = "xterm-256color"
-        environment["COLORTERM"] = "truecolor"
-        if environment["LANG"] == nil { environment["LANG"] = "en_US.UTF-8" }
-
-        return NativeCLICommand(
+        NativeCLICommand(
             executablePath: "/usr/bin/ssh",
             arguments: [
                 "-t",
@@ -37,7 +32,9 @@ struct RemoteCLICommandBuilder {
                 ),
             ],
             workingDirectory: NSHomeDirectory(),
-            environment: environment.map { "\($0.key)=\($0.value)" }.sorted()
+            environment: NativeCLICommand.environmentEntries(
+                TerminalColorEnvironment.embeddedTerminalEnvironment(from: inheritedEnvironment)
+            )
         )
     }
 

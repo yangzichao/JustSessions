@@ -29,6 +29,11 @@ struct NativeCLICommand {
         )
     }
 
+    /// `variables` as the sorted `NAME=value` entries `environment` holds.
+    static func environmentEntries(_ variables: [String: String]) -> [String] {
+        variables.map { "\($0.key)=\($0.value)" }.sorted()
+    }
+
     /// `environment` as a dictionary, for running the same executable outside a terminal.
     var environmentVariables: [String: String] {
         environment.reduce(into: [String: String]()) { variables, entry in
@@ -97,17 +102,14 @@ struct NativeCLICommandResolver {
             throw NativeCLICommandError.missingExecutable(provider.executableName)
         }
 
-        var environment = TerminalColorEnvironment.removingColorDisablingVariables(from: inheritedEnvironment)
+        var environment = TerminalColorEnvironment.embeddedTerminalEnvironment(from: inheritedEnvironment)
         environment["PATH"] = pathEnvironmentValue
-        environment["TERM"] = "xterm-256color"
-        environment["COLORTERM"] = "truecolor"
-        if environment["LANG"] == nil { environment["LANG"] = "en_US.UTF-8" }
 
         return NativeCLICommand(
             executablePath: executablePath,
             arguments: arguments,
             workingDirectory: projectPath,
-            environment: environment.map { "\($0.key)=\($0.value)" }.sorted()
+            environment: NativeCLICommand.environmentEntries(environment)
         )
     }
 

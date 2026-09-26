@@ -24,7 +24,8 @@ struct RemoteHostList: Equatable {
         let host = proposedHost.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !host.isEmpty, !host.hasPrefix("-"),
               host.rangeOfCharacter(from: .whitespacesAndNewlines) == nil,
-              !host.contains("/") else { return nil }
+              !host.contains("/"),
+              !host.allSatisfy({ $0 == "." }) else { return nil }
         return host
     }
 

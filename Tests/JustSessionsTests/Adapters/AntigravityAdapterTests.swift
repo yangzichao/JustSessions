@@ -5,7 +5,7 @@ import Testing
 
 struct AntigravityAdapterTests {
     @Test func discoversLocalSessionsWithSummaryAndMetadataFallback() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let project = root.appendingPathComponent("sample project")
         let conversations = root.appendingPathComponent("conversations")
@@ -48,7 +48,7 @@ struct AntigravityAdapterTests {
     }
 
     @Test func ignoresMissingAndMismatchedDatabases() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let conversations = root.appendingPathComponent("conversations")
         try FileManager.default.createDirectory(at: conversations, withIntermediateDirectories: true)

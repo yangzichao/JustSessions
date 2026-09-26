@@ -46,10 +46,7 @@ struct ThisMacTmuxSandbox {
 
     @discardableResult
     func writeExecutable(named name: String, script: String) throws -> URL {
-        let file = binaryDirectory.appendingPathComponent(name)
-        try script.write(to: file, atomically: true, encoding: .utf8)
-        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: file.path)
-        return file
+        try writeExecutableScript(script, to: binaryDirectory.appendingPathComponent(name))
     }
 
     /// A CLI stand-in's command in the project folder, before tmux wraps it.

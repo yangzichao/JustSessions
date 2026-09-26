@@ -26,6 +26,6 @@ struct SelectedSessionsContextMenu: View {
     }
 
     private func sessionCountLabel(_ count: Int) -> String {
-        "\(count) \(count == 1 ? "session" : "sessions")"
+        CountedNoun.phrase(count: count, singular: "session")
     }
 }

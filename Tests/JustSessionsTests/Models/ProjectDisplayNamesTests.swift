@@ -33,9 +33,9 @@ struct ProjectDisplayNamesTests {
     }
 
     @Test func customNamesSurviveASaveAndLoad() throws {
-        let suiteName = "ProjectDisplayNamesTests-\(UUID().uuidString)"
-        let userDefaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let userDefaults = isolatedUserDefaults.userDefaults
         var displayNames = ProjectDisplayNames()
         displayNames.rename(projectPath: projectPath, to: "Marketing site")
 

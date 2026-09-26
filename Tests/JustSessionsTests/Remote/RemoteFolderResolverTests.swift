@@ -5,7 +5,7 @@ import Testing
 struct RemoteFolderResolverTests {
     /// Runs the lookup in a local shell that starts in a temporary home folder, the way `ssh host <command>` would.
     @Test func resolvesHomeRelativeAbsoluteAndSymlinkedFolders() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let home = root.appendingPathComponent("home")
         let app = home.appendingPathComponent("code/my app")

@@ -47,7 +47,7 @@ struct SidebarRecencyPicker: View {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(title), \(count) \(count == 1 ? "session" : "sessions")")
+        .accessibilityLabel("\(title), \(CountedNoun.phrase(count: count, singular: "session"))")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

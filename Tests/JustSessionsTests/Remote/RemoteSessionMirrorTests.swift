@@ -5,7 +5,7 @@ import Testing
 /// Copies from a local folder standing in for the remote home, with the same rsync filters used over SSH.
 struct RemoteSessionMirrorTests {
     @Test func mirrorsOnlySessionFilesAndListsThemAsRemote() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let remoteHome = root.appendingPathComponent("remote-home")
         let claudeProject = remoteHome.appendingPathComponent(".claude/projects/-home-me-paper")
@@ -43,7 +43,7 @@ struct RemoteSessionMirrorTests {
     }
 
     @Test func hostWithoutAToolFolderListsNothingForIt() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let remoteHome = root.appendingPathComponent("remote-home")
         try FileManager.default.createDirectory(at: remoteHome, withIntermediateDirectories: true)

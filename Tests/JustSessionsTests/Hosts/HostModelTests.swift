@@ -31,7 +31,7 @@ struct HostModelTests {
     }
 
     @Test func folderOnThisMacIsKeyedByItsResolvedPath() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let folder = root.appendingPathComponent("paper")
         let link = root.appendingPathComponent("paper-link")

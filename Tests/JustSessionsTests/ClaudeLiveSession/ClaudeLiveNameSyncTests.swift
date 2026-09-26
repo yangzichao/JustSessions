@@ -103,12 +103,3 @@ struct ClaudeLiveNameSyncTests {
         return ClaudeLiveSessionRecord(jsonData: Data(json.utf8))!
     }
 }
-
-struct StaticConversationAdapter: ConversationAdapter {
-    let provider: ConversationProvider = .claude
-    let discoveredConversations: [Conversation]
-
-    func discover() throws -> [Conversation] { discoveredConversations }
-    func arguments(for conversation: Conversation, action: ConversationAction) -> [String] { [] }
-    func delete(_ conversation: Conversation) throws {}
-}

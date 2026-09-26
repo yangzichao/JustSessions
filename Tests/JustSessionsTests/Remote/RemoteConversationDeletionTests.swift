@@ -5,7 +5,7 @@ import Testing
 struct RemoteConversationDeletionTests {
     /// Runs the deletion script with a temporary folder as the remote home, the way `ssh host <command>` would.
     @Test func claudeDeletionRemovesTranscriptCompanionFolderAndIndexEntry() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let projectFolder = root.appendingPathComponent("home/.claude/projects/-home-me-bob's paper")
         let sessionID = UUID().uuidString.lowercased()

@@ -114,7 +114,7 @@ struct SidebarProjectSection: View {
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity)
             .help(project.location.copyablePath)
-            .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(project.sessionCount) \(project.sessionCount == 1 ? "session" : "sessions"), \(openTerminalCount) open")
+            .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(CountedNoun.phrase(count: project.sessionCount, singular: "session")), \(openTerminalCount) open")
             .contextMenu {
                 Menu("New session", systemImage: "plus") {
                     ForEach(project.newSessionProviders) { provider in

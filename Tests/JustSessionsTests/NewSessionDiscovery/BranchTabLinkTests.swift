@@ -8,7 +8,7 @@ struct BranchTabLinkTests {
     private static let forkSessionID = "77777777-7777-4777-8777-777777777777"
 
     @Test func branchTabIsListedUnderItsProjectRightAwayAndLinksToItsFork() async throws {
-        let root = try makeTemporaryDirectory()
+        let root = try makeRootWithProjectFolder()
         defer { try? FileManager.default.removeItem(at: root) }
         let forked = Self.conversation(sessionID: Self.forkedSessionID, under: root)
         let fork = Self.conversation(sessionID: Self.forkSessionID, under: root)
@@ -37,7 +37,7 @@ struct BranchTabLinkTests {
     }
 
     @Test func resumingTheForkedSessionOpensItsOwnTabInsteadOfTheBranch() async throws {
-        let root = try makeTemporaryDirectory()
+        let root = try makeRootWithProjectFolder()
         defer { try? FileManager.default.removeItem(at: root) }
         let forked = Self.conversation(sessionID: Self.forkedSessionID, under: root)
         let store = try await makeStore(discovering: [forked], under: root)
@@ -56,8 +56,7 @@ struct BranchTabLinkTests {
         let binaryDirectory = root.appendingPathComponent("bin")
         try FileManager.default.createDirectory(at: binaryDirectory, withIntermediateDirectories: true)
         let executable = binaryDirectory.appendingPathComponent("claude")
-        try "#!/bin/sh\nexit 0\n".write(to: executable, atomically: true, encoding: .utf8)
-        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: executable.path)
+        try writeExecutableScript("#!/bin/sh\nexit 0\n", to: executable)
         let store = ConversationStore(
             adapters: [StaticConversationAdapter(discoveredConversations: conversations)],
             commandResolver: NativeCLICommandResolver(searchDirectories: [binaryDirectory.path])
@@ -70,8 +69,9 @@ struct BranchTabLinkTests {
         return store
     }
 
-    private func makeTemporaryDirectory() throws -> URL {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    /// A temporary folder holding the `project` folder the sessions run in.
+    private func makeRootWithProjectFolder() throws -> URL {
+        let root = try makeTemporaryDirectory()
         try FileManager.default.createDirectory(at: root.appendingPathComponent("project"), withIntermediateDirectories: true)
         return root
     }

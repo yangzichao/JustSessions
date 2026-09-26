@@ -14,7 +14,7 @@ struct TerminalWorkspaceView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(session.displayTitle).font(.headline).lineLimit(1)
-                    Text(([projectDisplayName, hostDisplayName].compactMap { $0 } + [session.provider.rawValue, actionName])
+                    Text(([projectDisplayName, hostDisplayName].compactMap { $0 } + [session.provider.rawValue, session.action.displayName])
                         .joined(separator: " · "))
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -47,14 +47,6 @@ struct TerminalWorkspaceView: View {
             EmbeddedTerminalView(session: session, isActive: isActive)
                 .id(session.id)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-    }
-
-    private var actionName: String {
-        switch session.action {
-        case .new: "New"
-        case .resume: "Resume"
-        case .branch: "Branch"
         }
     }
 }

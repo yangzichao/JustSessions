@@ -201,12 +201,6 @@ struct NewSessionFileFinderTests {
         )
     }
 
-    private func makeTemporaryDirectory() throws -> URL {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        return root
-    }
-
     private func writeClaudeTranscript(sessionID: String, under root: URL) throws {
         let project = root.appendingPathComponent("projects/-tmp-new-session-project")
         try FileManager.default.createDirectory(at: project, withIntermediateDirectories: true)

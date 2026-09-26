@@ -12,7 +12,7 @@ struct HostRefreshAndLaunchTests {
         store.refreshThisMac()
         #expect(store.hostRefreshStatuses[.thisMac] == .refreshing)
         #expect(store.isRefreshingAnyHost)
-        try await waitUntil { !store.isScanningThisMac }
+        try await expectEventually { !store.isScanningThisMac }
 
         #expect(Set(store.conversations.map(\.id)) == [onThisMac.id, onDevbox.id])
         guard case .refreshed? = store.hostRefreshStatuses[.thisMac] else {
@@ -26,7 +26,7 @@ struct HostRefreshAndLaunchTests {
         let store = ConversationStore(adapters: [UnreadableConversationAdapter()])
 
         store.refreshThisMac()
-        try await waitUntil { !store.isScanningThisMac }
+        try await expectEventually { !store.isScanningThisMac }
 
         #expect(store.hostRefreshStatuses[.thisMac] == .failed("Codex: The session folder could not be read."))
         #expect(store.errorMessage == nil)
@@ -60,13 +60,6 @@ struct HostRefreshAndLaunchTests {
             try await store.launchNewSession(provider: .claude, host: .ssh("devbox"), folder: "~/gone", resolver: resolver)
         }
         #expect(store.terminalSessions.isEmpty)
-    }
-
-    @MainActor private func waitUntil(_ condition: () -> Bool) async throws {
-        for _ in 0..<100 where !condition() {
-            try await Task.sleep(for: .milliseconds(10))
-        }
-        #expect(condition())
     }
 
     private func conversation(project: String) -> Conversation {

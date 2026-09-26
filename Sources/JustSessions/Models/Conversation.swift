@@ -73,9 +73,6 @@ struct Conversation: Identifiable, Sendable {
             host: host
         )
     }
-    var projectName: String {
-        URL(fileURLWithPath: projectPath).lastPathComponent
-    }
     var projectLocation: ProjectLocation {
         ProjectLocation(host: host, path: projectPath)
     }

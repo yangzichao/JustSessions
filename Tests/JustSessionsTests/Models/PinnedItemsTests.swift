@@ -34,9 +34,9 @@ struct PinnedItemsTests {
     }
 
     @Test func pinsSurviveASaveAndLoad() throws {
-        let suiteName = "PinnedItemsTests-\(UUID().uuidString)"
-        let userDefaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let userDefaults = isolatedUserDefaults.userDefaults
         let pinnedItems = PinnedItems(pinnedProjectPaths: ["/tmp/project"], pinnedConversationIDs: ["Codex:abc"])
 
         pinnedItems.save(to: userDefaults)

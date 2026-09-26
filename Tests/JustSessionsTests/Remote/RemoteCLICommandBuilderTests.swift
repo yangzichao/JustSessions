@@ -19,15 +19,15 @@ struct RemoteCLICommandBuilderTests {
     /// Runs the remote command the way the host's shell would, with stand-ins for the login shell and the CLI,
     /// to check that a folder name with a space and a quote survives both levels of quoting.
     @Test func remoteCommandReachesTheCLIInTheProjectFolder() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let project = root.appendingPathComponent("Bob's paper v2")
         let bin = root.appendingPathComponent("bin")
         try FileManager.default.createDirectory(at: project, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
         // `$SHELL -lic <command>`: drop the flags and run the command.
-        try writeExecutable("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
-        try writeExecutable("#!/bin/sh\npwd -P\nprintf '%s\\n' \"$@\"\n", to: bin.appendingPathComponent("claude"))
+        try writeExecutableScript("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
+        try writeExecutableScript("#!/bin/sh\npwd -P\nprintf '%s\\n' \"$@\"\n", to: bin.appendingPathComponent("claude"))
 
         let remoteCommand = RemoteCLICommandBuilder.remoteCommand(
             provider: .claude,
@@ -45,10 +45,4 @@ struct RemoteCLICommandBuilderTests {
         let lines = output.split(separator: "\n").map(String.init)
         #expect(lines.first?.hasSuffix("/Bob's paper v2") == true)
         #expect(Array(lines.dropFirst()) == ["--resume", "id with space"])
-    }
-
-    private func writeExecutable(_ script: String, to file: URL) throws {
-        try script.write(to: file, atomically: true, encoding: .utf8)
-        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: file.path)
-    }
-}
+    }}

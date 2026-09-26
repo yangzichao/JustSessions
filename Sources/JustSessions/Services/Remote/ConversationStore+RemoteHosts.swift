@@ -28,14 +28,14 @@ extension ConversationStore {
     @discardableResult
     func addRemoteHost(_ proposedHost: String) -> Bool {
         guard remoteHostList.add(proposedHost), let host = RemoteHostList.normalizedHost(proposedHost) else { return false }
-        remoteHostList.save(to: .standard)
+        remoteHostList.save(to: userDefaults)
         refreshRemoteHost(host)
         return true
     }
 
     func removeRemoteHost(_ host: String, mirror: RemoteSessionMirror = RemoteSessionMirror()) {
         remoteHostList.remove(host)
-        remoteHostList.save(to: .standard)
+        remoteHostList.save(to: userDefaults)
         hostRefreshStatuses.removeValue(forKey: .ssh(host))
         tmuxSessionNamesByHost.removeValue(forKey: .ssh(host))
         replaceConversations(on: .ssh(host), with: [])

@@ -63,16 +63,9 @@ struct ClaudeSessionIDFlagSupportTests {
         #expect(support.preassigningSessionID(to: command) != nil)
     }
 
-    private func makeTemporaryDirectory() throws -> URL {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        return root
-    }
-
     private func fakeClaude(in root: URL, script: String) throws -> NativeCLICommand {
         let executable = root.appendingPathComponent("claude")
-        try script.write(to: executable, atomically: true, encoding: .utf8)
-        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: executable.path)
+        try writeExecutableScript(script, to: executable)
         return NativeCLICommand(
             executablePath: executable.path,
             arguments: [],

@@ -27,6 +27,8 @@ struct TranscriptBuilder {
         let timestamp: Date?
     }
 
+    static let compactionNoteText = "Earlier messages were compacted"
+
     let maximumEntryCount: Int
     let maximumTextLength: Int
     private var pendingEntries: [PendingEntry] = []
@@ -58,6 +60,11 @@ struct TranscriptBuilder {
                 pendingEntries.append(PendingEntry(content: .toolCalls([limitedText]), timestamp: timestamp))
             }
         }
+    }
+
+    /// Marks where the CLI summarized older messages to free up its context window.
+    mutating func appendCompactionNote(timestamp: Date?) {
+        append(.note, text: Self.compactionNoteText, timestamp: timestamp)
     }
 
     /// Keeps the newest entries when the session is longer than `maximumEntryCount`.

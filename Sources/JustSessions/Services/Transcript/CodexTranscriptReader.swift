@@ -15,27 +15,44 @@ struct CodexTranscriptReader {
     }
 
     /// Checks the start of a line so events and tool outputs, usually most of a rollout's bytes,
-    /// are skipped without JSON parsing. Lines in an unexpected shape are always parsed.
+    /// are skipped without JSON parsing. Only Codex's own layout is judged this way:
+    /// `{"timestamp":…,"type":"…","payload":{"type":"…"`, where the record's `type` comes before anything nested
+    /// (Codex puts an `ordinal` number between). Any other line is parsed.
     static func mightContainTranscriptItem(_ line: Data) -> Bool {
         let head = String(decoding: line.prefix(512), as: UTF8.self)
+        // A quote right after a comma cannot be inside a string, and with no `{` or `[` before it, this `type` is
+        // the record's own rather than one inside the payload.
         guard head.hasPrefix("{\"timestamp\":"),
-              let recordType = stringValue(after: "\"type\":\"", in: head) else { return true }
-        if recordType == "compacted" { return true }
-        guard recordType == "response_item" else { return false }
-        guard let payloadType = stringValue(after: "\"payload\":{\"type\":\"", in: head) else { return true }
-        return transcriptPayloadTypes.contains(payloadType)
+              let recordTypeMarker = head.range(of: ",\"type\":\""),
+              !head[..<recordTypeMarker.lowerBound].dropFirst().contains(where: { $0 == "{" || $0 == "[" }),
+              let recordType = plainStringValue(startingAt: recordTypeMarker.upperBound, in: head)
+        else { return true }
+        if recordType.value == "compacted" { return true }
+        guard recordType.value == "response_item" else { return false }
+
+        let payloadTypeMarker = ",\"payload\":{\"type\":\""
+        let afterRecordType = head[recordType.end...]
+        guard afterRecordType.hasPrefix(payloadTypeMarker),
+              let payloadType = plainStringValue(
+                  startingAt: afterRecordType.dropFirst(payloadTypeMarker.count).startIndex,
+                  in: head
+              )
+        else { return true }
+        return transcriptPayloadTypes.contains(payloadType.value)
     }
 
-    private static func stringValue(after marker: String, in text: String) -> String? {
-        guard let markerRange = text.range(of: marker),
-              let closingQuote = text[markerRange.upperBound...].firstIndex(of: "\"") else { return nil }
-        return String(text[markerRange.upperBound..<closingQuote])
+    /// The string value starting at `start` and the index after its closing quote. Nil when the value is cut off
+    /// or holds an escape, which could spell a type differently, so the line is parsed instead.
+    private static func plainStringValue(startingAt start: String.Index, in text: String) -> (value: String, end: String.Index)? {
+        guard let closingQuote = text[start...].firstIndex(of: "\""),
+              !text[start..<closingQuote].contains("\\") else { return nil }
+        return (String(text[start..<closingQuote]), text.index(after: closingQuote))
     }
 
     func append(_ record: [String: Any], to builder: inout TranscriptBuilder) {
         let timestamp = ConversationMetadata.date(record["timestamp"])
         if record["type"] as? String == "compacted" {
-            builder.append(.note, text: "Earlier messages were compacted", timestamp: timestamp)
+            builder.appendCompactionNote(timestamp: timestamp)
             return
         }
         guard record["type"] as? String == "response_item",
