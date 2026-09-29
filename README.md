@@ -36,7 +36,7 @@ Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of th
 ## Features
 
 **Find any session**
-- All Claude Code, Codex, and Antigravity CLI sessions in one sidebar, grouped by project folder and sorted by recent activity. With SSH hosts added, each machine's projects sit under its own heading.
+- All Claude Code, Codex, and Antigravity CLI sessions in one sidebar, grouped by machine (this Mac, then each SSH host), then by project folder, sorted by recent activity.
 - Search projects by name or path, and sessions by title or session ID.
 - Filter to sessions from the past seven days, or to one CLI.
 - Pin projects and sessions to keep them at the top. Rename any session locally without touching the CLI's own title.

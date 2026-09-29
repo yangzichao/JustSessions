@@ -2,7 +2,8 @@ import SwiftUI
 
 /// A host's heading above its projects: its name, how its last refresh went, and its project count, which gives way
 /// to a + for a new session there while the pointer is over it. Right-click to refresh the host or remove an SSH host.
-/// While this Mac is the only host, the heading reads PROJECTS and leaves refresh progress to the sidebar header.
+/// The heading is shown even while this Mac is the only host, so the sidebar always reads by host; in that case it
+/// leaves refresh progress to the sidebar header.
 struct SidebarHostHeading: View {
     let host: SessionHost
     let isOnlyHost: Bool
@@ -17,14 +18,12 @@ struct SidebarHostHeading: View {
 
     var body: some View {
         HStack(spacing: 6) {
-            if !isOnlyHost {
-                // One width for every host's symbol keeps the host names lined up.
-                Image(systemName: host.symbolName)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(.tertiary)
-                    .frame(width: 14)
-            }
-            Text(isOnlyHost ? "PROJECTS" : host.displayName.uppercased())
+            // One width for every host's symbol keeps the host names lined up.
+            Image(systemName: host.symbolName)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(.tertiary)
+                .frame(width: 14)
+            Text(host.displayName.uppercased())
                 .tracking(0.8)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
