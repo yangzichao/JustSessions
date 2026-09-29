@@ -1,7 +1,8 @@
 import AppKit
 
 enum TerminalAppearanceMode: String, CaseIterable, Codable, Identifiable {
-    case system
+    /// Takes on the app's appearance, whether that follows the Mac or is set to Light or Dark.
+    case matchApp
     case light
     case dark
 
@@ -9,23 +10,24 @@ enum TerminalAppearanceMode: String, CaseIterable, Codable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .system: "Follow system"
+        case .matchApp: "Match app"
         case .light: "Light"
         case .dark: "Dark"
         }
     }
 
+    /// Nil lets the terminal inherit the app's appearance from its window.
     var nativeAppearance: NSAppearance? {
         switch self {
-        case .system: nil
+        case .matchApp: nil
         case .light: NSAppearance(named: .aqua)
         case .dark: NSAppearance(named: .darkAqua)
         }
     }
 
-    func usesDarkPalette(systemAppearance: NSAppearance) -> Bool {
+    func usesDarkPalette(effectiveAppearance: NSAppearance) -> Bool {
         switch self {
-        case .system: systemAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+        case .matchApp: effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
         case .light: false
         case .dark: true
         }

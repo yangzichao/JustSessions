@@ -2,7 +2,7 @@
 
 [Back to JustSessions](../../README.md) · [Session storage and privacy](session-storage.md)
 
-Use the sidebar to find a conversation, read its preview, and resume it in its original CLI. These instructions cover the controls, SSH setup, terminal persistence, and cleanup.
+Use the sidebar to find a conversation, read its preview, and resume it in its original CLI. These instructions cover the controls, SSH setup, terminal persistence, cleanup, and appearance settings.
 
 ## Find any session
 
@@ -40,3 +40,10 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 - Projects stay in the sidebar after their last session is deleted, including after restarting the app. Right-click a project and choose **Remove from sidebar** to hide it without deleting its sessions or folder. Starting a new session in that folder brings it back.
 - Claude Code sessions on this Mac go to the macOS Trash. Codex uses `codex delete --force`. SSH hosts have no Trash, so deletions there are permanent.
 - Sessions with an open terminal tab, or still running in tmux, can't be deleted.
+
+## Appearance
+
+Open **Settings** at the bottom of the sidebar, or press ⌘,.
+
+- **Appearance**: choose **System** to switch between light and dark with your Mac, or keep the app **Light** or **Dark**.
+- **Terminal**: terminals match the app unless you give them **Light** or **Dark** colors of their own. The font and size are set here too. Changes apply to open terminals right away.

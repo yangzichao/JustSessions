@@ -2,6 +2,8 @@ import SwiftUI
 
 @main
 struct JustSessionsApp: App {
+    @NSApplicationDelegateAdaptor(JustSessionsAppDelegate.self) private var appDelegate
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -16,7 +18,7 @@ struct JustSessionsApp: App {
         }
 
         Settings {
-            TerminalAppearanceSettingsView(appearanceStore: .shared)
+            SettingsView(appAppearanceStore: .shared, terminalAppearanceStore: .shared)
         }
     }
 }

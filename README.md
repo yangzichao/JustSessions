@@ -137,7 +137,7 @@ No. Use your existing CLI authentication and provider accounts. JustSessions its
 
 ## Documentation and development
 
-- [Session management guide](docs/guides/session-management.md): pins, terminal tabs, activity indicators, SSH hosts, and cleanup.
+- [Session management guide](docs/guides/session-management.md): pins, terminal tabs, activity indicators, SSH hosts, cleanup, and appearance.
 - [Session storage and privacy](docs/guides/session-storage.md): history locations, remote caching, and tmux behavior.
 - [Build and release](docs/development/build-and-release.md): Swift build commands and release signing.
 - [Source layout](docs/development/source-layout.md): where each feature lives.

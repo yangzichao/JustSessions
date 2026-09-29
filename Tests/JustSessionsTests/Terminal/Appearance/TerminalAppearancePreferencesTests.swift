@@ -35,4 +35,17 @@ struct TerminalAppearancePreferencesTests {
         store.setFontSize(-1)
         #expect(store.preferences.fontSize == 10)
     }
+
+    @Test func aSavedValueThisVersionDoesNotKnowResetsOnlyThatSetting() throws {
+        let settings = try IsolatedUserDefaults()
+        defer { settings.removeSuite() }
+        let key = TerminalAppearancePreferences.userDefaultsKey
+
+        settings.userDefaults.set(Data(#"{"mode":"sepia","fontFamily":"menlo","fontSize":18}"#.utf8), forKey: key)
+        #expect(TerminalAppearanceStore(userDefaults: settings.userDefaults).preferences
+            == TerminalAppearancePreferences(mode: .matchApp, fontFamily: .menlo, fontSize: 18))
+
+        settings.userDefaults.set(Data(#"{"mode":"dark","fontSize":"large"}"#.utf8), forKey: key)
+        #expect(TerminalAppearancePreferences.load(from: settings.userDefaults) == TerminalAppearancePreferences(mode: .dark))
+    }
 }

@@ -50,7 +50,7 @@ struct TerminalAppearanceRenderingTests {
         #expect(terminalView.getSelection()?.contains("Keep this output") == true)
     }
 
-    @Test func followingSystemRemovesOverrideAndRespondsToParentAppearance() throws {
+    @Test func matchingTheAppRemovesOverrideAndRespondsToParentAppearance() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let store = TerminalAppearanceStore(userDefaults: settings.userDefaults)
@@ -61,7 +61,7 @@ struct TerminalAppearanceRenderingTests {
 
         store.setMode(.light)
         #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: TerminalColorScheme.paper.background))
-        store.setMode(.system)
+        store.setMode(.matchApp)
         #expect(terminalView.appearance == nil)
         #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: TerminalColorScheme.charcoal.background))
 

@@ -1,20 +1,15 @@
 import SwiftUI
 
+/// The Terminal tab of Settings: colors, which match the app unless set here, and the font.
 struct TerminalAppearanceSettingsView: View {
     @ObservedObject var appearanceStore: TerminalAppearanceStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            VStack(alignment: .leading, spacing: 5) {
-                Text("Terminal").font(.title2.weight(.semibold))
-                Text("Make your terminal comfortable to read.")
-                    .foregroundStyle(.secondary)
-            }
-
             Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 16) {
                 GridRow {
-                    Text("Appearance")
-                    Picker("Appearance", selection: Binding(
+                    Text("Colors")
+                    Picker("Colors", selection: Binding(
                         get: { appearanceStore.preferences.mode },
                         set: { appearanceStore.setMode($0) }
                     )) {
