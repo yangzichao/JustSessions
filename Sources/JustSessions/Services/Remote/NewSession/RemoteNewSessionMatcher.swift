@@ -1,15 +1,5 @@
 import Foundation
 
-/// A "New session" or "Branch" tab on a remote host, copied out of its `TerminalSession` for matching.
-struct WaitingRemoteNewSessionTab: Equatable {
-    let terminalID: UUID
-    let host: String
-    let provider: ConversationProvider
-    let projectPath: String
-    let launchedAt: Date
-    let sessionIDsKnownAtLaunch: Set<String>
-}
-
 /// The local new-session search watches the CLI process's open files, which an `ssh` tab cannot offer.
 /// A remote tab instead takes the first session that appears in its project, for its tool, after it started.
 enum RemoteNewSessionMatcher {

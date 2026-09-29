@@ -117,9 +117,13 @@ Each release includes the notarized `JustSessions.dmg`, plus `appcast.xml` and t
 
 ### Source layout
 
-- `Models/`: shared conversation model.
+- `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
+- `Models/Customizations/`: session and project names you set, and pins.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
-- `Services/Adapters/`: provider discovery and native arguments. Separate adapters make adding another CLI straightforward.
+- `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
+- `Models/Wording/`: counts and relative times in labels.
+- `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
+- `Services/Adapters/`: provider discovery and native arguments, one folder per CLI. Separate adapters make adding another CLI straightforward.
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
 - `Services/Launch/`: CLI executable resolution and process environment.
 - `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there.
@@ -129,12 +133,15 @@ Each release includes the notarized `JustSessions.dmg`, plus `appcast.xml` and t
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.
-- `Views/Browser/`: sidebar, terminal tab bar, and window layout.
-- `Views/Browser/Sidebar/`: sidebar header, filters, footer, and session rows with their tmux status.
-- `Views/Browser/Sidebar/Hosts/`: host headings and the Add SSH host button in the footer.
-- `Views/Remote/`: Add SSH host sheet.
-- `Views/Branding/`: the app mark drawn in the sidebar header.
+- `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
+- `Views/Browser/Sidebar/`: sidebar header and footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.
+- `Views/Browser/Sidebar/Hosts/`: host headings, and the Add SSH host button and sheet.
+- `Views/Terminal/`: a tab's embedded terminal.
 - `Views/Preview/`: conversation preview for the selected session.
+- `Views/Indicators/`: running, ended, tmux, and pinned glyphs.
+- `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
+- `Views/Theme/`: colors and button styles.
+- `Views/Branding/`: the app mark drawn in the sidebar header.
 
 ## License
 

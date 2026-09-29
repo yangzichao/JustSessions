@@ -1,48 +1,5 @@
 import Foundation
 
-enum NativeCLICommandError: LocalizedError {
-    case missingExecutable(String)
-    case missingProject(String)
-
-    var errorDescription: String? {
-        switch self {
-        case .missingExecutable(let name):
-            "Could not find the \(name) CLI in your shell PATH or common install locations. "
-                + "Install it, then check that `\(name)` runs in a new Terminal window."
-        case .missingProject(let path): "The project directory no longer exists: \(path)"
-        }
-    }
-}
-
-struct NativeCLICommand {
-    let executablePath: String
-    let arguments: [String]
-    let workingDirectory: String
-    let environment: [String]
-
-    func appendingArguments(_ extraArguments: [String]) -> NativeCLICommand {
-        NativeCLICommand(
-            executablePath: executablePath,
-            arguments: arguments + extraArguments,
-            workingDirectory: workingDirectory,
-            environment: environment
-        )
-    }
-
-    /// `variables` as the sorted `NAME=value` entries `environment` holds.
-    static func environmentEntries(_ variables: [String: String]) -> [String] {
-        variables.map { "\($0.key)=\($0.value)" }.sorted()
-    }
-
-    /// `environment` as a dictionary, for running the same executable outside a terminal.
-    var environmentVariables: [String: String] {
-        environment.reduce(into: [String: String]()) { variables, entry in
-            guard let separator = entry.firstIndex(of: "=") else { return }
-            variables[String(entry[..<separator])] = String(entry[entry.index(after: separator)...])
-        }
-    }
-}
-
 struct NativeCLICommandResolver {
     let fileManager: FileManager
     let inheritedEnvironment: [String: String]

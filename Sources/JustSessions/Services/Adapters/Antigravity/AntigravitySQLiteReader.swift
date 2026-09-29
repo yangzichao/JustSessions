@@ -1,19 +1,6 @@
 import Foundation
 import SQLite3
 
-struct AntigravityLocalSession {
-    let sessionID: String
-    let projectPath: String
-    let firstPrompt: String?
-}
-
-struct AntigravityConversationSummary {
-    let title: String?
-    let preview: String?
-    let projectPath: String?
-    let updatedAt: Date?
-}
-
 enum AntigravitySQLiteReader {
     static func localSession(at file: URL) -> AntigravityLocalSession? {
         guard let database = openReadOnly(file) else { return nil }

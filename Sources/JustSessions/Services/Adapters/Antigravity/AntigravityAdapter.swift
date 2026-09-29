@@ -61,11 +61,3 @@ struct AntigravityAdapter: ConversationAdapter {
         throw AntigravityAdapterError.deletionUnavailable
     }
 }
-
-enum AntigravityAdapterError: LocalizedError {
-    case deletionUnavailable
-
-    var errorDescription: String? {
-        "Delete this conversation in Antigravity CLI's interactive session picker."
-    }
-}

@@ -15,9 +15,3 @@ struct TranscriptEntry: Identifiable, Sendable, Equatable {
     /// First entry of a speaker's turn, where the preview shows "You" or the CLI's name.
     let startsTurn: Bool
 }
-
-struct TranscriptContent: Sendable, Equatable {
-    let entries: [TranscriptEntry]
-    /// Older entries left out so very long sessions stay responsive.
-    let omittedEntryCount: Int
-}
