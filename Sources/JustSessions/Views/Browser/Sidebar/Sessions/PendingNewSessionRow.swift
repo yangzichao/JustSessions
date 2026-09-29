@@ -8,25 +8,13 @@ struct PendingNewSessionRow: View {
 
     var body: some View {
         Button(action: onSelect) {
-            HStack(spacing: 8) {
-                Image(systemName: terminal.provider.symbolName)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(terminal.provider.tintColor)
-                    .frame(width: 14)
+            SidebarSessionRowLayout(provider: terminal.provider, isSelected: isSelected) {
                 Text(terminal.displayTitle)
-                    .font(.system(size: 12, weight: isSelected ? .medium : .regular))
                     .italic()
                     .foregroundStyle(isSelected ? .primary : .secondary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                Spacer(minLength: 6)
+            } trailing: {
                 TerminalStatusIndicator(session: terminal)
             }
-            .padding(.leading, 28)
-            .padding(.trailing, 10)
-            .frame(height: 28)
-            .contentShape(Rectangle())
-            .sidebarRowHighlight(isSelected: isSelected, selectionTint: terminal.provider.tintColor)
         }
         .buttonStyle(.plain)
         .help("\(terminal.provider.rawValue) has not saved this session yet · click to open its terminal")

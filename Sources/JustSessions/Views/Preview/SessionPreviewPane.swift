@@ -8,9 +8,8 @@ struct SessionPreviewPane: View {
     let onDelete: (Conversation) -> Void
 
     private var previewedConversation: Conversation? {
-        guard sessionSelection.selectedConversationIDs.count == 1,
-              let conversationID = sessionSelection.selectedConversationIDs.first else { return nil }
-        return store.conversations.first { $0.id == conversationID }
+        guard let conversationID = sessionSelection.onlySelectedConversationID else { return nil }
+        return store.conversation(withID: conversationID)
     }
 
     var body: some View {

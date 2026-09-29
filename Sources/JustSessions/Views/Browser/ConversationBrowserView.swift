@@ -6,10 +6,8 @@ struct ConversationBrowserView: View {
     @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
     let onRename: (Conversation) -> Void
-    let onDelete: (Conversation) -> Void
-    let onDeleteConversations: ([Conversation]) -> Void
     let onRenameProject: (ProjectConversationGroup) -> Void
-    let onDeleteProjectSessions: (String) -> Void
+    let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     @State private var sessionSelection = SessionMultiSelection()
     /// The host the New Session sheet opened on; nil while it is closed.
@@ -41,9 +39,8 @@ struct ConversationBrowserView: View {
     }
 
     private var focusedConversation: Conversation? {
-        guard sessionSelection.selectedConversationIDs.count == 1,
-              let conversationID = sessionSelection.selectedConversationIDs.first else { return nil }
-        return store.conversations.first { $0.id == conversationID }
+        guard let conversationID = sessionSelection.onlySelectedConversationID else { return nil }
+        return store.conversation(withID: conversationID)
     }
 
     var body: some View {
@@ -67,49 +64,23 @@ struct ConversationBrowserView: View {
                     store.selectTerminal(nil)
                 },
                 onRenameConversation: onRename,
-                onDeleteConversation: onDelete,
-                onDeleteConversations: onDeleteConversations,
                 onRenameProject: onRenameProject,
-                onDeleteProjectSessions: onDeleteProjectSessions
+                onRequestDeletion: onRequestDeletion
             )
         } detail: {
-            VStack(spacing: 0) {
-                if !store.terminalSessions.isEmpty {
-                    WorkspaceTabBar(store: store, onRenameConversation: onRename)
-                    ThemeDivider()
-                }
-                ZStack {
-                    SessionPreviewPane(
-                        store: store,
-                        sessionSelection: sessionSelection,
-                        onRename: onRename,
-                        onDelete: onDelete
-                    )
-                    .opacity(store.selectedTerminalID == nil ? 1 : 0)
-                    .allowsHitTesting(store.selectedTerminalID == nil)
-                    .accessibilityHidden(store.selectedTerminalID != nil)
-
-                    ForEach(store.terminalSessions) { session in
-                        let isActive = store.selectedTerminalID == session.id
-                        TerminalWorkspaceView(
-                            session: session,
-                            projectDisplayName: store.projectDisplayName(forProjectPath: session.projectDirectoryKey),
-                            hostDisplayName: store.hasRemoteHosts ? session.host.displayName : nil,
-                            isActive: isActive,
-                            onReconnect: session.host == .thisMac ? nil : { store.reconnectRemoteTerminal(session.id) }
-                        )
-                        .opacity(isActive ? 1 : 0)
-                        .allowsHitTesting(isActive)
-                        .accessibilityHidden(!isActive)
-                    }
-                }
-            }
+            WorkspaceDetailView(
+                store: store,
+                sessionSelection: sessionSelection,
+                onRename: onRename,
+                onDelete: { onRequestDeletion(.conversation($0)) }
+            )
         }
         .sheet(item: $newSessionSheetHost) { host in
+            let startableProjects = startableProjects
             NewSessionSheet(
                 initialProvider: newSessionProvider,
                 initialHost: host,
-                initialProjectPath: newSessionProjectPath(on: host),
+                initialProjectPath: newSessionProjectPath(on: host, startableProjects: startableProjects),
                 hosts: store.hosts,
                 recentProjects: startableProjects
             ) { provider, host, folder in
@@ -118,13 +89,9 @@ struct ConversationBrowserView: View {
         }
     }
 
+    /// The selected tab's tool, or else the one the sidebar shows; Codex when it shows every tool.
     private var newSessionProvider: ConversationProvider {
-        if let selectedTerminal = store.selectedTerminal { return selectedTerminal.provider }
-        switch providerFilter {
-        case .claude: return .claude
-        case .antigravity: return .antigravity
-        case .codex, .all: return .codex
-        }
+        store.selectedTerminal?.provider ?? providerFilter.provider ?? .codex
     }
 
     /// The host of the selected tab, or else of the selected session, so a new session starts next to it.
@@ -134,7 +101,7 @@ struct ConversationBrowserView: View {
     }
 
     /// The selected tab's or session's folder when it is on the host, or else the host's most recent project.
-    private func newSessionProjectPath(on host: SessionHost) -> String {
+    private func newSessionProjectPath(on host: SessionHost, startableProjects: [ProjectConversationGroup]) -> String {
         if let selectedTerminal = store.selectedTerminal, selectedTerminal.host == host {
             return selectedTerminal.projectPath
         }

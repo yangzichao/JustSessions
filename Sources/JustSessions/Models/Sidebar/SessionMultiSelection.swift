@@ -7,6 +7,11 @@ struct SessionMultiSelection: Equatable {
 
     var hasMultipleSelected: Bool { selectedConversationIDs.count > 1 }
 
+    /// The selected row when it is the only one, which the preview shows and a new session starts next to.
+    var onlySelectedConversationID: String? {
+        selectedConversationIDs.count == 1 ? selectedConversationIDs.first : nil
+    }
+
     func contains(_ conversationID: String) -> Bool {
         selectedConversationIDs.contains(conversationID)
     }

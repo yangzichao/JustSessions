@@ -12,21 +12,14 @@ struct SidebarProjectSection: View {
     let onClickConversation: (Conversation) -> Void
     let onSelectPendingNewSession: (UUID) -> Void
     let onRenameConversation: (Conversation) -> Void
-    let onDeleteConversation: (Conversation) -> Void
-    let onDeleteSelectedConversations: () -> Void
     let onClearSessionSelection: () -> Void
     let onRenameProject: () -> Void
-    let onDeleteProjectSessions: () -> Void
+    let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     @State private var isHovered = false
 
     private var openTerminalCount: Int {
         store.terminalSessions.filter { $0.projectDirectoryKey == project.id }.count
-    }
-
-
-    private var deletionPlan: SessionDeletionPlan {
-        store.deletionPlan(for: project.id)
     }
 
     var body: some View {
@@ -52,9 +45,8 @@ struct SidebarProjectSection: View {
                             selectedConversations: selectedConversations,
                             onClick: onClickConversation,
                             onRename: onRenameConversation,
-                            onDelete: onDeleteConversation,
-                            onDeleteSelected: onDeleteSelectedConversations,
-                            onClearSelection: onClearSessionSelection
+                            onClearSelection: onClearSessionSelection,
+                            onRequestDeletion: onRequestDeletion
                         )
                     }
                 }
@@ -116,32 +108,13 @@ struct SidebarProjectSection: View {
             .help(project.location.copyablePath)
             .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(CountedNoun.phrase(count: project.sessionCount, singular: "session")), \(openTerminalCount) open")
             .contextMenu {
-                Menu("New session", systemImage: "plus") {
-                    ForEach(project.newSessionProviders) { provider in
-                        Button(provider.rawValue, systemImage: provider.symbolName) {
-                            onNewSession(provider)
-                        }
-                    }
-                }
-                .disabled(!project.canStartNewSession)
-                if project.host == .thisMac {
-                    Button("Open project in Finder", systemImage: "folder") {
-                        SessionLocationActions.openProjectFolder(project.location.path)
-                    }
-                    .disabled(!project.location.folderExistsOnThisMac)
-                }
-                Button("Copy project path", systemImage: "doc.on.doc") {
-                    SessionLocationActions.copyProjectPath(project.location.copyablePath)
-                }
-                Button("Rename project…", systemImage: "pencil", action: onRenameProject)
-                Button(project.isPinned ? "Unpin project" : "Pin project", systemImage: project.isPinned ? "pin.slash" : "pin") {
-                    store.setPinned(!project.isPinned, projectPath: project.projectPath)
-                }
-                Divider()
-                Button("Delete all deletable sessions (\(deletionPlan.deletableConversations.count))…", systemImage: "trash", role: .destructive) {
-                    onDeleteProjectSessions()
-                }
-                .disabled(!deletionPlan.hasDeletableConversations || store.isScanningThisMac || store.isDeletingSessions)
+                ProjectContextMenu(
+                    store: store,
+                    project: project,
+                    onNewSession: onNewSession,
+                    onRename: onRenameProject,
+                    onDeleteSessions: { onRequestDeletion(.project(project.id)) }
+                )
             }
 
             sessionCountOrNewSessionMenu

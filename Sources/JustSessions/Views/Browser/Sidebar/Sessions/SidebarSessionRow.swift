@@ -8,9 +8,8 @@ struct SidebarSessionRow: View {
     let selectedConversations: [Conversation]
     let onClick: (Conversation) -> Void
     let onRename: (Conversation) -> Void
-    let onDelete: (Conversation) -> Void
-    let onDeleteSelected: () -> Void
     let onClearSelection: () -> Void
+    let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     /// The selected tab when it shows this session, otherwise any tab that does.
     private var openTerminal: TerminalSession? {
@@ -29,24 +28,12 @@ struct SidebarSessionRow: View {
         Button {
             onClick(conversation)
         } label: {
-            HStack(spacing: 8) {
-                Image(systemName: conversation.provider.symbolName)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(conversation.provider.tintColor)
-                    .frame(width: 14)
+            SidebarSessionRowLayout(provider: conversation.provider, isSelected: isHighlighted) {
                 Text(title)
-                    .font(.system(size: 12, weight: isHighlighted ? .medium : .regular))
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                Spacer(minLength: 6)
+            } trailing: {
                 if isPinned { PinnedIndicator() }
                 activityIndicator(openTerminal: openTerminal)
             }
-            .padding(.leading, 28)
-            .padding(.trailing, 10)
-            .frame(height: 28)
-            .contentShape(Rectangle())
-            .sidebarRowHighlight(isSelected: isHighlighted, selectionTint: conversation.provider.tintColor)
         }
         .buttonStyle(.plain)
         .help("\(title) · \(conversation.provider.rawValue) · \(conversation.updatedAt.formatted(date: .abbreviated, time: .shortened))")
@@ -56,7 +43,7 @@ struct SidebarSessionRow: View {
                 SelectedSessionsContextMenu(
                     store: store,
                     selectedConversations: selectedConversations,
-                    onDelete: onDeleteSelected,
+                    onDelete: { onRequestDeletion(.conversations(selectedConversations)) },
                     onClear: onClearSelection
                 )
             } else {
@@ -64,7 +51,7 @@ struct SidebarSessionRow: View {
                     store: store,
                     conversation: conversation,
                     onRename: { onRename(conversation) },
-                    onDelete: { onDelete(conversation) }
+                    onDelete: { onRequestDeletion(.conversation(conversation)) }
                 )
             }
         }

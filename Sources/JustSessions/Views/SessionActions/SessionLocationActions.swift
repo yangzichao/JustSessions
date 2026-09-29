@@ -2,13 +2,11 @@ import AppKit
 
 enum SessionLocationActions {
     static func copySessionID(_ conversation: Conversation) {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(conversation.sessionID, forType: .string)
+        copyToPasteboard(conversation.sessionID)
     }
 
     static func copyProjectPath(_ projectPath: String) {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(projectPath, forType: .string)
+        copyToPasteboard(projectPath)
     }
 
     static func revealSessionFile(_ conversation: Conversation) {
@@ -17,5 +15,10 @@ enum SessionLocationActions {
 
     static func openProjectFolder(_ projectPath: String) {
         NSWorkspace.shared.open(URL(fileURLWithPath: projectPath))
+    }
+
+    private static func copyToPasteboard(_ text: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
     }
 }

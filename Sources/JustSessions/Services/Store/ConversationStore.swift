@@ -145,6 +145,11 @@ final class ConversationStore: ObservableObject {
         deletingConversationID != nil || !batchDeletionConversationIDs.isEmpty
     }
 
+    /// A deletion waits for this Mac's scan and for the deletion already running.
+    var canStartDeletion: Bool {
+        !isScanningThisMac && !isDeletingSessions
+    }
+
     func isDeletionPending(for conversation: Conversation) -> Bool {
         deletingConversationID == conversation.id || batchDeletionConversationIDs.contains(conversation.id)
     }
@@ -168,7 +173,7 @@ final class ConversationStore: ObservableObject {
             errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
             return
         }
-        guard !isScanningThisMac, !isDeletingSessions, adapter(for: conversation.provider) != nil else { return }
+        guard canStartDeletion, adapter(for: conversation.provider) != nil else { return }
         deletingConversationID = conversation.id
         deleteInBackground([conversation], failureMessage: ConversationDeletionFailure.messageAfterDeletingOneSession)
     }
@@ -179,7 +184,7 @@ final class ConversationStore: ObservableObject {
 
     /// Deletes every deletable conversation in the list; open terminals and unsupported providers are skipped.
     func deleteConversations(_ candidateConversations: [Conversation]) {
-        guard !isScanningThisMac, !isDeletingSessions else { return }
+        guard canStartDeletion else { return }
         let candidateIDs = Set(candidateConversations.map(\.id))
         let deletionPlan = deletionPlan(for: conversations.filter { candidateIDs.contains($0.id) })
         guard deletionPlan.hasDeletableConversations else { return }

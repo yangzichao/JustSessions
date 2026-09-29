@@ -39,6 +39,20 @@ struct SessionMultiSelectionTests {
         #expect(selection.anchorConversationID == "e")
     }
 
+    @Test func onlySelectedRowIsNamedWhenExactlyOneIsSelected() {
+        var selection = SessionMultiSelection()
+        #expect(selection.onlySelectedConversationID == nil)
+
+        selection.selectOnly("b")
+        #expect(selection.onlySelectedConversationID == "b")
+
+        selection.toggle("d")
+        #expect(selection.onlySelectedConversationID == nil)
+
+        selection.toggle("b")
+        #expect(selection.onlySelectedConversationID == "d")
+    }
+
     @Test func keepOnlyDropsRowsThatAreNoLongerVisible() {
         var selection = SessionMultiSelection()
         selection.selectOnly("a")

@@ -27,10 +27,10 @@ struct WorkspaceTabBar: View {
             .padding(.vertical, 8)
         }
         .background(ThemePalette.contentSurface.ignoresSafeArea())
-        .confirmationDialog(closingTabTmuxHost == nil ? "End this CLI session?" : "Close this tab?", isPresented: Binding(
-            get: { closingSessionID != nil },
-            set: { if !$0 { closingSessionID = nil } }
-        )) {
+        .confirmationDialog(
+            closingTabTmuxHost == nil ? "End this CLI session?" : "Close this tab?",
+            isPresented: Binding(isPresenting: $closingSessionID)
+        ) {
             if closingTabTmuxHost != nil {
                 Button("Keep running") {
                     if let closingSessionID { store.closeTerminal(closingSessionID, endingTmuxSession: false) }

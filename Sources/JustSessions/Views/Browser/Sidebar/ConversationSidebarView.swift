@@ -15,10 +15,8 @@ struct ConversationSidebarView: View {
     let onNewSessionOnHost: (SessionHost) -> Void
     let onSelectConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void
-    let onDeleteConversation: (Conversation) -> Void
-    let onDeleteConversations: ([Conversation]) -> Void
     let onRenameProject: (ProjectConversationGroup) -> Void
-    let onDeleteProjectSessions: (String) -> Void
+    let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     @State private var expandedProjectPaths: Set<String> = []
     @State private var isAddRemoteHostSheetPresented = false
@@ -98,11 +96,9 @@ struct ConversationSidebarView: View {
                                     store.selectTerminal(terminalID)
                                 },
                                 onRenameConversation: onRenameConversation,
-                                onDeleteConversation: onDeleteConversation,
-                                onDeleteSelectedConversations: { onDeleteConversations(selectedConversations) },
                                 onClearSessionSelection: { sessionSelection.clear() },
                                 onRenameProject: { onRenameProject(project) },
-                                onDeleteProjectSessions: { onDeleteProjectSessions(project.id) }
+                                onRequestDeletion: onRequestDeletion
                             )
                         }
                         .padding(.horizontal, 8)
@@ -115,9 +111,9 @@ struct ConversationSidebarView: View {
                 ThemeDivider()
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
-                    isDeleteDisabled: store.isScanningThisMac || store.isDeletingSessions,
+                    isDeleteDisabled: !store.canStartDeletion,
                     onClear: { sessionSelection.clear() },
-                    onDelete: { onDeleteConversations(selectedConversations) }
+                    onDelete: { onRequestDeletion(.conversations(selectedConversations)) }
                 )
             }
 

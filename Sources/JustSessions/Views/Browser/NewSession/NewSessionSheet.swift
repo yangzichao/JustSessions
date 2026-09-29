@@ -98,10 +98,7 @@ struct NewSessionSheet: View {
         }
         .padding(24)
         .frame(width: 520)
-        .alert("Could not start session", isPresented: Binding(
-            get: { errorMessage != nil },
-            set: { if !$0 { errorMessage = nil } }
-        )) {
+        .alert("Could not start session", isPresented: Binding(isPresenting: $errorMessage)) {
             Button("OK") { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "Unknown error")
