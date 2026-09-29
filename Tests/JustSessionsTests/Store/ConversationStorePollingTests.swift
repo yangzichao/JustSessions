@@ -8,7 +8,9 @@ struct ConversationStorePollingTests {
         let runs = RunCounter()
         var store: ConversationStore? = ConversationStore(adapters: [])
         store?.runPeriodically(every: .milliseconds(10)) { _ in runs.count += 1 }
-        try await expectEventually { runs.count >= 3 }
+        // Other suites can occupy the main actor for several seconds on shared CI runners.
+        // Keep the repeated-work assertion, with enough time for three separate timer deliveries.
+        try await expectEventually(timeout: .seconds(10)) { runs.count >= 3 }
 
         weak var releasedStore = store
         store = nil
