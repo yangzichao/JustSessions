@@ -1,46 +1,35 @@
 import SwiftUI
 
-/// SSH hosts, update checks, and the source repository, kept small at the bottom of the sidebar.
+/// Host actions sit above the permanent app settings and support controls.
 struct SidebarFooter: View {
     let onAddRemoteHost: () -> Void
     let onCheckForUpdates: () -> Void
 
     var body: some View {
-        // A sidebar too narrow for both titles drops Update's, so "Add SSH host…" is never cut off.
-        ViewThatFits(in: .horizontal) {
-            footerRow(updateButton: checkForUpdatesButton.labelStyle(.titleAndIcon))
-            footerRow(updateButton: checkForUpdatesButton.labelStyle(.iconOnly))
+        VStack(alignment: .leading, spacing: 2) {
+            SidebarAddRemoteHostButton(action: onAddRemoteHost)
+                .frame(height: 28)
+
+            HStack(spacing: 8) {
+                SidebarSettingsLink()
+                checkForUpdatesButton
+                SidebarRepositoryLink()
+            }
         }
         .buttonStyle(.borderless)
         .font(.system(size: 12))
         .padding(.horizontal, 16)
-        .frame(height: 36)
-    }
-
-    private func footerRow(updateButton: some View) -> some View {
-        HStack(spacing: 0) {
-            SidebarAddRemoteHostButton(action: onAddRemoteHost)
-            Spacer(minLength: 12)
-            updateButton
-            Link(destination: AppLinks.githubRepositoryURL) {
-                Label {
-                    Text("GitHub")
-                } icon: {
-                    GitHubMark()
-                        .frame(width: 16, height: 16)
-                }
-                .labelStyle(.iconOnly)
-            }
-            .padding(.leading, 12)
-            .help("Open JustSessions on GitHub")
-            .accessibilityLabel("Open JustSessions on GitHub")
-        }
+        .padding(.vertical, 6)
     }
 
     private var checkForUpdatesButton: some View {
         Button(action: onCheckForUpdates) {
             Label("Update", systemImage: "arrow.down.circle")
+                .labelStyle(.iconOnly)
+                .frame(width: 26, height: 30)
+                .contentShape(Rectangle())
         }
         .help("Check for updates")
+        .accessibilityLabel("Check for updates")
     }
 }

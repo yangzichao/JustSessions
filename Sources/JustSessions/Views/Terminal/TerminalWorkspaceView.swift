@@ -38,12 +38,6 @@ struct TerminalWorkspaceView: View {
                 .buttonStyle(.borderless)
                 .disabled(!session.hasSelection)
                 .help("Hold Shift while dragging to select terminal text, then copy it (⌘C)")
-                SettingsLink {
-                    Label("Terminal appearance", systemImage: "gearshape")
-                        .labelStyle(.iconOnly)
-                }
-                .buttonStyle(.borderless)
-                .help("Terminal appearance (⌘,)")
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
