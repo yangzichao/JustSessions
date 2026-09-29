@@ -18,7 +18,7 @@ struct ConversationSidebarView: View {
     let onRenameProject: (ProjectConversationGroup) -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
-    @State private var expandedProjectPaths: Set<String> = []
+    @State private var projectExpansion = ProjectExpansion()
     @State private var isAddRemoteHostSheetPresented = false
 
     private var isSearching: Bool {
@@ -73,20 +73,24 @@ struct ConversationSidebarView: View {
                             .padding(.bottom, 4)
 
                         if section.projects.isEmpty {
-                            emptyProjectsMessage(for: section.host)
+                            SidebarEmptyHostNote(message: SidebarEmptyHostMessage(
+                                host: section.host,
+                                refreshStatus: store.hostRefreshStatuses[section.host],
+                                isSearching: isSearching,
+                                recencyFilter: recencyFilter
+                            ))
                         }
 
-                        let repeatedNames = Self.repeatedProjectNames(in: section.projects)
+                        let parentLabels = ProjectParentLabels(projectsOnOneHost: section.projects)
                         ForEach(section.projects) { project in
                             SidebarProjectSection(
                                 store: store,
                                 project: project,
-                                parentLabel: repeatedNames.contains(project.displayName)
-                                    ? projectParentLabel(project.location.path) : nil,
+                                parentLabel: parentLabels.label(for: project),
                                 isExpanded: isExpanded(project),
                                 sessionSelection: sessionSelection,
                                 selectedConversations: selectedConversations,
-                                onToggle: { toggleExpansion(of: project) },
+                                onToggle: { projectExpansion.toggle(project.id) },
                                 onNewSession: { provider in
                                     store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
                                 },
@@ -154,47 +158,8 @@ struct ConversationSidebarView: View {
         )
     }
 
-    /// Why a host lists no projects: its refresh is running or failed, or the filters left nothing.
-    private func emptyProjectsMessage(for host: SessionHost) -> some View {
-        Group {
-            if case .failed(let message)? = store.hostRefreshStatuses[host] {
-                Text(message).foregroundStyle(ThemePalette.warning)
-            } else {
-                Text(emptyProjectsText(for: host)).foregroundStyle(.secondary)
-            }
-        }
-        .font(.system(size: 12))
-        .fixedSize(horizontal: false, vertical: true)
-        .padding(.horizontal, 18)
-        .padding(.vertical, 4)
-    }
-
-    private func emptyProjectsText(for host: SessionHost) -> String {
-        if store.hostRefreshStatuses[host] == .refreshing {
-            return host == .thisMac ? "Scanning sessions…" : "Copying sessions…"
-        }
-        if isSearching { return "No matching projects or sessions" }
-        return recencyFilter == .recent ? "No sessions in the past seven days" : "No sessions"
-    }
-
-    /// Names shared by two projects on the same host; those rows add their parent folder. The same name on two
-    /// hosts needs nothing, since the headings already tell them apart.
-    private static func repeatedProjectNames(in projects: [ProjectConversationGroup]) -> Set<String> {
-        Set(Dictionary(grouping: projects, by: \.displayName)
-            .filter { $0.value.count > 1 }
-            .map(\.key))
-    }
-
     private func isExpanded(_ project: ProjectConversationGroup) -> Bool {
-        isSearching || expandedProjectPaths.contains(project.id)
-    }
-
-    private func toggleExpansion(of project: ProjectConversationGroup) {
-        if expandedProjectPaths.contains(project.id) {
-            expandedProjectPaths.remove(project.id)
-        } else {
-            expandedProjectPaths.insert(project.id)
-        }
+        projectExpansion.isExpanded(project.id, whileSearching: isSearching)
     }
 
     private func handleConversationClick(_ conversation: Conversation) {
@@ -211,14 +176,7 @@ struct ConversationSidebarView: View {
         }
     }
 
-    private func projectParentLabel(_ folderPath: String) -> String {
-        let parent = URL(fileURLWithPath: folderPath).deletingLastPathComponent()
-        return parent.pathComponents.suffix(2).joined(separator: "/")
-    }
-
     private func expandProjectsWithOpenTerminals() {
-        for terminal in store.terminalSessions {
-            expandedProjectPaths.insert(terminal.projectDirectoryKey)
-        }
+        projectExpansion.expand(store.terminalSessions.map(\.projectDirectoryKey))
     }
 }
