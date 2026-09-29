@@ -54,6 +54,7 @@ struct SessionDeletionConfirmationTextTests {
             plan: plan
         )
         #expect(message == "This affects all tools in /Users/me/app, including sessions hidden by the current filter. "
+            + "The project will stay in the sidebar. "
             + "Claude Code sessions move to the Trash; Codex sessions are permanently deleted. "
             + "1 session with an open terminal will be skipped.")
     }
@@ -65,6 +66,7 @@ struct SessionDeletionConfirmationTextTests {
             plan: plan
         )
         #expect(message == "This affects all tools in devbox:/srv/app, including sessions hidden by the current filter. "
+            + "The project will stay in the sidebar. "
             + "SSH hosts have no Trash, so every session is permanently deleted.")
     }
 

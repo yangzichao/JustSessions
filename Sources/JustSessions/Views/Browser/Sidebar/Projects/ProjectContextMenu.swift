@@ -26,6 +26,10 @@ struct ProjectContextMenu: View {
             store.setPinned(!project.isPinned, projectPath: project.projectPath)
         }
         Divider()
+        Button("Remove from sidebar", systemImage: "sidebar.left") {
+            store.removeProjectFromSidebar(project.id)
+        }
+        Divider()
         Button(
             "Delete all deletable sessions (\(deletionPlan.deletableConversations.count))…",
             systemImage: "trash",

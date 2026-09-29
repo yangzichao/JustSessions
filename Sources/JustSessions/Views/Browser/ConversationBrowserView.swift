@@ -15,27 +15,21 @@ struct ConversationBrowserView: View {
     @StateObject private var updateManager = SparkleUpdateManager()
 
     private var providerConversations: [Conversation] {
-        store.conversations.filter { providerFilter.includes($0.provider) }
+        store.sidebarConversations.filter { providerFilter.includes($0.provider) }
     }
 
     private var sidebarProjects: [ProjectConversationGroup] {
-        let projects = ProjectConversationGroup.grouped(
-            providerConversations.filter { recencyFilter.includes($0) },
-            pendingNewSessions: store.pendingNewSessions.filter { providerFilter.includes($0.provider) },
-            displayNames: store.projectDisplayNames,
-            pinnedItems: store.pinnedItems
+        let projects = SidebarProjectFiltering.projects(
+            store.sidebarProjectGroups,
+            providerFilter: providerFilter,
+            recencyFilter: recencyFilter
         )
         return SidebarProjectFiltering.projects(projects, matching: searchText) { store.title(for: $0) }
     }
 
     /// Projects on every host that a new session can start in, most recent first.
     private var startableProjects: [ProjectConversationGroup] {
-        ProjectConversationGroup.grouped(
-            store.conversations,
-            displayNames: store.projectDisplayNames,
-            pinnedItems: store.pinnedItems
-        )
-            .filter(\.canStartNewSession)
+        store.sidebarProjectGroups.filter(\.canStartNewSession)
     }
 
     private var focusedConversation: Conversation? {

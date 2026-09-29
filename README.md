@@ -61,6 +61,7 @@ Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of th
 
 **Clean up**
 - Delete sessions one at a time, in a multi-selection (⌘-click, ⇧-click), or per project, always after a confirmation.
+- Projects stay in the sidebar after their last session is deleted, including after restarting the app. Right-click a project and choose **Remove from sidebar** to hide it without deleting its sessions or folder. Starting a new session in that folder brings it back.
 - Claude Code sessions on this Mac go to the macOS Trash. Codex uses `codex delete --force`. SSH hosts have no Trash, so deletions there are permanent.
 - Sessions with an open terminal tab, or still running in tmux, can't be deleted.
 

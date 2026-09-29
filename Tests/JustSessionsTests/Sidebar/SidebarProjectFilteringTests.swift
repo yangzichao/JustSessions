@@ -3,6 +3,35 @@ import Testing
 @testable import JustSessions
 
 struct SidebarProjectFilteringTests {
+    @Test func providerFilterOrdersProjectsByTheirRemainingSessions() {
+        let olderClaude = Conversation.fixture(provider: .claude, projectPath: "/work/first", updatedAt: Date(timeIntervalSince1970: 10))
+        let newestCodex = Conversation.fixture(provider: .codex, projectPath: "/work/first", updatedAt: Date(timeIntervalSince1970: 30))
+        let newerClaude = Conversation.fixture(provider: .claude, projectPath: "/work/second", updatedAt: Date(timeIntervalSince1970: 20))
+        let projects = ProjectConversationGroup.grouped([olderClaude, newestCodex, newerClaude])
+
+        let filteredProjects = SidebarProjectFiltering.projects(projects, providerFilter: .claude, recencyFilter: .all)
+
+        #expect(projects.map(\.id) == [olderClaude.projectDirectoryKey, newerClaude.projectDirectoryKey])
+        #expect(filteredProjects.map(\.id) == [newerClaude.projectDirectoryKey, olderClaude.projectDirectoryKey])
+    }
+
+    @Test func filtersRetainEmptyProjectsWithoutShowingFilteredOutSessionsAsEmptyProjects() {
+        let oldClaude = Conversation.fixture(provider: .claude, projectPath: "/work/old", updatedAt: .distantPast)
+        let recentCodex = Conversation.fixture(provider: .codex, projectPath: "/work/recent")
+        let projects = ProjectConversationGroup.grouped(
+            [oldClaude, recentCodex],
+            retainedProjectPaths: ["/work/empty", oldClaude.projectDirectoryKey, recentCodex.projectDirectoryKey]
+        )
+
+        let filteredProjects = SidebarProjectFiltering.projects(projects, providerFilter: .claude, recencyFilter: .recent)
+        #expect(filteredProjects.map(\.id) == ["/work/empty"])
+        #expect(filteredProjects.first?.sessionCount == 0)
+        #expect(SidebarProjectFiltering.projects(filteredProjects, matching: "empty", title: \.suggestedTitle).count == 1)
+        #expect(SidebarProjectFiltering.projects(filteredProjects, matching: "missing", title: \.suggestedTitle).isEmpty)
+        let allRecentProjects = SidebarProjectFiltering.projects(projects, providerFilter: .all, recencyFilter: .recent)
+        #expect(allRecentProjects.map(\.id) == [recentCodex.projectDirectoryKey, "/work/empty"])
+    }
+
     @Test func projectMatchKeepsAllSessionsAndSessionMatchKeepsOnlyMatches() {
         let website = conversation(project: "/tmp/website", title: "Fix header")
         let websiteOther = conversation(project: "/tmp/website", title: "Update footer")

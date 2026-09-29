@@ -10,6 +10,7 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var titleAliases: ConversationTitleAliases
     @Published private(set) var projectDisplayNames: ProjectDisplayNames
     @Published private(set) var pinnedItems: PinnedItems
+    @Published var sidebarProjectList: SidebarProjectList
     @Published private(set) var terminalSessions: [TerminalSession] = []
     @Published private(set) var selectedTerminalID: UUID?
     @Published private(set) var deletingConversationID: String?
@@ -34,7 +35,7 @@ final class ConversationStore: ObservableObject {
 
     private let adapters: [any ConversationAdapter]
     let commandResolver: NativeCLICommandResolver
-    /// Where custom titles, project names, pins, and SSH hosts are kept.
+    /// Where custom titles, project names, pins, sidebar projects, and SSH hosts are kept.
     let userDefaults: UserDefaults
 
     init(
@@ -48,6 +49,7 @@ final class ConversationStore: ObservableObject {
         self.titleAliases = ConversationTitleAliases.load(from: userDefaults)
         self.projectDisplayNames = ProjectDisplayNames.load(from: userDefaults)
         self.pinnedItems = PinnedItems.load(from: userDefaults)
+        self.sidebarProjectList = SidebarProjectList.load(from: userDefaults)
         self.remoteHostList = RemoteHostList.load(from: userDefaults)
         LoginShellPathReader.warmUpInBackground()
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
@@ -97,6 +99,7 @@ final class ConversationStore: ObservableObject {
 
     /// Swaps in what one host lists now, keeping every other host's sessions.
     func replaceConversations(on host: SessionHost, with hostConversations: [Conversation]) {
+        rememberSidebarProjects(Set(hostConversations.map(\.projectDirectoryKey)))
         conversations = (conversations.filter { $0.host != host } + hostConversations)
             .sorted { $0.updatedAt > $1.updatedAt }
         synchronizeTerminalTitles()
@@ -267,6 +270,7 @@ final class ConversationStore: ObservableObject {
 
     /// Adds the tab and shows it.
     func openTerminal(_ session: TerminalSession) {
+        showProjectInSidebar(session.projectDirectoryKey)
         terminalSessions.append(session)
         selectedTerminalID = session.id
     }

@@ -24,6 +24,14 @@ struct SidebarProjectSection: View {
 
             if isExpanded {
                 VStack(spacing: 1) {
+                    if project.sessionCount == 0 {
+                        Text("No sessions")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.tertiary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 40)
+                            .padding(.vertical, 5)
+                    }
                     ForEach(project.pendingNewSessions) { pendingNewSession in
                         if let terminal = store.terminalSessions.first(where: { $0.id == pendingNewSession.terminalID }) {
                             PendingNewSessionRow(

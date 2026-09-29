@@ -1,6 +1,31 @@
 import Foundation
 
 enum SidebarProjectFiltering {
+    /// Truly empty projects remain available for new sessions. A populated project hidden by session filters
+    /// must not be mistaken for an empty project.
+    static func projects(
+        _ projects: [ProjectConversationGroup],
+        providerFilter: ConversationProviderFilter,
+        recencyFilter: SessionRecencyFilter
+    ) -> [ProjectConversationGroup] {
+        let filteredProjects: [ProjectConversationGroup] = projects.compactMap { project in
+            guard project.sessionCount > 0 else { return project }
+            let conversations = project.conversations.filter {
+                providerFilter.includes($0.provider) && recencyFilter.includes($0)
+            }
+            let pendingNewSessions = project.pendingNewSessions.filter { providerFilter.includes($0.provider) }
+            guard !conversations.isEmpty || !pendingNewSessions.isEmpty else { return nil }
+            return ProjectConversationGroup(
+                projectPath: project.projectPath,
+                displayName: project.displayName,
+                isPinned: project.isPinned,
+                conversations: conversations,
+                pendingNewSessions: pendingNewSessions
+            )
+        }
+        return ProjectConversationGroup.orderedForSidebar(filteredProjects)
+    }
+
     /// A project whose name or path matches keeps all its sessions. Otherwise only sessions whose
     /// title or session ID match stay, and projects left with none are dropped.
     static func projects(

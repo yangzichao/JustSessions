@@ -27,6 +27,7 @@ enum SessionDeletionConfirmationText {
     static func message(forDeletingProjectAt location: ProjectLocation, plan: SessionDeletionPlan) -> String {
         joined([
             "This affects all tools in \(location.copyablePath), including sessions hidden by the current filter.",
+            "The project will stay in the sidebar.",
             location.host == .thisMac
                 ? "Claude Code sessions move to the Trash; Codex sessions are permanently deleted."
                 : "SSH hosts have no Trash, so every session is permanently deleted.",

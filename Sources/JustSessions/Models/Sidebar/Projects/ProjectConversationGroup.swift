@@ -30,12 +30,14 @@ struct ProjectConversationGroup: Identifiable {
     static func grouped(
         _ conversations: [Conversation],
         pendingNewSessions: [PendingNewSession] = [],
+        retainedProjectPaths: Set<String> = [],
         displayNames: ProjectDisplayNames = ProjectDisplayNames(),
         pinnedItems: PinnedItems = PinnedItems()
     ) -> [ProjectConversationGroup] {
         let conversationsByProject = Dictionary(grouping: conversations, by: \.projectDirectoryKey)
         let pendingNewSessionsByProject = Dictionary(grouping: pendingNewSessions, by: \.projectDirectoryKey)
-        return Set(conversationsByProject.keys).union(pendingNewSessionsByProject.keys)
+        let projects = Set(conversationsByProject.keys).union(pendingNewSessionsByProject.keys)
+            .union(retainedProjectPaths)
             .map { projectPath in
                 ProjectConversationGroup(
                     projectPath: projectPath,
@@ -53,10 +55,14 @@ struct ProjectConversationGroup: Identifiable {
                     }
                 )
             }
-            .sorted { first, second in
-                if first.isPinned != second.isPinned { return first.isPinned }
-                if first.latestActivity != second.latestActivity { return first.latestActivity > second.latestActivity }
-                return first.projectPath.localizedStandardCompare(second.projectPath) == .orderedAscending
-            }
+        return orderedForSidebar(projects)
+    }
+
+    static func orderedForSidebar(_ projects: [ProjectConversationGroup]) -> [ProjectConversationGroup] {
+        projects.sorted { first, second in
+            if first.isPinned != second.isPinned { return first.isPinned }
+            if first.latestActivity != second.latestActivity { return first.latestActivity > second.latestActivity }
+            return first.projectPath.localizedStandardCompare(second.projectPath) == .orderedAscending
+        }
     }
 }

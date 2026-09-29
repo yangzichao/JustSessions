@@ -3,6 +3,47 @@ import Testing
 @testable import JustSessions
 
 struct ProjectSessionDeletionTests {
+    @Test(arguments: ["single", "selection", "project"])
+    @MainActor func deletingTheLastSessionKeepsTheProjectAcrossRefreshAndRelaunch(_ deletionKind: String) async throws {
+        let temporaryDirectory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let projectFolder = try makeProject("kept-project", in: temporaryDirectory)
+        let conversation = try savedConversation(.claude, project: projectFolder, in: temporaryDirectory)
+        let store = makeStore(listing: [conversation], userDefaults: isolatedUserDefaults.userDefaults)
+        store.refreshThisMac()
+        try await expectEventually { !store.isScanningThisMac }
+        store.renameProject(conversation.projectDirectoryKey, to: "Kept project")
+        store.setPinned(true, projectPath: conversation.projectDirectoryKey)
+
+        switch deletionKind {
+        case "single": store.delete(conversation)
+        case "selection": store.deleteConversations([conversation])
+        default: store.deleteSessions(in: conversation.projectDirectoryKey)
+        }
+        try await expectEventually { !store.isDeletingSessions }
+        #expect(store.conversations.isEmpty)
+        #expect(!FileManager.default.fileExists(atPath: conversation.sourceFile.path))
+        #expect(store.sidebarProjectGroups.map(\.id) == [conversation.projectDirectoryKey])
+        store.refreshThisMac()
+        try await expectEventually { !store.isScanningThisMac }
+
+        let relaunchedStore = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        let keptProject = try #require(relaunchedStore.sidebarProjectGroups.first)
+        #expect(keptProject.id == conversation.projectDirectoryKey)
+        #expect(keptProject.sessionCount == 0)
+        #expect(keptProject.displayName == "Kept project")
+        #expect(keptProject.isPinned)
+        #expect(keptProject.canStartNewSession)
+        #expect(store.sidebarProjectGroups.map(\.id) == [keptProject.id])
+
+        relaunchedStore.removeProjectFromSidebar(keptProject.id)
+        #expect(relaunchedStore.sidebarProjectGroups.isEmpty)
+        #expect(FileManager.default.fileExists(atPath: projectFolder.path))
+        #expect(ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults).sidebarProjectGroups.isEmpty)
+    }
+
     @Test @MainActor func batchDeletionKeepsOtherProjectsAndUnsupportedSessions() async throws {
         let temporaryDirectory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
