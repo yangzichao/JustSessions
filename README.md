@@ -48,7 +48,7 @@ Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of th
 - Resume a session in its native CLI inside an embedded terminal: double-click it, use **Resume**, or right-click.
 - Branch (fork) a Claude Code or Codex conversation into a new session. This forks the conversation, not a Git branch.
 - Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI. It appears in the sidebar right away.
-- Keep several terminal tabs open. Switch between a running CLI and the preview without stopping it.
+- Keep several terminal tabs open. Select a session in the sidebar to read its preview, or select a terminal tab to return to its CLI without stopping it.
 - With tmux 3.3 or later installed, a CLI on this Mac runs inside tmux. Closing its tab with **Keep running**, quitting the app, or installing an update leaves it running. Resume the session to reattach, or right-click it and choose **End on this Mac**.
 - Pick up names set with `/rename` in Claude Code within about a second.
 

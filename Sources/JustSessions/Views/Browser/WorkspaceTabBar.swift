@@ -13,15 +13,6 @@ struct WorkspaceTabBar: View {
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 6) {
-                Button {
-                    store.selectTerminal(nil)
-                } label: {
-                    Label("Preview", systemImage: "text.bubble")
-                }
-                .buttonStyle(WorkspaceTabButtonStyle(isSelected: store.selectedTerminalID == nil))
-                .help("Show the selected session's conversation")
-                .accessibilityLabel("Show session preview")
-
                 ForEach(store.terminalSessions) { session in
                     TerminalTab(
                         session: session,

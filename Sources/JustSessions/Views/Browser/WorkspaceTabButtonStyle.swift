@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Chip look shared by the Preview tab and terminal tabs. The selected tab is a raised paper chip with ink text,
+/// Chip look for terminal tabs. The selected tab is a raised paper chip with ink text,
 /// like a tab pulled forward; the others sit flat in secondary text and only show a faint fill under the pointer.
 struct WorkspaceTabButtonStyle: ButtonStyle {
     let isSelected: Bool

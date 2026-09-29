@@ -64,12 +64,7 @@ struct ConversationBrowserView: View {
                 onNewSessionOnHost: { newSessionSheetHost = $0 },
                 onSelectConversation: { conversation in
                     sessionSelection.selectOnly(conversation.id)
-                    let openTerminal = store.terminalSessions.first(where: {
-                        $0.conversation?.id == conversation.id && !$0.hasExited
-                    }) ?? store.terminalSessions.first(where: {
-                        $0.conversation?.id == conversation.id
-                    })
-                    store.selectTerminal(openTerminal?.id)
+                    store.selectTerminal(nil)
                 },
                 onRenameConversation: onRename,
                 onDeleteConversation: onDelete,
@@ -79,8 +74,10 @@ struct ConversationBrowserView: View {
             )
         } detail: {
             VStack(spacing: 0) {
-                WorkspaceTabBar(store: store, onRenameConversation: onRename)
-                ThemeDivider()
+                if !store.terminalSessions.isEmpty {
+                    WorkspaceTabBar(store: store, onRenameConversation: onRename)
+                    ThemeDivider()
+                }
                 ZStack {
                     SessionPreviewPane(
                         store: store,
