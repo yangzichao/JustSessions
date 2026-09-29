@@ -1,27 +1,21 @@
 import SwiftUI
 
-/// The Appearance tab of Settings: System, Light, or Dark for the whole app, each shown as a sketch of the window.
+/// The Appearance tab of Settings: System, Light, or Dark for the whole app, and the theme it is drawn in, each shown
+/// as a sketch of the window.
 struct AppAppearanceSettingsView: View {
-    @ObservedObject var appAppearanceStore: AppAppearanceStore
+    let appAppearanceStore: AppAppearanceStore
+    let appThemeStore: AppThemeStore
     @ObservedObject var terminalAppearanceStore: TerminalAppearanceStore
 
     var body: some View {
-        Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 12) {
-            GridRow {
-                Text("Appearance")
-                HStack(spacing: 14) {
-                    ForEach(AppAppearanceMode.allCases) { mode in
-                        AppAppearanceOption(
-                            mode: mode,
-                            isSelected: appAppearanceStore.mode == mode,
-                            onSelect: { appAppearanceStore.setMode(mode) }
-                        )
-                    }
-                }
-                // The grid offers this column less than the cards need, and a squeezed card loses its name.
-                .fixedSize()
-                .accessibilityElement(children: .contain)
-                .accessibilityLabel("Appearance")
+        Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 20) {
+            GridRow(alignment: .top) {
+                Text("Appearance").levelWithThumbnails()
+                AppAppearanceModePicker(appAppearanceStore: appAppearanceStore)
+            }
+            GridRow(alignment: .top) {
+                Text("Theme").levelWithThumbnails()
+                AppThemePicker(appThemeStore: appThemeStore)
             }
             GridRow {
                 Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
@@ -39,9 +33,9 @@ struct AppAppearanceSettingsView: View {
     /// Terminals can have colors of their own, so say whether they follow this choice.
     private var terminalNote: String {
         switch terminalAppearanceStore.preferences.mode {
-        case .matchApp: "Terminals match the app unless you choose their colors in the Terminal tab."
-        case .light: "Terminals stay light, as chosen in the Terminal tab."
-        case .dark: "Terminals stay dark, as chosen in the Terminal tab."
+        case .matchApp: "Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab."
+        case .light: "Terminals use the theme's light colors, as set in the Terminal tab."
+        case .dark: "Terminals use the theme's dark colors, as set in the Terminal tab."
         }
     }
 }

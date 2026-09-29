@@ -43,6 +43,6 @@ struct SessionPreviewPane: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(ThemePalette.contentSurface.ignoresSafeArea())
+        .background(ThemePalette.contentSurface)
     }
 }

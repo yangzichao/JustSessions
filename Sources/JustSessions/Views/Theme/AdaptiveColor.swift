@@ -18,15 +18,6 @@ extension NSColor {
             appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua ? darkColor : lightColor
         }
     }
-
-    /// The concrete sRGB color this dynamic color draws as under `appearance`, for APIs that read components.
-    func resolved(for appearance: NSAppearance) -> NSColor {
-        var resolvedColor = self
-        appearance.performAsCurrentDrawingAppearance {
-            resolvedColor = self.usingColorSpace(.sRGB) ?? self
-        }
-        return resolvedColor
-    }
 }
 
 extension Color {

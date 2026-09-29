@@ -26,7 +26,7 @@ struct WorkspaceTabBar: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
         }
-        .background(ThemePalette.contentSurface.ignoresSafeArea())
+        .background(ThemePalette.contentSurface)
         .confirmationDialog(
             closingTabTmuxHost == nil ? "End this CLI session?" : "Close this tab?",
             isPresented: Binding(isPresenting: $closingSessionID)

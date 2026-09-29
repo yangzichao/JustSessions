@@ -3,6 +3,8 @@ import SwiftUI
 /// The Terminal tab of Settings: colors, which match the app unless set here, and the font.
 struct TerminalAppearanceSettingsView: View {
     @ObservedObject var appearanceStore: TerminalAppearanceStore
+    /// For the preview, which shows the theme's terminal colors.
+    let themeStore: AppThemeStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -49,7 +51,7 @@ struct TerminalAppearanceSettingsView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Preview").font(.subheadline.weight(.medium))
-                TerminalAppearancePreview(appearanceStore: appearanceStore)
+                TerminalAppearancePreview(appearanceStore: appearanceStore, themeStore: themeStore)
                     .frame(height: max(180, appearanceStore.preferences.fontSize * 9))
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(ThemePalette.hairline))

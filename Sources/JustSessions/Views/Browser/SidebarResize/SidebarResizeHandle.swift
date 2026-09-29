@@ -13,8 +13,11 @@ struct SidebarResizeHandle: View {
 
     var body: some View {
         // The hairline sits on the sidebar's edge and the rest of the grab area continues the detail's surface.
-        ThemePalette.contentSurface
-            .overlay(isHovering ? ThemePalette.hoverFill : Color.clear)
+        Rectangle()
+            .fill(ThemePalette.contentSurface)
+            .overlay {
+                if isHovering { Rectangle().fill(ThemePalette.hoverFill) }
+            }
             .frame(width: 8)
             .overlay(alignment: .leading) {
                 Rectangle()

@@ -11,25 +11,26 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     var sendsShiftReturnAsCSIu = false
 
     private var appearancePreferences = TerminalAppearancePreferences()
+    private var theme = AppTheme.justSessions
     private var appearanceSubscription: AnyCancellable?
 
     override convenience init(frame: CGRect) {
-        self.init(frame: frame, appearanceStore: .shared)
+        self.init(frame: frame, appearanceStore: .shared, themeStore: .shared)
     }
 
-    init(frame: CGRect, appearanceStore: TerminalAppearanceStore) {
+    init(frame: CGRect, appearanceStore: TerminalAppearanceStore, themeStore: AppThemeStore) {
         super.init(frame: frame)
-        observeAppearance(in: appearanceStore)
+        observeAppearance(in: appearanceStore, themeStore: themeStore)
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        observeAppearance(in: .shared)
+        observeAppearance(in: .shared, themeStore: .shared)
     }
 
     override func viewDidChangeEffectiveAppearance() {
         super.viewDidChangeEffectiveAppearance()
-        TerminalAppearanceStyling.apply(appearancePreferences, to: self)
+        TerminalAppearanceStyling.apply(appearancePreferences, theme: theme, to: self)
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -52,12 +53,13 @@ final class SelectableTerminalView: LocalProcessTerminalView {
         onSelectionChanged?(selectionActive)
     }
 
-    private func observeAppearance(in store: TerminalAppearanceStore) {
-        appearanceSubscription = store.$preferences.sink { [weak self] preferences in
+    private func observeAppearance(in store: TerminalAppearanceStore, themeStore: AppThemeStore) {
+        appearanceSubscription = store.$preferences.combineLatest(themeStore.$theme).sink { [weak self] preferences, theme in
             guard let self else { return }
             appearancePreferences = preferences
+            self.theme = theme
             appearance = preferences.mode.nativeAppearance
-            TerminalAppearanceStyling.apply(preferences, to: self)
+            TerminalAppearanceStyling.apply(preferences, theme: theme, to: self)
         }
     }
 }

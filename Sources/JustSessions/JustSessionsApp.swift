@@ -7,6 +7,7 @@ struct JustSessionsApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .appTheme(from: .shared)
         }
         // The sidebar and detail colors run up behind the traffic lights instead of under a gray title bar.
         .windowStyle(.hiddenTitleBar)
@@ -18,7 +19,8 @@ struct JustSessionsApp: App {
         }
 
         Settings {
-            SettingsView(appAppearanceStore: .shared, terminalAppearanceStore: .shared)
+            SettingsView(appAppearanceStore: .shared, appThemeStore: .shared, terminalAppearanceStore: .shared)
+                .appTheme(from: .shared)
         }
     }
 }

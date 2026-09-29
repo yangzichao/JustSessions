@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Chip look for terminal tabs. The selected tab is a raised paper chip with ink text,
+/// Chip look for terminal tabs. The selected tab is a raised chip with ink text,
 /// like a tab pulled forward; the others sit flat in secondary text and only show a faint fill under the pointer.
 struct WorkspaceTabButtonStyle: ButtonStyle {
     let isSelected: Bool
@@ -22,7 +22,7 @@ private struct WorkspaceTabChip: View {
     var body: some View {
         configuration.label
             .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
-            .foregroundStyle(isSelected ? ThemePalette.ink : Color.secondary)
+            .foregroundStyle(isSelected ? AnyShapeStyle(ThemePalette.ink) : AnyShapeStyle(.secondary))
             .padding(.horizontal, 11)
             .frame(height: 28)
             .background {

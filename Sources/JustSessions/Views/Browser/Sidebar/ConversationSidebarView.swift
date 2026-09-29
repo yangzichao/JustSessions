@@ -141,9 +141,9 @@ struct ConversationSidebarView: View {
         }
     }
 
-    /// Warm stone under the sidebar, reaching up behind the title bar, sets it apart from the paper-colored detail.
+    /// The theme's sidebar surface, reaching up behind the title bar, sets the list apart from the detail.
     private var sidebarBackground: some View {
-        ThemePalette.sidebarSurface.ignoresSafeArea()
+        Rectangle().fill(ThemePalette.sidebarSurface).ignoresSafeArea()
     }
 
     private func hostHeading(for section: HostProjectSection) -> some View {

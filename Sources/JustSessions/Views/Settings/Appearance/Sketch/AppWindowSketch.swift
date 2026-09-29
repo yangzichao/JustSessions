@@ -1,9 +1,8 @@
 import SwiftUI
 
-/// A miniature of the main window in the theme's colors, sized for a 112 by 72 point thumbnail: the sidebar with a
-/// selected Claude Code session, and that session's preview. It draws in its environment's color scheme.
+/// A miniature of the main window, sized for a 112 by 72 point thumbnail: the sidebar with a selected Claude Code
+/// session, and that session's terminal tab. It draws in its environment's theme and color scheme.
 struct AppWindowSketch: View {
-    private static let selectedProvider = ConversationProvider.claude
     /// Close, minimize, and zoom.
     private static let windowButtonColors: [UInt32] = [0xFF5F57, 0xFEBC2E, 0x28C840]
 
@@ -16,7 +15,7 @@ struct AppWindowSketch: View {
             Rectangle()
                 .fill(ThemePalette.hairline)
                 .frame(width: 0.5)
-            preview
+            TerminalTabSketch()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(ThemePalette.contentSurface)
         }
@@ -42,7 +41,7 @@ struct AppWindowSketch: View {
                 .frame(height: 5)
                 .padding(.top, 6)
 
-            textLine(width: 14, opacity: 0.45)
+            SketchTextLine(width: 14, style: ThemePalette.ink.opacity(0.45))
                 .padding(.leading, 1)
                 .padding(.top, 6)
                 .padding(.bottom, 2)
@@ -60,7 +59,7 @@ struct AppWindowSketch: View {
             Circle()
                 .fill(provider.tintColor)
                 .frame(width: 2.5, height: 2.5)
-            textLine(width: titleWidth, opacity: isSelected ? 0.6 : 0.3)
+            SketchTextLine(width: titleWidth, style: ThemePalette.ink.opacity(isSelected ? 0.6 : 0.3))
             Spacer(minLength: 0)
         }
         .padding(.leading, 5)
@@ -77,66 +76,5 @@ struct AppWindowSketch: View {
                     }
             }
         }
-    }
-
-    private var preview: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            previewHeader
-            Rectangle()
-                .fill(ThemePalette.hairline)
-                .frame(height: 0.5)
-            transcript
-        }
-    }
-
-    /// Like `SessionPreviewHeader`: the CLI's badge, title and details, and the Resume button in the CLI's hue.
-    private var previewHeader: some View {
-        HStack(spacing: 3) {
-            RoundedRectangle(cornerRadius: 2, style: .continuous)
-                .fill(Self.selectedProvider.tintColor.opacity(0.18))
-                .overlay(Circle().fill(Self.selectedProvider.tintColor).frame(width: 2.5, height: 2.5))
-                .frame(width: 8, height: 8)
-            VStack(alignment: .leading, spacing: 2) {
-                textLine(width: 20, height: 2.5, opacity: 0.75)
-                textLine(width: 14, height: 1.5, opacity: 0.3)
-            }
-            Spacer(minLength: 2)
-            RoundedRectangle(cornerRadius: 1.5, style: .continuous)
-                .fill(Self.selectedProvider.emphasisTintColor)
-                .frame(width: 13, height: 5.5)
-        }
-        .padding(.horizontal, 5)
-        .frame(height: 18)
-    }
-
-    /// Like `TranscriptEntryView`: your message on its own surface, then the reply under the CLI's name.
-    private var transcript: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            RoundedRectangle(cornerRadius: 2.5, style: .continuous)
-                .fill(ThemePalette.userMessageSurface)
-                .overlay(alignment: .leading) {
-                    textLine(width: 28, height: 1.5, opacity: 0.4)
-                        .padding(.leading, 4)
-                }
-                .frame(height: 9)
-            Capsule()
-                .fill(Self.selectedProvider.tintColor)
-                .frame(width: 10, height: 1.5)
-                .padding(.top, 5)
-            VStack(alignment: .leading, spacing: 3) {
-                textLine(width: 52, height: 1.5, opacity: 0.25)
-                textLine(width: 46, height: 1.5, opacity: 0.25)
-                textLine(width: 34, height: 1.5, opacity: 0.25)
-            }
-            .padding(.top, 3)
-        }
-        .padding(6)
-    }
-
-    /// A line of text, drawn as a bar of ink.
-    private func textLine(width: CGFloat, height: CGFloat = 2, opacity: Double) -> some View {
-        Capsule()
-            .fill(ThemePalette.ink.opacity(opacity))
-            .frame(width: width, height: height)
     }
 }

@@ -10,11 +10,11 @@ struct SidebarRowBackground: View {
 
     var body: some View {
         RoundedRectangle(cornerRadius: 7, style: .continuous)
-            .fill(fillColor)
+            .fill(fillStyle)
             .overlay(alignment: .leading) {
                 if isSelected {
                     Capsule()
-                        .fill(selectionTint ?? ThemePalette.ink)
+                        .fill(selectionStyle)
                         .frame(width: 3)
                         .padding(.vertical, 7)
                         .padding(.leading, 3)
@@ -22,8 +22,12 @@ struct SidebarRowBackground: View {
             }
     }
 
-    private var fillColor: Color {
-        if isSelected { return (selectionTint ?? ThemePalette.ink).opacity(0.13) }
-        return isHovered ? ThemePalette.hoverFill : .clear
+    private var selectionStyle: AnyShapeStyle {
+        selectionTint.map(AnyShapeStyle.init) ?? AnyShapeStyle(ThemePalette.ink)
+    }
+
+    private var fillStyle: AnyShapeStyle {
+        if isSelected { return AnyShapeStyle(selectionStyle.opacity(0.13)) }
+        return isHovered ? AnyShapeStyle(ThemePalette.hoverFill) : AnyShapeStyle(Color.clear)
     }
 }

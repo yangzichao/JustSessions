@@ -46,4 +46,5 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 Open **Settings** at the bottom of the sidebar, or press ⌘,.
 
 - **Appearance**: choose **System** to switch between light and dark with your Mac, or keep the app **Light** or **Dark**.
-- **Terminal**: terminals match the app unless you give them **Light** or **Dark** colors of their own. The font and size are set here too. Changes apply to open terminals right away.
+- **Theme**: choose the app's colors: JustSessions, Solarized, Gruvbox, Catppuccin, Tokyo Night, or Rosé Pine. Each theme has light and dark colors, and **Appearance** picks between them. Terminals use the theme's colors too.
+- **Terminal**: terminals match the app unless you give them the theme's **Light** or **Dark** colors. The font and size are set here too. Changes apply to open terminals right away.

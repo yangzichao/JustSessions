@@ -1,33 +1,31 @@
-import AppKit
 import SwiftUI
 
-/// The app's colors. Surfaces are warm neutrals instead of system gray and white, the chrome uses the brand Ink,
-/// and saturated color is kept for meaning: each CLI's brand hue, the green of a running CLI, and the amber of
-/// what needs your attention.
+/// The app's colors. Surfaces and the ink come from the theme chosen in Settings (see `AppThemeColors`), and
+/// saturated color is kept for meaning: each CLI's brand hue, the green of a running CLI, and the amber of what needs
+/// your attention.
 enum ThemePalette {
     // MARK: Surfaces
 
-    /// Behind the sidebar: a warm stone that sets the list apart from the reading surface.
-    static let sidebarSurface = Color.adaptive(light: 0xF3F1EC, dark: 0x19191C)
-    /// Behind the preview, the tab bar, and terminals: warm paper rather than pure white or black.
-    static let contentSurface = Color(nsColor: contentSurfaceNSColor)
-    static let contentSurfaceNSColor = NSColor.adaptive(light: NSColor(hexValue: 0xFCFBF8), dark: NSColor(hexValue: 0x1F1F23))
+    /// Behind the sidebar, reaching up behind the title bar.
+    static let sidebarSurface = ThemeColor(role: .sidebarSurface)
+    /// Behind the preview, the tab bar, and terminals.
+    static let contentSurface = ThemeColor(role: .contentSurface)
     /// Raised controls on a surface: the search field, the selected segment, the selected tab.
-    static let raisedSurface = Color.adaptive(light: 0xFFFFFF, dark: 0x2C2C31)
+    static let raisedSurface = ThemeColor(role: .raisedSurface)
     /// Your messages in a transcript.
-    static let userMessageSurface = Color.adaptive(light: 0xF1EDE6, dark: 0x2A2A2F)
+    static let userMessageSurface = ThemeColor(role: .userMessageSurface)
 
     // MARK: Ink
 
-    /// The brand Ink, used where other apps put the system accent: the new-session badge and the selected tab text.
-    static let ink = Color.adaptive(light: 0x15171C, dark: 0xECEAE5)
+    /// Used where other apps put the system accent: the new-session badge and the selected tab text.
+    static let ink = ThemeColor(role: .ink)
     /// Text and glyphs drawn on top of `ink`.
-    static let inkForeground = Color.adaptive(light: 0xFFFFFF, dark: 0x15171C)
-    /// Faint ink fills: the pointer over a row, a track behind a segmented control.
-    static let hoverFill = Color.adaptive(light: 0x15171C, dark: 0xFFFFFF).opacity(0.055)
-    static let trackFill = Color.adaptive(light: 0x15171C, dark: 0xFFFFFF).opacity(0.06)
+    static let inkForeground = ThemeColor(role: .inkForeground)
+    /// Faint fills: the pointer over a row, a track behind a segmented control.
+    static let hoverFill = ThemeColor(role: .line, opacity: 0.055)
+    static let trackFill = ThemeColor(role: .line, opacity: 0.06)
     /// Hairlines between regions and around raised controls.
-    static let hairline = Color.adaptive(light: 0x15171C, dark: 0xFFFFFF).opacity(0.09)
+    static let hairline = ThemeColor(role: .line, opacity: 0.09)
 
     // MARK: Status
 

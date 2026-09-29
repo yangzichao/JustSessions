@@ -3,11 +3,13 @@ import SwiftUI
 /// Uses the same renderer and live appearance subscription as session tabs, without starting a process.
 struct TerminalAppearancePreview: NSViewRepresentable {
     let appearanceStore: TerminalAppearanceStore
+    let themeStore: AppThemeStore
 
     func makeNSView(context: Context) -> SelectableTerminalView {
         let terminalView = SelectableTerminalView(
             frame: NSRect(x: 0, y: 0, width: 490, height: 220),
-            appearanceStore: appearanceStore
+            appearanceStore: appearanceStore,
+            themeStore: themeStore
         )
         terminalView.feed(text: [
             " JustSessions",
