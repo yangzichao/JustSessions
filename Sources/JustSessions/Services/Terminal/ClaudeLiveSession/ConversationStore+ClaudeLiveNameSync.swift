@@ -4,13 +4,7 @@ import Foundation
 /// and the matching sidebar entry, without waiting for a full `refreshThisMac()`.
 extension ConversationStore {
     func startClaudeLiveNameSync(interval: Duration = .seconds(1)) {
-        Task { [weak self] in
-            while !Task.isCancelled {
-                try? await Task.sleep(for: interval)
-                guard let self else { return }
-                self.synchronizeClaudeLiveNames()
-            }
-        }
+        runPeriodically(every: interval) { $0.synchronizeClaudeLiveNames() }
     }
 
     func synchronizeClaudeLiveNames(registry: ClaudeLiveSessionRegistry = ClaudeLiveSessionRegistry()) {

@@ -112,7 +112,7 @@ extension ConversationStore {
             provider: provider,
             projectPath: standardizedPath,
             action: .new,
-            displayTitle: "New \(provider.rawValue) session",
+            displayTitle: provider.newSessionTabTitle,
             command: tabCommand.command,
             preassignedSessionID: preassignment?.sessionID,
             tmuxSessionName: tabCommand.tmuxSessionName

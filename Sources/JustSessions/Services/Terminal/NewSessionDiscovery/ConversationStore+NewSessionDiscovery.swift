@@ -14,13 +14,7 @@ extension ConversationStore {
     }
 
     func startNewSessionDiscovery(interval: Duration = .seconds(2)) {
-        Task { [weak self] in
-            while !Task.isCancelled {
-                try? await Task.sleep(for: interval)
-                guard let self else { return }
-                await self.discoverNewSessions(mayRefresh: true)
-            }
-        }
+        runPeriodically(every: interval) { await $0.discoverNewSessions(mayRefresh: true) }
     }
 
     /// Links waiting tabs to their conversations. With `mayRefresh` it also refreshes when a tab's session

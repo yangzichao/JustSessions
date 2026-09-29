@@ -12,13 +12,7 @@ extension ConversationStore {
     }
 
     func startCLIActivitySync(interval: Duration = .seconds(1)) {
-        Task { [weak self] in
-            while !Task.isCancelled {
-                try? await Task.sleep(for: interval)
-                guard let self else { return }
-                await self.synchronizeCLIActivity()
-            }
-        }
+        runPeriodically(every: interval) { await $0.synchronizeCLIActivity() }
     }
 
     func synchronizeCLIActivity(claudeRegistry: ClaudeLiveSessionRegistry = ClaudeLiveSessionRegistry()) async {

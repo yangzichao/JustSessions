@@ -4,7 +4,7 @@ struct Conversation: Identifiable, Sendable {
     let provider: ConversationProvider
     let sessionID: String
     let projectPath: String
-    let suggestedTitle: String
+    private(set) var suggestedTitle: String
     let updatedAt: Date
     /// For a session on this Mac, the file the CLI wrote. For one on an SSH host, its copy in the local mirror.
     let sourceFile: URL
@@ -19,26 +19,14 @@ struct Conversation: Identifiable, Sendable {
     var supportsDeletionFromLauncher: Bool { provider.supportsDeletionFromLauncher }
 
     func withSuggestedTitle(_ title: String) -> Conversation {
-        Conversation(
-            provider: provider,
-            sessionID: sessionID,
-            projectPath: projectPath,
-            suggestedTitle: title,
-            updatedAt: updatedAt,
-            sourceFile: sourceFile,
-            host: host
-        )
+        var renamed = self
+        renamed.suggestedTitle = title
+        return renamed
     }
     func onHost(_ host: SessionHost) -> Conversation {
-        Conversation(
-            provider: provider,
-            sessionID: sessionID,
-            projectPath: projectPath,
-            suggestedTitle: suggestedTitle,
-            updatedAt: updatedAt,
-            sourceFile: sourceFile,
-            host: host
-        )
+        var moved = self
+        moved.host = host
+        return moved
     }
     var projectLocation: ProjectLocation {
         ProjectLocation(host: host, path: projectPath)

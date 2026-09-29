@@ -23,6 +23,9 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
         }
     }
 
+    /// A new session's tab title until the tab is linked to the session its CLI saves.
+    var newSessionTabTitle: String { "New \(rawValue) session" }
+
     var supportsBranchFromLauncher: Bool { self != .antigravity }
     var supportsDeletionFromLauncher: Bool { self != .antigravity }
     /// Tools whose sessions are listed and resumed on SSH hosts.

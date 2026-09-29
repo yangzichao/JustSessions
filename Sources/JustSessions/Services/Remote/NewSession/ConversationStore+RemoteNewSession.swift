@@ -18,7 +18,7 @@ extension ConversationStore {
             provider: provider,
             projectPath: projectPath,
             action: .new,
-            displayTitle: "New \(provider.rawValue) session",
+            displayTitle: provider.newSessionTabTitle,
             command: command,
             host: .ssh(host),
             sessionIDsKnownAtLaunch: sessionIDsListed(on: .ssh(host)),
@@ -36,12 +36,8 @@ extension ConversationStore {
     }
 
     func startRemoteNewSessionPolling(interval: Duration = .seconds(10)) {
-        Task { [weak self] in
-            while !Task.isCancelled {
-                try? await Task.sleep(for: interval)
-                guard let self else { return }
-                for host in self.hostsWithRemoteNewSessionsToFollow() { self.refreshRemoteHost(host) }
-            }
+        runPeriodically(every: interval) { store in
+            for host in store.hostsWithRemoteNewSessionsToFollow() { store.refreshRemoteHost(host) }
         }
     }
 

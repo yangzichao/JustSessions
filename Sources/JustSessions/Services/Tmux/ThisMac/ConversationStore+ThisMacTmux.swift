@@ -13,13 +13,7 @@ extension ConversationStore {
     }
 
     func startTmuxPaneProcessLookup(interval: Duration = .seconds(1)) {
-        Task { [weak self] in
-            while !Task.isCancelled {
-                try? await Task.sleep(for: interval)
-                guard let self else { return }
-                await self.lookUpTmuxPaneProcesses()
-            }
-        }
+        runPeriodically(every: interval) { await $0.lookUpTmuxPaneProcesses() }
     }
 
     /// A tab whose CLI runs in tmux on this Mac runs a tmux client; the CLI is a process of the tmux server. This
