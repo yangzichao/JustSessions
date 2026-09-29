@@ -23,8 +23,13 @@ struct SidebarFooter: View {
             Spacer(minLength: 12)
             updateButton
             Link(destination: AppLinks.githubRepositoryURL) {
-                Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
-                    .labelStyle(.iconOnly)
+                Label {
+                    Text("GitHub")
+                } icon: {
+                    GitHubMark()
+                        .frame(width: 16, height: 16)
+                }
+                .labelStyle(.iconOnly)
             }
             .padding(.leading, 12)
             .help("Open JustSessions on GitHub")
