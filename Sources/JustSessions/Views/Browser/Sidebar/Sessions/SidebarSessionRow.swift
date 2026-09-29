@@ -1,7 +1,15 @@
 import SwiftUI
 
-/// A session under its project: tool icon and title, then a pin and either its terminal's status or how long ago it was active.
+/// A session under its project: tool icon and title, then a pin and either its CLI's status or how long ago it was active.
 struct SidebarSessionRow: View {
+    /// What the row's trailing status follows.
+    private enum StatusSource {
+        /// A tab's CLI, running or ended.
+        case tab(TerminalSession)
+        /// A CLI running in tmux with no tab open.
+        case detachedCLI(CLIActivity?)
+    }
+
     @ObservedObject var store: ConversationStore
     let conversation: Conversation
     let sessionSelection: SessionMultiSelection
@@ -11,19 +19,34 @@ struct SidebarSessionRow: View {
     let onClearSelection: () -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
-    /// The selected tab when it shows this session, otherwise any tab that does.
-    private var openTerminal: TerminalSession? {
-        store.terminalSessions.first { $0.conversation?.id == conversation.id && $0.id == store.selectedTerminalID }
-            ?? store.terminalSessions.first { $0.conversation?.id == conversation.id }
+    /// A tab whose CLI runs comes first, the selected one among them; then a CLI running in tmux with no tab; then a
+    /// tab whose CLI ended. Nil when nothing runs the session.
+    private func statusSource(tabs: [TerminalSession]) -> StatusSource? {
+        let runningTabs = tabs.filter { !$0.hasExited }
+        if let runningTab = runningTabs.first(where: { $0.id == store.selectedTerminalID }) ?? runningTabs.first {
+            return .tab(runningTab)
+        }
+        if store.isRunningInTmux(conversation) { return .detachedCLI(store.detachedCLIActivities[conversation.id]) }
+        return tabs.first.map { .tab($0) }
+    }
+
+    private func statusDescription(of source: StatusSource) -> String {
+        switch source {
+        case .tab(let tab):
+            (tab.hasExited ? SessionRunStatus.ended : .running(tab.cliActivity)).summary
+        case .detachedCLI(let activity):
+            SessionStatusIndicator.descriptionOfDetachedCLI(.running(activity), on: conversation.host)
+        }
     }
 
     var body: some View {
         let title = store.title(for: conversation)
-        let openTerminal = openTerminal
-        let isHighlighted = sessionSelection.contains(conversation.id)
-            || (openTerminal != nil && openTerminal?.id == store.selectedTerminalID)
+        let tabs = store.terminalSessions.filter { $0.conversation?.id == conversation.id }
+        let statusSource = statusSource(tabs: tabs)
+        let isHighlighted = sessionSelection.contains(conversation.id) || tabs.contains { $0.id == store.selectedTerminalID }
         let isInMultipleSelection = sessionSelection.hasMultipleSelected && sessionSelection.contains(conversation.id)
         let isPinned = store.pinnedItems.isPinned(conversationID: conversation.id)
+        let statusDescription = statusSource.map(statusDescription(of:))
 
         Button {
             onClick(conversation)
@@ -32,12 +55,12 @@ struct SidebarSessionRow: View {
                 Text(title)
             } trailing: {
                 if isPinned { PinnedIndicator() }
-                activityIndicator(openTerminal: openTerminal)
+                statusIndicator(statusSource, description: statusDescription)
             }
         }
         .buttonStyle(.plain)
-        .help("\(title) · \(conversation.provider.rawValue) · \(conversation.updatedAt.formatted(date: .abbreviated, time: .shortened))")
-        .accessibilityLabel("\(title), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(openTerminal == nil ? "" : ", open terminal")")
+        .help("\(title) · \(conversation.provider.rawValue) · \(conversation.updatedAt.formatted(date: .abbreviated, time: .shortened))\(statusDescription.map { " · \($0)" } ?? "")")
+        .accessibilityLabel("\(title), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(statusDescription.map { ", \($0)" } ?? "")")
         .contextMenu {
             if isInMultipleSelection {
                 SelectedSessionsContextMenu(
@@ -58,12 +81,13 @@ struct SidebarSessionRow: View {
     }
 
     @ViewBuilder
-    private func activityIndicator(openTerminal: TerminalSession?) -> some View {
-        if let openTerminal {
-            TerminalStatusIndicator(session: openTerminal)
-        } else if store.isRunningInTmux(conversation) {
-            TmuxRunningIndicator(host: conversation.host)
-        } else {
+    private func statusIndicator(_ source: StatusSource?, description: String?) -> some View {
+        switch source {
+        case .tab(let tab):
+            TerminalStatusIndicator(session: tab)
+        case .detachedCLI(let activity):
+            SessionStatusIndicator(status: .running(activity), description: description)
+        case nil:
             SessionAgeLabel(lastActivity: conversation.updatedAt)
         }
     }

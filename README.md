@@ -51,6 +51,7 @@ Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of th
 - Keep several terminal tabs open. Select a session in the sidebar to read its preview, or select a terminal tab to return to its CLI without stopping it.
 - With tmux 3.3 or later installed, a CLI on this Mac runs inside tmux. Closing its tab with **Keep running**, quitting the app, or installing an update leaves it running. Resume the session to reattach, or right-click it and choose **End on this Mac**.
 - Pick up names set with `/rename` in Claude Code within about a second.
+- See what each CLI is doing on its sidebar row, its project, and its tab: a turning arc while it works, an amber mark while it waits on your answer, a green dot while it waits for your next prompt, and a hollow circle once it ended in a tab still open. A session nothing runs shows how long ago it was active instead. Claude Code and Codex on this Mac tell what they are doing, also while they run in tmux with no tab open; elsewhere the green dot only says the CLI runs.
 
 **SSH hosts**
 - Click **Add SSH host…** at the bottom left of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code and Codex sessions are listed under its own heading, below this Mac's.
@@ -76,6 +77,8 @@ JustSessions reads session files that already exist on your Mac. It never upload
 The app runs each CLI in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it looks for CLIs and tmux in the inherited `PATH` plus `~/.local/bin`, `/opt/homebrew/bin`, and `/usr/local/bin`. Scanning reads the session files and runs no shell command; with tmux installed, it also asks tmux for its version and running sessions.
 
 With tmux 3.3 or later, each CLI on this Mac runs in the app's own tmux server, which ignores `~/.tmux.conf` and leaves your other tmux sessions alone. `tmux -L justsessions ls` lists its sessions. Without tmux, the CLI runs directly. In a tmux tab, dragging selects through tmux and copies to the clipboard when you let go; hold Shift while dragging to select the usual way. Shift-Return still adds a new line in Claude Code.
+
+Claude Code reports whether it is working or waiting on you in `~/.claude/sessions`; a Codex session file records when each turn starts and ends. The app reads both about once a second.
 
 SSH hosts must accept `ssh <host>` without a password prompt and need `rsync`. Their session files are mirrored into a local cache and read by the same code as this Mac's.
 
@@ -117,12 +120,14 @@ Each release includes the notarized `JustSessions.dmg`, plus `appcast.xml` and t
 
 ### Source layout
 
+- `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
 - `Models/Customizations/`: session and project names you set, and pins.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
+- `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
 - `Services/Adapters/`: provider discovery and native arguments, one folder per CLI. Separate adapters make adding another CLI straightforward.
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
 - `Services/Launch/`: CLI executable resolution and process environment.
@@ -138,7 +143,7 @@ Each release includes the notarized `JustSessions.dmg`, plus `appcast.xml` and t
 - `Views/Browser/Sidebar/Hosts/`: host headings, and the Add SSH host button and sheet.
 - `Views/Terminal/`: a tab's embedded terminal.
 - `Views/Preview/`: conversation preview for the selected session.
-- `Views/Indicators/`: running, ended, tmux, and pinned glyphs.
+- `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
 - `Views/Theme/`: colors and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.

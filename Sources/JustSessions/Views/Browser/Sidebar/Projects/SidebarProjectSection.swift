@@ -18,10 +18,6 @@ struct SidebarProjectSection: View {
 
     @State private var isHovered = false
 
-    private var openTerminalCount: Int {
-        store.terminalSessions.filter { $0.projectDirectoryKey == project.id }.count
-    }
-
     var body: some View {
         VStack(spacing: 1) {
             projectRow
@@ -65,7 +61,8 @@ struct SidebarProjectSection: View {
     }
 
     private var projectRow: some View {
-        HStack(spacing: 0) {
+        let activitySummary = store.activitySummary(forProjectDirectoryKey: project.id)
+        return HStack(spacing: 0) {
             Button(action: onToggle) {
                 HStack(spacing: 7) {
                     Image(systemName: "chevron.right")
@@ -92,10 +89,8 @@ struct SidebarProjectSection: View {
                     }
                     Spacer(minLength: 4)
                     if project.isPinned { PinnedIndicator() }
-                    if openTerminalCount > 0 {
-                        Image(systemName: "circle.fill")
-                            .font(.system(size: 6))
-                            .foregroundStyle(ThemePalette.live)
+                    if let status = activitySummary.mostPressingStatus {
+                        SessionStatusIndicator(status: status, description: activitySummary.summary)
                     }
                 }
                 .padding(.leading, 10)
@@ -106,7 +101,7 @@ struct SidebarProjectSection: View {
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity)
             .help(project.location.copyablePath)
-            .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(CountedNoun.phrase(count: project.sessionCount, singular: "session")), \(openTerminalCount) open")
+            .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(CountedNoun.phrase(count: project.sessionCount, singular: "session")), \(activitySummary.runningCount == 0 ? "none running" : activitySummary.summary)")
             .contextMenu {
                 ProjectContextMenu(
                     store: store,

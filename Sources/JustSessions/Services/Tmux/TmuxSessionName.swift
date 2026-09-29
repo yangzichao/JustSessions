@@ -19,6 +19,17 @@ enum TmuxSessionName {
         return "\(prefix)\(provider.executableName)-new-\(suffix)"
     }
 
+    /// The session whose own name this is; nil for a new session's temporary name and for other names.
+    static func session(named name: String) -> (provider: ConversationProvider, sessionID: String)? {
+        for provider in ConversationProvider.allCases {
+            let providerPrefix = "\(prefix)\(provider.executableName)-"
+            guard name.hasPrefix(providerPrefix) else { continue }
+            let sessionID = String(name.dropFirst(providerPrefix.count))
+            return ConversationMetadata.isValidSessionID(sessionID) ? (provider, sessionID) : nil
+        }
+        return nil
+    }
+
     /// Session names from `list-sessions`. Lines a shell profile prints, and sessions not started here, are ignored.
     static func appSessionNames(inListOutput output: String) -> Set<String> {
         Set(output

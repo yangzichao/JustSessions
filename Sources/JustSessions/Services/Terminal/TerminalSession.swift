@@ -35,6 +35,8 @@ final class TerminalSession: ObservableObject, Identifiable {
     @Published private(set) var hasExited = false
     @Published private(set) var exitCode: Int32?
     @Published private(set) var hasSelection = false
+    /// What the tab's CLI is doing, while it runs and tells; see `ConversationStore+CLIActivitySync`.
+    @Published private(set) var cliActivity: CLIActivity?
 
     private let processObserver: TerminalProcessObserver
     private var hasStarted = false
@@ -99,7 +101,16 @@ final class TerminalSession: ObservableObject, Identifiable {
         guard !isClosed else { return }
         self.exitCode = exitCode
         hasExited = true
+        cliActivity = nil
         onProcessFinished?()
+    }
+
+    /// Returns whether the activity changed. An ended CLI keeps none.
+    @discardableResult
+    func updateCLIActivity(_ activity: CLIActivity?) -> Bool {
+        guard !hasExited, cliActivity != activity else { return false }
+        cliActivity = activity
+        return true
     }
 
     func synchronize(conversation: Conversation, displayTitle: String) {

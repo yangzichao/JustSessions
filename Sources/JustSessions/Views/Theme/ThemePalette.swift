@@ -2,7 +2,8 @@ import AppKit
 import SwiftUI
 
 /// The app's colors. Surfaces are warm neutrals instead of system gray and white, the chrome uses the brand Ink,
-/// and saturated color is kept for meaning: each CLI's brand hue and the green of a running CLI.
+/// and saturated color is kept for meaning: each CLI's brand hue, the green of a running CLI, and the amber of
+/// what needs your attention.
 enum ThemePalette {
     // MARK: Surfaces
 
@@ -32,6 +33,6 @@ enum ThemePalette {
 
     /// A running CLI.
     static let live = Color.adaptive(light: 0x1FA463, dark: 0x3DD68C)
-    /// A warning that needs attention, such as an unreachable remote host.
+    /// Something that needs your attention, such as a CLI waiting on your answer or an unreachable remote host.
     static let warning = Color.adaptive(light: 0xE0892B, dark: 0xF2A54A)
 }

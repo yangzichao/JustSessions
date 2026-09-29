@@ -19,8 +19,15 @@ final class ConversationStore: ObservableObject {
     @Published var remoteHostList: RemoteHostList
     /// Each host's last refresh, this Mac's included.
     @Published var hostRefreshStatuses: [SessionHost: HostRefreshStatus] = [:]
-    /// tmux sessions JustSessions started that still run, per host, as of the host's last refresh.
+    /// tmux sessions JustSessions started that still run, per host, as of the host's last refresh. On this Mac, one
+    /// whose CLI ends leaves within about a second; see `ConversationStore+CLIActivitySync`.
     @Published var tmuxSessionNamesByHost: [SessionHost: Set<String>] = [:]
+    /// What the CLI of each session running in tmux on this Mac with no tab open is doing, by conversation id.
+    /// A tab's own CLI is on the tab; see `TerminalSession.cliActivity`.
+    @Published var detachedCLIActivities: [String: CLIActivity] = [:]
+    /// The CLI of each tmux session on this Mac, by session name, as of the last refresh or the closing of its tab.
+    var thisMacTmuxPaneProcessIDs: [String: Int32] = [:]
+    let codexTurnTracker = CodexRolloutTurnTracker()
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
     private var isRefreshQueued = false
@@ -48,6 +55,7 @@ final class ConversationStore: ObservableObject {
         startNewSessionDiscovery()
         startRemoteNewSessionPolling()
         startTmuxPaneProcessLookup()
+        startCLIActivitySync()
     }
 
     /// Scans the session folders on this Mac. SSH hosts refresh on their own, so a slow host never holds this up.
@@ -69,9 +77,10 @@ final class ConversationStore: ObservableObject {
                 catch { failures.append("\(adapter.provider.rawValue): \(error.localizedDescription)") }
             }
             // The first refresh also checks the tmux version, so tabs can run in tmux from then on.
-            let tmuxSessionNames = installedTmux.map { $0.hasSupportedVersion() ? $0.sessionNames() : [] } ?? []
+            let tmuxPaneProcessIDs = installedTmux.map { $0.hasSupportedVersion() ? $0.appSessionPaneProcessIDs() : [:] } ?? [:]
             await MainActor.run {
-                self.tmuxSessionNamesByHost[.thisMac] = tmuxSessionNames
+                self.tmuxSessionNamesByHost[.thisMac] = Set(tmuxPaneProcessIDs.keys)
+                self.thisMacTmuxPaneProcessIDs = tmuxPaneProcessIDs
                 self.replaceConversations(on: .thisMac, with: found)
                 self.hostRefreshStatuses[.thisMac] = failures.isEmpty
                     ? .refreshed(.now)

@@ -69,6 +69,11 @@ struct ThisMacTmuxServer: Sendable {
         Self.paneProcessIDs(inListOutput: output(of: ["list-panes", "-a", "-F", "#{session_name} #{pane_pid}"]) ?? "")
     }
 
+    /// `paneProcessIDsBySessionName()` for the JustSessions sessions alone, as `sessionNames()` lists them.
+    func appSessionPaneProcessIDs() -> [String: Int32] {
+        paneProcessIDsBySessionName().filter { $0.key.hasPrefix(TmuxSessionName.prefix) }
+    }
+
     func renameSession(from oldName: String, to newName: String) {
         _ = output(of: ["rename-session", "-t", "=\(oldName)", newName])
     }

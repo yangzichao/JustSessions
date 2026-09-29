@@ -51,6 +51,7 @@ extension ConversationStore {
         tmuxSessionNamesByHost[host]?.remove(name)
         switch host {
         case .thisMac:
+            thisMacTmuxPaneProcessIDs[name] = nil
             guard let tmuxServer = commandResolver.thisMacTmuxServer() else { return }
             Task.detached(priority: .utility) { tmuxServer.killSession(named: name) }
         case .ssh(let destination):
@@ -66,6 +67,7 @@ extension ConversationStore {
         guard let session = terminalSessions.first(where: { $0.id == id }) else { return }
         let host = session.host
         let tmuxName = session.tmuxSessionName
+        let paneProcessID = session.tmuxPaneProcessID
         let canKeepCLIRunning = session.canKeepCLIRunningAfterClose
         closeTerminal(id)
         guard let tmuxName else { return }
@@ -73,6 +75,8 @@ extension ConversationStore {
             endTmuxSession(named: tmuxName, on: host)
         } else if canKeepCLIRunning {
             tmuxSessionNamesByHost[host, default: []].insert(tmuxName)
+            // Lets the CLI activity sync tell when the CLI ends, before the next refresh.
+            if host == .thisMac, let paneProcessID { thisMacTmuxPaneProcessIDs[tmuxName] = paneProcessID }
         }
     }
 }
