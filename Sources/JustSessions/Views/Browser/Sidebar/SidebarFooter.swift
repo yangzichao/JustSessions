@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Adding an SSH host and update checks, kept small at the bottom of the sidebar.
+/// SSH hosts, update checks, and the source repository, kept small at the bottom of the sidebar.
 struct SidebarFooter: View {
     let onAddRemoteHost: () -> Void
     let onCheckForUpdates: () -> Void
@@ -22,6 +22,13 @@ struct SidebarFooter: View {
             SidebarAddRemoteHostButton(action: onAddRemoteHost)
             Spacer(minLength: 12)
             updateButton
+            Link(destination: AppLinks.githubRepositoryURL) {
+                Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                    .labelStyle(.iconOnly)
+            }
+            .padding(.leading, 12)
+            .help("Open JustSessions on GitHub")
+            .accessibilityLabel("Open JustSessions on GitHub")
         }
     }
 

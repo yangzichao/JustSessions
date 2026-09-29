@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftTerm
 
 /// Keeps the embedded CLI terminal usable as a native text surface.
@@ -9,19 +10,26 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     /// CSI u itself, and tmux hands it to the CLI unchanged; see `ThisMacTmuxServer.globalOptions`.
     var sendsShiftReturnAsCSIu = false
 
-    override init(frame: CGRect) {
+    private var appearancePreferences = TerminalAppearancePreferences()
+    private var appearanceSubscription: AnyCancellable?
+
+    override convenience init(frame: CGRect) {
+        self.init(frame: frame, appearanceStore: .shared)
+    }
+
+    init(frame: CGRect, appearanceStore: TerminalAppearanceStore) {
         super.init(frame: frame)
-        applySystemAppearance()
+        observeAppearance(in: appearanceStore)
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        applySystemAppearance()
+        observeAppearance(in: .shared)
     }
 
     override func viewDidChangeEffectiveAppearance() {
         super.viewDidChangeEffectiveAppearance()
-        applySystemAppearance()
+        TerminalAppearanceStyling.apply(appearancePreferences, to: self)
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -44,14 +52,12 @@ final class SelectableTerminalView: LocalProcessTerminalView {
         onSelectionChanged?(selectionActive)
     }
 
-    private func applySystemAppearance() {
-        configureNativeColors()
-        // The paper tint of the preview, so switching between a transcript and a terminal keeps the same surface.
-        nativeBackgroundColor = ThemePalette.contentSurfaceNSColor.resolved(for: effectiveAppearance)
-        selectedTextBackgroundColor = .selectedTextBackgroundColor
-        selectedTextForegroundColor = .selectedTextColor
-        caretColor = .textColor
-        layer?.backgroundColor = nativeBackgroundColor.cgColor
-        needsDisplay = true
+    private func observeAppearance(in store: TerminalAppearanceStore) {
+        appearanceSubscription = store.$preferences.sink { [weak self] preferences in
+            guard let self else { return }
+            appearancePreferences = preferences
+            appearance = preferences.mode.nativeAppearance
+            TerminalAppearanceStyling.apply(preferences, to: self)
+        }
     }
 }

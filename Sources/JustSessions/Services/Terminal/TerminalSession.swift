@@ -77,7 +77,6 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.branchedFromSessionID = branchedFromSessionID
         self.terminalView = SelectableTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.processObserver = TerminalProcessObserver()
-        terminalView.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
         terminalView.sendsShiftReturnAsCSIu = host == .thisMac && tmuxSessionName != nil
         terminalView.processDelegate = processObserver
         terminalView.onSelectionChanged = { [weak self] hasSelection in
