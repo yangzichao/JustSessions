@@ -5,7 +5,7 @@ import Foundation
 struct ClaudeSessionFileLocator: Sendable {
     let projectsDirectory: URL
 
-    init(configurationDirectory: URL = ClaudeAdapter().configurationDirectory) {
+    init(configurationDirectory: URL = ClaudeAdapter.defaultConfigurationDirectory) {
         self.projectsDirectory = configurationDirectory.appendingPathComponent("projects")
     }
 

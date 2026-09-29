@@ -4,7 +4,7 @@ import Foundation
 struct ClaudeLiveSessionRegistry: Sendable {
     let sessionsDirectory: URL
 
-    init(configurationDirectory: URL = ClaudeAdapter().configurationDirectory) {
+    init(configurationDirectory: URL = ClaudeAdapter.defaultConfigurationDirectory) {
         self.sessionsDirectory = configurationDirectory.appendingPathComponent("sessions")
     }
 

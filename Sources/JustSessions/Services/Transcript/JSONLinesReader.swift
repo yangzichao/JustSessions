@@ -23,4 +23,36 @@ enum JSONLinesReader {
         }
         if !buffer.isEmpty { try body(buffer) }
     }
+
+    /// The non-empty lines in the first `maximumByteCount` bytes of `file`, or none when it cannot be read. The last
+    /// line may be cut off at the limit.
+    static func leadingLines(in file: URL, maximumByteCount: Int) -> [Data] {
+        do {
+            let handle = try FileHandle(forReadingFrom: file)
+            defer { try? handle.close() }
+            return try nonEmptyLines(in: handle.read(upToCount: maximumByteCount) ?? Data())
+        } catch {
+            return []
+        }
+    }
+
+    /// The non-empty lines in the last `maximumByteCount` bytes of `file`, oldest first, or none when it cannot be
+    /// read. When those bytes start partway into the file, their first line is left out, since it may be cut off.
+    static func trailingLines(in file: URL, maximumByteCount: Int) -> [Data] {
+        do {
+            let handle = try FileHandle(forReadingFrom: file)
+            defer { try? handle.close() }
+            let length = try handle.seekToEnd()
+            let windowStart = length > UInt64(maximumByteCount) ? length - UInt64(maximumByteCount) : 0
+            try handle.seek(toOffset: windowStart)
+            let lines = try nonEmptyLines(in: handle.readToEnd() ?? Data())
+            return windowStart > 0 ? Array(lines.dropFirst()) : lines
+        } catch {
+            return []
+        }
+    }
+
+    private static func nonEmptyLines(in data: Data) -> [Data] {
+        data.split(separator: UInt8(ascii: "\n"), omittingEmptySubsequences: true).map { Data($0) }
+    }
 }

@@ -4,9 +4,12 @@ struct AntigravityAdapter: ConversationAdapter {
     let configurationDirectory: URL
     var provider: ConversationProvider { .antigravity }
 
-    init(configurationDirectory: URL? = nil) {
+    static var defaultConfigurationDirectory: URL {
+        URL(fileURLWithPath: NSHomeDirectory() + "/.gemini/antigravity-cli")
+    }
+
+    init(configurationDirectory: URL = AntigravityAdapter.defaultConfigurationDirectory) {
         self.configurationDirectory = configurationDirectory
-            ?? URL(fileURLWithPath: NSHomeDirectory() + "/.gemini/antigravity-cli")
     }
 
     func discover() throws -> [Conversation] {
