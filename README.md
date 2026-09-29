@@ -1,12 +1,13 @@
 <p align="center">
-  <img src="Branding/PNG/app-icon-256.png" width="128" height="128" alt="JustSessions app icon">
+  <img src="Branding/PNG/app-icon-256.png" width="96" height="96" alt="JustSessions macOS app icon">
 </p>
 
-<h1 align="center">JustSessions</h1>
+<h1 align="center">JustSessions — AI Session Manager for macOS</h1>
 
 <p align="center">
-  <b>A native macOS session manager for Claude Code, OpenAI Codex CLI, and Google Antigravity CLI.</b><br>
-  Browse, search, preview, resume, and branch every AI coding agent session from one window.
+  <b>Find the right AI coding session. Pick up where you left off.</b><br>
+  A lightweight, native macOS app for Claude Code, OpenAI Codex CLI, and Google Antigravity CLI.<br>
+  Local projects, remote machines over SSH, and sessions that keep running with tmux.
 </p>
 
 <p align="center">
@@ -21,134 +22,127 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yangzichao/JustSessions" alt="MIT license"></a>
 </p>
 
----
+You remember the work. Finding the conversation takes longer: which project, which terminal, which AI tool, which machine?
 
-Claude Code, Codex, and Antigravity each keep their own session history in hidden folders, and `claude --resume` or `codex resume` only show one CLI and one project at a time. JustSessions scans all of them, groups sessions by project, shows a read-only preview of each conversation, and resumes the one you pick in its own CLI inside an embedded terminal. Machines you reach over SSH are listed the same way as this Mac, each under its own heading.
+**JustSessions brings your AI coding session history into one window.** Search across projects, preview Claude Code and Codex conversations, then resume the right session in its original CLI and working directory. Keep using your editor, CLI configuration, and provider accounts.
 
-## Download
+[Download for macOS](#download) · [Remote sessions](#your-desktop-at-home-your-mac-on-the-go) · [tmux persistence](#close-the-tab-keep-the-work-running-with-tmux) · [Supported CLIs](#supported-clis) · [User guide](docs/guides/session-management.md)
 
-1. Download **[JustSessions.dmg](https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg)** (latest release, signed and notarized by Apple).
-2. Open it and drag **JustSessions** into **Applications**.
-3. Launch it from Applications. Updates install automatically through Sparkle.
+![JustSessions on macOS showing AI coding sessions grouped by project and machine, with a Claude Code conversation preview](docs/images/session-overview.jpg)
 
-Requirements: macOS 14 Sonoma or later on Apple Silicon, plus at least one of the CLIs installed: `claude`, `codex`, or `agy`.
+*Actual JustSessions interface with sample projects and conversations. Read the context before you resume.*
 
 ## Features
 
-**Find any session**
-- All Claude Code, Codex, and Antigravity CLI sessions in one sidebar, grouped by machine (this Mac, then each SSH host), then by project folder, sorted by recent activity.
-- Search projects by name or path, and sessions by title or session ID.
-- Filter to sessions from the past seven days, or to one CLI.
-- Pin projects and sessions to keep them at the top. Rename any session locally without touching the CLI's own title.
+Built for developers who work across multiple projects, AI coding tools, or SSH hosts.
 
-**Preview before you resume**
-- Read a Claude Code or Codex conversation without starting the CLI. Your messages and the agent's replies are shown; runs of tool calls collapse into one expandable row.
+| When this gets in your way… | JustSessions helps you… |
+| --- | --- |
+| “Which session had the work I need?” | Find sessions by title or ID, or find their project by name or path. Pin and rename the ones you return to. |
+| “I keep reopening sessions to remember what happened.” | Read Claude Code and Codex conversations before starting the CLI, with tool calls collapsed out of the way. |
+| “My work is spread across Claude Code, Codex, and terminal tabs.” | Browse supported CLIs together, grouped by machine and project, and resume in an embedded terminal. |
+| “I want to try another approach from this conversation.” | Branch a Claude Code or Codex session into a new conversation. |
 
-**Resume, branch, and start sessions**
-- Resume a session in its native CLI inside an embedded terminal: double-click it, use **Resume**, or right-click.
-- Branch (fork) a Claude Code or Codex conversation into a new session. This forks the conversation, not a Git branch.
-- Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI. It appears in the sidebar right away.
-- Keep several terminal tabs open. Select a session in the sidebar to read its preview, or select a terminal tab to return to its CLI without stopping it.
-- With tmux 3.3 or later installed, a CLI on this Mac runs inside tmux. Closing its tab with **Keep running**, quitting the app, or installing an update leaves it running. Resume the session to reattach, or right-click it and choose **End on this Mac**.
-- Pick up names set with `/rename` in Claude Code within about a second.
-- See what each CLI is doing on its sidebar row, its project, and its tab: a turning arc while it works, an amber mark while it waits on your answer, a green dot while it waits for your next prompt, and a hollow circle once it ended in a tab still open. A session nothing runs shows how long ago it was active instead. Claude Code and Codex on this Mac tell what they are doing, also while they run in tmux with no tab open; elsewhere the green dot only says the CLI runs.
+## Your desktop at home, your Mac on the go
 
-**SSH hosts**
-- Click **Add SSH host…** at the bottom left of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code and Codex sessions are listed under its own heading, below this Mac's.
-- Resume, branch, start, and delete sessions on the host over SSH, just like on this Mac.
-- Refresh updates every host at once. A host that can't be reached shows the error on its heading; the others still list.
-- With tmux on the host, a session there keeps running when the connection drops or the tab closes. Resume to reattach.
+The agent is running on your desktop or development server. You are working from your laptop. **Add the machine over SSH and continue its Claude Code or Codex sessions from JustSessions.**
 
-**Clean up**
-- Delete sessions one at a time, in a multi-selection (⌘-click, ⇧-click), or per project, always after a confirmation.
-- Projects stay in the sidebar after their last session is deleted, including after restarting the app. Right-click a project and choose **Remove from sidebar** to hide it without deleting its sessions or folder. Starting a new session in that folder brings it back.
-- Claude Code sessions on this Mac go to the macOS Trash. Codex uses `codex delete --force`. SSH hosts have no Trash, so deletions there are permanent.
-- Sessions with an open terminal tab, or still running in tmux, can't be deleted.
+- See **This Mac** and each remote host in the same sidebar, with their own projects and sessions.
+- Preview the conversation, then resume, branch, or start a session in the remote project directory.
+- Keep the code and CLI execution on that machine. JustSessions caches its session history locally for browsing.
+
+![JustSessions displaying a Claude Code conversation on the dev-desktop SSH host alongside local projects and a build server](docs/images/remote-desktop-sessions.jpg)
+
+*Sample remote desktop and server sessions in the real app interface. Connections use SSH; JustSessions manages terminal sessions, not graphical screen sharing.*
+
+Use an existing `~/.ssh/config` alias or `user@hostname`. The host needs passwordless SSH access, `rsync`, and the CLI you use. [Set up a remote host](docs/guides/session-management.md#ssh-hosts).
+
+## Close the tab. Keep the work running with tmux.
+
+**Leaving the window does not have to end the job.** With tmux available when a session launches, its process can keep running after you close the tab or quit JustSessions. On a remote host, tmux also keeps the session alive when the SSH connection drops.
+
+1. Launch a session with tmux installed on the machine doing the work.
+2. Close its terminal tab and choose **Keep running**.
+3. Return to the session and choose **Resume** to reattach to the running process.
+
+<p align="center">
+  <img src="docs/images/tmux-keep-running.jpg" width="360" alt="JustSessions close-tab dialog offering Keep running to leave a terminal session running in tmux">
+</p>
+
+*The app's actual close-tab dialog, shown with a sample process running in an isolated tmux session.*
+
+This Mac requires **tmux 3.3+**; remote sessions require tmux on the SSH host. The host must stay awake and running. Without tmux, closing the tab ends the terminal process. [How session persistence works](docs/guides/session-storage.md#terminal-persistence).
+
+## Lightweight by design
+
+- **Native SwiftUI app.** The [v0.24.0 Mac installer](https://github.com/yangzichao/JustSessions/releases/tag/v0.24.0) is about **4 MB**.
+- **Works with the history you already have.** Open the app to discover existing sessions. No manual import or JustSessions account to set up.
+- **Uses your existing CLIs.** Your CLI's commands, configuration, and authentication stay part of your workflow.
+- **Free and open source.** MIT licensed. JustSessions adds no subscription; your AI providers' own pricing still applies.
+
+## Download
+
+**Requires macOS 14 Sonoma or later on Apple Silicon.** Install and sign in to at least one supported CLI: `claude`, `codex`, or `agy`.
+
+1. Download **[JustSessions.dmg](https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg)**, Developer ID signed and notarized by Apple.
+2. Open it, drag **JustSessions** into **Applications**, and launch it.
+3. Find a project or session in the sidebar. Select a Claude Code or Codex session to read its preview.
+4. Double-click a session or choose **Resume** to continue in its original CLI.
+
+App updates are delivered through Sparkle. For remote sessions, use **Add SSH host…** in the sidebar; see the [SSH setup instructions](docs/guides/session-management.md#ssh-hosts).
+
+## Supported CLIs
+
+| Capability | Claude Code | OpenAI Codex CLI | Google Antigravity CLI |
+| --- | --- | --- | --- |
+| Browse, search, and resume local sessions | Yes | Yes | Yes |
+| Read a conversation preview | Yes | Yes | Not yet |
+| Branch a conversation from the app | Yes | Yes | Use `/fork` inside the CLI |
+| Browse and manage sessions over SSH | Yes | Yes | Not yet |
+| Delete sessions from the app | Yes | Yes | Not yet |
+
+Search matches project names and paths, session titles, and session IDs. It does not search the full conversation text. **Branch** forks a conversation; it does not create a Git branch.
 
 ## How it works
 
-JustSessions reads session files that already exist on your Mac. It never uploads them anywhere.
+JustSessions reads the history files your CLIs already create and launches the selected CLI in an embedded terminal. It does not upload conversation history to a JustSessions service. Adding an SSH host copies its supported session files to a local cache over SSH; the CLIs you run still communicate with their providers as usual.
 
-| CLI | Where sessions are read from | Preview | Branch | Delete |
-| --- | --- | --- | --- | --- |
-| Claude Code | `~/.claude/projects` (honors `CLAUDE_CONFIG_DIR`) | Yes | Yes | Yes |
-| OpenAI Codex CLI | `~/.codex/sessions` (honors `CODEX_HOME`) | Yes | Yes | Yes |
-| Google Antigravity CLI | `~/.gemini/antigravity-cli/conversations` | Not yet | Use `/fork` after resuming | No |
-
-The app runs each CLI in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it looks for CLIs and tmux in the inherited `PATH` plus `~/.local/bin`, `/opt/homebrew/bin`, and `/usr/local/bin`. Scanning reads the session files and runs no shell command; with tmux installed, it also asks tmux for its version and running sessions.
-
-With tmux 3.3 or later, each CLI on this Mac runs in the app's own tmux server, which ignores `~/.tmux.conf` and leaves your other tmux sessions alone. `tmux -L justsessions ls` lists its sessions. Without tmux, the CLI runs directly. In a tmux tab, dragging selects through tmux and copies to the clipboard when you let go; hold Shift while dragging to select the usual way. Shift-Return still adds a new line in Claude Code.
-
-Claude Code reports whether it is working or waiting on you in `~/.claude/sessions`; a Codex session file records when each turn starts and ends. The app reads both about once a second.
-
-SSH hosts must accept `ssh <host>` without a password prompt and need `rsync`. Their session files are mirrored into a local cache and read by the same code as this Mac's.
+[Session storage and privacy](docs/guides/session-storage.md) explains file locations, CLI discovery, SSH caching, and optional tmux persistence.
 
 ## FAQ
 
-**How do I see all my Claude Code sessions across projects?**
-Open JustSessions. Every project under `~/.claude/projects` is listed in the sidebar with its sessions, and search covers all of them at once.
+### How do I find Claude Code sessions across projects?
 
-**How do I resume an old Claude Code or Codex session?**
-Find it in the sidebar and double-click it. The app runs the CLI's own resume command in the session's original folder.
+Open JustSessions and search by project name, folder path, session title, or session ID. Sessions are grouped by project, so you can browse your history without remembering the original terminal tab.
 
-**Can I fork a Claude Code conversation?**
-Yes. **Branch** creates a new session from an existing Claude Code or Codex conversation and opens it in a new tab.
+### Can I manage Claude Code and Codex sessions in the same app?
 
-**Does it work with sessions on a remote server?**
-Yes, for Claude Code and Codex. Click **Add SSH host…** at the bottom left of the sidebar and enter the host. Its sessions appear under its own heading; hover the heading and click **+** to start a new session there.
+Yes. JustSessions is a macOS session manager for both, with conversation previews, resume, branching, and SSH support. Antigravity CLI sessions can also be browsed and resumed locally.
 
-**Is it free?**
-Yes. JustSessions is open source under the MIT license.
+### How do I resume an old Codex or Claude Code session?
 
-## Build from source
+Find it in the sidebar and double-click it. JustSessions uses that CLI's own resume command in the session's original working directory. For a session still running in an app-managed tmux session, it reattaches to that process.
 
-Requires macOS 14+ and Xcode Command Line Tools.
+### Can I keep an AI coding session running after closing the app?
 
-```sh
-swift test
-./Scripts/build-app.sh
-open "dist/JustSessions.app"
-```
+Yes, with tmux. Install tmux 3.3 or later on this Mac before launching the session; for an SSH session, tmux must be available on the host. Choose **Keep running** when closing a local terminal tab. See the [terminal persistence guide](docs/guides/session-storage.md#terminal-persistence).
 
-Pushes to `main` and pull requests run `swift test`. Pushing a version tag makes GitHub Actions build, Developer ID sign, notarize, and publish the app; the tag sets the app version:
+### Do I need Remote Desktop to use a session on another computer?
 
-```sh
-git tag v0.23.0
-git push origin v0.23.0
-```
+For supported CLI sessions, connect that computer over SSH from JustSessions. You can browse its Claude Code and Codex history and work in its terminal from your Mac. Graphical desktop access, such as controlling other applications through RDP or VNC, is outside JustSessions' scope.
 
-Each release includes the notarized `JustSessions.dmg`, plus `appcast.xml` and the Sparkle-signed `JustSessions.zip` used for updates. CI signing uses the repository secrets `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_NOTARY_KEY`, `APPLE_NOTARY_ISSUER_ID`, `APPLE_NOTARY_KEY_ID`, and `SPARKLE_EDDSA_PRIVATE_KEY`.
+### Does JustSessions need a new AI account or subscription?
 
-### Source layout
+No. Use your existing CLI authentication and provider accounts. JustSessions itself is free, open source, and requires no account. Any model usage is billed or limited by your existing provider plan.
 
-- `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up.
-- `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
-- `Models/Customizations/`: session and project names you set, and pins.
-- `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
-- `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
-- `Models/Wording/`: counts and relative times in labels.
-- `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
-- `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
-- `Services/Adapters/`: provider discovery and native arguments, one folder per CLI. Separate adapters make adding another CLI straightforward.
-- `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
-- `Services/Launch/`: CLI executable resolution and process environment.
-- `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there.
-- `Services/Tmux/`: tmux session names, and keeping a CLI running after its tab closes, on any host.
-- `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, and finding each tab's CLI process.
-- `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
-- `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
-- `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
-- `Services/Transcript/`: read-only conversation readers for the preview.
-- `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
-- `Views/Browser/Sidebar/`: sidebar header and footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.
-- `Views/Browser/Sidebar/Hosts/`: host headings, and the Add SSH host button and sheet.
-- `Views/Terminal/`: a tab's embedded terminal.
-- `Views/Preview/`: conversation preview for the selected session.
-- `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
-- `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
-- `Views/Theme/`: colors and button styles.
-- `Views/Branding/`: the app mark drawn in the sidebar header.
+## Documentation and development
+
+- [Session management guide](docs/guides/session-management.md): pins, terminal tabs, activity indicators, SSH hosts, and cleanup.
+- [Session storage and privacy](docs/guides/session-storage.md): history locations, remote caching, and tmux behavior.
+- [Build and release](docs/development/build-and-release.md): Swift build commands and release signing.
+- [Source layout](docs/development/source-layout.md): where each feature lives.
+- [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Bug reports and feature requests](https://github.com/yangzichao/JustSessions/issues)
 
 ## License
 
-MIT. The embedded terminal uses [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm) under its MIT license.
+[MIT](LICENSE). The embedded terminal uses [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm) under its MIT license.
