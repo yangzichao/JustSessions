@@ -7,9 +7,9 @@ struct SessionStatusIndicator: View {
     /// The tooltip and accessibility label; the status's own summary unless given.
     var description: String?
 
-    /// For a CLI running in tmux with no tab open, which resuming the session reattaches to.
+    /// For a CLI running in tmux with no tab open, which clicking the session reattaches to.
     static func descriptionOfDetachedCLI(_ status: SessionRunStatus, on host: SessionHost) -> String {
-        "\(status.summary) · in tmux on \(host.nameInSentence), no tab open; resume to reattach"
+        "\(status.summary) · in tmux on \(host.nameInSentence), no tab open; click to reattach"
     }
 
     var body: some View {

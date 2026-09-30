@@ -63,7 +63,7 @@ Use an existing `~/.ssh/config` alias or `user@hostname`. The host needs passwor
 
 1. Launch a session with tmux installed on the machine doing the work.
 2. Close its terminal tab and choose **Keep running**.
-3. Return to the session and choose **Resume** to reattach to the running process.
+3. Click the session in the sidebar to reattach to the running process.
 
 <p align="center">
   <img src="docs/images/tmux-keep-running.jpg" width="360" alt="JustSessions close-tab dialog offering Keep running to leave a terminal session running in tmux">
@@ -121,7 +121,7 @@ Yes. JustSessions is a macOS session manager for both, with conversation preview
 
 ### How do I resume an old Codex or Claude Code session?
 
-Find it in the sidebar and double-click it. JustSessions uses that CLI's own resume command in the session's original working directory. For a session still running in an app-managed tmux session, it reattaches to that process.
+Find it in the sidebar and double-click it. JustSessions uses that CLI's own resume command in the session's original working directory. A session whose CLI is still running, in a tab or in an app-managed tmux session, opens on that process with a single click.
 
 ### Can I keep an AI coding session running after closing the app?
 

@@ -43,7 +43,7 @@ struct WorkspaceTabBar: View {
             }
         } message: {
             if let closingTabTmuxHost {
-                Text("Keep running leaves the CLI running in tmux on \(closingTabTmuxHost.nameInSentence); resume the session to reattach. End session stops it.")
+                Text("Keep running leaves the CLI running in tmux on \(closingTabTmuxHost.nameInSentence); click the session to reattach. End session stops it.")
             } else {
                 Text("The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.")
             }

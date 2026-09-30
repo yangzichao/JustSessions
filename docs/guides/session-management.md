@@ -20,8 +20,8 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 - Resume a session in its native CLI inside an embedded terminal: double-click it, use **Resume**, or right-click.
 - Branch (fork) a Claude Code or Codex conversation into a new session. This forks the conversation, not a Git branch.
 - Start a new session in any project folder, on this Mac or an SSH host, with any CLI supported on that machine (Claude Code and Codex on SSH hosts). It appears in the sidebar right away.
-- Keep several terminal tabs open. Select a session in the sidebar to read its preview, or select a terminal tab to return to its CLI without stopping it.
-- With tmux 3.3 or later installed, a CLI on this Mac runs inside tmux. Closing its tab with **Keep running**, quitting the app, or installing an update leaves it running. Resume the session to reattach, or right-click it and choose **End on this Mac**.
+- Keep several terminal tabs open. Select a session in the sidebar to read its preview; a session whose CLI is running opens on its terminal instead. Select a terminal tab to return to its CLI without stopping it.
+- With tmux 3.3 or later installed, a CLI on this Mac runs inside tmux. Closing its tab with **Keep running**, quitting the app, or installing an update leaves it running. Select the session to reattach, or right-click it and choose **End on this Mac**.
 - Pick up names set with `/rename` in Claude Code within about a second.
 - See what each CLI is doing on its sidebar row, its project, and its tab: a turning arc while it works, an amber mark while it waits on your answer, a green dot while it waits for your next prompt, and a hollow circle once it ended in a tab still open. A session with no running CLI shows how long ago it was active instead. Claude Code and Codex on this Mac tell what they are doing, also while they run in tmux with no tab open; elsewhere the green dot only says the CLI runs.
 
@@ -32,7 +32,7 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 - Click **Add SSH host…** at the bottom left of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code and Codex sessions are listed under its own heading, below this Mac's.
 - Resume, branch, start, and delete sessions on the host over SSH, just like on this Mac.
 - Refresh updates every host at once. A host that can't be reached shows the error on its heading; the others still list.
-- With tmux on the host, a session there keeps running when the connection drops or the tab closes. Resume to reattach.
+- With tmux on the host, a session there keeps running when the connection drops or the tab closes. Select the session to reattach.
 
 ## Clean up
 

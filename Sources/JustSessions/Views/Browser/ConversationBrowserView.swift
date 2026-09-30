@@ -54,8 +54,14 @@ struct ConversationBrowserView: View {
                 onNewSession: { newSessionSheetHost = defaultNewSessionHost },
                 onNewSessionOnHost: { newSessionSheetHost = $0 },
                 onSelectConversation: { conversation in
-                    sessionSelection.selectOnly(conversation.id)
-                    store.selectTerminal(nil)
+                    // A session whose CLI runs opens on its terminal. Its row stays highlighted through its tab, so,
+                    // as for a new session's row, the selection clears and the highlight follows the tabs.
+                    if store.showRunningCLI(for: conversation) {
+                        sessionSelection.clear()
+                    } else {
+                        sessionSelection.selectOnly(conversation.id)
+                        store.selectTerminal(nil)
+                    }
                 },
                 onRenameConversation: onRename,
                 onRenameProject: onRenameProject,

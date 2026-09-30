@@ -14,14 +14,28 @@ extension ConversationStore {
         }
     }
 
+    /// The open tab whose CLI still runs the session, if any.
+    func runningTerminal(for conversation: Conversation) -> TerminalSession? {
+        terminalSessions.first { $0.conversation?.id == conversation.id && !$0.hasExited }
+    }
+
+    /// Shows the CLI that runs the session: its open tab, or else a new tab that reattaches to it in tmux. Returns
+    /// whether a tab now shows it; false when no CLI runs the session or reattaching failed.
+    @discardableResult
+    func showRunningCLI(for conversation: Conversation) -> Bool {
+        let hasRunningCLI = runningTerminal(for: conversation) != nil
+            || (isRunningInTmux(conversation) && canLaunch(conversation, action: .resume))
+        guard hasRunningCLI else { return false }
+        launch(conversation, action: .resume)
+        guard let shownTerminal = runningTerminal(for: conversation) else { return false }
+        return shownTerminal.id == selectedTerminalID
+    }
+
     func launch(_ conversation: Conversation, action: ConversationAction) {
         guard !isDeletionPending(for: conversation) else { return }
         guard action != .branch || conversation.provider.supportsBranchFromLauncher else { return }
-        if action == .resume,
-           let runningSession = terminalSessions.first(where: {
-               $0.conversation?.id == conversation.id && !$0.hasExited
-           }) {
-            selectTerminal(runningSession.id)
+        if action == .resume, let runningTerminal = runningTerminal(for: conversation) {
+            selectTerminal(runningTerminal.id)
             return
         }
         guard let adapter = adapter(for: conversation.provider) else { return }
