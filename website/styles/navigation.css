@@ -1,0 +1,16 @@
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 84px;
+  border-bottom: 1px solid var(--line);
+}
+.site-header nav { display: flex; align-items: center; gap: 25px; font-size: 14px; font-weight: 500; }
+.site-header nav > a:not(.button):hover,
+.site-footer nav a:hover { color: var(--blue); }
+.github-link span { margin-left: 4px; }
+.site-footer { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-block: 40px; margin-top: 20px; }
+.site-footer .wordmark { font-size: 18px; }
+.site-footer p { margin: 9px 0 0; font-size: 13px; }
+.site-footer nav { display: flex; flex-wrap: wrap; gap: 22px; font-size: 14px; color: var(--secondary); }

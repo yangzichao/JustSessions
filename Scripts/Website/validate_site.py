@@ -1,10 +1,11 @@
 """Check the publishable website without third-party dependencies."""
 
+import hashlib
 import json
 import struct
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 from xml.etree import ElementTree
 
 WEBSITE_URL = "https://yangzichao.github.io/JustSessions/"
@@ -72,6 +73,9 @@ def validate_site(website_directory: Path):
                 referenced_path /= "index.html"
             assert referenced_path.is_relative_to(website_directory.resolve()), f"Asset leaves published directory: {reference}"
             assert referenced_path.is_file(), f"Missing local target: {reference}"
+            if referenced_path.suffix == ".css":
+                expected_version = hashlib.sha256(referenced_path.read_bytes()).hexdigest()[:12]
+                assert parse_qs(parsed_reference.query).get("v") == [expected_version], f"Stylesheet cache version mismatch: {reference}"
             if parsed_reference.fragment and referenced_path in documents:
                 assert parsed_reference.fragment in documents[referenced_path].identifiers, f"Missing anchor: {reference}"
 
@@ -93,4 +97,4 @@ def validate_site(website_directory: Path):
     namespace = {"sitemap": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     assert sitemap.findtext("sitemap:url/sitemap:loc", namespaces=namespace) == WEBSITE_URL
     assert (website_directory / ".nojekyll").is_file()
-    print(f"Website validation passed: {len(documents)} pages, local links, assets, anchors, metadata, JSON-LD, social card, sitemap.")
+    print(f"Website validation passed: {len(documents)} pages, local links, assets, stylesheet versions, anchors, metadata, JSON-LD, social card, sitemap.")

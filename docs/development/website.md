@@ -13,7 +13,7 @@ python3 -m http.server 8765 --bind 127.0.0.1 --directory dist
 
 Open <http://127.0.0.1:8765/JustSessions/>. The build checks local links, anchors, image references and dimensions, required metadata, structured data, social-card dimensions, and the sitemap. The generated artifact is `dist/JustSessions/`, separate from the macOS app output. Only that website directory is uploaded to Pages.
 
-The website reuses screenshots from `docs/images/` and existing `Branding/` assets at build time. Keep the sample-data captions and feature limitations accurate when replacing them. See [screenshot provenance](../images/README.md).
+The website reuses screenshots from `docs/images/` and existing `Branding/` assets at build time. Stylesheet links include a content hash so a new page loads the matching CSS after an update. Keep the sample-data captions and feature limitations accurate when replacing them. See [screenshot provenance](../images/README.md).
 
 ## Social preview
 

@@ -1,5 +1,6 @@
 """Assemble the static Pages artifact from the website and existing brand assets."""
 
+import hashlib
 import shutil
 from pathlib import Path
 
@@ -16,11 +17,24 @@ def build_site():
     asset_directory.mkdir(exist_ok=True)
     for document_name in ("index.html", "404.html"):
         shutil.copy2(WEBSITE_SOURCE_DIRECTORY / document_name, WEBSITE_OUTPUT_DIRECTORY / document_name)
-    shutil.copytree(WEBSITE_SOURCE_DIRECTORY / "styles", WEBSITE_OUTPUT_DIRECTORY / "styles", dirs_exist_ok=True)
+    stylesheet_directory = WEBSITE_OUTPUT_DIRECTORY / "styles"
+    if stylesheet_directory.exists():
+        shutil.rmtree(stylesheet_directory)
+    shutil.copytree(WEBSITE_SOURCE_DIRECTORY / "styles", stylesheet_directory)
     for image_name in ("session-overview.jpg", "remote-desktop-sessions.jpg", "tmux-keep-running.jpg"):
         shutil.copy2(REPOSITORY_DIRECTORY / "docs/images" / image_name, asset_directory / image_name)
     for asset_path in ("Branding/SVG/mark.svg", "Branding/PNG/app-icon-256.png", "website/social/social-preview.png"):
         shutil.copy2(REPOSITORY_DIRECTORY / asset_path, asset_directory / Path(asset_path).name)
+    homepage_path = WEBSITE_OUTPUT_DIRECTORY / "index.html"
+    homepage_content = homepage_path.read_text()
+    for stylesheet_path in stylesheet_directory.glob("*.css"):
+        stylesheet_version = hashlib.sha256(stylesheet_path.read_bytes()).hexdigest()[:12]
+        stylesheet_reference = f"./styles/{stylesheet_path.name}"
+        homepage_content = homepage_content.replace(
+            f'href="{stylesheet_reference}"',
+            f'href="{stylesheet_reference}?v={stylesheet_version}"',
+        )
+    homepage_path.write_text(homepage_content)
     (WEBSITE_OUTPUT_DIRECTORY / ".nojekyll").touch()
     (WEBSITE_OUTPUT_DIRECTORY / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {WEBSITE_URL}sitemap.xml\n")
     (WEBSITE_OUTPUT_DIRECTORY / "sitemap.xml").write_text(

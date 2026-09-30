@@ -1,0 +1,20 @@
+.compatibility .section-heading { text-align: center; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: white; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; text-align: left; }
+th, td { padding: 20px; border-bottom: 1px solid var(--line); }
+thead { background: #f0f3f8; }
+thead th { font-size: 14px; font-weight: 600; }
+tbody th { font-weight: 500; }
+tbody tr:last-child > * { border-bottom: 0; }
+td { width: 20%; }
+.table-note { margin: 16px 0 0; max-width: 880px; }
+.questions { display: grid; grid-template-columns: .8fr 1.4fr; gap: 64px; padding-top: 0; }
+.questions h2 { max-width: 300px; }
+.question-list { border-top: 1px solid var(--line); }
+details { border-bottom: 1px solid var(--line); }
+summary { position: relative; padding: 21px 34px 21px 0; font-size: 16px; font-weight: 550; line-height: 1.5; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; position: absolute; top: 20px; right: 4px; font-size: 20px; font-weight: 400; color: var(--muted); }
+details[open] summary::after { content: "−"; }
+details p { margin-bottom: 22px; padding-right: 20px; font-size: 15px; line-height: 1.8; }
+details a { color: var(--blue); text-decoration: underline; text-underline-offset: 3px; }
