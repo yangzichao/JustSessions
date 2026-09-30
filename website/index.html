@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f4">
+  <title>JustSessions — Claude Code & Codex Session Manager for macOS</title>
+  <meta name="description" content="Find, preview, and resume your AI coding sessions in one native macOS app. Manage Claude Code and Codex locally or over SSH. Free and open source.">
+  <link rel="canonical" href="https://yangzichao.github.io/JustSessions/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="JustSessions">
+  <meta property="og:title" content="Your sessions. Right where you left them.">
+  <meta property="og:description" content="A native macOS home for Claude Code, Codex, and Antigravity CLI sessions. Find your context. Pick up the work.">
+  <meta property="og:url" content="https://yangzichao.github.io/JustSessions/">
+  <meta property="og:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="JustSessions — Your sessions. Right where you left them. A native macOS app for your AI coding sessions.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JustSessions — Your sessions. Right where you left them.">
+  <meta name="twitter:description" content="Find, preview, and resume your AI coding sessions. Native macOS. Free and open source.">
+  <meta name="twitter:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
+  <meta name="twitter:image:alt" content="JustSessions, a native macOS home for your AI coding sessions.">
+  <link rel="icon" type="image/svg+xml" href="./assets/mark.svg">
+  <link rel="apple-touch-icon" href="./assets/app-icon-256.png">
+  <link rel="stylesheet" href="./styles/foundation.css">
+  <link rel="stylesheet" href="./styles/homepage.css">
+  <link rel="stylesheet" href="./styles/responsive.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "JustSessions",
+      "url": "https://yangzichao.github.io/JustSessions/",
+      "image": "https://yangzichao.github.io/JustSessions/assets/social-preview.png",
+      "description": "A native macOS app to find, preview, and resume AI coding sessions, with SSH support for Claude Code and Codex.",
+      "operatingSystem": "macOS 14 or later (Apple Silicon)",
+      "applicationCategory": "DeveloperApplication",
+      "license": "https://github.com/yangzichao/JustSessions/blob/main/LICENSE",
+      "downloadUrl": "https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header page-width">
+    <a class="wordmark" href="./" aria-label="JustSessions home">
+      <img src="./assets/mark.svg" width="34" height="30" alt="">
+      <span>JustSessions</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a class="nav-detail" href="#workflow">How it works</a>
+      <a class="nav-detail" href="#questions">FAQ</a>
+      <a class="github-link" href="https://github.com/yangzichao/JustSessions">GitHub <span aria-hidden="true">↗</span></a>
+      <a class="button button-small" href="#download">Get the app <span aria-hidden="true">↓</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero page-width" aria-labelledby="hero-title">
+      <div class="eyebrow"><span class="status-dot" aria-hidden="true"></span> A little more order. A lot more context.</div>
+      <h1 id="hero-title">Your sessions.<br><span>Right where you left them.</span></h1>
+      <p class="hero-description">The native macOS home for your AI coding sessions.<br class="desktop-break"> Find the conversation, remember the context, and pick up the work.</p>
+      <div class="hero-actions">
+        <a class="button" href="https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg"><span aria-hidden="true">↓</span> Download for macOS</a>
+        <a class="text-link" href="#workflow">Take a closer look <span aria-hidden="true">↗</span></a>
+      </div>
+      <p class="download-note">Free & open source <span aria-hidden="true">·</span> macOS 14+ <span aria-hidden="true">·</span> Apple Silicon</p>
+      <div class="provider-list" aria-label="Supported command-line tools">
+        <span><i class="provider-dot claude" aria-hidden="true"></i> Claude Code</span>
+        <span><i class="provider-dot codex" aria-hidden="true"></i> OpenAI Codex CLI</span>
+        <span><i class="provider-dot antigravity" aria-hidden="true"></i> Antigravity CLI</span>
+      </div>
+      <figure class="hero-preview">
+        <a href="./assets/session-overview.jpg" aria-label="View the JustSessions app screenshot at full size">
+          <img src="./assets/session-overview.jpg" width="2560" height="1640" fetchpriority="high" alt="JustSessions showing projects, pinned AI coding sessions, remote machines, and a Claude Code conversation preview.">
+        </a>
+        <figcaption>The real app, with sample projects and conversations. Your next session is one click away.</figcaption>
+      </figure>
+    </section>
+
+    <div class="principles page-width" aria-label="App highlights">
+      <span>Built with SwiftUI</span><span>Uses your existing CLIs</span><span>No JustSessions account</span><span>MIT licensed</span>
+    </div>
+
+    <section class="workflow section-space page-width" id="workflow" aria-labelledby="workflow-title">
+      <div class="section-heading">
+        <p class="eyebrow">Less searching. More doing.</p>
+        <h2 id="workflow-title">You remember the work.<br>We help you find the thread.</h2>
+        <p>A dozen projects. A few different tools. That one conversation you need.<br class="desktop-break"> Bring them together without changing how you code.</p>
+      </div>
+      <div class="workflow-grid">
+        <article>
+          <span class="step-number">01 / FIND</span>
+          <h3>Every project. One place.</h3>
+          <p>Browse sessions by machine and project. Search names, paths, session titles, or IDs. Pin the conversations you keep coming back to.</p>
+        </article>
+        <article>
+          <span class="step-number">02 / REMEMBER</span>
+          <h3>Context before commands.</h3>
+          <p>Read Claude Code and Codex conversations before opening the CLI. Follow the thread with tool calls tucked out of the way.</p>
+        </article>
+        <article>
+          <span class="step-number">03 / CONTINUE</span>
+          <h3>Pick up the right session.</h3>
+          <p>Resume in an embedded terminal, in the original working directory. Or branch a Claude Code or Codex conversation to try another approach.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="remote-section section-space" id="remote" aria-labelledby="remote-title">
+      <div class="page-width remote-layout">
+        <div class="feature-copy">
+          <p class="eyebrow">Same work. Different machine.</p>
+          <h2 id="remote-title">Your desktop at home.<br>Your Mac on the go.</h2>
+          <p>The work lives on your desktop or development server. Add that machine over SSH and continue its Claude Code or Codex sessions from your Mac.</p>
+          <p>Browse the history, read the conversation, then resume in the remote project. The code and CLI execution stay on that machine.</p>
+          <a class="text-link" href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-management.md#ssh-hosts">Set up an SSH host <span aria-hidden="true">↗</span></a>
+          <p class="fine-print">Requires passwordless SSH, rsync, and the relevant CLI on the host. Session history is cached on your Mac for browsing.</p>
+        </div>
+        <figure class="remote-preview">
+          <a href="./assets/remote-desktop-sessions.jpg" aria-label="View the remote sessions screenshot at full size">
+            <img src="./assets/remote-desktop-sessions.jpg" width="2560" height="1640" loading="lazy" decoding="async" alt="A Claude Code conversation on the sample dev-desktop SSH host, with local and remote projects in the JustSessions sidebar.">
+          </a>
+          <figcaption>Actual interface with illustrative remote hosts and conversations.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="persistence-section section-space page-width" aria-labelledby="persistence-title">
+      <div class="persistence-visual">
+        <div class="session-status"><span class="status-dot" aria-hidden="true"></span> A little breathing room for long-running work</div>
+        <img src="./assets/tmux-keep-running.jpg" width="520" height="476" loading="lazy" decoding="async" alt="JustSessions asks whether to keep a terminal session running, with Keep running, End session, and Cancel choices.">
+        <p>Close the tab <span aria-hidden="true">→</span> Keep running <span aria-hidden="true">→</span> Come back later</p>
+      </div>
+      <div class="feature-copy">
+        <p class="eyebrow">Let it keep going.</p>
+        <h2 id="persistence-title">Close the window.<br>Keep the work running.</h2>
+        <p>With tmux available when you launch a session, closing a tab or quitting JustSessions doesn’t have to end the job. Come back and reattach to the running process.</p>
+        <p>On an SSH host, tmux can also keep your session alive when the connection drops.</p>
+        <a class="text-link" href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-storage.md#terminal-persistence">How session persistence works <span aria-hidden="true">↗</span></a>
+        <p class="fine-print">Requires tmux 3.3+ locally, or tmux on the remote host. The host must stay awake and running. Without tmux, closing the tab ends the process. Image shows a sample process in the real app.</p>
+      </div>
+    </section>
+
+    <section class="compatibility section-space page-width" id="compatibility" aria-labelledby="compatibility-title">
+      <div class="section-heading">
+        <p class="eyebrow">Your tools, together.</p>
+        <h2 id="compatibility-title">Keep the CLI you know.</h2>
+        <p>Your commands, configuration, and provider accounts come with you.</p>
+      </div>
+      <div class="table-scroll" role="region" aria-label="Supported CLI capabilities" tabindex="0">
+        <table>
+          <caption class="visually-hidden">Compare JustSessions support for Claude Code, OpenAI Codex CLI, and Google Antigravity CLI.</caption>
+          <thead><tr><th scope="col">In JustSessions</th><th scope="col"><span class="provider-dot claude" aria-hidden="true"></span> Claude Code</th><th scope="col"><span class="provider-dot codex" aria-hidden="true"></span> Codex CLI</th><th scope="col"><span class="provider-dot antigravity" aria-hidden="true"></span> Antigravity CLI</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Browse, search & resume locally</th><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+            <tr><th scope="row">Preview conversations</th><td>Yes</td><td>Yes</td><td class="muted">Not yet</td></tr>
+            <tr><th scope="row">Branch conversations in the app</th><td>Yes</td><td>Yes</td><td class="muted">Use /fork in CLI</td></tr>
+            <tr><th scope="row">Manage sessions over SSH</th><td>Yes</td><td>Yes</td><td class="muted">Not yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine-print table-note">Search covers project names and paths, session titles, and IDs; it does not search conversation text. Branching creates a new conversation, not a Git branch.</p>
+    </section>
+
+    <section class="questions section-space page-width" id="questions" aria-labelledby="questions-title">
+      <div class="section-heading">
+        <p class="eyebrow">A few things to know.</p>
+        <h2 id="questions-title">Small app. Clear answers.</h2>
+      </div>
+      <div class="question-list">
+        <details><summary>How do I find an old Claude Code or Codex session?</summary><p>Open JustSessions to discover the session history already on your Mac. Browse by project or search a project name, path, session title, or session ID. Select a conversation to preview it, then double-click or choose Resume to continue in its original CLI and working directory.</p></details>
+        <details><summary>Do I need a new account or subscription?</summary><p>No. JustSessions is free and open source, with no JustSessions account. Install and sign in to a supported CLI first: <code>claude</code>, <code>codex</code>, or <code>agy</code>. Your AI providers’ own plans, usage limits, and charges still apply.</p></details>
+        <details><summary>Where does my conversation history go?</summary><p>JustSessions reads the files your CLIs already create. It does not upload conversations to a JustSessions service. Adding an SSH host copies supported session files to a local cache over SSH. The CLIs still communicate with their providers, and Sparkle checks GitHub for app updates. <a href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-storage.md">Read the storage and privacy guide.</a></p></details>
+        <details><summary>Can I use sessions on another computer?</summary><p>Yes. Add an SSH host to browse, preview, resume, branch, or start Claude Code and Codex sessions on that machine. The host needs passwordless SSH access, rsync, and the relevant CLI. This is terminal access; JustSessions does not provide graphical remote desktop control.</p></details>
+        <details><summary>Will my session keep running when I close the app?</summary><p>With tmux available when the session launches, it can. Install tmux 3.3+ locally, or tmux on the SSH host, and choose Keep running when closing a local terminal tab. Keep the host awake and running. Without tmux, closing the terminal tab ends its process.</p></details>
+        <details><summary>Which Macs are supported, and how do updates work?</summary><p>JustSessions requires macOS 14 Sonoma or later on Apple Silicon. Download the Developer ID signed, Apple-notarized disk image and drag the app into Applications. Subsequent app updates are delivered through Sparkle. <a href="https://github.com/yangzichao/JustSessions/releases">Browse release notes.</a></p></details>
+      </div>
+    </section>
+
+    <section class="download-section page-width" id="download" aria-labelledby="download-title">
+      <img class="download-icon" src="./assets/app-icon-256.png" width="88" height="88" loading="lazy" alt="">
+      <p class="eyebrow">Back to the good part.</p>
+      <h2 id="download-title">Your next session is waiting.</h2>
+      <p>Download. Drag into Applications. Pick up where you left off.</p>
+      <a class="button" href="https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg"><span aria-hidden="true">↓</span> Download for macOS</a>
+      <p class="download-note">macOS 14+ · Apple Silicon · Signed & notarized</p>
+      <a class="release-link" href="https://github.com/yangzichao/JustSessions/releases/latest">See the latest release <span aria-hidden="true">↗</span></a>
+    </section>
+  </main>
+
+  <footer class="site-footer page-width">
+    <div><a class="wordmark" href="./"><img src="./assets/mark.svg" width="28" height="24" alt="">JustSessions</a><p>A little home for the work in progress.</p></div>
+    <nav aria-label="Footer navigation">
+      <a href="https://github.com/yangzichao/JustSessions">Source</a>
+      <a href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-management.md">User guide</a>
+      <a href="https://github.com/yangzichao/JustSessions/issues">Feedback</a>
+      <a href="https://github.com/yangzichao/JustSessions/blob/main/LICENSE">MIT license</a>
+    </nav>
+  </footer>
+</body>
+</html>

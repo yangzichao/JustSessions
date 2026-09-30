@@ -26,7 +26,7 @@ You remember the work. Finding the conversation takes longer: which project, whi
 
 **JustSessions brings your AI coding session history into one window.** Search across projects, preview Claude Code and Codex conversations, then resume the right session in its original CLI and working directory. Keep using your editor, CLI configuration, and provider accounts.
 
-[Download for macOS](#download) · [Remote sessions](#your-desktop-at-home-your-mac-on-the-go) · [tmux persistence](#close-the-tab-keep-the-work-running-with-tmux) · [Supported CLIs](#supported-clis) · [User guide](docs/guides/session-management.md)
+[Website](https://yangzichao.github.io/JustSessions/) · [Download for macOS](#download) · [Remote sessions](#your-desktop-at-home-your-mac-on-the-go) · [tmux persistence](#close-the-tab-keep-the-work-running-with-tmux) · [Supported CLIs](#supported-clis) · [User guide](docs/guides/session-management.md)
 
 ![JustSessions on macOS showing AI coding sessions grouped by project and machine, with a Claude Code conversation preview](docs/images/session-overview.jpg)
 
@@ -141,6 +141,7 @@ No. Use your existing CLI authentication and provider accounts. JustSessions its
 - [Session storage and privacy](docs/guides/session-storage.md): history locations, remote caching, and tmux behavior.
 - [Build and release](docs/development/build-and-release.md): Swift build commands and release signing.
 - [Source layout](docs/development/source-layout.md): where each feature lives.
+- [Website development](docs/development/website.md): preview, validate, and publish the GitHub Pages site.
 - [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Bug reports and feature requests](https://github.com/yangzichao/JustSessions/issues)
 
 ## License
