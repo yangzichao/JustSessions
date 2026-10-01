@@ -8,7 +8,8 @@ enum TranscriptLoader {
         case .codex: .loaded(try CodexTranscriptReader().read(conversation.sourceFile))
         case .kiro: .loaded(try KiroTranscriptReader().read(conversation.sourceFile))
         case .antigravity: .loaded(try AntigravityTranscriptReader().read(conversation.sourceFile))
-        case .opencode, .pi: .unsupported
+        case .pi: .loaded(try PiTranscriptReader().read(conversation.sourceFile))
+        case .opencode: .unsupported
         }
     }
 }

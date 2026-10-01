@@ -13,7 +13,7 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 
 ## Preview before you resume
 
-- Read a Claude Code, Codex, Antigravity, or Kiro CLI conversation without starting the CLI. Your messages and the agent's replies are shown; runs of tool calls collapse into one expandable row.
+- Read a Claude Code, Codex, Antigravity, Kiro CLI, or Pi conversation without starting the CLI. Your messages and the agent's replies are shown; runs of tool calls collapse into one expandable row.
 - Current source builds add **Read** in the preview header. It opens a separate, read-only window at your current position without changing the selected terminal. Opening Read again brings the existing window for that session forward; different sessions can have separate reading windows.
 - Use **A− / A+** to adjust text size from 12 to 22 points. The up/down buttons go to the first or latest available message. Markdown formatting, tables, and code blocks remain readable; wide tables and code blocks scroll horizontally, and code blocks have a **Copy** button.
 - Switching sessions restores your reading position while the workspace window stays open, including a position within a long message. Reading positions are not saved across app restarts. A separate reading window keeps its own position until it closes.
@@ -72,7 +72,7 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 - Projects stay in the sidebar after their last session is deleted, including after restarting the app. Right-click a project and choose **Remove from sidebar** to hide it without deleting its sessions or folder. Starting a new session in that folder brings it back.
 - Select several projects with ⌘-click, or select a continuous range with Shift-click, then click **Remove from sidebar** at the bottom of the sidebar or right-click a selected project and choose **Remove … projects from sidebar**. Open terminals keep running. Use a project's arrow to expand or collapse it while keeping the selection.
 - Click empty space in the sidebar or press Escape while the sidebar is focused to cancel a project or session batch selection. A single session's conversation stays open.
-- Claude Code and Antigravity sessions on this Mac go to the macOS Trash. Codex uses `codex delete --force`, and Kiro CLI uses `kiro-cli chat --delete-session <session-id>`. SSH hosts have no Trash, so deletions there are permanent.
+- Claude Code, Antigravity, and Pi sessions on this Mac go to the macOS Trash; a Pi session's folder beside its file goes too, if there is one. Codex uses `codex delete --force`, and Kiro CLI uses `kiro-cli chat --delete-session <session-id>`. SSH hosts have no Trash, so deletions there are permanent.
 - Sessions with an open terminal tab, or still running in tmux, can't be deleted.
 
 ## Appearance

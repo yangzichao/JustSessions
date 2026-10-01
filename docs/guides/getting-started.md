@@ -29,7 +29,7 @@ Sparkle delivers subsequent app updates. Your CLI provider's plans and charges s
 2. Select a supported session to read its conversation preview.
 3. Double-click a session or choose **Resume** to open its CLI in the original working directory.
 
-A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing and resume; current source builds provide previews for Claude Code, Codex, Antigravity, and Kiro CLI. See the [full capability table](../../README.md#supported-clis) and [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest) for the packaged app.
+A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing and resume; current source builds provide previews for Claude Code, Codex, Antigravity, Kiro CLI, and Pi. See the [full capability table](../../README.md#supported-clis) and [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest) for the packaged app.
 
 In current source builds, choose **Read** to open a dedicated reading window. Adjust text with **A− / A+**, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
 

@@ -13,7 +13,7 @@ JustSessions reads the session files your CLIs already create. It does not uploa
 | Google Antigravity CLI | `~/.gemini/antigravity-cli/conversations` | Yes | Use `/fork` after resuming | Yes |
 | Kiro CLI | `~/.kiro/sessions/cli` (honors `KIRO_HOME`) | Yes | Use `/rewind` after resuming | Yes |
 | OpenCode | `~/.local/share/opencode/opencode.db`, read-only (honors `OPENCODE_DB` and `XDG_DATA_HOME`) | Not yet | Yes | No |
-| Pi | `~/.pi/agent/sessions` (honors `PI_CODING_AGENT_SESSION_DIR`, `sessionDir` in Pi's `settings.json`, and `PI_CODING_AGENT_DIR`) | Not yet | Yes | No |
+| Pi | `~/.pi/agent/sessions` (honors `PI_CODING_AGENT_SESSION_DIR`, `sessionDir` in Pi's `settings.json`, and `PI_CODING_AGENT_DIR`) | Yes | Yes | Yes |
 
 Kiro CLI sessions are listed once they have a message; sessions a subagent started are left out. OpenCode subagent sessions and archived sessions are left out too.
 
@@ -22,6 +22,8 @@ Kiro previews show prompts, replies, and collapsed tool calls from the session's
 Kiro CLI sessions are permanently deleted using its native `kiro-cli chat --delete-session <session-id>` command. Deletion requires an installed Kiro CLI that supports this command; CLI errors are shown without falling back to removing files. See [Kiro's session management documentation](https://kiro.dev/docs/cli/chat/session-management/).
 
 Antigravity previews read visible user messages, agent replies, and tool-call summaries from its SQLite session database. Thinking, injected context, cleared steps, and raw tool output are omitted. On this Mac, deletion moves the database (including WAL companions), the session's `brain/<id>` folder, and its annotation file to the Trash, and removes only its CLI summary-index entry. Files held open by another process cannot be deleted. If moving a file or updating the index fails, moved files and the index are restored. The CLI's last-session shortcut verifies that the selected conversation still exists.
+
+Pi previews follow the branch the session is on now, from its `.jsonl` file: prompts, `!` commands, replies, and collapsed tool calls. Branches left behind with `/tree`, thinking, tool results, and extension messages are left out. On this Mac, deletion moves the session file and the folder beside it, where Pi extensions keep subagent runs and forks, to the Trash; Pi's own delete leaves that folder behind.
 
 ## Reading positions
 
