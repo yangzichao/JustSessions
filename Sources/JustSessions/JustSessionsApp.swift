@@ -19,7 +19,12 @@ struct JustSessionsApp: App {
         }
 
         Settings {
-            SettingsView(appAppearanceStore: .shared, appThemeStore: .shared, terminalAppearanceStore: .shared)
+            SettingsView(
+                appAppearanceStore: .shared,
+                appThemeStore: .shared,
+                terminalAppearanceStore: .shared,
+                notificationSettingsStore: .shared
+            )
                 .appTheme(from: .shared)
         }
     }

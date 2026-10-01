@@ -2,7 +2,7 @@
 
 [Back to JustSessions](../../README.md) · [Session storage and privacy](session-storage.md)
 
-Use the sidebar to find a conversation, read its preview, and resume it in its original CLI. These instructions cover the controls, SSH setup, terminal persistence, cleanup, and appearance settings.
+Use the sidebar to find a conversation, read its preview, and resume it in its original CLI. These instructions cover the controls, notifications, SSH setup, terminal persistence, cleanup, and appearance settings.
 
 ## Find any session
 
@@ -24,6 +24,16 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 - With tmux 3.3 or later installed, a CLI on this Mac runs inside tmux. Closing its tab with **Keep running**, quitting the app, or installing an update leaves it running. Select the session to reattach, or right-click it and choose **End on this Mac**.
 - Pick up names set with `/rename` in Claude Code within about a second.
 - See what each CLI is doing on its sidebar row, its project, and its tab: a turning arc while it works, an amber mark while it waits on your answer, a green dot while it waits for your next prompt, and a hollow circle once it ended in a tab still open. A session with no running CLI shows how long ago it was active instead. Claude Code and Codex on this Mac tell what they are doing, also while they run in tmux with no tab open; elsewhere the green dot only says the CLI runs.
+
+## Notifications
+
+JustSessions posts a macOS notification when a Claude Code or Codex session on this Mac finishes its turn, or stops in the middle of one to wait on you, such as at a permission prompt. Click the notification to open the session: its tab, or a new tab that reattaches to its CLI in tmux.
+
+- Sessions running in tmux with no tab open notify too.
+- A session whose tab is selected while JustSessions is in front sends none; you already see it.
+- macOS asks for permission the first time there is something to notify about.
+- Turn either kind off in **Settings > Notifications**. Banners, sounds, and Do Not Disturb follow **System Settings > Notifications**.
+- SSH hosts and Antigravity CLI don't report what their CLI is doing, so they send no notifications.
 
 ## SSH hosts
 

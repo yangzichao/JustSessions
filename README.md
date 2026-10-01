@@ -42,6 +42,7 @@ Built for developers who work across multiple projects, AI coding tools, or SSH 
 | “I keep reopening sessions to remember what happened.” | Read Claude Code and Codex conversations before starting the CLI, with tool calls collapsed out of the way. |
 | “My work is spread across Claude Code, Codex, and terminal tabs.” | Browse supported CLIs together, grouped by machine and project, and resume in an embedded terminal. |
 | “I want to try another approach from this conversation.” | Branch a Claude Code or Codex session into a new conversation. |
+| “I keep switching back to check whether the agent is done.” | Get a macOS notification when a session finishes its turn or waits on you. Click it to open the session. |
 
 ## Your desktop at home, your Mac on the go
 
@@ -137,7 +138,7 @@ No. Use your existing CLI authentication and provider accounts. JustSessions its
 
 ## Documentation and development
 
-- [Session management guide](docs/guides/session-management.md): pins, terminal tabs, activity indicators, SSH hosts, cleanup, and appearance.
+- [Session management guide](docs/guides/session-management.md): pins, terminal tabs, activity indicators, notifications, SSH hosts, cleanup, and appearance.
 - [Session storage and privacy](docs/guides/session-storage.md): history locations, remote caching, and tmux behavior.
 - [Build and release](docs/development/build-and-release.md): Swift build commands and release signing.
 - [Source layout](docs/development/source-layout.md): where each feature lives.

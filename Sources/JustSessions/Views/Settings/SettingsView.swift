@@ -1,10 +1,11 @@
 import SwiftUI
 
-/// The Settings window (⌘,): how the whole app looks, then how its terminals look.
+/// The Settings window (⌘,): how the whole app looks, how its terminals look, and when it notifies you.
 struct SettingsView: View {
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
+    let notificationSettingsStore: SessionNotificationSettingsStore
 
     var body: some View {
         TabView {
@@ -17,6 +18,9 @@ struct SettingsView: View {
 
             TerminalAppearanceSettingsView(appearanceStore: terminalAppearanceStore, themeStore: appThemeStore)
                 .tabItem { Label("Terminal", systemImage: "terminal") }
+
+            NotificationSettingsView(settingsStore: notificationSettingsStore)
+                .tabItem { Label("Notifications", systemImage: "bell.badge") }
         }
     }
 }

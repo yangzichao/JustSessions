@@ -29,6 +29,9 @@ final class ConversationStore: ObservableObject {
     /// The CLI of each tmux session on this Mac, by session name, as of the last refresh or the closing of its tab.
     var thisMacTmuxPaneProcessIDs: [String: Int32] = [:]
     let codexTurnTracker = CodexRolloutTurnTracker()
+    /// What each CLI on this Mac did at the last activity sync; see `ConversationStore+SessionNotifications`.
+    var sessionAttentionTracker = SessionAttentionTracker()
+    let sessionNotifier: any SessionNotifying
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
     private var isRefreshQueued = false
@@ -41,11 +44,13 @@ final class ConversationStore: ObservableObject {
     init(
         adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter(), AntigravityAdapter()],
         commandResolver: NativeCLICommandResolver = NativeCLICommandResolver(),
-        userDefaults: UserDefaults = .standard
+        userDefaults: UserDefaults = .standard,
+        sessionNotifier: any SessionNotifying = SessionNotificationCenter.shared
     ) {
         self.adapters = adapters
         self.commandResolver = commandResolver
         self.userDefaults = userDefaults
+        self.sessionNotifier = sessionNotifier
         self.titleAliases = ConversationTitleAliases.load(from: userDefaults)
         self.projectDisplayNames = ProjectDisplayNames.load(from: userDefaults)
         self.pinnedItems = PinnedItems.load(from: userDefaults)
@@ -58,6 +63,7 @@ final class ConversationStore: ObservableObject {
         startRemoteNewSessionPolling()
         startTmuxPaneProcessLookup()
         startCLIActivitySync()
+        sessionNotifier.follow(self)
     }
 
     /// Scans the session folders on this Mac. SSH hosts refresh on their own, so a slow host never holds this up.

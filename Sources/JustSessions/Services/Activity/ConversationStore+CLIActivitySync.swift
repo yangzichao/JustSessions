@@ -2,6 +2,7 @@ import Foundation
 
 /// Once a second, reads what each CLI on this Mac is doing: every tab's, and every session's whose CLI runs in tmux
 /// with no tab open. A session whose CLI ended in tmux stops counting as running then, without waiting for a refresh.
+/// A CLI that just finished its turn or stopped to wait on you gets a notification.
 extension ConversationStore {
     /// A session on this Mac whose CLI runs in tmux with no tab open.
     private struct DetachedTmuxSession {
@@ -20,7 +21,10 @@ extension ConversationStore {
             tab.hasExited ? nil : tab.cliActivityProbe.map { (tab: tab, probe: $0) }
         }
         let detachedSessions = detachedThisMacTmuxSessions()
-        guard !probedTabs.isEmpty || !detachedSessions.isEmpty || !detachedCLIActivities.isEmpty else { return }
+        guard !probedTabs.isEmpty || !detachedSessions.isEmpty || !detachedCLIActivities.isEmpty else {
+            notifyOfSessionsWantingAttention(after: [])
+            return
+        }
 
         let probes = probedTabs.map(\.probe) + detachedSessions.map {
             CLIActivityProbe(provider: $0.conversation.provider, processID: $0.paneProcessID ?? 0, sessionFile: $0.conversation.sourceFile)
@@ -38,17 +42,29 @@ extension ConversationStore {
         for (index, probedTab) in probedTabs.enumerated() where probedTab.tab.updateCLIActivity(activities[index]) {
             hasTabActivityChanged = true
         }
+        var observations = probedTabs.enumerated().map { index, probedTab in
+            SessionActivityObservation(
+                source: .tab(id: probedTab.tab.id, conversationID: probedTab.tab.conversation?.id),
+                activity: activities[index]
+            )
+        }
         var detachedActivities: [String: CLIActivity] = [:]
         for (index, detachedSession) in detachedSessions.enumerated() {
             // tmux ends a session once its only pane's process exits.
             if endedPanes[index] {
                 tmuxSessionNamesByHost[.thisMac]?.remove(detachedSession.tmuxSessionName)
                 thisMacTmuxPaneProcessIDs[detachedSession.tmuxSessionName] = nil
-            } else if let activity = activities[probedTabs.count + index] {
-                detachedActivities[detachedSession.conversation.id] = activity
+                continue
             }
+            let activity = activities[probedTabs.count + index]
+            observations.append(SessionActivityObservation(
+                source: .detachedTmux(conversationID: detachedSession.conversation.id),
+                activity: activity
+            ))
+            if let activity { detachedActivities[detachedSession.conversation.id] = activity }
         }
         if detachedCLIActivities != detachedActivities { detachedCLIActivities = detachedActivities }
+        notifyOfSessionsWantingAttention(after: observations)
         // Project rows sum up their tabs through the store, which does not see a tab's own changes.
         if hasTabActivityChanged { objectWillChange.send() }
     }

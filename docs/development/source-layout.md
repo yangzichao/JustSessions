@@ -9,12 +9,14 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
 - `Models/Customizations/`: session and project names you set, and pins.
+- `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
+- `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
 - `Services/Appearance/`: saves the app's appearance and theme, and sets the appearance on every window.
 - `Services/Adapters/`: provider discovery and native arguments, one folder per CLI. Separate adapters make adding another CLI straightforward.
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
@@ -34,6 +36,6 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Preview/`: conversation preview for the selected session.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
-- `Views/Settings/`: the Settings window, with an Appearance tab for the whole app's appearance and theme, and a Terminal tab.
+- `Views/Settings/`: the Settings window, with an Appearance tab for the whole app's appearance and theme, a Terminal tab, and a Notifications tab.
 - `Views/Theme/`: the chosen theme's colors, and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
