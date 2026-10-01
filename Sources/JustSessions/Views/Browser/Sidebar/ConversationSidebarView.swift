@@ -19,6 +19,7 @@ struct ConversationSidebarView: View {
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     @State private var projectExpansion = ProjectExpansion()
+    @State private var projectSelection = ProjectMultiSelection()
     @State private var isAddRemoteHostSheetPresented = false
 
     private var isSearching: Bool {
@@ -27,6 +28,14 @@ struct ConversationSidebarView: View {
 
     private var hostSections: [HostProjectSection] {
         HostProjectSection.sections(hosts: store.hosts, projects: projects)
+    }
+
+    private var visibleProjectIDs: [String] {
+        hostSections.flatMap { $0.projects.map(\.id) }
+    }
+
+    private var listedProjectIDs: Set<String> {
+        Set(visibleProjectIDs)
     }
 
     /// Session rows in the order they appear in the sidebar, used for Shift-click ranges.
@@ -89,20 +98,25 @@ struct ConversationSidebarView: View {
                                 project: project,
                                 parentLabel: parentLabels.label(for: project),
                                 isExpanded: isExpanded(project),
+                                projectSelection: projectSelection,
                                 sessionSelection: sessionSelection,
                                 selectedConversations: selectedConversations,
-                                onToggle: { projectExpansion.toggle(project.id) },
+                                onToggleExpansion: { projectExpansion.toggle(project.id) },
+                                onClickProject: { handleProjectClick(project) },
                                 onNewSession: { provider in
                                     store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
                                 },
                                 onClickConversation: handleConversationClick,
                                 onSelectPendingNewSession: { terminalID in
+                                    projectSelection.clear()
                                     sessionSelection.clear()
                                     store.selectTerminal(terminalID)
                                 },
                                 onRenameConversation: onRenameConversation,
                                 onClearSessionSelection: { sessionSelection.clear() },
                                 onRenameProject: { onRenameProject(project) },
+                                onRemoveSelectedProjects: removeSelectedProjects,
+                                onClearProjectSelection: { projectSelection.clear() },
                                 onRequestDeletion: onRequestDeletion
                             )
                         }
@@ -112,7 +126,14 @@ struct ConversationSidebarView: View {
                 .padding(.bottom, 12)
             }
 
-            if sessionSelection.hasMultipleSelected {
+            if projectSelection.hasSelection {
+                ThemeDivider()
+                SidebarProjectSelectionActionBar(
+                    selectedCount: projectSelection.selectedProjectIDs.count,
+                    onClear: { projectSelection.clear() },
+                    onRemove: removeSelectedProjects
+                )
+            } else if sessionSelection.hasMultipleSelected {
                 ThemeDivider()
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
@@ -140,6 +161,9 @@ struct ConversationSidebarView: View {
             // Rows hidden by a filter or search, or deleted, leave the selection so actions only touch listed rows.
             sessionSelection.keepOnly(newListedConversationIDs)
         }
+        .onChange(of: listedProjectIDs) { _, newListedProjectIDs in
+            projectSelection.keepOnly(newListedProjectIDs)
+        }
     }
 
     /// The theme's sidebar surface, reaching up behind the title bar, sets the list apart from the detail.
@@ -164,6 +188,7 @@ struct ConversationSidebarView: View {
     }
 
     private func handleConversationClick(_ conversation: Conversation) {
+        projectSelection.clear()
         let modifiers = NSEvent.modifierFlags
         if modifiers.contains(.shift) {
             sessionSelection.selectRange(to: conversation.id, in: visibleConversationIDs)
@@ -175,6 +200,24 @@ struct ConversationSidebarView: View {
                 store.launch(conversation, action: .resume)
             }
         }
+    }
+
+    private func handleProjectClick(_ project: ProjectConversationGroup) {
+        sessionSelection.clear()
+        let modifiers = NSEvent.modifierFlags
+        if modifiers.contains(.shift) {
+            projectSelection.selectRange(to: project.id, in: visibleProjectIDs)
+        } else if modifiers.contains(.command) {
+            projectSelection.toggle(project.id)
+        } else {
+            projectSelection.selectOnly(project.id)
+            projectExpansion.toggle(project.id)
+        }
+    }
+
+    private func removeSelectedProjects() {
+        store.removeProjectsFromSidebar(projectSelection.selectedProjectIDs.intersection(listedProjectIDs))
+        projectSelection.clear()
     }
 
     private func expandProjectsWithOpenTerminals() {

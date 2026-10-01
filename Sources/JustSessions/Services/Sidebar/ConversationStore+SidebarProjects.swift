@@ -39,8 +39,13 @@ extension ConversationStore {
 
     /// Only changes sidebar membership. Session files, open tabs, names, and pins are kept.
     func removeProjectFromSidebar(_ projectPath: String) {
+        removeProjectsFromSidebar([projectPath])
+    }
+
+    /// Saves one sidebar update for the whole selection, including projects on different hosts.
+    func removeProjectsFromSidebar(_ projectPaths: Set<String>) {
         var updatedList = sidebarProjectList
-        updatedList.remove(projectPath)
+        updatedList.remove(projectPaths)
         updateSidebarProjectList(updatedList)
     }
 

@@ -5,22 +5,37 @@ struct SidebarProjectSection: View {
     let project: ProjectConversationGroup
     let parentLabel: String?
     let isExpanded: Bool
+    let projectSelection: ProjectMultiSelection
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
-    let onToggle: () -> Void
+    let onToggleExpansion: () -> Void
+    let onClickProject: () -> Void
     let onNewSession: (ConversationProvider) -> Void
     let onClickConversation: (Conversation) -> Void
     let onSelectPendingNewSession: (UUID) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onClearSessionSelection: () -> Void
     let onRenameProject: () -> Void
+    let onRemoveSelectedProjects: () -> Void
+    let onClearProjectSelection: () -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
-
-    @State private var isHovered = false
 
     var body: some View {
         VStack(spacing: 1) {
-            projectRow
+            SidebarProjectRow(
+                store: store,
+                project: project,
+                parentLabel: parentLabel,
+                isExpanded: isExpanded,
+                projectSelection: projectSelection,
+                onToggleExpansion: onToggleExpansion,
+                onClick: onClickProject,
+                onNewSession: onNewSession,
+                onRename: onRenameProject,
+                onDeleteSessions: { onRequestDeletion(.project(project.id)) },
+                onRemoveSelectedProjects: onRemoveSelectedProjects,
+                onClearProjectSelection: onClearProjectSelection
+            )
 
             if isExpanded {
                 VStack(spacing: 1) {
@@ -66,85 +81,5 @@ struct SidebarProjectSection: View {
             .frame(width: 1)
             .padding(.leading, 15)
             .padding(.vertical, 3)
-    }
-
-    private var projectRow: some View {
-        let activitySummary = store.activitySummary(forProjectDirectoryKey: project.id)
-        return HStack(spacing: 0) {
-            Button(action: onToggle) {
-                HStack(spacing: 7) {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(.tertiary)
-                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
-                        .animation(.easeOut(duration: 0.12), value: isExpanded)
-                        .frame(width: 10)
-                    Image(systemName: "folder")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 16)
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(project.displayName)
-                            .font(.system(size: 12, weight: .medium))
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                        if let parentLabel {
-                            Text(parentLabel)
-                                .font(.system(size: 10))
-                                .foregroundStyle(.tertiary)
-                                .lineLimit(1)
-                        }
-                    }
-                    Spacer(minLength: 4)
-                    if project.isPinned { PinnedIndicator() }
-                    if let status = activitySummary.mostPressingStatus {
-                        SessionStatusIndicator(status: status, description: activitySummary.summary)
-                    }
-                }
-                .padding(.leading, 10)
-                .padding(.trailing, 6)
-                .frame(height: parentLabel == nil ? 30 : 40)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity)
-            .help(project.location.copyablePath)
-            .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(CountedNoun.phrase(count: project.sessionCount, singular: "session")), \(activitySummary.runningCount == 0 ? "none running" : activitySummary.summary)")
-            .contextMenu {
-                ProjectContextMenu(
-                    store: store,
-                    project: project,
-                    onNewSession: onNewSession,
-                    onRename: onRenameProject,
-                    onDeleteSessions: { onRequestDeletion(.project(project.id)) }
-                )
-            }
-
-            sessionCountOrNewSessionMenu
-                .padding(.trailing, 8)
-        }
-        .background(SidebarRowBackground(isSelected: false, isHovered: isHovered))
-        .onHover { isHovered = $0 }
-    }
-
-    /// The session count, which gives way to the + menu while the pointer is over the row.
-    private var sessionCountOrNewSessionMenu: some View {
-        ZStack(alignment: .trailing) {
-            Text(project.sessionCount.formatted())
-                .font(.system(size: 11).monospacedDigit())
-                .foregroundStyle(.secondary)
-                .opacity(isHovered ? 0 : 1)
-            ProjectNewSessionMenu(
-                project: project,
-                providers: store.newSessionProviders(on: project.host),
-                showsTitle: false,
-                onStart: onNewSession
-            )
-                .menuStyle(.borderlessButton)
-                .menuIndicator(.hidden)
-                .fixedSize()
-                .opacity(isHovered ? 1 : 0)
-                .allowsHitTesting(isHovered)
-        }
     }
 }
