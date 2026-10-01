@@ -24,7 +24,7 @@
 
 You remember the work. Finding the conversation takes longer: which project, which terminal, which AI tool, which machine?
 
-**JustSessions brings your AI coding session history into one window.** Search across projects, preview Claude Code and Codex conversations, then resume the right session in its original CLI and working directory. Keep using your editor, CLI configuration, and provider accounts.
+**JustSessions brings your AI coding session history into one window.** Search across projects, preview Claude Code, Codex, and Kiro CLI conversations, then resume the right session in its original CLI and working directory. Keep using your editor, CLI configuration, and provider accounts.
 
 [Website](https://yangzichao.github.io/JustSessions/) · [Download for macOS](#download) · [Remote sessions](#your-desktop-at-home-your-mac-on-the-go) · [tmux persistence](#close-the-tab-keep-the-work-running-with-tmux) · [Supported CLIs](#supported-clis) · [User guide](docs/guides/session-management.md)
 
@@ -39,14 +39,14 @@ Built for developers who work across multiple projects, AI coding tools, or SSH 
 | When this gets in your way… | JustSessions helps you… |
 | --- | --- |
 | “Which session had the work I need?” | Find sessions by title or ID, or find their project by name or path. Pin and rename the ones you return to. |
-| “I keep reopening sessions to remember what happened.” | Read Claude Code and Codex conversations before starting the CLI, with tool calls collapsed out of the way. |
+| “I keep reopening sessions to remember what happened.” | Read Claude Code, Codex, and Kiro CLI conversations before starting the CLI, with tool calls collapsed out of the way. |
 | “My work is spread across Claude Code, Codex, and terminal tabs.” | Browse supported CLIs together, grouped by machine and project, and resume in an embedded terminal. |
 | “I want to try another approach from this conversation.” | Branch a Claude Code or Codex session into a new conversation. |
 | “I keep switching back to check whether the agent is done.” | Get a macOS notification when a session finishes its turn or waits on you. Click it to open the session. |
 
 ## Your desktop at home, your Mac on the go
 
-The agent is running on your desktop or development server. You are working from your laptop. **Add the machine over SSH and continue its Claude Code or Codex sessions from JustSessions.**
+The agent is running on your desktop or development server. You are working from your laptop. **Add the machine over SSH and continue its Claude Code, Codex, or Kiro CLI sessions from JustSessions.**
 
 - See **This Mac** and each remote host in the same sidebar, with their own projects and sessions.
 - Preview the conversation, then resume, branch, or start a session in the remote project directory.
@@ -87,7 +87,7 @@ This Mac requires **tmux 3.3+**; remote sessions require tmux on the SSH host. T
 
 1. Download **[JustSessions.dmg](https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg)**, Developer ID signed and notarized by Apple.
 2. Open it, drag **JustSessions** into **Applications**, and launch it.
-3. Find a project or session in the sidebar. Select a Claude Code or Codex session to read its preview.
+3. Find a project or session in the sidebar. Select a Claude Code, Codex, or Kiro CLI session to read its preview.
 4. Double-click a session or choose **Resume** to continue in its original CLI.
 
 App updates are delivered through Sparkle. For remote sessions, use **Add SSH host…** in the sidebar; see the [SSH setup instructions](docs/guides/session-management.md#ssh-hosts).
@@ -97,9 +97,9 @@ App updates are delivered through Sparkle. For remote sessions, use **Add SSH ho
 | Capability | Claude Code | OpenAI Codex CLI | Google Antigravity CLI | Kiro CLI | OpenCode | Pi |
 | --- | --- | --- | --- | --- | --- | --- |
 | Browse, search, and resume local sessions | Yes | Yes | Yes | Yes | Yes | Yes |
-| Read a conversation preview | Yes | Yes | Not yet | Not yet | Not yet | Not yet |
-| Branch a conversation from the app | Yes | Yes | Use `/fork` inside the CLI | Not yet | Yes | Yes |
-| Browse and manage sessions over SSH | Yes | Yes | Not yet | Not yet | Not yet | Not yet |
+| Read a conversation preview | Yes | Yes | Not yet | Yes | Not yet | Not yet |
+| Branch a conversation from the app | Yes | Yes | Use `/fork` inside the CLI | Use `/rewind` inside the CLI | Yes | Yes |
+| Browse and manage sessions over SSH | Yes | Yes | Not yet | Yes | Not yet | Not yet |
 | Delete sessions from the app | Yes | Yes | Not yet | Yes | Not yet | Not yet |
 
 New session menus offer only the CLIs found on each machine, and the sidebar's tool filter lists only tools that are installed or have sessions.
@@ -120,7 +120,7 @@ Open JustSessions and search by project name, folder path, session title, or ses
 
 ### Can I manage Claude Code and Codex sessions in the same app?
 
-Yes. JustSessions is a macOS session manager for both, with conversation previews, resume, branching, and SSH support. Antigravity CLI, Kiro CLI, OpenCode, and Pi sessions can also be browsed and resumed on this Mac, and OpenCode and Pi sessions can be branched.
+Yes. JustSessions is a macOS session manager for both, with conversation previews, resume, branching, and SSH support. Kiro CLI also supports previews, resume, deletion, and SSH; use `/rewind` after resuming to fork at an earlier turn. Antigravity CLI, OpenCode, and Pi sessions can be browsed and resumed on this Mac, and OpenCode and Pi sessions can be branched.
 
 ### How do I resume an old Codex or Claude Code session?
 
@@ -132,7 +132,7 @@ Yes, with tmux. Install tmux 3.3 or later on this Mac before launching the sessi
 
 ### Do I need Remote Desktop to use a session on another computer?
 
-For supported CLI sessions, connect that computer over SSH from JustSessions. You can browse its Claude Code and Codex history and work in its terminal from your Mac. Graphical desktop access, such as controlling other applications through RDP or VNC, is outside JustSessions' scope.
+For supported CLI sessions, connect that computer over SSH from JustSessions. You can browse its Claude Code, Codex, and Kiro CLI history and work in its terminal from your Mac. Graphical desktop access, such as controlling other applications through RDP or VNC, is outside JustSessions' scope.
 
 ### Does JustSessions need a new AI account or subscription?
 

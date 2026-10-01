@@ -1,7 +1,7 @@
 import Foundation
 
 /// Deletes a session on its remote host over SSH. Remote hosts have no Trash, so this is permanent.
-/// Claude Code sessions lose their transcript, companion folder, and index entry; Codex deletes its own.
+/// Claude Code sessions lose their transcript, companion folder, and index entry; Codex and Kiro delete their own.
 struct RemoteConversationDeletion {
     let runner: RemoteHostCommandRunner
 
@@ -9,7 +9,7 @@ struct RemoteConversationDeletion {
         self.runner = runner
     }
 
-    /// Exit status of the Claude Code script when the transcript is already gone.
+    /// Exit status of a deletion script when the transcript is already gone.
     static let missingTranscriptExitStatus: Int32 = 3
 
     func delete(_ conversation: Conversation) throws {
@@ -27,7 +27,15 @@ struct RemoteConversationDeletion {
             command = RemoteCLICommandBuilder.loginShellCommand(
                 "codex delete --force \(ShellQuoting.quoted(conversation.sessionID))"
             )
-        case .antigravity, .kiro, .opencode, .pi:
+        case .kiro:
+            let metadataFile = conversation.sourceFile.deletingPathExtension().appendingPathExtension("json")
+            guard conversation.sourceFile.lastPathComponent == "\(conversation.sessionID).jsonl",
+                  let metadata = KiroSessionMetadata(file: metadataFile),
+                  metadata.sessionID == conversation.sessionID,
+                  metadata.projectPath == conversation.projectPath,
+                  conversation.projectPath.hasPrefix("/") else { throw ConversationDeletionError.invalidSource }
+            command = RemoteKiroConversationDeletion.command(sessionID: conversation.sessionID, projectPath: conversation.projectPath)
+        case .antigravity, .opencode, .pi:
             throw ConversationDeletionError.invalidSource
         }
 
@@ -36,9 +44,12 @@ struct RemoteConversationDeletion {
         case 0:
             // The mirror would drop it on the next copy; dropping it now keeps the list right until then.
             try? FileManager.default.removeItem(at: conversation.sourceFile)
+            if conversation.provider == .kiro {
+                try? FileManager.default.removeItem(at: conversation.sourceFile.deletingPathExtension().appendingPathExtension("json"))
+            }
         case RemoteHostCommandRunner.connectionFailureExitStatus:
             throw RemoteConversationDeletionError.sshFailed(host: host)
-        case Self.missingTranscriptExitStatus where conversation.provider == .claude:
+        case Self.missingTranscriptExitStatus where conversation.provider == .claude || conversation.provider == .kiro:
             throw RemoteConversationDeletionError.missingOnHost(host: host)
         default:
             let details = result.output.trimmingCharacters(in: .whitespacesAndNewlines)

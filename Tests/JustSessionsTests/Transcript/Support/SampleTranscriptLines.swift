@@ -57,7 +57,10 @@ struct TranscriptFileReader: Sendable, CustomTestStringConvertible {
     static let codex = TranscriptFileReader(testDescription: "Codex", sampleLines: SampleTranscriptLines.codex) {
         try CodexTranscriptReader().read($0)
     }
-    static let all = [claude, codex]
+    static let kiro = TranscriptFileReader(testDescription: "Kiro CLI", sampleLines: KiroTranscriptSamples.lines) {
+        try KiroTranscriptReader().read($0)
+    }
+    static let all = [claude, codex, kiro]
 
     private init(testDescription: String, sampleLines: [String], readFile: @escaping @Sendable (URL) throws -> TranscriptContent) {
         self.testDescription = testDescription

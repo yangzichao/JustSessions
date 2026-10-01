@@ -17,16 +17,16 @@ struct KiroConversationDeletion {
     func delete(_ conversation: Conversation) throws {
         let sourceFile = conversation.sourceFile.standardizedFileURL
         let metadataFile = sourceFile.deletingPathExtension().appendingPathExtension("json")
-        let resolvedSessionsDirectory = sessionsDirectory.resolvingSymlinksInPath()
+        let resolvedSessionsPath = sessionsDirectory.resolvingSymlinksInPath().path
         guard conversation.provider == .kiro,
               conversation.host == .thisMac,
               sessionsDirectory.lastPathComponent == "cli",
               sessionsDirectory.deletingLastPathComponent().lastPathComponent == "sessions",
               ConversationProvider.kiro.isValidSessionID(conversation.sessionID),
               sourceFile.lastPathComponent == "\(conversation.sessionID).jsonl",
-              sourceFile.deletingLastPathComponent().resolvingSymlinksInPath() == resolvedSessionsDirectory,
-              sourceFile.resolvingSymlinksInPath().deletingLastPathComponent() == resolvedSessionsDirectory,
-              metadataFile.resolvingSymlinksInPath().deletingLastPathComponent() == resolvedSessionsDirectory
+              sourceFile.deletingLastPathComponent().resolvingSymlinksInPath().path == resolvedSessionsPath,
+              sourceFile.resolvingSymlinksInPath().deletingLastPathComponent().path == resolvedSessionsPath,
+              metadataFile.resolvingSymlinksInPath().deletingLastPathComponent().path == resolvedSessionsPath
         else { throw ConversationDeletionError.invalidSource }
         guard fileManager.fileExists(atPath: sourceFile.path), fileManager.fileExists(atPath: metadataFile.path) else {
             throw ConversationDeletionError.missingSource

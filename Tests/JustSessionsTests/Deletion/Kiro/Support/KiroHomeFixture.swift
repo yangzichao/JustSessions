@@ -11,7 +11,7 @@ struct KiroHomeFixture {
 
     init() throws {
         root = try makeTemporaryDirectory()
-        kiroDirectory = root.appendingPathComponent("custom kiro home")
+        kiroDirectory = root.appendingPathComponent("custom kiro home; $dollar")
         sessionsDirectory = kiroDirectory.appendingPathComponent("sessions/cli")
         projectDirectory = root.appendingPathComponent("project with spaces")
         try FileManager.default.createDirectory(at: projectDirectory, withIntermediateDirectories: true)

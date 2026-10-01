@@ -52,8 +52,8 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
     /// Tools whose sessions are listed and resumed on SSH hosts.
     var supportsRemoteHosts: Bool {
         switch self {
-        case .claude, .codex: true
-        case .antigravity, .kiro, .opencode, .pi: false
+        case .claude, .codex, .kiro: true
+        case .antigravity, .opencode, .pi: false
         }
     }
 

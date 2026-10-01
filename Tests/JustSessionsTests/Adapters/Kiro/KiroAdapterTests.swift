@@ -52,6 +52,26 @@ struct KiroAdapterTests {
             == "/opt/kiro/sessions/cli")
     }
 
+    @Test func aMetadataFileNamedForAnotherSessionIsNotListed() throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let sessionID = UUID().uuidString.lowercased()
+        let otherSessionID = UUID().uuidString.lowercased()
+        try KiroSessionFolderFixture(sessionsDirectory: root).writeSession(
+            id: sessionID,
+            projectPath: "/Users/me/app",
+            messageLines: [KiroSessionFolderFixture.prompt("Keep me")]
+        )
+        for fileExtension in ["json", "jsonl"] {
+            try FileManager.default.moveItem(
+                at: root.appendingPathComponent("\(sessionID).\(fileExtension)"),
+                to: root.appendingPathComponent("\(otherSessionID).\(fileExtension)")
+            )
+        }
+
+        #expect(try KiroAdapter(sessionsDirectory: root).discover().isEmpty)
+    }
+
     @Test func firstPromptSkipsOtherLinesAndBlankText() {
         let blankPrompt = #"{"version":"v1","kind":"Prompt","data":{"content":[{"kind":"image","data":"…"},{"kind":"text","data":"  "}]}}"#
         let lines = jsonLines([KiroSessionFolderFixture.reply, blankPrompt, KiroSessionFolderFixture.prompt("Real prompt")])

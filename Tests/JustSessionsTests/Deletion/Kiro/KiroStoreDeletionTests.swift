@@ -23,7 +23,7 @@ struct KiroStoreDeletionTests {
         store.rename(selected, to: "Custom title")
         store.setPinned(true, conversation: selected)
         #expect(selected.supportsDeletionFromLauncher)
-        #expect(!selected.onHost(.ssh("devbox")).supportsDeletionFromLauncher)
+        #expect(selected.onHost(.ssh("devbox")).supportsDeletionFromLauncher)
         #expect(store.deletionPlan(for: [selected]).deletableConversations.map(\.id) == [selected.id])
 
         switch deletionKind {

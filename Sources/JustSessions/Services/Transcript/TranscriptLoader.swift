@@ -6,7 +6,8 @@ enum TranscriptLoader {
         switch conversation.provider {
         case .claude: .loaded(try ClaudeTranscriptReader().read(conversation.sourceFile))
         case .codex: .loaded(try CodexTranscriptReader().read(conversation.sourceFile))
-        case .antigravity, .kiro, .opencode, .pi: .unsupported
+        case .kiro: .loaded(try KiroTranscriptReader().read(conversation.sourceFile))
+        case .antigravity, .opencode, .pi: .unsupported
         }
     }
 }

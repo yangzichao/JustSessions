@@ -51,6 +51,7 @@ struct KiroAdapter: ConversationAdapter {
               let metadata = KiroSessionMetadata(file: metadataFile),
               metadata.createdReason != "subagent",
               provider.isValidSessionID(metadata.sessionID),
+              metadataFile.lastPathComponent == "\(metadata.sessionID).json",
               metadata.projectPath.hasPrefix("/") else { return nil }
         let title = ConversationMetadata.cleanTitle(
             metadata.title.flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }

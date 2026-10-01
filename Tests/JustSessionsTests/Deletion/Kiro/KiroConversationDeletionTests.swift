@@ -23,7 +23,7 @@ struct KiroConversationDeletionTests {
         let report = try String(contentsOf: reportFile, encoding: .utf8).split(separator: "\n").map(String.init)
         #expect(Array(report.prefix(4)) == ["chat", "--delete-session", selected.sessionID, fixture.kiroDirectory.path])
         let workingDirectory = try #require(report.last)
-        #expect(URL(fileURLWithPath: workingDirectory).resolvingSymlinksInPath() == fixture.projectDirectory.resolvingSymlinksInPath())
+        #expect(URL(fileURLWithPath: workingDirectory).resolvingSymlinksInPath().path == fixture.projectDirectory.resolvingSymlinksInPath().path)
         #expect(!FileManager.default.fileExists(atPath: selected.sourceFile.path))
         #expect(!FileManager.default.fileExists(atPath: fixture.metadataFile.path))
         #expect(try adapter.discover().map(\.sessionID) == [retainedSessionID])
@@ -39,7 +39,7 @@ struct KiroConversationDeletionTests {
             + "printf '%s\\n' \"$PWD\" > \(ShellQuoting.quoted(reportFile.path))\n")
 
         let workingDirectory = try String(contentsOf: reportFile, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
-        #expect(URL(fileURLWithPath: workingDirectory).resolvingSymlinksInPath() == fixture.kiroDirectory.resolvingSymlinksInPath())
+        #expect(URL(fileURLWithPath: workingDirectory).resolvingSymlinksInPath().path == fixture.kiroDirectory.resolvingSymlinksInPath().path)
         #expect(try KiroAdapter(sessionsDirectory: fixture.sessionsDirectory).discover().isEmpty)
     }
 

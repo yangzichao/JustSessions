@@ -82,7 +82,9 @@ struct RemoteSessionMirror: Sendable {
             ["/projects/", "/projects/*/", "/projects/*/*.jsonl", "/projects/*/sessions-index.json"]
         case .codex:
             ["/session_index.jsonl", "/sessions/", "/sessions/**/", "/sessions/**/rollout-*.jsonl"]
-        case .antigravity, .kiro, .opencode, .pi:
+        case .kiro:
+            ["/*.json", "/*.jsonl"]
+        case .antigravity, .opencode, .pi:
             []
         }
     }

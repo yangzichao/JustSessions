@@ -13,13 +13,14 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 
 ## Preview before you resume
 
-- Read a Claude Code or Codex conversation without starting the CLI. Your messages and the agent's replies are shown; runs of tool calls collapse into one expandable row.
+- Read a Claude Code, Codex, or Kiro CLI conversation without starting the CLI. Your messages and the agent's replies are shown; runs of tool calls collapse into one expandable row.
 
 ## Resume, branch, and start sessions
 
 - Resume a session in its native CLI inside an embedded terminal: double-click it, use **Resume**, or right-click.
 - Branch (fork) a Claude Code, Codex, OpenCode, or Pi conversation into a new session. This forks the conversation, not a Git branch.
-- Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI installed on that machine (Claude Code and Codex on SSH hosts). It appears in the sidebar right away.
+- Kiro CLI supports a fork at an earlier turn with `/rewind` inside the resumed session. It does not currently expose a direct branch launch flag, so JustSessions keeps its Branch action unavailable. See [Kiro's rewind documentation](https://kiro.dev/docs/cli/reference/slash-commands/#rewind).
+- Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI installed on that machine (Claude Code, Codex, and Kiro CLI on SSH hosts). It appears in the sidebar right away.
 - Open a plain terminal in a project folder: choose **Terminal** from the project's **+** menu, or right-click the project and choose **New terminal**. It runs your login shell, on this Mac or the project's SSH host. It is not a session: it isn't listed in the sidebar, sends no notifications, and doesn't run in tmux, so closing its tab ends the shell.
 - Keep several terminal tabs open. Select a session in the sidebar to read its preview; a session whose CLI is running opens on its terminal instead. Select a terminal tab to return to its CLI without stopping it.
 - Tabs group by project, like tab groups in a browser: a new tab opens next to its project's other tabs, behind a label in the project's color. Click the label to collapse the group; a collapsed group keeps only its selected tab in sight and shows how many tabs it hides and the most pressing status among them.
@@ -53,9 +54,9 @@ JustSessions posts a macOS notification when a Claude Code or Codex session on t
 
 ## SSH hosts
 
-The host must accept `ssh <host>` without a password prompt and have `rsync` plus the CLI you want to run installed. The app reads Claude Code and Codex history from the host's standard session folders.
+The host must accept `ssh <host>` without a password prompt and have `rsync` plus the CLI you want to run installed. The app reads Claude Code, Codex, and Kiro CLI history from the host's standard session folders.
 
-- Click **Add SSH host…** at the bottom left of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code and Codex sessions are listed under its own heading, below this Mac's.
+- Click **Add SSH host…** at the bottom left of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code, Codex, and Kiro CLI sessions are listed under its own heading, below this Mac's.
 - Resume, branch, start, and delete sessions on the host over SSH, just like on this Mac.
 - Refresh updates every host at once. A host that can't be reached shows the error on its heading; the others still list.
 - With tmux on the host, a session there keeps running when the connection drops or the tab closes. Select the session to reattach.
@@ -66,7 +67,7 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 - Projects stay in the sidebar after their last session is deleted, including after restarting the app. Right-click a project and choose **Remove from sidebar** to hide it without deleting its sessions or folder. Starting a new session in that folder brings it back.
 - Select several projects with ⌘-click, or select a continuous range with Shift-click, then click **Remove from sidebar** at the bottom of the sidebar or right-click a selected project and choose **Remove … projects from sidebar**. Open terminals keep running. Use a project's arrow to expand or collapse it while keeping the selection.
 - Click empty space in the sidebar or press Escape while the sidebar is focused to cancel a project or session batch selection. A single session's conversation stays open.
-- Claude Code sessions on this Mac go to the macOS Trash. Codex uses `codex delete --force`. SSH hosts have no Trash, so deletions there are permanent.
+- Claude Code sessions on this Mac go to the macOS Trash. Codex uses `codex delete --force`, and Kiro CLI uses `kiro-cli chat --delete-session <session-id>`. SSH hosts have no Trash, so deletions there are permanent.
 - Sessions with an open terminal tab, or still running in tmux, can't be deleted.
 
 ## Appearance

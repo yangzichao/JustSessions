@@ -15,7 +15,7 @@ struct AddRemoteHostSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Add SSH host").font(.title3.weight(.semibold))
-            Text("Claude Code and Codex sessions on the host are listed under it in the sidebar, and open over SSH. "
+            Text("Claude Code, Codex, and Kiro CLI sessions on the host are listed under it in the sidebar, and open over SSH. "
                 + "Use a Host alias from ~/.ssh/config or user@hostname. `ssh <host>` must work without a password prompt, "
                 + "and the host needs rsync. With tmux on the host, sessions keep running when the connection drops "
                 + "or the tab closes; click the session to reattach.")

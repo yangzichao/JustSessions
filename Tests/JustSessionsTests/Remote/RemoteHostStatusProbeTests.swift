@@ -49,7 +49,7 @@ struct RemoteHostStatusProbeTests {
         let bin = root.appendingPathComponent("bin")
         try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
         try writeExecutableScript("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
-        for executableName in ["codex", "pi"] {
+        for executableName in ["codex", "kiro-cli", "pi"] {
             try writeExecutableScript("#!/bin/sh\nexit 0\n", to: bin.appendingPathComponent(executableName))
         }
 
@@ -61,6 +61,6 @@ struct RemoteHostStatusProbeTests {
         )
 
         // Pi runs only on this Mac, so the probe does not look for it.
-        #expect(RemoteHostStatusProbe.status(inOutput: try #require(output)).installedProviders == [.codex])
+        #expect(RemoteHostStatusProbe.status(inOutput: try #require(output)).installedProviders == [.codex, .kiro])
     }
 }

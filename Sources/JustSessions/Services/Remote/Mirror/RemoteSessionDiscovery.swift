@@ -17,6 +17,7 @@ struct RemoteSessionDiscovery: Sendable {
         let adapters: [any ConversationAdapter] = [
             ClaudeAdapter(configurationDirectory: mirror.mirrorDirectory(host: host, provider: .claude)),
             CodexAdapter(codexDirectory: mirror.mirrorDirectory(host: host, provider: .codex)),
+            KiroAdapter(sessionsDirectory: mirror.mirrorDirectory(host: host, provider: .kiro)),
         ]
         return try adapters.flatMap { try $0.discover() }.map { $0.onHost(.ssh(host)) }
     }
