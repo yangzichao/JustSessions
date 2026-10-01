@@ -26,20 +26,22 @@ Sparkle delivers subsequent app updates. Your CLI provider's plans and charges s
 ## Resume your first session
 
 1. Search a project name or path, session title, or session ID.
-2. Select a Claude Code, Codex, or Kiro CLI session to read its conversation preview.
+2. Select a Claude Code, Codex, Antigravity, or Kiro CLI session to read its conversation preview.
 3. Double-click a session or choose **Resume** to open its CLI in the original working directory.
 
-A session whose CLI is already running opens on that process with one click. Search does not include conversation text. Antigravity, Kiro, OpenCode, and Pi support local browsing and resume; previews are available for Claude Code, Codex, and Kiro CLI. See the [full capability table](../../README.md#supported-clis).
+A session whose CLI is already running opens on that process with one click. Search does not include conversation text. Antigravity, Kiro, OpenCode, and Pi support local browsing and resume; previews are available for Claude Code, Codex, Antigravity, and Kiro CLI. See the [full capability table](../../README.md#supported-clis).
 
 **New session** starts an installed CLI in a project folder. A project's **+ → Terminal** opens your login shell in that folder. Project tab groups and [keyboard shortcuts](session-management.md#tab-keyboard-shortcuts) help you switch between open terminals.
 
 ## Use another machine over SSH
 
-The remote machine must accept `ssh <host>` without a password prompt and have `rsync` and Claude Code, Codex, or Kiro CLI installed.
+The remote machine must accept `ssh <host>` without a password prompt and have `rsync` and Claude Code, Codex, Antigravity, or Kiro CLI installed.
 
 1. Choose **Add SSH host…** in the sidebar.
 2. Enter a `~/.ssh/config` alias or `user@hostname`.
 3. Browse its projects and resume a session on that host.
+
+Antigravity SSH hosts also need `python3`; deleting its sessions there needs `lsof`.
 
 The code and CLI run remotely. Supported session files are cached on your Mac. This is terminal access, not graphical remote desktop control. [SSH setup and limits](session-management.md#ssh-hosts).
 
@@ -54,7 +56,7 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 - Clear the CLI and recent-session filters, then refresh the sidebar.
 - Confirm the CLI executable works in your usual terminal. New session menus offer only installed CLIs.
 - Start one conversation in the CLI so it has history for the app to discover. Kiro sessions need at least one message; OpenCode archived and subagent sessions are excluded.
-- Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, and Kiro CLI folders.
+- Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, Antigravity, and Kiro CLI folders.
 - For SSH, confirm passwordless access, `rsync`, and the remote CLI before adding the host.
 
 ## Appearance, privacy, and feedback

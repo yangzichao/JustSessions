@@ -22,7 +22,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yangzichao/JustSessions" alt="MIT license"></a>
 </p>
 
-**Find the conversation you need without hunting through terminal tabs.** JustSessions brings your AI coding history into one native Mac app. Search projects and sessions, preview Claude Code, Codex, and Kiro CLI conversations, and resume in the original CLI and project folder.
+**Find the conversation you need without hunting through terminal tabs.** JustSessions brings your AI coding history into one native Mac app. Search projects and sessions, preview Claude Code, Codex, Antigravity, and Kiro CLI conversations, and resume in the original CLI and project folder.
 
 [Website](https://yangzichao.github.io/JustSessions/) · [Download](#download) · [Getting started](docs/guides/getting-started.md) · [SSH](#remote-sessions-over-ssh) · [tmux](#keep-sessions-running-with-tmux) · [Supported CLIs](#supported-clis) · [Documentation](docs/README.md)
 
@@ -33,7 +33,7 @@
 ## Features
 
 - **Find:** search project names and paths, session titles, and IDs. Pin and rename sessions you return to.
-- **Preview:** read Claude Code, Codex, and Kiro CLI conversations before opening the CLI, with tool calls collapsed.
+- **Preview:** read Claude Code, Codex, Antigravity, and Kiro CLI conversations before opening the CLI, with tool calls collapsed.
 - **Resume or branch:** continue in an embedded terminal, or fork a supported conversation to try another approach.
 - **Organize:** group terminal tabs by project, open a plain project terminal, and switch tabs with familiar keyboard shortcuts.
 - **Stay informed:** local Claude Code and Codex sessions can notify when a turn finishes or needs your input.
@@ -41,7 +41,7 @@
 
 ## Remote sessions over SSH
 
-**Use your Mac to continue Claude Code, Codex, and Kiro CLI sessions on a desktop or development server.** Add a passwordless SSH host with `rsync` and the CLI installed. The code and CLI stay on that machine; JustSessions caches session history locally.
+**Use your Mac to continue Claude Code, Codex, Antigravity, and Kiro CLI sessions on a desktop or development server.** Add a passwordless SSH host with `rsync` and the CLI installed. The code and CLI stay on that machine; JustSessions caches session history locally.
 
 ![JustSessions displaying a Claude Code conversation on the dev-desktop SSH host alongside local projects and a build server](docs/images/remote-desktop-sessions.jpg)
 
@@ -78,7 +78,7 @@ This Mac requires **tmux 3.3+**; remote sessions require tmux on the SSH host. T
 
 1. Download **[JustSessions.dmg](https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg)**, Developer ID signed and notarized by Apple.
 2. Open it, drag **JustSessions** into **Applications**, and launch it.
-3. Find a project or session in the sidebar. Select a Claude Code, Codex, or Kiro CLI session to read its preview.
+3. Find a project or session in the sidebar. Select a Claude Code, Codex, Antigravity, or Kiro CLI session to read its preview.
 4. Double-click a session or choose **Resume** to continue in its original CLI.
 
 App updates are delivered through Sparkle. [Getting started](docs/guides/getting-started.md) covers your first session, missing CLIs, SSH, and tmux. The same quick guide is available on the [website](https://yangzichao.github.io/JustSessions/guide.html).
@@ -88,12 +88,12 @@ App updates are delivered through Sparkle. [Getting started](docs/guides/getting
 | Capability | Claude Code | OpenAI Codex CLI | Google Antigravity CLI | Kiro CLI | OpenCode | Pi |
 | --- | --- | --- | --- | --- | --- | --- |
 | Browse, search, and resume local sessions | Yes | Yes | Yes | Yes | Yes | Yes |
-| Read a conversation preview | Yes | Yes | Not yet | Yes | Not yet | Not yet |
+| Read a conversation preview | Yes | Yes | Yes | Yes | Not yet | Not yet |
 | Branch a conversation from the app | Yes | Yes | Use `/fork` inside the CLI | Use `/rewind` inside the CLI | Yes | Yes |
-| Browse and manage sessions over SSH | Yes | Yes | Not yet | Yes | Not yet | Not yet |
-| Delete sessions from the app | Yes | Yes | Not yet | Yes | Not yet | Not yet |
+| Browse and manage sessions over SSH | Yes | Yes | Yes | Yes | Not yet | Not yet |
+| Delete sessions from the app | Yes | Yes | Yes | Yes | Not yet | Not yet |
 
-New session menus offer only installed CLIs. The sidebar filter includes CLIs that are installed or have saved sessions. Kiro deletion uses its native CLI command; see the [storage guide](docs/guides/session-storage.md#session-locations).
+New session menus offer only installed CLIs. The sidebar filter includes CLIs that are installed or have saved sessions. Antigravity sessions on this Mac move to the Trash; SSH Antigravity management needs `python3`, and deletion also needs `lsof`. Kiro deletion uses its native CLI command; see the [storage guide](docs/guides/session-storage.md#session-locations).
 
 Search matches project names and paths, session titles, and session IDs. It does not search the full conversation text. **Branch** forks a conversation; it does not create a Git branch.
 

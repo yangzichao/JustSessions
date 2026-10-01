@@ -61,6 +61,6 @@ struct AntigravityAdapter: ConversationAdapter {
     }
 
     func delete(_ conversation: Conversation) throws {
-        throw AntigravityAdapterError.deletionUnavailable
+        try AntigravityConversationDeletion(configurationDirectory: configurationDirectory).delete(conversation)
     }
 }

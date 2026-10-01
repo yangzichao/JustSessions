@@ -24,7 +24,7 @@ struct InstalledCLIsTests {
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
 
         #expect(store.newSessionProviders(on: .thisMac) == ConversationProvider.allCases)
-        #expect(store.newSessionProviders(on: .ssh("devbox")) == [.claude, .codex, .kiro])
+        #expect(store.newSessionProviders(on: .ssh("devbox")) == [.claude, .codex, .antigravity, .kiro])
 
         store.setInstalledProviders([.pi, .claude], on: .thisMac)
         store.setInstalledProviders([.codex, .pi], on: .ssh("devbox"))
@@ -51,7 +51,7 @@ struct InstalledCLIsTests {
 
     @Test func noCLIMessageNamesEveryToolThatRunsOnTheHost() {
         #expect(NewSessionProviderAvailability.noCLIFoundMessage(on: .ssh("devbox"))
-            == "No supported CLI found on devbox. Install claude, codex, or kiro-cli there, then refresh.")
+            == "No supported CLI found on devbox. Install claude, codex, agy, or kiro-cli there, then refresh.")
         #expect(NewSessionProviderAvailability.noCLIFoundMessage(on: .thisMac).contains("kiro-cli"))
     }
 }

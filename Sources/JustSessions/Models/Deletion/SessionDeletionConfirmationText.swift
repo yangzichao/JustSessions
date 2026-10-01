@@ -17,14 +17,16 @@ enum SessionDeletionConfirmationText {
             return "\(conversation.provider.rawValue) will permanently delete this session using its native CLI. This cannot be undone."
         case .claude:
             return "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index."
-        case .antigravity, .opencode, .pi:
+        case .antigravity:
+            return "The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index."
+        case .opencode, .pi:
             return "JustSessions can't delete \(conversation.provider.rawValue) sessions yet."
         }
     }
 
     static func message(forDeletingSelectionWith plan: SessionDeletionPlan) -> String {
         joined([
-            "Claude Code sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.",
+            "Claude Code and Antigravity sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.",
             skippedSessionsSentence(for: plan),
         ])
     }
@@ -34,7 +36,7 @@ enum SessionDeletionConfirmationText {
             "This affects all tools in \(location.copyablePath), including sessions hidden by the current filter.",
             "The project will stay in the sidebar.",
             location.host == .thisMac
-                ? "Claude Code sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted."
+                ? "Claude Code and Antigravity sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted."
                 : "SSH hosts have no Trash, so every session is permanently deleted.",
             skippedSessionsSentence(for: plan),
         ])

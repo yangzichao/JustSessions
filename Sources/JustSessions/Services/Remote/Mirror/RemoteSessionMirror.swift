@@ -37,6 +37,10 @@ struct RemoteSessionMirror: Sendable {
     private func synchronize(host: String, provider: ConversationProvider) throws {
         let destination = mirrorDirectory(host: host, provider: provider)
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
+        if provider == .antigravity {
+            try AntigravityRemoteSessionMirror().synchronize(host: host, sourceHomeOverride: sourceHomeOverride, destination: destination)
+            return
+        }
         let remoteFolder = Self.remoteFolder(for: provider)
         let source = sourceHomeOverride.map { "\($0)/\(remoteFolder)/" } ?? "\(host):\(remoteFolder)/"
 
@@ -84,7 +88,10 @@ struct RemoteSessionMirror: Sendable {
             ["/session_index.jsonl", "/sessions/", "/sessions/**/", "/sessions/**/rollout-*.jsonl"]
         case .kiro:
             ["/*.json", "/*.jsonl"]
-        case .antigravity, .opencode, .pi:
+        case .antigravity:
+            ["/conversation_summaries.db", "/conversation_summaries.db-wal", "/conversation_summaries.db-shm",
+             "/conversations/", "/conversations/*.db", "/conversations/*.db-wal", "/conversations/*.db-shm"]
+        case .opencode, .pi:
             []
         }
     }

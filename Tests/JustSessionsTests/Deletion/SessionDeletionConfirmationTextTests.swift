@@ -55,7 +55,7 @@ struct SessionDeletionConfirmationTextTests {
         )
         #expect(message == "This affects all tools in /Users/me/app, including sessions hidden by the current filter. "
             + "The project will stay in the sidebar. "
-            + "Claude Code sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted. "
+            + "Claude Code and Antigravity sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted. "
             + "1 session with an open terminal will be skipped.")
     }
 
@@ -73,7 +73,7 @@ struct SessionDeletionConfirmationTextTests {
     @Test func selectionMentionsSkippedSessionsOnlyWhenThereAreSome() {
         let everythingDeletable = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: 0, unsupportedCount: 0)
         let someSkipped = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: 0, unsupportedCount: 2)
-        let intro = "Claude Code sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted."
+        let intro = "Claude Code and Antigravity sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted."
 
         #expect(SessionDeletionConfirmationText.message(forDeletingSelectionWith: everythingDeletable) == intro)
         #expect(SessionDeletionConfirmationText.message(forDeletingSelectionWith: someSkipped)

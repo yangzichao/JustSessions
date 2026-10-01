@@ -1,7 +1,7 @@
 import Foundation
 
 /// Deletes a session on its remote host over SSH. Remote hosts have no Trash, so this is permanent.
-/// Claude Code sessions lose their transcript, companion folder, and index entry; Codex and Kiro delete their own.
+/// Claude Code and Antigravity lose their stored history and index entry; Codex and Kiro use their native CLIs.
 struct RemoteConversationDeletion {
     let runner: RemoteHostCommandRunner
 
@@ -35,7 +35,11 @@ struct RemoteConversationDeletion {
                   metadata.projectPath == conversation.projectPath,
                   conversation.projectPath.hasPrefix("/") else { throw ConversationDeletionError.invalidSource }
             command = RemoteKiroConversationDeletion.command(sessionID: conversation.sessionID, projectPath: conversation.projectPath)
-        case .antigravity, .opencode, .pi:
+        case .antigravity:
+            let configurationDirectory = conversation.sourceFile.deletingLastPathComponent().deletingLastPathComponent()
+            _ = try AntigravityDeletionFiles.validated(for: conversation, configurationDirectory: configurationDirectory)
+            command = RemoteAntigravityConversationDeletion.command(sessionID: conversation.sessionID, projectPath: conversation.projectPath)
+        case .opencode, .pi:
             throw ConversationDeletionError.invalidSource
         }
 
@@ -47,9 +51,12 @@ struct RemoteConversationDeletion {
             if conversation.provider == .kiro {
                 try? FileManager.default.removeItem(at: conversation.sourceFile.deletingPathExtension().appendingPathExtension("json"))
             }
+            if conversation.provider == .antigravity {
+                for file in AntigravityDeletionFiles.databaseFiles(conversation.sourceFile) { try? FileManager.default.removeItem(at: file) }
+            }
         case RemoteHostCommandRunner.connectionFailureExitStatus:
             throw RemoteConversationDeletionError.sshFailed(host: host)
-        case Self.missingTranscriptExitStatus where conversation.provider == .claude || conversation.provider == .kiro:
+        case Self.missingTranscriptExitStatus where [.claude, .kiro, .antigravity].contains(conversation.provider):
             throw RemoteConversationDeletionError.missingOnHost(host: host)
         default:
             let details = result.output.trimmingCharacters(in: .whitespacesAndNewlines)

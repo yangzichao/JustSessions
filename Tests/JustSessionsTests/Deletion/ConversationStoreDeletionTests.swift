@@ -144,10 +144,10 @@ struct ConversationStoreDeletionTests {
         #expect(sandbox.fileExists(for: conversation))
     }
 
-    @Test func antigravitySessionsAreNeverDeleted() throws {
+    @Test func unsupportedOpenCodeSessionsAreNeverDeleted() throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
-        let conversation = try sandbox.savedConversation(.antigravity)
+        let conversation = try sandbox.savedConversation(.opencode)
         let store = sandbox.makeStore(listing: [conversation])
 
         store.delete(conversation)

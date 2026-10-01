@@ -10,7 +10,7 @@ JustSessions reads the session files your CLIs already create. It does not uploa
 | --- | --- | --- | --- | --- |
 | Claude Code | `~/.claude/projects` (honors `CLAUDE_CONFIG_DIR`) | Yes | Yes | Yes |
 | OpenAI Codex CLI | `~/.codex/sessions` (honors `CODEX_HOME`) | Yes | Yes | Yes |
-| Google Antigravity CLI | `~/.gemini/antigravity-cli/conversations` | Not yet | Use `/fork` after resuming | No |
+| Google Antigravity CLI | `~/.gemini/antigravity-cli/conversations` | Yes | Use `/fork` after resuming | Yes |
 | Kiro CLI | `~/.kiro/sessions/cli` (honors `KIRO_HOME`) | Yes | Use `/rewind` after resuming | Yes |
 | OpenCode | `~/.local/share/opencode/opencode.db`, read-only (honors `OPENCODE_DB` and `XDG_DATA_HOME`) | Not yet | Yes | No |
 | Pi | `~/.pi/agent/sessions` (honors `PI_CODING_AGENT_SESSION_DIR`, `sessionDir` in Pi's `settings.json`, and `PI_CODING_AGENT_DIR`) | Not yet | Yes | No |
@@ -20,6 +20,8 @@ Kiro CLI sessions are listed once they have a message; sessions a subagent start
 Kiro previews show prompts, replies, and collapsed tool calls from the session's `.jsonl` log. Thinking blocks, system context, and raw tool outputs are left out, as in the other supported previews.
 
 Kiro CLI sessions are permanently deleted using its native `kiro-cli chat --delete-session <session-id>` command. Deletion requires an installed Kiro CLI that supports this command; CLI errors are shown without falling back to removing files. See [Kiro's session management documentation](https://kiro.dev/docs/cli/chat/session-management/).
+
+Antigravity previews read visible user messages, agent replies, and tool-call summaries from its SQLite session database. Thinking, injected context, cleared steps, and raw tool output are omitted. On this Mac, deletion moves the database (including WAL companions), the session's `brain/<id>` folder, and its annotation file to the Trash, and removes only its CLI summary-index entry. Files held open by another process cannot be deleted. If moving a file or updating the index fails, moved files and the index are restored. The CLI's last-session shortcut verifies that the selected conversation still exists.
 
 ## CLI launch and discovery
 
@@ -41,4 +43,6 @@ Claude Code reports whether it is working or waiting on you in `~/.claude/sessio
 
 SSH hosts must accept `ssh <host>` without a password prompt and need `rsync`. Their session files are mirrored into a local cache and read by the same code as this Mac's.
 
-The mirror uses the standard `~/.claude`, `~/.codex`, and `~/.kiro/sessions/cli` locations on the remote host. Custom `CLAUDE_CONFIG_DIR`, `CODEX_HOME`, and `KIRO_HOME` support in the table above applies to this Mac. Kiro mirroring copies only session metadata and transcript files, excluding lock files, prompt history, and nested subagent folders.
+The mirror uses the standard `~/.claude`, `~/.codex`, `~/.gemini/antigravity-cli`, and `~/.kiro/sessions/cli` locations on the remote host. Custom `CLAUDE_CONFIG_DIR`, `CODEX_HOME`, and `KIRO_HOME` support in the table above applies to this Mac. Kiro mirroring copies only session metadata and transcript files, excluding lock files, prompt history, and nested subagent folders.
+
+Antigravity SSH hosts also need `python3`. SQLite backup snapshots include committed WAL updates; only conversation databases and their summary index are copied, excluding credentials, settings, brain artifacts, and annotations. Temporary snapshots are removed after transfer. Antigravity deletion over SSH additionally needs `lsof` to reject sessions open in another process. It validates the host database's session ID and workspace, stages its database and companions before committing the index change, and then permanently removes them. A failure before commit restores the files and rolls back the index.

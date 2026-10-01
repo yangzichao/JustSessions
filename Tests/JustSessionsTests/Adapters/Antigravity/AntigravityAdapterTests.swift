@@ -44,7 +44,7 @@ struct AntigravityAdapterTests {
         #expect(adapter.arguments(for: found[0], action: .resume) == ["--conversation", found[0].sessionID])
         #expect(adapter.arguments(for: found[0], action: .new).isEmpty)
         #expect(!ConversationProvider.antigravity.supportsBranchFromLauncher)
-        #expect(!ConversationProvider.antigravity.supportsDeletionFromLauncher)
+        #expect(ConversationProvider.antigravity.supportsDeletionFromLauncher)
     }
 
     @Test func ignoresMissingAndMismatchedDatabases() throws {

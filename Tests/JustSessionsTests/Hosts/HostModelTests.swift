@@ -72,7 +72,7 @@ struct HostModelTests {
 
     @Test func everyToolRunsOnThisMacAndClaudeCodeCodexAndKiroOnSSHHosts() {
         #expect(ConversationProvider.allCases.filter { $0.runs(on: .thisMac) } == ConversationProvider.allCases)
-        #expect(ConversationProvider.allCases.filter { $0.runs(on: .ssh("devbox")) } == [.claude, .codex, .kiro])
+        #expect(ConversationProvider.allCases.filter { $0.runs(on: .ssh("devbox")) } == [.claude, .codex, .antigravity, .kiro])
     }
 
     @Test func sidebarListsEveryHostInOrderIncludingOnesWithoutProjects() {
