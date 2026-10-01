@@ -9,11 +9,12 @@ struct SidebarFeedbackButton: View {
             openWindow(id: FeedbackView.windowID)
         } label: {
             Label("Feedback", systemImage: "bubble.left")
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .frame(height: 30)
+                .labelStyle(.iconOnly)
+                .frame(width: 26, height: 30)
                 .contentShape(Rectangle())
         }
         .help("Report a problem or suggest a feature")
+        .accessibilityLabel("Feedback")
         .accessibilityIdentifier("sidebar.feedback")
     }
 }
