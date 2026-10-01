@@ -43,5 +43,8 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
 - `Views/Settings/`: the Settings window, with an Appearance tab for the whole app's appearance and theme, a Terminal tab, and a Notifications tab.
+- `Views/Feedback/`: prepares bug reports, feature requests, and feedback for the user to review on GitHub.
 - `Views/Theme/`: the chosen theme's colors, and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
+
+The product website is separate from the app: `website/` contains static pages and focused stylesheets, and `Scripts/Website/` assembles and validates its Pages artifact. Documentation is indexed in [docs/README.md](../README.md). See [website development](website.md) for page metadata, app colors, and publishing.

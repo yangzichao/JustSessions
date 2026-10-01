@@ -1,0 +1,32 @@
+.guide-page { padding-block: 64px 20px; }
+.guide-introduction { max-width: 860px; }
+.guide-introduction h1 { margin-bottom: 20px; font-size: clamp(36px, 4.5vw, 56px); line-height: 1.15; letter-spacing: -.035em; }
+.guide-sections { display: flex; flex-wrap: wrap; gap: 12px 24px; padding-block: 20px 28px; margin-bottom: 40px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--secondary); }
+.guide-sections a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.guide-current { font-weight: 650; }
+.guide-content { max-width: 860px; }
+.guide-content section { margin-bottom: 48px; }
+.guide-content h2 { font-size: clamp(26px, 3vw, 32px); }
+.guide-content p, .guide-content li { font-size: 16px; line-height: 1.8; }
+.guide-content ol, .guide-content ul { padding-left: 24px; margin-bottom: 20px; color: var(--secondary); }
+.guide-content li { padding-left: 4px; margin-bottom: 8px; }
+.guide-content p a, .guide-content li a { text-decoration: underline; text-underline-offset: 3px; }
+.guide-content .fine-print { font-size: 13px; }
+.guide-table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.guide-table-scroll table { width: 100%; min-width: 580px; border-collapse: collapse; text-align: left; font-size: 14px; }
+.guide-table-scroll th, .guide-table-scroll td { padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.guide-table-scroll thead { background: var(--sidebar-surface); }
+.guide-table-scroll tbody th { font-weight: 550; }
+.guide-table-scroll tbody th code { display: block; margin-top: 5px; color: var(--muted); font-weight: 400; }
+.guide-table-scroll tbody tr:last-child > * { border-bottom: 0; }
+.guide-table-scroll + p { margin-top: 16px; }
+.guide-more { padding: 28px; border: 1px solid var(--line); border-radius: 12px; background: var(--sidebar-surface); }
+.guide-more p:last-child { margin-bottom: 0; }
+
+@media (max-width: 600px) {
+  .guide-page { padding-top: 36px; }
+  .guide-sections { gap: 14px 20px; margin-bottom: 32px; }
+  .guide-content section { margin-bottom: 36px; }
+  .guide-table-scroll th, .guide-table-scroll td { padding: 14px 16px; }
+  .guide-more { padding: 22px; }
+}

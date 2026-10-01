@@ -1,6 +1,6 @@
 # Branding
 
-The JustSessions mark is one conversation bubble holding three dots, one per supported CLI: orange for Claude Code, blue for Codex, purple for Antigravity. The dot order and hues match `ConversationProvider.tintColor`.
+The JustSessions mark is one conversation bubble holding three dots in the original CLI colors: orange for Claude Code, blue for Codex, and purple for Antigravity. The mark keeps those three dots as more CLIs are added. Their hues match `ConversationProvider.tintColor`.
 
 ## Files
 
@@ -25,6 +25,10 @@ The JustSessions mark is one conversation bubble holding three dots, one per sup
 | Blue | `#2F6BFF` |
 | Purple | `#A64DF0` |
 | White | `#FFFFFF` |
+
+The default light app theme and website use warm neutral surfaces: content `#FCFBF8`, sidebar `#F3F1EC`, raised controls `#FFFFFF`, and user messages `#F1EDE6`. Primary actions use Ink. App theme values live in `Sources/JustSessions/Models/Appearance/Themes/ThemeColors/JustSessionsThemeColors.swift`; the website mirrors them in `website/styles/app-theme.css`.
+
+Additional CLI tints are Kiro `#E0408A`, OpenCode `#12A08F`, and Pi `#3F9F2F`. These identify tools; they do not replace the app's neutral theme.
 
 ## Regenerate
 
