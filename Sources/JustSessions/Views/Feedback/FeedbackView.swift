@@ -5,8 +5,12 @@ struct FeedbackView: View {
     static let windowID = "feedback"
 
     @Environment(\.openURL) private var openURL
-    @State private var draft = FeedbackDraft()
+    @State private var draft: FeedbackDraft
     @State private var statusMessage = ""
+
+    init(initialDraft: FeedbackDraft = FeedbackDraft()) {
+        _draft = State(initialValue: initialDraft)
+    }
 
     private var versionInformation: String {
         let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Development build"
@@ -21,13 +25,13 @@ struct FeedbackView: View {
                 Label("Help improve JustSessions", systemImage: "bubble.left.and.bubble.right")
                     .font(.title2.weight(.semibold))
                 Text("Report a problem, suggest a feature, or share an idea.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ThemePalette.secondaryText)
             }
 
             FeedbackForm(draft: $draft, versionInformation: versionInformation)
 
             Text("Feedback is public on GitHub and requires a GitHub account. Review it there before submitting. Keep private code, conversations, and credentials out of your report.")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.caption).foregroundStyle(ThemePalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
 
             if !statusMessage.isEmpty {
@@ -39,10 +43,14 @@ struct FeedbackView: View {
 
             HStack {
                 Link("Browse feedback ↗", destination: AppLinks.githubIssuesURL)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(ThemePalette.ink)
                 Spacer()
                 Button("Copy feedback") { copyReport() }
+                    .buttonStyle(QuietBorderedButtonStyle())
                     .disabled(!draft.canContinue)
                 Button(continueButtonTitle, action: continueOnGitHub)
+                    .buttonStyle(ThemeProminentButtonStyle())
                     .keyboardShortcut(.defaultAction)
                     .disabled(!draft.canContinue)
                     .accessibilityIdentifier("feedback.continue")
@@ -50,6 +58,7 @@ struct FeedbackView: View {
         }
         .padding(24)
         .frame(width: 560)
+        .foregroundStyle(ThemePalette.ink)
         .background(ThemePalette.contentSurface)
         .onChange(of: draft.title) { _, _ in statusMessage = "" }
         .onChange(of: draft.details) { _, _ in statusMessage = "" }

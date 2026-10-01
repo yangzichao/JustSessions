@@ -14,13 +14,17 @@ struct SettingsView: View {
                 appThemeStore: appThemeStore,
                 terminalAppearanceStore: terminalAppearanceStore
             )
+            .background(ThemePalette.contentSurface)
             .tabItem { Label("Appearance", systemImage: "circle.lefthalf.filled") }
 
             TerminalAppearanceSettingsView(appearanceStore: terminalAppearanceStore, themeStore: appThemeStore)
+                .background(ThemePalette.contentSurface)
                 .tabItem { Label("Terminal", systemImage: "terminal") }
 
             NotificationSettingsView(settingsStore: notificationSettingsStore)
+                .background(ThemePalette.contentSurface)
                 .tabItem { Label("Notifications", systemImage: "bell.badge") }
         }
+        .background(ThemePalette.contentSurface)
     }
 }

@@ -13,7 +13,29 @@ struct AppThemeColors: Equatable, Sendable {
     let ink: UInt32
     /// Text and glyphs drawn on top of `ink`.
     let inkForeground: UInt32
+    /// Supporting text on either content or raised surfaces.
+    let secondaryText: UInt32
     /// Hover fills, tracks, and hairlines are this color at a low opacity.
     let line: UInt32
     let terminal: TerminalColorScheme
+    let tabGroupHexColors: [UInt32]
+
+    init(
+        sidebarSurface: UInt32, contentSurface: UInt32, raisedSurface: UInt32, userMessageSurface: UInt32,
+        ink: UInt32, inkForeground: UInt32, line: UInt32, terminal: TerminalColorScheme
+    ) {
+        self.sidebarSurface = sidebarSurface
+        self.contentSurface = contentSurface
+        self.raisedSurface = raisedSurface
+        self.userMessageSurface = userMessageSurface
+        self.ink = ink
+        self.inkForeground = inkForeground
+        secondaryText = ThemeColorContrast.readableText(
+            ThemeColorContrast.blend(ink, with: contentSurface, fraction: 0.35), on: [contentSurface, raisedSurface]
+        )
+        self.line = line
+        self.terminal = terminal
+        // Each immutable theme variant prepares its accents once, instead of doing contrast work while drawing.
+        tabGroupHexColors = Self.tabGroupColors(ansiColors: terminal.ansiHexColors, contentSurface: contentSurface)
+    }
 }

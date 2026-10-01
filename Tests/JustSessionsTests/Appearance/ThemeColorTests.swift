@@ -17,6 +17,7 @@ struct ThemeColorTests {
                     (ThemePalette.userMessageSurface, colors.userMessageSurface),
                     (ThemePalette.ink, colors.ink),
                     (ThemePalette.inkForeground, colors.inkForeground),
+                    (ThemePalette.secondaryText, colors.secondaryText),
                     (ThemePalette.hairline, colors.line),
                     (ThemeColor(role: .terminalForeground), colors.terminal.foreground),
                     (ThemeColor(role: .terminalANSI(3)), colors.terminal.ansiHexColors[3]),

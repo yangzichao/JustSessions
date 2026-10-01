@@ -6,7 +6,7 @@ import SwiftUI
 struct TerminalTabGroupLabel: View {
     let projectName: String
     let location: ProjectLocation
-    let color: Color
+    let color: ThemeColor
     let tabCount: Int
     let isCollapsed: Bool
     let hiddenTabCount: Int

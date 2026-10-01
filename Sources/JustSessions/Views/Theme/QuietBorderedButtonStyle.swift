@@ -7,7 +7,7 @@ struct QuietBorderedButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(.primary)
+            .foregroundStyle(ThemePalette.ink)
             .padding(.horizontal, 12)
             .frame(height: 28)
             .background(

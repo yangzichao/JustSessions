@@ -18,7 +18,7 @@ struct WorkspaceTabBar: View {
                         TerminalTabGroupSection(
                             store: store,
                             group: group,
-                            color: colorsByProjectKey[group.projectDirectoryKey] ?? .secondary,
+                            color: colorsByProjectKey[group.projectDirectoryKey] ?? ThemePalette.ink,
                             isCollapsed: collapsedProjectKeys.contains(group.projectDirectoryKey),
                             onToggleCollapsed: { toggleCollapsed(group.projectDirectoryKey) },
                             onRenameConversation: onRenameConversation,

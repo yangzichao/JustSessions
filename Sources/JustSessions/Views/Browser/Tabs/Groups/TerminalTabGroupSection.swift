@@ -5,7 +5,7 @@ import SwiftUI
 struct TerminalTabGroupSection: View {
     @ObservedObject var store: ConversationStore
     let group: TerminalTabGroup<TerminalSession>
-    let color: Color
+    let color: ThemeColor
     let isCollapsed: Bool
     let onToggleCollapsed: () -> Void
     let onRenameConversation: (Conversation) -> Void

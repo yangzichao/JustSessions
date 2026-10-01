@@ -6,16 +6,12 @@ struct FeedbackForm: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Picker("Feedback type", selection: $draft.kind) {
-                ForEach(FeedbackKind.allCases) { kind in
-                    Text(kind.rawValue).tag(kind)
-                }
-            }
+            FeedbackKindPicker(selection: $draft.kind)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Title").font(.subheadline.weight(.medium))
                 TextField("A short summary", text: $draft.title)
-                    .textFieldStyle(.roundedBorder)
+                    .textFieldStyle(ThemedTextFieldStyle())
                     .accessibilityIdentifier("feedback.title")
                 if draft.title.trimmingCharacters(in: .whitespacesAndNewlines).count > 200 {
                     Text("Use 200 characters or fewer for the title.")
@@ -26,10 +22,11 @@ struct FeedbackForm: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Details").font(.subheadline.weight(.medium))
                 Text(draft.kind.guidance)
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(ThemePalette.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
                 TextEditor(text: $draft.details)
                     .font(.body)
+                    .foregroundStyle(ThemePalette.ink)
                     .scrollContentBackground(.hidden)
                     .padding(6)
                     .frame(height: 160)
@@ -40,13 +37,15 @@ struct FeedbackForm: View {
             }
 
             Toggle("Include app and macOS versions", isOn: $draft.includesVersionInformation)
+                .toggleStyle(ThemedCheckboxToggleStyle())
                 .font(.subheadline)
             if draft.includesVersionInformation {
                 Text(versionInformation)
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(ThemePalette.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled)
             }
         }
+        .foregroundStyle(ThemePalette.ink)
     }
 }

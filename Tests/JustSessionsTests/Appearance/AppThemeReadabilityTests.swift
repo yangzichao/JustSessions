@@ -19,6 +19,28 @@ struct AppThemeReadabilityTests {
                 #expect(contrastRatio(terminal.ansiHexColors[8], colors.contentSurface) >= 1.5, "\(variant) bright black")
                 #expect(contrastRatio(colors.ink, colors.contentSurface) >= 4.5, "\(variant) ink")
                 #expect(contrastRatio(colors.inkForeground, colors.ink) >= 4.5, "\(variant) ink foreground")
+                #expect(contrastRatio(colors.secondaryText, colors.contentSurface) >= 4.5, "\(variant) secondary text")
+                #expect(contrastRatio(colors.secondaryText, colors.raisedSurface) >= 4.5, "\(variant) secondary text on a control")
+            }
+        }
+    }
+
+    @Test func projectLabelsStayReadableOnTheirNormalAndHoveredBackgrounds() {
+        for theme in AppTheme.allCases {
+            for isDark in [false, true] {
+                let colors = theme.colors(isDark: isDark)
+                #expect(colors.tabGroupHexColors.count == 8)
+                for foreground in colors.tabGroupHexColors {
+                    for fillOpacity in [0.0, 0.15, 0.24] {
+                        let background = [16, 8, 0].reduce(UInt32(0)) { result, shift in
+                            let surfaceChannel = Double((colors.contentSurface >> shift) & 0xFF)
+                            let foregroundChannel = Double((foreground >> shift) & 0xFF)
+                            let channel = UInt32((surfaceChannel * (1 - fillOpacity) + foregroundChannel * fillOpacity).rounded())
+                            return result << 8 | channel
+                        }
+                        #expect(contrastRatio(foreground, background) >= 4.5, "\(theme) dark=\(isDark) fill=\(fillOpacity)")
+                    }
+                }
             }
         }
     }

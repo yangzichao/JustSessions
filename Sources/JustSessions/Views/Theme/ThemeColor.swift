@@ -10,7 +10,9 @@ struct ThemeColor: ShapeStyle {
         case userMessageSurface
         case ink
         case inkForeground
+        case secondaryText
         case line
+        case tabGroup(Int)
         case terminalForeground
         /// One of the terminal's 16 ANSI colors, by its index.
         case terminalANSI(Int)
@@ -28,7 +30,9 @@ struct ThemeColor: ShapeStyle {
         case .userMessageSurface: colors.userMessageSurface
         case .ink: colors.ink
         case .inkForeground: colors.inkForeground
+        case .secondaryText: colors.secondaryText
         case .line: colors.line
+        case .tabGroup(let index): colors.tabGroupHexColors[index]
         case .terminalForeground: colors.terminal.foreground
         case .terminalANSI(let index): colors.terminal.ansiHexColors[index]
         }

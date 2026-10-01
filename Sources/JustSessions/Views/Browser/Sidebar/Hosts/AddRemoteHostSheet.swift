@@ -24,7 +24,7 @@ struct AddRemoteHostSheet: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             TextField("devbox or user@devbox.example.com", text: $proposedHost)
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(ThemedTextFieldStyle())
                 .onSubmit(addProposedHost)
 
             HStack {
@@ -38,6 +38,7 @@ struct AddRemoteHostSheet: View {
         }
         .padding(20)
         .frame(width: 480)
+        .background(ThemePalette.contentSurface)
     }
 
     private func addProposedHost() {

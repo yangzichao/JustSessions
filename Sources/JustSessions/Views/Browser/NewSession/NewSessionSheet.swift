@@ -124,6 +124,7 @@ struct NewSessionSheet: View {
         }
         .padding(24)
         .frame(width: 520)
+        .background(ThemePalette.contentSurface)
         .alert("Could not start session", isPresented: Binding(isPresenting: $errorMessage)) {
             Button("OK") { errorMessage = nil }
         } message: {
@@ -140,7 +141,7 @@ struct NewSessionSheet: View {
                     selectedHost == .thisMac ? "Choose or enter a folder" : "Path on the host, such as ~/code/app",
                     text: $projectPath
                 )
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(ThemedTextFieldStyle())
                 .accessibilityLabel("Project folder")
                 if selectedHost == .thisMac {
                     Button("Browse…", action: chooseProjectFolder)

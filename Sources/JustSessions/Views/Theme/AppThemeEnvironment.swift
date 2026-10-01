@@ -16,6 +16,8 @@ private struct ChosenAppTheme: ViewModifier {
     @ObservedObject var themeStore: AppThemeStore
 
     func body(content: Content) -> some View {
-        content.environment(\.appTheme, themeStore.theme)
+        content
+            .tint(ThemePalette.ink)
+            .environment(\.appTheme, themeStore.theme)
     }
 }

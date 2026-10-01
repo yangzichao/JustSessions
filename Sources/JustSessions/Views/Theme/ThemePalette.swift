@@ -21,6 +21,8 @@ enum ThemePalette {
     static let ink = ThemeColor(role: .ink)
     /// Text and glyphs drawn on top of `ink`.
     static let inkForeground = ThemeColor(role: .inkForeground)
+    /// Supporting copy, using the chosen theme's ink with sufficient contrast on its surfaces.
+    static let secondaryText = ThemeColor(role: .secondaryText)
     /// Faint fills: the pointer over a row, a track behind a segmented control.
     static let hoverFill = ThemeColor(role: .line, opacity: 0.055)
     static let trackFill = ThemeColor(role: .line, opacity: 0.06)
