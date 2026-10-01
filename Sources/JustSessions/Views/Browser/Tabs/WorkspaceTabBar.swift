@@ -1,9 +1,12 @@
 import SwiftUI
 
+/// The open tabs, grouped by project like tab groups in a browser: each project's tabs sit together behind a label
+/// in the project's color, which collapses or expands the group.
 struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
     let onRenameConversation: (Conversation) -> Void
     @State private var closingSessionID: UUID?
+    @State private var collapsedProjectKeys: Set<String> = []
 
     /// The host whose tmux can keep the closing tab's CLI running, when closing can leave it running.
     private var closingTabTmuxHost: SessionHost? {
@@ -20,15 +23,19 @@ struct WorkspaceTabBar: View {
     }
 
     var body: some View {
+        let groups = TerminalTabGroup.groups(of: store.terminalSessions, projectDirectoryKey: \.projectDirectoryKey)
+        let colorsByProjectKey = TabGroupPalette.colorsByProjectKey(groups.map(\.projectDirectoryKey))
         ScrollView(.horizontal) {
-            HStack(spacing: 6) {
-                ForEach(store.terminalSessions) { session in
-                    TerminalTab(
-                        session: session,
-                        isSelected: store.selectedTerminalID == session.id,
-                        onSelect: { store.selectTerminal(session.id) },
-                        onRename: onRenameConversation,
-                        onClose: { closingSessionID = session.id }
+            HStack(spacing: 14) {
+                ForEach(groups) { group in
+                    TerminalTabGroupSection(
+                        store: store,
+                        group: group,
+                        color: colorsByProjectKey[group.projectDirectoryKey] ?? .secondary,
+                        isCollapsed: collapsedProjectKeys.contains(group.projectDirectoryKey),
+                        onToggleCollapsed: { toggleCollapsed(group.projectDirectoryKey) },
+                        onRenameConversation: onRenameConversation,
+                        onCloseTab: { closingSessionID = $0 }
                     )
                 }
             }
@@ -36,6 +43,10 @@ struct WorkspaceTabBar: View {
             .padding(.vertical, 8)
         }
         .background(ThemePalette.contentSurface)
+        .onChange(of: groups.map(\.projectDirectoryKey)) { _, openProjectKeys in
+            // A project whose last tab closed opens expanded next time.
+            collapsedProjectKeys.formIntersection(openProjectKeys)
+        }
         .confirmationDialog(
             closingDialogTitle,
             isPresented: Binding(isPresenting: $closingSessionID)
@@ -60,45 +71,14 @@ struct WorkspaceTabBar: View {
             }
         }
     }
-}
 
-private struct TerminalTab: View {
-    @ObservedObject var session: TerminalSession
-    let isSelected: Bool
-    let onSelect: () -> Void
-    let onRename: (Conversation) -> Void
-    let onClose: () -> Void
-
-    var body: some View {
-        HStack(spacing: 2) {
-            Button(action: onSelect) {
-                HStack(spacing: 6) {
-                    TerminalStatusIndicator(session: session)
-                    Text(session.displayTitle)
-                        .lineLimit(1)
-                        .frame(maxWidth: 180)
-                }
+    private func toggleCollapsed(_ projectKey: String) {
+        withAnimation(.easeOut(duration: 0.15)) {
+            if collapsedProjectKeys.contains(projectKey) {
+                collapsedProjectKeys.remove(projectKey)
+            } else {
+                collapsedProjectKeys.insert(projectKey)
             }
-            .buttonStyle(WorkspaceTabButtonStyle(isSelected: isSelected))
-            .help("Show \(session.displayTitle)")
-            .contextMenu {
-                if session.isPlainTerminal {
-                    Button("Close terminal…", systemImage: "xmark", role: .destructive, action: onClose)
-                } else {
-                    Button("Rename", systemImage: "pencil") {
-                        if let conversation = session.conversation { onRename(conversation) }
-                    }
-                    .disabled(session.conversation == nil)
-                    Button("End session…", systemImage: "xmark", role: .destructive, action: onClose)
-                }
-            }
-
-            Button(action: onClose) {
-                Image(systemName: "xmark")
-            }
-            .buttonStyle(.borderless)
-            .help("End and close this terminal")
-            .accessibilityLabel("Close \(session.displayTitle)")
         }
     }
 }

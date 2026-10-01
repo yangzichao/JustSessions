@@ -283,10 +283,14 @@ final class ConversationStore: ObservableObject {
         if selectedTerminalID == replacedID { selectedTerminalID = session.id }
     }
 
-    /// Adds the tab and shows it.
+    /// Adds the tab after its project's other tabs, or at the end, and shows it.
     func openTerminal(_ session: TerminalSession) {
         showProjectInSidebar(session.projectDirectoryKey)
-        terminalSessions.append(session)
+        let insertionIndex = TerminalTabOrder.insertionIndex(
+            forProjectKey: session.projectDirectoryKey,
+            amongTabProjectKeys: terminalSessions.map(\.projectDirectoryKey)
+        )
+        terminalSessions.insert(session, at: insertionIndex)
         selectedTerminalID = session.id
     }
 
@@ -304,9 +308,13 @@ final class ConversationStore: ObservableObject {
     func closeTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }) else { return }
         let closedTab = terminalSessions[index]
+        let indexToSelect = TerminalTabOrder.indexToSelect(
+            afterClosingTabAt: index,
+            amongTabProjectKeys: terminalSessions.map(\.projectDirectoryKey)
+        )
         closedTab.close()
         terminalSessions.remove(at: index)
-        if selectedTerminalID == id { selectedTerminalID = terminalSessions.last?.id }
+        if selectedTerminalID == id { selectedTerminalID = indexToSelect.map { terminalSessions[$0].id } }
         if closedTab.startsNewSession { refresh(closedTab.host) }
     }
 

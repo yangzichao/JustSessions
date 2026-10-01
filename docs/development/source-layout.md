@@ -13,6 +13,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
+- `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
@@ -34,6 +35,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
+- `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
 - `Views/Browser/Sidebar/`: sidebar header and footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.
 - `Views/Browser/Sidebar/Hosts/`: host headings, and the Add SSH host button and sheet.
 - `Views/Terminal/`: a tab's embedded terminal.
