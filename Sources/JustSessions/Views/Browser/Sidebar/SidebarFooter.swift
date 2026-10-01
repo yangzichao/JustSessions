@@ -10,6 +10,8 @@ struct SidebarFooter: View {
             SidebarAddRemoteHostButton(action: onAddRemoteHost)
                 .frame(height: 28)
 
+            SidebarFeedbackButton()
+
             HStack(spacing: 8) {
                 SidebarSettingsLink()
                 checkForUpdatesButton

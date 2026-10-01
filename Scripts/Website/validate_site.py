@@ -90,11 +90,21 @@ def validate_site(website_directory: Path):
     assert structured_data["url"] == WEBSITE_URL
     assert structured_data["@type"] == "SoftwareApplication"
     assert structured_data["downloadUrl"] in homepage.references
+    feedback = documents[(website_directory / "feedback.html").resolve()]
+    assert feedback.canonical_url == WEBSITE_URL + "feedback.html"
+    assert feedback.metadata["og:url"] == feedback.canonical_url
+    assert "./feedback.html" in homepage.references, "Homepage needs a Feedback entry"
+    feedback_issue_links = [reference for reference in feedback.references if urlparse(reference).path == "/yangzichao/JustSessions/issues/new"]
+    assert len(feedback_issue_links) == 3, "Expected bug, feature, and general feedback links"
+    for reference in feedback_issue_links:
+        query = parse_qs(urlparse(reference).query)
+        assert query.get("title") and query.get("body"), "Feedback links need a draft title and body"
     image_header = (website_directory / "assets/social-preview.png").read_bytes()[:24]
     assert image_header[:8] == b"\x89PNG\r\n\x1a\n", "Social card must be a PNG"
     assert struct.unpack(">II", image_header[16:24]) == (1200, 630), "Social card must be 1200 x 630"
     sitemap = ElementTree.parse(website_directory / "sitemap.xml")
     namespace = {"sitemap": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     assert sitemap.findtext("sitemap:url/sitemap:loc", namespaces=namespace) == WEBSITE_URL
+    assert WEBSITE_URL + "feedback.html" in [element.text for element in sitemap.findall("sitemap:url/sitemap:loc", namespace)]
     assert (website_directory / ".nojekyll").is_file()
     print(f"Website validation passed: {len(documents)} pages, local links, assets, stylesheet versions, anchors, metadata, JSON-LD, social card, sitemap.")

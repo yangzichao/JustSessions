@@ -15,6 +15,8 @@ Open <http://127.0.0.1:8765/JustSessions/>. The build checks local links, anchor
 
 The website reuses screenshots from `docs/images/` and existing `Branding/` assets at build time. Stylesheet links include a content hash so a new page loads the matching CSS after an update. Keep the sample-data captions and feature limitations accurate when replacing them. See [screenshot provenance](../images/README.md).
 
+`feedback.html` is linked from the main navigation and footer, and included in the sitemap. Its three feedback actions open GitHub issue drafts with a title and report outline. Users review and submit on GitHub; the website has no feedback backend. Check both the homepage navigation and the feedback page at mobile widths after changing either.
+
 ## Social preview
 
 `website/social/preview.html` is the editable source for the checked-in `website/social/social-preview.png`. Serve the repository root locally, open the source in a browser with a 1200 × 630 viewport and device scale factor 1, then capture the `.social-card` element as a 1200 × 630 PNG. Only the PNG is published. The image uses the existing brand artwork; it does not contain a fabricated app screenshot.

@@ -39,6 +39,7 @@
   .site-header .wordmark { gap: 8px; font-size: 18px; }
   .site-header .wordmark img { width: 28px; }
   .site-header nav { gap: 15px; font-size: 13px; }
+  .site-header .github-link { display: none; }
   .button-small { font-size: 13px; padding-inline: 12px; }
   .hero { padding-top: 34px; }
   .hero-introduction { gap: 18px; margin-bottom: 26px; }
@@ -87,6 +88,8 @@
 }
 
 @media (max-width: 360px) {
+  .site-header { flex-wrap: wrap; padding-block: 14px; }
+  .site-header nav { width: 100%; justify-content: space-between; }
   .site-header .github-link { display: none; }
   .hero-actions { flex-direction: column; gap: 6px; }
   .hero-actions .button { width: 100%; }

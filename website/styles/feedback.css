@@ -1,0 +1,28 @@
+.feedback-page { padding-block: 64px 20px; }
+.feedback-introduction { max-width: 740px; margin-bottom: 40px; }
+.feedback-introduction h1 { margin-bottom: 20px; font-size: clamp(36px, 4.5vw, 56px); line-height: 1.1; letter-spacing: -.04em; }
+.feedback-introduction p:not(.eyebrow) { margin-bottom: 8px; font-size: 19px; }
+.feedback-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.feedback-option { display: flex; flex-direction: column; padding: 28px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.feedback-symbol { margin-bottom: 28px; font-size: 11px; font-weight: 650; letter-spacing: .06em; color: var(--blue); }
+.feedback-option h2 { margin-bottom: 14px; font-size: 24px; letter-spacing: -.025em; }
+.feedback-option p { margin-bottom: 14px; font-size: 15px; line-height: 1.7; }
+.feedback-option ul { margin: 0 0 28px; padding-left: 18px; color: var(--secondary); font-size: 13px; line-height: 1.8; }
+.feedback-option .button { align-self: flex-start; margin-top: auto; }
+.feedback-note { max-width: 850px; margin-top: 40px; padding: 28px 0; border-top: 1px solid var(--line); }
+.feedback-note h2 { font-size: 24px; }
+.feedback-note p { font-size: 14px; }
+.feedback-link[aria-current="page"] { color: var(--blue); }
+
+@media (max-width: 850px) {
+  .feedback-options { grid-template-columns: 1fr; gap: 16px; }
+  .feedback-option { padding: 24px; }
+  .feedback-symbol { margin-bottom: 18px; }
+}
+
+@media (max-width: 600px) {
+  .feedback-page { padding-top: 36px; }
+  .feedback-introduction { margin-bottom: 28px; }
+  .feedback-introduction p:not(.eyebrow) { font-size: 16px; }
+  .feedback-option h2 { font-size: 24px; }
+}

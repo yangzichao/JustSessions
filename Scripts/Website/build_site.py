@@ -15,7 +15,7 @@ def build_site():
     WEBSITE_OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
     asset_directory = WEBSITE_OUTPUT_DIRECTORY / "assets"
     asset_directory.mkdir(exist_ok=True)
-    for document_name in ("index.html", "404.html"):
+    for document_name in ("index.html", "feedback.html", "404.html"):
         shutil.copy2(WEBSITE_SOURCE_DIRECTORY / document_name, WEBSITE_OUTPUT_DIRECTORY / document_name)
     stylesheet_directory = WEBSITE_OUTPUT_DIRECTORY / "styles"
     if stylesheet_directory.exists():
@@ -25,22 +25,23 @@ def build_site():
         shutil.copy2(REPOSITORY_DIRECTORY / "docs/images" / image_name, asset_directory / image_name)
     for asset_path in ("Branding/SVG/mark.svg", "Branding/PNG/app-icon-256.png", "website/social/social-preview.png"):
         shutil.copy2(REPOSITORY_DIRECTORY / asset_path, asset_directory / Path(asset_path).name)
-    homepage_path = WEBSITE_OUTPUT_DIRECTORY / "index.html"
-    homepage_content = homepage_path.read_text()
-    for stylesheet_path in stylesheet_directory.glob("*.css"):
-        stylesheet_version = hashlib.sha256(stylesheet_path.read_bytes()).hexdigest()[:12]
-        stylesheet_reference = f"./styles/{stylesheet_path.name}"
-        homepage_content = homepage_content.replace(
-            f'href="{stylesheet_reference}"',
-            f'href="{stylesheet_reference}?v={stylesheet_version}"',
-        )
-    homepage_path.write_text(homepage_content)
+    for document_path in WEBSITE_OUTPUT_DIRECTORY.glob("*.html"):
+        document_content = document_path.read_text()
+        for stylesheet_path in stylesheet_directory.glob("*.css"):
+            stylesheet_version = hashlib.sha256(stylesheet_path.read_bytes()).hexdigest()[:12]
+            stylesheet_reference = f"./styles/{stylesheet_path.name}"
+            document_content = document_content.replace(
+                f'href="{stylesheet_reference}"',
+                f'href="{stylesheet_reference}?v={stylesheet_version}"',
+            )
+        document_path.write_text(document_content)
     (WEBSITE_OUTPUT_DIRECTORY / ".nojekyll").touch()
     (WEBSITE_OUTPUT_DIRECTORY / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {WEBSITE_URL}sitemap.xml\n")
     (WEBSITE_OUTPUT_DIRECTORY / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         f"  <url><loc>{WEBSITE_URL}</loc></url>\n"
+        f"  <url><loc>{WEBSITE_URL}feedback.html</loc></url>\n"
         "</urlset>\n"
     )
     validate_site(WEBSITE_OUTPUT_DIRECTORY)
