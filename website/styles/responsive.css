@@ -3,7 +3,6 @@
   .hero h1 { font-size: 46px; }
   .hero-description { font-size: 17px; }
   .hero-actions { gap: 8px 14px; }
-  .hero-actions .text-link { font-size: 14px; }
   .remote-layout { gap: 32px; }
   .persistence-section { gap: 36px; }
   .workflow-grid article { padding: 22px; }
@@ -29,7 +28,6 @@
   .persistence-visual img { width: 290px; }
   .questions { grid-template-columns: 1fr; gap: 0; }
   .questions h2 { max-width: none; }
-  th, td { padding: 18px 14px; }
 }
 
 @media (max-width: 600px) {
@@ -53,33 +51,16 @@
   .hero-preview img { border-radius: 6px; }
   .hero-preview figcaption { font-size: 12px; margin: 11px 6px; }
   .provider-list { gap: 12px 18px; padding-block: 22px 16px; font-size: 13px; }
-  .provider-list-label { flex-basis: 100%; text-align: center; }
-  .principles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; padding-block: 18px 22px; font-size: 12px; }
-  .principles span::before { margin-right: 5px; }
   .section-heading { margin-bottom: 26px; }
   .section-heading p { font-size: 16px; }
   .eyebrow { font-size: 11px; }
   h2 { font-size: 31px; letter-spacing: -.025em; }
-  .desktop-break { display: none; }
   .workflow-grid { grid-template-columns: 1fr; gap: 14px; }
   .workflow-grid article { padding: 23px; }
-  .step-number { margin-bottom: 16px; }
   .feature-icon { position: absolute; right: 23px; top: 20px; width: 24px; height: 24px; }
   .workflow-grid h3 { font-size: 23px; }
   .persistence-visual { padding: 24px 15px; }
-  .session-status { font-size: 12px; }
-  .persistence-visual p { font-size: 11px; }
   .persistence-visual img { width: 260px; }
-  .compatibility .section-heading { text-align: left; }
-  .table-scroll { border: 0; border-radius: 0; background: transparent; overflow: visible; }
-  table { display: block; }
-  thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-  tbody { display: grid; gap: 12px; }
-  tbody tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: white; }
-  tbody th { grid-column: 1 / -1; padding: 0 0 16px; font-size: 15px; font-weight: 600; border: 0; }
-  td { width: auto; padding: 0 6px 0 0; border: 0; font-size: 14px; }
-  td::before { content: attr(data-provider); display: block; margin-bottom: 7px; min-height: 36px; font-size: 12px; line-height: 1.5; color: var(--muted); }
-  .questions { padding-top: 0; }
   summary { font-size: 16px; }
   .download-section { padding: 32px 20px; }
   .download-section h2 { font-size: 31px; }
@@ -94,8 +75,4 @@
   .hero-actions { flex-direction: column; gap: 6px; }
   .hero-actions .button { width: 100%; }
   .provider-list { font-size: 12px; gap: 10px 14px; }
-  .principles { font-size: 11px; }
-  .session-status { font-size: 11px; }
-  .persistence-visual p span { margin-inline: 3px; }
-  tbody tr { padding: 14px; }
 }

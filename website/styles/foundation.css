@@ -62,11 +62,6 @@ code { font-size: .92em; }
 .text-link { display: inline-flex; align-items: center; gap: 8px; padding-block: 10px; font-size: 15px; font-weight: 600; color: var(--blue); }
 .text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
 .wordmark { display: inline-flex; align-items: center; gap: 11px; font-size: 21px; font-weight: 650; letter-spacing: -.025em; }
-.provider-dot { display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; }
-.claude { background: var(--orange); }
-.codex { background: #2f6bff; }
-.antigravity { background: var(--purple); }
-.status-dot { display: inline-block; width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%; background: #27845c; }
 .skip-link { position: absolute; top: -80px; left: 20px; z-index: 5; padding: 12px 20px; background: white; }
 .skip-link:focus { top: 14px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
