@@ -26,10 +26,12 @@ Sparkle delivers subsequent app updates. Your CLI provider's plans and charges s
 ## Resume your first session
 
 1. Search a project name or path, session title, or session ID.
-2. Select a Claude Code, Codex, Antigravity, or Kiro CLI session to read its conversation preview.
+2. Select a supported session to read its conversation preview.
 3. Double-click a session or choose **Resume** to open its CLI in the original working directory.
 
-A session whose CLI is already running opens on that process with one click. Search does not include conversation text. Antigravity, Kiro, OpenCode, and Pi support local browsing and resume; previews are available for Claude Code, Codex, Antigravity, and Kiro CLI. See the [full capability table](../../README.md#supported-clis).
+A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing and resume; current source builds provide previews for Claude Code, Codex, Antigravity, and Kiro CLI. See the [full capability table](../../README.md#supported-clis) and [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest) for the packaged app.
+
+In current source builds, choose **Read** to open a dedicated reading window. Adjust text with **A− / A+**, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
 
 **New session** starts an installed CLI in a project folder. A project's **+ → Terminal** opens your login shell in that folder. Project tab groups and [keyboard shortcuts](session-management.md#tab-keyboard-shortcuts) help you switch between open terminals.
 

@@ -23,6 +23,10 @@ Kiro CLI sessions are permanently deleted using its native `kiro-cli chat --dele
 
 Antigravity previews read visible user messages, agent replies, and tool-call summaries from its SQLite session database. Thinking, injected context, cleared steps, and raw tool output are omitted. On this Mac, deletion moves the database (including WAL companions), the session's `brain/<id>` folder, and its annotation file to the Trash, and removes only its CLI summary-index entry. Files held open by another process cannot be deleted. If moving a file or updating the index fails, moved files and the index are restored. The CLI's last-session shortcut verifies that the selected conversation still exists.
 
+## Reading positions
+
+Current source builds keep a session's reading position, including an offset within a long message, in memory for the workspace window's lifetime. Separate reading windows start at the preview's position and keep their own position until they close. Positions are not written to CLI history or persisted across app restarts. Reading a conversation does not launch a CLI or modify the saved session.
+
 ## CLI launch and discovery
 
 The app runs each CLI in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it combines the inherited `PATH` with the user's login-shell `PATH` and common installation folders, including Homebrew and Node version manager locations. Session discovery reads existing files; app startup also reads the login shell's `PATH`, and tmux integration checks its version and running sessions.

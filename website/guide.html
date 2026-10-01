@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fcfbf8">
   <title>JustSessions Guide — Resume AI Coding Sessions on macOS</title>
-  <meta name="description" content="Install JustSessions, resume Claude Code and Codex sessions, connect SSH hosts, and keep work running with tmux. Compare support for all six AI coding CLIs.">
+  <meta name="description" content="Find, read, and resume AI coding sessions on macOS. Learn reading controls, compare six CLIs, connect SSH hosts, and keep work running with tmux.">
   <link rel="canonical" href="https://yangzichao.github.io/JustSessions/guide.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="JustSessions">
   <meta property="og:title" content="JustSessions Guide — Resume AI Coding Sessions on macOS">
-  <meta property="og:description" content="Install JustSessions, resume Claude Code and Codex sessions, connect SSH hosts, and keep work running with tmux. Compare support for all six AI coding CLIs.">
+  <meta property="og:description" content="Find, read, and resume AI coding sessions on macOS. Learn reading controls, compare six CLIs, connect SSH hosts, and keep work running with tmux.">
   <meta property="og:url" content="https://yangzichao.github.io/JustSessions/guide.html">
   <meta property="og:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
   <meta property="og:image:width" content="1200">
@@ -18,7 +18,7 @@
   <meta property="og:image:alt" content="JustSessions, a native macOS home for your AI coding sessions.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="JustSessions Guide — Resume AI Coding Sessions on macOS">
-  <meta name="twitter:description" content="Install JustSessions, resume Claude Code and Codex sessions, connect SSH hosts, and keep work running with tmux. Compare support for all six AI coding CLIs.">
+  <meta name="twitter:description" content="Find, read, and resume AI coding sessions on macOS. Learn reading controls, compare six CLIs, connect SSH hosts, and keep work running with tmux.">
   <meta name="twitter:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
   <meta name="twitter:image:alt" content="JustSessions, a native macOS home for your AI coding sessions.">
   <link rel="icon" type="image/svg+xml" href="./assets/mark.svg">
@@ -47,9 +47,10 @@
       <p class="eyebrow">JustSessions user guide</p>
       <h1>Resume your AI coding sessions.</h1>
       <p>Install the app, find your conversation, and continue in the CLI you already use.</p>
+      <p class="fine-print">This guide follows the current source build. Check the <a href="https://github.com/yangzichao/JustSessions/releases/latest">latest release notes</a> for features in the downloaded app.</p>
     </div>
     <nav class="guide-sections" aria-label="Guide contents">
-      <a href="#install">Install</a><a href="#resume">Resume</a><a href="#supported-clis">CLIs</a><a href="#ssh-hosts">SSH</a><a href="#terminal-persistence">tmux</a><a href="#troubleshooting">Troubleshooting</a><a href="#privacy">Privacy</a>
+      <a href="#install">Install</a><a href="#resume">Resume</a><a href="#reading">Read</a><a href="#supported-clis">CLIs</a><a href="#ssh-hosts">SSH</a><a href="#terminal-persistence">tmux</a><a href="#troubleshooting">Troubleshooting</a><a href="#privacy">Privacy</a>
     </nav>
 
     <div class="guide-content">
@@ -74,20 +75,31 @@
         <p>A session whose CLI is already running opens on that process with one click. <strong>New session</strong> starts an installed CLI; a project's <strong>+ → Terminal</strong> opens your login shell. Search does not include conversation text.</p>
       </section>
 
+      <section id="reading" aria-labelledby="reading-title">
+        <h2 id="reading-title">Read without launching the CLI</h2>
+        <p>Current source builds add a <strong>Read</strong> button that opens the conversation in its own window. Keep it beside your terminal or compare two sessions.</p>
+        <ul>
+          <li>Use <strong>A− / A+</strong> to adjust the reading text, and the up/down buttons to jump to the first or latest available message.</li>
+          <li>Read formatted Markdown, scroll wide tables and code blocks, and copy code with <strong>Copy</strong>. Tool calls stay collapsed until you expand them.</li>
+          <li>Switch sessions and return to the same reading position while the workspace window stays open. A reading window starts at your current position.</li>
+        </ul>
+        <p class="fine-print">Reading is read-only: it does not start a terminal or change the saved conversation. Positions are kept for the window's lifetime.</p>
+      </section>
+
       <section id="supported-clis" aria-labelledby="clis-title">
         <h2 id="clis-title">Supported AI coding CLIs</h2>
         <p>All six support local browsing, search, and resume. Additional features vary by tool.</p>
         <div class="guide-table-scroll" role="region" aria-label="Compare CLI support" tabindex="0">
           <table>
-            <caption class="visually-hidden">Conversation previews, branching, and SSH support for six CLIs.</caption>
-            <thead><tr><th scope="col">CLI / command</th><th scope="col">Preview</th><th scope="col">Branch</th><th scope="col">SSH</th></tr></thead>
+            <caption class="visually-hidden">Current source support for conversation previews, branching, SSH, and deletion across six CLIs.</caption>
+            <thead><tr><th scope="col">CLI / command</th><th scope="col">Preview</th><th scope="col">Branch</th><th scope="col">SSH</th><th scope="col">Delete</th></tr></thead>
             <tbody>
-              <tr><th scope="row">Claude Code <code>claude</code></th><td>Yes</td><td>Yes</td><td>Yes</td></tr>
-              <tr><th scope="row">OpenAI Codex CLI <code>codex</code></th><td>Yes</td><td>Yes</td><td>Yes</td></tr>
-              <tr><th scope="row">Google Antigravity CLI <code>agy</code></th><td>Yes</td><td><code>/fork</code> in CLI</td><td>Yes</td></tr>
-              <tr><th scope="row">Kiro CLI <code>kiro-cli</code></th><td>Yes</td><td>Use <code>/rewind</code> in the CLI</td><td>Yes</td></tr>
-              <tr><th scope="row">OpenCode <code>opencode</code></th><td>Not yet</td><td>Yes</td><td>Not yet</td></tr>
-              <tr><th scope="row">Pi <code>pi</code></th><td>Not yet</td><td>Yes</td><td>Not yet</td></tr>
+              <tr data-provider="claude"><th scope="row">Claude Code <code>claude</code></th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+              <tr data-provider="codex"><th scope="row">OpenAI Codex CLI <code>codex</code></th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+              <tr data-provider="antigravity"><th scope="row">Google Antigravity CLI <code>agy</code></th><td>Yes</td><td><code>/fork</code> in CLI</td><td>Yes</td><td>Yes</td></tr>
+              <tr data-provider="kiro"><th scope="row">Kiro CLI <code>kiro-cli</code></th><td>Yes</td><td>Use <code>/rewind</code> in the CLI</td><td>Yes</td><td>Yes</td></tr>
+              <tr data-provider="opencode"><th scope="row">OpenCode <code>opencode</code></th><td>Not yet</td><td>Yes</td><td>Not yet</td><td>Not yet</td></tr>
+              <tr data-provider="pi"><th scope="row">Pi <code>pi</code></th><td>Not yet</td><td>Yes</td><td>Not yet</td><td>Not yet</td></tr>
             </tbody>
           </table>
         </div>
@@ -96,8 +108,8 @@
 
       <section id="ssh-hosts" aria-labelledby="ssh-title">
         <h2 id="ssh-title">Continue on another machine over SSH</h2>
-        <p>Antigravity hosts also need <code>python3</code>; deletion needs <code>lsof</code>.</p>
         <p>The host needs passwordless SSH, <code>rsync</code>, and Claude Code, Codex, Antigravity, or Kiro CLI installed.</p>
+        <p class="fine-print">Antigravity hosts also need <code>python3</code>; deleting their sessions needs <code>lsof</code>.</p>
         <ol><li>Choose <strong>Add SSH host…</strong> in the sidebar.</li><li>Enter a <code>~/.ssh/config</code> alias or <code>user@hostname</code>.</li><li>Browse the host's projects and resume a session there.</li></ol>
         <p>The code and CLI run remotely; supported history is cached on your Mac. JustSessions provides terminal access, not graphical screen sharing.</p>
         <a class="text-link" href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-management.md#ssh-hosts">Detailed SSH setup <span aria-hidden="true">↗</span></a>

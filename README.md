@@ -33,11 +33,13 @@
 ## Features
 
 - **Find:** search project names and paths, session titles, and IDs. Pin and rename sessions you return to.
-- **Preview:** read Claude Code, Codex, Antigravity, and Kiro CLI conversations before opening the CLI, with tool calls collapsed.
+- **Read:** preview supported conversations, adjust text size, copy code, and open a dedicated reading window without starting the CLI.
 - **Resume or branch:** continue in an embedded terminal, or fork a supported conversation to try another approach.
 - **Organize:** group terminal tabs by project, open a plain project terminal, and switch tabs with familiar keyboard shortcuts.
 - **Stay informed:** local Claude Code and Codex sessions can notify when a turn finishes or needs your input.
 - **Make it yours:** six app themes, light and dark appearances, and terminal font settings that update open terminals.
+
+This README describes the current `main` branch. Reading windows and other recent source changes may be ahead of the packaged app; check the [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest). [Reading controls](docs/guides/session-management.md#preview-before-you-resume).
 
 ## Remote sessions over SSH
 
@@ -78,7 +80,7 @@ This Mac requires **tmux 3.3+**; remote sessions require tmux on the SSH host. T
 
 1. Download **[JustSessions.dmg](https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg)**, Developer ID signed and notarized by Apple.
 2. Open it, drag **JustSessions** into **Applications**, and launch it.
-3. Find a project or session in the sidebar. Select a Claude Code, Codex, Antigravity, or Kiro CLI session to read its preview.
+3. Find a project or session in the sidebar. Select a supported session to read its preview.
 4. Double-click a session or choose **Resume** to continue in its original CLI.
 
 App updates are delivered through Sparkle. [Getting started](docs/guides/getting-started.md) covers your first session, missing CLIs, SSH, and tmux. The same quick guide is available on the [website](https://yangzichao.github.io/JustSessions/guide.html).

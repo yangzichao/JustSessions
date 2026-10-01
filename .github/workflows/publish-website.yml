@@ -6,6 +6,10 @@ on:
     paths:
       - 'website/**'
       - 'Scripts/Website/**'
+      - 'Sources/JustSessions/Models/Conversations/ConversationProvider.swift'
+      - 'Sources/JustSessions/Services/Transcript/TranscriptLoader.swift'
+      - 'README.md'
+      - 'docs/guides/session-storage.md'
       - 'docs/images/**'
       - 'Branding/SVG/mark.svg'
       - 'Branding/PNG/app-icon-256.png'
@@ -14,6 +18,10 @@ on:
     paths:
       - 'website/**'
       - 'Scripts/Website/**'
+      - 'Sources/JustSessions/Models/Conversations/ConversationProvider.swift'
+      - 'Sources/JustSessions/Services/Transcript/TranscriptLoader.swift'
+      - 'README.md'
+      - 'docs/guides/session-storage.md'
       - 'docs/images/**'
       - 'Branding/SVG/mark.svg'
       - 'Branding/PNG/app-icon-256.png'
@@ -36,7 +44,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Build and validate website
-        run: python3 Scripts/Website/build_site.py
+        run: |
+          python3 -m unittest discover -s Scripts/Website/tests -v
+          python3 Scripts/Website/build_site.py
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4

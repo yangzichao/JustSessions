@@ -7,11 +7,14 @@ The public website is at <https://yangzichao.github.io/JustSessions/>. Its sourc
 From the repository root, with Python 3.10 or later:
 
 ```sh
+python3 -m unittest discover -s Scripts/Website/tests -v
 python3 Scripts/Website/build_site.py
 python3 -m http.server 8765 --bind 127.0.0.1 --directory dist
 ```
 
 Open <http://127.0.0.1:8765/JustSessions/>. The build checks local links and anchors across four pages, image references and dimensions, unique titles and descriptions, canonical and share metadata, structured app data, social-card dimensions, and sitemap completeness. The generated artifact is `dist/JustSessions/`, separate from the macOS app output. Only that website directory is uploaded to Pages.
+
+It also checks visible CLI names, commands, and preview/branch/SSH/deletion cells in the online guide, README, and storage guide against `ConversationProvider.swift` and `TranscriptLoader.swift`. This runs without compiling Swift, including on the Pages Linux runner. The source reader recognizes their explicit case switches and fails if the representation changes; update it rather than skipping validation. Provider or transcript-support changes trigger the website workflow, and conflicting claims block publication.
 
 The website reuses screenshots from `docs/images/` and existing `Branding/` assets at build time. Stylesheet links include a content hash so a new page loads the matching CSS after an update. Keep the sample-data captions and feature limitations accurate when replacing them. See [screenshot provenance](../images/README.md).
 
@@ -20,6 +23,8 @@ The website reuses screenshots from `docs/images/` and existing `Branding/` asse
 ## Pages and app colors
 
 Keep the homepage brief. `guide.html` provides indexable setup instructions, the six-CLI compatibility table, SSH and tmux requirements, troubleshooting, and privacy details. The README and [getting-started guide](../guides/getting-started.md) link to it. Keep its behavior descriptions aligned with the repository guides and `ConversationProvider` capabilities when support changes.
+
+When a user-facing feature changes, update its guide and README entry in the same change. Mention its benefit on the homepage with a short sentence or guide link, then update page summaries and GitHub About only where needed. Source builds can be ahead of the latest signed installer: label unreleased controls in the guides and check release notes before presenting them as available in the download. Keep screenshot captions accurate until the actual interface captures are refreshed.
 
 `styles/app-theme.css` mirrors the app's default JustSessions light theme in `Sources/JustSessions/Models/Appearance/Themes/ThemeColors/JustSessionsThemeColors.swift`: warm content and sidebar surfaces, white raised controls, and Ink for primary actions. Shared page styles use these variables. The site keeps its light appearance; the Mac app can independently use its other themes and appearances. Recheck text contrast when adjusting secondary or muted colors.
 

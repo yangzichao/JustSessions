@@ -8,6 +8,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
 - `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
+- `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
 - `Models/Customizations/`: session and project names you set, and pins.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
@@ -34,12 +35,16 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Terminal/AppearingSessions/`: links a new tab to the first session that appears in its project, for SSH hosts and for CLIs that don't reveal the session they write.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.
+- `Services/Transcript/Markdown/`: splits Markdown into prose, code blocks, and tables for the native views.
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
 - `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
 - `Views/Browser/Sidebar/`: sidebar header and footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.
 - `Views/Browser/Sidebar/Hosts/`: host headings, and the Add SSH host button and sheet.
 - `Views/Terminal/`: a tab's embedded terminal.
 - `Views/Preview/`: conversation preview for the selected session.
+- `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
+- `Views/Preview/Reading/` and `ReadingPosition/`: text size, first/latest-message controls, and reading-position restoration.
+- `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
 - `Views/Settings/`: the Settings window, with an Appearance tab for the whole app's appearance and theme, a Terminal tab, and a Notifications tab.

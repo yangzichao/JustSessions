@@ -5,6 +5,7 @@ import shutil
 from pathlib import Path
 
 from validate_metadata import PUBLIC_PAGE_PATHS, WEBSITE_URL
+from validate_product_content import validate_product_content
 from validate_site import validate_site
 
 REPOSITORY_DIRECTORY = Path(__file__).resolve().parents[2]
@@ -13,6 +14,7 @@ WEBSITE_OUTPUT_DIRECTORY = REPOSITORY_DIRECTORY / "dist/JustSessions"
 
 
 def build_site():
+    validate_product_content(REPOSITORY_DIRECTORY)
     WEBSITE_OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
     asset_directory = WEBSITE_OUTPUT_DIRECTORY / "assets"
     asset_directory.mkdir(exist_ok=True)

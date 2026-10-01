@@ -7,7 +7,7 @@
 | Guide | Covers |
 | --- | --- |
 | [Getting started](guides/getting-started.md) | Install, discover existing sessions, resume, and troubleshoot missing tools. |
-| [Session management](guides/session-management.md) | Search, pins, branching, project tab groups, shortcuts, notifications, SSH, cleanup, and themes. |
+| [Session management](guides/session-management.md) | Search, reading windows and controls, pins, branching, project tabs, shortcuts, notifications, SSH, cleanup, and themes. |
 | [Session storage and privacy](guides/session-storage.md) | CLI file locations, capability limits, SSH caching, native deletion, and tmux behavior. |
 
 ## Develop and publish
