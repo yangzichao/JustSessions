@@ -4,7 +4,8 @@ import hashlib
 import shutil
 from pathlib import Path
 
-from validate_site import WEBSITE_URL, validate_site
+from validate_metadata import PUBLIC_PAGE_PATHS, WEBSITE_URL
+from validate_site import validate_site
 
 REPOSITORY_DIRECTORY = Path(__file__).resolve().parents[2]
 WEBSITE_SOURCE_DIRECTORY = REPOSITORY_DIRECTORY / "website"
@@ -15,7 +16,8 @@ def build_site():
     WEBSITE_OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
     asset_directory = WEBSITE_OUTPUT_DIRECTORY / "assets"
     asset_directory.mkdir(exist_ok=True)
-    for document_name in ("index.html", "feedback.html", "404.html"):
+    document_names = tuple(page_path or "index.html" for page_path in PUBLIC_PAGE_PATHS) + ("404.html",)
+    for document_name in document_names:
         shutil.copy2(WEBSITE_SOURCE_DIRECTORY / document_name, WEBSITE_OUTPUT_DIRECTORY / document_name)
     stylesheet_directory = WEBSITE_OUTPUT_DIRECTORY / "styles"
     if stylesheet_directory.exists():
@@ -37,12 +39,11 @@ def build_site():
         document_path.write_text(document_content)
     (WEBSITE_OUTPUT_DIRECTORY / ".nojekyll").touch()
     (WEBSITE_OUTPUT_DIRECTORY / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {WEBSITE_URL}sitemap.xml\n")
+    sitemap_entries = "".join(f"  <url><loc>{WEBSITE_URL}{page_path}</loc></url>\n" for page_path in PUBLIC_PAGE_PATHS)
     (WEBSITE_OUTPUT_DIRECTORY / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        f"  <url><loc>{WEBSITE_URL}</loc></url>\n"
-        f"  <url><loc>{WEBSITE_URL}feedback.html</loc></url>\n"
-        "</urlset>\n"
+        f"{sitemap_entries}</urlset>\n"
     )
     validate_site(WEBSITE_OUTPUT_DIRECTORY)
     print(f"Built website: {WEBSITE_OUTPUT_DIRECTORY}")

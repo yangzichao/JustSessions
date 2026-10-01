@@ -1,56 +1,13 @@
 """Check the publishable website without third-party dependencies."""
 
 import hashlib
-import json
 import struct
-from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 from xml.etree import ElementTree
 
-WEBSITE_URL = "https://yangzichao.github.io/JustSessions/"
-
-
-class WebsiteDocument(HTMLParser):
-    def __init__(self):
-        super().__init__(convert_charrefs=True)
-        self.references = []
-        self.identifiers = set()
-        self.metadata = {}
-        self.heading_count = 0
-        self.canonical_url = None
-        self.structured_data = ""
-        self.reading_structured_data = False
-
-    def handle_starttag(self, tag, attributes):
-        attributes = dict(attributes)
-        for reference in (attributes.get("href"), attributes.get("src")):
-            if reference is not None:
-                assert reference.strip(), "Empty link or asset reference"
-                self.references.append(reference)
-        if "id" in attributes:
-            identifier = attributes["id"]
-            assert identifier not in self.identifiers, f"Duplicate ID: {identifier}"
-            self.identifiers.add(identifier)
-        if tag == "h1":
-            self.heading_count += 1
-        if tag == "img":
-            assert "alt" in attributes, "Image is missing alt text"
-            assert "width" in attributes and "height" in attributes, "Image needs dimensions"
-        if tag == "meta":
-            self.metadata[attributes.get("name", attributes.get("property"))] = attributes.get("content")
-        if tag == "link" and attributes.get("rel") == "canonical":
-            self.canonical_url = attributes.get("href")
-        if tag == "script" and attributes.get("type") == "application/ld+json":
-            self.reading_structured_data = True
-
-    def handle_endtag(self, tag):
-        if tag == "script":
-            self.reading_structured_data = False
-
-    def handle_data(self, data):
-        if self.reading_structured_data:
-            self.structured_data += data
+from validate_metadata import PUBLIC_PAGE_PATHS, WEBSITE_URL, validate_metadata
+from website_document import WebsiteDocument
 
 
 def validate_site(website_directory: Path):
@@ -79,20 +36,9 @@ def validate_site(website_directory: Path):
             if parsed_reference.fragment and referenced_path in documents:
                 assert parsed_reference.fragment in documents[referenced_path].identifiers, f"Missing anchor: {reference}"
 
+    validate_metadata(documents, website_directory)
     homepage = documents[(website_directory / "index.html").resolve()]
-    assert homepage.canonical_url == WEBSITE_URL, "Canonical URL differs from published URL"
-    for metadata_name in ("description", "viewport", "og:title", "og:description", "og:image", "twitter:card"):
-        assert homepage.metadata.get(metadata_name), f"Missing metadata: {metadata_name}"
-    assert homepage.metadata["og:url"] == WEBSITE_URL
-    assert homepage.metadata["og:image"] == WEBSITE_URL + "assets/social-preview.png"
-    assert "noindex" not in homepage.metadata.get("robots", "")
-    structured_data = json.loads(homepage.structured_data)
-    assert structured_data["url"] == WEBSITE_URL
-    assert structured_data["@type"] == "SoftwareApplication"
-    assert structured_data["downloadUrl"] in homepage.references
     feedback = documents[(website_directory / "feedback.html").resolve()]
-    assert feedback.canonical_url == WEBSITE_URL + "feedback.html"
-    assert feedback.metadata["og:url"] == feedback.canonical_url
     assert "./feedback.html" in homepage.references, "Homepage needs a Feedback entry"
     feedback_issue_links = [reference for reference in feedback.references if urlparse(reference).path == "/yangzichao/JustSessions/issues/new"]
     assert len(feedback_issue_links) == 3, "Expected bug, feature, and general feedback links"
@@ -104,7 +50,7 @@ def validate_site(website_directory: Path):
     assert struct.unpack(">II", image_header[16:24]) == (1200, 630), "Social card must be 1200 x 630"
     sitemap = ElementTree.parse(website_directory / "sitemap.xml")
     namespace = {"sitemap": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-    assert sitemap.findtext("sitemap:url/sitemap:loc", namespaces=namespace) == WEBSITE_URL
-    assert WEBSITE_URL + "feedback.html" in [element.text for element in sitemap.findall("sitemap:url/sitemap:loc", namespace)]
+    sitemap_urls = [element.text for element in sitemap.findall("sitemap:url/sitemap:loc", namespace)]
+    assert sitemap_urls == [WEBSITE_URL + page_path for page_path in PUBLIC_PAGE_PATHS], "Sitemap differs from indexed pages"
     assert (website_directory / ".nojekyll").is_file()
     print(f"Website validation passed: {len(documents)} pages, local links, assets, stylesheet versions, anchors, metadata, JSON-LD, social card, sitemap.")

@@ -4,31 +4,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>JustSessions social card source</title>
+  <link rel="icon" type="image/svg+xml" href="../../Branding/SVG/mark.svg">
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #15171c; }
-    .social-card { position: relative; width: 1200px; height: 630px; overflow: hidden; background: #f8f7f4; padding: 65px 70px; }
+    .social-card { position: relative; width: 1200px; height: 630px; overflow: hidden; background: #fcfbf8; padding: 65px 70px; }
     .brand { display: flex; align-items: center; gap: 17px; font-size: 28px; font-weight: 600; letter-spacing: -1px; }
     .brand img { width: 48px; }
     h1 { position: relative; z-index: 1; margin: 57px 0 25px; font-size: 66px; line-height: 1.06; letter-spacing: -3px; font-weight: 650; }
-    h1 span { color: #777c85; }
-    p { position: relative; z-index: 1; font-size: 20px; line-height: 1.65; color: #545963; }
-    .providers { position: absolute; bottom: 66px; left: 70px; display: flex; gap: 26px; font-size: 15px; color: #545963; }
+    h1 span { color: #303139; }
+    p { position: relative; z-index: 1; font-size: 20px; line-height: 1.65; color: #303139; }
+    .providers { position: absolute; bottom: 66px; left: 70px; display: flex; gap: 22px; font-size: 15px; color: #303139; }
     i { display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; }
     .claude { background: #ff8a1f; } .codex { background: #2f6bff; } .antigravity { background: #a64df0; }
-    .side { position: absolute; top: 0; right: 0; width: 260px; height: 100%; border-left: 1px solid #dce0d3; background: #eceee7; }
+    .kiro { background: #e0408a; } .opencode { background: #12a08f; } .pi { background: #3f9f2f; }
+    .side { position: absolute; top: 0; right: 0; width: 260px; height: 100%; border-left: 1px solid #15171c17; background: #f3f1ec; }
     .side img { position: absolute; width: 180px; left: 40px; top: 206px; }
     .side p { position: absolute; left: 0; right: 0; bottom: 52px; text-align: center; font-size: 12px; letter-spacing: 1px; }
-    .rule { position: absolute; left: 70px; width: 800px; bottom: 114px; border-top: 1px solid #dfdfd9; }
+    .rule { position: absolute; left: 70px; width: 800px; bottom: 114px; border-top: 1px solid #15171c17; }
   </style>
 </head>
 <body>
   <main class="social-card">
     <div class="brand"><img src="../../Branding/SVG/mark.svg" alt="">JustSessions</div>
-    <h1>Your sessions.<br><span>Right where you<br>left them.</span></h1>
-    <p>A native macOS home for your AI coding sessions.</p>
+    <h1>Find your session.<br><span>Pick up your work.</span></h1>
+    <p>AI coding sessions. One native Mac app.</p>
     <div class="rule"></div>
-    <div class="providers"><span><i class="claude"></i>Claude Code</span><span><i class="codex"></i>Codex CLI</span><span><i class="antigravity"></i>Antigravity CLI</span></div>
+    <div class="providers"><span><i class="claude"></i>Claude Code</span><span><i class="codex"></i>Codex CLI</span><span><i class="antigravity"></i>Antigravity</span><span><i class="kiro"></i>Kiro CLI</span><span><i class="opencode"></i>OpenCode</span><span><i class="pi"></i>Pi</span></div>
     <div class="side"><img src="../../Branding/PNG/app-icon-256.png" alt=""><p>FREE & OPEN SOURCE</p></div>
   </main>
 </body>
