@@ -12,6 +12,7 @@ struct ConversationBrowserView: View {
     @State private var sessionSelection = SessionMultiSelection()
     /// The host the New Session sheet opened on; nil while it is closed.
     @State private var newSessionSheetHost: SessionHost?
+    @State private var closingTerminalID: UUID?
     @StateObject private var updateManager = SparkleUpdateManager()
 
     private var providerConversations: [Conversation] {
@@ -72,6 +73,7 @@ struct ConversationBrowserView: View {
                 store: store,
                 sessionSelection: sessionSelection,
                 onRename: onRename,
+                onCloseTerminal: { closingTerminalID = $0 },
                 onDelete: { onRequestDeletion(.conversation($0)) }
             )
         }
@@ -88,6 +90,24 @@ struct ConversationBrowserView: View {
                 try await store.launchNewSession(provider: provider, host: host, folder: folder)
             }
         }
+        .focusedSceneValue(\.workspaceTabActions, WorkspaceTabActions(
+            tabCount: store.terminalSessions.count,
+            hasSelectedTab: store.selectedTerminal != nil,
+            isEnabled: workspaceTabCommandsEnabled,
+            newSession: { newSessionSheetHost = defaultNewSessionHost },
+            closeSelectedTab: { closingTerminalID = store.selectedTerminalID },
+            selectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) },
+            selectTab: { store.selectTerminal(shortcutNumber: $0) }
+        ))
+        .background(WorkspaceTabCycleShortcuts(
+            isEnabled: workspaceTabCommandsEnabled && !store.terminalSessions.isEmpty,
+            onSelectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) }
+        ))
+        .modifier(TerminalTabCloseConfirmation(store: store, closingSessionID: $closingTerminalID))
+    }
+
+    private var workspaceTabCommandsEnabled: Bool {
+        newSessionSheetHost == nil && closingTerminalID == nil
     }
 
     /// The selected tab's tool, or else the one the sidebar shows; Codex when it shows every tool. The sheet takes

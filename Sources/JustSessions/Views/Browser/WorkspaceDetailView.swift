@@ -6,12 +6,13 @@ struct WorkspaceDetailView: View {
     @ObservedObject var store: ConversationStore
     let sessionSelection: SessionMultiSelection
     let onRename: (Conversation) -> Void
+    let onCloseTerminal: (UUID) -> Void
     let onDelete: (Conversation) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
             if !store.terminalSessions.isEmpty {
-                WorkspaceTabBar(store: store, onRenameConversation: onRename)
+                WorkspaceTabBar(store: store, onRenameConversation: onRename, onCloseTerminal: onCloseTerminal)
                 ThemeDivider()
             }
             ZStack {

@@ -27,6 +27,20 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 - Pick up names set with `/rename` in Claude Code within about a second.
 - See what each CLI is doing on its sidebar row, its project, and its tab: a turning arc while it works, an amber mark while it waits on your answer, a green dot while it waits for your next prompt, and a hollow circle once it ended in a tab still open. A session with no running CLI shows how long ago it was active instead. Claude Code and Codex on this Mac tell what they are doing, also while they run in tmux with no tab open; elsewhere the green dot only says the CLI runs.
 
+## Tab keyboard shortcuts
+
+| Shortcut | Action |
+| --- | --- |
+| ⌘T or ⌘N | Open the new session sheet using the current tab's host, CLI, and project folder. |
+| ⌘⇧N | Open another workspace window. |
+| ⌘W | Close the selected terminal tab, with the same **Keep running / End session** confirmation as its close button. |
+| ⌘⇧] or Ctrl+Tab | Select the next terminal tab, wrapping to the first. |
+| ⌘⇧[ or Ctrl+Shift+Tab | Select the previous terminal tab, wrapping to the last. |
+| ⌘1 through ⌘8 | Select a terminal tab by its position. |
+| ⌘9 | Select the last terminal tab. |
+
+These shortcuts work while the CLI has keyboard focus. From a session preview, next/previous selects the first/last open terminal tab. ⌘W stays disabled in a preview while terminal tabs are open; with no tabs, it closes the window. The **File** and **Tabs** menus list the commands.
+
 ## Notifications
 
 JustSessions posts a macOS notification when a Claude Code or Codex session on this Mac finishes its turn, or stops in the middle of one to wait on you, such as at a permission prompt. Click the notification to open the session: its tab, or a new tab that reattaches to its CLI in tmux.

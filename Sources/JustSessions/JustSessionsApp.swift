@@ -5,7 +5,7 @@ struct JustSessionsApp: App {
     @NSApplicationDelegateAdaptor(JustSessionsAppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "workspace") {
             ContentView()
                 .appTheme(from: .shared)
         }
@@ -13,6 +13,7 @@ struct JustSessionsApp: App {
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1100, height: 720)
         .commands {
+            WorkspaceTabCommands()
             CommandGroup(replacing: .help) {
                 Link("JustSessions on GitHub", destination: AppLinks.githubRepositoryURL)
             }

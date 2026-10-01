@@ -45,6 +45,7 @@ struct TerminalTabGroupSection: View {
                     onRename: onRenameConversation,
                     onClose: { onCloseTab(session.id) }
                 )
+                .id(session.id)
             }
         }
         .padding(.bottom, 3)

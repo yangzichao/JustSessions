@@ -5,70 +5,40 @@ import SwiftUI
 struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
     let onRenameConversation: (Conversation) -> Void
-    @State private var closingSessionID: UUID?
+    let onCloseTerminal: (UUID) -> Void
     @State private var collapsedProjectKeys: Set<String> = []
-
-    /// The host whose tmux can keep the closing tab's CLI running, when closing can leave it running.
-    private var closingTabTmuxHost: SessionHost? {
-        store.terminalSessions.first { $0.id == closingSessionID && $0.canKeepCLIRunningAfterClose }?.host
-    }
-
-    private var isClosingPlainTerminal: Bool {
-        store.terminalSessions.first { $0.id == closingSessionID }?.isPlainTerminal == true
-    }
-
-    private var closingDialogTitle: String {
-        if closingTabTmuxHost != nil { return "Close this tab?" }
-        return isClosingPlainTerminal ? "Close this terminal?" : "End this CLI session?"
-    }
 
     var body: some View {
         let groups = TerminalTabGroup.groups(of: store.terminalSessions, projectDirectoryKey: \.projectDirectoryKey)
         let colorsByProjectKey = TabGroupPalette.colorsByProjectKey(groups.map(\.projectDirectoryKey))
-        ScrollView(.horizontal) {
-            HStack(spacing: 14) {
-                ForEach(groups) { group in
-                    TerminalTabGroupSection(
-                        store: store,
-                        group: group,
-                        color: colorsByProjectKey[group.projectDirectoryKey] ?? .secondary,
-                        isCollapsed: collapsedProjectKeys.contains(group.projectDirectoryKey),
-                        onToggleCollapsed: { toggleCollapsed(group.projectDirectoryKey) },
-                        onRenameConversation: onRenameConversation,
-                        onCloseTab: { closingSessionID = $0 }
-                    )
+        ScrollViewReader { scrollProxy in
+            ScrollView(.horizontal) {
+                HStack(spacing: 14) {
+                    ForEach(groups) { group in
+                        TerminalTabGroupSection(
+                            store: store,
+                            group: group,
+                            color: colorsByProjectKey[group.projectDirectoryKey] ?? .secondary,
+                            isCollapsed: collapsedProjectKeys.contains(group.projectDirectoryKey),
+                            onToggleCollapsed: { toggleCollapsed(group.projectDirectoryKey) },
+                            onRenameConversation: onRenameConversation,
+                            onCloseTab: onCloseTerminal
+                        )
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+            }
+            .onChange(of: store.selectedTerminalID) { _, selectedTerminalID in
+                if let selectedTerminalID {
+                    scrollProxy.scrollTo(selectedTerminalID, anchor: .center)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
         }
         .background(ThemePalette.contentSurface)
         .onChange(of: groups.map(\.projectDirectoryKey)) { _, openProjectKeys in
             // A project whose last tab closed opens expanded next time.
             collapsedProjectKeys.formIntersection(openProjectKeys)
-        }
-        .confirmationDialog(
-            closingDialogTitle,
-            isPresented: Binding(isPresenting: $closingSessionID)
-        ) {
-            if closingTabTmuxHost != nil {
-                Button("Keep running") {
-                    if let closingSessionID { store.closeTerminal(closingSessionID, endingTmuxSession: false) }
-                    closingSessionID = nil
-                }
-            }
-            Button(isClosingPlainTerminal ? "Close terminal" : "End session", role: .destructive) {
-                if let closingSessionID { store.closeTerminal(closingSessionID, endingTmuxSession: true) }
-                closingSessionID = nil
-            }
-        } message: {
-            if let closingTabTmuxHost {
-                Text("Keep running leaves the CLI running in tmux on \(closingTabTmuxHost.nameInSentence); click the session to reattach. End session stops it.")
-            } else if isClosingPlainTerminal {
-                Text("The shell and anything still running in it will stop.")
-            } else {
-                Text("The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.")
-            }
         }
     }
 

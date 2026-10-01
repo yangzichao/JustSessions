@@ -25,7 +25,6 @@ struct SidebarNewSessionButton: View {
             .sidebarRowHighlight(isSelected: false)
         }
         .buttonStyle(.plain)
-        .keyboardShortcut("n", modifiers: .command)
         .help("Start an installed coding CLI in a project folder")
         .padding(.horizontal, 8)
     }
