@@ -2,7 +2,6 @@ import SwiftUI
 
 struct SidebarProjectSelectionActionBar: View {
     let selectedCount: Int
-    let onClear: () -> Void
     let onRemove: () -> Void
 
     var body: some View {
@@ -12,8 +11,6 @@ struct SidebarProjectSelectionActionBar: View {
                     .font(.system(size: 12, weight: .medium))
                     .lineLimit(1)
                 Spacer(minLength: 4)
-                Button("Clear", action: onClear)
-                    .buttonStyle(.borderless)
             }
             Button(action: onRemove) {
                 Label("Remove from sidebar", systemImage: "sidebar.left")

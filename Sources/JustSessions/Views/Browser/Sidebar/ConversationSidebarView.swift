@@ -21,6 +21,7 @@ struct ConversationSidebarView: View {
     @State private var projectExpansion = ProjectExpansion()
     @State private var projectSelection = ProjectMultiSelection()
     @State private var isAddRemoteHostSheetPresented = false
+    @FocusState private var isSidebarListFocused: Bool
 
     private var isSearching: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -75,7 +76,10 @@ struct ConversationSidebarView: View {
             )
             .padding(.top, 8)
 
-            ScrollView {
+            SidebarSelectionScrollView(
+                isFocused: $isSidebarListFocused,
+                onDismissSelection: dismissSidebarSelection
+            ) {
                 LazyVStack(alignment: .leading, spacing: 1) {
                     ForEach(hostSections) { section in
                         hostHeading(for: section)
@@ -113,10 +117,8 @@ struct ConversationSidebarView: View {
                                     store.selectTerminal(terminalID)
                                 },
                                 onRenameConversation: onRenameConversation,
-                                onClearSessionSelection: { sessionSelection.clear() },
                                 onRenameProject: { onRenameProject(project) },
                                 onRemoveSelectedProjects: removeSelectedProjects,
-                                onClearProjectSelection: { projectSelection.clear() },
                                 onRequestDeletion: onRequestDeletion
                             )
                         }
@@ -126,11 +128,10 @@ struct ConversationSidebarView: View {
                 .padding(.bottom, 12)
             }
 
-            if projectSelection.hasSelection {
+            if projectSelection.hasMultipleSelected {
                 ThemeDivider()
                 SidebarProjectSelectionActionBar(
                     selectedCount: projectSelection.selectedProjectIDs.count,
-                    onClear: { projectSelection.clear() },
                     onRemove: removeSelectedProjects
                 )
             } else if sessionSelection.hasMultipleSelected {
@@ -138,7 +139,6 @@ struct ConversationSidebarView: View {
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
                     isDeleteDisabled: !store.canStartDeletion,
-                    onClear: { sessionSelection.clear() },
                     onDelete: { onRequestDeletion(.conversations(selectedConversations)) }
                 )
             }
@@ -191,8 +191,10 @@ struct ConversationSidebarView: View {
         projectSelection.clear()
         let modifiers = NSEvent.modifierFlags
         if modifiers.contains(.shift) {
+            isSidebarListFocused = true
             sessionSelection.selectRange(to: conversation.id, in: visibleConversationIDs)
         } else if modifiers.contains(.command) {
+            isSidebarListFocused = true
             sessionSelection.toggle(conversation.id)
         } else {
             onSelectConversation(conversation)
@@ -203,6 +205,7 @@ struct ConversationSidebarView: View {
     }
 
     private func handleProjectClick(_ project: ProjectConversationGroup) {
+        isSidebarListFocused = true
         sessionSelection.clear()
         let modifiers = NSEvent.modifierFlags
         if modifiers.contains(.shift) {
@@ -212,6 +215,13 @@ struct ConversationSidebarView: View {
         } else {
             projectSelection.selectOnly(project.id)
             projectExpansion.toggle(project.id)
+        }
+    }
+
+    private func dismissSidebarSelection() {
+        projectSelection.clear()
+        if sessionSelection.hasMultipleSelected {
+            sessionSelection.clear()
         }
     }
 

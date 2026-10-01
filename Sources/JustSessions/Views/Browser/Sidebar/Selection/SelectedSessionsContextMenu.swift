@@ -5,7 +5,6 @@ struct SelectedSessionsContextMenu: View {
     @ObservedObject var store: ConversationStore
     let selectedConversations: [Conversation]
     let onDelete: () -> Void
-    let onClear: () -> Void
 
     var body: some View {
         let resumableCount = selectedConversations.filter { store.canLaunch($0, action: .resume) }.count
@@ -22,7 +21,6 @@ struct SelectedSessionsContextMenu: View {
         Divider()
         Button("Delete \(sessionCountLabel(selectedConversations.count))…", systemImage: "trash", role: .destructive, action: onDelete)
             .disabled(!store.canStartDeletion)
-        Button("Clear selection", systemImage: "xmark.circle", action: onClear)
     }
 
     private func sessionCountLabel(_ count: Int) -> String {

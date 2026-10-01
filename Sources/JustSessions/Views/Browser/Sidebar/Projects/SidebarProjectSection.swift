@@ -14,10 +14,8 @@ struct SidebarProjectSection: View {
     let onClickConversation: (Conversation) -> Void
     let onSelectPendingNewSession: (UUID) -> Void
     let onRenameConversation: (Conversation) -> Void
-    let onClearSessionSelection: () -> Void
     let onRenameProject: () -> Void
     let onRemoveSelectedProjects: () -> Void
-    let onClearProjectSelection: () -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     var body: some View {
@@ -33,8 +31,7 @@ struct SidebarProjectSection: View {
                 onNewSession: onNewSession,
                 onRename: onRenameProject,
                 onDeleteSessions: { onRequestDeletion(.project(project.id)) },
-                onRemoveSelectedProjects: onRemoveSelectedProjects,
-                onClearProjectSelection: onClearProjectSelection
+                onRemoveSelectedProjects: onRemoveSelectedProjects
             )
 
             if isExpanded {
@@ -65,7 +62,6 @@ struct SidebarProjectSection: View {
                             selectedConversations: selectedConversations,
                             onClick: onClickConversation,
                             onRename: onRenameConversation,
-                            onClearSelection: onClearSessionSelection,
                             onRequestDeletion: onRequestDeletion
                         )
                     }

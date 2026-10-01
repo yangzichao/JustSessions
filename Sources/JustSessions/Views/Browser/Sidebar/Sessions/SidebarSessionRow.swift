@@ -16,7 +16,6 @@ struct SidebarSessionRow: View {
     let selectedConversations: [Conversation]
     let onClick: (Conversation) -> Void
     let onRename: (Conversation) -> Void
-    let onClearSelection: () -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     /// A tab whose CLI runs comes first, the selected one among them; then a CLI running in tmux with no tab; then a
@@ -66,8 +65,7 @@ struct SidebarSessionRow: View {
                 SelectedSessionsContextMenu(
                     store: store,
                     selectedConversations: selectedConversations,
-                    onDelete: { onRequestDeletion(.conversations(selectedConversations)) },
-                    onClear: onClearSelection
+                    onDelete: { onRequestDeletion(.conversations(selectedConversations)) }
                 )
             } else {
                 SingleSessionContextMenu(

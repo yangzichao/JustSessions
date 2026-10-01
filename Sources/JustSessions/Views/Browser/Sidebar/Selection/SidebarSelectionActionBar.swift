@@ -4,7 +4,6 @@ import SwiftUI
 struct SidebarSelectionActionBar: View {
     let selectedCount: Int
     let isDeleteDisabled: Bool
-    let onClear: () -> Void
     let onDelete: () -> Void
 
     var body: some View {
@@ -12,8 +11,6 @@ struct SidebarSelectionActionBar: View {
             Text("\(selectedCount) selected")
                 .font(.system(size: 12, weight: .medium))
             Spacer(minLength: 4)
-            Button("Clear", action: onClear)
-                .buttonStyle(.borderless)
             Button(role: .destructive, action: onDelete) {
                 Label("Delete…", systemImage: "trash")
             }

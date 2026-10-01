@@ -13,7 +13,6 @@ struct SidebarProjectRow: View {
     let onRename: () -> Void
     let onDeleteSessions: () -> Void
     let onRemoveSelectedProjects: () -> Void
-    let onClearProjectSelection: () -> Void
 
     @State private var isHovered = false
 
@@ -80,8 +79,7 @@ struct SidebarProjectRow: View {
             if isSelected && projectSelection.hasMultipleSelected {
                 SelectedProjectsContextMenu(
                     selectedCount: projectSelection.selectedProjectIDs.count,
-                    onRemove: onRemoveSelectedProjects,
-                    onClear: onClearProjectSelection
+                    onRemove: onRemoveSelectedProjects
                 )
             } else {
                 ProjectContextMenu(
