@@ -20,6 +20,7 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 - Resume a session in its native CLI inside an embedded terminal: double-click it, use **Resume**, or right-click.
 - Branch (fork) a Claude Code, Codex, OpenCode, or Pi conversation into a new session. This forks the conversation, not a Git branch.
 - Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI installed on that machine (Claude Code and Codex on SSH hosts). It appears in the sidebar right away.
+- Open a plain terminal in a project folder: choose **Terminal** from the project's **+** menu, or right-click the project and choose **New terminal**. It runs your login shell, on this Mac or the project's SSH host. It is not a session: it isn't listed in the sidebar, sends no notifications, and doesn't run in tmux, so closing its tab ends the shell.
 - Keep several terminal tabs open. Select a session in the sidebar to read its preview; a session whose CLI is running opens on its terminal instead. Select a terminal tab to return to its CLI without stopping it.
 - With tmux 3.3 or later installed, a CLI on this Mac runs inside tmux. Closing its tab with **Keep running**, quitting the app, or installing an update leaves it running. Select the session to reattach, or right-click it and choose **End on this Mac**.
 - Pick up names set with `/rename` in Claude Code within about a second.

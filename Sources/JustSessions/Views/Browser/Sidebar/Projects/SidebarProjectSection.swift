@@ -51,6 +51,7 @@ struct SidebarProjectSection: View {
                         if let terminal = store.terminalSessions.first(where: { $0.id == pendingNewSession.terminalID }) {
                             PendingNewSessionRow(
                                 terminal: terminal,
+                                provider: pendingNewSession.provider,
                                 isSelected: store.selectedTerminalID == terminal.id,
                                 onSelect: { onSelectPendingNewSession(terminal.id) }
                             )

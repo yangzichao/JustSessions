@@ -14,7 +14,8 @@ struct TerminalWorkspaceView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(session.displayTitle).font(.headline).lineLimit(1)
-                    Text(([projectDisplayName, hostDisplayName].compactMap { $0 } + [session.provider.rawValue, session.action.displayName])
+                    Text([projectDisplayName, hostDisplayName, session.provider?.rawValue ?? "Terminal", session.action?.displayName]
+                        .compactMap { $0 }
                         .joined(separator: " · "))
                         .font(.caption)
                         .foregroundStyle(.secondary)

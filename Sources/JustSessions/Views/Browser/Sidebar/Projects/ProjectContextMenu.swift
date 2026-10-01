@@ -17,6 +17,10 @@ struct ProjectContextMenu: View {
             showsTitle: true,
             onStart: onNewSession
         )
+        Button("New terminal", systemImage: "apple.terminal") {
+            store.openPlainTerminal(in: project.location)
+        }
+        .disabled(!project.canStartNewSession)
         if project.host == .thisMac {
             Button("Open project in Finder", systemImage: "folder") {
                 SessionLocationActions.openProjectFolder(project.location.path)

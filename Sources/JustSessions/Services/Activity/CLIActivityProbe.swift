@@ -10,9 +10,9 @@ struct CLIActivityProbe: Sendable {
 }
 
 extension TerminalSession {
-    /// Nil for a tab on an SSH host, whose CLI runs out of reach.
+    /// Nil for a tab on an SSH host, whose CLI runs out of reach, and for a plain terminal, which runs no CLI.
     var cliActivityProbe: CLIActivityProbe? {
-        guard host == .thisMac else { return nil }
+        guard host == .thisMac, let provider else { return nil }
         return CLIActivityProbe(provider: provider, processID: cliProcessID, sessionFile: conversation?.sourceFile)
     }
 }

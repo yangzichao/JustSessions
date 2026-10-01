@@ -106,7 +106,8 @@ struct SidebarProjectRow: View {
                 project: project,
                 providers: store.newSessionProviders(on: project.host),
                 showsTitle: false,
-                onStart: onNewSession
+                onStart: onNewSession,
+                onOpenTerminal: { store.openPlainTerminal(in: project.location) }
             )
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)

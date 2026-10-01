@@ -2,8 +2,11 @@ import Foundation
 
 extension ConversationStore {
     /// Every CLI that runs a session of the project: its tabs' own, and those running in tmux with no tab open.
+    /// A plain terminal runs no session, so it does not count.
     func activitySummary(forProjectDirectoryKey projectDirectoryKey: String) -> SessionActivitySummary {
-        let runningTabs = terminalSessions.filter { $0.projectDirectoryKey == projectDirectoryKey && !$0.hasExited }
+        let runningTabs = terminalSessions.filter {
+            $0.projectDirectoryKey == projectDirectoryKey && !$0.isPlainTerminal && !$0.hasExited
+        }
         let conversationIDsWithRunningTab = Set(runningTabs.compactMap { $0.conversation?.id })
         let detachedActivities = conversations
             .filter {

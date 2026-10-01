@@ -22,6 +22,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
 - `Services/Hosts/InstalledCLIs/`: which CLIs each host has, so new sessions offer only those.
 - `Services/Launch/`: CLI executable resolution and process environment.
+- `Services/Launch/PlainTerminal/`: opens a plain terminal, a login shell in a project folder that is no session.
 - `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there.
 - `Services/Remote/HostStatus/`: one SSH call per refresh that lists the host's tmux sessions and installed CLIs.
 - `Services/Tmux/`: tmux session names, and keeping a CLI running after its tab closes, on any host.

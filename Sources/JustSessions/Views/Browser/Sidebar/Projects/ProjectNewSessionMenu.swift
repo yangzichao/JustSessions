@@ -6,6 +6,8 @@ struct ProjectNewSessionMenu: View {
     let providers: [ConversationProvider]
     let showsTitle: Bool
     let onStart: (ConversationProvider) -> Void
+    /// Adds a Terminal item, which opens a plain terminal in the project folder.
+    var onOpenTerminal: (() -> Void)?
 
     var body: some View {
         let canStartNewSession = project.canStartNewSession
@@ -18,6 +20,10 @@ struct ProjectNewSessionMenu: View {
                 Button(provider.rawValue, systemImage: provider.symbolName) {
                     onStart(provider)
                 }
+            }
+            if let onOpenTerminal {
+                Divider()
+                Button("Terminal", systemImage: "apple.terminal", action: onOpenTerminal)
             }
         } label: {
             if showsTitle {

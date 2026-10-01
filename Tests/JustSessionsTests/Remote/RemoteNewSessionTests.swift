@@ -75,7 +75,7 @@ struct RemoteNewSessionTests {
 
         let fork = remoteConversation(.claude, project: "/home/me/paper", minutesAgo: 0)
         let matches = AppearingSessionMatcher.matches(
-            for: [tab.waitingTabForAppearingSession],
+            for: [try #require(tab.waitingTabForAppearingSession)],
             in: [forked, fork],
             alreadyLinkedConversationIDs: []
         )

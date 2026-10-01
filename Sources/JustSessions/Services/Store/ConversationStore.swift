@@ -296,7 +296,7 @@ final class ConversationStore: ObservableObject {
 
     /// Leaving a new session's tab refreshes its host, so what its CLI saved so far is listed.
     func selectTerminal(_ id: UUID?) {
-        let leftNewSessionTab = selectedTerminalID == id ? nil : selectedTerminal.flatMap { $0.action.startsNewSession ? $0 : nil }
+        let leftNewSessionTab = selectedTerminalID == id ? nil : selectedTerminal.flatMap { $0.startsNewSession ? $0 : nil }
         selectedTerminalID = id
         if let leftNewSessionTab { refresh(leftNewSessionTab.host) }
     }
@@ -307,7 +307,7 @@ final class ConversationStore: ObservableObject {
         closedTab.close()
         terminalSessions.remove(at: index)
         if selectedTerminalID == id { selectedTerminalID = terminalSessions.last?.id }
-        if closedTab.action.startsNewSession { refresh(closedTab.host) }
+        if closedTab.startsNewSession { refresh(closedTab.host) }
     }
 
     func closeAllTerminals() {

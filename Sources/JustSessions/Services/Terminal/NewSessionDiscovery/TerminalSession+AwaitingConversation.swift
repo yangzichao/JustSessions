@@ -3,11 +3,13 @@ import Foundation
 extension TerminalSession {
     /// A tab started with "New session" or "Branch" that is not linked to its conversation yet.
     var isNewSessionAwaitingConversation: Bool {
-        action.startsNewSession && conversation == nil
+        startsNewSession && conversation == nil
     }
 
-    var waitingNewSessionTab: WaitingNewSessionTab {
-        WaitingNewSessionTab(
+    /// Nil for a plain terminal.
+    var waitingNewSessionTab: WaitingNewSessionTab? {
+        guard let provider else { return nil }
+        return WaitingNewSessionTab(
             terminalID: id,
             provider: provider,
             processID: cliProcessID,
@@ -18,7 +20,7 @@ extension TerminalSession {
     }
 
     var pendingNewSession: PendingNewSession? {
-        guard isNewSessionAwaitingConversation else { return nil }
+        guard isNewSessionAwaitingConversation, let provider else { return nil }
         return PendingNewSession(
             terminalID: id,
             provider: provider,

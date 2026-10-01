@@ -6,11 +6,13 @@ import SwiftTerm
 final class TerminalSession: ObservableObject, Identifiable {
     let id = UUID()
     @Published private(set) var conversation: Conversation?
-    let provider: ConversationProvider
+    /// The tool whose CLI the tab runs; nil for a plain terminal, which runs a shell and is no session.
+    let provider: ConversationProvider?
     let projectPath: String
     /// The machine the tab's CLI runs on.
     let host: SessionHost
-    let action: ConversationAction
+    /// Nil for a plain terminal.
+    let action: ConversationAction?
     @Published private(set) var displayTitle: String
     let command: NativeCLICommand
     let terminalView: SelectableTerminalView
@@ -50,12 +52,15 @@ final class TerminalSession: ObservableObject, Identifiable {
     var projectDirectoryKey: String {
         ProjectLocation(host: host, path: projectPath).key
     }
+    var isPlainTerminal: Bool { provider == nil }
+    /// A New session or Branch tab, whose session id the app learns once the CLI writes it.
+    var startsNewSession: Bool { action?.startsNewSession ?? false }
 
     init(
         conversation: Conversation?,
-        provider: ConversationProvider,
+        provider: ConversationProvider?,
         projectPath: String,
-        action: ConversationAction,
+        action: ConversationAction?,
         displayTitle: String,
         command: NativeCLICommand,
         preassignedSessionID: String? = nil,

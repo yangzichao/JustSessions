@@ -36,7 +36,7 @@ extension ConversationStore {
 
     private func hostsWithRemoteNewSessionsToFollow() -> Set<String> {
         Set(terminalSessions.compactMap { session -> String? in
-            guard let host = session.host.sshDestination, session.action.startsNewSession, !session.hasExited else { return nil }
+            guard let host = session.host.sshDestination, session.startsNewSession, !session.hasExited else { return nil }
             let needsTitle = session.conversation?.suggestedTitle == ConversationMetadata.untitledConversationTitle
             return session.isNewSessionAwaitingConversation || needsTitle ? host : nil
         })

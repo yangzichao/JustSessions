@@ -40,7 +40,7 @@ extension ConversationStore {
             $0.isNewSessionAwaitingConversation && $0.host == .thisMac && !$0.isWaitingForAppearingSession
         }
         guard !waitingTabs.isEmpty else { return }
-        let searches = waitingTabs.map(\.waitingNewSessionTab)
+        let searches = waitingTabs.compactMap(\.waitingNewSessionTab)
         let sessionFiles = await Task.detached(priority: .utility) {
             finder.sessionFiles(for: searches, processTree: .ofRunningProcesses())
         }.value
@@ -68,7 +68,7 @@ extension ConversationStore {
     }
 
     private func needsRefreshForFirstPromptTitle(_ session: TerminalSession) -> Bool {
-        guard session.action.startsNewSession, !session.hasExited, session.host == .thisMac,
+        guard session.startsNewSession, !session.hasExited, session.host == .thisMac,
               session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
               let conversation = session.conversation,
               conversation.suggestedTitle == ConversationMetadata.untitledConversationTitle else { return false }

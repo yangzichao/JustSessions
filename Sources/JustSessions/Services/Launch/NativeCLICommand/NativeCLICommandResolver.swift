@@ -51,11 +51,7 @@ struct NativeCLICommandResolver: @unchecked Sendable {
         projectPath: String,
         arguments: [String]
     ) throws -> NativeCLICommand {
-        var isDirectory: ObjCBool = false
-        guard fileManager.fileExists(atPath: projectPath, isDirectory: &isDirectory),
-              isDirectory.boolValue else {
-            throw NativeCLICommandError.missingProject(projectPath)
-        }
+        try requireProjectDirectory(projectPath)
 
         guard let executablePath = executablePath(named: provider.executableName) else {
             throw NativeCLICommandError.missingExecutable(provider.executableName)
@@ -70,6 +66,14 @@ struct NativeCLICommandResolver: @unchecked Sendable {
             workingDirectory: projectPath,
             environment: NativeCLICommand.environmentEntries(environment)
         )
+    }
+
+    func requireProjectDirectory(_ projectPath: String) throws {
+        var isDirectory: ObjCBool = false
+        guard fileManager.fileExists(atPath: projectPath, isDirectory: &isDirectory),
+              isDirectory.boolValue else {
+            throw NativeCLICommandError.missingProject(projectPath)
+        }
     }
 
     func executablePath(named name: String) -> String? {

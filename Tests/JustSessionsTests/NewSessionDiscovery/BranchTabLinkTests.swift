@@ -19,7 +19,7 @@ struct BranchTabLinkTests {
         let tab = try #require(store.terminalSessions.last)
         #expect(tab.action == .branch)
         #expect(tab.conversation == nil)
-        #expect(tab.waitingNewSessionTab.branchedFromSessionID == Self.forkedSessionID)
+        #expect(tab.waitingNewSessionTab?.branchedFromSessionID == Self.forkedSessionID)
         #expect(!store.hasTerminal(for: forked))
         let project = try #require(ProjectConversationGroup.grouped(
             store.conversations,

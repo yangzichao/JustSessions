@@ -14,7 +14,7 @@ extension ConversationStore {
         let waitingSessions = terminalSessions.filter { $0.host == host && $0.isWaitingForAppearingSession }
         guard !waitingSessions.isEmpty else { return }
         let matches = AppearingSessionMatcher.matches(
-            for: waitingSessions.map(\.waitingTabForAppearingSession),
+            for: waitingSessions.compactMap(\.waitingTabForAppearingSession),
             in: conversations,
             alreadyLinkedConversationIDs: Set(terminalSessions.compactMap { $0.conversation?.id })
         )

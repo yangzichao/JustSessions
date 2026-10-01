@@ -10,6 +10,15 @@ struct WorkspaceTabBar: View {
         store.terminalSessions.first { $0.id == closingSessionID && $0.canKeepCLIRunningAfterClose }?.host
     }
 
+    private var isClosingPlainTerminal: Bool {
+        store.terminalSessions.first { $0.id == closingSessionID }?.isPlainTerminal == true
+    }
+
+    private var closingDialogTitle: String {
+        if closingTabTmuxHost != nil { return "Close this tab?" }
+        return isClosingPlainTerminal ? "Close this terminal?" : "End this CLI session?"
+    }
+
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 6) {
@@ -28,7 +37,7 @@ struct WorkspaceTabBar: View {
         }
         .background(ThemePalette.contentSurface)
         .confirmationDialog(
-            closingTabTmuxHost == nil ? "End this CLI session?" : "Close this tab?",
+            closingDialogTitle,
             isPresented: Binding(isPresenting: $closingSessionID)
         ) {
             if closingTabTmuxHost != nil {
@@ -37,13 +46,15 @@ struct WorkspaceTabBar: View {
                     closingSessionID = nil
                 }
             }
-            Button("End session", role: .destructive) {
+            Button(isClosingPlainTerminal ? "Close terminal" : "End session", role: .destructive) {
                 if let closingSessionID { store.closeTerminal(closingSessionID, endingTmuxSession: true) }
                 closingSessionID = nil
             }
         } message: {
             if let closingTabTmuxHost {
                 Text("Keep running leaves the CLI running in tmux on \(closingTabTmuxHost.nameInSentence); click the session to reattach. End session stops it.")
+            } else if isClosingPlainTerminal {
+                Text("The shell and anything still running in it will stop.")
             } else {
                 Text("The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.")
             }
@@ -71,11 +82,15 @@ private struct TerminalTab: View {
             .buttonStyle(WorkspaceTabButtonStyle(isSelected: isSelected))
             .help("Show \(session.displayTitle)")
             .contextMenu {
-                Button("Rename", systemImage: "pencil") {
-                    if let conversation = session.conversation { onRename(conversation) }
+                if session.isPlainTerminal {
+                    Button("Close terminal…", systemImage: "xmark", role: .destructive, action: onClose)
+                } else {
+                    Button("Rename", systemImage: "pencil") {
+                        if let conversation = session.conversation { onRename(conversation) }
+                    }
+                    .disabled(session.conversation == nil)
+                    Button("End session…", systemImage: "xmark", role: .destructive, action: onClose)
                 }
-                .disabled(session.conversation == nil)
-                Button("End session…", systemImage: "xmark", role: .destructive, action: onClose)
             }
 
             Button(action: onClose) {

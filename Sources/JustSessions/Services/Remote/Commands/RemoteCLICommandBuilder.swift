@@ -17,6 +17,19 @@ struct RemoteCLICommandBuilder {
         arguments: [String],
         tmuxSessionName: String? = nil
     ) -> NativeCLICommand {
+        sshCommand(
+            host: host,
+            remoteCommand: Self.remoteCommand(
+                provider: provider,
+                projectPath: projectPath,
+                arguments: arguments,
+                tmuxSessionName: tmuxSessionName
+            )
+        )
+    }
+
+    /// `ssh -t <host> <remoteCommand>`, with a terminal for the remote command.
+    func sshCommand(host: String, remoteCommand: String) -> NativeCLICommand {
         NativeCLICommand(
             executablePath: "/usr/bin/ssh",
             arguments: [
@@ -24,12 +37,7 @@ struct RemoteCLICommandBuilder {
                 // Notice a dead connection within a minute, so the tab ends and offers to reconnect.
                 "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4",
                 host,
-                Self.remoteCommand(
-                    provider: provider,
-                    projectPath: projectPath,
-                    arguments: arguments,
-                    tmuxSessionName: tmuxSessionName
-                ),
+                remoteCommand,
             ],
             workingDirectory: NSHomeDirectory(),
             environment: NativeCLICommand.environmentEntries(

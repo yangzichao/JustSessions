@@ -38,12 +38,12 @@ extension ConversationStore {
     }
 
     private func sessionNotification(for event: SessionAttentionEvent) -> SessionNotification? {
-        if let tab = runningTab(for: event.source) {
+        if let tab = runningTab(for: event.source), let provider = tab.provider {
             return SessionNotification(
                 source: event.source,
                 reason: event.reason,
                 sessionTitle: tab.displayTitle,
-                provider: tab.provider,
+                provider: provider,
                 projectName: projectDisplayName(forProjectPath: tab.projectDirectoryKey)
             )
         }
