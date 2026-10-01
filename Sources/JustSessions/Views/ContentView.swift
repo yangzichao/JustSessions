@@ -35,6 +35,9 @@ struct ContentView: View {
                 store.refreshAllHosts()
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            ExternalEditorStore.shared.refresh()
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
             store.closeAllTerminals()
         }

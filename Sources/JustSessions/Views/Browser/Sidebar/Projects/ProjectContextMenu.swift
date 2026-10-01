@@ -17,6 +17,7 @@ struct ProjectContextMenu: View {
                 SessionLocationActions.openProjectFolder(project.location.path)
             }
             .disabled(!project.location.folderExistsOnThisMac)
+            ProjectOpenInEditorMenu(editorStore: .shared, project: project, onError: store.showError)
         }
         Button("Copy project path", systemImage: "doc.on.doc") {
             SessionLocationActions.copyProjectPath(project.location.copyablePath)
