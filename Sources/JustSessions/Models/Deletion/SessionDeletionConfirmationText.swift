@@ -12,14 +12,19 @@ enum SessionDeletionConfirmationText {
         if let sshDestination = conversation.host.sshDestination {
             return "This session will be permanently deleted on \(sshDestination). SSH hosts have no Trash, so this cannot be undone."
         }
-        return conversation.provider == .codex
-            ? "Codex will permanently delete this session using its native CLI. This cannot be undone."
-            : "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index."
+        switch conversation.provider {
+        case .codex, .kiro:
+            return "\(conversation.provider.rawValue) will permanently delete this session using its native CLI. This cannot be undone."
+        case .claude:
+            return "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index."
+        case .antigravity, .opencode, .pi:
+            return "JustSessions can't delete \(conversation.provider.rawValue) sessions yet."
+        }
     }
 
     static func message(forDeletingSelectionWith plan: SessionDeletionPlan) -> String {
         joined([
-            "Claude Code sessions on this Mac move to the Trash; Codex sessions and sessions on SSH hosts are permanently deleted.",
+            "Claude Code sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.",
             skippedSessionsSentence(for: plan),
         ])
     }
@@ -29,7 +34,7 @@ enum SessionDeletionConfirmationText {
             "This affects all tools in \(location.copyablePath), including sessions hidden by the current filter.",
             "The project will stay in the sidebar.",
             location.host == .thisMac
-                ? "Claude Code sessions move to the Trash; Codex sessions are permanently deleted."
+                ? "Claude Code sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted."
                 : "SSH hosts have no Trash, so every session is permanently deleted.",
             skippedSessionsSentence(for: plan),
         ])

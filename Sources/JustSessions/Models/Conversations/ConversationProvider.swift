@@ -44,8 +44,8 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
 
     var supportsDeletionFromLauncher: Bool {
         switch self {
-        case .claude, .codex: true
-        case .antigravity, .kiro, .opencode, .pi: false
+        case .claude, .codex, .kiro: true
+        case .antigravity, .opencode, .pi: false
         }
     }
 

@@ -16,7 +16,7 @@ struct Conversation: Identifiable, Sendable {
         guard let sshDestination = host.sshDestination else { return providerSessionID }
         return "\(providerSessionID)@\(sshDestination)"
     }
-    var supportsDeletionFromLauncher: Bool { provider.supportsDeletionFromLauncher }
+    var supportsDeletionFromLauncher: Bool { provider.supportsDeletionFromLauncher && provider.runs(on: host) }
 
     func withSuggestedTitle(_ title: String) -> Conversation {
         var renamed = self

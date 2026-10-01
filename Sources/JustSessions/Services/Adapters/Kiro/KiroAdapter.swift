@@ -4,6 +4,7 @@ import Foundation
 /// `sessions/cli` of its home folder (`KIRO_HOME`, or `~/.kiro`).
 struct KiroAdapter: ConversationAdapter {
     let sessionsDirectory: URL
+    let deletionExecutableURL: URL?
     var provider: ConversationProvider { .kiro }
 
     static func standardSessionsDirectory(
@@ -14,8 +15,9 @@ struct KiroAdapter: ConversationAdapter {
         return URL(fileURLWithPath: kiroHome).appendingPathComponent("sessions/cli")
     }
 
-    init(sessionsDirectory: URL = KiroAdapter.standardSessionsDirectory()) {
+    init(sessionsDirectory: URL = KiroAdapter.standardSessionsDirectory(), deletionExecutableURL: URL? = nil) {
         self.sessionsDirectory = sessionsDirectory
+        self.deletionExecutableURL = deletionExecutableURL
     }
 
     func discover() throws -> [Conversation] {
@@ -35,7 +37,10 @@ struct KiroAdapter: ConversationAdapter {
     }
 
     func delete(_ conversation: Conversation) throws {
-        throw ConversationDeletionError.unsupported(provider)
+        try KiroConversationDeletion(
+            sessionsDirectory: sessionsDirectory,
+            executableURL: deletionExecutableURL
+        ).delete(conversation)
     }
 
     /// Nil for a session another one started, such as a subagent's, and for one opened but never used, whose

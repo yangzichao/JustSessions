@@ -11,11 +11,13 @@ JustSessions reads the session files your CLIs already create. It does not uploa
 | Claude Code | `~/.claude/projects` (honors `CLAUDE_CONFIG_DIR`) | Yes | Yes | Yes |
 | OpenAI Codex CLI | `~/.codex/sessions` (honors `CODEX_HOME`) | Yes | Yes | Yes |
 | Google Antigravity CLI | `~/.gemini/antigravity-cli/conversations` | Not yet | Use `/fork` after resuming | No |
-| Kiro CLI | `~/.kiro/sessions/cli` (honors `KIRO_HOME`) | Not yet | No | No |
+| Kiro CLI | `~/.kiro/sessions/cli` (honors `KIRO_HOME`) | Not yet | No | Yes |
 | OpenCode | `~/.local/share/opencode/opencode.db`, read-only (honors `OPENCODE_DB` and `XDG_DATA_HOME`) | Not yet | Yes | No |
 | Pi | `~/.pi/agent/sessions` (honors `PI_CODING_AGENT_SESSION_DIR`, `sessionDir` in Pi's `settings.json`, and `PI_CODING_AGENT_DIR`) | Not yet | Yes | No |
 
 Kiro CLI sessions are listed once they have a message; sessions a subagent started are left out. OpenCode subagent sessions and archived sessions are left out too.
+
+Kiro CLI sessions are permanently deleted using its native `kiro-cli chat --delete-session <session-id>` command. Deletion requires an installed Kiro CLI that supports this command; CLI errors are shown without falling back to removing files. See [Kiro's session management documentation](https://kiro.dev/docs/cli/chat/session-management/).
 
 ## CLI launch and discovery
 

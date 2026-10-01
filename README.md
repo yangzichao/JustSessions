@@ -100,7 +100,7 @@ App updates are delivered through Sparkle. For remote sessions, use **Add SSH ho
 | Read a conversation preview | Yes | Yes | Not yet | Not yet | Not yet | Not yet |
 | Branch a conversation from the app | Yes | Yes | Use `/fork` inside the CLI | Not yet | Yes | Yes |
 | Browse and manage sessions over SSH | Yes | Yes | Not yet | Not yet | Not yet | Not yet |
-| Delete sessions from the app | Yes | Yes | Not yet | Not yet | Not yet | Not yet |
+| Delete sessions from the app | Yes | Yes | Not yet | Yes | Not yet | Not yet |
 
 New session menus offer only the CLIs found on each machine, and the sidebar's tool filter lists only tools that are installed or have sessions.
 
