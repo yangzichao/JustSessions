@@ -5,12 +5,32 @@ struct SessionPreviewHeader: View {
     let conversation: Conversation
     let onRename: () -> Void
     let onDelete: () -> Void
+    let onRead: () -> Void
 
     var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) {
+                sessionTitle
+                Spacer(minLength: 8)
+                sessionActions
+            }
+            VStack(alignment: .leading, spacing: 12) {
+                sessionTitle
+                HStack {
+                    Spacer(minLength: 0)
+                    sessionActions
+                }
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+    }
+
+    private var sessionTitle: some View {
         let title = store.title(for: conversation)
         let isPinned = store.pinnedItems.isPinned(conversationID: conversation.id)
 
-        HStack(alignment: .center, spacing: 12) {
+        return HStack(alignment: .center, spacing: 12) {
             Image(systemName: conversation.provider.symbolName)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(conversation.provider.tintColor)
@@ -47,8 +67,18 @@ struct SessionPreviewHeader: View {
                 .lineLimit(1)
             }
 
-            Spacer(minLength: 8)
+        }
+        .frame(minWidth: 180, maxWidth: .infinity, alignment: .leading)
+    }
 
+    private var sessionActions: some View {
+        HStack(spacing: 10) {
+            if conversation.provider == .claude || conversation.provider == .codex || conversation.provider == .kiro || conversation.provider == .antigravity {
+                Button("Read", systemImage: "book", action: onRead)
+                    .buttonStyle(QuietBorderedButtonStyle())
+                    .help("Open in a separate reading window")
+                    .accessibilityIdentifier("preview.open-reading-window")
+            }
             Button("Resume", systemImage: "play.fill") { store.launch(conversation, action: .resume) }
                 .buttonStyle(ProviderProminentButtonStyle(tint: conversation.provider.emphasisTintColor))
                 .disabled(!store.canLaunch(conversation, action: .resume))
@@ -60,8 +90,7 @@ struct SessionPreviewHeader: View {
             }
             moreActionsMenu
         }
-        .padding(.horizontal, 28)
-        .padding(.vertical, 16)
+        .fixedSize(horizontal: true, vertical: false)
     }
 
     private var moreActionsMenu: some View {

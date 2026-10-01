@@ -7,6 +7,8 @@ struct SessionPreviewPane: View {
     let onRename: (Conversation) -> Void
     let onDelete: (Conversation) -> Void
 
+    @State private var readingPositionStore = TranscriptReadingPositionStore()
+
     private var previewedConversation: Conversation? {
         guard let conversationID = sessionSelection.onlySelectedConversationID else { return nil }
         return store.conversation(withID: conversationID)
@@ -26,10 +28,15 @@ struct SessionPreviewPane: View {
                         store: store,
                         conversation: conversation,
                         onRename: { onRename(conversation) },
-                        onDelete: { onDelete(conversation) }
+                        onDelete: { onDelete(conversation) },
+                        onRead: {
+                            SessionReadingWindowManager.shared.open(
+                                conversation, store: store, initialPosition: readingPositionStore.position(for: conversation.id)
+                            )
+                        }
                     )
                     ThemeDivider()
-                    TranscriptView(conversation: conversation)
+                    TranscriptView(conversation: conversation, readingPositionStore: readingPositionStore)
                         .id(conversation.id)
                 }
             } else if store.isScanningThisMac && store.conversations.isEmpty {

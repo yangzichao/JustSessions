@@ -3,6 +3,7 @@ import SwiftUI
 /// Read-only conversation for one session, loaded off the main actor.
 struct TranscriptView: View {
     let conversation: Conversation
+    let readingPositionStore: TranscriptReadingPositionStore
 
     private enum LoadState: Equatable {
         case loading
@@ -51,34 +52,7 @@ struct TranscriptView: View {
         case .loaded(let transcript) where transcript.entries.isEmpty:
             ContentUnavailableView("No messages yet", systemImage: "text.bubble")
         case .loaded(let transcript):
-            transcriptScrollView(transcript)
+            TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: readingPositionStore)
         }
-    }
-
-    private func transcriptScrollView(_ transcript: TranscriptContent) -> some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                if transcript.omittedEntryCount > 0 {
-                    Text("\(transcript.omittedEntryCount) earlier entries are not shown. Resume the session to see all of it.")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.bottom, 8)
-                }
-                ForEach(transcript.entries) { entry in
-                    TranscriptEntryView(
-                        entry: entry,
-                        assistantName: conversation.provider.rawValue,
-                        assistantTint: conversation.provider.tintColor
-                    )
-                }
-            }
-            .frame(maxWidth: 820, alignment: .leading)
-            .padding(.horizontal, 28)
-            .padding(.top, 6)
-            .padding(.bottom, 28)
-            .frame(maxWidth: .infinity)
-        }
-        .defaultScrollAnchor(.bottom)
     }
 }
