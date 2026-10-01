@@ -1,13 +1,13 @@
 .hero { padding-top: 48px; }
 .hero-introduction { display: grid; grid-template-columns: 1.22fr 1fr; align-items: end; gap: 48px; margin-bottom: 36px; }
 .hero h1 { margin-bottom: 0; font-size: clamp(40px, 4.7vw, 64px); line-height: 1.12; letter-spacing: -.035em; }
-.hero h1 span { color: var(--blue); }
+.hero h1 span { color: var(--ink); }
 .hero-description { margin-bottom: 20px; max-width: 470px; font-size: 18px; line-height: 1.65; }
 .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px; }
 .download-note { margin: 14px 0 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
-.hero-preview { padding: 16px 16px 0; border: 1px solid #dce3f2; border-radius: 18px; background: linear-gradient(135deg, #eef3ff, #edf0f5); }
+.hero-preview { padding: 16px 16px 0; border: 1px solid var(--line); border-radius: 18px; background: var(--sidebar-surface); }
 .hero-preview a { display: block; }
-.hero-preview img { width: 100%; border: 1px solid #d8dde6; border-radius: 9px; box-shadow: 0 12px 36px #1b315a0e; }
+.hero-preview img { width: 100%; border: 1px solid var(--line); border-radius: 9px; box-shadow: 0 12px 36px var(--shadow); }
 .hero-preview figcaption { margin: 14px 4px; text-align: center; }
 .provider-list { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px 28px; padding-block: 26px; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 500; color: var(--secondary); }
 .provider-list > span { white-space: nowrap; }

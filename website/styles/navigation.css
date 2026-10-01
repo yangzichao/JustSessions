@@ -8,7 +8,7 @@
 }
 .site-header nav { display: flex; align-items: center; gap: 25px; font-size: 14px; font-weight: 500; }
 .site-header nav > a:not(.button):hover,
-.site-footer nav a:hover { color: var(--blue); }
+.site-footer nav a:hover { color: var(--ink); }
 .github-link span { margin-left: 4px; }
 .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-block: 40px; margin-top: 20px; }
 .site-footer .wordmark { font-size: 18px; }

@@ -1,0 +1,15 @@
+/* Matches justSessionsLight in Models/Appearance/Themes/ThemeColors/JustSessionsThemeColors.swift. */
+:root {
+  color-scheme: light;
+  --paper: #fcfbf8;
+  --sidebar-surface: #f3f1ec;
+  --surface: #ffffff;
+  --message-surface: #f1ede6;
+  --ink: #15171c;
+  --ink-foreground: #ffffff;
+  --secondary: #303139;
+  --muted: #68686e;
+  --line: rgb(21 23 28 / 9%);
+  --button-hover: #303139;
+  --shadow: rgb(21 23 28 / 6%);
+}

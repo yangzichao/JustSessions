@@ -7,4 +7,4 @@ summary::-webkit-details-marker { display: none; }
 summary::after { content: "+"; position: absolute; top: 20px; right: 4px; font-size: 20px; font-weight: 400; color: var(--muted); }
 details[open] summary::after { content: "−"; }
 details p { margin-bottom: 22px; padding-right: 20px; font-size: 15px; line-height: 1.8; }
-details a { color: var(--blue); text-decoration: underline; text-underline-offset: 3px; }
+details a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
