@@ -1,18 +1,8 @@
 import Foundation
 
-/// What only SSH hosts need of tmux: listing the host's sessions over SSH, and reconnecting a tab whose connection
-/// ended. The rest is shared with this Mac; see `ConversationStore+Tmux`.
+/// What only SSH hosts need of tmux: reconnecting a tab whose connection ended. A refresh lists the host's tmux
+/// sessions through `RemoteHostStatusProbe`; the rest is shared with this Mac, see `ConversationStore+Tmux`.
 extension ConversationStore {
-    /// Lists the tmux sessions JustSessions started on the host. Runs off the main actor.
-    nonisolated static func listRemoteTmuxSessions(
-        host: String,
-        runner: RemoteHostCommandRunner = RemoteHostCommandRunner()
-    ) -> Set<String>? {
-        guard let result = runner.run(host, RemoteTmuxCommands.listSessionsCommand, 30),
-              result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus else { return nil }
-        return TmuxSessionName.appSessionNames(inListOutput: result.output)
-    }
-
     /// Opens a fresh connection for a remote tab whose connection ended, in its place in the tab bar.
     func reconnectRemoteTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }),

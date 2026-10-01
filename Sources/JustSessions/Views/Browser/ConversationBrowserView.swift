@@ -82,6 +82,7 @@ struct ConversationBrowserView: View {
                 initialHost: host,
                 initialProjectPath: newSessionProjectPath(on: host, startableProjects: startableProjects),
                 hosts: store.hosts,
+                providersByHost: store.newSessionProvidersByHost,
                 recentProjects: startableProjects
             ) { provider, host, folder in
                 try await store.launchNewSession(provider: provider, host: host, folder: folder)
@@ -89,7 +90,8 @@ struct ConversationBrowserView: View {
         }
     }
 
-    /// The selected tab's tool, or else the one the sidebar shows; Codex when it shows every tool.
+    /// The selected tab's tool, or else the one the sidebar shows; Codex when it shows every tool. The sheet takes
+    /// the host's first installed tool instead when the host does not have this one.
     private var newSessionProvider: ConversationProvider {
         store.selectedTerminal?.provider ?? providerFilter.provider ?? .codex
     }

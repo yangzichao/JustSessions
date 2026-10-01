@@ -26,7 +26,7 @@ struct SidebarNewSessionButton: View {
         }
         .buttonStyle(.plain)
         .keyboardShortcut("n", modifiers: .command)
-        .help("Start Claude Code, Codex, or Antigravity in a project folder")
+        .help("Start an installed coding CLI in a project folder")
         .padding(.horizontal, 8)
     }
 }

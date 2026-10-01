@@ -11,10 +11,19 @@ JustSessions reads the session files your CLIs already create. It does not uploa
 | Claude Code | `~/.claude/projects` (honors `CLAUDE_CONFIG_DIR`) | Yes | Yes | Yes |
 | OpenAI Codex CLI | `~/.codex/sessions` (honors `CODEX_HOME`) | Yes | Yes | Yes |
 | Google Antigravity CLI | `~/.gemini/antigravity-cli/conversations` | Not yet | Use `/fork` after resuming | No |
+| Kiro CLI | `~/.kiro/sessions/cli` (honors `KIRO_HOME`) | Not yet | No | No |
+| OpenCode | `~/.local/share/opencode/opencode.db`, read-only (honors `OPENCODE_DB` and `XDG_DATA_HOME`) | Not yet | Yes | No |
+| Pi | `~/.pi/agent/sessions` (honors `PI_CODING_AGENT_SESSION_DIR`, `sessionDir` in Pi's `settings.json`, and `PI_CODING_AGENT_DIR`) | Not yet | Yes | No |
+
+Kiro CLI sessions are listed once they have a message; sessions a subagent started are left out. OpenCode subagent sessions and archived sessions are left out too.
 
 ## CLI launch and discovery
 
 The app runs each CLI in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it combines the inherited `PATH` with the user's login-shell `PATH` and common installation folders, including Homebrew and Node version manager locations. Session discovery reads existing files; app startup also reads the login shell's `PATH`, and tmux integration checks its version and running sessions.
+
+Each refresh also checks which CLIs are installed: on this Mac with the same lookup a launch uses, and on an SSH host with `command -v` in its login shell, in the same SSH call that lists its tmux sessions. New session menus offer only the CLIs found. Until a machine's first check finishes, they offer every CLI that runs there.
+
+Claude Code, Codex, and Antigravity CLI reveal which session a new tab's CLI is writing. Kiro CLI, OpenCode, and Pi don't, so a new tab for one of them takes the first session that appears in its project after the tab started. While such a tab waits, this Mac refreshes about every 6 seconds.
 
 ## Terminal persistence
 

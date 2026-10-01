@@ -10,6 +10,8 @@ struct NewSessionSheet: View {
     @State private var errorMessage: String?
 
     let hosts: [SessionHost]
+    /// The tools installed on each host; the picker offers the selected host's.
+    let providersByHost: [SessionHost: [ConversationProvider]]
     /// Projects on every host; the menu shows the selected host's.
     let recentProjects: [ProjectConversationGroup]
     let onStart: (ConversationProvider, SessionHost, String) async throws -> Void
@@ -19,15 +21,34 @@ struct NewSessionSheet: View {
         initialHost: SessionHost,
         initialProjectPath: String,
         hosts: [SessionHost],
+        providersByHost: [SessionHost: [ConversationProvider]],
         recentProjects: [ProjectConversationGroup],
         onStart: @escaping (ConversationProvider, SessionHost, String) async throws -> Void
     ) {
-        _selectedProvider = State(initialValue: Self.provider(initialProvider, orFirstThatRunsOn: initialHost))
+        _selectedProvider = State(initialValue: initialProvider)
         _selectedHost = State(initialValue: initialHost)
         _projectPath = State(initialValue: initialProjectPath)
         self.hosts = hosts
+        self.providersByHost = providersByHost
         self.recentProjects = recentProjects
         self.onStart = onStart
+    }
+
+    private var providersOnSelectedHost: [ConversationProvider] {
+        providersByHost[selectedHost] ?? []
+    }
+
+    /// The picked tool while the host has it, or else the host's first. Hosts are checked as they refresh, so the
+    /// list can change while the sheet is open. Nil when the host has none.
+    private var startingProvider: ConversationProvider? {
+        providersOnSelectedHost.contains(selectedProvider) ? selectedProvider : providersOnSelectedHost.first
+    }
+
+    private var providerSelection: Binding<ConversationProvider> {
+        Binding(
+            get: { startingProvider ?? selectedProvider },
+            set: { selectedProvider = $0 }
+        )
     }
 
     private var trimmedProjectPath: String {
@@ -38,14 +59,13 @@ struct NewSessionSheet: View {
         recentProjects.filter { $0.host == selectedHost }
     }
 
-    /// Switching hosts keeps the tool when it runs there and suggests the host's most recent project.
+    /// Switching hosts keeps the tool when the host has it and suggests the host's most recent project.
     private var hostSelection: Binding<SessionHost> {
         Binding(
             get: { selectedHost },
             set: { newHost in
                 guard newHost != selectedHost else { return }
                 selectedHost = newHost
-                selectedProvider = Self.provider(selectedProvider, orFirstThatRunsOn: newHost)
                 projectPath = recentProjects.first { $0.host == newHost }?.location.path ?? ""
             }
         )
@@ -71,12 +91,18 @@ struct NewSessionSheet: View {
                 .fixedSize()
             }
 
-            Picker("Tool", selection: $selectedProvider) {
-                ForEach(ConversationProvider.allCases.filter { $0.runs(on: selectedHost) }) { provider in
-                    Text(provider.rawValue).tag(provider)
+            if providersOnSelectedHost.isEmpty {
+                Label(NewSessionProviderAvailability.noCLIFoundMessage(on: selectedHost), systemImage: "exclamationmark.triangle")
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Picker("Tool", selection: providerSelection) {
+                    ForEach(providersOnSelectedHost) { provider in
+                        Text(provider.rawValue).tag(provider)
+                    }
                 }
+                .pickerStyle(.segmented)
             }
-            .pickerStyle(.segmented)
 
             projectFolderSection
 
@@ -91,9 +117,9 @@ struct NewSessionSheet: View {
                 Button("Cancel") { dismiss() }
                     .keyboardShortcut(.cancelAction)
                 Button("Start session", action: start)
-                    .buttonStyle(ProviderProminentButtonStyle(tint: selectedProvider.emphasisTintColor))
+                    .buttonStyle(ProviderProminentButtonStyle(tint: (startingProvider ?? selectedProvider).emphasisTintColor))
                     .keyboardShortcut(.defaultAction)
-                    .disabled(trimmedProjectPath.isEmpty || isStarting)
+                    .disabled(startingProvider == nil || trimmedProjectPath.isEmpty || isStarting)
             }
         }
         .padding(24)
@@ -135,7 +161,7 @@ struct NewSessionSheet: View {
     }
 
     private func start() {
-        let provider = selectedProvider
+        guard let provider = startingProvider else { return }
         let host = selectedHost
         let folder = trimmedProjectPath
         isStarting = true
@@ -164,9 +190,5 @@ struct NewSessionSheet: View {
                 projectPath = selectedFolder.path
             }
         }
-    }
-
-    private static func provider(_ provider: ConversationProvider, orFirstThatRunsOn host: SessionHost) -> ConversationProvider {
-        provider.runs(on: host) ? provider : ConversationProvider.allCases.first { $0.runs(on: host) } ?? provider
     }
 }

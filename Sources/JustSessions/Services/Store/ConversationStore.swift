@@ -23,6 +23,9 @@ final class ConversationStore: ObservableObject {
     /// tmux sessions JustSessions started that still run, per host, as of the host's last refresh. On this Mac, one
     /// whose CLI ends leaves within about a second; see `ConversationStore+CLIActivitySync`.
     @Published var tmuxSessionNamesByHost: [SessionHost: Set<String>] = [:]
+    /// The tools whose CLI each host has, as of the host's last refresh; a host not checked yet is missing.
+    /// See `ConversationStore+InstalledCLIs`.
+    @Published var installedProvidersByHost: [SessionHost: Set<ConversationProvider>] = [:]
     /// What the CLI of each session running in tmux on this Mac with no tab open is doing, by conversation id.
     /// A tab's own CLI is on the tab; see `TerminalSession.cliActivity`.
     @Published var detachedCLIActivities: [String: CLIActivity] = [:]
@@ -42,7 +45,9 @@ final class ConversationStore: ObservableObject {
     let userDefaults: UserDefaults
 
     init(
-        adapters: [any ConversationAdapter] = [ClaudeAdapter(), CodexAdapter(), AntigravityAdapter()],
+        adapters: [any ConversationAdapter] = [
+            ClaudeAdapter(), CodexAdapter(), AntigravityAdapter(), KiroAdapter(), OpenCodeAdapter(), PiAdapter(),
+        ],
         commandResolver: NativeCLICommandResolver = NativeCLICommandResolver(),
         userDefaults: UserDefaults = .standard,
         sessionNotifier: any SessionNotifying = SessionNotificationCenter.shared
@@ -76,6 +81,7 @@ final class ConversationStore: ObservableObject {
         hostRefreshStatuses[.thisMac] = .refreshing
         lastRefreshStartedAt = .now
         let adapters = self.adapters
+        let commandResolver = self.commandResolver
         let installedTmux = commandResolver.installedTmuxServer()
         Task.detached(priority: .userInitiated) {
             var found: [Conversation] = []
@@ -84,12 +90,15 @@ final class ConversationStore: ObservableObject {
                 do { found += try adapter.discover() }
                 catch { failures.append("\(adapter.provider.rawValue): \(error.localizedDescription)") }
             }
+            let installedProviders = InstalledCLIs.onThisMac(commandResolver: commandResolver)
             // The first refresh also checks the tmux version, so tabs can run in tmux from then on.
             let tmuxPaneProcessIDs = installedTmux.map { $0.hasSupportedVersion() ? $0.appSessionPaneProcessIDs() : [:] } ?? [:]
             await MainActor.run {
                 self.tmuxSessionNamesByHost[.thisMac] = Set(tmuxPaneProcessIDs.keys)
                 self.thisMacTmuxPaneProcessIDs = tmuxPaneProcessIDs
+                self.setInstalledProviders(installedProviders, on: .thisMac)
                 self.replaceConversations(on: .thisMac, with: found)
+                self.linkWaitingTabsByAppearance(on: .thisMac)
                 self.hostRefreshStatuses[.thisMac] = failures.isEmpty
                     ? .refreshed(.now)
                     : .failed(failures.joined(separator: "\n"))

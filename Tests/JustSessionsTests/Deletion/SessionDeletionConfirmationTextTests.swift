@@ -6,24 +6,24 @@ struct SessionDeletionConfirmationTextTests {
         let openTerminalCount: Int
         let unsupportedCount: Int
         let expectedSentence: String?
-        var testDescription: String { "\(openTerminalCount) open, \(unsupportedCount) Antigravity" }
+        var testDescription: String { "\(openTerminalCount) open, \(unsupportedCount) unsupported" }
     }
 
     static let skippedSessionsCases = [
         SkippedSessionsCase(openTerminalCount: 0, unsupportedCount: 0, expectedSentence: nil),
         SkippedSessionsCase(openTerminalCount: 1, unsupportedCount: 0, expectedSentence: "1 session with an open terminal will be skipped."),
         SkippedSessionsCase(openTerminalCount: 3, unsupportedCount: 0, expectedSentence: "3 sessions with open terminals will be skipped."),
-        SkippedSessionsCase(openTerminalCount: 0, unsupportedCount: 1, expectedSentence: "1 Antigravity session will be skipped."),
-        SkippedSessionsCase(openTerminalCount: 0, unsupportedCount: 2, expectedSentence: "2 Antigravity sessions will be skipped."),
+        SkippedSessionsCase(openTerminalCount: 0, unsupportedCount: 1, expectedSentence: "1 session from tools JustSessions can't delete will be skipped."),
+        SkippedSessionsCase(openTerminalCount: 0, unsupportedCount: 2, expectedSentence: "2 sessions from tools JustSessions can't delete will be skipped."),
         SkippedSessionsCase(
             openTerminalCount: 1,
             unsupportedCount: 1,
-            expectedSentence: "1 session with an open terminal and 1 Antigravity session will be skipped."
+            expectedSentence: "1 session with an open terminal and 1 session from tools JustSessions can't delete will be skipped."
         ),
         SkippedSessionsCase(
             openTerminalCount: 2,
             unsupportedCount: 4,
-            expectedSentence: "2 sessions with open terminals and 4 Antigravity sessions will be skipped."
+            expectedSentence: "2 sessions with open terminals and 4 sessions from tools JustSessions can't delete will be skipped."
         ),
     ]
 
@@ -77,7 +77,7 @@ struct SessionDeletionConfirmationTextTests {
 
         #expect(SessionDeletionConfirmationText.message(forDeletingSelectionWith: everythingDeletable) == intro)
         #expect(SessionDeletionConfirmationText.message(forDeletingSelectionWith: someSkipped)
-            == intro + " 2 Antigravity sessions will be skipped.")
+            == intro + " 2 sessions from tools JustSessions can't delete will be skipped.")
     }
 
     @Test(arguments: [

@@ -134,7 +134,12 @@ struct SidebarProjectSection: View {
                 .font(.system(size: 11).monospacedDigit())
                 .foregroundStyle(.secondary)
                 .opacity(isHovered ? 0 : 1)
-            ProjectNewSessionMenu(project: project, showsTitle: false, onStart: onNewSession)
+            ProjectNewSessionMenu(
+                project: project,
+                providers: store.newSessionProviders(on: project.host),
+                showsTitle: false,
+                onStart: onNewSession
+            )
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
                 .fixedSize()

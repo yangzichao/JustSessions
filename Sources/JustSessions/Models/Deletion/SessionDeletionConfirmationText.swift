@@ -44,7 +44,7 @@ enum SessionDeletionConfirmationText {
                 : "\(plan.openTerminalCount) sessions with open terminals")
         }
         if plan.unsupportedCount > 0 {
-            skippedParts.append(CountedNoun.phrase(count: plan.unsupportedCount, singular: "Antigravity session"))
+            skippedParts.append(CountedNoun.phrase(count: plan.unsupportedCount, singular: "session") + " from tools JustSessions can't delete")
         }
         guard !skippedParts.isEmpty else { return nil }
         return skippedParts.joined(separator: " and ") + " will be skipped."

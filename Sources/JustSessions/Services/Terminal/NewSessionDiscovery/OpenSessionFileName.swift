@@ -3,13 +3,14 @@ import Foundation
 /// Recognizes a session file among the files a CLI holds open and reads the session id from its name.
 /// Codex keeps `sessions/YYYY/MM/DD/rollout-<timestamp>-<session id>.jsonl` open while it runs, and
 /// Antigravity its SQLite `conversations/<session id>.db` with `-wal` and `-shm` companions.
-/// Claude Code does not keep its transcript open; its tabs are matched by session id instead.
+/// Claude Code does not keep its transcript open; its tabs are matched by session id instead. Kiro CLI, OpenCode,
+/// and Pi leave no such trace; see `ConversationProvider.linksNewSessionsByAppearance`.
 enum OpenSessionFileName {
     static func sessionID(inOpenFilePath path: String, provider: ConversationProvider) -> String? {
         let file = URL(fileURLWithPath: path)
         let sessionID: String
         switch provider {
-        case .claude:
+        case .claude, .kiro, .opencode, .pi:
             return nil
         case .codex:
             guard file.lastPathComponent.hasPrefix("rollout-"), file.pathExtension == "jsonl" else { return nil }
@@ -22,6 +23,6 @@ enum OpenSessionFileName {
             guard databaseFileName.hasSuffix(".db") else { return nil }
             sessionID = String(databaseFileName.dropLast(".db".count))
         }
-        return ConversationMetadata.isValidSessionID(sessionID) ? sessionID : nil
+        return provider.isValidSessionID(sessionID) ? sessionID : nil
     }
 }

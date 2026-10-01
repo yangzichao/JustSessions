@@ -6,9 +6,9 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 
 ## Find any session
 
-- All Claude Code, Codex, and Antigravity CLI sessions in one sidebar, grouped by machine (this Mac, then each SSH host), then by project folder, sorted by recent activity.
+- All Claude Code, Codex, Antigravity CLI, Kiro CLI, OpenCode, and Pi sessions in one sidebar, grouped by machine (this Mac, then each SSH host), then by project folder, sorted by recent activity.
 - Search projects by name or path, and sessions by title or session ID.
-- Filter to sessions from the past seven days, or to one CLI.
+- Filter to sessions from the past seven days, or to one CLI. The filter lists only CLIs that are installed or have sessions.
 - Pin projects and sessions to keep them at the top. Rename any session locally without touching the CLI's own title.
 
 ## Preview before you resume
@@ -18,8 +18,8 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 ## Resume, branch, and start sessions
 
 - Resume a session in its native CLI inside an embedded terminal: double-click it, use **Resume**, or right-click.
-- Branch (fork) a Claude Code or Codex conversation into a new session. This forks the conversation, not a Git branch.
-- Start a new session in any project folder, on this Mac or an SSH host, with any CLI supported on that machine (Claude Code and Codex on SSH hosts). It appears in the sidebar right away.
+- Branch (fork) a Claude Code, Codex, OpenCode, or Pi conversation into a new session. This forks the conversation, not a Git branch.
+- Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI installed on that machine (Claude Code and Codex on SSH hosts). It appears in the sidebar right away.
 - Keep several terminal tabs open. Select a session in the sidebar to read its preview; a session whose CLI is running opens on its terminal instead. Select a terminal tab to return to its CLI without stopping it.
 - With tmux 3.3 or later installed, a CLI on this Mac runs inside tmux. Closing its tab with **Keep running**, quitting the app, or installing an update leaves it running. Select the session to reattach, or right-click it and choose **End on this Mac**.
 - Pick up names set with `/rename` in Claude Code within about a second.
@@ -33,7 +33,7 @@ JustSessions posts a macOS notification when a Claude Code or Codex session on t
 - A session whose tab is selected while JustSessions is in front sends none; you already see it.
 - macOS asks for permission the first time there is something to notify about.
 - Turn either kind off in **Settings > Notifications**. Banners, sounds, and Do Not Disturb follow **System Settings > Notifications**.
-- SSH hosts and Antigravity CLI don't report what their CLI is doing, so they send no notifications.
+- SSH hosts, Antigravity CLI, Kiro CLI, OpenCode, and Pi don't report what their CLI is doing, so they send no notifications.
 
 ## SSH hosts
 

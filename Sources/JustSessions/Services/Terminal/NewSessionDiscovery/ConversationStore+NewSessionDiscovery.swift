@@ -8,6 +8,8 @@ extension ConversationStore {
     /// Claude Code writes a new transcript before the first prompt, so a freshly listed session can still be
     /// untitled. This many refreshes after its file changes are enough to pick up the first prompt.
     static let maximumTitleRefreshesPerNewSession = 3
+    /// A tab linked by appearance has no file to watch, so while one waits on this Mac, it refreshes this often.
+    static let refreshIntervalWhileWaitingForAppearingSession: TimeInterval = 6
 
     var pendingNewSessions: [PendingNewSession] {
         terminalSessions.compactMap(\.pendingNewSession)
@@ -27,9 +29,16 @@ extension ConversationStore {
             refreshThisMac()
             return
         }
+        if mayRefresh, isWaitingForAppearingSessionOnThisMac, isDueForRefreshWhileWaitingForAppearingSession {
+            refreshThisMac()
+            return
+        }
 
-        // Tabs on SSH hosts run `ssh`, whose open files say nothing; see `linkWaitingRemoteNewSessionTabs`.
-        let waitingTabs = terminalSessions.filter { $0.isNewSessionAwaitingConversation && $0.host == .thisMac }
+        // Tabs on SSH hosts run `ssh`, whose open files say nothing, and some tools leave no trace of their session;
+        // see `linkWaitingTabsByAppearance`.
+        let waitingTabs = terminalSessions.filter {
+            $0.isNewSessionAwaitingConversation && $0.host == .thisMac && !$0.isWaitingForAppearingSession
+        }
         guard !waitingTabs.isEmpty else { return }
         let searches = waitingTabs.map(\.waitingNewSessionTab)
         let sessionFiles = await Task.detached(priority: .utility) {
@@ -63,7 +72,22 @@ extension ConversationStore {
               session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
               let conversation = session.conversation,
               conversation.suggestedTitle == ConversationMetadata.untitledConversationTitle else { return false }
-        return wasModifiedSinceLastRefresh(ConversationMetadata.fileModificationDate(conversation.sourceFile))
+        // A SQLite source, such as OpenCode's, writes to its `-wal` file first.
+        return wasModifiedSinceLastRefresh(max(
+            ConversationMetadata.fileModificationDate(conversation.sourceFile),
+            ConversationMetadata.fileModificationDate(URL(fileURLWithPath: conversation.sourceFile.path + "-wal"))
+        ))
+    }
+
+    /// A refresh links such a tab once it lists the tab's session; see `linkWaitingTabsByAppearance`. A CLI that
+    /// exited writes no more sessions, and its tab refreshed when it did.
+    private var isWaitingForAppearingSessionOnThisMac: Bool {
+        terminalSessions.contains { $0.host == .thisMac && $0.isWaitingForAppearingSession && !$0.hasExited }
+    }
+
+    private var isDueForRefreshWhileWaitingForAppearingSession: Bool {
+        guard let lastRefreshStartedAt else { return true }
+        return Date.now.timeIntervalSince(lastRefreshStartedAt) >= Self.refreshIntervalWhileWaitingForAppearingSession
     }
 
     /// A refresh already saw every change made before it started, so only later changes are worth another.

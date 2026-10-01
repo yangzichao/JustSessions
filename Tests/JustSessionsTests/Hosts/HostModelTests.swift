@@ -63,7 +63,6 @@ struct HostModelTests {
         #expect(devboxGroup?.location.path == "/Users/me/paper")
         #expect(devboxGroup?.folderName == "paper")
         #expect(devboxGroup?.canStartNewSession == true)
-        #expect(devboxGroup?.newSessionProviders == [.claude, .codex])
     }
 
     @Test func hostNamesReadWithinASentence() {
@@ -71,8 +70,8 @@ struct HostModelTests {
         #expect("End on \(SessionHost.ssh("me@devbox").nameInSentence)" == "End on me@devbox")
     }
 
-    @Test func everyToolRunsOnThisMacAndAntigravityOnlyThere() {
-        #expect(ConversationProvider.allCases.filter { $0.runs(on: .thisMac) } == [.claude, .codex, .antigravity])
+    @Test func everyToolRunsOnThisMacAndOnlyClaudeCodeAndCodexOnSSHHosts() {
+        #expect(ConversationProvider.allCases.filter { $0.runs(on: .thisMac) } == ConversationProvider.allCases)
         #expect(ConversationProvider.allCases.filter { $0.runs(on: .ssh("devbox")) } == [.claude, .codex])
     }
 

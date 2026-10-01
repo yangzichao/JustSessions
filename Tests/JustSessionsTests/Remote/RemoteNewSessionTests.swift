@@ -13,7 +13,7 @@ struct RemoteNewSessionTests {
         let first = waitingTab(project: "/home/me/paper", known: [known.sessionID], startedMinutesAgo: 5)
         let second = waitingTab(project: "/home/me/paper", known: [known.sessionID], startedMinutesAgo: 2)
 
-        let matches = RemoteNewSessionMatcher.matches(
+        let matches = AppearingSessionMatcher.matches(
             for: [second, first],
             in: [known, otherProject, otherTool, otherHost, newest, newer],
             alreadyLinkedConversationIDs: []
@@ -25,15 +25,15 @@ struct RemoteNewSessionTests {
 
     @Test func sessionLinkedToAnotherTabIsNotReused() {
         let linked = remoteConversation(.codex, project: "/home/me/api", minutesAgo: 1)
-        let tab = WaitingRemoteNewSessionTab(
+        let tab = WaitingTabForAppearingSession(
             terminalID: UUID(),
-            host: "devbox",
+            host: .ssh("devbox"),
             provider: .codex,
             projectPath: "/home/me/api",
             launchedAt: .now,
             sessionIDsKnownAtLaunch: []
         )
-        let matches = RemoteNewSessionMatcher.matches(for: [tab], in: [linked], alreadyLinkedConversationIDs: [linked.id])
+        let matches = AppearingSessionMatcher.matches(for: [tab], in: [linked], alreadyLinkedConversationIDs: [linked.id])
         #expect(matches.isEmpty)
     }
 
@@ -52,12 +52,12 @@ struct RemoteNewSessionTests {
         #expect(tab.command.arguments.last?.contains("exec claude") == true)
         #expect(tab.pendingNewSession?.projectDirectoryKey == "ssh://devbox/home/me/paper")
 
-        store.linkWaitingRemoteNewSessionTabs(onHost: "devbox")
+        store.linkWaitingTabsByAppearance(on: .ssh("devbox"))
         #expect(tab.conversation == nil)
 
         let created = remoteConversation(.claude, project: "/home/me/paper", minutesAgo: 0)
         store.replaceConversations(on: .ssh("devbox"), with: [existing, created])
-        store.linkWaitingRemoteNewSessionTabs(onHost: "devbox")
+        store.linkWaitingTabsByAppearance(on: .ssh("devbox"))
         #expect(tab.conversation?.id == created.id)
         store.closeAllTerminals()
     }
@@ -74,8 +74,8 @@ struct RemoteNewSessionTests {
         #expect(tab.pendingNewSession?.projectDirectoryKey == "ssh://devbox/home/me/paper")
 
         let fork = remoteConversation(.claude, project: "/home/me/paper", minutesAgo: 0)
-        let matches = RemoteNewSessionMatcher.matches(
-            for: [tab.waitingRemoteNewSessionTab],
+        let matches = AppearingSessionMatcher.matches(
+            for: [tab.waitingTabForAppearingSession],
             in: [forked, fork],
             alreadyLinkedConversationIDs: []
         )
@@ -101,10 +101,10 @@ struct RemoteNewSessionTests {
         )
     }
 
-    private func waitingTab(project: String, known: Set<String>, startedMinutesAgo: Double) -> WaitingRemoteNewSessionTab {
-        WaitingRemoteNewSessionTab(
+    private func waitingTab(project: String, known: Set<String>, startedMinutesAgo: Double) -> WaitingTabForAppearingSession {
+        WaitingTabForAppearingSession(
             terminalID: UUID(),
-            host: "devbox",
+            host: .ssh("devbox"),
             provider: .claude,
             projectPath: project,
             launchedAt: Date(timeIntervalSinceNow: -startedMinutesAgo * 60),

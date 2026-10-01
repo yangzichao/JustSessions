@@ -21,43 +21,17 @@ extension ConversationStore {
             displayTitle: provider.newSessionTabTitle,
             command: command,
             host: .ssh(host),
-            sessionIDsKnownAtLaunch: sessionIDsListed(on: .ssh(host)),
+            sessionIDsKnownAtLaunch: sessionIDsKnownAtLaunch(of: provider, on: .ssh(host)),
             tmuxSessionName: tmuxSessionName
         )
         session.onProcessFinished = { [weak self] in self?.refreshRemoteHost(host) }
         openTerminal(session)
     }
 
-    /// A waiting tab on an SSH host takes a session that is not among these. A tab on this Mac finds its session
-    /// through the files its CLI opens instead, so it needs none.
-    func sessionIDsListed(on host: SessionHost) -> Set<String> {
-        guard host != .thisMac else { return [] }
-        return Set(conversations.filter { $0.host == host }.map(\.sessionID))
-    }
-
     func startRemoteNewSessionPolling(interval: Duration = .seconds(10)) {
         runPeriodically(every: interval) { store in
             for host in store.hostsWithRemoteNewSessionsToFollow() { store.refreshRemoteHost(host) }
         }
-    }
-
-    /// Links waiting new-session tabs on the host to sessions that appeared since they started.
-    func linkWaitingRemoteNewSessionTabs(onHost host: String) {
-        let waitingSessions = terminalSessions.filter { $0.host == .ssh(host) && $0.isNewSessionAwaitingConversation }
-        guard !waitingSessions.isEmpty else { return }
-        let matches = RemoteNewSessionMatcher.matches(
-            for: waitingSessions.map(\.waitingRemoteNewSessionTab),
-            in: conversations,
-            alreadyLinkedConversationIDs: Set(terminalSessions.compactMap { $0.conversation?.id })
-        )
-        guard !matches.isEmpty else { return }
-        for session in waitingSessions {
-            guard let conversation = matches[session.id] else { continue }
-            session.synchronize(conversation: conversation, displayTitle: title(for: conversation))
-            adoptSessionTmuxName(for: session)
-        }
-        // Sidebar rows look up open terminals through the store, which does not see a tab's own changes.
-        objectWillChange.send()
     }
 
     private func hostsWithRemoteNewSessionsToFollow() -> Set<String> {

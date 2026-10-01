@@ -53,7 +53,7 @@ extension ConversationStore {
                 command: command,
                 branchedFromSessionID: isBranch ? conversation.sessionID : nil,
                 host: conversation.host,
-                sessionIDsKnownAtLaunch: isBranch ? sessionIDsListed(on: conversation.host) : [],
+                sessionIDsKnownAtLaunch: isBranch ? sessionIDsKnownAtLaunch(of: conversation.provider, on: conversation.host) : [],
                 tmuxSessionName: tmuxSessionName
             )
             // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
@@ -129,6 +129,7 @@ extension ConversationStore {
             displayTitle: provider.newSessionTabTitle,
             command: tabCommand.command,
             preassignedSessionID: preassignment?.sessionID,
+            sessionIDsKnownAtLaunch: sessionIDsKnownAtLaunch(of: provider, on: .thisMac),
             tmuxSessionName: tabCommand.tmuxSessionName
         )
         // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.

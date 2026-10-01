@@ -45,7 +45,7 @@ struct CLIActivityReader: Sendable {
                 turnState: codexTurnTracker.turnState(ofRolloutFile: sessionFile),
                 cliStartedAt: RunningProcessInfo.startDate(of: probe.processID)
             )
-        case .antigravity:
+        case .antigravity, .kiro, .opencode, .pi:
             return nil
         }
     }

@@ -82,7 +82,7 @@ struct RemoteSessionMirror: Sendable {
             ["/projects/", "/projects/*/", "/projects/*/*.jsonl", "/projects/*/sessions-index.json"]
         case .codex:
             ["/session_index.jsonl", "/sessions/", "/sessions/**/", "/sessions/**/rollout-*.jsonl"]
-        case .antigravity:
+        case .antigravity, .kiro, .opencode, .pi:
             []
         }
     }
@@ -93,6 +93,9 @@ struct RemoteSessionMirror: Sendable {
         case .claude: ".claude"
         case .codex: ".codex"
         case .antigravity: ".gemini/antigravity-cli"
+        case .kiro: ".kiro/sessions/cli"
+        case .opencode: ".local/share/opencode"
+        case .pi: ".pi/agent/sessions"
         }
     }
 
@@ -101,6 +104,9 @@ struct RemoteSessionMirror: Sendable {
         case .claude: "claude"
         case .codex: "codex"
         case .antigravity: "antigravity"
+        case .kiro: "kiro"
+        case .opencode: "opencode"
+        case .pi: "pi"
         }
     }
 

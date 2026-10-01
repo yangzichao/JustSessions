@@ -23,10 +23,6 @@ struct ProjectConversationGroup: Identifiable {
 
     var canStartNewSession: Bool { location.canStartSessions }
 
-    var newSessionProviders: [ConversationProvider] {
-        ConversationProvider.allCases.filter { $0.runs(on: host) }
-    }
-
     static func grouped(
         _ conversations: [Conversation],
         pendingNewSessions: [PendingNewSession] = [],

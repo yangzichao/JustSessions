@@ -27,7 +27,7 @@ struct RemoteConversationDeletion {
             command = RemoteCLICommandBuilder.loginShellCommand(
                 "codex delete --force \(ShellQuoting.quoted(conversation.sessionID))"
             )
-        case .antigravity:
+        case .antigravity, .kiro, .opencode, .pi:
             throw ConversationDeletionError.invalidSource
         }
 

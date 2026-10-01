@@ -60,6 +60,7 @@ struct ConversationSidebarView: View {
             SidebarFilterBar(
                 recencyFilter: $recencyFilter,
                 providerFilter: $providerFilter,
+                offeredProviders: store.filterableProviders,
                 allSessionCount: allSessionCount,
                 recentSessionCount: recentSessionCount
             )

@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Find the right AI coding session. Pick up where you left off.</b><br>
-  A lightweight, native macOS app for Claude Code, OpenAI Codex CLI, and Google Antigravity CLI.<br>
+  A lightweight, native macOS app for Claude Code, OpenAI Codex CLI, Google Antigravity CLI, Kiro CLI, OpenCode, and Pi.<br>
   Local projects, remote machines over SSH, and sessions that keep running with tmux.
 </p>
 
@@ -83,7 +83,7 @@ This Mac requires **tmux 3.3+**; remote sessions require tmux on the SSH host. T
 
 ## Download
 
-**Requires macOS 14 Sonoma or later on Apple Silicon.** Install and sign in to at least one supported CLI: `claude`, `codex`, or `agy`.
+**Requires macOS 14 Sonoma or later on Apple Silicon.** Install and sign in to at least one supported CLI: `claude`, `codex`, `agy`, `kiro-cli`, `opencode`, or `pi`.
 
 1. Download **[JustSessions.dmg](https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg)**, Developer ID signed and notarized by Apple.
 2. Open it, drag **JustSessions** into **Applications**, and launch it.
@@ -94,13 +94,15 @@ App updates are delivered through Sparkle. For remote sessions, use **Add SSH ho
 
 ## Supported CLIs
 
-| Capability | Claude Code | OpenAI Codex CLI | Google Antigravity CLI |
-| --- | --- | --- | --- |
-| Browse, search, and resume local sessions | Yes | Yes | Yes |
-| Read a conversation preview | Yes | Yes | Not yet |
-| Branch a conversation from the app | Yes | Yes | Use `/fork` inside the CLI |
-| Browse and manage sessions over SSH | Yes | Yes | Not yet |
-| Delete sessions from the app | Yes | Yes | Not yet |
+| Capability | Claude Code | OpenAI Codex CLI | Google Antigravity CLI | Kiro CLI | OpenCode | Pi |
+| --- | --- | --- | --- | --- | --- | --- |
+| Browse, search, and resume local sessions | Yes | Yes | Yes | Yes | Yes | Yes |
+| Read a conversation preview | Yes | Yes | Not yet | Not yet | Not yet | Not yet |
+| Branch a conversation from the app | Yes | Yes | Use `/fork` inside the CLI | Not yet | Yes | Yes |
+| Browse and manage sessions over SSH | Yes | Yes | Not yet | Not yet | Not yet | Not yet |
+| Delete sessions from the app | Yes | Yes | Not yet | Not yet | Not yet | Not yet |
+
+New session menus offer only the CLIs found on each machine, and the sidebar's tool filter lists only tools that are installed or have sessions.
 
 Search matches project names and paths, session titles, and session IDs. It does not search the full conversation text. **Branch** forks a conversation; it does not create a Git branch.
 
@@ -118,7 +120,7 @@ Open JustSessions and search by project name, folder path, session title, or ses
 
 ### Can I manage Claude Code and Codex sessions in the same app?
 
-Yes. JustSessions is a macOS session manager for both, with conversation previews, resume, branching, and SSH support. Antigravity CLI sessions can also be browsed and resumed locally.
+Yes. JustSessions is a macOS session manager for both, with conversation previews, resume, branching, and SSH support. Antigravity CLI, Kiro CLI, OpenCode, and Pi sessions can also be browsed and resumed on this Mac, and OpenCode and Pi sessions can be branched.
 
 ### How do I resume an old Codex or Claude Code session?
 

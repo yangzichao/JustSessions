@@ -4,6 +4,8 @@ import SwiftUI
 struct SidebarFilterBar: View {
     @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
+    /// Tools installed on a host or with listed sessions; the menu offers only these.
+    let offeredProviders: Set<ConversationProvider>
     let allSessionCount: Int
     let recentSessionCount: Int
 
@@ -26,8 +28,8 @@ struct SidebarFilterBar: View {
 
         return Menu {
             Picker("Tool", selection: $providerFilter) {
-                ForEach(ConversationProviderFilter.allCases) { filter in
-                    Text(filter.rawValue).tag(filter)
+                ForEach(ConversationProviderFilter.choices(offering: offeredProviders, selected: providerFilter)) { filter in
+                    Text(filter.title).tag(filter)
                 }
             }
             .pickerStyle(.inline)
@@ -45,6 +47,6 @@ struct SidebarFilterBar: View {
             in: RoundedRectangle(cornerRadius: 7, style: .continuous)
         )
         .help(filteredProvider.map { "Showing \($0.rawValue) sessions only" } ?? "Show one tool's sessions")
-        .accessibilityLabel("Tool filter: \(providerFilter.rawValue)")
+        .accessibilityLabel("Tool filter: \(providerFilter.title)")
     }
 }

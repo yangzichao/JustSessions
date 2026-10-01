@@ -1,6 +1,8 @@
 import Foundation
 
-struct NativeCLICommandResolver {
+/// Sendable so a refresh can look up installed CLIs off the main actor. Its `FileManager` only checks paths, which
+/// is safe from any thread.
+struct NativeCLICommandResolver: @unchecked Sendable {
     let fileManager: FileManager
     let inheritedEnvironment: [String: String]
     private let searchDirectoriesOverride: [String]?

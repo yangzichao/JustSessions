@@ -25,7 +25,7 @@ enum TmuxSessionName {
             let providerPrefix = "\(prefix)\(provider.executableName)-"
             guard name.hasPrefix(providerPrefix) else { continue }
             let sessionID = String(name.dropFirst(providerPrefix.count))
-            return ConversationMetadata.isValidSessionID(sessionID) ? (provider, sessionID) : nil
+            return provider.isValidSessionID(sessionID) ? (provider, sessionID) : nil
         }
         return nil
     }

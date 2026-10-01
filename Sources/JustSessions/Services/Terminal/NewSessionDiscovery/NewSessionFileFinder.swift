@@ -31,6 +31,9 @@ struct NewSessionFileFinder: Sendable {
                 }
             case .codex, .antigravity:
                 processIDsOfTabsNeedingOpenFiles[tab.terminalID] = processIDs
+            case .kiro, .opencode, .pi:
+                // Linked by appearance once a refresh lists the session; see `linkWaitingTabsByAppearance`.
+                continue
             }
         }
         guard !processIDsOfTabsNeedingOpenFiles.isEmpty else { return sessionFiles }

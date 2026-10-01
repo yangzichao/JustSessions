@@ -19,8 +19,8 @@ final class TerminalSession: ObservableObject, Identifiable {
     /// For a Branch tab, the session it forked. The CLI runs a new session, so this one is never the tab's own.
     let branchedFromSessionID: String?
     let launchedAt = Date()
-    /// For a new session or branch on an SSH host: the host's session ids listed when the tab started. The
-    /// first session that appears after that in the same project is this tab's.
+    /// For a new session or branch linked by appearance: the tool's session ids listed on the host when the tab
+    /// started. The first session that appears after that in the same project is this tab's.
     let sessionIDsKnownAtLaunch: Set<String>
     /// The tmux session the tab's CLI runs in, on this Mac or an SSH host. A new session's or branch's tab renames
     /// it once its session is known.

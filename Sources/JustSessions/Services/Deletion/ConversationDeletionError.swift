@@ -7,6 +7,7 @@ enum ConversationDeletionError: LocalizedError, Equatable {
     case codexFailed(String)
     case codexDidNotFinish
     case sourceStillPresent
+    case unsupported(ConversationProvider)
 
     var errorDescription: String? {
         switch self {
@@ -16,6 +17,7 @@ enum ConversationDeletionError: LocalizedError, Equatable {
         case .codexFailed(let details): "Codex could not delete this session: \(details)"
         case .codexDidNotFinish: "Codex did not finish deleting this session. Refresh and try again."
         case .sourceStillPresent: "Codex reported success, but the session file is still present. Refresh and try again."
+        case .unsupported(let provider): "JustSessions can't delete \(provider.rawValue) sessions yet. Delete it from \(provider.rawValue) itself."
         }
     }
 }

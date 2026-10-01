@@ -14,8 +14,11 @@ extension ConversationStore {
             do {
                 let hostConversations = try discovery.discover(host: host)
                 await self.applyRemoteHostConversations(hostConversations, host: host)
-                if let tmuxSessionNames = Self.listRemoteTmuxSessions(host: host) {
-                    await self.setTmuxSessionNames(tmuxSessionNames, on: .ssh(host))
+                if let status = RemoteHostStatusProbe.status(ofHost: host) {
+                    await self.setTmuxSessionNames(status.tmuxSessionNames, on: .ssh(host))
+                    if let installedProviders = status.installedProviders {
+                        await self.setInstalledProviders(installedProviders, on: .ssh(host))
+                    }
                 }
                 await self.setRemoteHostRefreshStatus(.refreshed(.now), host: host)
             } catch {
@@ -38,6 +41,7 @@ extension ConversationStore {
         remoteHostList.save(to: userDefaults)
         hostRefreshStatuses.removeValue(forKey: .ssh(host))
         tmuxSessionNamesByHost.removeValue(forKey: .ssh(host))
+        installedProvidersByHost.removeValue(forKey: .ssh(host))
         replaceConversations(on: .ssh(host), with: [])
         Task.detached(priority: .utility) { mirror.removeMirror(host: host) }
     }
@@ -46,7 +50,7 @@ extension ConversationStore {
         // The host may have been removed while its copy ran.
         guard remoteHostList.hosts.contains(host) else { return }
         replaceConversations(on: .ssh(host), with: hostConversations)
-        linkWaitingRemoteNewSessionTabs(onHost: host)
+        linkWaitingTabsByAppearance(on: .ssh(host))
     }
 
     private func setRemoteHostRefreshStatus(_ status: HostRefreshStatus, host: String) {

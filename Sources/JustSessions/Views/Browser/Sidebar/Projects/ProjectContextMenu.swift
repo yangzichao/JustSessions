@@ -11,7 +11,12 @@ struct ProjectContextMenu: View {
     var body: some View {
         let deletionPlan = store.deletionPlan(for: project.id)
 
-        ProjectNewSessionMenu(project: project, showsTitle: true, onStart: onNewSession)
+        ProjectNewSessionMenu(
+            project: project,
+            providers: store.newSessionProviders(on: project.host),
+            showsTitle: true,
+            onStart: onNewSession
+        )
         if project.host == .thisMac {
             Button("Open project in Finder", systemImage: "folder") {
                 SessionLocationActions.openProjectFolder(project.location.path)

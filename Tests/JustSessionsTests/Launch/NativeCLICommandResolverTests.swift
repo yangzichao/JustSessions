@@ -39,7 +39,7 @@ struct NativeCLICommandResolverTests {
         let projectDirectory = root.appendingPathComponent("new project")
         try FileManager.default.createDirectory(at: binaryDirectory, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: projectDirectory, withIntermediateDirectories: true)
-        for executableName in ["claude", "codex", "agy"] {
+        for executableName in ConversationProvider.allCases.map(\.executableName) {
             let executable = binaryDirectory.appendingPathComponent(executableName)
             try writeExecutableScript("#!/bin/sh\nexit 0\n", to: executable)
         }
@@ -49,11 +49,13 @@ struct NativeCLICommandResolverTests {
             let command = try resolver.resolveNewSession(provider: provider, projectPath: projectDirectory.path)
             #expect(command.arguments.isEmpty)
             #expect(command.workingDirectory == projectDirectory.path)
-            let expectedExecutable: String
-            switch provider {
-            case .claude: expectedExecutable = "claude"
-            case .codex: expectedExecutable = "codex"
-            case .antigravity: expectedExecutable = "agy"
+            let expectedExecutable = switch provider {
+            case .claude: "claude"
+            case .codex: "codex"
+            case .antigravity: "agy"
+            case .kiro: "kiro-cli"
+            case .opencode: "opencode"
+            case .pi: "pi"
             }
             #expect(command.executablePath == binaryDirectory.appendingPathComponent(expectedExecutable).path)
         }

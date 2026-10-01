@@ -31,7 +31,7 @@ struct RemoteTmuxKeepAliveTests {
         firstClient.terminate()
         firstClient.waitUntilExit()
         #expect(sandbox.hasTmuxSession(tmuxName))
-        #expect(TmuxSessionName.appSessionNames(inListOutput: sandbox.run(RemoteTmuxCommands.listSessionsCommand)) == [tmuxName])
+        #expect(RemoteHostStatusProbe.status(inOutput: sandbox.run(RemoteHostStatusProbe.command)).tmuxSessionNames == [tmuxName])
 
         // Opening it again attaches instead of starting the CLI a second time.
         let secondClient = try sandbox.startClient(command)

@@ -24,6 +24,15 @@ struct CLIArgumentContractTests {
         ArgumentCase(provider: .antigravity, action: .new, expectedArguments: []),
         ArgumentCase(provider: .antigravity, action: .resume, expectedArguments: ["--conversation", sessionID]),
         ArgumentCase(provider: .antigravity, action: .branch, expectedArguments: ["--conversation", sessionID]),
+        ArgumentCase(provider: .kiro, action: .new, expectedArguments: ["chat"]),
+        ArgumentCase(provider: .kiro, action: .resume, expectedArguments: ["chat", "--resume-id", sessionID]),
+        ArgumentCase(provider: .kiro, action: .branch, expectedArguments: ["chat", "--resume-id", sessionID]),
+        ArgumentCase(provider: .opencode, action: .new, expectedArguments: []),
+        ArgumentCase(provider: .opencode, action: .resume, expectedArguments: ["--session", sessionID]),
+        ArgumentCase(provider: .opencode, action: .branch, expectedArguments: ["--session", sessionID, "--fork"]),
+        ArgumentCase(provider: .pi, action: .new, expectedArguments: []),
+        ArgumentCase(provider: .pi, action: .resume, expectedArguments: ["--session", sessionID]),
+        ArgumentCase(provider: .pi, action: .branch, expectedArguments: ["--fork", sessionID]),
     ]
 
     @Test(arguments: argumentCases)
@@ -49,6 +58,9 @@ struct CLIArgumentContractTests {
         case .claude: ClaudeAdapter(configurationDirectory: unusedDirectory)
         case .codex: CodexAdapter(codexDirectory: unusedDirectory)
         case .antigravity: AntigravityAdapter(configurationDirectory: unusedDirectory)
+        case .kiro: KiroAdapter(sessionsDirectory: unusedDirectory)
+        case .opencode: OpenCodeAdapter(databaseFile: unusedDirectory.appendingPathComponent("opencode.db"))
+        case .pi: PiAdapter(sessionsDirectory: unusedDirectory)
         }
     }
 }

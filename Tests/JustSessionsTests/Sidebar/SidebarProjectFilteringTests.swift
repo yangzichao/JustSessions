@@ -9,7 +9,7 @@ struct SidebarProjectFilteringTests {
         let newerClaude = Conversation.fixture(provider: .claude, projectPath: "/work/second", updatedAt: Date(timeIntervalSince1970: 20))
         let projects = ProjectConversationGroup.grouped([olderClaude, newestCodex, newerClaude])
 
-        let filteredProjects = SidebarProjectFiltering.projects(projects, providerFilter: .claude, recencyFilter: .all)
+        let filteredProjects = SidebarProjectFiltering.projects(projects, providerFilter: .only(.claude), recencyFilter: .all)
 
         #expect(projects.map(\.id) == [olderClaude.projectDirectoryKey, newerClaude.projectDirectoryKey])
         #expect(filteredProjects.map(\.id) == [newerClaude.projectDirectoryKey, olderClaude.projectDirectoryKey])
@@ -23,7 +23,7 @@ struct SidebarProjectFilteringTests {
             retainedProjectPaths: ["/work/empty", oldClaude.projectDirectoryKey, recentCodex.projectDirectoryKey]
         )
 
-        let filteredProjects = SidebarProjectFiltering.projects(projects, providerFilter: .claude, recencyFilter: .recent)
+        let filteredProjects = SidebarProjectFiltering.projects(projects, providerFilter: .only(.claude), recencyFilter: .recent)
         #expect(filteredProjects.map(\.id) == ["/work/empty"])
         #expect(filteredProjects.first?.sessionCount == 0)
         #expect(SidebarProjectFiltering.projects(filteredProjects, matching: "empty", title: \.suggestedTitle).count == 1)

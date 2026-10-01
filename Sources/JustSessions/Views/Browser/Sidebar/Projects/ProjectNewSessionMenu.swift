@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ProjectNewSessionMenu: View {
     let project: ProjectConversationGroup
+    /// The tools installed on the project's host.
+    let providers: [ConversationProvider]
     let showsTitle: Bool
     let onStart: (ConversationProvider) -> Void
 
@@ -9,7 +11,10 @@ struct ProjectNewSessionMenu: View {
         let canStartNewSession = project.canStartNewSession
 
         Menu {
-            ForEach(project.newSessionProviders) { provider in
+            if providers.isEmpty {
+                Text(NewSessionProviderAvailability.noCLIFoundMessage(on: project.host))
+            }
+            ForEach(providers) { provider in
                 Button(provider.rawValue, systemImage: provider.symbolName) {
                     onStart(provider)
                 }
