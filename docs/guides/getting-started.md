@@ -37,7 +37,7 @@ In current source builds, choose **Read** to open a dedicated reading window. Ad
 
 ## Use another machine over SSH
 
-The remote machine must accept `ssh <host>` without a password prompt and have `rsync` and Claude Code, Codex, Antigravity, or Kiro CLI installed.
+The remote machine must accept `ssh <host>` without a password prompt and have `rsync` and Claude Code, Codex, Antigravity, Kiro CLI, or Pi installed.
 
 1. Choose **Add SSH host…** in the sidebar.
 2. Enter a `~/.ssh/config` alias or `user@hostname`.
@@ -58,7 +58,7 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 - Clear the CLI and recent-session filters, then refresh the sidebar.
 - Confirm the CLI executable works in your usual terminal. New session menus offer only installed CLIs.
 - Start one conversation in the CLI so it has history for the app to discover. Kiro sessions need at least one message; OpenCode archived and subagent sessions are excluded.
-- Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, Antigravity, and Kiro CLI folders.
+- Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders.
 - For SSH, confirm passwordless access, `rsync`, and the remote CLI before adding the host.
 
 ## Appearance, privacy, and feedback

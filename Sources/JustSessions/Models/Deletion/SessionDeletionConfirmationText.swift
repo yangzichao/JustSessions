@@ -10,7 +10,9 @@ enum SessionDeletionConfirmationText {
 
     static func message(forDeleting conversation: Conversation) -> String {
         if let sshDestination = conversation.host.sshDestination {
-            return "This session will be permanently deleted on \(sshDestination). SSH hosts have no Trash, so this cannot be undone."
+            // The folder beside a Pi session holds subagent runs and forks that are never mirrored or listed.
+            let deletedItems = conversation.provider == .pi ? "The Pi session file and its associated folder" : "This session"
+            return "\(deletedItems) will be permanently deleted on \(sshDestination). SSH hosts have no Trash, so this cannot be undone."
         }
         switch conversation.provider {
         case .codex, .kiro:

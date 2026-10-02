@@ -19,6 +19,7 @@ struct RemoteSessionDiscovery: Sendable {
             CodexAdapter(codexDirectory: mirror.mirrorDirectory(host: host, provider: .codex)),
             AntigravityAdapter(configurationDirectory: mirror.mirrorDirectory(host: host, provider: .antigravity)),
             KiroAdapter(sessionsDirectory: mirror.mirrorDirectory(host: host, provider: .kiro)),
+            PiAdapter(sessionsDirectory: mirror.mirrorDirectory(host: host, provider: .pi)),
         ]
         return try adapters.flatMap { try $0.discover() }.map { $0.onHost(.ssh(host)) }
     }

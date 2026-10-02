@@ -25,7 +25,7 @@ These instructions follow the current source build. Check the [latest release no
 - Resume a session in its native CLI inside an embedded terminal: double-click it, use **Resume**, or right-click.
 - Branch (fork) a Claude Code, Codex, OpenCode, or Pi conversation into a new session. This forks the conversation, not a Git branch.
 - Kiro CLI supports a fork at an earlier turn with `/rewind` inside the resumed session. It does not currently expose a direct branch launch flag, so JustSessions keeps its Branch action unavailable. See [Kiro's rewind documentation](https://kiro.dev/docs/cli/reference/slash-commands/#rewind).
-- Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI installed on that machine (Claude Code, Codex, Antigravity, and Kiro CLI on SSH hosts). It appears in the sidebar right away.
+- Start a new session in any project folder, on this Mac or an SSH host, with any supported CLI installed on that machine (Claude Code, Codex, Antigravity, Kiro CLI, and Pi on SSH hosts). It appears in the sidebar right away.
 - Open a plain terminal in a project folder: choose **Terminal** from the project's **+** menu, or right-click the project and choose **New terminal**. It runs your login shell, on this Mac or the project's SSH host. It is not a session: it isn't listed in the sidebar, sends no notifications, and doesn't run in tmux, so closing its tab ends the shell.
 - Keep several terminal tabs open. Select a session in the sidebar to read its preview; a session whose CLI is running opens on its terminal instead. Select a terminal tab to return to its CLI without stopping it.
 - Tabs group by project, like tab groups in a browser: a new tab opens next to its project's other tabs, behind a label in the project's color. Click the label to collapse the group; a collapsed group keeps only its selected tab in sight and shows how many tabs it hides and the most pressing status among them.
@@ -59,10 +59,10 @@ JustSessions posts a macOS notification when a Claude Code or Codex session on t
 
 ## SSH hosts
 
-The host must accept `ssh <host>` without a password prompt and have `rsync` plus the CLI you want to run installed. Antigravity hosts also need `python3`; deleting an Antigravity session there needs `lsof`. The app reads Claude Code, Codex, Antigravity, and Kiro CLI history from the host's standard session folders.
+The host must accept `ssh <host>` without a password prompt and have `rsync` plus the CLI you want to run installed. Antigravity hosts also need `python3`; deleting an Antigravity session there needs `lsof`. The app reads Claude Code, Codex, Antigravity, Kiro CLI, and Pi history from the host's standard session folders. For Pi that is `~/.pi/agent/sessions`; a `PI_CODING_AGENT_DIR`, `PI_CODING_AGENT_SESSION_DIR`, or `sessionDir` setting on the host is not followed.
 
-- Click **Add SSH host…** at the bottom left of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code, Codex, Antigravity, and Kiro CLI sessions are listed under its own heading, below this Mac's.
-- Resume, branch, start, and delete sessions on the host over SSH, just like on this Mac.
+- Click **Add SSH host…** at the bottom left of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions are listed under its own heading, below this Mac's.
+- Resume, branch, start, and delete sessions on the host over SSH, just like on this Mac. SSH hosts have no Trash, so deleting a session there is permanent; for Pi, the folder beside the session file goes too.
 - Refresh updates every host at once. A host that can't be reached shows the error on its heading; the others still list.
 - With tmux on the host, a session there keeps running when the connection drops or the tab closes. Select the session to reattach.
 

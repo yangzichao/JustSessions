@@ -12,13 +12,14 @@ struct RemoteHostStatusProbeTests {
             \(RemoteHostStatusProbe.installedCLIsHeading)
             codex
             pi
+            opencode
 
             """
 
         let status = RemoteHostStatusProbe.status(inOutput: output)
 
         #expect(status.tmuxSessionNames == ["justsessions-claude-01a0cf02-2025-7990-8bb2-80feff2349d4"])
-        #expect(status.installedProviders == [.codex])
+        #expect(status.installedProviders == [.codex, .pi])
     }
 
     @Test func noCLIsBelowTheHeadingMeansNoneAreInstalled() {
@@ -49,7 +50,7 @@ struct RemoteHostStatusProbeTests {
         let bin = root.appendingPathComponent("bin")
         try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
         try writeExecutableScript("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
-        for executableName in ["codex", "agy", "kiro-cli", "pi"] {
+        for executableName in ["codex", "agy", "kiro-cli", "pi", "opencode"] {
             try writeExecutableScript("#!/bin/sh\nexit 0\n", to: bin.appendingPathComponent(executableName))
         }
 
@@ -60,7 +61,7 @@ struct RemoteHostStatusProbeTests {
             timeout: 10
         )
 
-        // Pi runs only on this Mac, so the probe does not look for it.
-        #expect(RemoteHostStatusProbe.status(inOutput: try #require(output)).installedProviders == [.codex, .antigravity, .kiro])
+        // OpenCode runs only on this Mac, so the probe does not look for it.
+        #expect(RemoteHostStatusProbe.status(inOutput: try #require(output)).installedProviders == [.codex, .antigravity, .kiro, .pi])
     }
 }

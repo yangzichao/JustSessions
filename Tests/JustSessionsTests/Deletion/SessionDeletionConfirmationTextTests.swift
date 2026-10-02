@@ -87,6 +87,7 @@ struct SessionDeletionConfirmationTextTests {
         (.pi, .thisMac, "The Pi session file and its associated folder will move to the macOS Trash."),
         (.claude, .ssh("devbox"), "This session will be permanently deleted on devbox. SSH hosts have no Trash, so this cannot be undone."),
         (.codex, .ssh("me@build"), "This session will be permanently deleted on me@build. SSH hosts have no Trash, so this cannot be undone."),
+        (.pi, .ssh("devbox"), "The Pi session file and its associated folder will be permanently deleted on devbox. SSH hosts have no Trash, so this cannot be undone."),
     ])
     func oneSessionSaysWhereItGoes(provider: ConversationProvider, host: SessionHost, expectedMessage: String) {
         let conversation = Conversation.fixture(provider: provider, host: host)

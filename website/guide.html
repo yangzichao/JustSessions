@@ -99,7 +99,7 @@
               <tr data-provider="antigravity"><th scope="row">Google Antigravity CLI <code>agy</code></th><td>Yes</td><td><code>/fork</code> in CLI</td><td>Yes</td><td>Yes</td></tr>
               <tr data-provider="kiro"><th scope="row">Kiro CLI <code>kiro-cli</code></th><td>Yes</td><td>Use <code>/rewind</code> in the CLI</td><td>Yes</td><td>Yes</td></tr>
               <tr data-provider="opencode"><th scope="row">OpenCode <code>opencode</code></th><td>Not yet</td><td>Yes</td><td>Not yet</td><td>Not yet</td></tr>
-              <tr data-provider="pi"><th scope="row">Pi <code>pi</code></th><td>Yes</td><td>Yes</td><td>Not yet</td><td>Yes</td></tr>
+              <tr data-provider="pi"><th scope="row">Pi <code>pi</code></th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
             </tbody>
           </table>
         </div>
@@ -108,7 +108,7 @@
 
       <section id="ssh-hosts" aria-labelledby="ssh-title">
         <h2 id="ssh-title">Continue on another machine over SSH</h2>
-        <p>The host needs passwordless SSH, <code>rsync</code>, and Claude Code, Codex, Antigravity, or Kiro CLI installed.</p>
+        <p>The host needs passwordless SSH, <code>rsync</code>, and Claude Code, Codex, Antigravity, Kiro CLI, or Pi installed.</p>
         <p class="fine-print">Antigravity hosts also need <code>python3</code>; deleting their sessions needs <code>lsof</code>.</p>
         <ol><li>Choose <strong>Add SSH host…</strong> in the sidebar.</li><li>Enter a <code>~/.ssh/config</code> alias or <code>user@hostname</code>.</li><li>Browse the host's projects and resume a session there.</li></ol>
         <p>The code and CLI run remotely; supported history is cached on your Mac. JustSessions provides terminal access, not graphical screen sharing.</p>
@@ -127,7 +127,7 @@
           <li>Clear the CLI and recent-session filters, then refresh the sidebar.</li>
           <li>Confirm the CLI runs in your usual terminal. New session menus offer only installed tools.</li>
           <li>Start one conversation so the CLI creates history. Kiro sessions need a message; archived and subagent OpenCode sessions are excluded.</li>
-          <li>For SSH, check passwordless access, <code>rsync</code>, and the remote CLI. Remote history uses the host's standard Claude Code, Codex, Antigravity, and Kiro CLI folders.</li>
+          <li>For SSH, check passwordless access, <code>rsync</code>, and the remote CLI. Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders.</li>
         </ul>
       </section>
 
