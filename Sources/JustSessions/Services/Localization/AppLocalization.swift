@@ -2,7 +2,13 @@ import Foundation
 
 /// AppKit panels share SwiftUI's language choice. Typed values preserve interpolation and compiler extraction.
 enum AppLocalization {
-    static let resourceBundle = Bundle.module
+    /// The packaged app keeps SwiftPM's resource bundle in Contents/Resources. `Bundle.module` never looks there:
+    /// it checks only the .app root and the absolute path of the machine that built it, then stops the app.
+    static let resourceBundle = packagedResourceBundle(in: .main) ?? .module
+
+    static func packagedResourceBundle(in appBundle: Bundle) -> Bundle? {
+        appBundle.resourceURL.flatMap { Bundle(url: $0.appendingPathComponent("JustSessions_JustSessions.bundle")) }
+    }
     static var developmentLanguage: AppInterfaceLanguage {
         AppInterfaceLanguage(identifier: resourceBundle.developmentLocalization ?? "en")
     }
