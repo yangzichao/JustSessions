@@ -10,7 +10,7 @@ Requires macOS 14+ and a Swift 6 toolchain (Xcode Command Line Tools). Run these
 make check  # Compile the Swift development build
 make test   # Run tests against the bundled tmux runtime
 make        # Package dist/JustSessions.app, including tmux
-make dev    # Build and open the app
+make dev    # Build the app, quit its running copy, and open it
 ```
 
 `make help` lists the commands. `make run` is an alias for `make dev`. `make dmg` packages `dist/JustSessions.dmg`, and `make website` builds and validates the product site. Set `APP_BUNDLE_PATH` or `INSTALLER_PATH` to change the output paths, for example `make build APP_BUNDLE_PATH="dist/JustSessions Preview.app"`. The targets use the existing build scripts and respect their version and signing environment variables.

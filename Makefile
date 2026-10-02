@@ -12,7 +12,7 @@ build:
 	./Scripts/build-app.sh "$(APP_BUNDLE_PATH)"
 
 dev run: build
-	open "$(APP_BUNDLE_PATH)"
+	./Scripts/open-dev-app.sh "$(APP_BUNDLE_PATH)"
 
 check:
 	swift build
@@ -30,7 +30,7 @@ website:
 help:
 	@printf '%s\n' \
 		'make           Build dist/JustSessions.app with bundled tmux' \
-		'make dev       Build and open the app' \
+		'make dev       Build the app, quit its running copy, and open it' \
 		'make run       Alias for make dev' \
 		'make check     Compile the Swift development build' \
 		'make test      Build bundled tmux and run the Swift tests' \

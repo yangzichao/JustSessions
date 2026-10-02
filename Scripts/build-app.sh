@@ -6,6 +6,13 @@ cd "$project_directory"
 swift build -c release
 
 app_directory="${1:-$project_directory/dist/JustSessions.app}"
+if [[ "$app_directory" != *.app ]]; then
+    print -u2 "The app bundle path must end in .app: $app_directory"
+    exit 1
+fi
+# Once the app has been opened, macOS App Management refuses writes inside its bundle ("Operation not permitted"),
+# but still allows removing the bundle. Each build assembles a fresh one.
+rm -rf "$app_directory"
 mkdir -p "$app_directory/Contents/MacOS" "$app_directory/Contents/Resources" "$app_directory/Contents/Frameworks"
 cp "$project_directory/.build/release/JustSessions" "$app_directory/Contents/MacOS/JustSessions"
 install_name_tool -add_rpath @executable_path/../Frameworks "$app_directory/Contents/MacOS/JustSessions"
