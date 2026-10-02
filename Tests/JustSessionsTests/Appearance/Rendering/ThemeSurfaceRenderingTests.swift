@@ -58,10 +58,13 @@ struct ThemeSurfaceRenderingTests {
         let renderingScale = Double(bitmap.pixelsWide) / viewWidth
         let edgeInset = Int(20 * renderingScale)
         let actionRows = (bitmap.pixelsHigh - Int(50 * renderingScale))..<(bitmap.pixelsHigh - Int(6 * renderingScale))
+        // Without a Retina display, as on CI, each link has only about 40 pixels of solid ink; the rest of its text
+        // is antialiased. With the links in another color, other text still leaves up to about 18 in the narrow window.
+        let minimumInkPixels = Int(30 * renderingScale * renderingScale)
         let linkPixels = matchingPixelCount(ink, in: bitmap, columns: edgeInset..<(bitmap.pixelsWide / 3), rows: actionRows)
-        #expect(linkPixels > Int(50 * renderingScale * renderingScale), "\(description) guide link uses theme ink")
+        #expect(linkPixels > minimumInkPixels, "\(description) guide link uses theme ink")
         let issueLinkPixels = matchingPixelCount(ink, in: bitmap, columns: (bitmap.pixelsWide * 2 / 3)..<(bitmap.pixelsWide - edgeInset), rows: actionRows)
-        #expect(issueLinkPixels > Int(50 * renderingScale * renderingScale), "\(description) issue link uses theme ink")
+        #expect(issueLinkPixels > minimumInkPixels, "\(description) issue link uses theme ink")
     }
 
     private func matchingPixelCount(_ color: UInt32, in bitmap: NSBitmapImageRep, columns: Range<Int>, rows: Range<Int>) -> Int {
