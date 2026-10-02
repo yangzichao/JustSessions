@@ -31,9 +31,9 @@ extension ConversationStore {
         switch session.host {
         case .thisMac:
             guard let tmuxServer = commandResolver.thisMacTmuxServer() else { return }
-            Task.detached(priority: .utility) { tmuxServer.renameSession(from: currentName, to: sessionName) }
+            tmuxCommandQueues.run(on: .thisMac) { tmuxServer.renameSession(from: currentName, to: sessionName) }
         case .ssh(let host):
-            Task.detached(priority: .utility) {
+            tmuxCommandQueues.run(on: session.host) {
                 _ = remoteRunner.run(host, RemoteTmuxCommands.renameSessionCommand(from: currentName, to: sessionName), 30)
             }
         }
@@ -53,9 +53,9 @@ extension ConversationStore {
         case .thisMac:
             thisMacTmuxPaneProcessIDs[name] = nil
             guard let tmuxServer = commandResolver.thisMacTmuxServer() else { return }
-            Task.detached(priority: .utility) { tmuxServer.killSession(named: name) }
+            tmuxCommandQueues.run(on: .thisMac) { tmuxServer.killSession(named: name) }
         case .ssh(let destination):
-            Task.detached(priority: .utility) {
+            tmuxCommandQueues.run(on: host) {
                 _ = remoteRunner.run(destination, RemoteTmuxCommands.killSessionCommand(name), 30)
             }
         }

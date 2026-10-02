@@ -31,6 +31,8 @@ final class ConversationStore: ObservableObject {
     @Published var detachedCLIActivities: [String: CLIActivity] = [:]
     /// The CLI of each tmux session on this Mac, by session name, as of the last refresh or the closing of its tab.
     var thisMacTmuxPaneProcessIDs: [String: Int32] = [:]
+    /// Renames and kills of tmux sessions, in order per host; see `ConversationStore+Tmux`.
+    let tmuxCommandQueues = TmuxCommandQueues()
     let codexTurnTracker = CodexRolloutTurnTracker()
     /// What each CLI on this Mac did at the last activity sync; see `ConversationStore+SessionNotifications`.
     var sessionAttentionTracker = SessionAttentionTracker()
