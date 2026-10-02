@@ -4,7 +4,9 @@ import Foundation
 /// so a slow or unreachable host never holds up the rest of the list.
 extension ConversationStore {
     func refreshRemoteHost(_ host: String, discovery: RemoteSessionDiscovery = RemoteSessionDiscovery()) {
-        guard remoteHostList.hosts.contains(host), hostRefreshStatuses[.ssh(host)] != .refreshing else { return }
+        guard remoteHostList.hosts.contains(host),
+              !deferRefreshWhileDeleting(on: .ssh(host)),
+              hostRefreshStatuses[.ssh(host)] != .refreshing else { return }
         hostRefreshStatuses[.ssh(host)] = .refreshing
         Task.detached(priority: .userInitiated) {
             // The last copy lists right away; the host may be slow or offline.

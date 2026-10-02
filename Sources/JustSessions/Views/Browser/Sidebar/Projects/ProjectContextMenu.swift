@@ -46,6 +46,6 @@ struct ProjectContextMenu: View {
             role: .destructive,
             action: onDeleteSessions
         )
-        .disabled(!deletionPlan.hasDeletableConversations || !store.canStartDeletion)
+        .disabled(!deletionPlan.hasDeletableConversations || !store.canStartDeletion(of: deletionPlan.deletableConversations))
     }
 }

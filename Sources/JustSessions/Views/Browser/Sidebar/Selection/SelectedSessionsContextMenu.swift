@@ -20,7 +20,7 @@ struct SelectedSessionsContextMenu: View {
         .disabled(branchableCount == 0)
         Divider()
         Button("Delete \(sessionCountLabel(selectedConversations.count))…", systemImage: "trash", role: .destructive, action: onDelete)
-            .disabled(!store.canStartDeletion)
+            .disabled(!store.canStartDeletion(of: selectedConversations))
     }
 
     private func sessionCountLabel(_ count: Int) -> String {

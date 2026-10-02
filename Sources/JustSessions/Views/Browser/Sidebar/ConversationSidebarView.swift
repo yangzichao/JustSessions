@@ -138,7 +138,7 @@ struct ConversationSidebarView: View {
                 ThemeDivider()
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
-                    isDeleteDisabled: !store.canStartDeletion,
+                    isDeleteDisabled: !store.canStartDeletion(of: selectedConversations),
                     onDelete: { onRequestDeletion(.conversations(selectedConversations)) }
                 )
             }

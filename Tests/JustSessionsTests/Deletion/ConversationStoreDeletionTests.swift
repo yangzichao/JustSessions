@@ -118,13 +118,13 @@ struct ConversationStoreDeletionTests {
         let store = sandbox.makeStore(listing: [first, second])
 
         store.delete(first)
-        #expect(!store.canStartDeletion)
+        #expect(!store.canStartDeletion(of: [second]))
         store.delete(second)
         store.deleteConversations([second])
         #expect(!store.isDeletionPending(for: second))
         try await expectEventually { !store.isDeletingSessions }
 
-        #expect(store.canStartDeletion)
+        #expect(store.canStartDeletion(of: [second]))
         #expect(store.conversations.map(\.id) == [second.id])
         #expect(sandbox.fileExists(for: second))
     }
@@ -135,7 +135,7 @@ struct ConversationStoreDeletionTests {
         let conversation = try sandbox.savedConversation()
         let store = sandbox.makeStore(listing: [conversation])
         store.hostRefreshStatuses[.thisMac] = .refreshing
-        #expect(!store.canStartDeletion)
+        #expect(!store.canStartDeletion(of: [conversation]))
 
         store.delete(conversation)
         store.deleteConversations([conversation])

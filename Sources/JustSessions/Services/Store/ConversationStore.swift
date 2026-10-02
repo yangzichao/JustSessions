@@ -40,6 +40,9 @@ final class ConversationStore: ObservableObject {
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
     private var isRefreshQueued = false
+    /// The hosts the running deletion deletes from. A refresh of one waits until it ends, see `deferRefreshWhileDeleting(on:)`.
+    private var hostsWithRunningDeletion: Set<SessionHost> = []
+    private var hostsToRefreshAfterDeletion: Set<SessionHost> = []
 
     private let adapters: [any ConversationAdapter]
     let commandResolver: NativeCLICommandResolver
@@ -78,7 +81,7 @@ final class ConversationStore: ObservableObject {
 
     /// Scans the session folders on this Mac. SSH hosts refresh on their own, so a slow host never holds this up.
     func refreshThisMac() {
-        guard !isDeletingSessions else { return }
+        guard !deferRefreshWhileDeleting(on: .thisMac) else { return }
         guard !isScanningThisMac else {
             isRefreshQueued = true
             return
@@ -176,9 +179,17 @@ final class ConversationStore: ObservableObject {
         deletingConversationID != nil || !batchDeletionConversationIDs.isEmpty
     }
 
-    /// A deletion waits for this Mac's scan and for the deletion already running.
-    var canStartDeletion: Bool {
-        !isScanningThisMac && !isDeletingSessions
+    /// A deletion waits for the deletion already running, and for the refresh of any host it deletes from: that
+    /// refresh may have read a session before it was deleted and would list it again.
+    func canStartDeletion(of candidateConversations: [Conversation]) -> Bool {
+        !isDeletingSessions && !candidateConversations.contains { hostRefreshStatuses[$0.host] == .refreshing }
+    }
+
+    /// Returns true when a deletion runs on `host`; its refresh then starts once the deletion ends, for the same reason.
+    func deferRefreshWhileDeleting(on host: SessionHost) -> Bool {
+        guard hostsWithRunningDeletion.contains(host) else { return false }
+        hostsToRefreshAfterDeletion.insert(host)
+        return true
     }
 
     func isDeletionPending(for conversation: Conversation) -> Bool {
@@ -204,7 +215,7 @@ final class ConversationStore: ObservableObject {
             errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
             return
         }
-        guard canStartDeletion, adapter(for: conversation.provider) != nil else { return }
+        guard canStartDeletion(of: [conversation]), adapter(for: conversation.provider) != nil else { return }
         deletingConversationID = conversation.id
         deleteInBackground([conversation], failureMessage: ConversationDeletionFailure.messageAfterDeletingOneSession)
     }
@@ -215,10 +226,9 @@ final class ConversationStore: ObservableObject {
 
     /// Deletes every deletable conversation in the list; open terminals and unsupported providers are skipped.
     func deleteConversations(_ candidateConversations: [Conversation]) {
-        guard canStartDeletion else { return }
         let candidateIDs = Set(candidateConversations.map(\.id))
         let deletionPlan = deletionPlan(for: conversations.filter { candidateIDs.contains($0.id) })
-        guard deletionPlan.hasDeletableConversations else { return }
+        guard deletionPlan.hasDeletableConversations, canStartDeletion(of: deletionPlan.deletableConversations) else { return }
 
         batchDeletionConversationIDs = Set(deletionPlan.deletableConversations.map(\.id))
         deleteInBackground(
@@ -234,6 +244,7 @@ final class ConversationStore: ObservableObject {
         failureMessage: @escaping @Sendable ([ConversationDeletionFailure]) -> String
     ) {
         let adapters = self.adapters
+        hostsWithRunningDeletion = Set(deletableConversations.map(\.host))
         Task.detached(priority: .userInitiated) {
             var failures: [ConversationDeletionFailure] = []
             for conversation in deletableConversations {
@@ -256,6 +267,10 @@ final class ConversationStore: ObservableObject {
                 self.deletingConversationID = nil
                 self.batchDeletionConversationIDs = []
                 if !finalFailures.isEmpty { self.errorMessage = failureMessage(finalFailures) }
+                self.hostsWithRunningDeletion = []
+                let hostsToRefresh = self.hostsToRefreshAfterDeletion
+                self.hostsToRefreshAfterDeletion = []
+                for host in self.hosts where hostsToRefresh.contains(host) { self.refresh(host) }
             }
         }
     }
