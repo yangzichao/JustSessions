@@ -15,7 +15,7 @@ struct TranscriptSearchIndex: Sendable {
         for (entryOffset, entry) in transcript.entries.enumerated() {
             try Task.checkCancellation()
             segments += TranscriptSearchSegments.texts(in: entry.content).enumerated().map { segmentIndex, text in
-                Segment(entryIndex: transcript.omittedEntryCount + entryOffset, segmentIndex: segmentIndex, text: text)
+                Segment(entryIndex: transcript.positionID(at: entryOffset), segmentIndex: segmentIndex, text: text)
             }
         }
         self.segments = segments

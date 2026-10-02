@@ -25,7 +25,7 @@ struct AntigravityTranscriptReader {
         return builder.build()
     }
 
-    private func append(stepType: Int32, payload: Data, to builder: inout TranscriptBuilder) {
+    func append(stepType: Int32, payload: Data, to builder: inout TranscriptBuilder) {
         let status = AntigravityProtobuf.integer(in: payload, field: 4)
         guard status != 4, status != 5 else { return } // Invalid or cleared by rewind/compaction.
         let timestamp = AntigravityTranscriptTimestamp.date(in: payload)

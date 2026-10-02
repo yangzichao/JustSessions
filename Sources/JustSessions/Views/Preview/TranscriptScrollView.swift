@@ -4,8 +4,9 @@ struct TranscriptScrollView: View {
     let conversation: Conversation
     let transcript: TranscriptContent
     let isActive: Bool
-    @State private var visibleEntryIndex: Int?
-    @State private var positionController: TranscriptScrollPositionController
+    let paging: TranscriptPagingModel?
+    @State var visibleEntryIndex: Int?
+    @State var positionController: TranscriptScrollPositionController
     @State private var readingFontSize: CGFloat = 15
     @State var searchState: TranscriptSearchState
     @State var searchIndex: TranscriptSearchIndex?
@@ -16,11 +17,12 @@ struct TranscriptScrollView: View {
 
     init(
         conversation: Conversation, transcript: TranscriptContent, positionStore: TranscriptReadingPositionStore,
-        isActive: Bool = true, searchState: TranscriptSearchState = TranscriptSearchState()
+        isActive: Bool = true, searchState: TranscriptSearchState = TranscriptSearchState(), paging: TranscriptPagingModel? = nil
     ) {
         self.conversation = conversation
         self.transcript = transcript
         self.isActive = isActive
+        self.paging = paging
         _searchState = State(initialValue: searchState)
         let initialPosition = (positionStore.position(for: conversation.id) ?? .bottom).resolved(in: transcript)
         self.initialPosition = initialPosition
@@ -41,21 +43,14 @@ struct TranscriptScrollView: View {
                             fontSize: $readingFontSize,
                             readingWidth: $readingWidth,
                             messageCount: messageCount,
-                            onFirstMessage: {
-                                guard let index = displayedEntryIndices.first else { return }
-                                positionController.restore(.entry(index: index, offset: -6))
-                                visibleEntryIndex = index
-                            },
-                            onLatestMessage: {
-                                positionController.restore(.bottom)
-                                visibleEntryIndex = displayedEntryIndices.last
-                            },
+                            onFirstMessage: showFirstMessage,
+                            onLatestMessage: showLatestMessage,
                             onFind: searchState.show
                         )
                         .disabled(!isActive)
                         if searchState.isPresented {
                             ThemeDivider()
-                            TranscriptSearchBar(searchState: searchState, hasOmittedEntries: transcript.omittedEntryCount > 0)
+                            TranscriptSearchBar(searchState: searchState, hasOmittedEntries: transcript.omittedEntryCount > 0 || paging?.hasEarlier == true || paging?.hasLater == true)
                         }
                         ThemeDivider()
                     }
@@ -84,6 +79,9 @@ struct TranscriptScrollView: View {
                 .onChange(of: searchState.isPresented) { positionController.restoreRecordedPosition() }
                 .onChange(of: readingFontSize) { positionController.restoreRecordedPosition() }
                 .onChange(of: readingWidth) { positionController.restoreRecordedPosition() }
+                .onChange(of: paging?.revision) { restorePagedPosition(using: scrollProxy) }
+                .onChange(of: visibleEntryIndex) { prefetchIfNeeded() }
+                .onAppear { positionController.tracksTranscriptBottom = paging?.hasLater != true }
                 .onReceive(positionController.entrySeekingRequests) { index in
                     scrollProxy.scrollTo(index, anchor: .top)
                 }
@@ -96,7 +94,10 @@ struct TranscriptScrollView: View {
     private var transcriptScrollView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                if transcript.omittedEntryCount > 0 {
+                if let paging, paging.hasEarlier {
+                    TranscriptPageBoundary(isEarlier: true, isLoading: paging.isLoading, action: loadEarlierPage)
+                        .disabled(!isActive)
+                } else if transcript.omittedEntryCount > 0 {
                     Text("\(transcript.omittedEntryCount) earlier entries are not shown. Resume the session to see all of it.")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
@@ -105,6 +106,13 @@ struct TranscriptScrollView: View {
                 }
                 // Only messages participate in scroll targeting; the omitted-entry notice has no message index.
                 transcriptEntries
+                if let paging, paging.hasLater {
+                    TranscriptPageBoundary(isEarlier: false, isLoading: paging.isLoading, action: loadLaterPage)
+                        .disabled(!isActive)
+                }
+                if let message = paging?.errorMessage {
+                    Text(verbatim: message).font(.caption).foregroundStyle(ThemePalette.secondaryText).padding(12)
+                }
             }
             .frame(maxWidth: readingWidth.maximumColumnWidth, alignment: .leading)
             .padding(.horizontal, 24)
@@ -120,10 +128,10 @@ struct TranscriptScrollView: View {
 
     private var transcriptEntries: some View {
         LazyVStack(alignment: .leading, spacing: 0) {
-            ForEach(displayedEntryIndices, id: \.self) { entryIndex in
-                let entry = transcript.entries[entryIndex - transcript.omittedEntryCount]
+            ForEach(transcript.positionedEntries) { positionedEntry in
+                let entryIndex = positionedEntry.id
                 TranscriptEntryView(
-                    entry: entry,
+                    entry: positionedEntry.entry,
                     assistantName: conversation.provider.rawValue,
                     assistantTint: conversation.provider.tintColor
                 )
@@ -135,9 +143,7 @@ struct TranscriptScrollView: View {
         .scrollTargetLayout()
     }
 
-    private var displayedEntryIndices: Range<Int> {
-        transcript.omittedEntryCount..<(transcript.omittedEntryCount + transcript.entries.count)
-    }
+    var displayedEntryIndices: [Int] { transcript.positionIDs }
 
     private var scrollTarget: Binding<Int?> {
         Binding(

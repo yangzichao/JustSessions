@@ -282,6 +282,10 @@
 	<string>浅色</string>
 	<key>List the sessions on another machine you reach with ssh</key>
 	<string>列出可通过 SSH 连接的另一台机器上的会话</string>
+	<key>Load earlier messages</key>
+	<string>加载更早的消息</string>
+	<key>Load later messages</key>
+	<string>加载后续消息</string>
 	<key>Match app</key>
 	<string>与应用一致</string>
 	<key>More actions</key>
@@ -553,6 +557,8 @@
 	<key>Tool filter: All tools</key>
 	<string>工具筛选：所有工具</string>
 	<key>Try Again</key>
+	<string>重试</string>
+	<key>Try again</key>
 	<string>重试</string>
 	<key>Unknown error</key>
 	<string>未知错误</string>

@@ -22,6 +22,8 @@ final class TranscriptScrollPositionController {
     private var geometryStableSince: TimeInterval = 0
 
     var isRestoring: Bool { pendingRestoration != nil }
+    var recordedPosition: TranscriptReadingPosition? { positionStore.position(for: conversationID) }
+    var tracksTranscriptBottom = true
     let entrySeekingRequests = PassthroughSubject<Int, Never>()
 
     init(conversationID: String, positionStore: TranscriptReadingPositionStore, initialPosition: TranscriptReadingPosition) {
@@ -138,7 +140,7 @@ final class TranscriptScrollPositionController {
         guard pendingRestoration == nil, !isStopped, let scrollView else { return }
         let clipView = scrollView.contentView
         let visibleBounds = clipView.bounds
-        if clipView.documentRect.maxY - visibleBounds.maxY <= 2 {
+        if tracksTranscriptBottom, clipView.documentRect.maxY - visibleBounds.maxY <= 2 {
             positionStore.record(.bottom, for: conversationID)
             return
         }

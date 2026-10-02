@@ -6,54 +6,50 @@ struct TranscriptView: View {
     let readingPositionStore: TranscriptReadingPositionStore
     var isActive = true
 
-    private enum LoadState: Equatable {
-        case loading
-        case loaded(TranscriptContent)
-        case unsupported
-        case failed(String)
-    }
-
     private struct LoadKey: Equatable {
         let conversationID: String
         let updatedAt: Date
     }
 
-    @State private var loadState: LoadState = .loading
+    @State private var paging = TranscriptPagingModel()
 
     var body: some View {
         content
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .task(id: LoadKey(conversationID: conversation.id, updatedAt: conversation.updatedAt)) {
-                do {
-                    switch try await TranscriptLoader.load(conversation) {
-                    case .loaded(let transcript): loadState = .loaded(transcript)
-                    case .unsupported: loadState = .unsupported
-                    }
-                } catch is CancellationError {
-                    // A newer load replaced this one.
-                } catch {
-                    loadState = .failed(error.localizedDescription)
+                if isActive, TranscriptLoader.supportsReading(conversation.provider) {
+                    paging.refresh(conversation, position: readingPositionStore.position(for: conversation.id))
                 }
             }
+            .onChange(of: isActive) {
+                if isActive, TranscriptLoader.supportsReading(conversation.provider) {
+                    paging.refresh(conversation, position: readingPositionStore.position(for: conversation.id))
+                } else { paging.cancel() }
+            }
+            .onDisappear { paging.cancel() }
     }
 
     @ViewBuilder
     private var content: some View {
-        switch loadState {
-        case .loading:
-            ProgressView().controlSize(.small)
-        case .unsupported:
+        if !TranscriptLoader.supportsReading(conversation.provider) {
             ContentUnavailableView(
                 "Preview not available",
                 systemImage: "eye.slash",
                 description: Text("JustSessions can't read \(conversation.provider.rawValue) conversations yet. Resume the session to see it.")
             )
-        case .failed(let message):
-            ContentUnavailableView("Could not read this session", systemImage: "exclamationmark.triangle", description: Text(message))
-        case .loaded(let transcript) where transcript.entries.isEmpty:
+        } else if let transcript = paging.transcript, !transcript.entries.isEmpty {
+            TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: readingPositionStore,
+                                 isActive: isActive, paging: paging)
+        } else if let message = paging.errorMessage {
+            VStack {
+                ContentUnavailableView("Could not read this session", systemImage: "exclamationmark.triangle", description: Text(message))
+                Button("Try again") { paging.refresh(conversation, position: readingPositionStore.position(for: conversation.id)) }
+                    .buttonStyle(.borderless)
+            }
+        } else if paging.transcript != nil {
             ContentUnavailableView("No messages yet", systemImage: "text.bubble")
-        case .loaded(let transcript):
-            TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: readingPositionStore, isActive: isActive)
+        } else {
+            ProgressView().controlSize(.small)
         }
     }
 }

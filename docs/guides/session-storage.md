@@ -29,6 +29,8 @@ Pi previews follow the branch the session is on now, from its `.jsonl` file: pro
 
 Current source builds keep a session's reading position, including an offset within a long message, in memory for the workspace window's lifetime. Separate reading windows start at the preview's position and keep their own position until they close. Positions are not written to CLI history or persisted across app restarts. Reading a conversation does not launch a CLI or modify the saved session.
 
+Reading uses up to three nearby pages, normally about 80 entries per page. Pages also have byte and source-record budgets; all parts of one source record stay together. JSONL readers build a lightweight byte-offset index instead of decoding the entire history. Pi also resolves its active branch from parent links, and Antigravity reads selected step payloads from a consistent SQLite snapshot. A source record above 16 MiB is not decoded for preview; Pi reports an error if such a record prevents correct branch selection. Export continues to use the full transcript loader rather than the page window.
+
 ## CLI launch and discovery
 
 The app runs each CLI in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it combines the inherited `PATH` with the user's login-shell `PATH` and common installation folders, including Homebrew and Node version manager locations. Session discovery reads existing files; app startup also reads the login shell's `PATH`, and tmux integration checks its version and running sessions.

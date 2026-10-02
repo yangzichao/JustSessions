@@ -32,7 +32,7 @@ struct PiTranscriptReader {
         return builder.build()
     }
 
-    private func append(_ entry: PiSessionEntry, to builder: inout TranscriptBuilder) {
+    func append(_ entry: PiSessionEntry, to builder: inout TranscriptBuilder) {
         guard let previewedEntry = entry.previewedEntry else { return }
         let timestamp = entry.timestamp.flatMap(ISO8601TimestampParser.shared.date(from:))
         let message = entry.message

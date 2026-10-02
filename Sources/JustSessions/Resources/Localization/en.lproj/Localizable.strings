@@ -290,6 +290,10 @@
 	<string>Light</string>
 	<key>List the sessions on another machine you reach with ssh</key>
 	<string>List the sessions on another machine you reach with ssh</string>
+	<key>Load earlier messages</key>
+	<string>Load earlier messages</string>
+	<key>Load later messages</key>
+	<string>Load later messages</string>
 	<key>Markdown (.md)…</key>
 	<string>Markdown (.md)…</string>
 	<key>Match app</key>
@@ -558,6 +562,8 @@
 	<string>Tool filter: All tools</string>
 	<key>Try Again</key>
 	<string>Try Again</string>
+	<key>Try again</key>
+	<string>Try again</string>
 	<key>Unknown error</key>
 	<string>Unknown error</string>
 	<key>Unpin project</key>

@@ -2,14 +2,16 @@ import Foundation
 
 enum TranscriptReadingPosition: Equatable {
     case bottom
-    /// The entry's index in the full transcript and the distance already read within that entry.
+    /// The entry's stable reading ID and the distance already read within that entry.
     case entry(index: Int, offset: CGFloat)
 
     func resolved(in transcript: TranscriptContent) -> TranscriptReadingPosition {
         guard case .entry(let index, let offset) = self,
-              let lastEntry = transcript.entries.last else { return self }
-        let firstIndex = transcript.omittedEntryCount
-        let lastIndex = firstIndex + lastEntry.id
+              let firstIndex = transcript.positionIDs.first, let lastIndex = transcript.positionIDs.last else { return self }
+        if transcript.usesEntryIDsForPositions {
+            let resolvedIndex = transcript.positionIDs.first(where: { $0 >= index }) ?? lastIndex
+            return .entry(index: resolvedIndex, offset: resolvedIndex == index ? offset : 0)
+        }
         return .entry(
             index: min(max(index, firstIndex), lastIndex),
             offset: (firstIndex...lastIndex).contains(index) ? offset : 0

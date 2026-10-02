@@ -20,9 +20,9 @@ final class TranscriptScrollViewFixture {
         window.contentView = hostingView
     }
 
-    func show(_ conversation: Conversation, transcript: TranscriptContent) async throws -> NSScrollView {
-        hostingView.rootView = AnyView(TranscriptScrollView(
-            conversation: conversation, transcript: transcript, positionStore: positionStore
+    func show(_ conversation: Conversation, transcript: TranscriptContent, paging: TranscriptPagingModel? = nil) async throws -> NSScrollView {
+        hostingView.rootView = AnyView(TranscriptPagingTestReader(
+            conversation: conversation, transcript: transcript, positionStore: positionStore, paging: paging
         ).id(conversation.id).defaultAppStorage(settings.userDefaults))
         try await settleLayout()
         return try #require(descendant(ofType: NSScrollView.self, in: hostingView))
@@ -123,5 +123,17 @@ final class TranscriptScrollViewFixture {
 
     private func descendants<ViewType: NSView>(ofType type: ViewType.Type, in view: NSView) -> [ViewType] {
         (view as? ViewType).map { [$0] } ?? view.subviews.flatMap { descendants(ofType: type, in: $0) }
+    }
+}
+
+private struct TranscriptPagingTestReader: View {
+    let conversation: Conversation
+    let transcript: TranscriptContent
+    let positionStore: TranscriptReadingPositionStore
+    let paging: TranscriptPagingModel?
+
+    var body: some View {
+        TranscriptScrollView(conversation: conversation, transcript: paging?.transcript ?? transcript,
+                             positionStore: positionStore, paging: paging)
     }
 }
