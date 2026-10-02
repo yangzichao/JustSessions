@@ -37,7 +37,7 @@ struct ThisMacTmuxStoreTests {
         #expect(tab.tmuxSessionName == tmuxSessionName)
         #expect(tab.command.executablePath == sandbox.server.executablePath)
         tab.startIfNeeded()
-        #expect(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] })
+        try #require(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
         try #require(await sandbox.waitForPaneProcess(in: store, for: tab))
         let cliProcessID = try #require(tab.tmuxPaneProcessID)
         try #require(cliProcessID > 0)
@@ -76,7 +76,7 @@ struct ThisMacTmuxStoreTests {
         #expect(tmuxSessionName.hasPrefix("justsessions-codex-new-"))
         #expect(tab.terminalView.sendsShiftReturnAsCSIu)
         tab.startIfNeeded()
-        #expect(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] })
+        try #require(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
 
         store.closeTerminal(tab.id, endingTmuxSession: true)
         #expect(store.terminalSessions.isEmpty)

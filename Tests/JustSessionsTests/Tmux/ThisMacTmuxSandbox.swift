@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 @testable import JustSessions
 
@@ -108,6 +109,18 @@ struct ThisMacTmuxSandbox {
             try? await Task.sleep(for: .milliseconds(100))
         }
         return false
+    }
+
+    /// Keep a failed real-terminal launch actionable on a headless CI runner.
+    @MainActor
+    func launchDiagnostics(for tab: TerminalSession) -> String {
+        let terminalOutput = String(decoding: tab.terminalView.getTerminal().getBufferAsData(), as: UTF8.self)
+        var descriptorLimit = rlimit()
+        getrlimit(RLIMIT_NOFILE, &descriptorLimit)
+        let openDescriptorCount = (0..<1024).filter { fcntl(Int32($0), F_GETFD) >= 0 }.count
+        return "client PID: \(tab.processID), exited: \(tab.hasExited), exit code: \(String(describing: tab.exitCode)); "
+            + "open descriptors below 1024: \(openDescriptorCount), limit: \(descriptorLimit.rlim_cur); "
+            + "socket directory: \(root.path); terminal output: \(terminalOutput)"
     }
 
     func tearDown() {
