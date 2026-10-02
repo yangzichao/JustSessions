@@ -2,10 +2,12 @@ import Foundation
 
 /// Reads the visible conversation from a Codex rollout file (`~/.codex/sessions/**/rollout-*.jsonl`).
 struct CodexTranscriptReader {
+    var maximumEntryCount = 2_000
+    var maximumTextLength = 12_000
     private static let transcriptPayloadTypes: Set<String> = ["message", "function_call", "custom_tool_call"]
 
     func read(_ file: URL) throws -> TranscriptContent {
-        var builder = TranscriptBuilder()
+        var builder = TranscriptBuilder(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength)
         try JSONLinesReader.forEachLine(in: file) { line in
             guard Self.mightContainTranscriptItem(line),
                   let record = ConversationMetadata.object(from: line) else { return }

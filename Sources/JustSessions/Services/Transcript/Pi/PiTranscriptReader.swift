@@ -4,6 +4,8 @@ import Foundation
 /// The file holds every branch of the session, so it is read twice: once to find the current branch from how its
 /// entries link together, then again to decode only that branch's entries.
 struct PiTranscriptReader {
+    var maximumEntryCount = 2_000
+    var maximumTextLength = 12_000
     /// Marks where the user went back to an earlier message and Pi summarized the branch they left.
     static let branchSummaryNoteText = "Returned to an earlier message; the branch left behind was summarized"
 
@@ -18,7 +20,7 @@ struct PiTranscriptReader {
         // Lines Pi appends after the first pass have higher indices than any of these, so they are left out.
         var remainingLineIndices = PiActiveBranch.entries(in: links).filter(\.mightBeShown).map(\.lineIndex)[...]
 
-        var builder = TranscriptBuilder()
+        var builder = TranscriptBuilder(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength)
         var lineIndex = 0
         try JSONLinesReader.forEachLine(in: file) { line in
             defer { lineIndex += 1 }

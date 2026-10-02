@@ -2,8 +2,11 @@ import Foundation
 
 /// Reads the visible conversation from a Claude Code session file (`~/.claude/projects/<project>/<session>.jsonl`).
 struct ClaudeTranscriptReader {
+    var maximumEntryCount = 2_000
+    var maximumTextLength = 12_000
+
     func read(_ file: URL) throws -> TranscriptContent {
-        var builder = TranscriptBuilder()
+        var builder = TranscriptBuilder(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength)
         try JSONLinesReader.forEachLine(in: file) { line in
             guard let record = ConversationMetadata.object(from: line) else { return }
             append(record, to: &builder)

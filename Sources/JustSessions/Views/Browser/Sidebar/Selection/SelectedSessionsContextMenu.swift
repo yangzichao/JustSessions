@@ -19,6 +19,10 @@ struct SelectedSessionsContextMenu: View {
         }
         .disabled(branchableCount == 0)
         Divider()
+        ConversationSharingMenuItems(selections: selectedConversations.map {
+            ConversationExportSelection(conversation: $0, title: store.title(for: $0))
+        })
+        Divider()
         Button("Delete \(sessionCountLabel(selectedConversations.count))…", systemImage: "trash", role: .destructive, action: onDelete)
             .disabled(!store.canStartDeletion(of: selectedConversations))
     }

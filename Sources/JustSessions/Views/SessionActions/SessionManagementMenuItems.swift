@@ -14,6 +14,8 @@ struct SessionManagementMenuItems: View {
         Button(isPinned ? "Unpin session" : "Pin session", systemImage: isPinned ? "pin.slash" : "pin") {
             store.setPinned(!isPinned, conversation: conversation)
         }
+        Divider()
+        ConversationSharingMenuItems(selections: [ConversationExportSelection(conversation: conversation, title: store.title(for: conversation))])
         Button("Copy session ID", systemImage: "doc.on.doc") {
             SessionLocationActions.copySessionID(conversation)
         }

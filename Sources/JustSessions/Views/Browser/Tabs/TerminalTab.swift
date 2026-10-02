@@ -27,6 +27,11 @@ struct TerminalTab: View {
                         if let conversation = session.conversation { onRename(conversation) }
                     }
                     .disabled(session.conversation == nil)
+                    if let conversation = session.conversation {
+                        Divider()
+                        ConversationSharingMenuItems(selections: [ConversationExportSelection(conversation: conversation, title: session.displayTitle)])
+                        Divider()
+                    }
                     Button("End session…", systemImage: "xmark", role: .destructive, action: onClose)
                 }
             }
