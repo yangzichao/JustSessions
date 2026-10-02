@@ -1,0 +1,9 @@
+# Pinned upstream release archives. Update checksums with each dependency upgrade.
+tmux_version=3.7c
+tmux_checksum=7c60cae9a0e25288e2e24750aafc9e8800fc7fd4555e447e1b29ee4201cfb3bf
+libevent_version=2.1.13-stable
+libevent_checksum=f7e9383b8c0baa81b687e5b5eecc01beefaf1b19b64151d95ed61647fe7a315c
+ncurses_version=6.6
+ncurses_checksum=355b4cbbed880b0381a04c46617b7656e362585d52e9cf84a67e2009b749ff11
+utf8proc_version=2.12.0
+utf8proc_checksum=a393fbef160835fb315bc3e91ba8d86f7a73a7cec9e6198b6c60b848b498bfeb

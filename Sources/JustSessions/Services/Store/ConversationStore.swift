@@ -82,7 +82,6 @@ final class ConversationStore: ObservableObject {
         lastRefreshStartedAt = .now
         let adapters = self.adapters
         let commandResolver = self.commandResolver
-        let installedTmux = commandResolver.installedTmuxServer()
         Task.detached(priority: .userInitiated) {
             var found: [Conversation] = []
             var failures: [String] = []
@@ -92,7 +91,7 @@ final class ConversationStore: ObservableObject {
             }
             let installedProviders = InstalledCLIs.onThisMac(commandResolver: commandResolver)
             // The first refresh also checks the tmux version, so tabs can run in tmux from then on.
-            let tmuxPaneProcessIDs = installedTmux.map { $0.hasSupportedVersion() ? $0.appSessionPaneProcessIDs() : [:] } ?? [:]
+            let tmuxPaneProcessIDs = commandResolver.refreshThisMacTmuxServer()?.appSessionPaneProcessIDs() ?? [:]
             await MainActor.run {
                 self.tmuxSessionNamesByHost[.thisMac] = Set(tmuxPaneProcessIDs.keys)
                 self.thisMacTmuxPaneProcessIDs = tmuxPaneProcessIDs

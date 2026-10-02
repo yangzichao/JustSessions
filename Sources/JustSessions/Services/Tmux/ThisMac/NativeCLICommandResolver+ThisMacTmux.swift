@@ -1,9 +1,25 @@
 import Foundation
 
 extension NativeCLICommandResolver {
-    /// The tmux installed on this Mac, whatever its version. It is looked up where the CLIs are.
+    /// The selected tmux, or the bundled-first candidate before the first background refresh.
     func installedTmuxServer() -> ThisMacTmuxServer? {
-        executablePath(named: "tmux").map { ThisMacTmuxServer(executablePath: $0, environment: inheritedEnvironment) }
+        tmuxSelection.server ?? availableTmuxServers().first
+    }
+
+    func availableTmuxServers() -> [ThisMacTmuxServer] {
+        var servers: [ThisMacTmuxServer] = []
+        if let bundled = bundledTmuxRuntime?.server(environment: inheritedEnvironment, fileManager: fileManager) {
+            servers.append(bundled)
+        }
+        if let installedPath = executablePath(named: "tmux"), !servers.contains(where: { $0.executablePath == installedPath }) {
+            servers.append(ThisMacTmuxServer(executablePath: installedPath, environment: inheritedEnvironment))
+        }
+        return servers
+    }
+
+    /// Checks versions and existing servers off the main thread, preserving previously running work.
+    func refreshThisMacTmuxServer() -> ThisMacTmuxServer? {
+        tmuxSelection.select(from: availableTmuxServers())
     }
 
     /// The tmux new tabs run their CLI in: installed and known to be new enough. A refresh of this Mac checks the

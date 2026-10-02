@@ -5,15 +5,19 @@ import Foundation
 struct NativeCLICommandResolver: @unchecked Sendable {
     let fileManager: FileManager
     let inheritedEnvironment: [String: String]
+    let bundledTmuxRuntime: BundledTmuxRuntime?
+    let tmuxSelection = ThisMacTmuxSelection()
     private let searchDirectoriesOverride: [String]?
 
     init(
         fileManager: FileManager = .default,
         searchDirectories: [String]? = nil,
-        inheritedEnvironment: [String: String] = ProcessInfo.processInfo.environment
+        inheritedEnvironment: [String: String] = ProcessInfo.processInfo.environment,
+        bundledTmuxDirectory: URL? = BundledTmuxRuntime.appBundleDirectory
     ) {
         self.fileManager = fileManager
         self.inheritedEnvironment = inheritedEnvironment
+        self.bundledTmuxRuntime = bundledTmuxDirectory.map { BundledTmuxRuntime(directory: $0) }
         self.searchDirectoriesOverride = searchDirectories
     }
 

@@ -39,7 +39,11 @@ Claude Code, Codex, and Antigravity CLI reveal which session a new tab's CLI is 
 
 ## Terminal persistence
 
-With tmux 3.3 or later, each CLI on this Mac runs in the app's own tmux server, which ignores `~/.tmux.conf` and leaves your other tmux sessions alone. `tmux -L justsessions ls` lists its sessions. Without tmux, the CLI runs directly. In a tmux tab, dragging selects through tmux and copies to the clipboard when you let go; hold Shift while dragging to select the usual way. Shift-Return still adds a new line in Claude Code.
+The packaged app contains tmux and its terminal database in `Contents/Resources/Tmux`, with its third-party libraries statically linked. It needs no Homebrew, separate installer, system-directory changes, or runtime download. Direct `swift run` builds and older releases use an installed tmux 3.3 or later; without a supported tmux, the CLI runs directly.
+
+The first background refresh checks the available versions. The app prefers its bundled runtime, but uses the installed client when needed to reconnect to an existing JustSessions server, so migration does not restart running work. Each CLI runs in the app's own server (`-L justsessions`), which ignores `~/.tmux.conf` and leaves your other tmux sessions alone. SSH sessions use the host's tmux; the bundled Mac executable is not copied to remote hosts.
+
+For a bundled server, `"/Applications/JustSessions.app/Contents/Resources/Tmux/bin/tmux" -L justsessions ls` lists its sessions. Use the original installed client for a server started by an older release until those sessions finish. In a tmux tab, dragging selects through tmux and copies to the clipboard when you let go; hold Shift while dragging to select the usual way. Shift-Return still adds a new line in Claude Code.
 
 ## Activity indicators
 

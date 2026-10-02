@@ -11,5 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Build and verify bundled tmux
+        run: |
+          runtime_directory="$(./Scripts/Tmux/build-runtime.sh)"
+          printf 'JUSTSESSIONS_TEST_TMUX_RUNTIME=%s\n' "$runtime_directory" >> "$GITHUB_ENV"
+
       - name: Test
         run: swift test

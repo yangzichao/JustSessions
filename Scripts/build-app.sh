@@ -16,6 +16,8 @@ fi
 cp -f "$project_directory/.build/checkouts/SwiftTerm/LICENSE" "$app_directory/Contents/Resources/SwiftTerm-LICENSE.txt"
 cp -f "$project_directory/Branding/ThirdParty/Octicons/LICENSE" "$app_directory/Contents/Resources/Octicons-LICENSE.txt"
 cp -f "$project_directory/Branding/AppIcon.icns" "$app_directory/Contents/Resources/AppIcon.icns"
+tmux_runtime_directory="$("$project_directory/Scripts/Tmux/build-runtime.sh")"
+ditto "$tmux_runtime_directory" "$app_directory/Contents/Resources/Tmux"
 sparkle_framework="$project_directory/.build/artifacts/Sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
 if [[ ! -d "$sparkle_framework" ]]; then
     print -u2 "Sparkle.framework was not found at $sparkle_framework"
@@ -51,8 +53,11 @@ source_revision="$(git rev-parse HEAD)"
 plutil -insert JustSessionsSourceRevision -string "$source_revision" "$app_directory/Contents/Info.plist"
 codesign_identity="${CODE_SIGN_IDENTITY:--}"
 if [[ "$codesign_identity" == "-" ]]; then
+    codesign --force --sign "$codesign_identity" "$app_directory/Contents/Resources/Tmux/bin/tmux"
     codesign --force --deep --sign "$codesign_identity" "$app_directory"
 else
+    codesign --force --options runtime --timestamp --sign "$codesign_identity" "$app_directory/Contents/Resources/Tmux/bin/tmux"
     codesign --force --deep --options runtime --timestamp --sign "$codesign_identity" "$app_directory"
 fi
+python3 "$project_directory/Scripts/Tmux/verify-runtime.py" "$app_directory/Contents/Resources/Tmux"
 echo "$app_directory"

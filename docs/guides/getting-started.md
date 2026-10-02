@@ -49,7 +49,7 @@ The code and CLI run remotely. Supported session files are cached on your Mac. T
 
 ## Keep work running with tmux
 
-Install **tmux 3.3+ on this Mac**, or tmux on the SSH host, before launching the session. Close a local tab with **Keep running**, then select its session to reattach. Quitting the app also leaves tmux sessions running; remote tmux sessions survive SSH disconnections.
+Apps packaged from the current source include tmux for this Mac; no Homebrew or separate tmux install is needed. Older releases and direct `swift run` builds need **tmux 3.3+**. SSH hosts need their own tmux before launching the session. Close a local tab with **Keep running**, then select its session to reattach. Quitting the app also leaves tmux sessions running; remote tmux sessions survive SSH disconnections.
 
 Keep the machine doing the work awake. Without tmux, closing a terminal tab ends its process. Plain project terminals do not use tmux. [Terminal persistence details](session-storage.md#terminal-persistence).
 

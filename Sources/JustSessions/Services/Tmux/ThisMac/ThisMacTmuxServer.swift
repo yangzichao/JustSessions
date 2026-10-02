@@ -32,13 +32,15 @@ struct ThisMacTmuxServer: Sendable {
     let executablePath: String
     /// What tmux commands run with; a `TMUX_TMPDIR` in it decides where the server's socket is.
     let environment: [String: String]
+    var terminfoDirectory: String? = nil
 
     /// The tab's command: a tmux client attached to `sessionName`, which first starts `command` in that session
     /// unless it already runs. The session starts in the client's folder, the command's own.
     func command(attachingTo sessionName: String, running command: NativeCLICommand) -> NativeCLICommand {
         let serverArguments = ["-L", Self.socketName, "-f", "/dev/null", "-u", "-T", "RGB"]
         let optionArguments = Self.globalOptions.flatMap { ["set-option", "-gq", $0.name, $0.value, ";"] }
-        let sessionEnvironment = command.environmentVariables
+        let clientEnvironment = runtimeEnvironment(from: command.environmentVariables)
+        let sessionEnvironment = clientEnvironment
             .filter { !Self.variablesTmuxSetsInSessions.contains($0.key) }
             .sorted { $0.key < $1.key }
             .flatMap { ["-e", "\($0.key)=\($0.value)"] }
@@ -55,13 +57,17 @@ struct ThisMacTmuxServer: Sendable {
                 + sessionArguments.map(Self.escapingCommandSeparator),
             workingDirectory: command.workingDirectory,
             // tmux refuses to start a session from inside another one.
-            environment: command.environment.filter { !$0.hasPrefix("TMUX=") && !$0.hasPrefix("TMUX_PANE=") }
+            environment: NativeCLICommand.environmentEntries(clientEnvironment.filter { $0.key != "TMUX" && $0.key != "TMUX_PANE" })
         )
     }
 
     /// The JustSessions sessions the server runs; none when the server is not running.
     func sessionNames() -> Set<String> {
         TmuxSessionName.appSessionNames(inListOutput: output(of: ["list-sessions", "-F", "#{session_name}"]) ?? "")
+    }
+
+    var hasRunningSessions: Bool {
+        output(of: ["list-sessions", "-F", "#{session_name}"]) != nil
     }
 
     /// The CLI of each session: the process of its pane. The tab's own process is only the tmux client.
@@ -117,7 +123,7 @@ struct ThisMacTmuxServer: Sendable {
         guard let result = BoundedProcessRunner.result(
             ofExecutable: executablePath,
             arguments: ["-L", Self.socketName] + arguments,
-            environment: environment,
+            environment: runtimeEnvironment(from: environment),
             timeout: 10
         ), result.exitStatus == 0 else { return nil }
         return result.output

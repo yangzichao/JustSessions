@@ -29,6 +29,11 @@ jobs:
           fi
           printf 'APP_VERSION=%s\n' "${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
 
+      - name: Build and verify bundled tmux
+        run: |
+          runtime_directory="$(./Scripts/Tmux/build-runtime.sh)"
+          printf 'JUSTSESSIONS_TEST_TMUX_RUNTIME=%s\n' "$runtime_directory" >> "$GITHUB_ENV"
+
       - name: Test
         run: swift test
 
@@ -65,6 +70,7 @@ jobs:
         run: |
           APP_BUILD_NUMBER=$((GITHUB_RUN_NUMBER + 19)) ./Scripts/build-app.sh
           codesign --verify --deep --strict dist/JustSessions.app
+          codesign --verify --strict dist/JustSessions.app/Contents/Resources/Tmux/bin/tmux
           test "$(plutil -extract JustSessionsSourceRevision raw dist/JustSessions.app/Contents/Info.plist)" = "$GITHUB_SHA"
           test "$(plutil -extract CFBundleDisplayName raw dist/JustSessions.app/Contents/Info.plist)" = "JustSessions"
           test "$(plutil -extract CFBundleVersion raw dist/JustSessions.app/Contents/Info.plist)" = "$((GITHUB_RUN_NUMBER + 19))"
@@ -154,6 +160,6 @@ jobs:
               --repo yangzichao/JustSessions \
               --verify-tag \
               --title "JustSessions $tag" \
-              --notes "Signed, notarized JustSessions build. To install, open JustSessions.dmg and drag JustSessions into Applications. Sparkle updates use appcast.xml and JustSessions.zip." \
+              --notes "Signed, notarized JustSessions build. Includes tmux for local session persistence without a separate install; SSH hosts still need their own tmux. To install, open JustSessions.dmg and drag JustSessions into Applications. Sparkle updates use appcast.xml and JustSessions.zip." \
               --latest
           fi

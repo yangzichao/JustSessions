@@ -12,15 +12,19 @@ struct ThisMacTmuxSandbox {
     let environment: [String: String]
     let server: ThisMacTmuxServer
 
-    static func make() throws -> ThisMacTmuxSandbox? {
-        guard let tmuxPath = ["/opt/homebrew/bin/tmux", "/usr/local/bin/tmux", "/usr/bin/tmux"]
+    static func make(tmuxPathOverride: String? = nil) throws -> ThisMacTmuxSandbox? {
+        let bundledRuntime = tmuxPathOverride == nil
+            ? ProcessInfo.processInfo.environment["JUSTSESSIONS_TEST_TMUX_RUNTIME"].map { URL(fileURLWithPath: $0) } : nil
+        let candidatePaths = tmuxPathOverride.map { [$0] } ?? bundledRuntime.map { [$0.appendingPathComponent("bin/tmux").path] }
+            ?? ["/opt/homebrew/bin/tmux", "/usr/local/bin/tmux", "/usr/bin/tmux"]
+        guard let tmuxPath = candidatePaths
             .first(where: FileManager.default.isExecutableFile(atPath:)),
             let versionOutput = BoundedProcessRunner.output(ofExecutable: tmuxPath, arguments: ["-V"], timeout: 5),
             ThisMacTmuxVersionCheck.isSupported(versionOutput: versionOutput) else { return nil }
-        return try ThisMacTmuxSandbox(installedTmuxPath: tmuxPath)
+        return try ThisMacTmuxSandbox(installedTmuxPath: tmuxPath, bundledRuntime: bundledRuntime)
     }
 
-    private init(installedTmuxPath: String) throws {
+    private init(installedTmuxPath: String, bundledRuntime: URL?) throws {
         // A socket path has to stay short, so the folder sits right in the temporary folder.
         root = FileManager.default.temporaryDirectory.appendingPathComponent("tmux-\(UUID().uuidString.prefix(8))")
         project = root.appendingPathComponent("Bob's paper")
@@ -29,13 +33,17 @@ struct ThisMacTmuxSandbox {
         try FileManager.default.createDirectory(at: binaryDirectory, withIntermediateDirectories: true)
         let tmuxLink = binaryDirectory.appendingPathComponent("tmux")
         try FileManager.default.createSymbolicLink(at: tmuxLink, withDestinationURL: URL(fileURLWithPath: installedTmuxPath))
-        environment = [
+        var sandboxEnvironment = [
             "HOME": root.path,
             "PATH": "\(binaryDirectory.path):/usr/bin:/bin",
             "TMUX_TMPDIR": root.path,
             "TERM": "xterm-256color",
             "LANG": "en_US.UTF-8",
         ]
+        if let bundledRuntime {
+            sandboxEnvironment["TERMINFO_DIRS"] = bundledRuntime.appendingPathComponent("share/terminfo").path + ":/usr/share/terminfo"
+        }
+        environment = sandboxEnvironment
         server = ThisMacTmuxServer(executablePath: tmuxLink.path, environment: environment)
     }
 

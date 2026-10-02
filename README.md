@@ -53,9 +53,9 @@ Use a `~/.ssh/config` alias or `user@hostname`. [Set up an SSH host](docs/guides
 
 ## Keep sessions running with tmux
 
-**Close the tab or quit the app, then reattach to the same process.** Install tmux before launching the session. Remote tmux sessions also survive an SSH disconnection.
+**Close the tab or quit the app, then reattach to the same process.** The packaged app includes tmux for this Mac. Remote tmux sessions also survive an SSH disconnection.
 
-1. Launch a session with tmux installed on the machine doing the work.
+1. Launch a session on this Mac, or on an SSH host with tmux installed.
 2. Close its terminal tab and choose **Keep running**.
 3. Click the session in the sidebar to reattach to the running process.
 
@@ -65,7 +65,7 @@ Use a `~/.ssh/config` alias or `user@hostname`. [Set up an SSH host](docs/guides
 
 *The app's actual close-tab dialog, shown with a sample tmux process.*
 
-This Mac requires **tmux 3.3+**; remote sessions require tmux on the SSH host. The host must stay awake and running. Without tmux, closing the tab ends the terminal process. [How session persistence works](docs/guides/session-storage.md#terminal-persistence).
+No separate local tmux install is needed in apps packaged from the current source. Older releases and direct `swift run` builds need **tmux 3.3+**; SSH hosts need their own tmux. Keep the machine awake. Without tmux, closing the tab ends the terminal process. [How session persistence works](docs/guides/session-storage.md#terminal-persistence).
 
 ## Lightweight by design
 

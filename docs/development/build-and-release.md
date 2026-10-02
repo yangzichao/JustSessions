@@ -13,6 +13,16 @@ swift test
 open "dist/JustSessions.app"
 ```
 
+`build-app.sh` builds a pinned tmux runtime from checksum-verified upstream archives, statically links libevent, ncurses, and utf8proc, and packages the binary, terminal database, and license notices under `Contents/Resources/Tmux`. The first package build downloads sources; subsequent builds reuse the verified runtime when its build fingerprint matches. End users need no separate tmux install. Direct `swift run` development builds still use an installed tmux 3.3+.
+
+```sh
+./Scripts/Tmux/build-runtime.sh
+python3 Scripts/Tmux/verify-runtime.py .build/Tmux/arm64/runtime
+JUSTSESSIONS_TEST_TMUX_RUNTIME="$PWD/.build/Tmux/arm64/runtime" swift test
+```
+
+The verifier relocates the runtime to a path with spaces, restricts `PATH` to system tools, checks system-only dynamic linkage and license notices, and detaches and reattaches a real terminal client without replacing the running process. Both test and release workflows build this runtime before testing, so local tmux integration tests run against the shipped binary. `build-app.sh` signs the nested tmux executable before signing the app; the existing notarization and Sparkle archive include it. Update `Scripts/Tmux/versions.sh` and its archive checksums together when upgrading dependencies, and retest client/server compatibility with existing sessions.
+
 ## Releases
 
 Pushes to `main` and pull requests run `swift test`. Pushing a version tag makes GitHub Actions build, Developer ID sign, notarize, and publish the app; the tag sets the app version. Choose a new, unused semantic version for each release:
