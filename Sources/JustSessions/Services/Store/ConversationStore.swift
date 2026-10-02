@@ -50,7 +50,8 @@ final class ConversationStore: ObservableObject {
         ],
         commandResolver: NativeCLICommandResolver = NativeCLICommandResolver(),
         userDefaults: UserDefaults = .standard,
-        sessionNotifier: any SessionNotifying = SessionNotificationCenter.shared
+        sessionNotifier: any SessionNotifying = SessionNotificationCenter.shared,
+        startsBackgroundPolling: Bool = true
     ) {
         self.adapters = adapters
         self.commandResolver = commandResolver
@@ -63,11 +64,13 @@ final class ConversationStore: ObservableObject {
         self.remoteHostList = RemoteHostList.load(from: userDefaults)
         LoginShellPathReader.warmUpInBackground()
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
-        startClaudeLiveNameSync()
-        startNewSessionDiscovery()
-        startRemoteNewSessionPolling()
-        startTmuxPaneProcessLookup()
-        startCLIActivitySync()
+        if startsBackgroundPolling {
+            startClaudeLiveNameSync()
+            startNewSessionDiscovery()
+            startRemoteNewSessionPolling()
+            startTmuxPaneProcessLookup()
+            startCLIActivitySync()
+        }
         sessionNotifier.follow(self)
     }
 

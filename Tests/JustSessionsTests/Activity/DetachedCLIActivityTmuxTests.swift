@@ -20,7 +20,8 @@ struct DetachedCLIActivityTmuxTests {
         )
         let store = ConversationStore(
             adapters: [StaticConversationAdapter(discoveredConversations: [conversation])],
-            commandResolver: sandbox.resolver
+            commandResolver: sandbox.resolver,
+            startsBackgroundPolling: false
         )
         defer { store.closeAllTerminals() }
         store.refreshThisMac()
@@ -29,9 +30,11 @@ struct DetachedCLIActivityTmuxTests {
         let tab = try #require(store.terminalSessions.last)
         tab.startIfNeeded()
         #expect(await sandbox.waitUntil { sandbox.server.sessionNames() == [TmuxSessionName.forConversation(conversation)] })
-        await store.lookUpTmuxPaneProcesses()
-        let cliProcessID = tab.cliProcessID
-        #expect(cliProcessID > 0)
+        // A session can be listed before its pane process is ready. Wait for the production lookup to
+        // record the PID; stop here on failure rather than passing PID 0 to the registry or kill().
+        try #require(await sandbox.waitForPaneProcess(in: store, for: tab))
+        let cliProcessID = try #require(tab.tmuxPaneProcessID)
+        try #require(cliProcessID > 0)
         // Claude Code's live registry entry for the CLI in tmux.
         let claudeRegistry = ClaudeLiveSessionRegistry(configurationDirectory: sandbox.root.appendingPathComponent("claude"))
         try FileManager.default.createDirectory(at: claudeRegistry.sessionsDirectory, withIntermediateDirectories: true)

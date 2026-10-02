@@ -100,6 +100,16 @@ struct ThisMacTmuxSandbox {
         return condition()
     }
 
+    @MainActor
+    func waitForPaneProcess(in store: ConversationStore, for tab: TerminalSession) async -> Bool {
+        for _ in 0..<100 {
+            await store.lookUpTmuxPaneProcesses()
+            if (tab.tmuxPaneProcessID ?? 0) > 0 { return true }
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+        return false
+    }
+
     func tearDown() {
         _ = tmuxOutput(["kill-server"])
         try? FileManager.default.removeItem(at: root)

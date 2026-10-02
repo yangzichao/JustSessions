@@ -6,11 +6,11 @@ import Testing
 struct ConversationStorePollingTests {
     @Test func workRepeatsWhileTheStoreExistsAndStopsOnceItIsGone() async throws {
         let runs = RunCounter()
-        var store: ConversationStore? = ConversationStore(adapters: [])
+        var store: ConversationStore? = ConversationStore(adapters: [], startsBackgroundPolling: false)
         store?.runPeriodically(every: .milliseconds(10)) { _ in runs.count += 1 }
         // Other suites can occupy the main actor for several seconds on shared CI runners.
         // Keep the repeated-work assertion, with enough time for three separate timer deliveries.
-        try await expectEventually(timeout: .seconds(10)) { runs.count >= 3 }
+        try await expectEventually(timeout: .seconds(30)) { runs.count >= 3 }
 
         weak var releasedStore = store
         store = nil

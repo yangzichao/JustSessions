@@ -20,7 +20,8 @@ struct ThisMacTmuxStoreTests {
         )
         let store = ConversationStore(
             adapters: [StaticConversationAdapter(discoveredConversations: [conversation])],
-            commandResolver: sandbox.resolver
+            commandResolver: sandbox.resolver,
+            startsBackgroundPolling: false
         )
         defer { store.closeAllTerminals() }
         let tmuxSessionName = TmuxSessionName.forConversation(conversation)
@@ -37,8 +38,9 @@ struct ThisMacTmuxStoreTests {
         #expect(tab.command.executablePath == sandbox.server.executablePath)
         tab.startIfNeeded()
         #expect(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] })
-        await store.lookUpTmuxPaneProcesses()
-        let cliProcessID = tab.cliProcessID
+        try #require(await sandbox.waitForPaneProcess(in: store, for: tab))
+        let cliProcessID = try #require(tab.tmuxPaneProcessID)
+        try #require(cliProcessID > 0)
         #expect(cliProcessID == sandbox.server.paneProcessIDsBySessionName()[tmuxSessionName])
         #expect(cliProcessID != tab.processID)
 
@@ -63,7 +65,7 @@ struct ThisMacTmuxStoreTests {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
         try sandbox.writeExecutable(named: "codex", script: "#!/bin/sh\nexec sleep 60\n")
-        let store = ConversationStore(adapters: [], commandResolver: sandbox.resolver)
+        let store = ConversationStore(adapters: [], commandResolver: sandbox.resolver, startsBackgroundPolling: false)
         defer { store.closeAllTerminals() }
         store.refreshThisMac()
         #expect(await sandbox.waitUntil { !store.isScanningThisMac })
@@ -85,7 +87,7 @@ struct ThisMacTmuxStoreTests {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
         try sandbox.writeExecutable(named: "codex", script: "#!/bin/sh\nexit 0\n")
-        let store = ConversationStore(adapters: [], commandResolver: sandbox.resolver)
+        let store = ConversationStore(adapters: [], commandResolver: sandbox.resolver, startsBackgroundPolling: false)
         defer { store.closeAllTerminals() }
         store.refreshThisMac()
         #expect(await sandbox.waitUntil { !store.isScanningThisMac })
