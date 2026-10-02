@@ -24,15 +24,15 @@ struct InstalledCLIsTests {
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
 
         #expect(store.newSessionProviders(on: .thisMac) == ConversationProvider.allCases)
-        #expect(store.newSessionProviders(on: .ssh("devbox")) == [.claude, .codex, .antigravity, .kiro])
+        #expect(store.newSessionProviders(on: .ssh("devbox")) == [.claude, .codex, .antigravity, .kiro, .pi])
 
         store.setInstalledProviders([.pi, .claude], on: .thisMac)
         store.setInstalledProviders([.codex, .pi], on: .ssh("devbox"))
         store.setInstalledProviders([.claude], on: .ssh("unlisted"))
 
         #expect(store.newSessionProviders(on: .thisMac) == [.claude, .pi])
-        #expect(store.newSessionProviders(on: .ssh("devbox")) == [.codex])
-        #expect(store.newSessionProvidersByHost == [.thisMac: [.claude, .pi], .ssh("devbox"): [.codex]])
+        #expect(store.newSessionProviders(on: .ssh("devbox")) == [.codex, .pi])
+        #expect(store.newSessionProvidersByHost == [.thisMac: [.claude, .pi], .ssh("devbox"): [.codex, .pi]])
         #expect(store.installedProvidersByHost[.ssh("unlisted")] == nil)
 
         store.setInstalledProviders([], on: .thisMac)
@@ -51,7 +51,7 @@ struct InstalledCLIsTests {
 
     @Test func noCLIMessageNamesEveryToolThatRunsOnTheHost() {
         #expect(NewSessionProviderAvailability.noCLIFoundMessage(on: .ssh("devbox"))
-            == "No supported CLI found on devbox. Install claude, codex, agy, or kiro-cli there, then refresh.")
+            == "No supported CLI found on devbox. Install claude, codex, agy, kiro-cli, or pi there, then refresh.")
         #expect(NewSessionProviderAvailability.noCLIFoundMessage(on: .thisMac).contains("kiro-cli"))
     }
 }

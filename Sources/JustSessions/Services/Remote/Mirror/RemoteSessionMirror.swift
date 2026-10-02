@@ -79,7 +79,8 @@ struct RemoteSessionMirror: Sendable {
             + ["--exclude=*", source, destination]
     }
 
-    /// Only the files the adapters read; Claude Code's subagent transcripts and caches stay on the host.
+    /// Only the files the adapters read; Claude Code's subagent transcripts and caches stay on the host, and so do
+    /// the subagent runs, forks, and artifacts Pi extensions keep in folders inside a Pi project folder.
     static func includedPatterns(for provider: ConversationProvider) -> [String] {
         switch provider {
         case .claude:
@@ -91,7 +92,9 @@ struct RemoteSessionMirror: Sendable {
         case .antigravity:
             ["/conversation_summaries.db", "/conversation_summaries.db-wal", "/conversation_summaries.db-shm",
              "/conversations/", "/conversations/*.db", "/conversations/*.db-wal", "/conversations/*.db-shm"]
-        case .opencode, .pi:
+        case .pi:
+            ["/*/", "/*/*.jsonl"]
+        case .opencode:
             []
         }
     }

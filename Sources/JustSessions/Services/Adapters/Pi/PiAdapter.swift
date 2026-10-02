@@ -4,10 +4,13 @@ import Foundation
 /// sessions folder. The first line names the session and its folder.
 struct PiAdapter: ConversationAdapter {
     let sessionsDirectory: URL
+    /// Nil moves deleted sessions to the macOS Trash; tests pass their own.
+    let moveToTrash: (@Sendable (URL) throws -> Void)?
     var provider: ConversationProvider { .pi }
 
-    init(sessionsDirectory: URL = PiSessionsDirectory.standard()) {
+    init(sessionsDirectory: URL = PiSessionsDirectory.standard(), moveToTrash: (@Sendable (URL) throws -> Void)? = nil) {
         self.sessionsDirectory = sessionsDirectory
+        self.moveToTrash = moveToTrash
     }
 
     func discover() throws -> [Conversation] {
@@ -24,7 +27,7 @@ struct PiAdapter: ConversationAdapter {
     }
 
     func delete(_ conversation: Conversation) throws {
-        throw ConversationDeletionError.unsupported(provider)
+        try PiConversationDeletion(sessionsDirectory: sessionsDirectory, moveToTrash: moveToTrash).delete(conversation)
     }
 
     private func conversation(in file: URL) -> Conversation? {

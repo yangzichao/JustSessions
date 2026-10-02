@@ -70,9 +70,9 @@ struct HostModelTests {
         #expect("End on \(SessionHost.ssh("me@devbox").nameInSentence)" == "End on me@devbox")
     }
 
-    @Test func everyToolRunsOnThisMacAndClaudeCodeCodexAndKiroOnSSHHosts() {
+    @Test func everyToolRunsOnThisMacAndAllButOpenCodeOnSSHHosts() {
         #expect(ConversationProvider.allCases.filter { $0.runs(on: .thisMac) } == ConversationProvider.allCases)
-        #expect(ConversationProvider.allCases.filter { $0.runs(on: .ssh("devbox")) } == [.claude, .codex, .antigravity, .kiro])
+        #expect(ConversationProvider.allCases.filter { $0.runs(on: .ssh("devbox")) } == [.claude, .codex, .antigravity, .kiro, .pi])
     }
 
     @Test func sidebarListsEveryHostInOrderIncludingOnesWithoutProjects() {

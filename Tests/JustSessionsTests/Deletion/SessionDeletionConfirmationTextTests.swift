@@ -55,7 +55,7 @@ struct SessionDeletionConfirmationTextTests {
         )
         #expect(message == "This affects all tools in /Users/me/app, including sessions hidden by the current filter. "
             + "The project will stay in the sidebar. "
-            + "Claude Code and Antigravity sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted. "
+            + "Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted. "
             + "1 session with an open terminal will be skipped.")
     }
 
@@ -73,7 +73,7 @@ struct SessionDeletionConfirmationTextTests {
     @Test func selectionMentionsSkippedSessionsOnlyWhenThereAreSome() {
         let everythingDeletable = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: 0, unsupportedCount: 0)
         let someSkipped = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: 0, unsupportedCount: 2)
-        let intro = "Claude Code and Antigravity sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted."
+        let intro = "Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted."
 
         #expect(SessionDeletionConfirmationText.message(forDeletingSelectionWith: everythingDeletable) == intro)
         #expect(SessionDeletionConfirmationText.message(forDeletingSelectionWith: someSkipped)
@@ -84,8 +84,10 @@ struct SessionDeletionConfirmationTextTests {
         (ConversationProvider.claude, SessionHost.thisMac, "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index."),
         (.codex, .thisMac, "Codex will permanently delete this session using its native CLI. This cannot be undone."),
         (.kiro, .thisMac, "Kiro CLI will permanently delete this session using its native CLI. This cannot be undone."),
+        (.pi, .thisMac, "The Pi session file and its associated folder will move to the macOS Trash."),
         (.claude, .ssh("devbox"), "This session will be permanently deleted on devbox. SSH hosts have no Trash, so this cannot be undone."),
         (.codex, .ssh("me@build"), "This session will be permanently deleted on me@build. SSH hosts have no Trash, so this cannot be undone."),
+        (.pi, .ssh("devbox"), "The Pi session file and its associated folder will be permanently deleted on devbox. SSH hosts have no Trash, so this cannot be undone."),
     ])
     func oneSessionSaysWhereItGoes(provider: ConversationProvider, host: SessionHost, expectedMessage: String) {
         let conversation = Conversation.fixture(provider: provider, host: host)

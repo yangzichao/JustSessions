@@ -1,12 +1,16 @@
 import Foundation
 
 /// Deletes a session on its remote host over SSH. Remote hosts have no Trash, so this is permanent.
-/// Claude Code and Antigravity lose their stored history and index entry; Codex and Kiro use their native CLIs.
+/// Claude Code and Antigravity lose their stored history and index entry; Codex and Kiro use their native CLIs;
+/// Pi loses its session file and the folder beside it.
 struct RemoteConversationDeletion {
     let runner: RemoteHostCommandRunner
+    /// Where the host's sessions were copied, so a Pi session's file is found relative to that host's Pi mirror.
+    let mirror: RemoteSessionMirror
 
-    init(runner: RemoteHostCommandRunner = RemoteHostCommandRunner()) {
+    init(runner: RemoteHostCommandRunner = RemoteHostCommandRunner(), mirror: RemoteSessionMirror = RemoteSessionMirror()) {
         self.runner = runner
+        self.mirror = mirror
     }
 
     /// Exit status of a deletion script when the transcript is already gone.
@@ -39,7 +43,17 @@ struct RemoteConversationDeletion {
             let configurationDirectory = conversation.sourceFile.deletingLastPathComponent().deletingLastPathComponent()
             _ = try AntigravityDeletionFiles.validated(for: conversation, configurationDirectory: configurationDirectory)
             command = RemoteAntigravityConversationDeletion.command(sessionID: conversation.sessionID, projectPath: conversation.projectPath)
-        case .opencode, .pi:
+        case .pi:
+            let names = try RemotePiConversationDeletion.hostFileNames(
+                of: conversation,
+                piMirrorDirectory: mirror.mirrorDirectory(host: host, provider: .pi)
+            )
+            command = RemotePiConversationDeletion.command(
+                projectFolderName: names.projectFolderName,
+                fileName: names.fileName,
+                sessionID: conversation.sessionID
+            )
+        case .opencode:
             throw ConversationDeletionError.invalidSource
         }
 
@@ -56,7 +70,7 @@ struct RemoteConversationDeletion {
             }
         case RemoteHostCommandRunner.connectionFailureExitStatus:
             throw RemoteConversationDeletionError.sshFailed(host: host)
-        case Self.missingTranscriptExitStatus where [.claude, .kiro, .antigravity].contains(conversation.provider):
+        case Self.missingTranscriptExitStatus where [.claude, .kiro, .antigravity, .pi].contains(conversation.provider):
             throw RemoteConversationDeletionError.missingOnHost(host: host)
         default:
             let details = result.output.trimmingCharacters(in: .whitespacesAndNewlines)
