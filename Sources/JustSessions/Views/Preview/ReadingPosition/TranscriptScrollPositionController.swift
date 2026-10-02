@@ -72,8 +72,8 @@ final class TranscriptScrollPositionController {
         scheduleUpdate()
     }
 
-    /// Rewrapping, such as after a reading width change, resizes every entry; return to the entry being read.
-    /// The lazy stack may have dropped that entry's row, so SwiftUI first brings it back into view.
+    /// Rewrapping, such as after a text size or reading width change, resizes every entry; return to the entry being
+    /// read. The lazy stack may have dropped that entry's row, so SwiftUI first brings it back into view.
     func restoreRecordedPosition() {
         guard pendingRestoration == nil, let position = positionStore.position(for: conversationID) else { return }
         restore(position)

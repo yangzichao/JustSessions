@@ -46,6 +46,7 @@ struct TranscriptScrollView: View {
                     .background(ThemePalette.contentSurface)
                 }
                 .environment(\.transcriptReadingFontSize, readingFontSize)
+                .onChange(of: readingFontSize) { positionController.restoreRecordedPosition() }
                 .onChange(of: readingWidth) { positionController.restoreRecordedPosition() }
                 .onReceive(positionController.entrySeekingRequests) { index in
                     scrollProxy.scrollTo(index, anchor: .top)
