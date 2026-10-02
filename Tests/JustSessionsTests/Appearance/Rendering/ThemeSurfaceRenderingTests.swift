@@ -57,10 +57,12 @@ struct ThemeSurfaceRenderingTests {
         let referenceRow = bitmap.pixelsHigh - 2
         let raisedSurface = hexValue(of: try #require(bitmap.colorAt(x: bitmap.pixelsWide / 2, y: referenceRow)))
         let ink = hexValue(of: try #require(bitmap.colorAt(x: bitmap.pixelsWide * 5 / 6, y: referenceRow)))
-        let editorBackground = hexValue(of: try #require(bitmap.colorAt(x: bitmap.pixelsWide / 2, y: bitmap.pixelsHigh / 2)))
-        #expect(editorBackground == raisedSurface, "\(description) editor surface")
-
         let renderingScale = Double(bitmap.pixelsWide) / 560
+        // The details editor fills the lower middle of the window; its exact position moves with the header copy.
+        let editorRows = (bitmap.pixelsHigh * 45 / 100)..<(bitmap.pixelsHigh * 70 / 100)
+        let editorPixels = matchingPixelCount(raisedSurface, in: bitmap, columns: (bitmap.pixelsWide / 3)..<(bitmap.pixelsWide * 2 / 3), rows: editorRows)
+        #expect(editorPixels > Int(150 * 60 * renderingScale * renderingScale), "\(description) editor surface")
+
         let edgeInset = Int(20 * renderingScale)
         let actionRows = (bitmap.pixelsHigh - Int(50 * renderingScale))..<(bitmap.pixelsHigh - Int(6 * renderingScale))
         let linkPixels = matchingPixelCount(ink, in: bitmap, columns: edgeInset..<(bitmap.pixelsWide / 3), rows: actionRows)

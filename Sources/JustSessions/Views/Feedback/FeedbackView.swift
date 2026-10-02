@@ -21,18 +21,9 @@ struct FeedbackView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            VStack(alignment: .leading, spacing: 8) {
-                Label("Help improve JustSessions", systemImage: "bubble.left.and.bubble.right")
-                    .font(.title2.weight(.semibold))
-                Text("Report a problem, suggest a feature, or share an idea.")
-                    .foregroundStyle(ThemePalette.secondaryText)
-            }
+            FeedbackHeader()
 
             FeedbackForm(draft: $draft, versionInformation: versionInformation)
-
-            Text("Feedback is public on GitHub and requires a GitHub account. Review it there before submitting. Keep private code, conversations, and credentials out of your report.")
-                .font(.caption).foregroundStyle(ThemePalette.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
 
             if !statusMessage.isEmpty {
                 Text(statusMessage)
@@ -49,7 +40,7 @@ struct FeedbackView: View {
                 Button("Copy feedback") { copyReport() }
                     .buttonStyle(QuietBorderedButtonStyle())
                     .disabled(!draft.canContinue)
-                Button(continueButtonTitle, action: continueOnGitHub)
+                Button("Continue on GitHub…", action: continueOnGitHub)
                     .buttonStyle(ThemeProminentButtonStyle())
                     .keyboardShortcut(.defaultAction)
                     .disabled(!draft.canContinue)
@@ -64,11 +55,6 @@ struct FeedbackView: View {
         .onChange(of: draft.details) { _, _ in statusMessage = "" }
         .onChange(of: draft.kind) { _, _ in statusMessage = "" }
         .onChange(of: draft.includesVersionInformation) { _, _ in statusMessage = "" }
-    }
-
-    private var continueButtonTitle: String {
-        draft.prefilledIssueURL(versionInformation: versionInformation) == nil && draft.canContinue
-            ? "Copy & open GitHub…" : "Continue on GitHub…"
     }
 
     @discardableResult
