@@ -6,13 +6,16 @@ import Testing
 @MainActor
 final class TranscriptScrollViewFixture {
     let positionStore = TranscriptReadingPositionStore()
+    /// The transcript's saved settings, such as its reading width, live here instead of in the app's own settings.
+    let settings: IsolatedUserDefaults
     let hostingView: NSHostingView<AnyView>
     private let window: NSWindow
 
-    init() {
+    init(width: CGFloat = 780) throws {
         _ = NSApplication.shared
+        settings = try IsolatedUserDefaults()
         hostingView = NSHostingView(rootView: AnyView(EmptyView()))
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 780, height: 480), styleMask: [.borderless], backing: .buffered, defer: false)
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: width, height: 480), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
     }
@@ -20,7 +23,7 @@ final class TranscriptScrollViewFixture {
     func show(_ conversation: Conversation, transcript: TranscriptContent) async throws -> NSScrollView {
         hostingView.rootView = AnyView(TranscriptScrollView(
             conversation: conversation, transcript: transcript, positionStore: positionStore
-        ).id(conversation.id))
+        ).id(conversation.id).defaultAppStorage(settings.userDefaults))
         try await settleLayout()
         return try #require(descendant(ofType: NSScrollView.self, in: hostingView))
     }
@@ -42,6 +45,7 @@ final class TranscriptScrollViewFixture {
     func close() {
         hostingView.rootView = AnyView(EmptyView())
         window.close()
+        settings.removeSuite()
     }
 
     func visiblePosition(in scrollView: NSScrollView) -> TranscriptReadingPosition? {
@@ -52,6 +56,15 @@ final class TranscriptScrollViewFixture {
             .filter { $0.1.maxY > clipView.bounds.minY && $0.1.minY < clipView.bounds.maxY }
         guard let (index, frame) = visibleMarkers.min(by: { $0.1.minY < $1.1.minY }) else { return nil }
         return .entry(index: index, offset: clipView.bounds.minY - frame.minY)
+    }
+
+    /// The frames of the entries on screen, in the scroll view's visible area. Entries fill the transcript column's
+    /// width; entries scrolled out of sight can keep an earlier layout, so they are left out.
+    func visibleEntryFrames(in scrollView: NSScrollView) -> [CGRect] {
+        let clipView = scrollView.contentView
+        return descendants(ofType: TranscriptEntryPositionMarkerView.self, in: hostingView)
+            .map { $0.convert($0.bounds, to: clipView) }
+            .filter { $0.intersects(clipView.bounds) }
     }
 
     static func conversation(_ sessionID: String) -> Conversation {

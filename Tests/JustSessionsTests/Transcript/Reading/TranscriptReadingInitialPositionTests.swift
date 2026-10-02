@@ -4,7 +4,7 @@ import Testing
 @MainActor
 struct TranscriptReadingInitialPositionTests {
     @Test func initiallyPositionsATallMessageBeforeReadingWithinIt() async throws {
-        let fixture = TranscriptScrollViewFixture()
+        let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
         let conversation = TranscriptScrollViewFixture.conversation("initial-tall-reader")
         let longMessage = (0..<100).map { "Line \($0) of a message taller than the window." }.joined(separator: "\n")

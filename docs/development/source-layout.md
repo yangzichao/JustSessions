@@ -8,6 +8,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
 - `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
+- `Models/Transcript/`: the reading width, a readable column or the full window, shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
 - `Models/Customizations/`: session and project names you set, and pins.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
@@ -45,7 +46,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Terminal/`: a tab's embedded terminal.
 - `Views/Preview/`: conversation preview for the selected session.
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
-- `Views/Preview/Reading/` and `ReadingPosition/`: text size, first/latest-message controls, and reading-position restoration.
+- `Views/Preview/Reading/` and `ReadingPosition/`: text size, reading width, first/latest-message controls, and reading-position restoration.
 - `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.

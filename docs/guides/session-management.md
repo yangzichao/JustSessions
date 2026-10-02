@@ -15,7 +15,7 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 
 - Read a Claude Code, Codex, Antigravity, Kiro CLI, or Pi conversation without starting the CLI. Your messages and the agent's replies are shown; runs of tool calls collapse into one expandable row.
 - Current source builds add **Read** in the preview header. It opens a separate, read-only window at your current position without changing the selected terminal. Opening Read again brings the existing window for that session forward; different sessions can have separate reading windows.
-- Use **A− / A+** to adjust text size from 12 to 22 points. The up/down buttons go to the first or latest available message. Markdown formatting, tables, and code blocks remain readable; wide tables and code blocks scroll horizontally, and code blocks have a **Copy** button.
+- Use **A− / A+** to adjust text size from 12 to 22 points. The width button switches between a readable column and the full window width, and the preview and every reading window share the choice, which is remembered after you quit. The up/down buttons go to the first or latest available message. Markdown formatting, tables, and code blocks remain readable; wide tables and code blocks scroll horizontally, and code blocks have a **Copy** button.
 - Switching sessions restores your reading position while the workspace window stays open, including a position within a long message. Reading positions are not saved across app restarts. A separate reading window keeps its own position until it closes.
 
 These instructions follow the current source build. Check the [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest) for features included in the downloaded app.

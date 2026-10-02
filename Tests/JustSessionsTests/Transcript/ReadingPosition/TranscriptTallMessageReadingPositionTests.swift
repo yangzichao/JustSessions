@@ -4,7 +4,7 @@ import Testing
 @MainActor
 struct TranscriptTallMessageReadingPositionTests {
     @Test func switchingSessionsPreservesAnOffsetLargerThanTheViewport() async throws {
-        let fixture = TranscriptScrollViewFixture()
+        let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
         let conversation = TranscriptScrollViewFixture.conversation("tall-message")
         let longMessage = (0..<100).map { "Line \($0) of a message taller than the window." }.joined(separator: "\n")

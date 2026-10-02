@@ -6,7 +6,7 @@ import Testing
 @Suite(.serialized)
 struct TranscriptScrollViewReadingPositionTests {
     @Test func switchingSessionsRestoresTheOffsetWithinTheMessage() async throws {
-        let fixture = TranscriptScrollViewFixture()
+        let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
         let firstConversation = TranscriptScrollViewFixture.conversation("first")
         let secondConversation = TranscriptScrollViewFixture.conversation("second")
@@ -40,7 +40,7 @@ struct TranscriptScrollViewReadingPositionTests {
     }
 
     @Test func appendedMessagesDoNotPullAMidConversationReaderToTheBottom() async throws {
-        let fixture = TranscriptScrollViewFixture()
+        let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
         let conversation = TranscriptScrollViewFixture.conversation("updating")
         let scrollView = try await fixture.show(conversation, transcript: TranscriptScrollViewFixture.transcript())
@@ -55,7 +55,7 @@ struct TranscriptScrollViewReadingPositionTests {
     }
 
     @Test func returningToTheBottomShowsTheLatestMessages() async throws {
-        let fixture = TranscriptScrollViewFixture()
+        let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
         let conversation = TranscriptScrollViewFixture.conversation("latest")
         _ = try await fixture.show(conversation, transcript: TranscriptScrollViewFixture.transcript())
@@ -67,7 +67,7 @@ struct TranscriptScrollViewReadingPositionTests {
     }
 
     @Test func returningToTheBeginningPreservesTheTopPadding() async throws {
-        let fixture = TranscriptScrollViewFixture()
+        let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
         let conversation = TranscriptScrollViewFixture.conversation("beginning")
         let transcript = TranscriptScrollViewFixture.transcript()
@@ -83,7 +83,7 @@ struct TranscriptScrollViewReadingPositionTests {
     }
 
     @Test func omittingEarlierMessagesRestoresTheSameRetainedMessage() async throws {
-        let fixture = TranscriptScrollViewFixture()
+        let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
         let conversation = TranscriptScrollViewFixture.conversation("retained")
         let scrollView = try await fixture.show(conversation, transcript: TranscriptScrollViewFixture.transcript())
