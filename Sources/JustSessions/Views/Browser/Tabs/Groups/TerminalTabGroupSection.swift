@@ -15,8 +15,8 @@ struct TerminalTabGroupSection: View {
         isCollapsed ? group.tabs.filter { $0.id == store.selectedTerminalID } : group.tabs
     }
 
-    private var hiddenTabs: [TerminalSession] {
-        isCollapsed ? group.tabs.filter { $0.id != store.selectedTerminalID } : []
+    private var tabsHiddenWhenCollapsed: [TerminalSession] {
+        group.tabsHiddenWhenCollapsed(selectedTabID: store.selectedTerminalID)
     }
 
     /// What the hidden tabs' CLIs are doing. A plain terminal runs no session, so it does not count.
@@ -25,7 +25,8 @@ struct TerminalTabGroupSection: View {
     }
 
     var body: some View {
-        let hiddenTabs = hiddenTabs
+        let tabsHiddenWhenCollapsed = tabsHiddenWhenCollapsed
+        let hiddenTabs = isCollapsed ? tabsHiddenWhenCollapsed : []
         HStack(spacing: 6) {
             TerminalTabGroupLabel(
                 projectName: store.projectDisplayName(forProjectPath: group.projectDirectoryKey),
@@ -33,6 +34,7 @@ struct TerminalTabGroupSection: View {
                 color: color,
                 tabCount: group.tabs.count,
                 isCollapsed: isCollapsed,
+                canCollapse: !tabsHiddenWhenCollapsed.isEmpty,
                 hiddenTabCount: hiddenTabs.count,
                 hiddenTabsActivity: hiddenTabsActivity(hiddenTabs),
                 onToggleCollapsed: onToggleCollapsed

@@ -3,9 +3,11 @@ import Testing
 
 /// The tab bar shows one group per project, in the order each project's first tab appears, each with its own color.
 struct TerminalTabGroupTests {
-    private struct Tab: Equatable {
+    private struct Tab: Equatable, Identifiable {
         let name: String
         let projectKey: String
+
+        var id: String { name }
     }
 
     @Test func tabsGroupByProjectInTheOrderTheirFirstTabAppears() {
@@ -19,6 +21,20 @@ struct TerminalTabGroupTests {
 
         #expect(groups.map(\.projectDirectoryKey) == ["/b", "/a"])
         #expect(groups.map { $0.tabs.map(\.name) } == [["b1", "b2"], ["a1"]])
+    }
+
+    @Test func collapsingHidesEveryTabButTheSelectedOne() {
+        let group = TerminalTabGroup(projectDirectoryKey: "/a", tabs: [Tab(name: "a1", projectKey: "/a"), Tab(name: "a2", projectKey: "/a")])
+
+        #expect(group.tabsHiddenWhenCollapsed(selectedTabID: "a1").map(\.name) == ["a2"])
+        #expect(group.tabsHiddenWhenCollapsed(selectedTabID: "b1").map(\.name) == ["a1", "a2"])
+        #expect(group.tabsHiddenWhenCollapsed(selectedTabID: nil).map(\.name) == ["a1", "a2"])
+    }
+
+    @Test func aGroupWhoseOnlyTabIsSelectedHasNothingToHide() {
+        let group = TerminalTabGroup(projectDirectoryKey: "/a", tabs: [Tab(name: "a1", projectKey: "/a")])
+
+        #expect(group.tabsHiddenWhenCollapsed(selectedTabID: "a1").isEmpty)
     }
 
     @Test func aProjectKeepsTheSameColorFromOneLaunchToTheNext() {
