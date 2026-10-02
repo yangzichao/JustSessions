@@ -141,13 +141,23 @@ struct PiConversationDeletionTests {
         #expect(sandbox.trashedNames.isEmpty)
     }
 
-    @Test func refusesAFileWhoseFirstLineIsNotASessionHeader() throws {
+    /// `SESSION_ID` stands for the session's id.
+    @Test(arguments: [
+        #"{"type":"message","id":"SESSION_ID","parentId":null,"timestamp":"2026-09-30T10:00:00.000Z"}"# + "\n",
+        #"{"type":"session","version":3,"id":7,"cwd":"/Users/me/app"}"# + "\n",
+        #"{"type":["session"],"id":"SESSION_ID"}"# + "\n",
+        #"[{"type":"session","id":"SESSION_ID"}]"# + "\n",
+        "not json\n",
+        // A header whose line never ends, or a file with no lines.
+        #"{"type":"session","version":3,"id":"SESSION_ID","cwd":"/Users/me/app"}"#,
+        "",
+    ])
+    func refusesAFileWhoseFirstLineIsNotASessionHeader(contents: String) throws {
         let sandbox = try PiDeletionSandbox()
         defer { sandbox.remove() }
         let sessionID = UUID().uuidString.lowercased()
         let sessionFile = try sandbox.folder.writeSession(id: sessionID, projectPath: "/Users/me/app")
-        let entryFirst = #"{"type":"message","id":"\#(sessionID)","parentId":null,"timestamp":"2026-09-30T10:00:00.000Z"}"# + "\n"
-        try entryFirst.write(to: sessionFile, atomically: true, encoding: .utf8)
+        try contents.replacingOccurrences(of: "SESSION_ID", with: sessionID).write(to: sessionFile, atomically: true, encoding: .utf8)
 
         #expect(throws: ConversationDeletionError.sourceMismatch) {
             try sandbox.deletion.delete(.fixture(provider: .pi, sessionID: sessionID, sourceFile: sessionFile))

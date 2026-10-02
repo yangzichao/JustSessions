@@ -109,6 +109,49 @@ struct PiTranscriptReaderTests {
         #expect(transcript.entries.map(\.content) == [.userMessage("Hello"), .note("429 rate limited")])
     }
 
+    /// A field of an unexpected type reads as missing, as it would in a JSON dictionary, and the rest of the entry
+    /// is still shown.
+    @Test func fieldsOfAnotherTypeDoNotHideTheirEntry() throws {
+        let transcript = try read([
+            #"{"type":"message","id":"u1","parentId":null,"timestamp":17,"message":{"role":"user","content":"Untimed"}}"#,
+            Self.message("x1", parent: "u1", #"{"role":"bashExecution","command":"ls","excludeFromContext":"yes","timestamp":1}"#),
+            Self.message("a1", parent: "x1", #"{"role":"assistant","content":["#
+                + #"{"type":"text","text":5},{"type":"text","text":"Still here."},"#
+                + #"{"type":"toolCall","name":7,"arguments":"ls -la"},"#
+                + #"{"type":"toolCall","name":"bash","arguments":{"timeout":60,"command":["git","status"],"env":null}}"#
+                + #"],"stopReason":"error","errorMessage":{"code":500},"timestamp":2}"#),
+            Self.message("a2", parent: "a1", #"{"role":"assistant","content":"Plain text is not an assistant's content","timestamp":3}"#),
+        ])
+
+        #expect(transcript.entries.map(\.content) == [
+            .userMessage("Untimed"),
+            .userMessage("!ls"),
+            .assistantMessage("Still here."),
+            .toolCalls(["tool", "bash · git status"]),
+        ])
+        #expect(transcript.entries.first?.timestamp == nil)
+    }
+
+    /// Pi writes `excludeFromContext` as a boolean; the numbers 0 and 1 read as one too, as in a JSON dictionary.
+    @Test func aShellCommandsExcludeFromContextReadsZeroAndOneAsABoolean() throws {
+        let values = ["true", "1", "1.0", "0", "2", "false"]
+        let lines = values.enumerated().map { offset, value in
+            Self.message("x\(offset)", parent: offset == 0 ? nil : "x\(offset - 1)",
+                         #"{"role":"bashExecution","command":"c\#(offset)","excludeFromContext":\#(value),"timestamp":1}"#)
+        }
+
+        let transcript = try read(lines)
+
+        #expect(transcript.entries.map(\.content) == [
+            .userMessage("!!c0"),
+            .userMessage("!!c1"),
+            .userMessage("!!c2"),
+            .userMessage("!c3"),
+            .userMessage("!c4"),
+            .userMessage("!c5"),
+        ])
+    }
+
     @Test func linesInAnotherKeyOrderAreParsedAndLinked() throws {
         let reorderedUser = #"{"message":{"content":"Reordered","role":"user"},"parentId":"a1","id":"u2","timestamp":"2026-09-30T10:00:00.000Z","type":"message"}"#
         let escapedID = #"{"type":"message","id":"a\u0032","parentId":"u2","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Escaped id"}]}}"#

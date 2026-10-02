@@ -3,11 +3,6 @@ import Foundation
 /// What the preview learns about one line of a Pi session before decoding it: where the line is, how its entry links
 /// into the session's tree, and whether it could show anything.
 struct PiEntryLink: Equatable {
-    private static let shownEntryTypes: Set<String> = ["message", "compaction", "branch_summary"]
-    private static let shownMessageRoles: Set<String> = ["user", "assistant", "bashExecution"]
-    /// Enough of a line for its type, id, parent, timestamp, and message role.
-    private static let headByteCount = 512
-
     /// Counts the file's non-empty lines from zero.
     let lineIndex: Int
     /// Nil in version 1 sessions, which list entries in order without linking them.
@@ -16,31 +11,27 @@ struct PiEntryLink: Equatable {
     let parentID: String?
     /// False for entries the preview never shows, such as tool results and model changes, so they are not decoded.
     let mightBeShown: Bool
+}
 
-    init(lineIndex: Int, id: String?, parentID: String?, mightBeShown: Bool) {
-        self.lineIndex = lineIndex
-        self.id = id
-        self.parentID = parentID
-        self.mightBeShown = mightBeShown
-    }
+extension PiEntryLink {
+    /// Enough of a line for its type, id, parent, timestamp, and message role.
+    private static let headByteCount = 512
 
-    /// Nil for the session header and for lines that are not entries.
-    init?(line: Data, lineIndex: Int) {
+    /// Nil for the session header and for lines that are not entries. `decoder` parses a line not in Pi's own
+    /// layout, so a reader going through many lines can share one.
+    init?(line: Data, lineIndex: Int, decoder: JSONDecoder = JSONDecoder()) {
         if let link = Self.linkFromLineHead(line, lineIndex: lineIndex) {
             self = link
             return
         }
-        guard let record = ConversationMetadata.object(from: line),
-              let entryType = record["type"] as? String,
+        guard let record = try? decoder.decode(PiEntryLinkRecord.self, from: line),
+              let entryType = record.type,
               entryType != "session" else { return nil }
         self.init(
             lineIndex: lineIndex,
-            id: record["id"] as? String,
-            parentID: record["parentId"] as? String,
-            mightBeShown: Self.mightBeShown(
-                entryType: entryType,
-                role: (record["message"] as? [String: Any])?["role"] as? String
-            )
+            id: record.id,
+            parentID: record.parentID,
+            mightBeShown: PiPreviewedEntry(entryType: entryType, role: record.message?.role) != nil
         )
     }
 
@@ -50,7 +41,7 @@ struct PiEntryLink: Equatable {
     /// on is needed only for messages. Any other line, or one cut off before its closing brace, is parsed instead.
     private static func linkFromLineHead(_ line: Data, lineIndex: Int) -> PiEntryLink? {
         guard line.last == UInt8(ascii: "}") else { return nil }
-        var scanner = PiLineHeadScanner(bytes: Array(line.prefix(headByteCount)))
+        var scanner = PiLineHeadScanner(line: line, byteLimit: headByteCount)
         guard scanner.skip("{\"type\":\""),
               let entryType = scanner.plainString(),
               scanner.skip(",\"id\":\""),
@@ -77,12 +68,7 @@ struct PiEntryLink: Equatable {
             lineIndex: lineIndex,
             id: id,
             parentID: parentID,
-            mightBeShown: mightBeShown(entryType: entryType, role: role)
+            mightBeShown: PiPreviewedEntry(entryType: entryType, role: role) != nil
         )
-    }
-
-    private static func mightBeShown(entryType: String, role: String?) -> Bool {
-        guard entryType == "message" else { return shownEntryTypes.contains(entryType) }
-        return role.map(shownMessageRoles.contains) ?? false
     }
 }

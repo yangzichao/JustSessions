@@ -37,9 +37,9 @@ struct PiConversationDeletion {
             throw ConversationDeletionError.missingSource
         }
         guard itemType(at: sourceFile) == .typeRegular,
-              let header = ConversationMetadata.firstLine(of: sourceFile),
-              header["type"] as? String == "session",
-              header["id"] as? String == conversation.sessionID
+              let header = PiSessionFileHeader(firstLineOf: sourceFile),
+              header.type == "session",
+              header.id == conversation.sessionID
         else { throw ConversationDeletionError.sourceMismatch }
 
         let companionDirectory = sourceFile.deletingPathExtension()

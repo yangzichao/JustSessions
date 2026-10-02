@@ -8,10 +8,11 @@ struct PiTranscriptReader {
     static let branchSummaryNoteText = "Returned to an earlier message; the branch left behind was summarized"
 
     func read(_ file: URL) throws -> TranscriptContent {
+        let decoder = JSONDecoder()
         var links: [PiEntryLink] = []
         var lineCount = 0
         try JSONLinesReader.forEachLine(in: file) { line in
-            if let link = PiEntryLink(line: line, lineIndex: lineCount) { links.append(link) }
+            if let link = PiEntryLink(line: line, lineIndex: lineCount, decoder: decoder) { links.append(link) }
             lineCount += 1
         }
         // Lines Pi appends after the first pass have higher indices than any of these, so they are left out.
@@ -23,74 +24,65 @@ struct PiTranscriptReader {
             defer { lineIndex += 1 }
             guard remainingLineIndices.first == lineIndex else { return }
             remainingLineIndices.removeFirst()
-            guard let record = ConversationMetadata.object(from: line) else { return }
-            append(record, to: &builder)
+            guard let entry = try? decoder.decode(PiSessionEntry.self, from: line) else { return }
+            append(entry, to: &builder)
         }
         return builder.build()
     }
 
-    func append(_ record: [String: Any], to builder: inout TranscriptBuilder) {
-        let timestamp = ConversationMetadata.date(record["timestamp"])
-        switch record["type"] as? String {
-        case "message":
-            guard let message = record["message"] as? [String: Any] else { return }
-            appendMessage(message, timestamp: timestamp, to: &builder)
-        case "compaction":
-            builder.appendCompactionNote(timestamp: timestamp)
-        case "branch_summary":
-            builder.append(.note, text: Self.branchSummaryNoteText, timestamp: timestamp)
-        default:
-            // Extension messages (`custom_message`) are context injected for the model, like the tagged text the
-            // other readers leave out; the rest record settings, labels, names, and usage.
-            return
-        }
-    }
-
-    private func appendMessage(_ message: [String: Any], timestamp: Date?, to builder: inout TranscriptBuilder) {
-        switch message["role"] as? String {
-        case "user":
-            builder.append(.userMessage, text: userText(from: message["content"]), timestamp: timestamp)
-        case "bashExecution":
+    private func append(_ entry: PiSessionEntry, to builder: inout TranscriptBuilder) {
+        guard let previewedEntry = entry.previewedEntry else { return }
+        let timestamp = entry.timestamp.flatMap(ISO8601TimestampParser.shared.date(from:))
+        let message = entry.message
+        switch previewedEntry {
+        case .userMessage:
+            builder.append(.userMessage, text: userText(from: message?.content), timestamp: timestamp)
+        case .shellCommand:
             // `!!` runs a command whose output is kept out of the model's context.
-            let prefix = message["excludeFromContext"] as? Bool == true ? "!!" : "!"
-            let command = (message["command"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let prefix = message?.excludeFromContext == true ? "!!" : "!"
+            let command = (message?.command ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
             guard !command.isEmpty else { return }
             builder.append(.userMessage, text: prefix + command, timestamp: timestamp)
-        case "assistant":
-            for part in message["content"] as? [[String: Any]] ?? [] {
-                switch part["type"] as? String {
+        case .assistantMessage:
+            for part in Self.parts(of: message?.content) {
+                switch part.type {
                 case "text":
-                    builder.append(.assistantMessage, text: part["text"] as? String ?? "", timestamp: timestamp)
+                    builder.append(.assistantMessage, text: part.text ?? "", timestamp: timestamp)
                 case "toolCall":
                     let summary = ToolCallSummary.summary(
-                        toolName: part["name"] as? String ?? "tool",
-                        arguments: part["arguments"] as? [String: Any] ?? [:]
+                        toolName: part.name ?? "tool",
+                        arguments: part.arguments?.foundationValue as? [String: Any] ?? [:]
                     )
                     builder.append(.toolCall, text: summary, timestamp: timestamp)
                 default:
                     continue // Thinking blocks are left out of the preview.
                 }
             }
-            if message["stopReason"] as? String == "error" {
-                builder.append(.note, text: message["errorMessage"] as? String ?? "", timestamp: timestamp)
+            if message?.stopReason == "error" {
+                builder.append(.note, text: message?.errorMessage ?? "", timestamp: timestamp)
             }
-        default:
-            // Tool results are shown through the tool call that produced them. System messages carry the prompt
-            // and tools, not conversation.
-            return
+        case .compaction:
+            builder.appendCompactionNote(timestamp: timestamp)
+        case .branchSummary:
+            builder.append(.note, text: Self.branchSummaryNoteText, timestamp: timestamp)
         }
     }
 
-    private func userText(from content: Any?) -> String {
-        if let text = content as? String { return visibleUserText(text) }
-        let parts = content as? [[String: Any]] ?? []
-        return parts.compactMap { part -> String? in
-            switch part["type"] as? String {
-            case "text": visibleUserText(part["text"] as? String ?? "")
+    private func userText(from content: PiSessionEntry.Message.Content?) -> String {
+        if case .text(let text) = content { return visibleUserText(text) }
+        return Self.parts(of: content).compactMap { part -> String? in
+            switch part.type {
+            case "text": visibleUserText(part.text ?? "")
             case "image": "[Image]"
             default: nil
             }
         }.joined(separator: "\n\n")
+    }
+
+    /// The parts of `content`; none when it is plain text or missing.
+    private static func parts(of content: PiSessionEntry.Message.Content?) -> [PiSessionEntry.Message.Part] {
+        guard case .parts(let parts) = content else { return [] }
+        return parts
     }
 
     /// Pi expands `/skill:name arguments` into the skill's instructions, wrapped as

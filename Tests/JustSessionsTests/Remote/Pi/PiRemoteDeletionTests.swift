@@ -2,10 +2,29 @@ import Foundation
 import Testing
 @testable import JustSessions
 
-/// Runs the deletion script in a local shell whose `$HOME` is a temporary folder standing in for the host's home.
+/// Runs the deletion script in a local shell whose `$HOME` is a temporary folder standing in for the host's home,
+/// under both macOS's `/bin/sh` and dash, the `/bin/sh` of Debian and Ubuntu hosts. Serialized because each case
+/// blocks a thread while its shell runs.
+@Suite(.serialized)
 struct PiRemoteDeletionTests {
-    @Test func removesTheFolderBesideTheSessionAndItsFileThenDropsTheMirrorCopy() throws {
-        let fixture = try RemotePiFixture()
+    typealias HostShell = RemotePiFixture.HostShell
+
+    /// The script runs as `sh -c …`, so that inner `sh` must be dash too for dash to check it: dash rejects the
+    /// bash-only `[[`, which macOS's `/bin/sh` accepts. Skipped without `/bin/dash`, which shows that the other tests
+    /// ran only under `/bin/sh`.
+    @Test(.enabled(if: HostShell.dash.isInstalled, "Needs /bin/dash, the /bin/sh of Debian and Ubuntu"))
+    func underDashTheScriptsOwnShIsDashToo() throws {
+        let fixture = try RemotePiFixture(shell: .dash)
+        defer { fixture.remove() }
+
+        let result = fixture.runOnHost("sh -c '[[ -n x ]]'")
+
+        #expect(result?.exitStatus == 127)
+    }
+
+    @Test(arguments: HostShell.installed)
+    func removesTheFolderBesideTheSessionAndItsFileThenDropsTheMirrorCopy(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         let runFolder = fixture.hostCompanionFolder.appendingPathComponent("\(UUID().uuidString.lowercased())/run-1")
         try FileManager.default.createDirectory(at: runFolder, withIntermediateDirectories: true)
@@ -24,8 +43,9 @@ struct PiRemoteDeletionTests {
         #expect(!FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
     }
 
-    @Test func aSessionWithoutAFolderLosesOnlyItsFile() throws {
-        let fixture = try RemotePiFixture()
+    @Test(arguments: HostShell.installed)
+    func aSessionWithoutAFolderLosesOnlyItsFile(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
 
         try fixture.deletion().delete(fixture.conversation)
@@ -34,8 +54,9 @@ struct PiRemoteDeletionTests {
         #expect(try FileManager.default.contentsOfDirectory(atPath: fixture.hostProjectFolder.sessionsDirectory.path).isEmpty)
     }
 
-    @Test func aFolderBesideTheSessionThatIsASymbolicLinkIsLeftAlone() throws {
-        let fixture = try RemotePiFixture()
+    @Test(arguments: HostShell.installed)
+    func aFolderBesideTheSessionThatIsASymbolicLinkIsLeftAlone(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         let elsewhere = fixture.root.appendingPathComponent("elsewhere")
         try FileManager.default.createDirectory(at: elsewhere, withIntermediateDirectories: true)
@@ -49,8 +70,9 @@ struct PiRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: elsewhere.appendingPathComponent("notes.txt").path))
     }
 
-    @Test func aSymbolicLinkInPlaceOfTheSessionFileIsRefused() throws {
-        let fixture = try RemotePiFixture()
+    @Test(arguments: HostShell.installed)
+    func aSymbolicLinkInPlaceOfTheSessionFileIsRefused(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         let target = fixture.root.appendingPathComponent("target.jsonl")
         try FileManager.default.moveItem(at: fixture.hostSessionFile, to: target)
@@ -64,8 +86,9 @@ struct PiRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
     }
 
-    @Test func aProjectFolderThatIsASymbolicLinkIsRefused() throws {
-        let fixture = try RemotePiFixture()
+    @Test(arguments: HostShell.installed)
+    func aProjectFolderThatIsASymbolicLinkIsRefused(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         let elsewhere = fixture.root.appendingPathComponent("elsewhere")
         try FileManager.default.moveItem(at: fixture.hostProjectFolder.sessionsDirectory, to: elsewhere)
@@ -75,8 +98,9 @@ struct PiRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: elsewhere.appendingPathComponent(fixture.hostSessionFile.lastPathComponent).path))
     }
 
-    @Test func aFolderInPlaceOfTheSessionFileIsRefused() throws {
-        let fixture = try RemotePiFixture()
+    @Test(arguments: HostShell.installed)
+    func aFolderInPlaceOfTheSessionFileIsRefused(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         try FileManager.default.removeItem(at: fixture.hostSessionFile)
         try FileManager.default.createDirectory(at: fixture.hostSessionFile, withIntermediateDirectories: true)
@@ -85,29 +109,34 @@ struct PiRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.hostSessionFile.path))
     }
 
-    @Test(arguments: [
-        (#"{"type":"session","version":3,"id":"019a0000-0000-7000-8000-0000000000aa","cwd":"/home/me/paper"}"#,
-         "The file belongs to another session. Refresh before deleting."),
-        (#"{"type":"message","id":"a1","parentId":null}"#, "The file is not a Pi session. Refresh before deleting."),
+    @Test(arguments: HostShell.installed, [
+        (firstLine: #"{"type":"session","version":3,"id":"019a0000-0000-7000-8000-0000000000aa","cwd":"/home/me/paper"}"#,
+         expectedFailure: "The file belongs to another session. Refresh before deleting."),
+        (firstLine: #"{"type":"message","id":"a1","parentId":null}"#,
+         expectedFailure: "The file is not a Pi session. Refresh before deleting."),
     ])
-    func aFileWhoseFirstLineIsNotThisSessionsHeaderIsRefused(firstLine: String, expectedFailure: String) throws {
-        let fixture = try RemotePiFixture()
+    func aFileWhoseFirstLineIsNotThisSessionsHeaderIsRefused(
+        shell: HostShell,
+        headerCase: (firstLine: String, expectedFailure: String)
+    ) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         let companionFile = fixture.hostCompanionFolder.appendingPathComponent("forks/kept.jsonl")
         try FileManager.default.createDirectory(at: companionFile.deletingLastPathComponent(), withIntermediateDirectories: true)
         try "fork".write(to: companionFile, atomically: true, encoding: .utf8)
         // The session's own header further down does not count.
         let original = try String(contentsOf: fixture.hostSessionFile, encoding: .utf8)
-        try (firstLine + "\n" + original).write(to: fixture.hostSessionFile, atomically: true, encoding: .utf8)
+        try (headerCase.firstLine + "\n" + original).write(to: fixture.hostSessionFile, atomically: true, encoding: .utf8)
 
-        #expect(deletionFailure(fixture) == expectedFailure)
+        #expect(deletionFailure(fixture) == headerCase.expectedFailure)
         #expect(FileManager.default.fileExists(atPath: fixture.hostSessionFile.path))
         #expect(FileManager.default.fileExists(atPath: companionFile.path))
         #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
     }
 
-    @Test func aSessionHeaderNestedInsideAnotherRecordIsRefused() throws {
-        let fixture = try RemotePiFixture()
+    @Test(arguments: HostShell.installed)
+    func aSessionHeaderNestedInsideAnotherRecordIsRefused(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         let id = fixture.conversation.sessionID
         let original = try String(contentsOf: fixture.hostSessionFile, encoding: .utf8)
@@ -118,8 +147,9 @@ struct PiRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.hostSessionFile.path))
     }
 
-    @Test func aSessionAlreadyGoneFromTheHostIsReportedWithoutDroppingTheMirror() throws {
-        let fixture = try RemotePiFixture()
+    @Test(arguments: HostShell.installed)
+    func aSessionAlreadyGoneFromTheHostIsReportedWithoutDroppingTheMirror(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         try FileManager.default.removeItem(at: fixture.hostSessionFile)
 
@@ -203,8 +233,9 @@ struct PiRemoteDeletionTests {
 
     /// The script checks its arguments itself too, so a session file reached through `..` or a nested folder, or
     /// named for another session, is never removed even if a caller skipped the checks in `hostFileNames`.
-    @Test func theScriptRefusesUnexpectedNamesWithoutRemovingAnything() throws {
-        let fixture = try RemotePiFixture()
+    @Test(arguments: HostShell.installed)
+    func theScriptRefusesUnexpectedNamesWithoutRemovingAnything(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         let id = fixture.conversation.sessionID
         let fileName = fixture.hostSessionFile.lastPathComponent
@@ -240,8 +271,9 @@ struct PiRemoteDeletionTests {
         }
     }
 
-    @Test func theScriptReportsAMissingProjectFolderAsAMissingSession() throws {
-        let fixture = try RemotePiFixture()
+    @Test(arguments: HostShell.installed)
+    func theScriptReportsAMissingProjectFolderAsAMissingSession(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
 
         let result = fixture.runOnHost(RemotePiConversationDeletion.command(

@@ -41,6 +41,34 @@ struct PiEntryLinkTests {
         #expect(Self.link(longTypeLine) == PiEntryLink(lineIndex: 7, id: "a2", parentID: "a1", mightBeShown: false))
     }
 
+    /// Lines are slices of the reader's buffer, so a line's bytes need not start at index zero.
+    @Test func readsALineSlicedFromALargerBuffer() {
+        let user = #"{"type":"message","id":"a1","parentId":"p0","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","content":"Hi"}}"#
+        let longIDLine = #"{"type":"message","id":"\#(String(repeating: "a", count: 600))","parentId":"a1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"toolResult","content":[]}}"#
+        let buffer = Data((String(repeating: "x", count: 700) + "\n" + user + "\n" + longIDLine).utf8)
+        let lines = buffer.split(separator: UInt8(ascii: "\n"))
+
+        #expect(lines[1].startIndex == 701)
+        #expect(PiEntryLink(line: lines[1], lineIndex: 7) == PiEntryLink(lineIndex: 7, id: "a1", parentID: "p0", mightBeShown: true))
+        #expect(PiEntryLink(line: lines[2], lineIndex: 8) == PiEntryLink(
+            lineIndex: 8,
+            id: String(repeating: "a", count: 600),
+            parentID: "a1",
+            mightBeShown: false
+        ))
+    }
+
+    @Test func fieldsOfAnotherTypeInAParsedLineReadAsMissing() {
+        let oddParent = #"{"type":"message","id":"a1","parentId":7,"message":{"role":"assistant"}}"#
+        let oddRole = #"{"type":"message","id":"a2","parentId":"a1","message":{"role":["user"]}}"#
+        let oddMessage = #"{"type":"message","id":"a3","parentId":"a2","message":"user"}"#
+
+        #expect(Self.link(oddParent) == PiEntryLink(lineIndex: 7, id: "a1", parentID: nil, mightBeShown: true))
+        #expect(Self.link(oddRole) == PiEntryLink(lineIndex: 7, id: "a2", parentID: "a1", mightBeShown: false))
+        #expect(Self.link(oddMessage) == PiEntryLink(lineIndex: 7, id: "a3", parentID: "a2", mightBeShown: false))
+        #expect(Self.link(#"{"type":1,"id":"a4","parentId":"a3"}"#) == nil)
+    }
+
     @Test func theHeaderAndLinesThatAreNotEntriesHaveNoLink() {
         #expect(Self.link(#"{"type":"session","version":3,"id":"019a0000-0000-7000-8000-000000000000","cwd":"/tmp"}"#) == nil)
         #expect(Self.link("not json") == nil)
