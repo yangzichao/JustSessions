@@ -3,7 +3,7 @@ import Foundation
 /// Deletes a session on its remote host over SSH. Remote hosts have no Trash, so this is permanent.
 /// Claude Code and Antigravity lose their stored history and index entry; Codex and Kiro use their native CLIs;
 /// Pi loses its session file and the folder beside it.
-struct RemoteConversationDeletion {
+struct RemoteConversationDeletion: Sendable {
     let runner: RemoteHostCommandRunner
     /// Where the host's sessions were copied, so a Pi session's file is found relative to that host's Pi mirror.
     let mirror: RemoteSessionMirror

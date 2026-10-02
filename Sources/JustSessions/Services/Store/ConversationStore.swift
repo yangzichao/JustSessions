@@ -16,9 +16,11 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var selectedTerminalID: UUID? {
         didSet { selectedTerminal?.startNowThatItIsShown() }
     }
-    @Published private(set) var deletingConversationID: String?
-    /// Every conversation queued in the running batch deletion.
-    @Published private(set) var batchDeletionConversationIDs: Set<String> = []
+    /// Every conversation queued in the running deletion, of one session or several. It changes only when a
+    /// deletion starts and ends; `deletionProgress` follows the sessions in between.
+    @Published private(set) var pendingDeletionConversationIDs: Set<String> = []
+    /// How far the running deletion has got. Only the sidebar's progress bar observes it.
+    let deletionProgress = SessionDeletionProgress()
     /// The SSH hosts listed after this Mac.
     @Published var remoteHostList: RemoteHostList
     /// Each host's last refresh, this Mac's included.
@@ -48,9 +50,15 @@ final class ConversationStore: ObservableObject {
     /// The hosts the running deletion deletes from. A refresh of one waits until it ends, see `deferRefreshWhileDeleting(on:)`.
     private var hostsWithRunningDeletion: Set<SessionHost> = []
     private var hostsToRefreshAfterDeletion: Set<SessionHost> = []
+    private var deletionTask: Task<Void, Never>?
+    /// Deleted sessions leave the list, and the progress bar moves, at most this often while a deletion runs, and
+    /// once more when it ends. Tests set it to zero to follow each session.
+    var deletionListUpdateInterval: Duration = .milliseconds(500)
 
     private let adapters: [any ConversationAdapter]
     let commandResolver: NativeCLICommandResolver
+    /// Deletes sessions on SSH hosts.
+    private let remoteDeletion: RemoteConversationDeletion
     /// Where custom titles, project names, pins, sidebar projects, and SSH hosts are kept.
     let userDefaults: UserDefaults
 
@@ -61,10 +69,12 @@ final class ConversationStore: ObservableObject {
         commandResolver: NativeCLICommandResolver = NativeCLICommandResolver(),
         userDefaults: UserDefaults = .standard,
         sessionNotifier: any SessionNotifying = SessionNotificationCenter.shared,
+        remoteDeletion: RemoteConversationDeletion = RemoteConversationDeletion(),
         startsBackgroundPolling: Bool = true
     ) {
         self.adapters = adapters
         self.commandResolver = commandResolver
+        self.remoteDeletion = remoteDeletion
         self.userDefaults = userDefaults
         self.sessionNotifier = sessionNotifier
         self.titleAliases = ConversationTitleAliases.load(from: userDefaults)
@@ -182,7 +192,7 @@ final class ConversationStore: ObservableObject {
     }
 
     var isDeletingSessions: Bool {
-        deletingConversationID != nil || !batchDeletionConversationIDs.isEmpty
+        !pendingDeletionConversationIDs.isEmpty
     }
 
     /// A deletion waits for the deletion already running, and for the refresh of any host it deletes from: that
@@ -199,7 +209,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func isDeletionPending(for conversation: Conversation) -> Bool {
-        deletingConversationID == conversation.id || batchDeletionConversationIDs.contains(conversation.id)
+        pendingDeletionConversationIDs.contains(conversation.id)
     }
 
     func deletionPlan(for projectPath: String) -> SessionDeletionPlan {
@@ -222,7 +232,6 @@ final class ConversationStore: ObservableObject {
             return
         }
         guard canStartDeletion(of: [conversation]), adapter(for: conversation.provider) != nil else { return }
-        deletingConversationID = conversation.id
         deleteInBackground([conversation], failureMessage: ConversationDeletionFailure.messageAfterDeletingOneSession)
     }
 
@@ -236,65 +245,135 @@ final class ConversationStore: ObservableObject {
         let deletionPlan = deletionPlan(for: conversations.filter { candidateIDs.contains($0.id) })
         guard deletionPlan.hasDeletableConversations, canStartDeletion(of: deletionPlan.deletableConversations) else { return }
 
-        batchDeletionConversationIDs = Set(deletionPlan.deletableConversations.map(\.id))
         deleteInBackground(
             deletionPlan.deletableConversations,
             failureMessage: ConversationDeletionFailure.messageAfterDeletingSeveralSessions
         )
     }
 
+    /// Stops the running deletion after the session it is deleting, never during one. The sessions after it are
+    /// not attempted and stay listed.
+    func cancelDeletion() {
+        guard let deletionTask, !deletionProgress.isStopping else { return }
+        deletionProgress.markStopping()
+        deletionTask.cancel()
+    }
+
     /// Deletes the conversations one at a time off the main actor, then shows `failureMessage` for any that failed.
-    /// A conversation whose file is gone leaves the list even when its deletion reported an error.
+    /// A conversation whose file is gone leaves the list even when its deletion reported an error. Once an SSH host
+    /// cannot be reached or does not respond in time, its remaining sessions are not attempted. Deleted sessions leave the list in groups,
+    /// at most every `deletionListUpdateInterval`, so a long deletion does not re-render the sidebar per session.
     private func deleteInBackground(
         _ deletableConversations: [Conversation],
         failureMessage: @escaping @Sendable ([ConversationDeletionFailure]) -> String
     ) {
-        let adapters = self.adapters
+        pendingDeletionConversationIDs = Set(deletableConversations.map(\.id))
         hostsWithRunningDeletion = Set(deletableConversations.map(\.host))
-        Task.detached(priority: .userInitiated) {
+        deletionProgress.start(totalCount: deletableConversations.count)
+        let adapters = self.adapters
+        let remoteDeletion = self.remoteDeletion
+        let listUpdateInterval = deletionListUpdateInterval
+        deletionTask = Task.detached(priority: .userInitiated) {
+            let clock = ContinuousClock()
+            var lastListUpdate = clock.now
+            var deletedSinceListUpdate: [Conversation] = []
+            var attemptedCount = 0
             var failures: [ConversationDeletionFailure] = []
+            var unresponsiveHosts: [String: UnresponsiveSSHHost] = [:]
             for conversation in deletableConversations {
-                guard let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { continue }
-                await MainActor.run { self.deletingConversationID = conversation.id }
-                do {
-                    try Self.deleteFromDisk(conversation, adapter: adapter)
-                    await MainActor.run { self.removeDeletedConversation(conversation) }
-                } catch {
-                    failures.append(ConversationDeletionFailure(conversation: conversation, reason: error.localizedDescription))
-                    await MainActor.run {
+                // Cancel takes effect between sessions, so no session is left half deleted.
+                if Task.isCancelled { break }
+                attemptedCount += 1
+                if let unresponsiveHost = conversation.host.sshDestination.flatMap({ unresponsiveHosts[$0] }) {
+                    failures.append(ConversationDeletionFailure(
+                        conversation: conversation,
+                        reason: RemoteConversationDeletionError.notAttempted(unresponsiveHost).localizedDescription,
+                        unresponsiveHost: unresponsiveHost
+                    ))
+                } else if let adapter = adapters.first(where: { $0.provider == conversation.provider }) {
+                    do {
+                        try Self.deleteFromDisk(conversation, adapter: adapter, remoteDeletion: remoteDeletion)
+                        deletedSinceListUpdate.append(conversation)
+                    } catch {
+                        let unresponsiveHost = (error as? RemoteConversationDeletionError)?.unresponsiveHost
+                        if let unresponsiveHost { unresponsiveHosts[unresponsiveHost.host] = unresponsiveHost }
+                        failures.append(ConversationDeletionFailure(
+                            conversation: conversation,
+                            reason: error.localizedDescription,
+                            unresponsiveHost: unresponsiveHost
+                        ))
                         if !FileManager.default.fileExists(atPath: conversation.sourceFile.path) {
-                            self.removeDeletedConversation(conversation)
+                            deletedSinceListUpdate.append(conversation)
                         }
                     }
                 }
+                if clock.now - lastListUpdate >= listUpdateInterval {
+                    let deleted = deletedSinceListUpdate
+                    let completedCount = attemptedCount
+                    deletedSinceListUpdate = []
+                    lastListUpdate = clock.now
+                    await self.applyDeletionProgress(removing: deleted, completedCount: completedCount)
+                }
             }
+            let deleted = deletedSinceListUpdate
             let finalFailures = failures
-            await MainActor.run {
-                self.deletingConversationID = nil
-                self.batchDeletionConversationIDs = []
-                if !finalFailures.isEmpty { self.errorMessage = failureMessage(finalFailures) }
-                self.hostsWithRunningDeletion = []
-                let hostsToRefresh = self.hostsToRefreshAfterDeletion
-                self.hostsToRefreshAfterDeletion = []
-                for host in self.hosts where hostsToRefresh.contains(host) { self.refresh(host) }
-            }
+            await self.finishDeletion(removing: deleted, failures: finalFailures, failureMessage: failureMessage)
         }
     }
 
     /// A session on this Mac is deleted by its tool's adapter; one on an SSH host over SSH.
-    nonisolated private static func deleteFromDisk(_ conversation: Conversation, adapter: any ConversationAdapter) throws {
+    nonisolated private static func deleteFromDisk(
+        _ conversation: Conversation,
+        adapter: any ConversationAdapter,
+        remoteDeletion: RemoteConversationDeletion
+    ) throws {
         switch conversation.host {
         case .thisMac: try adapter.delete(conversation)
-        case .ssh: try RemoteConversationDeletion().delete(conversation)
+        case .ssh: try remoteDeletion.delete(conversation)
         }
     }
 
-    private func removeDeletedConversation(_ conversation: Conversation) {
-        conversations.removeAll { $0.id == conversation.id }
-        titleAliases.removeTitle(forConversationID: conversation.id)
-        titleAliases.save(to: userDefaults)
-        if pinnedItems.isPinned(conversationID: conversation.id) {
-            setPinned(false, conversation: conversation)
+    private func applyDeletionProgress(removing deleted: [Conversation], completedCount: Int) {
+        removeDeletedConversations(deleted)
+        deletionProgress.update(completedCount: completedCount)
+    }
+
+    /// Always runs when a deletion ends, canceled or not, so another can start; then refreshes the hosts whose
+    /// refresh waited for it.
+    private func finishDeletion(
+        removing deleted: [Conversation],
+        failures: [ConversationDeletionFailure],
+        failureMessage: ([ConversationDeletionFailure]) -> String
+    ) {
+        removeDeletedConversations(deleted)
+        pendingDeletionConversationIDs = []
+        deletionTask = nil
+        deletionProgress.finish()
+        if !failures.isEmpty { errorMessage = failureMessage(failures) }
+
+        hostsWithRunningDeletion = []
+        let hostsToRefresh = hostsToRefreshAfterDeletion
+        hostsToRefreshAfterDeletion = []
+        for host in hosts where hostsToRefresh.contains(host) { refresh(host) }
+    }
+
+    /// Takes the deleted sessions off the list in one change, and forgets their custom titles and pins.
+    private func removeDeletedConversations(_ deleted: [Conversation]) {
+        guard !deleted.isEmpty else { return }
+        let deletedIDs = Set(deleted.map(\.id))
+        conversations.removeAll { deletedIDs.contains($0.id) }
+
+        var remainingTitleAliases = titleAliases
+        for conversationID in deletedIDs { remainingTitleAliases.removeTitle(forConversationID: conversationID) }
+        if remainingTitleAliases != titleAliases {
+            titleAliases = remainingTitleAliases
+            titleAliases.save(to: userDefaults)
+        }
+        var remainingPinnedItems = pinnedItems
+        for conversationID in deletedIDs { remainingPinnedItems.setPinned(false, conversationID: conversationID) }
+        if remainingPinnedItems != pinnedItems {
+            pinnedItems = remainingPinnedItems
+            pinnedItems.save(to: userDefaults)
         }
     }
 

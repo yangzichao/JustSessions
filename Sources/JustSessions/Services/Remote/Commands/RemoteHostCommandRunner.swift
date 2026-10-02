@@ -9,11 +9,25 @@ struct RemoteHostCommandRunner: Sendable {
         self.run = run ?? { host, command, timeout in
             BoundedProcessRunner.result(
                 ofExecutable: "/usr/bin/ssh",
-                arguments: ["-o", "BatchMode=yes", "-o", "ConnectTimeout=10", host, command],
+                arguments: Self.sshArguments(host: host, command: command),
                 includesStandardError: true,
                 timeout: timeout
             )
         }
+    }
+
+    /// The `ssh` options of every connection made without a terminal, the `rsync` copies' included. A host that
+    /// does not answer fails within 10 seconds, and a connection that dies, as when the Mac sleeps, within about
+    /// 15 seconds instead of hanging until the command's timeout.
+    static let nonInteractiveSSHOptions = [
+        "-o", "BatchMode=yes",
+        "-o", "ConnectTimeout=10",
+        "-o", "ServerAliveInterval=5",
+        "-o", "ServerAliveCountMax=3",
+    ]
+
+    static func sshArguments(host: String, command: String) -> [String] {
+        nonInteractiveSSHOptions + [host, command]
     }
 
     /// `ssh` exits with this when it could not connect or authenticate.

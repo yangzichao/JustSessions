@@ -73,11 +73,14 @@ struct RemoteSessionMirror: Sendable {
     static func rsyncArguments(for provider: ConversationProvider, source: String, destination: String) -> [String] {
         [
             "--archive", "--delete",
-            "-e", "ssh -o BatchMode=yes -o ConnectTimeout=10",
+            "-e", rsyncRemoteShell,
         ]
             + includedPatterns(for: provider).map { "--include=\($0)" }
             + ["--exclude=*", source, destination]
     }
+
+    /// The `ssh` command `rsync` connects with; none of the options has a space, so joining them needs no quoting.
+    static let rsyncRemoteShell = (["ssh"] + RemoteHostCommandRunner.nonInteractiveSSHOptions).joined(separator: " ")
 
     /// Only the files the adapters read; Claude Code's subagent transcripts and caches stay on the host, and so do
     /// the subagent runs, forks, and artifacts Pi extensions keep in folders inside a Pi project folder.
