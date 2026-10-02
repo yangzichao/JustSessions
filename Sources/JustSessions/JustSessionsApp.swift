@@ -25,7 +25,7 @@ struct JustSessionsApp: App {
             HelpView()
                 .appTheme(from: .shared)
         }
-        .defaultSize(width: 600, height: 760)
+        .defaultSize(width: 600, height: 640)
         .windowResizability(.contentMinSize)
 
         Settings {

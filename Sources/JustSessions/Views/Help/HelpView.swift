@@ -10,7 +10,7 @@ struct HelpView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("JustSessions Help", systemImage: "questionmark.circle")
                             .font(.title2.weight(.semibold))
-                        Text("Find, read, and continue your AI coding sessions in one place.")
+                        Text("Browse, read, and resume your coding sessions.")
                             .foregroundStyle(ThemePalette.secondaryText)
                     }
 

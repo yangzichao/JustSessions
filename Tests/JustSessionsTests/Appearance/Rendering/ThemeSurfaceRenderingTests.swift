@@ -14,7 +14,7 @@ struct ThemeSurfaceRenderingTests {
         let notificationStore = SessionNotificationSettingsStore(userDefaults: settings.userDefaults)
         let tabReopeningStore = TabReopeningSettingsStore(userDefaults: settings.userDefaults)
         let views: [(String, AnyView, CGSize)] = [
-            ("help", AnyView(HelpView()), CGSize(width: 600, height: 760)),
+            ("help", AnyView(HelpView()), CGSize(width: 600, height: 640)),
             ("help-narrow", AnyView(HelpView()), CGSize(width: 480, height: 560)),
             ("settings", AnyView(SettingsView(
                 tabReopeningSettingsStore: tabReopeningStore,

@@ -5,10 +5,10 @@ struct HelpRemoteHostSection: View {
         VStack(alignment: .leading, spacing: 10) {
             Label("Remote hosts over SSH", systemImage: "network")
                 .font(.headline)
-            Text("**Install tmux on the remote host.** The app's bundled tmux is only for this Mac. Remote sessions need their own tmux to keep running after a disconnect or closing a tab.")
-            Text("The host also needs passwordless SSH, rsync, and your coding CLI. Antigravity also needs python3; deleting its sessions needs lsof.")
+            Text("**Install tmux on each remote host.** The Mac's bundled tmux only works locally.")
+            Text("Also required: passwordless SSH, rsync, and your CLI. Antigravity needs python3; lsof for deletion.")
                 .foregroundStyle(ThemePalette.secondaryText)
-            Text("Run `tmux -V` on the host to check installation. Then choose **Add SSH host…** and enter an SSH config alias or `user@hostname`.")
+            Text("Check `tmux -V` on the host, then **Add SSH host…** with an alias or `user@hostname`.")
         }
         .font(.callout)
         .fixedSize(horizontal: false, vertical: true)
