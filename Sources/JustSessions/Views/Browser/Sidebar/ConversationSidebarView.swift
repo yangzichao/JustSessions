@@ -85,7 +85,7 @@ struct ConversationSidebarView: View {
                 isFocused: $isSidebarListFocused,
                 onDismissSelection: dismissSidebarSelection
             ) {
-                LazyVStack(alignment: .leading, spacing: 1) {
+                LazyVStack(alignment: .leading, spacing: SidebarIndentGuide.rowSpacing) {
                     ForEach(hostSections) { section in
                         hostHeading(for: section)
                             .padding(.top, 14)

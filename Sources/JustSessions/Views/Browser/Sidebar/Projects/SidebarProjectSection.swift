@@ -18,65 +18,68 @@ struct SidebarProjectSection: View {
     let onRemoveSelectedProjects: () -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
+    /// The project row, then its sessions while it is expanded, as separate views: the sidebar's lazy list then
+    /// builds only the rows in sight, even for a project with hundreds of sessions.
     var body: some View {
-        VStack(spacing: 1) {
-            SidebarProjectRow(
-                store: store,
-                project: project,
-                parentLabel: parentLabel,
-                isExpanded: isExpanded,
-                projectSelection: projectSelection,
-                onToggleExpansion: onToggleExpansion,
-                onClick: onClickProject,
-                onNewSession: onNewSession,
-                onRename: onRenameProject,
-                onDeleteSessions: { onRequestDeletion(.project(project.id)) },
-                onRemoveSelectedProjects: onRemoveSelectedProjects
-            )
+        SidebarProjectRow(
+            store: store,
+            project: project,
+            parentLabel: parentLabel,
+            isExpanded: isExpanded,
+            projectSelection: projectSelection,
+            onToggleExpansion: onToggleExpansion,
+            onClick: onClickProject,
+            onNewSession: onNewSession,
+            onRename: onRenameProject,
+            onDeleteSessions: { onRequestDeletion(.project(project.id)) },
+            onRemoveSelectedProjects: onRemoveSelectedProjects
+        )
 
-            if isExpanded {
-                VStack(spacing: 1) {
-                    if project.sessionCount == 0 {
-                        Text("No sessions")
-                            .font(.system(size: 11))
-                            .foregroundStyle(.tertiary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 40)
-                            .padding(.vertical, 5)
-                    }
-                    ForEach(project.pendingNewSessions) { pendingNewSession in
-                        if let terminal = store.terminalSessions.first(where: { $0.id == pendingNewSession.terminalID }) {
-                            PendingNewSessionRow(
-                                terminal: terminal,
-                                provider: pendingNewSession.provider,
-                                isSelected: store.selectedTerminalID == terminal.id,
-                                onSelect: { onSelectPendingNewSession(terminal.id) }
-                            )
-                        }
-                    }
-                    ForEach(project.conversations) { conversation in
-                        SidebarSessionRow(
-                            store: store,
-                            conversation: conversation,
-                            sessionSelection: sessionSelection,
-                            selectedConversations: selectedConversations,
-                            onClick: onClickConversation,
-                            onRename: onRenameConversation,
-                            onRequestDeletion: onRequestDeletion
-                        )
-                    }
-                }
-                .background(alignment: .leading) { indentGuide }
+        if isExpanded {
+            let pendingNewSessionTerminals = pendingNewSessionTerminals
+            if project.sessionCount == 0 {
+                Text("No sessions")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.tertiary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 40)
+                    .padding(.vertical, 5)
+                    .sidebarIndentGuide(isFirstRow: true, isLastRow: true)
+            }
+            ForEach(Array(pendingNewSessionTerminals.enumerated()), id: \.element.pendingNewSession.id) { index, row in
+                PendingNewSessionRow(
+                    terminal: row.terminal,
+                    provider: row.pendingNewSession.provider,
+                    isSelected: store.selectedTerminalID == row.terminal.id,
+                    onSelect: { onSelectPendingNewSession(row.terminal.id) }
+                )
+                .sidebarIndentGuide(
+                    isFirstRow: index == 0,
+                    isLastRow: index == pendingNewSessionTerminals.count - 1 && project.conversations.isEmpty
+                )
+            }
+            ForEach(project.conversations) { conversation in
+                SidebarSessionRow(
+                    store: store,
+                    conversation: conversation,
+                    sessionSelection: sessionSelection,
+                    selectedConversations: selectedConversations,
+                    onClick: onClickConversation,
+                    onRename: onRenameConversation,
+                    onRequestDeletion: onRequestDeletion
+                )
+                .sidebarIndentGuide(
+                    isFirstRow: pendingNewSessionTerminals.isEmpty && conversation.id == project.conversations.first?.id,
+                    isLastRow: conversation.id == project.conversations.last?.id
+                )
             }
         }
     }
 
-    /// A hairline under the chevron that ties the sessions to their project.
-    private var indentGuide: some View {
-        Rectangle()
-            .fill(ThemePalette.hairline)
-            .frame(width: 1)
-            .padding(.leading, 15)
-            .padding(.vertical, 3)
+    /// The project's new sessions whose tab is still open, each with that tab.
+    private var pendingNewSessionTerminals: [(pendingNewSession: PendingNewSession, terminal: TerminalSession)] {
+        project.pendingNewSessions.compactMap { pendingNewSession in
+            store.terminalSessions.first { $0.id == pendingNewSession.terminalID }.map { (pendingNewSession, $0) }
+        }
     }
 }

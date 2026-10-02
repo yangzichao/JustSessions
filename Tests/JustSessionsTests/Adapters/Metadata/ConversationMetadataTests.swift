@@ -19,6 +19,8 @@ struct ConversationMetadataTests {
         TitleCase(rawTitle: "First line\nSecond line", expectedTitle: "First line", testDescription: "several lines"),
         TitleCase(rawTitle: "Windows line\r\nnext", expectedTitle: "Windows line", testDescription: "CRLF line ending"),
         TitleCase(rawTitle: "\n\n  Pasted after blank lines", expectedTitle: "Pasted after blank lines", testDescription: "leading blank lines"),
+        TitleCase(rawTitle: "\r\n \r\nAfter CRLF blank lines\r\nnext", expectedTitle: "After CRLF blank lines", testDescription: "leading CRLF blank lines"),
+        TitleCase(rawTitle: "\u{2028}First\u{2029}Second", expectedTitle: "First", testDescription: "Unicode line separators"),
         TitleCase(rawTitle: "Compare a < b", expectedTitle: "Compare a < b", testDescription: "angle bracket inside the text"),
         TitleCase(
             rawTitle: String(repeating: "é", count: 200),

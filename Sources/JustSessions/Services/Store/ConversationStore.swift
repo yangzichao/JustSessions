@@ -5,7 +5,17 @@ import Foundation
 /// methods below to refresh hosts, launch CLIs, and link new sessions to their tabs.
 @MainActor
 final class ConversationStore: ObservableObject {
-    @Published private(set) var conversations: [Conversation] = []
+    @Published private(set) var conversations: [Conversation] = [] {
+        didSet {
+            conversationIndex = ConversationIndex(conversations)
+            conversationsRevision &+= 1
+        }
+    }
+    private(set) var conversationIndex = ConversationIndex([])
+    /// Changes with every change to `conversations`, so what is worked out from them knows when to work it out again.
+    private(set) var conversationsRevision = 0
+    /// What the sidebar lists, kept until what it was worked out from changes; see `ConversationStore+SidebarProjects`.
+    var cachedSidebarProjection: SidebarProjection?
     /// What the main window's alert shows, if anything.
     @Published private(set) var alert: StoreAlert?
     /// Alerts that came while `alert` was shown. Each is shown once the ones before it are dismissed, since

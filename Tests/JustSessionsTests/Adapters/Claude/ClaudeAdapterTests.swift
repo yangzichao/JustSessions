@@ -165,4 +165,17 @@ struct ClaudeAdapterTests {
         #expect(updatedAt[indexIsNewer] == ConversationMetadata.date("2026-09-24T12:00:00Z"))
         #expect(updatedAt[neitherHasATime] == fileDate)
     }
+
+    @Test func aTranscriptClaudeWroteMoreToSinceTheLastScanIsReadAgain() throws {
+        let folder = try ClaudeProjectFolderFixture()
+        defer { folder.remove() }
+        let sessionID = UUID().uuidString
+        let firstPrompt = #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Draft intro"}}"#
+        try folder.writeTranscript(sessionID, lines: [firstPrompt])
+        #expect(try folder.discover().first?.suggestedTitle == "Draft intro")
+
+        try folder.writeTranscript(sessionID, lines: [firstPrompt, #"{"type":"custom-title","customTitle":"Renamed with /rename"}"#])
+
+        #expect(try folder.discover().first?.suggestedTitle == "Renamed with /rename")
+    }
 }

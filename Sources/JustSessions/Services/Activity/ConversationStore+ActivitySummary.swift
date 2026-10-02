@@ -8,13 +8,8 @@ extension ConversationStore {
             $0.projectDirectoryKey == projectDirectoryKey && !$0.isPlainTerminal && $0.isRunning
         }
         let conversationIDsWithRunningTab = Set(runningTabs.compactMap { $0.conversation?.id })
-        // The project key is checked last: it is the slowest to work out, and few sessions run in tmux.
-        let detachedActivities = conversations
-            .filter {
-                isRunningInTmux($0)
-                    && !conversationIDsWithRunningTab.contains($0.id)
-                    && $0.projectDirectoryKey == projectDirectoryKey
-            }
+        let detachedActivities = conversationIndex.conversations(inProject: projectDirectoryKey)
+            .filter { isRunningInTmux($0) && !conversationIDsWithRunningTab.contains($0.id) }
             .map { detachedCLIActivities[$0.id] }
         return SessionActivitySummary(activities: runningTabs.map(\.cliActivity) + detachedActivities)
     }

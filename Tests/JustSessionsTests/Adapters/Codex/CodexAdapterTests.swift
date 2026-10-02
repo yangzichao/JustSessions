@@ -69,4 +69,18 @@ struct CodexAdapterTests {
         #expect(updatedAt[indexIsLater] == ConversationMetadata.date("2026-09-24T10:00:00Z"))
         #expect(updatedAt[fileIsLater] == fileDate)
     }
+
+    @Test func aRolloutCodexWroteMoreToSinceTheLastScanIsReadAgain() throws {
+        let home = try CodexRolloutFolderFixture()
+        defer { home.remove() }
+        let sessionID = UUID().uuidString
+        try home.writeRollout(sessionID: sessionID)
+        #expect(try home.discover().first?.suggestedTitle == ConversationMetadata.untitledConversationTitle)
+
+        try home.writeRollout(sessionID: sessionID, laterLines: [
+            #"{"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Refactor backend"}]}}"#,
+        ])
+
+        #expect(try home.discover().first?.suggestedTitle == "Refactor backend")
+    }
 }

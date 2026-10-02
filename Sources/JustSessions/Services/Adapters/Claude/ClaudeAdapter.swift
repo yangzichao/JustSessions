@@ -13,6 +13,10 @@ struct ClaudeAdapter: ConversationAdapter {
         self.configurationDirectory = configurationDirectory
     }
 
+    /// Shared by every Claude Code adapter, this Mac's and each SSH host's mirror, which keep their files apart.
+    private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>()
+    private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>()
+
     func discover() throws -> [Conversation] {
         let projectsDirectory = configurationDirectory.appendingPathComponent("projects")
         guard let projectDirectories = try? FileManager.default.contentsOfDirectory(
@@ -21,15 +25,20 @@ struct ClaudeAdapter: ConversationAdapter {
             options: [.skipsHiddenFiles]
         ) else { return [] }
 
-        return projectDirectories.flatMap { projectDirectory -> [Conversation] in
+        var transcriptFiles: [URL] = []
+        let conversations = projectDirectories.flatMap { projectDirectory -> [Conversation] in
             let index = ClaudeSessionsIndex(projectDirectory: projectDirectory)
             let files = (try? FileManager.default.contentsOfDirectory(
                 at: projectDirectory,
-                includingPropertiesForKeys: [.contentModificationDateKey],
+                includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey],
                 options: [.skipsHiddenFiles]
             )) ?? []
+            transcriptFiles += files
             return files.compactMap { conversation(in: $0, index: index) }
         }
+        Self.transcriptHeads.forgetFiles(in: projectsDirectory, except: transcriptFiles)
+        Self.transcriptTails.forgetFiles(in: projectsDirectory, except: transcriptFiles)
+        return conversations
     }
 
     func arguments(for conversation: Conversation, action: ConversationAction) -> [String] {
@@ -50,12 +59,12 @@ struct ClaudeAdapter: ConversationAdapter {
         guard file.pathExtension == "jsonl", ConversationMetadata.isValidSessionID(sessionID) else { return nil }
         let indexEntry = index.entry(forSessionID: sessionID)
         if indexEntry?.isSidechain == true { return nil }
-        let head = ClaudeTranscriptHead(file: file)
-        guard !head.isSidechain,
+        guard let head = Self.transcriptHeads.summary(of: file, read: ClaudeTranscriptHead.init(file:)),
+              !head.isSidechain,
               let projectPath = indexEntry?.projectPath ?? head.workingDirectory ?? index.originalProjectPath else {
             return nil
         }
-        let tail = ClaudeTranscriptTail(file: file)
+        guard let tail = Self.transcriptTails.summary(of: file, read: ClaudeTranscriptTail.init(file:)) else { return nil }
         let title = ConversationMetadata.cleanTitle(
             tail.latestCustomTitle
                 ?? indexEntry?.customTitle

@@ -33,12 +33,21 @@ enum ConversationMetadata {
     /// The first non-blank line of a prompt, or `fallback` when there is none or it is markup the CLI injected
     /// (such as `<command-name>`) rather than something the user typed.
     static func cleanTitle(_ rawTitle: String?, fallback: String) -> String {
-        let firstLine = rawTitle?
-            .components(separatedBy: .newlines)
-            .lazy
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .first { !$0.isEmpty }
-        guard let firstLine, !firstLine.hasPrefix("<") else { return fallback }
+        guard let firstLine = rawTitle.flatMap(firstNonBlankLine(of:)), !firstLine.hasPrefix("<") else { return fallback }
         return String(firstLine.prefix(maximumTitleLength))
+    }
+
+    /// Stops at the first line with text, since a prompt can run to hundreds of kilobytes of pasted text.
+    private static func firstNonBlankLine(of text: String) -> String? {
+        let scalars = text.unicodeScalars
+        var lineStart = scalars.startIndex
+        while lineStart < scalars.endIndex {
+            let lineEnd = scalars[lineStart...].firstIndex(where: CharacterSet.newlines.contains) ?? scalars.endIndex
+            let line = String(Substring(scalars[lineStart..<lineEnd])).trimmingCharacters(in: .whitespacesAndNewlines)
+            if !line.isEmpty { return line }
+            guard lineEnd < scalars.endIndex else { return nil }
+            lineStart = scalars.index(after: lineEnd)
+        }
+        return nil
     }
 }

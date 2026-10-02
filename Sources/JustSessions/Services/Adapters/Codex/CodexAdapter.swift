@@ -15,38 +15,41 @@ struct CodexAdapter: ConversationAdapter {
         self.deletionExecutableURL = deletionExecutableURL
     }
 
+    /// Shared by every Codex adapter, this Mac's and each SSH host's mirror, which keep their files apart.
+    private static let rolloutHeads = SessionFileSummaryCache<CodexRolloutHead>()
+    private static let firstUserPrompts = SessionFileSummaryCache<String>()
+
     func discover() throws -> [Conversation] {
         let index = CodexSessionIndex(codexDirectory: codexDirectory)
         let sessionsDirectory = codexDirectory.appendingPathComponent("sessions")
         guard let enumerator = FileManager.default.enumerator(
             at: sessionsDirectory,
-            includingPropertiesForKeys: [.contentModificationDateKey, .isRegularFileKey],
+            includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey, .isRegularFileKey],
             options: [.skipsHiddenFiles]
         ) else { return [] }
 
+        var rolloutFiles: [URL] = []
         var conversations: [Conversation] = []
         for case let file as URL in enumerator where file.pathExtension == "jsonl" && file.lastPathComponent.hasPrefix("rollout-") {
-            guard let root = ConversationMetadata.firstLine(of: file),
-                  root["type"] as? String == "session_meta",
-                  let payload = root["payload"] as? [String: Any],
-                  let sessionID = payload["id"] as? String,
-                  ConversationMetadata.isValidSessionID(sessionID),
-                  let projectPath = payload["cwd"] as? String else { continue }
-            let indexEntry = index.entry(forSessionID: sessionID)
+            rolloutFiles.append(file)
+            guard let head = Self.rolloutHeads.summary(of: file, read: CodexRolloutHead.init(file:)) else { continue }
+            let indexEntry = index.entry(forSessionID: head.sessionID)
             let title = ConversationMetadata.cleanTitle(
-                indexEntry?.threadName ?? CodexFirstUserPrompt.find(in: file),
+                indexEntry?.threadName ?? Self.firstUserPrompts.summary(of: file, read: CodexFirstUserPrompt.find(in:)),
                 fallback: ConversationMetadata.untitledConversationTitle
             )
             let updatedAt = max(indexEntry?.updatedAt ?? .distantPast, ConversationMetadata.fileModificationDate(file))
             conversations.append(Conversation(
                 provider: provider,
-                sessionID: sessionID,
-                projectPath: projectPath,
+                sessionID: head.sessionID,
+                projectPath: head.projectPath,
                 suggestedTitle: title,
                 updatedAt: updatedAt,
                 sourceFile: file
             ))
         }
+        Self.rolloutHeads.forgetFiles(in: sessionsDirectory, except: rolloutFiles)
+        Self.firstUserPrompts.forgetFiles(in: sessionsDirectory, except: rolloutFiles)
         return conversations
     }
 

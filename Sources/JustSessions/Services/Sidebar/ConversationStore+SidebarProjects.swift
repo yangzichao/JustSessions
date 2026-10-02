@@ -2,27 +2,27 @@ import Foundation
 
 extension ConversationStore {
     var sidebarConversations: [Conversation] {
-        let listedHosts = Set(hosts)
-        return conversations.filter {
-            listedHosts.contains($0.host) && !sidebarProjectList.removedProjectPaths.contains($0.projectDirectoryKey)
-        }
+        sidebarProjection.conversations
     }
 
     /// Includes saved empty projects; provider, recency, and search filters are applied by the browser.
     var sidebarProjectGroups: [ProjectConversationGroup] {
-        let listedHosts = Set(hosts)
-        return ProjectConversationGroup.grouped(
-            sidebarConversations,
-            pendingNewSessions: pendingNewSessions.filter {
-                listedHosts.contains(ProjectLocation(key: $0.projectDirectoryKey).host)
-                    && !sidebarProjectList.removedProjectPaths.contains($0.projectDirectoryKey)
-            },
-            retainedProjectPaths: sidebarProjectList.projectPaths.filter {
-                listedHosts.contains(ProjectLocation(key: $0).host)
-            },
-            displayNames: projectDisplayNames,
+        sidebarProjection.projectGroups
+    }
+
+    private var sidebarProjection: SidebarProjection {
+        let inputs = SidebarProjection.Inputs(
+            conversationsRevision: conversationsRevision,
+            hosts: hosts,
+            sidebarProjectList: sidebarProjectList,
+            pendingNewSessions: pendingNewSessions,
+            projectDisplayNames: projectDisplayNames,
             pinnedItems: pinnedItems
         )
+        if let cachedSidebarProjection, cachedSidebarProjection.inputs == inputs { return cachedSidebarProjection }
+        let projection = SidebarProjection(inputs: inputs, conversations: conversations)
+        cachedSidebarProjection = projection
+        return projection
     }
 
     func rememberSidebarProjects(_ projectPaths: Set<String>) {
