@@ -18,7 +18,7 @@ struct ThisMacTmuxKeepAliveTests {
               for argument in "$@"; do echo "argument=$argument"; done
               echo "COLORTERM=$COLORTERM"
             } >> "$CLI_LOG"
-            exec sleep 60
+            exec /bin/sleep 60
             """)
         let name = "justsessions-claude-keepalive"
         let command = sandbox.server.command(

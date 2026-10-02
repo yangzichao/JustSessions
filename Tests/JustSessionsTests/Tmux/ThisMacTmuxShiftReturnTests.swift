@@ -17,7 +17,7 @@ struct ThisMacTmuxShiftReturnTests {
             stty raw -echo
             : > "$READY_MARKER"
             head -c 8 > "$KEY_LOG"
-            exec sleep 60
+            exec /bin/sleep 60
             """)
         let tmuxSessionName = "justsessions-claude-keys"
         let tab = TerminalSession(

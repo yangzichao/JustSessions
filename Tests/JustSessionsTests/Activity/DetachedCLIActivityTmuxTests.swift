@@ -9,7 +9,7 @@ struct DetachedCLIActivityTmuxTests {
     @Test func aCLILeftRunningInTmuxShowsWhatItDoesUntilItEnds() async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
-        try sandbox.writeExecutable(named: "claude", script: "#!/bin/sh\nexec sleep 60\n")
+        try sandbox.writeExecutable(named: "claude", script: "#!/bin/sh\nexec /bin/sleep 60\n")
         let conversation = Conversation(
             provider: .claude,
             sessionID: UUID().uuidString.lowercased(),
