@@ -14,9 +14,10 @@ struct ThisMacTmuxShiftReturnTests {
         // Records the first 8 bytes it reads, unaltered by the terminal driver.
         let cli = try sandbox.writeExecutable(named: "claude", script: """
             #!/bin/sh
-            stty raw -echo
+            /bin/stty raw -echo
+            printf 'KEY_READER_READY'
             : > "$READY_MARKER"
-            head -c 8 > "$KEY_LOG"
+            /usr/bin/head -c 8 > "$KEY_LOG"
             exec /bin/sleep 60
             """)
         let tmuxSessionName = "justsessions-claude-keys"
@@ -42,15 +43,19 @@ struct ThisMacTmuxShiftReturnTests {
         }
 
         tab.startIfNeeded()
-        #expect(await sandbox.waitUntil {
+        // A file can appear before tmux's initial screen reaches SwiftTerm. Wait for rendered output too,
+        // so key events are sent through an attached, initialized terminal rather than during its handshake.
+        try #require(await sandbox.waitUntil {
             FileManager.default.fileExists(atPath: readyMarker.path)
                 && sandbox.tmuxOutput(["list-clients", "-F", "#{session_name}"]) == "\(tmuxSessionName)\n"
-        })
+                && String(decoding: tab.terminalView.getTerminal().getBufferAsData(), as: UTF8.self).contains("KEY_READER_READY")
+        }, "\(sandbox.launchDiagnostics(for: tab))")
         tab.terminalView.keyDown(with: returnKeyEvent(modifiers: .shift, windowNumber: window.windowNumber))
         tab.terminalView.keyDown(with: returnKeyEvent(modifiers: [], windowNumber: window.windowNumber))
 
-        #expect(await sandbox.waitUntil { (try? Data(contentsOf: keyLog))?.count == 8 })
-        #expect(String(decoding: try Data(contentsOf: keyLog), as: UTF8.self) == "\u{1b}[13;2u\r")
+        try #require(await sandbox.waitUntil { (try? Data(contentsOf: keyLog))?.count == 8 })
+        let recordedKeys = String(decoding: try Data(contentsOf: keyLog), as: UTF8.self)
+        #expect(recordedKeys == "\u{1b}[13;2u\r", "Received bytes: \(Array(recordedKeys.utf8))")
     }
 
     @Test func onlyATabWhoseCLIRunsInTmuxOnThisMacSendsShiftReturnAsCSIu() {
