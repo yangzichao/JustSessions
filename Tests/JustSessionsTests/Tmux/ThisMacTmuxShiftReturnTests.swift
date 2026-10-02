@@ -11,15 +11,7 @@ struct ThisMacTmuxShiftReturnTests {
         defer { sandbox.tearDown() }
         let keyLog = sandbox.root.appendingPathComponent("keys")
         let readyMarker = sandbox.root.appendingPathComponent("ready")
-        // Records the first 8 bytes it reads, unaltered by the terminal driver.
-        let cli = try sandbox.writeExecutable(named: "claude", script: """
-            #!/bin/sh
-            /bin/stty raw -echo
-            printf 'KEY_READER_READY'
-            : > "$READY_MARKER"
-            /usr/bin/head -c 8 > "$KEY_LOG"
-            exec /bin/sleep 60
-            """)
+        let cli = try sandbox.writeExecutable(named: "claude", script: TmuxKeyboardReaderFixture.script)
         let tmuxSessionName = "justsessions-claude-keys"
         let tab = TerminalSession(
             conversation: nil,
@@ -50,6 +42,8 @@ struct ThisMacTmuxShiftReturnTests {
                 && sandbox.tmuxOutput(["list-clients", "-F", "#{session_name}"]) == "\(tmuxSessionName)\n"
                 && String(decoding: tab.terminalView.getTerminal().getBufferAsData(), as: UTF8.self).contains("KEY_READER_READY")
         }, "\(sandbox.launchDiagnostics(for: tab))")
+        // Reproduce a late initialization reply deterministically, rather than relying on CI timing.
+        _ = sandbox.tmuxOutput(["send-keys", "-t", "=\(tmuxSessionName):", "-l", "\u{1b}[?65;4;6;18;22c"])
         tab.terminalView.keyDown(with: returnKeyEvent(modifiers: .shift, windowNumber: window.windowNumber))
         tab.terminalView.keyDown(with: returnKeyEvent(modifiers: [], windowNumber: window.windowNumber))
 
