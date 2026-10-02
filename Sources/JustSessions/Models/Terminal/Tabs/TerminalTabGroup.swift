@@ -19,11 +19,3 @@ struct TerminalTabGroup<Tab>: Identifiable {
         return projectKeysInOrder.map { TerminalTabGroup(projectDirectoryKey: $0, tabs: tabsByProjectKey[$0] ?? []) }
     }
 }
-
-extension TerminalTabGroup where Tab: Identifiable {
-    /// The tabs a collapsed group hides: all but the selected one, which stays in sight. With none, collapsing the
-    /// group would change nothing.
-    func tabsHiddenWhenCollapsed(selectedTabID: Tab.ID?) -> [Tab] {
-        tabs.filter { $0.id != selectedTabID }
-    }
-}

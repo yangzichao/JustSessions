@@ -1,7 +1,7 @@
 import Foundation
 
-/// Where tabs open and which tab shows after one closes, so each project's tabs stay side by side, like a tab group
-/// in a browser. Tabs are given by their project keys, in tab bar order.
+/// Where tabs open and which tab shows after one closes or its group collapses, so each project's tabs stay side by
+/// side, like a tab group in a browser. Tabs are given by their project keys, in tab bar order.
 enum TerminalTabOrder {
     /// Right after the project's last tab, or at the end when the project has none open.
     static func insertionIndex(forProjectKey projectKey: String, amongTabProjectKeys tabProjectKeys: [String]) -> Int {
@@ -20,5 +20,18 @@ enum TerminalTabOrder {
             .compactMap { $0 }
             .first { remainingProjectKeys[$0] == closedProjectKey }
         return sameProjectNeighbor ?? rightNeighbor ?? leftNeighbor
+    }
+
+    /// The tab to show once the selected tab's group collapses: the nearest tab still in sight, the right one first.
+    /// Nil when every other tab is in a collapsed group too, so the selected tab keeps showing.
+    static func indexToSelect(
+        afterCollapsingGroupOfTabAt selectedIndex: Int,
+        collapsedProjectKeys: Set<String>,
+        amongTabProjectKeys tabProjectKeys: [String]
+    ) -> Int? {
+        let hiddenProjectKeys = collapsedProjectKeys.union([tabProjectKeys[selectedIndex]])
+        let tabsToTheRight = tabProjectKeys.indices.suffix(from: selectedIndex + 1)
+        let tabsToTheLeft = tabProjectKeys.indices.prefix(upTo: selectedIndex).reversed()
+        return (Array(tabsToTheRight) + tabsToTheLeft).first { !hiddenProjectKeys.contains(tabProjectKeys[$0]) }
     }
 }

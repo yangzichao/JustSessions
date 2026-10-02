@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// One project's tabs behind its group label, underlined in the group color. A collapsed group keeps only its
-/// selected tab in sight.
+/// One project's tabs behind its group label, underlined in the group color. A collapsed group shows only its label.
 struct TerminalTabGroupSection: View {
     @ObservedObject var store: ConversationStore
     let group: TerminalTabGroup<TerminalSession>
@@ -11,22 +10,13 @@ struct TerminalTabGroupSection: View {
     let onRenameConversation: (Conversation) -> Void
     let onCloseTab: (UUID) -> Void
 
-    private var visibleTabs: [TerminalSession] {
-        isCollapsed ? group.tabs.filter { $0.id == store.selectedTerminalID } : group.tabs
-    }
-
-    private var tabsHiddenWhenCollapsed: [TerminalSession] {
-        group.tabsHiddenWhenCollapsed(selectedTabID: store.selectedTerminalID)
-    }
-
     /// What the hidden tabs' CLIs are doing. A plain terminal runs no session, so it does not count.
     private func hiddenTabsActivity(_ hiddenTabs: [TerminalSession]) -> SessionActivitySummary {
         SessionActivitySummary(activities: hiddenTabs.filter { !$0.isPlainTerminal && $0.isRunning }.map(\.cliActivity))
     }
 
     var body: some View {
-        let tabsHiddenWhenCollapsed = tabsHiddenWhenCollapsed
-        let hiddenTabs = isCollapsed ? tabsHiddenWhenCollapsed : []
+        let hiddenTabs = isCollapsed ? group.tabs : []
         HStack(spacing: 6) {
             TerminalTabGroupLabel(
                 projectName: store.projectDisplayName(forProjectPath: group.projectDirectoryKey),
@@ -34,12 +24,11 @@ struct TerminalTabGroupSection: View {
                 color: color,
                 tabCount: group.tabs.count,
                 isCollapsed: isCollapsed,
-                canCollapse: !tabsHiddenWhenCollapsed.isEmpty,
                 hiddenTabCount: hiddenTabs.count,
                 hiddenTabsActivity: hiddenTabsActivity(hiddenTabs),
                 onToggleCollapsed: onToggleCollapsed
             )
-            ForEach(visibleTabs) { session in
+            ForEach(isCollapsed ? [] : group.tabs) { session in
                 TerminalTab(
                     session: session,
                     isSelected: store.selectedTerminalID == session.id,

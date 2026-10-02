@@ -2,6 +2,7 @@ import Testing
 @testable import JustSessions
 
 /// Tabs open next to their project's other tabs, and closing one stays in its project while the project has tabs.
+/// Collapsing the selected tab's group shows the nearest tab still in sight.
 struct TerminalTabOrderTests {
     @Test func aTabOpensAfterItsProjectsLastTab() {
         let tabProjectKeys = ["/a", "/a", "/b", "/c"]
@@ -32,5 +33,24 @@ struct TerminalTabOrderTests {
 
     @Test func closingTheOnlyTabShowsNone() {
         #expect(TerminalTabOrder.indexToSelect(afterClosingTabAt: 0, amongTabProjectKeys: ["/a"]) == nil)
+    }
+
+    @Test func collapsingTheSelectedTabsGroupShowsTheFirstTabToItsRight() {
+        #expect(TerminalTabOrder.indexToSelect(afterCollapsingGroupOfTabAt: 1, collapsedProjectKeys: [], amongTabProjectKeys: ["/a", "/b", "/b", "/c"]) == 3)
+    }
+
+    @Test func collapsingTheLastGroupShowsTheTabToItsLeft() {
+        #expect(TerminalTabOrder.indexToSelect(afterCollapsingGroupOfTabAt: 2, collapsedProjectKeys: [], amongTabProjectKeys: ["/a", "/b", "/b"]) == 0)
+    }
+
+    @Test func collapsingSkipsTabsOfGroupsAlreadyCollapsed() {
+        let tabProjectKeys = ["/a", "/b", "/c", "/d"]
+
+        #expect(TerminalTabOrder.indexToSelect(afterCollapsingGroupOfTabAt: 1, collapsedProjectKeys: ["/c", "/d"], amongTabProjectKeys: tabProjectKeys) == 0)
+    }
+
+    @Test func collapsingWithNoOtherTabInSightKeepsTheSelectedTab() {
+        #expect(TerminalTabOrder.indexToSelect(afterCollapsingGroupOfTabAt: 0, collapsedProjectKeys: [], amongTabProjectKeys: ["/a", "/a"]) == nil)
+        #expect(TerminalTabOrder.indexToSelect(afterCollapsingGroupOfTabAt: 0, collapsedProjectKeys: ["/b"], amongTabProjectKeys: ["/a", "/b"]) == nil)
     }
 }

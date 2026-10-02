@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// The open tabs, grouped by project like tab groups in a browser: each project's tabs sit together behind a label
-/// in the project's color, which collapses or expands the group.
+/// in the project's color, which collapses or expands the group. Selecting a tab of a collapsed group, by shortcut or
+/// from the sidebar, expands it.
 struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
     let onRenameConversation: (Conversation) -> Void
@@ -30,9 +31,11 @@ struct WorkspaceTabBar: View {
                 .padding(.vertical, 8)
             }
             .onChange(of: store.selectedTerminalID) { _, selectedTerminalID in
-                if let selectedTerminalID {
-                    scrollProxy.scrollTo(selectedTerminalID, anchor: .center)
+                guard let selectedTerminal = store.selectedTerminal else { return }
+                if collapsedProjectKeys.contains(selectedTerminal.projectDirectoryKey) {
+                    expandGroup(selectedTerminal.projectDirectoryKey)
                 }
+                scrollProxy.scrollTo(selectedTerminalID, anchor: .center)
             }
         }
         .background(ThemePalette.contentSurface)
@@ -43,12 +46,33 @@ struct WorkspaceTabBar: View {
     }
 
     private func toggleCollapsed(_ projectKey: String) {
-        withAnimation(.easeOut(duration: 0.15)) {
-            if collapsedProjectKeys.contains(projectKey) {
-                collapsedProjectKeys.remove(projectKey)
-            } else {
-                collapsedProjectKeys.insert(projectKey)
-            }
+        if collapsedProjectKeys.contains(projectKey) {
+            expandGroup(projectKey)
+            return
         }
+        // Show another tab first, so the group's selected tab does not hide while its terminal stays in front.
+        selectTabInSight(insteadOfTabsIn: projectKey)
+        withAnimation(.easeOut(duration: 0.15)) {
+            _ = collapsedProjectKeys.insert(projectKey)
+        }
+    }
+
+    private func expandGroup(_ projectKey: String) {
+        withAnimation(.easeOut(duration: 0.15)) {
+            _ = collapsedProjectKeys.remove(projectKey)
+        }
+    }
+
+    /// With every other tab in a collapsed group too, the selected tab keeps showing behind its collapsed label.
+    private func selectTabInSight(insteadOfTabsIn projectKey: String) {
+        let tabProjectKeys = store.terminalSessions.map(\.projectDirectoryKey)
+        guard let selectedIndex = store.terminalSessions.firstIndex(where: { $0.id == store.selectedTerminalID }),
+              tabProjectKeys[selectedIndex] == projectKey,
+              let indexToSelect = TerminalTabOrder.indexToSelect(
+                  afterCollapsingGroupOfTabAt: selectedIndex,
+                  collapsedProjectKeys: collapsedProjectKeys,
+                  amongTabProjectKeys: tabProjectKeys
+              ) else { return }
+        store.selectTerminal(store.terminalSessions[indexToSelect].id)
     }
 }
