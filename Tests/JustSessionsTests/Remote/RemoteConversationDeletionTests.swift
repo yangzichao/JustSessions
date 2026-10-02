@@ -36,7 +36,8 @@ struct RemoteConversationDeletionTests {
         #expect(remainingIDs == [keptID])
         #expect(updatedIndex?["originalPath"] as? String == "/home/me")
 
-        #expect(throws: RemoteConversationDeletionError.self) { try deletion.delete(conversation) }
+        // Already gone from the host: deleting it again counts as deleted.
+        try deletion.delete(conversation)
     }
 
     @Test func codexDeletionRunsTheNativeCommandThroughTheLoginShell() throws {

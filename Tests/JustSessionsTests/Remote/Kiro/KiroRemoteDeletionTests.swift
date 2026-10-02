@@ -41,16 +41,15 @@ struct KiroRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.deletingPathExtension().appendingPathExtension("json").path))
     }
 
-    @Test func missingHistoryOnTheHostIsReportedWithoutDroppingTheMirror() throws {
+    @Test func missingHistoryOnTheHostCountsAsDeletedAndDropsTheMirror() throws {
         let fixture = try RemoteKiroFixture()
         defer { fixture.remove() }
         try FileManager.default.removeItem(at: fixture.sessionsDirectory.appendingPathComponent("\(fixture.conversation.sessionID).jsonl"))
 
-        #expect(throws: RemoteConversationDeletionError.self) {
-            try RemoteConversationDeletion(runner: fixture.runner()).delete(fixture.conversation)
-        }
+        try RemoteConversationDeletion(runner: fixture.runner()).delete(fixture.conversation)
 
-        #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
+        #expect(!FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
+        #expect(!FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.deletingPathExtension().appendingPathExtension("json").path))
     }
 
     @Test func aNativeExitCodeDoesNotMasqueradeAsMissingHistory() throws {

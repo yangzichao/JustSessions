@@ -18,11 +18,11 @@ struct RemoteHostCommandRunner: Sendable {
 
     /// The `ssh` options of every connection made without a terminal, the `rsync` copies' included. A host that
     /// does not answer fails within 10 seconds, and a connection that dies, as when the Mac sleeps, within about
-    /// 15 seconds instead of hanging until the command's timeout.
+    /// 30 seconds instead of hanging until the command's timeout; a shorter network stall does not end it.
     static let nonInteractiveSSHOptions = [
         "-o", "BatchMode=yes",
         "-o", "ConnectTimeout=10",
-        "-o", "ServerAliveInterval=5",
+        "-o", "ServerAliveInterval=10",
         "-o", "ServerAliveCountMax=3",
     ]
 

@@ -46,7 +46,9 @@ struct ConversationStoreDeletionTests {
         store.delete(refused)
         try await expectEventually { !store.isDeletingSessions }
 
+        #expect(store.alert?.title == "Couldn't delete “Keep me”")
         #expect(store.errorMessage == "The session is locked.")
+        #expect(store.alert?.offersTryAgain == false)
         #expect(store.conversations.map(\.id) == [refused.id])
         #expect(sandbox.fileExists(for: refused))
     }
@@ -68,7 +70,8 @@ struct ConversationStoreDeletionTests {
         #expect(store.isDeletionPending(for: deleted) && store.isDeletionPending(for: refused))
         try await expectEventually { !store.isDeletingSessions }
 
-        #expect(store.errorMessage == "Some sessions could not be deleted:\nClaude Code · Keep me: Permission denied")
+        #expect(store.alert?.title == "1 session wasn't deleted")
+        #expect(store.errorMessage == "Deleted 1 of 2 sessions. The other one is still listed.\n\nClaude Code · Keep me: Permission denied.")
         #expect(store.conversations.map(\.id) == [refused.id])
     }
 
@@ -93,6 +96,40 @@ struct ConversationStoreDeletionTests {
         #expect(store.errorMessage == "The index could not be updated.")
     }
 
+    /// The alert names the session as the sidebar did, even though deleting it forgot its custom title.
+    @Test func aSessionGoneDespiteAnErrorKeepsItsCustomTitleInTheAlert() async throws {
+        let sandbox = try DeletionSandbox()
+        defer { sandbox.remove() }
+        let conversation = try sandbox.savedConversation()
+        let halfFailingAdapter = FileBackedConversationAdapter(
+            provider: .claude,
+            conversations: [conversation],
+            refusedSessionIDs: [conversation.sessionID],
+            refusalReason: "The index could not be updated.",
+            removesRefusedFiles: true
+        )
+        let store = sandbox.makeStore(listing: [conversation], adapters: [halfFailingAdapter])
+        store.rename(conversation, to: "My refactor")
+
+        store.delete(conversation)
+        try await expectEventually { !store.isDeletingSessions }
+
+        #expect(store.alert?.title == "“My refactor” was deleted with an error")
+        #expect(store.titleAliases.customTitlesByConversationID.isEmpty)
+    }
+
+    @Test func anOpenTerminalRefusalCutsALongTitle() throws {
+        let sandbox = try DeletionSandbox()
+        defer { sandbox.remove() }
+        let running = try sandbox.savedConversation(title: String(repeating: "Long title ", count: 12))
+        let store = sandbox.makeStore(listing: [running])
+        store.tmuxSessionNamesByHost[.thisMac] = [TmuxSessionName.forConversation(running)]
+
+        store.delete(running)
+
+        #expect(store.alert?.title == "Couldn't delete “Long title Long title Long title Long t…”")
+    }
+
     @Test func aSessionStillRunningInTmuxIsNotDeleted() throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
@@ -107,6 +144,7 @@ struct ConversationStoreDeletionTests {
 
         #expect(!store.isDeletingSessions)
         #expect(store.errorMessage == ConversationDeletionError.activeTerminal.localizedDescription)
+        #expect(store.alert?.title == "Couldn't delete “Session”")
         #expect(sandbox.fileExists(for: running))
     }
 

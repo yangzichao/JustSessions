@@ -4,7 +4,7 @@ import Testing
 /// Commands and copies over SSH without a terminal notice a host that stops answering, as after the Mac sleeps.
 struct NonInteractiveSSHOptionsTests {
     static let expectedOptions = [
-        "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "-o", "ServerAliveInterval=5", "-o", "ServerAliveCountMax=3",
+        "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "-o", "ServerAliveInterval=10", "-o", "ServerAliveCountMax=3",
     ]
 
     @Test func remoteCommandsUseTheSharedOptions() {
@@ -17,7 +17,7 @@ struct NonInteractiveSSHOptionsTests {
         let remoteShellIndex = try #require(arguments.firstIndex(of: "-e")) + 1
 
         #expect(arguments[remoteShellIndex]
-            == "ssh -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=3")
+            == "ssh -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=10 -o ServerAliveCountMax=3")
         #expect(arguments[remoteShellIndex] == (["ssh"] + RemoteHostCommandRunner.nonInteractiveSSHOptions).joined(separator: " "))
     }
 }

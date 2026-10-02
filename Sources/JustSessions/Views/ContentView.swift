@@ -64,13 +64,6 @@ struct ContentView: View {
             Text("This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (\(renamingProject?.folderName ?? "")).")
         }
         .sessionDeletionDialog(for: $deletionRequest, store: store)
-        .alert("Could not complete action", isPresented: Binding(
-            get: { store.errorMessage != nil },
-            set: { if !$0 { store.dismissError() } }
-        )) {
-            Button("OK") { store.dismissError() }
-        } message: {
-            Text(store.errorMessage ?? "Unknown error")
-        }
+        .storeAlert(store)
     }
 }
