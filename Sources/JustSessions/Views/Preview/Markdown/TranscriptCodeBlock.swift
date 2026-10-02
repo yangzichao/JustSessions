@@ -4,6 +4,7 @@ import SwiftUI
 struct TranscriptCodeBlock: View {
     let text: String
     let language: String?
+    var segmentIndex = 0
     @Environment(\.transcriptReadingFontSize) private var fontSize
     @State private var hasCopied = false
 
@@ -27,7 +28,7 @@ struct TranscriptCodeBlock: View {
             .padding(.vertical, 8)
             ThemeDivider()
             ScrollView(.horizontal) {
-                Text(verbatim: text)
+                TranscriptSearchableText(source: AttributedString(text), segmentIndex: segmentIndex, fontSize: fontSize - 1, isMonospaced: true, lineSpacing: 3)
                     .font(.system(size: fontSize - 1, design: .monospaced))
                     .lineSpacing(3)
                     .textSelection(.enabled)

@@ -3,15 +3,17 @@ import SwiftUI
 struct TranscriptMarkdownView: View {
     @Environment(\.transcriptReadingFontSize) private var fontSize
     private let blocks: [TranscriptMarkdownBlock]
+    private let segmentStarts: [Int: Int]
 
     init(text: String) {
         blocks = TranscriptMarkdownParser.blocks(from: text)
+        segmentStarts = TranscriptSearchSegments.startingIndices(in: blocks)
     }
 
     var body: some View {
         Group {
             if let paragraph = singleParagraph {
-                Text(TranscriptReadingTypography.inlineText(paragraph, fontSize: fontSize))
+                TranscriptSearchableText(source: TranscriptReadingTypography.inlineText(paragraph, fontSize: fontSize), fontSize: fontSize)
                     .textSelection(.enabled)
             } else {
                 structuredBlocks
@@ -41,7 +43,7 @@ struct TranscriptMarkdownView: View {
                             .foregroundStyle(.secondary)
                             .frame(minWidth: 18, alignment: .trailing)
                     }
-                    blockContent(block.content)
+                    blockContent(block.content, segmentIndex: segmentStarts[block.id] ?? 0)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.leading, CGFloat(max(0, block.listDepth - 1)) * 20)
@@ -50,16 +52,19 @@ struct TranscriptMarkdownView: View {
     }
 
     @ViewBuilder
-    private func blockContent(_ content: TranscriptMarkdownBlock.Content) -> some View {
+    private func blockContent(_ content: TranscriptMarkdownBlock.Content, segmentIndex: Int) -> some View {
         switch content {
         case .text(let text, let headingLevel):
-            Text(TranscriptReadingTypography.inlineText(text, fontSize: fontSize))
+            TranscriptSearchableText(
+                source: TranscriptReadingTypography.inlineText(text, fontSize: fontSize), segmentIndex: segmentIndex,
+                fontSize: headingLevel.map(headingFontSize) ?? fontSize, isSemibold: headingLevel != nil
+            )
                 .font(headingLevel.map { .system(size: headingFontSize($0), weight: .semibold) } ?? .system(size: fontSize))
                 .textSelection(.enabled)
         case .code(let text, let language):
-            TranscriptCodeBlock(text: text, language: language)
+            TranscriptCodeBlock(text: text, language: language, segmentIndex: segmentIndex)
         case .table(let table):
-            TranscriptMarkdownTableView(table: table)
+            TranscriptMarkdownTableView(table: table, segmentIndex: segmentIndex)
         case .divider:
             ThemeDivider().padding(.vertical, 4)
         }

@@ -4,6 +4,7 @@ import SwiftUI
 struct TranscriptView: View {
     let conversation: Conversation
     let readingPositionStore: TranscriptReadingPositionStore
+    var isActive = true
 
     private enum LoadState: Equatable {
         case loading
@@ -52,7 +53,7 @@ struct TranscriptView: View {
         case .loaded(let transcript) where transcript.entries.isEmpty:
             ContentUnavailableView("No messages yet", systemImage: "text.bubble")
         case .loaded(let transcript):
-            TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: readingPositionStore)
+            TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: readingPositionStore, isActive: isActive)
         }
     }
 }

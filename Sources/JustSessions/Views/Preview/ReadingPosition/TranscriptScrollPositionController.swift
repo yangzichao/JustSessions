@@ -13,8 +13,8 @@ final class TranscriptScrollPositionController {
     private let conversationID: String
     private let positionStore: TranscriptReadingPositionStore
     private var pendingRestoration: TranscriptReadingPosition?
-    private weak var scrollView: NSScrollView?
-    private let entryMarkers = NSMapTable<NSNumber, NSView>(keyOptions: .strongMemory, valueOptions: .weakMemory)
+    weak var scrollView: NSScrollView?
+    let entryMarkers = NSMapTable<NSNumber, NSView>(keyOptions: .strongMemory, valueOptions: .weakMemory)
     private var observations: Set<AnyCancellable> = []
     private var hasScheduledUpdate = false
     private var isStopped = false

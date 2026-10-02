@@ -20,7 +20,7 @@ struct TranscriptEntryView: View {
     private var entryContent: some View {
         switch entry.content {
         case .userMessage(let text):
-            Text(text)
+            TranscriptSearchableText(source: AttributedString(text), fontSize: fontSize)
                 .textSelection(.enabled)
                 .lineSpacing(4)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -32,7 +32,7 @@ struct TranscriptEntryView: View {
         case .toolCalls(let summaries):
             TranscriptToolCallsView(summaries: summaries)
         case .note(let text):
-            Text(text)
+            TranscriptSearchableText(source: AttributedString(text), fontSize: 12, isSecondary: true)
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .frame(maxWidth: .infinity)

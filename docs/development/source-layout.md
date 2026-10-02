@@ -48,6 +48,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
 - `Views/Preview/Reading/` and `ReadingPosition/`: text size, reading width, first/latest-message controls, and reading-position restoration.
 - `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.
+- `Models/Transcript/Search/`, `Services/Transcript/Search/`, and `Views/Preview/Search/`: temporary per-reader text matching, keyboard shortcuts, highlights, and navigation to occurrences in the displayed transcript.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
 - `Views/Settings/`: the Settings window, with an Appearance tab for the whole app's appearance and theme, a Terminal tab, and a Notifications tab.

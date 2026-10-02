@@ -36,7 +36,7 @@ struct SessionPreviewPane: View {
                         }
                     )
                     ThemeDivider()
-                    TranscriptView(conversation: conversation, readingPositionStore: readingPositionStore)
+                    TranscriptView(conversation: conversation, readingPositionStore: readingPositionStore, isActive: store.selectedTerminalID == nil)
                         .id(conversation.id)
                 }
             } else if store.isScanningThisMac && store.conversations.isEmpty {

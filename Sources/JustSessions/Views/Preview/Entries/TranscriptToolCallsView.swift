@@ -4,12 +4,14 @@ import SwiftUI
 struct TranscriptToolCallsView: View {
     let summaries: [String]
     @State private var isExpanded = false
+    @Environment(\.transcriptSearchContext) private var searchContext
+    @Environment(\.transcriptSearchEntryIndex) private var entryIndex
 
     var body: some View {
         DisclosureGroup(isExpanded: $isExpanded) {
             VStack(alignment: .leading, spacing: 8) {
-                ForEach(Array(summaries.enumerated()), id: \.offset) { _, summary in
-                    Text(verbatim: summary)
+                ForEach(Array(summaries.enumerated()), id: \.offset) { segmentIndex, summary in
+                    TranscriptSearchableText(source: AttributedString(summary), segmentIndex: segmentIndex, fontSize: 12, isMonospaced: true, isSecondary: true)
                         .font(.system(size: 12, design: .monospaced))
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -22,5 +24,11 @@ struct TranscriptToolCallsView: View {
         }
         .foregroundStyle(.secondary)
         .padding(.vertical, 4)
+        .onAppear(perform: revealMatchingTool)
+        .onChange(of: searchContext.selectedMatch) { revealMatchingTool() }
+    }
+
+    private func revealMatchingTool() {
+        if searchContext.selectedMatch?.entryIndex == entryIndex { isExpanded = true }
     }
 }

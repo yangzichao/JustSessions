@@ -2,15 +2,20 @@ import SwiftUI
 
 struct TranscriptMarkdownTableView: View {
     let table: TranscriptMarkdownTable
+    var segmentIndex = 0
     @Environment(\.transcriptReadingFontSize) private var fontSize
 
     var body: some View {
         ScrollView(.horizontal) {
             Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
-                ForEach(table.rows) { row in
+                ForEach(Array(table.rows.enumerated()), id: \.element.id) { rowIndex, row in
                     GridRow {
-                        ForEach(Array(row.cells.enumerated()), id: \.offset) { _, cell in
-                            Text(TranscriptReadingTypography.inlineText(cell, fontSize: fontSize))
+                        ForEach(Array(row.cells.enumerated()), id: \.offset) { cellIndex, cell in
+                            TranscriptSearchableText(
+                                source: TranscriptReadingTypography.inlineText(cell, fontSize: fontSize),
+                                segmentIndex: segmentIndex + table.rows.prefix(rowIndex).reduce(0) { $0 + $1.cells.count } + cellIndex,
+                                fontSize: fontSize, isSemibold: row.isHeader
+                            )
                                 .fontWeight(row.isHeader ? .semibold : .regular)
                                 .textSelection(.enabled)
                                 .padding(.horizontal, 12)

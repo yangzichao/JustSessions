@@ -6,6 +6,7 @@ struct TranscriptReadingToolbar: View {
     let messageCount: Int
     let onFirstMessage: () -> Void
     let onLatestMessage: () -> Void
+    var onFind: (() -> Void)?
 
     var body: some View {
         HStack(spacing: 14) {
@@ -13,6 +14,12 @@ struct TranscriptReadingToolbar: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Spacer(minLength: 8)
+            if let onFind {
+                Button("Find in conversation", systemImage: "magnifyingglass", action: onFind)
+                    .labelStyle(.iconOnly)
+                    .help("Find in conversation (⌘F)")
+                    .accessibilityIdentifier("preview.find")
+            }
             HStack(spacing: 12) {
                 Button { fontSize = max(12, fontSize - 1) } label: { Text("A−") }
                     .disabled(fontSize <= 12)
