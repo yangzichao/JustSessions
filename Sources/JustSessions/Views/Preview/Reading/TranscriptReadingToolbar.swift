@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TranscriptReadingToolbar: View {
     @Binding var fontSize: CGFloat
+    @Binding var readingWidth: TranscriptReadingWidth
     let messageCount: Int
     let onFirstMessage: () -> Void
     let onLatestMessage: () -> Void
@@ -23,6 +24,7 @@ struct TranscriptReadingToolbar: View {
                     .accessibilityLabel("Larger reading text")
             }
             .font(.system(size: 13, weight: .medium))
+            readingWidthButton
             HStack(spacing: 12) {
                 Button("First message", systemImage: "arrow.up.to.line", action: onFirstMessage)
                     .help("Go to the first available message")
@@ -35,5 +37,21 @@ struct TranscriptReadingToolbar: View {
         .padding(.horizontal, 24)
         .padding(.vertical, 10)
         .accessibilityIdentifier("preview.reading-toolbar")
+    }
+
+    /// The icon shows what a click does: widen to the full window, or narrow back to the readable column.
+    private var readingWidthButton: some View {
+        Button("Reading width", systemImage: readingWidthSymbol) { readingWidth = readingWidth.toggled }
+            .labelStyle(.iconOnly)
+            .help(readingWidth == .readable ? "Use the full window width" : "Use a readable width")
+            .accessibilityValue(readingWidth.displayName)
+            .accessibilityHint("Switches between a readable width and the full window width")
+    }
+
+    private var readingWidthSymbol: String {
+        switch readingWidth {
+        case .readable: "arrow.left.and.line.vertical.and.arrow.right"
+        case .full: "arrow.right.and.line.vertical.and.arrow.left"
+        }
     }
 }

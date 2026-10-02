@@ -20,6 +20,7 @@ struct TranscriptReadingRenderingTests {
                 TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: positions)
             }
             .background(ThemePalette.contentSurface)
+            .defaultAppStorage(settings.userDefaults)
             for scheme in [ColorScheme.light, .dark] {
                 let fixture = ThemeSurfaceRenderingFixture(content: AnyView(content), size: CGSize(width: width, height: 920), colorScheme: scheme)
                 defer { fixture.close() }
@@ -41,6 +42,7 @@ struct TranscriptReadingRenderingTests {
         let conversation = Conversation(provider: .claude, sessionID: "reading-window-fixture", projectPath: directory.path,
                                         suggestedTitle: "Read before you resume", updatedAt: .now, sourceFile: sourceFile)
         let content = SessionReadingView(store: store, conversation: conversation, readingPositionStore: TranscriptReadingPositionStore())
+            .defaultAppStorage(settings.userDefaults)
         let fixture = ThemeSurfaceRenderingFixture(content: AnyView(content), size: CGSize(width: 760, height: 900), colorScheme: .light)
         defer { fixture.close() }
         let bitmap = try await fixture.capture(named: "independent-session-reader")

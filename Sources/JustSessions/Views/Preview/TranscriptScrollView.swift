@@ -6,6 +6,7 @@ struct TranscriptScrollView: View {
     @State private var visibleEntryIndex: Int?
     @State private var positionController: TranscriptScrollPositionController
     @State private var readingFontSize: CGFloat = 15
+    @AppStorage(TranscriptReadingWidth.userDefaultsKey) private var readingWidth = TranscriptReadingWidth.readable
     private let initialPosition: TranscriptReadingPosition
 
     init(conversation: Conversation, transcript: TranscriptContent, positionStore: TranscriptReadingPositionStore) {
@@ -28,6 +29,7 @@ struct TranscriptScrollView: View {
                     VStack(spacing: 0) {
                         TranscriptReadingToolbar(
                             fontSize: $readingFontSize,
+                            readingWidth: $readingWidth,
                             messageCount: messageCount,
                             onFirstMessage: {
                                 guard let index = displayedEntryIndices.first else { return }
@@ -44,6 +46,8 @@ struct TranscriptScrollView: View {
                     .background(ThemePalette.contentSurface)
                 }
                 .environment(\.transcriptReadingFontSize, readingFontSize)
+                .onChange(of: readingFontSize) { positionController.restoreRecordedPosition() }
+                .onChange(of: readingWidth) { positionController.restoreRecordedPosition() }
                 .onReceive(positionController.entrySeekingRequests) { index in
                     scrollProxy.scrollTo(index, anchor: .top)
                 }
@@ -66,7 +70,7 @@ struct TranscriptScrollView: View {
                 // Only messages participate in scroll targeting; the omitted-entry notice has no message index.
                 transcriptEntries
             }
-            .frame(maxWidth: 760, alignment: .leading)
+            .frame(maxWidth: readingWidth.maximumColumnWidth, alignment: .leading)
             .padding(.horizontal, 24)
             .padding(.top, 6)
             .padding(.bottom, 36)

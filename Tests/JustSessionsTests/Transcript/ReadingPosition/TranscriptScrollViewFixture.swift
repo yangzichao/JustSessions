@@ -6,13 +6,16 @@ import Testing
 @MainActor
 final class TranscriptScrollViewFixture {
     let positionStore = TranscriptReadingPositionStore()
+    /// The transcript's saved settings, such as its reading width, live here instead of in the app's own settings.
+    let settings: IsolatedUserDefaults
     let hostingView: NSHostingView<AnyView>
     private let window: NSWindow
 
-    init() {
+    init(width: CGFloat = 780) throws {
         _ = NSApplication.shared
+        settings = try IsolatedUserDefaults()
         hostingView = NSHostingView(rootView: AnyView(EmptyView()))
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 780, height: 480), styleMask: [.borderless], backing: .buffered, defer: false)
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: width, height: 480), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
     }
@@ -20,7 +23,7 @@ final class TranscriptScrollViewFixture {
     func show(_ conversation: Conversation, transcript: TranscriptContent) async throws -> NSScrollView {
         hostingView.rootView = AnyView(TranscriptScrollView(
             conversation: conversation, transcript: transcript, positionStore: positionStore
-        ).id(conversation.id))
+        ).id(conversation.id).defaultAppStorage(settings.userDefaults))
         try await settleLayout()
         return try #require(descendant(ofType: NSScrollView.self, in: hostingView))
     }
@@ -39,9 +42,34 @@ final class TranscriptScrollViewFixture {
         try await settleLayout()
     }
 
+    /// Presses a toolbar button the way VoiceOver does, through the hosting view's accessibility elements. SwiftUI only
+    /// builds those elements while an assistive app has turned on the app's enhanced user interface, so the press turns
+    /// it on, then restores its earlier value afterward. The attribute accessors exist only in the deprecated informal
+    /// accessibility API; calling them by selector keeps the build free of deprecation warnings.
+    ///
+    /// The enhanced user interface is app-wide, and other main-actor tests can run while the press waits for layout.
+    /// They only see SwiftUI build its accessibility elements, but two presses must not overlap: the first to finish
+    /// would turn the setting off while the other still searches. Call this only from one test at a time.
+    func pressButton(labeled label: String) async throws {
+        let getValue = NSSelectorFromString("accessibilityAttributeValue:")
+        let setValue = NSSelectorFromString("accessibilitySetValue:forAttribute:")
+        let enhancedUserInterface = "AXEnhancedUserInterface" as NSString
+        let earlierValue = NSApp.perform(getValue, with: enhancedUserInterface)?.takeUnretainedValue() as? NSNumber
+        NSApp.perform(setValue, with: NSNumber(value: true), with: enhancedUserInterface)
+        defer { NSApp.perform(setValue, with: earlierValue ?? NSNumber(value: false), with: enhancedUserInterface) }
+        try await settleLayout()
+        let button = try #require(
+            accessibilityElement(labeled: label, in: hostingView),
+            "No accessibility element is labeled \"\(label)\". SwiftUI builds them only after NSApp's AXEnhancedUserInterface turns on; check that setting it still works before looking for a missing button."
+        )
+        #expect(button.accessibilityPerformPress?() == true)
+        try await settleLayout()
+    }
+
     func close() {
         hostingView.rootView = AnyView(EmptyView())
         window.close()
+        settings.removeSuite()
     }
 
     func visiblePosition(in scrollView: NSScrollView) -> TranscriptReadingPosition? {
@@ -54,6 +82,15 @@ final class TranscriptScrollViewFixture {
         return .entry(index: index, offset: clipView.bounds.minY - frame.minY)
     }
 
+    /// The frames of the entries on screen, in the scroll view's visible area. Entries fill the transcript column's
+    /// width; entries scrolled out of sight can keep an earlier layout, so they are left out.
+    func visibleEntryFrames(in scrollView: NSScrollView) -> [CGRect] {
+        let clipView = scrollView.contentView
+        return descendants(ofType: TranscriptEntryPositionMarkerView.self, in: hostingView)
+            .map { $0.convert($0.bounds, to: clipView) }
+            .filter { $0.intersects(clipView.bounds) }
+    }
+
     static func conversation(_ sessionID: String) -> Conversation {
         Conversation(provider: .codex, sessionID: sessionID, projectPath: "/tmp/reading-position", suggestedTitle: sessionID,
                      updatedAt: .now, sourceFile: URL(fileURLWithPath: "/tmp/\(sessionID).jsonl"))
@@ -64,6 +101,16 @@ final class TranscriptScrollViewFixture {
             let text = (0..<(12 + index % 5)).map { "Message \(index + omittedEntryCount), line \($0): keep this reading position." }.joined(separator: "\n")
             return TranscriptEntry(id: index, content: .assistantMessage(text), timestamp: nil, startsTurn: true)
         }, omittedEntryCount: omittedEntryCount)
+    }
+
+    /// SwiftUI's accessibility elements are Objective-C objects without a Swift protocol conformance, so the search
+    /// looks their accessibility methods up dynamically.
+    private func accessibilityElement(labeled label: String, in element: AnyObject) -> AnyObject? {
+        if element.accessibilityLabel?() == label { return element }
+        for child in element.accessibilityChildren?() ?? [] {
+            if let match = accessibilityElement(labeled: label, in: child as AnyObject) { return match }
+        }
+        return nil
     }
 
     private func descendant<ViewType: NSView>(ofType type: ViewType.Type, in view: NSView) -> ViewType? {
