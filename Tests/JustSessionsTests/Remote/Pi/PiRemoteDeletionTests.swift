@@ -148,21 +148,14 @@ struct PiRemoteDeletionTests {
     }
 
     @Test(arguments: HostShell.installed)
-    func aSessionAlreadyGoneFromTheHostIsReportedWithoutDroppingTheMirror(shell: HostShell) throws {
+    func aSessionAlreadyGoneFromTheHostCountsAsDeletedAndDropsTheMirrorCopy(shell: HostShell) throws {
         let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
         try FileManager.default.removeItem(at: fixture.hostSessionFile)
 
-        let error = #expect(throws: RemoteConversationDeletionError.self) {
-            try fixture.deletion().delete(fixture.conversation)
-        }
+        try fixture.deletion().delete(fixture.conversation)
 
-        guard case .missingOnHost(let host) = error else {
-            Issue.record("A session file missing on the host should be reported as missing: \(String(describing: error))")
-            return
-        }
-        #expect(host == "devbox")
-        #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
+        #expect(!FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
     }
 
     @Test func anUnreachableHostIsReportedAsAConnectionProblem() throws {
@@ -170,17 +163,22 @@ struct PiRemoteDeletionTests {
         defer { fixture.remove() }
         let recorder = RemoteCommandRecorder()
         let deletion = RemoteConversationDeletion(
-            runner: recorder.runner(answering: (RemoteHostCommandRunner.connectionFailureExitStatus, "ssh: connect to host devbox")),
+            runner: recorder.runner(answering: (
+                RemoteHostCommandRunner.connectionFailureExitStatus,
+                "ssh: connect to host devbox port 22: Connection refused\n"
+            )),
             mirror: fixture.mirror
         )
 
         let error = #expect(throws: RemoteConversationDeletionError.self) { try deletion.delete(fixture.conversation) }
 
-        guard case .sshFailed(let host) = error else {
+        guard case .sshFailed(let host, let details) = error else {
             Issue.record("An SSH failure should be reported as one: \(String(describing: error))")
             return
         }
         #expect(host == "devbox")
+        #expect(details == "ssh: connect to host devbox port 22: Connection refused")
+        #expect(error?.localizedDescription == "devbox refused the SSH connection. Check that SSH is running on it.")
         #expect(recorder.commands.map(\.host) == ["devbox"])
         #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
     }

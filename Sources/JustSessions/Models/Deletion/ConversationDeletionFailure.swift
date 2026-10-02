@@ -4,16 +4,8 @@ import Foundation
 struct ConversationDeletionFailure: Sendable {
     let conversation: Conversation
     let reason: String
-
-    /// What is shown after deleting one session: the reason alone, since the user just picked the session.
-    static func messageAfterDeletingOneSession(_ failures: [ConversationDeletionFailure]) -> String {
-        failures.map(\.reason).joined(separator: "\n")
-    }
-
-    /// What is shown after deleting several sessions: which ones failed, and why.
-    static func messageAfterDeletingSeveralSessions(_ failures: [ConversationDeletionFailure]) -> String {
-        "Some sessions could not be deleted:\n" + failures.map {
-            "\($0.conversation.provider.rawValue) · \($0.conversation.suggestedTitle): \($0.reason)"
-        }.joined(separator: "\n")
-    }
+    /// The SSH host given up on, when that is why the session was not deleted.
+    var unresponsiveHost: UnresponsiveSSHHost? = nil
+    /// False when the session's file is gone anyway, so it left the list although its tool reported an error.
+    var isStillListed = true
 }

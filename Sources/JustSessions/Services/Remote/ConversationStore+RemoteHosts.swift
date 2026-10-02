@@ -46,6 +46,9 @@ extension ConversationStore {
         installedProvidersByHost.removeValue(forKey: .ssh(host))
         replaceConversations(on: .ssh(host), with: [])
         Task.detached(priority: .utility) { mirror.removeMirror(host: host) }
+        // A Try Again that waited for this host's refresh can start for the other hosts' sessions; the refresh
+        // ends without reporting, now that the host is gone.
+        startQueuedRetry()
     }
 
     private func applyRemoteHostConversations(_ hostConversations: [Conversation], host: String) {
@@ -58,5 +61,7 @@ extension ConversationStore {
     private func setRemoteHostRefreshStatus(_ status: HostRefreshStatus, host: String) {
         guard remoteHostList.hosts.contains(host) else { return }
         hostRefreshStatuses[.ssh(host)] = status
+        // A Try Again that waited for this refresh can start now.
+        startQueuedRetry()
     }
 }

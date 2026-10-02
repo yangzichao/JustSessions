@@ -21,7 +21,12 @@ struct ConversationSidebarView: View {
     @State private var projectExpansion = ProjectExpansion()
     @State private var projectSelection = ProjectMultiSelection()
     @State private var isAddRemoteHostSheetPresented = false
+    /// Set once a deletion of several sessions has run for `deletionProgressBarDelay`, so a quick one never
+    /// flashes the progress bar.
+    @State private var isDeletionProgressBarShown = false
     @FocusState private var isSidebarListFocused: Bool
+
+    static let deletionProgressBarDelay: Duration = .milliseconds(300)
 
     private var isSearching: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -128,13 +133,17 @@ struct ConversationSidebarView: View {
                 .padding(.bottom, 12)
             }
 
+            if isDeletionProgressBarShown {
+                ThemeDivider()
+                SidebarDeletionProgressBar(progress: store.deletionProgress, onCancel: store.cancelDeletion)
+            }
             if projectSelection.hasMultipleSelected {
                 ThemeDivider()
                 SidebarProjectSelectionActionBar(
                     selectedCount: projectSelection.selectedProjectIDs.count,
                     onRemove: removeSelectedProjects
                 )
-            } else if sessionSelection.hasMultipleSelected {
+            } else if sessionSelection.hasMultipleSelected && !isDeletionProgressBarShown {
                 ThemeDivider()
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
@@ -164,6 +173,15 @@ struct ConversationSidebarView: View {
         .onChange(of: listedProjectIDs) { _, newListedProjectIDs in
             projectSelection.keepOnly(newListedProjectIDs)
         }
+        .task(id: store.isDeletingSessions) {
+            // One session has nothing to cancel between, so only a deletion of several shows the bar.
+            guard store.isDeletingSessions, store.pendingDeletionConversationIDs.count > 1 else {
+                isDeletionProgressBarShown = false
+                return
+            }
+            do { try await Task.sleep(for: Self.deletionProgressBarDelay) } catch { return }
+            isDeletionProgressBarShown = true
+        }
     }
 
     /// The theme's sidebar surface, reaching up behind the title bar, sets the list apart from the detail.
@@ -179,6 +197,7 @@ struct ConversationSidebarView: View {
             projectCount: section.projects.count,
             onNewSession: { onNewSessionOnHost(section.host) },
             onRefresh: { store.refresh(section.host) },
+            isRefreshDisabled: store.isDeletingSessions,
             onRemove: section.host.sshDestination.map { destination in { store.removeRemoteHost(destination) } }
         )
     }

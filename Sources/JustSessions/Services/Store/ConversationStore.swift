@@ -6,7 +6,11 @@ import Foundation
 @MainActor
 final class ConversationStore: ObservableObject {
     @Published private(set) var conversations: [Conversation] = []
-    @Published private(set) var errorMessage: String?
+    /// What the main window's alert shows, if anything.
+    @Published private(set) var alert: StoreAlert?
+    /// Alerts that came while `alert` was shown. Each is shown once the ones before it are dismissed, since
+    /// SwiftUI keeps showing an alert whose content changes under it.
+    private var waitingAlerts: [StoreAlert] = []
     @Published private(set) var titleAliases: ConversationTitleAliases
     @Published private(set) var projectDisplayNames: ProjectDisplayNames
     @Published private(set) var pinnedItems: PinnedItems
@@ -16,9 +20,11 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var selectedTerminalID: UUID? {
         didSet { selectedTerminal?.startNowThatItIsShown() }
     }
-    @Published private(set) var deletingConversationID: String?
-    /// Every conversation queued in the running batch deletion.
-    @Published private(set) var batchDeletionConversationIDs: Set<String> = []
+    /// Every conversation queued in the running deletion, of one session or several. It changes only when a
+    /// deletion starts and ends; `deletionProgress` follows the sessions in between.
+    @Published private(set) var pendingDeletionConversationIDs: Set<String> = []
+    /// How far the running deletion has got. Only the sidebar's progress bar observes it.
+    let deletionProgress = SessionDeletionProgress()
     /// The SSH hosts listed after this Mac.
     @Published var remoteHostList: RemoteHostList
     /// Each host's last refresh, this Mac's included.
@@ -48,9 +54,18 @@ final class ConversationStore: ObservableObject {
     /// The hosts the running deletion deletes from. A refresh of one waits until it ends, see `deferRefreshWhileDeleting(on:)`.
     private var hostsWithRunningDeletion: Set<SessionHost> = []
     private var hostsToRefreshAfterDeletion: Set<SessionHost> = []
+    /// Sessions Try Again asked to delete while a deletion ran or a host they are on was refreshing. They are
+    /// deleted when that ends; see `retryDeletion(of:)`.
+    private(set) var queuedRetryConversationIDs: Set<String> = []
+    private var deletionTask: Task<Void, Never>?
+    /// Deleted sessions leave the list, and the progress bar moves, at most this often while a deletion runs, and
+    /// once more when it ends. Tests set it to zero to follow each session.
+    var deletionListUpdateInterval: Duration = .milliseconds(500)
 
     private let adapters: [any ConversationAdapter]
     let commandResolver: NativeCLICommandResolver
+    /// Deletes sessions on SSH hosts.
+    private let remoteDeletion: RemoteConversationDeletion
     /// Where custom titles, project names, pins, sidebar projects, and SSH hosts are kept.
     let userDefaults: UserDefaults
 
@@ -61,10 +76,12 @@ final class ConversationStore: ObservableObject {
         commandResolver: NativeCLICommandResolver = NativeCLICommandResolver(),
         userDefaults: UserDefaults = .standard,
         sessionNotifier: any SessionNotifying = SessionNotificationCenter.shared,
+        remoteDeletion: RemoteConversationDeletion = RemoteConversationDeletion(),
         startsBackgroundPolling: Bool = true
     ) {
         self.adapters = adapters
         self.commandResolver = commandResolver
+        self.remoteDeletion = remoteDeletion
         self.userDefaults = userDefaults
         self.sessionNotifier = sessionNotifier
         self.titleAliases = ConversationTitleAliases.load(from: userDefaults)
@@ -120,6 +137,7 @@ final class ConversationStore: ObservableObject {
                 } else {
                     Task { await self.discoverNewSessions(mayRefresh: false) }
                 }
+                self.startQueuedRetry()
             }
         }
     }
@@ -182,7 +200,7 @@ final class ConversationStore: ObservableObject {
     }
 
     var isDeletingSessions: Bool {
-        deletingConversationID != nil || !batchDeletionConversationIDs.isEmpty
+        !pendingDeletionConversationIDs.isEmpty
     }
 
     /// A deletion waits for the deletion already running, and for the refresh of any host it deletes from: that
@@ -199,7 +217,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func isDeletionPending(for conversation: Conversation) -> Bool {
-        deletingConversationID == conversation.id || batchDeletionConversationIDs.contains(conversation.id)
+        pendingDeletionConversationIDs.contains(conversation.id)
     }
 
     func deletionPlan(for projectPath: String) -> SessionDeletionPlan {
@@ -218,12 +236,14 @@ final class ConversationStore: ObservableObject {
     func delete(_ conversation: Conversation) {
         guard conversation.supportsDeletionFromLauncher else { return }
         guard !hasTerminal(for: conversation) else {
-            errorMessage = ConversationDeletionError.activeTerminal.localizedDescription
+            show(StoreAlert(
+                title: SessionDeletionReport.oneSessionTitle(title(for: conversation)),
+                message: ConversationDeletionError.activeTerminal.localizedDescription
+            ))
             return
         }
         guard canStartDeletion(of: [conversation]), adapter(for: conversation.provider) != nil else { return }
-        deletingConversationID = conversation.id
-        deleteInBackground([conversation], failureMessage: ConversationDeletionFailure.messageAfterDeletingOneSession)
+        deleteInBackground([conversation])
     }
 
     func deleteSessions(in projectPath: String) {
@@ -236,65 +256,165 @@ final class ConversationStore: ObservableObject {
         let deletionPlan = deletionPlan(for: conversations.filter { candidateIDs.contains($0.id) })
         guard deletionPlan.hasDeletableConversations, canStartDeletion(of: deletionPlan.deletableConversations) else { return }
 
-        batchDeletionConversationIDs = Set(deletionPlan.deletableConversations.map(\.id))
-        deleteInBackground(
-            deletionPlan.deletableConversations,
-            failureMessage: ConversationDeletionFailure.messageAfterDeletingSeveralSessions
-        )
+        deleteInBackground(deletionPlan.deletableConversations)
     }
 
-    /// Deletes the conversations one at a time off the main actor, then shows `failureMessage` for any that failed.
-    /// A conversation whose file is gone leaves the list even when its deletion reported an error.
-    private func deleteInBackground(
-        _ deletableConversations: [Conversation],
-        failureMessage: @escaping @Sendable ([ConversationDeletionFailure]) -> String
-    ) {
-        let adapters = self.adapters
+    /// Try Again in the alert after a deletion: deletes again those of the sessions still listed and still
+    /// deletable, through the same path as any deletion; does nothing when none are. While a deletion runs, or a
+    /// host they are on is refreshing, the sessions wait and are deleted when that ends.
+    func retryDeletion(of conversationIDs: Set<String>) {
+        let deletionPlan = deletionPlan(for: conversations.filter { conversationIDs.contains($0.id) })
+        guard deletionPlan.hasDeletableConversations else { return }
+        guard canStartDeletion(of: deletionPlan.deletableConversations) else {
+            queuedRetryConversationIDs.formUnion(conversationIDs)
+            return
+        }
+        deleteInBackground(deletionPlan.deletableConversations)
+    }
+
+    /// Starts the Try Again that waited, when a deletion or a host's refresh ends. Still held up, it waits again;
+    /// it is taken off the queue first, so it starts at most once.
+    func startQueuedRetry() {
+        guard !queuedRetryConversationIDs.isEmpty else { return }
+        let conversationIDs = queuedRetryConversationIDs
+        queuedRetryConversationIDs = []
+        retryDeletion(of: conversationIDs)
+    }
+
+    /// Stops the running deletion after the session it is deleting, never during one. The sessions after it are
+    /// not attempted and stay listed.
+    func cancelDeletion() {
+        guard let deletionTask, !deletionProgress.isStopping else { return }
+        deletionProgress.markStopping()
+        deletionTask.cancel()
+    }
+
+    /// Deletes the conversations one at a time off the main actor, then shows an alert if any could not be
+    /// deleted; see `SessionDeletionReport`. A session already gone counts as deleted, and one whose file is gone
+    /// leaves the list even when its deletion reported an error. Once an SSH host cannot be reached or does not
+    /// respond in time, its remaining sessions are not attempted. Deleted sessions leave the list in groups, at
+    /// most every `deletionListUpdateInterval`, so a long deletion does not re-render the sidebar per session.
+    private func deleteInBackground(_ deletableConversations: [Conversation]) {
+        pendingDeletionConversationIDs = Set(deletableConversations.map(\.id))
         hostsWithRunningDeletion = Set(deletableConversations.map(\.host))
-        Task.detached(priority: .userInitiated) {
+        deletionProgress.start(totalCount: deletableConversations.count)
+        let adapters = self.adapters
+        let remoteDeletion = self.remoteDeletion
+        let listUpdateInterval = deletionListUpdateInterval
+        deletionTask = Task.detached(priority: .userInitiated) {
+            let clock = ContinuousClock()
+            var lastListUpdate = clock.now
+            var deletedSinceListUpdate: [Conversation] = []
+            var deletedCount = 0
+            var attemptedCount = 0
+            var wasCanceled = false
             var failures: [ConversationDeletionFailure] = []
+            var unresponsiveHosts: [String: UnresponsiveSSHHost] = [:]
             for conversation in deletableConversations {
-                guard let adapter = adapters.first(where: { $0.provider == conversation.provider }) else { continue }
-                await MainActor.run { self.deletingConversationID = conversation.id }
-                do {
-                    try Self.deleteFromDisk(conversation, adapter: adapter)
-                    await MainActor.run { self.removeDeletedConversation(conversation) }
-                } catch {
-                    failures.append(ConversationDeletionFailure(conversation: conversation, reason: error.localizedDescription))
-                    await MainActor.run {
-                        if !FileManager.default.fileExists(atPath: conversation.sourceFile.path) {
-                            self.removeDeletedConversation(conversation)
-                        }
+                // Cancel takes effect between sessions, so no session is left half deleted.
+                if Task.isCancelled {
+                    wasCanceled = true
+                    break
+                }
+                attemptedCount += 1
+                if let unresponsiveHost = conversation.host.sshDestination.flatMap({ unresponsiveHosts[$0] }) {
+                    failures.append(ConversationDeletionFailure(
+                        conversation: conversation,
+                        reason: RemoteConversationDeletionError.notAttempted(unresponsiveHost).localizedDescription,
+                        unresponsiveHost: unresponsiveHost
+                    ))
+                } else if let adapter = adapters.first(where: { $0.provider == conversation.provider }) {
+                    do {
+                        try Self.deleteFromDisk(conversation, adapter: adapter, remoteDeletion: remoteDeletion)
+                        deletedSinceListUpdate.append(conversation)
+                    } catch ConversationDeletionError.missingSource {
+                        // Already gone, as after an earlier deletion whose result was lost: it counts as deleted.
+                        deletedSinceListUpdate.append(conversation)
+                    } catch {
+                        let unresponsiveHost = (error as? RemoteConversationDeletionError)?.unresponsiveHost
+                        if let unresponsiveHost { unresponsiveHosts[unresponsiveHost.host] = unresponsiveHost }
+                        let isFileGone = !FileManager.default.fileExists(atPath: conversation.sourceFile.path)
+                        failures.append(ConversationDeletionFailure(
+                            conversation: conversation,
+                            reason: error.localizedDescription,
+                            unresponsiveHost: unresponsiveHost,
+                            isStillListed: !isFileGone
+                        ))
+                        if isFileGone { deletedSinceListUpdate.append(conversation) }
                     }
                 }
+                if clock.now - lastListUpdate >= listUpdateInterval {
+                    let deleted = deletedSinceListUpdate
+                    let completedCount = attemptedCount
+                    deletedCount += deleted.count
+                    deletedSinceListUpdate = []
+                    lastListUpdate = clock.now
+                    await self.applyDeletionProgress(removing: deleted, completedCount: completedCount)
+                }
             }
-            let finalFailures = failures
-            await MainActor.run {
-                self.deletingConversationID = nil
-                self.batchDeletionConversationIDs = []
-                if !finalFailures.isEmpty { self.errorMessage = failureMessage(finalFailures) }
-                self.hostsWithRunningDeletion = []
-                let hostsToRefresh = self.hostsToRefreshAfterDeletion
-                self.hostsToRefreshAfterDeletion = []
-                for host in self.hosts where hostsToRefresh.contains(host) { self.refresh(host) }
-            }
+            let deleted = deletedSinceListUpdate
+            let report = SessionDeletionReport(
+                requestedCount: deletableConversations.count,
+                deletedCount: deletedCount + deleted.count,
+                failures: failures,
+                wasCanceled: wasCanceled
+            )
+            await self.finishDeletion(removing: deleted, report: report)
         }
     }
 
     /// A session on this Mac is deleted by its tool's adapter; one on an SSH host over SSH.
-    nonisolated private static func deleteFromDisk(_ conversation: Conversation, adapter: any ConversationAdapter) throws {
+    nonisolated private static func deleteFromDisk(
+        _ conversation: Conversation,
+        adapter: any ConversationAdapter,
+        remoteDeletion: RemoteConversationDeletion
+    ) throws {
         switch conversation.host {
         case .thisMac: try adapter.delete(conversation)
-        case .ssh: try RemoteConversationDeletion().delete(conversation)
+        case .ssh: try remoteDeletion.delete(conversation)
         }
     }
 
-    private func removeDeletedConversation(_ conversation: Conversation) {
-        conversations.removeAll { $0.id == conversation.id }
-        titleAliases.removeTitle(forConversationID: conversation.id)
-        titleAliases.save(to: userDefaults)
-        if pinnedItems.isPinned(conversationID: conversation.id) {
-            setPinned(false, conversation: conversation)
+    private func applyDeletionProgress(removing deleted: [Conversation], completedCount: Int) {
+        removeDeletedConversations(deleted)
+        deletionProgress.update(completedCount: completedCount)
+    }
+
+    /// Always runs when a deletion ends, canceled or not, so another can start; then refreshes the hosts whose
+    /// refresh waited for it, and starts a Try Again that waited, if nothing holds it up any more.
+    private func finishDeletion(removing deleted: [Conversation], report: SessionDeletionReport) {
+        // Before the deleted sessions' custom titles are forgotten, so the alert names them as the sidebar did.
+        let reportAlert = report.alert(titleOf: title(for:))
+        removeDeletedConversations(deleted)
+        pendingDeletionConversationIDs = []
+        deletionTask = nil
+        deletionProgress.finish()
+        if let reportAlert { show(reportAlert) }
+
+        hostsWithRunningDeletion = []
+        let hostsToRefresh = hostsToRefreshAfterDeletion
+        hostsToRefreshAfterDeletion = []
+        for host in hosts where hostsToRefresh.contains(host) { refresh(host) }
+        startQueuedRetry()
+    }
+
+    /// Takes the deleted sessions off the list in one change, and forgets their custom titles and pins.
+    private func removeDeletedConversations(_ deleted: [Conversation]) {
+        guard !deleted.isEmpty else { return }
+        let deletedIDs = Set(deleted.map(\.id))
+        conversations.removeAll { deletedIDs.contains($0.id) }
+
+        var remainingTitleAliases = titleAliases
+        for conversationID in deletedIDs { remainingTitleAliases.removeTitle(forConversationID: conversationID) }
+        if remainingTitleAliases != titleAliases {
+            titleAliases = remainingTitleAliases
+            titleAliases.save(to: userDefaults)
+        }
+        var remainingPinnedItems = pinnedItems
+        for conversationID in deletedIDs { remainingPinnedItems.setPinned(false, conversationID: conversationID) }
+        if remainingPinnedItems != pinnedItems {
+            pinnedItems = remainingPinnedItems
+            pinnedItems.save(to: userDefaults)
         }
     }
 
@@ -358,11 +478,32 @@ final class ConversationStore: ObservableObject {
 
     // MARK: - Errors
 
+    /// The message of the alert shown, if any.
+    var errorMessage: String? { alert?.message }
+
+    /// Shows `message` under the general title.
     func showError(_ message: String) {
-        errorMessage = message
+        show(StoreAlert(title: StoreAlert.defaultTitle, message: message))
     }
 
+    /// Shows `newAlert` now, or after the alerts already shown or waiting are dismissed.
+    func show(_ newAlert: StoreAlert) {
+        if alert == nil {
+            alert = newAlert
+        } else {
+            waitingAlerts.append(newAlert)
+        }
+    }
+
+    /// Dismisses `dismissedAlert` if it is the one shown, then shows the next waiting one. An alert that already
+    /// went, such as one whose closing reports late, leaves a newer one alone.
+    func dismissAlert(_ dismissedAlert: StoreAlert) {
+        guard alert?.id == dismissedAlert.id else { return }
+        alert = waitingAlerts.isEmpty ? nil : waitingAlerts.removeFirst()
+    }
+
+    /// Dismisses the alert shown, if any.
     func dismissError() {
-        errorMessage = nil
+        if let alert { dismissAlert(alert) }
     }
 }

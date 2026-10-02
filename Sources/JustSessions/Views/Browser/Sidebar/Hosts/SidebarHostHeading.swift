@@ -11,6 +11,8 @@ struct SidebarHostHeading: View {
     let projectCount: Int
     let onNewSession: () -> Void
     let onRefresh: () -> Void
+    /// While sessions are being deleted, refreshing waits, as the sidebar header's button does.
+    let isRefreshDisabled: Bool
     /// Nil for this Mac, which is always listed.
     let onRemove: (() -> Void)?
 
@@ -42,7 +44,7 @@ struct SidebarHostHeading: View {
         .contextMenu {
             Button("New session on \(host.displayName)…", systemImage: "plus", action: onNewSession)
             Button("Refresh", systemImage: "arrow.clockwise", action: onRefresh)
-                .disabled(refreshStatus == .refreshing)
+                .disabled(refreshStatus == .refreshing || isRefreshDisabled)
             if let onRemove {
                 Divider()
                 Button("Remove host", systemImage: "minus.circle", role: .destructive, action: onRemove)

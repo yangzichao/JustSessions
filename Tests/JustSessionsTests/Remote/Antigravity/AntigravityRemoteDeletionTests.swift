@@ -35,17 +35,17 @@ struct AntigravityRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
     }
 
-    @Test func missingRemoteDatabaseReportsMissingWithoutRemovingTheCache() throws {
+    @Test func aMissingRemoteDatabaseCountsAsDeletedAndDropsTheCache() throws {
         let fixture = try RemoteAntigravityFixture()
         defer { fixture.remove() }
         try FileManager.default.removeItem(at: fixture.session.databaseFile)
-        do {
-            try RemoteConversationDeletion(runner: fixture.runner()).delete(fixture.conversation)
-            Issue.record("Expected the missing-session error")
-        } catch RemoteConversationDeletionError.missingOnHost(let host) {
-            #expect(host == "devbox")
+
+        try RemoteConversationDeletion(runner: fixture.runner()).delete(fixture.conversation)
+
+        #expect(!FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
+        for file in AntigravityDeletionFiles.databaseFiles(fixture.conversation.sourceFile) {
+            #expect(!FileManager.default.fileExists(atPath: file.path))
         }
-        #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
     }
 
     @Test func aFailureAfterStagingTheDatabaseRestoresFilesAndTheIndex() throws {

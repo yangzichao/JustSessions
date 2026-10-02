@@ -2,8 +2,8 @@ import Foundation
 
 /// Deletes a session on its remote host over SSH. Remote hosts have no Trash, so this is permanent.
 /// Claude Code and Antigravity lose their stored history and index entry; Codex and Kiro use their native CLIs;
-/// Pi loses its session file and the folder beside it.
-struct RemoteConversationDeletion {
+/// Pi loses its session file and the folder beside it. A session already gone from the host counts as deleted.
+struct RemoteConversationDeletion: Sendable {
     let runner: RemoteHostCommandRunner
     /// Where the host's sessions were copied, so a Pi session's file is found relative to that host's Pi mirror.
     let mirror: RemoteSessionMirror
@@ -60,24 +60,33 @@ struct RemoteConversationDeletion {
         guard let result = runner.run(host, command, 60) else { throw RemoteConversationDeletionError.couldNotRun(host: host) }
         switch result.exitStatus {
         case 0:
-            // The mirror would drop it on the next copy; dropping it now keeps the list right until then.
-            try? FileManager.default.removeItem(at: conversation.sourceFile)
-            if conversation.provider == .kiro {
-                try? FileManager.default.removeItem(at: conversation.sourceFile.deletingPathExtension().appendingPathExtension("json"))
-            }
-            if conversation.provider == .antigravity {
-                for file in AntigravityDeletionFiles.databaseFiles(conversation.sourceFile) { try? FileManager.default.removeItem(at: file) }
-            }
+            removeMirrorCopies(of: conversation)
         case RemoteHostCommandRunner.connectionFailureExitStatus:
-            throw RemoteConversationDeletionError.sshFailed(host: host)
+            throw RemoteConversationDeletionError.sshFailed(
+                host: host,
+                details: SSHConnectionProblem.tellingLine(inOutput: result.output) ?? "exit status \(result.exitStatus)"
+            )
         case Self.missingTranscriptExitStatus where [.claude, .kiro, .antigravity, .pi].contains(conversation.provider):
-            throw RemoteConversationDeletionError.missingOnHost(host: host)
+            // Already gone, for example deleted just before a dropped connection hid the result: it counts as
+            // deleted.
+            removeMirrorCopies(of: conversation)
         default:
             let details = result.output.trimmingCharacters(in: .whitespacesAndNewlines)
             throw RemoteConversationDeletionError.failed(
                 host: host,
                 details: details.isEmpty ? "exit status \(result.exitStatus)" : String(details.suffix(500))
             )
+        }
+    }
+
+    /// The mirror would drop the session on the next copy; dropping it now keeps the list right until then.
+    private func removeMirrorCopies(of conversation: Conversation) {
+        try? FileManager.default.removeItem(at: conversation.sourceFile)
+        if conversation.provider == .kiro {
+            try? FileManager.default.removeItem(at: conversation.sourceFile.deletingPathExtension().appendingPathExtension("json"))
+        }
+        if conversation.provider == .antigravity {
+            for file in AntigravityDeletionFiles.databaseFiles(conversation.sourceFile) { try? FileManager.default.removeItem(at: file) }
         }
     }
 
