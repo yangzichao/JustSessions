@@ -21,3 +21,8 @@ jobs:
 
       - name: Check localization
         run: make localization-check
+
+      - name: Check the packaged app opens
+        run: |
+          ./Scripts/build-app.sh
+          ./Scripts/Release/check-app-launches.sh

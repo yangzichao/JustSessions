@@ -29,6 +29,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there.
 - `Services/Remote/HostStatus/`: one SSH call per refresh that lists the host's tmux sessions and installed CLIs.
 - `Services/Tmux/ThisMac/`: bundled runtime discovery, terminal database environment, compatible server selection, and local persistence.
+- `Scripts/Release/`: release checks, such as opening the packaged app without the build machine's resource bundles.
 - `Scripts/Tmux/`: pinned source builds, license collection, and relocated runtime verification for app packaging and CI.
 - `Services/Tmux/`: tmux session names, and keeping a CLI running after its tab closes, on any host.
 - `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, and finding each tab's CLI process.

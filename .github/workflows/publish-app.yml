@@ -80,6 +80,9 @@ jobs:
           test "$(plutil -extract CFBundleShortVersionString raw dist/JustSessions.app/Contents/Info.plist)" = "$APP_VERSION"
           codesign --display --verbose=2 dist/JustSessions.app 2>&1 | grep -F "Authority=Developer ID Application:"
 
+      - name: Check the signed app opens
+        run: ./Scripts/Release/check-app-launches.sh
+
       - name: Notarize and staple app
         env:
           APPLE_NOTARY_KEY: ${{ secrets.APPLE_NOTARY_KEY }}
