@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
+    let isSidebarHidden: Bool
     let sidebar: Sidebar
     let detail: Detail
 
@@ -10,9 +11,11 @@ struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
     @State private var draggingSidebarWidth: CGFloat?
 
     init(
+        isSidebarHidden: Bool,
         @ViewBuilder sidebar: () -> Sidebar,
         @ViewBuilder detail: () -> Detail
     ) {
+        self.isSidebarHidden = isSidebarHidden
         self.sidebar = sidebar()
         self.detail = detail()
     }
@@ -26,23 +29,32 @@ struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
             )
 
             HStack(spacing: 0) {
-                sidebar.frame(width: sidebarWidth)
+                // A hidden sidebar stays in the view tree, past the window's leading edge, so it comes back with its
+                // expanded projects and scroll position.
+                sidebar
+                    .frame(width: sidebarWidth)
+                    .frame(width: isSidebarHidden ? 0 : sidebarWidth, alignment: .trailing)
+                    .opacity(isSidebarHidden ? 0 : 1)
+                    .disabled(isSidebarHidden)
+                    .accessibilityHidden(isSidebarHidden)
 
-                SidebarResizeHandle(
-                    width: sidebarWidth,
-                    minimumWidth: minimumSidebarWidth,
-                    maximumWidth: maximumSidebarWidth,
-                    onChange: { draggingSidebarWidth = $0 },
-                    onCommit: { newWidth in
-                        savedSidebarWidth = Double(newWidth)
-                        draggingSidebarWidth = nil
-                    }
-                )
+                if !isSidebarHidden {
+                    SidebarResizeHandle(
+                        width: sidebarWidth,
+                        minimumWidth: minimumSidebarWidth,
+                        maximumWidth: maximumSidebarWidth,
+                        onChange: { draggingSidebarWidth = $0 },
+                        onCommit: { newWidth in
+                            savedSidebarWidth = Double(newWidth)
+                            draggingSidebarWidth = nil
+                        }
+                    )
+                }
 
                 detail.frame(minWidth: 600, maxWidth: .infinity)
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
-        .frame(minWidth: 940, minHeight: 550)
+        .frame(minWidth: isSidebarHidden ? 600 : 940, minHeight: 550)
     }
 }

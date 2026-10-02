@@ -13,6 +13,7 @@ struct ConversationBrowserView: View {
     /// The host the New Session sheet opened on; nil while it is closed.
     @State private var newSessionSheetHost: SessionHost?
     @State private var closingTerminalID: UUID?
+    @SceneStorage("isSidebarHidden") private var isSidebarHidden = false
     @StateObject private var updateManager = SparkleUpdateManager()
 
     private var providerConversations: [Conversation] {
@@ -41,7 +42,7 @@ struct ConversationBrowserView: View {
     var body: some View {
         let providerConversations = providerConversations
 
-        ResizableSidebarLayout {
+        ResizableSidebarLayout(isSidebarHidden: isSidebarHidden) {
             ConversationSidebarView(
                 store: store,
                 searchText: $searchText,
@@ -77,6 +78,8 @@ struct ConversationBrowserView: View {
                 onDelete: { onRequestDeletion(.conversation($0)) }
             )
         }
+        .titleBarSidebarToggle(isSidebarHidden: $isSidebarHidden)
+        .focusedSceneValue(\.isSidebarHidden, $isSidebarHidden)
         .sheet(item: $newSessionSheetHost) { host in
             let startableProjects = startableProjects
             NewSessionSheet(

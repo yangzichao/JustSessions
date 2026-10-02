@@ -14,6 +14,7 @@ struct JustSessionsApp: App {
         .defaultSize(width: 1100, height: 720)
         .commands {
             WorkspaceTabCommands()
+            SidebarToggleCommands()
             CommandGroup(replacing: .help) {
                 HelpWindowButton()
                 Divider()
