@@ -6,12 +6,12 @@
 APP_BUNDLE_PATH ?= dist/JustSessions.app
 INSTALLER_PATH ?= dist/JustSessions.dmg
 
-.PHONY: build run check test dmg website help
+.PHONY: build dev run check test dmg website help
 
 build:
 	./Scripts/build-app.sh "$(APP_BUNDLE_PATH)"
 
-run: build
+dev run: build
 	open "$(APP_BUNDLE_PATH)"
 
 check:
@@ -30,7 +30,8 @@ website:
 help:
 	@printf '%s\n' \
 		'make           Build dist/JustSessions.app with bundled tmux' \
-		'make run       Build and open the app' \
+		'make dev       Build and open the app' \
+		'make run       Alias for make dev' \
 		'make check     Compile the Swift development build' \
 		'make test      Build bundled tmux and run the Swift tests' \
 		'make dmg       Build the app and dist/JustSessions.dmg' \
