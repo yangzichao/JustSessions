@@ -35,7 +35,11 @@ struct SidebarFilterBar: View {
             .pickerStyle(.inline)
             .labelsHidden()
         } label: {
-            Image(systemName: filteredProvider?.symbolName ?? "line.3.horizontal.decrease")
+            if let filteredProvider {
+                filteredProvider.iconImage()
+            } else {
+                Image(systemName: "line.3.horizontal.decrease")
+            }
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)

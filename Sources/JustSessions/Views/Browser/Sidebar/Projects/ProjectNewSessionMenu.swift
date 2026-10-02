@@ -17,8 +17,14 @@ struct ProjectNewSessionMenu: View {
                 Text(NewSessionProviderAvailability.noCLIFoundMessage(on: project.host))
             }
             ForEach(providers) { provider in
-                Button(provider.rawValue, systemImage: provider.symbolName) {
+                Button {
                     onStart(provider)
+                } label: {
+                    Label {
+                        Text(provider.rawValue)
+                    } icon: {
+                        provider.iconImage()
+                    }
                 }
             }
             if let onOpenTerminal {

@@ -22,7 +22,7 @@ struct SidebarSessionRowLayout<Title: View, Trailing: View>: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: provider.symbolName)
+            provider.iconImage(size: 10)
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(provider.tintColor)
                 .frame(width: 14)

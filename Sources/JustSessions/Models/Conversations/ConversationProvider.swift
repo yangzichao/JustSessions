@@ -9,17 +9,6 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
     case pi = "Pi"
 
     var id: String { rawValue }
-    var symbolName: String {
-        switch self {
-        case .claude: "asterisk"
-        case .codex: "terminal"
-        case .antigravity: "sparkle"
-        case .kiro: "bolt"
-        case .opencode: "chevron.left.forwardslash.chevron.right"
-        case .pi: "pi"
-        }
-    }
-
     /// The CLI's command name, on this Mac and on SSH hosts.
     var executableName: String {
         switch self {

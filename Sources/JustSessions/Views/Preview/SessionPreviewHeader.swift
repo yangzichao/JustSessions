@@ -31,7 +31,7 @@ struct SessionPreviewHeader: View {
         let isPinned = store.pinnedItems.isPinned(conversationID: conversation.id)
 
         return HStack(alignment: .center, spacing: 12) {
-            Image(systemName: conversation.provider.symbolName)
+            conversation.provider.iconImage(size: 15)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(conversation.provider.tintColor)
                 .frame(width: 34, height: 34)
