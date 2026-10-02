@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// What a session's CLI is doing, as one small glyph: a turning arc while it works, an amber mark while it needs
-/// your input, a green dot while it runs otherwise, and a hollow circle once it ended in a tab still open.
+/// your input, a green dot while it runs otherwise, a hollow circle once it ended in a tab still open, and a dotted
+/// circle on a reopened tab that has not started yet.
 struct SessionStatusIndicator: View {
     let status: SessionRunStatus
     /// The tooltip and accessibility label; the status's own summary unless given.
@@ -36,6 +37,10 @@ struct SessionStatusIndicator: View {
         case .ended:
             Image(systemName: "circle")
                 .font(.system(size: 7, weight: .semibold))
+                .foregroundStyle(.secondary)
+        case .waitingToBeShown:
+            Image(systemName: "circle.dotted")
+                .font(.system(size: 8, weight: .semibold))
                 .foregroundStyle(.secondary)
         }
     }

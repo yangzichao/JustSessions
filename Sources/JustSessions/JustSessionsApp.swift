@@ -30,6 +30,7 @@ struct JustSessionsApp: App {
 
         Settings {
             SettingsView(
+                tabReopeningSettingsStore: .shared,
                 appAppearanceStore: .shared,
                 appThemeStore: .shared,
                 terminalAppearanceStore: .shared,

@@ -7,6 +7,8 @@ enum SessionRunStatus: Equatable {
     case running(CLIActivity?)
     /// The tab is still open after its CLI ended.
     case ended
+    /// A tab reopened at launch that starts its CLI once you select it.
+    case waitingToBeShown
 
     /// What the indicator means, for its tooltip and accessibility label.
     var summary: String {
@@ -16,6 +18,7 @@ enum SessionRunStatus: Equatable {
         case .running(.idle): "Idle, waiting for your next prompt"
         case .running(nil): "Running"
         case .ended: "Ended"
+        case .waitingToBeShown: "Reopened from last time; starts when you select its tab"
         }
     }
 }

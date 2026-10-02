@@ -21,7 +21,7 @@ struct TerminalTabGroupSection: View {
 
     /// What the hidden tabs' CLIs are doing. A plain terminal runs no session, so it does not count.
     private func hiddenTabsActivity(_ hiddenTabs: [TerminalSession]) -> SessionActivitySummary {
-        SessionActivitySummary(activities: hiddenTabs.filter { !$0.isPlainTerminal && !$0.hasExited }.map(\.cliActivity))
+        SessionActivitySummary(activities: hiddenTabs.filter { !$0.isPlainTerminal && $0.isRunning }.map(\.cliActivity))
     }
 
     var body: some View {

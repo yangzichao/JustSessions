@@ -5,6 +5,6 @@ struct TerminalStatusIndicator: View {
     @ObservedObject var session: TerminalSession
 
     var body: some View {
-        SessionStatusIndicator(status: session.hasExited ? .ended : .running(session.cliActivity))
+        SessionStatusIndicator(status: session.runStatus)
     }
 }

@@ -12,6 +12,7 @@ struct ThemeSurfaceRenderingTests {
         let appearanceStore = AppAppearanceStore(userDefaults: settings.userDefaults) { _ in }
         let terminalStore = TerminalAppearanceStore(userDefaults: settings.userDefaults)
         let notificationStore = SessionNotificationSettingsStore(userDefaults: settings.userDefaults)
+        let tabReopeningStore = TabReopeningSettingsStore(userDefaults: settings.userDefaults)
         let views: [(String, AnyView, CGSize)] = [
             ("feedback", AnyView(FeedbackView()), CGSize(width: 560, height: 640)),
             ("feedback-ready", AnyView(FeedbackView(initialDraft: FeedbackDraft(
@@ -20,6 +21,7 @@ struct ThemeSurfaceRenderingTests {
                 includesVersionInformation: false
             ))), CGSize(width: 560, height: 640)),
             ("settings", AnyView(SettingsView(
+                tabReopeningSettingsStore: tabReopeningStore,
                 appAppearanceStore: appearanceStore, appThemeStore: themeStore,
                 terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore
             )), CGSize(width: 560, height: 420)),

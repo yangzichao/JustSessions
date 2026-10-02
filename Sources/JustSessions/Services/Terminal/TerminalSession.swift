@@ -34,6 +34,9 @@ final class TerminalSession: ObservableObject, Identifiable {
     var titleRefreshCount = 0
     var onProcessFinished: (() -> Void)?
 
+    /// A tab reopened at launch for a session whose CLI no longer runs starts it only once shown, the way a browser
+    /// loads a restored tab once you select it. Until then it runs nothing.
+    @Published private(set) var isWaitingToBeShown: Bool
     @Published private(set) var hasExited = false
     @Published private(set) var exitCode: Int32?
     @Published private(set) var hasSelection = false
@@ -53,6 +56,12 @@ final class TerminalSession: ObservableObject, Identifiable {
         ProjectLocation(host: host, path: projectPath).key
     }
     var isPlainTerminal: Bool { provider == nil }
+    /// Its process runs, or starts once the tab's view appears: not ended, and not waiting to be shown.
+    var isRunning: Bool { !hasExited && !isWaitingToBeShown }
+    var runStatus: SessionRunStatus {
+        if isWaitingToBeShown { return .waitingToBeShown }
+        return hasExited ? .ended : .running(cliActivity)
+    }
     /// A New session or Branch tab, whose session id the app learns once the CLI writes it.
     var startsNewSession: Bool { action?.startsNewSession ?? false }
 
@@ -67,7 +76,8 @@ final class TerminalSession: ObservableObject, Identifiable {
         branchedFromSessionID: String? = nil,
         host: SessionHost = .thisMac,
         sessionIDsKnownAtLaunch: Set<String> = [],
-        tmuxSessionName: String? = nil
+        tmuxSessionName: String? = nil,
+        startsOnceShown: Bool = false
     ) {
         self.conversation = conversation
         self.provider = provider
@@ -80,6 +90,7 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.command = command
         self.preassignedSessionID = preassignedSessionID
         self.branchedFromSessionID = branchedFromSessionID
+        self.isWaitingToBeShown = startsOnceShown
         self.terminalView = SelectableTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.processObserver = TerminalProcessObserver()
         terminalView.sendsShiftReturnAsCSIu = host == .thisMac && tmuxSessionName != nil
@@ -91,7 +102,7 @@ final class TerminalSession: ObservableObject, Identifiable {
     }
 
     func startIfNeeded() {
-        guard !hasStarted && !isClosed else { return }
+        guard !hasStarted && !isClosed && !isWaitingToBeShown else { return }
         hasStarted = true
         terminalView.startProcess(
             executable: command.executablePath,
@@ -99,6 +110,13 @@ final class TerminalSession: ObservableObject, Identifiable {
             environment: command.environment,
             currentDirectory: command.workingDirectory
         )
+    }
+
+    /// Starts a tab that waited to be shown, now that it is.
+    func startNowThatItIsShown() {
+        guard isWaitingToBeShown else { return }
+        isWaitingToBeShown = false
+        startIfNeeded()
     }
 
     func processFinished(exitCode: Int32?) {

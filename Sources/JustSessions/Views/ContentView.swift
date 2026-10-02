@@ -32,6 +32,7 @@ struct ContentView: View {
         .onAppear {
             if !hasStartedScan {
                 hasStartedScan = true
+                store.reopenTabsFromLastQuit()
                 store.refreshAllHosts()
             }
         }
@@ -39,6 +40,7 @@ struct ContentView: View {
             ExternalEditorStore.shared.refresh()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
+            store.saveTabsForNextLaunch()
             store.closeAllTerminals()
         }
         .alert("Rename conversation", isPresented: Binding(isPresenting: $renamingConversation)) {

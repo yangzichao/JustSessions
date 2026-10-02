@@ -19,9 +19,9 @@ struct SidebarSessionRow: View {
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     /// A tab whose CLI runs comes first, the selected one among them; then a CLI running in tmux with no tab; then a
-    /// tab whose CLI ended. Nil when nothing runs the session.
+    /// tab whose CLI ended or has not started. Nil when nothing runs the session.
     private func statusSource(tabs: [TerminalSession]) -> StatusSource? {
-        let runningTabs = tabs.filter { !$0.hasExited }
+        let runningTabs = tabs.filter(\.isRunning)
         if let runningTab = runningTabs.first(where: { $0.id == store.selectedTerminalID }) ?? runningTabs.first {
             return .tab(runningTab)
         }
@@ -32,7 +32,7 @@ struct SidebarSessionRow: View {
     private func statusDescription(of source: StatusSource) -> String {
         switch source {
         case .tab(let tab):
-            (tab.hasExited ? SessionRunStatus.ended : .running(tab.cliActivity)).summary
+            tab.runStatus.summary
         case .detachedCLI(let activity):
             SessionStatusIndicator.descriptionOfDetachedCLI(.running(activity), on: conversation.host)
         }

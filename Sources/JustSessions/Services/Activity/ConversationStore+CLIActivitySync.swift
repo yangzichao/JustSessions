@@ -18,7 +18,7 @@ extension ConversationStore {
 
     func synchronizeCLIActivity(claudeRegistry: ClaudeLiveSessionRegistry = ClaudeLiveSessionRegistry()) async {
         let probedTabs = terminalSessions.compactMap { tab in
-            tab.hasExited ? nil : tab.cliActivityProbe.map { (tab: tab, probe: $0) }
+            tab.isRunning ? tab.cliActivityProbe.map { (tab: tab, probe: $0) } : nil
         }
         let detachedSessions = detachedThisMacTmuxSessions()
         guard !probedTabs.isEmpty || !detachedSessions.isEmpty || !detachedCLIActivities.isEmpty else {
@@ -72,7 +72,7 @@ extension ConversationStore {
     /// Listed sessions of this Mac that run in tmux, as of the last refresh, with no running tab.
     private func detachedThisMacTmuxSessions() -> [DetachedTmuxSession] {
         guard let runningNames = tmuxSessionNamesByHost[.thisMac], !runningNames.isEmpty else { return [] }
-        let conversationIDsWithRunningTab = Set(terminalSessions.filter { !$0.hasExited }.compactMap { $0.conversation?.id })
+        let conversationIDsWithRunningTab = Set(terminalSessions.filter(\.isRunning).compactMap { $0.conversation?.id })
         return runningNames.sorted().compactMap { name in
             guard let session = TmuxSessionName.session(named: name),
                   let conversation = conversations.first(where: {

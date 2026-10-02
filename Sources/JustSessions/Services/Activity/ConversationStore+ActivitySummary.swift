@@ -5,7 +5,7 @@ extension ConversationStore {
     /// A plain terminal runs no session, so it does not count.
     func activitySummary(forProjectDirectoryKey projectDirectoryKey: String) -> SessionActivitySummary {
         let runningTabs = terminalSessions.filter {
-            $0.projectDirectoryKey == projectDirectoryKey && !$0.isPlainTerminal && !$0.hasExited
+            $0.projectDirectoryKey == projectDirectoryKey && !$0.isPlainTerminal && $0.isRunning
         }
         let conversationIDsWithRunningTab = Set(runningTabs.compactMap { $0.conversation?.id })
         let detachedActivities = conversations

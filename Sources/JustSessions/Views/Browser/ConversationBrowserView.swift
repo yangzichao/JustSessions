@@ -73,7 +73,7 @@ struct ConversationBrowserView: View {
                 store: store,
                 sessionSelection: sessionSelection,
                 onRename: onRename,
-                onCloseTerminal: { closingTerminalID = $0 },
+                onCloseTerminal: { requestClosingTerminal($0) },
                 onDelete: { onRequestDeletion(.conversation($0)) }
             )
         }
@@ -95,7 +95,7 @@ struct ConversationBrowserView: View {
             hasSelectedTab: store.selectedTerminal != nil,
             isEnabled: workspaceTabCommandsEnabled,
             newSession: { newSessionSheetHost = defaultNewSessionHost },
-            closeSelectedTab: { closingTerminalID = store.selectedTerminalID },
+            closeSelectedTab: { requestClosingTerminal(store.selectedTerminalID) },
             selectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) },
             selectTab: { store.selectTerminal(shortcutNumber: $0) }
         ))
@@ -104,6 +104,16 @@ struct ConversationBrowserView: View {
             onSelectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) }
         ))
         .modifier(TerminalTabCloseConfirmation(store: store, closingSessionID: $closingTerminalID))
+    }
+
+    /// A tab still waiting to be shown runs nothing, so it closes without asking what to do with its CLI.
+    private func requestClosingTerminal(_ id: UUID?) {
+        guard let id else { return }
+        if store.terminalSessions.first(where: { $0.id == id })?.isWaitingToBeShown == true {
+            store.closeTerminal(id)
+        } else {
+            closingTerminalID = id
+        }
     }
 
     private var workspaceTabCommandsEnabled: Bool {

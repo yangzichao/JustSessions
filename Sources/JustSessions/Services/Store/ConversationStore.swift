@@ -12,7 +12,10 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var pinnedItems: PinnedItems
     @Published var sidebarProjectList: SidebarProjectList
     @Published private(set) var terminalSessions: [TerminalSession] = []
-    @Published private(set) var selectedTerminalID: UUID?
+    /// Selecting a tab that waited to be shown starts it; see `TerminalSession.isWaitingToBeShown`.
+    @Published private(set) var selectedTerminalID: UUID? {
+        didSet { selectedTerminal?.startNowThatItIsShown() }
+    }
     @Published private(set) var deletingConversationID: String?
     /// Every conversation queued in the running batch deletion.
     @Published private(set) var batchDeletionConversationIDs: Set<String> = []
@@ -36,6 +39,8 @@ final class ConversationStore: ObservableObject {
     let codexTurnTracker = CodexRolloutTurnTracker()
     /// What each CLI on this Mac did at the last activity sync; see `ConversationStore+SessionNotifications`.
     var sessionAttentionTracker = SessionAttentionTracker()
+    /// Tabs from the last quit still waiting for their host's sessions; see `ConversationStore+TabReopening`.
+    var pendingTabReopening = PendingTabReopening()
     let sessionNotifier: any SessionNotifying
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
@@ -125,6 +130,7 @@ final class ConversationStore: ObservableObject {
         conversations = (conversations.filter { $0.host != host } + hostConversations)
             .sorted { $0.updatedAt > $1.updatedAt }
         synchronizeTerminalTitles()
+        reopenWaitingTabs(on: host)
     }
 
     func adapter(for provider: ConversationProvider) -> (any ConversationAdapter)? {
@@ -311,6 +317,13 @@ final class ConversationStore: ObservableObject {
         )
         terminalSessions.insert(session, at: insertionIndex)
         selectedTerminalID = session.id
+    }
+
+    /// Puts a tab reopened from the last quit at `index` without showing it, unless `selecting`.
+    func insertReopenedTerminal(_ session: TerminalSession, at index: Int, selecting: Bool) {
+        showProjectInSidebar(session.projectDirectoryKey)
+        terminalSessions.insert(session, at: min(index, terminalSessions.count))
+        if selecting { selectedTerminalID = session.id }
     }
 
     var selectedTerminal: TerminalSession? {

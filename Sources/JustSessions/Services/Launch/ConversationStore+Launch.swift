@@ -14,7 +14,7 @@ extension ConversationStore {
         }
     }
 
-    /// The open tab whose CLI still runs the session, if any.
+    /// The open tab whose CLI still runs the session, or starts it once shown, if any.
     func runningTerminal(for conversation: Conversation) -> TerminalSession? {
         terminalSessions.first { $0.conversation?.id == conversation.id && !$0.hasExited }
     }
@@ -38,30 +38,41 @@ extension ConversationStore {
             selectTerminal(runningTerminal.id)
             return
         }
-        guard let adapter = adapter(for: conversation.provider) else { return }
         do {
-            let (command, tmuxSessionName) = try launchCommand(for: conversation, action: action, adapter: adapter)
-            // A branch runs a fork with a session id of its own, so its tab waits for that session like a
-            // new session's tab does; see new session discovery.
-            let isBranch = action == .branch
-            let session = TerminalSession(
-                conversation: isBranch ? nil : conversation,
-                provider: conversation.provider,
-                projectPath: conversation.projectPath,
-                action: action,
-                displayTitle: title(for: conversation),
-                command: command,
-                branchedFromSessionID: isBranch ? conversation.sessionID : nil,
-                host: conversation.host,
-                sessionIDsKnownAtLaunch: isBranch ? sessionIDsKnownAtLaunch(of: conversation.provider, on: conversation.host) : [],
-                tmuxSessionName: tmuxSessionName
-            )
-            // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
-            session.onProcessFinished = { [weak self] in self?.refresh(conversation.host) }
+            guard let session = try makeTerminal(for: conversation, action: action) else { return }
             openTerminal(session)
         } catch {
             showError(error.localizedDescription)
         }
+    }
+
+    /// A tab that runs the session's CLI, not opened yet; nil when no adapter reads the session's tool.
+    func makeTerminal(
+        for conversation: Conversation,
+        action: ConversationAction,
+        startsOnceShown: Bool = false
+    ) throws -> TerminalSession? {
+        guard let adapter = adapter(for: conversation.provider) else { return nil }
+        let (command, tmuxSessionName) = try launchCommand(for: conversation, action: action, adapter: adapter)
+        // A branch runs a fork with a session id of its own, so its tab waits for that session like a
+        // new session's tab does; see new session discovery.
+        let isBranch = action == .branch
+        let session = TerminalSession(
+            conversation: isBranch ? nil : conversation,
+            provider: conversation.provider,
+            projectPath: conversation.projectPath,
+            action: action,
+            displayTitle: title(for: conversation),
+            command: command,
+            branchedFromSessionID: isBranch ? conversation.sessionID : nil,
+            host: conversation.host,
+            sessionIDsKnownAtLaunch: isBranch ? sessionIDsKnownAtLaunch(of: conversation.provider, on: conversation.host) : [],
+            tmuxSessionName: tmuxSessionName,
+            startsOnceShown: startsOnceShown
+        )
+        // A CLI that exits on its own leaves its tab open; list what it saved without waiting for the tab to close.
+        session.onProcessFinished = { [weak self] in self?.refresh(conversation.host) }
+        return session
     }
 
     /// On this Mac, the CLI itself, in tmux when it is installed; on an SSH host, `ssh` into the tmux session the

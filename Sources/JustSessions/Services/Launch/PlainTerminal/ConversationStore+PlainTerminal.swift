@@ -5,20 +5,25 @@ import Foundation
 extension ConversationStore {
     func openPlainTerminal(in location: ProjectLocation) {
         do {
-            let (command, projectPath) = try plainTerminalCommand(in: location)
-            let session = TerminalSession(
-                conversation: nil,
-                provider: nil,
-                projectPath: projectPath,
-                action: nil,
-                displayTitle: "Terminal · \(projectDisplayName(forProjectPath: location.key))",
-                command: command,
-                host: location.host
-            )
-            openTerminal(session)
+            openTerminal(try makePlainTerminal(in: location))
         } catch {
             showError(error.localizedDescription)
         }
+    }
+
+    /// A plain terminal tab in the folder, not opened yet.
+    func makePlainTerminal(in location: ProjectLocation, startsOnceShown: Bool = false) throws -> TerminalSession {
+        let (command, projectPath) = try plainTerminalCommand(in: location)
+        return TerminalSession(
+            conversation: nil,
+            provider: nil,
+            projectPath: projectPath,
+            action: nil,
+            displayTitle: "Terminal · \(projectDisplayName(forProjectPath: location.key))",
+            command: command,
+            host: location.host,
+            startsOnceShown: startsOnceShown
+        )
     }
 
     /// Also returns the folder as the tab records it.
