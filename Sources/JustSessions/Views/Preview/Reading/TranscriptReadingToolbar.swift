@@ -51,7 +51,7 @@ struct TranscriptReadingToolbar: View {
         Button("Reading width", systemImage: readingWidthSymbol) { readingWidth = readingWidth.toggled }
             .labelStyle(.iconOnly)
             .help(readingWidth == .readable ? "Use the full window width" : "Use a readable width")
-            .accessibilityValue(readingWidth.displayName)
+            .accessibilityValue(readingWidth == .readable ? "Readable" : "Full")
             .accessibilityHint("Switches between a readable width and the full window width")
     }
 

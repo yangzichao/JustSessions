@@ -16,7 +16,7 @@ struct TerminalAppearanceSettingsView: View {
                         set: { appearanceStore.setMode($0) }
                     )) {
                         ForEach(TerminalAppearanceMode.allCases) { mode in
-                            Text(mode.displayName).tag(mode)
+                            Text(mode.localizedDisplayName).tag(mode)
                         }
                     }
                     .pickerStyle(.segmented)
@@ -29,7 +29,11 @@ struct TerminalAppearanceSettingsView: View {
                         set: { appearanceStore.setFontFamily($0) }
                     )) {
                         ForEach(TerminalFontFamily.allCases) { family in
-                            Text(family.displayName).tag(family)
+                            if family == .system {
+                                Text("System Monospaced").tag(family)
+                            } else {
+                                Text(verbatim: family.displayName).tag(family)
+                            }
                         }
                     }
                     .labelsHidden()

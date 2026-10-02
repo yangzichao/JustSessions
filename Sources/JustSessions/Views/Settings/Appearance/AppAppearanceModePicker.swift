@@ -8,7 +8,7 @@ struct AppAppearanceModePicker: View {
         HStack(spacing: 14) {
             ForEach(AppAppearanceMode.allCases) { mode in
                 ThumbnailChoiceButton(
-                    title: mode.displayName,
+                    title: mode.localizedDisplayName,
                     isSelected: appAppearanceStore.mode == mode,
                     onSelect: { appAppearanceStore.setMode(mode) }
                 ) {

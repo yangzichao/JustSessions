@@ -63,7 +63,7 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 
 ## Appearance, privacy, and help
 
-Open **Settings** in the sidebar or press ⌘, to choose a theme, light or dark appearance, and terminal font settings. Existing terminals update in place.
+Open **Settings** in the sidebar or press ⌘,. **General > Interface language** offers **Follow System** (default), **English**, and **Chinese**. The interface updates immediately and remembers your choice. Appearance and terminal settings also update open terminals in place.
 
 JustSessions reads local CLI files and caches supported remote history over SSH. It does not upload conversations to a JustSessions service. The CLIs still communicate with their providers, and Sparkle checks GitHub for updates. [Storage and privacy](session-storage.md).
 

@@ -22,7 +22,10 @@ struct TerminalWorkspaceView: View {
                 }
                 Spacer()
                 if session.hasExited {
-                    Text(session.exitCode.map { "Exited (\($0))" } ?? "Ended")
+                    Group {
+                        if let exitCode = session.exitCode { Text("Exited (\(exitCode))") }
+                        else { Text("Ended") }
+                    }
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     if let onReconnect {

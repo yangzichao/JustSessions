@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>%@ could not be refreshed: %@</key>
+	<string>无法刷新 %@：%@</string>
+	<key>%@ has not saved this session yet · click to open its terminal</key>
+	<string>%@ 尚未保存此会话 · 点击打开终端</string>
+	<key>%@ tab group</key>
+	<string>%@ 标签组</string>
+	<key>%@ will permanently delete this session using its native CLI. This cannot be undone.</key>
+	<string>%@ 将通过原生 CLI 永久删除此会话。此操作无法撤销。</string>
+	<key>%@ · ⌘-click to select multiple projects; Shift-click to select a range</key>
+	<string>%@ · 按住 ⌘ 点击选择多个项目；按住 Shift 点击选择一个范围</string>
+	<key>%@, %@, open terminal, not saved yet</key>
+	<string>%@，%@，终端已打开，尚未保存</string>
+	<key>%@, by host and project. It reads the history they already save: no import, no account.</key>
+	<string>按主机和项目浏览 %@ 的会话。直接读取现有历史记录，无需导入或注册。</string>
+	<key>%lld earlier entries are not shown. Resume the session to see all of it.</key>
+	<string>未显示前面的 %lld 条记录。继续会话可查看全部内容。</string>
+	<key>%lld messages</key>
+	<string>%lld 条消息</string>
+	<key>%lld of %lld</key>
+	<string>%lld / %lld</string>
+	<key>%lld points</key>
+	<string>%lld 磅</string>
+	<key>%lld projects selected</key>
+	<string>已选择 %lld 个项目</string>
+	<key>%lld pt</key>
+	<string>%lld 磅</string>
+	<key>%lld selected</key>
+	<string>已选择 %lld 项</string>
+	<key>%lld sessions from tools JustSessions can't delete will be skipped.</key>
+	<string>将跳过 %lld 个尚不支持删除的工具会话。</string>
+	<key>%lld sessions selected</key>
+	<string>已选择 %lld 个会话</string>
+	<key>%lld sessions with open terminals and %lld sessions from tools JustSessions can't delete will be skipped.</key>
+	<string>将跳过 %lld 个终端已打开的会话，以及 %lld 个尚不支持删除的工具会话。</string>
+	<key>%lld sessions with open terminals and 1 session from tools JustSessions can't delete will be skipped.</key>
+	<string>将跳过 %lld 个终端已打开的会话，以及 1 个尚不支持删除的工具会话。</string>
+	<key>%lld sessions with open terminals will be skipped.</key>
+	<string>将跳过 %lld 个终端已打开的会话。</string>
+	<key>%lld tool calls</key>
+	<string>%lld 次工具调用</string>
+	<key>**Install tmux on the host** so sessions survive a dropped connection or a closed tab. Built-in tmux is only for this Mac.</key>
+	<string>**在远程主机上安装 tmux**，让会话在断线或关闭标签后继续运行。内置 tmux 仅用于本机。</string>
+	<key>, %lld sessions</key>
+	<string>，%lld 个会话</string>
+	<key>1 message</key>
+	<string>1 条消息</string>
+	<key>1 session from tools JustSessions can't delete will be skipped.</key>
+	<string>将跳过 1 个尚不支持删除的工具会话。</string>
+	<key>1 session with an open terminal and %lld sessions from tools JustSessions can't delete will be skipped.</key>
+	<string>将跳过 1 个终端已打开的会话，以及 %lld 个尚不支持删除的工具会话。</string>
+	<key>1 session with an open terminal and 1 session from tools JustSessions can't delete will be skipped.</key>
+	<string>将跳过 1 个终端已打开的会话，以及 1 个尚不支持删除的工具会话。</string>
+	<key>1 session with an open terminal will be skipped.</key>
+	<string>将跳过 1 个终端已打开的会话。</string>
+	<key>1 tool call</key>
+	<string>1 次工具调用</string>
+	<key>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</key>
+	<string>仍在 tmux 中运行的 CLI 会重新连接。其他标签会在选中时继续会话，包括 Mac 重启后的会话。普通终端会在原文件夹中打开新 shell。</string>
+	<key>Add SSH host</key>
+	<string>添加 SSH 主机</string>
+	<key>Add SSH host…</key>
+	<string>添加 SSH 主机…</string>
+	<key>Add host</key>
+	<string>添加主机</string>
+	<key>All</key>
+	<string>全部</string>
+	<key>All tools</key>
+	<string>所有工具</string>
+	<key>All your CLIs in one place</key>
+	<string>统一管理各个 CLI</string>
+	<key>Also: search, pin, rename, and export sessions as Markdown. Claude Code and Codex on this Mac can notify you when they finish or need input. Features vary by CLI.</key>
+	<string>还可搜索、置顶、重命名会话，并导出为 Markdown。本机的 Claude Code 和 Codex 可在完成任务或等待输入时通知你。各 CLI 支持的功能有所不同。</string>
+	<key>Appearance</key>
+	<string>外观</string>
+	<key>Applies immediately to all terminals. Some CLI apps use their own colors.</key>
+	<string>立即应用到所有终端。部分 CLI 应用使用自己的配色。</string>
+	<key>At launch</key>
+	<string>启动时</string>
+	<key>Branch</key>
+	<string>分支</string>
+	<key>Branch %lld sessions</key>
+	<string>为 %lld 个会话创建分支</string>
+	<key>Browse…</key>
+	<string>浏览…</string>
+	<key>Cancel</key>
+	<string>取消</string>
+	<key>Cancel deletion</key>
+	<string>取消删除</string>
+	<key>Check `tmux -V` on the host, then choose **Add SSH host…** in the sidebar.</key>
+	<string>在远程主机上运行 `tmux -V`，然后在侧栏选择**添加 SSH 主机…**。</string>
+	<key>Check for updates</key>
+	<string>检查更新</string>
+	<key>Checking the folder on %@…</key>
+	<string>正在检查 %@ 上的文件夹…</string>
+	<key>Choose</key>
+	<string>选择</string>
+	<key>Choose a session in the sidebar to read its conversation.</key>
+	<string>在侧栏中选择一个会话，阅读其对话内容。</string>
+	<key>Choose or enter a folder</key>
+	<string>选择或输入文件夹</string>
+	<key>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted.</key>
+	<string>Claude Code、Antigravity 和 Pi 会话将移到废纸篓；Codex 和 Kiro CLI 会话将被永久删除。</string>
+	<key>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.</key>
+	<string>本机的 Claude Code、Antigravity 和 Pi 会话将移到废纸篓。Codex、Kiro CLI 会话和 SSH 主机上的所有会话将被永久删除。</string>
+	<key>Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity also needs python3; deleting its sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
+	<string>主机上的 Claude Code、Codex、Antigravity、Kiro CLI 和 Pi 会话会列在侧栏中，并通过 SSH 打开。请使用 ~/.ssh/config 中的主机别名或 user@hostname。`ssh &lt;host&gt;` 必须能够免密连接，主机还需要 rsync。Antigravity 需要 python3；删除会话还需要 lsof。在远程主机上安装 tmux，可让会话在断线或关闭标签后继续运行；点击会话即可重新连接。应用内置的 tmux 仅适用于此 Mac。</string>
+	<key>Clear search</key>
+	<string>清空搜索</string>
+	<key>Close %@</key>
+	<string>关闭 %@</string>
+	<key>Close Tab…</key>
+	<string>关闭标签…</string>
+	<key>Close Window</key>
+	<string>关闭窗口</string>
+	<key>Close a tab with **Keep running**, or quit the app. Built-in tmux keeps the CLI going; click the session to reattach.</key>
+	<string>关闭标签时选择**保持运行**，或直接退出应用。内置 tmux 会让 CLI 继续运行；点击会话即可重新连接。</string>
+	<key>Close search</key>
+	<string>关闭搜索</string>
+	<key>Close search (Escape)</key>
+	<string>关闭搜索（Escape）</string>
+	<key>Close terminal</key>
+	<string>关闭终端</string>
+	<key>Close terminal…</key>
+	<string>关闭终端…</string>
+	<key>Collapse Group</key>
+	<string>折叠标签组</string>
+	<key>Collapse project</key>
+	<string>折叠项目</string>
+	<key>Colors</key>
+	<string>配色</string>
+	<key>Connect again; a CLI still running in tmux on the host is reattached</key>
+	<string>重新连接；仍在主机 tmux 中运行的 CLI 会重新接入</string>
+	<key>Continue in the original CLI and project folder, inside the app. **Branch** to try another approach.</key>
+	<string>在应用内通过原来的 CLI 和项目目录继续工作。选择**分支**尝试另一种思路。</string>
+	<key>Copied</key>
+	<string>已复制</string>
+	<key>Copy</key>
+	<string>复制</string>
+	<key>Copy %lld conversations</key>
+	<string>复制 %lld 个对话</string>
+	<key>Copy code</key>
+	<string>复制代码</string>
+	<key>Copy conversation</key>
+	<string>复制对话</string>
+	<key>Copy project path</key>
+	<string>复制项目路径</string>
+	<key>Copy saved messages and tool-call summaries as Markdown</key>
+	<string>将已保存的消息和工具调用摘要复制为 Markdown</string>
+	<key>Copy selection</key>
+	<string>复制所选内容</string>
+	<key>Copy session ID</key>
+	<string>复制会话 ID</string>
+	<key>Copying sessions…</key>
+	<string>正在复制会话…</string>
+	<key>Could not copy conversation</key>
+	<string>无法复制对话</string>
+	<key>Could not export conversation</key>
+	<string>无法导出对话</string>
+	<key>Could not read this session</key>
+	<string>无法读取此会话</string>
+	<key>Could not start session</key>
+	<string>无法启动会话</string>
+	<key>Dark</key>
+	<string>深色</string>
+	<key>Delete %lld sessions</key>
+	<string>删除 %lld 个会话</string>
+	<key>Delete %lld sessions…</key>
+	<string>删除 %lld 个会话…</string>
+	<key>Delete 1 session</key>
+	<string>删除 1 个会话</string>
+	<key>Delete all deletable sessions (%lld)…</key>
+	<string>删除所有可删除的会话（%lld）…</string>
+	<key>Delete session</key>
+	<string>删除会话</string>
+	<key>Delete sessions?</key>
+	<string>删除会话？</string>
+	<key>Delete session…</key>
+	<string>删除会话…</string>
+	<key>Delete…</key>
+	<string>删除…</string>
+	<key>Deleting %lld of %lld…</key>
+	<string>正在删除 %lld / %lld…</string>
+	<key>Deleting sessions</key>
+	<string>正在删除会话</string>
+	<key>Deletion progress</key>
+	<string>删除进度</string>
+	<key>End and close this terminal</key>
+	<string>结束并关闭此终端</string>
+	<key>End on %@</key>
+	<string>在 %@ 上结束</string>
+	<key>End session</key>
+	<string>结束会话</string>
+	<key>End session…</key>
+	<string>结束会话…</string>
+	<key>Ended</key>
+	<string>已结束</string>
+	<key>Exited (%d)</key>
+	<string>已退出（%d）</string>
+	<key>Expand Group</key>
+	<string>展开标签组</string>
+	<key>Expand project</key>
+	<string>展开项目</string>
+	<key>Export</key>
+	<string>导出</string>
+	<key>Export %lld conversations</key>
+	<string>导出 %lld 个对话</string>
+	<key>Export conversation</key>
+	<string>导出对话</string>
+	<key>Export conversations</key>
+	<string>导出对话</string>
+	<key>Find in conversation</key>
+	<string>在对话中查找</string>
+	<key>Find in conversation (⌘F)</key>
+	<string>在对话中查找（⌘F）</string>
+	<key>Find the right AI coding session. Pick up where you left off.</key>
+	<string>找到需要的 AI 编程会话，接着上次的进度继续。</string>
+	<key>Finishes its turn</key>
+	<string>完成一轮任务</string>
+	<key>First message</key>
+	<string>第一条消息</string>
+	<key>Folder missing</key>
+	<string>文件夹不存在</string>
+	<key>Follow System</key>
+	<string>跟随系统</string>
+	<key>Font</key>
+	<string>字体</string>
+	<key>Font size</key>
+	<string>字号</string>
+	<key>Fork in the native CLI</key>
+	<string>在原生 CLI 中创建分支</string>
+	<key>Full</key>
+	<string>全宽</string>
+	<key>General</key>
+	<string>通用</string>
+	<key>Go to the first available message</key>
+	<string>跳到第一条可用消息</string>
+	<key>Go to the latest message</key>
+	<string>跳到最新消息</string>
+	<key>Help</key>
+	<string>帮助</string>
+	<key>Help and remote host setup</key>
+	<string>帮助与远程主机设置</string>
+	<key>Hide Sidebar</key>
+	<string>隐藏侧栏</string>
+	<key>Hide sidebar</key>
+	<string>隐藏侧栏</string>
+	<key>Hide sidebar (⌃⌘S)</key>
+	<string>隐藏侧栏（⌃⌘S）</string>
+	<key>Hold Shift while dragging to select terminal text, then copy it (⌘C)</key>
+	<string>按住 Shift 拖动选择终端文字，然后复制（⌘C）</string>
+	<key>Host</key>
+	<string>主机</string>
+	<key>Interface language</key>
+	<string>界面语言</string>
+	<key>JustSessions Help</key>
+	<string>JustSessions 帮助</string>
+	<key>JustSessions can't delete %@ sessions yet.</key>
+	<string>JustSessions 暂不支持删除 %@ 会话。</string>
+	<key>JustSessions can't read %@ conversations yet. Resume the session to see it.</key>
+	<string>JustSessions 暂时无法读取 %@ 的对话。继续会话以查看内容。</string>
+	<key>JustSessions on GitHub</key>
+	<string>GitHub 上的 JustSessions</string>
+	<key>Keep it running</key>
+	<string>让任务持续运行</string>
+	<key>Keep running</key>
+	<string>保持运行</string>
+	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
+	<string>保持运行会让 CLI 继续在 %@ 的 tmux 中运行；点击会话即可重新连接。结束会话会停止 CLI。</string>
+	<key>Larger reading text</key>
+	<string>增大阅读字号</string>
+	<key>Larger text</key>
+	<string>增大字号</string>
+	<key>Last Tab</key>
+	<string>最后一个标签</string>
+	<key>Latest message</key>
+	<string>最新消息</string>
+	<key>Light</key>
+	<string>浅色</string>
+	<key>List the sessions on another machine you reach with ssh</key>
+	<string>列出可通过 SSH 连接的另一台机器上的会话</string>
+	<key>Match app</key>
+	<string>与应用一致</string>
+	<key>More actions</key>
+	<string>更多操作</string>
+	<key>More actions for %@</key>
+	<string>%@ 的更多操作</string>
+	<key>Name</key>
+	<string>名称</string>
+	<key>Needs my input, such as a permission prompt</key>
+	<string>需要我的输入，例如权限确认</string>
+	<key>New Session…</key>
+	<string>新建会话…</string>
+	<key>New Tab…</key>
+	<string>新建标签…</string>
+	<key>New Window</key>
+	<string>新建窗口</string>
+	<key>New session</key>
+	<string>新建会话</string>
+	<key>New session in %@</key>
+	<string>在 %@ 中新建会话</string>
+	<key>New session on %@</key>
+	<string>在 %@ 上新建会话</string>
+	<key>New session on %@…</key>
+	<string>在 %@ 上新建会话…</string>
+	<key>New terminal</key>
+	<string>新建终端</string>
+	<key>Next Tab</key>
+	<string>下一个标签</string>
+	<key>Next match</key>
+	<string>下一个匹配项</string>
+	<key>Next match (⌘G or Return)</key>
+	<string>下一个匹配项（⌘G 或 Return）</string>
+	<key>No matches</key>
+	<string>无匹配项</string>
+	<key>No matching projects or sessions</key>
+	<string>无匹配的项目或会话</string>
+	<key>No messages yet</key>
+	<string>暂无消息</string>
+	<key>No session selected</key>
+	<string>未选择会话</string>
+	<key>No sessions</key>
+	<string>暂无会话</string>
+	<key>No sessions in the past seven days</key>
+	<string>过去七天没有会话</string>
+	<key>No supported CLI found on %@. Install %@ there, then refresh.</key>
+	<string>在 %@ 上未找到支持的 CLI。请在该主机安装 %@，然后刷新。</string>
+	<key>No supported CLI found on this Mac. Install %@, then refresh.</key>
+	<string>本机未找到支持的 CLI。请安装 %@，然后刷新。</string>
+	<key>Notifications</key>
+	<string>通知</string>
+	<key>Notifications for JustSessions are turned off in System Settings &gt; Notifications.</key>
+	<string>JustSessions 的通知已在「系统设置 &gt; 通知」中关闭。</string>
+	<key>Notify me when a session</key>
+	<string>在以下情况通知我</string>
+	<key>OK</key>
+	<string>好</string>
+	<key>Open JustSessions on GitHub</key>
+	<string>在 GitHub 上打开 JustSessions</string>
+	<key>Open in a separate reading window</key>
+	<string>在独立阅读窗口中打开</string>
+	<key>Open project in</key>
+	<string>打开项目于</string>
+	<key>Open project in Finder</key>
+	<string>在 Finder 中打开项目</string>
+	<key>Path on the host, such as ~/code/app</key>
+	<string>主机上的路径，例如 ~/code/app</string>
+	<key>Pin project</key>
+	<string>置顶项目</string>
+	<key>Pin session</key>
+	<string>置顶会话</string>
+	<key>Pinned</key>
+	<string>已置顶</string>
+	<key>Plain text (.txt)…</key>
+	<string>纯文本（.txt）…</string>
+	<key>Preview</key>
+	<string>预览</string>
+	<key>Preview a session, or choose **Read** for its own window. Nothing runs until you resume.</key>
+	<string>预览会话，或选择**阅读**打开独立窗口。恢复会话前不会启动 CLI。</string>
+	<key>Preview not available</key>
+	<string>无法预览</string>
+	<key>Previous Tab</key>
+	<string>上一个标签</string>
+	<key>Previous match</key>
+	<string>上一个匹配项</string>
+	<key>Previous match (⇧⌘G or ⇧Return)</key>
+	<string>上一个匹配项（⇧⌘G 或 ⇧Return）</string>
+	<key>Project folder</key>
+	<string>项目文件夹</string>
+	<key>Project folder on %@</key>
+	<string>%@ 上的项目文件夹</string>
+	<key>Read</key>
+	<string>阅读</string>
+	<key>Read only</key>
+	<string>只读</string>
+	<key>Read without resuming</key>
+	<string>先阅读，再继续</string>
+	<key>Readable</key>
+	<string>适合阅读</string>
+	<key>Reading width</key>
+	<string>阅读宽度</string>
+	<key>Recent</key>
+	<string>最近</string>
+	<key>Recent projects</key>
+	<string>最近的项目</string>
+	<key>Reconnect</key>
+	<string>重新连接</string>
+	<key>Refresh</key>
+	<string>刷新</string>
+	<key>Refresh sessions</key>
+	<string>刷新会话</string>
+	<key>Refreshing %@</key>
+	<string>正在刷新 %@</string>
+	<key>Remove %lld projects from sidebar</key>
+	<string>从侧栏移除 %lld 个项目</string>
+	<key>Remove from sidebar</key>
+	<string>从侧栏移除</string>
+	<key>Remove host</key>
+	<string>移除主机</string>
+	<key>Remove selected projects from sidebar</key>
+	<string>从侧栏移除所选项目</string>
+	<key>Remove selected projects from the sidebar; keep sessions and open terminals</key>
+	<string>从侧栏移除所选项目；保留会话和已打开的终端</string>
+	<key>Rename</key>
+	<string>重命名</string>
+	<key>Rename conversation</key>
+	<string>重命名对话</string>
+	<key>Rename project</key>
+	<string>重命名项目</string>
+	<key>Rename project…</key>
+	<string>重命名项目…</string>
+	<key>Reopen the tabs that were open when JustSessions quit</key>
+	<string>重新打开上次退出 JustSessions 时的标签</string>
+	<key>Report an issue ↗</key>
+	<string>报告问题 ↗</string>
+	<key>Required: passwordless SSH, rsync, and the CLI (not OpenCode). Antigravity also needs python3, and lsof to delete sessions.</key>
+	<string>需要免密 SSH、rsync 和对应的 CLI（不支持 OpenCode）。Antigravity 还需要 python3，删除会话时需要 lsof。</string>
+	<key>Restore Defaults</key>
+	<string>恢复默认设置</string>
+	<key>Resume</key>
+	<string>继续</string>
+	<key>Resume %lld sessions</key>
+	<string>继续 %lld 个会话</string>
+	<key>Resume sessions on SSH hosts. The code and CLI stay on that machine.</key>
+	<string>恢复 SSH 主机上的会话。代码和 CLI 始终留在远程主机上。</string>
+	<key>Resume where you left off</key>
+	<string>接着上次的进度继续</string>
+	<key>Reveal session file in Finder</key>
+	<string>在 Finder 中显示会话文件</string>
+	<key>Right-click a selected row in the sidebar to resume, branch, or delete them.</key>
+	<string>右键点击侧栏中已选择的条目，以继续、创建分支或删除会话。</string>
+	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
+	<string>SSH 主机没有废纸篓，因此所有会话都将被永久删除。</string>
+	<key>Save</key>
+	<string>保存</string>
+	<key>Save messages and tool-call summaries to a file</key>
+	<string>将消息和工具调用摘要保存到文件</string>
+	<key>Scanning conversations</key>
+	<string>正在扫描对话</string>
+	<key>Scanning sessions…</key>
+	<string>正在扫描会话…</string>
+	<key>Search covers the entries shown in this preview.</key>
+	<string>搜索范围为此预览中显示的记录。</string>
+	<key>Search projects and sessions</key>
+	<string>搜索项目和会话</string>
+	<key>Search projects by name or path and sessions by title or ID</key>
+	<string>按名称或路径搜索项目，按标题或 ID 搜索会话</string>
+	<key>Searching…</key>
+	<string>正在搜索…</string>
+	<key>Session %lld of %lld</key>
+	<string>会话 %lld / %lld</string>
+	<key>Sessions active in the past seven days</key>
+	<string>过去七天内活跃的会话</string>
+	<key>Set up an SSH host</key>
+	<string>配置 SSH 主机</string>
+	<key>Settings</key>
+	<string>设置</string>
+	<key>Settings (⌘,)</key>
+	<string>设置（⌘,）</string>
+	<key>Show %@</key>
+	<string>显示 %@</string>
+	<key>Show Sidebar</key>
+	<string>显示侧栏</string>
+	<key>Show one tool's sessions</key>
+	<string>仅显示一种工具的会话</string>
+	<key>Show sidebar</key>
+	<string>显示侧栏</string>
+	<key>Show sidebar (⌃⌘S)</key>
+	<string>显示侧栏（⌃⌘S）</string>
+	<key>Showing %@ sessions only</key>
+	<string>仅显示 %@ 的会话</string>
+	<key>Sidebar width</key>
+	<string>侧栏宽度</string>
+	<key>Size</key>
+	<string>字号</string>
+	<key>Smaller reading text</key>
+	<string>减小阅读字号</string>
+	<key>Smaller text</key>
+	<string>减小字号</string>
+	<key>Start a native CLI in a project folder.</key>
+	<string>在项目文件夹中启动原生 CLI。</string>
+	<key>Start a new session in %@</key>
+	<string>在 %@ 中新建会话</string>
+	<key>Start a new session in %@ on %@</key>
+	<string>在 %2$@ 的 %1$@ 中新建会话</string>
+	<key>Start a new session on %@</key>
+	<string>在 %@ 上新建会话</string>
+	<key>Start an installed coding CLI in a project folder</key>
+	<string>在项目文件夹中启动已安装的编程 CLI</string>
+	<key>Start session</key>
+	<string>开始会话</string>
+	<key>Stop deleting after the current session; the rest stay listed</key>
+	<string>删除当前会话后停止；保留其余会话</string>
+	<key>Stopping deletion</key>
+	<string>正在停止删除</string>
+	<key>Stopping…</key>
+	<string>正在停止…</string>
+	<key>Switches between a readable width and the full window width</key>
+	<string>在适合阅读的宽度和窗口全宽之间切换</string>
+	<key>System</key>
+	<string>跟随系统</string>
+	<key>System Monospaced</key>
+	<string>系统等宽字体</string>
+	<key>Tab %lld</key>
+	<string>标签 %lld</string>
+	<key>Tabs</key>
+	<string>标签</string>
+	<key>Terminal</key>
+	<string>终端</string>
+	<key>Terminal appearance preview</key>
+	<string>终端外观预览</string>
+	<key>Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab.</key>
+	<string>终端使用主题配色并与应用外观一致，除非你在「终端」标签中设为浅色或深色。</string>
+	<key>Terminals use the theme's dark colors, as set in the Terminal tab.</key>
+	<string>终端使用主题的深色配色，与「终端」标签中的设置一致。</string>
+	<key>Terminals use the theme's light colors, as set in the Terminal tab.</key>
+	<string>终端使用主题的浅色配色，与「终端」标签中的设置一致。</string>
+	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
+	<string>Antigravity 会话数据库、关联文件夹和注释将移到 macOS 废纸篓，并从 Antigravity 本地索引中移除。</string>
+	<key>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</key>
+	<string>Claude Code 会话文件及其关联文件夹将移到 macOS 废纸篓，并从 Claude Code 本地索引中移除。</string>
+	<key>The Pi session file and its associated folder will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
+	<string>%@ 上的 Pi 会话文件及其关联文件夹将被永久删除。SSH 主机没有废纸篓，此操作无法撤销。</string>
+	<key>The Pi session file and its associated folder will move to the macOS Trash.</key>
+	<string>Pi 会话文件及其关联文件夹将移到 macOS 废纸篓。</string>
+	<key>The project folder no longer exists</key>
+	<string>项目文件夹已不存在</string>
+	<key>The project will stay in the sidebar.</key>
+	<string>项目仍会保留在侧栏中。</string>
+	<key>The shell and anything still running in it will stop.</key>
+	<string>shell 及其中仍在运行的进程都会停止。</string>
+	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
+	<string>终端进程会停止。CLI 已保存的会话将在刷新后出现在项目列表中。</string>
+	<key>Theme</key>
+	<string>主题</string>
+	<key>This Mac</key>
+	<string>此 Mac</string>
+	<key>This affects all tools in %@, including sessions hidden by the current filter.</key>
+	<string>此操作会影响 %@ 中所有工具的会话，包括被当前筛选条件隐藏的会话。</string>
+	<key>This changes the display name in JustSessions.</key>
+	<string>仅修改 JustSessions 中的显示名称。</string>
+	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>
+	<string>修改 JustSessions 中的显示名称，文件夹保持原样。留空可使用文件夹名称（%@）。</string>
+	<key>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
+	<string>%@ 上的此会话将被永久删除。SSH 主机没有废纸篓，此操作无法撤销。</string>
+	<key>Tool</key>
+	<string>工具</string>
+	<key>Tool filter: %@</key>
+	<string>工具筛选：%@</string>
+	<key>Tool filter: All tools</key>
+	<string>工具筛选：所有工具</string>
+	<key>Try Again</key>
+	<string>重试</string>
+	<key>Unknown error</key>
+	<string>未知错误</string>
+	<key>Unpin project</key>
+	<string>取消置顶项目</string>
+	<key>Unpin session</key>
+	<string>取消置顶会话</string>
+	<key>Update</key>
+	<string>更新</string>
+	<key>Use a readable width</key>
+	<string>使用适合阅读的宽度</string>
+	<key>Use the full window width</key>
+	<string>使用窗口全宽</string>
+	<key>User guide ↗</key>
+	<string>用户指南 ↗</string>
+	<key>What makes it different</key>
+	<string>JustSessions 的不同之处</string>
+	<key>Work on other machines</key>
+	<string>在其他主机上工作</string>
+	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
+	<string>支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
+	<key>You</key>
+	<string>你</string>
+</dict>
+</plist>

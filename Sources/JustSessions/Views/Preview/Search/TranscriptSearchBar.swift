@@ -5,6 +5,13 @@ struct TranscriptSearchBar: View {
     let hasOmittedEntries: Bool
     @FocusState private var isFieldFocused: Bool
 
+    private var localizedResultLabel: LocalizedStringKey {
+        if searchState.isSearching { return "Searching…" }
+        if searchState.query.isEmpty { return "" }
+        guard let index = searchState.selectedMatchIndex else { return "No matches" }
+        return "\(index + 1) of \(searchState.matches.count)"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 10) {
@@ -20,7 +27,7 @@ struct TranscriptSearchBar: View {
                 .padding(.vertical, 6)
                 .background(ThemePalette.raisedSurface, in: RoundedRectangle(cornerRadius: 6))
                 .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(ThemePalette.hairline))
-                Text(searchState.resultLabel)
+                Text(localizedResultLabel)
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(ThemePalette.secondaryText)
                     .fixedSize()

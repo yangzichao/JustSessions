@@ -37,7 +37,7 @@
 - **Resume or branch:** continue in an embedded terminal, or fork a supported conversation to try another approach.
 - **Organize:** group terminal tabs by project, open a plain project terminal, and switch tabs with familiar keyboard shortcuts.
 - **Stay informed:** local Claude Code and Codex sessions can notify when a turn finishes or needs your input.
-- **Make it yours:** six app themes, light and dark appearances, and terminal font settings that update open terminals.
+- **Make it yours:** system, English, or Chinese interface language; six app themes, light and dark appearances, and terminal font settings that update open terminals.
 
 This README describes the current `main` branch. Reading windows and other recent source changes may be ahead of the packaged app; check the [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest). [Reading controls](docs/guides/session-management.md#preview-before-you-resume).
 

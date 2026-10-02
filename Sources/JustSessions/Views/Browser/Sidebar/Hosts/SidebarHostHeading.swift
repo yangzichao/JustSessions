@@ -25,7 +25,11 @@ struct SidebarHostHeading: View {
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(.tertiary)
                 .frame(width: 14)
-            Text(host.displayName.uppercased())
+            Group {
+                if host == .thisMac { Text("This Mac") }
+                else { Text(verbatim: host.displayName) }
+            }
+            .textCase(.uppercase)
                 .tracking(0.8)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)

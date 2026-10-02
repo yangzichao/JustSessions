@@ -3,6 +3,7 @@ import SwiftUI
 
 struct NewSessionSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
     @State private var selectedProvider: ConversationProvider
     @State private var selectedHost: SessionHost
     @State private var projectPath: String
@@ -84,7 +85,11 @@ struct NewSessionSheet: View {
             if hosts.count > 1 {
                 Picker("Host", selection: hostSelection) {
                     ForEach(hosts) { host in
-                        Label(host.displayName, systemImage: host.symbolName).tag(host)
+                        Label {
+                            if host == .thisMac { Text("This Mac") }
+                            else { Text(verbatim: host.displayName) }
+                        } icon: { Image(systemName: host.symbolName) }
+                        .tag(host)
                     }
                 }
                 .pickerStyle(.menu)
@@ -92,7 +97,7 @@ struct NewSessionSheet: View {
             }
 
             if providersOnSelectedHost.isEmpty {
-                Label(NewSessionProviderAvailability.noCLIFoundMessage(on: selectedHost), systemImage: "exclamationmark.triangle")
+                Label(NewSessionProviderAvailability.noCLIFoundMessage(on: selectedHost, language: AppInterfaceLanguage(identifier: locale.identifier)), systemImage: "exclamationmark.triangle")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
@@ -128,7 +133,8 @@ struct NewSessionSheet: View {
         .alert("Could not start session", isPresented: Binding(isPresenting: $errorMessage)) {
             Button("OK") { errorMessage = nil }
         } message: {
-            Text(errorMessage ?? "Unknown error")
+            if let errorMessage { Text(verbatim: errorMessage) }
+            else { Text("Unknown error") }
         }
     }
 
@@ -182,7 +188,7 @@ struct NewSessionSheet: View {
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
-        panel.prompt = "Choose"
+        panel.prompt = AppLocalization.string("Choose")
         if FileManager.default.fileExists(atPath: projectPath) {
             panel.directoryURL = URL(fileURLWithPath: projectPath)
         }

@@ -10,11 +10,11 @@ struct SelectedSessionsContextMenu: View {
         let resumableCount = selectedConversations.filter { store.canLaunch($0, action: .resume) }.count
         let branchableCount = selectedConversations.filter { store.canLaunch($0, action: .branch) }.count
 
-        Button("Resume \(sessionCountLabel(resumableCount))", systemImage: "play") {
+        Button("Resume \(resumableCount) sessions", systemImage: "play") {
             store.launch(selectedConversations, action: .resume)
         }
         .disabled(resumableCount == 0)
-        Button("Branch \(sessionCountLabel(branchableCount))", systemImage: "arrow.triangle.branch") {
+        Button("Branch \(branchableCount) sessions", systemImage: "arrow.triangle.branch") {
             store.launch(selectedConversations, action: .branch)
         }
         .disabled(branchableCount == 0)
@@ -23,11 +23,8 @@ struct SelectedSessionsContextMenu: View {
             ConversationExportSelection(conversation: $0, title: store.title(for: $0))
         })
         Divider()
-        Button("Delete \(sessionCountLabel(selectedConversations.count))…", systemImage: "trash", role: .destructive, action: onDelete)
+        Button("Delete \(selectedConversations.count) sessions…", systemImage: "trash", role: .destructive, action: onDelete)
             .disabled(!store.canStartDeletion(of: selectedConversations))
     }
 
-    private func sessionCountLabel(_ count: Int) -> String {
-        CountedNoun.phrase(count: count, singular: "session")
-    }
 }

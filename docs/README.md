@@ -16,6 +16,7 @@
 | --- | --- |
 | [Build and release](development/build-and-release.md) | Swift builds, tests, signed installers, notarization, and Sparkle updates. |
 | [Source layout](development/source-layout.md) | Feature folders and responsibilities. |
+| [Interface localization](development/localization.md) | String Catalog, language discovery, adding translations, and automated checks. |
 | [Website development](development/website.md) | Static Pages builds, app colors, metadata, sitemap, previews, and publishing. |
 | [Branding](../Branding/README.md) | Icon sources, brand colors, and asset generation. |
 | [Screenshot provenance](images/README.md) | Real interface captures, sample data, and their limits. |

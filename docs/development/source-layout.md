@@ -52,7 +52,9 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Transcript/Search/`, `Services/Transcript/Search/`, and `Views/Preview/Search/`: temporary per-reader text matching, keyboard shortcuts, highlights, and navigation to occurrences in the displayed transcript.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
-- `Views/Settings/`: the Settings window, with an Appearance tab for the whole app's appearance and theme, a Terminal tab, and a Notifications tab.
+- `Views/Settings/`: General (language and launch behavior), Appearance, Terminal, and Notifications tabs.
+- `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
+- `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
 - `Views/Feedback/`: prepares bug reports, feature requests, and feedback for the user to review on GitHub.
 - `Views/Theme/`: the chosen theme's colors, and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.

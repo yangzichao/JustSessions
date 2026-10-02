@@ -3,6 +3,9 @@ set -euo pipefail
 
 project_directory="${0:A:h:h}"
 cd "$project_directory"
+python3 Scripts/Localization/compile_catalog.py
+# Recreate this generated bundle: incremental SwiftPM builds can retain a removed language directory.
+rm -rf "$project_directory/.build/release/JustSessions_JustSessions.bundle"
 swift build -c release
 
 app_directory="${1:-$project_directory/dist/JustSessions.app}"
@@ -16,6 +19,14 @@ rm -rf "$app_directory"
 mkdir -p "$app_directory/Contents/MacOS" "$app_directory/Contents/Resources" "$app_directory/Contents/Frameworks"
 cp "$project_directory/.build/release/JustSessions" "$app_directory/Contents/MacOS/JustSessions"
 install_name_tool -add_rpath @executable_path/../Frameworks "$app_directory/Contents/MacOS/JustSessions"
+localization_resources="$project_directory/.build/release/JustSessions_JustSessions.bundle"
+ditto "$localization_resources" "$app_directory/Contents/Resources/JustSessions_JustSessions.bundle"
+# SwiftUI's standard controls look in Bundle.main; AppKit strings use the SwiftPM resource bundle.
+localization_identifiers=()
+for localization_directory in "$localization_resources"/*.lproj; do
+    ditto "$localization_directory" "$app_directory/Contents/Resources/${localization_directory:t}"
+    localization_identifiers+=("${${localization_directory:t}%.lproj}")
+done
 swiftterm_resources="$project_directory/.build/release/SwiftTerm_SwiftTerm.bundle"
 if [[ -d "$swiftterm_resources" ]]; then
     ditto "$swiftterm_resources" "$app_directory/Contents/Resources/SwiftTerm_SwiftTerm.bundle"
@@ -44,6 +55,7 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
     <key>CFBundleExecutable</key><string>JustSessions</string>
     <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleDevelopmentRegion</key><string>en</string>
     <key>CFBundleShortVersionString</key><string>0.16.0</string>
     <key>CFBundleVersion</key><string>BUILD_NUMBER_PLACEHOLDER</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
@@ -54,6 +66,7 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
     <key>SUVerifyUpdateBeforeExtraction</key><true/>
 </dict></plist>
 PLIST
+plutil -insert CFBundleLocalizations -json "$(python3 -c 'import json, sys; print(json.dumps(sys.argv[1:]))' "${localization_identifiers[@]}")" "$app_directory/Contents/Info.plist"
 plutil -replace CFBundleVersion -string "$build_number" "$app_directory/Contents/Info.plist"
 plutil -replace CFBundleShortVersionString -string "$app_version" "$app_directory/Contents/Info.plist"
 source_revision="$(git rev-parse HEAD)"

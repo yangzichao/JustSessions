@@ -42,7 +42,9 @@ struct TranscriptEntryView: View {
     private var speakerLabel: some View {
         let isUser = if case .userMessage = entry.content { true } else { false }
         return HStack(spacing: 6) {
-            Text(isUser ? "You" : assistantName)
+            Group {
+                if isUser { Text("You") } else { Text(verbatim: assistantName) }
+            }
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(isUser ? Color.secondary : assistantTint)
             if let timestamp = entry.timestamp {

@@ -1,0 +1,19 @@
+import Testing
+@testable import JustSessions
+
+struct SessionDeletionLocalizationTests {
+    private let chinese = AppInterfaceLanguage(identifier: "zh-Hans")
+
+    @Test func destructiveRemoteWarningPreservesDestinationAndExplainsPermanence() {
+        let conversation = Conversation.fixture(provider: .pi, host: .ssh("me@build"))
+        #expect(SessionDeletionConfirmationText.message(forDeleting: conversation, language: chinese)
+            == "me@build 上的 Pi 会话文件及其关联文件夹将被永久删除。SSH 主机没有废纸篓，此操作无法撤销。")
+    }
+
+    @Test func skippedCountsAndDeletionCountAreTranslatedAsCompleteSentences() {
+        let plan = SessionDeletionPlan(deletableConversations: [.fixture(), .fixture()], openTerminalCount: 2, unsupportedCount: 4)
+        #expect(SessionDeletionConfirmationText.buttonTitle(for: plan, language: chinese) == "删除 2 个会话")
+        #expect(SessionDeletionConfirmationText.skippedSessionsSentence(for: plan, language: chinese)
+            == "将跳过 2 个终端已打开的会话，以及 4 个尚不支持删除的工具会话。")
+    }
+}

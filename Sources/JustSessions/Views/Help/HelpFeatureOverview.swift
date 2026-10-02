@@ -2,8 +2,13 @@ import SwiftUI
 
 /// What sets JustSessions apart, in the order a session is found, read, resumed, kept running, and reached remotely.
 struct HelpFeatureOverview: View {
+    @Environment(\.locale) private var locale
+
     private var providerList: String {
-        ListFormatter.localizedString(byJoining: ConversationProvider.allCases.map(\.rawValue))
+        let formatter = ListFormatter()
+        formatter.locale = locale
+        let providers = ConversationProvider.allCases.map(\.rawValue)
+        return formatter.string(from: providers) ?? providers.joined(separator: ", ")
     }
 
     var body: some View {

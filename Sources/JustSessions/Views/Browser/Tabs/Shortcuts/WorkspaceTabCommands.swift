@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct WorkspaceTabCommands: Commands {
+    @ObservedObject private var languageStore = AppLanguageStore.shared
     @Environment(\.openWindow) private var openWindow
     @FocusedValue(\.workspaceTabActions) private var actions
 
@@ -8,18 +9,18 @@ struct WorkspaceTabCommands: Commands {
 
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
-            Button("New Session…") { actions?.newSession() }
+            Button(AppLocalization.string("New Session…", language: languageStore.language)) { actions?.newSession() }
                 .keyboardShortcut("n", modifiers: .command)
                 .disabled(actions?.isEnabled != true)
-            Button("New Tab…") { actions?.newSession() }
+            Button(AppLocalization.string("New Tab…", language: languageStore.language)) { actions?.newSession() }
                 .keyboardShortcut("t", modifiers: .command)
                 .disabled(actions?.isEnabled != true)
-            Button("New Window") { openWindow(id: "workspace") }
+            Button(AppLocalization.string("New Window", language: languageStore.language)) { openWindow(id: "workspace") }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
         }
 
         CommandGroup(replacing: .saveItem) {
-            Button(closesTab ? "Close Tab…" : "Close Window") {
+            Button(AppLocalization.string(closesTab ? "Close Tab…" : "Close Window", language: languageStore.language)) {
                 if closesTab {
                     actions?.closeSelectedTab()
                 } else {
@@ -30,18 +31,18 @@ struct WorkspaceTabCommands: Commands {
             .disabled(actions?.isEnabled == false || (closesTab && actions?.hasSelectedTab != true))
         }
 
-        CommandMenu("Tabs") {
-            Button("Previous Tab") { actions?.selectAdjacentTab(false) }
+        CommandMenu(AppLocalization.string("Tabs", language: languageStore.language)) {
+            Button(AppLocalization.string("Previous Tab", language: languageStore.language)) { actions?.selectAdjacentTab(false) }
                 .keyboardShortcut("[", modifiers: [.command, .shift])
                 .disabled(actions?.isEnabled != true || actions?.tabCount == 0)
-            Button("Next Tab") { actions?.selectAdjacentTab(true) }
+            Button(AppLocalization.string("Next Tab", language: languageStore.language)) { actions?.selectAdjacentTab(true) }
                 .keyboardShortcut("]", modifiers: [.command, .shift])
                 .disabled(actions?.isEnabled != true || actions?.tabCount == 0)
 
             Divider()
 
             ForEach(1...9, id: \.self) { shortcutNumber in
-                Button(shortcutNumber == 9 ? "Last Tab" : "Tab \(shortcutNumber)") {
+                Button(AppLocalization.string(shortcutNumber == 9 ? "Last Tab" : "Tab \(shortcutNumber)", language: languageStore.language)) {
                     actions?.selectTab(shortcutNumber)
                 }
                 .keyboardShortcut(KeyEquivalent(Character(String(shortcutNumber))), modifiers: .command)

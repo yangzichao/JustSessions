@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key></key>
+	<string></string>
+	<key>%@ %@</key>
+	<string>%@ %@</string>
+	<key>%@ %@ — %@</key>
+	<string>%@ %@ — %@</string>
+	<key>%@ could not be refreshed: %@</key>
+	<string>%@ could not be refreshed: %@</string>
+	<key>%@ has not saved this session yet · click to open its terminal</key>
+	<string>%@ has not saved this session yet · click to open its terminal</string>
+	<key>%@ tab group</key>
+	<string>%@ tab group</string>
+	<key>%@ will permanently delete this session using its native CLI. This cannot be undone.</key>
+	<string>%@ will permanently delete this session using its native CLI. This cannot be undone.</string>
+	<key>%@ · %@ · %@%@</key>
+	<string>%@ · %@ · %@%@</string>
+	<key>%@ · ⌘-click to select multiple projects; Shift-click to select a range</key>
+	<string>%@ · ⌘-click to select multiple projects; Shift-click to select a range</string>
+	<key>%@ — %@</key>
+	<string>%@ — %@</string>
+	<key>%@%@, %@, %@</key>
+	<string>%@%@, %@, %@</string>
+	<key>%@, %@</key>
+	<string>%@, %@</string>
+	<key>%@, %@%@%@</key>
+	<string>%@, %@%@%@</string>
+	<key>%@, %@, open terminal, not saved yet</key>
+	<string>%@, %@, open terminal, not saved yet</string>
+	<key>%@, by host and project. It reads the history they already save: no import, no account.</key>
+	<string>%@, by host and project. It reads the history they already save: no import, no account.</string>
+	<key>%lld</key>
+	<string>%lld</string>
+	<key>%lld earlier entries are not shown. Resume the session to see all of it.</key>
+	<string>%lld earlier entries are not shown. Resume the session to see all of it.</string>
+	<key>%lld of %lld</key>
+	<string>%lld of %lld</string>
+	<key>%lld points</key>
+	<string>%lld points</string>
+	<key>%lld pt</key>
+	<string>%lld pt</string>
+	<key>%lld selected</key>
+	<string>%lld selected</string>
+	<key>%lld sessions from tools JustSessions can't delete will be skipped.</key>
+	<string>%lld sessions from tools JustSessions can't delete will be skipped.</string>
+	<key>%lld sessions selected</key>
+	<string>%lld sessions selected</string>
+	<key>%lld sessions with open terminals and 1 session from tools JustSessions can't delete will be skipped.</key>
+	<string>%lld sessions with open terminals and 1 session from tools JustSessions can't delete will be skipped.</string>
+	<key>%lld sessions with open terminals will be skipped.</key>
+	<string>%lld sessions with open terminals will be skipped.</string>
+	<key>%lld tool calls</key>
+	<string>%lld tool calls</string>
+	<key>**Install tmux on the host** so sessions survive a dropped connection or a closed tab. Built-in tmux is only for this Mac.</key>
+	<string>**Install tmux on the host** so sessions survive a dropped connection or a closed tab. Built-in tmux is only for this Mac.</string>
+	<key>1 message</key>
+	<string>1 message</string>
+	<key>1 session from tools JustSessions can't delete will be skipped.</key>
+	<string>1 session from tools JustSessions can't delete will be skipped.</string>
+	<key>1 session with an open terminal and %lld sessions from tools JustSessions can't delete will be skipped.</key>
+	<string>1 session with an open terminal and %lld sessions from tools JustSessions can't delete will be skipped.</string>
+	<key>1 session with an open terminal and 1 session from tools JustSessions can't delete will be skipped.</key>
+	<string>1 session with an open terminal and 1 session from tools JustSessions can't delete will be skipped.</string>
+	<key>1 session with an open terminal will be skipped.</key>
+	<string>1 session with an open terminal will be skipped.</string>
+	<key>1 tool call</key>
+	<string>1 tool call</string>
+	<key>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</key>
+	<string>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</string>
+	<key>A+</key>
+	<string>A+</string>
+	<key>Add SSH host</key>
+	<string>Add SSH host</string>
+	<key>Add SSH host…</key>
+	<string>Add SSH host…</string>
+	<key>Add host</key>
+	<string>Add host</string>
+	<key>All</key>
+	<string>All</string>
+	<key>All tools</key>
+	<string>All tools</string>
+	<key>All your CLIs in one place</key>
+	<string>All your CLIs in one place</string>
+	<key>Also: search, pin, rename, and export sessions as Markdown. Claude Code and Codex on this Mac can notify you when they finish or need input. Features vary by CLI.</key>
+	<string>Also: search, pin, rename, and export sessions as Markdown. Claude Code and Codex on this Mac can notify you when they finish or need input. Features vary by CLI.</string>
+	<key>Appearance</key>
+	<string>Appearance</string>
+	<key>Applies immediately to all terminals. Some CLI apps use their own colors.</key>
+	<string>Applies immediately to all terminals. Some CLI apps use their own colors.</string>
+	<key>At launch</key>
+	<string>At launch</string>
+	<key>A−</key>
+	<string>A−</string>
+	<key>Branch</key>
+	<string>Branch</string>
+	<key>Browse…</key>
+	<string>Browse…</string>
+	<key>Cancel</key>
+	<string>Cancel</string>
+	<key>Cancel deletion</key>
+	<string>Cancel deletion</string>
+	<key>Check `tmux -V` on the host, then choose **Add SSH host…** in the sidebar.</key>
+	<string>Check `tmux -V` on the host, then choose **Add SSH host…** in the sidebar.</string>
+	<key>Check for updates</key>
+	<string>Check for updates</string>
+	<key>Checking the folder on %@…</key>
+	<string>Checking the folder on %@…</string>
+	<key>Choose</key>
+	<string>Choose</string>
+	<key>Choose a session in the sidebar to read its conversation.</key>
+	<string>Choose a session in the sidebar to read its conversation.</string>
+	<key>Choose or enter a folder</key>
+	<string>Choose or enter a folder</string>
+	<key>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted.</key>
+	<string>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted.</string>
+	<key>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.</key>
+	<string>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.</string>
+	<key>Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity also needs python3; deleting its sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
+	<string>Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity also needs python3; deleting its sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</string>
+	<key>Clear search</key>
+	<string>Clear search</string>
+	<key>Close %@</key>
+	<string>Close %@</string>
+	<key>Close Tab…</key>
+	<string>Close Tab…</string>
+	<key>Close Window</key>
+	<string>Close Window</string>
+	<key>Close a tab with **Keep running**, or quit the app. Built-in tmux keeps the CLI going; click the session to reattach.</key>
+	<string>Close a tab with **Keep running**, or quit the app. Built-in tmux keeps the CLI going; click the session to reattach.</string>
+	<key>Close search</key>
+	<string>Close search</string>
+	<key>Close search (Escape)</key>
+	<string>Close search (Escape)</string>
+	<key>Close terminal</key>
+	<string>Close terminal</string>
+	<key>Close terminal…</key>
+	<string>Close terminal…</string>
+	<key>Collapse Group</key>
+	<string>Collapse Group</string>
+	<key>Collapse project</key>
+	<string>Collapse project</string>
+	<key>Colors</key>
+	<string>Colors</string>
+	<key>Connect again; a CLI still running in tmux on the host is reattached</key>
+	<string>Connect again; a CLI still running in tmux on the host is reattached</string>
+	<key>Continue in the original CLI and project folder, inside the app. **Branch** to try another approach.</key>
+	<string>Continue in the original CLI and project folder, inside the app. **Branch** to try another approach.</string>
+	<key>Copied</key>
+	<string>Copied</string>
+	<key>Copy</key>
+	<string>Copy</string>
+	<key>Copy code</key>
+	<string>Copy code</string>
+	<key>Copy conversation</key>
+	<string>Copy conversation</string>
+	<key>Copy project path</key>
+	<string>Copy project path</string>
+	<key>Copy saved messages and tool-call summaries as Markdown</key>
+	<string>Copy saved messages and tool-call summaries as Markdown</string>
+	<key>Copy selection</key>
+	<string>Copy selection</string>
+	<key>Copy session ID</key>
+	<string>Copy session ID</string>
+	<key>Copying sessions…</key>
+	<string>Copying sessions…</string>
+	<key>Could not copy conversation</key>
+	<string>Could not copy conversation</string>
+	<key>Could not export conversation</key>
+	<string>Could not export conversation</string>
+	<key>Could not read this session</key>
+	<string>Could not read this session</string>
+	<key>Could not start session</key>
+	<string>Could not start session</string>
+	<key>Dark</key>
+	<string>Dark</string>
+	<key>Delete 1 session</key>
+	<string>Delete 1 session</string>
+	<key>Delete all deletable sessions (%lld)…</key>
+	<string>Delete all deletable sessions (%lld)…</string>
+	<key>Delete session</key>
+	<string>Delete session</string>
+	<key>Delete sessions?</key>
+	<string>Delete sessions?</string>
+	<key>Delete session…</key>
+	<string>Delete session…</string>
+	<key>Delete…</key>
+	<string>Delete…</string>
+	<key>Deleting %lld of %lld…</key>
+	<string>Deleting %lld of %lld…</string>
+	<key>Deleting sessions</key>
+	<string>Deleting sessions</string>
+	<key>Deletion progress</key>
+	<string>Deletion progress</string>
+	<key>End and close this terminal</key>
+	<string>End and close this terminal</string>
+	<key>End on %@</key>
+	<string>End on %@</string>
+	<key>End session</key>
+	<string>End session</string>
+	<key>End session…</key>
+	<string>End session…</string>
+	<key>Ended</key>
+	<string>Ended</string>
+	<key>Exited (%d)</key>
+	<string>Exited (%d)</string>
+	<key>Expand Group</key>
+	<string>Expand Group</string>
+	<key>Expand project</key>
+	<string>Expand project</string>
+	<key>Export</key>
+	<string>Export</string>
+	<key>Export conversation</key>
+	<string>Export conversation</string>
+	<key>Export conversations</key>
+	<string>Export conversations</string>
+	<key>Find in conversation</key>
+	<string>Find in conversation</string>
+	<key>Find in conversation (⌘F)</key>
+	<string>Find in conversation (⌘F)</string>
+	<key>Find the right AI coding session. Pick up where you left off.</key>
+	<string>Find the right AI coding session. Pick up where you left off.</string>
+	<key>Finishes its turn</key>
+	<string>Finishes its turn</string>
+	<key>First message</key>
+	<string>First message</string>
+	<key>Folder missing</key>
+	<string>Folder missing</string>
+	<key>Follow System</key>
+	<string>Follow System</string>
+	<key>Font</key>
+	<string>Font</string>
+	<key>Font size</key>
+	<string>Font size</string>
+	<key>Fork in the native CLI</key>
+	<string>Fork in the native CLI</string>
+	<key>Full</key>
+	<string>Full</string>
+	<key>General</key>
+	<string>General</string>
+	<key>GitHub</key>
+	<string>GitHub</string>
+	<key>Go to the first available message</key>
+	<string>Go to the first available message</string>
+	<key>Go to the latest message</key>
+	<string>Go to the latest message</string>
+	<key>Help</key>
+	<string>Help</string>
+	<key>Help and remote host setup</key>
+	<string>Help and remote host setup</string>
+	<key>Hide Sidebar</key>
+	<string>Hide Sidebar</string>
+	<key>Hide sidebar</key>
+	<string>Hide sidebar</string>
+	<key>Hide sidebar (⌃⌘S)</key>
+	<string>Hide sidebar (⌃⌘S)</string>
+	<key>Hold Shift while dragging to select terminal text, then copy it (⌘C)</key>
+	<string>Hold Shift while dragging to select terminal text, then copy it (⌘C)</string>
+	<key>Host</key>
+	<string>Host</string>
+	<key>Interface language</key>
+	<string>Interface language</string>
+	<key>JustSessions</key>
+	<string>JustSessions</string>
+	<key>JustSessions Help</key>
+	<string>JustSessions Help</string>
+	<key>JustSessions can't delete %@ sessions yet.</key>
+	<string>JustSessions can't delete %@ sessions yet.</string>
+	<key>JustSessions can't read %@ conversations yet. Resume the session to see it.</key>
+	<string>JustSessions can't read %@ conversations yet. Resume the session to see it.</string>
+	<key>JustSessions on GitHub</key>
+	<string>JustSessions on GitHub</string>
+	<key>Keep it running</key>
+	<string>Keep it running</string>
+	<key>Keep running</key>
+	<string>Keep running</string>
+	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
+	<string>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</string>
+	<key>Larger reading text</key>
+	<string>Larger reading text</string>
+	<key>Larger text</key>
+	<string>Larger text</string>
+	<key>Last Tab</key>
+	<string>Last Tab</string>
+	<key>Latest message</key>
+	<string>Latest message</string>
+	<key>Light</key>
+	<string>Light</string>
+	<key>List the sessions on another machine you reach with ssh</key>
+	<string>List the sessions on another machine you reach with ssh</string>
+	<key>Markdown (.md)…</key>
+	<string>Markdown (.md)…</string>
+	<key>Match app</key>
+	<string>Match app</string>
+	<key>More actions</key>
+	<string>More actions</string>
+	<key>More actions for %@</key>
+	<string>More actions for %@</string>
+	<key>Name</key>
+	<string>Name</string>
+	<key>Needs my input, such as a permission prompt</key>
+	<string>Needs my input, such as a permission prompt</string>
+	<key>New Session…</key>
+	<string>New Session…</string>
+	<key>New Tab…</key>
+	<string>New Tab…</string>
+	<key>New Window</key>
+	<string>New Window</string>
+	<key>New session</key>
+	<string>New session</string>
+	<key>New session in %@</key>
+	<string>New session in %@</string>
+	<key>New session on %@</key>
+	<string>New session on %@</string>
+	<key>New session on %@…</key>
+	<string>New session on %@…</string>
+	<key>New terminal</key>
+	<string>New terminal</string>
+	<key>Next Tab</key>
+	<string>Next Tab</string>
+	<key>Next match</key>
+	<string>Next match</string>
+	<key>Next match (⌘G or Return)</key>
+	<string>Next match (⌘G or Return)</string>
+	<key>No matches</key>
+	<string>No matches</string>
+	<key>No matching projects or sessions</key>
+	<string>No matching projects or sessions</string>
+	<key>No messages yet</key>
+	<string>No messages yet</string>
+	<key>No session selected</key>
+	<string>No session selected</string>
+	<key>No sessions</key>
+	<string>No sessions</string>
+	<key>No sessions in the past seven days</key>
+	<string>No sessions in the past seven days</string>
+	<key>No supported CLI found on this Mac. Install %@, then refresh.</key>
+	<string>No supported CLI found on this Mac. Install %@, then refresh.</string>
+	<key>Notifications</key>
+	<string>Notifications</string>
+	<key>Notifications for JustSessions are turned off in System Settings &gt; Notifications.</key>
+	<string>Notifications for JustSessions are turned off in System Settings &gt; Notifications.</string>
+	<key>Notify me when a session</key>
+	<string>Notify me when a session</string>
+	<key>OK</key>
+	<string>OK</string>
+	<key>Open JustSessions on GitHub</key>
+	<string>Open JustSessions on GitHub</string>
+	<key>Open in a separate reading window</key>
+	<string>Open in a separate reading window</string>
+	<key>Open project in</key>
+	<string>Open project in</string>
+	<key>Open project in Finder</key>
+	<string>Open project in Finder</string>
+	<key>Path on the host, such as ~/code/app</key>
+	<string>Path on the host, such as ~/code/app</string>
+	<key>Pin project</key>
+	<string>Pin project</string>
+	<key>Pin session</key>
+	<string>Pin session</string>
+	<key>Pinned</key>
+	<string>Pinned</string>
+	<key>Plain text (.txt)…</key>
+	<string>Plain text (.txt)…</string>
+	<key>Preview</key>
+	<string>Preview</string>
+	<key>Preview a session, or choose **Read** for its own window. Nothing runs until you resume.</key>
+	<string>Preview a session, or choose **Read** for its own window. Nothing runs until you resume.</string>
+	<key>Preview not available</key>
+	<string>Preview not available</string>
+	<key>Previous Tab</key>
+	<string>Previous Tab</string>
+	<key>Previous match</key>
+	<string>Previous match</string>
+	<key>Previous match (⇧⌘G or ⇧Return)</key>
+	<string>Previous match (⇧⌘G or ⇧Return)</string>
+	<key>Project folder</key>
+	<string>Project folder</string>
+	<key>Project folder on %@</key>
+	<string>Project folder on %@</string>
+	<key>Read</key>
+	<string>Read</string>
+	<key>Read only</key>
+	<string>Read only</string>
+	<key>Read without resuming</key>
+	<string>Read without resuming</string>
+	<key>Readable</key>
+	<string>Readable</string>
+	<key>Reading width</key>
+	<string>Reading width</string>
+	<key>Recent</key>
+	<string>Recent</string>
+	<key>Recent projects</key>
+	<string>Recent projects</string>
+	<key>Reconnect</key>
+	<string>Reconnect</string>
+	<key>Refresh</key>
+	<string>Refresh</string>
+	<key>Refresh sessions</key>
+	<string>Refresh sessions</string>
+	<key>Refreshing %@</key>
+	<string>Refreshing %@</string>
+	<key>Remove %lld projects from sidebar</key>
+	<string>Remove %lld projects from sidebar</string>
+	<key>Remove from sidebar</key>
+	<string>Remove from sidebar</string>
+	<key>Remove host</key>
+	<string>Remove host</string>
+	<key>Remove selected projects from sidebar</key>
+	<string>Remove selected projects from sidebar</string>
+	<key>Remove selected projects from the sidebar; keep sessions and open terminals</key>
+	<string>Remove selected projects from the sidebar; keep sessions and open terminals</string>
+	<key>Rename</key>
+	<string>Rename</string>
+	<key>Rename conversation</key>
+	<string>Rename conversation</string>
+	<key>Rename project</key>
+	<string>Rename project</string>
+	<key>Rename project…</key>
+	<string>Rename project…</string>
+	<key>Reopen the tabs that were open when JustSessions quit</key>
+	<string>Reopen the tabs that were open when JustSessions quit</string>
+	<key>Report an issue ↗</key>
+	<string>Report an issue ↗</string>
+	<key>Required: passwordless SSH, rsync, and the CLI (not OpenCode). Antigravity also needs python3, and lsof to delete sessions.</key>
+	<string>Required: passwordless SSH, rsync, and the CLI (not OpenCode). Antigravity also needs python3, and lsof to delete sessions.</string>
+	<key>Restore Defaults</key>
+	<string>Restore Defaults</string>
+	<key>Resume</key>
+	<string>Resume</string>
+	<key>Resume sessions on SSH hosts. The code and CLI stay on that machine.</key>
+	<string>Resume sessions on SSH hosts. The code and CLI stay on that machine.</string>
+	<key>Resume where you left off</key>
+	<string>Resume where you left off</string>
+	<key>Reveal session file in Finder</key>
+	<string>Reveal session file in Finder</string>
+	<key>Right-click a selected row in the sidebar to resume, branch, or delete them.</key>
+	<string>Right-click a selected row in the sidebar to resume, branch, or delete them.</string>
+	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
+	<string>SSH hosts have no Trash, so every session is permanently deleted.</string>
+	<key>Save</key>
+	<string>Save</string>
+	<key>Save messages and tool-call summaries to a file</key>
+	<string>Save messages and tool-call summaries to a file</string>
+	<key>Scanning conversations</key>
+	<string>Scanning conversations</string>
+	<key>Scanning sessions…</key>
+	<string>Scanning sessions…</string>
+	<key>Search covers the entries shown in this preview.</key>
+	<string>Search covers the entries shown in this preview.</string>
+	<key>Search projects and sessions</key>
+	<string>Search projects and sessions</string>
+	<key>Search projects by name or path and sessions by title or ID</key>
+	<string>Search projects by name or path and sessions by title or ID</string>
+	<key>Searching…</key>
+	<string>Searching…</string>
+	<key>Session %lld of %lld</key>
+	<string>Session %lld of %lld</string>
+	<key>Sessions active in the past seven days</key>
+	<string>Sessions active in the past seven days</string>
+	<key>Set up an SSH host</key>
+	<string>Set up an SSH host</string>
+	<key>Settings</key>
+	<string>Settings</string>
+	<key>Settings (⌘,)</key>
+	<string>Settings (⌘,)</string>
+	<key>Show %@</key>
+	<string>Show %@</string>
+	<key>Show Sidebar</key>
+	<string>Show Sidebar</string>
+	<key>Show one tool's sessions</key>
+	<string>Show one tool's sessions</string>
+	<key>Show sidebar</key>
+	<string>Show sidebar</string>
+	<key>Show sidebar (⌃⌘S)</key>
+	<string>Show sidebar (⌃⌘S)</string>
+	<key>Showing %@ sessions only</key>
+	<string>Showing %@ sessions only</string>
+	<key>Sidebar width</key>
+	<string>Sidebar width</string>
+	<key>Size</key>
+	<string>Size</string>
+	<key>Smaller reading text</key>
+	<string>Smaller reading text</string>
+	<key>Smaller text</key>
+	<string>Smaller text</string>
+	<key>Start a native CLI in a project folder.</key>
+	<string>Start a native CLI in a project folder.</string>
+	<key>Start a new session in %@</key>
+	<string>Start a new session in %@</string>
+	<key>Start a new session on %@</key>
+	<string>Start a new session on %@</string>
+	<key>Start an installed coding CLI in a project folder</key>
+	<string>Start an installed coding CLI in a project folder</string>
+	<key>Start session</key>
+	<string>Start session</string>
+	<key>Stop deleting after the current session; the rest stay listed</key>
+	<string>Stop deleting after the current session; the rest stay listed</string>
+	<key>Stopping deletion</key>
+	<string>Stopping deletion</string>
+	<key>Stopping…</key>
+	<string>Stopping…</string>
+	<key>Switches between a readable width and the full window width</key>
+	<string>Switches between a readable width and the full window width</string>
+	<key>System</key>
+	<string>System</string>
+	<key>System Monospaced</key>
+	<string>System Monospaced</string>
+	<key>Tab %lld</key>
+	<string>Tab %lld</string>
+	<key>Tabs</key>
+	<string>Tabs</string>
+	<key>Terminal</key>
+	<string>Terminal</string>
+	<key>Terminal appearance preview</key>
+	<string>Terminal appearance preview</string>
+	<key>Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab.</key>
+	<string>Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab.</string>
+	<key>Terminals use the theme's dark colors, as set in the Terminal tab.</key>
+	<string>Terminals use the theme's dark colors, as set in the Terminal tab.</string>
+	<key>Terminals use the theme's light colors, as set in the Terminal tab.</key>
+	<string>Terminals use the theme's light colors, as set in the Terminal tab.</string>
+	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
+	<string>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</string>
+	<key>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</key>
+	<string>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</string>
+	<key>The Pi session file and its associated folder will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
+	<string>The Pi session file and its associated folder will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</string>
+	<key>The Pi session file and its associated folder will move to the macOS Trash.</key>
+	<string>The Pi session file and its associated folder will move to the macOS Trash.</string>
+	<key>The project folder no longer exists</key>
+	<string>The project folder no longer exists</string>
+	<key>The project will stay in the sidebar.</key>
+	<string>The project will stay in the sidebar.</string>
+	<key>The shell and anything still running in it will stop.</key>
+	<string>The shell and anything still running in it will stop.</string>
+	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
+	<string>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</string>
+	<key>Theme</key>
+	<string>Theme</string>
+	<key>This Mac</key>
+	<string>This Mac</string>
+	<key>This affects all tools in %@, including sessions hidden by the current filter.</key>
+	<string>This affects all tools in %@, including sessions hidden by the current filter.</string>
+	<key>This changes the display name in JustSessions.</key>
+	<string>This changes the display name in JustSessions.</string>
+	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>
+	<string>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</string>
+	<key>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
+	<string>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</string>
+	<key>Tool</key>
+	<string>Tool</string>
+	<key>Tool filter: %@</key>
+	<string>Tool filter: %@</string>
+	<key>Tool filter: All tools</key>
+	<string>Tool filter: All tools</string>
+	<key>Try Again</key>
+	<string>Try Again</string>
+	<key>Unknown error</key>
+	<string>Unknown error</string>
+	<key>Unpin project</key>
+	<string>Unpin project</string>
+	<key>Unpin session</key>
+	<string>Unpin session</string>
+	<key>Update</key>
+	<string>Update</string>
+	<key>Use a readable width</key>
+	<string>Use a readable width</string>
+	<key>Use the full window width</key>
+	<string>Use the full window width</string>
+	<key>User guide ↗</key>
+	<string>User guide ↗</string>
+	<key>What makes it different</key>
+	<string>What makes it different</string>
+	<key>Work on other machines</key>
+	<string>Work on other machines</string>
+	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
+	<string>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
+	<key>You</key>
+	<string>You</string>
+	<key>devbox or user@devbox.example.com</key>
+	<string>devbox or user@devbox.example.com</string>
+	<key>·</key>
+	<string>·</string>
+	<key>⌘N</key>
+	<string>⌘N</string>
+</dict>
+</plist>

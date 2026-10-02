@@ -7,7 +7,7 @@ struct SidebarProjectSelectionActionBar: View {
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
-                Text("\(CountedNoun.phrase(count: selectedCount, singular: "project")) selected")
+                Text("\(selectedCount) projects selected")
                     .font(.system(size: 12, weight: .medium))
                     .lineLimit(1)
                 Spacer(minLength: 4)

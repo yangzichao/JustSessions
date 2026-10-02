@@ -37,6 +37,9 @@ jobs:
       - name: Test
         run: swift test
 
+      - name: Check localization
+        run: make localization-check
+
       - name: Import Developer ID certificate
         env:
           APPLE_CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}

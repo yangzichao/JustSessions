@@ -18,7 +18,7 @@ extension View {
 
 /// A choice drawn as a thumbnail above its name, ringed in ink while chosen and faintly under the pointer.
 struct ThumbnailChoiceButton<Thumbnail: View>: View {
-    let title: String
+    let title: LocalizedStringKey
     let isSelected: Bool
     let onSelect: () -> Void
     @ViewBuilder let thumbnail: () -> Thumbnail

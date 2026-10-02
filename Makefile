@@ -6,7 +6,7 @@
 APP_BUNDLE_PATH ?= dist/JustSessions.app
 INSTALLER_PATH ?= dist/JustSessions.dmg
 
-.PHONY: build dev run check test dmg website help
+.PHONY: build dev run check test dmg website localization localization-check help
 
 build:
 	./Scripts/build-app.sh "$(APP_BUNDLE_PATH)"
@@ -27,6 +27,13 @@ dmg: build
 website:
 	python3 Scripts/Website/build_site.py
 
+localization:
+	python3 Scripts/Localization/sync_catalog.py
+
+localization-check:
+	python3 Scripts/Localization/sync_catalog.py --check
+	python3 -m unittest discover -s Scripts/Localization/tests
+
 help:
 	@printf '%s\n' \
 		'make           Build dist/JustSessions.app with bundled tmux' \
@@ -36,4 +43,6 @@ help:
 		'make test      Build bundled tmux and run the Swift tests' \
 		'make dmg       Build the app and dist/JustSessions.dmg' \
 		'make website   Build and validate the product website' \
+		'make localization        Extract UI strings and compile translations' \
+		'make localization-check  Check UI strings, translations, and resources' \
 		'Override output paths with APP_BUNDLE_PATH=... and INSTALLER_PATH=...'

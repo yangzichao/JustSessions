@@ -19,7 +19,7 @@ struct SidebarRecencyPicker: View {
         .background(ThemePalette.trackFill, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
     }
 
-    private func segment(_ filter: SessionRecencyFilter, title: String, count: Int) -> some View {
+    private func segment(_ filter: SessionRecencyFilter, title: LocalizedStringKey, count: Int) -> some View {
         let isSelected = selection == filter
 
         return Button {
@@ -47,7 +47,7 @@ struct SidebarRecencyPicker: View {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(title), \(CountedNoun.phrase(count: count, singular: "session"))")
+        .accessibilityLabel(Text(title) + Text(", \(count) sessions"))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

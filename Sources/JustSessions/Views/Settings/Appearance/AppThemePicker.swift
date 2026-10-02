@@ -10,7 +10,7 @@ struct AppThemePicker: View {
         LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
             ForEach(AppTheme.allCases) { theme in
                 ThumbnailChoiceButton(
-                    title: theme.displayName,
+                    title: LocalizedStringKey(theme.displayName),
                     isSelected: appThemeStore.theme == theme,
                     onSelect: { appThemeStore.setTheme(theme) }
                 ) {

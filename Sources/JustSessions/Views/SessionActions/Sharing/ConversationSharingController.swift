@@ -26,8 +26,9 @@ final class ConversationSharingController: ObservableObject {
     func export(_ selections: [ConversationExportSelection], format: ConversationExportFormat) {
         perform(selections, failureTitle: "Could not export conversation") { document, window in
             let panel = NSSavePanel()
-            panel.title = selections.count == 1 ? "Export conversation" : "Export conversations"
-            panel.prompt = "Export"
+            panel.title = selections.count == 1
+                ? AppLocalization.string("Export conversation") : AppLocalization.string("Export conversations")
+            panel.prompt = AppLocalization.string("Export")
             panel.allowedContentTypes = [UTType(filenameExtension: format.fileExtension) ?? .plainText]
             panel.canCreateDirectories = true
             panel.nameFieldStringValue = document.suggestedFileName(for: format)
@@ -39,7 +40,7 @@ final class ConversationSharingController: ObservableObject {
 
     private func perform(
         _ selections: [ConversationExportSelection],
-        failureTitle: String,
+        failureTitle: String.LocalizationValue,
         operation: @escaping @MainActor (ConversationExportDocument, NSWindow?) async throws -> Void
     ) {
         guard !isSharing else { return }
@@ -55,7 +56,7 @@ final class ConversationSharingController: ObservableObject {
             } catch {
                 let alert = NSAlert()
                 alert.alertStyle = .warning
-                alert.messageText = failureTitle
+                alert.messageText = AppLocalization.string(failureTitle)
                 alert.informativeText = error.localizedDescription
                 if let window, window.isVisible, window.attachedSheet == nil {
                     await alert.beginSheetModal(for: window)

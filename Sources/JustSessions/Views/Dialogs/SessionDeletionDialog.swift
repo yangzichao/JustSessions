@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Confirms a `SessionDeletionRequest`, then hands it to the store.
 private struct SessionDeletionDialog: ViewModifier {
+    @Environment(\.locale) private var locale
     @ObservedObject var store: ConversationStore
     @Binding var request: SessionDeletionRequest?
 
@@ -9,7 +10,7 @@ private struct SessionDeletionDialog: ViewModifier {
         content.confirmationDialog("Delete sessions?", isPresented: Binding(isPresenting: $request)) {
             switch request {
             case .conversation(let conversation):
-                deleteButton(title: SessionDeletionConfirmationText.oneSessionButtonTitle) {
+                deleteButton(title: AppLocalization.string("Delete session", language: language)) {
                     store.delete(conversation)
                 }
             case .conversations(let conversations):
@@ -40,23 +41,25 @@ private struct SessionDeletionDialog: ViewModifier {
 
     /// Names how many sessions the plan deletes, and is disabled when that is none.
     private func deleteButton(for plan: SessionDeletionPlan, delete: @escaping () -> Void) -> some View {
-        deleteButton(title: SessionDeletionConfirmationText.buttonTitle(for: plan), delete: delete)
+        deleteButton(title: SessionDeletionConfirmationText.buttonTitle(for: plan, language: language), delete: delete)
             .disabled(!plan.hasDeletableConversations)
     }
 
     private func message(for request: SessionDeletionRequest) -> String {
         switch request {
         case .conversation(let conversation):
-            SessionDeletionConfirmationText.message(forDeleting: conversation)
+            SessionDeletionConfirmationText.message(forDeleting: conversation, language: language)
         case .conversations(let conversations):
-            SessionDeletionConfirmationText.message(forDeletingSelectionWith: store.deletionPlan(for: conversations))
+            SessionDeletionConfirmationText.message(forDeletingSelectionWith: store.deletionPlan(for: conversations), language: language)
         case .project(let projectPath):
             SessionDeletionConfirmationText.message(
                 forDeletingProjectAt: ProjectLocation(key: projectPath),
-                plan: store.deletionPlan(for: projectPath)
+                plan: store.deletionPlan(for: projectPath), language: language
             )
         }
     }
+
+    private var language: AppInterfaceLanguage { AppInterfaceLanguage(identifier: locale.identifier) }
 }
 
 extension View {

@@ -14,7 +14,7 @@ final class SessionReadingWindowController: NSWindowController, NSWindowDelegate
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 820, height: 760),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         window.title = store.title(for: conversation)
-        window.contentViewController = NSHostingController(rootView: content.appTheme(from: .shared))
+        window.contentViewController = NSHostingController(rootView: content.appTheme(from: .shared).appLanguage(from: .shared))
         window.isReleasedWhenClosed = false
         window.minSize = NSSize(width: 400, height: 350)
         readingWindow = window

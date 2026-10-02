@@ -29,7 +29,11 @@ struct SidebarFilterBar: View {
         return Menu {
             Picker("Tool", selection: $providerFilter) {
                 ForEach(ConversationProviderFilter.choices(offering: offeredProviders, selected: providerFilter)) { filter in
-                    Text(filter.title).tag(filter)
+                    if let provider = filter.provider {
+                        Text(verbatim: provider.rawValue).tag(filter)
+                    } else {
+                        Text("All tools").tag(filter)
+                    }
                 }
             }
             .pickerStyle(.inline)
@@ -50,7 +54,17 @@ struct SidebarFilterBar: View {
             filteredProvider.map { AnyShapeStyle($0.tintColor.opacity(0.15)) } ?? AnyShapeStyle(ThemePalette.trackFill),
             in: RoundedRectangle(cornerRadius: 7, style: .continuous)
         )
-        .help(filteredProvider.map { "Showing \($0.rawValue) sessions only" } ?? "Show one tool's sessions")
-        .accessibilityLabel("Tool filter: \(providerFilter.title)")
+        .help(toolFilterHelp)
+        .accessibilityLabel(toolFilterAccessibilityLabel)
+    }
+
+    private var toolFilterHelp: LocalizedStringKey {
+        if let provider = providerFilter.provider { return "Showing \(provider.rawValue) sessions only" }
+        return "Show one tool's sessions"
+    }
+
+    private var toolFilterAccessibilityLabel: LocalizedStringKey {
+        if let provider = providerFilter.provider { return "Tool filter: \(provider.rawValue)" }
+        return "Tool filter: All tools"
     }
 }

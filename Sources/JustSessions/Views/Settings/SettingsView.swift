@@ -3,6 +3,7 @@ import SwiftUI
 /// The Settings window (⌘,): what happens at launch, how the whole app looks, how its terminals look, and when it
 /// notifies you.
 struct SettingsView: View {
+    let languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
@@ -11,7 +12,7 @@ struct SettingsView: View {
 
     var body: some View {
         TabView {
-            GeneralSettingsView(tabReopeningSettingsStore: tabReopeningSettingsStore)
+            GeneralSettingsView(languageStore: languageStore, tabReopeningSettingsStore: tabReopeningSettingsStore)
                 .background(ThemePalette.contentSurface)
                 .tabItem { Label("General", systemImage: "gearshape") }
 

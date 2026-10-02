@@ -2,8 +2,8 @@ import SwiftUI
 
 struct SidebarSearchField: View {
     @Binding var text: String
-    let placeholder: String
-    let accessibilityLabel: String
+    let placeholder: LocalizedStringKey
+    let accessibilityLabel: LocalizedStringKey
 
     var body: some View {
         HStack(spacing: 6) {
@@ -18,7 +18,7 @@ struct SidebarSearchField: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.tertiary)
-                .accessibilityLabel("Clear \(placeholder.lowercased())")
+                .accessibilityLabel("Clear search")
             }
         }
         .font(.system(size: 12))

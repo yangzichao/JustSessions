@@ -4,61 +4,49 @@ import Foundation
 enum SessionDeletionConfirmationText {
     static let oneSessionButtonTitle = "Delete session"
 
-    static func buttonTitle(for plan: SessionDeletionPlan) -> String {
-        "Delete \(CountedNoun.phrase(count: plan.deletableConversations.count, singular: "session"))"
+    static func buttonTitle(for plan: SessionDeletionPlan, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
+        let count = plan.deletableConversations.count
+        return AppLocalization.string(count == 1 ? "Delete 1 session" : "Delete \(count) sessions", language: language)
     }
 
-    static func message(forDeleting conversation: Conversation) -> String {
+    static func message(forDeleting conversation: Conversation, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
         if let sshDestination = conversation.host.sshDestination {
             // The folder beside a Pi session holds subagent runs and forks that are never mirrored or listed.
-            let deletedItems = conversation.provider == .pi ? "The Pi session file and its associated folder" : "This session"
-            return "\(deletedItems) will be permanently deleted on \(sshDestination). SSH hosts have no Trash, so this cannot be undone."
+            if conversation.provider == .pi {
+                return AppLocalization.string("The Pi session file and its associated folder will be permanently deleted on \(sshDestination). SSH hosts have no Trash, so this cannot be undone.", language: language)
+            }
+            return AppLocalization.string("This session will be permanently deleted on \(sshDestination). SSH hosts have no Trash, so this cannot be undone.", language: language)
         }
         switch conversation.provider {
         case .codex, .kiro:
-            return "\(conversation.provider.rawValue) will permanently delete this session using its native CLI. This cannot be undone."
+            return AppLocalization.string("\(conversation.provider.rawValue) will permanently delete this session using its native CLI. This cannot be undone.", language: language)
         case .claude:
-            return "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index."
+            return AppLocalization.string("The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.", language: language)
         case .antigravity:
-            return "The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index."
+            return AppLocalization.string("The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.", language: language)
         case .pi:
-            return "The Pi session file and its associated folder will move to the macOS Trash."
+            return AppLocalization.string("The Pi session file and its associated folder will move to the macOS Trash.", language: language)
         case .opencode:
-            return "JustSessions can't delete \(conversation.provider.rawValue) sessions yet."
+            return AppLocalization.string("JustSessions can't delete \(conversation.provider.rawValue) sessions yet.", language: language)
         }
     }
 
-    static func message(forDeletingSelectionWith plan: SessionDeletionPlan) -> String {
+    static func message(forDeletingSelectionWith plan: SessionDeletionPlan, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
         joined([
-            "Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.",
-            skippedSessionsSentence(for: plan),
+            AppLocalization.string("Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.", language: language),
+            skippedSessionsSentence(for: plan, language: language),
         ])
     }
 
-    static func message(forDeletingProjectAt location: ProjectLocation, plan: SessionDeletionPlan) -> String {
+    static func message(forDeletingProjectAt location: ProjectLocation, plan: SessionDeletionPlan, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
         joined([
-            "This affects all tools in \(location.copyablePath), including sessions hidden by the current filter.",
-            "The project will stay in the sidebar.",
+            AppLocalization.string("This affects all tools in \(location.copyablePath), including sessions hidden by the current filter.", language: language),
+            AppLocalization.string("The project will stay in the sidebar.", language: language),
             location.host == .thisMac
-                ? "Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted."
-                : "SSH hosts have no Trash, so every session is permanently deleted.",
-            skippedSessionsSentence(for: plan),
+                ? AppLocalization.string("Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted.", language: language)
+                : AppLocalization.string("SSH hosts have no Trash, so every session is permanently deleted.", language: language),
+            skippedSessionsSentence(for: plan, language: language),
         ])
-    }
-
-    /// Names what the deletion leaves alone, or nil when it deletes every candidate.
-    static func skippedSessionsSentence(for plan: SessionDeletionPlan) -> String? {
-        var skippedParts: [String] = []
-        if plan.openTerminalCount > 0 {
-            skippedParts.append(plan.openTerminalCount == 1
-                ? "1 session with an open terminal"
-                : "\(plan.openTerminalCount) sessions with open terminals")
-        }
-        if plan.unsupportedCount > 0 {
-            skippedParts.append(CountedNoun.phrase(count: plan.unsupportedCount, singular: "session") + " from tools JustSessions can't delete")
-        }
-        guard !skippedParts.isEmpty else { return nil }
-        return skippedParts.joined(separator: " and ") + " will be skipped."
     }
 
     private static func joined(_ sentences: [String?]) -> String {

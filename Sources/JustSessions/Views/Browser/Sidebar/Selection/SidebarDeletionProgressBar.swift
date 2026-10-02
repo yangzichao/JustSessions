@@ -14,7 +14,7 @@ struct SidebarDeletionProgressBar: View {
         min(progress.completedCount + 1, progress.totalCount)
     }
 
-    private var statusText: String {
+    private var statusText: LocalizedStringKey {
         progress.isStopping ? "Stopping…" : "Deleting \(sessionBeingDeleted) of \(progress.totalCount)…"
     }
 

@@ -4,13 +4,14 @@ import Foundation
 /// filters and search left nothing.
 struct SidebarEmptyHostMessage: Equatable {
     let text: String
+    let localizedText: LocalizedStringResource?
     /// The host's refresh failed, and `text` is its error.
     let isFailure: Bool
 
     init(host: SessionHost, refreshStatus: HostRefreshStatus?, isSearching: Bool, recencyFilter: SessionRecencyFilter) {
         switch refreshStatus {
         case .failed(let error)?:
-            self.init(text: error, isFailure: true)
+            self.init(failure: error)
         case .refreshing?:
             self.init(text: host == .thisMac ? "Scanning sessions…" : "Copying sessions…")
         case .refreshed?, nil:
@@ -22,8 +23,15 @@ struct SidebarEmptyHostMessage: Equatable {
         }
     }
 
-    private init(text: String, isFailure: Bool = false) {
-        self.text = text
-        self.isFailure = isFailure
+    private init(text: String.LocalizationValue) {
+        self.text = AppLocalization.string(text, language: AppInterfaceLanguage(identifier: AppLocalization.resourceBundle.developmentLocalization ?? "en"))
+        localizedText = LocalizedStringResource(text, bundle: .atURL(AppLocalization.resourceBundle.bundleURL))
+        isFailure = false
+    }
+
+    private init(failure: String) {
+        text = failure
+        localizedText = nil
+        isFailure = true
     }
 }

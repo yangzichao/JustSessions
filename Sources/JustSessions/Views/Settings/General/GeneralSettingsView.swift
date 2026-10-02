@@ -1,11 +1,28 @@
 import SwiftUI
 
-/// The General tab of Settings: what the app does at launch.
+/// The General tab of Settings: interface language and what the app does at launch.
 struct GeneralSettingsView: View {
+    @ObservedObject var languageStore: AppLanguageStore
     @ObservedObject var tabReopeningSettingsStore: TabReopeningSettingsStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
+            Picker("Interface language", selection: Binding(
+                get: { languageStore.language },
+                set: { languageStore.setLanguage($0) }
+            )) {
+                ForEach(languageStore.choices) { language in
+                    if language == .followSystem {
+                        Text("Follow System").tag(language)
+                    } else {
+                        Text(verbatim: language.nativeName).tag(language)
+                    }
+                }
+            }
+            .accessibilityIdentifier("settings.interfaceLanguage")
+
+            ThemeDivider()
+
             Text("At launch")
                 .font(.subheadline.weight(.medium))
             Toggle("Reopen the tabs that were open when JustSessions quit", isOn: Binding(
@@ -14,7 +31,7 @@ struct GeneralSettingsView: View {
             ))
             Text("A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(24)

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ProjectNewSessionMenu: View {
+    @Environment(\.locale) private var locale
     let project: ProjectConversationGroup
     /// The tools installed on the project's host.
     let providers: [ConversationProvider]
@@ -14,7 +15,7 @@ struct ProjectNewSessionMenu: View {
 
         Menu {
             if providers.isEmpty {
-                Text(NewSessionProviderAvailability.noCLIFoundMessage(on: project.host))
+                Text(NewSessionProviderAvailability.noCLIFoundMessage(on: project.host, language: AppInterfaceLanguage(identifier: locale.identifier)))
             }
             ForEach(providers) { provider in
                 Button {
@@ -45,7 +46,7 @@ struct ProjectNewSessionMenu: View {
         .accessibilityLabel("New session in \(project.displayName)")
     }
 
-    private var helpText: String {
+    private var helpText: LocalizedStringKey {
         guard project.canStartNewSession else { return "The project folder no longer exists" }
         return project.host == .thisMac
             ? "Start a new session in \(project.location.path)"

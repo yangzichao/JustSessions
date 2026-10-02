@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "JustSessions",
+    defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     products: [.executable(name: "JustSessions", targets: ["JustSessions"])],
     dependencies: [
@@ -16,6 +17,7 @@ let package = Package(
                 .product(name: "Sparkle", package: "Sparkle"),
                 .product(name: "SwiftTerm", package: "SwiftTerm"),
             ],
+            resources: [.process("Resources/Localization")],
             linkerSettings: [.linkedLibrary("sqlite3")]
         ),
         .testTarget(name: "JustSessionsTests", dependencies: ["JustSessions"]),
