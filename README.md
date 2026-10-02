@@ -107,10 +107,12 @@ JustSessions reads the history files your CLIs already create and launches the s
 
 ## Documentation and development
 
+Build locally with `make`; the app is written to `dist/JustSessions.app`. Use `make run` to build and open it, or `make help` for other commands.
+
 - [Getting started](docs/guides/getting-started.md): install the app, find and resume a session, and troubleshoot discovery.
 - [Session management guide](docs/guides/session-management.md): pins, project tab groups, shortcuts, notifications, SSH hosts, cleanup, and appearance.
 - [Session storage and privacy](docs/guides/session-storage.md): history locations, remote caching, and tmux behavior.
-- [Build and release](docs/development/build-and-release.md): Swift build commands and release signing.
+- [Build and release](docs/development/build-and-release.md): Make commands and release signing.
 - [Source layout](docs/development/source-layout.md): where each feature lives.
 - [Website development](docs/development/website.md): preview, validate, and publish the GitHub Pages site.
 - [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Send feedback](https://yangzichao.github.io/JustSessions/feedback.html)

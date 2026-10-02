@@ -7,11 +7,13 @@
 Requires macOS 14+ and a Swift 6 toolchain (Xcode Command Line Tools). Run these commands from the repository root.
 
 ```sh
-swift build
-swift test
-./Scripts/build-app.sh
-open "dist/JustSessions.app"
+make check  # Compile the Swift development build
+make test   # Run tests against the bundled tmux runtime
+make        # Package dist/JustSessions.app, including tmux
+make run    # Build and open the app
 ```
+
+`make help` lists the commands. `make dmg` packages `dist/JustSessions.dmg`, and `make website` builds and validates the product site. Set `APP_BUNDLE_PATH` or `INSTALLER_PATH` to change the output paths, for example `make build APP_BUNDLE_PATH="dist/JustSessions Preview.app"`. The targets use the existing build scripts and respect their version and signing environment variables.
 
 `build-app.sh` builds a pinned tmux runtime from checksum-verified upstream archives, statically links libevent, ncurses, and utf8proc, and packages the binary, terminal database, and license notices under `Contents/Resources/Tmux`. The first package build downloads sources; subsequent builds reuse the verified runtime when its build fingerprint matches. End users need no separate tmux install. Direct `swift run` development builds still use an installed tmux 3.3+.
 
