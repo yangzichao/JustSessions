@@ -27,7 +27,9 @@ build_dependency() {
 
 build_libevent() {
     cd "$sources_directory/libevent-$libevent_version"
-    ./configure --prefix="$prefix_directory" --disable-shared --enable-static \
+    # configure's link test finds pipe2() in the macOS 27 SDK, but earlier macOS lacks it and tmux would crash
+    # calling the NULL weak import. Without pipe2(), libevent uses pipe() and fcntl() instead.
+    ac_cv_func_pipe2=no ./configure --prefix="$prefix_directory" --disable-shared --enable-static \
         --disable-openssl --disable-samples --disable-libevent-regress
     make -j "$build_jobs"
     make install

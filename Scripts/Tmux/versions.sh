@@ -7,3 +7,5 @@ ncurses_version=6.6
 ncurses_checksum=355b4cbbed880b0381a04c46617b7656e362585d52e9cf84a67e2009b749ff11
 utf8proc_version=2.12.0
 utf8proc_checksum=a393fbef160835fb315bc3e91ba8d86f7a73a7cec9e6198b6c60b848b498bfeb
+# Oldest macOS the runtime runs on; keep equal to Package.swift and LSMinimumSystemVersion in build-app.sh.
+macos_deployment_target=14.0

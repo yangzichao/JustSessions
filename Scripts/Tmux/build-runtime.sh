@@ -27,8 +27,10 @@ fi
 rm -rf "$sources_directory" "$prefix_directory" "$runtime_directory"
 mkdir -p "$downloads_directory" "$sources_directory" "$prefix_directory/lib" "$prefix_directory/include"
 export CC=/usr/bin/clang
-export CFLAGS="-O2 -arch $build_architecture -isysroot $compiler_sdk_directory -mmacosx-version-min=14.0"
-export LDFLAGS="-arch $build_architecture -isysroot $compiler_sdk_directory -mmacosx-version-min=14.0"
+# The runtime must run on the app's oldest supported macOS, even when the SDK is newer. An API newer than
+# the deployment target becomes a weak import that is NULL on older macOS, so calling one fails the build.
+export CFLAGS="-O2 -arch $build_architecture -isysroot $compiler_sdk_directory -mmacosx-version-min=$macos_deployment_target -Werror=unguarded-availability-new"
+export LDFLAGS="-arch $build_architecture -isysroot $compiler_sdk_directory -mmacosx-version-min=$macos_deployment_target"
 # Upstream build utilities also use CPPFLAGS, which must not inherit Homebrew paths.
 export CPPFLAGS=""
 export PKG_CONFIG=/usr/bin/false
