@@ -18,10 +18,10 @@ struct AddRemoteHostSheet: View {
             Text("Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. "
                 + "Use a Host alias from ~/.ssh/config or user@hostname. `ssh <host>` must work without a password prompt, "
                 + "and the host needs rsync. Antigravity also needs python3; deleting its sessions needs lsof. "
-                + "With tmux on the host, sessions keep running when the connection drops "
-                + "or the tab closes; click the session to reattach.")
+                + "Install tmux on the remote host so sessions keep running when the connection drops "
+                + "or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.")
                 .font(.callout)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
 
             TextField("devbox or user@devbox.example.com", text: $proposedHost)

@@ -36,7 +36,7 @@
     <nav aria-label="Main navigation">
       <a class="nav-detail guide-current" href="./guide.html" aria-current="page">Guide</a>
       <a class="nav-detail" href="./#questions">FAQ</a>
-      <a class="feedback-link" href="./feedback.html">Feedback</a>
+      <a class="help-link" href="./help.html"><span class="help-icon" aria-hidden="true">?</span> Help</a>
       <a class="github-link" href="https://github.com/yangzichao/JustSessions">GitHub <span aria-hidden="true">↗</span></a>
       <a class="button button-small" href="./#download">Download <span aria-hidden="true">↓</span></a>
     </nav>
@@ -108,7 +108,7 @@
 
       <section id="ssh-hosts" aria-labelledby="ssh-title">
         <h2 id="ssh-title">Continue on another machine over SSH</h2>
-        <p>The host needs passwordless SSH, <code>rsync</code>, and Claude Code, Codex, Antigravity, Kiro CLI, or Pi installed.</p>
+        <p>Install <strong>tmux on the remote host</strong> so sessions survive a disconnect or closing a tab. The host also needs passwordless SSH, <code>rsync</code>, and Claude Code, Codex, Antigravity, Kiro CLI, or Pi installed.</p>
         <p class="fine-print">Antigravity hosts also need <code>python3</code>; deleting their sessions needs <code>lsof</code>.</p>
         <ol><li>Choose <strong>Add SSH host…</strong> in the sidebar.</li><li>Enter a <code>~/.ssh/config</code> alias or <code>user@hostname</code>.</li><li>Browse the host's projects and resume a session there.</li></ol>
         <p>The code and CLI run remotely; supported history is cached on your Mac. JustSessions provides terminal access, not graphical screen sharing.</p>
@@ -140,14 +140,14 @@
       <aside class="guide-more" aria-label="More help">
         <h2>Make it yours.</h2>
         <p>Open <strong>Settings</strong> in the sidebar or press ⌘, for themes, light or dark appearance, and terminal fonts. Open terminals update in place.</p>
-        <p><a href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-management.md">Full session management guide</a> · <a href="./feedback.html">Send feedback</a></p>
+        <p><a href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-management.md">Full session management guide</a> · <a href="./help.html">Quick help</a></p>
       </aside>
     </div>
   </main>
 
   <footer class="site-footer page-width">
     <a class="wordmark" href="./"><img src="./assets/mark.svg" width="28" height="24" alt="">JustSessions</a>
-    <nav aria-label="Footer navigation"><a href="https://github.com/yangzichao/JustSessions">Source</a><a href="./guide.html" aria-current="page">User guide</a><a href="./feedback.html">Feedback</a><a href="https://github.com/yangzichao/JustSessions/blob/main/LICENSE">MIT license</a></nav>
+    <nav aria-label="Footer navigation"><a href="https://github.com/yangzichao/JustSessions">Source</a><a href="./guide.html" aria-current="page">User guide</a><a href="./help.html">Help</a><a href="https://github.com/yangzichao/JustSessions/blob/main/LICENSE">MIT license</a></nav>
   </footer>
 </body>
 </html>

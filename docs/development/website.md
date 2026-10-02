@@ -12,13 +12,13 @@ python3 Scripts/Website/build_site.py
 python3 -m http.server 8765 --bind 127.0.0.1 --directory dist
 ```
 
-Open <http://127.0.0.1:8765/JustSessions/>. The build checks local links and anchors across four pages, image references and dimensions, unique titles and descriptions, canonical and share metadata, structured app data, social-card dimensions, and sitemap completeness. The generated artifact is `dist/JustSessions/`, separate from the macOS app output. Only that website directory is uploaded to Pages.
+Open <http://127.0.0.1:8765/JustSessions/>. The build checks local links and anchors across five pages, image references and dimensions, unique titles and descriptions, canonical and share metadata, structured app data, social-card dimensions, and sitemap completeness. The generated artifact is `dist/JustSessions/`, separate from the macOS app output. Only that website directory is uploaded to Pages.
 
 It also checks visible CLI names, commands, and preview/branch/SSH/deletion cells in the online guide, README, and storage guide against `ConversationProvider.swift` and `TranscriptLoader.swift`. This runs without compiling Swift, including on the Pages Linux runner. The source reader recognizes their explicit case switches and fails if the representation changes; update it rather than skipping validation. Provider or transcript-support changes trigger the website workflow, and conflicting claims block publication.
 
 The website reuses screenshots from `docs/images/` and existing `Branding/` assets at build time. Stylesheet links include a content hash so a new page loads the matching CSS after an update. Keep the sample-data captions and feature limitations accurate when replacing them. See [screenshot provenance](../images/README.md).
 
-`feedback.html` is linked from the main navigation and footer, and included in the sitemap. Its three feedback actions open GitHub issue drafts with a title and report outline. Users review and submit on GitHub; the website has no feedback backend. Check both the homepage navigation and the feedback page at mobile widths after changing either.
+`help.html` is linked from the main navigation and footer, and included in the sitemap. It briefly lists features and highlights installing tmux on remote hosts. It links to the full guide and GitHub issues. The old `feedback.html` URL redirects to Help, uses `noindex`, and stays out of the sitemap. Check both the homepage navigation and the Help page at mobile widths after changing either.
 
 ## Pages and app colors
 
@@ -34,7 +34,7 @@ Each indexed page has a distinct title and description. Its Open Graph and Twitt
 
 The homepage's `SoftwareApplication` JSON-LD describes the real app, macOS requirement, free download, screenshot, source repository, and guide. Do not invent ratings or reviews to qualify for a search feature. Google requires a real rating or review for its software-app rich results; valid JSON-LD alone is not proof of eligibility. See Google's [software-app documentation](https://developers.google.com/search/docs/appearance/structured-data/software-app), [title guidance](https://developers.google.com/search/docs/appearance/title-link), and [description guidance](https://developers.google.com/search/docs/appearance/snippet).
 
-Before publishing, build the site and check the homepage, guide, and feedback page at desktop and 390px widths. Confirm images load, links reach their intended sections, the comparison table scrolls inside its own region on narrow screens, and the browser reports no errors.
+Before publishing, build the site and check the homepage, guide, and Help page at desktop and 390px widths. Confirm images load, links reach their intended sections, the comparison table scrolls inside its own region on narrow screens, and the browser reports no errors.
 
 ## Social preview
 

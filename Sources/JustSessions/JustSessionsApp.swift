@@ -15,18 +15,18 @@ struct JustSessionsApp: App {
         .commands {
             WorkspaceTabCommands()
             CommandGroup(replacing: .help) {
-                FeedbackWindowButton()
+                HelpWindowButton()
                 Divider()
                 Link("JustSessions on GitHub", destination: AppLinks.githubRepositoryURL)
             }
         }
 
-        Window("Feedback", id: FeedbackView.windowID) {
-            FeedbackView()
+        Window("JustSessions Help", id: HelpView.windowID) {
+            HelpView()
                 .appTheme(from: .shared)
         }
-        .defaultSize(width: 560, height: 620)
-        .windowResizability(.contentSize)
+        .defaultSize(width: 600, height: 760)
+        .windowResizability(.contentMinSize)
 
         Settings {
             SettingsView(

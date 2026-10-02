@@ -65,7 +65,7 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 - Click **Add SSH host…** at the bottom left of the sidebar and enter a host from `~/.ssh/config` or `user@hostname`. Its Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions are listed under its own heading, below this Mac's.
 - Resume, branch, start, and delete sessions on the host over SSH, just like on this Mac. SSH hosts have no Trash, so deleting a session there is permanent; for Pi, the folder beside the session file goes too.
 - Refresh updates every host at once. A host that can't be reached shows the error on its heading; the others still list.
-- With tmux on the host, a session there keeps running when the connection drops or the tab closes. Select the session to reattach.
+- Install **tmux on the remote host** so a session there keeps running when the connection drops or the tab closes. The app's bundled tmux is only for this Mac. Run `tmux -V` on the host to check installation, then select the session to reattach.
 
 ## Clean up
 

@@ -38,13 +38,14 @@ def validate_site(website_directory: Path):
 
     validate_metadata(documents, website_directory)
     homepage = documents[(website_directory / "index.html").resolve()]
-    feedback = documents[(website_directory / "feedback.html").resolve()]
-    assert "./feedback.html" in homepage.references, "Homepage needs a Feedback entry"
-    feedback_issue_links = [reference for reference in feedback.references if urlparse(reference).path == "/yangzichao/JustSessions/issues/new"]
-    assert len(feedback_issue_links) == 3, "Expected bug, feature, and general feedback links"
-    for reference in feedback_issue_links:
-        query = parse_qs(urlparse(reference).query)
-        assert query.get("title") and query.get("body"), "Feedback links need a draft title and body"
+    help_page = documents[(website_directory / "help.html").resolve()]
+    assert "./help.html" in homepage.references, "Homepage needs a Help entry"
+    assert "remote-hosts" in help_page.identifiers, "Help needs remote host setup"
+    assert "./guide.html#ssh-hosts" in help_page.references, "Help needs detailed SSH instructions"
+    legacy_feedback = documents[(website_directory / "feedback.html").resolve()]
+    assert "./help.html" in legacy_feedback.references, "Old Feedback URL needs a Help link"
+    assert legacy_feedback.canonical_url == WEBSITE_URL + "help.html"
+    assert "noindex" in legacy_feedback.metadata.get("robots", ""), "Old Feedback URL should not be indexed"
     image_header = (website_directory / "assets/social-preview.png").read_bytes()[:24]
     assert image_header[:8] == b"\x89PNG\r\n\x1a\n", "Social card must be a PNG"
     assert struct.unpack(">II", image_header[16:24]) == (1200, 630), "Social card must be 1200 x 630"

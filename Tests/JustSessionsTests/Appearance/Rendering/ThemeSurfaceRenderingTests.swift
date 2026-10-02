@@ -14,12 +14,8 @@ struct ThemeSurfaceRenderingTests {
         let notificationStore = SessionNotificationSettingsStore(userDefaults: settings.userDefaults)
         let tabReopeningStore = TabReopeningSettingsStore(userDefaults: settings.userDefaults)
         let views: [(String, AnyView, CGSize)] = [
-            ("feedback", AnyView(FeedbackView()), CGSize(width: 560, height: 640)),
-            ("feedback-ready", AnyView(FeedbackView(initialDraft: FeedbackDraft(
-                kind: .feature, title: "Feedback should follow the selected theme",
-                details: "Buttons, links, and form controls should use the same palette as the rest of the app.",
-                includesVersionInformation: false
-            ))), CGSize(width: 560, height: 640)),
+            ("help", AnyView(HelpView()), CGSize(width: 600, height: 760)),
+            ("help-narrow", AnyView(HelpView()), CGSize(width: 480, height: 560)),
             ("settings", AnyView(SettingsView(
                 tabReopeningSettingsStore: tabReopeningStore,
                 appAppearanceStore: appearanceStore, appThemeStore: themeStore,
@@ -47,31 +43,24 @@ struct ThemeSurfaceRenderingTests {
                     let pixel = try #require(bitmap.colorAt(x: bitmap.pixelsWide / 2, y: bitmap.pixelsHigh - 20))
                     let actualColor = hexValue(of: pixel)
                     #expect(actualColor == expectedColor, "\(name) \(theme) \(colorScheme): surface \(String(actualColor, radix: 16))")
-                    if name.hasPrefix("feedback") {
-                        try checkFeedbackControls(bitmap, isReady: name == "feedback-ready", description: "\(theme) \(colorScheme)")
+                    if name.hasPrefix("help") {
+                        try checkHelpLinks(bitmap, viewWidth: size.width, description: "\(name) \(theme) \(colorScheme)")
                     }
                 }
             }
         }
     }
 
-    private func checkFeedbackControls(_ bitmap: NSBitmapImageRep, isReady: Bool, description: String) throws {
+    private func checkHelpLinks(_ bitmap: NSBitmapImageRep, viewWidth: CGFloat, description: String) throws {
         let referenceRow = bitmap.pixelsHigh - 2
-        let raisedSurface = hexValue(of: try #require(bitmap.colorAt(x: bitmap.pixelsWide / 2, y: referenceRow)))
         let ink = hexValue(of: try #require(bitmap.colorAt(x: bitmap.pixelsWide * 5 / 6, y: referenceRow)))
-        let renderingScale = Double(bitmap.pixelsWide) / 560
-        // The details editor fills the lower middle of the window; its exact position moves with the header copy.
-        let editorRows = (bitmap.pixelsHigh * 45 / 100)..<(bitmap.pixelsHigh * 70 / 100)
-        let editorPixels = matchingPixelCount(raisedSurface, in: bitmap, columns: (bitmap.pixelsWide / 3)..<(bitmap.pixelsWide * 2 / 3), rows: editorRows)
-        #expect(editorPixels > Int(150 * 60 * renderingScale * renderingScale), "\(description) editor surface")
-
+        let renderingScale = Double(bitmap.pixelsWide) / viewWidth
         let edgeInset = Int(20 * renderingScale)
         let actionRows = (bitmap.pixelsHigh - Int(50 * renderingScale))..<(bitmap.pixelsHigh - Int(6 * renderingScale))
         let linkPixels = matchingPixelCount(ink, in: bitmap, columns: edgeInset..<(bitmap.pixelsWide / 3), rows: actionRows)
-        #expect(linkPixels > Int(50 * renderingScale * renderingScale), "\(description) link uses theme ink")
-        let buttonPixels = matchingPixelCount(ink, in: bitmap, columns: (bitmap.pixelsWide * 2 / 3)..<(bitmap.pixelsWide - edgeInset), rows: actionRows)
-        let filledButtonThreshold = Int(750 * renderingScale * renderingScale)
-        #expect(isReady ? buttonPixels > filledButtonThreshold : buttonPixels < filledButtonThreshold, "\(description) primary button enabled=\(isReady)")
+        #expect(linkPixels > Int(50 * renderingScale * renderingScale), "\(description) guide link uses theme ink")
+        let issueLinkPixels = matchingPixelCount(ink, in: bitmap, columns: (bitmap.pixelsWide * 2 / 3)..<(bitmap.pixelsWide - edgeInset), rows: actionRows)
+        #expect(issueLinkPixels > Int(50 * renderingScale * renderingScale), "\(description) issue link uses theme ink")
     }
 
     private func matchingPixelCount(_ color: UInt32, in bitmap: NSBitmapImageRep, columns: Range<Int>, rows: Range<Int>) -> Int {

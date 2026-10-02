@@ -13,7 +13,7 @@ struct SidebarFooter: View {
             HStack(spacing: 8) {
                 SidebarSettingsLink()
                 checkForUpdatesButton
-                SidebarFeedbackButton()
+                SidebarHelpButton()
                 SidebarRepositoryLink()
             }
         }

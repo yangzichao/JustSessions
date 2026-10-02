@@ -115,9 +115,9 @@ Build locally with `make`; the app is written to `dist/JustSessions.app`. Use `m
 - [Build and release](docs/development/build-and-release.md): Make commands and release signing.
 - [Source layout](docs/development/source-layout.md): where each feature lives.
 - [Website development](docs/development/website.md): preview, validate, and publish the GitHub Pages site.
-- [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Send feedback](https://yangzichao.github.io/JustSessions/feedback.html)
+- [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Help](https://yangzichao.github.io/JustSessions/help.html)
 
-In the app, use the sidebar's Feedback icon or **Help → Send Feedback…** to prepare a GitHub report. Review it on GitHub before submitting.
+In the app, use the sidebar's question mark icon or **Help → JustSessions Help** for a brief feature overview and SSH setup. Install **tmux on each remote host** to keep its sessions running after a disconnect or closing a tab.
 
 ## License
 

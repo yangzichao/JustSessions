@@ -18,7 +18,7 @@ def build_site():
     WEBSITE_OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
     asset_directory = WEBSITE_OUTPUT_DIRECTORY / "assets"
     asset_directory.mkdir(exist_ok=True)
-    document_names = tuple(page_path or "index.html" for page_path in PUBLIC_PAGE_PATHS) + ("404.html",)
+    document_names = tuple(page_path or "index.html" for page_path in PUBLIC_PAGE_PATHS) + ("404.html", "feedback.html")
     for document_name in document_names:
         shutil.copy2(WEBSITE_SOURCE_DIRECTORY / document_name, WEBSITE_OUTPUT_DIRECTORY / document_name)
     stylesheet_directory = WEBSITE_OUTPUT_DIRECTORY / "styles"

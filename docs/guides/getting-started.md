@@ -61,10 +61,10 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 - Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders.
 - For SSH, confirm passwordless access, `rsync`, and the remote CLI before adding the host.
 
-## Appearance, privacy, and feedback
+## Appearance, privacy, and help
 
 Open **Settings** in the sidebar or press ⌘, to choose a theme, light or dark appearance, and terminal font settings. Existing terminals update in place.
 
 JustSessions reads local CLI files and caches supported remote history over SSH. It does not upload conversations to a JustSessions service. The CLIs still communicate with their providers, and Sparkle checks GitHub for updates. [Storage and privacy](session-storage.md).
 
-Use the sidebar's Feedback icon or **Help → Send Feedback…** to prepare a report, then review and submit it on GitHub. You can also use the [website feedback page](https://yangzichao.github.io/JustSessions/feedback.html).
+Use the sidebar's question mark icon or **Help → JustSessions Help** for a brief feature overview and remote host setup. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The same overview is on the [website Help page](https://yangzichao.github.io/JustSessions/help.html); its issue link opens GitHub.

@@ -20,6 +20,6 @@
 | [Branding](../Branding/README.md) | Icon sources, brand colors, and asset generation. |
 | [Screenshot provenance](images/README.md) | Real interface captures, sample data, and their limits. |
 
-## Feedback
+## Help
 
-Use [Send feedback](https://yangzichao.github.io/JustSessions/feedback.html) for bugs, feature requests, or questions. Each action opens a draft for you to review and submit on GitHub. In the app, the same workflow is available from the sidebar's Feedback icon and **Help → Send Feedback…**.
+Use [Help](https://yangzichao.github.io/JustSessions/help.html) for a brief feature overview and remote host setup, including installing tmux on the host. In the app, open the sidebar's question mark icon or **Help → JustSessions Help**. The Help page also links to GitHub issues.
