@@ -33,7 +33,9 @@ for build_bundle in "$release_build_directory"/*.bundle(N); do
     mv "$build_bundle" "$hidden_bundles_directory/"
 done
 
-"$app_path/Contents/MacOS/$executable_name" >"$launch_log" 2>&1 &
+# On a developer's Mac, reopening the last quit's tabs could resume CLIs in tmux that outlive this check.
+# The argument domain needs a plist boolean: a bare NO reads as a string, which the setting ignores.
+"$app_path/Contents/MacOS/$executable_name" -reopensTabsAtLaunch '<false/>' >"$launch_log" 2>&1 &
 app_process_id=$!
 for _ in {1..$seconds_to_stay_running}; do
     if ! kill -0 "$app_process_id" 2>/dev/null; then

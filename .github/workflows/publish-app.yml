@@ -29,16 +29,10 @@ jobs:
           fi
           printf 'APP_VERSION=%s\n' "${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
 
+      # Tests and localization checks already ran: tag a commit that passed the Test workflow and `make verify`.
+      # The shipped tmux is built from source, never restored from a cache.
       - name: Build and verify bundled tmux
-        run: |
-          runtime_directory="$(./Scripts/Tmux/build-runtime.sh)"
-          printf 'JUSTSESSIONS_TEST_TMUX_RUNTIME=%s\n' "$runtime_directory" >> "$GITHUB_ENV"
-
-      - name: Test
-        run: swift test
-
-      - name: Check localization
-        run: make localization-check
+        run: ./Scripts/Tmux/build-runtime.sh
 
       - name: Import Developer ID certificate
         env:

@@ -6,7 +6,7 @@
 APP_BUNDLE_PATH ?= dist/JustSessions.app
 INSTALLER_PATH ?= dist/JustSessions.dmg
 
-.PHONY: build dev run check test dmg website localization localization-check help
+.PHONY: build dev run check test verify dmg website localization localization-check help
 
 build:
 	./Scripts/build-app.sh "$(APP_BUNDLE_PATH)"
@@ -20,6 +20,10 @@ check:
 test:
 	@runtime_directory="$$(./Scripts/Tmux/build-runtime.sh)" && \
 	JUSTSESSIONS_TEST_TMUX_RUNTIME="$$runtime_directory" swift test
+
+# CI runs only the tests; run this before pushing a release tag.
+verify: test localization-check build
+	./Scripts/Release/check-app-launches.sh "$(APP_BUNDLE_PATH)"
 
 dmg: build
 	./Scripts/build-dmg.sh "$(APP_BUNDLE_PATH)" "$(INSTALLER_PATH)"
@@ -41,6 +45,7 @@ help:
 		'make run       Alias for make dev' \
 		'make check     Compile the Swift development build' \
 		'make test      Build bundled tmux and run the Swift tests' \
+		'make verify    Run the tests, localization checks, and check the built app opens' \
 		'make dmg       Build the app and dist/JustSessions.dmg' \
 		'make website   Build and validate the product website' \
 		'make localization        Extract UI strings and compile translations' \

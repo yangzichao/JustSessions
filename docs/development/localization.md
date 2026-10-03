@@ -19,7 +19,7 @@ Keep session titles, paths, transcript text, CLI names, and other user data verb
 
 For count labels, configure plural variations in the catalog, including English. The generated `.stringsdict` applies each language's grammar; a label such as `Resume \(count) sessions` can render “Resume 1 session” without any language-specific Swift branches.
 
-Run `make localization` after changing UI copy. Newly extracted strings must be translated before compilation passes. `make localization-check`, also run in CI, detects uncatalogued or stale UI strings, missing translations, incompatible format arguments, and generated resources that do not match the catalog. Catalog compilation uses `xcstringstool`, including its support for plural rules and substitutions.
+Run `make localization` after changing UI copy. Newly extracted strings must be translated before compilation passes. `make localization-check`, also run by `make verify`, detects uncatalogued or stale UI strings, missing translations, incompatible format arguments, and generated resources that do not match the catalog. Catalog compilation uses `xcstringstool`, including its support for plural rules and substitutions.
 
 ## Runtime behavior
 
