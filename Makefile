@@ -21,7 +21,7 @@ test:
 	@runtime_directory="$$(./Scripts/Tmux/build-runtime.sh)" && \
 	JUSTSESSIONS_TEST_TMUX_RUNTIME="$$runtime_directory" swift test
 
-# CI runs only the tests; run this before pushing a release tag.
+# CI runs only the tests; run this before opening a pull request, pushing to main, or tagging a release.
 verify: test localization-check build
 	./Scripts/Release/check-app-launches.sh "$(APP_BUNDLE_PATH)"
 

@@ -28,7 +28,7 @@ The verifier relocates the runtime to a path with spaces, restricts `PATH` to sy
 
 ## Releases
 
-Pushes to `main` and pull requests run only `swift test` in CI. Run `make verify` locally before tagging a release: it also runs `make localization-check`, then builds the app and opens it with `Scripts/Release/check-app-launches.sh`. The check hides the resource bundles in `.build/release`, because SwiftPM's `Bundle.module` falls back to that absolute path on the build machine but not on users' Macs. Pushing a version tag makes GitHub Actions build, Developer ID sign, notarize, and publish the app; the tag sets the app version. Choose a new, unused semantic version for each release:
+Pushes to `main` and pull requests run only `swift test` in CI. Run `make verify` locally before opening a pull request, pushing to `main`, or tagging a release: it also runs `make localization-check`, then builds the app and opens it with `Scripts/Release/check-app-launches.sh`. The check hides the resource bundles in `.build/release`, because SwiftPM's `Bundle.module` falls back to that absolute path on the build machine but not on users' Macs. Pushing a version tag makes GitHub Actions build, Developer ID sign, notarize, and publish the app; the tag sets the app version. Choose a new, unused semantic version for each release:
 
 Before tagging user-facing changes, update the README, affected user guides, and concise homepage copy or guide links in the same change. Run `python3 Scripts/Website/build_site.py` to check capability claims against the app and validate the Pages artifact. After the signed installer is published, update any source-build availability notes that became part of the release. See [website maintenance](website.md).
 
