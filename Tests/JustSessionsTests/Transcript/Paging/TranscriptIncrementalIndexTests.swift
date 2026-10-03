@@ -23,6 +23,23 @@ struct TranscriptIncrementalIndexTests {
         #expect(updated.scannedByteCount == appended.count)
     }
 
+    @Test func linesAppendedDuringTheScanAreIndexedByTheNextRefresh() throws {
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let file = directory.appendingPathComponent("session.jsonl")
+        try Data(String(repeating: "{\"type\":\"event\"}\n", count: 60_000).utf8).write(to: file)
+        let appender = try ContinuousLogAppender(file: file)
+        appender.start()
+        // Small chunks stretch the scan over many reads, so the appender writes between its first and last.
+        let scannedWhileAppending = try TranscriptFileIndex.read(file, chunkSize: 4096)
+        appender.stop()
+        #expect(appender.appendedLineCount > 1)
+        let refreshed = try TranscriptFileIndex.read(file, updating: scannedWhileAppending)
+        let rebuilt = try TranscriptFileIndex.read(file)
+        #expect(refreshed.lineStarts == rebuilt.lineStarts)
+        #expect(refreshed.scannedByteCount < rebuilt.scannedByteCount)
+    }
+
     @Test func replacementSameSizeAndDateDoesNotReuseOldOffsets() throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }

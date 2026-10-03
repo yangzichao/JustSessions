@@ -50,7 +50,9 @@ struct TranscriptFileIndex: Sendable {
         let edgeLength = min(byteCount, 256)
         let prefix = try edge(in: handle, offset: 0, count: edgeLength)
         let suffix = try edge(in: handle, offset: byteCount - edgeLength, count: edgeLength)
-        guard try TranscriptFileFingerprint(handle: handle) == fingerprint else { throw TranscriptPagingError.sourceChanged }
+        // A running CLI appends while the scan runs. The offsets still describe the first `byteCount` bytes, and keeping
+        // the fingerprint from before the scan makes the next refresh extend them. Only a shrinking file fails the read.
+        guard try TranscriptFileFingerprint(handle: handle).byteCount >= byteCount else { throw TranscriptPagingError.sourceChanged }
         return Self(lineStarts: lineStarts, byteCount: byteCount, fingerprint: fingerprint,
                     scannedByteCount: byteCount - scanStart, prefix: prefix, suffix: suffix)
     }
