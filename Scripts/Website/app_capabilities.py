@@ -25,18 +25,22 @@ def read_app_capabilities(repository_directory: Path):
     for capability, property_name, value_pattern in (
         ("command", "executableName", r'"[^"]+"'),
         ("branch", "supportsBranchFromLauncher", "true|false"),
-        ("ssh", "supportsRemoteHosts", "true|false"),
-        ("delete", "supportsDeletionFromLauncher", "true|false"),
     ):
         switch_pattern = rf"\bvar {property_name}: [^{{]+{{\s*switch self\s*{{([^}}]+)}}"
         values = read_switch_values(provider_source, switch_pattern, value_pattern, provider_names)
         for identifier, value in values.items():
             capabilities[identifier][capability] = value.strip('"') if capability == "command" else value == "true"
 
+    # Every tool's sessions are deleted and listed on SSH hosts; the app has no per-tool switch for either.
+    for support in capabilities.values():
+        support["ssh"] = True
+        support["delete"] = True
+
     transcript_source = (repository_directory / "Sources/JustSessions/Services/Transcript/TranscriptLoader.swift").read_text()
-    preview_values = read_switch_values(
-        transcript_source, r"switch conversation\.provider\s*{([^}]+)}", r"\.(?:loaded|unsupported)\b", provider_names,
-    )
-    for identifier, value in preview_values.items():
-        capabilities[identifier]["preview"] = value == ".loaded"
+    switch_match = re.search(r"switch conversation\.provider\s*{([^}]+)}", transcript_source, re.DOTALL)
+    assert switch_match, "Cannot read the app transcript switch; update the website source reader"
+    providers_with_reader = set(re.findall(r"case\s+\.(\w+):\s*try\s+\w+TranscriptReader\b", switch_match[1]))
+    assert providers_with_reader <= set(provider_names), "Unrecognized transcript cases; update the website source reader"
+    for identifier, support in capabilities.items():
+        support["preview"] = identifier in providers_with_reader
     return capabilities

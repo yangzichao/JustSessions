@@ -53,7 +53,7 @@ class ProductContentValidationTests(unittest.TestCase):
     def test_app_preview_change_requires_matching_documentation(self):
         self.replace_first(
             "Sources/JustSessions/Services/Transcript/TranscriptLoader.swift",
-            r'(case \.\w+: )\.loaded[^\n]+', r'\1.unsupported',
+            r'^\s*case \.\w+: try \w+TranscriptReader[^\n]*\n', '',
         )
         self.assert_stale_claim_rejected("guide.html")
 
