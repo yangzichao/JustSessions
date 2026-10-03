@@ -42,6 +42,15 @@ class ProductContentValidationTests(unittest.TestCase):
         self.replace_first("website/guide.html", r'(<tr data-provider="[^\"]+">[^\n]+?</th><td>)Yes(</td>)', r'\1Not yet\2')
         self.assert_stale_claim_rejected("guide.html")
 
+    def test_stale_homepage_preview_claim_is_rejected(self):
+        self.replace_first("website/index.html", r'(data-capability="preview" data-support=")all(")', r'\1some\2')
+        self.assert_stale_claim_rejected("homepage preview")
+
+    def test_missing_homepage_claim_is_rejected(self):
+        self.replace_first("website/index.html", r' data-capability="preview"', '')
+        with self.assertRaisesRegex(AssertionError, "Homepage capability claims are missing"):
+            validate_product_content(self.repository_directory)
+
     def test_stale_readme_preview_claim_is_rejected(self):
         self.replace_first("README.md", r'^(\| Read a conversation preview \| )Yes( \|)', r'\1Not yet\2')
         self.assert_stale_claim_rejected("README")

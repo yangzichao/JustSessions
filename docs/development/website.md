@@ -16,6 +16,8 @@ Open <http://127.0.0.1:8765/JustSessions/>. The build checks local links and anc
 
 It also checks visible CLI names, commands, and preview/branch/SSH/deletion cells in the online guide, README, and storage guide against `ConversationProvider.swift` and `TranscriptLoader.swift`. This runs without compiling Swift, including on the Pages Linux runner. The source reader recognizes their explicit case switches and fails if the representation changes; update it rather than skipping validation. Provider or transcript-support changes trigger the website workflow, and conflicting claims block publication.
 
+The homepage's capability summary uses `data-capability` and `data-support="all|some|none"` on its reading, deletion, SSH, and branching claims. The same check compares these markers with the app's capabilities, so a stale homepage summary also blocks publication. Keep each marker on the sentence or phrase describing that capability.
+
 The website reuses screenshots from `docs/images/` and existing `Branding/` assets at build time. Stylesheet links include a content hash so a new page loads the matching CSS after an update. Keep the sample-data captions and feature limitations accurate when replacing them. See [screenshot provenance](../images/README.md).
 
 `help.html` is linked from the main navigation and footer, and included in the sitemap. It briefly lists features and highlights installing tmux on remote hosts. It links to the full guide and GitHub issues. The old `feedback.html` URL redirects to Help, uses `noindex`, and stays out of the sitemap. Check both the homepage navigation and the Help page at mobile widths after changing either.

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from app_capabilities import read_app_capabilities
 from capability_table import CapabilityTable
+from homepage_capabilities import validate_homepage_capabilities
 
 
 def validate_support_cell(cell, expected_support, location, capability):
@@ -60,7 +61,8 @@ def validate_product_content(repository_directory: Path):
         assert len(row) == 5 and support["name"] in row[0], "Storage guide provider order differs from the app"
         for column_index, capability in enumerate(("preview", "branch", "delete"), start=2):
             validate_support_cell(row[column_index], support[capability], f"storage guide {support['name']} {capability}", capability)
-    print(f"Product content validation passed: {len(capabilities)} CLIs, homepage names, guide commands, and preview/branch/SSH/deletion claims.")
+    validate_homepage_capabilities(homepage_content, capabilities)
+    print(f"Product content validation passed: {len(capabilities)} CLIs, homepage capability claims, guide commands, and preview/branch/SSH/deletion tables.")
 
 
 if __name__ == "__main__":
