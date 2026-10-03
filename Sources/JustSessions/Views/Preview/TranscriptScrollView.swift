@@ -5,6 +5,7 @@ struct TranscriptScrollView: View {
     let transcript: TranscriptContent
     let isActive: Bool
     let paging: TranscriptPagingModel?
+    let onOpenInNewWindow: (() -> Void)?
     @State var visibleEntryIndex: Int?
     @State var positionController: TranscriptScrollPositionController
     @State private var readingFontSize: CGFloat = 15
@@ -17,12 +18,14 @@ struct TranscriptScrollView: View {
 
     init(
         conversation: Conversation, transcript: TranscriptContent, positionStore: TranscriptReadingPositionStore,
-        isActive: Bool = true, searchState: TranscriptSearchState = TranscriptSearchState(), paging: TranscriptPagingModel? = nil
+        isActive: Bool = true, searchState: TranscriptSearchState = TranscriptSearchState(), paging: TranscriptPagingModel? = nil,
+        onOpenInNewWindow: (() -> Void)? = nil
     ) {
         self.conversation = conversation
         self.transcript = transcript
         self.isActive = isActive
         self.paging = paging
+        self.onOpenInNewWindow = onOpenInNewWindow
         _searchState = State(initialValue: searchState)
         let initialPosition = (positionStore.position(for: conversation.id) ?? .bottom).resolved(in: transcript)
         self.initialPosition = initialPosition
@@ -45,7 +48,8 @@ struct TranscriptScrollView: View {
                             messageCount: messageCount,
                             onFirstMessage: showFirstMessage,
                             onLatestMessage: showLatestMessage,
-                            onFind: searchState.show
+                            onFind: searchState.show,
+                            onOpenInNewWindow: onOpenInNewWindow
                         )
                         .disabled(!isActive)
                         if searchState.isPresented {

@@ -18,7 +18,7 @@ struct HelpFeatureOverview: View {
             HelpFeatureRow(title: "All your CLIs in one place", systemImage: "square.stack.3d.up",
                            detail: "\(providerList), by host and project. It reads the history they already save: no import, no account.")
             HelpFeatureRow(title: "Read without resuming", systemImage: "book",
-                           detail: "Preview a session, or choose **Read** for its own window. Nothing runs until you resume.")
+                           detail: "Preview a session, or open it in its own reading window. Nothing runs until you resume.")
             HelpFeatureRow(title: "Resume where you left off", systemImage: "terminal",
                            detail: "Continue in the original CLI and project folder, inside the app. **Branch** to try another approach.")
             HelpFeatureRow(title: "Keep it running", systemImage: "arrow.triangle.2.circlepath",

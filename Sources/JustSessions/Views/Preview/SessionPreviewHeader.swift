@@ -5,7 +5,6 @@ struct SessionPreviewHeader: View {
     let conversation: Conversation
     let onRename: () -> Void
     let onDelete: () -> Void
-    let onRead: () -> Void
 
     var body: some View {
         ViewThatFits(in: .horizontal) {
@@ -73,12 +72,6 @@ struct SessionPreviewHeader: View {
 
     private var sessionActions: some View {
         HStack(spacing: 10) {
-            if conversation.provider == .claude || conversation.provider == .codex || conversation.provider == .kiro || conversation.provider == .antigravity {
-                Button("Read", systemImage: "book", action: onRead)
-                    .buttonStyle(QuietBorderedButtonStyle())
-                    .help("Open in a separate reading window")
-                    .accessibilityIdentifier("preview.open-reading-window")
-            }
             Button("Resume", systemImage: "play.fill") { store.launch(conversation, action: .resume) }
                 .buttonStyle(ProviderProminentButtonStyle(tint: conversation.provider.emphasisTintColor))
                 .disabled(!store.canLaunch(conversation, action: .resume))

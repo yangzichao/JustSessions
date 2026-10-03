@@ -348,6 +348,8 @@
 	<string>Open JustSessions on GitHub</string>
 	<key>Open in a separate reading window</key>
 	<string>Open in a separate reading window</string>
+	<key>Open in new window</key>
+	<string>Open in new window</string>
 	<key>Open project in</key>
 	<string>Open project in</string>
 	<key>Open project in Finder</key>
@@ -364,8 +366,8 @@
 	<string>Plain text (.txt)…</string>
 	<key>Preview</key>
 	<string>Preview</string>
-	<key>Preview a session, or choose **Read** for its own window. Nothing runs until you resume.</key>
-	<string>Preview a session, or choose **Read** for its own window. Nothing runs until you resume.</string>
+	<key>Preview a session, or open it in its own reading window. Nothing runs until you resume.</key>
+	<string>Preview a session, or open it in its own reading window. Nothing runs until you resume.</string>
 	<key>Preview not available</key>
 	<string>Preview not available</string>
 	<key>Previous Tab</key>
@@ -378,8 +380,6 @@
 	<string>Project folder</string>
 	<key>Project folder on %@</key>
 	<string>Project folder on %@</string>
-	<key>Read</key>
-	<string>Read</string>
 	<key>Read only</key>
 	<string>Read only</string>
 	<key>Read without resuming</key>

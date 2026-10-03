@@ -28,15 +28,19 @@ struct SessionPreviewPane: View {
                         store: store,
                         conversation: conversation,
                         onRename: { onRename(conversation) },
-                        onDelete: { onDelete(conversation) },
-                        onRead: {
+                        onDelete: { onDelete(conversation) }
+                    )
+                    ThemeDivider()
+                    TranscriptView(
+                        conversation: conversation,
+                        readingPositionStore: readingPositionStore,
+                        isActive: store.selectedTerminalID == nil,
+                        onOpenInNewWindow: {
                             SessionReadingWindowManager.shared.open(
                                 conversation, store: store, initialPosition: readingPositionStore.position(for: conversation.id)
                             )
                         }
                     )
-                    ThemeDivider()
-                    TranscriptView(conversation: conversation, readingPositionStore: readingPositionStore, isActive: store.selectedTerminalID == nil)
                         .id(conversation.id)
                 }
             } else if store.isScanningThisMac && store.conversations.isEmpty {

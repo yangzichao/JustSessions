@@ -15,7 +15,7 @@ struct TranscriptReadingRenderingTests {
             let positions = TranscriptReadingPositionStore()
             positions.record(.entry(index: 0, offset: 0), for: conversation.id)
             let content = VStack(spacing: 0) {
-                SessionPreviewHeader(store: store, conversation: conversation, onRename: {}, onDelete: {}, onRead: {})
+                SessionPreviewHeader(store: store, conversation: conversation, onRename: {}, onDelete: {})
                 ThemeDivider()
                 TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: positions)
             }

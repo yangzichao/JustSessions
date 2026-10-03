@@ -1869,6 +1869,16 @@
         }
       }
     },
+    "Open in new window": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在新窗口中打开"
+          }
+        }
+      }
+    },
     "Open project in": {
       "localizations": {
         "zh-Hans": {
@@ -1949,12 +1959,12 @@
         }
       }
     },
-    "Preview a session, or choose **Read** for its own window. Nothing runs until you resume.": {
+    "Preview a session, or open it in its own reading window. Nothing runs until you resume.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "预览会话，或选择**阅读**打开独立窗口。恢复会话前不会启动 CLI。"
+            "value": "预览会话，或在独立的阅读窗口中打开。恢复会话前不会启动 CLI。"
           }
         }
       }
@@ -2015,16 +2025,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 上的项目文件夹"
-          }
-        }
-      }
-    },
-    "Read": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "阅读"
           }
         }
       }

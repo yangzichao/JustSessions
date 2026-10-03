@@ -7,6 +7,8 @@ struct TranscriptReadingToolbar: View {
     let onFirstMessage: () -> Void
     let onLatestMessage: () -> Void
     var onFind: (() -> Void)?
+    /// Set in the workspace preview only; a reading window has no button that opens another.
+    var onOpenInNewWindow: (() -> Void)?
 
     var body: some View {
         HStack(spacing: 14) {
@@ -39,6 +41,12 @@ struct TranscriptReadingToolbar: View {
                     .help("Go to the latest message")
             }
             .labelStyle(.iconOnly)
+            if let onOpenInNewWindow {
+                Button("Open in new window", systemImage: "macwindow.badge.plus", action: onOpenInNewWindow)
+                    .labelStyle(.iconOnly)
+                    .help("Open in a separate reading window")
+                    .accessibilityIdentifier("preview.open-reading-window")
+            }
         }
         .buttonStyle(.borderless)
         .padding(.horizontal, 24)

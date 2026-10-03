@@ -31,7 +31,7 @@ Sparkle delivers subsequent app updates. Your CLI provider's plans and charges s
 
 A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing and resume; current source builds provide previews for all of them. See the [full capability table](../../README.md#supported-clis) and [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest) for the packaged app.
 
-In current source builds, choose **Read** to open a dedicated reading window. Adjust text with **A− / A+**, switch between a readable column and the full window width, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
+In current source builds, click the new-window button in the preview's reading toolbar to open a dedicated reading window. Adjust text with **A− / A+**, switch between a readable column and the full window width, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
 
 **New session** starts an installed CLI in a project folder. A project's **+ → Terminal** opens your login shell in that folder. Project tab groups and [keyboard shortcuts](session-management.md#tab-keyboard-shortcuts) help you switch between open terminals.
 

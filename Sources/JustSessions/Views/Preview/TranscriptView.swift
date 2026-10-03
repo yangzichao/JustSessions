@@ -5,6 +5,8 @@ struct TranscriptView: View {
     let conversation: Conversation
     let readingPositionStore: TranscriptReadingPositionStore
     var isActive = true
+    /// Shown as a reading toolbar button; see `TranscriptReadingToolbar.onOpenInNewWindow`.
+    var onOpenInNewWindow: (() -> Void)?
 
     private struct LoadKey: Equatable {
         let conversationID: String
@@ -39,7 +41,7 @@ struct TranscriptView: View {
             )
         } else if let transcript = paging.transcript, !transcript.entries.isEmpty {
             TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: readingPositionStore,
-                                 isActive: isActive, paging: paging)
+                                 isActive: isActive, paging: paging, onOpenInNewWindow: onOpenInNewWindow)
         } else if let message = paging.errorMessage {
             VStack {
                 ContentUnavailableView("Could not read this session", systemImage: "exclamationmark.triangle", description: Text(message))
