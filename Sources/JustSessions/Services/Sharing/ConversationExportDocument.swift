@@ -14,15 +14,14 @@ struct ConversationExportDocument: Sendable {
         var sessions: [SessionTranscript] = []
         for selection in selections {
             try Task.checkCancellation()
-            let result: TranscriptLoadResult
+            let transcript: TranscriptContent
             do {
-                result = try await TranscriptLoader.load(selection.conversation, maximumEntryCount: .max, maximumTextLength: .max)
+                transcript = try await TranscriptLoader.load(selection.conversation, maximumEntryCount: .max, maximumTextLength: .max)
             } catch is CancellationError {
                 throw CancellationError()
             } catch {
                 throw ConversationExportError.unreadable(selection, reason: error.localizedDescription)
             }
-            guard case .loaded(let transcript) = result else { throw ConversationExportError.unsupported(selection) }
             guard !transcript.entries.isEmpty else { throw ConversationExportError.noMessages(selection) }
             sessions.append(SessionTranscript(selection: selection, transcript: transcript))
         }

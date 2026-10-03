@@ -9,7 +9,7 @@ enum RemoteHostStatusProbe {
     static let installedCLIsHeading = "JustSessions installed CLIs:"
 
     static var command: String {
-        let cliChecks = remoteProviders.map { provider in
+        let cliChecks = ConversationProvider.allCases.map { provider in
             let name = ShellQuoting.quoted(provider.executableName)
             return "command -v \(name) >/dev/null 2>&1 && echo \(name)"
         }
@@ -38,11 +38,7 @@ enum RemoteHostStatusProbe {
         let foundNames = Set(lines[(headingIndex + 1)...])
         return RemoteHostStatus(
             tmuxSessionNames: TmuxSessionName.appSessionNames(inListOutput: lines[..<headingIndex].joined(separator: "\n")),
-            installedProviders: Set(remoteProviders.filter { foundNames.contains($0.executableName) })
+            installedProviders: Set(ConversationProvider.allCases.filter { foundNames.contains($0.executableName) })
         )
-    }
-
-    private static var remoteProviders: [ConversationProvider] {
-        ConversationProvider.allCases.filter(\.supportsRemoteHosts)
     }
 }

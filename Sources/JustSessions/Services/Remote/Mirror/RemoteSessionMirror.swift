@@ -23,9 +23,9 @@ struct RemoteSessionMirror: Sendable {
             .appendingPathComponent(Self.mirroredFolderName(for: provider))
     }
 
-    /// Copies the host's session files for each tool that runs on remote hosts.
+    /// Copies the host's session files for each tool.
     func synchronize(host: String) throws {
-        for provider in ConversationProvider.allCases where provider.supportsRemoteHosts {
+        for provider in ConversationProvider.allCases {
             try synchronize(host: host, provider: provider)
         }
     }

@@ -30,14 +30,8 @@
 	<string>%lld 磅</string>
 	<key>%lld selected</key>
 	<string>已选择 %lld 项</string>
-	<key>%lld sessions from tools JustSessions can't delete will be skipped.</key>
-	<string>将跳过 %lld 个尚不支持删除的工具会话。</string>
 	<key>%lld sessions selected</key>
 	<string>已选择 %lld 个会话</string>
-	<key>%lld sessions with open terminals and %lld sessions from tools JustSessions can't delete will be skipped.</key>
-	<string>将跳过 %lld 个终端已打开的会话，以及 %lld 个尚不支持删除的工具会话。</string>
-	<key>%lld sessions with open terminals and 1 session from tools JustSessions can't delete will be skipped.</key>
-	<string>将跳过 %lld 个终端已打开的会话，以及 1 个尚不支持删除的工具会话。</string>
 	<key>%lld sessions with open terminals will be skipped.</key>
 	<string>将跳过 %lld 个终端已打开的会话。</string>
 	<key>%lld tool calls</key>
@@ -48,12 +42,6 @@
 	<string>，%lld 个会话</string>
 	<key>1 message</key>
 	<string>1 条消息</string>
-	<key>1 session from tools JustSessions can't delete will be skipped.</key>
-	<string>将跳过 1 个尚不支持删除的工具会话。</string>
-	<key>1 session with an open terminal and %lld sessions from tools JustSessions can't delete will be skipped.</key>
-	<string>将跳过 1 个终端已打开的会话，以及 %lld 个尚不支持删除的工具会话。</string>
-	<key>1 session with an open terminal and 1 session from tools JustSessions can't delete will be skipped.</key>
-	<string>将跳过 1 个终端已打开的会话，以及 1 个尚不支持删除的工具会话。</string>
 	<key>1 session with an open terminal will be skipped.</key>
 	<string>将跳过 1 个终端已打开的会话。</string>
 	<key>1 tool call</key>
@@ -254,8 +242,6 @@
 	<string>界面语言</string>
 	<key>JustSessions Help</key>
 	<string>JustSessions 帮助</string>
-	<key>JustSessions can't read %@ conversations yet. Resume the session to see it.</key>
-	<string>JustSessions 暂时无法读取 %@ 的对话。继续会话以查看内容。</string>
 	<key>JustSessions on GitHub</key>
 	<string>GitHub 上的 JustSessions</string>
 	<key>Keep it running</key>
@@ -360,8 +346,6 @@
 	<string>预览</string>
 	<key>Preview a session, or open it in its own reading window. Nothing runs until you resume.</key>
 	<string>预览会话，或在独立的阅读窗口中打开。恢复会话前不会启动 CLI。</string>
-	<key>Preview not available</key>
-	<string>无法预览</string>
 	<key>Previous Tab</key>
 	<string>上一个标签</string>
 	<key>Previous match</key>

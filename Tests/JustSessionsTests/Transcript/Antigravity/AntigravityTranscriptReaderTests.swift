@@ -16,7 +16,7 @@ struct AntigravityTranscriptReaderTests {
         try fixture.append(field(114, Data("Raw tool output".utf8)), type: 101, index: 4)
         try fixture.append(Data([0xff, 0xff]), type: 15, index: 5)
 
-        guard case .loaded(let transcript) = try await TranscriptLoader.load(fixture.conversation) else { Issue.record("Missing preview"); return }
+        let transcript = try await TranscriptLoader.load(fixture.conversation)
         #expect(transcript.entries.map(\.content) == [.userMessage("Fix the build"), .assistantMessage("Build succeeded"), .toolCalls(["run_command · swift build"])])
         #expect(transcript.entries.first?.timestamp == Date(timeIntervalSince1970: 1_790_400_000.25))
     }

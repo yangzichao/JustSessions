@@ -262,12 +262,8 @@ struct PiTranscriptReaderTests {
             lines: [Self.user("u1", parent: nil, "Hello Pi")]
         )
 
-        let result = try await TranscriptLoader.load(.fixture(provider: .pi, sourceFile: file))
+        let transcript = try await TranscriptLoader.load(.fixture(provider: .pi, sourceFile: file))
 
-        guard case .loaded(let transcript) = result else {
-            Issue.record("Pi sessions should load a transcript")
-            return
-        }
         #expect(transcript.entries.map(\.content) == [.userMessage("Hello Pi")])
     }
 

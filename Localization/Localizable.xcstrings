@@ -204,48 +204,12 @@
         }
       }
     },
-    "%lld sessions from tools JustSessions can't delete will be skipped.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将跳过 %lld 个尚不支持删除的工具会话。"
-          }
-        }
-      }
-    },
     "%lld sessions selected": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "已选择 %lld 个会话"
-          }
-        }
-      }
-    },
-    "%lld sessions with open terminals and %lld sessions from tools JustSessions can't delete will be skipped.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$lld sessions with open terminals and %2$lld sessions from tools JustSessions can't delete will be skipped."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将跳过 %lld 个终端已打开的会话，以及 %lld 个尚不支持删除的工具会话。"
-          }
-        }
-      }
-    },
-    "%lld sessions with open terminals and 1 session from tools JustSessions can't delete will be skipped.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将跳过 %lld 个终端已打开的会话，以及 1 个尚不支持删除的工具会话。"
           }
         }
       }
@@ -314,36 +278,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "1 条消息"
-          }
-        }
-      }
-    },
-    "1 session from tools JustSessions can't delete will be skipped.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将跳过 1 个尚不支持删除的工具会话。"
-          }
-        }
-      }
-    },
-    "1 session with an open terminal and %lld sessions from tools JustSessions can't delete will be skipped.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将跳过 1 个终端已打开的会话，以及 %lld 个尚不支持删除的工具会话。"
-          }
-        }
-      }
-    },
-    "1 session with an open terminal and 1 session from tools JustSessions can't delete will be skipped.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将跳过 1 个终端已打开的会话，以及 1 个尚不支持删除的工具会话。"
           }
         }
       }
@@ -1450,16 +1384,6 @@
         }
       }
     },
-    "JustSessions can't read %@ conversations yet. Resume the session to see it.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JustSessions 暂时无法读取 %@ 的对话。继续会话以查看内容。"
-          }
-        }
-      }
-    },
     "JustSessions on GitHub": {
       "localizations": {
         "zh-Hans": {
@@ -1965,16 +1889,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "预览会话，或在独立的阅读窗口中打开。恢复会话前不会启动 CLI。"
-          }
-        }
-      }
-    },
-    "Preview not available": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法预览"
           }
         }
       }

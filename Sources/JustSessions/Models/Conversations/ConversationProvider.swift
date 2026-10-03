@@ -31,19 +31,6 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
         }
     }
 
-    var supportsDeletionFromLauncher: Bool {
-        switch self {
-        case .claude, .codex, .antigravity, .kiro, .opencode, .pi: true
-        }
-    }
-
-    /// Tools whose sessions are listed and resumed on SSH hosts.
-    var supportsRemoteHosts: Bool {
-        switch self {
-        case .claude, .codex, .antigravity, .kiro, .opencode, .pi: true
-        }
-    }
-
     /// Whether a new session's tab on this Mac is linked to the first session that appears in its project after it
     /// started, as on SSH hosts. The other tools leave evidence of the session a process writes; see
     /// `NewSessionFileFinder`. These write their sessions without keeping the file open, or into a database that
@@ -53,10 +40,6 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
         case .claude, .codex, .antigravity: false
         case .kiro, .opencode, .pi: true
         }
-    }
-
-    func runs(on host: SessionHost) -> Bool {
-        host == .thisMac || supportsRemoteHosts
     }
 
     /// Session ids end up in file names, tmux session names, and shell commands, so only the tool's own id

@@ -8,10 +8,7 @@ struct ConversationExportLoadingTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let conversation = try ConversationExportFixture.conversation(provider: provider, in: directory)
-        guard case .loaded(let preview) = try await TranscriptLoader.load(conversation) else {
-            Issue.record("Missing preview")
-            return
-        }
+        let preview = try await TranscriptLoader.load(conversation)
         #expect(preview.omittedEntryCount == 2)
         #expect(preview.entries.last?.content != .userMessage(ConversationExportFixture.longMessage))
 

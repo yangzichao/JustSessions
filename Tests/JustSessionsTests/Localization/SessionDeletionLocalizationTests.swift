@@ -11,9 +11,9 @@ struct SessionDeletionLocalizationTests {
     }
 
     @Test func skippedCountsAndDeletionCountAreTranslatedAsCompleteSentences() {
-        let plan = SessionDeletionPlan(deletableConversations: [.fixture(), .fixture()], openTerminalCount: 2, unsupportedCount: 4)
+        let plan = SessionDeletionPlan(deletableConversations: [.fixture(), .fixture()], openTerminalCount: 2)
         #expect(SessionDeletionConfirmationText.buttonTitle(for: plan, language: chinese) == "删除 2 个会话")
         #expect(SessionDeletionConfirmationText.skippedSessionsSentence(for: plan, language: chinese)
-            == "将跳过 2 个终端已打开的会话，以及 4 个尚不支持删除的工具会话。")
+            == "将跳过 2 个终端已打开的会话。")
     }
 }

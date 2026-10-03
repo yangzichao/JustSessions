@@ -22,8 +22,6 @@ struct KiroStoreDeletionTests {
         let selected = try #require(store.conversations.first { $0.sessionID == fixture.conversation.sessionID })
         store.rename(selected, to: "Custom title")
         store.setPinned(true, conversation: selected)
-        #expect(selected.supportsDeletionFromLauncher)
-        #expect(selected.onHost(.ssh("devbox")).supportsDeletionFromLauncher)
         #expect(store.deletionPlan(for: [selected]).deletableConversations.map(\.id) == [selected.id])
 
         switch deletionKind {

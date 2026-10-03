@@ -19,12 +19,12 @@ struct TranscriptView: View {
         content
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .task(id: LoadKey(conversationID: conversation.id, updatedAt: conversation.updatedAt)) {
-                if isActive, TranscriptLoader.supportsReading(conversation.provider) {
+                if isActive {
                     paging.refresh(conversation, position: readingPositionStore.position(for: conversation.id))
                 }
             }
             .onChange(of: isActive) {
-                if isActive, TranscriptLoader.supportsReading(conversation.provider) {
+                if isActive {
                     paging.refresh(conversation, position: readingPositionStore.position(for: conversation.id))
                 } else { paging.cancel() }
             }
@@ -33,13 +33,7 @@ struct TranscriptView: View {
 
     @ViewBuilder
     private var content: some View {
-        if !TranscriptLoader.supportsReading(conversation.provider) {
-            ContentUnavailableView(
-                "Preview not available",
-                systemImage: "eye.slash",
-                description: Text("JustSessions can't read \(conversation.provider.rawValue) conversations yet. Resume the session to see it.")
-            )
-        } else if let transcript = paging.transcript, !transcript.entries.isEmpty {
+        if let transcript = paging.transcript, !transcript.entries.isEmpty {
             TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: readingPositionStore,
                                  isActive: isActive, paging: paging, onOpenInNewWindow: onOpenInNewWindow)
         } else if let message = paging.errorMessage {

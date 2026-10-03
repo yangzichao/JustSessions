@@ -8,11 +8,10 @@ extension ConversationStore {
     }
 
     /// The tools a new session on the host can start, in their usual order. Until the host's first check, every
-    /// tool that runs there, so a CLI that is missing is reported when it is started rather than hidden.
+    /// tool, so a CLI that is missing is reported when it is started rather than hidden.
     func newSessionProviders(on host: SessionHost) -> [ConversationProvider] {
-        let runnableProviders = ConversationProvider.allCases.filter { $0.runs(on: host) }
-        guard let installedProviders = installedProvidersByHost[host] else { return runnableProviders }
-        return runnableProviders.filter(installedProviders.contains)
+        guard let installedProviders = installedProvidersByHost[host] else { return ConversationProvider.allCases }
+        return ConversationProvider.allCases.filter(installedProviders.contains)
     }
 
     /// Each host's new-session tools, for views that let the host be picked.

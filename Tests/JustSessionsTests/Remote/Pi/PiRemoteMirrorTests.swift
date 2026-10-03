@@ -41,11 +41,7 @@ struct PiRemoteMirrorTests {
         #expect(conversation.host == .ssh("devbox"))
         #expect(conversation.projectDirectoryKey == "ssh://devbox/home/me/paper")
         #expect(conversation.suggestedTitle == "Build fix")
-        #expect(conversation.supportsDeletionFromLauncher)
-        guard case .loaded(let transcript) = try await TranscriptLoader.load(conversation) else {
-            Issue.record("A mirrored Pi conversation should have a preview")
-            return
-        }
+        let transcript = try await TranscriptLoader.load(conversation)
         #expect(transcript.entries.first?.content == .userMessage("Fix the build"))
         let mirroredProjectFolder = mirror.mirrorDirectory(host: "devbox", provider: .pi)
             .appendingPathComponent(projectFolder.lastPathComponent)

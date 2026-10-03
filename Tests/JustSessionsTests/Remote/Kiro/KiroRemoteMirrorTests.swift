@@ -29,11 +29,7 @@ struct KiroRemoteMirrorTests {
         #expect(conversation.sessionID == sessionID)
         #expect(conversation.host == .ssh("devbox"))
         #expect(conversation.suggestedTitle == "Build fix")
-        #expect(conversation.supportsDeletionFromLauncher)
-        guard case .loaded(let transcript) = try await TranscriptLoader.load(conversation) else {
-            Issue.record("A mirrored Kiro conversation should have a preview")
-            return
-        }
+        let transcript = try await TranscriptLoader.load(conversation)
         #expect(transcript.entries.first?.content == .userMessage("Fix the build"))
         let mirroredDirectory = mirror.mirrorDirectory(host: "devbox", provider: .kiro)
         for excludedPath in ["\(sessionID).lock", "\(sessionID).history", sessionID, "settings.json"] {

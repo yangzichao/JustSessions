@@ -65,7 +65,6 @@ struct ProjectSessionDeletionTests {
         try await expectEventually { !store.isScanningThisMac }
         let deletionPlan = store.deletionPlan(for: selectedProject.path)
         #expect(deletionPlan.deletableConversations.map(\.id).sorted() == [selectedClaude.id, selectedCodex.id, selectedOpenCode.id].sorted())
-        #expect(deletionPlan.unsupportedCount == 0)
 
         store.deleteSessions(in: selectedProject.path)
         try await expectEventually { !store.isDeletingSessions }
@@ -145,7 +144,6 @@ struct ProjectSessionDeletionTests {
         let selectedConversations = [selectedFirstClaude, selectedSecondCodex, selectedOpenCode]
         let deletionPlan = store.deletionPlan(for: selectedConversations)
         #expect(deletionPlan.deletableConversations.map(\.id).sorted() == selectedConversations.map(\.id).sorted())
-        #expect(deletionPlan.unsupportedCount == 0)
 
         store.deleteConversations(selectedConversations)
         #expect(store.isDeletionPending(for: selectedFirstClaude))

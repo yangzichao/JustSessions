@@ -15,7 +15,6 @@ struct PiStoreDeletionTests {
         let deletionPlan = store.deletionPlan(for: [deleted, running])
         #expect(deletionPlan.deletableConversations.map(\.id) == [deleted.id])
         #expect(deletionPlan.openTerminalCount == 1)
-        #expect(deletionPlan.unsupportedCount == 0)
         store.deleteConversations([deleted, running])
         try await expectEventually { !store.isDeletingSessions }
 

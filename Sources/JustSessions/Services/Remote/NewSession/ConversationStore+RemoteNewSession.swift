@@ -4,7 +4,6 @@ import Foundation
 /// again every few seconds until the tab is linked to its session and that session has a title.
 extension ConversationStore {
     func launchNewRemoteSession(provider: ConversationProvider, host: String, projectPath: String) {
-        guard provider.supportsRemoteHosts else { return }
         let tmuxSessionName = TmuxSessionName.unique(for: provider)
         let command = RemoteCLICommandBuilder().command(
             host: host,

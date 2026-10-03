@@ -45,12 +45,6 @@ struct PiAdapterTests {
         #expect(try PiAdapter(sessionsDirectory: root.appendingPathComponent("missing")).discover().isEmpty)
     }
 
-    @Test func sessionsAreDeletableOnThisMacAndOnSSHHosts() {
-        #expect(ConversationProvider.pi.supportsDeletionFromLauncher)
-        #expect(ConversationProvider.pi.supportsRemoteHosts)
-        #expect(ConversationProvider.pi.runs(on: .ssh("devbox")))
-    }
-
     /// The adapter deletes only from its own sessions folder; moving to the Trash is covered by
     /// `PiConversationDeletionTests`. Any move here fails the test rather than reaching the real Trash.
     @Test func deletionRefusesASessionOutsideTheAdaptersSessionsFolder() throws {

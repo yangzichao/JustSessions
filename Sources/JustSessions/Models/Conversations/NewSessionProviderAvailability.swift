@@ -5,7 +5,6 @@ enum NewSessionProviderAvailability {
     static func noCLIFoundMessage(on host: SessionHost, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
         let locale = Locale(identifier: language.localizationIdentifier(availableLocalizations: AppLocalization.resourceBundle.localizations))
         let supportedCLINames = ConversationProvider.allCases
-            .filter { $0.runs(on: host) }
             .map(\.executableName)
             .formatted(.list(type: .or).locale(locale))
         return host == .thisMac

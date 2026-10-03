@@ -34,8 +34,6 @@ struct Conversation: Identifiable, Sendable {
         self.projectDirectoryKey = ProjectLocation(host: host, path: projectPath).key
     }
 
-    var supportsDeletionFromLauncher: Bool { provider.supportsDeletionFromLauncher && provider.runs(on: host) }
-
     func withSuggestedTitle(_ title: String) -> Conversation {
         var renamed = self
         renamed.suggestedTitle = title

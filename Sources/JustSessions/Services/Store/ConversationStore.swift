@@ -237,16 +237,13 @@ final class ConversationStore: ObservableObject {
     }
 
     func deletionPlan(for candidateConversations: [Conversation]) -> SessionDeletionPlan {
-        let supportedConversations = candidateConversations.filter(\.supportsDeletionFromLauncher)
-        return SessionDeletionPlan(
-            deletableConversations: supportedConversations.filter { !hasTerminal(for: $0) },
-            openTerminalCount: supportedConversations.filter { hasTerminal(for: $0) }.count,
-            unsupportedCount: candidateConversations.count - supportedConversations.count
+        SessionDeletionPlan(
+            deletableConversations: candidateConversations.filter { !hasTerminal(for: $0) },
+            openTerminalCount: candidateConversations.filter { hasTerminal(for: $0) }.count
         )
     }
 
     func delete(_ conversation: Conversation) {
-        guard conversation.supportsDeletionFromLauncher else { return }
         guard !hasTerminal(for: conversation) else {
             show(StoreAlert(
                 title: SessionDeletionReport.oneSessionTitle(title(for: conversation)),
@@ -262,7 +259,7 @@ final class ConversationStore: ObservableObject {
         deleteConversations(conversations.filter { $0.projectDirectoryKey == projectPath })
     }
 
-    /// Deletes every deletable conversation in the list; open terminals and unsupported providers are skipped.
+    /// Deletes every conversation in the list except those with open terminals.
     func deleteConversations(_ candidateConversations: [Conversation]) {
         let candidateIDs = Set(candidateConversations.map(\.id))
         let deletionPlan = deletionPlan(for: conversations.filter { candidateIDs.contains($0.id) })

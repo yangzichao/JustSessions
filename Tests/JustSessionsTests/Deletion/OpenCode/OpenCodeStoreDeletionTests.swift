@@ -16,7 +16,6 @@ struct OpenCodeStoreDeletionTests {
         let selected = try #require(store.conversations.first { $0.sessionID == OpenCodeDeletionFixture.selectedSessionID })
         store.rename(selected, to: "Custom title")
         store.setPinned(true, conversation: selected)
-        #expect(selected.supportsDeletionFromLauncher)
         #expect(store.deletionPlan(for: [selected]).deletableConversations.map(\.id) == [selected.id])
 
         switch deletionKind {

@@ -54,7 +54,6 @@ struct HostModelTests {
         #expect(onDevbox.id == "Claude Code:\(sessionID)@devbox")
         #expect(onDevbox.projectDirectoryKey == "ssh://devbox/Users/me/paper")
         #expect(onDevbox.isProjectAvailable)
-        #expect(onDevbox.supportsDeletionFromLauncher)
         #expect(onDevbox.withSuggestedTitle("Renamed").host == .ssh("devbox"))
 
         let groups = ProjectConversationGroup.grouped([onThisMac, onDevbox])
@@ -68,11 +67,6 @@ struct HostModelTests {
     @Test func hostNamesReadWithinASentence() {
         #expect("End on \(SessionHost.thisMac.nameInSentence)" == "End on this Mac")
         #expect("End on \(SessionHost.ssh("me@devbox").nameInSentence)" == "End on me@devbox")
-    }
-
-    @Test func everyToolRunsOnThisMacAndOnSSHHosts() {
-        #expect(ConversationProvider.allCases.filter { $0.runs(on: .thisMac) } == ConversationProvider.allCases)
-        #expect(ConversationProvider.allCases.filter { $0.runs(on: .ssh("devbox")) } == ConversationProvider.allCases)
     }
 
     @Test func sidebarListsEveryHostInOrderIncludingOnesWithoutProjects() {

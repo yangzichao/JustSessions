@@ -44,12 +44,8 @@
 	<string>%lld pt</string>
 	<key>%lld selected</key>
 	<string>%lld selected</string>
-	<key>%lld sessions from tools JustSessions can't delete will be skipped.</key>
-	<string>%lld sessions from tools JustSessions can't delete will be skipped.</string>
 	<key>%lld sessions selected</key>
 	<string>%lld sessions selected</string>
-	<key>%lld sessions with open terminals and 1 session from tools JustSessions can't delete will be skipped.</key>
-	<string>%lld sessions with open terminals and 1 session from tools JustSessions can't delete will be skipped.</string>
 	<key>%lld sessions with open terminals will be skipped.</key>
 	<string>%lld sessions with open terminals will be skipped.</string>
 	<key>%lld tool calls</key>
@@ -58,12 +54,6 @@
 	<string>**Install tmux on the host** so sessions survive a dropped connection or a closed tab. Built-in tmux is only for this Mac.</string>
 	<key>1 message</key>
 	<string>1 message</string>
-	<key>1 session from tools JustSessions can't delete will be skipped.</key>
-	<string>1 session from tools JustSessions can't delete will be skipped.</string>
-	<key>1 session with an open terminal and %lld sessions from tools JustSessions can't delete will be skipped.</key>
-	<string>1 session with an open terminal and %lld sessions from tools JustSessions can't delete will be skipped.</string>
-	<key>1 session with an open terminal and 1 session from tools JustSessions can't delete will be skipped.</key>
-	<string>1 session with an open terminal and 1 session from tools JustSessions can't delete will be skipped.</string>
 	<key>1 session with an open terminal will be skipped.</key>
 	<string>1 session with an open terminal will be skipped.</string>
 	<key>1 tool call</key>
@@ -262,8 +252,6 @@
 	<string>JustSessions</string>
 	<key>JustSessions Help</key>
 	<string>JustSessions Help</string>
-	<key>JustSessions can't read %@ conversations yet. Resume the session to see it.</key>
-	<string>JustSessions can't read %@ conversations yet. Resume the session to see it.</string>
 	<key>JustSessions on GitHub</key>
 	<string>JustSessions on GitHub</string>
 	<key>Keep it running</key>
@@ -368,8 +356,6 @@
 	<string>Preview</string>
 	<key>Preview a session, or open it in its own reading window. Nothing runs until you resume.</key>
 	<string>Preview a session, or open it in its own reading window. Nothing runs until you resume.</string>
-	<key>Preview not available</key>
-	<string>Preview not available</string>
 	<key>Previous Tab</key>
 	<string>Previous Tab</string>
 	<key>Previous match</key>

@@ -24,10 +24,8 @@ struct SessionManagementMenuItems: View {
                 SessionLocationActions.revealSessionFile(conversation)
             }
         }
-        if conversation.supportsDeletionFromLauncher {
-            Divider()
-            Button("Delete session…", systemImage: "trash", role: .destructive, action: onDelete)
-                .disabled(store.hasTerminal(for: conversation) || !store.canStartDeletion(of: [conversation]))
-        }
+        Divider()
+        Button("Delete session…", systemImage: "trash", role: .destructive, action: onDelete)
+            .disabled(store.hasTerminal(for: conversation) || !store.canStartDeletion(of: [conversation]))
     }
 }

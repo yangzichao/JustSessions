@@ -66,7 +66,7 @@ struct KiroTranscriptReaderTests {
         defer { try? FileManager.default.removeItem(at: file) }
         let expected = try KiroTranscriptReader().read(file)
         for host: SessionHost in [.thisMac, .ssh("devbox")] {
-            #expect(try await TranscriptLoader.load(.fixture(provider: .kiro, sourceFile: file, host: host)) == .loaded(expected))
+            #expect(try await TranscriptLoader.load(.fixture(provider: .kiro, sourceFile: file, host: host)) == expected)
         }
     }
 }
