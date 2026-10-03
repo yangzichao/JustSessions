@@ -3,8 +3,7 @@ import Foundation
 enum TranscriptLoader {
     static func supportsReading(_ provider: ConversationProvider) -> Bool {
         switch provider {
-        case .claude, .codex, .kiro, .antigravity, .pi: true
-        case .opencode: false
+        case .claude, .codex, .kiro, .antigravity, .opencode, .pi: true
         }
     }
 
@@ -20,7 +19,7 @@ enum TranscriptLoader {
         case .kiro: .loaded(try KiroTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile))
         case .antigravity: .loaded(try AntigravityTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile))
         case .pi: .loaded(try PiTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile))
-        case .opencode: .unsupported
+        case .opencode: .loaded(try OpenCodeTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile, sessionID: conversation.sessionID))
         }
     }
 }

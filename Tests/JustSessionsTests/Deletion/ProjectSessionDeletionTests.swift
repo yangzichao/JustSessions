@@ -44,7 +44,7 @@ struct ProjectSessionDeletionTests {
         #expect(ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults).sidebarProjectGroups.isEmpty)
     }
 
-    @Test @MainActor func batchDeletionKeepsOtherProjectsAndUnsupportedSessions() async throws {
+    @Test @MainActor func projectDeletionDeletesEveryToolsSessionsAndKeepsOtherProjects() async throws {
         let temporaryDirectory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
         let isolatedUserDefaults = try IsolatedUserDefaults()
@@ -64,16 +64,16 @@ struct ProjectSessionDeletionTests {
         store.refreshThisMac()
         try await expectEventually { !store.isScanningThisMac }
         let deletionPlan = store.deletionPlan(for: selectedProject.path)
-        #expect(deletionPlan.deletableConversations.map(\.id).sorted() == [selectedClaude.id, selectedCodex.id].sorted())
-        #expect(deletionPlan.unsupportedCount == 1)
+        #expect(deletionPlan.deletableConversations.map(\.id).sorted() == [selectedClaude.id, selectedCodex.id, selectedOpenCode.id].sorted())
+        #expect(deletionPlan.unsupportedCount == 0)
 
         store.deleteSessions(in: selectedProject.path)
         try await expectEventually { !store.isDeletingSessions }
         #expect(!FileManager.default.fileExists(atPath: selectedClaude.sourceFile.path))
         #expect(!FileManager.default.fileExists(atPath: selectedCodex.sourceFile.path))
-        #expect(FileManager.default.fileExists(atPath: selectedOpenCode.sourceFile.path))
+        #expect(!FileManager.default.fileExists(atPath: selectedOpenCode.sourceFile.path))
         #expect(FileManager.default.fileExists(atPath: otherClaude.sourceFile.path))
-        #expect(store.conversations.map(\.id).sorted() == [selectedOpenCode.id, otherClaude.id].sorted())
+        #expect(store.conversations.map(\.id) == [otherClaude.id])
         #expect(store.errorMessage == nil)
     }
 
@@ -85,16 +85,17 @@ struct ProjectSessionDeletionTests {
         let removedProject = try makeProject("removed", in: temporaryDirectory)
         let otherProject = try makeProject("other", in: temporaryDirectory)
         let removedClaude = try savedConversation(.claude, project: removedProject, in: temporaryDirectory)
-        let removedOpenCode = try savedConversation(.opencode, project: removedProject, in: temporaryDirectory)
+        let runningOpenCode = try savedConversation(.opencode, project: removedProject, in: temporaryDirectory)
         let otherClaude = try savedConversation(.claude, project: otherProject, in: temporaryDirectory)
-        let store = makeStore(listing: [removedClaude, removedOpenCode, otherClaude], userDefaults: isolatedUserDefaults.userDefaults)
+        let store = makeStore(listing: [removedClaude, runningOpenCode, otherClaude], userDefaults: isolatedUserDefaults.userDefaults)
         store.refreshThisMac()
         try await expectEventually { !store.isScanningThisMac }
+        store.tmuxSessionNamesByHost[.thisMac] = [TmuxSessionName.forConversation(runningOpenCode)]
 
         store.deleteSessionsAndRemoveProject(removedProject.path)
         try await expectEventually { !store.isDeletingSessions }
         #expect(!FileManager.default.fileExists(atPath: removedClaude.sourceFile.path))
-        #expect(FileManager.default.fileExists(atPath: removedOpenCode.sourceFile.path))
+        #expect(FileManager.default.fileExists(atPath: runningOpenCode.sourceFile.path))
         #expect(FileManager.default.fileExists(atPath: otherClaude.sourceFile.path))
         #expect(FileManager.default.fileExists(atPath: removedProject.path))
         #expect(store.sidebarProjectGroups.map(\.id) == [otherProject.path])
@@ -110,18 +111,19 @@ struct ProjectSessionDeletionTests {
         defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
-        let project = try makeProject("unsupported-only", in: temporaryDirectory)
-        let openCode = try savedConversation(.opencode, project: project, in: temporaryDirectory)
-        let store = makeStore(listing: [openCode], userDefaults: isolatedUserDefaults.userDefaults)
+        let project = try makeProject("running-only", in: temporaryDirectory)
+        let running = try savedConversation(.opencode, project: project, in: temporaryDirectory)
+        let store = makeStore(listing: [running], userDefaults: isolatedUserDefaults.userDefaults)
         store.refreshThisMac()
         try await expectEventually { !store.isScanningThisMac }
+        store.tmuxSessionNamesByHost[.thisMac] = [TmuxSessionName.forConversation(running)]
 
         store.deleteSessionsAndRemoveProject(project.path)
         #expect(!store.isDeletingSessions)
         #expect(store.sidebarProjectGroups.map(\.id) == [project.path])
     }
 
-    @Test @MainActor func selectedSessionDeletionSpansProjectsAndSkipsUnsupportedSessions() async throws {
+    @Test @MainActor func selectedSessionDeletionSpansProjectsAndTools() async throws {
         let temporaryDirectory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
         let isolatedUserDefaults = try IsolatedUserDefaults()
@@ -142,8 +144,8 @@ struct ProjectSessionDeletionTests {
         try await expectEventually { !store.isScanningThisMac }
         let selectedConversations = [selectedFirstClaude, selectedSecondCodex, selectedOpenCode]
         let deletionPlan = store.deletionPlan(for: selectedConversations)
-        #expect(deletionPlan.deletableConversations.map(\.id).sorted() == [selectedFirstClaude.id, selectedSecondCodex.id].sorted())
-        #expect(deletionPlan.unsupportedCount == 1)
+        #expect(deletionPlan.deletableConversations.map(\.id).sorted() == selectedConversations.map(\.id).sorted())
+        #expect(deletionPlan.unsupportedCount == 0)
 
         store.deleteConversations(selectedConversations)
         #expect(store.isDeletionPending(for: selectedFirstClaude))
@@ -151,9 +153,9 @@ struct ProjectSessionDeletionTests {
         try await expectEventually { !store.isDeletingSessions }
         #expect(!FileManager.default.fileExists(atPath: selectedFirstClaude.sourceFile.path))
         #expect(!FileManager.default.fileExists(atPath: selectedSecondCodex.sourceFile.path))
-        #expect(FileManager.default.fileExists(atPath: selectedOpenCode.sourceFile.path))
+        #expect(!FileManager.default.fileExists(atPath: selectedOpenCode.sourceFile.path))
         #expect(FileManager.default.fileExists(atPath: unselectedFirstClaude.sourceFile.path))
-        #expect(store.conversations.map(\.id).sorted() == [selectedOpenCode.id, unselectedFirstClaude.id].sorted())
+        #expect(store.conversations.map(\.id) == [unselectedFirstClaude.id])
         #expect(store.errorMessage == nil)
     }
 

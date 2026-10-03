@@ -181,18 +181,4 @@ struct ConversationStoreDeletionTests {
         #expect(!store.isDeletingSessions)
         #expect(sandbox.fileExists(for: conversation))
     }
-
-    @Test func unsupportedOpenCodeSessionsAreNeverDeleted() throws {
-        let sandbox = try DeletionSandbox()
-        defer { sandbox.remove() }
-        let conversation = try sandbox.savedConversation(.opencode)
-        let store = sandbox.makeStore(listing: [conversation])
-
-        store.delete(conversation)
-        store.deleteConversations([conversation])
-
-        #expect(!store.isDeletingSessions)
-        #expect(store.errorMessage == nil)
-        #expect(sandbox.fileExists(for: conversation))
-    }
 }

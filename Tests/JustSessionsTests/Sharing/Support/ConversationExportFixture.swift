@@ -13,6 +13,12 @@ enum ConversationExportFixture {
             }
             return fixture.conversation
         }
+        if provider == .opencode {
+            let database = try OpenCodeDatabaseFixture(file: directory.appendingPathComponent("opencode.db"))
+            try database.addSession("ses_exportfixture1")
+            try database.addUserPrompts((0..<entryCount).map(message(at:)), session: "ses_exportfixture1")
+            return .fixture(provider: .opencode, sessionID: "ses_exportfixture1", sourceFile: database.file)
+        }
         var records: [[String: Any]] = []
         for index in 0..<entryCount {
             let text = message(at: index)
@@ -26,7 +32,7 @@ enum ConversationExportFixture {
             case .pi:
                 records.append(["type": "message", "id": "entry-\(index)", "parentId": index == 0 ? NSNull() : "entry-\(index - 1)", "message": ["role": "user", "content": text]])
             case .antigravity, .opencode:
-                preconditionFailure("Use the database fixture for Antigravity; OpenCode is unsupported")
+                preconditionFailure("Antigravity and OpenCode sessions are databases, made above")
             }
         }
         let temporaryFile = try TranscriptTestFiles.write(records)

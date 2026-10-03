@@ -612,32 +612,32 @@
         }
       }
     },
-    "Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted.": {
+    "Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Claude Code、Antigravity 和 Pi 会话将移到废纸篓；Codex 和 Kiro CLI 会话将被永久删除。"
+            "value": "Claude Code、Antigravity 和 Pi 会话将移到废纸篓；Codex、Kiro CLI 和 OpenCode 会话将被永久删除。"
           }
         }
       }
     },
-    "Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.": {
+    "Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "本机的 Claude Code、Antigravity 和 Pi 会话将移到废纸篓。Codex、Kiro CLI 会话和 SSH 主机上的所有会话将被永久删除。"
+            "value": "本机的 Claude Code、Antigravity 和 Pi 会话将移到废纸篓。Codex、Kiro CLI、OpenCode 会话和 SSH 主机上的所有会话将被永久删除。"
           }
         }
       }
     },
-    "Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh <host>` must work without a password prompt, and the host needs rsync. Antigravity also needs python3; deleting its sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.": {
+    "Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh <host>` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "主机上的 Claude Code、Codex、Antigravity、Kiro CLI 和 Pi 会话会列在侧栏中，并通过 SSH 打开。请使用 ~/.ssh/config 中的主机别名或 user@hostname。`ssh <host>` 必须能够免密连接，主机还需要 rsync。Antigravity 需要 python3；删除会话还需要 lsof。在远程主机上安装 tmux，可让会话在断线或关闭标签后继续运行；点击会话即可重新连接。应用内置的 tmux 仅适用于此 Mac。"
+            "value": "主机上的 Claude Code、Codex、Antigravity、Kiro CLI、OpenCode 和 Pi 会话会列在侧栏中，并通过 SSH 打开。请使用 ~/.ssh/config 中的主机别名或 user@hostname。`ssh <host>` 必须能够免密连接，主机还需要 rsync。Antigravity 和 OpenCode 还需要 python3；删除 Antigravity 会话还需要 lsof。在远程主机上安装 tmux，可让会话在断线或关闭标签后继续运行；点击会话即可重新连接。应用内置的 tmux 仅适用于此 Mac。"
           }
         }
       }
@@ -1446,16 +1446,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "JustSessions 帮助"
-          }
-        }
-      }
-    },
-    "JustSessions can't delete %@ sessions yet.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JustSessions 暂不支持删除 %@ 会话。"
           }
         }
       }
@@ -2279,12 +2269,12 @@
         }
       }
     },
-    "Required: passwordless SSH, rsync, and the CLI (not OpenCode). Antigravity also needs python3, and lsof to delete sessions.": {
+    "Required: passwordless SSH, rsync, and the CLI. Antigravity and OpenCode also need python3; Antigravity needs lsof to delete sessions.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "需要免密 SSH、rsync 和对应的 CLI（不支持 OpenCode）。Antigravity 还需要 python3，删除会话时需要 lsof。"
+            "value": "需要免密 SSH、rsync 和对应的 CLI。Antigravity 和 OpenCode 还需要 python3；删除 Antigravity 会话时需要 lsof。"
           }
         }
       }

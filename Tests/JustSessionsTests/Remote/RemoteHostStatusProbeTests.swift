@@ -13,13 +13,14 @@ struct RemoteHostStatusProbeTests {
             codex
             pi
             opencode
+            gemini
 
             """
 
         let status = RemoteHostStatusProbe.status(inOutput: output)
 
         #expect(status.tmuxSessionNames == ["justsessions-claude-01a0cf02-2025-7990-8bb2-80feff2349d4"])
-        #expect(status.installedProviders == [.codex, .pi])
+        #expect(status.installedProviders == [.codex, .opencode, .pi])
     }
 
     @Test func noCLIsBelowTheHeadingMeansNoneAreInstalled() {
@@ -61,7 +62,6 @@ struct RemoteHostStatusProbeTests {
             timeout: 10
         )
 
-        // OpenCode runs only on this Mac, so the probe does not look for it.
-        #expect(RemoteHostStatusProbe.status(inOutput: try #require(output)).installedProviders == [.codex, .antigravity, .kiro, .pi])
+        #expect(RemoteHostStatusProbe.status(inOutput: try #require(output)).installedProviders == [.codex, .antigravity, .kiro, .opencode, .pi])
     }
 }

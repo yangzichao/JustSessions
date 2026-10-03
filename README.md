@@ -43,7 +43,7 @@ This README describes the current `main` branch. Reading windows and other recen
 
 ## Remote sessions over SSH
 
-**Use your Mac to continue Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions on a desktop or development server.** Add a passwordless SSH host with `rsync` and the CLI installed. The code and CLI stay on that machine; JustSessions caches session history locally.
+**Use your Mac to continue Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on a desktop or development server.** Add a passwordless SSH host with `rsync` and the CLI installed. The code and CLI stay on that machine; JustSessions caches session history locally.
 
 ![JustSessions displaying a Claude Code conversation on the dev-desktop SSH host alongside local projects and a build server](docs/images/remote-desktop-sessions.jpg)
 
@@ -90,12 +90,12 @@ App updates are delivered through Sparkle. [Getting started](docs/guides/getting
 | Capability | Claude Code | OpenAI Codex CLI | Google Antigravity CLI | Kiro CLI | OpenCode | Pi |
 | --- | --- | --- | --- | --- | --- | --- |
 | Browse, search, and resume local sessions | Yes | Yes | Yes | Yes | Yes | Yes |
-| Read a conversation preview | Yes | Yes | Yes | Yes | Not yet | Yes |
+| Read a conversation preview | Yes | Yes | Yes | Yes | Yes | Yes |
 | Branch a conversation from the app | Yes | Yes | Use `/fork` inside the CLI | Use `/rewind` inside the CLI | Yes | Yes |
-| Browse and manage sessions over SSH | Yes | Yes | Yes | Yes | Not yet | Yes |
-| Delete sessions from the app | Yes | Yes | Yes | Yes | Not yet | Yes |
+| Browse and manage sessions over SSH | Yes | Yes | Yes | Yes | Yes | Yes |
+| Delete sessions from the app | Yes | Yes | Yes | Yes | Yes | Yes |
 
-New session menus offer only installed CLIs. The sidebar filter includes CLIs that are installed or have saved sessions. Antigravity and Pi sessions on this Mac move to the Trash; SSH Antigravity management needs `python3`, and deletion also needs `lsof`. Kiro deletion uses its native CLI command; see the [storage guide](docs/guides/session-storage.md#session-locations).
+New session menus offer only installed CLIs. The sidebar filter includes CLIs that are installed or have saved sessions. Antigravity and Pi sessions on this Mac move to the Trash; SSH Antigravity and OpenCode management needs `python3`, and Antigravity deletion also needs `lsof`. Kiro and OpenCode deletion use their native CLI commands; see the [storage guide](docs/guides/session-storage.md#session-locations).
 
 Search matches project names and paths, session titles, and session IDs. It does not search the full conversation text. **Branch** forks a conversation; it does not create a Git branch.
 

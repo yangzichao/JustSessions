@@ -3,7 +3,7 @@ import Testing
 @testable import JustSessions
 
 struct ConversationExportLoadingTests {
-    @Test(arguments: [ConversationProvider.claude, .codex, .kiro, .pi, .antigravity])
+    @Test(arguments: ConversationProvider.allCases)
     func exportsEverySavedEntryAndUncutMessagesFromLocalOrMirroredFiles(_ provider: ConversationProvider) async throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -28,11 +28,8 @@ struct ConversationExportLoadingTests {
         }
     }
 
-    @Test func emptyUnsupportedAndMissingSessionsProduceExplicitErrors() async throws {
+    @Test func emptyAndMissingSessionsProduceExplicitErrors() async throws {
         await #expect(throws: ConversationExportError.self) { try await ConversationExportDocument.load([]) }
-        let unsupported = ConversationExportSelection(conversation: .fixture(provider: .opencode), title: "Unsupported")
-        #expect(!TranscriptLoader.supportsReading(.opencode))
-        await #expect(throws: ConversationExportError.self) { try await ConversationExportDocument.load([unsupported]) }
         let missing = ConversationExportSelection(conversation: .fixture(), title: "Missing")
         await #expect(throws: ConversationExportError.self) { try await ConversationExportDocument.load([missing]) }
         let file = try TranscriptTestFiles.write([])

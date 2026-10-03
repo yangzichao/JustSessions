@@ -4,13 +4,16 @@ import Foundation
 actor TranscriptPageSource {
     let file: URL
     let provider: ConversationProvider
+    /// Picks the session out of a database that holds every session, as OpenCode's does.
+    let sessionID: String?
     let limits: TranscriptPageLimits
     private var fileIndex: TranscriptFileIndex?
     private var piRecordIndices: [Int]?
 
-    init(file: URL, provider: ConversationProvider, limits: TranscriptPageLimits = TranscriptPageLimits()) {
+    init(file: URL, provider: ConversationProvider, sessionID: String? = nil, limits: TranscriptPageLimits = TranscriptPageLimits()) {
         self.file = file
         self.provider = provider
+        self.sessionID = sessionID
         self.limits = limits
     }
 
@@ -18,6 +21,10 @@ actor TranscriptPageSource {
         try Task.checkCancellation()
         if provider == .antigravity {
             return try AntigravityTranscriptPageSource.read(file, request: request, limits: limits)
+        }
+        if provider == .opencode {
+            guard let sessionID else { throw OpenCodeDatabaseError.unreadable }
+            return try OpenCodeTranscriptPageSource.read(file, sessionID: sessionID, request: request, limits: limits)
         }
         if fileIndex == nil || refreshIndex {
             fileIndex = try TranscriptFileIndex.read(file)

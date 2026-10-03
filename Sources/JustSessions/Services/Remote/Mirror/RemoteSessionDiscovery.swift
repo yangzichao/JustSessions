@@ -20,6 +20,7 @@ struct RemoteSessionDiscovery: Sendable {
             AntigravityAdapter(configurationDirectory: mirror.mirrorDirectory(host: host, provider: .antigravity)),
             KiroAdapter(sessionsDirectory: mirror.mirrorDirectory(host: host, provider: .kiro)),
             PiAdapter(sessionsDirectory: mirror.mirrorDirectory(host: host, provider: .pi)),
+            OpenCodeAdapter(databaseFile: mirror.mirrorDirectory(host: host, provider: .opencode).appendingPathComponent("opencode.db")),
         ]
         return try adapters.flatMap { try $0.discover() }.map { $0.onHost(.ssh(host)) }
     }

@@ -41,6 +41,10 @@ struct RemoteSessionMirror: Sendable {
             try AntigravityRemoteSessionMirror().synchronize(host: host, sourceHomeOverride: sourceHomeOverride, destination: destination)
             return
         }
+        if provider == .opencode {
+            try OpenCodeRemoteSessionMirror().synchronize(host: host, sourceHomeOverride: sourceHomeOverride, destination: destination)
+            return
+        }
         let remoteFolder = Self.remoteFolder(for: provider)
         let source = sourceHomeOverride.map { "\($0)/\(remoteFolder)/" } ?? "\(host):\(remoteFolder)/"
 
@@ -69,12 +73,15 @@ struct RemoteSessionMirror: Sendable {
     }
 
     /// No `--prune-empty-dirs`: it drops a project folder whose last session was deleted from the transfer,
-    /// and `--delete` then never removes that session from the mirror.
+    /// and `--delete` then never removes that session from the mirror. OpenCode's snapshot is rebuilt for every
+    /// copy, and macOS's `rsync` compares file dates in whole seconds, so a snapshot of the same size made within
+    /// the same second would look unchanged; `--ignore-times` compares its contents instead.
     static func rsyncArguments(for provider: ConversationProvider, source: String, destination: String) -> [String] {
         [
             "--archive", "--delete",
             "-e", rsyncRemoteShell,
         ]
+            + (provider == .opencode ? ["--ignore-times"] : [])
             + includedPatterns(for: provider).map { "--include=\($0)" }
             + ["--exclude=*", source, destination]
     }
@@ -83,7 +90,8 @@ struct RemoteSessionMirror: Sendable {
     static let rsyncRemoteShell = (["ssh"] + RemoteHostCommandRunner.nonInteractiveSSHOptions).joined(separator: " ")
 
     /// Only the files the adapters read; Claude Code's subagent transcripts and caches stay on the host, and so do
-    /// the subagent runs, forks, and artifacts Pi extensions keep in folders inside a Pi project folder.
+    /// the subagent runs, forks, and artifacts Pi extensions keep in folders inside a Pi project folder. OpenCode's
+    /// database is copied from a snapshot that holds only its sessions.
     static func includedPatterns(for provider: ConversationProvider) -> [String] {
         switch provider {
         case .claude:
@@ -98,7 +106,7 @@ struct RemoteSessionMirror: Sendable {
         case .pi:
             ["/*/", "/*/*.jsonl"]
         case .opencode:
-            []
+            ["/opencode.db"]
         }
     }
 

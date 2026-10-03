@@ -114,12 +114,12 @@
 	<string>Choose a session in the sidebar to read its conversation.</string>
 	<key>Choose or enter a folder</key>
 	<string>Choose or enter a folder</string>
-	<key>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted.</key>
-	<string>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted.</string>
-	<key>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.</key>
-	<string>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex and Kiro CLI sessions and all sessions on SSH hosts are permanently deleted.</string>
-	<key>Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity also needs python3; deleting its sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
-	<string>Claude Code, Codex, Antigravity, Kiro CLI, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity also needs python3; deleting its sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</string>
+	<key>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.</key>
+	<string>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.</string>
+	<key>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</key>
+	<string>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</string>
+	<key>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
+	<string>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</string>
 	<key>Clear search</key>
 	<string>Clear search</string>
 	<key>Close %@</key>
@@ -262,8 +262,6 @@
 	<string>JustSessions</string>
 	<key>JustSessions Help</key>
 	<string>JustSessions Help</string>
-	<key>JustSessions can't delete %@ sessions yet.</key>
-	<string>JustSessions can't delete %@ sessions yet.</string>
 	<key>JustSessions can't read %@ conversations yet. Resume the session to see it.</key>
 	<string>JustSessions can't read %@ conversations yet. Resume the session to see it.</string>
 	<key>JustSessions on GitHub</key>
@@ -430,8 +428,8 @@
 	<string>Reopen the tabs that were open when JustSessions quit</string>
 	<key>Report an issue ↗</key>
 	<string>Report an issue ↗</string>
-	<key>Required: passwordless SSH, rsync, and the CLI (not OpenCode). Antigravity also needs python3, and lsof to delete sessions.</key>
-	<string>Required: passwordless SSH, rsync, and the CLI (not OpenCode). Antigravity also needs python3, and lsof to delete sessions.</string>
+	<key>Required: passwordless SSH, rsync, and the CLI. Antigravity and OpenCode also need python3; Antigravity needs lsof to delete sessions.</key>
+	<string>Required: passwordless SSH, rsync, and the CLI. Antigravity and OpenCode also need python3; Antigravity needs lsof to delete sessions.</string>
 	<key>Restore Defaults</key>
 	<string>Restore Defaults</string>
 	<key>Resume</key>

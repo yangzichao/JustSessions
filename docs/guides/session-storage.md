@@ -12,12 +12,14 @@ JustSessions reads the session files your CLIs already create. It does not uploa
 | OpenAI Codex CLI | `~/.codex/sessions` (honors `CODEX_HOME`) | Yes | Yes | Yes |
 | Google Antigravity CLI | `~/.gemini/antigravity-cli/conversations` | Yes | Use `/fork` after resuming | Yes |
 | Kiro CLI | `~/.kiro/sessions/cli` (honors `KIRO_HOME`) | Yes | Use `/rewind` after resuming | Yes |
-| OpenCode | `~/.local/share/opencode/opencode.db`, read-only (honors `OPENCODE_DB` and `XDG_DATA_HOME`) | Not yet | Yes | No |
+| OpenCode | `~/.local/share/opencode/opencode.db`, read-only (honors `OPENCODE_DB` and `XDG_DATA_HOME`) | Yes | Yes | Yes |
 | Pi | `~/.pi/agent/sessions` (honors `PI_CODING_AGENT_SESSION_DIR`, `sessionDir` in Pi's `settings.json`, and `PI_CODING_AGENT_DIR`) | Yes | Yes | Yes |
 
 Kiro CLI sessions are listed once they have a message; sessions a subagent started are left out. OpenCode subagent sessions and archived sessions are left out too.
 
 Kiro previews show prompts, replies, and collapsed tool calls from the session's `.jsonl` log. Thinking blocks, system context, and raw tool outputs are left out, as in the other supported previews.
+
+OpenCode previews read one session out of its database: prompts, replies, and collapsed tool calls, in the order OpenCode shows them. Text OpenCode adds to a prompt, such as the contents of a mentioned file, is left out, and so are reasoning, tool output, and step markers. Attachments a prompt doesn't mention show as `[Image]` or `[File: name]`. After `/undo`, the undone messages are hidden, as in OpenCode, and a note says `/redo` restores them. OpenCode sessions are permanently deleted using its native `opencode session delete <session-id>` command, pointed at the database the session was listed from; it also deletes the session's subagent sessions.
 
 Kiro CLI sessions are permanently deleted using its native `kiro-cli chat --delete-session <session-id>` command. Deletion requires an installed Kiro CLI that supports this command; CLI errors are shown without falling back to removing files. See [Kiro's session management documentation](https://kiro.dev/docs/cli/chat/session-management/).
 
@@ -58,5 +60,7 @@ SSH hosts must accept `ssh <host>` without a password prompt and need `rsync`. T
 The mirror uses the standard `~/.claude`, `~/.codex`, `~/.gemini/antigravity-cli`, `~/.kiro/sessions/cli`, and `~/.pi/agent/sessions` locations on the remote host. Custom `CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `KIRO_HOME`, `PI_CODING_AGENT_DIR`, `PI_CODING_AGENT_SESSION_DIR`, and Pi `sessionDir` support in the table above applies to this Mac; on a host, Pi sessions saved anywhere else are not listed. Kiro mirroring copies only session metadata and transcript files, excluding lock files, prompt history, and nested subagent folders.
 
 Pi mirroring copies only the session files directly inside each project folder, `<project>/<timestamp>_<session-id>.jsonl`. What Pi extensions keep inside a project folder stays on the host: the folder beside each session with its subagent runs and forks, and `subagent-artifacts`. Deleting a Pi session over SSH is permanent, because SSH hosts have no Trash. It removes the folder beside the session file, then the file, and only within `~/.pi/agent/sessions`. It refuses a session file or project folder that is a symbolic link, and a file whose first line is not that session's header; a symbolically linked folder beside the session is left in place.
+
+OpenCode SSH hosts also need `python3`. The host's login shell decides where its database is, following `OPENCODE_DB` and `XDG_DATA_HOME` as on this Mac. Each refresh builds a temporary snapshot there of the listed sessions only: their messages without tool output, attachments, or reasoning. OpenCode's accounts, credentials, event log, archived sessions, and subagent sessions stay on the host, and the snapshot is removed after transfer. Deleting an OpenCode session over SSH runs `opencode session delete` on the host against that same database.
 
 Antigravity SSH hosts also need `python3`. SQLite backup snapshots include committed WAL updates; only conversation databases and their summary index are copied, excluding credentials, settings, brain artifacts, and annotations. Temporary snapshots are removed after transfer. Antigravity deletion over SSH additionally needs `lsof` to reject sessions open in another process. It validates the host database's session ID and workspace, stages its database and companions before committing the index change, and then permanently removes them. A failure before commit restores the files and rolls back the index.

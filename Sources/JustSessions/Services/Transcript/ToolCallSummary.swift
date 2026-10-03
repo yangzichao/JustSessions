@@ -5,7 +5,7 @@ enum ToolCallSummary {
     static let maximumLength = 240
 
     private static let descriptiveArgumentKeys = [
-        "command", "cmd", "file_path", "path", "pattern", "url", "query",
+        "command", "cmd", "file_path", "filePath", "path", "pattern", "url", "query",
         "description", "title", "task_name", "message", "prompt",
     ]
 

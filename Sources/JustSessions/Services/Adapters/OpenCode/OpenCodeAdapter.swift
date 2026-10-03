@@ -4,6 +4,7 @@ import Foundation
 /// source file is that database.
 struct OpenCodeAdapter: ConversationAdapter {
     let databaseFile: URL
+    let deletionExecutableURL: URL?
     var provider: ConversationProvider { .opencode }
 
     /// `OPENCODE_DB` when it is an absolute path, or else `opencode.db` in `$XDG_DATA_HOME/opencode`
@@ -19,8 +20,9 @@ struct OpenCodeAdapter: ConversationAdapter {
         return URL(fileURLWithPath: dataHome).appendingPathComponent("opencode/opencode.db")
     }
 
-    init(databaseFile: URL = OpenCodeAdapter.standardDatabaseFile()) {
+    init(databaseFile: URL = OpenCodeAdapter.standardDatabaseFile(), deletionExecutableURL: URL? = nil) {
         self.databaseFile = databaseFile
+        self.deletionExecutableURL = deletionExecutableURL
     }
 
     func discover() throws -> [Conversation] {
@@ -55,6 +57,6 @@ struct OpenCodeAdapter: ConversationAdapter {
     }
 
     func delete(_ conversation: Conversation) throws {
-        throw ConversationDeletionError.unsupported(provider)
+        try OpenCodeConversationDeletion(databaseFile: databaseFile, executableURL: deletionExecutableURL).delete(conversation)
     }
 }

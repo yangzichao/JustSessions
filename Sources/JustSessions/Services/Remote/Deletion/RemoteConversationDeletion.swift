@@ -1,8 +1,8 @@
 import Foundation
 
 /// Deletes a session on its remote host over SSH. Remote hosts have no Trash, so this is permanent.
-/// Claude Code and Antigravity lose their stored history and index entry; Codex and Kiro use their native CLIs;
-/// Pi loses its session file and the folder beside it. A session already gone from the host counts as deleted.
+/// Claude Code and Antigravity lose their stored history and index entry; Codex, Kiro, and OpenCode use their
+/// native CLIs; Pi loses its session file and the folder beside it. A session already gone from the host counts as deleted.
 struct RemoteConversationDeletion: Sendable {
     let runner: RemoteHostCommandRunner
     /// Where the host's sessions were copied, so a Pi session's file is found relative to that host's Pi mirror.
@@ -18,7 +18,7 @@ struct RemoteConversationDeletion: Sendable {
 
     func delete(_ conversation: Conversation) throws {
         guard let host = conversation.host.sshDestination,
-              ConversationMetadata.isValidSessionID(conversation.sessionID) else {
+              conversation.provider.isValidSessionID(conversation.sessionID) else {
             throw ConversationDeletionError.invalidSource
         }
         let command: String
@@ -54,7 +54,8 @@ struct RemoteConversationDeletion: Sendable {
                 sessionID: conversation.sessionID
             )
         case .opencode:
-            throw ConversationDeletionError.invalidSource
+            _ = try RemoteOpenCodeConversationDeletion.validatedMirrorDatabase(for: conversation, mirror: mirror, host: host)
+            command = RemoteOpenCodeConversationDeletion.command(sessionID: conversation.sessionID)
         }
 
         guard let result = runner.run(host, command, 60) else { throw RemoteConversationDeletionError.couldNotRun(host: host) }
@@ -66,12 +67,12 @@ struct RemoteConversationDeletion: Sendable {
                 host: host,
                 details: SSHConnectionProblem.tellingLine(inOutput: result.output) ?? "exit status \(result.exitStatus)"
             )
-        case Self.missingTranscriptExitStatus where [.claude, .kiro, .antigravity, .pi].contains(conversation.provider):
+        case Self.missingTranscriptExitStatus where [.claude, .kiro, .antigravity, .opencode, .pi].contains(conversation.provider):
             // Already gone, for example deleted just before a dropped connection hid the result: it counts as
             // deleted.
             removeMirrorCopies(of: conversation)
         default:
-            let details = result.output.trimmingCharacters(in: .whitespacesAndNewlines)
+            let details = TerminalEscapeSequences.removed(from: result.output).trimmingCharacters(in: .whitespacesAndNewlines)
             throw RemoteConversationDeletionError.failed(
                 host: host,
                 details: details.isEmpty ? "exit status \(result.exitStatus)" : String(details.suffix(500))
@@ -81,6 +82,10 @@ struct RemoteConversationDeletion: Sendable {
 
     /// The mirror would drop the session on the next copy; dropping it now keeps the list right until then.
     private func removeMirrorCopies(of conversation: Conversation) {
+        if conversation.provider == .opencode {
+            RemoteOpenCodeConversationDeletion.removeMirrorRows(of: conversation.sessionID, from: conversation.sourceFile)
+            return
+        }
         try? FileManager.default.removeItem(at: conversation.sourceFile)
         if conversation.provider == .kiro {
             try? FileManager.default.removeItem(at: conversation.sourceFile.deletingPathExtension().appendingPathExtension("json"))

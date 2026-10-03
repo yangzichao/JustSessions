@@ -6,7 +6,7 @@ struct HelpRemoteHostSection: View {
             Label("Set up an SSH host", systemImage: "network")
                 .font(.headline)
             Text("**Install tmux on the host** so sessions survive a dropped connection or a closed tab. Built-in tmux is only for this Mac.")
-            Text("Required: passwordless SSH, rsync, and the CLI (not OpenCode). Antigravity also needs python3, and lsof to delete sessions.")
+            Text("Required: passwordless SSH, rsync, and the CLI. Antigravity and OpenCode also need python3; Antigravity needs lsof to delete sessions.")
                 .foregroundStyle(ThemePalette.secondaryText)
             Text("Check `tmux -V` on the host, then choose **Add SSH host…** in the sidebar.")
         }

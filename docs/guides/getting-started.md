@@ -29,7 +29,7 @@ Sparkle delivers subsequent app updates. Your CLI provider's plans and charges s
 2. Select a supported session to read its conversation preview.
 3. Double-click a session or choose **Resume** to open its CLI in the original working directory.
 
-A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing and resume; current source builds provide previews for Claude Code, Codex, Antigravity, Kiro CLI, and Pi. See the [full capability table](../../README.md#supported-clis) and [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest) for the packaged app.
+A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing and resume; current source builds provide previews for all of them. See the [full capability table](../../README.md#supported-clis) and [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest) for the packaged app.
 
 In current source builds, choose **Read** to open a dedicated reading window. Adjust text with **A− / A+**, switch between a readable column and the full window width, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
 
@@ -37,13 +37,13 @@ In current source builds, choose **Read** to open a dedicated reading window. Ad
 
 ## Use another machine over SSH
 
-The remote machine must accept `ssh <host>` without a password prompt and have `rsync` and Claude Code, Codex, Antigravity, Kiro CLI, or Pi installed.
+The remote machine must accept `ssh <host>` without a password prompt and have `rsync` and Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, or Pi installed.
 
 1. Choose **Add SSH host…** in the sidebar.
 2. Enter a `~/.ssh/config` alias or `user@hostname`.
 3. Browse its projects and resume a session on that host.
 
-Antigravity SSH hosts also need `python3`; deleting its sessions there needs `lsof`.
+Antigravity and OpenCode SSH hosts also need `python3`; deleting Antigravity sessions there needs `lsof`.
 
 The code and CLI run remotely. Supported session files are cached on your Mac. This is terminal access, not graphical remote desktop control. [SSH setup and limits](session-management.md#ssh-hosts).
 
@@ -58,7 +58,7 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 - Clear the CLI and recent-session filters, then refresh the sidebar.
 - Confirm the CLI executable works in your usual terminal. New session menus offer only installed CLIs.
 - Start one conversation in the CLI so it has history for the app to discover. Kiro sessions need at least one message; OpenCode archived and subagent sessions are excluded.
-- Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders.
+- Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders, and the OpenCode database its login shell points to.
 - For SSH, confirm passwordless access, `rsync`, and the remote CLI before adding the host.
 
 ## Appearance, privacy, and help

@@ -69,7 +69,7 @@
         <h2 id="resume-title">Find and resume a session</h2>
         <ol>
           <li>Search a project name or path, session title, or session ID.</li>
-          <li>Select a Claude Code, Codex, Antigravity, Kiro CLI, or Pi session to read its conversation preview.</li>
+          <li>Select a session to read its conversation preview.</li>
           <li>Double-click a session or choose <strong>Resume</strong> to continue in its original CLI and project folder.</li>
         </ol>
         <p>A session whose CLI is already running opens on that process with one click. <strong>New session</strong> starts an installed CLI; a project's <strong>+ → Terminal</strong> opens your login shell. Search does not include conversation text.</p>
@@ -98,7 +98,7 @@
               <tr data-provider="codex"><th scope="row">OpenAI Codex CLI <code>codex</code></th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
               <tr data-provider="antigravity"><th scope="row">Google Antigravity CLI <code>agy</code></th><td>Yes</td><td><code>/fork</code> in CLI</td><td>Yes</td><td>Yes</td></tr>
               <tr data-provider="kiro"><th scope="row">Kiro CLI <code>kiro-cli</code></th><td>Yes</td><td>Use <code>/rewind</code> in the CLI</td><td>Yes</td><td>Yes</td></tr>
-              <tr data-provider="opencode"><th scope="row">OpenCode <code>opencode</code></th><td>Not yet</td><td>Yes</td><td>Not yet</td><td>Not yet</td></tr>
+              <tr data-provider="opencode"><th scope="row">OpenCode <code>opencode</code></th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
               <tr data-provider="pi"><th scope="row">Pi <code>pi</code></th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
             </tbody>
           </table>
@@ -108,8 +108,8 @@
 
       <section id="ssh-hosts" aria-labelledby="ssh-title">
         <h2 id="ssh-title">Continue on another machine over SSH</h2>
-        <p>Install <strong>tmux on the remote host</strong> so sessions survive a disconnect or closing a tab. The host also needs passwordless SSH, <code>rsync</code>, and Claude Code, Codex, Antigravity, Kiro CLI, or Pi installed.</p>
-        <p class="fine-print">Antigravity hosts also need <code>python3</code>; deleting their sessions needs <code>lsof</code>.</p>
+        <p>Install <strong>tmux on the remote host</strong> so sessions survive a disconnect or closing a tab. The host also needs passwordless SSH, <code>rsync</code>, and Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, or Pi installed.</p>
+        <p class="fine-print">Antigravity and OpenCode hosts also need <code>python3</code>; deleting Antigravity sessions needs <code>lsof</code>.</p>
         <ol><li>Choose <strong>Add SSH host…</strong> in the sidebar.</li><li>Enter a <code>~/.ssh/config</code> alias or <code>user@hostname</code>.</li><li>Browse the host's projects and resume a session there.</li></ol>
         <p>The code and CLI run remotely; supported history is cached on your Mac. JustSessions provides terminal access, not graphical screen sharing.</p>
         <a class="text-link" href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-management.md#ssh-hosts">Detailed SSH setup <span aria-hidden="true">↗</span></a>
@@ -127,7 +127,7 @@
           <li>Clear the CLI and recent-session filters, then refresh the sidebar.</li>
           <li>Confirm the CLI runs in your usual terminal. New session menus offer only installed tools.</li>
           <li>Start one conversation so the CLI creates history. Kiro sessions need a message; archived and subagent OpenCode sessions are excluded.</li>
-          <li>For SSH, check passwordless access, <code>rsync</code>, and the remote CLI. Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders.</li>
+          <li>For SSH, check passwordless access, <code>rsync</code>, and the remote CLI. Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders, and the OpenCode database its login shell points to.</li>
         </ul>
       </section>
 
