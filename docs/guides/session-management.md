@@ -50,6 +50,8 @@ These instructions follow the current source build. Check the [latest release no
 
 These shortcuts work while the CLI has keyboard focus. From a session preview, next/previous selects the first/last open terminal tab. ⌘W stays disabled in a preview while terminal tabs are open; with no tabs, it closes the window. The **File** and **Tabs** menus list the commands.
 
+To copy terminal text, hold Shift while dragging to select it, then press ⌘C. In a tmux tab, a plain drag also copies when you let go.
+
 ## Notifications
 
 JustSessions posts a macOS notification when a Claude Code or Codex session on this Mac finishes its turn, or stops in the middle of one to wait on you, such as at a permission prompt. Click the notification to open the session: its tab, or a new tab that reattaches to its CLI in tmux.

@@ -160,8 +160,6 @@
 	<string>Copy project path</string>
 	<key>Copy saved messages and tool-call summaries as Markdown</key>
 	<string>Copy saved messages and tool-call summaries as Markdown</string>
-	<key>Copy selection</key>
-	<string>Copy selection</string>
 	<key>Copy session ID</key>
 	<string>Copy session ID</string>
 	<key>Copying sessions…</key>
@@ -256,8 +254,6 @@
 	<string>Hide sidebar</string>
 	<key>Hide sidebar (⌃⌘S)</key>
 	<string>Hide sidebar (⌃⌘S)</string>
-	<key>Hold Shift while dragging to select terminal text, then copy it (⌘C)</key>
-	<string>Hold Shift while dragging to select terminal text, then copy it (⌘C)</string>
 	<key>Host</key>
 	<string>Host</string>
 	<key>Interface language</key>

@@ -4,7 +4,6 @@ import SwiftTerm
 
 /// Keeps the embedded CLI terminal usable as a native text surface.
 final class SelectableTerminalView: LocalProcessTerminalView {
-    var onSelectionChanged: ((Bool) -> Void)?
     /// For a tab whose CLI runs in tmux on this Mac. SwiftTerm tells Shift-Return from Return only once the CLI
     /// turns on the kitty keyboard protocol, which tmux never does with the tab. So the tab sends Shift-Return as
     /// CSI u itself, and tmux hands it to the CLI unchanged; see `ThisMacTmuxServer.globalOptions`.
@@ -46,11 +45,6 @@ final class SelectableTerminalView: LocalProcessTerminalView {
             return
         }
         super.interpretKeyEvents(eventArray)
-    }
-
-    override func selectionChanged(source: Terminal) {
-        super.selectionChanged(source: source)
-        onSelectionChanged?(selectionActive)
     }
 
     private func observeAppearance(in store: TerminalAppearanceStore, themeStore: AppThemeStore) {

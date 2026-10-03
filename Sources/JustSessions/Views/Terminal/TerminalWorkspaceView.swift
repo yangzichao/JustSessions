@@ -34,14 +34,6 @@ struct TerminalWorkspaceView: View {
                             .help("Connect again; a CLI still running in tmux on the host is reattached")
                     }
                 }
-                Button {
-                    session.copySelection()
-                } label: {
-                    Label("Copy selection", systemImage: "doc.on.doc")
-                }
-                .buttonStyle(.borderless)
-                .disabled(!session.hasSelection)
-                .help("Hold Shift while dragging to select terminal text, then copy it (⌘C)")
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)

@@ -39,7 +39,6 @@ final class TerminalSession: ObservableObject, Identifiable {
     @Published private(set) var isWaitingToBeShown: Bool
     @Published private(set) var hasExited = false
     @Published private(set) var exitCode: Int32?
-    @Published private(set) var hasSelection = false
     /// What the tab's CLI is doing, while it runs and tells; see `ConversationStore+CLIActivitySync`.
     @Published private(set) var cliActivity: CLIActivity?
 
@@ -95,9 +94,6 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.processObserver = TerminalProcessObserver()
         terminalView.sendsShiftReturnAsCSIu = host == .thisMac && tmuxSessionName != nil
         terminalView.processDelegate = processObserver
-        terminalView.onSelectionChanged = { [weak self] hasSelection in
-            self?.hasSelection = hasSelection
-        }
         processObserver.session = self
     }
 
@@ -143,11 +139,6 @@ final class TerminalSession: ObservableObject, Identifiable {
     func updateDisplayTitle(_ title: String) {
         guard displayTitle != title else { return }
         displayTitle = title
-    }
-
-    func copySelection() {
-        guard terminalView.selectionActive else { return }
-        terminalView.copy(self)
     }
 
     func close() {
