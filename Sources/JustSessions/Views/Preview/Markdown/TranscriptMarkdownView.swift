@@ -2,18 +2,20 @@ import SwiftUI
 
 struct TranscriptMarkdownView: View {
     @Environment(\.transcriptReadingFontSize) private var fontSize
-    let text: String
-    var prepared: PreparedTranscriptMarkdown?
-    @State private var fallback: PreparedTranscriptMarkdown?
+    private let markdown: PreparedTranscriptMarkdown
 
-    private var blocks: [TranscriptMarkdownBlock] { (prepared ?? fallback)?.blocks ?? [] }
-    private var segmentStarts: [Int: Int] { (prepared ?? fallback)?.segmentStarts ?? [:] }
+    /// Pages prepare their Markdown on the reader actor. A transcript built any other way is prepared here, before its
+    /// first layout, so the message never changes height after the reader has restored a position.
+    init(text: String, prepared: PreparedTranscriptMarkdown?) {
+        markdown = prepared ?? PreparedTranscriptMarkdown(text: text)
+    }
+
+    private var blocks: [TranscriptMarkdownBlock] { markdown.blocks }
+    private var segmentStarts: [Int: Int] { markdown.segmentStarts }
 
     var body: some View {
         Group {
-            if prepared == nil && fallback == nil {
-                Text(verbatim: text)
-            } else if let paragraph = singleParagraph {
+            if let paragraph = singleParagraph {
                 TranscriptSearchableText(source: TranscriptReadingTypography.inlineText(paragraph, fontSize: fontSize), fontSize: fontSize)
                     .textSelection(.enabled)
             } else {
@@ -23,13 +25,6 @@ struct TranscriptMarkdownView: View {
         .font(.system(size: fontSize))
         .lineSpacing(4)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .task(id: text) {
-            guard prepared == nil else { return }
-            fallback = nil
-            let task = Task.detached(priority: .userInitiated) { PreparedTranscriptMarkdown(text: text) }
-            let result = await withTaskCancellationHandler { await task.value } onCancel: { task.cancel() }
-            if !Task.isCancelled { fallback = result }
-        }
     }
 
     /// Plain messages need only one text view, keeping their lazy scroll measurements inexpensive and stable.
