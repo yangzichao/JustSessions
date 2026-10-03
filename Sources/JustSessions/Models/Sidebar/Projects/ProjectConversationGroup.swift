@@ -7,19 +7,33 @@ struct ProjectConversationGroup: Identifiable {
     let conversations: [Conversation]
     /// Newest first; listed above the conversations.
     let pendingNewSessions: [PendingNewSession]
+    /// Pinned sessions come first, so the newest one is not necessarily `conversations.first`. Stored, not worked
+    /// out on each read: `orderedForSidebar` reads it on every comparison of a sort that runs on every render.
+    let latestActivity: Date
+
+    init(
+        projectPath: String,
+        displayName: String,
+        isPinned: Bool,
+        conversations: [Conversation],
+        pendingNewSessions: [PendingNewSession]
+    ) {
+        self.projectPath = projectPath
+        self.displayName = displayName
+        self.isPinned = isPinned
+        self.conversations = conversations
+        self.pendingNewSessions = pendingNewSessions
+        latestActivity = max(
+            conversations.map(\.updatedAt).max() ?? .distantPast,
+            pendingNewSessions.map(\.startedAt).max() ?? .distantPast
+        )
+    }
 
     var id: String { projectPath }
     var location: ProjectLocation { ProjectLocation(key: projectPath) }
     var host: SessionHost { location.host }
     var folderName: String { ProjectDisplayNames.folderName(forProjectPath: projectPath) }
     var sessionCount: Int { conversations.count + pendingNewSessions.count }
-    // Pinned sessions come first, so the newest one is not necessarily `conversations.first`.
-    var latestActivity: Date {
-        max(
-            conversations.map(\.updatedAt).max() ?? .distantPast,
-            pendingNewSessions.map(\.startedAt).max() ?? .distantPast
-        )
-    }
 
     var canStartNewSession: Bool { location.canStartSessions }
 

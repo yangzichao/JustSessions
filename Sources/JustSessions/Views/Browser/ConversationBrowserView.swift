@@ -16,17 +16,12 @@ struct ConversationBrowserView: View {
     @SceneStorage("isSidebarHidden") private var isSidebarHidden = false
     @StateObject private var updateManager = SparkleUpdateManager()
 
-    private var providerConversations: [Conversation] {
-        store.sidebarConversations.filter { providerFilter.includes($0.provider) }
-    }
-
-    private var sidebarProjects: [ProjectConversationGroup] {
-        let projects = SidebarProjectFiltering.projects(
-            store.sidebarProjectGroups,
+    private var filteredProjection: FilteredSidebarProjection {
+        store.filteredSidebarProjection(
             providerFilter: providerFilter,
-            recencyFilter: recencyFilter
+            recencyFilter: recencyFilter,
+            searchText: searchText
         )
-        return SidebarProjectFiltering.projects(projects, matching: searchText) { store.title(for: $0) }
     }
 
     /// Projects on every host that a new session can start in, most recent first.
@@ -40,7 +35,7 @@ struct ConversationBrowserView: View {
     }
 
     var body: some View {
-        let providerConversations = providerConversations
+        let filteredProjection = filteredProjection
 
         ResizableSidebarLayout(isSidebarHidden: isSidebarHidden) {
             ConversationSidebarView(
@@ -49,9 +44,9 @@ struct ConversationBrowserView: View {
                 recencyFilter: $recencyFilter,
                 providerFilter: $providerFilter,
                 sessionSelection: $sessionSelection,
-                projects: sidebarProjects,
-                allSessionCount: providerConversations.count,
-                recentSessionCount: providerConversations.filter { SessionRecencyFilter.recent.includes($0) }.count,
+                projects: filteredProjection.projects,
+                allSessionCount: filteredProjection.allSessionCount,
+                recentSessionCount: filteredProjection.recentSessionCount,
                 onCheckForUpdates: { updateManager.checkForUpdates() },
                 onNewSession: { newSessionSheetHost = defaultNewSessionHost },
                 onNewSessionOnHost: { newSessionSheetHost = $0 },

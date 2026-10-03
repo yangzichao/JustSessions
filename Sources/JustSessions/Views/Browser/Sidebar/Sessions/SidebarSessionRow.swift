@@ -58,7 +58,7 @@ struct SidebarSessionRow: View {
             }
         }
         .buttonStyle(.plain)
-        .help("\(title) · \(conversation.provider.rawValue) · \(conversation.updatedAt.formatted(date: .abbreviated, time: .shortened))\(statusDescription.map { " · \($0)" } ?? "")")
+        .help("\(title) · \(conversation.provider.rawValue) · \(SidebarSessionDateText.shared.text(for: conversation.updatedAt))\(statusDescription.map { " · \($0)" } ?? "")")
         .accessibilityLabel("\(title), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(statusDescription.map { ", \($0)" } ?? "")")
         .contextMenu {
             if isInMultipleSelection {

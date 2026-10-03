@@ -16,6 +16,8 @@ final class ConversationStore: ObservableObject {
     private(set) var conversationsRevision = 0
     /// What the sidebar lists, kept until what it was worked out from changes; see `ConversationStore+SidebarProjects`.
     var cachedSidebarProjection: SidebarProjection?
+    /// What the browser last showed for its filters, kept the same way; see `ConversationStore+SidebarProjects`.
+    var cachedFilteredSidebarProjection: FilteredSidebarProjection?
     /// What the main window's alert shows, if anything.
     @Published private(set) var alert: StoreAlert?
     /// Alerts that came while `alert` was shown. Each is shown once the ones before it are dismissed, since
