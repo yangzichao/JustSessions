@@ -30,8 +30,6 @@
 	<string>%@, %@%@%@</string>
 	<key>%@, %@, open terminal, not saved yet</key>
 	<string>%@, %@, open terminal, not saved yet</string>
-	<key>%@, by host and project. It reads the history they already save: no import, no account.</key>
-	<string>%@, by host and project. It reads the history they already save: no import, no account.</string>
 	<key>%lld</key>
 	<string>%lld</string>
 	<key>%lld earlier entries are not shown. Resume the session to see all of it.</key>
@@ -50,8 +48,8 @@
 	<string>%lld sessions with open terminals will be skipped.</string>
 	<key>%lld tool calls</key>
 	<string>%lld tool calls</string>
-	<key>**Install tmux on the host** so sessions survive a dropped connection or a closed tab. Built-in tmux is only for this Mac.</key>
-	<string>**Install tmux on the host** so sessions survive a dropped connection or a closed tab. Built-in tmux is only for this Mac.</string>
+	<key>**Resume** continues in the original CLI and folder. **Branch** tries another approach.</key>
+	<string>**Resume** continues in the original CLI and folder. **Branch** tries another approach.</string>
 	<key>1 message</key>
 	<string>1 message</string>
 	<key>1 session with an open terminal will be skipped.</key>
@@ -72,10 +70,6 @@
 	<string>All</string>
 	<key>All tools</key>
 	<string>All tools</string>
-	<key>All your CLIs in one place</key>
-	<string>All your CLIs in one place</string>
-	<key>Also: search, pin, rename, and export sessions as Markdown. Claude Code and Codex on this Mac can notify you when they finish or need input. Features vary by CLI.</key>
-	<string>Also: search, pin, rename, and export sessions as Markdown. Claude Code and Codex on this Mac can notify you when they finish or need input. Features vary by CLI.</string>
 	<key>Appearance</key>
 	<string>Appearance</string>
 	<key>Applies immediately to all terminals. Some CLI apps use their own colors.</key>
@@ -92,14 +86,14 @@
 	<string>Cancel</string>
 	<key>Cancel deletion</key>
 	<string>Cancel deletion</string>
-	<key>Check `tmux -V` on the host, then choose **Add SSH host…** in the sidebar.</key>
-	<string>Check `tmux -V` on the host, then choose **Add SSH host…** in the sidebar.</string>
 	<key>Check for updates</key>
 	<string>Check for updates</string>
 	<key>Checking the folder on %@…</key>
 	<string>Checking the folder on %@…</string>
 	<key>Choose</key>
 	<string>Choose</string>
+	<key>Choose **Add SSH host…** in the sidebar. The host needs passwordless SSH, rsync, and the CLI.</key>
+	<string>Choose **Add SSH host…** in the sidebar. The host needs passwordless SSH, rsync, and the CLI.</string>
 	<key>Choose a session in the sidebar to read its conversation.</key>
 	<string>Choose a session in the sidebar to read its conversation.</string>
 	<key>Choose or enter a folder</key>
@@ -112,14 +106,16 @@
 	<string>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</string>
 	<key>Clear search</key>
 	<string>Clear search</string>
+	<key>Click a session to read it. Nothing runs.</key>
+	<string>Click a session to read it. Nothing runs.</string>
 	<key>Close %@</key>
 	<string>Close %@</string>
 	<key>Close Tab…</key>
 	<string>Close Tab…</string>
 	<key>Close Window</key>
 	<string>Close Window</string>
-	<key>Close a tab with **Keep running**, or quit the app. Built-in tmux keeps the CLI going; click the session to reattach.</key>
-	<string>Close a tab with **Keep running**, or quit the app. Built-in tmux keeps the CLI going; click the session to reattach.</string>
+	<key>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</key>
+	<string>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</string>
 	<key>Close search</key>
 	<string>Close search</string>
 	<key>Close search (Escape)</key>
@@ -136,8 +132,6 @@
 	<string>Colors</string>
 	<key>Connect again; a CLI still running in tmux on the host is reattached</key>
 	<string>Connect again; a CLI still running in tmux on the host is reattached</string>
-	<key>Continue in the original CLI and project folder, inside the app. **Branch** to try another approach.</key>
-	<string>Continue in the original CLI and project folder, inside the app. **Branch** to try another approach.</string>
 	<key>Copied</key>
 	<string>Copied</string>
 	<key>Copy</key>
@@ -204,6 +198,8 @@
 	<string>Export conversation</string>
 	<key>Export conversations</key>
 	<string>Export conversations</string>
+	<key>Find</key>
+	<string>Find</string>
 	<key>Find in conversation</key>
 	<string>Find in conversation</string>
 	<key>Find in conversation (⌘F)</key>
@@ -246,6 +242,10 @@
 	<string>Hide sidebar (⌃⌘S)</string>
 	<key>Host</key>
 	<string>Host</string>
+	<key>How it works</key>
+	<string>How it works</string>
+	<key>Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.</key>
+	<string>Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.</string>
 	<key>Interface language</key>
 	<string>Interface language</string>
 	<key>JustSessions</key>
@@ -254,8 +254,6 @@
 	<string>JustSessions Help</string>
 	<key>JustSessions on GitHub</key>
 	<string>JustSessions on GitHub</string>
-	<key>Keep it running</key>
-	<string>Keep it running</string>
 	<key>Keep running</key>
 	<string>Keep running</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
@@ -354,8 +352,6 @@
 	<string>Plain text (.txt)…</string>
 	<key>Preview</key>
 	<string>Preview</string>
-	<key>Preview a session, or open it in its own reading window. Nothing runs until you resume.</key>
-	<string>Preview a session, or open it in its own reading window. Nothing runs until you resume.</string>
 	<key>Previous Tab</key>
 	<string>Previous Tab</string>
 	<key>Previous match</key>
@@ -366,10 +362,10 @@
 	<string>Project folder</string>
 	<key>Project folder on %@</key>
 	<string>Project folder on %@</string>
+	<key>Read</key>
+	<string>Read</string>
 	<key>Read only</key>
 	<string>Read only</string>
-	<key>Read without resuming</key>
-	<string>Read without resuming</string>
 	<key>Readable</key>
 	<string>Readable</string>
 	<key>Reading width</key>
@@ -414,20 +410,16 @@
 	<string>Reopen the tabs that were open when JustSessions quit</string>
 	<key>Report an issue ↗</key>
 	<string>Report an issue ↗</string>
-	<key>Required: passwordless SSH, rsync, and the CLI. Antigravity and OpenCode also need python3; Antigravity needs lsof to delete sessions.</key>
-	<string>Required: passwordless SSH, rsync, and the CLI. Antigravity and OpenCode also need python3; Antigravity needs lsof to delete sessions.</string>
 	<key>Restore Defaults</key>
 	<string>Restore Defaults</string>
 	<key>Resume</key>
 	<string>Resume</string>
-	<key>Resume sessions on SSH hosts. The code and CLI stay on that machine.</key>
-	<string>Resume sessions on SSH hosts. The code and CLI stay on that machine.</string>
-	<key>Resume where you left off</key>
-	<string>Resume where you left off</string>
 	<key>Reveal session file in Finder</key>
 	<string>Reveal session file in Finder</string>
 	<key>Right-click a selected row in the sidebar to resume, branch, or delete them.</key>
 	<string>Right-click a selected row in the sidebar to resume, branch, or delete them.</string>
+	<key>SSH hosts</key>
+	<string>SSH hosts</string>
 	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
 	<string>SSH hosts have no Trash, so every session is permanently deleted.</string>
 	<key>Save</key>
@@ -450,8 +442,8 @@
 	<string>Session %lld of %lld</string>
 	<key>Sessions active in the past seven days</key>
 	<string>Sessions active in the past seven days</string>
-	<key>Set up an SSH host</key>
-	<string>Set up an SSH host</string>
+	<key>Sessions from %@, grouped by host and project.</key>
+	<string>Sessions from %@, grouped by host and project.</string>
 	<key>Settings</key>
 	<string>Settings</string>
 	<key>Settings (⌘,)</key>
@@ -566,10 +558,6 @@
 	<string>Use the full window width</string>
 	<key>User guide ↗</key>
 	<string>User guide ↗</string>
-	<key>What makes it different</key>
-	<string>What makes it different</string>
-	<key>Work on other machines</key>
-	<string>Work on other machines</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
 	<string>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
 	<key>You</key>

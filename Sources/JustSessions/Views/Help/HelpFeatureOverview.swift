@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// What sets JustSessions apart, in the order a session is found, read, resumed, kept running, and reached remotely.
+/// The main flow, in the order a session is found, read, resumed, and kept running.
 struct HelpFeatureOverview: View {
     @Environment(\.locale) private var locale
 
@@ -13,18 +13,16 @@ struct HelpFeatureOverview: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("What makes it different").font(.headline)
+            Text("How it works").font(.headline)
 
-            HelpFeatureRow(title: "All your CLIs in one place", systemImage: "square.stack.3d.up",
-                           detail: "\(providerList), by host and project. It reads the history they already save: no import, no account.")
-            HelpFeatureRow(title: "Read without resuming", systemImage: "book",
-                           detail: "Preview a session, or open it in its own reading window. Nothing runs until you resume.")
-            HelpFeatureRow(title: "Resume where you left off", systemImage: "terminal",
-                           detail: "Continue in the original CLI and project folder, inside the app. **Branch** to try another approach.")
-            HelpFeatureRow(title: "Keep it running", systemImage: "arrow.triangle.2.circlepath",
-                           detail: "Close a tab with **Keep running**, or quit the app. Built-in tmux keeps the CLI going; click the session to reattach.")
-            HelpFeatureRow(title: "Work on other machines", systemImage: "network",
-                           detail: "Resume sessions on SSH hosts. The code and CLI stay on that machine.")
+            HelpFeatureRow(title: "Find", systemImage: "square.stack.3d.up",
+                           detail: "Sessions from \(providerList), grouped by host and project.")
+            HelpFeatureRow(title: "Read", systemImage: "book",
+                           detail: "Click a session to read it. Nothing runs.")
+            HelpFeatureRow(title: "Resume", systemImage: "terminal",
+                           detail: "**Resume** continues in the original CLI and folder. **Branch** tries another approach.")
+            HelpFeatureRow(title: "Keep running", systemImage: "arrow.triangle.2.circlepath",
+                           detail: "Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.")
         }
     }
 }

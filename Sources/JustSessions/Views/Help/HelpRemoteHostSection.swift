@@ -3,12 +3,11 @@ import SwiftUI
 struct HelpRemoteHostSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label("Set up an SSH host", systemImage: "network")
+            Label("SSH hosts", systemImage: "network")
                 .font(.headline)
-            Text("**Install tmux on the host** so sessions survive a dropped connection or a closed tab. Built-in tmux is only for this Mac.")
-            Text("Required: passwordless SSH, rsync, and the CLI. Antigravity and OpenCode also need python3; Antigravity needs lsof to delete sessions.")
+            Text("Choose **Add SSH host…** in the sidebar. The host needs passwordless SSH, rsync, and the CLI.")
+            Text("Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.")
                 .foregroundStyle(ThemePalette.secondaryText)
-            Text("Check `tmux -V` on the host, then choose **Add SSH host…** in the sidebar.")
         }
         .font(.callout)
         .fixedSize(horizontal: false, vertical: true)

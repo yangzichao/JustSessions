@@ -16,7 +16,6 @@ struct HelpView: View {
 
                     HelpFeatureOverview()
                     HelpRemoteHostSection()
-                    HelpMoreFeatures()
                 }
                 .padding(24)
                 .frame(maxWidth: .infinity, alignment: .leading)

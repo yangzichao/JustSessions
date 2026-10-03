@@ -85,16 +85,6 @@
         }
       }
     },
-    "%@, by host and project. It reads the history they already save: no import, no account.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "按主机和项目浏览 %@ 的会话。直接读取现有历史记录，无需导入或注册。"
-          }
-        }
-      }
-    },
     "%lld": {
       "shouldTranslate": false
     },
@@ -234,12 +224,12 @@
         }
       }
     },
-    "**Install tmux on the host** so sessions survive a dropped connection or a closed tab. Built-in tmux is only for this Mac.": {
+    "**Resume** continues in the original CLI and folder. **Branch** tries another approach.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "**在远程主机上安装 tmux**，让会话在断线或关闭标签后继续运行。内置 tmux 仅用于本机。"
+            "value": "**继续** 会在原来的 CLI 和文件夹中接着运行。**分支** 可以换一种思路尝试。"
           }
         }
       }
@@ -365,26 +355,6 @@
         }
       }
     },
-    "All your CLIs in one place": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "统一管理各个 CLI"
-          }
-        }
-      }
-    },
-    "Also: search, pin, rename, and export sessions as Markdown. Claude Code and Codex on this Mac can notify you when they finish or need input. Features vary by CLI.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "还可搜索、置顶、重命名会话，并导出为 Markdown。本机的 Claude Code 和 Codex 可在完成任务或等待输入时通知你。各 CLI 支持的功能有所不同。"
-          }
-        }
-      }
-    },
     "Appearance": {
       "localizations": {
         "zh-Hans": {
@@ -486,16 +456,6 @@
         }
       }
     },
-    "Check `tmux -V` on the host, then choose **Add SSH host…** in the sidebar.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在远程主机上运行 `tmux -V`，然后在侧栏选择**添加 SSH 主机…**。"
-          }
-        }
-      }
-    },
     "Check for updates": {
       "localizations": {
         "zh-Hans": {
@@ -522,6 +482,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "选择"
+          }
+        }
+      }
+    },
+    "Choose **Add SSH host…** in the sidebar. The host needs passwordless SSH, rsync, and the CLI.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在侧边栏选择 **添加 SSH 主机…**。主机需要免密码 SSH、rsync 和对应的 CLI。"
           }
         }
       }
@@ -586,12 +556,32 @@
         }
       }
     },
+    "Click a session to read it. Nothing runs.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击会话即可阅读，不会启动任何 CLI。"
+          }
+        }
+      }
+    },
     "Close %@": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "关闭 %@"
+          }
+        }
+      }
+    },
+    "Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用 **保持运行** 关闭标签页，或直接退出应用，CLI 会继续运行；点击会话即可回到它。"
           }
         }
       }
@@ -612,16 +602,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭窗口"
-          }
-        }
-      }
-    },
-    "Close a tab with **Keep running**, or quit the app. Built-in tmux keeps the CLI going; click the session to reattach.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "关闭标签时选择**保持运行**，或直接退出应用。内置 tmux 会让 CLI 继续运行；点击会话即可重新连接。"
           }
         }
       }
@@ -702,16 +682,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "重新连接；仍在主机 tmux 中运行的 CLI 会重新接入"
-          }
-        }
-      }
-    },
-    "Continue in the original CLI and project folder, inside the app. **Branch** to try another approach.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在应用内通过原来的 CLI 和项目目录继续工作。选择**分支**尝试另一种思路。"
           }
         }
       }
@@ -1158,6 +1128,16 @@
         }
       }
     },
+    "Find": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查找"
+          }
+        }
+      }
+    },
     "Find in conversation": {
       "localizations": {
         "zh-Hans": {
@@ -1361,6 +1341,26 @@
         }
       }
     },
+    "How it works": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用方式"
+          }
+        }
+      }
+    },
+    "Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "也请在主机上安装 tmux，否则连接断开时 CLI 会停止。Antigravity 和 OpenCode 还需要 python3。"
+          }
+        }
+      }
+    },
     "Interface language": {
       "localizations": {
         "zh-Hans": {
@@ -1390,16 +1390,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "GitHub 上的 JustSessions"
-          }
-        }
-      }
-    },
-    "Keep it running": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "让任务持续运行"
           }
         }
       }
@@ -1883,16 +1873,6 @@
         }
       }
     },
-    "Preview a session, or open it in its own reading window. Nothing runs until you resume.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "预览会话，或在独立的阅读窗口中打开。恢复会话前不会启动 CLI。"
-          }
-        }
-      }
-    },
     "Previous Tab": {
       "localizations": {
         "zh-Hans": {
@@ -1943,22 +1923,22 @@
         }
       }
     },
+    "Read": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "阅读"
+          }
+        }
+      }
+    },
     "Read only": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "只读"
-          }
-        }
-      }
-    },
-    "Read without resuming": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "先阅读，再继续"
           }
         }
       }
@@ -2183,16 +2163,6 @@
         }
       }
     },
-    "Required: passwordless SSH, rsync, and the CLI. Antigravity and OpenCode also need python3; Antigravity needs lsof to delete sessions.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "需要免密 SSH、rsync 和对应的 CLI。Antigravity 和 OpenCode 还需要 python3；删除 Antigravity 会话时需要 lsof。"
-          }
-        }
-      }
-    },
     "Restore Defaults": {
       "localizations": {
         "zh-Hans": {
@@ -2241,26 +2211,6 @@
         }
       }
     },
-    "Resume sessions on SSH hosts. The code and CLI stay on that machine.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "恢复 SSH 主机上的会话。代码和 CLI 始终留在远程主机上。"
-          }
-        }
-      }
-    },
-    "Resume where you left off": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "接着上次的进度继续"
-          }
-        }
-      }
-    },
     "Reveal session file in Finder": {
       "localizations": {
         "zh-Hans": {
@@ -2277,6 +2227,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "右键点击侧栏中已选择的条目，以继续、创建分支或删除会话。"
+          }
+        }
+      }
+    },
+    "Sessions from %@, grouped by host and project.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来自 %@ 的会话，按主机和项目分组。"
+          }
+        }
+      }
+    },
+    "SSH hosts": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SSH 主机"
           }
         }
       }
@@ -2387,16 +2357,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "过去七天内活跃的会话"
-          }
-        }
-      }
-    },
-    "Set up an SSH host": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "配置 SSH 主机"
           }
         }
       }
@@ -2973,26 +2933,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "用户指南 ↗"
-          }
-        }
-      }
-    },
-    "What makes it different": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JustSessions 的不同之处"
-          }
-        }
-      }
-    },
-    "Work on other machines": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在其他主机上工作"
           }
         }
       }
