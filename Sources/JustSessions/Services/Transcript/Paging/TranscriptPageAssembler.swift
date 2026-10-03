@@ -32,7 +32,7 @@ enum TranscriptPageAssembler {
             }
             defer { previousSpeaker = speaker }
             return TranscriptEntry(id: entry.id, content: entry.content, timestamp: entry.timestamp,
-                                   startsTurn: speaker != nil && speaker != previousSpeaker)
+                                   startsTurn: speaker != nil && speaker != previousSpeaker, markdown: entry.markdown)
         }
         return TranscriptContent(entries: entries, omittedEntryCount: 0, usesEntryIDsForPositions: true)
     }

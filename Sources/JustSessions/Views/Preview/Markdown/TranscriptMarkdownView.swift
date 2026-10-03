@@ -2,17 +2,18 @@ import SwiftUI
 
 struct TranscriptMarkdownView: View {
     @Environment(\.transcriptReadingFontSize) private var fontSize
-    private let blocks: [TranscriptMarkdownBlock]
-    private let segmentStarts: [Int: Int]
+    let text: String
+    var prepared: PreparedTranscriptMarkdown?
+    @State private var fallback: PreparedTranscriptMarkdown?
 
-    init(text: String) {
-        blocks = TranscriptMarkdownParser.blocks(from: text)
-        segmentStarts = TranscriptSearchSegments.startingIndices(in: blocks)
-    }
+    private var blocks: [TranscriptMarkdownBlock] { (prepared ?? fallback)?.blocks ?? [] }
+    private var segmentStarts: [Int: Int] { (prepared ?? fallback)?.segmentStarts ?? [:] }
 
     var body: some View {
         Group {
-            if let paragraph = singleParagraph {
+            if prepared == nil && fallback == nil {
+                Text(verbatim: text)
+            } else if let paragraph = singleParagraph {
                 TranscriptSearchableText(source: TranscriptReadingTypography.inlineText(paragraph, fontSize: fontSize), fontSize: fontSize)
                     .textSelection(.enabled)
             } else {
@@ -22,6 +23,13 @@ struct TranscriptMarkdownView: View {
         .font(.system(size: fontSize))
         .lineSpacing(4)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .task(id: text) {
+            guard prepared == nil else { return }
+            fallback = nil
+            let task = Task.detached(priority: .userInitiated) { PreparedTranscriptMarkdown(text: text) }
+            let result = await withTaskCancellationHandler { await task.value } onCancel: { task.cancel() }
+            if !Task.isCancelled { fallback = result }
+        }
     }
 
     /// Plain messages need only one text view, keeping their lazy scroll measurements inexpensive and stable.

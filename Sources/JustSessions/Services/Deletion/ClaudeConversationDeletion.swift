@@ -4,14 +4,17 @@ struct ClaudeConversationDeletion {
     let configurationDirectory: URL
     let fileManager: FileManager
     let moveToTrash: (URL) throws -> Void
+    let indexBatch: ClaudeDeletionIndexBatch?
 
     init(
         configurationDirectory: URL,
         fileManager: FileManager = .default,
-        moveToTrash: ((URL) throws -> Void)? = nil
+        moveToTrash: ((URL) throws -> Void)? = nil,
+        indexBatch: ClaudeDeletionIndexBatch? = nil
     ) {
         self.configurationDirectory = configurationDirectory
         self.fileManager = fileManager
+        self.indexBatch = indexBatch
         self.moveToTrash = moveToTrash ?? { url in
             try fileManager.trashItem(at: url, resultingItemURL: nil)
         }
@@ -38,19 +41,7 @@ struct ClaudeConversationDeletion {
            isDirectory.boolValue {
             try moveToTrash(companionDirectory)
         }
-        try removeIndexEntry(for: conversation.sessionID, in: projectDirectory)
-    }
-
-    private func removeIndexEntry(for sessionID: String, in projectDirectory: URL) throws {
-        let indexFile = projectDirectory.appendingPathComponent("sessions-index.json")
-        guard fileManager.fileExists(atPath: indexFile.path) else { return }
-        let data = try Data(contentsOf: indexFile)
-        guard var index = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let entries = index["entries"] as? [[String: Any]] else { return }
-        let remainingEntries = entries.filter { $0["sessionId"] as? String != sessionID }
-        guard remainingEntries.count != entries.count else { return }
-        index["entries"] = remainingEntries
-        let updatedData = try JSONSerialization.data(withJSONObject: index, options: [.prettyPrinted, .sortedKeys])
-        try updatedData.write(to: indexFile, options: .atomic)
+        if let indexBatch { indexBatch.record(conversation, in: projectDirectory) }
+        else { try ClaudeConversationIndex.remove(sessionIDs: [conversation.sessionID], in: projectDirectory) }
     }
 }

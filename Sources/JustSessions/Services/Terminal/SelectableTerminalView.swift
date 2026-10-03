@@ -12,6 +12,32 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     private var appearancePreferences = TerminalAppearancePreferences()
     private var theme = AppTheme.justSessions
     private var appearanceSubscription: AnyCancellable?
+    private lazy var outputCoalescer: TerminalOutputCoalescer = {
+        let coalescer = TerminalOutputCoalescer()
+        coalescer.consume = { [weak self] bytes in self?.feed(byteArray: bytes) }
+        return coalescer
+    }()
+
+    func setWorkspaceActive(_ isActive: Bool) {
+        guard outputCoalescer.isActive != isActive else { return }
+        outputCoalescer.isActive = isActive
+        // AppKit can also omit drawing and cursor subviews while this tab is invisible.
+        isHidden = !isActive
+        if isActive { needsDisplay = true }
+    }
+
+    override func dataReceived(slice: ArraySlice<UInt8>) { outputCoalescer.receive(slice) }
+
+    override func setFrameSize(_ newSize: NSSize) {
+        // Interpret queued output at the dimensions it arrived under before resizing the terminal grid.
+        outputCoalescer.flush()
+        super.setFrameSize(newSize)
+    }
+
+    override func processTerminated(_ source: LocalProcess, exitCode: Int32?) {
+        outputCoalescer.flush()
+        super.processTerminated(source, exitCode: exitCode)
+    }
 
     override convenience init(frame: CGRect) {
         self.init(frame: frame, appearanceStore: .shared, themeStore: .shared)

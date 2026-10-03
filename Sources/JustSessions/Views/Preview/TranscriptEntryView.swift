@@ -28,7 +28,7 @@ struct TranscriptEntryView: View {
                 .padding(.vertical, 12)
                 .background(ThemePalette.userMessageSurface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         case .assistantMessage(let text):
-            TranscriptMarkdownView(text: text)
+            TranscriptMarkdownView(text: text, prepared: entry.markdown)
         case .toolCalls(let summaries):
             TranscriptToolCallsView(summaries: summaries)
         case .note(let text):

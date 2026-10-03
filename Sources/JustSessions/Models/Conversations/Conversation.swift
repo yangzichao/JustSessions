@@ -1,6 +1,6 @@
 import Foundation
 
-struct Conversation: Identifiable, Sendable {
+struct Conversation: Identifiable, Sendable, Equatable {
     let provider: ConversationProvider
     let sessionID: String
     let projectPath: String

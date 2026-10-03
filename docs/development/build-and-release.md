@@ -26,6 +26,19 @@ JUSTSESSIONS_TEST_TMUX_RUNTIME="$PWD/.build/Tmux/arm64/runtime" swift test
 
 The verifier relocates the runtime to a path with spaces, restricts `PATH` to system tools, checks system-only dynamic linkage and license notices, checks that tmux targets the `macos_deployment_target` from `Scripts/Tmux/versions.sh` (macOS 14.0) with no weak imports, and detaches and reattaches a real terminal client without replacing the running process. The test workflow builds this runtime before testing, so tmux integration tests run against the shipped binary; it caches the runtime between runs and rebuilds it when `Scripts/Tmux` or the SDK changes. The release workflow always builds it from source. `build-app.sh` signs the nested tmux executable before signing the app; the existing notarization and Sparkle archive include it. The runtime build compiles against the active SDK but must run on macOS 14: calls to newer APIs fail the build, and a weak import means a dependency's `configure` found a newer function, such as `pipe2()` in the macOS 27 SDK, which is missing on older macOS and crashes tmux. Disable such functions in `Scripts/Tmux/build-helpers.sh`. Update `Scripts/Tmux/versions.sh` and its archive checksums together when upgrading dependencies, and retest client/server compatibility with existing sessions.
 
+## Performance measurements
+
+Run these opt-in suites separately, with a release build, so their visible test windows do not compete for the main thread:
+
+```sh
+JUSTSESSIONS_PERF=1 swift test -c release --filter SidebarInteractionMeasurements
+JUSTSESSIONS_PERF=1 swift test -c release --filter TerminalVisibilityMeasurements
+```
+
+The sidebar suite records interaction time and main-thread heartbeat gaps at 300 and 2,000 sessions. The terminal suite replays continuous ANSI output through five or ten SwiftTerm views, comparing the original opacity-only behavior with inactive-output coalescing. It reports process CPU as a percentage of one core, taking the median of three runs; it starts no CLI sessions. These are controlled workloads, not battery-life measurements.
+
+Discovery metadata is cached under the app's macOS Caches directory in `SessionSummaries`. The snapshots are versioned and disposable; each entry is checked against the source file's size, modification date, and inode before use. A missing, incompatible, or corrupt cache falls back to reading source files.
+
 ## Releases
 
 Pushes to `main` and pull requests run only `swift test` in CI. Run `make verify` locally before opening a pull request, pushing to `main`, or tagging a release: it also runs `make localization-check`, then builds the app and opens it with `Scripts/Release/check-app-launches.sh`. The check hides the resource bundles in `.build/release`, because SwiftPM's `Bundle.module` falls back to that absolute path on the build machine but not on users' Macs. Pushing a version tag makes GitHub Actions build, Developer ID sign, notarize, and publish the app; the tag sets the app version. Choose a new, unused semantic version for each release:

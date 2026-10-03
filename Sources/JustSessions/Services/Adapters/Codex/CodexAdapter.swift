@@ -16,8 +16,8 @@ struct CodexAdapter: ConversationAdapter {
     }
 
     /// Shared by every Codex adapter, this Mac's and each SSH host's mirror, which keep their files apart.
-    private static let rolloutHeads = SessionFileSummaryCache<CodexRolloutHead>()
-    private static let firstUserPrompts = SessionFileSummaryCache<String>()
+    private static let rolloutHeads = SessionFileSummaryCache<CodexRolloutHead>(persistenceFile: SessionSummaryCacheLocation.file(named: "codex-heads"))
+    private static let firstUserPrompts = SessionFileSummaryCache<String>(persistenceFile: SessionSummaryCacheLocation.file(named: "codex-prompts"))
 
     func discover() throws -> [Conversation] {
         let index = CodexSessionIndex(codexDirectory: codexDirectory)

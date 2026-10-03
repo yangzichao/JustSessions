@@ -132,8 +132,8 @@ final class TerminalSession: ObservableObject, Identifiable {
     }
 
     func synchronize(conversation: Conversation, displayTitle: String) {
-        self.conversation = conversation
-        self.displayTitle = displayTitle
+        if self.conversation != conversation { self.conversation = conversation }
+        updateDisplayTitle(displayTitle)
     }
 
     func updateDisplayTitle(_ title: String) {

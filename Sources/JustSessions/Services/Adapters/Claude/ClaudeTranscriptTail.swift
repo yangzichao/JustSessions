@@ -1,7 +1,7 @@
 import Foundation
 
 /// What the last lines of a Claude Code transcript say about its session, found without reading the whole file.
-struct ClaudeTranscriptTail {
+struct ClaudeTranscriptTail: Sendable, Codable {
     static let maximumByteCount = 262_144
 
     /// The `timestamp` of the last line that has one.

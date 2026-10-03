@@ -3,7 +3,7 @@ import Foundation
 /// What the first lines of a Claude Code transcript say about its session. Only the first `maximumByteCount` bytes
 /// are read, and reading stops after `maximumLineCount` lines or as soon as the working directory, first prompt, and a
 /// custom title are all known.
-struct ClaudeTranscriptHead {
+struct ClaudeTranscriptHead: Sendable, Codable {
     static let maximumByteCount = 131_072
     static let maximumLineCount = 30
 

@@ -14,8 +14,8 @@ struct ClaudeAdapter: ConversationAdapter {
     }
 
     /// Shared by every Claude Code adapter, this Mac's and each SSH host's mirror, which keep their files apart.
-    private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>()
-    private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>()
+    private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-heads"))
+    private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-tails"))
 
     func discover() throws -> [Conversation] {
         let projectsDirectory = configurationDirectory.appendingPathComponent("projects")

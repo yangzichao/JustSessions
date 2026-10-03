@@ -1,7 +1,7 @@
 import Foundation
 
 /// What the `session_meta` line opening a Codex rollout file says: the session and the folder it ran in.
-struct CodexRolloutHead: Sendable {
+struct CodexRolloutHead: Sendable, Codable {
     let sessionID: String
     let projectPath: String
 

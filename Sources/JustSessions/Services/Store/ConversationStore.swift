@@ -157,8 +157,9 @@ final class ConversationStore: ObservableObject {
     /// Swaps in what one host lists now, keeping every other host's sessions.
     func replaceConversations(on host: SessionHost, with hostConversations: [Conversation]) {
         rememberSidebarProjects(Set(hostConversations.map(\.projectDirectoryKey)))
-        conversations = (conversations.filter { $0.host != host } + hostConversations)
+        let updatedConversations = (conversations.filter { $0.host != host } + hostConversations)
             .sorted { $0.updatedAt > $1.updatedAt }
+        if conversations != updatedConversations { conversations = updatedConversations }
         synchronizeTerminalTitles()
         reopenWaitingTabs(on: host)
     }
@@ -311,6 +312,7 @@ final class ConversationStore: ObservableObject {
         let remoteDeletion = self.remoteDeletion
         let listUpdateInterval = deletionListUpdateInterval
         deletionTask = Task.detached(priority: .userInitiated) {
+            let claudeIndexBatch = ClaudeDeletionIndexBatch()
             let clock = ContinuousClock()
             var lastListUpdate = clock.now
             var deletedSinceListUpdate: [Conversation] = []
@@ -334,7 +336,7 @@ final class ConversationStore: ObservableObject {
                     ))
                 } else if let adapter = adapters.first(where: { $0.provider == conversation.provider }) {
                     do {
-                        try Self.deleteFromDisk(conversation, adapter: adapter, remoteDeletion: remoteDeletion)
+                        try Self.deleteFromDisk(conversation, adapter: adapter, remoteDeletion: remoteDeletion, claudeIndexBatch: claudeIndexBatch)
                         deletedSinceListUpdate.append(conversation)
                     } catch ConversationDeletionError.missingSource {
                         // Already gone, as after an earlier deletion whose result was lost: it counts as deleted.
@@ -352,7 +354,8 @@ final class ConversationStore: ObservableObject {
                         if isFileGone { deletedSinceListUpdate.append(conversation) }
                     }
                 }
-                if clock.now - lastListUpdate >= listUpdateInterval {
+                if clock.now - lastListUpdate >= listUpdateInterval || claudeIndexBatch.pendingCount >= ClaudeDeletionIndexBatch.maximumSessionCount {
+                    failures += claudeIndexBatch.flush()
                     let deleted = deletedSinceListUpdate
                     let completedCount = attemptedCount
                     deletedCount += deleted.count
@@ -361,6 +364,7 @@ final class ConversationStore: ObservableObject {
                     await self.applyDeletionProgress(removing: deleted, completedCount: completedCount)
                 }
             }
+            failures += claudeIndexBatch.flush()
             let deleted = deletedSinceListUpdate
             let report = SessionDeletionReport(
                 requestedCount: deletableConversations.count,
@@ -376,10 +380,14 @@ final class ConversationStore: ObservableObject {
     nonisolated private static func deleteFromDisk(
         _ conversation: Conversation,
         adapter: any ConversationAdapter,
-        remoteDeletion: RemoteConversationDeletion
+        remoteDeletion: RemoteConversationDeletion,
+        claudeIndexBatch: ClaudeDeletionIndexBatch
     ) throws {
         switch conversation.host {
-        case .thisMac: try adapter.delete(conversation)
+        case .thisMac:
+            if let claude = adapter as? ClaudeAdapter {
+                try ClaudeConversationDeletion(configurationDirectory: claude.configurationDirectory, indexBatch: claudeIndexBatch).delete(conversation)
+            } else { try adapter.delete(conversation) }
         case .ssh: try remoteDeletion.delete(conversation)
         }
     }
@@ -461,6 +469,7 @@ final class ConversationStore: ObservableObject {
 
     /// Leaving a new session's tab refreshes its host, so what its CLI saved so far is listed.
     func selectTerminal(_ id: UUID?) {
+        guard selectedTerminalID != id else { return }
         let leftNewSessionTab = selectedTerminalID == id ? nil : selectedTerminal.flatMap { $0.startsNewSession ? $0 : nil }
         selectedTerminalID = id
         if let leftNewSessionTab { refresh(leftNewSessionTab.host) }

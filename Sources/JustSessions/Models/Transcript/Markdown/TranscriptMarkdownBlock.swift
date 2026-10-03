@@ -1,7 +1,7 @@
 import Foundation
 
-struct TranscriptMarkdownBlock: Identifiable, Equatable {
-    enum Content: Equatable {
+struct TranscriptMarkdownBlock: Identifiable, Sendable, Equatable {
+    enum Content: Sendable, Equatable {
         case text(AttributedString, headingLevel: Int?)
         case code(String, language: String?)
         case table(TranscriptMarkdownTable)
@@ -15,8 +15,8 @@ struct TranscriptMarkdownBlock: Identifiable, Equatable {
     let quoteDepth: Int
 }
 
-struct TranscriptMarkdownTable: Equatable {
-    struct Row: Identifiable, Equatable {
+struct TranscriptMarkdownTable: Sendable, Equatable {
+    struct Row: Identifiable, Sendable, Equatable {
         let id: Int
         let isHeader: Bool
         var cells: [AttributedString]

@@ -20,15 +20,16 @@ actor TranscriptPageSource {
     func read(_ request: TranscriptPageRequest, refreshIndex: Bool = false) throws -> TranscriptPage {
         try Task.checkCancellation()
         if provider == .antigravity {
-            return try AntigravityTranscriptPageSource.read(file, request: request, limits: limits)
+            return try AntigravityTranscriptPageSource.read(file, request: request, limits: limits).preparingMarkdown()
         }
         if provider == .opencode {
             guard let sessionID else { throw OpenCodeDatabaseError.unreadable }
-            return try OpenCodeTranscriptPageSource.read(file, sessionID: sessionID, request: request, limits: limits)
+            return try OpenCodeTranscriptPageSource.read(file, sessionID: sessionID, request: request, limits: limits).preparingMarkdown()
         }
         if fileIndex == nil || refreshIndex {
-            fileIndex = try TranscriptFileIndex.read(file)
-            piRecordIndices = nil
+            let updatedIndex = try TranscriptFileIndex.read(file, updating: fileIndex)
+            if updatedIndex.fingerprint != fileIndex?.fingerprint { piRecordIndices = nil }
+            fileIndex = updatedIndex
         }
         let index = fileIndex!
         let handle = try FileHandle(forReadingFrom: file)
@@ -54,6 +55,6 @@ actor TranscriptPageSource {
                     return (decoder.entries(from: data), data?.count ?? 0)
                 }
             }
-        )
+        ).preparingMarkdown()
     }
 }
