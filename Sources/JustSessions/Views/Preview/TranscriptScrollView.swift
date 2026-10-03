@@ -8,6 +8,7 @@ struct TranscriptScrollView: View {
     let onOpenInNewWindow: (() -> Void)?
     @State var visibleEntryIndex: Int?
     @State var positionController: TranscriptScrollPositionController
+    @State var restoredPagingRevision: Int?
     @State private var readingFontSize: CGFloat = 15
     @State var searchState: TranscriptSearchState
     @State var searchIndex: TranscriptSearchIndex?
@@ -26,6 +27,7 @@ struct TranscriptScrollView: View {
         self.isActive = isActive
         self.paging = paging
         self.onOpenInNewWindow = onOpenInNewWindow
+        _restoredPagingRevision = State(initialValue: paging?.revision)
         _searchState = State(initialValue: searchState)
         let initialPosition = (positionStore.position(for: conversation.id) ?? .bottom).resolved(in: transcript)
         self.initialPosition = initialPosition
@@ -79,12 +81,14 @@ struct TranscriptScrollView: View {
                     visibleEntryIndex = match.entryIndex
                     scrollProxy.scrollTo(match.entryIndex, anchor: .top)
                 }
-                .onChange(of: isActive) { if !isActive { searchState.close() } }
+                .onChange(of: isActive) {
+                    if !isActive { searchState.close() } else { prefetchIfNeeded() }
+                }
                 .onChange(of: searchState.isPresented) { positionController.restoreRecordedPosition() }
                 .onChange(of: readingFontSize) { positionController.restoreRecordedPosition() }
                 .onChange(of: readingWidth) { positionController.restoreRecordedPosition() }
                 .onChange(of: paging?.revision) { restorePagedPosition(using: scrollProxy) }
-                .onChange(of: visibleEntryIndex) { prefetchIfNeeded() }
+                .onReceive(positionController.viewportUpdates) { prefetchIfNeeded(in: $0) }
                 .onAppear { positionController.tracksTranscriptBottom = paging?.hasLater != true }
                 .onReceive(positionController.entrySeekingRequests) { index in
                     scrollProxy.scrollTo(index, anchor: .top)

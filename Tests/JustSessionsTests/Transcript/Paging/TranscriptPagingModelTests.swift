@@ -3,6 +3,20 @@ import Testing
 
 @MainActor
 struct TranscriptPagingModelTests {
+    @Test func loadingPreservesThePositionReachedWhileThePageWasBeingRead() async throws {
+        let fixture = try TranscriptPagingFixture()
+        defer { fixture.remove() }
+        let model = TranscriptPagingModel()
+        model.refresh(fixture.conversation, position: nil)
+        try await expectEventually { !model.isLoading }
+        let initialPosition = TranscriptReadingPosition.entry(index: TranscriptPageIdentity.entryID(record: 430, part: 0), offset: 10)
+        var currentPosition = initialPosition
+        model.earlier(preserving: initialPosition, currentPosition: { currentPosition })
+        currentPosition = .entry(index: TranscriptPageIdentity.entryID(record: 425, part: 0), offset: 57)
+        try await expectEventually { !model.isLoading }
+        #expect(model.restorationPosition == currentPosition)
+    }
+
     @Test func evictsDistantPagesAndCanReadThemAgain() async throws {
         let fixture = try TranscriptPagingFixture(count: 600)
         defer { fixture.remove() }

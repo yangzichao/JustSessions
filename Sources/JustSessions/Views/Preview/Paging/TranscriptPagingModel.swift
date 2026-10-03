@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class TranscriptPagingModel {
-    static let maximumPageCount = 3
+    nonisolated static let maximumPageCount = 3
     private(set) var transcript: TranscriptContent?
     private(set) var pages: [TranscriptPage] = []
     private(set) var isLoading = false
@@ -32,14 +32,14 @@ final class TranscriptPagingModel {
         request(position.entryIndex.map(TranscriptPageRequest.around) ?? .latest, preserving: position, refreshIndex: true)
     }
 
-    func earlier(preserving position: TranscriptReadingPosition) {
+    func earlier(preserving position: TranscriptReadingPosition, currentPosition: (() -> TranscriptReadingPosition?)? = nil) {
         guard !isLoading, let first = pages.first, first.hasEarlier else { return }
-        request(.before(first.records.lowerBound), preserving: position)
+        request(.before(first.records.lowerBound), preserving: position, currentPosition: currentPosition)
     }
 
-    func later(preserving position: TranscriptReadingPosition) {
+    func later(preserving position: TranscriptReadingPosition, currentPosition: (() -> TranscriptReadingPosition?)? = nil) {
         guard !isLoading, let last = pages.last, last.hasLater else { return }
-        request(.after(last.records.upperBound), preserving: position)
+        request(.after(last.records.upperBound), preserving: position, currentPosition: currentPosition)
     }
 
     func first() { request(.first, preserving: .entry(index: 0, offset: -6)) }
@@ -52,7 +52,10 @@ final class TranscriptPagingModel {
         isLoading = false
     }
 
-    private func request(_ request: TranscriptPageRequest, preserving position: TranscriptReadingPosition, refreshIndex: Bool = false) {
+    private func request(
+        _ request: TranscriptPageRequest, preserving position: TranscriptReadingPosition, refreshIndex: Bool = false,
+        currentPosition: (() -> TranscriptReadingPosition?)? = nil
+    ) {
         guard let source else { return }
         cancel()
         let requestRevision = requestRevision
@@ -63,6 +66,8 @@ final class TranscriptPagingModel {
                 let page = try await source.read(request, refreshIndex: refreshIndex)
                 try Task.checkCancellation()
                 guard let self, self.requestRevision == requestRevision else { return }
+                // A reader may keep scrolling while the next page is decoded. Preserve where they are now.
+                let position = currentPosition?() ?? position
                 switch request {
                 case .before:
                     self.pages.insert(page, at: 0)

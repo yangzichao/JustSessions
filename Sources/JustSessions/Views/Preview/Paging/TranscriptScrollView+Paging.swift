@@ -15,25 +15,29 @@ extension TranscriptScrollView {
     }
 
     func loadEarlierPage() {
-        paging?.earlier(preserving: positionController.recordedPosition ?? .bottom)
+        paging?.earlier(preserving: positionController.recordedPosition ?? .bottom,
+                        currentPosition: { positionController.recordedPosition })
     }
 
     func loadLaterPage() {
-        paging?.later(preserving: positionController.recordedPosition ?? .bottom)
+        paging?.later(preserving: positionController.recordedPosition ?? .bottom,
+                      currentPosition: { positionController.recordedPosition })
     }
 
-    func prefetchIfNeeded() {
-        guard isActive, let paging, !paging.isLoading, !searchState.isPresented, !positionController.isRestoring,
-              let visibleEntryIndex, let offset = displayedEntryIndices.firstIndex(of: visibleEntryIndex) else { return }
-        if offset < 5, paging.hasEarlier {
-            loadEarlierPage()
-        } else if offset >= displayedEntryIndices.count - 5, paging.hasLater {
-            loadLaterPage()
+    func prefetchIfNeeded(in viewport: TranscriptPagingViewport? = nil) {
+        guard isActive, let paging, !paging.isLoading, paging.errorMessage == nil, !searchState.isPresented,
+              !positionController.isRestoring, restoredPagingRevision == paging.revision,
+              let viewport = viewport ?? positionController.pagingViewport else { return }
+        switch viewport.prefetchDirection(hasEarlier: paging.hasEarlier, hasLater: paging.hasLater, retainedPageCount: paging.pages.count) {
+        case .earlier: loadEarlierPage()
+        case .later: loadLaterPage()
+        case nil: break
         }
     }
 
     func restorePagedPosition(using scrollProxy: ScrollViewProxy) {
         guard let paging else { return }
+        restoredPagingRevision = paging.revision
         // Old indexes and snapshots must not keep pages alive after eviction, even while Find is closed.
         searchIndex = nil
         indexedTranscript = nil

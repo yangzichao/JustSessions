@@ -25,6 +25,12 @@ final class TranscriptScrollPositionController {
     var recordedPosition: TranscriptReadingPosition? { positionStore.position(for: conversationID) }
     var tracksTranscriptBottom = true
     let entrySeekingRequests = PassthroughSubject<Int, Never>()
+    let viewportUpdates = PassthroughSubject<TranscriptPagingViewport, Never>()
+
+    var pagingViewport: TranscriptPagingViewport? {
+        guard let clipView = scrollView?.contentView else { return nil }
+        return TranscriptPagingViewport(document: clipView.documentRect, visible: clipView.bounds)
+    }
 
     init(conversationID: String, positionStore: TranscriptReadingPositionStore, initialPosition: TranscriptReadingPosition) {
         self.conversationID = conversationID
@@ -91,7 +97,9 @@ final class TranscriptScrollPositionController {
             guard let self, !self.isStopped else { return }
             self.hasScheduledUpdate = false
             self.restorePositionIfNeeded()
-            self.recordPosition()
+            let hasReadingPosition = self.recordPosition()
+            // Recheck after restoration and lazy layout, even if the first visible message did not change.
+            if hasReadingPosition, let viewport = self.pagingViewport { self.viewportUpdates.send(viewport) }
         }
     }
 
@@ -136,13 +144,14 @@ final class TranscriptScrollPositionController {
         }
     }
 
-    private func recordPosition() {
-        guard pendingRestoration == nil, !isStopped, let scrollView else { return }
+    @discardableResult
+    private func recordPosition() -> Bool {
+        guard pendingRestoration == nil, !isStopped, let scrollView else { return false }
         let clipView = scrollView.contentView
         let visibleBounds = clipView.bounds
         if tracksTranscriptBottom, clipView.documentRect.maxY - visibleBounds.maxY <= 2 {
             positionStore.record(.bottom, for: conversationID)
-            return
+            return true
         }
         let visibleEntries = entryMarkers.dictionaryRepresentation().compactMap { _, view -> (Int, NSRect)? in
             guard let marker = view as? TranscriptEntryPositionMarkerView,
@@ -151,7 +160,8 @@ final class TranscriptScrollPositionController {
             guard entryFrame.maxY > visibleBounds.minY, entryFrame.minY < visibleBounds.maxY else { return nil }
             return (marker.entryIndex, entryFrame)
         }
-        guard let (index, entryFrame) = visibleEntries.min(by: { $0.1.minY < $1.1.minY }) else { return }
+        guard let (index, entryFrame) = visibleEntries.min(by: { $0.1.minY < $1.1.minY }) else { return false }
         positionStore.record(.entry(index: index, offset: visibleBounds.minY - entryFrame.minY), for: conversationID)
+        return true
     }
 }

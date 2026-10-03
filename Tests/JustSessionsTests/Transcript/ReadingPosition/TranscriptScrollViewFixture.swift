@@ -11,18 +11,22 @@ final class TranscriptScrollViewFixture {
     let hostingView: NSHostingView<AnyView>
     private let window: NSWindow
 
-    init(width: CGFloat = 780) throws {
+    init(width: CGFloat = 780, height: CGFloat = 480) throws {
         _ = NSApplication.shared
         settings = try IsolatedUserDefaults()
         hostingView = NSHostingView(rootView: AnyView(EmptyView()))
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: width, height: 480), styleMask: [.borderless], backing: .buffered, defer: false)
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: width, height: height), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
     }
 
-    func show(_ conversation: Conversation, transcript: TranscriptContent, paging: TranscriptPagingModel? = nil) async throws -> NSScrollView {
+    func show(
+        _ conversation: Conversation, transcript: TranscriptContent, paging: TranscriptPagingModel? = nil,
+        isActive: Bool = true, searchState: TranscriptSearchState = TranscriptSearchState()
+    ) async throws -> NSScrollView {
         hostingView.rootView = AnyView(TranscriptPagingTestReader(
-            conversation: conversation, transcript: transcript, positionStore: positionStore, paging: paging
+            conversation: conversation, transcript: transcript, positionStore: positionStore, paging: paging,
+            isActive: isActive, searchState: searchState
         ).id(conversation.id).defaultAppStorage(settings.userDefaults))
         try await settleLayout()
         return try #require(descendant(ofType: NSScrollView.self, in: hostingView))
@@ -131,9 +135,11 @@ private struct TranscriptPagingTestReader: View {
     let transcript: TranscriptContent
     let positionStore: TranscriptReadingPositionStore
     let paging: TranscriptPagingModel?
+    let isActive: Bool
+    let searchState: TranscriptSearchState
 
     var body: some View {
         TranscriptScrollView(conversation: conversation, transcript: paging?.transcript ?? transcript,
-                             positionStore: positionStore, paging: paging)
+                             positionStore: positionStore, isActive: isActive, searchState: searchState, paging: paging)
     }
 }
