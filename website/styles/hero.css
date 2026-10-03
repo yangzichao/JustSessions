@@ -9,5 +9,3 @@
 .hero-preview a { display: block; }
 .hero-preview img { width: 100%; border: 1px solid var(--line); border-radius: 9px; box-shadow: 0 12px 36px var(--shadow); }
 .hero-preview figcaption { margin: 14px 4px; text-align: center; }
-.provider-list { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px 28px; padding-block: 26px; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 500; color: var(--secondary); }
-.provider-list > span { white-space: nowrap; }

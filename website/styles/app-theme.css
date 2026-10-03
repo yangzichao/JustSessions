@@ -12,4 +12,11 @@
   --line: rgb(21 23 28 / 9%);
   --button-hover: #303139;
   --shadow: rgb(21 23 28 / 6%);
+  /* ConversationProvider+TintColor.swift, light appearance. */
+  --provider-claude: #ff8a1f;
+  --provider-codex: #2f6bff;
+  --provider-antigravity: #a64df0;
+  --provider-kiro: #e0408a;
+  --provider-opencode: #12a08f;
+  --provider-pi: #3f9f2f;
 }

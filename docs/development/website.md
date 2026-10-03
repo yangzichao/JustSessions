@@ -30,6 +30,8 @@ When a user-facing feature changes, update its guide and README entry in the sam
 
 `styles/app-theme.css` mirrors the app's default JustSessions light theme in `Sources/JustSessions/Models/Appearance/Themes/ThemeColors/JustSessionsThemeColors.swift`: warm content and sidebar surfaces, white raised controls, and Ink for primary actions. Shared page styles use these variables. The site keeps its light appearance; the Mac app can independently use its other themes and appearances. Recheck text contrast when adjusting secondary or muted colors.
 
+The homepage's agent list pairs each visible name with a decorative inline SVG matching the app's sidebar symbol in `Views/Branding/Providers/`. Its color variables in `styles/app-theme.css` mirror the light colors in `Views/Theme/ConversationProvider+TintColor.swift`. Keep both aligned when the app's provider identity changes. `styles/providers.css` handles the list's desktop row and mobile two-column layout.
+
 ## Search and sharing metadata
 
 Each indexed page has a distinct title and description. Its Open Graph and Twitter title and description match those values; its canonical URL and `og:url` match the published page. `PUBLIC_PAGE_PATHS` in `Scripts/Website/validate_metadata.py` controls which pages are copied and included in the sitemap. Add a page there, supply its metadata, and link it from an existing page. The 404 page uses `noindex` and stays out of the sitemap.

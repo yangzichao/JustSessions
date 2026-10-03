@@ -1,0 +1,24 @@
+/* Shapes and colors mirror the app's Branding/Providers icons and provider tint colors. */
+.provider-support { padding-block: 26px; border-bottom: 1px solid var(--line); }
+.provider-caption { margin-bottom: 18px; text-align: center; font-size: 15px; font-weight: 500; color: var(--ink); }
+.provider-list { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 16px 28px; margin: 0; padding: 0; list-style: none; }
+.provider-item { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 14px; font-weight: 500; color: var(--secondary); }
+.provider-icon { flex: none; }
+.provider-claude .provider-icon { color: var(--provider-claude); }
+.provider-codex .provider-icon { color: var(--provider-codex); }
+.provider-antigravity .provider-icon { color: var(--provider-antigravity); }
+.provider-kiro .provider-icon { color: var(--provider-kiro); }
+.provider-opencode .provider-icon { color: var(--provider-opencode); }
+.provider-pi .provider-icon { color: var(--provider-pi); }
+
+@media (max-width: 600px) {
+  .provider-support { padding-block: 22px; }
+  .provider-caption { margin-bottom: 16px; font-size: 14px; }
+  .provider-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; max-width: 340px; margin-inline: auto; }
+  .provider-item { font-size: 13px; }
+}
+
+@media (max-width: 360px) {
+  .provider-list { gap: 14px; }
+  .provider-item { font-size: 12px; }
+}
