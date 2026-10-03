@@ -6,6 +6,9 @@ import Testing
 struct NewSessionFileFinderTests {
     /// Larger than any macOS process id, so it stands for a wrapper process that no longer matters.
     private static let wrapperProcessID: Int32 = 999_999
+    // Shared CI runners can deschedule discovery for longer than 30 seconds. Cleanup ends these processes;
+    // this upper bound only prevents an abandoned fixture from living indefinitely.
+    private static let fixtureProcessLifetime = "300"
 
     @Test func findsThePreassignedClaudeTranscriptEvenAfterTheCLIExited() throws {
         let root = try makeTemporaryDirectory()
@@ -55,7 +58,7 @@ struct NewSessionFileFinderTests {
         // The wrapper never opens the rollout; only the child it starts, standing in for the real CLI, does.
         let wrapper = Process()
         wrapper.executableURL = URL(fileURLWithPath: "/bin/sh")
-        wrapper.arguments = ["-c", #"sleep 30 3<"$0" & echo $!; wait"#, rollout.path]
+        wrapper.arguments = ["-c", #"sleep "$1" 3<"$0" & echo $!; wait"#, rollout.path, Self.fixtureProcessLifetime]
         let output = Pipe()
         wrapper.standardOutput = output
         try wrapper.run()
@@ -116,7 +119,7 @@ struct NewSessionFileFinderTests {
         // Stands in for `codex fork`, holding the rollout it forked open ahead of its own.
         let cli = Process()
         cli.executableURL = URL(fileURLWithPath: "/bin/sh")
-        cli.arguments = ["-c", #"exec sleep 30 3<"$0" 4<"$1""#, forkedRollout.path, forkRollout.path]
+        cli.arguments = ["-c", #"exec sleep "$2" 3<"$0" 4<"$1""#, forkedRollout.path, forkRollout.path, Self.fixtureProcessLifetime]
         try cli.run()
         defer {
             cli.terminate()
@@ -142,7 +145,7 @@ struct NewSessionFileFinderTests {
         // A process of its own: tests running in parallel may hold session files open in this one.
         let idleCLI = Process()
         idleCLI.executableURL = URL(fileURLWithPath: "/bin/sleep")
-        idleCLI.arguments = ["30"]
+        idleCLI.arguments = [Self.fixtureProcessLifetime]
         try idleCLI.run()
         defer {
             idleCLI.terminate()

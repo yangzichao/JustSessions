@@ -33,7 +33,7 @@
 ## Features
 
 - **Find:** search project names and paths, session titles, and IDs. Pin and rename sessions you return to.
-- **Read:** preview supported conversations, find text with ⌘F, adjust text size, switch between a readable column and the full window width, copy code, and open a dedicated reading window without starting the CLI. [Reading controls](docs/guides/session-management.md#preview-before-you-resume).
+- **Read:** preview supported conversations, find text with ⌘F, adjust text size, switch between a readable column and the full window width, copy code, and open a dedicated reading window without starting the CLI. Long histories load automatically as you scroll. [Reading controls](docs/guides/session-management.md#preview-before-you-resume).
 - **Resume or branch:** continue in an embedded terminal, or fork a supported conversation to try another approach.
 - **Organize:** group terminal tabs by project, open a plain project terminal, and switch tabs with familiar keyboard shortcuts.
 - **Stay informed:** local Claude Code and Codex sessions can notify when a turn finishes or needs your input.
