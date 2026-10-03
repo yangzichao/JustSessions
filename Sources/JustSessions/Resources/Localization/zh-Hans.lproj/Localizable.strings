@@ -242,8 +242,8 @@
 	<string>界面语言</string>
 	<key>JustSessions Help</key>
 	<string>JustSessions 帮助</string>
-	<key>JustSessions on GitHub</key>
-	<string>GitHub 上的 JustSessions</string>
+	<key>JustSessions Website</key>
+	<string>JustSessions 网站</string>
 	<key>Keep running</key>
 	<string>保持运行</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
@@ -320,8 +320,6 @@
 	<string>在以下情况通知我</string>
 	<key>OK</key>
 	<string>好</string>
-	<key>Open JustSessions on GitHub</key>
-	<string>在 GitHub 上打开 JustSessions</string>
 	<key>Open in a separate reading window</key>
 	<string>在独立阅读窗口中打开</string>
 	<key>Open in new window</key>
@@ -330,6 +328,8 @@
 	<string>打开项目于</string>
 	<key>Open project in Finder</key>
 	<string>在 Finder 中打开项目</string>
+	<key>Open the JustSessions website</key>
+	<string>打开 JustSessions 网站</string>
 	<key>Path on the host, such as ~/code/app</key>
 	<string>主机上的路径，例如 ~/code/app</string>
 	<key>Pin project</key>
@@ -552,6 +552,8 @@
 	<string>使用窗口全宽</string>
 	<key>User guide ↗</key>
 	<string>用户指南 ↗</string>
+	<key>Website</key>
+	<string>网站</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
 	<string>支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
 	<key>You</key>

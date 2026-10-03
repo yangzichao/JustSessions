@@ -14,7 +14,7 @@ struct SidebarFooter: View {
                 SidebarSettingsLink()
                 checkForUpdatesButton
                 SidebarHelpButton()
-                SidebarRepositoryLink()
+                SidebarWebsiteLink()
             }
         }
         .buttonStyle(.borderless)

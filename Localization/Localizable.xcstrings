@@ -1258,9 +1258,6 @@
         }
       }
     },
-    "GitHub": {
-      "shouldTranslate": false
-    },
     "Go to the first available message": {
       "localizations": {
         "zh-Hans": {
@@ -1384,12 +1381,12 @@
         }
       }
     },
-    "JustSessions on GitHub": {
+    "JustSessions Website": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "GitHub 上的 JustSessions"
+            "value": "JustSessions 网站"
           }
         }
       }
@@ -1763,16 +1760,6 @@
         }
       }
     },
-    "Open JustSessions on GitHub": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 GitHub 上打开 JustSessions"
-          }
-        }
-      }
-    },
     "Open in a separate reading window": {
       "localizations": {
         "zh-Hans": {
@@ -1809,6 +1796,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "在 Finder 中打开项目"
+          }
+        }
+      }
+    },
+    "Open the JustSessions website": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 JustSessions 网站"
           }
         }
       }
@@ -2933,6 +2930,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "用户指南 ↗"
+          }
+        }
+      }
+    },
+    "Website": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网站"
           }
         }
       }

@@ -20,7 +20,7 @@ struct JustSessionsApp: App {
             CommandGroup(replacing: .help) {
                 HelpWindowButton().appLanguage(from: languageStore)
                 Divider()
-                Link("JustSessions on GitHub", destination: AppLinks.githubRepositoryURL)
+                Link("JustSessions Website", destination: AppLinks.websiteURL)
                     .environment(\.locale, languageStore.locale)
             }
         }
