@@ -31,12 +31,14 @@ def build_site():
         shutil.copy2(REPOSITORY_DIRECTORY / asset_path, asset_directory / Path(asset_path).name)
     for document_path in WEBSITE_OUTPUT_DIRECTORY.glob("*.html"):
         document_content = document_path.read_text()
-        for stylesheet_path in stylesheet_directory.glob("*.css"):
-            stylesheet_version = hashlib.sha256(stylesheet_path.read_bytes()).hexdigest()[:12]
-            stylesheet_reference = f"./styles/{stylesheet_path.name}"
+        for resource_path in (*stylesheet_directory.glob("*.css"), *asset_directory.iterdir()):
+            if not resource_path.is_file():
+                continue
+            resource_version = hashlib.sha256(resource_path.read_bytes()).hexdigest()[:12]
+            resource_reference = f"./{resource_path.relative_to(WEBSITE_OUTPUT_DIRECTORY).as_posix()}"
             document_content = document_content.replace(
-                f'href="{stylesheet_reference}"',
-                f'href="{stylesheet_reference}?v={stylesheet_version}"',
+                f'"{resource_reference}"',
+                f'"{resource_reference}?v={resource_version}"',
             )
         document_path.write_text(document_content)
     (WEBSITE_OUTPUT_DIRECTORY / ".nojekyll").touch()

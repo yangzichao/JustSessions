@@ -30,9 +30,9 @@ def validate_site(website_directory: Path):
                 referenced_path /= "index.html"
             assert referenced_path.is_relative_to(website_directory.resolve()), f"Asset leaves published directory: {reference}"
             assert referenced_path.is_file(), f"Missing local target: {reference}"
-            if referenced_path.suffix == ".css":
+            if referenced_path.suffix in (".css", ".jpg", ".png", ".svg"):
                 expected_version = hashlib.sha256(referenced_path.read_bytes()).hexdigest()[:12]
-                assert parse_qs(parsed_reference.query).get("v") == [expected_version], f"Stylesheet cache version mismatch: {reference}"
+                assert parse_qs(parsed_reference.query).get("v") == [expected_version], f"Asset cache version mismatch: {reference}"
             if parsed_reference.fragment and referenced_path in documents:
                 assert parsed_reference.fragment in documents[referenced_path].identifiers, f"Missing anchor: {reference}"
 
@@ -54,4 +54,4 @@ def validate_site(website_directory: Path):
     sitemap_urls = [element.text for element in sitemap.findall("sitemap:url/sitemap:loc", namespace)]
     assert sitemap_urls == [WEBSITE_URL + page_path for page_path in PUBLIC_PAGE_PATHS], "Sitemap differs from indexed pages"
     assert (website_directory / ".nojekyll").is_file()
-    print(f"Website validation passed: {len(documents)} pages, local links, assets, stylesheet versions, anchors, metadata, JSON-LD, social card, sitemap.")
+    print(f"Website validation passed: {len(documents)} pages, local links, assets, stylesheet/image versions, anchors, metadata, JSON-LD, social card, sitemap.")
