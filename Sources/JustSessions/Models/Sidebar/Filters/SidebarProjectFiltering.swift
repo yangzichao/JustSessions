@@ -6,12 +6,13 @@ enum SidebarProjectFiltering {
     static func projects(
         _ projects: [ProjectConversationGroup],
         providerFilter: ConversationProviderFilter,
-        recencyFilter: SessionRecencyFilter
+        recencyFilter: SessionRecencyFilter,
+        now: Date = .now
     ) -> [ProjectConversationGroup] {
         let filteredProjects: [ProjectConversationGroup] = projects.compactMap { project in
             guard project.sessionCount > 0 else { return project }
             let conversations = project.conversations.filter {
-                providerFilter.includes($0.provider) && recencyFilter.includes($0)
+                providerFilter.includes($0.provider) && recencyFilter.includes($0, now: now)
             }
             let pendingNewSessions = project.pendingNewSessions.filter { providerFilter.includes($0.provider) }
             guard !conversations.isEmpty || !pendingNewSessions.isEmpty else { return nil }

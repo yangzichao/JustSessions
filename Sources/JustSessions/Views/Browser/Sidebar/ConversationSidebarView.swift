@@ -57,7 +57,9 @@ struct ConversationSidebarView: View {
     }
 
     private var selectedConversations: [Conversation] {
-        projects.flatMap(\.conversations).filter { sessionSelection.contains($0.id) }
+        // Nothing selected is the common case, and this runs on every render, so it skips the walk of every row.
+        guard !sessionSelection.selectedConversationIDs.isEmpty else { return [] }
+        return projects.flatMap(\.conversations).filter { sessionSelection.contains($0.id) }
     }
 
     var body: some View {

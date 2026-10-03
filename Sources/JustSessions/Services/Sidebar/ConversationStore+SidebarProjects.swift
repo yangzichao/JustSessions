@@ -10,6 +10,29 @@ extension ConversationStore {
         sidebarProjection.projectGroups
     }
 
+    /// `sidebarProjectGroups` narrowed by the browser's filters, with the filter bar's session counts.
+    func filteredSidebarProjection(
+        providerFilter: ConversationProviderFilter,
+        recencyFilter: SessionRecencyFilter,
+        searchText: String
+    ) -> FilteredSidebarProjection {
+        let projection = sidebarProjection
+        let inputs = FilteredSidebarProjection.Inputs(
+            projectionInputs: projection.inputs,
+            titleAliases: titleAliases,
+            providerFilter: providerFilter,
+            recencyFilter: recencyFilter,
+            searchText: searchText,
+            recencyNow: Date(timeIntervalSinceReferenceDate: (Date.now.timeIntervalSinceReferenceDate / 60).rounded(.down) * 60)
+        )
+        if let cachedFilteredSidebarProjection, cachedFilteredSidebarProjection.inputs == inputs {
+            return cachedFilteredSidebarProjection
+        }
+        let filtered = FilteredSidebarProjection(inputs: inputs, projection: projection) { title(for: $0) }
+        cachedFilteredSidebarProjection = filtered
+        return filtered
+    }
+
     private var sidebarProjection: SidebarProjection {
         let inputs = SidebarProjection.Inputs(
             conversationsRevision: conversationsRevision,
