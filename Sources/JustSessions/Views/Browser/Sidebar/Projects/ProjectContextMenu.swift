@@ -7,6 +7,7 @@ struct ProjectContextMenu: View {
     let onNewSession: (ConversationProvider) -> Void
     let onRename: () -> Void
     let onDeleteSessions: () -> Void
+    let onRemoveProjectAndDeleteSessions: () -> Void
 
     var body: some View {
         let deletionPlan = store.deletionPlan(for: project.id)
@@ -46,6 +47,17 @@ struct ProjectContextMenu: View {
             role: .destructive,
             action: onDeleteSessions
         )
-        .disabled(!deletionPlan.hasDeletableConversations || !store.canStartDeletion(of: deletionPlan.deletableConversations))
+        .disabled(!canDeleteSessions(deletionPlan))
+        Button(
+            "Remove project and delete all sessions (\(deletionPlan.deletableConversations.count))…",
+            systemImage: "trash",
+            role: .destructive,
+            action: onRemoveProjectAndDeleteSessions
+        )
+        .disabled(!canDeleteSessions(deletionPlan))
+    }
+
+    private func canDeleteSessions(_ deletionPlan: SessionDeletionPlan) -> Bool {
+        deletionPlan.hasDeletableConversations && store.canStartDeletion(of: deletionPlan.deletableConversations)
     }
 }

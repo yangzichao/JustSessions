@@ -12,6 +12,7 @@ struct SidebarProjectRow: View {
     let onNewSession: (ConversationProvider) -> Void
     let onRename: () -> Void
     let onDeleteSessions: () -> Void
+    let onRemoveProjectAndDeleteSessions: () -> Void
     let onRemoveSelectedProjects: () -> Void
 
     @State private var isHovered = false
@@ -87,7 +88,8 @@ struct SidebarProjectRow: View {
                     project: project,
                     onNewSession: onNewSession,
                     onRename: onRename,
-                    onDeleteSessions: onDeleteSessions
+                    onDeleteSessions: onDeleteSessions,
+                    onRemoveProjectAndDeleteSessions: onRemoveProjectAndDeleteSessions
                 )
             }
         }

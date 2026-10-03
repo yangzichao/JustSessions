@@ -6,4 +6,6 @@ enum SessionDeletionRequest {
     case conversations([Conversation])
     /// Every deletable session in the project with this `projectDirectoryKey`.
     case project(String)
+    /// Every deletable session in the project with this `projectDirectoryKey`, then the project leaves the sidebar.
+    case projectRemoval(String)
 }

@@ -9,6 +9,14 @@ enum SessionDeletionConfirmationText {
         return AppLocalization.string(count == 1 ? "Delete 1 session" : "Delete \(count) sessions", language: language)
     }
 
+    static func projectRemovalButtonTitle(for plan: SessionDeletionPlan, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
+        let count = plan.deletableConversations.count
+        return AppLocalization.string(
+            count == 1 ? "Remove project and delete 1 session" : "Remove project and delete \(count) sessions",
+            language: language
+        )
+    }
+
     static func message(forDeleting conversation: Conversation, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
         if let sshDestination = conversation.host.sshDestination {
             // The folder beside a Pi session holds subagent runs and forks that are never mirrored or listed.
@@ -38,10 +46,17 @@ enum SessionDeletionConfirmationText {
         ])
     }
 
-    static func message(forDeletingProjectAt location: ProjectLocation, plan: SessionDeletionPlan, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
+    static func message(
+        forDeletingProjectAt location: ProjectLocation,
+        plan: SessionDeletionPlan,
+        removesProjectFromSidebar: Bool = false,
+        language: AppInterfaceLanguage = AppLocalization.developmentLanguage
+    ) -> String {
         joined([
             AppLocalization.string("This affects all tools in \(location.copyablePath), including sessions hidden by the current filter.", language: language),
-            AppLocalization.string("The project will stay in the sidebar.", language: language),
+            removesProjectFromSidebar
+                ? AppLocalization.string("The project will be removed from the sidebar; skipped sessions stay on disk.", language: language)
+                : AppLocalization.string("The project will stay in the sidebar.", language: language),
             location.host == .thisMac
                 ? AppLocalization.string("Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted.", language: language)
                 : AppLocalization.string("SSH hosts have no Trash, so every session is permanently deleted.", language: language),

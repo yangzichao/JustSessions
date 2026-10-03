@@ -412,6 +412,12 @@
 	<string>Remove from sidebar</string>
 	<key>Remove host</key>
 	<string>Remove host</string>
+	<key>Remove project and delete %lld sessions</key>
+	<string>Remove project and delete %lld sessions</string>
+	<key>Remove project and delete 1 session</key>
+	<string>Remove project and delete 1 session</string>
+	<key>Remove project and delete all sessions (%lld)…</key>
+	<string>Remove project and delete all sessions (%lld)…</string>
 	<key>Remove selected projects from sidebar</key>
 	<string>Remove selected projects from sidebar</string>
 	<key>Remove selected projects from the sidebar; keep sessions and open terminals</key>
@@ -536,6 +542,8 @@
 	<string>The Pi session file and its associated folder will move to the macOS Trash.</string>
 	<key>The project folder no longer exists</key>
 	<string>The project folder no longer exists</string>
+	<key>The project will be removed from the sidebar; skipped sessions stay on disk.</key>
+	<string>The project will be removed from the sidebar; skipped sessions stay on disk.</string>
 	<key>The project will stay in the sidebar.</key>
 	<string>The project will stay in the sidebar.</string>
 	<key>The shell and anything still running in it will stop.</key>

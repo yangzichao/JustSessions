@@ -32,6 +32,7 @@ struct SidebarProjectSection: View {
             onNewSession: onNewSession,
             onRename: onRenameProject,
             onDeleteSessions: { onRequestDeletion(.project(project.id)) },
+            onRemoveProjectAndDeleteSessions: { onRequestDeletion(.projectRemoval(project.id)) },
             onRemoveSelectedProjects: onRemoveSelectedProjects
         )
 

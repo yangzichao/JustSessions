@@ -70,6 +70,20 @@ struct SessionDeletionConfirmationTextTests {
             + "SSH hosts have no Trash, so every session is permanently deleted.")
     }
 
+    @Test func projectRemovalSaysTheProjectLeavesTheSidebar() {
+        let plan = SessionDeletionPlan(deletableConversations: [.fixture(), .fixture()], openTerminalCount: 1, unsupportedCount: 0)
+        let message = SessionDeletionConfirmationText.message(
+            forDeletingProjectAt: ProjectLocation(host: .thisMac, path: "/Users/me/app"),
+            plan: plan,
+            removesProjectFromSidebar: true
+        )
+        #expect(message == "This affects all tools in /Users/me/app, including sessions hidden by the current filter. "
+            + "The project will be removed from the sidebar; skipped sessions stay on disk. "
+            + "Claude Code, Antigravity, and Pi sessions move to the Trash; Codex and Kiro CLI sessions are permanently deleted. "
+            + "1 session with an open terminal will be skipped.")
+        #expect(SessionDeletionConfirmationText.projectRemovalButtonTitle(for: plan) == "Remove project and delete 2 sessions")
+    }
+
     @Test func selectionMentionsSkippedSessionsOnlyWhenThereAreSome() {
         let everythingDeletable = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: 0, unsupportedCount: 0)
         let someSkipped = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: 0, unsupportedCount: 2)

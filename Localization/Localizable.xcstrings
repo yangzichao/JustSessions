@@ -2189,6 +2189,36 @@
         }
       }
     },
+    "Remove project and delete %lld sessions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除项目并删除 %lld 个会话"
+          }
+        }
+      }
+    },
+    "Remove project and delete 1 session": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除项目并删除 1 个会话"
+          }
+        }
+      }
+    },
+    "Remove project and delete all sessions (%lld)…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除项目并删除所有会话（%lld）…"
+          }
+        }
+      }
+    },
     "Remove selected projects from sidebar": {
       "localizations": {
         "zh-Hans": {
@@ -2849,6 +2879,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "项目文件夹已不存在"
+          }
+        }
+      }
+    },
+    "The project will be removed from the sidebar; skipped sessions stay on disk.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "项目将从侧栏移除；被跳过的会话会保留在磁盘上。"
           }
         }
       }

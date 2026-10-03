@@ -404,6 +404,12 @@
 	<string>从侧栏移除</string>
 	<key>Remove host</key>
 	<string>移除主机</string>
+	<key>Remove project and delete %lld sessions</key>
+	<string>移除项目并删除 %lld 个会话</string>
+	<key>Remove project and delete 1 session</key>
+	<string>移除项目并删除 1 个会话</string>
+	<key>Remove project and delete all sessions (%lld)…</key>
+	<string>移除项目并删除所有会话（%lld）…</string>
 	<key>Remove selected projects from sidebar</key>
 	<string>从侧栏移除所选项目</string>
 	<key>Remove selected projects from the sidebar; keep sessions and open terminals</key>
@@ -532,6 +538,8 @@
 	<string>Pi 会话文件及其关联文件夹将移到 macOS 废纸篓。</string>
 	<key>The project folder no longer exists</key>
 	<string>项目文件夹已不存在</string>
+	<key>The project will be removed from the sidebar; skipped sessions stay on disk.</key>
+	<string>项目将从侧栏移除；被跳过的会话会保留在磁盘上。</string>
 	<key>The project will stay in the sidebar.</key>
 	<string>项目仍会保留在侧栏中。</string>
 	<key>The shell and anything still running in it will stop.</key>

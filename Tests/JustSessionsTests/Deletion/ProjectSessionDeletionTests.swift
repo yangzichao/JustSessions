@@ -77,6 +77,50 @@ struct ProjectSessionDeletionTests {
         #expect(store.errorMessage == nil)
     }
 
+    @Test @MainActor func projectRemovalDeletesItsSessionsAndRemovesItFromTheSidebar() async throws {
+        let temporaryDirectory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let removedProject = try makeProject("removed", in: temporaryDirectory)
+        let otherProject = try makeProject("other", in: temporaryDirectory)
+        let removedClaude = try savedConversation(.claude, project: removedProject, in: temporaryDirectory)
+        let removedOpenCode = try savedConversation(.opencode, project: removedProject, in: temporaryDirectory)
+        let otherClaude = try savedConversation(.claude, project: otherProject, in: temporaryDirectory)
+        let store = makeStore(listing: [removedClaude, removedOpenCode, otherClaude], userDefaults: isolatedUserDefaults.userDefaults)
+        store.refreshThisMac()
+        try await expectEventually { !store.isScanningThisMac }
+
+        store.deleteSessionsAndRemoveProject(removedProject.path)
+        try await expectEventually { !store.isDeletingSessions }
+        #expect(!FileManager.default.fileExists(atPath: removedClaude.sourceFile.path))
+        #expect(FileManager.default.fileExists(atPath: removedOpenCode.sourceFile.path))
+        #expect(FileManager.default.fileExists(atPath: otherClaude.sourceFile.path))
+        #expect(FileManager.default.fileExists(atPath: removedProject.path))
+        #expect(store.sidebarProjectGroups.map(\.id) == [otherProject.path])
+
+        store.refreshThisMac()
+        try await expectEventually { !store.isScanningThisMac }
+        #expect(store.sidebarProjectGroups.map(\.id) == [otherProject.path])
+        #expect(ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults).sidebarProjectGroups.map(\.id) == [otherProject.path])
+    }
+
+    @Test @MainActor func projectRemovalKeepsTheProjectWhenNothingCanBeDeleted() async throws {
+        let temporaryDirectory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let project = try makeProject("unsupported-only", in: temporaryDirectory)
+        let openCode = try savedConversation(.opencode, project: project, in: temporaryDirectory)
+        let store = makeStore(listing: [openCode], userDefaults: isolatedUserDefaults.userDefaults)
+        store.refreshThisMac()
+        try await expectEventually { !store.isScanningThisMac }
+
+        store.deleteSessionsAndRemoveProject(project.path)
+        #expect(!store.isDeletingSessions)
+        #expect(store.sidebarProjectGroups.map(\.id) == [project.path])
+    }
+
     @Test @MainActor func selectedSessionDeletionSpansProjectsAndSkipsUnsupportedSessions() async throws {
         let temporaryDirectory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
