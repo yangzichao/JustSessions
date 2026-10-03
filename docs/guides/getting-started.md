@@ -29,9 +29,9 @@ Sparkle delivers subsequent app updates. Your CLI provider's plans and charges s
 2. Select a supported session to read its conversation preview.
 3. Double-click a session or choose **Resume** to open its CLI in the original working directory.
 
-A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing and resume; current source builds provide previews for all of them. See the [full capability table](../../README.md#supported-clis) and [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest) for the packaged app.
+A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing, preview, and resume. See the [full capability table](../../README.md#supported-clis).
 
-In current source builds, click the new-window button in the preview's reading toolbar to open a dedicated reading window. Adjust text with **A− / A+**, switch between a readable column and the full window width, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
+Click the new-window button in the preview's reading toolbar to open a dedicated reading window. Adjust text with **A− / A+**, switch between a readable column and the full window width, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
 
 **New session** starts an installed CLI in a project folder. A project's **+ → Terminal** opens your login shell in that folder. Project tab groups and [keyboard shortcuts](session-management.md#tab-keyboard-shortcuts) help you switch between open terminals.
 
@@ -49,7 +49,7 @@ The code and CLI run remotely. Supported session files are cached on your Mac. T
 
 ## Keep work running with tmux
 
-Apps packaged from the current source include tmux for this Mac; no Homebrew or separate tmux install is needed. Older releases and direct `swift run` builds need **tmux 3.3+**. SSH hosts need their own tmux before launching the session. Close a local tab with **Keep running**, then select its session to reattach. Quitting the app also leaves tmux sessions running; remote tmux sessions survive SSH disconnections.
+The app includes tmux for this Mac; no Homebrew or separate tmux install is needed. Direct `swift run` builds need **tmux 3.3+**. SSH hosts need their own tmux before launching the session. Close a local tab with **Keep running**, then select its session to reattach. Quitting the app also leaves tmux sessions running; remote tmux sessions survive SSH disconnections.
 
 Keep the machine doing the work awake. Without tmux, closing a terminal tab ends its process. Plain project terminals do not use tmux. [Terminal persistence details](session-storage.md#terminal-persistence).
 

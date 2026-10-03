@@ -29,7 +29,7 @@ Pi previews follow the branch the session is on now, from its `.jsonl` file: pro
 
 ## Reading positions
 
-Current source builds keep a session's reading position, including an offset within a long message, in memory for the workspace window's lifetime. Separate reading windows start at the preview's position and keep their own position until they close. Positions are not written to CLI history or persisted across app restarts. Reading a conversation does not launch a CLI or modify the saved session.
+The app keeps a session's reading position, including an offset within a long message, in memory for the workspace window's lifetime. Separate reading windows start at the preview's position and keep their own position until they close. Positions are not written to CLI history or persisted across app restarts. Reading a conversation does not launch a CLI or modify the saved session.
 
 Reading uses up to three nearby pages, normally about 80 entries per page. Pages also have byte and source-record budgets; all parts of one source record stay together. JSONL readers build a lightweight byte-offset index instead of decoding the entire history. Pi also resolves its active branch from parent links, and Antigravity reads selected step payloads from a consistent SQLite snapshot. A source record above 16 MiB is not decoded for preview; Pi reports an error if such a record prevents correct branch selection. Export continues to use the full transcript loader rather than the page window.
 
@@ -43,7 +43,7 @@ Claude Code, Codex, and Antigravity CLI reveal which session a new tab's CLI is 
 
 ## Terminal persistence
 
-The packaged app contains tmux and its terminal database in `Contents/Resources/Tmux`, with its third-party libraries statically linked. It needs no Homebrew, separate installer, system-directory changes, or runtime download. Direct `swift run` builds and older releases use an installed tmux 3.3 or later; without a supported tmux, the CLI runs directly.
+The packaged app contains tmux and its terminal database in `Contents/Resources/Tmux`, with its third-party libraries statically linked. It needs no Homebrew, separate installer, system-directory changes, or runtime download. Direct `swift run` builds use an installed tmux 3.3 or later; without a supported tmux, the CLI runs directly.
 
 The first background refresh checks the available versions. The app prefers its bundled runtime, but uses the installed client when needed to reconnect to an existing JustSessions server, so migration does not restart running work. Each CLI runs in the app's own server (`-L justsessions`), which ignores `~/.tmux.conf` and leaves your other tmux sessions alone. SSH sessions use the host's tmux; the bundled Mac executable is not copied to remote hosts.
 

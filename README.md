@@ -22,7 +22,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yangzichao/JustSessions" alt="MIT license"></a>
 </p>
 
-**Find the conversation you need without hunting through terminal tabs.** JustSessions brings your AI coding history into one native Mac app. Search projects and sessions, preview Claude Code, Codex, Antigravity, Kiro CLI, and Pi conversations, and resume in the original CLI and project folder.
+**Find the conversation you need without hunting through terminal tabs.** JustSessions brings your AI coding history into one native Mac app. Search projects and sessions, preview their conversations, and resume in the original CLI and project folder.
 
 [Website](https://yangzichao.github.io/JustSessions/) · [Download](#download) · [Getting started](docs/guides/getting-started.md) · [SSH](#remote-sessions-over-ssh) · [tmux](#keep-sessions-running-with-tmux) · [Supported CLIs](#supported-clis) · [Documentation](docs/README.md)
 
@@ -33,13 +33,11 @@
 ## Features
 
 - **Find:** search project names and paths, session titles, and IDs. Pin and rename sessions you return to.
-- **Read:** preview supported conversations, find text with ⌘F, adjust text size, switch between a readable column and the full window width, copy code, and open a dedicated reading window without starting the CLI.
+- **Read:** preview supported conversations, find text with ⌘F, adjust text size, switch between a readable column and the full window width, copy code, and open a dedicated reading window without starting the CLI. [Reading controls](docs/guides/session-management.md#preview-before-you-resume).
 - **Resume or branch:** continue in an embedded terminal, or fork a supported conversation to try another approach.
 - **Organize:** group terminal tabs by project, open a plain project terminal, and switch tabs with familiar keyboard shortcuts.
 - **Stay informed:** local Claude Code and Codex sessions can notify when a turn finishes or needs your input.
 - **Make it yours:** system, English, or Chinese interface language; six app themes, light and dark appearances, and terminal font settings that update open terminals.
-
-This README describes the current `main` branch. Reading windows and other recent source changes may be ahead of the packaged app; check the [latest release notes](https://github.com/yangzichao/JustSessions/releases/latest). [Reading controls](docs/guides/session-management.md#preview-before-you-resume).
 
 ## Remote sessions over SSH
 
@@ -65,7 +63,7 @@ Use a `~/.ssh/config` alias or `user@hostname`. [Set up an SSH host](docs/guides
 
 *The app's actual close-tab dialog, shown with a sample tmux process.*
 
-No separate local tmux install is needed in apps packaged from the current source. Older releases and direct `swift run` builds need **tmux 3.3+**; SSH hosts need their own tmux. Keep the machine awake. Without tmux, closing the tab ends the terminal process. [How session persistence works](docs/guides/session-storage.md#terminal-persistence).
+No separate local tmux install is needed. Direct `swift run` builds need **tmux 3.3+**; SSH hosts need their own tmux. Keep the machine awake. Without tmux, closing the tab ends the terminal process. [How session persistence works](docs/guides/session-storage.md#terminal-persistence).
 
 ## Lightweight by design
 

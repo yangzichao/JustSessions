@@ -47,7 +47,6 @@
       <p class="eyebrow">JustSessions user guide</p>
       <h1>Resume your AI coding sessions.</h1>
       <p>Install the app, find your conversation, and continue in the CLI you already use.</p>
-      <p class="fine-print">This guide follows the current source build. Check the <a href="https://github.com/yangzichao/JustSessions/releases/latest">latest release notes</a> for features in the downloaded app.</p>
     </div>
     <nav class="guide-sections" aria-label="Guide contents">
       <a href="#install">Install</a><a href="#resume">Resume</a><a href="#reading">Read</a><a href="#supported-clis">CLIs</a><a href="#ssh-hosts">SSH</a><a href="#terminal-persistence">tmux</a><a href="#troubleshooting">Troubleshooting</a><a href="#privacy">Privacy</a>
@@ -77,7 +76,7 @@
 
       <section id="reading" aria-labelledby="reading-title">
         <h2 id="reading-title">Read without launching the CLI</h2>
-        <p>Current source builds add a <strong>Read</strong> button that opens the conversation in its own window. Keep it beside your terminal or compare two sessions.</p>
+        <p>The new-window button in the reading toolbar opens the conversation in its own window. Keep it beside your terminal or compare two sessions.</p>
         <ul>
           <li>Use <strong>A− / A+</strong> to adjust the reading text, the width button to switch between a readable column and the full window width, and the up/down buttons to jump to the first or latest available message.</li>
           <li>Read formatted Markdown, scroll wide tables and code blocks, and copy code with <strong>Copy</strong>. Tool calls stay collapsed until you expand them.</li>
@@ -91,7 +90,7 @@
         <p>All six support local browsing, search, and resume. Additional features vary by tool.</p>
         <div class="guide-table-scroll" role="region" aria-label="Compare CLI support" tabindex="0">
           <table>
-            <caption class="visually-hidden">Current source support for conversation previews, branching, SSH, and deletion across six CLIs.</caption>
+            <caption class="visually-hidden">Support for conversation previews, branching, SSH, and deletion across six CLIs.</caption>
             <thead><tr><th scope="col">CLI / command</th><th scope="col">Preview</th><th scope="col">Branch</th><th scope="col">SSH</th><th scope="col">Delete</th></tr></thead>
             <tbody>
               <tr data-provider="claude"><th scope="row">Claude Code <code>claude</code></th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
@@ -117,7 +116,7 @@
 
       <section id="terminal-persistence" aria-labelledby="tmux-title">
         <h2 id="tmux-title">Keep work running with tmux</h2>
-        <p>Apps packaged from the current source include tmux for this Mac. Older releases and direct source runs need tmux 3.3+. SSH hosts need their own tmux. Choose <strong>Keep running</strong> when closing a local tab, then select its session to reattach.</p>
+        <p>The app includes tmux for this Mac. Direct <code>swift run</code> builds need tmux 3.3+. SSH hosts need their own tmux. Choose <strong>Keep running</strong> when closing a local tab, then select its session to reattach.</p>
         <p>Quitting the app leaves tmux sessions running. Remote tmux sessions survive SSH disconnections. Keep the machine awake; without tmux, closing the tab ends its process. Plain project terminals do not use tmux.</p>
       </section>
 
