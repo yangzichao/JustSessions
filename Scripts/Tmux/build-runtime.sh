@@ -35,10 +35,16 @@ export LDFLAGS="-arch $build_architecture -isysroot $compiler_sdk_directory -mma
 export CPPFLAGS=""
 export PKG_CONFIG=/usr/bin/false
 
-download_source "libevent-$libevent_version" "https://github.com/libevent/libevent/releases/download/release-$libevent_version/libevent-$libevent_version.tar.gz" "$libevent_checksum"
-download_source "ncurses-$ncurses_version" "https://ftp.gnu.org/gnu/ncurses/ncurses-$ncurses_version.tar.gz" "$ncurses_checksum"
-download_source "utf8proc-$utf8proc_version" "https://github.com/JuliaStrings/utf8proc/releases/download/v$utf8proc_version/utf8proc-$utf8proc_version.tar.gz" "$utf8proc_checksum"
-download_source "tmux-$tmux_version" "https://github.com/tmux/tmux/releases/download/$tmux_version/tmux-$tmux_version.tar.gz" "$tmux_checksum"
+download_source "libevent-$libevent_version" "$libevent_checksum" \
+    "https://github.com/libevent/libevent/releases/download/release-$libevent_version/libevent-$libevent_version.tar.gz"
+download_source "ncurses-$ncurses_version" "$ncurses_checksum" \
+    "https://ftp.gnu.org/gnu/ncurses/ncurses-$ncurses_version.tar.gz" \
+    "https://ftpmirror.gnu.org/gnu/ncurses/ncurses-$ncurses_version.tar.gz" \
+    "https://invisible-mirror.net/archives/ncurses/ncurses-$ncurses_version.tar.gz"
+download_source "utf8proc-$utf8proc_version" "$utf8proc_checksum" \
+    "https://github.com/JuliaStrings/utf8proc/releases/download/v$utf8proc_version/utf8proc-$utf8proc_version.tar.gz"
+download_source "tmux-$tmux_version" "$tmux_checksum" \
+    "https://github.com/tmux/tmux/releases/download/$tmux_version/tmux-$tmux_version.tar.gz"
 
 build_dependency libevent build_libevent
 build_dependency ncurses build_ncurses

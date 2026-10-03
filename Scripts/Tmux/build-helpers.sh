@@ -1,10 +1,24 @@
 # Sourced by build-runtime.sh; all paths are private build directories.
+# Tries each URL in order, so one unreachable host does not fail the build; the checksum pins the archive.
 download_source() {
-    local source_name="$1" source_url="$2" expected_checksum="$3"
+    local source_name="$1" expected_checksum="$2"
+    shift 2
     local archive_path="$downloads_directory/$source_name.tar.gz"
     if [[ ! -f "$archive_path" ]]; then
-        curl --fail --location --silent --show-error --retry 3 "$source_url" --output "$archive_path.partial"
-        mv "$archive_path.partial" "$archive_path"
+        local source_url
+        for source_url in "$@"; do
+            if curl --fail --location --silent --show-error --retry 3 --connect-timeout 20 \
+                "$source_url" --output "$archive_path.partial"; then
+                mv "$archive_path.partial" "$archive_path"
+                break
+            fi
+            print -u2 "Download failed: $source_url"
+        done
+        if [[ ! -f "$archive_path" ]]; then
+            rm -f "$archive_path.partial"
+            print -u2 "No source reachable for $source_name"
+            return 1
+        fi
     fi
     local actual_checksum="$(shasum -a 256 "$archive_path" | awk '{print $1}')"
     if [[ "$actual_checksum" != "$expected_checksum" ]]; then
