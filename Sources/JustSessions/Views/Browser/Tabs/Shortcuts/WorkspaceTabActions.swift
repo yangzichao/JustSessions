@@ -5,10 +5,15 @@ struct WorkspaceTabActions {
     let tabCount: Int
     let hasSelectedTab: Bool
     let isEnabled: Bool
+    let canSplitSelectedTab: Bool
+    let canClosePane: Bool
     let newSession: () -> Void
     let closeSelectedTab: () -> Void
     let selectAdjacentTab: (_ movingForward: Bool) -> Void
     let selectTab: (_ shortcutNumber: Int) -> Void
+    /// Docks the selected tab beside (`false`) or below (`true`) the focused pane.
+    let splitSelectedTab: (_ downward: Bool) -> Void
+    let closeFocusedPane: () -> Void
 }
 
 private struct WorkspaceTabActionsKey: FocusedValueKey {

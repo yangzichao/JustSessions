@@ -12,9 +12,21 @@ extension ConversationStore {
             + pendingTabReopening.waitingTabs.map(\.tab)
     }
 
-    /// As the app quits, before its tabs close.
+    /// As the app quits, before its tabs close. The pane layout is saved against each docked tab's place in the
+    /// saved order, since tab ids do not survive the relaunch.
     func saveTabsForNextLaunch(to tabsSavedAtQuit: TabsSavedAtQuit = .shared) {
-        tabsSavedAtQuit.save(reopenableTabs, to: userDefaults)
+        var savedPositionsByTabID: [UUID: Int] = [:]
+        var savedPosition = 0
+        for session in terminalSessions
+        where ReopenableTerminalTab(tab: session, selectedTerminalID: selectedTerminalID) != nil {
+            savedPositionsByTabID[session.id] = savedPosition
+            savedPosition += 1
+        }
+        tabsSavedAtQuit.save(
+            reopenableTabs,
+            paneLayout: SavedPaneLayout(layout: paneLayout, savedPositionsByTabID: savedPositionsByTabID),
+            to: userDefaults
+        )
     }
 
     /// At launch, before the first refresh.
@@ -22,9 +34,10 @@ extension ConversationStore {
         from tabsSavedAtQuit: TabsSavedAtQuit = .shared,
         isEnabled: Bool = TabReopeningSettingsStore.shared.reopensTabsAtLaunch
     ) {
-        let tabs = tabsSavedAtQuit.take(from: userDefaults)
+        let savedState = tabsSavedAtQuit.takeSavedState(from: userDefaults)
         guard isEnabled else { return }
-        beginReopening(tabs)
+        beginRestoringPaneLayout(savedState.paneLayout)
+        beginReopening(savedState.tabs)
     }
 
     /// Plain terminals reopen right away. Session tabs wait for their host to list its sessions; a host no longer in
@@ -41,6 +54,8 @@ extension ConversationStore {
     }
 
     private func reopenWaitingTabs(where shouldReopen: (ReopenableTerminalTab) -> Bool) {
+        // Even with nothing left waiting, a saved layout of previews alone may still need restoring.
+        defer { restoreSavedPaneLayoutIfReady() }
         guard !pendingTabReopening.waitingTabs.isEmpty else { return }
         for waitingTab in pendingTabReopening.takeWaitingTabs(where: shouldReopen) {
             guard let session = makeReopenedTerminal(for: waitingTab.tab) else { continue }

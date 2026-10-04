@@ -9,6 +9,9 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     /// CSI u itself, and tmux hands it to the CLI unchanged; see `ThisMacTmuxServer.globalOptions`.
     var sendsShiftReturnAsCSIu = false
 
+    /// Tells the workspace a click put the keyboard here, so the focused pane follows.
+    var onFocusClick: (() -> Void)?
+
     private var appearancePreferences = TerminalAppearancePreferences()
     private var theme = AppTheme.justSessions
     private var appearanceSubscription: AnyCancellable?
@@ -60,6 +63,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
 
     override func mouseDown(with event: NSEvent) {
         window?.makeFirstResponder(self)
+        onFocusClick?()
         super.mouseDown(with: event)
     }
 

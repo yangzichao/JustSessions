@@ -34,6 +34,16 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 - Pick up names set with `/rename` in Claude Code within about a second.
 - See what each CLI is doing on its sidebar row, its project, and its tab: a turning arc while it works, an amber mark while it waits on your answer, a green dot while it waits for your next prompt, and a hollow circle once it ended in a tab still open. A session with no running CLI shows how long ago it was active instead. Claude Code and Codex on this Mac tell what they are doing, also while they run in tmux with no tab open; elsewhere the green dot only says the CLI runs.
 
+## Tiled panes
+
+- Split the detail area into tiled panes, each showing a terminal tab or a read-only session preview. Without splits, nothing changes: the one pane shows the selected tab or the selected session's preview, as always.
+- **Drag a tab** from the tab bar into the detail area. A highlight previews the drop: an edge docks the tab into a new pane on that side — left/right splits side by side, top/bottom stacks — and the middle of another docked pane moves the tab there, swapping the two. Releasing anywhere else changes nothing.
+- Or right-click a tab and choose **Split right** or **Split down**, or press **⌘D** / **⇧⌘D** to dock the selected tab beside or below the focused pane. Each pane can split again.
+- Right-click a session in the sidebar and choose **Open preview in pane** to read its conversation beside a running terminal, with the reader's search, text size, and paging controls.
+- Drag the divider between panes to resize them. Click a pane to give it the keyboard; selecting a docked tab in the tab bar focuses its pane.
+- **Close a pane** with ⌃⌘W, the tab's **Close pane** menu item, or the preview pane's close button. The neighbor takes the space, and a docked tab goes back to being a plain tab — nothing closes but the pane. Closing the tab itself also closes its pane.
+- With **Reopen tabs at launch** on, the pane layout is saved at quit and restored with the tabs. A pane whose tab or session is gone collapses; everything else comes back where it was.
+
 ## Tab keyboard shortcuts
 
 | Shortcut | Action |
@@ -44,6 +54,8 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 | ⌘⇧] or Ctrl+Tab | Select the next terminal tab, wrapping to the first. |
 | ⌘⇧[ or Ctrl+Shift+Tab | Select the previous terminal tab, wrapping to the last. |
 | ⌘1 through ⌘8 | Select a terminal tab by its position. |
+| ⌘D / ⇧⌘D | Dock the selected tab in a pane beside / below the focused pane. |
+| ⌃⌘W | Close the focused pane; its tab stays open. |
 | ⌘9 | Select the last terminal tab. |
 
 These shortcuts work while the CLI has keyboard focus. From a session preview, next/previous selects the first/last open terminal tab. ⌘W stays disabled in a preview while terminal tabs are open; with no tabs, it closes the window. The **File** and **Tabs** menus list the commands.

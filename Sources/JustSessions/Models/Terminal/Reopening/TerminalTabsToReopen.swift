@@ -5,6 +5,9 @@ struct TerminalTabsToReopen: Codable, Equatable {
     static let userDefaultsKey = "terminalTabsToReopen"
 
     var tabs: [ReopenableTerminalTab] = []
+    /// How the first-saved window's panes were tiled; nil from an unsplit workspace and from saves before panes
+    /// existed, which restore as plain tabs.
+    var paneLayout: SavedPaneLayout?
 
     static func load(from userDefaults: UserDefaults) -> Self {
         guard let data = userDefaults.data(forKey: userDefaultsKey),

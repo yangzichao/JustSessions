@@ -7,6 +7,9 @@ struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
     let onRenameConversation: (Conversation) -> Void
     let onCloseTerminal: (UUID) -> Void
+    /// Forwarded tab drags, in `WorkspacePaneDropZone.coordinateSpaceName`, for docking tabs into panes.
+    var onTabDragChanged: (UUID, CGPoint) -> Void = { _, _ in }
+    var onTabDragEnded: (UUID, CGPoint) -> Void = { _, _ in }
     @State private var collapsedProjectKeys: Set<String> = []
 
     var body: some View {
@@ -23,7 +26,9 @@ struct WorkspaceTabBar: View {
                             isCollapsed: collapsedProjectKeys.contains(group.projectDirectoryKey),
                             onToggleCollapsed: { toggleCollapsed(group.projectDirectoryKey) },
                             onRenameConversation: onRenameConversation,
-                            onCloseTab: onCloseTerminal
+                            onCloseTab: onCloseTerminal,
+                            onTabDragChanged: onTabDragChanged,
+                            onTabDragEnded: onTabDragEnded
                         )
                     }
                 }

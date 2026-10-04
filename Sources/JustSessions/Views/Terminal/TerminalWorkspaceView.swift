@@ -5,7 +5,12 @@ struct TerminalWorkspaceView: View {
     let projectDisplayName: String
     /// Named once SSH hosts are added, whichever host the tab runs on.
     let hostDisplayName: String?
-    let isActive: Bool
+    /// On screen, as the selected tab or docked to a pane.
+    let isVisible: Bool
+    /// Holding the keyboard: visible and in the focused pane.
+    let isFocused: Bool
+    /// Called when a click inside the terminal takes the keyboard.
+    var onFocus: (() -> Void)?
     /// Shown for a remote tab whose connection ended.
     let onReconnect: (() -> Void)?
 
@@ -40,7 +45,7 @@ struct TerminalWorkspaceView: View {
             .background(ThemePalette.contentSurface)
 
             ThemeDivider()
-            EmbeddedTerminalView(session: session, isActive: isActive)
+            EmbeddedTerminalView(session: session, isVisible: isVisible, isFocused: isFocused, onFocus: onFocus)
                 .id(session.id)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

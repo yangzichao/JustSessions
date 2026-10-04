@@ -18,6 +18,9 @@ struct SingleSessionContextMenu: View {
             }
             .disabled(!store.canLaunch(conversation, action: .branch))
         }
+        Button("Open preview in pane", systemImage: "rectangle.split.2x1") {
+            store.dockPane(.preview(conversation.id), on: .trailing, of: store.focusedPaneContent)
+        }
         if store.isRunningInTmux(conversation) {
             Button("End on \(conversation.host.nameInSentence)", systemImage: "stop.circle") {
                 store.endTmuxSession(for: conversation)

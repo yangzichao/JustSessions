@@ -9,6 +9,8 @@ struct TerminalTabGroupSection: View {
     let onToggleCollapsed: () -> Void
     let onRenameConversation: (Conversation) -> Void
     let onCloseTab: (UUID) -> Void
+    let onTabDragChanged: (UUID, CGPoint) -> Void
+    let onTabDragEnded: (UUID, CGPoint) -> Void
 
     /// What the hidden tabs' CLIs are doing. A plain terminal runs no session, so it does not count.
     private func hiddenTabsActivity(_ hiddenTabs: [TerminalSession]) -> SessionActivitySummary {
@@ -32,9 +34,17 @@ struct TerminalTabGroupSection: View {
                 TerminalTab(
                     session: session,
                     isSelected: store.selectedTerminalID == session.id,
+                    isDocked: store.paneLayout.contains(.terminal(session.id)),
+                    canSplit: store.focusedPaneContent != .terminal(session.id),
                     onSelect: { store.selectTerminal(session.id) },
                     onRename: onRenameConversation,
-                    onClose: { onCloseTab(session.id) }
+                    onSplit: { downward in
+                        store.dockPane(.terminal(session.id), on: downward ? .bottom : .trailing, of: store.focusedPaneContent)
+                    },
+                    onClosePane: { store.closePane(.terminal(session.id)) },
+                    onClose: { onCloseTab(session.id) },
+                    onDragChanged: { onTabDragChanged(session.id, $0) },
+                    onDragEnded: { onTabDragEnded(session.id, $0) }
                 )
                 .id(session.id)
             }

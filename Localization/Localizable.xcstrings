@@ -375,22 +375,22 @@
         }
       }
     },
-    "App": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "应用"
-          }
-        }
-      }
-    },
     "An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "已归档的项目会从侧栏中隐藏。其文件夹和会话仍保留在磁盘上，恢复后会重新列出。在其文件夹中新建会话也会恢复该项目。"
+          }
+        }
+      }
+    },
+    "App": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用"
           }
         }
       }
@@ -411,16 +411,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "立即应用到所有终端。部分 CLI 应用使用自己的配色。"
-          }
-        }
-      }
-    },
-    "Ask Now": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "立即请求"
           }
         }
       }
@@ -521,6 +511,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "已归档的项目（%lld）…"
+          }
+        }
+      }
+    },
+    "Ask Now": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即请求"
           }
         }
       }
@@ -746,6 +746,16 @@
         }
       }
     },
+    "Close Pane": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭窗格"
+          }
+        }
+      }
+    },
     "Close Tab…": {
       "localizations": {
         "zh-Hans": {
@@ -772,6 +782,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "用 **保持运行** 关闭标签页，或直接退出应用，CLI 会继续运行；点击会话即可回到它。"
+          }
+        }
+      }
+    },
+    "Close pane": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭窗格"
           }
         }
       }
@@ -2130,6 +2150,16 @@
         }
       }
     },
+    "Open preview in pane": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在窗格中打开预览"
+          }
+        }
+      }
+    },
     "Open project in": {
       "localizations": {
         "zh-Hans": {
@@ -2166,6 +2196,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "可选。没有它时，终端中的 CLI 第一次打开受保护文件夹（例如「文稿」或外置磁盘）中的文件，macOS 会逐个询问。"
+          }
+        }
+      }
+    },
+    "Pane divider": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "窗格分隔条"
           }
         }
       }
@@ -2500,22 +2540,22 @@
         }
       }
     },
-    "Restores the terminal colors, font, and size.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "恢复终端的配色、字体和字号。"
-          }
-        }
-      }
-    },
     "Restore archived projects to the sidebar": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "将已归档的项目恢复到侧栏"
+          }
+        }
+      }
+    },
+    "Restores the terminal colors, font, and size.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复终端的配色、字体和字号。"
           }
         }
       }
@@ -2834,6 +2874,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "缺少部分颜色，例如文字或背景颜色。"
+          }
+        }
+      }
+    },
+    "Split Down": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向下拆分"
+          }
+        }
+      }
+    },
+    "Split Right": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向右拆分"
+          }
+        }
+      }
+    },
+    "Split down": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向下拆分"
+          }
+        }
+      }
+    },
+    "Split right": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向右拆分"
           }
         }
       }

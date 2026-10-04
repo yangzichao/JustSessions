@@ -9,6 +9,8 @@ final class ConversationStore: ObservableObject {
         didSet {
             conversationIndex = ConversationIndex(conversations)
             conversationsRevision &+= 1
+            prunePanesForMissingPreviews()
+            restoreSavedPaneLayoutIfReady()
         }
     }
     private(set) var conversationIndex = ConversationIndex([])
@@ -28,6 +30,15 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var pinnedItems: PinnedItems
     @Published var sidebarProjectList: SidebarProjectList
     @Published private(set) var terminalSessions: [TerminalSession] = []
+    /// How the detail area is tiled. The selection pane always exists; docked tabs and previews get panes of
+    /// their own. `.selectionOnly` is the unsplit workspace.
+    @Published private(set) var paneLayout: WorkspacePaneLayout = .selectionOnly
+    /// The pane whose terminal takes keystrokes, and where splitting shortcuts act.
+    @Published private(set) var focusedPaneContent: WorkspacePaneContent = .selection
+    /// The last quit's pane layout, waiting for its docked tabs to reopen; see `restoreSavedPaneLayoutIfReady`.
+    private(set) var pendingSavedPaneLayout: SavedPaneLayout?
+    /// Where `conversationsRevision` stood when reopening began, so previewed sessions get their first listing.
+    private var conversationsRevisionWhenReopeningBegan = 0
     /// Selecting a tab that waited to be shown starts it; see `TerminalSession.isWaitingToBeShown`.
     @Published private(set) var selectedTerminalID: UUID? {
         didSet { selectedTerminal?.startNowThatItIsShown() }
@@ -454,6 +465,7 @@ final class ConversationStore: ObservableObject {
         )
         terminalSessions.insert(session, at: insertionIndex)
         selectedTerminalID = session.id
+        focusedPaneContent = .selection
     }
 
     /// Puts a tab reopened from the last quit at `index` without showing it, unless `selecting`.
@@ -469,6 +481,12 @@ final class ConversationStore: ObservableObject {
 
     /// Leaving a new session's tab refreshes its host, so what its CLI saved so far is listed.
     func selectTerminal(_ id: UUID?) {
+        // Selecting a docked tab focuses its pane; any other selection puts the keyboard on the selection pane.
+        if let id, paneLayout.contains(.terminal(id)) {
+            focusedPaneContent = .terminal(id)
+        } else {
+            focusedPaneContent = .selection
+        }
         guard selectedTerminalID != id else { return }
         let leftNewSessionTab = selectedTerminalID == id ? nil : selectedTerminal.flatMap { $0.startsNewSession ? $0 : nil }
         selectedTerminalID = id
@@ -485,6 +503,7 @@ final class ConversationStore: ObservableObject {
         closedTab.close()
         terminalSessions.remove(at: index)
         if selectedTerminalID == id { selectedTerminalID = indexToSelect.map { terminalSessions[$0].id } }
+        pruneClosedTerminalPanes()
         if closedTab.startsNewSession { refresh(closedTab.host) }
     }
 
@@ -492,6 +511,103 @@ final class ConversationStore: ObservableObject {
         for session in terminalSessions { session.close() }
         terminalSessions = []
         selectedTerminalID = nil
+        pruneClosedTerminalPanes()
+    }
+
+    // MARK: - Panes
+
+    /// Docks a tab or preview on `edge` of the pane holding `target`, focusing the new pane.
+    func dockPane(_ content: WorkspacePaneContent, on edge: WorkspacePaneEdge, of target: WorkspacePaneContent) {
+        let updated = paneLayout.docking(content, on: edge, of: target)
+        guard updated != paneLayout else { return }
+        paneLayout = updated
+        focusedPaneContent = content
+    }
+
+    /// Moves a docked tab or preview into the pane holding `target`; see `WorkspacePaneLayout.movingToCenter`.
+    func movePaneContent(_ content: WorkspacePaneContent, onto target: WorkspacePaneContent) {
+        let updated = paneLayout.movingToCenter(content, of: target)
+        guard updated != paneLayout else { return }
+        paneLayout = updated
+        focusedPaneContent = content
+    }
+
+    /// Closes the pane holding `content`; a docked tab goes back to being a plain tab, still open.
+    func closePane(_ content: WorkspacePaneContent) {
+        guard paneLayout.contains(content), content != .selection else { return }
+        if focusedPaneContent == content { focusedPaneContent = paneLayout.focusTarget(afterClosing: content) }
+        paneLayout = paneLayout.closing(content)
+    }
+
+    func focusPane(_ content: WorkspacePaneContent) {
+        guard content == .selection || paneLayout.contains(content) else { return }
+        focusedPaneContent = content
+    }
+
+    /// Docks the selected tab beside or below the focused pane, where the split commands act.
+    func splitSelectedTab(downward: Bool) {
+        guard let selectedID = selectedTerminalID else { return }
+        dockPane(.terminal(selectedID), on: downward ? .bottom : .trailing, of: focusedPaneContent)
+    }
+
+    var canSplitSelectedTab: Bool {
+        guard let selectedID = selectedTerminalID else { return false }
+        return focusedPaneContent != .terminal(selectedID)
+    }
+
+    func closeFocusedPane() {
+        closePane(focusedPaneContent)
+    }
+
+    var canCloseFocusedPane: Bool { focusedPaneContent != .selection }
+
+    func setPaneFraction(_ fraction: Double, atSplitIndex index: Int) {
+        paneLayout = paneLayout.settingFraction(fraction, atSplitIndex: index)
+    }
+
+    /// Keeps the saved layout until no docked tab it references is still waiting for its host, then restores it
+    /// onto the reopened tabs' new ids. Tabs that never reopened and sessions no longer listed lose their panes.
+    func restoreSavedPaneLayoutIfReady() {
+        guard let savedLayout = pendingSavedPaneLayout else { return }
+        let waitingPositions = Set(pendingTabReopening.waitingTabs.map(\.savedPosition))
+        guard !savedLayout.referencesTab(in: waitingPositions) else { return }
+        // A previewed session may not be listed yet right at launch; wait for the first listing to arrive.
+        if savedLayout.referencesPreview(notIn: Set(conversations.map(\.id))),
+           conversationsRevision == conversationsRevisionWhenReopeningBegan { return }
+        pendingSavedPaneLayout = nil
+        let restored = savedLayout.restored(
+            tabIDsBySavedPosition: pendingTabReopening.reopenedTabIDsBySavedPosition,
+            listedConversationIDs: Set(conversations.map(\.id))
+        )
+        if restored != paneLayout { paneLayout = restored }
+    }
+
+    func beginRestoringPaneLayout(_ savedLayout: SavedPaneLayout?) {
+        pendingSavedPaneLayout = savedLayout
+        conversationsRevisionWhenReopeningBegan = conversationsRevision
+    }
+
+    /// Panes previewing deleted sessions close; focus falls back to the selection pane.
+    private func prunePanesForMissingPreviews() {
+        guard paneLayout.panes.contains(where: { if case .preview = $0 { true } else { false } }) else { return }
+        let conversationIDs = Set(conversations.map(\.id))
+        if case .preview(let focusedID) = focusedPaneContent, !conversationIDs.contains(focusedID) {
+            focusedPaneContent = .selection
+        }
+        let pruned = paneLayout.closingPreviews(notIn: conversationIDs)
+        if pruned != paneLayout { paneLayout = pruned }
+    }
+
+    /// Panes of tabs that no longer exist close; focus falls back to the selection pane.
+    private func pruneClosedTerminalPanes() {
+        let remainingIDs = Set(terminalSessions.map(\.id))
+        if case .terminal(let focusedID) = focusedPaneContent, !remainingIDs.contains(focusedID) {
+            focusedPaneContent = paneLayout.focusTarget(afterClosing: .terminal(focusedID))
+            if case .terminal(let stillGone) = focusedPaneContent, !remainingIDs.contains(stillGone) {
+                focusedPaneContent = .selection
+            }
+        }
+        paneLayout = paneLayout.closingTerminals(notIn: remainingIDs)
     }
 
     // MARK: - Errors

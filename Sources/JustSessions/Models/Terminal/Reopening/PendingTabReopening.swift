@@ -29,6 +29,11 @@ struct PendingTabReopening {
         savedPositionsOfReopenedTabs[id] = savedPosition
     }
 
+    /// The reopened tab at each saved place, for restoring a saved pane layout onto the new tab ids.
+    var reopenedTabIDsBySavedPosition: [Int: UUID] {
+        Dictionary(uniqueKeysWithValues: savedPositionsOfReopenedTabs.map { ($0.value, $0.key) })
+    }
+
     /// Where a tab with this saved place goes among the open tabs: before the first reopened tab saved after it, or
     /// else after the last reopened tab saved before it. With no reopened tab open, it goes first, ahead of tabs
     /// opened since launch.

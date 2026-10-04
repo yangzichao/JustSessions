@@ -130,12 +130,16 @@
 	<string>点击会话即可阅读，不会启动任何 CLI。</string>
 	<key>Close %@</key>
 	<string>关闭 %@</string>
+	<key>Close Pane</key>
+	<string>关闭窗格</string>
 	<key>Close Tab…</key>
 	<string>关闭标签…</string>
 	<key>Close Window</key>
 	<string>关闭窗口</string>
 	<key>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</key>
 	<string>用 **保持运行** 关闭标签页，或直接退出应用，CLI 会继续运行；点击会话即可回到它。</string>
+	<key>Close pane</key>
+	<string>关闭窗格</string>
 	<key>Close search</key>
 	<string>关闭搜索</string>
 	<key>Close search (Escape)</key>
@@ -390,6 +394,8 @@
 	<string>在独立阅读窗口中打开</string>
 	<key>Open in new window</key>
 	<string>在新窗口中打开</string>
+	<key>Open preview in pane</key>
+	<string>在窗格中打开预览</string>
 	<key>Open project in</key>
 	<string>打开项目于</string>
 	<key>Open project in Finder</key>
@@ -398,6 +404,8 @@
 	<string>打开 JustSessions 网站</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
 	<string>可选。没有它时，终端中的 CLI 第一次打开受保护文件夹（例如「文稿」或外置磁盘）中的文件，macOS 会逐个询问。</string>
+	<key>Pane divider</key>
+	<string>窗格分隔条</string>
 	<key>Path on the host, such as ~/code/app</key>
 	<string>主机上的路径，例如 ~/code/app</string>
 	<key>Permissions</key>
@@ -528,6 +536,14 @@
 	<string>减小字号</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>缺少部分颜色，例如文字或背景颜色。</string>
+	<key>Split Down</key>
+	<string>向下拆分</string>
+	<key>Split Right</key>
+	<string>向右拆分</string>
+	<key>Split down</key>
+	<string>向下拆分</string>
+	<key>Split right</key>
+	<string>向右拆分</string>
 	<key>Start a native CLI in a project folder.</key>
 	<string>在项目文件夹中启动原生 CLI。</string>
 	<key>Start a new session in %@</key>

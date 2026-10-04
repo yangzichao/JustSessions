@@ -144,12 +144,16 @@
 	<string>Click a session to read it. Nothing runs.</string>
 	<key>Close %@</key>
 	<string>Close %@</string>
+	<key>Close Pane</key>
+	<string>Close Pane</string>
 	<key>Close Tab…</key>
 	<string>Close Tab…</string>
 	<key>Close Window</key>
 	<string>Close Window</string>
 	<key>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</key>
 	<string>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</string>
+	<key>Close pane</key>
+	<string>Close pane</string>
 	<key>Close search</key>
 	<string>Close search</string>
 	<key>Close search (Escape)</key>
@@ -398,6 +402,8 @@
 	<string>Open in a separate reading window</string>
 	<key>Open in new window</key>
 	<string>Open in new window</string>
+	<key>Open preview in pane</key>
+	<string>Open preview in pane</string>
 	<key>Open project in</key>
 	<string>Open project in</string>
 	<key>Open project in Finder</key>
@@ -406,6 +412,8 @@
 	<string>Open the JustSessions website</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
 	<string>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</string>
+	<key>Pane divider</key>
+	<string>Pane divider</string>
 	<key>Path on the host, such as ~/code/app</key>
 	<string>Path on the host, such as ~/code/app</string>
 	<key>Permissions</key>
@@ -534,6 +542,14 @@
 	<string>Smaller text</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>Some colors are missing, such as the text or background color.</string>
+	<key>Split Down</key>
+	<string>Split Down</string>
+	<key>Split Right</key>
+	<string>Split Right</string>
+	<key>Split down</key>
+	<string>Split down</string>
+	<key>Split right</key>
+	<string>Split right</string>
 	<key>Start a native CLI in a project folder.</key>
 	<string>Start a native CLI in a project folder.</string>
 	<key>Start a new session in %@</key>

@@ -41,6 +41,20 @@ struct WorkspaceTabCommands: Commands {
 
             Divider()
 
+            Divider()
+
+            Button(AppLocalization.string("Split Right", language: languageStore.language)) { actions?.splitSelectedTab(false) }
+                .keyboardShortcut("d", modifiers: .command)
+                .disabled(actions?.isEnabled != true || actions?.canSplitSelectedTab != true)
+            Button(AppLocalization.string("Split Down", language: languageStore.language)) { actions?.splitSelectedTab(true) }
+                .keyboardShortcut("d", modifiers: [.command, .shift])
+                .disabled(actions?.isEnabled != true || actions?.canSplitSelectedTab != true)
+            Button(AppLocalization.string("Close Pane", language: languageStore.language)) { actions?.closeFocusedPane() }
+                .keyboardShortcut("w", modifiers: [.command, .control])
+                .disabled(actions?.isEnabled != true || actions?.canClosePane != true)
+
+            Divider()
+
             ForEach(1...9, id: \.self) { shortcutNumber in
                 Button(AppLocalization.string(shortcutNumber == 9 ? "Last Tab" : "Tab \(shortcutNumber)", language: languageStore.language)) {
                     actions?.selectTab(shortcutNumber)
