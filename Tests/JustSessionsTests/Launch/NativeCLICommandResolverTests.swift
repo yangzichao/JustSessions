@@ -47,7 +47,8 @@ struct NativeCLICommandResolverTests {
 
         for provider in ConversationProvider.allCases {
             let command = try resolver.resolveNewSession(provider: provider, projectPath: projectDirectory.path)
-            #expect(command.arguments.isEmpty)
+            // Codex names its thread in the terminal title only when asked; see `CodexThreadTitle`.
+            #expect(command.arguments == (provider == .codex ? CodexThreadTitle.launchArguments : []))
             #expect(command.workingDirectory == projectDirectory.path)
             let expectedExecutable = switch provider {
             case .claude: "claude"

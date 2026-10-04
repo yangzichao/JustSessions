@@ -24,6 +24,9 @@ struct ThisMacTmuxServer: Sendable {
         // so the CLI can tell it from Return.
         ("extended-keys", "always"),
         ("extended-keys-format", "csi-u"),
+        // The tab's terminal gets the title the CLI sets, where a Codex CLI names its thread; see `CodexThreadTitle`.
+        ("set-titles", "on"),
+        ("set-titles-string", "#{pane_title}"),
     ]
 
     /// tmux sets these in a session itself: `TERM` names tmux's own terminal type, the rest say the CLI runs in tmux.

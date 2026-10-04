@@ -46,6 +46,8 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Terminal/Appearance/Import/`: reads colors from iTerm2's default profile or an `.itermcolors` file, only when asked.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
 - `Services/Terminal/ClaudeLiveSession/`: reads Claude Code's live registry for names chosen with `/rename`, and makes a tab follow its CLI to the session `/clear` starts.
+- `Services/Terminal/CodexLiveThread/`: starts Codex on this Mac with its thread's id in the terminal title, and reads that title so a new tab finds its thread and a tab follows its CLI to the thread `/new`, `/clear`, `/resume`, or `/fork` moves it to.
+- `Services/Terminal/Tabs/`: moving between tabs, and linking a tab to the session its CLI is in.
 - `Services/Terminal/AppearingSessions/`: links a new tab to the first session that appears in its project, for SSH hosts and for CLIs that don't reveal the session they write.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.

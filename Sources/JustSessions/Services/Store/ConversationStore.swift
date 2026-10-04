@@ -109,6 +109,7 @@ final class ConversationStore: ObservableObject {
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
         if startsBackgroundPolling {
             startClaudeLiveNameSync()
+            startCodexThreadFollowing()
             startNewSessionDiscovery()
             startRemoteNewSessionPolling()
             startTmuxPaneProcessLookup()

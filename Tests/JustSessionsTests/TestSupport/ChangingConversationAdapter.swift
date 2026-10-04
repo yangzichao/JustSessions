@@ -1,11 +1,15 @@
 import Foundation
 @testable import JustSessions
 
-/// Claude Code sessions a test can add to between refreshes, as a running CLI writes new ones.
+/// Sessions of one tool that a test can add to between refreshes, as a running CLI writes new ones.
 final class ChangingConversationAdapter: ConversationAdapter, @unchecked Sendable {
-    let provider: ConversationProvider = .claude
+    let provider: ConversationProvider
     private let lock = NSLock()
     private var conversations: [Conversation] = []
+
+    init(provider: ConversationProvider) {
+        self.provider = provider
+    }
 
     func add(_ conversation: Conversation) {
         lock.withLock { conversations.append(conversation) }

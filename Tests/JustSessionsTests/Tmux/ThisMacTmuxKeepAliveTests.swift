@@ -39,10 +39,10 @@ struct ThisMacTmuxKeepAliveTests {
         // A pane target needs the colon to name the session exactly.
         let options = sandbox.tmuxOutput([
             "display-message", "-p", "-t", "=\(name):",
-            "#{session_name} #{status} #{mouse} #{prefix} #{focus-events} #{escape-time} #{extended-keys} #{extended-keys-format}",
+            "#{session_name} #{status} #{mouse} #{prefix} #{focus-events} #{escape-time} #{extended-keys} #{extended-keys-format} #{set-titles}",
         ])
         // tmux prints on and off options as 1 and 0.
-        #expect(options == "\(name) off 1 None 1 10 always csi-u\n")
+        #expect(options == "\(name) off 1 None 1 10 always csi-u 1\n")
 
         // Closing a tab ends its tmux client with SIGTERM.
         let clientProcessIDs = sandbox.tmuxOutput(["list-clients", "-F", "#{client_pid}"]).split(separator: "\n").compactMap { Int32($0) }

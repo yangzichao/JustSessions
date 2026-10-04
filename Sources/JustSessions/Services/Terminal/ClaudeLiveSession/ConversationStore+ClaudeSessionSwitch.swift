@@ -15,17 +15,13 @@ extension ConversationStore {
         guard let switchedConversation = conversations.first(where: {
             $0.provider == .claude && $0.host == session.host && $0.sessionID == sessionID
         }) else {
-            if session.sessionIDRefreshedForAfterCLISwitch != sessionID {
-                session.sessionIDRefreshedForAfterCLISwitch = sessionID
+            if session.cliSessionIDRefreshedFor != sessionID {
+                session.cliSessionIDRefreshedFor = sessionID
                 refreshThisMac()
             }
             return false
         }
-        session.synchronize(conversation: switchedConversation, displayTitle: title(for: switchedConversation))
-        adoptSessionTmuxName(for: session)
-        // Sidebar rows look up open terminals through the store, which does not see a tab's own changes.
-        persistOpenTabs()
-        objectWillChange.send()
+        link(session, to: switchedConversation)
         return true
     }
 }

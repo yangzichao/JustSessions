@@ -32,9 +32,11 @@ final class TerminalSession: ObservableObject, Identifiable {
     var tmuxPaneProcessID: Int32?
     /// Refreshes spent picking up a new session's first prompt as its title; see new session discovery.
     var titleRefreshCount = 0
-    /// The session a Claude Code CLI moved to, as with `/clear`, that a refresh already looked for; see
-    /// `followClaudeSessionSwitch`.
-    var sessionIDRefreshedForAfterCLISwitch: String?
+    /// The session the tab's CLI is in, which no refresh had listed when the tab found it, once a refresh looked for
+    /// it; see `followClaudeSessionSwitch` and `followCodexThreads`.
+    var cliSessionIDRefreshedFor: String?
+    /// The title the tab's CLI last gave its terminal. A Codex CLI's title names its thread; see `CodexThreadTitle`.
+    private(set) var terminalTitle: String?
     var onProcessFinished: (() -> Void)?
 
     /// A tab reopened at launch for a session whose CLI no longer runs starts it only once shown, the way a browser
@@ -124,6 +126,10 @@ final class TerminalSession: ObservableObject, Identifiable {
         hasExited = true
         cliActivity = nil
         onProcessFinished?()
+    }
+
+    func updateTerminalTitle(_ title: String) {
+        terminalTitle = title
     }
 
     /// Returns whether the activity changed. An ended CLI keeps none.
