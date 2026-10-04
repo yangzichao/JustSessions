@@ -25,5 +25,6 @@ struct SidebarToggleButton: View {
         .buttonStyle(ThemePlainButtonStyle())
         .help(helpText)
         .accessibilityLabel(actionName)
+        .onboardingTourStop(isSidebarHidden ? nil : .hideSidebar)
     }
 }

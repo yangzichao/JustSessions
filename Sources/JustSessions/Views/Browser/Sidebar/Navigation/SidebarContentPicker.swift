@@ -50,5 +50,6 @@ struct SidebarContentPicker: View {
         .accessibilityValue(count.map { String($0) } ?? "")
         .accessibilityIdentifier("sidebar.mode.\(mode.rawValue)")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .onboardingTourStop(mode == .openTabs ? .openTabs : nil)
     }
 }

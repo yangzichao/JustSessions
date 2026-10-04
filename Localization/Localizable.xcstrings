@@ -234,12 +234,32 @@
         }
       }
     },
+    "**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**已打开** 列出每个标签页，以及它的 CLI 正在做什么。⌘1 到 ⌘9 可在标签页之间切换。"
+          }
+        }
+      }
+    },
     "**Resume** continues in the original CLI and folder. **Branch** tries another approach.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "**继续** 会在原来的 CLI 和文件夹中接着运行。**分支** 可以换一种思路尝试。"
+          }
+        }
+      }
+    },
+    "**Resume** continues this conversation in its CLI, in its original folder. Double-clicking the session in the sidebar does the same.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**继续** 会在原来的文件夹中用它的 CLI 接着这段对话。在侧栏双击这个会话也可以。"
           }
         }
       }
@@ -794,6 +814,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "单击会话即可阅读，不会运行任何东西。双击则在原文件夹中用它的 CLI 继续。"
+          }
+        }
+      }
+    },
+    "Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单击项目名称即可折叠它的标签页。折叠后，有 CLI 在等你时仍会显示出来。"
           }
         }
       }
@@ -1362,6 +1392,16 @@
         }
       }
     },
+    "Every open tab in one list": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有标签页都在这里"
+          }
+        }
+      }
+    },
     "Exited (%d)": {
       "localizations": {
         "zh-Hans": {
@@ -1490,6 +1530,16 @@
         }
       }
     },
+    "Find any session": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找到任意会话"
+          }
+        }
+      }
+    },
     "Find in conversation": {
       "localizations": {
         "zh-Hans": {
@@ -1506,6 +1556,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "在对话中查找（⌘F）"
+          }
+        }
+      }
+    },
+    "Find in this conversation": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在这段对话中查找"
           }
         }
       }
@@ -1686,6 +1746,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "隐藏侧栏（⌃⌘S）"
+          }
+        }
+      }
+    },
+    "Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌃⌘S does the same.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏侧栏，让终端占满整个窗口；再点一次即可恢复。⌃⌘S 也可以。"
           }
         }
       }
@@ -2002,6 +2072,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 的更多操作"
+          }
+        }
+      }
+    },
+    "More in the right-click menu": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右键菜单里还有更多"
+          }
+        }
+      }
+    },
+    "More room for the terminal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "给终端更多空间"
           }
         }
       }
@@ -2442,6 +2532,16 @@
         }
       }
     },
+    "Pick up where you left off": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从上次停下的地方继续"
+          }
+        }
+      }
+    },
     "Picks the light or dark version of color schemes that have both.": {
       "localizations": {
         "zh-Hans": {
@@ -2850,6 +2950,16 @@
         }
       }
     },
+    "Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右键单击会话可以重命名、置顶、导出或删除。按住 ⌘ 或 Shift 单击可一次选择多个。"
+          }
+        }
+      }
+    },
     "SSH hosts": {
       "localizations": {
         "zh-Hans": {
@@ -2956,6 +3066,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "按名称或路径搜索项目，按标题或 ID 搜索会话"
+          }
+        }
+      }
+    },
+    "Search projects by name or path, and sessions by title or ID.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按名称或路径搜索项目，按标题或 ID 搜索会话。"
+          }
+        }
+      }
+    },
+    "Search the text of the conversation you are reading. ⌘F does the same.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在正在阅读的对话中搜索文字。⌘F 也可以。"
           }
         }
       }
@@ -3090,12 +3220,12 @@
         }
       }
     },
-    "Skip tour": {
+    "Skip": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "跳过引导"
+            "value": "跳过"
           }
         }
       }
@@ -3292,6 +3422,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "标签"
+          }
+        }
+      }
+    },
+    "Tabs grouped by project": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "标签页按项目分组"
           }
         }
       }

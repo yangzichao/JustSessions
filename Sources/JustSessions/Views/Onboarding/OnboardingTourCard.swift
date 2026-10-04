@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// One tip of the tour: how far along the tour is, what the control it points at does, and the way on.
+/// One tip: how far along its tour or tip it is, what the control it points at does, and the way on.
 struct OnboardingTourCard: View {
     static let width: CGFloat = 280
 
@@ -36,7 +36,7 @@ struct OnboardingTourCard: View {
 
             HStack(spacing: 8) {
                 if !isLastStep {
-                    Button("Skip tour", action: onEnd)
+                    Button("Skip", action: onEnd)
                         .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 6, verticalPadding: 4))
                         .font(.system(size: 12))
                         .foregroundStyle(ThemePalette.secondaryText)

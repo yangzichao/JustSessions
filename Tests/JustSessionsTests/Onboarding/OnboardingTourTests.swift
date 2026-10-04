@@ -39,4 +39,18 @@ struct OnboardingTourTests {
         tour.start([])
         #expect(tour.currentStop == .keepRunning)
     }
+
+    @Test func movesPastStopsThatCannotShowAndEndsWhenNoneAfterCan() {
+        let tour = OnboardingTour()
+        tour.start([.tabGroup, .hideSidebar, .keepRunning])
+
+        tour.moveOnFromStops { $0 != .tabGroup && $0 != .hideSidebar }
+        #expect(tour.currentStop == .keepRunning)
+
+        tour.moveOnFromStops { _ in true }
+        #expect(tour.currentStop == .keepRunning)
+
+        tour.moveOnFromStops { _ in false }
+        #expect(!tour.isRunning)
+    }
 }

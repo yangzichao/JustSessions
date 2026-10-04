@@ -79,6 +79,7 @@ struct SidebarProjectSection: View {
                 .onboardingTourStop(
                     isOnboardingTourProject && conversation.id == project.conversations.first?.id ? .sessions : nil
                 )
+                .onboardingTourStop(sessionSelection.onlySelectedConversationID == conversation.id ? .sessionMenu : nil)
             }
         }
     }

@@ -26,6 +26,7 @@ struct SidebarHeader: View {
                         : "Search open tabs by title, project, or host",
                     onClose: closeSearch
                 )
+                .onboardingTourStop(searchTourStop)
             } else {
                 markAndActions
             }
@@ -61,6 +62,13 @@ struct SidebarHeader: View {
         .buttonStyle(ThemePlainButtonStyle())
         .help(searchLabel)
         .accessibilityLabel(searchLabel)
+        .onboardingTourStop(searchTourStop)
+    }
+
+    /// Search's tip is about projects and sessions, so it waits while search looks through open tabs. It moves to the
+    /// field when the field opens.
+    private var searchTourStop: OnboardingTourStop? {
+        contentMode == .projects ? .searchSessions : nil
     }
 
     private var searchLabel: LocalizedStringKey {

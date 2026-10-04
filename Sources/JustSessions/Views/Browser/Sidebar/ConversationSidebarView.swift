@@ -275,7 +275,7 @@ struct ConversationSidebarView: View {
     /// A tour stop among the projects needs the project list in front, with the tour's project in sight and, for its
     /// sessions, open.
     private func showOnboardingTourStop(_ stop: OnboardingTourStop) {
-        guard stop.isInProjectList else { return }
+        guard stop.isTourStopInProjectList else { return }
         contentMode = .projects
         guard let onboardingTourProjectID else { return }
         if stop == .sessions { projectExpansion.expand([onboardingTourProjectID]) }

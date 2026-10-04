@@ -115,6 +115,8 @@ struct ConversationBrowserView: View {
             tour: onboardingTour,
             tipsStore: .shared,
             listsProjectWithSessions: filteredProjection.projects.contains { !$0.conversations.isEmpty },
+            readSession: store.selectedTerminalID == nil ? focusedConversation : nil,
+            isSidebarShown: !isSidebarHidden,
             isReadyForTips: workspaceTabCommandsEnabled,
             onStartTour: { isSidebarHidden = false }
         ))

@@ -21,7 +21,7 @@ You need **macOS 14 Sonoma or later on Apple Silicon**, plus at least one instal
 2. Open the disk image and drag **JustSessions** into **Applications**.
 3. Launch the app. Existing local sessions appear under **This Mac**, grouped by project.
 
-On first launch, a short tour points out your sessions, **New session**, and SSH hosts beside the controls themselves; the first time you open a CLI tab, a tip explains **Keep running**. Skip it at any step. To see it again, choose **Help → Take the Tour**, or **Take the tour** in **Settings → Help & feedback**.
+On first launch, a short tour points out your sessions, **New session**, and SSH hosts beside the controls themselves. After that, tips show the first time you need them: reading a session points out **Resume** and find, reading another points out its right-click menu and search, and your first tabs point out tab groups, hiding the sidebar, **Keep running**, and **Open tabs**. Each shows once; skip any of them. To see it again, choose **Help → Take the Tour**, or **Take the tour** in **Settings → Help & feedback**.
 
 Sparkle delivers subsequent app updates. Your CLI provider's plans and charges still apply.
 

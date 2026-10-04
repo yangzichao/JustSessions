@@ -75,6 +75,7 @@ struct SessionPreviewHeader: View {
             Button("Resume", systemImage: "play.fill") { store.launch(conversation, action: .resume) }
                 .buttonStyle(ProviderProminentButtonStyle(tint: conversation.provider.emphasisTintColor))
                 .disabled(!store.canLaunch(conversation, action: .resume))
+                .onboardingTourStop(.resume)
             if conversation.provider.supportsBranchFromLauncher {
                 Button("Branch", systemImage: "arrow.triangle.branch") { store.launch(conversation, action: .branch) }
                     .buttonStyle(QuietBorderedButtonStyle())

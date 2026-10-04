@@ -21,6 +21,7 @@ struct TranscriptReadingToolbar: View {
                     .labelStyle(.iconOnly)
                     .help("Find in conversation (⌘F)")
                     .accessibilityIdentifier("preview.find")
+                    .onboardingTourStop(.findInConversation)
             }
             HStack(spacing: 12) {
                 Button { fontSize = max(12, fontSize - 1) } label: { Text("A−") }

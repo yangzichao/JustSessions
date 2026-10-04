@@ -50,8 +50,12 @@
 	<string>%lld sessions with open terminals will be skipped.</string>
 	<key>%lld tool calls</key>
 	<string>%lld tool calls</string>
+	<key>**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs.</key>
+	<string>**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs.</string>
 	<key>**Resume** continues in the original CLI and folder. **Branch** tries another approach.</key>
 	<string>**Resume** continues in the original CLI and folder. **Branch** tries another approach.</string>
+	<key>**Resume** continues this conversation in its CLI, in its original folder. Double-clicking the session in the sidebar does the same.</key>
+	<string>**Resume** continues this conversation in its CLI, in its original folder. Double-clicking the session in the sidebar does the same.</string>
 	<key>1 message</key>
 	<string>1 message</string>
 	<key>1 session with an open terminal will be skipped.</key>
@@ -160,6 +164,8 @@
 	<string>Click a session to read it. Nothing runs.</string>
 	<key>Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.</key>
 	<string>Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.</string>
+	<key>Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you.</key>
+	<string>Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you.</string>
 	<key>Close %@</key>
 	<string>Close %@</string>
 	<key>Close Tab…</key>
@@ -256,6 +262,8 @@
 	<string>End session…</string>
 	<key>Ended</key>
 	<string>Ended</string>
+	<key>Every open tab in one list</key>
+	<string>Every open tab in one list</string>
 	<key>Exited (%d)</key>
 	<string>Exited (%d)</string>
 	<key>Expand Group</key>
@@ -276,10 +284,14 @@
 	<string>Filters active</string>
 	<key>Find</key>
 	<string>Find</string>
+	<key>Find any session</key>
+	<string>Find any session</string>
 	<key>Find in conversation</key>
 	<string>Find in conversation</string>
 	<key>Find in conversation (⌘F)</key>
 	<string>Find in conversation (⌘F)</string>
+	<key>Find in this conversation</key>
+	<string>Find in this conversation</string>
 	<key>Finishes its turn</key>
 	<string>Finishes its turn</string>
 	<key>First message</key>
@@ -316,6 +328,8 @@
 	<string>Hide sidebar</string>
 	<key>Hide sidebar (⌃⌘S)</key>
 	<string>Hide sidebar (⌃⌘S)</string>
+	<key>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌃⌘S does the same.</key>
+	<string>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌃⌘S does the same.</string>
 	<key>Host</key>
 	<string>Host</string>
 	<key>How it works</key>
@@ -382,6 +396,10 @@
 	<string>More actions</string>
 	<key>More actions for %@</key>
 	<string>More actions for %@</string>
+	<key>More in the right-click menu</key>
+	<string>More in the right-click menu</string>
+	<key>More room for the terminal</key>
+	<string>More room for the terminal</string>
 	<key>Name</key>
 	<string>Name</string>
 	<key>Needs my input, such as a permission prompt</key>
@@ -466,6 +484,8 @@
 	<string>Path on the host, such as ~/code/app</string>
 	<key>Permissions</key>
 	<string>Permissions</string>
+	<key>Pick up where you left off</key>
+	<string>Pick up where you left off</string>
 	<key>Picks the light or dark version of color schemes that have both.</key>
 	<string>Picks the light or dark version of color schemes that have both.</string>
 	<key>Pin project</key>
@@ -542,6 +562,8 @@
 	<string>Reveal session file in Finder</string>
 	<key>Right-click a selected row in the sidebar to resume, branch, or delete them.</key>
 	<string>Right-click a selected row in the sidebar to resume, branch, or delete them.</string>
+	<key>Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.</key>
+	<string>Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.</string>
 	<key>SSH hosts</key>
 	<string>SSH hosts</string>
 	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
@@ -564,6 +586,10 @@
 	<string>Search projects and sessions</string>
 	<key>Search projects by name or path and sessions by title or ID</key>
 	<string>Search projects by name or path and sessions by title or ID</string>
+	<key>Search projects by name or path, and sessions by title or ID.</key>
+	<string>Search projects by name or path, and sessions by title or ID.</string>
+	<key>Search the text of the conversation you are reading. ⌘F does the same.</key>
+	<string>Search the text of the conversation you are reading. ⌘F does the same.</string>
 	<key>Searching…</key>
 	<string>Searching…</string>
 	<key>Session %lld of %lld</key>
@@ -590,8 +616,8 @@
 	<string>Sidebar width</string>
 	<key>Size</key>
 	<string>Size</string>
-	<key>Skip tour</key>
-	<string>Skip tour</string>
+	<key>Skip</key>
+	<string>Skip</string>
 	<key>Smaller reading text</key>
 	<string>Smaller reading text</string>
 	<key>Smaller text</key>
@@ -628,6 +654,8 @@
 	<string>Tab %lld</string>
 	<key>Tabs</key>
 	<string>Tabs</string>
+	<key>Tabs grouped by project</key>
+	<string>Tabs grouped by project</string>
 	<key>Take the Tour</key>
 	<string>Take the Tour</string>
 	<key>Take the tour</key>

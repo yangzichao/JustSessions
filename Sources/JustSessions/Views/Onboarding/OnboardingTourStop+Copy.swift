@@ -9,6 +9,13 @@ extension OnboardingTourStop {
         case .newSession: "Start something new"
         case .sshHosts: "Sessions on other machines"
         case .keepRunning: "Close the tab, keep the CLI"
+        case .resume: "Pick up where you left off"
+        case .findInConversation: "Find in this conversation"
+        case .sessionMenu: "More in the right-click menu"
+        case .searchSessions: "Find any session"
+        case .tabGroup: "Tabs grouped by project"
+        case .hideSidebar: "More room for the terminal"
+        case .openTabs: "Every open tab in one list"
         }
     }
 
@@ -26,6 +33,20 @@ extension OnboardingTourStop {
             "Add a server you reach with passwordless SSH to browse and resume its sessions here."
         case .keepRunning:
             "When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return."
+        case .resume:
+            "**Resume** continues this conversation in its CLI, in its original folder. Double-clicking the session in the sidebar does the same."
+        case .findInConversation:
+            "Search the text of the conversation you are reading. ⌘F does the same."
+        case .sessionMenu:
+            "Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once."
+        case .searchSessions:
+            "Search projects by name or path, and sessions by title or ID."
+        case .tabGroup:
+            "Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you."
+        case .hideSidebar:
+            "Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌃⌘S does the same."
+        case .openTabs:
+            "**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs."
         }
     }
 
@@ -33,8 +54,8 @@ extension OnboardingTourStop {
     /// and beside the sidebar's other controls, into the window.
     var tipEdge: Edge {
         switch self {
-        case .newSession, .keepRunning: .bottom
-        case .noSessionsYet, .projects, .sessions, .sshHosts: .trailing
+        case .newSession, .keepRunning, .resume, .findInConversation, .searchSessions, .tabGroup, .hideSidebar: .bottom
+        case .noSessionsYet, .projects, .sessions, .sshHosts, .sessionMenu, .openTabs: .trailing
         }
     }
 }

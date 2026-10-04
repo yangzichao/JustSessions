@@ -36,6 +36,7 @@ struct TerminalTabGroupSection: View {
                 hiddenTabsActivity: hiddenTabsActivity(hiddenTabs),
                 onToggleCollapsed: onToggleCollapsed
             )
+            .onboardingTourStop(group.tabs.contains { $0.id == store.selectedTerminalID } ? .tabGroup : nil)
             .padding(.trailing, 6)
             .onGeometryChange(for: CGFloat.self, of: \.size.width, action: onLabelWidthChange)
             ForEach(Array(shownTabs.enumerated()), id: \.element.id) { index, session in

@@ -36,8 +36,12 @@
 	<string>将跳过 %lld 个终端已打开的会话。</string>
 	<key>%lld tool calls</key>
 	<string>%lld 次工具调用</string>
+	<key>**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs.</key>
+	<string>**已打开** 列出每个标签页，以及它的 CLI 正在做什么。⌘1 到 ⌘9 可在标签页之间切换。</string>
 	<key>**Resume** continues in the original CLI and folder. **Branch** tries another approach.</key>
 	<string>**继续** 会在原来的 CLI 和文件夹中接着运行。**分支** 可以换一种思路尝试。</string>
+	<key>**Resume** continues this conversation in its CLI, in its original folder. Double-clicking the session in the sidebar does the same.</key>
+	<string>**继续** 会在原来的文件夹中用它的 CLI 接着这段对话。在侧栏双击这个会话也可以。</string>
 	<key>1 message</key>
 	<string>1 条消息</string>
 	<key>1 session with an open terminal will be skipped.</key>
@@ -144,6 +148,8 @@
 	<string>点击会话即可阅读，不会启动任何 CLI。</string>
 	<key>Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.</key>
 	<string>单击会话即可阅读，不会运行任何东西。双击则在原文件夹中用它的 CLI 继续。</string>
+	<key>Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you.</key>
+	<string>单击项目名称即可折叠它的标签页。折叠后，有 CLI 在等你时仍会显示出来。</string>
 	<key>Close %@</key>
 	<string>关闭 %@</string>
 	<key>Close Tab…</key>
@@ -246,6 +252,8 @@
 	<string>结束会话…</string>
 	<key>Ended</key>
 	<string>已结束</string>
+	<key>Every open tab in one list</key>
+	<string>所有标签页都在这里</string>
 	<key>Exited (%d)</key>
 	<string>已退出（%d）</string>
 	<key>Expand Group</key>
@@ -268,10 +276,14 @@
 	<string>已启用筛选</string>
 	<key>Find</key>
 	<string>查找</string>
+	<key>Find any session</key>
+	<string>找到任意会话</string>
 	<key>Find in conversation</key>
 	<string>在对话中查找</string>
 	<key>Find in conversation (⌘F)</key>
 	<string>在对话中查找（⌘F）</string>
+	<key>Find in this conversation</key>
+	<string>在这段对话中查找</string>
 	<key>Finishes its turn</key>
 	<string>完成一轮任务</string>
 	<key>First message</key>
@@ -308,6 +320,8 @@
 	<string>隐藏侧栏</string>
 	<key>Hide sidebar (⌃⌘S)</key>
 	<string>隐藏侧栏（⌃⌘S）</string>
+	<key>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌃⌘S does the same.</key>
+	<string>隐藏侧栏，让终端占满整个窗口；再点一次即可恢复。⌃⌘S 也可以。</string>
 	<key>Host</key>
 	<string>主机</string>
 	<key>How it works</key>
@@ -370,6 +384,10 @@
 	<string>更多操作</string>
 	<key>More actions for %@</key>
 	<string>%@ 的更多操作</string>
+	<key>More in the right-click menu</key>
+	<string>右键菜单里还有更多</string>
+	<key>More room for the terminal</key>
+	<string>给终端更多空间</string>
 	<key>Name</key>
 	<string>名称</string>
 	<key>Needs my input, such as a permission prompt</key>
@@ -456,6 +474,8 @@
 	<string>主机上的路径，例如 ~/code/app</string>
 	<key>Permissions</key>
 	<string>权限</string>
+	<key>Pick up where you left off</key>
+	<string>从上次停下的地方继续</string>
 	<key>Picks the light or dark version of color schemes that have both.</key>
 	<string>为同时有浅色和深色版本的配色方案选择其中一个版本。</string>
 	<key>Pin project</key>
@@ -534,6 +554,8 @@
 	<string>在 Finder 中显示会话文件</string>
 	<key>Right-click a selected row in the sidebar to resume, branch, or delete them.</key>
 	<string>右键点击侧栏中已选择的条目，以继续、创建分支或删除会话。</string>
+	<key>Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.</key>
+	<string>右键单击会话可以重命名、置顶、导出或删除。按住 ⌘ 或 Shift 单击可一次选择多个。</string>
 	<key>SSH hosts</key>
 	<string>SSH 主机</string>
 	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
@@ -556,6 +578,10 @@
 	<string>搜索项目和会话</string>
 	<key>Search projects by name or path and sessions by title or ID</key>
 	<string>按名称或路径搜索项目，按标题或 ID 搜索会话</string>
+	<key>Search projects by name or path, and sessions by title or ID.</key>
+	<string>按名称或路径搜索项目，按标题或 ID 搜索会话。</string>
+	<key>Search the text of the conversation you are reading. ⌘F does the same.</key>
+	<string>在正在阅读的对话中搜索文字。⌘F 也可以。</string>
 	<key>Searching…</key>
 	<string>正在搜索…</string>
 	<key>Session %lld of %lld</key>
@@ -582,8 +608,8 @@
 	<string>侧栏宽度</string>
 	<key>Size</key>
 	<string>字号</string>
-	<key>Skip tour</key>
-	<string>跳过引导</string>
+	<key>Skip</key>
+	<string>跳过</string>
 	<key>Smaller reading text</key>
 	<string>减小阅读字号</string>
 	<key>Smaller text</key>
@@ -622,6 +648,8 @@
 	<string>标签 %lld</string>
 	<key>Tabs</key>
 	<string>标签</string>
+	<key>Tabs grouped by project</key>
+	<string>标签页按项目分组</string>
 	<key>Take the Tour</key>
 	<string>查看引导</string>
 	<key>Take the tour</key>

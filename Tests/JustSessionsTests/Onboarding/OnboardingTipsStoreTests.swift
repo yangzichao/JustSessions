@@ -8,14 +8,15 @@ struct OnboardingTipsStoreTests {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
         let tipsStore = OnboardingTipsStore(userDefaults: isolatedUserDefaults.userDefaults, isFreshInstall: true)
-        #expect(tipsStore.shouldShow(.tour))
-        #expect(tipsStore.shouldShow(.keepRunning))
+        #expect(tipsStore.tipsToShow == Set(OnboardingTip.allCases))
 
         tipsStore.markShown(.tour)
+        tipsStore.markShown(.readingSession)
 
-        let relaunchedTipsStore = OnboardingTipsStore(userDefaults: isolatedUserDefaults.userDefaults, isFreshInstall: true)
+        let relaunchedTipsStore = OnboardingTipsStore(userDefaults: isolatedUserDefaults.userDefaults, isFreshInstall: false)
         #expect(!relaunchedTipsStore.shouldShow(.tour))
-        #expect(relaunchedTipsStore.shouldShow(.keepRunning))
+        #expect(!relaunchedTipsStore.shouldShow(.readingSession))
+        #expect(relaunchedTipsStore.shouldShow(.terminalTab))
     }
 
     @Test func existingInstallShowsNoTipEvenAfterItsSettingsLookFresh() throws {
@@ -34,16 +35,18 @@ struct OnboardingTipsStoreTests {
         #expect(!askedWhetherFresh)
     }
 
-    @Test func savesTipsInDeclarationOrderAndIgnoresUnknownSavedTips() throws {
+    @Test func savesShownTipsInDeclarationOrderAndIgnoresUnknownSavedTips() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
         let userDefaults = isolatedUserDefaults.userDefaults
-        userDefaults.set(["keepRunning", "retiredTip", "tour"], forKey: OnboardingTipsStore.userDefaultsKey)
+        userDefaults.set(true, forKey: OnboardingTipsStore.showsTipsKey)
+        userDefaults.set(["keepRunning", "retiredTip", "tour"], forKey: OnboardingTipsStore.shownTipsKey)
 
         let tipsStore = OnboardingTipsStore(userDefaults: userDefaults, isFreshInstall: false)
-        #expect(tipsStore.tipsToShow == [.tour, .keepRunning])
+        // Tips added since those were saved still show.
+        #expect(tipsStore.tipsToShow == Set(OnboardingTip.allCases).subtracting([.tour, .keepRunning]))
 
-        tipsStore.markShown(.keepRunning)
-        #expect(userDefaults.stringArray(forKey: OnboardingTipsStore.userDefaultsKey) == ["tour"])
+        tipsStore.markShown(.readingSession)
+        #expect(userDefaults.stringArray(forKey: OnboardingTipsStore.shownTipsKey) == ["tour", "readingSession", "keepRunning"])
     }
 }
