@@ -26,9 +26,9 @@
 
 [Website](https://yangzichao.github.io/JustSessions/) · [Download](#download) · [Getting started](docs/guides/getting-started.md) · [SSH](#remote-sessions-over-ssh) · [tmux](#keep-sessions-running-with-tmux) · [Supported CLIs](#supported-clis) · [Documentation](docs/README.md)
 
-![JustSessions on macOS showing AI coding sessions grouped by project and machine, with a Claude Code conversation preview](docs/images/session-overview.jpg)
+![The real Claude Code CLI running in JustSessions' native terminal, with project tabs and sessions from six coding agents](docs/images/native-terminal.jpg)
 
-*Real app interface with sample projects and conversations.*
+*Real Claude Code CLI, showing its local help screen in a sample project.*
 
 ## Features
 
@@ -43,9 +43,11 @@
 
 **Your agents and shell, in project tabs.** JustSessions embeds SwiftTerm's native AppKit terminal. Run your CLI or open a plain project shell, switch with **Open tabs**, and import your iTerm2 colors.
 
-![Claude Code's interactive help screen in the native terminal, with project tabs and sessions from six coding agents](docs/images/native-terminal.jpg)
+## Read before you resume
 
-*Real Claude Code in a sample project. The screenshot shows its local help screen.*
+![JustSessions' conversation reader, with reading controls and sessions grouped by project and machine](docs/images/session-overview.jpg)
+
+*Real app interface with sample projects and conversations.*
 
 ## Remote sessions over SSH
 

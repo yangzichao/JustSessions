@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="./styles/hero.css">
   <link rel="stylesheet" href="./styles/providers.css">
   <link rel="stylesheet" href="./styles/features.css">
-  <link rel="stylesheet" href="./styles/terminal.css">
+  <link rel="stylesheet" href="./styles/reading.css">
   <link rel="stylesheet" href="./styles/details.css">
   <link rel="stylesheet" href="./styles/responsive.css">
   <script type="application/ld+json">
@@ -40,7 +40,7 @@
       "name": "JustSessions",
       "url": "https://yangzichao.github.io/JustSessions/",
       "image": "https://yangzichao.github.io/JustSessions/assets/social-preview.png",
-      "screenshot": "https://yangzichao.github.io/JustSessions/assets/session-overview.jpg",
+      "screenshot": "https://yangzichao.github.io/JustSessions/assets/native-terminal.jpg",
       "description": "A native macOS wrapper for existing coding CLIs: find, read, resume, and manage sessions locally or over SSH, with bundled local tmux.",
       "operatingSystem": "macOS 14 or later (Apple Silicon)",
       "applicationCategory": "DeveloperApplication",
@@ -83,11 +83,11 @@
           <p class="download-note">Free & open source · macOS 14+ · Apple Silicon</p>
         </div>
       </div>
-      <figure class="hero-preview">
-        <a href="./assets/session-overview.jpg" aria-label="View the JustSessions app screenshot at full size">
-          <img src="./assets/session-overview.jpg" width="2560" height="1640" fetchpriority="high" alt="JustSessions showing six coding CLIs grouped by project and host, a Claude Code conversation, and the reading toolbar with Find and Open in new window.">
+      <figure class="hero-preview" id="terminal">
+        <a href="./assets/native-terminal.jpg" aria-label="View the Claude Code CLI screenshot at full size">
+          <img src="./assets/native-terminal.jpg" width="2560" height="1640" fetchpriority="high" alt="The real Claude Code CLI running in JustSessions' native terminal, showing its interactive help screen alongside project tabs, a shell, and sessions from six coding agents.">
         </a>
-        <figcaption>Real app. Sample sessions.</figcaption>
+        <figcaption>Claude Code CLI. Native terminal. Sample project.</figcaption>
       </figure>
       <div class="provider-support">
         <p class="provider-caption">Multiple agents. All your sessions.</p>
@@ -142,19 +142,19 @@
       </div>
     </section>
 
-    <section class="terminal-section section-space page-width" id="terminal" aria-labelledby="terminal-title">
-      <div class="terminal-heading">
-        <h2 id="terminal-title">A real terminal. Built in.</h2>
+    <section class="reading-section section-space page-width" id="reading" aria-labelledby="reading-title">
+      <div class="reading-heading">
+        <h2 id="reading-title">Read before you resume.</h2>
         <div class="feature-copy">
-          <p>Your agents and shell, in project tabs. Bring your iTerm2 colors.</p>
-          <a class="text-link" href="./guide.html#terminal">Terminal guide <span aria-hidden="true">→</span></a>
+          <p>Find text. Copy code. Return to your reading position.</p>
+          <a class="text-link" href="./guide.html#reading">Reading guide <span aria-hidden="true">→</span></a>
         </div>
       </div>
-      <figure class="terminal-preview">
-        <a href="./assets/native-terminal.jpg" aria-label="View Claude Code in the native terminal at full size">
-          <img src="./assets/native-terminal.jpg" width="2560" height="1640" loading="lazy" decoding="async" alt="Claude Code's interactive help screen in JustSessions' native terminal, with project tabs for Claude Code, Codex, Pi, and a shell, alongside six types of agent sessions.">
+      <figure class="reading-preview">
+        <a href="./assets/session-overview.jpg" aria-label="View the conversation reader screenshot at full size">
+          <img src="./assets/session-overview.jpg" width="2560" height="1640" loading="lazy" decoding="async" alt="JustSessions' conversation reader with Find, text size, width, and reading window controls, alongside six types of agent sessions grouped by project and host.">
         </a>
-        <figcaption>Real Claude Code. Sample project.</figcaption>
+        <figcaption>Real app. Sample conversations.</figcaption>
       </figure>
     </section>
 

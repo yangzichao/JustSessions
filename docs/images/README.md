@@ -5,7 +5,7 @@ These are unedited JPEG captures of the actual JustSessions SwiftUI interface. T
 | Image | What it shows |
 | --- | --- |
 | [session-overview.jpg](session-overview.jpg) | All six CLI icons, pinned sessions, Projects / Open tabs navigation, per-host refresh buttons, and the reading toolbar with Find and Open in new window. |
-| [native-terminal.jpg](native-terminal.jpg) | The installed Claude Code CLI's real interactive `/help` screen in the native terminal, with project tab groups, agent icons, and a plain shell tab. |
+| [native-terminal.jpg](native-terminal.jpg) | The homepage and README's primary screenshot: the installed Claude Code CLI's real interactive `/help` screen in the native terminal, with project tab groups, agent icons, and a plain shell tab. |
 | [remote-desktop-sessions.jpg](remote-desktop-sessions.jpg) | A selected Claude Code conversation under the sample `dev-desktop` SSH host with the current sidebar and reading controls. |
 | [tmux-keep-running.jpg](tmux-keep-running.jpg) | The real close-tab confirmation with **Keep running**, **End session**, and **Cancel**. |
 

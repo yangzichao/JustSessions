@@ -1,0 +1,18 @@
+.reading-section { border-top: 1px solid var(--line); }
+.reading-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-bottom: 28px; }
+.reading-heading h2 { margin-bottom: 0; }
+.reading-heading p { margin-bottom: 14px; }
+.reading-preview { padding: 16px 16px 0; border: 1px solid var(--line); border-radius: 18px; background: var(--sidebar-surface); }
+.reading-preview a { display: block; }
+.reading-preview img { width: 100%; border: 1px solid var(--line); border-radius: 9px; box-shadow: 0 12px 36px var(--shadow); }
+.reading-preview figcaption { margin: 14px 4px; text-align: center; }
+
+@media (max-width: 850px) {
+  .reading-heading { grid-template-columns: 1fr; gap: 18px; }
+}
+
+@media (max-width: 600px) {
+  .reading-preview { padding: 6px 6px 0; border-radius: 11px; }
+  .reading-preview img { border-radius: 6px; }
+  .reading-preview figcaption { font-size: 12px; margin: 11px 6px; }
+}
