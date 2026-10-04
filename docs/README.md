@@ -24,4 +24,4 @@
 
 ## Help
 
-Use [Help](https://yangzichao.github.io/JustSessions/help.html) for a brief feature overview and remote host setup, including installing tmux on the host. In the app, open the sidebar's question mark icon or **Help → JustSessions Help**. Choose **Create a GitHub issue** for feedback on GitHub, or **Bug report** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com).
+Use [Help](https://yangzichao.github.io/JustSessions/help.html) for a brief feature overview and remote host setup, including installing tmux on the host. In the app, open the sidebar's question mark icon or **Help → JustSessions Help**. Under **Feedback**, choose **GitHub issue** to open one on GitHub, or **Email** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com).

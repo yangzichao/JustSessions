@@ -118,7 +118,7 @@ Build locally with `make`; the app is written to `dist/JustSessions.app`. Use `m
 
 In the app, use the sidebar's question mark icon or **Help → JustSessions Help** for a brief feature overview and SSH setup. Install **tmux on each remote host** to keep its sessions running after a disconnect or closing a tab.
 
-For feedback, choose **Create a GitHub issue** in Help, or **Bug report** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com). Both options are also on the website's Help page.
+For feedback, choose **GitHub issue** in Help, or **Email** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com). Both options are also on the website's Help page.
 
 ## License
 

@@ -23,7 +23,7 @@ struct HelpView: View {
             }
 
             ThemeDivider()
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
                 Link("User guide ↗", destination: AppLinks.userGuideURL)
                 Spacer()
                 HelpFeedbackLinks()

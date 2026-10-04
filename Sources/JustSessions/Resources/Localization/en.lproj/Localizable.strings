@@ -112,8 +112,6 @@
 	<string>Branch</string>
 	<key>Browse…</key>
 	<string>Browse…</string>
-	<key>Bug report</key>
-	<string>Bug report</string>
 	<key>Can't check</key>
 	<string>Can't check</string>
 	<key>Cancel</key>
@@ -196,8 +194,8 @@
 	<string>Could not start session</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</string>
-	<key>Create a GitHub issue ↗</key>
-	<string>Create a GitHub issue ↗</string>
+	<key>Create a GitHub issue</key>
+	<string>Create a GitHub issue</string>
 	<key>Dark</key>
 	<string>Dark</string>
 	<key>Delete 1 session</key>
@@ -220,8 +218,10 @@
 	<string>Deletion progress</string>
 	<key>Done</key>
 	<string>Done</string>
-	<key>Email a bug report</key>
-	<string>Email a bug report</string>
+	<key>Email feedback</key>
+	<string>Email feedback</string>
+	<key>Email ↗</key>
+	<string>Email ↗</string>
 	<key>End and close this terminal</key>
 	<string>End and close this terminal</string>
 	<key>End on %@</key>
@@ -244,6 +244,8 @@
 	<string>Export conversation</string>
 	<key>Export conversations</key>
 	<string>Export conversations</string>
+	<key>Feedback:</key>
+	<string>Feedback:</string>
 	<key>Find</key>
 	<string>Find</string>
 	<key>Find in conversation</key>
@@ -272,6 +274,8 @@
 	<string>Full Disk Access</string>
 	<key>General</key>
 	<string>General</string>
+	<key>GitHub issue ↗</key>
+	<string>GitHub issue ↗</string>
 	<key>Go to the first available message</key>
 	<string>Go to the first available message</string>
 	<key>Go to the latest message</key>

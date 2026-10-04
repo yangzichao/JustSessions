@@ -2,14 +2,17 @@ import SwiftUI
 
 struct HelpFeedbackLinks: View {
     var body: some View {
-        VStack(alignment: .trailing, spacing: 8) {
-            Link("Create a GitHub issue ↗", destination: AppLinks.createGitHubIssueURL)
+        HStack(spacing: 6) {
+            Text("Feedback:")
+                .foregroundStyle(ThemePalette.secondaryText)
+            Link("GitHub issue ↗", destination: AppLinks.createGitHubIssueURL)
+                .help("Create a GitHub issue")
                 .accessibilityIdentifier("help.github-issue")
-            Link(destination: AppLinks.bugReportEmailURL) {
-                Label("Bug report", systemImage: "envelope")
-            }
-            .help("Email a bug report")
-            .accessibilityIdentifier("help.email-bug-report")
+            Text("·")
+                .foregroundStyle(ThemePalette.secondaryText)
+            Link("Email ↗", destination: AppLinks.feedbackEmailURL)
+                .help("Email feedback")
+                .accessibilityIdentifier("help.email-feedback")
         }
     }
 }

@@ -98,8 +98,6 @@
 	<string>为 %lld 个会话创建分支</string>
 	<key>Browse…</key>
 	<string>浏览…</string>
-	<key>Bug report</key>
-	<string>报告问题</string>
 	<key>Can't check</key>
 	<string>无法检查</string>
 	<key>Cancel</key>
@@ -184,8 +182,8 @@
 	<string>无法启动会话</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>找不到 iTerm2 的默认 Profile。动态 Profile 无法导入。</string>
-	<key>Create a GitHub issue ↗</key>
-	<string>创建 GitHub Issue ↗</string>
+	<key>Create a GitHub issue</key>
+	<string>创建 GitHub Issue</string>
 	<key>Dark</key>
 	<string>深色</string>
 	<key>Delete %lld sessions</key>
@@ -212,8 +210,10 @@
 	<string>删除进度</string>
 	<key>Done</key>
 	<string>完成</string>
-	<key>Email a bug report</key>
-	<string>通过邮件报告问题</string>
+	<key>Email feedback</key>
+	<string>通过邮件反馈</string>
+	<key>Email ↗</key>
+	<string>邮件 ↗</string>
 	<key>End and close this terminal</key>
 	<string>结束并关闭此终端</string>
 	<key>End on %@</key>
@@ -238,6 +238,8 @@
 	<string>导出对话</string>
 	<key>Export conversations</key>
 	<string>导出对话</string>
+	<key>Feedback:</key>
+	<string>反馈：</string>
 	<key>Find</key>
 	<string>查找</string>
 	<key>Find in conversation</key>
@@ -266,6 +268,8 @@
 	<string>完全磁盘访问权限</string>
 	<key>General</key>
 	<string>通用</string>
+	<key>GitHub issue ↗</key>
+	<string>GitHub Issue ↗</string>
 	<key>Go to the first available message</key>
 	<string>跳到第一条可用消息</string>
 	<key>Go to the latest message</key>
