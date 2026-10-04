@@ -78,10 +78,10 @@ No separate local tmux install is needed. Direct `swift run` builds need **tmux 
 
 1. Download **[JustSessions.dmg](https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg)**, Developer ID signed and notarized by Apple.
 2. Open it, drag **JustSessions** into **Applications**, and launch it.
-3. Find a project or session in the sidebar. Select a supported session to read its preview.
+3. Choose **Projects** in the sidebar to browse sessions, or **Open tabs** to switch between open terminals. Select a supported session to read its preview.
 4. Double-click a session or choose **Resume** to continue in its original CLI.
 
-App updates are delivered through Sparkle. [Getting started](docs/guides/getting-started.md) covers your first session, missing CLIs, SSH, and tmux. The same quick guide is available on the [website](https://yangzichao.github.io/JustSessions/guide.html).
+App updates are delivered through Sparkle; check manually in **Settings → General**. [Getting started](docs/guides/getting-started.md) covers your first session, missing CLIs, SSH, and tmux. The same quick guide is available on the [website](https://yangzichao.github.io/JustSessions/guide.html).
 
 ## Supported CLIs
 
@@ -116,7 +116,7 @@ Build locally with `make`; the app is written to `dist/JustSessions.app`. Use `m
 - [Website development](docs/development/website.md): preview, validate, and publish the GitHub Pages site.
 - [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Help](https://yangzichao.github.io/JustSessions/help.html)
 
-In the app, use the sidebar's question mark icon or **Help → JustSessions Help** for a brief feature overview and SSH setup. Install **tmux on each remote host** to keep its sessions running after a disconnect or closing a tab.
+In the app, open **Settings → Help & feedback** or **Help → JustSessions Help** for a brief feature overview and SSH setup. Install **tmux on each remote host** to keep its sessions running after a disconnect or closing a tab.
 
 For feedback, choose **GitHub issue** in Help, or **Email** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com). Both options are also on the website's Help page.
 

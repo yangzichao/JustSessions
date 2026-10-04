@@ -61,7 +61,7 @@
           <li>Open the disk image and drag <strong>JustSessions</strong> into <strong>Applications</strong>.</li>
           <li>Launch the app. Existing sessions appear under <strong>This Mac</strong>, grouped by project.</li>
         </ol>
-        <p class="fine-print">App updates arrive through Sparkle. JustSessions is free; your CLI provider's charges still apply.</p>
+        <p class="fine-print">App updates arrive through Sparkle; check manually in <strong>Settings → General</strong>. JustSessions is free; your CLI provider's charges still apply.</p>
       </section>
 
       <section id="resume" aria-labelledby="resume-title">
@@ -71,7 +71,7 @@
           <li>Select a session to read its conversation preview.</li>
           <li>Double-click a session or choose <strong>Resume</strong> to continue in its original CLI and project folder.</li>
         </ol>
-        <p>A session whose CLI is already running opens on that process with one click. The <strong>+</strong> at the top of the sidebar starts an installed CLI, or <strong>Terminal</strong> for your login shell; a project's <strong>+</strong> menu offers the same. <strong>Open tabs</strong> above the project list keeps every open terminal one click away. Search does not include conversation text.</p>
+        <p>A session whose CLI is already running opens on that process with one click. The <strong>+</strong> at the top of the sidebar starts an installed CLI, or <strong>Terminal</strong> for your login shell; a project's <strong>+</strong> menu offers the same. Switch between <strong>Projects</strong> to browse saved sessions and <strong>Open tabs</strong> to switch terminals. Each open tab shows its project and remote host when applicable. Both views retain their search and scroll position. Time and CLI filters live beside the switch in Projects and do not hide open tabs. Search does not include conversation text.</p>
       </section>
 
       <section id="reading" aria-labelledby="reading-title">
@@ -126,7 +126,7 @@
       <section id="troubleshooting" aria-labelledby="troubleshooting-title">
         <h2 id="troubleshooting-title">If a session or CLI is missing</h2>
         <ul>
-          <li>Clear the CLI and recent-session filters, then refresh the sidebar.</li>
+          <li>In <strong>Projects</strong>, clear the time and CLI filters, then click the affected host's refresh button.</li>
           <li>Confirm the CLI runs in your usual terminal. New session menus offer only installed tools.</li>
           <li>Start one conversation so the CLI creates history. Kiro sessions need a message; archived and subagent OpenCode sessions are excluded.</li>
           <li>For SSH, check passwordless access, <code>rsync</code>, and the remote CLI. Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders, and the OpenCode database its login shell points to.</li>
@@ -141,7 +141,7 @@
 
       <aside id="settings" class="guide-more" aria-label="More help">
         <h2>Make it yours.</h2>
-        <p>Open <strong>Settings</strong> in the sidebar or press ⌘,. <strong>General → Interface language</strong> offers Follow System (default), English, or 简体中文. Choose from six themes, including GitHub, Atom One, and Tokyo Night, which color the terminals too, plus light or dark appearance and terminal fonts. Under <strong>Appearance → Terminal</strong>, <strong>Colors</strong> gives terminals their own color scheme, such as Dracula or Nord, or imports your iTerm2 colors; iTerm2's settings are read only when you choose that. Changes apply in place. <strong>Permissions</strong> shows whether macOS allows notifications, Full Disk Access, and Local Network.</p>
+        <p>Open <strong>Settings</strong> in the sidebar or press ⌘,. <strong>Help &amp; feedback</strong> contains the feature overview and support links. <strong>General → Interface language</strong> offers Follow System (default), English, or 简体中文. Choose from six themes, including GitHub, Atom One, and Tokyo Night, which color the terminals too, plus light or dark appearance and terminal fonts. Under <strong>Appearance → Terminal</strong>, <strong>Colors</strong> gives terminals their own color scheme, such as Dracula or Nord, or imports your iTerm2 colors; iTerm2's settings are read only when you choose that. Changes apply in place. <strong>Permissions</strong> shows whether macOS allows notifications, Full Disk Access, and Local Network.</p>
         <p><a href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-management.md">Full session management guide</a> · <a href="./help.html">Quick help</a></p>
       </aside>
     </div>

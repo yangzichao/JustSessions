@@ -25,11 +25,11 @@ Sparkle delivers subsequent app updates. Your CLI provider's plans and charges s
 
 ## Resume your first session
 
-1. Search a project name or path, session title, or session ID.
+1. Choose **Projects** in the sidebar, then search a project name or path, session title, or session ID.
 2. Select a supported session to read its conversation preview.
 3. Double-click a session or choose **Resume** to open its CLI in the original working directory.
 
-A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing, preview, and resume. See the [full capability table](../../README.md#supported-clis).
+Choose **Open tabs** to switch between this window's terminals; each row shows its project and, for SSH, its host. Switching views keeps each list's search and scroll position. A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing, preview, and resume. See the [full capability table](../../README.md#supported-clis).
 
 Click the new-window button in the preview's reading toolbar to open a dedicated reading window. Adjust text with **A− / A+**, switch between a readable column and the full window width, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
 
@@ -55,7 +55,7 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 
 ## If a session or CLI is missing
 
-- Clear the CLI and recent-session filters, then refresh the sidebar.
+- In **Projects**, clear the time and CLI filters, then click the affected host's refresh button.
 - Confirm the CLI executable works in your usual terminal. New session menus offer only installed CLIs.
 - Start one conversation in the CLI so it has history for the app to discover. Kiro sessions need at least one message; OpenCode archived and subagent sessions are excluded.
 - Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders, and the OpenCode database its login shell points to.
@@ -67,4 +67,4 @@ Open **Settings** in the sidebar or press ⌘,. **General > Interface language**
 
 JustSessions reads local CLI files and caches supported remote history over SSH. It does not upload conversations to a JustSessions service. The CLIs still communicate with their providers. Sparkle checks for app updates through a JustSessions update server that counts checks per day and app version, without storing IP addresses or identifiers. [Storage and privacy](session-storage.md).
 
-Use the sidebar's question mark icon or **Help → JustSessions Help** for a brief feature overview and remote host setup. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The same overview is on the [website Help page](https://yangzichao.github.io/JustSessions/help.html); its issue link opens GitHub.
+Open **Settings → Help & feedback** or **Help → JustSessions Help** for a brief feature overview and remote host setup. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The same overview is on the [website Help page](https://yangzichao.github.io/JustSessions/help.html); its issue link opens GitHub.
