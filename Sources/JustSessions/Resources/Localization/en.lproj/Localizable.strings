@@ -10,6 +10,10 @@
 	<string>%@ %@ — %@</string>
 	<key>%@ (imported)</key>
 	<string>%@ (imported)</string>
+	<key>%@ - Left view</key>
+	<string>%@ - Left view</string>
+	<key>%@ - Right view</key>
+	<string>%@ - Right view</string>
 	<key>%@ could not be refreshed: %@</key>
 	<string>%@ could not be refreshed: %@</string>
 	<key>%@ has not saved this session yet · click to open its terminal</key>
@@ -86,6 +90,8 @@
 	<string>Add project on this Mac</string>
 	<key>Add project…</key>
 	<string>Add project…</string>
+	<key>Add tab to new split view</key>
+	<string>Add tab to new split view</string>
 	<key>All sessions</key>
 	<string>All sessions</string>
 	<key>All time</key>
@@ -124,6 +130,8 @@
 	<string>Archived projects (%lld)…</string>
 	<key>Archived projects on %@</key>
 	<string>Archived projects on %@</string>
+	<key>Arrange split view</key>
+	<string>Arrange split view</string>
 	<key>Ask Now</key>
 	<string>Ask Now</string>
 	<key>A−</key>
@@ -168,12 +176,20 @@
 	<string>Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you.</string>
 	<key>Close %@</key>
 	<string>Close %@</string>
+	<key>Close Left View</key>
+	<string>Close Left View</string>
+	<key>Close Right View</key>
+	<string>Close Right View</string>
 	<key>Close Tab…</key>
 	<string>Close Tab…</string>
 	<key>Close Window</key>
 	<string>Close Window</string>
 	<key>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</key>
 	<string>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</string>
+	<key>Close left view</key>
+	<string>Close left view</string>
+	<key>Close right view</key>
+	<string>Close right view</string>
 	<key>Close search</key>
 	<string>Close search</string>
 	<key>Close search (Escape)</key>
@@ -184,6 +200,8 @@
 	<string>Close terminal…</string>
 	<key>Close the tab, keep the CLI</key>
 	<string>Close the tab, keep the CLI</string>
+	<key>Close this view</key>
+	<string>Close this view</string>
 	<key>Collapse Group</key>
 	<string>Collapse Group</string>
 	<key>Collapse project</key>
@@ -372,10 +390,6 @@
 	<string>Latest message</string>
 	<key>Launch JustSessions at login</key>
 	<string>Launch JustSessions at login</string>
-	<key>Leave Split View</key>
-	<string>Leave Split View</string>
-	<key>Leave split view</key>
-	<string>Leave split view</string>
 	<key>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</key>
 	<string>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</string>
 	<key>Light</key>
@@ -404,6 +418,8 @@
 	<string>More in the right-click menu</string>
 	<key>More room for the terminal</key>
 	<string>More room for the terminal</string>
+	<key>Move tab into split view</key>
+	<string>Move tab into split view</string>
 	<key>Name</key>
 	<string>Name</string>
 	<key>Needs my input, such as a permission prompt</key>
@@ -420,6 +436,8 @@
 	<string>New session (⌘N)</string>
 	<key>New session in %@</key>
 	<string>New session in %@</string>
+	<key>New split view with current tab</key>
+	<string>New split view with current tab</string>
 	<key>New terminal</key>
 	<string>New terminal</string>
 	<key>Next</key>
@@ -472,8 +490,6 @@
 	<string>Open in a separate reading window</string>
 	<key>Open in new window</key>
 	<string>Open in new window</string>
-	<key>Open in split view</key>
-	<string>Open in split view</string>
 	<key>Open project in</key>
 	<string>Open project in</string>
 	<key>Open project in Finder</key>
@@ -566,6 +582,10 @@
 	<string>Resume</string>
 	<key>Reveal session file in Finder</key>
 	<string>Reveal session file in Finder</string>
+	<key>Reverse Views</key>
+	<string>Reverse Views</string>
+	<key>Reverse views</key>
+	<string>Reverse views</string>
 	<key>Right-click a selected row in the sidebar to resume, branch, or delete them.</key>
 	<string>Right-click a selected row in the sidebar to resume, branch, or delete them.</string>
 	<key>Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.</key>
@@ -598,6 +618,10 @@
 	<string>Search the text of the conversation you are reading. ⌘F does the same.</string>
 	<key>Searching…</key>
 	<string>Searching…</string>
+	<key>Separate Views</key>
+	<string>Separate Views</string>
+	<key>Separate views</key>
+	<string>Separate views</string>
 	<key>Session %lld of %lld</key>
 	<string>Session %lld of %lld</string>
 	<key>Sessions from %@, grouped by host and project.</key>
@@ -618,8 +642,6 @@
 	<string>Show sidebar</string>
 	<key>Show sidebar (⌃⌘S)</key>
 	<string>Show sidebar (⌃⌘S)</string>
-	<key>Shown in split view</key>
-	<string>Shown in split view</string>
 	<key>Sidebar width</key>
 	<string>Sidebar width</string>
 	<key>Size</key>
@@ -634,8 +656,8 @@
 	<string>Software updates</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>Some colors are missing, such as the text or background color.</string>
-	<key>Split view divider</key>
-	<string>Split view divider</string>
+	<key>Split View Resize Handle (draggable)</key>
+	<string>Split View Resize Handle (draggable)</string>
 	<key>Start a native CLI or a plain terminal in a project folder.</key>
 	<string>Start a native CLI or a plain terminal in a project folder.</string>
 	<key>Start a new session in %@</key>
@@ -654,10 +676,10 @@
 	<string>Stopping deletion</string>
 	<key>Stopping…</key>
 	<string>Stopping…</string>
-	<key>Swap Split Sides</key>
-	<string>Swap Split Sides</string>
-	<key>Swap split sides</key>
-	<string>Swap split sides</string>
+	<key>Swap with left view</key>
+	<string>Swap with left view</string>
+	<key>Swap with right view</key>
+	<string>Swap with right view</string>
 	<key>Switches between a readable width and the full window width</key>
 	<string>Switches between a readable width and the full window width</string>
 	<key>System</key>

@@ -4,6 +4,10 @@
 <dict>
 	<key>%@ (imported)</key>
 	<string>%@（已导入）</string>
+	<key>%@ - Left view</key>
+	<string>%@ - 左侧视图</string>
+	<key>%@ - Right view</key>
+	<string>%@ - 右侧视图</string>
 	<key>%@ could not be refreshed: %@</key>
 	<string>无法刷新 %@：%@</string>
 	<key>%@ has not saved this session yet · click to open its terminal</key>
@@ -70,6 +74,8 @@
 	<string>在此 Mac 上添加项目</string>
 	<key>Add project…</key>
 	<string>添加项目…</string>
+	<key>Add tab to new split view</key>
+	<string>向新拆分视图添加标签页</string>
 	<key>All sessions</key>
 	<string>全部会话</string>
 	<key>All time</key>
@@ -108,6 +114,8 @@
 	<string>已归档的项目（%lld）…</string>
 	<key>Archived projects on %@</key>
 	<string>%@ 上已归档的项目</string>
+	<key>Arrange split view</key>
+	<string>调整拆分视图</string>
 	<key>Ask Now</key>
 	<string>立即请求</string>
 	<key>Branch</key>
@@ -152,12 +160,20 @@
 	<string>单击项目名称即可折叠它的标签页。折叠后，有 CLI 在等你时仍会显示出来。</string>
 	<key>Close %@</key>
 	<string>关闭 %@</string>
+	<key>Close Left View</key>
+	<string>关闭左侧视图</string>
+	<key>Close Right View</key>
+	<string>关闭右侧视图</string>
 	<key>Close Tab…</key>
 	<string>关闭标签…</string>
 	<key>Close Window</key>
 	<string>关闭窗口</string>
 	<key>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</key>
 	<string>用 **保持运行** 关闭标签页，或直接退出应用，CLI 会继续运行；点击会话即可回到它。</string>
+	<key>Close left view</key>
+	<string>关闭左侧视图</string>
+	<key>Close right view</key>
+	<string>关闭右侧视图</string>
 	<key>Close search</key>
 	<string>关闭搜索</string>
 	<key>Close search (Escape)</key>
@@ -168,6 +184,8 @@
 	<string>关闭终端…</string>
 	<key>Close the tab, keep the CLI</key>
 	<string>关掉标签页，CLI 照常运行</string>
+	<key>Close this view</key>
+	<string>关闭此视图</string>
 	<key>Collapse Group</key>
 	<string>折叠标签组</string>
 	<key>Collapse project</key>
@@ -362,10 +380,6 @@
 	<string>最新消息</string>
 	<key>Launch JustSessions at login</key>
 	<string>开机启动 JustSessions</string>
-	<key>Leave Split View</key>
-	<string>退出分屏</string>
-	<key>Leave split view</key>
-	<string>退出分屏</string>
 	<key>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</key>
 	<string>让 JustSessions 在会话需要你的输入或完成本轮回复时通知你。在「通用」中选择通知哪些情况。</string>
 	<key>Light</key>
@@ -392,6 +406,8 @@
 	<string>右键菜单里还有更多</string>
 	<key>More room for the terminal</key>
 	<string>给终端更多空间</string>
+	<key>Move tab into split view</key>
+	<string>将标签页移至拆分视图</string>
 	<key>Name</key>
 	<string>名称</string>
 	<key>Needs my input, such as a permission prompt</key>
@@ -408,6 +424,8 @@
 	<string>新建会话（⌘N）</string>
 	<key>New session in %@</key>
 	<string>在 %@ 中新建会话</string>
+	<key>New split view with current tab</key>
+	<string>使用当前标签页创建新的拆分视图</string>
 	<key>New terminal</key>
 	<string>新建终端</string>
 	<key>Next</key>
@@ -462,8 +480,6 @@
 	<string>在独立阅读窗口中打开</string>
 	<key>Open in new window</key>
 	<string>在新窗口中打开</string>
-	<key>Open in split view</key>
-	<string>在分屏中打开</string>
 	<key>Open project in</key>
 	<string>打开项目于</string>
 	<key>Open project in Finder</key>
@@ -558,6 +574,10 @@
 	<string>继续 %lld 个会话</string>
 	<key>Reveal session file in Finder</key>
 	<string>在 Finder 中显示会话文件</string>
+	<key>Reverse Views</key>
+	<string>反转视图</string>
+	<key>Reverse views</key>
+	<string>反转视图</string>
 	<key>Right-click a selected row in the sidebar to resume, branch, or delete them.</key>
 	<string>右键点击侧栏中已选择的条目，以继续、创建分支或删除会话。</string>
 	<key>Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.</key>
@@ -590,6 +610,10 @@
 	<string>在正在阅读的对话中搜索文字。⌘F 也可以。</string>
 	<key>Searching…</key>
 	<string>正在搜索…</string>
+	<key>Separate Views</key>
+	<string>取消拆分视图</string>
+	<key>Separate views</key>
+	<string>取消拆分视图</string>
 	<key>Session %lld of %lld</key>
 	<string>会话 %lld / %lld</string>
 	<key>Sessions from %@, grouped by host and project.</key>
@@ -610,8 +634,6 @@
 	<string>显示侧栏</string>
 	<key>Show sidebar (⌃⌘S)</key>
 	<string>显示侧栏（⌃⌘S）</string>
-	<key>Shown in split view</key>
-	<string>在分屏中显示</string>
 	<key>Sidebar width</key>
 	<string>侧栏宽度</string>
 	<key>Size</key>
@@ -626,8 +648,8 @@
 	<string>软件更新</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>缺少部分颜色，例如文字或背景颜色。</string>
-	<key>Split view divider</key>
-	<string>分屏分隔条</string>
+	<key>Split View Resize Handle (draggable)</key>
+	<string>拆分视图下大小调整手柄（可拖动）</string>
 	<key>Start a native CLI or a plain terminal in a project folder.</key>
 	<string>在项目文件夹中启动原生 CLI 或普通终端。</string>
 	<key>Start a new session in %@</key>
@@ -648,10 +670,10 @@
 	<string>正在停止删除</string>
 	<key>Stopping…</key>
 	<string>正在停止…</string>
-	<key>Swap Split Sides</key>
-	<string>交换左右位置</string>
-	<key>Swap split sides</key>
-	<string>交换左右位置</string>
+	<key>Swap with left view</key>
+	<string>与左侧视图交换</string>
+	<key>Swap with right view</key>
+	<string>与右侧视图交换</string>
 	<key>Switches between a readable width and the full window width</key>
 	<string>在适合阅读的宽度和窗口全宽之间切换</string>
 	<key>System</key>

@@ -4,7 +4,8 @@ import SwiftUI
 /// in the project's color, which collapses or expands the group. Selecting a tab of a collapsed group, by shortcut or
 /// from the sidebar, expands it. The bar sits in the title bar, in the sidebar's color, like a browser's tab strip:
 /// the selected tab takes its terminal's color and runs down into it, through the bar's bottom line. As in Chrome,
-/// tabs narrow together to fit the bar as more open, and the bar scrolls once they are as narrow as they get.
+/// tabs narrow together to fit the bar as more open, and the bar scrolls once they are as narrow as they get; a split's
+/// two tabs share one tab's width.
 struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
     /// Width at the leading edge that tabs never enter, even when scrolled, so the window buttons and sidebar toggle
@@ -20,9 +21,12 @@ struct WorkspaceTabBar: View {
     var body: some View {
         let groups = TerminalTabGroup.groups(of: store.terminalSessions, projectDirectoryKey: store.tabGroupKey(of:))
         let colorsByProjectKey = TabGroupPalette.colorsByProjectKey(groups.map(\.projectDirectoryKey))
-        let shownTabCount = groups
+        let shownTabs = groups
             .filter { !collapsedProjectKeys.contains($0.projectDirectoryKey) }
-            .reduce(0) { $0 + $1.tabs.count }
+            .flatMap(\.tabs)
+        // A split's two tabs, always in one group, take one tab's place.
+        let shownSplitCount = store.terminalSplits.filter { split in shownTabs.contains { split.contains($0.id) } }.count
+        let shownTabCount = shownTabs.count - shownSplitCount
         let tabWidth = WorkspaceTabWidth.fitting(
             shownTabCount: shownTabCount,
             groupCount: groups.count,

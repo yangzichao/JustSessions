@@ -36,4 +36,21 @@ struct WorkspaceTabWidthTests {
 
         #expect(width == WorkspaceTabMetrics.maximumWidth)
     }
+
+    @Test func aSplitTakesOneTabsPlaceWithEachOfItsTabsHalfAsWide() {
+        // Seven tabs, two of them a split, share 900 as six places.
+        let tabWidth = WorkspaceTabWidth.fitting(shownTabCount: 6, groupCount: 1, groupLabelsWidth: 100, barWidth: 1032)
+
+        #expect(tabWidth == 150)
+        #expect(WorkspaceTabWidth.splitTabWidth(forTabWidth: tabWidth) == 75)
+        #expect(WorkspaceTabWidth.splitTabWidth(forTabWidth: WorkspaceTabMetrics.maximumWidth) == 100)
+    }
+
+    @Test func aSplitTabsHalfWidthRoundsDownToWholePoints() {
+        #expect(WorkspaceTabWidth.splitTabWidth(forTabWidth: 151) == 75)
+    }
+
+    @Test func aSplitTabStopsNarrowingAtItsNarrowestWidth() {
+        #expect(WorkspaceTabWidth.splitTabWidth(forTabWidth: WorkspaceTabMetrics.minimumWidth) == WorkspaceTabMetrics.minimumSplitTabWidth)
+    }
 }

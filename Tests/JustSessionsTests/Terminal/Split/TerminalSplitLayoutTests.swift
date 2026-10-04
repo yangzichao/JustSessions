@@ -2,26 +2,37 @@ import Foundation
 import Testing
 @testable import JustSessions
 
-/// The divider parts the split's width beside it; each pane keeps a workable minimum while the window has room.
+/// The panes sit inside the split area's insets, around the resize area; each pane keeps a workable minimum while the
+/// window has room.
 struct TerminalSplitLayoutTests {
     @Test func anEvenFractionPartsTheAvailableWidthEvenly() {
-        let widths = TerminalSplitLayout.paneWidths(fraction: 0.5, totalWidth: 1008)
+        // 1026 minus two 8-point insets and the 10-point resize area leaves 1000.
+        let widths = TerminalSplitLayout.paneWidths(fraction: 0.5, totalWidth: 1026)
         #expect(widths.leading == 500)
         #expect(widths.trailing == 500)
     }
 
-    @Test func paneWidthsAndTheDividerAlwaysFillTheTotal() {
+    @Test func paneWidthsTheInsetsAndTheResizeAreaAlwaysFillTheTotal() {
         for fraction in stride(from: 0.0, through: 1.0, by: 0.07) {
             let widths = TerminalSplitLayout.paneWidths(fraction: fraction, totalWidth: 987)
-            #expect(widths.leading + widths.trailing + TerminalSplitLayout.dividerWidth == 987)
+            let total = widths.leading + widths.trailing + TerminalSplitLayout.resizeAreaWidth + 2 * TerminalSplitLayout.contentInset
+            #expect(total == 987)
         }
     }
 
+    @Test func thePanesSitInsideTheInsetsWithTheResizeAreaBetweenThem() {
+        let frames = TerminalSplitLayout.frames(fraction: 0.5, size: CGSize(width: 1026, height: 600))
+        #expect(frames.left == CGRect(x: 8, y: 8, width: 500, height: 584))
+        #expect(frames.resizeArea == CGRect(x: 508, y: 8, width: 10, height: 584))
+        #expect(frames.right == CGRect(x: 518, y: 8, width: 500, height: 584))
+        #expect(frames.right.maxX + TerminalSplitLayout.contentInset == 1026)
+    }
+
     @Test func neitherPaneGetsNarrowerThanTheMinimum() {
-        let narrow = TerminalSplitLayout.paneWidths(fraction: 0.01, totalWidth: 1008)
+        let narrow = TerminalSplitLayout.paneWidths(fraction: 0.01, totalWidth: 1026)
         #expect(narrow.leading == TerminalSplitLayout.minimumPaneWidth)
 
-        let wide = TerminalSplitLayout.paneWidths(fraction: 0.99, totalWidth: 1008)
+        let wide = TerminalSplitLayout.paneWidths(fraction: 0.99, totalWidth: 1026)
         #expect(wide.trailing == TerminalSplitLayout.minimumPaneWidth)
     }
 
@@ -31,16 +42,16 @@ struct TerminalSplitLayoutTests {
         #expect(abs(widths.leading - widths.trailing) <= 1)
     }
 
-    @Test func draggingTheDividerMovesTheFractionByTheTravelledShare() {
-        let total: CGFloat = 1008
+    @Test func draggingTheResizeAreaMovesTheFractionByTheTravelledShare() {
+        let total: CGFloat = 1026
         let availableWidth = TerminalSplitLayout.availableWidth(totalWidth: total)
         let dragged = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: availableWidth / 10, totalWidth: total)
         #expect(abs(dragged - 0.6) < 0.0001)
     }
 
     @Test func aDragPastTheEdgeStopsAtTheMinimumPane() {
-        let dragged = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: -5000, totalWidth: 1008)
-        let widths = TerminalSplitLayout.paneWidths(fraction: dragged, totalWidth: 1008)
+        let dragged = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: -5000, totalWidth: 1026)
+        let widths = TerminalSplitLayout.paneWidths(fraction: dragged, totalWidth: 1026)
         #expect(widths.leading == TerminalSplitLayout.minimumPaneWidth)
     }
 }
