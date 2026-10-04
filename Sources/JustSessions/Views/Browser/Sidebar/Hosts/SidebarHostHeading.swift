@@ -106,7 +106,7 @@ struct SidebarHostHeading: View {
                     .frame(width: 16, height: 16)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ThemePlainButtonStyle(cornerRadius: 4))
             .opacity(isHovered ? 1 : 0)
             .allowsHitTesting(isHovered)
             .help(addProjectHelpText)

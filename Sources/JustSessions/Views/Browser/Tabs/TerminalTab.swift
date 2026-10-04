@@ -33,7 +33,7 @@ struct TerminalTab: View {
                 .frame(maxHeight: .infinity)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ThemePlainButtonStyle(showsHover: false))
             .help(Text("Show \(session.displayTitle)") + Text(verbatim: "\n" + details))
             .accessibilityAddTraits(isSelected ? .isSelected : [])
             .contextMenu {

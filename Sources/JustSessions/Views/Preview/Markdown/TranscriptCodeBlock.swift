@@ -19,7 +19,7 @@ struct TranscriptCodeBlock: View {
                     NSPasteboard.general.clearContents()
                     hasCopied = NSPasteboard.general.setString(text, forType: .string)
                 }
-                .buttonStyle(.borderless)
+                .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 4, verticalPadding: 2))
                 .font(.caption)
                 .help("Copy code")
                 .accessibilityLabel("Copy code")

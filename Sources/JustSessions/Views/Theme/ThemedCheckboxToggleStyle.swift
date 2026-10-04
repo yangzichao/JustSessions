@@ -21,7 +21,7 @@ struct ThemedCheckboxToggleStyle: ToggleStyle {
                 configuration.label.foregroundStyle(ThemePalette.ink)
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemePlainButtonStyle(showsHover: false))
         .accessibilityRepresentation {
             Toggle(isOn: configuration.$isOn) { configuration.label }
                 .toggleStyle(.checkbox)

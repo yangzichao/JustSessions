@@ -28,6 +28,7 @@ struct PermissionsSettingsView: View {
             HStack {
                 Spacer()
                 Button("Check Again") { Task { await checkAll() } }
+                    .buttonStyle(QuietBorderedButtonStyle())
             }
         }
         .task { await checkAll() }

@@ -16,8 +16,7 @@ struct ProviderProminentButtonStyle: ButtonStyle {
                     .fill(tint.gradient)
                     .shadow(color: tint.opacity(isEnabled ? 0.3 : 0), radius: 3, y: 1)
             )
-            .brightness(configuration.isPressed ? -0.06 : 0)
-            .opacity(isEnabled ? 1 : 0.4)
             .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .modifier(ThemeButtonPressFeedback(isPressed: configuration.isPressed))
     }
 }

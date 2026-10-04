@@ -10,7 +10,7 @@ struct HelpAndFeedbackSettingsView: View {
                 HelpFeedbackLinks()
                 Spacer(minLength: 0)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ThemePlainButtonStyle(verticalPadding: 2))
             .font(.callout)
 
             HelpFeatureOverview()

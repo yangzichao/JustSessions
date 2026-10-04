@@ -57,7 +57,7 @@ struct SidebarHeader: View {
                 .frame(width: 24, height: 24)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(ThemePlainButtonStyle())
         .help(searchLabel)
         .accessibilityLabel(searchLabel)
     }

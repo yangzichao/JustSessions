@@ -11,7 +11,7 @@ struct TranscriptPageBoundary: View {
             Button(action: action) {
                 if isEarlier { Text("Load earlier messages") } else { Text("Load later messages") }
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 6, verticalPadding: 4))
             .disabled(isLoading)
         }
         .font(.caption)

@@ -17,7 +17,7 @@ struct PendingNewSessionRow: View {
                 TerminalStatusIndicator(session: terminal)
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemePlainButtonStyle(showsHover: false))
         .help("\(provider.rawValue) has not saved this session yet · click to open its terminal")
         .accessibilityLabel("\(terminal.displayTitle), \(provider.rawValue), open terminal, not saved yet")
     }

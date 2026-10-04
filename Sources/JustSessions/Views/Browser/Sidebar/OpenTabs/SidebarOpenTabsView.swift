@@ -48,7 +48,7 @@ struct SidebarOpenTabsView: View {
                     if store.terminalSessions.isEmpty {
                         Text("No open tabs")
                         Button("New session", action: onNewSession)
-                            .buttonStyle(.borderless)
+                            .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 6, verticalPadding: 4))
                     } else {
                         Text("No matching open tabs")
                     }

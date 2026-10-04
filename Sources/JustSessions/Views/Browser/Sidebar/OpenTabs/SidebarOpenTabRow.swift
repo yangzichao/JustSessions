@@ -33,7 +33,7 @@ struct SidebarOpenTabRow: View {
             .contentShape(Rectangle())
             .sidebarRowHighlight(isSelected: isSelected, selectionTint: tab.provider?.tintColor)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemePlainButtonStyle(showsHover: false))
         .help(Text("Show \(tab.displayTitle)") + Text(verbatim: "\n" + projectContext + "\n" + tab.projectPath))
         .accessibilityLabel(Text(verbatim: "\(tab.displayTitle), \(projectContext)"))
         .accessibilityAddTraits(isSelected ? .isSelected : [])

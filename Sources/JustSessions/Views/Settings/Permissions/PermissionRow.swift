@@ -28,6 +28,7 @@ struct PermissionRow: View {
                 }
                 Button("Open System Settings") { permission.openSystemSettings() }
             }
+            .buttonStyle(QuietBorderedButtonStyle())
             .controlSize(.small)
             .padding(.top, 2)
         }

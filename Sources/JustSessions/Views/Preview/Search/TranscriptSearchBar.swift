@@ -43,7 +43,7 @@ struct TranscriptSearchBar: View {
                     .help("Close search (Escape)")
             }
             .labelStyle(.iconOnly)
-            .buttonStyle(.borderless)
+            .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 4, verticalPadding: 4))
             if hasOmittedEntries {
                 Text("Search covers the entries shown in this preview.")
                     .font(.caption)

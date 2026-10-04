@@ -21,7 +21,7 @@ struct SidebarHostRefreshButton: View {
                         .frame(width: 16, height: 20)
                         .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ThemePlainButtonStyle(cornerRadius: 4))
                 .disabled(isDisabled)
                 .help(refreshAccessibilityLabel)
                 .accessibilityLabel(refreshAccessibilityLabel)

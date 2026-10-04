@@ -5,7 +5,6 @@ struct SidebarToggleButton: View {
     static let width: CGFloat = 28
 
     @Binding var isSidebarHidden: Bool
-    @State private var isHovered = false
 
     private var actionName: LocalizedStringKey {
         isSidebarHidden ? "Show sidebar" : "Hide sidebar"
@@ -21,15 +20,9 @@ struct SidebarToggleButton: View {
                 .font(.system(size: 14))
                 .foregroundStyle(.secondary)
                 .frame(width: Self.width, height: 22)
-                .background {
-                    if isHovered {
-                        RoundedRectangle(cornerRadius: 6, style: .continuous).fill(ThemePalette.hoverFill)
-                    }
-                }
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .onHover { isHovered = $0 }
+        .buttonStyle(ThemePlainButtonStyle())
         .help(helpText)
         .accessibilityLabel(actionName)
     }

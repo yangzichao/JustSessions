@@ -25,6 +25,8 @@ enum ThemePalette {
     static let secondaryText = ThemeColor(role: .secondaryText)
     /// Faint fills: the pointer over a row, a track behind a segmented control.
     static let hoverFill = ThemeColor(role: .line, opacity: 0.055)
+    /// Held-down controls: clearly stronger than the pointer's hover surface in either appearance.
+    static let pressedFill = ThemeColor(role: .line, opacity: 0.14)
     static let trackFill = ThemeColor(role: .line, opacity: 0.06)
     /// Hairlines between regions and around raised controls.
     static let hairline = ThemeColor(role: .line, opacity: 0.09)

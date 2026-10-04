@@ -40,7 +40,7 @@ struct TranscriptView: View {
             VStack {
                 ContentUnavailableView("Could not read this session", systemImage: "exclamationmark.triangle", description: Text(message))
                 Button("Try again") { paging.refresh(conversation, position: readingPositionStore.position(for: conversation.id)) }
-                    .buttonStyle(.borderless)
+                    .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 6, verticalPadding: 4))
             }
         } else if paging.transcript != nil {
             ContentUnavailableView("No messages yet", systemImage: "text.bubble")

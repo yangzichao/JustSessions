@@ -48,7 +48,7 @@ struct TranscriptReadingToolbar: View {
                     .accessibilityIdentifier("preview.open-reading-window")
             }
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 4, verticalPadding: 4))
         .padding(.horizontal, 24)
         .padding(.vertical, 10)
         .accessibilityIdentifier("preview.reading-toolbar")

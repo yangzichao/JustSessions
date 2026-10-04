@@ -49,7 +49,7 @@ struct TerminalTabGroupLabel: View {
             .padding(.vertical, 4)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemePressButtonStyle())
         .onHover { isHovered = $0 }
         .help("\(isCollapsed ? "Expand" : "Collapse") \(projectName) — \(location.copyablePath)")
         .accessibilityLabel("\(projectName) tab group")

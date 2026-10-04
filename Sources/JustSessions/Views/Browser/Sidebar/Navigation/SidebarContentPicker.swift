@@ -45,7 +45,7 @@ struct SidebarContentPicker: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemePlainButtonStyle(cornerRadius: 5))
         .accessibilityLabel(Text(title))
         .accessibilityValue(count.map { String($0) } ?? "")
         .accessibilityIdentifier("sidebar.mode.\(mode.rawValue)")

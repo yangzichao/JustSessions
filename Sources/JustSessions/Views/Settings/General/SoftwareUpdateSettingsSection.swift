@@ -20,6 +20,7 @@ struct SoftwareUpdateSettingsSection: View {
                 }
                 Spacer(minLength: 12)
                 Button("Check for updates", action: onCheckForUpdates)
+                    .buttonStyle(QuietBorderedButtonStyle())
                     .accessibilityIdentifier("settings.checkForUpdates")
             }
             Link("JustSessions website ↗", destination: AppLinks.websiteURL)

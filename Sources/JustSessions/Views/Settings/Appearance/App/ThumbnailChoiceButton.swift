@@ -53,7 +53,7 @@ struct ThumbnailChoiceButton<Thumbnail: View>: View {
             }
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemePressButtonStyle())
         .onHover { isHovered = $0 }
         .accessibilityLabel(title)
         .accessibilityAddTraits(isSelected ? .isSelected : [])

@@ -21,7 +21,7 @@ struct SidebarSearchField: View {
             Button(action: onClose) {
                 Image(systemName: "xmark.circle.fill")
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 2, verticalPadding: 2))
             .foregroundStyle(.tertiary)
             .help("Close search")
             .accessibilityLabel("Close search")

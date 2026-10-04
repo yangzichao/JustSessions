@@ -33,7 +33,7 @@ struct SidebarProjectRow: View {
                     .frame(width: 27, height: rowHeight)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ThemePlainButtonStyle(showsHover: false))
             .help(isExpanded ? "Collapse project" : "Expand project")
             .accessibilityLabel("\(isExpanded ? "Collapse" : "Expand") \(project.displayName)")
 
@@ -65,7 +65,7 @@ struct SidebarProjectRow: View {
                 .frame(height: rowHeight)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ThemePlainButtonStyle(showsHover: false))
             .frame(maxWidth: .infinity)
             .help("\(project.location.copyablePath) · ⌘-click to select multiple projects; Shift-click to select a range")
             .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(CountedNoun.phrase(count: project.sessionCount, singular: "session")), \(activitySummary.runningCount == 0 ? "none running" : activitySummary.summary)")

@@ -40,5 +40,6 @@ struct GeneralSettingsView: View {
 
             SoftwareUpdateSettingsSection(onCheckForUpdates: onCheckForUpdates)
         }
+        .toggleStyle(ThemedCheckboxToggleStyle())
     }
 }

@@ -57,7 +57,7 @@ struct SidebarSessionRow: View {
                 statusIndicator(statusSource, description: statusDescription)
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemePlainButtonStyle(showsHover: false))
         .help("\(title) · \(conversation.provider.rawValue) · \(SidebarSessionDateText.shared.text(for: conversation.updatedAt))\(statusDescription.map { " · \($0)" } ?? "")")
         .accessibilityLabel("\(title), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(statusDescription.map { ", \($0)" } ?? "")")
         .contextMenu {

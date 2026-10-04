@@ -13,7 +13,7 @@ struct SidebarNewSessionButton: View {
                 .background(ThemePalette.ink, in: Circle())
                 .contentShape(Circle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ThemePressButtonStyle())
         .help("New session (⌘N)")
         .accessibilityLabel("New session")
     }

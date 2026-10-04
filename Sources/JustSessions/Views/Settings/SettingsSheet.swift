@@ -23,6 +23,7 @@ struct SettingsSheet: View {
             HStack {
                 Spacer()
                 Button("Done") { dismiss() }
+                    .buttonStyle(ThemeProminentButtonStyle())
                     .keyboardShortcut(.defaultAction)
             }
             .padding(.horizontal, 20)

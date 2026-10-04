@@ -10,10 +10,11 @@ struct SidebarFooter: View {
             Spacer(minLength: 4)
             SidebarSettingsButton()
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 6))
+        .foregroundStyle(ThemePalette.ink)
         .font(.system(size: 12))
-        .padding(.leading, 16)
-        .padding(.trailing, 10)
+        .padding(.leading, 10)
+        .padding(.trailing, 4)
         .padding(.vertical, 4)
     }
 }
