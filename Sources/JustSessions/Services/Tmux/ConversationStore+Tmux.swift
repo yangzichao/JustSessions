@@ -22,7 +22,8 @@ extension ConversationStore {
     }
 
     /// A new session's or branch's tab started under a temporary name; once its session is known, it takes the
-    /// session's own name, so resuming that session later reattaches to it.
+    /// session's own name, so resuming that session later reattaches to it. A tab that followed its CLI to another
+    /// session, as after `/clear`, takes that session's name the same way.
     func adoptSessionTmuxName(for session: TerminalSession, remoteRunner: RemoteHostCommandRunner = RemoteHostCommandRunner()) {
         guard let currentName = session.tmuxSessionName, let conversation = session.conversation else { return }
         let sessionName = TmuxSessionName.forConversation(conversation)

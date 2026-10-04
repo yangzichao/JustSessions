@@ -26,6 +26,12 @@ JUSTSESSIONS_TEST_TMUX_RUNTIME="$PWD/.build/Tmux/arm64/runtime" swift test
 
 The verifier relocates the runtime to a path with spaces, restricts `PATH` to system tools, checks system-only dynamic linkage and license notices, checks that tmux targets the `macos_deployment_target` from `Scripts/Tmux/versions.sh` (macOS 14.0) with no weak imports, and detaches and reattaches a real terminal client without replacing the running process. Both local `make test` and the release workflow build this runtime before testing, so tmux integration tests run against the shipped binary. Local builds reuse it when the build fingerprint matches; the release workflow builds it from source without an Actions cache. `build-app.sh` signs the nested tmux executable before signing the app; the existing notarization and Sparkle archive include it. The runtime build compiles against the active SDK but must run on macOS 14: calls to newer APIs fail the build, and a weak import means a dependency's `configure` found a newer function, such as `pipe2()` in the macOS 27 SDK, which is missing on older macOS and crashes tmux. Disable such functions in `Scripts/Tmux/build-helpers.sh`. Update `Scripts/Tmux/versions.sh` and its archive checksums together when upgrading dependencies, and retest client/server compatibility with existing sessions.
 
+## Gherkin features
+
+Behavior that reads best as a story is written as Gherkin in `Tests/JustSessionsTests/Gherkin/Features/`, one folder per feature, and run by [CucumberSwift](https://github.com/cucumberswift/CucumberSwift) as part of `make test`. Each feature's steps live beside it under `Tests/JustSessionsTests/Gherkin/` and register in `CucumberStepImplementation.swift`, the one step implementation SwiftPM's single test bundle allows.
+
+CucumberSwift makes an XCTest case for each step when the run starts, so `swift test list` does not show them, `swift test --filter` cannot pick a scenario, and `swift test --parallel` runs none of them while still passing. Run them with plain `swift test`, as `make test` does. `CUCUMBER_VERBOSE=1 make test` prints each scenario's result; `CUCUMBER_TAGS=<tag> swift test` runs only the scenarios with that tag.
+
 ## Performance measurements
 
 Run these opt-in suites separately, with a release build, so their visible test windows do not compete for the main thread:

@@ -9,6 +9,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/sparkle-project/Sparkle.git", exact: "2.10.0"),
         .package(url: "https://github.com/migueldeicaza/SwiftTerm.git", exact: "1.15.0"),
+        .package(url: "https://github.com/cucumberswift/CucumberSwift.git", exact: "6.3.0"),
     ],
     targets: [
         .executableTarget(
@@ -20,6 +21,14 @@ let package = Package(
             resources: [.process("Resources/Localization")],
             linkerSettings: [.linkedLibrary("sqlite3")]
         ),
-        .testTarget(name: "JustSessionsTests", dependencies: ["JustSessions"]),
+        .testTarget(
+            name: "JustSessionsTests",
+            dependencies: [
+                "JustSessions",
+                .product(name: "CucumberSwift", package: "CucumberSwift"),
+            ],
+            // CucumberSwift reads the Gherkin features from a resource folder that must be named Features.
+            resources: [.copy("Gherkin/Features")]
+        ),
     ]
 )

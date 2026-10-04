@@ -2,7 +2,7 @@
 
 [Back to JustSessions](../../README.md) · [Build and release](build-and-release.md)
 
-Application paths below are relative to `Sources/JustSessions/`. Tests live in `Tests/JustSessionsTests/`.
+Application paths below are relative to `Sources/JustSessions/`. Tests live in `Tests/JustSessionsTests/`, with Gherkin features and their steps in `Tests/JustSessionsTests/Gherkin/`; see [Gherkin features](build-and-release.md#gherkin-features).
 
 - `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up.
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
@@ -45,6 +45,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal.
 - `Services/Terminal/Appearance/Import/`: reads colors from iTerm2's default profile or an `.itermcolors` file, only when asked.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
+- `Services/Terminal/ClaudeLiveSession/`: reads Claude Code's live registry for names chosen with `/rename`, and makes a tab follow its CLI to the session `/clear` starts.
 - `Services/Terminal/AppearingSessions/`: links a new tab to the first session that appears in its project, for SSH hosts and for CLIs that don't reveal the session they write.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.
