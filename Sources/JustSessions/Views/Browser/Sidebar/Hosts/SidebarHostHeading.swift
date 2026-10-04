@@ -1,9 +1,9 @@
 import SwiftUI
 
 /// A host's heading above its projects: its name, how its last refresh went, and its project count, which gives way
-/// to a + for adding a project there, or restoring an archived one, while the pointer is over it. New sessions start
-/// from a project's own +, so the heading manages the host's projects instead. Its refresh button refreshes this host alone, and shows its progress.
-/// Right-click to add a project, restore archived projects, refresh the host, or remove an SSH host.
+/// to a ⋯ and a + while the pointer is over it. The ⋯ opens the same menu as a right-click; the + adds a project
+/// there, or restores an archived one. New sessions start from a project's own +, so the heading manages the host's
+/// projects instead. Its refresh button refreshes this host alone, and shows its progress.
 struct SidebarHostHeading: View {
     let host: SessionHost
     let refreshStatus: HostRefreshStatus?
@@ -43,7 +43,7 @@ struct SidebarHostHeading: View {
                 isDisabled: isRefreshDisabled,
                 action: onRefresh
             )
-            projectCountOrAddProjectButton
+            projectCountOrHoverActions
         }
         .font(.system(size: 10, weight: .semibold))
         .padding(.leading, 18)
@@ -52,20 +52,19 @@ struct SidebarHostHeading: View {
         .contentShape(Rectangle())
         .onHover { isHovered = $0 }
         .help(helpText)
-        .contextMenu {
-            Button("Add project…", systemImage: "plus", action: onAddProject)
-            if archivedProjectCount > 0 {
-                Button("Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox",
-                       action: onShowArchivedProjects)
-            }
-            Divider()
-            Button("Refresh", systemImage: "arrow.clockwise", action: onRefresh)
-                .disabled(refreshStatus == .refreshing || isRefreshDisabled)
-            if let onRemove {
-                Divider()
-                Button("Remove host", systemImage: "minus.circle", role: .destructive, action: onRemove)
-            }
-        }
+        .contextMenu { menuItems }
+    }
+
+    private var menuItems: SidebarHostMenuItems {
+        SidebarHostMenuItems(
+            refreshStatus: refreshStatus,
+            isRefreshDisabled: isRefreshDisabled,
+            archivedProjectCount: archivedProjectCount,
+            onAddProject: onAddProject,
+            onShowArchivedProjects: onShowArchivedProjects,
+            onRefresh: onRefresh,
+            onRemove: onRemove
+        )
     }
 
     @ViewBuilder
@@ -93,18 +92,21 @@ struct SidebarHostHeading: View {
         }
     }
 
-    private var projectCountOrAddProjectButton: some View {
+    private var projectCountOrHoverActions: some View {
         ZStack(alignment: .trailing) {
             Text(projectCount.formatted())
                 .monospacedDigit()
                 .foregroundStyle(.tertiary)
                 .opacity(isHovered ? 0 : 1)
-            SidebarHostAddProjectButton(
-                host: host,
-                archivedProjectCount: archivedProjectCount,
-                onAddProject: onAddProject,
-                onShowArchivedProjects: onShowArchivedProjects
-            )
+            HStack(spacing: 2) {
+                SidebarHostMoreActionsMenu(host: host, menuItems: menuItems)
+                SidebarHostAddProjectButton(
+                    host: host,
+                    archivedProjectCount: archivedProjectCount,
+                    onAddProject: onAddProject,
+                    onShowArchivedProjects: onShowArchivedProjects
+                )
+            }
             .opacity(isHovered ? 1 : 0)
             .allowsHitTesting(isHovered)
         }

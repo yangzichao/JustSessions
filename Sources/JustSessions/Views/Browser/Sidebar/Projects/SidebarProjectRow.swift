@@ -71,49 +71,73 @@ struct SidebarProjectRow: View {
             .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(CountedNoun.phrase(count: project.sessionCount, singular: "session")), \(activitySummary.runningCount == 0 ? "none running" : activitySummary.summary)")
             .accessibilityAddTraits(isSelected ? .isSelected : [])
 
-            sessionCountOrNewSessionMenu
+            sessionCountOrHoverActions
                 .padding(.trailing, 8)
         }
         .background(SidebarRowBackground(isSelected: isSelected, isHovered: isHovered))
         .onHover { isHovered = $0 }
-        .contextMenu {
-            if isSelected && projectSelection.hasMultipleSelected {
-                SelectedProjectsContextMenu(
-                    selectedCount: projectSelection.selectedProjectIDs.count,
-                    onRemove: onRemoveSelectedProjects
-                )
-            } else {
-                ProjectContextMenu(
-                    store: store,
-                    project: project,
-                    onNewSession: onNewSession,
-                    onRename: onRename,
-                    onDeleteSessions: onDeleteSessions,
-                    onRemoveProjectAndDeleteSessions: onRemoveProjectAndDeleteSessions
-                )
-            }
+        .contextMenu { menuItems }
+    }
+
+    /// The same items whether the menu comes from a right-click or the ⋯ button.
+    @ViewBuilder
+    private var menuItems: some View {
+        if isSelected && projectSelection.hasMultipleSelected {
+            SelectedProjectsContextMenu(
+                selectedCount: projectSelection.selectedProjectIDs.count,
+                onRemove: onRemoveSelectedProjects
+            )
+        } else {
+            ProjectContextMenu(
+                store: store,
+                project: project,
+                onNewSession: onNewSession,
+                onRename: onRename,
+                onDeleteSessions: onDeleteSessions,
+                onRemoveProjectAndDeleteSessions: onRemoveProjectAndDeleteSessions
+            )
         }
     }
 
-    /// The session count gives way to the + menu while the pointer is over the row.
-    private var sessionCountOrNewSessionMenu: some View {
+    /// The session count gives way to the ⋯ and + menus while the pointer is over the row. Both keep their room
+    /// while hidden, so nothing in the row moves as the pointer passes over it.
+    private var sessionCountOrHoverActions: some View {
         ZStack(alignment: .trailing) {
             Text(project.sessionCount.formatted())
                 .font(.system(size: 11).monospacedDigit())
                 .foregroundStyle(.secondary)
                 .opacity(isHovered ? 0 : 1)
-            ProjectNewSessionMenu(
-                project: project,
-                providers: store.newSessionProviders(on: project.host),
-                showsTitle: false,
-                onStart: onNewSession,
-                onOpenTerminal: { store.openPlainTerminal(in: project.location) }
-            )
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .fixedSize()
+            HStack(spacing: 0) {
+                moreActionsMenu
+                ProjectNewSessionMenu(
+                    project: project,
+                    providers: store.newSessionProviders(on: project.host),
+                    showsTitle: false,
+                    onStart: onNewSession,
+                    onOpenTerminal: { store.openPlainTerminal(in: project.location) }
+                )
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
+            }
             .opacity(isHovered ? 1 : 0)
             .allowsHitTesting(isHovered)
         }
+    }
+
+    /// Opens the right-click menu from a button, so it can be found without a right-click.
+    private var moreActionsMenu: some View {
+        Menu {
+            menuItems
+        } label: {
+            Image(systemName: "ellipsis")
+                .frame(width: 20, height: 20)
+                .contentShape(Rectangle())
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .help("More actions")
+        .accessibilityLabel("More actions for \(project.displayName)")
     }
 }

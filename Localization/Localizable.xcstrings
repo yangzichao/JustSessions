@@ -2116,6 +2116,16 @@
         }
       }
     },
+    "More actions for this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 Mac 的更多操作"
+          }
+        }
+      }
+    },
     "More in the right-click menu": {
       "localizations": {
         "zh-Hans": {
