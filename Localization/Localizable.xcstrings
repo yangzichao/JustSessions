@@ -347,6 +347,26 @@
         }
       }
     },
+    "Add a project folder or restore an archived project on %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 %@ 上添加项目文件夹，或恢复已归档的项目"
+          }
+        }
+      }
+    },
+    "Add a project folder or restore an archived project on this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此 Mac 上添加项目文件夹，或恢复已归档的项目"
+          }
+        }
+      }
+    },
     "Add a server you reach with passwordless SSH to browse and resume its sessions here.": {
       "localizations": {
         "zh-Hans": {
@@ -363,6 +383,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加主机"
+          }
+        }
+      }
+    },
+    "Add or restore a project on %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 %@ 上添加或恢复项目"
+          }
+        }
+      }
+    },
+    "Add or restore a project on this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此 Mac 上添加或恢复项目"
           }
         }
       }

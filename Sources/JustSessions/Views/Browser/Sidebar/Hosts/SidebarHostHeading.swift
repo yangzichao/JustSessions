@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// A host's heading above its projects: its name, how its last refresh went, and its project count, which gives way
-/// to a + for adding a project there while the pointer is over it. New sessions start from a project's own +, so the
-/// heading manages the host's projects instead. Its refresh button refreshes this host alone, and shows its progress.
+/// to a + for adding a project there, or restoring an archived one, while the pointer is over it. New sessions start
+/// from a project's own +, so the heading manages the host's projects instead. Its refresh button refreshes this host alone, and shows its progress.
 /// Right-click to add a project, restore archived projects, refresh the host, or remove an SSH host.
 struct SidebarHostHeading: View {
     let host: SessionHost
@@ -99,27 +99,15 @@ struct SidebarHostHeading: View {
                 .monospacedDigit()
                 .foregroundStyle(.tertiary)
                 .opacity(isHovered ? 0 : 1)
-            Button(action: onAddProject) {
-                Image(systemName: "plus")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(.secondary)
-                    .frame(width: 16, height: 16)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(ThemePlainButtonStyle(cornerRadius: 4))
+            SidebarHostAddProjectButton(
+                host: host,
+                archivedProjectCount: archivedProjectCount,
+                onAddProject: onAddProject,
+                onShowArchivedProjects: onShowArchivedProjects
+            )
             .opacity(isHovered ? 1 : 0)
             .allowsHitTesting(isHovered)
-            .help(addProjectHelpText)
-            .accessibilityLabel(addProjectAccessibilityLabel)
         }
-    }
-
-    private var addProjectHelpText: LocalizedStringKey {
-        host == .thisMac ? "Add a project folder on this Mac" : "Add a project folder on \(host.displayName)"
-    }
-
-    private var addProjectAccessibilityLabel: LocalizedStringKey {
-        host == .thisMac ? "Add project on this Mac" : "Add project on \(host.displayName)"
     }
 
     private var helpText: String {

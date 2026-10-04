@@ -74,10 +74,18 @@
 	<string>Add a project folder on %@</string>
 	<key>Add a project folder on this Mac</key>
 	<string>Add a project folder on this Mac</string>
+	<key>Add a project folder or restore an archived project on %@</key>
+	<string>Add a project folder or restore an archived project on %@</string>
+	<key>Add a project folder or restore an archived project on this Mac</key>
+	<string>Add a project folder or restore an archived project on this Mac</string>
 	<key>Add a server you reach with passwordless SSH to browse and resume its sessions here.</key>
 	<string>Add a server you reach with passwordless SSH to browse and resume its sessions here.</string>
 	<key>Add host</key>
 	<string>Add host</string>
+	<key>Add or restore a project on %@</key>
+	<string>Add or restore a project on %@</string>
+	<key>Add or restore a project on this Mac</key>
+	<string>Add or restore a project on this Mac</string>
 	<key>Add project</key>
 	<string>Add project</string>
 	<key>Add project on %@</key>
