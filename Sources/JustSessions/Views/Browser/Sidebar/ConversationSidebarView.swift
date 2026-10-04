@@ -21,6 +21,7 @@ struct ConversationSidebarView: View {
     @State private var projectExpansion = ProjectExpansion()
     @State private var projectSelection = ProjectMultiSelection()
     @State private var isAddRemoteHostSheetPresented = false
+    @State private var isArchivedProjectsSheetPresented = false
     /// Set once a deletion of several sessions has run for `deletionProgressBarDelay`, so a quick one never
     /// flashes the progress bar.
     @State private var isDeletionProgressBarShown = false
@@ -156,6 +157,8 @@ struct ConversationSidebarView: View {
 
             ThemeDivider()
             SidebarFooter(
+                archivedProjectCount: store.archivedProjectPaths.count,
+                onShowArchivedProjects: { isArchivedProjectsSheetPresented = true },
                 onAddRemoteHost: { isAddRemoteHostSheetPresented = true },
                 onCheckForUpdates: onCheckForUpdates
             )
@@ -163,6 +166,9 @@ struct ConversationSidebarView: View {
         .background(sidebarBackground)
         .sheet(isPresented: $isAddRemoteHostSheetPresented) {
             AddRemoteHostSheet(store: store)
+        }
+        .sheet(isPresented: $isArchivedProjectsSheetPresented) {
+            ArchivedProjectsSheet(store: store)
         }
         .onAppear { expandProjectsWithOpenTerminals() }
         .onChange(of: store.terminalSessions.map(\.id)) { _, _ in

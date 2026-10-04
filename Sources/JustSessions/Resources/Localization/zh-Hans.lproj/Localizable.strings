@@ -58,10 +58,32 @@
 	<string>全部</string>
 	<key>All tools</key>
 	<string>所有工具</string>
+	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
+	<string>已归档的项目会从侧栏中隐藏。其文件夹和会话仍保留在磁盘上，恢复后会重新列出。在其文件夹中新建会话也会恢复该项目。</string>
 	<key>Appearance</key>
 	<string>外观</string>
 	<key>Applies immediately to all terminals. Some CLI apps use their own colors.</key>
 	<string>立即应用到所有终端。部分 CLI 应用使用自己的配色。</string>
+	<key>Archive</key>
+	<string>归档</string>
+	<key>Archive %lld projects</key>
+	<string>归档 %lld 个项目</string>
+	<key>Archive project</key>
+	<string>归档项目</string>
+	<key>Archive project and delete %lld sessions</key>
+	<string>归档项目并删除 %lld 个会话</string>
+	<key>Archive project and delete 1 session</key>
+	<string>归档项目并删除 1 个会话</string>
+	<key>Archive project and delete all sessions (%lld)…</key>
+	<string>归档项目并删除所有会话（%lld）…</string>
+	<key>Archive selected projects</key>
+	<string>归档所选项目</string>
+	<key>Archive the selected projects; keep sessions and open terminals</key>
+	<string>归档所选项目；保留会话和已打开的终端</string>
+	<key>Archived projects</key>
+	<string>已归档的项目</string>
+	<key>Archived projects (%lld)…</key>
+	<string>已归档的项目（%lld）…</string>
 	<key>At launch</key>
 	<string>启动时</string>
 	<key>Branch</key>
@@ -174,6 +196,8 @@
 	<string>正在删除会话</string>
 	<key>Deletion progress</key>
 	<string>删除进度</string>
+	<key>Done</key>
+	<string>完成</string>
 	<key>End and close this terminal</key>
 	<string>结束并关闭此终端</string>
 	<key>End on %@</key>
@@ -310,6 +334,8 @@
 	<string>下一个匹配项</string>
 	<key>Next match (⌘G or Return)</key>
 	<string>下一个匹配项（⌘G 或 Return）</string>
+	<key>No archived projects</key>
+	<string>没有已归档的项目</string>
 	<key>No matches</key>
 	<string>无匹配项</string>
 	<key>No matching projects or sessions</key>
@@ -388,22 +414,8 @@
 	<string>刷新会话</string>
 	<key>Refreshing %@</key>
 	<string>正在刷新 %@</string>
-	<key>Remove %lld projects from sidebar</key>
-	<string>从侧栏移除 %lld 个项目</string>
-	<key>Remove from sidebar</key>
-	<string>从侧栏移除</string>
 	<key>Remove host</key>
 	<string>移除主机</string>
-	<key>Remove project and delete %lld sessions</key>
-	<string>移除项目并删除 %lld 个会话</string>
-	<key>Remove project and delete 1 session</key>
-	<string>移除项目并删除 1 个会话</string>
-	<key>Remove project and delete all sessions (%lld)…</key>
-	<string>移除项目并删除所有会话（%lld）…</string>
-	<key>Remove selected projects from sidebar</key>
-	<string>从侧栏移除所选项目</string>
-	<key>Remove selected projects from the sidebar; keep sessions and open terminals</key>
-	<string>从侧栏移除所选项目；保留会话和已打开的终端</string>
 	<key>Rename</key>
 	<string>重命名</string>
 	<key>Rename conversation</key>
@@ -416,8 +428,14 @@
 	<string>重新打开上次退出 JustSessions 时的标签</string>
 	<key>Report an issue ↗</key>
 	<string>报告问题 ↗</string>
+	<key>Restore</key>
+	<string>恢复</string>
+	<key>Restore %@</key>
+	<string>恢复 %@</string>
 	<key>Restore Defaults</key>
 	<string>恢复默认设置</string>
+	<key>Restore archived projects to the sidebar</key>
+	<string>将已归档的项目恢复到侧栏</string>
 	<key>Resume</key>
 	<string>继续</string>
 	<key>Resume %lld sessions</key>
@@ -528,8 +546,8 @@
 	<string>Pi 会话文件及其关联文件夹将移到 macOS 废纸篓。</string>
 	<key>The project folder no longer exists</key>
 	<string>项目文件夹已不存在</string>
-	<key>The project will be removed from the sidebar; skipped sessions stay on disk.</key>
-	<string>项目将从侧栏移除；被跳过的会话会保留在磁盘上。</string>
+	<key>The project will be archived; skipped sessions stay on disk and come back when it is restored.</key>
+	<string>项目将被归档；被跳过的会话仍保留在磁盘上，恢复项目后会重新显示。</string>
 	<key>The project will stay in the sidebar.</key>
 	<string>项目仍会保留在侧栏中。</string>
 	<key>The shell and anything still running in it will stop.</key>

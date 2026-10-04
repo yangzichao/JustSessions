@@ -12,7 +12,7 @@ enum SessionDeletionConfirmationText {
     static func projectRemovalButtonTitle(for plan: SessionDeletionPlan, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
         let count = plan.deletableConversations.count
         return AppLocalization.string(
-            count == 1 ? "Remove project and delete 1 session" : "Remove project and delete \(count) sessions",
+            count == 1 ? "Archive project and delete 1 session" : "Archive project and delete \(count) sessions",
             language: language
         )
     }
@@ -53,7 +53,7 @@ enum SessionDeletionConfirmationText {
         joined([
             AppLocalization.string("This affects all tools in \(location.copyablePath), including sessions hidden by the current filter.", language: language),
             removesProjectFromSidebar
-                ? AppLocalization.string("The project will be removed from the sidebar; skipped sessions stay on disk.", language: language)
+                ? AppLocalization.string("The project will be archived; skipped sessions stay on disk and come back when it is restored.", language: language)
                 : AppLocalization.string("The project will stay in the sidebar.", language: language),
             location.host == .thisMac
                 ? AppLocalization.string("Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.", language: language)

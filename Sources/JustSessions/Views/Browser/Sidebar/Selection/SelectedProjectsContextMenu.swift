@@ -6,6 +6,6 @@ struct SelectedProjectsContextMenu: View {
 
     var body: some View {
         Text("\(selectedCount) projects selected")
-        Button("Remove \(selectedCount) projects from sidebar", systemImage: "sidebar.left", action: onRemove)
+        Button("Archive \(selectedCount) projects", systemImage: "archivebox", action: onRemove)
     }
 }

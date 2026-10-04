@@ -13,13 +13,13 @@ struct SidebarProjectSelectionActionBar: View {
                 Spacer(minLength: 4)
             }
             Button(action: onRemove) {
-                Label("Remove from sidebar", systemImage: "sidebar.left")
+                Label("Archive", systemImage: "archivebox")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
-            .help("Remove selected projects from the sidebar; keep sessions and open terminals")
-            .accessibilityLabel("Remove selected projects from sidebar")
+            .help("Archive the selected projects; keep sessions and open terminals")
+            .accessibilityLabel("Archive selected projects")
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 10)

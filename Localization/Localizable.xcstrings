@@ -110,12 +110,6 @@
     },
     "%lld messages": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 条消息"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -132,6 +126,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 条消息"
           }
         }
       }
@@ -158,12 +158,6 @@
     },
     "%lld projects selected": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已选择 %lld 个项目"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -180,6 +174,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已选择 %lld 个项目"
           }
         }
       }
@@ -246,12 +246,6 @@
     },
     ", %lld sessions": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "，%lld 个会话"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -268,6 +262,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "，%lld 个会话"
           }
         }
       }
@@ -365,6 +365,16 @@
         }
       }
     },
+    "An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档的项目会从侧栏中隐藏。其文件夹和会话仍保留在磁盘上，恢复后会重新列出。在其文件夹中新建会话也会恢复该项目。"
+          }
+        }
+      }
+    },
     "Appearance": {
       "localizations": {
         "zh-Hans": {
@@ -381,6 +391,106 @@
           "stringUnit": {
             "state": "translated",
             "value": "立即应用到所有终端。部分 CLI 应用使用自己的配色。"
+          }
+        }
+      }
+    },
+    "Archive": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档"
+          }
+        }
+      }
+    },
+    "Archive %lld projects": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档 %lld 个项目"
+          }
+        }
+      }
+    },
+    "Archive project": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档项目"
+          }
+        }
+      }
+    },
+    "Archive project and delete %lld sessions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档项目并删除 %lld 个会话"
+          }
+        }
+      }
+    },
+    "Archive project and delete 1 session": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档项目并删除 1 个会话"
+          }
+        }
+      }
+    },
+    "Archive project and delete all sessions (%lld)…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档项目并删除所有会话（%lld）…"
+          }
+        }
+      }
+    },
+    "Archive selected projects": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档所选项目"
+          }
+        }
+      }
+    },
+    "Archive the selected projects; keep sessions and open terminals": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档所选项目；保留会话和已打开的终端"
+          }
+        }
+      }
+    },
+    "Archived projects": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档的项目"
+          }
+        }
+      }
+    },
+    "Archived projects (%lld)…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档的项目（%lld）…"
           }
         }
       }
@@ -410,12 +520,6 @@
     },
     "Branch %lld sessions": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "为 %lld 个会话创建分支"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -432,6 +536,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为 %lld 个会话创建分支"
           }
         }
       }
@@ -586,16 +696,6 @@
         }
       }
     },
-    "Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "用 **保持运行** 关闭标签页，或直接退出应用，CLI 会继续运行；点击会话即可回到它。"
-          }
-        }
-      }
-    },
     "Close Tab…": {
       "localizations": {
         "zh-Hans": {
@@ -612,6 +712,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭窗口"
+          }
+        }
+      }
+    },
+    "Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用 **保持运行** 关闭标签页，或直接退出应用，CLI 会继续运行；点击会话即可回到它。"
           }
         }
       }
@@ -728,12 +838,6 @@
     },
     "Copy %lld conversations": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "复制 %lld 个对话"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -750,6 +854,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制 %lld 个对话"
           }
         }
       }
@@ -876,12 +986,6 @@
     },
     "Delete %lld sessions": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "删除 %lld 个会话"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -899,17 +1003,17 @@
               }
             }
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除 %lld 个会话"
+          }
         }
       }
     },
     "Delete %lld sessions…": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "删除 %lld 个会话…"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -926,6 +1030,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除 %lld 个会话…"
           }
         }
       }
@@ -1016,6 +1126,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "删除进度"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
           }
         }
       }
@@ -1112,12 +1232,6 @@
     },
     "Export %lld conversations": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "导出 %lld 个对话"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -1134,6 +1248,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出 %lld 个对话"
           }
         }
       }
@@ -1378,6 +1498,26 @@
         }
       }
     },
+    "Image": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "图片"
+          }
+        }
+      }
+    },
+    "Image can't be shown": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法显示图片"
+          }
+        }
+      }
+    },
     "Import": {
       "localizations": {
         "zh-Hans": {
@@ -1507,6 +1647,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "列出可通过 SSH 连接的另一台机器上的会话"
+          }
+        }
+      }
+    },
+    "Load earlier messages": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加载更早的消息"
+          }
+        }
+      }
+    },
+    "Load later messages": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加载后续消息"
           }
         }
       }
@@ -1680,6 +1840,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "下一个匹配项（⌘G 或 Return）"
+          }
+        }
+      }
+    },
+    "No archived projects": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有已归档的项目"
           }
         }
       }
@@ -2080,82 +2250,12 @@
         }
       }
     },
-    "Remove %lld projects from sidebar": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "从侧栏移除 %lld 个项目"
-          }
-        }
-      }
-    },
-    "Remove from sidebar": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "从侧栏移除"
-          }
-        }
-      }
-    },
     "Remove host": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "移除主机"
-          }
-        }
-      }
-    },
-    "Remove project and delete %lld sessions": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移除项目并删除 %lld 个会话"
-          }
-        }
-      }
-    },
-    "Remove project and delete 1 session": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移除项目并删除 1 个会话"
-          }
-        }
-      }
-    },
-    "Remove project and delete all sessions (%lld)…": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移除项目并删除所有会话（%lld）…"
-          }
-        }
-      }
-    },
-    "Remove selected projects from sidebar": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "从侧栏移除所选项目"
-          }
-        }
-      }
-    },
-    "Remove selected projects from the sidebar; keep sessions and open terminals": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "从侧栏移除所选项目；保留会话和已打开的终端"
           }
         }
       }
@@ -2220,12 +2320,42 @@
         }
       }
     },
+    "Restore": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复"
+          }
+        }
+      }
+    },
+    "Restore %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复 %@"
+          }
+        }
+      }
+    },
     "Restore Defaults": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "恢复默认设置"
+          }
+        }
+      }
+    },
+    "Restore archived projects to the sidebar": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将已归档的项目恢复到侧栏"
           }
         }
       }
@@ -2242,12 +2372,6 @@
     },
     "Resume %lld sessions": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "继续 %lld 个会话"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -2264,6 +2388,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续 %lld 个会话"
           }
         }
       }
@@ -2284,16 +2414,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "右键点击侧栏中已选择的条目，以继续、创建分支或删除会话。"
-          }
-        }
-      }
-    },
-    "Sessions from %@, grouped by host and project.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来自 %@ 的会话，按主机和项目分组。"
           }
         }
       }
@@ -2414,6 +2534,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "过去七天内活跃的会话"
+          }
+        }
+      }
+    },
+    "Sessions from %@, grouped by host and project.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来自 %@ 的会话，按主机和项目分组。"
           }
         }
       }
@@ -2804,12 +2934,12 @@
         }
       }
     },
-    "The project will be removed from the sidebar; skipped sessions stay on disk.": {
+    "The project will be archived; skipped sessions stay on disk and come back when it is restored.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "项目将从侧栏移除；被跳过的会话会保留在磁盘上。"
+            "value": "项目将被归档；被跳过的会话仍保留在磁盘上，恢复项目后会重新显示。"
           }
         }
       }
@@ -2945,6 +3075,16 @@
       }
     },
     "Try Again": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试"
+          }
+        }
+      }
+    },
+    "Try again": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -3092,56 +3232,6 @@
     },
     "⌘N": {
       "shouldTranslate": false
-    },
-    "Load earlier messages": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "加载更早的消息"
-          }
-        }
-      }
-    },
-    "Load later messages": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "加载后续消息"
-          }
-        }
-      }
-    },
-    "Try again": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重试"
-          }
-        }
-      }
-    },
-    "Image": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "图片"
-          }
-        }
-      }
-    },
-    "Image can't be shown": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法显示图片"
-          }
-        }
-      }
     }
   },
   "version": "1.0"
