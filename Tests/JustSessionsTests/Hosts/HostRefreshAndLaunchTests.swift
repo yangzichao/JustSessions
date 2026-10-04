@@ -62,6 +62,35 @@ struct HostRefreshAndLaunchTests {
         #expect(store.terminalSessions.isEmpty)
     }
 
+    @Test @MainActor func plainTerminalOnAnSSHHostOpensInTheFolderTheHostReports() async throws {
+        let store = ConversationStore(adapters: [])
+        let recorder = RemoteCommandRecorder()
+
+        try await store.openPlainTerminal(
+            host: .ssh("devbox"),
+            folder: "~/api",
+            resolver: RemoteFolderResolver(runner: recorder.runner(answering: (0, "/home/me/api\n")))
+        )
+
+        let tab = try #require(store.terminalSessions.last)
+        #expect(recorder.commands.map(\.host) == ["devbox"])
+        #expect(tab.host == .ssh("devbox"))
+        #expect(tab.projectPath == "/home/me/api")
+        #expect(tab.provider == nil)
+        #expect(tab.pendingNewSession == nil)
+        store.closeAllTerminals()
+    }
+
+    @Test @MainActor func plainTerminalInAMissingFolderOnAnSSHHostOpensNoTab() async {
+        let store = ConversationStore(adapters: [])
+        let resolver = RemoteFolderResolver(runner: RemoteCommandRecorder().runner(answering: (2, "sh: cd: can't cd to gone")))
+
+        await #expect(throws: RemoteFolderResolutionError.missingFolder(host: "devbox", folder: "~/gone")) {
+            try await store.openPlainTerminal(host: .ssh("devbox"), folder: "~/gone", resolver: resolver)
+        }
+        #expect(store.terminalSessions.isEmpty)
+    }
+
     private func conversation(project: String) -> Conversation {
         let sessionID = UUID().uuidString
         return Conversation(

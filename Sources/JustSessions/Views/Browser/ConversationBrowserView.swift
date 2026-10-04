@@ -79,14 +79,17 @@ struct ConversationBrowserView: View {
         .sheet(item: $newSessionSheetHost) { host in
             let startableProjects = startableProjects
             NewSessionSheet(
-                initialProvider: newSessionProvider,
+                initialKind: newSessionKind,
                 initialHost: host,
                 initialProjectPath: newSessionProjectPath(on: host, startableProjects: startableProjects),
                 hosts: store.hosts,
                 providersByHost: store.newSessionProvidersByHost,
                 recentProjects: startableProjects
-            ) { provider, host, folder in
-                try await store.launchNewSession(provider: provider, host: host, folder: folder)
+            ) { kind, host, folder in
+                switch kind {
+                case .cli(let provider): try await store.launchNewSession(provider: provider, host: host, folder: folder)
+                case .plainTerminal: try await store.openPlainTerminal(host: host, folder: folder)
+                }
             }
         }
         .dismissesOnClickOutside(item: $newSessionSheetHost)
@@ -120,10 +123,13 @@ struct ConversationBrowserView: View {
         newSessionSheetHost == nil && closingTerminalID == nil
     }
 
-    /// The selected tab's tool, or else the one the sidebar shows; Codex when it shows every tool. The sheet takes
-    /// the host's first installed tool instead when the host does not have this one.
-    private var newSessionProvider: ConversationProvider {
-        store.selectedTerminal?.provider ?? providerFilter.provider ?? .codex
+    /// The selected tab's tool, or a terminal when that tab is one; else the tool the sidebar shows, Codex when it shows
+    /// every tool. The sheet takes the host's first installed tool instead when the host does not have this one.
+    private var newSessionKind: NewSessionKind {
+        if let selectedTerminal = store.selectedTerminal {
+            return selectedTerminal.provider.map(NewSessionKind.cli) ?? .plainTerminal
+        }
+        return .cli(providerFilter.provider ?? .codex)
     }
 
     /// The host of the selected tab, or else of the selected session, so a new session starts next to it.

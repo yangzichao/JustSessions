@@ -4,7 +4,7 @@ import SwiftUI
 struct NewSessionSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
-    @State private var selectedProvider: ConversationProvider
+    @State private var selectedKind: NewSessionKind
     @State private var selectedHost: SessionHost
     @State private var projectPath: String
     @State private var isStarting = false
@@ -15,18 +15,18 @@ struct NewSessionSheet: View {
     let providersByHost: [SessionHost: [ConversationProvider]]
     /// Projects on every host; the menu shows the selected host's.
     let recentProjects: [ProjectConversationGroup]
-    let onStart: (ConversationProvider, SessionHost, String) async throws -> Void
+    let onStart: (NewSessionKind, SessionHost, String) async throws -> Void
 
     init(
-        initialProvider: ConversationProvider,
+        initialKind: NewSessionKind,
         initialHost: SessionHost,
         initialProjectPath: String,
         hosts: [SessionHost],
         providersByHost: [SessionHost: [ConversationProvider]],
         recentProjects: [ProjectConversationGroup],
-        onStart: @escaping (ConversationProvider, SessionHost, String) async throws -> Void
+        onStart: @escaping (NewSessionKind, SessionHost, String) async throws -> Void
     ) {
-        _selectedProvider = State(initialValue: initialProvider)
+        _selectedKind = State(initialValue: initialKind)
         _selectedHost = State(initialValue: initialHost)
         _projectPath = State(initialValue: initialProjectPath)
         self.hosts = hosts
@@ -39,16 +39,18 @@ struct NewSessionSheet: View {
         providersByHost[selectedHost] ?? []
     }
 
-    /// The picked tool while the host has it, or else the host's first. Hosts are checked as they refresh, so the
-    /// list can change while the sheet is open. Nil when the host has none.
-    private var startingProvider: ConversationProvider? {
-        providersOnSelectedHost.contains(selectedProvider) ? selectedProvider : providersOnSelectedHost.first
+    /// A picked tool while the host has it, or else the host's first. Hosts are checked as they refresh, so the list
+    /// can change while the sheet is open. A terminal when picked or when the host has no tool.
+    private var startingKind: NewSessionKind {
+        guard case .cli(let provider) = selectedKind else { return .plainTerminal }
+        if providersOnSelectedHost.contains(provider) { return selectedKind }
+        return providersOnSelectedHost.first.map(NewSessionKind.cli) ?? .plainTerminal
     }
 
-    private var providerSelection: Binding<ConversationProvider> {
+    private var kindSelection: Binding<NewSessionKind> {
         Binding(
-            get: { startingProvider ?? selectedProvider },
-            set: { selectedProvider = $0 }
+            get: { startingKind },
+            set: { selectedKind = $0 }
         )
     }
 
@@ -77,7 +79,7 @@ struct NewSessionSheet: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text("New session")
                     .font(.title2.weight(.semibold))
-                Text("Start a native CLI in a project folder.")
+                Text("Start a native CLI or a plain terminal in a project folder.")
                     .foregroundStyle(.secondary)
             }
 
@@ -96,18 +98,11 @@ struct NewSessionSheet: View {
                 .fixedSize()
             }
 
-            if providersOnSelectedHost.isEmpty {
-                Label(NewSessionProviderAvailability.noCLIFoundMessage(on: selectedHost, language: AppInterfaceLanguage(identifier: locale.identifier)), systemImage: "exclamationmark.triangle")
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
-                Picker("Tool", selection: providerSelection) {
-                    ForEach(providersOnSelectedHost) { provider in
-                        Text(provider.rawValue).tag(provider)
-                    }
-                }
-                .pickerStyle(.segmented)
-            }
+            NewSessionKindPicker(
+                selection: kindSelection,
+                providers: providersOnSelectedHost,
+                noCLIFoundMessage: NewSessionProviderAvailability.noCLIFoundMessage(on: selectedHost, language: AppInterfaceLanguage(identifier: locale.identifier))
+            )
 
             projectFolderSection
 
@@ -121,16 +116,16 @@ struct NewSessionSheet: View {
                 Spacer()
                 Button("Cancel") { dismiss() }
                     .keyboardShortcut(.cancelAction)
-                Button("Start session", action: start)
-                    .buttonStyle(ProviderProminentButtonStyle(tint: (startingProvider ?? selectedProvider).emphasisTintColor))
+                Button(startingKind == .plainTerminal ? "Open terminal" : "Start session", action: start)
+                    .buttonStyle(ProviderProminentButtonStyle(tint: startingKind.emphasisTintColor))
                     .keyboardShortcut(.defaultAction)
-                    .disabled(startingProvider == nil || trimmedProjectPath.isEmpty || isStarting)
+                    .disabled(trimmedProjectPath.isEmpty || isStarting)
             }
         }
         .padding(24)
         .frame(width: 520)
         .background(ThemePalette.contentSurface)
-        .alert("Could not start session", isPresented: Binding(isPresenting: $errorMessage)) {
+        .alert(startingKind == .plainTerminal ? "Could not open terminal" : "Could not start session", isPresented: Binding(isPresenting: $errorMessage)) {
             Button("OK") { errorMessage = nil }
         } message: {
             if let errorMessage { Text(verbatim: errorMessage) }
@@ -170,13 +165,13 @@ struct NewSessionSheet: View {
     }
 
     private func start() {
-        guard let provider = startingProvider else { return }
+        let kind = startingKind
         let host = selectedHost
         let folder = trimmedProjectPath
         isStarting = true
         Task {
             do {
-                try await onStart(provider, host, folder)
+                try await onStart(kind, host, folder)
                 dismiss()
             } catch {
                 errorMessage = error.localizedDescription

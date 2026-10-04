@@ -23,7 +23,7 @@ struct ThemeSurfaceRenderingTests {
                 terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore
             )), CGSize(width: 560, height: 420)),
             ("new-session", AnyView(NewSessionSheet(
-                initialProvider: .codex, initialHost: .thisMac, initialProjectPath: "/tmp/theme-check",
+                initialKind: .cli(.codex), initialHost: .thisMac, initialProjectPath: "/tmp/theme-check",
                 hosts: [.thisMac], providersByHost: [.thisMac: [.codex]], recentProjects: [], onStart: { _, _, _ in }
             )), CGSize(width: 520, height: 260)),
         ]

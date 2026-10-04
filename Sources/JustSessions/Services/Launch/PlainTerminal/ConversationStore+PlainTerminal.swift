@@ -11,6 +11,16 @@ extension ConversationStore {
         }
     }
 
+    /// From the New Session sheet, which shows the error. A folder typed for an SSH host is looked up there first, so a
+    /// missing folder is reported before a tab opens.
+    func openPlainTerminal(
+        host: SessionHost,
+        folder: String,
+        resolver: RemoteFolderResolver = RemoteFolderResolver()
+    ) async throws {
+        openTerminal(try makePlainTerminal(in: try await projectLocation(of: folder, on: host, resolver: resolver)))
+    }
+
     /// A plain terminal tab in the folder, not opened yet.
     func makePlainTerminal(in location: ProjectLocation, startsOnceShown: Bool = false) throws -> TerminalSession {
         let (command, projectPath) = try plainTerminalCommand(in: location)

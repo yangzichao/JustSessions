@@ -994,6 +994,16 @@
         }
       }
     },
+    "Could not open terminal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法打开终端"
+          }
+        }
+      }
+    },
     "Could not read this session": {
       "localizations": {
         "zh-Hans": {
@@ -2210,6 +2220,16 @@
         }
       }
     },
+    "Open terminal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开终端"
+          }
+        }
+      }
+    },
     "Open the JustSessions website": {
       "localizations": {
         "zh-Hans": {
@@ -2878,12 +2898,12 @@
         }
       }
     },
-    "Start a native CLI in a project folder.": {
+    "Start a native CLI or a plain terminal in a project folder.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在项目文件夹中启动原生 CLI。"
+            "value": "在项目文件夹中启动原生 CLI 或普通终端。"
           }
         }
       }
@@ -3340,6 +3360,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "你"
+          }
+        }
+      }
+    },
+    "Your login shell, with no CLI": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的登录 shell，不运行 CLI"
           }
         }
       }

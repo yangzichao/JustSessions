@@ -176,6 +176,8 @@
 	<string>无法复制对话</string>
 	<key>Could not export conversation</key>
 	<string>无法导出对话</string>
+	<key>Could not open terminal</key>
+	<string>无法打开终端</string>
 	<key>Could not read this session</key>
 	<string>无法读取此会话</string>
 	<key>Could not start session</key>
@@ -406,6 +408,8 @@
 	<string>打开项目于</string>
 	<key>Open project in Finder</key>
 	<string>在 Finder 中打开项目</string>
+	<key>Open terminal</key>
+	<string>打开终端</string>
 	<key>Open the JustSessions website</key>
 	<string>打开 JustSessions 网站</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
@@ -536,8 +540,8 @@
 	<string>减小字号</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>缺少部分颜色，例如文字或背景颜色。</string>
-	<key>Start a native CLI in a project folder.</key>
-	<string>在项目文件夹中启动原生 CLI。</string>
+	<key>Start a native CLI or a plain terminal in a project folder.</key>
+	<string>在项目文件夹中启动原生 CLI 或普通终端。</string>
 	<key>Start a new session in %@</key>
 	<string>在 %@ 中新建会话</string>
 	<key>Start a new session in %@ on %@</key>
@@ -628,6 +632,8 @@
 	<string>支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
 	<key>You</key>
 	<string>你</string>
+	<key>Your login shell, with no CLI</key>
+	<string>你的登录 shell，不运行 CLI</string>
 	<key>iTerm2 Color Preset File…</key>
 	<string>iTerm2 配色预设文件…</string>
 	<key>iTerm2 Default Profile</key>

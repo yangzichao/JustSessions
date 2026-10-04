@@ -188,6 +188,8 @@
 	<string>Could not copy conversation</string>
 	<key>Could not export conversation</key>
 	<string>Could not export conversation</string>
+	<key>Could not open terminal</key>
+	<string>Could not open terminal</string>
 	<key>Could not read this session</key>
 	<string>Could not read this session</string>
 	<key>Could not start session</key>
@@ -414,6 +416,8 @@
 	<string>Open project in</string>
 	<key>Open project in Finder</key>
 	<string>Open project in Finder</string>
+	<key>Open terminal</key>
+	<string>Open terminal</string>
 	<key>Open the JustSessions website</key>
 	<string>Open the JustSessions website</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
@@ -542,8 +546,8 @@
 	<string>Smaller text</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>Some colors are missing, such as the text or background color.</string>
-	<key>Start a native CLI in a project folder.</key>
-	<string>Start a native CLI in a project folder.</string>
+	<key>Start a native CLI or a plain terminal in a project folder.</key>
+	<string>Start a native CLI or a plain terminal in a project folder.</string>
 	<key>Start a new session in %@</key>
 	<string>Start a new session in %@</string>
 	<key>Start a new session on %@</key>
@@ -632,6 +636,8 @@
 	<string>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
 	<key>You</key>
 	<string>You</string>
+	<key>Your login shell, with no CLI</key>
+	<string>Your login shell, with no CLI</string>
 	<key>devbox or user@devbox.example.com</key>
 	<string>devbox or user@devbox.example.com</string>
 	<key>iTerm2 Color Preset File…</key>
