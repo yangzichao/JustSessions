@@ -29,7 +29,10 @@ struct SidebarResizeHandle: View {
             .sidebarResizeCursor(canShrink: width > minimumWidth, canGrow: width < maximumWidth)
             .onHover { isHovering = $0 }
             .gesture(
-                DragGesture(minimumDistance: 1)
+                // Global coordinates, because the handle itself moves with the width it changes: a translation in
+                // the handle's own space would shrink as the handle slides under the cursor, pulling the width
+                // back each event and shaking both sides of the divider.
+                DragGesture(minimumDistance: 1, coordinateSpace: .global)
                     .onChanged { gesture in
                         let startingWidth = dragStartWidth ?? width
                         if dragStartWidth == nil { dragStartWidth = startingWidth }
@@ -52,7 +55,10 @@ struct SidebarResizeHandle: View {
             }
     }
 
+    /// Whole points, like a native split view divider: a drag's fractional positions would land the hairline and
+    /// every row's text on sub-pixel offsets, shimmering on each mouse movement, and relayout the sidebar for
+    /// width changes too small to see.
     private func clamped(_ proposedWidth: CGFloat) -> CGFloat {
-        min(max(proposedWidth, minimumWidth), maximumWidth)
+        min(max(proposedWidth.rounded(), minimumWidth), maximumWidth)
     }
 }

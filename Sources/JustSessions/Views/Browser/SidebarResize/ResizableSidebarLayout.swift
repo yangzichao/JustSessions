@@ -23,10 +23,12 @@ struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
     var body: some View {
         GeometryReader { geometry in
             let maximumSidebarWidth = max(minimumSidebarWidth, min(480, geometry.size.width - 608))
+            // Rounded so a saved fractional width or a fractional window-derived maximum cannot put the divider
+            // and the sidebar's text on sub-pixel offsets.
             let sidebarWidth = min(
-                max(draggingSidebarWidth ?? CGFloat(savedSidebarWidth), minimumSidebarWidth),
+                max((draggingSidebarWidth ?? CGFloat(savedSidebarWidth)).rounded(), minimumSidebarWidth),
                 maximumSidebarWidth
-            )
+            ).rounded(.down)
 
             HStack(spacing: 0) {
                 // A hidden sidebar stays in the view tree, past the window's leading edge, so it comes back with its
