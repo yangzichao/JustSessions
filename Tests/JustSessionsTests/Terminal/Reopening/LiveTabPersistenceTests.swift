@@ -74,7 +74,7 @@ struct LiveTabPersistenceTests {
         defer { sandbox.tearDown() }
         let remote = sandbox.conversation(title: "Remote", host: .ssh("devbox"))
         let local = sandbox.conversation(title: "Local")
-        let original: [ReopenableTerminalTab] = [.session(remote, wasSelected: true), .session(local)]
+        let original: [ReopenableTerminalTab] = [.session(remote), .session(local)]
         TerminalTabsToReopen(tabs: original).save(to: sandbox.userDefaults)
         let store = sandbox.makeStore()
         defer { store.closeAllTerminals() }
