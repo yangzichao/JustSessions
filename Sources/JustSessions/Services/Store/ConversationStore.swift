@@ -556,19 +556,19 @@ final class ConversationStore: ObservableObject {
     }
 
     /// Unlinks the split, keeping both tabs open and the selection; a tab from another project goes back to its
-    /// project's tabs.
+    /// project's tabs. The shown split's tab that is not selected goes off screen.
     func separateSplit(_ splitID: UUID) {
         guard terminalSplits.contains(where: { $0.id == splitID }) else { return }
         defer { persistOpenTabs() }
         var strip = tabStrip
         strip.separateSplit(splitID)
-        apply(strip)
+        refreshingHostsOfNewSessionsLeavingTheScreen { apply(strip) }
     }
 
     /// Puts a tab in no split into the shown split in place of the tab on `side`, as Chrome's "Move tab into split
     /// view": the two trade places in the tab bar, and the tab swapped out goes back to its project's tabs when it
-    /// lands among another project's. When the tab swapped out was selected, the incoming tab is selected instead. A
-    /// reopened tab still waiting to be shown starts as it joins.
+    /// lands among another project's, and goes off screen. When the tab swapped out was selected, the incoming tab is
+    /// selected instead. A reopened tab still waiting to be shown starts as it joins.
     func moveIntoShownSplit(_ tabID: UUID, swappingWith side: TerminalSplit.Side) {
         guard let shownSplit, let sides = sides(of: shownSplit),
               let incomingTab = terminalSessions.first(where: { $0.id == tabID }) else { return }
@@ -576,8 +576,10 @@ final class ConversationStore: ObservableObject {
         var strip = tabStrip
         guard strip.swap(tabID, intoSplit: shownSplit.id, replacing: outgoingID) else { return }
         defer { persistOpenTabs() }
-        apply(strip)
-        if selectedTerminalID == outgoingID { selectedTerminalID = tabID }
+        refreshingHostsOfNewSessionsLeavingTheScreen {
+            apply(strip)
+            if selectedTerminalID == outgoingID { selectedTerminalID = tabID }
+        }
         incomingTab.startNowThatItIsShown()
     }
 
@@ -587,19 +589,25 @@ final class ConversationStore: ObservableObject {
         return selectedTerminalID.map { [$0] } ?? []
     }
 
-    /// A new session's tab that goes off screen refreshes its host, so what its CLI saved so far is listed.
-    /// Moving between the two panes of a shown split keeps both on screen, so it refreshes nothing.
-    func selectTerminal(_ id: UUID?) {
-        guard selectedTerminalID != id else { return }
-        defer { persistOpenTabs() }
+    /// Makes `change`, then refreshes the host of every new session's tab it took off screen, so what its CLI saved so
+    /// far is listed.
+    private func refreshingHostsOfNewSessionsLeavingTheScreen(_ change: () -> Void) {
         let shownBefore = terminalIDsOnScreen
-        selectedTerminalID = id
+        change()
         let shownAfter = terminalIDsOnScreen
         var hostsToRefresh: [SessionHost] = []
         for tab in terminalSessions where tab.startsNewSession && shownBefore.contains(tab.id) && !shownAfter.contains(tab.id) {
             if !hostsToRefresh.contains(tab.host) { hostsToRefresh.append(tab.host) }
         }
         for host in hostsToRefresh { refresh(host) }
+    }
+
+    /// A new session's tab that goes off screen refreshes its host, so what its CLI saved so far is listed.
+    /// Moving between the two panes of a shown split keeps both on screen, so it refreshes nothing.
+    func selectTerminal(_ id: UUID?) {
+        guard selectedTerminalID != id else { return }
+        defer { persistOpenTabs() }
+        refreshingHostsOfNewSessionsLeavingTheScreen { selectedTerminalID = id }
     }
 
     /// Closing a tab of a split unlinks it, and the other tab goes back to its project's tabs; closing the selected

@@ -32,7 +32,8 @@ struct TerminalSplit: Identifiable, Equatable {
     /// The two tabs, in no particular order.
     private(set) var tabIDs: Set<UUID>
     /// The tab group both tabs show in, by project key: the group of the tab the split was made from, so a tab from
-    /// another project joins that tab's group while they are split, as Chrome moves it into the group.
+    /// another project joins that tab's group while they are split, as Chrome moves it into the group. Once no tab of
+    /// that project is left in the group, the split takes its left tab's project; see `TerminalTabStrip`.
     let groupKey: String
 
     init(id: UUID = UUID(), tabIDs: (UUID, UUID), groupKey: String) {
@@ -57,5 +58,11 @@ struct TerminalSplit: Identifiable, Equatable {
     func replacing(_ oldID: UUID, with newID: UUID) -> TerminalSplit {
         guard let partner = partner(of: oldID), partner != newID else { return self }
         return TerminalSplit(id: id, tabIDs: (partner, newID), groupKey: groupKey)
+    }
+
+    /// The same split, showing in the group `groupKey`.
+    func regrouped(into groupKey: String) -> TerminalSplit {
+        let tabIDs = Array(tabIDs)
+        return TerminalSplit(id: id, tabIDs: (tabIDs[0], tabIDs[1]), groupKey: groupKey)
     }
 }

@@ -15,12 +15,12 @@ struct WorkspaceSplitMiniToolbar: View {
 
     /// Chrome's `kMiniToolbarDomainMaxWidth`.
     private static let titleMaximumWidth: CGFloat = 140
-    /// Chrome's `kMiniToolbarContentPadding`: from the notch's curve to the toolbar's contents.
-    private static let contentPadding: CGFloat = 4
 
     var body: some View {
         let outlineWidth = WorkspaceSplitPaneMetrics.outlineWidth
         let cornerRadius = WorkspaceSplitPaneMetrics.outlineCornerRadius
+        let contentPadding = WorkspaceSplitPaneMetrics.miniToolbarContentPadding
+        let buttonSize = WorkspaceSplitPaneMetrics.miniToolbarButtonSize
         HStack(spacing: 6) {
             if showsTabDetails {
                 TerminalStatusIndicator(session: session)
@@ -32,19 +32,21 @@ struct WorkspaceSplitMiniToolbar: View {
             Button(action: onClose) {
                 Image(systemName: "xmark")
                     .font(.system(size: 10, weight: .bold))
-                    .frame(width: 20, height: 20)
+                    .frame(width: buttonSize, height: buttonSize)
                     .contentShape(Circle())
             }
-            .buttonStyle(ThemePlainButtonStyle(cornerRadius: 10))
+            .buttonStyle(ThemePlainButtonStyle(cornerRadius: buttonSize / 2))
             .help("Close this view")
             .accessibilityLabel("Close this view")
         }
+        // As tall as the ×, so the toolbar is `miniToolbarHeight` tall in either pane, which the terminal ends above.
+        .frame(height: buttonSize)
         .font(.system(size: 12, weight: .medium))
         .foregroundStyle(ThemePalette.ink)
         // Chrome's margins: clear of the notch's curves at the top and leading side, which leaves the title more room,
         // and on the outline's edge at the bottom and trailing side.
-        .padding(.top, cornerRadius + Self.contentPadding)
-        .padding(.leading, showsTabDetails ? cornerRadius * 2 : cornerRadius + Self.contentPadding)
+        .padding(.top, cornerRadius + contentPadding)
+        .padding(.leading, showsTabDetails ? cornerRadius * 2 : cornerRadius + contentPadding)
         .padding([.bottom, .trailing], outlineWidth)
         .background(WorkspaceSplitMiniToolbarShape().fill(terminalPalette.backgroundColor))
         .contentShape(WorkspaceSplitMiniToolbarShape())

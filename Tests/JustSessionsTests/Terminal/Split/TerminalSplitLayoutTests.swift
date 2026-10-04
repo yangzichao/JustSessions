@@ -49,6 +49,23 @@ struct TerminalSplitLayoutTests {
         #expect(abs(dragged - 0.6) < 0.0001)
     }
 
+    @Test func aDragEndingNearTheMiddleSnapsThePanesEven() {
+        // 1026 leaves 1000 for the panes, so a left pane from 486 to 514 points wide snaps to 500.
+        let fromTheLeft = TerminalSplitLayout.fraction(startingAt: 0.3, draggedBy: 190, totalWidth: 1026)
+        #expect(fromTheLeft == TerminalSplitLayout.evenFraction)
+        let fromTheRight = TerminalSplitLayout.fraction(startingAt: 0.7, draggedBy: -186, totalWidth: 1026)
+        #expect(fromTheRight == TerminalSplitLayout.evenFraction)
+        let nudgedFromEven = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: 14, totalWidth: 1026)
+        #expect(nudgedFromEven == TerminalSplitLayout.evenFraction)
+    }
+
+    @Test func aDragEndingTheSnapDistanceOrMoreFromTheMiddleStaysWhereItIs() {
+        let atTheSnapDistance = TerminalSplitLayout.fraction(startingAt: 0.3, draggedBy: 185, totalWidth: 1026)
+        #expect(abs(atTheSnapDistance - 0.485) < 0.0001)
+        let pastIt = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: 15, totalWidth: 1026)
+        #expect(abs(pastIt - 0.515) < 0.0001)
+    }
+
     @Test func aDragPastTheEdgeStopsAtTheMinimumPane() {
         let dragged = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: -5000, totalWidth: 1026)
         let widths = TerminalSplitLayout.paneWidths(fraction: dragged, totalWidth: 1026)

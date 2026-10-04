@@ -453,6 +453,46 @@ struct TerminalSplitStoreTests {
         #expect(store.terminalSplits.isEmpty)
     }
 
+    @Test func closingTheLastTabOfASplitsGroupProjectRegroupsTheSplitUnderItsLeftTab() throws {
+        let (store, cleanUp) = try makeStore()
+        defer { cleanUp() }
+        let app = open(store, makeTab(projectPath: "/tmp/app"))
+        let tools = open(store, makeTab(projectPath: "/tmp/tools"))
+        let docs = open(store, makeTab(projectPath: "/tmp/docs"))
+        store.selectTerminal(app.id)
+        store.splitSelectedTerminal(with: tools.id)
+        store.moveIntoShownSplit(docs.id, swappingWith: .left)
+        #expect(store.tabGroupKeys == [app, app, app].map(\.projectDirectoryKey))
+
+        store.closeTerminal(app.id)
+
+        // No group is left named for the app with none of its tabs.
+        #expect(ids(store) == [docs.id, tools.id])
+        #expect(store.tabGroupKeys == [docs, docs].map(\.projectDirectoryKey))
+        #expect(store.split(containing: docs.id)?.groupKey == docs.projectDirectoryKey)
+        expectSplitRules(store)
+    }
+
+    @Test func aSelectedTabLeavingAnotherProjectsGroupChangesItsGroupKey() throws {
+        let (store, cleanUp) = try makeStore()
+        defer { cleanUp() }
+        let app = open(store, makeTab(projectPath: "/tmp/app"))
+        let tools = open(store, makeTab(projectPath: "/tmp/tools"))
+        let secondTools = open(store, makeTab(projectPath: "/tmp/tools"))
+        store.selectTerminal(app.id)
+        store.splitSelectedTerminal(with: secondTools.id)
+        store.selectTerminal(secondTools.id)
+        let groupKeyInTheSplit = try store.tabGroupKey(of: #require(store.selectedTerminal))
+        #expect(groupKeyInTheSplit == app.projectDirectoryKey)
+
+        store.separateSplit(try #require(store.shownSplit).id)
+
+        // The selection stays while the selected tab's group changes: the tab bar expands that group if collapsed.
+        #expect(store.selectedTerminalID == secondTools.id)
+        #expect(try store.tabGroupKey(of: #require(store.selectedTerminal)) == tools.projectDirectoryKey)
+        expectSplitRules(store)
+    }
+
     // MARK: - Reconnecting
 
     @Test func aTabReplacedInPlaceKeepsItsPlaceInTheSplit() throws {
@@ -522,6 +562,50 @@ struct TerminalSplitStoreTests {
         // The other tab is the selected one; the new session's tab still goes off screen with it.
         store.selectTerminal(outside.id)
 
+        #expect(store.hostRefreshStatuses[.thisMac] == .refreshing)
+    }
+
+    @Test func separatingAShownSplitRefreshesTheHostOfANewSessionTabGoingOffScreen() throws {
+        let (store, cleanUp) = try makeStore()
+        defer { cleanUp() }
+        let newSessionTab = open(store, makeTab(action: .new))
+        let other = open(store, makeTab())
+        store.selectTerminal(other.id)
+        store.splitSelectedTerminal(with: newSessionTab.id)
+        #expect(store.hostRefreshStatuses[.thisMac] == nil)
+
+        store.separateSplit(try #require(store.shownSplit).id)
+
+        #expect(store.hostRefreshStatuses[.thisMac] == .refreshing)
+    }
+
+    @Test func separatingAShownSplitRefreshesNoHostWhileTheNewSessionTabStaysSelected() throws {
+        let (store, cleanUp) = try makeStore()
+        defer { cleanUp() }
+        let newSessionTab = open(store, makeTab(action: .new))
+        let other = open(store, makeTab())
+        store.selectTerminal(newSessionTab.id)
+        store.splitSelectedTerminal(with: other.id)
+
+        store.separateSplit(try #require(store.shownSplit).id)
+
+        #expect(store.hostRefreshStatuses[.thisMac] == nil)
+    }
+
+    @Test func aNewSessionTabSwappedOutOfTheShownSplitRefreshesItsHost() throws {
+        let (store, cleanUp) = try makeStore()
+        defer { cleanUp() }
+        let newSessionTab = open(store, makeTab(action: .new))
+        let other = open(store, makeTab())
+        let incoming = open(store, makeTab())
+        store.selectTerminal(other.id)
+        store.splitSelectedTerminal(with: newSessionTab.id)
+        let shownSplit = try #require(store.shownSplit)
+        let side = try #require(store.sides(of: shownSplit)?.side(of: newSessionTab.id))
+
+        store.moveIntoShownSplit(incoming.id, swappingWith: side)
+
+        #expect(store.selectedTerminalID == other.id)
         #expect(store.hostRefreshStatuses[.thisMac] == .refreshing)
     }
 

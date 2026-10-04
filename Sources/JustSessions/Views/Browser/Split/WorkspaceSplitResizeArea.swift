@@ -3,12 +3,13 @@ import SwiftUI
 /// The resize area between a split's two panes, as Chrome's: a band in the split area's color with a small pill handle
 /// in its middle, which shows while the pointer is over the band or it is dragged. It has its own place in the layout,
 /// so the panes' terminals never lie under it; dragging it resizes both terminals live, as the sidebar's resize handle
-/// does.
+/// does, snapping them even near the middle. Double-clicking it reverses the split's views, as in Chrome.
 struct WorkspaceSplitResizeArea: View {
     /// The left pane's share of the width the panes share.
     @Binding var fraction: CGFloat
     /// The whole split area's width.
     let totalWidth: CGFloat
+    let onReverse: () -> Void
 
     /// Where the resize area sat as the current drag began, or nil between drags.
     @State private var dragStartFraction: CGFloat?
@@ -58,6 +59,7 @@ struct WorkspaceSplitResizeArea: View {
                     }
                     .onEnded { _ in dragStartFraction = nil }
             )
+            .onTapGesture(count: 2, perform: onReverse)
             .accessibilityElement()
             .accessibilityLabel("Split View Resize Handle (draggable)")
             .accessibilityValue(Text(verbatim: "\(Int((shownFraction * 100).rounded()))%"))

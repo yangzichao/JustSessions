@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Sizes of a split pane's outline, as Chrome's `ContentsContainerOutline` and `kSplitViewContentPadding`.
+/// Sizes of a split pane's outline, as Chrome's `ContentsContainerOutline` and `kSplitViewContentPadding`, and of the
+/// mini toolbar in its corner.
 enum WorkspaceSplitPaneMetrics {
     static let outlineWidth: CGFloat = 1
     static let outlineCornerRadius: CGFloat = 8
@@ -8,6 +9,21 @@ enum WorkspaceSplitPaneMetrics {
     static let contentPadding: CGFloat = 4
     /// From the pane's edge to its terminal.
     static var terminalInset: CGFloat { outlineWidth + contentPadding }
+    /// The mini toolbar's × button, the tallest thing in the toolbar.
+    static let miniToolbarButtonSize: CGFloat = 20
+    /// Chrome's `kMiniToolbarContentPadding`: from the notch's curve to the toolbar's contents.
+    static let miniToolbarContentPadding: CGFloat = 4
+    /// The mini toolbar's height, the same in either pane: its ×, with Chrome's margins clear of the notch's curve
+    /// above it and on the outline's edge below it. Worked out from the toolbar's own sizes rather than measured, so a
+    /// split's terminal keeps the same room while its pane is hidden.
+    static var miniToolbarHeight: CGFloat {
+        outlineCornerRadius + miniToolbarContentPadding + miniToolbarButtonSize + outlineWidth
+    }
+    /// From the pane's edges to its terminal, which ends at the top of the mini toolbar's notch, so the toolbar covers
+    /// none of the terminal's last rows, where CLIs draw their input and status.
+    static var terminalInsets: EdgeInsets {
+        EdgeInsets(top: terminalInset, leading: terminalInset, bottom: miniToolbarHeight, trailing: terminalInset)
+    }
 }
 
 /// The rounded outline around a split pane, as Chrome's `ContentsContainerOutline::GetPath` draws it: with a mini

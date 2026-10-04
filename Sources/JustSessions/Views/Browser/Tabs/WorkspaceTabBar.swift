@@ -2,7 +2,8 @@ import SwiftUI
 
 /// The open tabs, grouped by project like tab groups in a browser: each project's tabs sit together behind a label
 /// in the project's color, which collapses or expands the group. Selecting a tab of a collapsed group, by shortcut or
-/// from the sidebar, expands it. The bar sits in the title bar, in the sidebar's color, like a browser's tab strip:
+/// from the sidebar, expands it, as does the selected tab moving into a collapsed group, such as when it leaves a
+/// split in another project's group. The bar sits in the title bar, in the sidebar's color, like a browser's tab strip:
 /// the selected tab takes its terminal's color and runs down into it, through the bar's bottom line. As in Chrome,
 /// tabs narrow together to fit the bar as more open, and the bar scrolls once they are as narrow as they get; a split's
 /// two tabs share one tab's width.
@@ -29,6 +30,7 @@ struct WorkspaceTabBar: View {
         let shownTabCount = shownTabs.count - shownSplitCount
         let tabWidth = WorkspaceTabWidth.fitting(
             shownTabCount: shownTabCount,
+            shownSplitCount: shownSplitCount,
             groupCount: groups.count,
             groupLabelsWidth: groups.compactMap { groupLabelWidthsByProjectKey[$0.projectDirectoryKey] }.reduce(0, +),
             barWidth: barWidth
@@ -56,14 +58,8 @@ struct WorkspaceTabBar: View {
                 .animation(.easeOut(duration: 0.15), value: shownTabCount)
             }
             .onGeometryChange(for: CGFloat.self, of: \.size.width) { barWidth = $0 }
-            .onChange(of: store.selectedTerminalID) { _, selectedTerminalID in
-                guard let selectedTerminal = store.selectedTerminal else { return }
-                let groupKey = store.tabGroupKey(of: selectedTerminal)
-                if collapsedProjectKeys.contains(groupKey) {
-                    expandGroup(groupKey)
-                }
-                scrollProxy.scrollTo(selectedTerminalID, anchor: .center)
-            }
+            .onChange(of: store.selectedTerminalID) { revealSelectedTab(scrollProxy) }
+            .onChange(of: store.selectedTerminal.map(store.tabGroupKey(of:))) { revealSelectedTab(scrollProxy) }
         }
         .padding(.leading, leadingClearance)
         .background {
@@ -90,6 +86,16 @@ struct WorkspaceTabBar: View {
         withAnimation(.easeOut(duration: 0.15)) {
             _ = collapsedProjectKeys.insert(projectKey)
         }
+    }
+
+    /// Expands the selected tab's group if it is collapsed, and scrolls the tab into sight.
+    private func revealSelectedTab(_ scrollProxy: ScrollViewProxy) {
+        guard let selectedTerminal = store.selectedTerminal else { return }
+        let groupKey = store.tabGroupKey(of: selectedTerminal)
+        if collapsedProjectKeys.contains(groupKey) {
+            expandGroup(groupKey)
+        }
+        scrollProxy.scrollTo(selectedTerminal.id, anchor: .center)
     }
 
     private func expandGroup(_ projectKey: String) {

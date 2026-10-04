@@ -4,7 +4,9 @@ import SwiftUI
 /// selected, the selected session's preview. Every tab's terminal stays in the view tree; only the selected one
 /// shows, filling the area, or both views of a split while either of its tabs is selected, laid out as Chrome's split
 /// view: in the terminals' background, each terminal inside a rounded outline with a mini toolbar in its corner, and a
-/// resize area between them. A click in the pane whose tab is not selected, or on its toolbar, selects that tab,
+/// resize area between them. Unlike Chrome, whose mini toolbar overlaps the page under it, each terminal ends above
+/// its toolbar: a page scrolls and seldom puts anything in its bottom corner, but a terminal's last rows stay put and
+/// hold the CLI's input and status. A click in the pane whose tab is not selected, or on its toolbar, selects that tab,
 /// bringing it the keyboard, and a click in the pane still reaches its terminal, so scrolling and selecting text work
 /// there too. Every split's tabs keep their terminals' sizes while another tab shows, so coming back resizes no
 /// terminal.
@@ -61,8 +63,9 @@ struct WorkspaceDetailView: View {
                             onReconnect: session.host == .thisMac ? nil : { store.reconnectRemoteTerminal(session.id) },
                             onFocus: { store.selectTerminal(session.id) }
                         )
-                        // A split's terminal keeps its place inside the pane's outline while another tab shows.
-                        .padding(split == nil ? 0 : WorkspaceSplitPaneMetrics.terminalInset)
+                        // A split's terminal keeps its place inside the pane's outline, above the mini toolbar, while
+                        // another tab shows too, so selecting another tab resizes no terminal.
+                        .padding(split == nil ? EdgeInsets() : WorkspaceSplitPaneMetrics.terminalInsets)
                         .overlay {
                             if split != nil && isShown {
                                 WorkspaceSplitPaneOverlay(
@@ -80,7 +83,11 @@ struct WorkspaceDetailView: View {
 
                     if let shownSplit {
                         let resizeAreaFrame = TerminalSplitLayout.frames(fraction: splitFraction(of: shownSplit), size: geometry.size).resizeArea
-                        WorkspaceSplitResizeArea(fraction: splitFractionBinding(for: shownSplit), totalWidth: geometry.size.width)
+                        WorkspaceSplitResizeArea(
+                            fraction: splitFractionBinding(for: shownSplit),
+                            totalWidth: geometry.size.width,
+                            onReverse: { store.reverseSplit(shownSplit.id) }
+                        )
                             .frame(width: resizeAreaFrame.width, height: resizeAreaFrame.height)
                             .offset(x: resizeAreaFrame.minX, y: resizeAreaFrame.minY)
                     }

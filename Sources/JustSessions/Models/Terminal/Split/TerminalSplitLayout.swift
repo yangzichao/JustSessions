@@ -3,7 +3,7 @@ import CoreGraphics
 /// Where a shown split's panes and the resize area between them sit, as in Chrome's split view: the panes are inset
 /// from the split area's edges, with the resize area between them. The fraction is the left pane's share of the width
 /// the two panes share; it is kept where both panes stay wide enough for a terminal, and the split starts even, as in
-/// Chrome.
+/// Chrome. A drag that brings the panes close to even snaps them even, as Chrome's snap point does.
 enum TerminalSplitLayout {
     /// Between the split area's edges and its panes, as Chrome's `kSplitViewContentInset`. Chrome has no inset at the
     /// top, where its toolbar sits; with no toolbar here, the same band runs along the top too.
@@ -14,6 +14,9 @@ enum TerminalSplitLayout {
     /// Neither pane gets narrower than this while the window has room for both, as Chrome's `kMinWebContentsSize`.
     static let minimumPaneWidth: CGFloat = 200
     static let evenFraction: CGFloat = 0.5
+    /// A drag leaving the left pane less than this from half the panes' width snaps it to half, as Chrome's
+    /// `kSnapDistance` around its one snap point.
+    static let snapDistance: CGFloat = 15
 
     struct PaneWidths: Equatable {
         var leading: CGFloat
@@ -58,10 +61,13 @@ enum TerminalSplitLayout {
         return Frames(left: left, resizeArea: resizeArea, right: right)
     }
 
-    /// The fraction after the resize area is dragged `delta` points from where it sat at `startFraction`.
+    /// The fraction after the resize area is dragged `delta` points from where it sat at `startFraction`, even when
+    /// that leaves the left pane within `snapDistance` of half the width, as Chrome's `CalculateRatioWithSnapPoints`.
     static func fraction(startingAt startFraction: CGFloat, draggedBy delta: CGFloat, totalWidth: CGFloat) -> CGFloat {
         let availableWidth = availableWidth(totalWidth: totalWidth)
         guard availableWidth > 0 else { return evenFraction }
-        return clampedFraction(startFraction + delta / availableWidth, totalWidth: totalWidth)
+        let leftWidth = startFraction * availableWidth + delta
+        guard abs(leftWidth - evenFraction * availableWidth) >= snapDistance else { return evenFraction }
+        return clampedFraction(leftWidth / availableWidth, totalWidth: totalWidth)
     }
 }

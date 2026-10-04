@@ -75,7 +75,9 @@ struct TerminalTabGroupSection: View {
         guard let selectedTerminalID = store.selectedTerminalID else { return nil }
         if store.split(containing: selectedTerminalID) != nil { return .moveIntoShownSplit }
         guard tabID == selectedTerminalID else { return .newSplitWithSelectedTab }
-        let candidates = store.terminalSessions.filter { $0.id != tabID && store.split(containing: $0.id) == nil }
+        let candidates = store.terminalSessions
+            .filter { $0.id != tabID && store.split(containing: $0.id) == nil }
+            .map { TerminalTabSplitCandidate(session: $0, projectDisplayName: store.projectDisplayName(forProjectPath: $0.projectDirectoryKey)) }
         return .addTabToNewSplit(candidates: candidates)
     }
 
