@@ -141,9 +141,17 @@ final class TerminalSession: ObservableObject, Identifiable {
         displayTitle = title
     }
 
+    /// Hangs up on the tab's process with SIGHUP, as closing a terminal window does. An interactive shell ignores the
+    /// SIGTERM of SwiftTerm's `terminate()`, which also leaves the terminal open, so a plain terminal's shell would
+    /// otherwise outlive its tab. A tmux client detaches on SIGHUP and leaves its CLI running.
     func close() {
         guard !isClosed else { return }
         isClosed = true
-        if hasStarted && !hasExited { terminalView.terminate() }
+        guard hasStarted && !hasExited else { return }
+        let processID = self.processID
+        // kill(0) or kill(-1) would signal the app itself or every process of the user.
+        if processID > 0 { kill(processID, SIGHUP) }
+        terminalView.terminate()
+        ClosedTabProcessReaper.reapOnceExited(processID)
     }
 }

@@ -41,6 +41,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Tmux/`: tmux session names, and keeping a CLI running after its tab closes, on any host.
 - `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, and finding each tab's CLI process.
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
+- `Services/Terminal/Closing/`: waits for a closed tab's process to exit, so it leaves no zombie behind.
 - `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal.
 - `Services/Terminal/Appearance/Import/`: reads colors from iTerm2's default profile or an `.itermcolors` file, only when asked.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
