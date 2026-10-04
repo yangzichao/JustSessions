@@ -119,7 +119,7 @@ struct TerminalSplitStoreTests {
         #expect(store.selectedTerminalID == second.id)
     }
 
-    @Test func closingTheHiddenHalfKeepsTheSelectionAndUnlinks() throws {
+    @Test func closingTheShownHalfThatIsNotSelectedKeepsTheSelectionAndUnlinks() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
@@ -257,6 +257,66 @@ struct TerminalSplitStoreTests {
         #expect(store.terminalSplitPair == TerminalSplitPair(leadingID: first.id, trailingID: replacement.id))
     }
 
+    @Test func replacingTheSelectedHalfKeepsThePairItsSideAndTheSelection() throws {
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        defer { store.closeAllTerminals() }
+        let first = makeTab()
+        let second = makeTab()
+        store.openTerminal(first)
+        store.openTerminal(second)
+        store.selectTerminal(first.id)
+        store.splitSelectedTerminal(with: second.id)
+
+        let replacement = makeTab()
+        let index = try #require(store.terminalSessions.firstIndex { $0.id == first.id })
+        store.replaceTerminal(at: index, with: replacement)
+
+        #expect(store.terminalSplitPair == TerminalSplitPair(leadingID: replacement.id, trailingID: second.id))
+        #expect(store.selectedTerminalID == replacement.id)
+        #expect(store.shownSplitPair != nil)
+    }
+
+    @Test func movingBetweenThePanesOfAShownSplitRefreshesNoHost() throws {
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        defer { store.closeAllTerminals() }
+        let newSessionTab = makeTab(action: .new)
+        let other = makeTab()
+        store.openTerminal(newSessionTab)
+        store.openTerminal(other)
+        store.selectTerminal(newSessionTab.id)
+        store.splitSelectedTerminal(with: other.id)
+
+        store.selectTerminal(other.id)
+        store.selectTerminal(newSessionTab.id)
+
+        #expect(store.hostRefreshStatuses[.thisMac] == nil)
+    }
+
+    @Test func aNewSessionTabLeavingTheScreenWithItsSplitRefreshesItsHost() throws {
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        defer { store.closeAllTerminals() }
+        let newSessionTab = makeTab(action: .new)
+        let other = makeTab()
+        let outside = makeTab()
+        store.openTerminal(newSessionTab)
+        store.openTerminal(other)
+        store.openTerminal(outside)
+        store.selectTerminal(other.id)
+        store.splitSelectedTerminal(with: newSessionTab.id)
+        #expect(store.hostRefreshStatuses[.thisMac] == nil)
+
+        // The other half is the selected one; the new session's tab still goes off screen with it.
+        store.selectTerminal(outside.id)
+
+        #expect(store.hostRefreshStatuses[.thisMac] == .refreshing)
+    }
+
     @Test func closingAllTabsUnlinksThePair() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
@@ -273,12 +333,12 @@ struct TerminalSplitStoreTests {
         #expect(store.terminalSplitPair == nil)
     }
 
-    private func makeTab(projectPath: String = "/tmp/app") -> TerminalSession {
+    private func makeTab(projectPath: String = "/tmp/app", action: ConversationAction = .resume) -> TerminalSession {
         TerminalSession(
             conversation: nil,
             provider: .claude,
             projectPath: projectPath,
-            action: .resume,
+            action: action,
             displayTitle: "Tab in \(projectPath)",
             command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [], workingDirectory: projectPath, environment: [])
         )

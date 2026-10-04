@@ -75,17 +75,8 @@ struct WorkspaceDetailView: View {
         }
         .ignoresSafeArea(edges: .top)
         .onChange(of: store.terminalSplitPair) { oldPair, newPair in
-            guard let newPair, newPair != oldPair else { return }
-            if oldPair?.swapped == newPair {
-                // Swapped panes keep their widths as they trade sides.
-                splitFraction = 1 - splitFraction
-            } else if let oldPair, newPair.sharesTab(with: oldPair) {
-                // A tab replaced in place, or a new partner for the selected tab, keeps the divider where it was.
-                return
-            } else {
-                // A pair of tabs new to the split starts even, as in Chrome.
-                splitFraction = TerminalSplitLayout.evenFraction
-            }
+            guard let newPair else { return }
+            splitFraction = TerminalSplitLayout.fraction(splitFraction, afterPairChangeFrom: oldPair, to: newPair)
         }
     }
 

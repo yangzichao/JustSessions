@@ -511,13 +511,25 @@ final class ConversationStore: ObservableObject {
         terminalSplitPair = nil
     }
 
-    /// Leaving a new session's tab refreshes its host, so what its CLI saved so far is listed.
+    /// The tabs whose terminals are on screen: both halves of a shown split, or else the selected tab.
+    private var terminalIDsOnScreen: Set<UUID> {
+        if let shownSplitPair { return [shownSplitPair.leadingID, shownSplitPair.trailingID] }
+        return selectedTerminalID.map { [$0] } ?? []
+    }
+
+    /// A new session's tab that goes off screen refreshes its host, so what its CLI saved so far is listed.
+    /// Moving between the two panes of a shown split keeps both on screen, so it refreshes nothing.
     func selectTerminal(_ id: UUID?) {
         guard selectedTerminalID != id else { return }
         defer { persistOpenTabs() }
-        let leftNewSessionTab = selectedTerminalID == id ? nil : selectedTerminal.flatMap { $0.startsNewSession ? $0 : nil }
+        let shownBefore = terminalIDsOnScreen
         selectedTerminalID = id
-        if let leftNewSessionTab { refresh(leftNewSessionTab.host) }
+        let shownAfter = terminalIDsOnScreen
+        var hostsToRefresh: [SessionHost] = []
+        for tab in terminalSessions where tab.startsNewSession && shownBefore.contains(tab.id) && !shownAfter.contains(tab.id) {
+            if !hostsToRefresh.contains(tab.host) { hostsToRefresh.append(tab.host) }
+        }
+        for host in hostsToRefresh { refresh(host) }
     }
 
     func closeTerminal(_ id: UUID) {

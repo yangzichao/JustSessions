@@ -14,7 +14,9 @@ struct WorkspaceSplitDivider: View {
     @State private var isHovering = false
 
     var body: some View {
-        let paneWidths = TerminalSplitLayout.paneWidths(fraction: fraction, totalWidth: totalWidth)
+        // The fraction as the panes show it now: one set in a wider window may sit past where this width allows.
+        let shownFraction = TerminalSplitLayout.clampedFraction(fraction, totalWidth: totalWidth)
+        let paneWidths = TerminalSplitLayout.paneWidths(fraction: shownFraction, totalWidth: totalWidth)
         Rectangle()
             .fill(ThemePalette.sidebarSurface)
             .overlay {
@@ -32,7 +34,7 @@ struct WorkspaceSplitDivider: View {
                 // own space would shrink as it slides under the pointer, pulling the panes back each event.
                 DragGesture(minimumDistance: 1, coordinateSpace: .global)
                     .onChanged { gesture in
-                        let startFraction = dragStartFraction ?? fraction
+                        let startFraction = dragStartFraction ?? shownFraction
                         if dragStartFraction == nil { dragStartFraction = startFraction }
                         fraction = TerminalSplitLayout.fraction(
                             startingAt: startFraction,
@@ -44,10 +46,10 @@ struct WorkspaceSplitDivider: View {
             )
             .accessibilityElement()
             .accessibilityLabel("Split view divider")
-            .accessibilityValue(Text(verbatim: "\(Int((fraction * 100).rounded()))%"))
+            .accessibilityValue(Text(verbatim: "\(Int((shownFraction * 100).rounded()))%"))
             .accessibilityAdjustableAction { direction in
                 let step: CGFloat = direction == .increment ? 0.05 : -0.05
-                fraction = TerminalSplitLayout.clampedFraction(fraction + step, totalWidth: totalWidth)
+                fraction = TerminalSplitLayout.clampedFraction(shownFraction + step, totalWidth: totalWidth)
             }
     }
 }

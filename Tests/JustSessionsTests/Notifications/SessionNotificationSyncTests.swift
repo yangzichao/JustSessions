@@ -47,6 +47,42 @@ struct SessionNotificationSyncTests {
         #expect(notification.body == "Finished, waiting for your next prompt")
     }
 
+    @Test func aCLIInTheSplitPaneBesideTheSelectedTabIsInView() async throws {
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let rolloutFile = directory.appendingPathComponent("rollout.jsonl")
+        let conversation = Conversation.fixture(provider: .codex, projectPath: directory.path, title: "Fix login", sourceFile: rolloutFile)
+        let other = Conversation.fixture(provider: .codex, projectPath: directory.path)
+        let notifier = RecordingSessionNotifier()
+        notifier.isApplicationActive = true
+        let store = Self.makeStore(listing: [conversation, other], searching: directory, notifier: notifier)
+        defer { store.closeAllTerminals() }
+        let tab = Self.startTab(for: conversation)
+        store.openTerminal(tab)
+        store.openTerminal(Self.makeTab(for: other))
+        store.splitSelectedTerminal(with: tab.id)
+        #expect(store.selectedTerminalID != tab.id)
+        let cliStartedAt = try #require(RunningProcessInfo.startDate(of: tab.cliProcessID))
+        let registry = Self.emptyClaudeRegistry(in: directory)
+        try CodexRolloutLines.write([CodexRolloutLines.sessionMeta, CodexRolloutLines.turnStarted(at: cliStartedAt + 1)], to: rolloutFile)
+        await store.synchronizeCLIActivity(claudeRegistry: registry)
+        #expect(tab.cliActivity == .working)
+
+        // The tab is not selected, but its terminal shows beside the selected one, so you see the turn end.
+        try CodexRolloutLines.append(CodexRolloutLines.text([CodexRolloutLines.turnCompleted()]), to: rolloutFile)
+        await store.synchronizeCLIActivity(claudeRegistry: registry)
+        #expect(tab.cliActivity == .idle)
+        #expect(notifier.notifications.isEmpty)
+
+        // Once the split ends, the tab is out of view and the next turn's end notifies.
+        store.endSplit()
+        try CodexRolloutLines.append(CodexRolloutLines.text([CodexRolloutLines.turnStarted(at: cliStartedAt + 2)]), to: rolloutFile)
+        await store.synchronizeCLIActivity(claudeRegistry: registry)
+        try CodexRolloutLines.append(CodexRolloutLines.text([CodexRolloutLines.turnCompleted()]), to: rolloutFile)
+        await store.synchronizeCLIActivity(claudeRegistry: registry)
+        #expect(notifier.notifications.count == 1)
+    }
+
     @Test func aCLIInTmuxWithNoTabNotifiesWhenItStopsForAPrompt() async throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }

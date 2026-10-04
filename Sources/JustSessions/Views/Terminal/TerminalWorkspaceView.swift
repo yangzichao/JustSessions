@@ -8,7 +8,8 @@ struct TerminalWorkspaceView: View {
     let isShown: Bool
     /// The tab is selected, so its terminal gets the keyboard.
     let isActive: Bool
-    /// Shown for a remote tab whose connection ended.
+    /// Shown for a remote tab whose connection ended. Reconnecting selects the tab first, as from a split pane whose
+    /// tab is not selected, so the replacement it opens is selected too.
     let onReconnect: (() -> Void)?
     /// Called when a click lands on the terminal, before it takes the keyboard.
     let onFocus: () -> Void
@@ -16,7 +17,7 @@ struct TerminalWorkspaceView: View {
     var body: some View {
         VStack(spacing: 0) {
             if session.hasExited {
-                TerminalEndedBar(exitCode: session.exitCode, onReconnect: onReconnect)
+                TerminalEndedBar(exitCode: session.exitCode, onReconnect: onReconnect.map { reconnect in { onFocus(); reconnect() } })
                 ThemeDivider()
             }
             EmbeddedTerminalView(session: session, isShown: isShown, isActive: isActive, onFocus: onFocus)

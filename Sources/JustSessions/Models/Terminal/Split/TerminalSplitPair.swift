@@ -11,11 +11,6 @@ struct TerminalSplitPair: Equatable {
         id == leadingID || id == trailingID
     }
 
-    /// Either tab of this pair is also in `other`, as when one half was replaced and the other stayed.
-    func sharesTab(with other: TerminalSplitPair) -> Bool {
-        other.contains(leadingID) || other.contains(trailingID)
-    }
-
     /// The other half of the pair, or nil for a tab outside it.
     func counterpart(of id: UUID) -> UUID? {
         switch id {
