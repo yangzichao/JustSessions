@@ -30,6 +30,7 @@ struct SettingsSheet: View {
             .padding(.vertical, 12)
         }
         .background(ThemePalette.contentSurface)
+        .background(SettingsSheetTerminationPolicy())
         .appLanguage(from: .shared)
     }
 }
