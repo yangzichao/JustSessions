@@ -47,10 +47,10 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Transcript/Markdown/`: splits Markdown into prose, code blocks, and tables for the native views.
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
 - `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
-- `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar.
+- `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
 - `Views/Browser/Sidebar/`: sidebar header and footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.
 - `Views/Browser/Sidebar/Hosts/`: host headings, and the Add SSH host button and sheet.
-- `Views/Terminal/`: a tab's embedded terminal.
+- `Views/Terminal/`: a tab's embedded terminal, inset from the window's edges, and the bar above it once its CLI ends.
 - `Views/Preview/`: conversation preview for the selected session.
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
 - `Views/Preview/Reading/` and `ReadingPosition/`: text size, reading width, first/latest-message controls, and reading-position restoration.

@@ -2,9 +2,14 @@ import SwiftUI
 
 /// The open tabs, grouped by project like tab groups in a browser: each project's tabs sit together behind a label
 /// in the project's color, which collapses or expands the group. Selecting a tab of a collapsed group, by shortcut or
-/// from the sidebar, expands it.
+/// from the sidebar, expands it. The bar sits in the title bar, with its tabs on the title bar's center line, level
+/// with the window buttons.
 struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
+    let titleBarHeight: CGFloat
+    /// Width at the leading edge that tabs never enter, even when scrolled, so the window buttons and sidebar toggle
+    /// stay clear of them.
+    let leadingClearance: CGFloat
     let onRenameConversation: (Conversation) -> Void
     let onCloseTerminal: (UUID) -> Void
     @State private var collapsedProjectKeys: Set<String> = []
@@ -28,7 +33,8 @@ struct WorkspaceTabBar: View {
                     }
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                .padding(.top, max(3, (titleBarHeight - WorkspaceTabButtonStyle.height) / 2))
+                .padding(.bottom, 5)
             }
             .onChange(of: store.selectedTerminalID) { _, selectedTerminalID in
                 guard let selectedTerminal = store.selectedTerminal else { return }
@@ -38,6 +44,7 @@ struct WorkspaceTabBar: View {
                 scrollProxy.scrollTo(selectedTerminalID, anchor: .center)
             }
         }
+        .padding(.leading, leadingClearance)
         .background(ThemePalette.contentSurface)
         .onChange(of: groups.map(\.projectDirectoryKey)) { _, openProjectKeys in
             // A project whose last tab closed opens expanded next time.

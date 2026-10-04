@@ -68,6 +68,7 @@ struct ConversationBrowserView: View {
             WorkspaceDetailView(
                 store: store,
                 sessionSelection: sessionSelection,
+                isSidebarHidden: isSidebarHidden,
                 onRename: onRename,
                 onCloseTerminal: { requestClosingTerminal($0) },
                 onDelete: { onRequestDeletion(.conversation($0)) }

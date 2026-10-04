@@ -2,7 +2,7 @@ import SwiftUI
 
 extension View {
     /// Puts the sidebar toggle in the title bar, just right of the close, minimize, and zoom buttons, where it stays
-    /// while the sidebar is hidden.
+    /// while the sidebar is hidden. The content reads the title bar's layout from `titleBarRow`.
     func titleBarSidebarToggle(isSidebarHidden: Binding<Bool>) -> some View {
         modifier(TitleBarSidebarToggle(isSidebarHidden: isSidebarHidden))
     }
@@ -20,13 +20,26 @@ private struct TitleBarSidebarToggle: ViewModifier {
 
     private var isFullScreen: Bool { titleBarHeight == 0 }
 
+    private var toggleLeadingInset: CGFloat {
+        isFullScreen ? Self.leadingInsetInFullScreen : Self.leadingInsetBesideWindowButtons
+    }
+
+    private var row: TitleBarRow {
+        TitleBarRow(
+            height: isFullScreen ? Self.standardTitleBarHeight : titleBarHeight,
+            toggleTrailingEdge: toggleLeadingInset + SidebarToggleButton.width
+        )
+    }
+
     func body(content: Content) -> some View {
+        let row = row
         content
             .safeAreaPadding(.top, isFullScreen ? Self.standardTitleBarHeight : 0)
+            .environment(\.titleBarRow, row)
             .overlay(alignment: .topLeading) {
                 SidebarToggleButton(isSidebarHidden: $isSidebarHidden)
-                    .frame(height: isFullScreen ? Self.standardTitleBarHeight : titleBarHeight)
-                    .padding(.leading, isFullScreen ? Self.leadingInsetInFullScreen : Self.leadingInsetBesideWindowButtons)
+                    .frame(height: row.height)
+                    .padding(.leading, toggleLeadingInset)
                     .ignoresSafeArea(edges: .top)
             }
             .background {

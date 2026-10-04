@@ -521,6 +521,7 @@ private struct SidebarPerfBrowserHarness: View {
             WorkspaceDetailView(
                 store: store,
                 sessionSelection: controls.sessionSelection,
+                isSidebarHidden: false,
                 onRename: { _ in },
                 onCloseTerminal: { _ in },
                 onDelete: { _ in }

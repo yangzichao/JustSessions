@@ -2,6 +2,8 @@ import SwiftUI
 
 /// The sidebar icon that hides or shows the sidebar, with a faint fill under the pointer.
 struct SidebarToggleButton: View {
+    static let width: CGFloat = 28
+
     @Binding var isSidebarHidden: Bool
     @State private var isHovered = false
 
@@ -18,7 +20,7 @@ struct SidebarToggleButton: View {
             Image(systemName: "sidebar.left")
                 .font(.system(size: 14))
                 .foregroundStyle(.secondary)
-                .frame(width: 28, height: 22)
+                .frame(width: Self.width, height: 22)
                 .background {
                     if isHovered {
                         RoundedRectangle(cornerRadius: 6, style: .continuous).fill(ThemePalette.hoverFill)
