@@ -42,6 +42,19 @@ struct AppBundleInfoContractTests {
         #expect(infoPlist["SUVerifyUpdateBeforeExtraction"] as? Bool == true)
     }
 
+    /// The feed is the Worker in `Cloudflare/UpdateFeed/`, which counts the check and redirects to the appcast on GitHub.
+    @Test func updatesAreCheckedThroughTheCountingWorker() throws {
+        let feedURL = try #require((try Self.infoPlistTemplate()["SUFeedURL"] as? String).flatMap(URL.init(string:)))
+        let workerConfiguration = try RepositoryFiles.contents(of: "Cloudflare/UpdateFeed/wrangler.jsonc")
+        let workerSource = try RepositoryFiles.contents(of: "Cloudflare/UpdateFeed/src/worker.js")
+        let workerName = try #require(workerConfiguration.firstMatch(of: try Regex(#""name": "([^"]+)""#))?.output[1].substring)
+
+        #expect(feedURL.host()?.hasPrefix("\(workerName).") == true, "\(feedURL)")
+        #expect(feedURL.host()?.hasSuffix(".workers.dev") == true, "\(feedURL)")
+        #expect(workerSource.contains("pathname !== \"\(feedURL.path())\""))
+        #expect(workerSource.contains("\"https://github.com/yangzichao/JustSessions/releases/latest/download/appcast.xml\""))
+    }
+
     /// `plutil -replace` fills in the version at build time; each key it replaces is in the template.
     @Test func everyKeyTheScriptFillsInIsInTheTemplate() throws {
         let script = try RepositoryFiles.contents(of: "Scripts/build-app.sh")

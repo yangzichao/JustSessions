@@ -2,7 +2,7 @@
 
 [Back to JustSessions](../../README.md) · [Session management guide](session-management.md)
 
-JustSessions reads the session files your CLIs already create. It does not upload conversation history to a JustSessions service. When you add an SSH host, its supported session files are copied to a cache on your Mac over SSH. The CLIs you run keep their own network behavior and provider accounts; Sparkle checks GitHub for app updates.
+JustSessions reads the session files your CLIs already create. It does not upload conversation history to a JustSessions service. When you add an SSH host, its supported session files are copied to a cache on your Mac over SSH. The CLIs you run keep their own network behavior and provider accounts. Sparkle checks for app updates through a JustSessions update server that counts checks per day and app version, without storing IP addresses or identifiers; the downloads come from GitHub Releases.
 
 ## Session locations
 

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/wrangler@4/config-schema.json",
+  "name": "justsessions-update-feed",
+  // zichao.yang.phys@gmail.com's account; Wrangler refuses to deploy while signed in to another one.
+  "account_id": "8b165b15e729dc4442baca8094edc756",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "UPDATE_CHECKS_DATABASE",
+      "database_name": "justsessions-update-checks",
+      "database_id": "c7127e13-97e8-422a-89d9-9f85de3c4217",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Persisted request logs would keep request metadata; the counts are the only thing this Worker stores.
+  // Use `wrangler tail` to watch live errors.
+  "observability": { "enabled": false }
+}

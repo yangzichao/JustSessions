@@ -6,7 +6,7 @@
 APP_BUNDLE_PATH ?= dist/JustSessions.app
 INSTALLER_PATH ?= dist/JustSessions.dmg
 
-.PHONY: build dev run check test verify dmg website website-check localization localization-check help
+.PHONY: build dev run check test verify dmg website website-check localization localization-check update-feed-test update-feed-deploy update-checks help
 
 build:
 	./Scripts/build-app.sh "$(APP_BUNDLE_PATH)"
@@ -22,7 +22,7 @@ test:
 	JUSTSESSIONS_TEST_TMUX_RUNTIME="$$runtime_directory" swift test
 
 # PRs and branch pushes do not run CI; verify the final commit locally before delivering or tagging it.
-verify: website-check test localization-check build
+verify: website-check update-feed-test test localization-check build
 	./Scripts/Release/check-app-launches.sh "$(APP_BUNDLE_PATH)"
 
 dmg: build
@@ -42,6 +42,15 @@ localization-check:
 	python3 Scripts/Localization/sync_catalog.py --check
 	python3 -m unittest discover -s Scripts/Localization/tests
 
+update-feed-test:
+	node --test Cloudflare/UpdateFeed/tests/*.test.js
+
+update-feed-deploy: update-feed-test
+	cd Cloudflare/UpdateFeed && wrangler d1 migrations apply justsessions-update-checks --remote && wrangler deploy
+
+update-checks:
+	./Cloudflare/UpdateFeed/show-daily-update-checks.sh
+
 help:
 	@printf '%s\n' \
 		'make           Build dist/JustSessions.app with bundled tmux' \
@@ -55,4 +64,7 @@ help:
 		'make website-check  Run the website tests and build' \
 		'make localization        Extract UI strings and compile translations' \
 		'make localization-check  Check UI strings, translations, and resources' \
+		'make update-feed-test    Test the Cloudflare Worker that counts update checks' \
+		'make update-feed-deploy  Apply its database migrations and deploy it' \
+		'make update-checks       Show update checks per day for the last 30 days' \
 		'Override output paths with APP_BUNDLE_PATH=... and INSTALLER_PATH=...'

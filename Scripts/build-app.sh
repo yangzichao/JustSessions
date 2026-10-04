@@ -66,7 +66,7 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
     <key>CFBundleVersion</key><string>BUILD_NUMBER_PLACEHOLDER</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>NSHighResolutionCapable</key><true/>
-    <key>SUFeedURL</key><string>https://github.com/yangzichao/JustSessions/releases/latest/download/appcast.xml</string>
+    <key>SUFeedURL</key><string>https://justsessions-update-feed.noether-lab.workers.dev/appcast.xml</string>
     <key>SUPublicEDKey</key><string>pTbuztMtV4TVr5xOu9ON8B3L2xsJJRf8q5zyMg7SaD8=</string>
     <key>SUEnableAutomaticChecks</key><true/>
     <key>SUVerifyUpdateBeforeExtraction</key><true/>

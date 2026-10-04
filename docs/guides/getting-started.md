@@ -65,6 +65,6 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 
 Open **Settings** in the sidebar or press ⌘,. **General > Interface language** offers **Follow System** (default), **English**, and **Chinese**. The interface updates immediately and remembers your choice. Appearance and terminal settings also update open terminals in place. **Permissions** shows what macOS allows JustSessions, such as notifications.
 
-JustSessions reads local CLI files and caches supported remote history over SSH. It does not upload conversations to a JustSessions service. The CLIs still communicate with their providers, and Sparkle checks GitHub for updates. [Storage and privacy](session-storage.md).
+JustSessions reads local CLI files and caches supported remote history over SSH. It does not upload conversations to a JustSessions service. The CLIs still communicate with their providers. Sparkle checks for app updates through a JustSessions update server that counts checks per day and app version, without storing IP addresses or identifiers. [Storage and privacy](session-storage.md).
 
 Use the sidebar's question mark icon or **Help → JustSessions Help** for a brief feature overview and remote host setup. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The same overview is on the [website Help page](https://yangzichao.github.io/JustSessions/help.html); its issue link opens GitHub.

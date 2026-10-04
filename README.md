@@ -112,6 +112,7 @@ Build locally with `make`; the app is written to `dist/JustSessions.app`. Use `m
 - [Session storage and privacy](docs/guides/session-storage.md): history locations, remote caching, and tmux behavior.
 - [Build and release](docs/development/build-and-release.md): Make commands and release signing.
 - [Source layout](docs/development/source-layout.md): where each feature lives.
+- [Counting update checks](docs/development/update-checks.md): how daily update checks estimate active installs without collecting user data.
 - [Website development](docs/development/website.md): preview, validate, and publish the GitHub Pages site.
 - [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Help](https://yangzichao.github.io/JustSessions/help.html)
 

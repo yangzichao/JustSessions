@@ -12,7 +12,7 @@ Run it on the final commit before opening or updating a pull request, merging, o
 
 Use the PR template to attach the tested commit SHA, verification date, macOS and Swift versions, exact commands and results, and a concise log summary. Update that evidence whenever the PR head changes; identify any failures or checks that were not run explicitly. Include relevant manual checks for behavior changes. For direct pushes to `main`, report the same evidence in the delivery summary.
 
-`make verify` runs the website tests and build, `make test`, and `make localization-check`, builds `dist/JustSessions.app`, and opens it for 8 seconds to check it keeps running. Reopening the last quit's tabs is off for that launch, so it starts no CLIs. After editing workflows, also run `actionlint` locally.
+`make verify` runs the website tests and build, the update feed Worker tests, `make test`, and `make localization-check`, builds `dist/JustSessions.app`, and opens it for 8 seconds to check it keeps running. Reopening the last quit's tabs is off for that launch, so it starts no CLIs. After editing workflows, also run `actionlint` locally.
 
 Run `make verify` again on the exact commit you tag for a release. The single release workflow validates the website, reruns the Swift tests and localization checks, then signs and publishes the app and deploys the website from the same tag. Website changes on `main` become public at the next release.
 
