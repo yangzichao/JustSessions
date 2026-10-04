@@ -11,6 +11,7 @@ enum TranscriptSearchSegments {
         case .userMessage(let text), .note(let text): [text]
         case .toolCalls(let summaries): summaries
         case .assistantMessage(let text): TranscriptMarkdownParser.blocks(from: text).flatMap(texts(in:))
+        case .userImage, .toolResultImage: []
         }
     }
 

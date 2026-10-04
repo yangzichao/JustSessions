@@ -248,6 +248,10 @@
 	<string>Host</string>
 	<key>How it works</key>
 	<string>How it works</string>
+	<key>Image</key>
+	<string>Image</string>
+	<key>Image can't be shown</key>
+	<string>Image can't be shown</string>
 	<key>Import</key>
 	<string>Import</string>
 	<key>Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.</key>

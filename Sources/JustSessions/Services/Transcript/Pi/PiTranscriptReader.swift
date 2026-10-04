@@ -39,6 +39,9 @@ struct PiTranscriptReader {
         switch previewedEntry {
         case .userMessage:
             builder.append(.userMessage, text: userText(from: message?.content), timestamp: timestamp)
+            for image in Self.images(in: message?.content) {
+                builder.appendUserImage(image, timestamp: timestamp)
+            }
         case .shellCommand:
             // `!!` runs a command whose output is kept out of the model's context.
             let prefix = message?.excludeFromContext == true ? "!!" : "!"
@@ -63,6 +66,10 @@ struct PiTranscriptReader {
             if message?.stopReason == "error" {
                 builder.append(.note, text: message?.errorMessage ?? "", timestamp: timestamp)
             }
+        case .toolResult:
+            for image in Self.images(in: message?.content) {
+                builder.appendToolResultImage(image, timestamp: timestamp)
+            }
         case .compaction:
             builder.appendCompactionNote(timestamp: timestamp)
         case .branchSummary:
@@ -70,21 +77,22 @@ struct PiTranscriptReader {
         }
     }
 
+    /// The text of a user message; its images follow it as entries of their own.
     private func userText(from content: PiSessionEntry.Message.Content?) -> String {
         if case .text(let text) = content { return visibleUserText(text) }
-        return Self.parts(of: content).compactMap { part -> String? in
-            switch part.type {
-            case "text": visibleUserText(part.text ?? "")
-            case "image": "[Image]"
-            default: nil
-            }
-        }.joined(separator: "\n\n")
+        return Self.parts(of: content)
+            .compactMap { part in part.type == "text" ? visibleUserText(part.text ?? "") : nil }
+            .joined(separator: "\n\n")
     }
 
     /// The parts of `content`; none when it is plain text or missing.
     private static func parts(of content: PiSessionEntry.Message.Content?) -> [PiSessionEntry.Message.Part] {
         guard case .parts(let parts) = content else { return [] }
         return parts
+    }
+
+    private static func images(in content: PiSessionEntry.Message.Content?) -> [TranscriptImage] {
+        parts(of: content).compactMap(\.image)
     }
 
     /// Pi expands `/skill:name arguments` into the skill's instructions, wrapped as

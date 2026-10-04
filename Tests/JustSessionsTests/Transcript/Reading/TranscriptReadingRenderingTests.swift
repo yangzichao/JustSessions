@@ -50,6 +50,40 @@ struct TranscriptReadingRenderingTests {
         #expect(store.terminalSessions.isEmpty)
     }
 
+    /// The sample image is solid red, so red pixels in the capture show it was decoded and drawn; an image that
+    /// cannot be decoded shows its placeholder without failing the layout.
+    @Test func imagesAreDrawnInTheReadingLayout() async throws {
+        let settings = try IsolatedUserDefaults()
+        defer { settings.removeSuite() }
+        let conversation = TranscriptScrollViewFixture.conversation("A screenshot from a tool")
+        let transcript = TranscriptContent(entries: [
+            .init(id: 0, content: .userMessage("What is in this?"), timestamp: nil, startsTurn: true),
+            .init(id: 1, content: .userImage(SampleTranscriptImage.image), timestamp: nil, startsTurn: false),
+            .init(id: 2, content: .toolCalls(["screenshot"]), timestamp: nil, startsTurn: true),
+            .init(id: 3, content: .toolResultImage(TranscriptImage(base64Encoded: "AAAA")), timestamp: nil, startsTurn: false),
+        ], omittedEntryCount: 0)
+        let content = TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: TranscriptReadingPositionStore())
+            .background(ThemePalette.contentSurface)
+            .defaultAppStorage(settings.userDefaults)
+        let fixture = ThemeSurfaceRenderingFixture(content: AnyView(content), size: CGSize(width: 820, height: 920), colorScheme: .light)
+        defer { fixture.close() }
+
+        let bitmap = try await fixture.capture(named: "reading-preview-images")
+
+        #expect(Self.containsRedPixel(bitmap))
+    }
+
+    /// Loose enough for the capture's color space, where sRGB red keeps some green and blue.
+    private static func containsRedPixel(_ bitmap: NSBitmapImageRep) -> Bool {
+        for y in stride(from: 0, to: bitmap.pixelsHigh, by: 4) {
+            for x in stride(from: 0, to: bitmap.pixelsWide, by: 4) {
+                guard let color = bitmap.colorAt(x: x, y: y)?.usingColorSpace(.sRGB) else { continue }
+                if color.redComponent > 0.8, color.greenComponent < 0.35, color.blueComponent < 0.35 { return true }
+            }
+        }
+        return false
+    }
+
     private var sampleTranscript: TranscriptContent {
         TranscriptContent(entries: [
             .init(id: 0, content: .userMessage("帮我整理这次会话的改动，先阅读，再决定是否继续。"), timestamp: nil, startsTurn: true),

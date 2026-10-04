@@ -242,6 +242,10 @@
 	<string>主机</string>
 	<key>How it works</key>
 	<string>使用方式</string>
+	<key>Image</key>
+	<string>图片</string>
+	<key>Image can't be shown</key>
+	<string>无法显示图片</string>
 	<key>Import</key>
 	<string>导入</string>
 	<key>Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.</key>

@@ -9,7 +9,8 @@ struct PiEntryLink: Equatable {
     let id: String?
     /// Nil for an entry that starts the tree, and in version 1 sessions.
     let parentID: String?
-    /// False for entries the preview never shows, such as tool results and model changes, so they are not decoded.
+    /// False for entries the preview never shows, such as model changes and tool results without an image, so they
+    /// are not decoded.
     let mightBeShown: Bool
 }
 
@@ -31,8 +32,12 @@ extension PiEntryLink {
             lineIndex: lineIndex,
             id: record.id,
             parentID: record.parentID,
-            mightBeShown: PiPreviewedEntry(entryType: entryType, role: record.message?.role) != nil
+            mightBeShown: Self.mightShow(line, entryType: entryType, role: record.message?.role)
         )
+    }
+
+    private static func mightShow(_ line: Data, entryType: String, role: String?) -> Bool {
+        PiPreviewedEntry(entryType: entryType, role: role)?.mightBeShown(in: line) ?? false
     }
 
     /// Reads the start of a line without JSON parsing, which matters because tool results make up most of a
@@ -68,7 +73,7 @@ extension PiEntryLink {
             lineIndex: lineIndex,
             id: id,
             parentID: parentID,
-            mightBeShown: PiPreviewedEntry(entryType: entryType, role: role) != nil
+            mightBeShown: mightShow(line, entryType: entryType, role: role)
         )
     }
 }

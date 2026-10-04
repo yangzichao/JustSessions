@@ -13,7 +13,8 @@ struct CodexTranscriptReaderTests {
             ]]),
             codexItem(["type": "message", "role": "user", "content": [
                 ["type": "input_text", "text": "Add a test"],
-                ["type": "input_image", "image_url": "data:"],
+                ["type": "input_image", "image_url": "data:image/png;base64,\(SampleTranscriptImage.base64)"],
+                ["type": "input_image", "image_url": "https://example.com/not-inline.png"],
             ]]),
             codexItem(["type": "reasoning", "summary": []]),
             codexItem(["type": "function_call", "name": "shell", "arguments": #"{"command":["bash","-lc","swift test"]}"#]),
@@ -28,7 +29,8 @@ struct CodexTranscriptReaderTests {
         let transcript = try CodexTranscriptReader().read(file)
 
         #expect(transcript.entries.map(\.content) == [
-            .userMessage("Add a test\n\n[Image]"),
+            .userMessage("Add a test"),
+            .userImage(SampleTranscriptImage.image),
             .toolCalls(["shell · bash -lc swift test", "exec · const x = 1"]),
             .assistantMessage("Done."),
             .note("Earlier messages were compacted"),

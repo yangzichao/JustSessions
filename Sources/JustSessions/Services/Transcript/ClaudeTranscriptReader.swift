@@ -26,6 +26,18 @@ struct ClaudeTranscriptReader {
             builder.appendCompactionNote(timestamp: timestamp)
         } else if recordType == "user" {
             builder.append(.userMessage, text: userText(from: message["content"]), timestamp: timestamp)
+            for part in message["content"] as? [[String: Any]] ?? [] {
+                switch part["type"] as? String {
+                case "image":
+                    if let image = Self.image(from: part) { builder.appendUserImage(image, timestamp: timestamp) }
+                case "tool_result":
+                    for resultPart in part["content"] as? [[String: Any]] ?? [] {
+                        if let image = Self.image(from: resultPart) { builder.appendToolResultImage(image, timestamp: timestamp) }
+                    }
+                default:
+                    continue
+                }
+            }
         } else if record["isApiErrorMessage"] as? Bool == true {
             builder.append(.note, text: assistantParts(from: message["content"]).map(\.text).joined(separator: "\n"), timestamp: timestamp)
         } else {
@@ -35,16 +47,22 @@ struct ClaudeTranscriptReader {
         }
     }
 
+    /// The text of a user message; its images follow it as entries of their own. A tool result's text is shown
+    /// through the tool call that produced it.
     private func userText(from content: Any?) -> String {
         if let text = content as? String { return visibleUserText(text) ?? "" }
         let parts = content as? [[String: Any]] ?? []
-        return parts.compactMap { part -> String? in
-            switch part["type"] as? String {
-            case "text": visibleUserText(part["text"] as? String ?? "")
-            case "image": "[Image]"
-            default: nil // Tool results are shown through the tool call that produced them.
-            }
-        }.joined(separator: "\n\n")
+        return parts
+            .compactMap { part in part["type"] as? String == "text" ? visibleUserText(part["text"] as? String ?? "") : nil }
+            .joined(separator: "\n\n")
+    }
+
+    /// The image of an `image` part, which Claude Code stores as `{"source":{"type":"base64","data":…}}`.
+    private static func image(from part: [String: Any]) -> TranscriptImage? {
+        guard part["type"] as? String == "image",
+              let source = part["source"] as? [String: Any],
+              let data = source["data"] as? String else { return nil }
+        return TranscriptImage(base64Encoded: data)
     }
 
     /// Claude Code stores slash commands, shell escapes, and injected context as tagged user text.

@@ -66,6 +66,9 @@ struct CodexTranscriptReader {
             switch payload["role"] as? String {
             case "user":
                 builder.append(.userMessage, text: userText(from: content), timestamp: timestamp)
+                for image in content.compactMap(Self.image(from:)) {
+                    builder.appendUserImage(image, timestamp: timestamp)
+                }
             case "assistant":
                 let text = content
                     .compactMap { $0["type"] as? String == "output_text" ? $0["text"] as? String : nil }
@@ -96,18 +99,21 @@ struct CodexTranscriptReader {
         }
     }
 
+    /// The text of a user message; its images follow it as entries of their own.
     private func userText(from content: [[String: Any]]) -> String {
         content.compactMap { part -> String? in
-            switch part["type"] as? String {
-            case "input_text":
-                let text = (part["text"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-                // Codex sends AGENTS.md, environment context, and similar tagged blocks as user input.
-                return text.hasPrefix("<") || text.hasPrefix("# AGENTS.md") ? nil : text
-            case "input_image":
-                return "[Image]"
-            default:
-                return nil
-            }
+            guard part["type"] as? String == "input_text" else { return nil }
+            let text = (part["text"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            // Codex sends AGENTS.md, environment context, and similar tagged blocks as user input.
+            return text.hasPrefix("<") || text.hasPrefix("# AGENTS.md") ? nil : text
         }.joined(separator: "\n\n")
+    }
+
+    /// The image of an `input_image` part, whose `image_url` is a data URL: `data:image/png;base64,…`.
+    private static func image(from part: [String: Any]) -> TranscriptImage? {
+        guard part["type"] as? String == "input_image",
+              let url = part["image_url"] as? String, url.hasPrefix("data:"),
+              let separator = url.firstIndex(of: ",") else { return nil }
+        return TranscriptImage(base64Encoded: String(url[url.index(after: separator)...]))
     }
 }
