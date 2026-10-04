@@ -33,11 +33,11 @@
 ## Features
 
 - **Find:** search project names and paths, session titles, and IDs. Pin and rename sessions you return to.
-- **Read:** preview supported conversations, find text with ⌘F, adjust text size, switch between a readable column and the full window width, copy code, and open a dedicated reading window without starting the CLI. Long histories load automatically as you scroll. [Reading controls](docs/guides/session-management.md#preview-before-you-resume).
+- **Read:** preview supported conversations, find text with ⌘F, adjust text size, switch between a readable column and the full window width, copy code, and open a dedicated reading window without starting the CLI. Long histories load automatically as you scroll, and images you attached or a tool returned show in place for Claude Code, Codex, and Pi. [Reading controls](docs/guides/session-management.md#preview-before-you-resume).
 - **Resume or branch:** continue in an embedded terminal, or fork a supported conversation to try another approach.
 - **Organize:** group terminal tabs by project, open a plain project terminal, and switch tabs with familiar keyboard shortcuts.
 - **Stay informed:** local Claude Code and Codex sessions can notify when a turn finishes or needs your input.
-- **Make it yours:** system, English, or Chinese interface language; six app themes, light and dark appearances, and terminal font settings that update open terminals.
+- **Make it yours:** system, English, or Chinese interface language; six app themes, light and dark appearances, terminal color schemes or your own iTerm2 colors, and terminal font settings that update open terminals.
 
 ## Remote sessions over SSH
 

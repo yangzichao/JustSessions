@@ -90,4 +90,5 @@ Open **Settings** at the bottom of the sidebar, or press ⌘,.
 
 - **Appearance**: choose **System** to switch between light and dark with your Mac, or keep the app **Light** or **Dark**.
 - **Theme**: choose the app's colors: JustSessions, Solarized, Gruvbox, Catppuccin, Tokyo Night, or Rosé Pine. Each theme has light and dark colors, and **Appearance** picks between them. Terminals use the theme's colors too.
-- **Terminal**: terminals match the app unless you give them the theme's **Light** or **Dark** colors. The font and size are set here too. Changes apply to open terminals right away.
+- **Terminal > Colors**: terminals use the app theme's colors unless you pick a color scheme of their own: one of the app themes, Dracula, Nord, One Half, or GitHub. **Import** copies the colors of iTerm2's default profile, or of an iTerm2 color preset (`.itermcolors`) file. JustSessions reads iTerm2's settings only when you choose that, and never again after.
+- **Terminal > Appearance**: terminals match the app unless you give them the **Light** or **Dark** version of their colors. A scheme with only one version, such as Dracula or Nord, keeps it. The font and size are set here too. Changes apply to open terminals right away.
