@@ -1940,22 +1940,22 @@
         }
       }
     },
-    "Hide sidebar (⌃⌘S)": {
+    "Hide sidebar (⌘B)": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "隐藏侧栏（⌃⌘S）"
+            "value": "隐藏侧栏（⌘B）"
           }
         }
       }
     },
-    "Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌃⌘S does the same.": {
+    "Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌘B does the same.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "隐藏侧栏，让终端占满整个窗口；再点一次即可恢复。⌃⌘S 也可以。"
+            "value": "隐藏侧栏，让终端占满整个窗口；再点一次即可恢复。⌘B 也可以。"
           }
         }
       }
@@ -3530,12 +3530,12 @@
         }
       }
     },
-    "Show sidebar (⌃⌘S)": {
+    "Show sidebar (⌘B)": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "显示侧栏（⌃⌘S）"
+            "value": "显示侧栏（⌘B）"
           }
         }
       }

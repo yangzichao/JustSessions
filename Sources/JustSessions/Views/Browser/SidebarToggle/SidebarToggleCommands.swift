@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// View → Hide Sidebar / Show Sidebar, with the system's ⌃⌘S.
+/// View → Hide Sidebar / Show Sidebar, with ⌘B, as in code editors such as VS Code. Command shortcuts never reach a
+/// tab's CLI, so this leaves Control-B to it.
 struct SidebarToggleCommands: Commands {
     @ObservedObject private var languageStore = AppLanguageStore.shared
     @FocusedBinding(\.isSidebarHidden) private var isSidebarHidden
@@ -11,7 +12,7 @@ struct SidebarToggleCommands: Commands {
                                           language: languageStore.language)) {
                 isSidebarHidden?.toggle()
             }
-            .keyboardShortcut("s", modifiers: [.command, .control])
+            .keyboardShortcut("b", modifiers: .command)
             .disabled(isSidebarHidden == nil)
         }
     }

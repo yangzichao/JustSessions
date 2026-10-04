@@ -358,10 +358,10 @@
 	<string>隐藏或显示侧栏</string>
 	<key>Hide sidebar</key>
 	<string>隐藏侧栏</string>
-	<key>Hide sidebar (⌃⌘S)</key>
-	<string>隐藏侧栏（⌃⌘S）</string>
-	<key>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌃⌘S does the same.</key>
-	<string>隐藏侧栏，让终端占满整个窗口；再点一次即可恢复。⌃⌘S 也可以。</string>
+	<key>Hide sidebar (⌘B)</key>
+	<string>隐藏侧栏（⌘B）</string>
+	<key>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌘B does the same.</key>
+	<string>隐藏侧栏，让终端占满整个窗口；再点一次即可恢复。⌘B 也可以。</string>
 	<key>Host</key>
 	<string>主机</string>
 	<key>How it works</key>
@@ -670,8 +670,8 @@
 	<string>显示侧栏</string>
 	<key>Show sidebar</key>
 	<string>显示侧栏</string>
-	<key>Show sidebar (⌃⌘S)</key>
-	<string>显示侧栏（⌃⌘S）</string>
+	<key>Show sidebar (⌘B)</key>
+	<string>显示侧栏（⌘B）</string>
 	<key>Sidebar</key>
 	<string>侧栏</string>
 	<key>Sidebar width</key>

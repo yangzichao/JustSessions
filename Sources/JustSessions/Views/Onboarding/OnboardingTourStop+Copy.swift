@@ -44,7 +44,7 @@ extension OnboardingTourStop {
         case .tabGroup:
             "Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you."
         case .hideSidebar:
-            "Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌃⌘S does the same."
+            "Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌘B does the same."
         case .openTabs:
             "**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs."
         }

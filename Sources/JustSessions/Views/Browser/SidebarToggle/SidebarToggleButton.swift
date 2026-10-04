@@ -11,7 +11,7 @@ struct SidebarToggleButton: View {
     }
 
     private var helpText: LocalizedStringKey {
-        isSidebarHidden ? "Show sidebar (⌃⌘S)" : "Hide sidebar (⌃⌘S)"
+        isSidebarHidden ? "Show sidebar (⌘B)" : "Hide sidebar (⌘B)"
     }
 
     var body: some View {

@@ -14,7 +14,7 @@ extension HelpKeyboardShortcutGroup {
                 HelpKeyboardShortcut(keys: "⇧⌘[", "⌃⇧Tab", action: "Previous tab"),
                 HelpKeyboardShortcut(keys: "⌘1–⌘8", action: "Go to a tab by its position"),
                 HelpKeyboardShortcut(keys: "⌘9", action: "Last tab"),
-                HelpKeyboardShortcut(keys: "⌃⌘S", action: "Hide or show the sidebar"),
+                HelpKeyboardShortcut(keys: "⌘B", action: "Hide or show the sidebar"),
                 HelpKeyboardShortcut(keys: "⌘,", action: "Settings"),
             ]),
             HelpKeyboardShortcutGroup(title: "Reading a session", shortcuts: [

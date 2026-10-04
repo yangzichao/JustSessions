@@ -11,7 +11,7 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 - Choose **Projects** to browse the library or **Open tabs** to switch between this window's open terminals. Each view keeps its search and scroll position when switching; each window remembers the selected view.
 - In **Projects**, use the filter menu beside the switch to choose **Last 7 days** or one CLI. These filters do not hide open tabs. The menu lists only CLIs that are installed or have sessions. Refresh each machine using its own heading's refresh button.
 - Pin projects and sessions to keep them at the top. Rename any session locally without touching the CLI's own title.
-- Hide the sidebar to give the terminal or preview the whole window: click the sidebar button next to the window's close, minimize, and zoom buttons, choose **View → Hide Sidebar**, or press **⌃⌘S**. Each window keeps its own choice, and the sidebar comes back with the same projects expanded.
+- Hide the sidebar to give the terminal or preview the whole window: click the sidebar button next to the window's close, minimize, and zoom buttons, choose **View → Hide Sidebar**, or press **⌘B**. Each window keeps its own choice, and the sidebar comes back with the same projects expanded.
 
 ## Preview before you resume
 
