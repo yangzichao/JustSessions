@@ -7,19 +7,19 @@ struct EmbeddedTerminalView: NSViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    func makeNSView(context: Context) -> LocalProcessTerminalView {
+    func makeNSView(context: Context) -> TerminalInsetView {
         let terminalView = session.terminalView
         terminalView.setWorkspaceActive(isActive)
         session.startIfNeeded()
         context.coordinator.wasActive = isActive
         if isActive { focus(terminalView, coordinator: context.coordinator) }
-        return terminalView
+        return TerminalInsetView(terminalView: terminalView)
     }
 
-    func updateNSView(_ terminalView: LocalProcessTerminalView, context: Context) {
-        session.terminalView.setWorkspaceActive(isActive)
+    func updateNSView(_ insetView: TerminalInsetView, context: Context) {
+        insetView.terminalView.setWorkspaceActive(isActive)
         if isActive && !context.coordinator.wasActive {
-            focus(terminalView, coordinator: context.coordinator)
+            focus(insetView.terminalView, coordinator: context.coordinator)
         }
         context.coordinator.wasActive = isActive
     }

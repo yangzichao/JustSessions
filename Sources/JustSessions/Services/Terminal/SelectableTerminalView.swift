@@ -8,6 +8,8 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     /// turns on the kitty keyboard protocol, which tmux never does with the tab. So the tab sends Shift-Return as
     /// CSI u itself, and tmux hands it to the CLI unchanged; see `ThisMacTmuxServer.globalOptions`.
     var sendsShiftReturnAsCSIu = false
+    /// Called after the terminal's colors are set, so the margin around it can match its background.
+    var onBackgroundColorChange: (() -> Void)?
 
     private var appearancePreferences = TerminalAppearancePreferences()
     private var theme = AppTheme.justSessions
@@ -55,7 +57,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
 
     override func viewDidChangeEffectiveAppearance() {
         super.viewDidChangeEffectiveAppearance()
-        TerminalAppearanceStyling.apply(appearancePreferences, theme: theme, to: self)
+        applyAppearance()
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -79,7 +81,12 @@ final class SelectableTerminalView: LocalProcessTerminalView {
             appearancePreferences = preferences
             self.theme = theme
             appearance = TerminalAppearanceStyling.nativeAppearance(for: preferences, theme: theme)
-            TerminalAppearanceStyling.apply(preferences, theme: theme, to: self)
+            applyAppearance()
         }
+    }
+
+    private func applyAppearance() {
+        TerminalAppearanceStyling.apply(appearancePreferences, theme: theme, to: self)
+        onBackgroundColorChange?()
     }
 }
