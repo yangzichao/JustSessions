@@ -31,7 +31,7 @@ Sparkle delivers subsequent app updates. Your CLI provider's plans and charges s
 2. Select a supported session to read its conversation preview.
 3. Double-click a session or choose **Resume** to open its CLI in the original working directory.
 
-Choose **Open tabs** to switch between this window's terminals; each row shows its project and, for SSH, its host. Switching views keeps each list's search and scroll position. A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing, preview, and resume. See the [full capability table](../../README.md#supported-clis).
+Choose **Open tabs** to switch between this window's terminals, grouped by project like the tab bar; each group's heading shows its project and, for SSH, its host. Switching views keeps each list's search and scroll position. A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing, preview, and resume. See the [full capability table](../../README.md#supported-clis).
 
 Click the new-window button in the preview's reading toolbar to open a dedicated reading window. Adjust text with **A− / A+**, switch between a readable column and the full window width, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
 

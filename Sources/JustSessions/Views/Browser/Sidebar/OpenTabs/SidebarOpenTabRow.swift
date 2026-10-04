@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// An open tab: its tool's icon, the tab's title, and its CLI's status, highlighted while the tab is selected.
+/// An open tab on one line: its tool's icon, the tab's title, and its CLI's status, highlighted while the tab is
+/// selected. Its project shows in the heading of the group above it, so the row leaves it to the tooltip.
 struct SidebarOpenTabRow: View {
     @ObservedObject var tab: TerminalSession
     let projectDisplayName: String
@@ -8,7 +9,7 @@ struct SidebarOpenTabRow: View {
     let onSelect: () -> Void
     let onClose: () -> Void
 
-    static let height: CGFloat = 44
+    static let height: CGFloat = 28
 
     var body: some View {
         Button(action: onSelect) {
@@ -16,15 +17,10 @@ struct SidebarOpenTabRow: View {
                 toolIcon
                     .font(.system(size: 10, weight: .medium))
                     .frame(width: 14)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: tab.displayTitle)
-                        .font(.system(size: 12, weight: isSelected ? .medium : .regular))
-                    Text(verbatim: projectContext)
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                }
-                .lineLimit(1)
-                .truncationMode(.tail)
+                Text(verbatim: tab.displayTitle)
+                    .font(.system(size: 12, weight: isSelected ? .medium : .regular))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
                 Spacer(minLength: 6)
                 TerminalStatusIndicator(session: tab)
             }
