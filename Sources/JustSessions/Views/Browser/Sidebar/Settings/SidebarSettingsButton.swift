@@ -1,9 +1,13 @@
 import SwiftUI
 
 /// App-wide settings stay available even when no terminal tab is open.
-struct SidebarSettingsLink: View {
+struct SidebarSettingsButton: View {
+    @Environment(\.showAppWideSheet) private var showAppWideSheet
+
     var body: some View {
-        SettingsLink {
+        Button {
+            showAppWideSheet(.settings)
+        } label: {
             Label("Settings", systemImage: "gearshape")
                 .labelStyle(.iconOnly)
                 .frame(width: 26, height: 30)

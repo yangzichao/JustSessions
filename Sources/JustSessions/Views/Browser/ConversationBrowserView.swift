@@ -12,6 +12,8 @@ struct ConversationBrowserView: View {
     @State private var sessionSelection = SessionMultiSelection()
     /// The host the New Session sheet opened on; nil while it is closed.
     @State private var newSessionSheetHost: SessionHost?
+    /// Settings or Help while either shows as a sheet on this window.
+    @State private var appWideSheet: AppWideSheet?
     @State private var closingTerminalID: UUID?
     @SceneStorage("isSidebarHidden") private var isSidebarHidden = false
     @StateObject private var updateManager = SparkleUpdateManager()
@@ -93,6 +95,7 @@ struct ConversationBrowserView: View {
             }
         }
         .dismissesOnClickOutside(item: $newSessionSheetHost)
+        .showsAppWideSheets($appWideSheet)
         .focusedSceneValue(\.workspaceTabActions, WorkspaceTabActions(
             tabCount: store.terminalSessions.count,
             hasSelectedTab: store.selectedTerminal != nil,
@@ -120,7 +123,7 @@ struct ConversationBrowserView: View {
     }
 
     private var workspaceTabCommandsEnabled: Bool {
-        newSessionSheetHost == nil && closingTerminalID == nil
+        newSessionSheetHost == nil && appWideSheet == nil && closingTerminalID == nil
     }
 
     /// The selected tab's tool, or a terminal when that tab is one; else the tool the sidebar shows, Codex when it shows

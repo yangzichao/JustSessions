@@ -1,7 +1,8 @@
 import SwiftUI
 
+/// Help as a sheet on a workspace window: what JustSessions does, SSH host setup, and where to send feedback.
 struct HelpView: View {
-    static let windowID = "help"
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,17 +24,21 @@ struct HelpView: View {
             }
 
             ThemeDivider()
-            HStack(alignment: .firstTextBaseline) {
+            HStack(alignment: .firstTextBaseline, spacing: 16) {
                 Link("User guide ↗", destination: AppLinks.userGuideURL)
-                Spacer()
                 HelpFeedbackLinks()
+                Spacer()
+                Button("Done") { dismiss() }
+                    .buttonStyle(.automatic)
+                    .font(.body)
+                    .keyboardShortcut(.defaultAction)
             }
             .buttonStyle(.plain)
             .font(.callout)
             .padding(.horizontal, 24)
-            .padding(.vertical, 16)
+            .padding(.vertical, 12)
         }
-        .frame(minWidth: 480, minHeight: 560)
+        .frame(width: 600, height: 560)
         .foregroundStyle(ThemePalette.ink)
         .background(ThemePalette.contentSurface)
     }

@@ -9,7 +9,7 @@ struct SidebarFooter: View {
         HStack(spacing: 4) {
             SidebarAddRemoteHostButton(action: onAddRemoteHost)
             Spacer(minLength: 4)
-            SidebarSettingsLink()
+            SidebarSettingsButton()
             checkForUpdatesButton
             SidebarHelpButton()
         }

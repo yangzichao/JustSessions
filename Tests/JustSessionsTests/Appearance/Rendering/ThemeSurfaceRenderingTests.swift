@@ -5,7 +5,7 @@ import Testing
 
 @MainActor
 struct ThemeSurfaceRenderingTests {
-    @Test func secondaryWindowsAndNewSessionSheetFollowThemeChangesInPlace() async throws {
+    @Test func settingsHelpAndNewSessionSheetsFollowThemeChangesInPlace() async throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let themeStore = AppThemeStore(userDefaults: settings.userDefaults)
@@ -13,16 +13,18 @@ struct ThemeSurfaceRenderingTests {
         let terminalStore = TerminalAppearanceStore(userDefaults: settings.userDefaults)
         let notificationStore = SessionNotificationSettingsStore(userDefaults: settings.userDefaults)
         let tabReopeningStore = TabReopeningSettingsStore(userDefaults: settings.userDefaults)
+        let helpView = AnyView(HelpView())
+        let settingsView = AnyView(SettingsView(
+            languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
+            tabReopeningSettingsStore: tabReopeningStore,
+            launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
+            appAppearanceStore: appearanceStore, appThemeStore: themeStore,
+            terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore
+        ))
+        // Help and Settings have a fixed size, so each renders at it and the reference strip lands at its bottom edge.
         let views: [(String, AnyView, CGSize)] = [
-            ("help", AnyView(HelpView()), CGSize(width: 600, height: 680)),
-            ("help-narrow", AnyView(HelpView()), CGSize(width: 480, height: 560)),
-            ("settings", AnyView(SettingsView(
-                languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
-                tabReopeningSettingsStore: tabReopeningStore,
-                launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
-                appAppearanceStore: appearanceStore, appThemeStore: themeStore,
-                terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore
-            )), CGSize(width: 560, height: 420)),
+            ("help", helpView, fittingSize(of: helpView)),
+            ("settings", settingsView, fittingSize(of: settingsView)),
             ("new-session", AnyView(NewSessionSheet(
                 initialKind: .cli(.codex), initialHost: .thisMac, initialProjectPath: "/tmp/theme-check",
                 hosts: [.thisMac], providersByHost: [.thisMac: [.codex]], recentProjects: [], onStart: { _, _, _ in }
@@ -60,12 +62,13 @@ struct ThemeSurfaceRenderingTests {
         let edgeInset = Int(20 * renderingScale)
         let actionRows = (bitmap.pixelsHigh - Int(50 * renderingScale))..<(bitmap.pixelsHigh - Int(6 * renderingScale))
         // Without a Retina display, as on CI, each link has only about 40 pixels of solid ink; the rest of its text
-        // is antialiased. With the links in another color, other text still leaves up to about 18 in the narrow window.
+        // is antialiased. With the links in another color, other text still leaves up to about 18.
         let minimumInkPixels = Int(30 * renderingScale * renderingScale)
-        let linkPixels = matchingPixelCount(ink, in: bitmap, columns: edgeInset..<(bitmap.pixelsWide / 3), rows: actionRows)
+        // The guide link comes first, then the feedback links; Done, at the trailing edge, is left out.
+        let linkPixels = matchingPixelCount(ink, in: bitmap, columns: edgeInset..<(bitmap.pixelsWide / 4), rows: actionRows)
         #expect(linkPixels > minimumInkPixels, "\(description) guide link uses theme ink")
-        let issueLinkPixels = matchingPixelCount(ink, in: bitmap, columns: (bitmap.pixelsWide * 2 / 3)..<(bitmap.pixelsWide - edgeInset), rows: actionRows)
-        #expect(issueLinkPixels > minimumInkPixels, "\(description) issue link uses theme ink")
+        let feedbackLinkPixels = matchingPixelCount(ink, in: bitmap, columns: (bitmap.pixelsWide / 4)..<(bitmap.pixelsWide * 2 / 3), rows: actionRows)
+        #expect(feedbackLinkPixels > minimumInkPixels, "\(description) feedback links use theme ink")
     }
 
     private func matchingPixelCount(_ color: UInt32, in bitmap: NSBitmapImageRep, columns: Range<Int>, rows: Range<Int>) -> Int {
@@ -80,6 +83,11 @@ struct ThemeSurfaceRenderingTests {
                 } ?? false
             }.count
         }
+    }
+
+    private func fittingSize(of view: AnyView) -> CGSize {
+        _ = NSApplication.shared
+        return NSHostingView(rootView: view).fittingSize
     }
 
     private func hexValue(of color: NSColor) -> UInt32 {

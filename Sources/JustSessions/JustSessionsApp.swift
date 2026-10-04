@@ -17,34 +17,7 @@ struct JustSessionsApp: App {
         .commands {
             WorkspaceTabCommands()
             SidebarToggleCommands()
-            CommandGroup(replacing: .help) {
-                HelpWindowButton().appLanguage(from: languageStore)
-                Divider()
-                Link("JustSessions Website", destination: AppLinks.websiteURL)
-                    .environment(\.locale, languageStore.locale)
-            }
-        }
-
-        Window(AppLocalization.string("JustSessions Help", language: languageStore.language), id: HelpView.windowID) {
-            HelpView()
-                .appTheme(from: .shared)
-                .appLanguage(from: languageStore)
-        }
-        .defaultSize(width: 600, height: 680)
-        .windowResizability(.contentMinSize)
-
-        Settings {
-            SettingsView(
-                languageStore: languageStore,
-                tabReopeningSettingsStore: .shared,
-                launchAtLoginSettingsStore: .shared,
-                appAppearanceStore: .shared,
-                appThemeStore: .shared,
-                terminalAppearanceStore: .shared,
-                notificationSettingsStore: .shared
-            )
-                .appTheme(from: .shared)
-                .appLanguage(from: languageStore)
+            AppWideSheetCommands()
         }
     }
 }

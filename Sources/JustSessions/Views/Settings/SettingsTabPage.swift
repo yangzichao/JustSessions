@@ -1,14 +1,14 @@
 import SwiftUI
 
-/// The size every Settings tab shares, and the margin around its content.
+/// The size every Settings page shares, and the margin around its content.
 enum SettingsTabPageMetrics {
-    /// Fits the General and Permissions tabs without scrolling. The Appearance tab, much taller, scrolls.
+    /// Fits the General and Permissions pages without scrolling. The Appearance page, much taller, scrolls.
     static let size = CGSize(width: 540, height: 480)
     static let contentPadding: CGFloat = 24
 }
 
-/// One tab of the Settings window, at the size every tab shares, so the window keeps one size when you switch tabs or
-/// a setting changes what a tab shows. Content taller than that, such as the Appearance tab, scrolls inside the tab.
+/// One page of Settings, at the size every page shares, so the sheet keeps one size when you switch pages or a
+/// setting changes what a page shows. Content taller than that, such as the Appearance page, scrolls inside the page.
 struct SettingsTabPage<Content: View>: View {
     @ViewBuilder let content: () -> Content
 

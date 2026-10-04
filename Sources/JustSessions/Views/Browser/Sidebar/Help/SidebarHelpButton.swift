@@ -2,11 +2,11 @@ import SwiftUI
 
 /// Help stays available in every sidebar state.
 struct SidebarHelpButton: View {
-    @Environment(\.openWindow) private var openWindow
+    @Environment(\.showAppWideSheet) private var showAppWideSheet
 
     var body: some View {
         Button {
-            openWindow(id: HelpView.windowID)
+            showAppWideSheet(.help)
         } label: {
             Label("Help", systemImage: "questionmark.circle")
                 .labelStyle(.iconOnly)

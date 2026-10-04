@@ -544,6 +544,8 @@
 	<string>Settings</string>
 	<key>Settings (⌘,)</key>
 	<string>Settings (⌘,)</string>
+	<key>Settings…</key>
+	<string>Settings…</string>
 	<key>Show %@</key>
 	<string>Show %@</string>
 	<key>Show Sidebar</key>

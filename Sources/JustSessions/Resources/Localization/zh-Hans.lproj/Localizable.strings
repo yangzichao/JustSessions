@@ -538,6 +538,8 @@
 	<string>设置</string>
 	<key>Settings (⌘,)</key>
 	<string>设置（⌘,）</string>
+	<key>Settings…</key>
+	<string>设置…</string>
 	<key>Show %@</key>
 	<string>显示 %@</string>
 	<key>Show Sidebar</key>
