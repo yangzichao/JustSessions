@@ -1,7 +1,13 @@
 import AppKit
 import SwiftUI
 
+/// Where the sidebar's edge is grabbed to resize it: the divider and a few points of the detail past it. It draws
+/// nothing until the pointer is over it, so the detail shows through.
 struct SidebarResizeHandle: View {
+    /// Narrower than the tab bar's and the terminal's leading margins, so it stays off the first tab and the
+    /// terminal's text.
+    private static let grabAreaWidth: CGFloat = 8
+
     let width: CGFloat
     let minimumWidth: CGFloat
     let maximumWidth: CGFloat
@@ -12,18 +18,11 @@ struct SidebarResizeHandle: View {
     @State private var isHovering = false
 
     var body: some View {
-        // The hairline sits on the sidebar's edge and the rest of the grab area continues the detail's surface.
-        Rectangle()
-            .fill(ThemePalette.contentSurface)
+        Color.clear
             .overlay {
                 if isHovering { Rectangle().fill(ThemePalette.hoverFill) }
             }
-            .frame(width: 8)
-            .overlay(alignment: .leading) {
-                Rectangle()
-                    .fill(ThemePalette.hairline)
-                    .frame(width: 1)
-            }
+            .frame(width: Self.grabAreaWidth)
             .ignoresSafeArea(edges: .top)
             .contentShape(Rectangle())
             .columnResizeCursor(canShrink: width > minimumWidth, canGrow: width < maximumWidth)

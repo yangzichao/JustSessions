@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The Help & feedback tab: the guide and feedback links, session basics, and SSH host setup.
+/// The Help & feedback tab: the guide and feedback links, session basics, SSH host setup, and keyboard shortcuts.
 struct HelpAndFeedbackSettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -15,6 +15,7 @@ struct HelpAndFeedbackSettingsView: View {
 
             HelpFeatureOverview()
             HelpRemoteHostSection()
+            HelpKeyboardShortcutsSection()
         }
         .foregroundStyle(ThemePalette.ink)
         .textSelection(.enabled)

@@ -5,7 +5,3 @@
 .hero-description { margin-bottom: 20px; max-width: 470px; font-size: 18px; line-height: 1.65; }
 .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px; }
 .download-note { margin: 14px 0 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
-.hero-preview { padding: 16px 16px 0; border: 1px solid var(--line); border-radius: 18px; background: var(--sidebar-surface); }
-.hero-preview a { display: block; }
-.hero-preview img { width: 100%; border: 1px solid var(--line); border-radius: 9px; box-shadow: 0 12px 36px var(--shadow); }
-.hero-preview figcaption { margin: 14px 4px; text-align: center; }

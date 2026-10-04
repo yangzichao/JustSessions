@@ -6,6 +6,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 from xml.etree import ElementTree
 
+from script_assets import validate_script_imports
 from validate_metadata import PUBLIC_PAGE_PATHS, WEBSITE_URL, validate_metadata
 from website_document import WebsiteDocument
 
@@ -30,12 +31,13 @@ def validate_site(website_directory: Path):
                 referenced_path /= "index.html"
             assert referenced_path.is_relative_to(website_directory.resolve()), f"Asset leaves published directory: {reference}"
             assert referenced_path.is_file(), f"Missing local target: {reference}"
-            if referenced_path.suffix in (".css", ".jpg", ".png", ".svg"):
+            if referenced_path.suffix in (".css", ".js", ".jpg", ".png", ".svg"):
                 expected_version = hashlib.sha256(referenced_path.read_bytes()).hexdigest()[:12]
                 assert parse_qs(parsed_reference.query).get("v") == [expected_version], f"Asset cache version mismatch: {reference}"
             if parsed_reference.fragment and referenced_path in documents:
                 assert parsed_reference.fragment in documents[referenced_path].identifiers, f"Missing anchor: {reference}"
 
+    validate_script_imports(website_directory)
     validate_metadata(documents, website_directory)
     homepage = documents[(website_directory / "index.html").resolve()]
     help_page = documents[(website_directory / "help.html").resolve()]
@@ -54,4 +56,4 @@ def validate_site(website_directory: Path):
     sitemap_urls = [element.text for element in sitemap.findall("sitemap:url/sitemap:loc", namespace)]
     assert sitemap_urls == [WEBSITE_URL + page_path for page_path in PUBLIC_PAGE_PATHS], "Sitemap differs from indexed pages"
     assert (website_directory / ".nojekyll").is_file()
-    print(f"Website validation passed: {len(documents)} pages, local links, assets, stylesheet/image versions, anchors, metadata, JSON-LD, social card, sitemap.")
+    print(f"Website validation passed: {len(documents)} pages, local links, assets, stylesheet/script/image versions, anchors, metadata, JSON-LD, social card, sitemap.")

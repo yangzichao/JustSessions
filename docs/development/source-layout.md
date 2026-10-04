@@ -2,7 +2,7 @@
 
 [Back to JustSessions](../../README.md) · [Build and release](build-and-release.md)
 
-Application paths below are relative to `Sources/JustSessions/`. Tests live in `Tests/JustSessionsTests/`.
+Application paths below are relative to `Sources/JustSessions/`. Tests live in `Tests/JustSessionsTests/`, with Gherkin features and their steps in `Tests/JustSessionsTests/Gherkin/`; see [Gherkin features](build-and-release.md#gherkin-features).
 
 - `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up.
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
@@ -15,7 +15,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
-- `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
+- `Models/Sidebar/`: the sidebar's filters, projects with their sessions, multi-selection, and which Open tabs groups are collapsed.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
@@ -46,6 +46,9 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal.
 - `Services/Terminal/Appearance/Import/`: reads colors from iTerm2's default profile or an `.itermcolors` file, only when asked.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
+- `Services/Terminal/ClaudeLiveSession/`: reads Claude Code's live registry for names chosen with `/rename`, and makes a tab follow its CLI to the session `/clear` starts.
+- `Services/Terminal/CodexLiveThread/`: starts Codex on this Mac with its thread's id in the terminal title, and reads that title so a new tab finds its thread and a tab follows its CLI to the thread `/new`, `/clear`, `/resume`, or `/fork` moves it to.
+- `Services/Terminal/Tabs/`: moving between tabs, and linking a tab to the session its CLI is in.
 - `Services/Terminal/AppearingSessions/`: links a new tab to the first session that appears in its project, for SSH hosts and for CLIs that don't reveal the session they write.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Transcript/`: read-only conversation readers for the preview.
@@ -56,11 +59,11 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/Split/`: what a shown split view draws around its panes, as Chrome does: the area's terminal-colored background, each pane's rounded outline with its mini toolbar in the corner, and the resize area between the panes, which you drag to resize them.
 - `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help & feedback in the same sheet.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
-- `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.
+- `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, and multi-selection. `SidebarRowMoreActionsMenu` is the ⋯ that project and session rows show under the pointer, which opens the row's right-click menu.
 - `Views/Browser/Sidebar/Header/`: the app mark with the search and new session icons; search opens into a field across that line.
 - `Views/Browser/Sidebar/Navigation/`: the Projects / Open tabs switch and persistent view containers that retain both lists' scroll positions.
-- `Views/Browser/Sidebar/OpenTabs/`: the full-height open-tab list, independent search, project and host context, and empty states.
-- `Views/Browser/Sidebar/Hosts/`: host headings with their own refresh buttons and progress, and the Add SSH host button and sheet. `AddProject/` types the path of a project to add on an SSH host; this Mac's is picked with the folder panel in `Views/Browser/ProjectFolders/`, which the New session sheet uses too.
+- `Views/Browser/Sidebar/OpenTabs/`: the full-height open-tab list, grouped by project under headings in the tab bar's group colors that collapse their groups, without indenting the rows, independent search, and empty states.
+- `Views/Browser/Sidebar/Hosts/`: host headings with their own refresh buttons and progress, and the Add SSH host button and sheet. `Menu/` holds a heading's right-click menu. `AddProject/` holds the heading's +, a menu that also restores archived projects while the host has any, and the sheet that types the path of a project to add on an SSH host; this Mac's is picked with the folder panel in `Views/Browser/ProjectFolders/`, which the New session sheet uses too.
 - `Views/Terminal/`: a tab's embedded terminal, inset from the window's edges, and the bar above it once its CLI ends.
 - `Views/Preview/`: conversation preview for the selected session.
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
@@ -76,7 +79,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Settings/Permissions/`: each permission's status and a link to its page in System Settings.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
-- `Views/Settings/Help/`: the Help & feedback page: feature overview, SSH setup, the user guide, and links to create a GitHub issue or email feedback. `Models/App/AppLinks.swift` holds the destinations.
+- `Views/Settings/Help/`: the Help & feedback page: feature overview, SSH setup, the keyboard shortcut list (`Shortcuts/`), the user guide, and links to create a GitHub issue or email feedback. `Models/App/AppLinks.swift` holds the destinations.
 - `Views/Theme/`: the chosen theme's colors, and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 

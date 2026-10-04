@@ -3,7 +3,8 @@ import Foundation
 /// A tab started with "New session" or "Branch" has no conversation until the CLI writes its session file;
 /// a branch runs a fork with an id of its own. The sidebar lists such a tab under its project right away
 /// (`pendingNewSessions`). Meanwhile this finds the file the tab's CLI is writing, refreshes so the real
-/// session shows up, and links the tab to it.
+/// session shows up, and links the tab to it. A Codex tab whose CLI names its thread in the terminal title is also
+/// linked by `followCodexThreads`.
 extension ConversationStore {
     /// Claude Code writes a new transcript before the first prompt, so a freshly listed session can still be
     /// untitled. This many refreshes after its file changes are enough to pick up the first prompt.
@@ -60,11 +61,7 @@ extension ConversationStore {
               let conversation = conversations.first(where: {
                   $0.provider == session.provider && $0.sessionID == sessionID
               }) else { return false }
-        session.synchronize(conversation: conversation, displayTitle: title(for: conversation))
-        adoptSessionTmuxName(for: session)
-        // Sidebar rows look up open terminals through the store, which does not see a tab's own changes.
-        persistOpenTabs()
-        objectWillChange.send()
+        link(session, to: conversation)
         return true
     }
 

@@ -6,15 +6,6 @@
 .workflow-grid h3 { margin-bottom: 12px; }
 .workflow-grid p { margin-bottom: 0; font-size: 16px; }
 .workflow-grid .text-link { margin-top: 14px; font-size: 14px; }
-.remote-section { background: var(--sidebar-surface); border-block: 1px solid var(--line); }
-.remote-layout { display: grid; grid-template-columns: .9fr 1.3fr; align-items: center; gap: 48px; }
-.feature-copy > p { font-size: 16px; }
-.remote-preview a { display: block; }
-.remote-preview img { width: 100%; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 14px 36px var(--shadow); }
-.persistence-section { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; border-bottom: 1px solid var(--line); }
-.persistence-visual { min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 30px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--message-surface); }
-.persistence-visual img { width: 290px; border-radius: 12px; box-shadow: 0 8px 24px var(--shadow); }
-.persistence-visual figcaption { text-align: center; }
 .download-section { padding: 42px 24px; text-align: center; background: var(--sidebar-surface); border: 1px solid var(--line); border-radius: 14px; }
 .download-icon { margin: 0 auto 14px; }
 .download-section h2 { margin-bottom: 14px; }

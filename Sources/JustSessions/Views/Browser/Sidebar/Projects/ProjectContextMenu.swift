@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Right-click menu for a project row in the sidebar.
+/// A project row's menu, from a right-click or its ⋯ button.
 struct ProjectContextMenu: View {
     @ObservedObject var store: ConversationStore
     let project: ProjectConversationGroup

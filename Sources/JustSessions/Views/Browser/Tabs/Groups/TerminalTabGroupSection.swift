@@ -16,11 +16,6 @@ struct TerminalTabGroupSection: View {
 
     @State private var hoveredTabID: UUID?
 
-    /// What the hidden tabs' CLIs are doing. A plain terminal runs no session, so it does not count.
-    private func hiddenTabsActivity(_ hiddenTabs: [TerminalSession]) -> SessionActivitySummary {
-        SessionActivitySummary(activities: hiddenTabs.filter { !$0.isPlainTerminal && $0.isRunning }.map(\.cliActivity))
-    }
-
     var body: some View {
         let hiddenTabs = isCollapsed ? group.tabs : []
         let shownTabs = isCollapsed ? [] : group.tabs
@@ -33,7 +28,7 @@ struct TerminalTabGroupSection: View {
                 tabCount: group.tabs.count,
                 isCollapsed: isCollapsed,
                 hiddenTabCount: hiddenTabs.count,
-                hiddenTabsActivity: hiddenTabsActivity(hiddenTabs),
+                hiddenTabsActivity: SessionActivitySummary(tabs: hiddenTabs),
                 onToggleCollapsed: onToggleCollapsed
             )
             .onboardingTourStop(group.tabs.contains { $0.id == store.selectedTerminalID } ? .tabGroup : nil)

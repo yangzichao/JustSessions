@@ -25,13 +25,18 @@ final class TerminalSession: ObservableObject, Identifiable {
     /// started. The first session that appears after that in the same project is this tab's.
     let sessionIDsKnownAtLaunch: Set<String>
     /// The tmux session the tab's CLI runs in, on this Mac or an SSH host. A new session's or branch's tab renames
-    /// it once its session is known.
+    /// it once its session is known, and so does a tab that follows its CLI to another session.
     var tmuxSessionName: String?
     /// For a tab whose CLI runs in tmux on this Mac: the CLI's process, which the tmux server started rather than
     /// the tab. Found once the tmux session runs.
     var tmuxPaneProcessID: Int32?
     /// Refreshes spent picking up a new session's first prompt as its title; see new session discovery.
     var titleRefreshCount = 0
+    /// The session the tab's CLI is in, which no refresh had listed when the tab found it, once a refresh looked for
+    /// it; see `followClaudeSessionSwitch` and `followCodexThreads`.
+    var cliSessionIDRefreshedFor: String?
+    /// The title the tab's CLI last gave its terminal. A Codex CLI's title names its thread; see `CodexThreadTitle`.
+    private(set) var terminalTitle: String?
     var onProcessFinished: (() -> Void)?
 
     /// A tab reopened at launch for a session whose CLI no longer runs starts it only once shown, the way a browser
@@ -121,6 +126,10 @@ final class TerminalSession: ObservableObject, Identifiable {
         hasExited = true
         cliActivity = nil
         onProcessFinished?()
+    }
+
+    func updateTerminalTitle(_ title: String) {
+        terminalTitle = title
     }
 
     /// Returns whether the activity changed. An ended CLI keeps none.

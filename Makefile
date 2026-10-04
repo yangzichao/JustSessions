@@ -33,6 +33,7 @@ website:
 
 website-check:
 	python3 -m unittest discover -s Scripts/Website/tests -v
+	node --test Scripts/Website/tests/*.test.mjs
 	$(MAKE) website
 
 localization:

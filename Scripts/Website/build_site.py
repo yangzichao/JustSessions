@@ -4,6 +4,7 @@ import hashlib
 import shutil
 from pathlib import Path
 
+from script_assets import version_script_imports
 from validate_metadata import PUBLIC_PAGE_PATHS, WEBSITE_URL
 from validate_product_content import validate_product_content
 from validate_site import validate_site
@@ -25,13 +26,18 @@ def build_site():
     if stylesheet_directory.exists():
         shutil.rmtree(stylesheet_directory)
     shutil.copytree(WEBSITE_SOURCE_DIRECTORY / "styles", stylesheet_directory)
+    script_directory = WEBSITE_OUTPUT_DIRECTORY / "scripts"
+    if script_directory.exists():
+        shutil.rmtree(script_directory)
+    shutil.copytree(WEBSITE_SOURCE_DIRECTORY / "scripts", script_directory)
+    version_script_imports(script_directory)
     for image_name in ("session-overview.jpg", "native-terminal.jpg", "remote-desktop-sessions.jpg", "tmux-keep-running.jpg"):
         shutil.copy2(REPOSITORY_DIRECTORY / "docs/images" / image_name, asset_directory / image_name)
     for asset_path in ("Branding/SVG/mark.svg", "Branding/PNG/app-icon-256.png", "website/social/social-preview.png"):
         shutil.copy2(REPOSITORY_DIRECTORY / asset_path, asset_directory / Path(asset_path).name)
     for document_path in WEBSITE_OUTPUT_DIRECTORY.glob("*.html"):
         document_content = document_path.read_text()
-        for resource_path in (*stylesheet_directory.glob("*.css"), *asset_directory.iterdir()):
+        for resource_path in (*stylesheet_directory.glob("*.css"), *script_directory.rglob("*.js"), *asset_directory.iterdir()):
             if not resource_path.is_file():
                 continue
             resource_version = hashlib.sha256(resource_path.read_bytes()).hexdigest()[:12]

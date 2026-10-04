@@ -66,7 +66,8 @@ struct NativeCLICommandResolver: @unchecked Sendable {
 
         return NativeCLICommand(
             executablePath: executablePath,
-            arguments: arguments,
+            // Codex names the thread its CLI is in only in the terminal title, and only when asked.
+            arguments: provider == .codex ? CodexThreadTitle.launchArguments + arguments : arguments,
             workingDirectory: projectPath,
             environment: NativeCLICommand.environmentEntries(environment)
         )

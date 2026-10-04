@@ -78,10 +78,18 @@
 	<string>Add a project folder on %@</string>
 	<key>Add a project folder on this Mac</key>
 	<string>Add a project folder on this Mac</string>
+	<key>Add a project folder or restore an archived project on %@</key>
+	<string>Add a project folder or restore an archived project on %@</string>
+	<key>Add a project folder or restore an archived project on this Mac</key>
+	<string>Add a project folder or restore an archived project on this Mac</string>
 	<key>Add a server you reach with passwordless SSH to browse and resume its sessions here.</key>
 	<string>Add a server you reach with passwordless SSH to browse and resume its sessions here.</string>
 	<key>Add host</key>
 	<string>Add host</string>
+	<key>Add or restore a project on %@</key>
+	<string>Add or restore a project on %@</string>
+	<key>Add or restore a project on this Mac</key>
+	<string>Add or restore a project on this Mac</string>
 	<key>Add project</key>
 	<string>Add project</string>
 	<key>Add project on %@</key>
@@ -168,6 +176,8 @@
 	<string>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</string>
 	<key>Clear filters</key>
 	<string>Clear filters</string>
+	<key>Clear the selection, or close search</key>
+	<string>Clear the selection, or close search</string>
 	<key>Click a session to read it. Nothing runs.</key>
 	<string>Click a session to read it. Nothing runs.</string>
 	<key>Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.</key>
@@ -186,6 +196,8 @@
 	<string>Close Window</string>
 	<key>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</key>
 	<string>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</string>
+	<key>Close find</key>
+	<string>Close find</string>
 	<key>Close left view</key>
 	<string>Close left view</string>
 	<key>Close right view</key>
@@ -200,6 +212,8 @@
 	<string>Close terminal…</string>
 	<key>Close the tab, keep the CLI</key>
 	<string>Close the tab, keep the CLI</string>
+	<key>Close the tab, or the window when no tabs are open</key>
+	<string>Close the tab, or the window when no tabs are open</string>
 	<key>Close this view</key>
 	<string>Close this view</string>
 	<key>Collapse Group</key>
@@ -226,6 +240,8 @@
 	<string>Copy saved messages and tool-call summaries as Markdown</string>
 	<key>Copy session ID</key>
 	<string>Copy session ID</string>
+	<key>Copy the selection. Hold ⇧ while dragging to select text.</key>
+	<string>Copy the selection. Hold ⇧ while dragging to select text.</string>
 	<key>Copying sessions…</key>
 	<string>Copying sessions…</string>
 	<key>Could not change launch at login: %@</key>
@@ -308,6 +324,8 @@
 	<string>Find in conversation</string>
 	<key>Find in conversation (⌘F)</key>
 	<string>Find in conversation (⌘F)</string>
+	<key>Find in the conversation</key>
+	<string>Find in the conversation</string>
 	<key>Find in this conversation</key>
 	<string>Find in this conversation</string>
 	<key>Finishes its turn</key>
@@ -332,6 +350,8 @@
 	<string>General</string>
 	<key>GitHub issue ↗</key>
 	<string>GitHub issue ↗</string>
+	<key>Go to a tab by its position</key>
+	<string>Go to a tab by its position</string>
 	<key>Go to the first available message</key>
 	<string>Go to the first available message</string>
 	<key>Go to the latest message</key>
@@ -342,6 +362,8 @@
 	<string>Help &amp; feedback</string>
 	<key>Hide Sidebar</key>
 	<string>Hide Sidebar</string>
+	<key>Hide or show the sidebar</key>
+	<string>Hide or show the sidebar</string>
 	<key>Hide sidebar</key>
 	<string>Hide sidebar</string>
 	<key>Hide sidebar (⌃⌘S)</key>
@@ -378,6 +400,8 @@
 	<string>Keep running</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
 	<string>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</string>
+	<key>Keyboard shortcuts</key>
+	<string>Keyboard shortcuts</string>
 	<key>Larger reading text</key>
 	<string>Larger reading text</string>
 	<key>Larger text</key>
@@ -386,6 +410,8 @@
 	<string>Last 7 days</string>
 	<key>Last Tab</key>
 	<string>Last Tab</string>
+	<key>Last tab</key>
+	<string>Last tab</string>
 	<key>Latest message</key>
 	<string>Latest message</string>
 	<key>Launch JustSessions at login</key>
@@ -440,6 +466,8 @@
 	<string>New split view with current tab</string>
 	<key>New terminal</key>
 	<string>New terminal</string>
+	<key>New window</key>
+	<string>New window</string>
 	<key>Next</key>
 	<string>Next</string>
 	<key>Next Tab</key>
@@ -448,6 +476,8 @@
 	<string>Next match</string>
 	<key>Next match (⌘G or Return)</key>
 	<string>Next match (⌘G or Return)</string>
+	<key>Next tab</key>
+	<string>Next tab</string>
 	<key>No archived projects</key>
 	<string>No archived projects</string>
 	<key>No matches</key>
@@ -526,6 +556,8 @@
 	<string>Previous match</string>
 	<key>Previous match (⇧⌘G or ⇧Return)</key>
 	<string>Previous match (⇧⌘G or ⇧Return)</string>
+	<key>Previous tab</key>
+	<string>Previous tab</string>
 	<key>Project filters are active</key>
 	<string>Project filters are active</string>
 	<key>Project folder</key>
@@ -542,6 +574,8 @@
 	<string>Read only</string>
 	<key>Readable</key>
 	<string>Readable</string>
+	<key>Reading a session</key>
+	<string>Reading a session</string>
 	<key>Reading width</key>
 	<string>Reading width</string>
 	<key>Recent projects</key>
@@ -618,6 +652,10 @@
 	<string>Search the text of the conversation you are reading. ⌘F does the same.</string>
 	<key>Searching…</key>
 	<string>Searching…</string>
+	<key>Select a range</key>
+	<string>Select a range</string>
+	<key>Select several sessions or projects</key>
+	<string>Select several sessions or projects</string>
 	<key>Separate Views</key>
 	<string>Separate Views</string>
 	<key>Separate views</key>
@@ -642,6 +680,8 @@
 	<string>Show sidebar</string>
 	<key>Show sidebar (⌃⌘S)</key>
 	<string>Show sidebar (⌃⌘S)</string>
+	<key>Sidebar</key>
+	<string>Sidebar</string>
 	<key>Sidebar width</key>
 	<string>Sidebar width</string>
 	<key>Size</key>
@@ -690,6 +730,8 @@
 	<string>Tab %lld</string>
 	<key>Tabs</key>
 	<string>Tabs</string>
+	<key>Tabs and windows</key>
+	<string>Tabs and windows</string>
 	<key>Tabs grouped by project</key>
 	<string>Tabs grouped by project</string>
 	<key>Take the Tour</key>
@@ -784,5 +826,9 @@
 	<string>macOS doesn't let apps check this. Look for JustSessions in System Settings.</string>
 	<key>·</key>
 	<string>·</string>
+	<key>⇧-click</key>
+	<string>⇧-click</string>
+	<key>⌘-click</key>
+	<string>⌘-click</string>
 </dict>
 </plist>
