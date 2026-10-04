@@ -1691,6 +1691,16 @@
         }
       }
     },
+    "JustSessions website ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JustSessions 网站 ↗"
+          }
+        }
+      }
+    },
     "Keep running": {
       "localizations": {
         "zh-Hans": {
@@ -3320,16 +3330,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "用户指南 ↗"
-          }
-        }
-      }
-    },
-    "Website": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "网站"
           }
         }
       }

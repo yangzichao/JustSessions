@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// The General tab of Settings: interface language, what the app does at launch, and when it notifies you.
+/// The General tab of Settings: interface language, what the app does at launch, when it notifies you, and a link to
+/// the website.
 struct GeneralSettingsView: View {
     @ObservedObject var languageStore: AppLanguageStore
     @ObservedObject var tabReopeningSettingsStore: TabReopeningSettingsStore
@@ -38,6 +39,11 @@ struct GeneralSettingsView: View {
             ThemeDivider()
 
             NotificationSettingsSection(settingsStore: notificationSettingsStore)
+
+            ThemeDivider()
+
+            Link("JustSessions website ↗", destination: AppLinks.websiteURL)
+                .help("Open the JustSessions website")
         }
         .padding(24)
         .frame(width: 540, alignment: .leading)

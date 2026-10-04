@@ -23,7 +23,6 @@ struct SidebarFooter: View {
                 SidebarSettingsLink()
                 checkForUpdatesButton
                 SidebarHelpButton()
-                SidebarWebsiteLink()
             }
         }
         .buttonStyle(.borderless)

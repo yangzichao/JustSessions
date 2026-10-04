@@ -312,6 +312,8 @@
 	<string>JustSessions Website</string>
 	<key>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</key>
 	<string>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</string>
+	<key>JustSessions website ↗</key>
+	<string>JustSessions website ↗</string>
 	<key>Keep running</key>
 	<string>Keep running</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
@@ -628,8 +630,6 @@
 	<string>Use the full window width</string>
 	<key>User guide ↗</key>
 	<string>User guide ↗</string>
-	<key>Website</key>
-	<string>Website</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
 	<string>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
 	<key>You</key>

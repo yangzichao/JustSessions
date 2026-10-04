@@ -304,6 +304,8 @@
 	<string>JustSessions 网站</string>
 	<key>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</key>
 	<string>JustSessions 及其终端中的 CLI 需要它来访问你所在网络中的设备，例如本地地址上的 SSH 主机。macOS 不允许应用检查这项权限，请在「隐私与安全性 &gt; 本地网络」中找到 JustSessions。</string>
+	<key>JustSessions website ↗</key>
+	<string>JustSessions 网站 ↗</string>
 	<key>Keep running</key>
 	<string>保持运行</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
@@ -624,8 +626,6 @@
 	<string>使用窗口全宽</string>
 	<key>User guide ↗</key>
 	<string>用户指南 ↗</string>
-	<key>Website</key>
-	<string>网站</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
 	<string>支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
 	<key>You</key>
