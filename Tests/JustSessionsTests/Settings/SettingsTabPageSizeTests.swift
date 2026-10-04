@@ -18,6 +18,7 @@ struct SettingsTabPageSizeTests {
             ("General", AnyView(GeneralSettingsView(
                 languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
                 tabReopeningSettingsStore: TabReopeningSettingsStore(userDefaults: settings.userDefaults),
+                launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
                 notificationSettingsStore: SessionNotificationSettingsStore(userDefaults: settings.userDefaults)
             ))),
             ("Appearance", AnyView(AppearanceSettingsView(

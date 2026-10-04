@@ -365,6 +365,16 @@
         }
       }
     },
+    "Allow JustSessions in macOS Login Items to finish enabling automatic launch.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在 macOS 的“登录项”中允许 JustSessions，以完成自动启动设置。"
+          }
+        }
+      }
+    },
     "Allowed": {
       "localizations": {
         "zh-Hans": {
@@ -531,6 +541,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "启动时"
+          }
+        }
+      }
+    },
+    "Automatically open JustSessions when you log in to your Mac.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登录 Mac 时自动打开 JustSessions。"
           }
         }
       }
@@ -970,6 +990,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在复制会话…"
+          }
+        }
+      }
+    },
+    "Could not change launch at login: %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更改开机启动设置：%@"
           }
         }
       }
@@ -1771,6 +1801,16 @@
         }
       }
     },
+    "Launch JustSessions at login": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开机启动 JustSessions"
+          }
+        }
+      }
+    },
     "Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.": {
       "localizations": {
         "zh-Hans": {
@@ -2166,6 +2206,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "好"
+          }
+        }
+      }
+    },
+    "Open Login Items Settings": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开登录项设置"
           }
         }
       }

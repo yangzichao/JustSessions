@@ -5,6 +5,7 @@ import SwiftUI
 struct GeneralSettingsView: View {
     @ObservedObject var languageStore: AppLanguageStore
     @ObservedObject var tabReopeningSettingsStore: TabReopeningSettingsStore
+    let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
     let notificationSettingsStore: SessionNotificationSettingsStore
 
     var body: some View {
@@ -27,6 +28,7 @@ struct GeneralSettingsView: View {
 
             Text("At launch")
                 .font(.subheadline.weight(.medium))
+            LaunchAtLoginSettingsSection(settingsStore: launchAtLoginSettingsStore)
             Toggle("Reopen the tabs that were open when JustSessions quit", isOn: Binding(
                 get: { tabReopeningSettingsStore.reopensTabsAtLaunch },
                 set: { tabReopeningSettingsStore.setReopensTabsAtLaunch($0) }

@@ -72,6 +72,8 @@
 	<string>All</string>
 	<key>All tools</key>
 	<string>All tools</string>
+	<key>Allow JustSessions in macOS Login Items to finish enabling automatic launch.</key>
+	<string>Allow JustSessions in macOS Login Items to finish enabling automatic launch.</string>
 	<key>Allowed</key>
 	<string>Allowed</string>
 	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
@@ -106,6 +108,8 @@
 	<string>Ask Now</string>
 	<key>At launch</key>
 	<string>At launch</string>
+	<key>Automatically open JustSessions when you log in to your Mac.</key>
+	<string>Automatically open JustSessions when you log in to your Mac.</string>
 	<key>A−</key>
 	<string>A−</string>
 	<key>Branch</key>
@@ -184,6 +188,8 @@
 	<string>Copy session ID</string>
 	<key>Copying sessions…</key>
 	<string>Copying sessions…</string>
+	<key>Could not change launch at login: %@</key>
+	<string>Could not change launch at login: %@</string>
 	<key>Could not copy conversation</key>
 	<string>Could not copy conversation</string>
 	<key>Could not export conversation</key>
@@ -328,6 +334,8 @@
 	<string>Last Tab</string>
 	<key>Latest message</key>
 	<string>Latest message</string>
+	<key>Launch JustSessions at login</key>
+	<string>Launch JustSessions at login</string>
 	<key>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</key>
 	<string>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</string>
 	<key>Light</key>
@@ -406,6 +414,8 @@
 	<string>Notify me when a session</string>
 	<key>OK</key>
 	<string>OK</string>
+	<key>Open Login Items Settings</key>
+	<string>Open Login Items Settings</string>
 	<key>Open System Settings</key>
 	<string>Open System Settings</string>
 	<key>Open in a separate reading window</key>

@@ -23,6 +23,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
 - `Services/Permissions/`: reads each permission's status without asking for it, and the System Settings page that changes it.
+- `Services/Startup/`: registers the app as a macOS login item and reads its current system approval status.
 - `Services/Appearance/`: saves the app's appearance and theme, sets the appearance on every window, and gives terminals a newly chosen theme's colors.
 - `Services/Adapters/`: provider discovery and native arguments, one folder per CLI. Separate adapters make adding another CLI straightforward.
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.

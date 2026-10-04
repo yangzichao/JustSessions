@@ -5,6 +5,7 @@ import SwiftUI
 struct SettingsView: View {
     let languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
+    let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
@@ -16,6 +17,7 @@ struct SettingsView: View {
                 GeneralSettingsView(
                     languageStore: languageStore,
                     tabReopeningSettingsStore: tabReopeningSettingsStore,
+                    launchAtLoginSettingsStore: launchAtLoginSettingsStore,
                     notificationSettingsStore: notificationSettingsStore
                 )
             }

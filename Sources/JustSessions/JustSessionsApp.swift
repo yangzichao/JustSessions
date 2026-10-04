@@ -37,6 +37,7 @@ struct JustSessionsApp: App {
             SettingsView(
                 languageStore: languageStore,
                 tabReopeningSettingsStore: .shared,
+                launchAtLoginSettingsStore: .shared,
                 appAppearanceStore: .shared,
                 appThemeStore: .shared,
                 terminalAppearanceStore: .shared,

@@ -19,6 +19,7 @@ struct ThemeSurfaceRenderingTests {
             ("settings", AnyView(SettingsView(
                 languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
                 tabReopeningSettingsStore: tabReopeningStore,
+                launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
                 appAppearanceStore: appearanceStore, appThemeStore: themeStore,
                 terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore
             )), CGSize(width: 560, height: 420)),
