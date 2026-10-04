@@ -42,7 +42,7 @@ struct TerminalTabGroupSection: View {
             ForEach(Array(shownTabs.enumerated()), id: \.element.id) { index, session in
                 TerminalTab(
                     session: session,
-                    projectDisplayName: projectName,
+                    projectDisplayName: store.projectDisplayName(forProjectPath: session.projectDirectoryKey),
                     hostDisplayName: store.hasRemoteHosts ? session.host.displayName : nil,
                     width: tabWidth,
                     isSelected: store.selectedTerminalID == session.id,
@@ -53,8 +53,8 @@ struct TerminalTabGroupSection: View {
                     onSelect: { store.selectTerminal(session.id) },
                     onRename: onRenameConversation,
                     onOpenInSplitView: { store.splitSelectedTerminal(with: session.id) },
-                    onSwapSplitSides: { store.swapSplitSides() },
-                    onLeaveSplitView: { store.endSplit() },
+                    onSwapSplitSides: { if let shownSplit = store.shownSplit { store.reverseSplit(shownSplit.id) } },
+                    onLeaveSplitView: { if let shownSplit = store.shownSplit { store.separateSplit(shownSplit.id) } },
                     onClose: { onCloseTab(session.id) }
                 )
                 .id(session.id)
@@ -67,17 +67,18 @@ struct TerminalTabGroupSection: View {
         }
     }
 
-    /// A tab of the split on screen offers the split's own actions; any other tab but the selected one, wherever it
-    /// sits in the bar, can open in a split with the selected tab.
+    /// A tab of the split on screen offers the split's own actions; while the selected tab is in no split, any other
+    /// tab in no split, wherever it sits in the bar, can open in a split with it.
     private func splitMenu(for tabID: UUID) -> TerminalTabSplitMenu? {
-        if store.shownSplitPair?.contains(tabID) == true { return .linkedInPair }
-        guard let selectedTerminalID = store.selectedTerminalID, selectedTerminalID != tabID else { return nil }
+        if store.shownSplit?.contains(tabID) == true { return .linkedInPair }
+        guard let selectedTerminalID = store.selectedTerminalID, selectedTerminalID != tabID,
+              store.split(containing: selectedTerminalID) == nil, store.split(containing: tabID) == nil else { return nil }
         return .joinsSelectedTab
     }
 
     /// The tab whose terminal shows in the split beside the selected tab's.
     private func isShownInSplit(_ tabID: UUID) -> Bool {
-        tabID != store.selectedTerminalID && store.shownSplitPair?.contains(tabID) == true
+        tabID != store.selectedTerminalID && store.shownSplit?.contains(tabID) == true
     }
 
     /// The selected, the hovered, and the split partner's tab draw a shape of their own, so no separator runs beside

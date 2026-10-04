@@ -19,7 +19,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
-- `Models/Terminal/Split/`: the two tabs linked in a split view, and where the divider parts their panes.
+- `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, and where the divider parts the panes.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.

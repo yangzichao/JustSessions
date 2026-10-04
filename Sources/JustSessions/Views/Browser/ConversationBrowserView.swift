@@ -99,14 +99,14 @@ struct ConversationBrowserView: View {
         .focusedSceneValue(\.workspaceTabActions, WorkspaceTabActions(
             tabCount: store.terminalSessions.count,
             hasSelectedTab: store.selectedTerminal != nil,
-            isSplitShown: store.shownSplitPair != nil,
+            isSplitShown: store.shownSplit != nil,
             isEnabled: workspaceTabCommandsEnabled,
             newSession: { newSessionSheetHost = defaultNewSessionHost },
             closeSelectedTab: { requestClosingTerminal(store.selectedTerminalID) },
             selectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) },
             selectTab: { store.selectTerminal(shortcutNumber: $0) },
-            swapSplitSides: { store.swapSplitSides() },
-            leaveSplitView: { store.endSplit() }
+            swapSplitSides: { if let shownSplit = store.shownSplit { store.reverseSplit(shownSplit.id) } },
+            leaveSplitView: { if let shownSplit = store.shownSplit { store.separateSplit(shownSplit.id) } }
         ))
         .background(WorkspaceTabCycleShortcuts(
             isEnabled: workspaceTabCommandsEnabled && !store.terminalSessions.isEmpty,

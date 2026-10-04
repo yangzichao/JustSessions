@@ -42,18 +42,4 @@ enum TerminalSplitLayout {
         guard availableWidth > 0 else { return evenFraction }
         return clampedFraction(startFraction + delta / availableWidth, totalWidth: totalWidth)
     }
-
-    /// Where the divider sits once the split's pair changes from `oldPair` to `newPair`. Swapped panes keep their
-    /// widths as they trade sides; a tab that keeps its side, replaced in place by reconnecting or the selected
-    /// tab with a new partner, keeps the divider where it was; any other pair starts even, as in Chrome.
-    static func fraction(
-        _ current: CGFloat,
-        afterPairChangeFrom oldPair: TerminalSplitPair?,
-        to newPair: TerminalSplitPair
-    ) -> CGFloat {
-        guard let oldPair else { return evenFraction }
-        if newPair == oldPair.swapped { return 1 - current }
-        if newPair.leadingID == oldPair.leadingID || newPair.trailingID == oldPair.trailingID { return current }
-        return evenFraction
-    }
 }

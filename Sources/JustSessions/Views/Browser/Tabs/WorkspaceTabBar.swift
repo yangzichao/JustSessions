@@ -18,7 +18,7 @@ struct WorkspaceTabBar: View {
     @State private var groupLabelWidthsByProjectKey: [String: CGFloat] = [:]
 
     var body: some View {
-        let groups = TerminalTabGroup.groups(of: store.terminalSessions, projectDirectoryKey: \.projectDirectoryKey)
+        let groups = TerminalTabGroup.groups(of: store.terminalSessions, projectDirectoryKey: store.tabGroupKey(of:))
         let colorsByProjectKey = TabGroupPalette.colorsByProjectKey(groups.map(\.projectDirectoryKey))
         let shownTabCount = groups
             .filter { !collapsedProjectKeys.contains($0.projectDirectoryKey) }
@@ -54,8 +54,9 @@ struct WorkspaceTabBar: View {
             .onGeometryChange(for: CGFloat.self, of: \.size.width) { barWidth = $0 }
             .onChange(of: store.selectedTerminalID) { _, selectedTerminalID in
                 guard let selectedTerminal = store.selectedTerminal else { return }
-                if collapsedProjectKeys.contains(selectedTerminal.projectDirectoryKey) {
-                    expandGroup(selectedTerminal.projectDirectoryKey)
+                let groupKey = store.tabGroupKey(of: selectedTerminal)
+                if collapsedProjectKeys.contains(groupKey) {
+                    expandGroup(groupKey)
                 }
                 scrollProxy.scrollTo(selectedTerminalID, anchor: .center)
             }
@@ -95,7 +96,7 @@ struct WorkspaceTabBar: View {
 
     /// With every other tab in a collapsed group too, the selected tab keeps showing behind its collapsed label.
     private func selectTabInSight(insteadOfTabsIn projectKey: String) {
-        let tabProjectKeys = store.terminalSessions.map(\.projectDirectoryKey)
+        let tabProjectKeys = store.tabGroupKeys
         guard let selectedIndex = store.terminalSessions.firstIndex(where: { $0.id == store.selectedTerminalID }),
               tabProjectKeys[selectedIndex] == projectKey,
               let indexToSelect = TerminalTabOrder.indexToSelect(

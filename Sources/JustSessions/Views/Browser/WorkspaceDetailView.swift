@@ -4,8 +4,8 @@ import SwiftUI
 /// selected, the selected session's preview. Every tab's terminal stays in the view tree; only the selected one
 /// shows, or both halves of a split while a split tab is selected, side by side around a draggable gutter as in
 /// Chrome's split view. A click in the pane whose tab is not selected selects it, bringing it the keyboard, and still
-/// reaches its terminal, so scrolling and selecting text work there too; that pane is dimmed slightly. A split tab
-/// keeps its pane's width while another tab shows, so coming back resizes no terminal.
+/// reaches its terminal, so scrolling and selecting text work there too; that pane is dimmed slightly. Every split's
+/// tabs keep their panes' widths while another tab shows, so coming back resizes no terminal.
 /// The tab bar runs up into the title bar beside the window buttons; with no tabs open, the title bar stays clear.
 struct WorkspaceDetailView: View {
     @ObservedObject var store: ConversationStore
@@ -16,8 +16,8 @@ struct WorkspaceDetailView: View {
     let onDelete: (Conversation) -> Void
 
     @Environment(\.titleBarRow) private var titleBarRow
-    /// The leading pane's share of the split's width; even until the divider is dragged.
-    @State private var splitFraction: CGFloat = TerminalSplitLayout.evenFraction
+    /// Each split's leading pane share of its width, by split id; even until its divider is dragged.
+    @State private var splitFractions: [UUID: CGFloat] = [:]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -33,9 +33,7 @@ struct WorkspaceDetailView: View {
                 )
             }
             GeometryReader { geometry in
-                let splitPair = store.terminalSplitPair
-                let shownSplitPair = store.shownSplitPair
-                let paneWidths = TerminalSplitLayout.paneWidths(fraction: splitFraction, totalWidth: geometry.size.width)
+                let shownSplit = store.shownSplit
                 ZStack(alignment: .topLeading) {
                     SessionPreviewPane(
                         store: store,
@@ -47,8 +45,13 @@ struct WorkspaceDetailView: View {
 
                     ForEach(store.terminalSessions) { session in
                         let isActive = store.selectedTerminalID == session.id
-                        let isShown = isActive || shownSplitPair?.contains(session.id) == true
-                        let side = splitSide(of: session.id, in: splitPair)
+                        let isShown = isActive || shownSplit?.contains(session.id) == true
+                        let split = store.split(containing: session.id)
+                        let side = split.flatMap { store.sides(of: $0)?.side(of: session.id) }
+                        let paneWidths = TerminalSplitLayout.paneWidths(
+                            fraction: split.map(splitFraction(of:)) ?? TerminalSplitLayout.evenFraction,
+                            totalWidth: geometry.size.width
+                        )
                         TerminalWorkspaceView(
                             session: session,
                             isShown: isShown,
@@ -61,11 +64,12 @@ struct WorkspaceDetailView: View {
                         }
                         .shown(isShown)
                         .frame(width: paneWidth(of: side, paneWidths: paneWidths, totalWidth: geometry.size.width), height: geometry.size.height)
-                        .offset(x: side == .trailing ? paneWidths.leading + TerminalSplitLayout.dividerWidth : 0)
+                        .offset(x: side == .right ? paneWidths.leading + TerminalSplitLayout.dividerWidth : 0)
                     }
 
-                    if shownSplitPair != nil {
-                        WorkspaceSplitDivider(fraction: $splitFraction, totalWidth: geometry.size.width)
+                    if let shownSplit {
+                        let paneWidths = TerminalSplitLayout.paneWidths(fraction: splitFraction(of: shownSplit), totalWidth: geometry.size.width)
+                        WorkspaceSplitDivider(fraction: splitFractionBinding(for: shownSplit), totalWidth: geometry.size.width)
                             .frame(height: geometry.size.height)
                             .padding(.leading, paneWidths.leading)
                     }
@@ -74,27 +78,24 @@ struct WorkspaceDetailView: View {
             .tabBarTerminalPalette(from: .shared)
         }
         .ignoresSafeArea(edges: .top)
-        .onChange(of: store.terminalSplitPair) { oldPair, newPair in
-            guard let newPair else { return }
-            splitFraction = TerminalSplitLayout.fraction(splitFraction, afterPairChangeFrom: oldPair, to: newPair)
+        .onChange(of: store.terminalSplits.map(\.id)) { _, splitIDs in
+            // Forget the dividers of splits that are gone.
+            splitFractions = splitFractions.filter { splitIDs.contains($0.key) }
         }
     }
 
-    private enum SplitSide {
-        case leading, trailing
+    private func splitFraction(of split: TerminalSplit) -> CGFloat {
+        splitFractions[split.id] ?? TerminalSplitLayout.evenFraction
     }
 
-    /// The tab's side of the split pair, kept while the pair is not shown, or nil for a tab outside it.
-    private func splitSide(of tabID: UUID, in splitPair: TerminalSplitPair?) -> SplitSide? {
-        if tabID == splitPair?.leadingID { return .leading }
-        if tabID == splitPair?.trailingID { return .trailing }
-        return nil
+    private func splitFractionBinding(for split: TerminalSplit) -> Binding<CGFloat> {
+        Binding(get: { splitFraction(of: split) }, set: { splitFractions[split.id] = $0 })
     }
 
-    private func paneWidth(of side: SplitSide?, paneWidths: TerminalSplitLayout.PaneWidths, totalWidth: CGFloat) -> CGFloat {
+    private func paneWidth(of side: TerminalSplit.Side?, paneWidths: TerminalSplitLayout.PaneWidths, totalWidth: CGFloat) -> CGFloat {
         switch side {
-        case .leading: paneWidths.leading
-        case .trailing: paneWidths.trailing
+        case .left: paneWidths.leading
+        case .right: paneWidths.trailing
         case nil: totalWidth
         }
     }

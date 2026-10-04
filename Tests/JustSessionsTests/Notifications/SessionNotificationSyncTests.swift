@@ -62,6 +62,7 @@ struct SessionNotificationSyncTests {
         store.openTerminal(Self.makeTab(for: other))
         store.splitSelectedTerminal(with: tab.id)
         #expect(store.selectedTerminalID != tab.id)
+        #expect(store.shownSplit?.contains(tab.id) == true)
         let cliStartedAt = try #require(RunningProcessInfo.startDate(of: tab.cliProcessID))
         let registry = Self.emptyClaudeRegistry(in: directory)
         try CodexRolloutLines.write([CodexRolloutLines.sessionMeta, CodexRolloutLines.turnStarted(at: cliStartedAt + 1)], to: rolloutFile)
@@ -75,7 +76,7 @@ struct SessionNotificationSyncTests {
         #expect(notifier.notifications.isEmpty)
 
         // Once the split ends, the tab is out of view and the next turn's end notifies.
-        store.endSplit()
+        store.separateSplit(try #require(store.shownSplit).id)
         try CodexRolloutLines.append(CodexRolloutLines.text([CodexRolloutLines.turnStarted(at: cliStartedAt + 2)]), to: rolloutFile)
         await store.synchronizeCLIActivity(claudeRegistry: registry)
         try CodexRolloutLines.append(CodexRolloutLines.text([CodexRolloutLines.turnCompleted()]), to: rolloutFile)

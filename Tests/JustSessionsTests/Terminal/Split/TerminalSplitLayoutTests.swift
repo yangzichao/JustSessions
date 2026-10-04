@@ -2,8 +2,7 @@ import Foundation
 import Testing
 @testable import JustSessions
 
-/// The divider parts the split's width beside it; each pane keeps a workable minimum while the window has room. It
-/// stays put while a tab keeps its side of a changed pair, mirrors on a swap, and starts even otherwise.
+/// The divider parts the split's width beside it; each pane keeps a workable minimum while the window has room.
 struct TerminalSplitLayoutTests {
     @Test func anEvenFractionPartsTheAvailableWidthEvenly() {
         let widths = TerminalSplitLayout.paneWidths(fraction: 0.5, totalWidth: 1008)
@@ -44,43 +43,4 @@ struct TerminalSplitLayoutTests {
         let widths = TerminalSplitLayout.paneWidths(fraction: dragged, totalWidth: 1008)
         #expect(widths.leading == TerminalSplitLayout.minimumPaneWidth)
     }
-
-    @Test func swappingThePairMirrorsTheDivider() {
-        let pair = TerminalSplitPair(leadingID: first, trailingID: second)
-        #expect(abs(TerminalSplitLayout.fraction(0.3, afterPairChangeFrom: pair, to: pair.swapped) - 0.7) < 0.0001)
-    }
-
-    @Test func aTabKeepingTheLeftPaneKeepsTheDivider() {
-        let pair = TerminalSplitPair(leadingID: first, trailingID: second)
-        let newPair = TerminalSplitPair(leadingID: first, trailingID: third)
-        #expect(TerminalSplitLayout.fraction(0.3, afterPairChangeFrom: pair, to: newPair) == 0.3)
-    }
-
-    @Test func aTabKeepingTheRightPaneKeepsTheDivider() {
-        let pair = TerminalSplitPair(leadingID: first, trailingID: second)
-        let newPair = TerminalSplitPair(leadingID: third, trailingID: second)
-        #expect(TerminalSplitLayout.fraction(0.3, afterPairChangeFrom: pair, to: newPair) == 0.3)
-    }
-
-    @Test func aTabChangingSidesStartsEven() {
-        let pair = TerminalSplitPair(leadingID: first, trailingID: second)
-        let newPair = TerminalSplitPair(leadingID: third, trailingID: first)
-        #expect(TerminalSplitLayout.fraction(0.3, afterPairChangeFrom: pair, to: newPair) == TerminalSplitLayout.evenFraction)
-    }
-
-    @Test func aPairOfOtherTabsStartsEven() {
-        let pair = TerminalSplitPair(leadingID: first, trailingID: second)
-        let newPair = TerminalSplitPair(leadingID: third, trailingID: fourth)
-        #expect(TerminalSplitLayout.fraction(0.3, afterPairChangeFrom: pair, to: newPair) == TerminalSplitLayout.evenFraction)
-    }
-
-    @Test func aFirstSplitStartsEven() {
-        let newPair = TerminalSplitPair(leadingID: first, trailingID: second)
-        #expect(TerminalSplitLayout.fraction(0.3, afterPairChangeFrom: nil, to: newPair) == TerminalSplitLayout.evenFraction)
-    }
-
-    private let first = UUID()
-    private let second = UUID()
-    private let third = UUID()
-    private let fourth = UUID()
 }

@@ -27,7 +27,7 @@ extension ConversationStore {
     /// split shown beside the selected tab.
     private func isInView(_ source: SessionAttentionSource) -> Bool {
         guard let tabID = source.tabID else { return false }
-        return sessionNotifier.isApplicationActive && (selectedTerminalID == tabID || shownSplitPair?.contains(tabID) == true)
+        return sessionNotifier.isApplicationActive && (selectedTerminalID == tabID || shownSplit?.contains(tabID) == true)
     }
 
     /// The tab the source names, or else a tab opened on the same session since, such as by reattaching.
