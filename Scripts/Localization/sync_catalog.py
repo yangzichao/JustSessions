@@ -20,14 +20,7 @@ def sync_catalog(check_only=False):
     source_names = [source_path.stem for source_path in source_paths]
     if len(source_names) != len(set(source_names)):
         raise SystemExit('Localization extraction requires unique Swift source filenames. Rename duplicate files.')
-    stringsdata_files = [extraction_directory / (source_path.stem + '.stringsdata') for source_path in source_paths]
-    missing_files = [path for path in stringsdata_files if not path.is_file()]
-    if missing_files:
-        raise SystemExit(f'Compiler extraction is incomplete: {missing_files}. Remove .build and retry.')
-    for source_path, stringsdata_path in zip(source_paths, stringsdata_files):
-        extracted_source = Path(json.loads(stringsdata_path.read_text())['source'])
-        if extracted_source.resolve() != source_path.resolve():
-            raise SystemExit(f'Localization extraction for {source_path} was overwritten by {extracted_source}. Use a unique filename.')
+    stringsdata_files = extracted_stringsdata(source_paths)
     with tempfile.TemporaryDirectory(prefix='justsessions-catalog-') as temporary_directory:
         synced_catalog = Path(temporary_directory) / CATALOG_PATH.name
         shutil.copyfile(CATALOG_PATH, synced_catalog)
@@ -44,6 +37,27 @@ def sync_catalog(check_only=False):
         else:
             shutil.copyfile(synced_catalog, CATALOG_PATH)
     compile_catalog(check_only=check_only)
+
+
+def extracted_stringsdata(source_paths):
+    """One .stringsdata per source file, in the given order, from wherever the build system wrote it.
+
+    SwiftPM's deprecated native build system writes them to the directory given with -emit-localized-strings-path.
+    Its default swiftbuild system overrides that path and writes them beside its object files, so each file is
+    matched by the source it records instead. Where a source has several, the newest is from its latest compile.
+    """
+    newest_by_source = {}
+    for path in (PROJECT_DIRECTORY / '.build').rglob('*.stringsdata'):
+        try:
+            source = Path(json.loads(path.read_text())['source']).resolve()
+        except (OSError, ValueError, KeyError):
+            continue
+        if source not in newest_by_source or path.stat().st_mtime > newest_by_source[source].stat().st_mtime:
+            newest_by_source[source] = path
+    missing_sources = [source_path for source_path in source_paths if source_path.resolve() not in newest_by_source]
+    if missing_sources:
+        raise SystemExit(f'Compiler extraction is incomplete: {missing_sources}. Remove .build and retry.')
+    return [newest_by_source[source_path.resolve()] for source_path in source_paths]
 
 
 if __name__ == '__main__':
