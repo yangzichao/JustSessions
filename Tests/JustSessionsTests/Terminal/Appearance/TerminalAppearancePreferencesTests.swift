@@ -19,6 +19,37 @@ struct TerminalAppearancePreferencesTests {
         #expect(TerminalAppearancePreferences.load(from: settings.userDefaults) == TerminalAppearancePreferences())
     }
 
+    @Test func colorChoiceAndImportedColorsSurviveReopeningAndRestoreDefaultsClearsThem() throws {
+        let settings = try IsolatedUserDefaults()
+        defer { settings.removeSuite() }
+        let store = TerminalAppearanceStore(userDefaults: settings.userDefaults)
+        let importedColors = ImportedTerminalColors(sourceName: "iTerm2 · Work", variants: .single(.nord))
+        store.useImportedColors(importedColors)
+        #expect(store.preferences.colorChoice == .imported)
+        store.setColorChoice(.preset(.dracula))
+
+        let reopened = TerminalAppearanceStore(userDefaults: settings.userDefaults)
+        #expect(reopened.preferences.colorChoice == .preset(.dracula))
+        #expect(reopened.preferences.importedColors == importedColors)
+        reopened.setColorChoice(.imported)
+        #expect(reopened.preferences.colorVariants(appTheme: .justSessions) == .single(.nord))
+
+        reopened.restoreDefaults()
+        #expect(TerminalAppearancePreferences.load(from: settings.userDefaults) == TerminalAppearancePreferences())
+    }
+
+    @Test func anUnknownSchemeOrMissingImportedColorsFallBackToTheAppTheme() throws {
+        let settings = try IsolatedUserDefaults()
+        defer { settings.removeSuite() }
+        let key = TerminalAppearancePreferences.userDefaultsKey
+
+        settings.userDefaults.set(Data(#"{"colorChoice":"monokai","mode":"dark"}"#.utf8), forKey: key)
+        #expect(TerminalAppearancePreferences.load(from: settings.userDefaults) == TerminalAppearancePreferences(mode: .dark))
+
+        settings.userDefaults.set(Data(#"{"colorChoice":"imported","fontSize":18}"#.utf8), forKey: key)
+        #expect(TerminalAppearancePreferences.load(from: settings.userDefaults) == TerminalAppearancePreferences(fontSize: 18))
+    }
+
     @Test func invalidSavedSettingsFallBackAndOversizedFontsAreClamped() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

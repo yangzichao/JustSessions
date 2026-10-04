@@ -15,6 +15,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
+- `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the preset colors in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
@@ -35,6 +36,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, and finding each tab's CLI process.
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
 - `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal.
+- `Services/Terminal/Appearance/Import/`: reads colors from iTerm2's default profile or an `.itermcolors` file, only when asked.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
 - `Services/Terminal/AppearingSessions/`: links a new tab to the first session that appears in its project, for SSH hosts and for CLIs that don't reveal the session they write.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
@@ -54,6 +56,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
 - `Views/Settings/`: General (language and launch behavior), Appearance, Terminal, and Notifications tabs.
+- `Views/Settings/Terminal/Colors/`: the terminal color scheme menu and the iTerm2 import menu.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
 - `Views/Feedback/`: prepares bug reports, feature requests, and feedback for the user to review on GitHub.

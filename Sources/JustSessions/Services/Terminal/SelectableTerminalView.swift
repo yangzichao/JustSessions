@@ -78,7 +78,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
             guard let self else { return }
             appearancePreferences = preferences
             self.theme = theme
-            appearance = preferences.mode.nativeAppearance
+            appearance = TerminalAppearanceStyling.nativeAppearance(for: preferences, theme: theme)
             TerminalAppearanceStyling.apply(preferences, theme: theme, to: self)
         }
     }

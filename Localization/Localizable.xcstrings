@@ -10,6 +10,16 @@
     "%@ %@ — %@": {
       "shouldTranslate": false
     },
+    "%@ (imported)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@（已导入）"
+          }
+        }
+      }
+    },
     "%@ could not be refreshed: %@": {
       "localizations": {
         "zh-Hans": {
@@ -696,6 +706,16 @@
         }
       }
     },
+    "Copies the colors once. JustSessions doesn't read iTerm2's settings again.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只复制一次配色，之后 JustSessions 不会再读取 iTerm2 的设置。"
+          }
+        }
+      }
+    },
     "Copy": {
       "localizations": {
         "zh-Hans": {
@@ -830,6 +850,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法启动会话"
+          }
+        }
+      }
+    },
+    "Couldn't find iTerm2's default profile. A dynamic profile can't be imported.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找不到 iTerm2 的默认 Profile。动态 Profile 无法导入。"
           }
         }
       }
@@ -1348,6 +1378,16 @@
         }
       }
     },
+    "Import": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入"
+          }
+        }
+      }
+    },
     "Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.": {
       "localizations": {
         "zh-Hans": {
@@ -1480,6 +1520,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "与应用一致"
+          }
+        }
+      }
+    },
+    "Match app theme": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与应用主题一致"
           }
         }
       }
@@ -1816,6 +1866,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "主机上的路径，例如 ~/code/app"
+          }
+        }
+      }
+    },
+    "Picks the light or dark version of color schemes that have both.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为同时有浅色和深色版本的配色方案选择其中一个版本。"
           }
         }
       }
@@ -2478,6 +2538,16 @@
         }
       }
     },
+    "Some colors are missing, such as the text or background color.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缺少部分颜色，例如文字或背景颜色。"
+          }
+        }
+      }
+    },
     "Start a native CLI in a project folder.": {
       "localizations": {
         "zh-Hans": {
@@ -2640,6 +2710,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "终端外观预览"
+          }
+        }
+      }
+    },
+    "Terminals use the color scheme chosen in the Terminal tab.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "终端使用「终端」标签中选择的配色方案。"
           }
         }
       }
@@ -2814,6 +2894,16 @@
         }
       }
     },
+    "This file isn't an iTerm2 color preset.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此文件不是 iTerm2 配色预设。"
+          }
+        }
+      }
+    },
     "This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.": {
       "localizations": {
         "zh-Hans": {
@@ -2966,6 +3056,36 @@
     },
     "devbox or user@devbox.example.com": {
       "shouldTranslate": false
+    },
+    "iTerm2 Color Preset File…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iTerm2 配色预设文件…"
+          }
+        }
+      }
+    },
+    "iTerm2 Default Profile": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iTerm2 默认 Profile"
+          }
+        }
+      }
+    },
+    "iTerm2 has no saved settings on this Mac.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 上没有 iTerm2 的设置。"
+          }
+        }
+      }
     },
     "·": {
       "shouldTranslate": false

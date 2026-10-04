@@ -8,6 +8,8 @@
 	<string>%@ %@</string>
 	<key>%@ %@ — %@</key>
 	<string>%@ %@ — %@</string>
+	<key>%@ (imported)</key>
+	<string>%@ (imported)</string>
 	<key>%@ could not be refreshed: %@</key>
 	<string>%@ could not be refreshed: %@</string>
 	<key>%@ has not saved this session yet · click to open its terminal</key>
@@ -134,6 +136,8 @@
 	<string>Connect again; a CLI still running in tmux on the host is reattached</string>
 	<key>Copied</key>
 	<string>Copied</string>
+	<key>Copies the colors once. JustSessions doesn't read iTerm2's settings again.</key>
+	<string>Copies the colors once. JustSessions doesn't read iTerm2's settings again.</string>
 	<key>Copy</key>
 	<string>Copy</string>
 	<key>Copy code</key>
@@ -156,6 +160,8 @@
 	<string>Could not read this session</string>
 	<key>Could not start session</key>
 	<string>Could not start session</string>
+	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
+	<string>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</string>
 	<key>Dark</key>
 	<string>Dark</string>
 	<key>Delete 1 session</key>
@@ -242,6 +248,8 @@
 	<string>Host</string>
 	<key>How it works</key>
 	<string>How it works</string>
+	<key>Import</key>
+	<string>Import</string>
 	<key>Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.</key>
 	<string>Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.</string>
 	<key>Interface language</key>
@@ -276,6 +284,8 @@
 	<string>Markdown (.md)…</string>
 	<key>Match app</key>
 	<string>Match app</string>
+	<key>Match app theme</key>
+	<string>Match app theme</string>
 	<key>More actions</key>
 	<string>More actions</string>
 	<key>More actions for %@</key>
@@ -340,6 +350,8 @@
 	<string>Open the JustSessions website</string>
 	<key>Path on the host, such as ~/code/app</key>
 	<string>Path on the host, such as ~/code/app</string>
+	<key>Picks the light or dark version of color schemes that have both.</key>
+	<string>Picks the light or dark version of color schemes that have both.</string>
 	<key>Pin project</key>
 	<string>Pin project</string>
 	<key>Pin session</key>
@@ -466,6 +478,8 @@
 	<string>Smaller reading text</string>
 	<key>Smaller text</key>
 	<string>Smaller text</string>
+	<key>Some colors are missing, such as the text or background color.</key>
+	<string>Some colors are missing, such as the text or background color.</string>
 	<key>Start a native CLI in a project folder.</key>
 	<string>Start a native CLI in a project folder.</string>
 	<key>Start a new session in %@</key>
@@ -496,6 +510,8 @@
 	<string>Terminal</string>
 	<key>Terminal appearance preview</key>
 	<string>Terminal appearance preview</string>
+	<key>Terminals use the color scheme chosen in the Terminal tab.</key>
+	<string>Terminals use the color scheme chosen in the Terminal tab.</string>
 	<key>Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab.</key>
 	<string>Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab.</string>
 	<key>Terminals use the theme's dark colors, as set in the Terminal tab.</key>
@@ -530,6 +546,8 @@
 	<string>This changes the display name in JustSessions.</string>
 	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>
 	<string>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</string>
+	<key>This file isn't an iTerm2 color preset.</key>
+	<string>This file isn't an iTerm2 color preset.</string>
 	<key>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
 	<string>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</string>
 	<key>Tool</key>
@@ -564,6 +582,12 @@
 	<string>You</string>
 	<key>devbox or user@devbox.example.com</key>
 	<string>devbox or user@devbox.example.com</string>
+	<key>iTerm2 Color Preset File…</key>
+	<string>iTerm2 Color Preset File…</string>
+	<key>iTerm2 Default Profile</key>
+	<string>iTerm2 Default Profile</string>
+	<key>iTerm2 has no saved settings on this Mac.</key>
+	<string>iTerm2 has no saved settings on this Mac.</string>
 	<key>·</key>
 	<string>·</string>
 	<key>⌘N</key>

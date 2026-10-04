@@ -93,6 +93,44 @@ struct TerminalAppearanceRenderingTests {
         #expect(terminalView.getSelection()?.contains("Keep this output") == true)
     }
 
+    @Test func aPresetGivesTerminalsItsOwnColorsWhateverTheAppTheme() throws {
+        let settings = try IsolatedUserDefaults()
+        defer { settings.removeSuite() }
+        let store = TerminalAppearanceStore(userDefaults: settings.userDefaults)
+        let themeStore = AppThemeStore(userDefaults: settings.userDefaults)
+        store.setMode(.light)
+        let terminalView = makeTerminal(store: store, themeStore: themeStore)
+        terminalView.feed(text: "Keep this output")
+
+        store.setColorChoice(.preset(.gitHub))
+        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: TerminalPalette.gitHubLight.background))
+        themeStore.setTheme(.gruvbox)
+        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: TerminalPalette.gitHubLight.background))
+
+        store.setMode(.dark)
+        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: TerminalPalette.gitHubDark.background))
+        #expect(terminalView.nativeForegroundColor == NSColor(hexValue: TerminalPalette.gitHubDark.scheme.foreground))
+        #expect(terminalView.selectedTextBackgroundColor == NSColor(hexValue: TerminalPalette.gitHubDark.scheme.selectionBackground))
+        terminalView.selectAll()
+        #expect(terminalView.getSelection()?.contains("Keep this output") == true)
+    }
+
+    @Test func aSchemeWithOnlyADarkVersionKeepsTheTerminalDarkWhenLightIsSet() throws {
+        let settings = try IsolatedUserDefaults()
+        defer { settings.removeSuite() }
+        let store = TerminalAppearanceStore(userDefaults: settings.userDefaults)
+        store.setMode(.light)
+        store.setColorChoice(.preset(.dracula))
+        let terminalView = makeTerminal(store: store, themeStore: AppThemeStore(userDefaults: settings.userDefaults))
+
+        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: TerminalPalette.dracula.background))
+        #expect(terminalView.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua)
+
+        store.setColorChoice(.matchAppTheme)
+        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: AppThemeColors.justSessionsLight.contentSurface))
+        #expect(terminalView.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .aqua)
+    }
+
     private func makeTerminal(store: TerminalAppearanceStore, themeStore: AppThemeStore) -> SelectableTerminalView {
         SelectableTerminalView(frame: NSRect(x: 0, y: 0, width: 600, height: 400), appearanceStore: store, themeStore: themeStore)
     }

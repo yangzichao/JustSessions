@@ -13,6 +13,20 @@ final class TerminalAppearanceStore: ObservableObject {
         preferences = TerminalAppearancePreferences.load(from: userDefaults)
     }
 
+    func setColorChoice(_ colorChoice: TerminalColorChoice) {
+        var updated = preferences
+        updated.colorChoice = colorChoice
+        update(updated)
+    }
+
+    /// Saves colors read from iTerm2 or an .itermcolors file, replacing any imported before, and switches to them.
+    func useImportedColors(_ importedColors: ImportedTerminalColors) {
+        var updated = preferences
+        updated.importedColors = importedColors
+        updated.colorChoice = .imported
+        update(updated)
+    }
+
     func setMode(_ mode: TerminalAppearanceMode) {
         var updated = preferences
         updated.mode = mode

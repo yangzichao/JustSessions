@@ -32,7 +32,10 @@ struct AppAppearanceSettingsView: View {
 
     /// Terminals can have colors of their own, so say whether they follow this choice.
     private var terminalNote: LocalizedStringKey {
-        switch terminalAppearanceStore.preferences.mode {
+        guard terminalAppearanceStore.preferences.colorChoice == .matchAppTheme else {
+            return "Terminals use the color scheme chosen in the Terminal tab."
+        }
+        return switch terminalAppearanceStore.preferences.mode {
         case .matchApp: "Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab."
         case .light: "Terminals use the theme's light colors, as set in the Terminal tab."
         case .dark: "Terminals use the theme's dark colors, as set in the Terminal tab."

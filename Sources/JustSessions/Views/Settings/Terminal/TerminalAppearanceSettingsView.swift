@@ -1,9 +1,10 @@
 import SwiftUI
 
-/// The Terminal tab of Settings: colors, which match the app unless set here, and the font.
+/// The Terminal tab of Settings: the color scheme, which matches the app theme unless set here, its light or dark
+/// version, and the font.
 struct TerminalAppearanceSettingsView: View {
     @ObservedObject var appearanceStore: TerminalAppearanceStore
-    /// For the preview, which shows the theme's terminal colors.
+    /// For the preview, which can show the theme's terminal colors.
     let themeStore: AppThemeStore
 
     var body: some View {
@@ -11,7 +12,11 @@ struct TerminalAppearanceSettingsView: View {
             Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 16) {
                 GridRow {
                     Text("Colors")
-                    Picker("Colors", selection: Binding(
+                    TerminalColorSchemePicker(appearanceStore: appearanceStore)
+                }
+                GridRow {
+                    Text("Appearance")
+                    Picker("Appearance", selection: Binding(
                         get: { appearanceStore.preferences.mode },
                         set: { appearanceStore.setMode($0) }
                     )) {
@@ -21,6 +26,9 @@ struct TerminalAppearanceSettingsView: View {
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
+                    // The theme only matters here for whether the scheme has both versions, and every app theme does.
+                    .disabled(!appearanceStore.preferences.colorVariants(appTheme: themeStore.theme).hasLightAndDarkVersions)
+                    .help("Picks the light or dark version of color schemes that have both.")
                 }
                 GridRow {
                     Text("Font")

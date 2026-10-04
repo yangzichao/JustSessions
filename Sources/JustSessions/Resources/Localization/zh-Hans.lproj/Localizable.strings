@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>%@ (imported)</key>
+	<string>%@（已导入）</string>
 	<key>%@ could not be refreshed: %@</key>
 	<string>无法刷新 %@：%@</string>
 	<key>%@ has not saved this session yet · click to open its terminal</key>
@@ -120,6 +122,8 @@
 	<string>重新连接；仍在主机 tmux 中运行的 CLI 会重新接入</string>
 	<key>Copied</key>
 	<string>已复制</string>
+	<key>Copies the colors once. JustSessions doesn't read iTerm2's settings again.</key>
+	<string>只复制一次配色，之后 JustSessions 不会再读取 iTerm2 的设置。</string>
 	<key>Copy</key>
 	<string>复制</string>
 	<key>Copy %lld conversations</key>
@@ -144,6 +148,8 @@
 	<string>无法读取此会话</string>
 	<key>Could not start session</key>
 	<string>无法启动会话</string>
+	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
+	<string>找不到 iTerm2 的默认 Profile。动态 Profile 无法导入。</string>
 	<key>Dark</key>
 	<string>深色</string>
 	<key>Delete %lld sessions</key>
@@ -236,6 +242,8 @@
 	<string>主机</string>
 	<key>How it works</key>
 	<string>使用方式</string>
+	<key>Import</key>
+	<string>导入</string>
 	<key>Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.</key>
 	<string>也请在主机上安装 tmux，否则连接断开时 CLI 会停止。Antigravity 和 OpenCode 还需要 python3。</string>
 	<key>Interface language</key>
@@ -266,6 +274,8 @@
 	<string>加载后续消息</string>
 	<key>Match app</key>
 	<string>与应用一致</string>
+	<key>Match app theme</key>
+	<string>与应用主题一致</string>
 	<key>More actions</key>
 	<string>更多操作</string>
 	<key>More actions for %@</key>
@@ -332,6 +342,8 @@
 	<string>打开 JustSessions 网站</string>
 	<key>Path on the host, such as ~/code/app</key>
 	<string>主机上的路径，例如 ~/code/app</string>
+	<key>Picks the light or dark version of color schemes that have both.</key>
+	<string>为同时有浅色和深色版本的配色方案选择其中一个版本。</string>
 	<key>Pin project</key>
 	<string>置顶项目</string>
 	<key>Pin session</key>
@@ -460,6 +472,8 @@
 	<string>减小阅读字号</string>
 	<key>Smaller text</key>
 	<string>减小字号</string>
+	<key>Some colors are missing, such as the text or background color.</key>
+	<string>缺少部分颜色，例如文字或背景颜色。</string>
 	<key>Start a native CLI in a project folder.</key>
 	<string>在项目文件夹中启动原生 CLI。</string>
 	<key>Start a new session in %@</key>
@@ -492,6 +506,8 @@
 	<string>终端</string>
 	<key>Terminal appearance preview</key>
 	<string>终端外观预览</string>
+	<key>Terminals use the color scheme chosen in the Terminal tab.</key>
+	<string>终端使用「终端」标签中选择的配色方案。</string>
 	<key>Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab.</key>
 	<string>终端使用主题配色并与应用外观一致，除非你在「终端」标签中设为浅色或深色。</string>
 	<key>Terminals use the theme's dark colors, as set in the Terminal tab.</key>
@@ -526,6 +542,8 @@
 	<string>仅修改 JustSessions 中的显示名称。</string>
 	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>
 	<string>修改 JustSessions 中的显示名称，文件夹保持原样。留空可使用文件夹名称（%@）。</string>
+	<key>This file isn't an iTerm2 color preset.</key>
+	<string>此文件不是 iTerm2 配色预设。</string>
 	<key>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
 	<string>%@ 上的此会话将被永久删除。SSH 主机没有废纸篓，此操作无法撤销。</string>
 	<key>Tool</key>
@@ -558,5 +576,11 @@
 	<string>支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
 	<key>You</key>
 	<string>你</string>
+	<key>iTerm2 Color Preset File…</key>
+	<string>iTerm2 配色预设文件…</string>
+	<key>iTerm2 Default Profile</key>
+	<string>iTerm2 默认 Profile</string>
+	<key>iTerm2 has no saved settings on this Mac.</key>
+	<string>这台 Mac 上没有 iTerm2 的设置。</string>
 </dict>
 </plist>
