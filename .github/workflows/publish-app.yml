@@ -1,7 +1,7 @@
 name: Publish JustSessions release
 
 # Publishes only when a version tag such as v0.17.0 is pushed.
-# PRs and branch pushes are verified locally with make verify.
+# App changes are verified locally with make verify; website deployment is separate.
 on:
   push:
     tags: ['v*']
@@ -29,10 +29,6 @@ jobs:
           python-version: '3.12'
       - name: Test and build website
         run: make website-check
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: dist/JustSessions
 
   publish:
     needs: website-build
@@ -187,19 +183,3 @@ jobs:
               --notes "Signed, notarized JustSessions build. Includes tmux for local session persistence without a separate install; SSH hosts still need their own tmux. To install, open JustSessions.dmg and drag JustSessions into Applications. Sparkle updates use appcast.xml and JustSessions.zip." \
               --latest
           fi
-
-  website-deploy:
-    needs: [website-build, publish]
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - name: Publish to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

@@ -4,7 +4,7 @@ Describe the problem and resulting behavior.
 
 ## Local verification
 
-PRs and branch pushes do not run GitHub Actions. Complete this section for the current PR head before merging, and refresh it after every update.
+PRs and non-main branch pushes do not run GitHub Actions. Website deployment checks on `main` do not replace local app verification. Complete this section for the current PR head before merging, and refresh it after every update.
 
 - Tested commit SHA:
 - Verification date:

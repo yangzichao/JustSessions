@@ -46,9 +46,17 @@ Before publishing, build the site and check the homepage, guide, and Help page a
 
 ## Deployment and discovery
 
-The `Publish JustSessions release` GitHub Actions workflow builds the website from a pushed version tag and deploys it after the signed app is published. Pull requests and branch pushes do not run Actions; website changes on `main` become public at the next release. Run `make verify` locally and attach the results to the PR before merging. See [build and release](build-and-release.md).
+The independent `Publish JustSessions website` workflow tests, builds, and deploys the website when relevant files change on `main`. This includes website sources, screenshots, branding, website scripts, and the app capability sources and documentation checked by the website build. It does not build or publish the app. Run `make verify` and, for workflow changes, `actionlint` locally before pushing. See [build and release](build-and-release.md).
 
-Repository **Settings → Pages → Source** must be **GitHub Actions**. The `github-pages` environment's selected deployment branches and tags must include a tag rule for `v*`, so release tags can deploy. The deployment job uses narrowly scoped Pages and identity-token permissions.
+To redeploy without changing files or creating a version tag, choose **Actions → Publish JustSessions website → Run workflow → main**, or run:
+
+```sh
+gh workflow run publish-website.yml --ref main
+```
+
+Automatic and manual runs build current `main`; selecting another branch skips the build and deployment. The workflow records the checked-out source revision in its build summary. Runs are serialized across both build and deployment, and an active deployment finishes before the next starts. App releases retain website validation but do not deploy Pages, so an app release cannot replace a newer website with its tagged copy. Pull requests and other branch pushes do not deploy.
+
+Repository **Settings → Pages → Source** must be **GitHub Actions**. The `github-pages` environment's selected deployment branches must allow `main`. The deployment job uses narrowly scoped Pages and identity-token permissions.
 
 The canonical URLs, Open Graph tags, JSON-LD, 404 home link, and `WEBSITE_URL` in `Scripts/Website/validate_metadata.py` share the public URL. Update all of them together if introducing a custom domain. The repository Website field and README link should match. Keep the repository description and topics current with supported tools and the SSH/tmux workflow.
 

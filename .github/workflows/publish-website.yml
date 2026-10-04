@@ -1,0 +1,64 @@
+name: Publish JustSessions website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-website.yml'
+      - 'website/**'
+      - 'Scripts/Website/**'
+      - 'docs/images/**'
+      - 'Branding/**'
+      - 'README.md'
+      - 'docs/guides/session-storage.md'
+      - 'Sources/JustSessions/Models/Conversations/ConversationProvider.swift'
+      - 'Sources/JustSessions/Services/Transcript/TranscriptLoader.swift'
+      - 'Makefile'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Serialize the full workflow and build current main, including for manual reruns.
+# Finish an active deployment before starting the next one.
+concurrency:
+  group: publish-website
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Record website source revision
+        run: |
+          revision="$(git rev-parse HEAD)"
+          echo "Website source revision: $revision" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Test and build website
+        run: make website-check
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/JustSessions
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

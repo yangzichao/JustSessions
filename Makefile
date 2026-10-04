@@ -21,7 +21,7 @@ test:
 	@runtime_directory="$$(./Scripts/Tmux/build-runtime.sh)" && \
 	JUSTSESSIONS_TEST_TMUX_RUNTIME="$$runtime_directory" swift test
 
-# PRs and branch pushes do not run CI; verify the final commit locally before delivering or tagging it.
+# Website deployment checks do not replace local app verification before delivering or tagging.
 verify: website-check update-feed-test test localization-check build
 	./Scripts/Release/check-app-launches.sh "$(APP_BUNDLE_PATH)"
 
