@@ -54,13 +54,25 @@ extension ConversationStore {
         updateSidebarProjectList(updatedList)
     }
 
+    /// Archived projects for the restore list: by display name, then by key so equal names keep a stable order.
+    var archivedProjectPaths: [String] {
+        sidebarProjectList.removedProjectPaths.sorted { left, right in
+            switch projectDisplayName(forProjectPath: left)
+                .localizedCaseInsensitiveCompare(projectDisplayName(forProjectPath: right)) {
+            case .orderedAscending: true
+            case .orderedDescending: false
+            case .orderedSame: left < right
+            }
+        }
+    }
+
     func showProjectInSidebar(_ projectPath: String) {
         var updatedList = sidebarProjectList
         updatedList.show(projectPath)
         updateSidebarProjectList(updatedList)
     }
 
-    /// Only changes sidebar membership. Session files, open tabs, names, and pins are kept.
+    /// Archiving only changes sidebar membership. Session files, open tabs, names, and pins are kept.
     func removeProjectFromSidebar(_ projectPath: String) {
         removeProjectsFromSidebar([projectPath])
     }
@@ -72,8 +84,8 @@ extension ConversationStore {
         updateSidebarProjectList(updatedList)
     }
 
-    /// Starts deleting the project's deletable sessions, then removes the project from the sidebar right away.
-    /// Skipped sessions, such as those with open terminals, stay on disk and come back if the project is shown again.
+    /// Starts deleting the project's deletable sessions, then archives the project right away.
+    /// Skipped sessions, such as those with open terminals, stay on disk and come back if the project is restored.
     /// When the deletion cannot start, the project stays.
     func deleteSessionsAndRemoveProject(_ projectPath: String) {
         let plan = deletionPlan(for: projectPath)

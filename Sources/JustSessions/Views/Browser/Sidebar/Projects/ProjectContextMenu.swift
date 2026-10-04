@@ -37,7 +37,7 @@ struct ProjectContextMenu: View {
             store.setPinned(!project.isPinned, projectPath: project.projectPath)
         }
         Divider()
-        Button("Remove from sidebar", systemImage: "sidebar.left") {
+        Button("Archive project", systemImage: "archivebox") {
             store.removeProjectFromSidebar(project.id)
         }
         Divider()
@@ -49,7 +49,7 @@ struct ProjectContextMenu: View {
         )
         .disabled(!canDeleteSessions(deletionPlan))
         Button(
-            "Remove project and delete all sessions (\(deletionPlan.deletableConversations.count))…",
+            "Archive project and delete all sessions (\(deletionPlan.deletableConversations.count))…",
             systemImage: "trash",
             role: .destructive,
             action: onRemoveProjectAndDeleteSessions

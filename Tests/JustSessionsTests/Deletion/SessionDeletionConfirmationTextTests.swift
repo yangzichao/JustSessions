@@ -41,7 +41,7 @@ struct SessionDeletionConfirmationTextTests {
             + "SSH hosts have no Trash, so every session is permanently deleted.")
     }
 
-    @Test func projectRemovalSaysTheProjectLeavesTheSidebar() {
+    @Test func projectRemovalSaysTheProjectIsArchived() {
         let plan = SessionDeletionPlan(deletableConversations: [.fixture(), .fixture()], openTerminalCount: 1)
         let message = SessionDeletionConfirmationText.message(
             forDeletingProjectAt: ProjectLocation(host: .thisMac, path: "/Users/me/app"),
@@ -49,10 +49,10 @@ struct SessionDeletionConfirmationTextTests {
             removesProjectFromSidebar: true
         )
         #expect(message == "This affects all tools in /Users/me/app, including sessions hidden by the current filter. "
-            + "The project will be removed from the sidebar; skipped sessions stay on disk. "
+            + "The project will be archived; skipped sessions stay on disk and come back when it is restored. "
             + "Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted. "
             + "1 session with an open terminal will be skipped.")
-        #expect(SessionDeletionConfirmationText.projectRemovalButtonTitle(for: plan) == "Remove project and delete 2 sessions")
+        #expect(SessionDeletionConfirmationText.projectRemovalButtonTitle(for: plan) == "Archive project and delete 2 sessions")
     }
 
     @Test func selectionMentionsSkippedSessionsOnlyWhenThereAreSome() {

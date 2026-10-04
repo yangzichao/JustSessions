@@ -72,10 +72,32 @@
 	<string>All</string>
 	<key>All tools</key>
 	<string>All tools</string>
+	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
+	<string>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</string>
 	<key>Appearance</key>
 	<string>Appearance</string>
 	<key>Applies immediately to all terminals. Some CLI apps use their own colors.</key>
 	<string>Applies immediately to all terminals. Some CLI apps use their own colors.</string>
+	<key>Archive</key>
+	<string>Archive</string>
+	<key>Archive %lld projects</key>
+	<string>Archive %lld projects</string>
+	<key>Archive project</key>
+	<string>Archive project</string>
+	<key>Archive project and delete %lld sessions</key>
+	<string>Archive project and delete %lld sessions</string>
+	<key>Archive project and delete 1 session</key>
+	<string>Archive project and delete 1 session</string>
+	<key>Archive project and delete all sessions (%lld)…</key>
+	<string>Archive project and delete all sessions (%lld)…</string>
+	<key>Archive selected projects</key>
+	<string>Archive selected projects</string>
+	<key>Archive the selected projects; keep sessions and open terminals</key>
+	<string>Archive the selected projects; keep sessions and open terminals</string>
+	<key>Archived projects</key>
+	<string>Archived projects</string>
+	<key>Archived projects (%lld)…</key>
+	<string>Archived projects (%lld)…</string>
 	<key>At launch</key>
 	<string>At launch</string>
 	<key>A−</key>
@@ -182,6 +204,8 @@
 	<string>Deleting sessions</string>
 	<key>Deletion progress</key>
 	<string>Deletion progress</string>
+	<key>Done</key>
+	<string>Done</string>
 	<key>End and close this terminal</key>
 	<string>End and close this terminal</string>
 	<key>End on %@</key>
@@ -320,6 +344,8 @@
 	<string>Next match</string>
 	<key>Next match (⌘G or Return)</key>
 	<string>Next match (⌘G or Return)</string>
+	<key>No archived projects</key>
+	<string>No archived projects</string>
 	<key>No matches</key>
 	<string>No matches</string>
 	<key>No matching projects or sessions</key>
@@ -396,22 +422,8 @@
 	<string>Refresh sessions</string>
 	<key>Refreshing %@</key>
 	<string>Refreshing %@</string>
-	<key>Remove %lld projects from sidebar</key>
-	<string>Remove %lld projects from sidebar</string>
-	<key>Remove from sidebar</key>
-	<string>Remove from sidebar</string>
 	<key>Remove host</key>
 	<string>Remove host</string>
-	<key>Remove project and delete %lld sessions</key>
-	<string>Remove project and delete %lld sessions</string>
-	<key>Remove project and delete 1 session</key>
-	<string>Remove project and delete 1 session</string>
-	<key>Remove project and delete all sessions (%lld)…</key>
-	<string>Remove project and delete all sessions (%lld)…</string>
-	<key>Remove selected projects from sidebar</key>
-	<string>Remove selected projects from sidebar</string>
-	<key>Remove selected projects from the sidebar; keep sessions and open terminals</key>
-	<string>Remove selected projects from the sidebar; keep sessions and open terminals</string>
 	<key>Rename</key>
 	<string>Rename</string>
 	<key>Rename conversation</key>
@@ -424,8 +436,14 @@
 	<string>Reopen the tabs that were open when JustSessions quit</string>
 	<key>Report an issue ↗</key>
 	<string>Report an issue ↗</string>
+	<key>Restore</key>
+	<string>Restore</string>
+	<key>Restore %@</key>
+	<string>Restore %@</string>
 	<key>Restore Defaults</key>
 	<string>Restore Defaults</string>
+	<key>Restore archived projects to the sidebar</key>
+	<string>Restore archived projects to the sidebar</string>
 	<key>Resume</key>
 	<string>Resume</string>
 	<key>Reveal session file in Finder</key>
@@ -532,8 +550,8 @@
 	<string>The Pi session file and its associated folder will move to the macOS Trash.</string>
 	<key>The project folder no longer exists</key>
 	<string>The project folder no longer exists</string>
-	<key>The project will be removed from the sidebar; skipped sessions stay on disk.</key>
-	<string>The project will be removed from the sidebar; skipped sessions stay on disk.</string>
+	<key>The project will be archived; skipped sessions stay on disk and come back when it is restored.</key>
+	<string>The project will be archived; skipped sessions stay on disk and come back when it is restored.</string>
 	<key>The project will stay in the sidebar.</key>
 	<string>The project will stay in the sidebar.</string>
 	<key>The shell and anything still running in it will stop.</key>

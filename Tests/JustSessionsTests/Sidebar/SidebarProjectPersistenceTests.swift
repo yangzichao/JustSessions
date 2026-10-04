@@ -63,6 +63,36 @@ struct SidebarProjectPersistenceTests {
         #expect(relaunchedStore.sidebarProjectGroups.map(\.id) == [project.id])
     }
 
+    /// The footer's restore list orders projects by display name and shows them across hosts. Restoring one
+    /// lists its kept sessions again; the rest stay archived, including across a relaunch.
+    @Test func archivedProjectsListByDisplayNameAndRestoringOneListsItsSessionsAgain() throws {
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        RemoteHostList(hosts: ["devbox"]).save(to: isolatedUserDefaults.userDefaults)
+        let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        let zebra = Conversation.fixture(projectPath: "/work/zebra")
+        let remote = Conversation.fixture(projectPath: "/work/remote", host: .ssh("devbox"))
+        store.replaceConversations(on: .thisMac, with: [zebra])
+        store.replaceConversations(on: remote.host, with: [remote])
+        store.renameProject(zebra.projectDirectoryKey, to: "Alpha tools")
+
+        #expect(store.archivedProjectPaths.isEmpty)
+        store.removeProjectsFromSidebar([zebra.projectDirectoryKey, remote.projectDirectoryKey])
+
+        #expect(store.sidebarProjectGroups.isEmpty)
+        #expect(store.archivedProjectPaths == [zebra.projectDirectoryKey, remote.projectDirectoryKey])
+
+        store.showProjectInSidebar(zebra.projectDirectoryKey)
+
+        #expect(store.archivedProjectPaths == [remote.projectDirectoryKey])
+        let restored = try #require(store.sidebarProjectGroups.first { $0.id == zebra.projectDirectoryKey })
+        #expect(restored.conversations.map(\.id) == [zebra.id])
+        #expect(restored.displayName == "Alpha tools")
+
+        let relaunchedStore = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        #expect(relaunchedStore.archivedProjectPaths == [remote.projectDirectoryKey])
+    }
+
     @Test func samePathOnDifferentHostsHasIndependentSidebarMembership() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
