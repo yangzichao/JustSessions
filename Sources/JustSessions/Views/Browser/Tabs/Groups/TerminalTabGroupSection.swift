@@ -47,9 +47,13 @@ struct TerminalTabGroupSection: View {
                     width: tabWidth,
                     isSelected: store.selectedTerminalID == session.id,
                     showsLeadingSeparator: index > 0 && !standsOut(session.id) && !standsOut(shownTabs[index - 1].id),
+                    splitMenu: splitMenu(for: session.id),
                     onHoverChange: { trackHover(of: session.id, isHovering: $0) },
                     onSelect: { store.selectTerminal(session.id) },
                     onRename: onRenameConversation,
+                    onOpenInSplitView: { store.splitSelectedTerminal(with: session.id) },
+                    onSwapSplitSides: { store.swapSplitSides() },
+                    onLeaveSplitView: { store.endSplit() },
                     onClose: { onCloseTab(session.id) }
                 )
                 .id(session.id)
@@ -60,6 +64,13 @@ struct TerminalTabGroupSection: View {
                 .fill(color.opacity(0.8))
                 .frame(height: 2)
         }
+    }
+
+    /// A pair tab offers the split's own actions; any other tab beside the selected one can join it in a split.
+    private func splitMenu(for tabID: UUID) -> TerminalTabSplitMenu? {
+        if store.terminalSplitPair?.contains(tabID) == true { return .linkedInPair }
+        guard let selectedTerminalID = store.selectedTerminalID, selectedTerminalID != tabID else { return nil }
+        return .joinsSelectedTab
     }
 
     /// The selected and the hovered tab draw a shape of their own, so no separator runs beside them.

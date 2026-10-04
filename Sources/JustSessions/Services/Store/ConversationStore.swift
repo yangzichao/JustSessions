@@ -32,6 +32,9 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var selectedTerminalID: UUID? {
         didSet { selectedTerminal?.startNowThatItIsShown() }
     }
+    /// Two tabs linked side by side, as in Chrome's split view, or nil with no split made. The pair outlives
+    /// the selection; both terminals show only while one of them is selected, see `shownSplitPair`.
+    @Published private(set) var terminalSplitPair: TerminalSplitPair?
     /// Every conversation queued in the running deletion, of one session or several. It changes only when a
     /// deletion starts and ends; `deletionProgress` follows the sessions in between.
     @Published private(set) var pendingDeletionConversationIDs: Set<String> = []
@@ -441,12 +444,14 @@ final class ConversationStore: ObservableObject {
 
     // MARK: - Tabs
 
-    /// Swaps a tab for another in the same place, closing the old one; keeps it selected if it was.
+    /// Swaps a tab for another in the same place, closing the old one; keeps it selected if it was, and keeps
+    /// its side of a split.
     func replaceTerminal(at index: Int, with session: TerminalSession) {
         defer { persistOpenTabs() }
         let replacedID = terminalSessions[index].id
         terminalSessions[index].close()
         terminalSessions[index] = session
+        terminalSplitPair = terminalSplitPair?.replacing(replacedID, with: session.id)
         if selectedTerminalID == replacedID { selectedTerminalID = session.id }
     }
 
@@ -474,6 +479,31 @@ final class ConversationStore: ObservableObject {
         terminalSessions.first { $0.id == selectedTerminalID }
     }
 
+    // MARK: - Split view
+
+    /// The pair while the selected tab is half of it, when both panes show side by side.
+    var shownSplitPair: TerminalSplitPair? {
+        guard let terminalSplitPair, let selectedTerminalID, terminalSplitPair.contains(selectedTerminalID) else { return nil }
+        return terminalSplitPair
+    }
+
+    /// Links the tab beside the selected tab, which keeps the keyboard and the left pane, as Chrome adds a tab
+    /// to a split view. A pair already linked is replaced; there is one split at a time.
+    func splitSelectedTerminal(with id: UUID) {
+        guard let selectedTerminalID, selectedTerminalID != id,
+              terminalSessions.contains(where: { $0.id == id }) else { return }
+        terminalSplitPair = TerminalSplitPair(leadingID: selectedTerminalID, trailingID: id)
+    }
+
+    func swapSplitSides() {
+        terminalSplitPair = terminalSplitPair?.swapped
+    }
+
+    /// Unlinks the pair; the selected tab stays, alone again.
+    func endSplit() {
+        terminalSplitPair = nil
+    }
+
     /// Leaving a new session's tab refreshes its host, so what its CLI saved so far is listed.
     func selectTerminal(_ id: UUID?) {
         guard selectedTerminalID != id else { return }
@@ -487,13 +517,16 @@ final class ConversationStore: ObservableObject {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }) else { return }
         defer { persistOpenTabs() }
         let closedTab = terminalSessions[index]
+        // Closing half of a split unlinks it; closing the shown half leaves the other half in front, full width.
+        let splitCounterpart = terminalSplitPair?.counterpart(of: id)
+        if splitCounterpart != nil { terminalSplitPair = nil }
         let indexToSelect = TerminalTabOrder.indexToSelect(
             afterClosingTabAt: index,
             amongTabProjectKeys: terminalSessions.map(\.projectDirectoryKey)
         )
         closedTab.close()
         terminalSessions.remove(at: index)
-        if selectedTerminalID == id { selectedTerminalID = indexToSelect.map { terminalSessions[$0].id } }
+        if selectedTerminalID == id { selectedTerminalID = splitCounterpart ?? indexToSelect.map { terminalSessions[$0].id } }
         if closedTab.startsNewSession { refresh(closedTab.host) }
     }
 
@@ -501,6 +534,7 @@ final class ConversationStore: ObservableObject {
         defer { persistOpenTabs() }
         for session in terminalSessions { session.close() }
         terminalSessions = []
+        terminalSplitPair = nil
         selectedTerminalID = nil
     }
 

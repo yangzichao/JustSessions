@@ -372,6 +372,8 @@
 	<string>Latest message</string>
 	<key>Launch JustSessions at login</key>
 	<string>Launch JustSessions at login</string>
+	<key>Leave split view</key>
+	<string>Leave split view</string>
 	<key>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</key>
 	<string>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</string>
 	<key>Light</key>
@@ -468,6 +470,8 @@
 	<string>Open in a separate reading window</string>
 	<key>Open in new window</key>
 	<string>Open in new window</string>
+	<key>Open in split view</key>
+	<string>Open in split view</string>
 	<key>Open project in</key>
 	<string>Open project in</string>
 	<key>Open project in Finder</key>
@@ -626,6 +630,8 @@
 	<string>Software updates</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>Some colors are missing, such as the text or background color.</string>
+	<key>Split view divider</key>
+	<string>Split view divider</string>
 	<key>Start a native CLI or a plain terminal in a project folder.</key>
 	<string>Start a native CLI or a plain terminal in a project folder.</string>
 	<key>Start a new session in %@</key>
@@ -644,6 +650,8 @@
 	<string>Stopping deletion</string>
 	<key>Stopping…</key>
 	<string>Stopping…</string>
+	<key>Swap split sides</key>
+	<string>Swap split sides</string>
 	<key>Switches between a readable width and the full window width</key>
 	<string>Switches between a readable width and the full window width</string>
 	<key>System</key>

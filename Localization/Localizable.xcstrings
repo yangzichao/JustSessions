@@ -1963,6 +1963,16 @@
         }
       }
     },
+    "Leave split view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退出拆分视图"
+          }
+        }
+      }
+    },
     "Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.": {
       "localizations": {
         "zh-Hans": {
@@ -2448,6 +2458,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "在新窗口中打开"
+          }
+        }
+      }
+    },
+    "Open in split view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在拆分视图中打开"
           }
         }
       }
@@ -3270,6 +3290,16 @@
         }
       }
     },
+    "Split view divider": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拆分视图分隔条"
+          }
+        }
+      }
+    },
     "Start a native CLI or a plain terminal in a project folder.": {
       "localizations": {
         "zh-Hans": {
@@ -3372,6 +3402,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在停止…"
+          }
+        }
+      }
+    },
+    "Swap split sides": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交换拆分两侧"
           }
         }
       }

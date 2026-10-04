@@ -362,6 +362,8 @@
 	<string>最新消息</string>
 	<key>Launch JustSessions at login</key>
 	<string>开机启动 JustSessions</string>
+	<key>Leave split view</key>
+	<string>退出拆分视图</string>
 	<key>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</key>
 	<string>让 JustSessions 在会话需要你的输入或完成本轮回复时通知你。在「通用」中选择通知哪些情况。</string>
 	<key>Light</key>
@@ -458,6 +460,8 @@
 	<string>在独立阅读窗口中打开</string>
 	<key>Open in new window</key>
 	<string>在新窗口中打开</string>
+	<key>Open in split view</key>
+	<string>在拆分视图中打开</string>
 	<key>Open project in</key>
 	<string>打开项目于</string>
 	<key>Open project in Finder</key>
@@ -618,6 +622,8 @@
 	<string>软件更新</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>缺少部分颜色，例如文字或背景颜色。</string>
+	<key>Split view divider</key>
+	<string>拆分视图分隔条</string>
 	<key>Start a native CLI or a plain terminal in a project folder.</key>
 	<string>在项目文件夹中启动原生 CLI 或普通终端。</string>
 	<key>Start a new session in %@</key>
@@ -638,6 +644,8 @@
 	<string>正在停止删除</string>
 	<key>Stopping…</key>
 	<string>正在停止…</string>
+	<key>Swap split sides</key>
+	<string>交换拆分两侧</string>
 	<key>Switches between a readable width and the full window width</key>
 	<string>在适合阅读的宽度和窗口全宽之间切换</string>
 	<key>System</key>
