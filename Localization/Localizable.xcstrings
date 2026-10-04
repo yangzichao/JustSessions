@@ -776,16 +776,6 @@
         }
       }
     },
-    "Clear search": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "清空搜索"
-          }
-        }
-      }
-    },
     "Click a session to read it. Nothing runs.": {
       "localizations": {
         "zh-Hans": {
@@ -882,6 +872,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "折叠标签组"
+          }
+        }
+      }
+    },
+    "Collapse open tabs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收起打开的标签"
           }
         }
       }
@@ -1366,6 +1366,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "展开标签组"
+          }
+        }
+      }
+    },
+    "Expand open tabs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "展开打开的标签"
           }
         }
       }
@@ -2024,6 +2034,16 @@
         }
       }
     },
+    "New session (⌘N)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建会话（⌘N）"
+          }
+        }
+      }
+    },
     "New session in %@": {
       "localizations": {
         "zh-Hans": {
@@ -2286,6 +2306,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "在 Finder 中打开项目"
+          }
+        }
+      }
+    },
+    "Open tabs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开的标签"
           }
         }
       }
@@ -3004,16 +3034,6 @@
         }
       }
     },
-    "Start an installed coding CLI in a project folder": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在项目文件夹中启动已安装的编程 CLI"
-          }
-        }
-      }
-    },
     "Start session": {
       "localizations": {
         "zh-Hans": {
@@ -3518,9 +3538,6 @@
       }
     },
     "·": {
-      "shouldTranslate": false
-    },
-    "⌘N": {
       "shouldTranslate": false
     }
   },

@@ -136,8 +136,6 @@
 	<string>本机的 Claude Code、Antigravity 和 Pi 会话将移到废纸篓。Codex、Kiro CLI、OpenCode 会话和 SSH 主机上的所有会话将被永久删除。</string>
 	<key>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
 	<string>主机上的 Claude Code、Codex、Antigravity、Kiro CLI、OpenCode 和 Pi 会话会列在侧栏中，并通过 SSH 打开。请使用 ~/.ssh/config 中的主机别名或 user@hostname。`ssh &lt;host&gt;` 必须能够免密连接，主机还需要 rsync。Antigravity 和 OpenCode 还需要 python3；删除 Antigravity 会话还需要 lsof。在远程主机上安装 tmux，可让会话在断线或关闭标签后继续运行；点击会话即可重新连接。应用内置的 tmux 仅适用于此 Mac。</string>
-	<key>Clear search</key>
-	<string>清空搜索</string>
 	<key>Click a session to read it. Nothing runs.</key>
 	<string>点击会话即可阅读，不会启动任何 CLI。</string>
 	<key>Close %@</key>
@@ -158,6 +156,8 @@
 	<string>关闭终端…</string>
 	<key>Collapse Group</key>
 	<string>折叠标签组</string>
+	<key>Collapse open tabs</key>
+	<string>收起打开的标签</string>
 	<key>Collapse project</key>
 	<string>折叠项目</string>
 	<key>Colors</key>
@@ -244,6 +244,8 @@
 	<string>已退出（%d）</string>
 	<key>Expand Group</key>
 	<string>展开标签组</string>
+	<key>Expand open tabs</key>
+	<string>展开打开的标签</string>
 	<key>Expand project</key>
 	<string>展开项目</string>
 	<key>Export</key>
@@ -370,6 +372,8 @@
 	<string>新建窗口</string>
 	<key>New session</key>
 	<string>新建会话</string>
+	<key>New session (⌘N)</key>
+	<string>新建会话（⌘N）</string>
 	<key>New session in %@</key>
 	<string>在 %@ 中新建会话</string>
 	<key>New terminal</key>
@@ -422,6 +426,8 @@
 	<string>打开项目于</string>
 	<key>Open project in Finder</key>
 	<string>在 Finder 中打开项目</string>
+	<key>Open tabs</key>
+	<string>打开的标签</string>
 	<key>Open terminal</key>
 	<string>打开终端</string>
 	<key>Open the JustSessions website</key>
@@ -560,8 +566,6 @@
 	<string>在 %@ 中新建会话</string>
 	<key>Start a new session in %@ on %@</key>
 	<string>在 %2$@ 的 %1$@ 中新建会话</string>
-	<key>Start an installed coding CLI in a project folder</key>
-	<string>在项目文件夹中启动已安装的编程 CLI</string>
 	<key>Start session</key>
 	<string>开始会话</string>
 	<key>Startup</key>

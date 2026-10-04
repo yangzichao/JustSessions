@@ -1,25 +1,23 @@
 import SwiftUI
 
-/// Host actions sit above the permanent app settings and support controls.
+/// One line: adding an SSH host, then settings, updates, and help as icons.
 struct SidebarFooter: View {
     let onAddRemoteHost: () -> Void
     let onCheckForUpdates: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        HStack(spacing: 4) {
             SidebarAddRemoteHostButton(action: onAddRemoteHost)
-                .frame(height: 28)
-
-            HStack(spacing: 8) {
-                SidebarSettingsLink()
-                checkForUpdatesButton
-                SidebarHelpButton()
-            }
+            Spacer(minLength: 4)
+            SidebarSettingsLink()
+            checkForUpdatesButton
+            SidebarHelpButton()
         }
         .buttonStyle(.borderless)
         .font(.system(size: 12))
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
+        .padding(.leading, 16)
+        .padding(.trailing, 10)
+        .padding(.vertical, 4)
     }
 
     private var checkForUpdatesButton: some View {

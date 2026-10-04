@@ -5,9 +5,8 @@ struct SidebarSettingsLink: View {
     var body: some View {
         SettingsLink {
             Label("Settings", systemImage: "gearshape")
-                .labelStyle(.titleAndIcon)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .frame(height: 30)
+                .labelStyle(.iconOnly)
+                .frame(width: 26, height: 30)
                 .contentShape(Rectangle())
         }
         .help("Settings (⌘,)")

@@ -61,7 +61,8 @@ struct ConversationBrowserView: View {
                 },
                 onRenameConversation: onRename,
                 onRenameProject: onRenameProject,
-                onRequestDeletion: onRequestDeletion
+                onRequestDeletion: onRequestDeletion,
+                onCloseTerminal: { requestClosingTerminal($0) }
             )
         } detail: {
             WorkspaceDetailView(

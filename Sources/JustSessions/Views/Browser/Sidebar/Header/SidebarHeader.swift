@@ -1,0 +1,68 @@
+import SwiftUI
+
+/// One short line for the app mark and name, then search, refresh, and new session as icons, so the session list gets
+/// the height. Search opens into a field across the whole line, and goes back to its icon when closed, or once it is
+/// empty and loses focus.
+struct SidebarHeader: View {
+    @ObservedObject var store: ConversationStore
+    @Binding var searchText: String
+    let onNewSession: () -> Void
+
+    @State private var isSearchOpen = false
+
+    /// A search with text stays open, so the list is never narrowed by a field out of sight.
+    private var isSearchShown: Bool {
+        isSearchOpen || !searchText.isEmpty
+    }
+
+    var body: some View {
+        Group {
+            if isSearchShown {
+                SidebarSearchField(
+                    text: $searchText,
+                    placeholder: "Search projects and sessions",
+                    accessibilityLabel: "Search projects by name or path and sessions by title or ID",
+                    onClose: closeSearch
+                )
+            } else {
+                markAndActions
+            }
+        }
+        .frame(height: 46)
+    }
+
+    private var markAndActions: some View {
+        HStack(spacing: 8) {
+            JustSessionsMark()
+                .frame(width: 21, height: 18)
+            Text("JustSessions")
+                .font(.system(size: 13, weight: .semibold))
+                .lineLimit(1)
+            Spacer(minLength: 4)
+            HStack(spacing: 4) {
+                searchButton
+                SidebarRefreshButton(store: store)
+                SidebarNewSessionButton(action: onNewSession)
+            }
+            .layoutPriority(1)
+        }
+        .padding(.leading, 18)
+        .padding(.trailing, 12)
+    }
+
+    private var searchButton: some View {
+        Button { isSearchOpen = true } label: {
+            Image(systemName: "magnifyingglass")
+                .frame(width: 24, height: 24)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.borderless)
+        .help("Search projects and sessions")
+        .accessibilityLabel("Search projects and sessions")
+    }
+
+    private func closeSearch() {
+        searchText = ""
+        isSearchOpen = false
+    }
+}

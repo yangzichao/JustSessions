@@ -150,8 +150,6 @@
 	<string>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</string>
 	<key>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
 	<string>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</string>
-	<key>Clear search</key>
-	<string>Clear search</string>
 	<key>Click a session to read it. Nothing runs.</key>
 	<string>Click a session to read it. Nothing runs.</string>
 	<key>Close %@</key>
@@ -172,6 +170,8 @@
 	<string>Close terminal…</string>
 	<key>Collapse Group</key>
 	<string>Collapse Group</string>
+	<key>Collapse open tabs</key>
+	<string>Collapse open tabs</string>
 	<key>Collapse project</key>
 	<string>Collapse project</string>
 	<key>Colors</key>
@@ -252,6 +252,8 @@
 	<string>Exited (%d)</string>
 	<key>Expand Group</key>
 	<string>Expand Group</string>
+	<key>Expand open tabs</key>
+	<string>Expand open tabs</string>
 	<key>Expand project</key>
 	<string>Expand project</string>
 	<key>Export</key>
@@ -380,6 +382,8 @@
 	<string>New Window</string>
 	<key>New session</key>
 	<string>New session</string>
+	<key>New session (⌘N)</key>
+	<string>New session (⌘N)</string>
 	<key>New session in %@</key>
 	<string>New session in %@</string>
 	<key>New terminal</key>
@@ -430,6 +434,8 @@
 	<string>Open project in</string>
 	<key>Open project in Finder</key>
 	<string>Open project in Finder</string>
+	<key>Open tabs</key>
+	<string>Open tabs</string>
 	<key>Open terminal</key>
 	<string>Open terminal</string>
 	<key>Open the JustSessions website</key>
@@ -564,8 +570,6 @@
 	<string>Start a native CLI or a plain terminal in a project folder.</string>
 	<key>Start a new session in %@</key>
 	<string>Start a new session in %@</string>
-	<key>Start an installed coding CLI in a project folder</key>
-	<string>Start an installed coding CLI in a project folder</string>
 	<key>Start session</key>
 	<string>Start session</string>
 	<key>Startup</key>
@@ -670,7 +674,5 @@
 	<string>macOS doesn't let apps check this. Look for JustSessions in System Settings.</string>
 	<key>·</key>
 	<string>·</string>
-	<key>⌘N</key>
-	<string>⌘N</string>
 </dict>
 </plist>

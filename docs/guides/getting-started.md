@@ -33,7 +33,7 @@ A session whose CLI is already running opens on that process with one click. Sea
 
 Click the new-window button in the preview's reading toolbar to open a dedicated reading window. Adjust text with **A− / A+**, switch between a readable column and the full window width, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
 
-**New session** starts an installed CLI in a project folder, or choose **Terminal** there to open your login shell instead. A project's **+** menu offers the same. Project tab groups and [keyboard shortcuts](session-management.md#tab-keyboard-shortcuts) help you switch between open terminals.
+The **+** at the top of the sidebar, or **⌘N**, opens **New session**: start an installed CLI in a project folder, or choose **Terminal** to open your login shell instead. A project's **+** menu offers the same. Project tab groups and [keyboard shortcuts](session-management.md#tab-keyboard-shortcuts) help you switch between open terminals.
 
 ## Use another machine over SSH
 

@@ -16,6 +16,7 @@ struct ConversationSidebarView: View {
     let onRenameConversation: (Conversation) -> Void
     let onRenameProject: (ProjectConversationGroup) -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
+    let onCloseTerminal: (UUID) -> Void
 
     @State private var projectExpansion = ProjectExpansion()
     @State private var projectSelection = ProjectMultiSelection()
@@ -72,14 +73,7 @@ struct ConversationSidebarView: View {
         let selectedConversations = selectedConversations
 
         VStack(alignment: .leading, spacing: 0) {
-            SidebarHeader(store: store)
-            SidebarNewSessionButton(action: onNewSession)
-            SidebarSearchField(
-                text: $searchText,
-                placeholder: "Search projects and sessions",
-                accessibilityLabel: "Search projects by name or path and sessions by title or ID"
-            )
-            .padding(.top, 8)
+            SidebarHeader(store: store, searchText: $searchText, onNewSession: onNewSession)
             SidebarFilterBar(
                 recencyFilter: $recencyFilter,
                 providerFilter: $providerFilter,
@@ -87,7 +81,11 @@ struct ConversationSidebarView: View {
                 allSessionCount: allSessionCount,
                 recentSessionCount: recentSessionCount
             )
-            .padding(.top, 8)
+
+            if !store.terminalSessions.isEmpty {
+                SidebarOpenTabsSection(store: store, onSelectTab: selectTab, onCloseTab: onCloseTerminal)
+                ThemeDivider()
+            }
 
             ScrollViewReader { scrollProxy in
                 SidebarSelectionScrollView(
@@ -125,11 +123,7 @@ struct ConversationSidebarView: View {
                                         store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
                                     },
                                     onClickConversation: handleConversationClick,
-                                    onSelectPendingNewSession: { terminalID in
-                                        projectSelection.clear()
-                                        sessionSelection.clear()
-                                        store.selectTerminal(terminalID)
-                                    },
+                                    onSelectPendingNewSession: selectTab,
                                     onRenameConversation: onRenameConversation,
                                     onRenameProject: { onRenameProject(project) },
                                     onRemoveSelectedProjects: removeSelectedProjects,
@@ -269,6 +263,13 @@ struct ConversationSidebarView: View {
                 store.launch(conversation, action: .resume)
             }
         }
+    }
+
+    /// Shows the tab's terminal; the rows highlighted for it replace any selection in the list.
+    private func selectTab(_ terminalID: UUID) {
+        projectSelection.clear()
+        sessionSelection.clear()
+        store.selectTerminal(terminalID)
     }
 
     private func handleProjectClick(_ project: ProjectConversationGroup) {
