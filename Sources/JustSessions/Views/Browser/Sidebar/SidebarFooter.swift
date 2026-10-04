@@ -2,20 +2,11 @@ import SwiftUI
 
 /// Host actions sit above the permanent app settings and support controls.
 struct SidebarFooter: View {
-    let archivedProjectCount: Int
-    let onShowArchivedProjects: () -> Void
     let onAddRemoteHost: () -> Void
     let onCheckForUpdates: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            if archivedProjectCount > 0 {
-                Button(action: onShowArchivedProjects) {
-                    Label("Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox")
-                }
-                .help("Restore archived projects to the sidebar")
-                .frame(height: 28)
-            }
             SidebarAddRemoteHostButton(action: onAddRemoteHost)
                 .frame(height: 28)
 

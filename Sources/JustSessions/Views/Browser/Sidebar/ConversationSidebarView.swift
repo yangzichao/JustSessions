@@ -21,7 +21,8 @@ struct ConversationSidebarView: View {
     @State private var projectExpansion = ProjectExpansion()
     @State private var projectSelection = ProjectMultiSelection()
     @State private var isAddRemoteHostSheetPresented = false
-    @State private var isArchivedProjectsSheetPresented = false
+    /// The host whose archived projects are listed, from its heading's context menu.
+    @State private var hostShowingArchivedProjects: SessionHost?
     /// Set once a deletion of several sessions has run for `deletionProgressBarDelay`, so a quick one never
     /// flashes the progress bar.
     @State private var isDeletionProgressBarShown = false
@@ -157,8 +158,6 @@ struct ConversationSidebarView: View {
 
             ThemeDivider()
             SidebarFooter(
-                archivedProjectCount: store.archivedProjectPaths.count,
-                onShowArchivedProjects: { isArchivedProjectsSheetPresented = true },
                 onAddRemoteHost: { isAddRemoteHostSheetPresented = true },
                 onCheckForUpdates: onCheckForUpdates
             )
@@ -167,8 +166,8 @@ struct ConversationSidebarView: View {
         .sheet(isPresented: $isAddRemoteHostSheetPresented) {
             AddRemoteHostSheet(store: store)
         }
-        .sheet(isPresented: $isArchivedProjectsSheetPresented) {
-            ArchivedProjectsSheet(store: store)
+        .sheet(item: $hostShowingArchivedProjects) { host in
+            ArchivedProjectsSheet(store: store, host: host)
         }
         .onAppear { expandProjectsWithOpenTerminals() }
         .onChange(of: store.terminalSessions.map(\.id)) { _, _ in
@@ -206,6 +205,8 @@ struct ConversationSidebarView: View {
             onNewSession: { onNewSessionOnHost(section.host) },
             onRefresh: { store.refresh(section.host) },
             isRefreshDisabled: store.isDeletingSessions,
+            archivedProjectCount: store.archivedProjectPaths(on: section.host).count,
+            onShowArchivedProjects: { hostShowingArchivedProjects = section.host },
             onRemove: section.host.sshDestination.map { destination in { store.removeRemoteHost(destination) } }
         )
     }

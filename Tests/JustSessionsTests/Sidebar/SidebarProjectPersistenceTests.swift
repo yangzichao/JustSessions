@@ -63,8 +63,8 @@ struct SidebarProjectPersistenceTests {
         #expect(relaunchedStore.sidebarProjectGroups.map(\.id) == [project.id])
     }
 
-    /// The footer's restore list orders projects by display name and shows them across hosts. Restoring one
-    /// lists its kept sessions again; the rest stay archived, including across a relaunch.
+    /// Archived projects are ordered by display name across hosts. Restoring one lists its kept sessions again; the
+    /// rest stay archived, including across a relaunch.
     @Test func archivedProjectsListByDisplayNameAndRestoringOneListsItsSessionsAgain() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
@@ -81,6 +81,9 @@ struct SidebarProjectPersistenceTests {
 
         #expect(store.sidebarProjectGroups.isEmpty)
         #expect(store.archivedProjectPaths == [zebra.projectDirectoryKey, remote.projectDirectoryKey])
+        // Each host heading's restore list holds only that host's projects.
+        #expect(store.archivedProjectPaths(on: .thisMac) == [zebra.projectDirectoryKey])
+        #expect(store.archivedProjectPaths(on: remote.host) == [remote.projectDirectoryKey])
 
         store.showProjectInSidebar(zebra.projectDirectoryKey)
 

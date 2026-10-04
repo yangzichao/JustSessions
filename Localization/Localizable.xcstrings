@@ -495,22 +495,22 @@
         }
       }
     },
-    "Archived projects": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已归档的项目"
-          }
-        }
-      }
-    },
     "Archived projects (%lld)…": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "已归档的项目（%lld）…"
+          }
+        }
+      }
+    },
+    "Archived projects on %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 上已归档的项目"
           }
         }
       }
@@ -2546,16 +2546,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "恢复默认设置"
-          }
-        }
-      }
-    },
-    "Restore archived projects to the sidebar": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将已归档的项目恢复到侧栏"
           }
         }
       }

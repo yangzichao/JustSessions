@@ -98,10 +98,10 @@
 	<string>Archive selected projects</string>
 	<key>Archive the selected projects; keep sessions and open terminals</key>
 	<string>Archive the selected projects; keep sessions and open terminals</string>
-	<key>Archived projects</key>
-	<string>Archived projects</string>
 	<key>Archived projects (%lld)…</key>
 	<string>Archived projects (%lld)…</string>
+	<key>Archived projects on %@</key>
+	<string>Archived projects on %@</string>
 	<key>Ask Now</key>
 	<string>Ask Now</string>
 	<key>At launch</key>
@@ -482,8 +482,6 @@
 	<string>Restore %@</string>
 	<key>Restore Defaults</key>
 	<string>Restore Defaults</string>
-	<key>Restore archived projects to the sidebar</key>
-	<string>Restore archived projects to the sidebar</string>
 	<key>Restores the terminal colors, font, and size.</key>
 	<string>Restores the terminal colors, font, and size.</string>
 	<key>Resume</key>

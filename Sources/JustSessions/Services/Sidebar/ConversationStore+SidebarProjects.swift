@@ -66,6 +66,11 @@ extension ConversationStore {
         }
     }
 
+    /// One host's archived projects, in the restore list's order, for the list opened from that host's heading.
+    func archivedProjectPaths(on host: SessionHost) -> [String] {
+        archivedProjectPaths.filter { ProjectLocation(key: $0).host == host }
+    }
+
     func showProjectInSidebar(_ projectPath: String) {
         var updatedList = sidebarProjectList
         updatedList.show(projectPath)

@@ -84,10 +84,10 @@
 	<string>归档所选项目</string>
 	<key>Archive the selected projects; keep sessions and open terminals</key>
 	<string>归档所选项目；保留会话和已打开的终端</string>
-	<key>Archived projects</key>
-	<string>已归档的项目</string>
 	<key>Archived projects (%lld)…</key>
 	<string>已归档的项目（%lld）…</string>
+	<key>Archived projects on %@</key>
+	<string>%@ 上已归档的项目</string>
 	<key>Ask Now</key>
 	<string>立即请求</string>
 	<key>At launch</key>
@@ -474,8 +474,6 @@
 	<string>恢复 %@</string>
 	<key>Restore Defaults</key>
 	<string>恢复默认设置</string>
-	<key>Restore archived projects to the sidebar</key>
-	<string>将已归档的项目恢复到侧栏</string>
 	<key>Restores the terminal colors, font, and size.</key>
 	<string>恢复终端的配色、字体和字号。</string>
 	<key>Resume</key>

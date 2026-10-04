@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// A host's heading above its projects: its name, how its last refresh went, and its project count, which gives way
-/// to a + for a new session there while the pointer is over it. Right-click to refresh the host or remove an SSH host.
+/// to a + for a new session there while the pointer is over it. Right-click to refresh the host, restore its archived
+/// projects, or remove an SSH host.
 /// The heading is shown even while this Mac is the only host, so the sidebar always reads by host; in that case it
 /// leaves refresh progress to the sidebar header.
 struct SidebarHostHeading: View {
@@ -13,6 +14,8 @@ struct SidebarHostHeading: View {
     let onRefresh: () -> Void
     /// While sessions are being deleted, refreshing waits, as the sidebar header's button does.
     let isRefreshDisabled: Bool
+    let archivedProjectCount: Int
+    let onShowArchivedProjects: () -> Void
     /// Nil for this Mac, which is always listed.
     let onRemove: (() -> Void)?
 
@@ -49,6 +52,10 @@ struct SidebarHostHeading: View {
             Button("New session on \(host.displayName)…", systemImage: "plus", action: onNewSession)
             Button("Refresh", systemImage: "arrow.clockwise", action: onRefresh)
                 .disabled(refreshStatus == .refreshing || isRefreshDisabled)
+            if archivedProjectCount > 0 {
+                Button("Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox",
+                       action: onShowArchivedProjects)
+            }
             if let onRemove {
                 Divider()
                 Button("Remove host", systemImage: "minus.circle", role: .destructive, action: onRemove)
