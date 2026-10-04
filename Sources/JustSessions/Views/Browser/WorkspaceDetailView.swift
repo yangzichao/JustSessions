@@ -28,8 +28,6 @@ struct WorkspaceDetailView: View {
                     let isActive = store.selectedTerminalID == session.id
                     TerminalWorkspaceView(
                         session: session,
-                        projectDisplayName: store.projectDisplayName(forProjectPath: session.projectDirectoryKey),
-                        hostDisplayName: store.hasRemoteHosts ? session.host.displayName : nil,
                         isActive: isActive,
                         onReconnect: session.host == .thisMac ? nil : { store.reconnectRemoteTerminal(session.id) }
                     )

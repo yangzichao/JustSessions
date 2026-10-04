@@ -2,6 +2,9 @@ import SwiftUI
 
 struct TerminalTab: View {
     @ObservedObject var session: TerminalSession
+    let projectDisplayName: String
+    /// Named once SSH hosts are added, whichever host the tab runs on.
+    let hostDisplayName: String?
     let isSelected: Bool
     let onSelect: () -> Void
     let onRename: (Conversation) -> Void
@@ -18,7 +21,7 @@ struct TerminalTab: View {
                 }
             }
             .buttonStyle(WorkspaceTabButtonStyle(isSelected: isSelected))
-            .help("Show \(session.displayTitle)")
+            .help(Text("Show \(session.displayTitle)") + Text(verbatim: "\n" + details))
             .contextMenu {
                 if session.isPlainTerminal {
                     Button("Close terminal…", systemImage: "xmark", role: .destructive, action: onClose)
@@ -43,5 +46,12 @@ struct TerminalTab: View {
             .help("End and close this terminal")
             .accessibilityLabel("Close \(session.displayTitle)")
         }
+    }
+
+    /// Where the tab runs and what it runs, such as "JustSessions · Claude Code · Resume".
+    private var details: String {
+        [projectDisplayName, hostDisplayName, session.provider?.rawValue ?? "Terminal", session.action?.displayName]
+            .compactMap { $0 }
+            .joined(separator: " · ")
     }
 }

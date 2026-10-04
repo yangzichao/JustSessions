@@ -17,9 +17,10 @@ struct TerminalTabGroupSection: View {
 
     var body: some View {
         let hiddenTabs = isCollapsed ? group.tabs : []
+        let projectName = store.projectDisplayName(forProjectPath: group.projectDirectoryKey)
         HStack(spacing: 6) {
             TerminalTabGroupLabel(
-                projectName: store.projectDisplayName(forProjectPath: group.projectDirectoryKey),
+                projectName: projectName,
                 location: ProjectLocation(key: group.projectDirectoryKey),
                 color: color,
                 tabCount: group.tabs.count,
@@ -31,6 +32,8 @@ struct TerminalTabGroupSection: View {
             ForEach(isCollapsed ? [] : group.tabs) { session in
                 TerminalTab(
                     session: session,
+                    projectDisplayName: projectName,
+                    hostDisplayName: store.hasRemoteHosts ? session.host.displayName : nil,
                     isSelected: store.selectedTerminalID == session.id,
                     onSelect: { store.selectTerminal(session.id) },
                     onRename: onRenameConversation,
