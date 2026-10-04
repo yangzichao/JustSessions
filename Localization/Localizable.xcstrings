@@ -838,6 +838,16 @@
         }
       }
     },
+    "Clear the selection, or close search": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消选择，或关闭搜索"
+          }
+        }
+      }
+    },
     "Click a session to read it. Nothing runs.": {
       "localizations": {
         "zh-Hans": {
@@ -908,6 +918,16 @@
         }
       }
     },
+    "Close find": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭查找"
+          }
+        }
+      }
+    },
     "Close search": {
       "localizations": {
         "zh-Hans": {
@@ -954,6 +974,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "关掉标签页，CLI 照常运行"
+          }
+        }
+      }
+    },
+    "Close the tab, or the window when no tabs are open": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭标签页；没有标签页时关闭窗口"
           }
         }
       }
@@ -1102,6 +1132,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "复制会话 ID"
+          }
+        }
+      }
+    },
+    "Copy the selection. Hold ⇧ while dragging to select text.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制所选内容。按住 ⇧ 拖动即可选择文字。"
           }
         }
       }
@@ -1600,6 +1640,16 @@
         }
       }
     },
+    "Find in the conversation": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在对话中查找"
+          }
+        }
+      }
+    },
     "Find in this conversation": {
       "localizations": {
         "zh-Hans": {
@@ -1720,6 +1770,16 @@
         }
       }
     },
+    "Go to a tab by its position": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按位置切换到标签页"
+          }
+        }
+      }
+    },
     "Go to the first available message": {
       "localizations": {
         "zh-Hans": {
@@ -1766,6 +1826,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "隐藏侧栏"
+          }
+        }
+      }
+    },
+    "Hide or show the sidebar": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏或显示侧栏"
           }
         }
       }
@@ -1943,6 +2013,16 @@
         }
       }
     },
+    "Keyboard shortcuts": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "键盘快捷键"
+          }
+        }
+      }
+    },
     "Larger reading text": {
       "localizations": {
         "zh-Hans": {
@@ -1979,6 +2059,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "最后一个标签"
+          }
+        }
+      }
+    },
+    "Last tab": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最后一个标签页"
           }
         }
       }
@@ -2236,6 +2326,16 @@
         }
       }
     },
+    "New window": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建窗口"
+          }
+        }
+      }
+    },
     "Next": {
       "localizations": {
         "zh-Hans": {
@@ -2272,6 +2372,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "下一个匹配项（⌘G 或 Return）"
+          }
+        }
+      }
+    },
+    "Next tab": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一个标签页"
           }
         }
       }
@@ -2682,6 +2792,16 @@
         }
       }
     },
+    "Previous tab": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上一个标签页"
+          }
+        }
+      }
+    },
     "Project filters are active": {
       "localizations": {
         "zh-Hans": {
@@ -2758,6 +2878,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "适合阅读"
+          }
+        }
+      }
+    },
+    "Reading a session": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "阅读会话"
           }
         }
       }
@@ -3150,6 +3280,26 @@
         }
       }
     },
+    "Select a range": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择一个范围"
+          }
+        }
+      }
+    },
+    "Select several sessions or projects": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择多个会话或项目"
+          }
+        }
+      }
+    },
     "Session %lld of %lld": {
       "localizations": {
         "zh-Hans": {
@@ -3246,6 +3396,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "显示侧栏（⌃⌘S）"
+          }
+        }
+      }
+    },
+    "Sidebar": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "侧栏"
           }
         }
       }
@@ -3472,6 +3632,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "标签"
+          }
+        }
+      }
+    },
+    "Tabs and windows": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "标签页和窗口"
           }
         }
       }
@@ -3931,6 +4101,26 @@
     },
     "·": {
       "shouldTranslate": false
+    },
+    "⇧-click": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧ 点击"
+          }
+        }
+      }
+    },
+    "⌘-click": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘ 点击"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

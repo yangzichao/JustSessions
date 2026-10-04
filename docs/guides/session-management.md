@@ -50,7 +50,7 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 | ⌘1 through ⌘8 | Select a terminal tab by its position. |
 | ⌘9 | Select the last terminal tab. |
 
-These shortcuts work while the CLI has keyboard focus. From a session preview, next/previous selects the first/last open terminal tab. ⌘W stays disabled in a preview while terminal tabs are open; with no tabs, it closes the window. The **File** and **Tabs** menus list the commands.
+These shortcuts work while the CLI has keyboard focus. From a session preview, next/previous selects the first/last open terminal tab. ⌘W stays disabled in a preview while terminal tabs are open; with no tabs, it closes the window. The **File** and **Tabs** menus list the commands, and **Settings → Help & feedback** lists every shortcut in the app.
 
 To copy terminal text, hold Shift while dragging to select it, then press ⌘C. In a tmux tab, a plain drag also copies when you let go.
 

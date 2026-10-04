@@ -69,4 +69,4 @@ Open **Settings** in the sidebar or press ⌘,. **General > Interface language**
 
 JustSessions reads local CLI files and caches supported remote history over SSH. It does not upload conversations to a JustSessions service. The CLIs still communicate with their providers. Sparkle checks for app updates through a JustSessions update server that counts checks per day and app version, without storing IP addresses or identifiers. [Storage and privacy](session-storage.md).
 
-Open **Settings → Help & feedback** or **Help → JustSessions Help** for a brief feature overview and remote host setup. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The same overview is on the [website Help page](https://yangzichao.github.io/JustSessions/help.html); its issue link opens GitHub.
+Open **Settings → Help & feedback** or **Help → JustSessions Help** for a brief feature overview, remote host setup, and every keyboard shortcut. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The same overview is on the [website Help page](https://yangzichao.github.io/JustSessions/help.html); its issue link opens GitHub.

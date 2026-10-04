@@ -74,7 +74,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Settings/Permissions/`: each permission's status and a link to its page in System Settings.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
-- `Views/Settings/Help/`: the Help & feedback page: feature overview, SSH setup, the user guide, and links to create a GitHub issue or email feedback. `Models/App/AppLinks.swift` holds the destinations.
+- `Views/Settings/Help/`: the Help & feedback page: feature overview, SSH setup, the keyboard shortcut list (`Shortcuts/`), the user guide, and links to create a GitHub issue or email feedback. `Models/App/AppLinks.swift` holds the destinations.
 - `Views/Theme/`: the chosen theme's colors, and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 
