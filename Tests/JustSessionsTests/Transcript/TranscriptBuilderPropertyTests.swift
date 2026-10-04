@@ -67,8 +67,8 @@ struct TranscriptBuilderPropertyTests {
 
     private static func speaker(of entry: TranscriptEntry) -> Speaker? {
         switch entry.content {
-        case .userMessage: .user
-        case .assistantMessage, .toolCalls: .assistant
+        case .userMessage, .userImage: .user
+        case .assistantMessage, .toolCalls, .toolResultImage: .assistant
         case .note: nil
         }
     }
@@ -77,6 +77,7 @@ struct TranscriptBuilderPropertyTests {
         switch entry.content {
         case .userMessage(let text), .assistantMessage(let text), .note(let text): [text]
         case .toolCalls(let summaries): summaries
+        case .userImage, .toolResultImage: []
         }
     }
 }

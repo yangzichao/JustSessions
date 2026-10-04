@@ -27,6 +27,18 @@ struct PiEntryLinkTests {
         #expect(Self.link(reorderedAssistant) == PiEntryLink(lineIndex: 7, id: "f6", parentID: "e5", mightBeShown: true))
     }
 
+    /// A tool result is shown only for its images, which are found from the line's bytes in either layout.
+    @Test func aToolResultWithAnImageMightBeShownInEitherLayout() {
+        let imagePart = #"{"type":"image","data":"AAAA","mimeType":"image/png"}"#
+        let pisLayout = #"{"type":"message","id":"b2","parentId":"a1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"toolResult","toolCallId":"t1","content":[\#(imagePart)]}}"#
+        let reordered = #"{"message":{"role":"toolResult","content":[\#(imagePart)]},"type":"message","parentId":"a1","id":"b3"}"#
+        let reorderedTextOnly = #"{"message":{"role":"toolResult","content":[{"type":"text","text":"ok"}]},"type":"message","parentId":"a1","id":"b4"}"#
+
+        #expect(Self.link(pisLayout) == PiEntryLink(lineIndex: 7, id: "b2", parentID: "a1", mightBeShown: true))
+        #expect(Self.link(reordered) == PiEntryLink(lineIndex: 7, id: "b3", parentID: "a1", mightBeShown: true))
+        #expect(Self.link(reorderedTextOnly) == PiEntryLink(lineIndex: 7, id: "b4", parentID: "a1", mightBeShown: false))
+    }
+
     /// Only the first 512 bytes are read without parsing; a value that runs past them is found by parsing the line.
     @Test func anIDOrParentPastTheStartOfTheLineIsFoundByParsingIt() {
         let longID = String(repeating: "a", count: 600)

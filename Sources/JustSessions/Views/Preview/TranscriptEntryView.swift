@@ -36,11 +36,16 @@ struct TranscriptEntryView: View {
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .frame(maxWidth: .infinity)
+        case .userImage(let image), .toolResultImage(let image):
+            TranscriptImageView(image: image)
         }
     }
 
     private var speakerLabel: some View {
-        let isUser = if case .userMessage = entry.content { true } else { false }
+        let isUser = switch entry.content {
+        case .userMessage, .userImage: true
+        default: false
+        }
         return HStack(spacing: 6) {
             Group {
                 if isUser { Text("You") } else { Text(verbatim: assistantName) }

@@ -82,7 +82,7 @@ struct PiTranscriptReaderTests {
         let transcript = try read([
             Self.user("u1", parent: nil, "Plain text"),
             Self.message("u2", parent: "u1", #"{"role":"user","content":[{"type":"text","text":"Look at this"},"#
-                + #"{"type":"image","data":"AAAA","mimeType":"image/png"},{"type":"text","text":"and this"}],"timestamp":1}"#),
+                + #"{"type":"image","data":"\#(SampleTranscriptImage.base64)","mimeType":"image/png"},{"type":"text","text":"and this"}],"timestamp":1}"#),
             Self.user("u3", parent: "u2", skillBlock),
             Self.message("x1", parent: "u3", #"{"role":"bashExecution","command":"git status","output":"hidden","exitCode":0,"cancelled":false,"truncated":false,"timestamp":1}"#),
             Self.message("x2", parent: "x1", #"{"role":"bashExecution","command":"ls","output":"hidden","exitCode":0,"cancelled":false,"truncated":false,"excludeFromContext":true,"timestamp":1}"#),
@@ -92,11 +92,36 @@ struct PiTranscriptReaderTests {
 
         #expect(transcript.entries.map(\.content) == [
             .userMessage("Plain text"),
-            .userMessage("Look at this\n\n[Image]\n\nand this"),
+            .userMessage("Look at this\n\nand this"),
+            .userImage(SampleTranscriptImage.image),
             .userMessage("/skill:review the login page"),
             .userMessage("!git status"),
             .userMessage("!!ls"),
         ])
+        #expect(transcript.entries.map(\.startsTurn) == [true, false, false, false, false, false])
+    }
+
+    /// A tool's screenshot shows after the call that produced it, in the assistant's turn; its text does not.
+    @Test func showsAToolResultsImagesAfterTheToolCallThatProducedThem() throws {
+        let transcript = try read([
+            Self.user("u1", parent: nil, "Render the scene"),
+            Self.message("a1", parent: "u1", #"{"role":"assistant","content":[{"type":"toolCall","id":"t1","name":"screenshot","arguments":{}}],"stopReason":"toolUse","timestamp":2}"#),
+            Self.message("r1", parent: "a1", #"{"role":"toolResult","toolCallId":"t1","toolName":"screenshot","content":["#
+                + #"{"type":"text","text":"hidden caption"},{"type":"image","data":"\#(SampleTranscriptImage.base64)","mimeType":"image/png"},"#
+                + #"{"type":"image","mimeType":"image/png"}],"isError":false,"timestamp":3}"#),
+            Self.message("a2", parent: "r1", #"{"role":"assistant","content":[{"type":"toolCall","id":"t2","name":"bash","arguments":{"command":"ls"}}],"stopReason":"toolUse","timestamp":4}"#),
+            Self.toolResult("r2", parent: "a2", toolCallID: "t2"),
+            Self.assistant("a3", parent: "r2", "Rendered."),
+        ])
+
+        #expect(transcript.entries.map(\.content) == [
+            .userMessage("Render the scene"),
+            .toolCalls(["screenshot"]),
+            .toolResultImage(SampleTranscriptImage.image),
+            .toolCalls(["bash · ls"]),
+            .assistantMessage("Rendered."),
+        ])
+        #expect(transcript.entries.map(\.startsTurn) == [true, true, false, false, false])
     }
 
     @Test func showsAFailedReplysErrorAsANote() throws {

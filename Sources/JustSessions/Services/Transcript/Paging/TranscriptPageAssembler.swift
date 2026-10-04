@@ -26,8 +26,8 @@ enum TranscriptPageAssembler {
         var previousSpeaker: Int?
         let entries = pages.flatMap(\.entries).map { entry in
             let speaker: Int? = switch entry.content {
-            case .userMessage: 0
-            case .assistantMessage, .toolCalls: 1
+            case .userMessage, .userImage: 0
+            case .assistantMessage, .toolCalls, .toolResultImage: 1
             case .note: nil
             }
             defer { previousSpeaker = speaker }

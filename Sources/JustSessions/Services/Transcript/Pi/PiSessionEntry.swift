@@ -24,7 +24,7 @@ struct PiSessionEntry: Decodable {
         /// One part of a message's content.
         struct Part: Decodable {
             private enum CodingKeys: String, CodingKey {
-                case type, text, name, arguments
+                case type, text, name, arguments, data
             }
 
             /// Such as `text`, `image`, `thinking`, or `toolCall`.
@@ -34,6 +34,8 @@ struct PiSessionEntry: Decodable {
             let name: String?
             /// The arguments of a `toolCall` part, in whatever shape the tool takes them.
             let arguments: PiJSONValue?
+            /// The base64 of an `image` part.
+            let data: String?
 
             init(from decoder: any Decoder) throws {
                 let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -41,6 +43,13 @@ struct PiSessionEntry: Decodable {
                 text = container.lenientlyDecode(String.self, forKey: .text)
                 name = container.lenientlyDecode(String.self, forKey: .name)
                 arguments = container.lenientlyDecode(PiJSONValue.self, forKey: .arguments)
+                data = container.lenientlyDecode(String.self, forKey: .data)
+            }
+
+            /// The image of an `image` part; nil for other parts and for one without base64.
+            var image: TranscriptImage? {
+                guard type == "image", let data else { return nil }
+                return TranscriptImage(base64Encoded: data)
             }
         }
 

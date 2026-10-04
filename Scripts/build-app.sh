@@ -22,8 +22,14 @@ install_name_tool -add_rpath @executable_path/../Frameworks "$app_directory/Cont
 localization_resources="$project_directory/.build/release/JustSessions_JustSessions.bundle"
 ditto "$localization_resources" "$app_directory/Contents/Resources/JustSessions_JustSessions.bundle"
 # SwiftUI's standard controls look in Bundle.main; AppKit strings use the SwiftPM resource bundle.
+# SwiftPM's native build system lays the bundle out flat; its default swiftbuild system uses Contents/Resources.
+localization_directories=("$localization_resources"/*.lproj(N) "$localization_resources"/Contents/Resources/*.lproj(N))
+if (( ${#localization_directories} == 0 )); then
+    print -u2 "No localizations were found in $localization_resources"
+    exit 1
+fi
 localization_identifiers=()
-for localization_directory in "$localization_resources"/*.lproj; do
+for localization_directory in "${localization_directories[@]}"; do
     ditto "$localization_directory" "$app_directory/Contents/Resources/${localization_directory:t}"
     localization_identifiers+=("${${localization_directory:t}%.lproj}")
 done

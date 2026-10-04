@@ -15,8 +15,8 @@ struct TranscriptBuilder {
 
         init?(_ content: TranscriptEntry.Content) {
             switch content {
-            case .userMessage: self = .user
-            case .assistantMessage, .toolCalls: self = .assistant
+            case .userMessage, .userImage: self = .user
+            case .assistantMessage, .toolCalls, .toolResultImage: self = .assistant
             case .note: return nil
             }
         }
@@ -60,6 +60,14 @@ struct TranscriptBuilder {
                 pendingEntries.append(PendingEntry(content: .toolCalls([limitedText]), timestamp: timestamp))
             }
         }
+    }
+
+    mutating func appendUserImage(_ image: TranscriptImage, timestamp: Date?) {
+        pendingEntries.append(PendingEntry(content: .userImage(image), timestamp: timestamp))
+    }
+
+    mutating func appendToolResultImage(_ image: TranscriptImage, timestamp: Date?) {
+        pendingEntries.append(PendingEntry(content: .toolResultImage(image), timestamp: timestamp))
     }
 
     /// Marks where the CLI summarized older messages to free up its context window.

@@ -33,4 +33,28 @@ struct TranscriptBuilderTests {
         ])
         #expect(transcript.entries.map(\.startsTurn) == [true, false, true])
     }
+
+    /// A user's image stays in their turn, and a tool's image stays in the assistant's, so neither repeats the
+    /// speaker. An image between tool calls keeps them apart, so it shows after the call that produced it.
+    @Test func imagesContinueTheirSpeakersTurnAndSeparateToolCalls() {
+        var builder = TranscriptBuilder()
+        builder.append(.userMessage, text: "Look", timestamp: nil)
+        builder.appendUserImage(SampleTranscriptImage.image, timestamp: nil)
+        builder.append(.toolCall, text: "screenshot", timestamp: nil)
+        builder.appendToolResultImage(SampleTranscriptImage.image, timestamp: nil)
+        builder.append(.toolCall, text: "Bash · ls", timestamp: nil)
+        builder.appendUserImage(SampleTranscriptImage.image, timestamp: nil)
+
+        let transcript = builder.build()
+
+        #expect(transcript.entries.map(\.content) == [
+            .userMessage("Look"),
+            .userImage(SampleTranscriptImage.image),
+            .toolCalls(["screenshot"]),
+            .toolResultImage(SampleTranscriptImage.image),
+            .toolCalls(["Bash · ls"]),
+            .userImage(SampleTranscriptImage.image),
+        ])
+        #expect(transcript.entries.map(\.startsTurn) == [true, false, true, false, false, true])
+    }
 }

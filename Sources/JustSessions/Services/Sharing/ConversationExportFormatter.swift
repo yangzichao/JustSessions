@@ -34,6 +34,12 @@ enum ConversationExportFormatter {
                 case .note(let text):
                     heading = "Note"
                     body = text
+                case .userImage:
+                    heading = "You"
+                    body = "[Image]"
+                case .toolResultImage:
+                    heading = "Tool result"
+                    body = "[Image]"
                 }
                 let timestamp = entry.timestamp.map { " · \($0.ISO8601Format())" } ?? ""
                 blocks.append((format == .markdown ? "## " : "") + heading + timestamp + "\n\n" + body)
