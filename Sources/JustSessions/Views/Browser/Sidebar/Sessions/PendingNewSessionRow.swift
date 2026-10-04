@@ -16,6 +16,7 @@ struct PendingNewSessionRow: View {
             } trailing: {
                 TerminalStatusIndicator(session: terminal)
             }
+            .sidebarRowHighlight(isSelected: isSelected, selectionTint: provider.tintColor)
         }
         .buttonStyle(ThemePlainButtonStyle(showsHover: false))
         .help("\(provider.rawValue) has not saved this session yet · click to open its terminal")

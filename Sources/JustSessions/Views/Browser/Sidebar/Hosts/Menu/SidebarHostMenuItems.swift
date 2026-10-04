@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// A host heading's menu, from a right-click or its ⋯ button: add a project, restore archived projects, refresh the
-/// host, or remove an SSH host.
+/// A host heading's right-click menu: add a project, restore archived projects, refresh the host, or remove an SSH
+/// host.
 struct SidebarHostMenuItems: View {
     let refreshStatus: HostRefreshStatus?
     let isRefreshDisabled: Bool

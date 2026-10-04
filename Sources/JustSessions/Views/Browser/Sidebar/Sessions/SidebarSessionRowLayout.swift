@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// What every session row under a project shares: the tool's icon, a one-line title, and trailing status,
-/// indented under the project and washed in the tool's hue when selected.
+/// What every session row under a project shares: the tool's icon, a one-line title, and trailing status, indented
+/// under the project. Each row draws its own highlight, so a session row's can take in the ⋯ laid over its button.
 struct SidebarSessionRowLayout<Title: View, Trailing: View>: View {
     let provider: ConversationProvider
     let isSelected: Bool
@@ -34,9 +34,13 @@ struct SidebarSessionRowLayout<Title: View, Trailing: View>: View {
             trailing
         }
         .padding(.leading, 28)
-        .padding(.trailing, 10)
+        .padding(.trailing, SidebarSessionRowMetrics.trailingPadding)
         .frame(height: 28)
         .contentShape(Rectangle())
-        .sidebarRowHighlight(isSelected: isSelected, selectionTint: provider.tintColor)
     }
+}
+
+enum SidebarSessionRowMetrics {
+    /// The room after a row's trailing status, which a session row's ⋯ lines up with.
+    static let trailingPadding: CGFloat = 10
 }

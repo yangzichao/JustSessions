@@ -108,7 +108,9 @@ struct SidebarProjectRow: View {
                 .foregroundStyle(.secondary)
                 .opacity(isHovered ? 0 : 1)
             HStack(spacing: 0) {
-                moreActionsMenu
+                SidebarRowMoreActionsMenu(accessibilityLabel: "More actions for \(project.displayName)") {
+                    menuItems
+                }
                 ProjectNewSessionMenu(
                     project: project,
                     providers: store.newSessionProviders(on: project.host),
@@ -123,21 +125,5 @@ struct SidebarProjectRow: View {
             .opacity(isHovered ? 1 : 0)
             .allowsHitTesting(isHovered)
         }
-    }
-
-    /// Opens the right-click menu from a button, so it can be found without a right-click.
-    private var moreActionsMenu: some View {
-        Menu {
-            menuItems
-        } label: {
-            Image(systemName: "ellipsis")
-                .frame(width: 20, height: 20)
-                .contentShape(Rectangle())
-        }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .help("More actions")
-        .accessibilityLabel("More actions for \(project.displayName)")
     }
 }

@@ -1,9 +1,9 @@
 import SwiftUI
 
 /// A host's heading above its projects: its name, how its last refresh went, and its project count, which gives way
-/// to a ⋯ and a + while the pointer is over it. The ⋯ opens the same menu as a right-click; the + adds a project
-/// there, or restores an archived one. New sessions start from a project's own +, so the heading manages the host's
-/// projects instead. Its refresh button refreshes this host alone, and shows its progress.
+/// to a + while the pointer is over it. The + adds a project there, or restores an archived one; a right-click opens
+/// the heading's other actions. New sessions start from a project's own +, so the heading manages the host's projects
+/// instead. Its refresh button refreshes this host alone, and shows its progress.
 struct SidebarHostHeading: View {
     let host: SessionHost
     let refreshStatus: HostRefreshStatus?
@@ -43,7 +43,7 @@ struct SidebarHostHeading: View {
                 isDisabled: isRefreshDisabled,
                 action: onRefresh
             )
-            projectCountOrHoverActions
+            projectCountOrAddProjectButton
         }
         .font(.system(size: 10, weight: .semibold))
         .padding(.leading, 18)
@@ -52,19 +52,17 @@ struct SidebarHostHeading: View {
         .contentShape(Rectangle())
         .onHover { isHovered = $0 }
         .help(helpText)
-        .contextMenu { menuItems }
-    }
-
-    private var menuItems: SidebarHostMenuItems {
-        SidebarHostMenuItems(
-            refreshStatus: refreshStatus,
-            isRefreshDisabled: isRefreshDisabled,
-            archivedProjectCount: archivedProjectCount,
-            onAddProject: onAddProject,
-            onShowArchivedProjects: onShowArchivedProjects,
-            onRefresh: onRefresh,
-            onRemove: onRemove
-        )
+        .contextMenu {
+            SidebarHostMenuItems(
+                refreshStatus: refreshStatus,
+                isRefreshDisabled: isRefreshDisabled,
+                archivedProjectCount: archivedProjectCount,
+                onAddProject: onAddProject,
+                onShowArchivedProjects: onShowArchivedProjects,
+                onRefresh: onRefresh,
+                onRemove: onRemove
+            )
+        }
     }
 
     @ViewBuilder
@@ -92,21 +90,18 @@ struct SidebarHostHeading: View {
         }
     }
 
-    private var projectCountOrHoverActions: some View {
+    private var projectCountOrAddProjectButton: some View {
         ZStack(alignment: .trailing) {
             Text(projectCount.formatted())
                 .monospacedDigit()
                 .foregroundStyle(.tertiary)
                 .opacity(isHovered ? 0 : 1)
-            HStack(spacing: 2) {
-                SidebarHostMoreActionsMenu(host: host, menuItems: menuItems)
-                SidebarHostAddProjectButton(
-                    host: host,
-                    archivedProjectCount: archivedProjectCount,
-                    onAddProject: onAddProject,
-                    onShowArchivedProjects: onShowArchivedProjects
-                )
-            }
+            SidebarHostAddProjectButton(
+                host: host,
+                archivedProjectCount: archivedProjectCount,
+                onAddProject: onAddProject,
+                onShowArchivedProjects: onShowArchivedProjects
+            )
             .opacity(isHovered ? 1 : 0)
             .allowsHitTesting(isHovered)
         }

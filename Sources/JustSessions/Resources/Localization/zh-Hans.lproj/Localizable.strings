@@ -410,8 +410,6 @@
 	<string>更多操作</string>
 	<key>More actions for %@</key>
 	<string>%@ 的更多操作</string>
-	<key>More actions for this Mac</key>
-	<string>此 Mac 的更多操作</string>
 	<key>More in the right-click menu</key>
 	<string>右键菜单里还有更多</string>
 	<key>More room for the terminal</key>
