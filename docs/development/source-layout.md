@@ -19,6 +19,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
+- `Models/Terminal/Tabs/Moving/`: dragging in the tab bar: a tab moves within its group, a split's two tabs together, and a group whole by its label; and where a dragged tab or group lands as the pointer moves.
 - `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, and where a shown split's panes and the resize area between them sit.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
@@ -56,6 +57,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Transcript/Markdown/`: splits Markdown into prose, code blocks, and tables for the native views.
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
 - `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
+- `Views/Browser/Tabs/Dragging/`: the drag gesture tabs and group labels share, which takes over from their buttons once the pointer moves.
 - `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, joined for a split's two tabs, how tabs narrow to share the bar as more open, and the terminal colors the selected tab takes on.
 - `Views/Browser/Split/`: what a shown split view draws around its panes, as Chrome does: the area's terminal-colored background, each pane's rounded outline with its mini toolbar in the corner, and the resize area between the panes, which you drag to resize them.
 - `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help & feedback in the same sheet.

@@ -493,7 +493,7 @@ final class ConversationStore: ObservableObject {
     }
 
     /// Takes on the strip's order and splits, changing only what differs.
-    private func apply(_ strip: TerminalTabStrip) {
+    func apply(_ strip: TerminalTabStrip) {
         let tabIDs = strip.tabIDs
         if tabIDs != terminalSessions.map(\.id) {
             let tabsByID = Dictionary(uniqueKeysWithValues: terminalSessions.map { ($0.id, $0) })

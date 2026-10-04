@@ -6,7 +6,8 @@ import SwiftUI
 /// split in another project's group. The bar sits in the title bar, in the sidebar's color, like a browser's tab strip:
 /// the selected tab takes its terminal's color and runs down into it, through the bar's bottom line. As in Chrome,
 /// tabs narrow together to fit the bar as more open, and the bar scrolls once they are as narrow as they get; a split's
-/// two tabs share one tab's width.
+/// two tabs share one tab's width. Dragging a group's label moves the whole group among the others; tabs drag within
+/// their group, see `TerminalTabGroupSection`.
 struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
     /// Width at the leading edge that tabs never enter, even when scrolled, so the window buttons and sidebar toggle
@@ -18,10 +19,17 @@ struct WorkspaceTabBar: View {
     /// The bar's visible width, past the leading clearance. Until measured, tabs take their full width.
     @State private var barWidth: CGFloat = .infinity
     @State private var groupLabelWidthsByProjectKey: [String: CGFloat] = [:]
+    /// Each group's full width, its label's and its tabs', which a group drag works out its places from.
+    @State private var groupWidthsByProjectKey: [String: CGFloat] = [:]
+    /// The group being dragged by its label, named by its project key.
+    @State private var groupDrag: TabBarDrag<String>?
 
     var body: some View {
         let groups = TerminalTabGroup.groups(of: store.terminalSessions, projectDirectoryKey: store.tabGroupKey(of:))
-        let colorsByProjectKey = TabGroupPalette.colorsByProjectKey(groups.map(\.projectDirectoryKey))
+        let groupKeys = groups.map(\.projectDirectoryKey)
+        let colorsByProjectKey = TabGroupPalette.colorsByProjectKey(groupKeys)
+        // A drag begun before a group appeared or went away is no longer drawn, and is let go once the bar catches up.
+        let currentGroupDrag = groupDrag.flatMap { $0.itemIDs == groupKeys ? $0 : nil }
         let shownTabs = groups
             .filter { !collapsedProjectKeys.contains($0.projectDirectoryKey) }
             .flatMap(\.tabs)
@@ -39,6 +47,7 @@ struct WorkspaceTabBar: View {
             ScrollView(.horizontal) {
                 HStack(spacing: WorkspaceTabMetrics.groupSpacing) {
                     ForEach(groups) { group in
+                        let isDragged = currentGroupDrag?.draggedID == group.projectDirectoryKey
                         TerminalTabGroupSection(
                             store: store,
                             group: group,
@@ -47,9 +56,16 @@ struct WorkspaceTabBar: View {
                             tabWidth: tabWidth,
                             onToggleCollapsed: { toggleCollapsed(group.projectDirectoryKey) },
                             onLabelWidthChange: { groupLabelWidthsByProjectKey[group.projectDirectoryKey] = $0 },
+                            onLabelDragChanged: { dragGroup(group.projectDirectoryKey, by: $0, among: groupKeys) },
+                            onLabelDragEnded: dropDraggedGroup,
                             onRenameConversation: onRenameConversation,
                             onCloseTab: onCloseTerminal
                         )
+                        .onGeometryChange(for: CGFloat.self, of: \.size.width) { groupWidthsByProjectKey[group.projectDirectoryKey] = $0 }
+                        .offset(x: currentGroupDrag?.offset(of: group.projectDirectoryKey) ?? 0)
+                        // The groups the dragged one passes slide over; it follows the pointer itself.
+                        .animation(isDragged ? nil : TabBarDragMetrics.slideAnimation, value: currentGroupDrag?.targetIndex)
+                        .zIndex(isDragged ? 1 : 0)
                     }
                 }
                 .padding(.horizontal, WorkspaceTabMetrics.horizontalInset)
@@ -73,6 +89,31 @@ struct WorkspaceTabBar: View {
             // A project whose last tab closed opens expanded next time.
             collapsedProjectKeys.formIntersection(openProjectKeys)
             groupLabelWidthsByProjectKey = groupLabelWidthsByProjectKey.filter { openProjectKeys.contains($0.key) }
+            groupWidthsByProjectKey = groupWidthsByProjectKey.filter { openProjectKeys.contains($0.key) }
+            groupDrag = nil
+        }
+    }
+
+    /// Starts dragging the group among the groups as they are now, or follows the pointer once it has started.
+    private func dragGroup(_ projectKey: String, by translation: CGFloat, among groupKeys: [String]) {
+        if groupDrag?.draggedID != projectKey {
+            groupDrag = TabBarDrag(
+                dragging: projectKey,
+                among: groupKeys,
+                widths: groupKeys.compactMap { groupWidthsByProjectKey[$0] },
+                spacing: WorkspaceTabMetrics.groupSpacing
+            )
+        }
+        groupDrag?.translation = translation
+    }
+
+    /// Moves the dragged group to where it was let go, unless a group appeared or went away meanwhile.
+    private func dropDraggedGroup() {
+        guard let groupDrag else { return }
+        let stillMatches = groupDrag.itemIDs == store.tabStrip.groupKeysInOrder
+        withAnimation(TabBarDragMetrics.slideAnimation) {
+            if stillMatches { store.moveTabGroup(groupDrag.draggedID, toPlace: groupDrag.targetIndex) }
+            self.groupDrag = nil
         }
     }
 
