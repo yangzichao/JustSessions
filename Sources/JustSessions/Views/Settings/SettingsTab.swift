@@ -5,6 +5,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     case general
     case appearance
     case permissions
+    case helpAndFeedback
 
     var id: String { rawValue }
 
@@ -13,6 +14,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
         case .general: "General"
         case .appearance: "Appearance"
         case .permissions: "Permissions"
+        case .helpAndFeedback: "Help & feedback"
         }
     }
 }

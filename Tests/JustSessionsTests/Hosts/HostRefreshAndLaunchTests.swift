@@ -8,10 +8,11 @@ struct HostRefreshAndLaunchTests {
         let onDevbox = conversation(project: "/home/me/api").onHost(.ssh("devbox"))
         let store = ConversationStore(adapters: [StaticConversationAdapter(discoveredConversations: [onThisMac])])
         store.replaceConversations(on: .ssh("devbox"), with: [onDevbox])
+        store.hostRefreshStatuses[.ssh("devbox")] = .refreshing
 
-        store.refreshThisMac()
+        store.refresh(.thisMac)
         #expect(store.hostRefreshStatuses[.thisMac] == .refreshing)
-        #expect(store.isRefreshingAnyHost)
+        #expect(store.isScanningThisMac)
         try await expectEventually { !store.isScanningThisMac }
 
         #expect(Set(store.conversations.map(\.id)) == [onThisMac.id, onDevbox.id])
@@ -19,7 +20,8 @@ struct HostRefreshAndLaunchTests {
             Issue.record("This Mac's scan should end as refreshed, not \(String(describing: store.hostRefreshStatuses[.thisMac]))")
             return
         }
-        #expect(!store.isRefreshingAnyHost)
+        #expect(!store.isScanningThisMac)
+        #expect(store.hostRefreshStatuses[.ssh("devbox")] == .refreshing)
     }
 
     @Test @MainActor func thisMacScanFailureShowsOnItsHeadingInsteadOfAnAlert() async throws {

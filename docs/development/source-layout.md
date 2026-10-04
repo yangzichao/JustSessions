@@ -49,12 +49,12 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
 - `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
 - `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, and the terminal colors the selected tab takes on.
-- `Views/Browser/AppWideSheets/`: shows Settings and Help as sheets on a workspace window, from the sidebar or the app menu, which picks the frontmost workspace window.
+- `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help & feedback in the same sheet.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
 - `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.
-- `Views/Browser/Sidebar/Header/`: the app mark with the search, refresh, and new session icons; search opens into a field across that line.
+- `Views/Browser/Sidebar/Header/`: the app mark with the search and new session icons; search opens into a field across that line.
 - `Views/Browser/Sidebar/OpenTabs/`: the window's open tabs, listed above the project list and outside its scrolling.
-- `Views/Browser/Sidebar/Hosts/`: host headings, and the Add SSH host button and sheet. `AddProject/` types the path of a project to add on an SSH host; this Mac's is picked with the folder panel in `Views/Browser/ProjectFolders/`, which the New session sheet uses too.
+- `Views/Browser/Sidebar/Hosts/`: host headings with their own refresh buttons and progress, and the Add SSH host button and sheet. `AddProject/` types the path of a project to add on an SSH host; this Mac's is picked with the folder panel in `Views/Browser/ProjectFolders/`, which the New session sheet uses too.
 - `Views/Terminal/`: a tab's embedded terminal, inset from the window's edges, and the bar above it once its CLI ends.
 - `Views/Preview/`: conversation preview for the selected session.
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
@@ -64,12 +64,12 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Dialogs/`: the store's alert and the deletion confirmation. `ClickOutside/` closes a sheet, alert, or dialog, as Cancel would, when you click the window around it.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
-- `Views/Settings/`: the Settings sheet, with General (language, startup, notifications, and software updates), Appearance, and Permissions pages, each in a `SettingsTabPage` of the one size they share.
+- `Views/Settings/`: the Settings sheet, with General (language, startup, notifications, and software updates), Appearance, Permissions, and Help & feedback pages, each in a `SettingsTabPage` of the one size they share.
 - `Views/Settings/Appearance/`: the app's appearance and theme in `App/`, then its terminals' colors, font, and preview in `Terminal/`, with the color scheme and iTerm2 import menus in `Terminal/Colors/`.
 - `Views/Settings/Permissions/`: each permission's status and a link to its page in System Settings.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
-- `Views/Help/`: the Help sheet: feature overview, SSH setup, and links to create a GitHub issue or email feedback. `Models/App/AppLinks.swift` holds the destinations.
+- `Views/Settings/Help/`: the Help & feedback page: feature overview, SSH setup, the user guide, and links to create a GitHub issue or email feedback. `Models/App/AppLinks.swift` holds the destinations.
 - `Views/Theme/`: the chosen theme's colors, and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 

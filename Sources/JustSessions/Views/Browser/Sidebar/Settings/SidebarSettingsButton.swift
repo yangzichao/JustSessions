@@ -9,8 +9,9 @@ struct SidebarSettingsButton: View {
             showAppWideSheet(.settings)
         } label: {
             Label("Settings", systemImage: "gearshape")
-                .labelStyle(.iconOnly)
-                .frame(width: 26, height: 30)
+                .labelStyle(.titleAndIcon)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(height: 30)
                 .contentShape(Rectangle())
         }
         .help("Settings (⌘,)")

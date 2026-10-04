@@ -1488,16 +1488,6 @@
         }
       }
     },
-    "Find the right AI coding session. Pick up where you left off.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "找到需要的 AI 编程会话，接着上次的进度继续。"
-          }
-        }
-      }
-    },
     "Finishes its turn": {
       "localizations": {
         "zh-Hans": {
@@ -1628,22 +1618,12 @@
         }
       }
     },
-    "Help": {
+    "Help & feedback": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "帮助"
-          }
-        }
-      }
-    },
-    "Help and remote host setup": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "帮助与远程主机设置"
+            "value": "帮助与反馈"
           }
         }
       }
@@ -2560,12 +2540,22 @@
         }
       }
     },
-    "Refresh sessions": {
+    "Refresh sessions on %@": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "刷新会话"
+            "value": "刷新 %@ 的会话"
+          }
+        }
+      }
+    },
+    "Refresh sessions on this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刷新此 Mac 的会话"
           }
         }
       }
@@ -2576,6 +2566,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在刷新 %@"
+          }
+        }
+      }
+    },
+    "Refreshing this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在刷新此 Mac"
           }
         }
       }

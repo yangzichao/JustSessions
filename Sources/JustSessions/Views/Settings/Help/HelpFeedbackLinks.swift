@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// Feedback destinations shared by the Help & feedback page.
 struct HelpFeedbackLinks: View {
     var body: some View {
         HStack(spacing: 6) {

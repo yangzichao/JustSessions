@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// SSH setup guidance in the Help & feedback page.
 struct HelpRemoteHostSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {

@@ -13,19 +13,23 @@ struct ThemeSurfaceRenderingTests {
         let terminalStore = TerminalAppearanceStore(userDefaults: settings.userDefaults)
         let notificationStore = SessionNotificationSettingsStore(userDefaults: settings.userDefaults)
         let tabReopeningStore = TabReopeningSettingsStore(userDefaults: settings.userDefaults)
-        let helpView = AnyView(HelpView())
-        let settingsView = AnyView(SettingsView(
-            languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
-            tabReopeningSettingsStore: tabReopeningStore,
-            launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
-            appAppearanceStore: appearanceStore, appThemeStore: themeStore,
-            terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore,
-            onCheckForUpdates: {}
-        ))
-        // Help and Settings have a fixed size, so each renders at it and the reference strip lands at its bottom edge.
+        func settingsView(selectedTab: SettingsTab) -> AnyView {
+            AnyView(SettingsView(
+                selectedTab: .constant(selectedTab),
+                languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
+                tabReopeningSettingsStore: tabReopeningStore,
+                launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
+                appAppearanceStore: appearanceStore, appThemeStore: themeStore,
+                terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore,
+                onCheckForUpdates: {}
+            ))
+        }
+        let generalView = settingsView(selectedTab: .general)
+        let helpView = settingsView(selectedTab: .helpAndFeedback)
+        // Settings pages share a fixed size, so the reference strip lands at the same bottom edge.
         let views: [(String, AnyView, CGSize)] = [
             ("help", helpView, fittingSize(of: helpView)),
-            ("settings", settingsView, fittingSize(of: settingsView)),
+            ("settings", generalView, fittingSize(of: generalView)),
             ("new-session", AnyView(NewSessionSheet(
                 initialKind: .cli(.codex), initialHost: .thisMac, initialProjectPath: "/tmp/theme-check",
                 hosts: [.thisMac], providersByHost: [.thisMac: [.codex]], recentProjects: [], onStart: { _, _, _ in }
@@ -46,7 +50,7 @@ struct ThemeSurfaceRenderingTests {
                     let referencePixel = try #require(bitmap.colorAt(x: bitmap.pixelsWide / 6, y: bitmap.pixelsHigh - 2))
                     let expectedColor = hexValue(of: referencePixel)
                     // Ten points up, in points rather than pixels: on a display without Retina, as on CI, 20 pixels
-                    // reach the Help sheet's bottom row of links.
+                    // reach the sheet's bottom controls.
                     let renderingScale = Double(bitmap.pixelsWide) / size.width
                     let pixel = try #require(bitmap.colorAt(
                         x: bitmap.pixelsWide / 2,
@@ -67,11 +71,12 @@ struct ThemeSurfaceRenderingTests {
         let ink = hexValue(of: try #require(bitmap.colorAt(x: bitmap.pixelsWide * 5 / 6, y: referenceRow)))
         let renderingScale = Double(bitmap.pixelsWide) / viewWidth
         let edgeInset = Int(20 * renderingScale)
-        let actionRows = (bitmap.pixelsHigh - Int(50 * renderingScale))..<(bitmap.pixelsHigh - Int(6 * renderingScale))
+        // The guide and feedback links are the first row below the tab picker and the page's top padding.
+        let actionRows = Int(70 * renderingScale)..<Int(100 * renderingScale)
         // Without a Retina display, as on CI, each link has only about 40 pixels of solid ink; the rest of its text
         // is antialiased. With the links in another color, other text still leaves up to about 18.
         let minimumInkPixels = Int(30 * renderingScale * renderingScale)
-        // The guide link comes first, then the feedback links; Done, at the trailing edge, is left out.
+        // The guide link comes first, then the feedback links.
         let linkPixels = matchingPixelCount(ink, in: bitmap, columns: edgeInset..<(bitmap.pixelsWide / 4), rows: actionRows)
         #expect(linkPixels > minimumInkPixels, "\(description) guide link uses theme ink")
         let feedbackLinkPixels = matchingPixelCount(ink, in: bitmap, columns: (bitmap.pixelsWide / 4)..<(bitmap.pixelsWide * 2 / 3), rows: actionRows)

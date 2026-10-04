@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Shows Settings or Help as a sheet on the workspace window this view is in.
+/// Opens a page of Settings on the workspace window this view is in.
 struct ShowAppWideSheetAction {
     let show: @MainActor (AppWideSheet) -> Void
 

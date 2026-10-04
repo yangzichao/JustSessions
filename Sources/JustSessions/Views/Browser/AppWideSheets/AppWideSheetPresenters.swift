@@ -6,6 +6,7 @@ import AppKit
 enum AppWideSheetPresenters {
     private struct Registration {
         weak var window: NSWindow?
+        let isShowingSettings: () -> Bool
         let show: (AppWideSheet) -> Void
     }
 
@@ -13,9 +14,13 @@ enum AppWideSheetPresenters {
     /// Asked for while no workspace window was open, so the window opened for it shows it as it appears.
     private static var sheetForNewWorkspaceWindow: AppWideSheet?
 
-    static func register(_ window: NSWindow, show: @escaping (AppWideSheet) -> Void) {
+    static func register(
+        _ window: NSWindow,
+        isShowingSettings: @escaping () -> Bool,
+        show: @escaping (AppWideSheet) -> Void
+    ) {
         unregister(window)
-        registrations.append(Registration(window: window, show: show))
+        registrations.append(Registration(window: window, isShowingSettings: isShowingSettings, show: show))
     }
 
     static func unregister(_ window: NSWindow) {
@@ -23,7 +28,7 @@ enum AppWideSheetPresenters {
     }
 
     /// Shows `sheet` on the frontmost workspace window, or on one `openWorkspaceWindow` opens when none is open. A
-    /// window that already shows a sheet, alert, or dialog only comes forward.
+    /// window showing Settings switches pages; one showing another sheet, alert, or dialog only comes forward.
     static func show(_ sheet: AppWideSheet, openWorkspaceWindow: () -> Void) {
         registrations.removeAll { $0.window == nil }
         let frontmostRegistration = NSApp.orderedWindows.lazy
@@ -39,7 +44,7 @@ enum AppWideSheetPresenters {
         }
         if window.isMiniaturized { window.deminiaturize(nil) }
         window.makeKeyAndOrderFront(nil)
-        if window.attachedSheet == nil { registration.show(sheet) }
+        if window.attachedSheet == nil || registration.isShowingSettings() { registration.show(sheet) }
     }
 
     /// The sheet asked for while no workspace window was open, handed out once.

@@ -1,10 +1,9 @@
 import SwiftUI
 
-/// One short line for the app mark and name, then search, refresh, and new session as icons, so the session list gets
+/// One short line for the app mark and name, then search and new session as icons, so the session list gets
 /// the height. Search opens into a field across the whole line, and goes back to its icon when closed, or once it is
 /// empty and loses focus.
 struct SidebarHeader: View {
-    @ObservedObject var store: ConversationStore
     @Binding var searchText: String
     let onNewSession: () -> Void
 
@@ -41,7 +40,6 @@ struct SidebarHeader: View {
             Spacer(minLength: 4)
             HStack(spacing: 4) {
                 searchButton
-                SidebarRefreshButton(store: store)
                 SidebarNewSessionButton(action: onNewSession)
             }
             .layoutPriority(1)

@@ -33,7 +33,8 @@ struct ContentView: View {
             if !hasStartedScan {
                 hasStartedScan = true
                 store.reopenTabsFromLastQuit()
-                store.refreshAllHosts()
+                // Each host loads independently when the workspace first opens.
+                for host in store.hosts { store.refresh(host) }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in

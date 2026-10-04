@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The main flow, in the order a session is found, read, resumed, and kept running.
+/// Help in Settings: the main flow, in the order a session is found, read, resumed, and kept running.
 struct HelpFeatureOverview: View {
     @Environment(\.locale) private var locale
 

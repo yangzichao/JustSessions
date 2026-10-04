@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// JustSessions → Settings… (⌘,) and Help → JustSessions Help, each as a sheet on the frontmost workspace window, and
-/// the website.
+/// Settings… (⌘,) opens General; JustSessions Help opens Help & feedback in the same Settings sheet.
 struct AppWideSheetCommands: Commands {
     @ObservedObject private var languageStore = AppLanguageStore.shared
     @Environment(\.openWindow) private var openWindow

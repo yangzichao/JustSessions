@@ -25,16 +25,39 @@ struct AppWideSheetPresentersTests {
         #expect(!openedAWorkspaceWindow)
     }
 
-    @Test func aWindowAlreadyShowingASheetKeepsIt() async throws {
+    @Test func aMenuRequestSwitchesPagesInTheExistingSettingsSheet() async throws {
         let workspaceWindow = WorkspaceWindowStandIn()
         defer { workspaceWindow.close() }
         try await workspaceWindow.waitUntilRegistered()
-        AppWideSheetPresenters.show(.help) {}
-        try await expectEventually(timeout: .seconds(5)) { workspaceWindow.window.attachedSheet != nil }
-
         AppWideSheetPresenters.show(.settings) {}
+        try await expectEventually(timeout: .seconds(5)) { workspaceWindow.window.attachedSheet != nil }
+        let originalSheet = try #require(workspaceWindow.window.attachedSheet)
+
+        AppWideSheetPresenters.show(.help) {}
 
         #expect(workspaceWindow.state.sheet == .help)
+        #expect(workspaceWindow.window.attachedSheet === originalSheet)
+    }
+
+    @Test func aWindowShowingAnotherSheetKeepsIt() async throws {
+        let workspaceWindow = WorkspaceWindowStandIn()
+        defer { workspaceWindow.close() }
+        try await workspaceWindow.waitUntilRegistered()
+        let unrelatedSheet = NSWindow(
+            contentRect: CGRect(x: 0, y: 0, width: 300, height: 180),
+            styleMask: [.titled], backing: .buffered, defer: false
+        )
+        unrelatedSheet.isReleasedWhenClosed = false
+        workspaceWindow.window.beginSheet(unrelatedSheet, completionHandler: { _ in })
+        defer {
+            workspaceWindow.window.endSheet(unrelatedSheet)
+            unrelatedSheet.close()
+        }
+
+        AppWideSheetPresenters.show(.help) {}
+
+        #expect(workspaceWindow.state.sheet == nil)
+        #expect(workspaceWindow.window.attachedSheet === unrelatedSheet)
     }
 
     @Test func withNoWorkspaceWindowOpenTheNewOneShowsTheSheet() async throws {

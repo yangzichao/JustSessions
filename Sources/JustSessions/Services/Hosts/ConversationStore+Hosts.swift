@@ -12,18 +12,11 @@ extension ConversationStore {
 
     var isScanningThisMac: Bool { hostRefreshStatuses[.thisMac] == .refreshing }
 
-    var isRefreshingAnyHost: Bool { hostRefreshStatuses.values.contains(.refreshing) }
-
     func refresh(_ host: SessionHost) {
         switch host {
         case .thisMac: refreshThisMac()
         case .ssh(let destination): refreshRemoteHost(destination)
         }
-    }
-
-    /// What the refresh button and app launch run.
-    func refreshAllHosts() {
-        for host in hosts { refresh(host) }
     }
 
     /// From the New Session sheet. A folder typed for an SSH host is looked up there first, so a missing folder is

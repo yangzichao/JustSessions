@@ -270,8 +270,6 @@
 	<string>Find in conversation</string>
 	<key>Find in conversation (⌘F)</key>
 	<string>Find in conversation (⌘F)</string>
-	<key>Find the right AI coding session. Pick up where you left off.</key>
-	<string>Find the right AI coding session. Pick up where you left off.</string>
 	<key>Finishes its turn</key>
 	<string>Finishes its turn</string>
 	<key>First message</key>
@@ -298,10 +296,8 @@
 	<string>Go to the first available message</string>
 	<key>Go to the latest message</key>
 	<string>Go to the latest message</string>
-	<key>Help</key>
-	<string>Help</string>
-	<key>Help and remote host setup</key>
-	<string>Help and remote host setup</string>
+	<key>Help &amp; feedback</key>
+	<string>Help &amp; feedback</string>
 	<key>Hide Sidebar</key>
 	<string>Hide Sidebar</string>
 	<key>Hide sidebar</key>
@@ -484,10 +480,14 @@
 	<string>Reconnect</string>
 	<key>Refresh</key>
 	<string>Refresh</string>
-	<key>Refresh sessions</key>
-	<string>Refresh sessions</string>
+	<key>Refresh sessions on %@</key>
+	<string>Refresh sessions on %@</string>
+	<key>Refresh sessions on this Mac</key>
+	<string>Refresh sessions on this Mac</string>
 	<key>Refreshing %@</key>
 	<string>Refreshing %@</string>
+	<key>Refreshing this Mac</key>
+	<string>Refreshing this Mac</string>
 	<key>Remove host</key>
 	<string>Remove host</string>
 	<key>Rename</key>

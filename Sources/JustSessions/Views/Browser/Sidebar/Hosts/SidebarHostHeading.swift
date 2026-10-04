@@ -2,18 +2,15 @@ import SwiftUI
 
 /// A host's heading above its projects: its name, how its last refresh went, and its project count, which gives way
 /// to a + for adding a project there while the pointer is over it. New sessions start from a project's own +, so the
-/// heading manages the host's projects instead. Right-click to add a project, restore archived projects, refresh the
-/// host, or remove an SSH host.
-/// The heading is shown even while this Mac is the only host, so the sidebar always reads by host; in that case it
-/// leaves refresh progress to the sidebar header.
+/// heading manages the host's projects instead. Its refresh button refreshes this host alone, and shows its progress.
+/// Right-click to add a project, restore archived projects, refresh the host, or remove an SSH host.
 struct SidebarHostHeading: View {
     let host: SessionHost
-    let isOnlyHost: Bool
     let refreshStatus: HostRefreshStatus?
     let projectCount: Int
     let onAddProject: () -> Void
     let onRefresh: () -> Void
-    /// While sessions are being deleted, refreshing waits, as the sidebar header's button does.
+    /// While sessions are being deleted, manual refresh is disabled.
     let isRefreshDisabled: Bool
     let archivedProjectCount: Int
     let onShowArchivedProjects: () -> Void
@@ -40,6 +37,12 @@ struct SidebarHostHeading: View {
                 .truncationMode(.middle)
             Spacer(minLength: 6)
             refreshStatusIndicator
+            SidebarHostRefreshButton(
+                host: host,
+                refreshStatus: refreshStatus,
+                isDisabled: isRefreshDisabled,
+                action: onRefresh
+            )
             projectCountOrAddProjectButton
         }
         .font(.system(size: 10, weight: .semibold))
@@ -69,12 +72,7 @@ struct SidebarHostHeading: View {
     private var refreshStatusIndicator: some View {
         switch refreshStatus {
         case .refreshing?:
-            if !isOnlyHost {
-                ProgressView()
-                    .controlSize(.mini)
-                    .frame(width: 12, height: 12)
-                    .accessibilityLabel("Refreshing \(host.displayName)")
-            }
+            EmptyView()
         case .failed(let message)?:
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(ThemePalette.warning)

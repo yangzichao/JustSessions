@@ -1,8 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Registers the window it sits in with `AppWideSheetPresenters` as a workspace window that shows Settings and Help
-/// by setting `sheet`.
+/// Registers the workspace window so menu commands can open Settings or select a page already showing there.
 struct AppWideSheetWindowRegistration: NSViewRepresentable {
     @Binding var sheet: AppWideSheet?
 
@@ -28,7 +27,9 @@ final class AppWideSheetWindowRegistrationView: NSView {
         unregister()
         guard let window else { return }
         registeredWindow = window
-        AppWideSheetPresenters.register(window) { [weak self] shownSheet in
+        AppWideSheetPresenters.register(window, isShowingSettings: { [weak self] in
+            self?.sheet?.wrappedValue != nil
+        }) { [weak self] shownSheet in
             self?.sheet?.wrappedValue = shownSheet
         }
     }

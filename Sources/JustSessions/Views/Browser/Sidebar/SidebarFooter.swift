@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// One line: adding an SSH host, then help and settings as icons.
+/// One line: adding an SSH host, then settings.
 struct SidebarFooter: View {
     let onAddRemoteHost: () -> Void
 
@@ -8,7 +8,6 @@ struct SidebarFooter: View {
         HStack(spacing: 4) {
             SidebarAddRemoteHostButton(action: onAddRemoteHost)
             Spacer(minLength: 4)
-            SidebarHelpButton()
             SidebarSettingsButton()
         }
         .buttonStyle(.borderless)

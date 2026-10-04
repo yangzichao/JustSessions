@@ -2,12 +2,14 @@ import SwiftUI
 
 /// Settings as a sheet on a workspace window: the tabs, then Done.
 struct SettingsSheet: View {
+    @Binding var selectedTab: SettingsTab
     let onCheckForUpdates: () -> Void
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {
             SettingsView(
+                selectedTab: $selectedTab,
                 languageStore: .shared,
                 tabReopeningSettingsStore: .shared,
                 launchAtLoginSettingsStore: .shared,

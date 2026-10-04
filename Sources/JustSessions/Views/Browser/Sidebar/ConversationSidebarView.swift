@@ -72,7 +72,7 @@ struct ConversationSidebarView: View {
         let selectedConversations = selectedConversations
 
         VStack(alignment: .leading, spacing: 0) {
-            SidebarHeader(store: store, searchText: $searchText, onNewSession: onNewSession)
+            SidebarHeader(searchText: $searchText, onNewSession: onNewSession)
             SidebarFilterBar(
                 recencyFilter: $recencyFilter,
                 providerFilter: $providerFilter,
@@ -208,7 +208,6 @@ struct ConversationSidebarView: View {
     private func hostHeading(for section: HostProjectSection) -> some View {
         SidebarHostHeading(
             host: section.host,
-            isOnlyHost: !store.hasRemoteHosts,
             refreshStatus: store.hostRefreshStatuses[section.host],
             projectCount: section.projects.count,
             onAddProject: { addProject(on: section.host) },
