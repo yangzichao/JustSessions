@@ -172,6 +172,9 @@ struct ConversationSidebarView: View {
                 return
             }
             do { try await Task.sleep(for: Self.deletionProgressBarDelay) } catch { return }
+            // A deletion ending right at the delay can resume the sleep just before the task is cancelled;
+            // showing the bar then would leave it stuck at "0 of 0", as nothing restarts this task.
+            guard !Task.isCancelled, store.isDeletingSessions else { return }
             isDeletionProgressBarShown = true
         }
     }
