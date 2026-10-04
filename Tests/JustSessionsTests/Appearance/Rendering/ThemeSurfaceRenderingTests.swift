@@ -44,7 +44,13 @@ struct ThemeSurfaceRenderingTests {
                     // Compare pixels rendered through the same display profile instead of unconverted RGB bytes.
                     let referencePixel = try #require(bitmap.colorAt(x: bitmap.pixelsWide / 6, y: bitmap.pixelsHigh - 2))
                     let expectedColor = hexValue(of: referencePixel)
-                    let pixel = try #require(bitmap.colorAt(x: bitmap.pixelsWide / 2, y: bitmap.pixelsHigh - 20))
+                    // Ten points up, in points rather than pixels: on a display without Retina, as on CI, 20 pixels
+                    // reach the Help sheet's bottom row of links.
+                    let renderingScale = Double(bitmap.pixelsWide) / size.width
+                    let pixel = try #require(bitmap.colorAt(
+                        x: bitmap.pixelsWide / 2,
+                        y: bitmap.pixelsHigh - Int(10 * renderingScale)
+                    ))
                     let actualColor = hexValue(of: pixel)
                     #expect(actualColor == expectedColor, "\(name) \(theme) \(colorScheme): surface \(String(actualColor, radix: 16))")
                     if name.hasPrefix("help") {
