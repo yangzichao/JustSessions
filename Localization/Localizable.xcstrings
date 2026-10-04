@@ -244,34 +244,6 @@
         }
       }
     },
-    ", %lld sessions": {
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": ", %lld session"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": ", %lld sessions"
-                }
-              }
-            }
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "，%lld 个会话"
-          }
-        }
-      }
-    },
     "1 message": {
       "localizations": {
         "zh-Hans": {
@@ -405,12 +377,22 @@
         }
       }
     },
-    "All": {
+    "All sessions": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "全部"
+            "value": "全部会话"
+          }
+        }
+      }
+    },
+    "All time": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部时间"
           }
         }
       }
@@ -776,6 +758,16 @@
         }
       }
     },
+    "Clear filters": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除筛选"
+          }
+        }
+      }
+    },
     "Click a session to read it. Nothing runs.": {
       "localizations": {
         "zh-Hans": {
@@ -872,16 +864,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "折叠标签组"
-          }
-        }
-      }
-    },
-    "Collapse open tabs": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "收起打开的标签"
           }
         }
       }
@@ -1370,16 +1352,6 @@
         }
       }
     },
-    "Expand open tabs": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "展开打开的标签"
-          }
-        }
-      }
-    },
     "Expand project": {
       "localizations": {
         "zh-Hans": {
@@ -1454,6 +1426,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "反馈："
+          }
+        }
+      }
+    },
+    "Filter project sessions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "筛选项目中的会话"
+          }
+        }
+      }
+    },
+    "Filters active": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已启用筛选"
           }
         }
       }
@@ -1811,6 +1803,16 @@
         }
       }
     },
+    "Last 7 days": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近 7 天"
+          }
+        }
+      }
+    },
     "Last Tab": {
       "localizations": {
         "zh-Hans": {
@@ -2094,6 +2096,16 @@
         }
       }
     },
+    "No matching open tabs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有匹配的已打开标签"
+          }
+        }
+      }
+    },
     "No matching projects or sessions": {
       "localizations": {
         "zh-Hans": {
@@ -2110,6 +2122,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "暂无消息"
+          }
+        }
+      }
+    },
+    "No open tabs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无打开的标签"
           }
         }
       }
@@ -2295,7 +2317,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "打开的标签"
+            "value": "已打开"
           }
         }
       }
@@ -2440,6 +2462,16 @@
         }
       }
     },
+    "Project filters are active": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "项目筛选已启用"
+          }
+        }
+      }
+    },
     "Project folder": {
       "localizations": {
         "zh-Hans": {
@@ -2456,6 +2488,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 上的项目文件夹"
+          }
+        }
+      }
+    },
+    "Projects": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "项目"
           }
         }
       }
@@ -2496,16 +2538,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "阅读宽度"
-          }
-        }
-      }
-    },
-    "Recent": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最近"
           }
         }
       }
@@ -2808,6 +2840,26 @@
         }
       }
     },
+    "Search open tabs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索已打开的标签"
+          }
+        }
+      }
+    },
+    "Search open tabs by title, project, or host": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按标题、项目或主机搜索已打开的标签"
+          }
+        }
+      }
+    },
     "Search projects and sessions": {
       "localizations": {
         "zh-Hans": {
@@ -2844,16 +2896,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "会话 %lld / %lld"
-          }
-        }
-      }
-    },
-    "Sessions active in the past seven days": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "过去七天内活跃的会话"
           }
         }
       }
@@ -2918,16 +2960,6 @@
         }
       }
     },
-    "Show one tool's sessions": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "仅显示一种工具的会话"
-          }
-        }
-      }
-    },
     "Show sidebar": {
       "localizations": {
         "zh-Hans": {
@@ -2944,16 +2976,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "显示侧栏（⌃⌘S）"
-          }
-        }
-      }
-    },
-    "Showing %@ sessions only": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "仅显示 %@ 的会话"
           }
         }
       }
@@ -3344,32 +3366,22 @@
         }
       }
     },
+    "Time range": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间范围"
+          }
+        }
+      }
+    },
     "Tool": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "工具"
-          }
-        }
-      }
-    },
-    "Tool filter: %@": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "工具筛选：%@"
-          }
-        }
-      }
-    },
-    "Tool filter: All tools": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "工具筛选：所有工具"
           }
         }
       }

@@ -8,7 +8,7 @@ struct SidebarOpenTabRow: View {
     let onSelect: () -> Void
     let onClose: () -> Void
 
-    static let height: CGFloat = 28
+    static let height: CGFloat = 44
 
     var body: some View {
         Button(action: onSelect) {
@@ -16,10 +16,15 @@ struct SidebarOpenTabRow: View {
                 toolIcon
                     .font(.system(size: 10, weight: .medium))
                     .frame(width: 14)
-                Text(tab.displayTitle)
-                    .font(.system(size: 12, weight: isSelected ? .medium : .regular))
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verbatim: tab.displayTitle)
+                        .font(.system(size: 12, weight: isSelected ? .medium : .regular))
+                    Text(verbatim: projectContext)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                }
+                .lineLimit(1)
+                .truncationMode(.tail)
                 Spacer(minLength: 6)
                 TerminalStatusIndicator(session: tab)
             }
@@ -29,8 +34,8 @@ struct SidebarOpenTabRow: View {
             .sidebarRowHighlight(isSelected: isSelected, selectionTint: tab.provider?.tintColor)
         }
         .buttonStyle(.plain)
-        .help(Text("Show \(tab.displayTitle)") + Text(verbatim: "\n" + projectDisplayName))
-        .accessibilityLabel(Text(verbatim: "\(tab.displayTitle), \(projectDisplayName)"))
+        .help(Text("Show \(tab.displayTitle)") + Text(verbatim: "\n" + projectContext + "\n" + tab.projectPath))
+        .accessibilityLabel(Text(verbatim: "\(tab.displayTitle), \(projectContext)"))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .contextMenu {
             if tab.isPlainTerminal {
@@ -39,6 +44,13 @@ struct SidebarOpenTabRow: View {
                 Button("End session…", systemImage: "xmark", role: .destructive, action: onClose)
             }
         }
+    }
+
+    private var projectContext: String {
+        if let destination = tab.host.sshDestination {
+            return "\(projectDisplayName) · \(destination)"
+        }
+        return projectDisplayName
     }
 
     @ViewBuilder

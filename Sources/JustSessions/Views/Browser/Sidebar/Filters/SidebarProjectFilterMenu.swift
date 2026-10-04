@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Recency and tool filters on one line under search, since all three narrow the same project list.
-struct SidebarFilterBar: View {
+/// Time and tool filters apply only to the project library, never to open terminals.
+struct SidebarProjectFilterMenu: View {
     @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
     /// Tools installed on a host or with listed sessions; the menu offers only these.
@@ -9,24 +9,24 @@ struct SidebarFilterBar: View {
     let allSessionCount: Int
     let recentSessionCount: Int
 
-    var body: some View {
-        HStack(spacing: 6) {
-            SidebarRecencyPicker(
-                selection: $recencyFilter,
-                allSessionCount: allSessionCount,
-                recentSessionCount: recentSessionCount
-            )
-            toolFilterMenu
-        }
-        .padding(.horizontal, 12)
+    private var isFiltering: Bool {
+        recencyFilter != .all || providerFilter.provider != nil
     }
 
     /// Shows the chosen tool's icon on a tinted chip while it filters the list,
     /// so the filter stays visible without opening the menu.
-    private var toolFilterMenu: some View {
+    var body: some View {
         let filteredProvider = providerFilter.provider
 
         return Menu {
+            Picker("Time range", selection: $recencyFilter) {
+                (Text("All time") + Text(verbatim: " · \(allSessionCount.formatted())"))
+                    .tag(SessionRecencyFilter.all)
+                (Text("Last 7 days") + Text(verbatim: " · \(recentSessionCount.formatted())"))
+                    .tag(SessionRecencyFilter.recent)
+            }
+            .pickerStyle(.inline)
+            Divider()
             Picker("Tool", selection: $providerFilter) {
                 ForEach(ConversationProviderFilter.choices(offering: offeredProviders, selected: providerFilter)) { filter in
                     if let provider = filter.provider {
@@ -38,11 +38,18 @@ struct SidebarFilterBar: View {
             }
             .pickerStyle(.inline)
             .labelsHidden()
+            if isFiltering {
+                Divider()
+                Button("Clear filters") {
+                    recencyFilter = .all
+                    providerFilter = .all
+                }
+            }
         } label: {
             if let filteredProvider {
                 filteredProvider.iconImage()
             } else {
-                Image(systemName: "line.3.horizontal.decrease")
+                Image(systemName: isFiltering ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease")
             }
         }
         .menuStyle(.borderlessButton)
@@ -54,17 +61,14 @@ struct SidebarFilterBar: View {
             filteredProvider.map { AnyShapeStyle($0.tintColor.opacity(0.15)) } ?? AnyShapeStyle(ThemePalette.trackFill),
             in: RoundedRectangle(cornerRadius: 7, style: .continuous)
         )
-        .help(toolFilterHelp)
-        .accessibilityLabel(toolFilterAccessibilityLabel)
-    }
-
-    private var toolFilterHelp: LocalizedStringKey {
-        if let provider = providerFilter.provider { return "Showing \(provider.rawValue) sessions only" }
-        return "Show one tool's sessions"
-    }
-
-    private var toolFilterAccessibilityLabel: LocalizedStringKey {
-        if let provider = providerFilter.provider { return "Tool filter: \(provider.rawValue)" }
-        return "Tool filter: All tools"
+        .overlay(alignment: .topTrailing) {
+            if recencyFilter == .recent, filteredProvider != nil {
+                Circle().fill(.primary).frame(width: 4, height: 4)
+            }
+        }
+        .help(isFiltering ? "Project filters are active" : "Filter project sessions")
+        .accessibilityLabel("Filter project sessions")
+        .accessibilityValue(isFiltering ? Text("Filters active") : Text("All sessions"))
+        .accessibilityIdentifier("sidebar.projectFilters")
     }
 }

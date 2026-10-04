@@ -5,6 +5,7 @@ import SwiftUI
 /// empty and loses focus.
 struct SidebarHeader: View {
     @Binding var searchText: String
+    var contentMode: SidebarContentMode = .projects
     let onNewSession: () -> Void
 
     @State private var isSearchOpen = false
@@ -19,8 +20,10 @@ struct SidebarHeader: View {
             if isSearchShown {
                 SidebarSearchField(
                     text: $searchText,
-                    placeholder: "Search projects and sessions",
-                    accessibilityLabel: "Search projects by name or path and sessions by title or ID",
+                    placeholder: searchLabel,
+                    accessibilityLabel: contentMode == .projects
+                        ? "Search projects by name or path and sessions by title or ID"
+                        : "Search open tabs by title, project, or host",
                     onClose: closeSearch
                 )
             } else {
@@ -55,8 +58,12 @@ struct SidebarHeader: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.borderless)
-        .help("Search projects and sessions")
-        .accessibilityLabel("Search projects and sessions")
+        .help(searchLabel)
+        .accessibilityLabel(searchLabel)
+    }
+
+    private var searchLabel: LocalizedStringKey {
+        contentMode == .projects ? "Search projects and sessions" : "Search open tabs"
     }
 
     private func closeSearch() {

@@ -17,8 +17,10 @@ struct ConversationSidebarView: View {
     let onRequestDeletion: (SessionDeletionRequest) -> Void
     let onCloseTerminal: (UUID) -> Void
 
-    @State private var projectExpansion = ProjectExpansion()
-    @State private var projectSelection = ProjectMultiSelection()
+    @SceneStorage("sidebarContentMode") private var contentMode: SidebarContentMode = .projects
+    @SceneStorage("sidebarOpenTabSearch") private var openTabSearchText = ""
+    @State var projectExpansion = ProjectExpansion()
+    @State var projectSelection = ProjectMultiSelection()
     @State private var isAddRemoteHostSheetPresented = false
     /// The host whose archived projects are listed, from its heading's context menu.
     @State private var hostShowingArchivedProjects: SessionHost?
@@ -26,19 +28,19 @@ struct ConversationSidebarView: View {
     @State private var sshHostAddingProject: SessionHost?
     /// A project just added from a host's heading, scrolled into view once it is listed. A project with no sessions
     /// sorts last under its host, so it could otherwise be added out of sight.
-    @State private var projectToReveal: String?
+    @State var projectToReveal: String?
     /// Set once a deletion of several sessions has run for `deletionProgressBarDelay`, so a quick one never
     /// flashes the progress bar.
     @State private var isDeletionProgressBarShown = false
-    @FocusState private var isSidebarListFocused: Bool
+    @FocusState var isSidebarListFocused: Bool
 
     static let deletionProgressBarDelay: Duration = .milliseconds(300)
 
-    private var isSearching: Bool {
+    var isSearching: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    private var hostSections: [HostProjectSection] {
+    var hostSections: [HostProjectSection] {
         HostProjectSection.sections(hosts: store.hosts, projects: projects)
     }
 
@@ -62,7 +64,7 @@ struct ConversationSidebarView: View {
         Set(projects.flatMap { $0.conversations.map(\.id) })
     }
 
-    private var selectedConversations: [Conversation] {
+    var selectedConversations: [Conversation] {
         // Nothing selected is the common case, and this runs on every render, so it skips the walk of every row.
         guard !sessionSelection.selectedConversationIDs.isEmpty else { return [] }
         return projects.flatMap(\.conversations).filter { sessionSelection.contains($0.id) }
@@ -72,86 +74,50 @@ struct ConversationSidebarView: View {
         let selectedConversations = selectedConversations
 
         VStack(alignment: .leading, spacing: 0) {
-            SidebarHeader(searchText: $searchText, onNewSession: onNewSession)
-            SidebarFilterBar(
-                recencyFilter: $recencyFilter,
-                providerFilter: $providerFilter,
-                offeredProviders: store.filterableProviders,
-                allSessionCount: allSessionCount,
-                recentSessionCount: recentSessionCount
+            SidebarHeader(
+                searchText: contentMode == .projects ? $searchText : $openTabSearchText,
+                contentMode: contentMode,
+                onNewSession: onNewSession
             )
-
-            if !store.terminalSessions.isEmpty {
-                SidebarOpenTabsSection(store: store, onSelectTab: selectTab, onCloseTab: onCloseTerminal)
-                ThemeDivider()
+            HStack(spacing: 6) {
+                SidebarContentPicker(selection: $contentMode, openTabCount: store.terminalSessions.count)
+                SidebarProjectFilterMenu(
+                    recencyFilter: $recencyFilter,
+                    providerFilter: $providerFilter,
+                    offeredProviders: store.filterableProviders,
+                    allSessionCount: allSessionCount,
+                    recentSessionCount: recentSessionCount
+                )
+                .opacity(contentMode == .projects ? 1 : 0)
+                .allowsHitTesting(contentMode == .projects)
+                .disabled(contentMode != .projects)
+                .accessibilityHidden(contentMode != .projects)
             }
+            .padding(.horizontal, 12)
 
-            ScrollViewReader { scrollProxy in
-                SidebarSelectionScrollView(
-                    isFocused: $isSidebarListFocused,
-                    onDismissSelection: dismissSidebarSelection
-                ) {
-                    LazyVStack(alignment: .leading, spacing: SidebarIndentGuide.rowSpacing) {
-                        ForEach(hostSections) { section in
-                            hostHeading(for: section)
-                                .padding(.top, 14)
-                                .padding(.bottom, 4)
-
-                            if section.projects.isEmpty {
-                                SidebarEmptyHostNote(message: SidebarEmptyHostMessage(
-                                    host: section.host,
-                                    refreshStatus: store.hostRefreshStatuses[section.host],
-                                    isSearching: isSearching,
-                                    recencyFilter: recencyFilter
-                                ))
-                            }
-
-                            let parentLabels = ProjectParentLabels(projectsOnOneHost: section.projects)
-                            ForEach(section.projects) { project in
-                                SidebarProjectSection(
-                                    store: store,
-                                    project: project,
-                                    parentLabel: parentLabels.label(for: project),
-                                    isExpanded: isExpanded(project),
-                                    projectSelection: projectSelection,
-                                    sessionSelection: sessionSelection,
-                                    selectedConversations: selectedConversations,
-                                    onToggleExpansion: { projectExpansion.toggle(project.id) },
-                                    onClickProject: { handleProjectClick(project) },
-                                    onNewSession: { provider in
-                                        store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
-                                    },
-                                    onClickConversation: handleConversationClick,
-                                    onSelectPendingNewSession: selectTab,
-                                    onRenameConversation: onRenameConversation,
-                                    onRenameProject: { onRenameProject(project) },
-                                    onRemoveSelectedProjects: removeSelectedProjects,
-                                    onRequestDeletion: onRequestDeletion
-                                )
-                            }
-                            .padding(.horizontal, 8)
-                        }
-                    }
-                    .padding(.bottom, 12)
-                }
-                .task(id: projectToReveal) {
-                    guard let projectToReveal else { return }
-                    withAnimation { scrollProxy.scrollTo(projectToReveal, anchor: .center) }
-                    self.projectToReveal = nil
-                }
+            SidebarContentPanels(selection: contentMode) {
+                projectList
+            } openTabs: {
+                SidebarOpenTabsView(
+                    store: store,
+                    searchText: openTabSearchText,
+                    onSelectTab: selectTab,
+                    onCloseTab: onCloseTerminal,
+                    onNewSession: onNewSession
+                )
             }
 
             if isDeletionProgressBarShown {
                 ThemeDivider()
                 SidebarDeletionProgressBar(progress: store.deletionProgress, onCancel: store.cancelDeletion)
             }
-            if projectSelection.hasMultipleSelected {
+            if contentMode == .projects, projectSelection.hasMultipleSelected {
                 ThemeDivider()
                 SidebarProjectSelectionActionBar(
                     selectedCount: projectSelection.selectedProjectIDs.count,
                     onRemove: removeSelectedProjects
                 )
-            } else if sessionSelection.hasMultipleSelected && !isDeletionProgressBarShown {
+            } else if contentMode == .projects && sessionSelection.hasMultipleSelected && !isDeletionProgressBarShown {
                 ThemeDivider()
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
@@ -179,6 +145,10 @@ struct ConversationSidebarView: View {
         }
         .dismissesOnClickOutside(item: $sshHostAddingProject)
         .onAppear { expandProjectsWithOpenTerminals() }
+        .onChange(of: contentMode) { _, _ in
+            isSidebarListFocused = false
+            dismissSidebarSelection()
+        }
         .onChange(of: store.terminalSessions.map(\.id)) { _, _ in
             expandProjectsWithOpenTerminals()
         }
@@ -205,7 +175,7 @@ struct ConversationSidebarView: View {
         Rectangle().fill(ThemePalette.sidebarSurface).ignoresSafeArea()
     }
 
-    private func hostHeading(for section: HostProjectSection) -> some View {
+    func hostHeading(for section: HostProjectSection) -> some View {
         SidebarHostHeading(
             host: section.host,
             refreshStatus: store.hostRefreshStatuses[section.host],
@@ -235,17 +205,18 @@ struct ConversationSidebarView: View {
 
     /// Selects the added project, as a click on it would, and scrolls to it.
     private func revealAddedProject(_ projectPath: String) {
+        contentMode = .projects
         isSidebarListFocused = true
         sessionSelection.clear()
         projectSelection.selectOnly(projectPath)
         projectToReveal = projectPath
     }
 
-    private func isExpanded(_ project: ProjectConversationGroup) -> Bool {
+    func isExpanded(_ project: ProjectConversationGroup) -> Bool {
         projectExpansion.isExpanded(project.id, whileSearching: isSearching)
     }
 
-    private func handleConversationClick(_ conversation: Conversation) {
+    func handleConversationClick(_ conversation: Conversation) {
         projectSelection.clear()
         let modifiers = NSEvent.modifierFlags
         if modifiers.contains(.shift) {
@@ -263,13 +234,13 @@ struct ConversationSidebarView: View {
     }
 
     /// Shows the tab's terminal; the rows highlighted for it replace any selection in the list.
-    private func selectTab(_ terminalID: UUID) {
+    func selectTab(_ terminalID: UUID) {
         projectSelection.clear()
         sessionSelection.clear()
         store.selectTerminal(terminalID)
     }
 
-    private func handleProjectClick(_ project: ProjectConversationGroup) {
+    func handleProjectClick(_ project: ProjectConversationGroup) {
         isSidebarListFocused = true
         sessionSelection.clear()
         let modifiers = NSEvent.modifierFlags
@@ -283,14 +254,14 @@ struct ConversationSidebarView: View {
         }
     }
 
-    private func dismissSidebarSelection() {
+    func dismissSidebarSelection() {
         projectSelection.clear()
         if sessionSelection.hasMultipleSelected {
             sessionSelection.clear()
         }
     }
 
-    private func removeSelectedProjects() {
+    func removeSelectedProjects() {
         store.removeProjectsFromSidebar(projectSelection.selectedProjectIDs.intersection(listedProjectIDs))
         projectSelection.clear()
     }

@@ -1,37 +1,36 @@
 import SwiftUI
 
-/// All / Recent switch with each option's session count. Neutral colors keep it quieter than
-/// the accent-filled native segmented control, so the list's selected row stays the one accent in the sidebar.
-struct SidebarRecencyPicker: View {
-    @Binding var selection: SessionRecencyFilter
-    let allSessionCount: Int
-    let recentSessionCount: Int
+/// Projects browse the library; Open tabs switches among terminals already open in this window.
+struct SidebarContentPicker: View {
+    @Binding var selection: SidebarContentMode
+    let openTabCount: Int
 
     @Namespace private var selectedSegmentNamespace
 
     var body: some View {
         HStack(spacing: 2) {
-            segment(.all, title: "All", count: allSessionCount)
-            segment(.recent, title: "Recent", count: recentSessionCount)
-                .help("Sessions active in the past seven days")
+            segment(.projects, title: "Projects")
+            segment(.openTabs, title: "Open tabs", count: openTabCount)
         }
         .padding(2)
         .background(ThemePalette.trackFill, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
     }
 
-    private func segment(_ filter: SessionRecencyFilter, title: LocalizedStringKey, count: Int) -> some View {
-        let isSelected = selection == filter
+    private func segment(_ mode: SidebarContentMode, title: LocalizedStringKey, count: Int? = nil) -> some View {
+        let isSelected = selection == mode
 
         return Button {
-            withAnimation(.snappy(duration: 0.2)) { selection = filter }
+            selection = mode
         } label: {
             HStack(spacing: 4) {
                 Text(title)
                     .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
                     .foregroundStyle(isSelected ? .primary : .secondary)
-                Text(count.formatted())
-                    .font(.system(size: 11).monospacedDigit())
-                    .foregroundStyle(.tertiary)
+                if let count {
+                    Text(count.formatted())
+                        .font(.system(size: 11).monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
             }
             .lineLimit(1)
             .frame(maxWidth: .infinity)
@@ -47,7 +46,9 @@ struct SidebarRecencyPicker: View {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Text(title) + Text(", \(count) sessions"))
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(count.map { String($0) } ?? "")
+        .accessibilityIdentifier("sidebar.mode.\(mode.rawValue)")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
