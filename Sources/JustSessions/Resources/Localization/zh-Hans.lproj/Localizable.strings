@@ -52,8 +52,20 @@
 	<string>添加 SSH 主机</string>
 	<key>Add SSH host…</key>
 	<string>添加 SSH 主机…</string>
+	<key>Add a project folder on %@</key>
+	<string>在 %@ 上添加项目文件夹</string>
+	<key>Add a project folder on this Mac</key>
+	<string>在此 Mac 上添加项目文件夹</string>
 	<key>Add host</key>
 	<string>添加主机</string>
+	<key>Add project</key>
+	<string>添加项目</string>
+	<key>Add project on %@</key>
+	<string>在 %@ 上添加项目</string>
+	<key>Add project on this Mac</key>
+	<string>在此 Mac 上添加项目</string>
+	<key>Add project…</key>
+	<string>添加项目…</string>
 	<key>All</key>
 	<string>全部</string>
 	<key>All tools</key>
@@ -360,10 +372,6 @@
 	<string>新建会话</string>
 	<key>New session in %@</key>
 	<string>在 %@ 中新建会话</string>
-	<key>New session on %@</key>
-	<string>在 %@ 上新建会话</string>
-	<key>New session on %@…</key>
-	<string>在 %@ 上新建会话…</string>
 	<key>New terminal</key>
 	<string>新建终端</string>
 	<key>Next Tab</key>
@@ -552,8 +560,6 @@
 	<string>在 %@ 中新建会话</string>
 	<key>Start a new session in %@ on %@</key>
 	<string>在 %2$@ 的 %1$@ 中新建会话</string>
-	<key>Start a new session on %@</key>
-	<string>在 %@ 上新建会话</string>
 	<key>Start an installed coding CLI in a project folder</key>
 	<string>在项目文件夹中启动已安装的编程 CLI</string>
 	<key>Start session</key>
@@ -588,6 +594,8 @@
 	<string>%@ 上的 Pi 会话文件及其关联文件夹将被永久删除。SSH 主机没有废纸篓，此操作无法撤销。</string>
 	<key>The Pi session file and its associated folder will move to the macOS Trash.</key>
 	<string>Pi 会话文件及其关联文件夹将移到 macOS 废纸篓。</string>
+	<key>The folder is listed under %@ in the sidebar, ready for new sessions.</key>
+	<string>该文件夹会列在侧边栏的 %@ 下，可直接在其中新建会话。</string>
 	<key>The project folder no longer exists</key>
 	<string>项目文件夹已不存在</string>
 	<key>The project will be archived; skipped sessions stay on disk and come back when it is restored.</key>

@@ -77,6 +77,20 @@ extension ConversationStore {
         updateSidebarProjectList(updatedList)
     }
 
+    /// From a host heading's +: lists a folder under its host before it has any sessions, or brings it back from the
+    /// archive, and returns its project key. A folder typed for an SSH host is looked up there first, so a missing
+    /// folder is reported and the project is keyed by the path the CLIs record.
+    @discardableResult
+    func addProjectToSidebar(
+        folder: String,
+        on host: SessionHost,
+        resolver: RemoteFolderResolver = RemoteFolderResolver()
+    ) async throws -> String {
+        let projectPath = try await projectLocation(of: folder, on: host, resolver: resolver).key
+        showProjectInSidebar(projectPath)
+        return projectPath
+    }
+
     /// Archiving only changes sidebar membership. Session files, open tabs, names, and pins are kept.
     func removeProjectFromSidebar(_ projectPath: String) {
         removeProjectsFromSidebar([projectPath])

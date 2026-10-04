@@ -504,7 +504,6 @@ private struct SidebarPerfBrowserHarness: View {
                 recentSessionCount: filteredProjection.recentSessionCount,
                 onCheckForUpdates: {},
                 onNewSession: {},
-                onNewSessionOnHost: { _ in },
                 onSelectConversation: { conversation in
                     if store.showRunningCLI(for: conversation) {
                         controls.sessionSelection.clear()

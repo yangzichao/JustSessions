@@ -49,7 +49,6 @@ struct ConversationBrowserView: View {
                 recentSessionCount: filteredProjection.recentSessionCount,
                 onCheckForUpdates: { updateManager.checkForUpdates() },
                 onNewSession: { newSessionSheetHost = defaultNewSessionHost },
-                onNewSessionOnHost: { newSessionSheetHost = $0 },
                 onSelectConversation: { conversation in
                     // A session whose CLI runs opens on its terminal. Its row stays highlighted through its tab, so,
                     // as for a new session's row, the selection clears and the highlight follows the tabs.

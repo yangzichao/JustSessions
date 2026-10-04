@@ -51,7 +51,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, and the terminal colors the selected tab takes on.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
 - `Views/Browser/Sidebar/`: sidebar header and footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.
-- `Views/Browser/Sidebar/Hosts/`: host headings, and the Add SSH host button and sheet.
+- `Views/Browser/Sidebar/Hosts/`: host headings, and the Add SSH host button and sheet. `AddProject/` types the path of a project to add on an SSH host; this Mac's is picked with the folder panel in `Views/Browser/ProjectFolders/`, which the New session sheet uses too.
 - `Views/Terminal/`: a tab's embedded terminal, inset from the window's edges, and the bar above it once its CLI ends.
 - `Views/Preview/`: conversation preview for the selected session.
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.

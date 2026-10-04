@@ -1,8 +1,9 @@
 import SwiftUI
 
 /// A host's heading above its projects: its name, how its last refresh went, and its project count, which gives way
-/// to a + for a new session there while the pointer is over it. Right-click to refresh the host, restore its archived
-/// projects, or remove an SSH host.
+/// to a + for adding a project there while the pointer is over it. New sessions start from a project's own +, so the
+/// heading manages the host's projects instead. Right-click to add a project, restore archived projects, refresh the
+/// host, or remove an SSH host.
 /// The heading is shown even while this Mac is the only host, so the sidebar always reads by host; in that case it
 /// leaves refresh progress to the sidebar header.
 struct SidebarHostHeading: View {
@@ -10,7 +11,7 @@ struct SidebarHostHeading: View {
     let isOnlyHost: Bool
     let refreshStatus: HostRefreshStatus?
     let projectCount: Int
-    let onNewSession: () -> Void
+    let onAddProject: () -> Void
     let onRefresh: () -> Void
     /// While sessions are being deleted, refreshing waits, as the sidebar header's button does.
     let isRefreshDisabled: Bool
@@ -39,7 +40,7 @@ struct SidebarHostHeading: View {
                 .truncationMode(.middle)
             Spacer(minLength: 6)
             refreshStatusIndicator
-            projectCountOrNewSessionButton
+            projectCountOrAddProjectButton
         }
         .font(.system(size: 10, weight: .semibold))
         .padding(.leading, 18)
@@ -49,13 +50,14 @@ struct SidebarHostHeading: View {
         .onHover { isHovered = $0 }
         .help(helpText)
         .contextMenu {
-            Button("New session on \(host.displayName)…", systemImage: "plus", action: onNewSession)
-            Button("Refresh", systemImage: "arrow.clockwise", action: onRefresh)
-                .disabled(refreshStatus == .refreshing || isRefreshDisabled)
+            Button("Add project…", systemImage: "plus", action: onAddProject)
             if archivedProjectCount > 0 {
                 Button("Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox",
                        action: onShowArchivedProjects)
             }
+            Divider()
+            Button("Refresh", systemImage: "arrow.clockwise", action: onRefresh)
+                .disabled(refreshStatus == .refreshing || isRefreshDisabled)
             if let onRemove {
                 Divider()
                 Button("Remove host", systemImage: "minus.circle", role: .destructive, action: onRemove)
@@ -93,13 +95,13 @@ struct SidebarHostHeading: View {
         }
     }
 
-    private var projectCountOrNewSessionButton: some View {
+    private var projectCountOrAddProjectButton: some View {
         ZStack(alignment: .trailing) {
             Text(projectCount.formatted())
                 .monospacedDigit()
                 .foregroundStyle(.tertiary)
                 .opacity(isHovered ? 0 : 1)
-            Button(action: onNewSession) {
+            Button(action: onAddProject) {
                 Image(systemName: "plus")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
@@ -109,9 +111,17 @@ struct SidebarHostHeading: View {
             .buttonStyle(.plain)
             .opacity(isHovered ? 1 : 0)
             .allowsHitTesting(isHovered)
-            .help("Start a new session on \(host.displayName)")
-            .accessibilityLabel("New session on \(host.displayName)")
+            .help(addProjectHelpText)
+            .accessibilityLabel(addProjectAccessibilityLabel)
         }
+    }
+
+    private var addProjectHelpText: LocalizedStringKey {
+        host == .thisMac ? "Add a project folder on this Mac" : "Add a project folder on \(host.displayName)"
+    }
+
+    private var addProjectAccessibilityLabel: LocalizedStringKey {
+        host == .thisMac ? "Add project on this Mac" : "Add project on \(host.displayName)"
     }
 
     private var helpText: String {

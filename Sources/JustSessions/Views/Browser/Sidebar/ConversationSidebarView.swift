@@ -12,7 +12,6 @@ struct ConversationSidebarView: View {
     let recentSessionCount: Int
     let onCheckForUpdates: () -> Void
     let onNewSession: () -> Void
-    let onNewSessionOnHost: (SessionHost) -> Void
     let onSelectConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onRenameProject: (ProjectConversationGroup) -> Void
@@ -23,6 +22,11 @@ struct ConversationSidebarView: View {
     @State private var isAddRemoteHostSheetPresented = false
     /// The host whose archived projects are listed, from its heading's context menu.
     @State private var hostShowingArchivedProjects: SessionHost?
+    /// The SSH host a folder path is being typed for, from its heading's +.
+    @State private var sshHostAddingProject: SessionHost?
+    /// A project just added from a host's heading, scrolled into view once it is listed. A project with no sessions
+    /// sorts last under its host, so it could otherwise be added out of sight.
+    @State private var projectToReveal: String?
     /// Set once a deletion of several sessions has run for `deletionProgressBarDelay`, so a quick one never
     /// flashes the progress bar.
     @State private var isDeletionProgressBarShown = false
@@ -85,56 +89,63 @@ struct ConversationSidebarView: View {
             )
             .padding(.top, 8)
 
-            SidebarSelectionScrollView(
-                isFocused: $isSidebarListFocused,
-                onDismissSelection: dismissSidebarSelection
-            ) {
-                LazyVStack(alignment: .leading, spacing: SidebarIndentGuide.rowSpacing) {
-                    ForEach(hostSections) { section in
-                        hostHeading(for: section)
-                            .padding(.top, 14)
-                            .padding(.bottom, 4)
+            ScrollViewReader { scrollProxy in
+                SidebarSelectionScrollView(
+                    isFocused: $isSidebarListFocused,
+                    onDismissSelection: dismissSidebarSelection
+                ) {
+                    LazyVStack(alignment: .leading, spacing: SidebarIndentGuide.rowSpacing) {
+                        ForEach(hostSections) { section in
+                            hostHeading(for: section)
+                                .padding(.top, 14)
+                                .padding(.bottom, 4)
 
-                        if section.projects.isEmpty {
-                            SidebarEmptyHostNote(message: SidebarEmptyHostMessage(
-                                host: section.host,
-                                refreshStatus: store.hostRefreshStatuses[section.host],
-                                isSearching: isSearching,
-                                recencyFilter: recencyFilter
-                            ))
-                        }
+                            if section.projects.isEmpty {
+                                SidebarEmptyHostNote(message: SidebarEmptyHostMessage(
+                                    host: section.host,
+                                    refreshStatus: store.hostRefreshStatuses[section.host],
+                                    isSearching: isSearching,
+                                    recencyFilter: recencyFilter
+                                ))
+                            }
 
-                        let parentLabels = ProjectParentLabels(projectsOnOneHost: section.projects)
-                        ForEach(section.projects) { project in
-                            SidebarProjectSection(
-                                store: store,
-                                project: project,
-                                parentLabel: parentLabels.label(for: project),
-                                isExpanded: isExpanded(project),
-                                projectSelection: projectSelection,
-                                sessionSelection: sessionSelection,
-                                selectedConversations: selectedConversations,
-                                onToggleExpansion: { projectExpansion.toggle(project.id) },
-                                onClickProject: { handleProjectClick(project) },
-                                onNewSession: { provider in
-                                    store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
-                                },
-                                onClickConversation: handleConversationClick,
-                                onSelectPendingNewSession: { terminalID in
-                                    projectSelection.clear()
-                                    sessionSelection.clear()
-                                    store.selectTerminal(terminalID)
-                                },
-                                onRenameConversation: onRenameConversation,
-                                onRenameProject: { onRenameProject(project) },
-                                onRemoveSelectedProjects: removeSelectedProjects,
-                                onRequestDeletion: onRequestDeletion
-                            )
+                            let parentLabels = ProjectParentLabels(projectsOnOneHost: section.projects)
+                            ForEach(section.projects) { project in
+                                SidebarProjectSection(
+                                    store: store,
+                                    project: project,
+                                    parentLabel: parentLabels.label(for: project),
+                                    isExpanded: isExpanded(project),
+                                    projectSelection: projectSelection,
+                                    sessionSelection: sessionSelection,
+                                    selectedConversations: selectedConversations,
+                                    onToggleExpansion: { projectExpansion.toggle(project.id) },
+                                    onClickProject: { handleProjectClick(project) },
+                                    onNewSession: { provider in
+                                        store.launchNewSessionFromProject(provider: provider, projectPath: project.projectPath)
+                                    },
+                                    onClickConversation: handleConversationClick,
+                                    onSelectPendingNewSession: { terminalID in
+                                        projectSelection.clear()
+                                        sessionSelection.clear()
+                                        store.selectTerminal(terminalID)
+                                    },
+                                    onRenameConversation: onRenameConversation,
+                                    onRenameProject: { onRenameProject(project) },
+                                    onRemoveSelectedProjects: removeSelectedProjects,
+                                    onRequestDeletion: onRequestDeletion
+                                )
+                            }
+                            .padding(.horizontal, 8)
                         }
-                        .padding(.horizontal, 8)
                     }
+                    .padding(.bottom, 12)
                 }
-                .padding(.bottom, 12)
+                .task(id: projectToReveal) {
+                    guard let projectToReveal else { return }
+                    withAnimation { scrollProxy.scrollTo(projectToReveal, anchor: .center) }
+                    self.projectToReveal = nil
+                }
             }
 
             if isDeletionProgressBarShown {
@@ -171,6 +182,10 @@ struct ConversationSidebarView: View {
             ArchivedProjectsSheet(store: store, host: host)
         }
         .dismissesOnClickOutside(item: $hostShowingArchivedProjects)
+        .sheet(item: $sshHostAddingProject) { host in
+            AddProjectOnSSHHostSheet(store: store, host: host, onAdded: revealAddedProject)
+        }
+        .dismissesOnClickOutside(item: $sshHostAddingProject)
         .onAppear { expandProjectsWithOpenTerminals() }
         .onChange(of: store.terminalSessions.map(\.id)) { _, _ in
             expandProjectsWithOpenTerminals()
@@ -204,13 +219,35 @@ struct ConversationSidebarView: View {
             isOnlyHost: !store.hasRemoteHosts,
             refreshStatus: store.hostRefreshStatuses[section.host],
             projectCount: section.projects.count,
-            onNewSession: { onNewSessionOnHost(section.host) },
+            onAddProject: { addProject(on: section.host) },
             onRefresh: { store.refresh(section.host) },
             isRefreshDisabled: store.isDeletingSessions,
             archivedProjectCount: store.archivedProjectPaths(on: section.host).count,
             onShowArchivedProjects: { hostShowingArchivedProjects = section.host },
             onRemove: section.host.sshDestination.map { destination in { store.removeRemoteHost(destination) } }
         )
+    }
+
+    /// This Mac's folder is picked in the system's panel; an SSH host's is typed, as nothing can browse it.
+    private func addProject(on host: SessionHost) {
+        guard host == .thisMac else {
+            sshHostAddingProject = host
+            return
+        }
+        ProjectFolderPanel.choose(prompt: AppLocalization.string("Add project")) { folder in
+            Task {
+                guard let projectPath = try? await store.addProjectToSidebar(folder: folder, on: .thisMac) else { return }
+                revealAddedProject(projectPath)
+            }
+        }
+    }
+
+    /// Selects the added project, as a click on it would, and scrolls to it.
+    private func revealAddedProject(_ projectPath: String) {
+        isSidebarListFocused = true
+        sessionSelection.clear()
+        projectSelection.selectOnly(projectPath)
+        projectToReveal = projectPath
     }
 
     private func isExpanded(_ project: ProjectConversationGroup) -> Bool {

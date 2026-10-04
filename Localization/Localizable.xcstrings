@@ -335,12 +335,72 @@
         }
       }
     },
+    "Add a project folder on %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 %@ 上添加项目文件夹"
+          }
+        }
+      }
+    },
+    "Add a project folder on this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此 Mac 上添加项目文件夹"
+          }
+        }
+      }
+    },
     "Add host": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "添加主机"
+          }
+        }
+      }
+    },
+    "Add project": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加项目"
+          }
+        }
+      }
+    },
+    "Add project on %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 %@ 上添加项目"
+          }
+        }
+      }
+    },
+    "Add project on this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此 Mac 上添加项目"
+          }
+        }
+      }
+    },
+    "Add project…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加项目…"
           }
         }
       }
@@ -1974,26 +2034,6 @@
         }
       }
     },
-    "New session on %@": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 %@ 上新建会话"
-          }
-        }
-      }
-    },
-    "New session on %@…": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 %@ 上新建会话…"
-          }
-        }
-      }
-    },
     "New terminal": {
       "localizations": {
         "zh-Hans": {
@@ -2964,16 +3004,6 @@
         }
       }
     },
-    "Start a new session on %@": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 %@ 上新建会话"
-          }
-        }
-      }
-    },
     "Start an installed coding CLI in a project folder": {
       "localizations": {
         "zh-Hans": {
@@ -3140,6 +3170,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pi 会话文件及其关联文件夹将移到 macOS 废纸篓。"
+          }
+        }
+      }
+    },
+    "The folder is listed under %@ in the sidebar, ready for new sessions.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该文件夹会列在侧边栏的 %@ 下，可直接在其中新建会话。"
           }
         }
       }

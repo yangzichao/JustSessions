@@ -1,4 +1,3 @@
-import AppKit
 import SwiftUI
 
 struct NewSessionSheet: View {
@@ -181,18 +180,8 @@ struct NewSessionSheet: View {
     }
 
     private func chooseProjectFolder() {
-        let panel = NSOpenPanel()
-        panel.canChooseFiles = false
-        panel.canChooseDirectories = true
-        panel.allowsMultipleSelection = false
-        panel.prompt = AppLocalization.string("Choose")
-        if FileManager.default.fileExists(atPath: projectPath) {
-            panel.directoryURL = URL(fileURLWithPath: projectPath)
-        }
-        panel.begin { response in
-            if response == .OK, let selectedFolder = panel.url {
-                projectPath = selectedFolder.path
-            }
+        ProjectFolderPanel.choose(prompt: AppLocalization.string("Choose"), startingAt: projectPath) { chosenFolder in
+            projectPath = chosenFolder
         }
     }
 }

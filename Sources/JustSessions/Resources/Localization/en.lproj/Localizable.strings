@@ -66,8 +66,20 @@
 	<string>Add SSH host</string>
 	<key>Add SSH host…</key>
 	<string>Add SSH host…</string>
+	<key>Add a project folder on %@</key>
+	<string>Add a project folder on %@</string>
+	<key>Add a project folder on this Mac</key>
+	<string>Add a project folder on this Mac</string>
 	<key>Add host</key>
 	<string>Add host</string>
+	<key>Add project</key>
+	<string>Add project</string>
+	<key>Add project on %@</key>
+	<string>Add project on %@</string>
+	<key>Add project on this Mac</key>
+	<string>Add project on this Mac</string>
+	<key>Add project…</key>
+	<string>Add project…</string>
 	<key>All</key>
 	<string>All</string>
 	<key>All tools</key>
@@ -370,10 +382,6 @@
 	<string>New session</string>
 	<key>New session in %@</key>
 	<string>New session in %@</string>
-	<key>New session on %@</key>
-	<string>New session on %@</string>
-	<key>New session on %@…</key>
-	<string>New session on %@…</string>
 	<key>New terminal</key>
 	<string>New terminal</string>
 	<key>Next Tab</key>
@@ -556,8 +564,6 @@
 	<string>Start a native CLI or a plain terminal in a project folder.</string>
 	<key>Start a new session in %@</key>
 	<string>Start a new session in %@</string>
-	<key>Start a new session on %@</key>
-	<string>Start a new session on %@</string>
 	<key>Start an installed coding CLI in a project folder</key>
 	<string>Start an installed coding CLI in a project folder</string>
 	<key>Start session</key>
@@ -592,6 +598,8 @@
 	<string>The Pi session file and its associated folder will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</string>
 	<key>The Pi session file and its associated folder will move to the macOS Trash.</key>
 	<string>The Pi session file and its associated folder will move to the macOS Trash.</string>
+	<key>The folder is listed under %@ in the sidebar, ready for new sessions.</key>
+	<string>The folder is listed under %@ in the sidebar, ready for new sessions.</string>
 	<key>The project folder no longer exists</key>
 	<string>The project folder no longer exists</string>
 	<key>The project will be archived; skipped sessions stay on disk and come back when it is restored.</key>
