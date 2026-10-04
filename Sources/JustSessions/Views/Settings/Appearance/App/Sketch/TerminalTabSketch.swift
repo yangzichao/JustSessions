@@ -17,26 +17,34 @@ struct TerminalTabSketch: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             tabBar
-            Rectangle()
-                .fill(ThemePalette.hairline)
-                .frame(height: 0.5)
             output
         }
     }
 
-    /// Like `WorkspaceTabBar`: the selected tab raised on a chip with ink text, another tab flat beside it.
+    /// Like `WorkspaceTabBar`: a strip in the sidebar's color, the selected tab in the terminal's color running down
+    /// into the terminal, and another tab flat on the strip beside it.
     private var tabBar: some View {
         HStack(spacing: 5) {
-            RoundedRectangle(cornerRadius: 2, style: .continuous)
-                .fill(ThemePalette.raisedSurface)
-                .overlay(RoundedRectangle(cornerRadius: 2, style: .continuous).strokeBorder(ThemePalette.hairline, lineWidth: 0.5))
-                .overlay(SketchTextLine(width: 14, style: ThemePalette.ink.opacity(0.8)))
-                .frame(width: 24, height: 8)
+            SketchTextLine(width: 14, style: ThemePalette.ink.opacity(0.8))
+                .frame(width: 24, height: 10)
+                .background {
+                    WorkspaceTabShape(cornerRadius: 2.5, footRadius: 2)
+                        .fill(ThemePalette.contentSurface)
+                    WorkspaceTabShape(cornerRadius: 2.5, footRadius: 2, isOpenAtBottom: true)
+                        .stroke(ThemePalette.hairline, lineWidth: 0.5)
+                        .padding(.vertical, 0.25)
+                }
             SketchTextLine(width: 12, style: ThemePalette.ink.opacity(0.3))
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 5)
-        .frame(height: 16)
+        .padding(.top, 4)
+        .background {
+            ZStack(alignment: .bottom) {
+                Rectangle().fill(ThemePalette.sidebarSurface)
+                Rectangle().fill(ThemePalette.hairline).frame(height: 0.5)
+            }
+        }
     }
 
     private var output: some View {

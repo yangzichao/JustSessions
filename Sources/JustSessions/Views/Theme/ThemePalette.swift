@@ -6,11 +6,11 @@ import SwiftUI
 enum ThemePalette {
     // MARK: Surfaces
 
-    /// Behind the sidebar, reaching up behind the title bar.
+    /// Behind the sidebar, reaching up behind the title bar, and behind the tab bar.
     static let sidebarSurface = ThemeColor(role: .sidebarSurface)
-    /// Behind the preview, the tab bar, and terminals.
+    /// Behind the preview and terminals.
     static let contentSurface = ThemeColor(role: .contentSurface)
-    /// Raised controls on a surface: the search field, the selected segment, the selected tab.
+    /// Raised controls on a surface: the search field and the selected segment.
     static let raisedSurface = ThemeColor(role: .raisedSurface)
     /// Your messages in a transcript.
     static let userMessageSurface = ThemeColor(role: .userMessageSurface)

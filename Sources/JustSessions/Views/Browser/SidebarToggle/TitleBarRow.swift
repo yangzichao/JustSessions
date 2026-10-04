@@ -1,8 +1,7 @@
 import SwiftUI
 
 /// The strip along the window's top edge that holds the close, minimize, and zoom buttons and the sidebar toggle.
-/// The tab bar shares it: its tabs sit on the strip's center line and, while the sidebar is hidden, start past the
-/// toggle.
+/// The tab bar shares it: while the sidebar is hidden, its tabs start past the toggle.
 struct TitleBarRow: Equatable {
     /// The title bar's height, or in full screen the height of the strip left for the toggle.
     var height: CGFloat

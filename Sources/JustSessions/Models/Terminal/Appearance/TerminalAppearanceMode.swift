@@ -27,8 +27,13 @@ enum TerminalAppearanceMode: String, CaseIterable, Codable, Identifiable {
 
     /// Whether the terminal takes the dark version of the theme's colors.
     func usesDarkColors(effectiveAppearance: NSAppearance) -> Bool {
+        usesDarkColors(whenAppIsDark: effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua)
+    }
+
+    /// The same, for a view that knows only whether the app around it is dark.
+    func usesDarkColors(whenAppIsDark appIsDark: Bool) -> Bool {
         switch self {
-        case .matchApp: effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+        case .matchApp: appIsDark
         case .light: false
         case .dark: true
         }

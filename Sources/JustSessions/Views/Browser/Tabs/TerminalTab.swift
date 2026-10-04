@@ -1,27 +1,41 @@
 import SwiftUI
 
+/// One open terminal in the tab bar, drawn as in Chrome: every tab is one width, with its × inside. The selected tab
+/// takes its terminal's background and runs down into it; the others sit on the bar, parted by short lines.
 struct TerminalTab: View {
     @ObservedObject var session: TerminalSession
     let projectDisplayName: String
     /// Named once SSH hosts are added, whichever host the tab runs on.
     let hostDisplayName: String?
     let isSelected: Bool
+    /// The line that parts this tab from the one before. It hides beside the selected or hovered tab.
+    let showsLeadingSeparator: Bool
+    let onHoverChange: (Bool) -> Void
     let onSelect: () -> Void
     let onRename: (Conversation) -> Void
     let onClose: () -> Void
 
+    @Environment(\.tabBarTerminalPalette) private var terminalPalette
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var isHovered = false
+
     var body: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: 4) {
             Button(action: onSelect) {
                 HStack(spacing: 6) {
                     TerminalStatusIndicator(session: session)
                     Text(session.displayTitle)
                         .lineLimit(1)
-                        .frame(maxWidth: 180)
+                    Spacer(minLength: 0)
                 }
+                // The padding is inside the button, so a click anywhere in the tab but its × selects it.
+                .padding(.leading, 10)
+                .frame(maxHeight: .infinity)
+                .contentShape(Rectangle())
             }
-            .buttonStyle(WorkspaceTabButtonStyle(isSelected: isSelected))
+            .buttonStyle(.plain)
             .help(Text("Show \(session.displayTitle)") + Text(verbatim: "\n" + details))
+            .accessibilityAddTraits(isSelected ? .isSelected : [])
             .contextMenu {
                 if session.isPlainTerminal {
                     Button("Close terminal…", systemImage: "xmark", role: .destructive, action: onClose)
@@ -39,12 +53,20 @@ struct TerminalTab: View {
                 }
             }
 
-            Button(action: onClose) {
-                Image(systemName: "xmark")
-            }
-            .buttonStyle(.borderless)
-            .help("End and close this terminal")
-            .accessibilityLabel("Close \(session.displayTitle)")
+            TerminalTabCloseButton(title: session.displayTitle, action: onClose)
+        }
+        .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
+        .foregroundStyle(isSelected ? AnyShapeStyle(ThemePalette.ink) : AnyShapeStyle(.secondary))
+        // The selected tab sits on the terminal's background, which can be dark in a light window or the reverse.
+        .environment(\.colorScheme, isSelected ? (terminalPalette.isDark ? .dark : .light) : colorScheme)
+        .padding(.trailing, 6)
+        .frame(width: WorkspaceTabMetrics.width, height: WorkspaceTabMetrics.height)
+        .background {
+            WorkspaceTabBackground(isSelected: isSelected, isHovered: isHovered, showsLeadingSeparator: showsLeadingSeparator)
+        }
+        .onHover { isHovering in
+            isHovered = isHovering
+            onHoverChange(isHovering)
         }
     }
 

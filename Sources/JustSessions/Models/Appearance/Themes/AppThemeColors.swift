@@ -1,11 +1,11 @@
 /// One theme's colors in light or in dark, as 0xRRGGBB values. Saturated color stays out of the theme: each CLI keeps
 /// its brand hue, and running and attention states keep their green and amber.
 struct AppThemeColors: Equatable, Sendable {
-    /// Behind the sidebar, setting the list apart from the reading surface.
+    /// Behind the sidebar and the tab bar, setting them apart from the reading surface.
     let sidebarSurface: UInt32
-    /// Behind the preview, the tab bar, and terminals.
+    /// Behind the preview and terminals.
     let contentSurface: UInt32
-    /// Raised controls on a surface: the search field, the selected segment, the selected tab.
+    /// Raised controls on a surface: the search field and the selected segment.
     let raisedSurface: UInt32
     /// Your messages in a transcript.
     let userMessageSurface: UInt32

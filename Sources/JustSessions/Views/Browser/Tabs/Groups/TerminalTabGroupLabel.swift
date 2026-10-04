@@ -43,10 +43,10 @@ struct TerminalTabGroupLabel: View {
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(color)
             .padding(.horizontal, 8)
-            .frame(height: WorkspaceTabButtonStyle.height - 4)
+            .frame(height: WorkspaceTabMetrics.height - 8)
             .background(labelShape.fill(color.opacity(isHovered ? 0.24 : 0.15)))
             // The click target runs the full height of the tabs beside it, not just the pill.
-            .padding(.vertical, 2)
+            .padding(.vertical, 4)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

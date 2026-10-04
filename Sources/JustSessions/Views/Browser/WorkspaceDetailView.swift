@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Right side of the window: the tab bar while tabs are open, above the selected tab's terminal or, with no tab
 /// selected, the selected session's preview. Every tab's terminal stays in the view tree; only the selected one shows.
-/// The tab bar runs up into the title bar, level with the window buttons; with no tabs open, the title bar stays clear.
+/// The tab bar runs up into the title bar beside the window buttons; with no tabs open, the title bar stays clear.
 struct WorkspaceDetailView: View {
     @ObservedObject var store: ConversationStore
     let sessionSelection: SessionMultiSelection
@@ -20,13 +20,11 @@ struct WorkspaceDetailView: View {
             } else {
                 WorkspaceTabBar(
                     store: store,
-                    titleBarHeight: titleBarRow.height,
                     // With the sidebar hidden, the bar's leading edge is the window's, under the window buttons.
                     leadingClearance: isSidebarHidden ? titleBarRow.toggleTrailingEdge : 0,
                     onRenameConversation: onRename,
                     onCloseTerminal: onCloseTerminal
                 )
-                ThemeDivider()
             }
             ZStack {
                 SessionPreviewPane(
