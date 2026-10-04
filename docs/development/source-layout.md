@@ -48,7 +48,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Transcript/Markdown/`: splits Markdown into prose, code blocks, and tables for the native views.
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
 - `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
-- `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, and the terminal colors the selected tab takes on.
+- `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, how tabs narrow to share the bar as more open, and the terminal colors the selected tab takes on.
 - `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help & feedback in the same sheet.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
 - `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.

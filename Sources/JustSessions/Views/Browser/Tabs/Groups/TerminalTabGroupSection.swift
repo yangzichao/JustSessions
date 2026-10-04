@@ -7,7 +7,10 @@ struct TerminalTabGroupSection: View {
     let group: TerminalTabGroup<TerminalSession>
     let color: ThemeColor
     let isCollapsed: Bool
+    let tabWidth: CGFloat
     let onToggleCollapsed: () -> Void
+    /// The label's width with the space after it, which the bar leaves out of the room its tabs share.
+    let onLabelWidthChange: (CGFloat) -> Void
     let onRenameConversation: (Conversation) -> Void
     let onCloseTab: (UUID) -> Void
 
@@ -34,11 +37,13 @@ struct TerminalTabGroupSection: View {
                 onToggleCollapsed: onToggleCollapsed
             )
             .padding(.trailing, 6)
+            .onGeometryChange(for: CGFloat.self, of: \.size.width, action: onLabelWidthChange)
             ForEach(Array(shownTabs.enumerated()), id: \.element.id) { index, session in
                 TerminalTab(
                     session: session,
                     projectDisplayName: projectName,
                     hostDisplayName: store.hasRemoteHosts ? session.host.displayName : nil,
+                    width: tabWidth,
                     isSelected: store.selectedTerminalID == session.id,
                     showsLeadingSeparator: index > 0 && !standsOut(session.id) && !standsOut(shownTabs[index - 1].id),
                     onHoverChange: { trackHover(of: session.id, isHovering: $0) },

@@ -1,12 +1,14 @@
 import SwiftUI
 
-/// One open terminal in the tab bar, drawn as in Chrome: every tab is one width, with its × inside. The selected tab
-/// takes its terminal's background and runs down into it; the others sit on the bar, parted by short lines.
+/// One open terminal in the tab bar, drawn as in Chrome: every tab is one width, which narrows as more tabs open, with
+/// its × inside. The selected tab takes its terminal's background and runs down into it; the others sit on the bar,
+/// parted by short lines.
 struct TerminalTab: View {
     @ObservedObject var session: TerminalSession
     let projectDisplayName: String
     /// Named once SSH hosts are added, whichever host the tab runs on.
     let hostDisplayName: String?
+    let width: CGFloat
     let isSelected: Bool
     /// The line that parts this tab from the one before. It hides beside the selected or hovered tab.
     let showsLeadingSeparator: Bool
@@ -24,9 +26,7 @@ struct TerminalTab: View {
             Button(action: onSelect) {
                 HStack(spacing: 6) {
                     TerminalStatusIndicator(session: session)
-                    Text(session.displayTitle)
-                        .lineLimit(1)
-                    Spacer(minLength: 0)
+                    TerminalTabTitle(title: session.displayTitle)
                 }
                 // The padding is inside the button, so a click anywhere in the tab but its × selects it.
                 .padding(.leading, 10)
@@ -53,14 +53,17 @@ struct TerminalTab: View {
                 }
             }
 
-            TerminalTabCloseButton(title: session.displayTitle, action: onClose)
+            if showsCloseButton {
+                TerminalTabCloseButton(title: session.displayTitle, action: onClose)
+            }
         }
         .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
         .foregroundStyle(isSelected ? AnyShapeStyle(ThemePalette.ink) : AnyShapeStyle(.secondary))
         // The selected tab sits on the terminal's background, which can be dark in a light window or the reverse.
         .environment(\.colorScheme, isSelected ? (terminalPalette.isDark ? .dark : .light) : colorScheme)
-        .padding(.trailing, 6)
-        .frame(width: WorkspaceTabMetrics.width, height: WorkspaceTabMetrics.height)
+        // Without the ×, the title ends as far from the tab's edge as it starts.
+        .padding(.trailing, showsCloseButton ? 6 : 10)
+        .frame(width: width, height: WorkspaceTabMetrics.height)
         .background {
             WorkspaceTabBackground(isSelected: isSelected, isHovered: isHovered, showsLeadingSeparator: showsLeadingSeparator)
         }
@@ -68,6 +71,11 @@ struct TerminalTab: View {
             isHovered = isHovering
             onHoverChange(isHovering)
         }
+    }
+
+    /// A narrow tab hides its × until selected or pointed at, as in Chrome, so its title keeps the room.
+    private var showsCloseButton: Bool {
+        isSelected || isHovered || width >= WorkspaceTabMetrics.minimumWidthForCloseButton
     }
 
     /// Where the tab runs and what it runs, such as "JustSessions · Claude Code · Resume".
