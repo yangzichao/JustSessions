@@ -29,6 +29,11 @@ struct PendingTabReopening {
         savedPositionsOfReopenedTabs[id] = savedPosition
     }
 
+    mutating func returnWaitingTab(_ waitingTab: WaitingTab) {
+        waitingTabs.append(waitingTab)
+        waitingTabs.sort { $0.savedPosition < $1.savedPosition }
+    }
+
     /// Where a tab with this saved place goes among the open tabs: before the first reopened tab saved after it, or
     /// else after the last reopened tab saved before it. With no reopened tab open, it goes first, ahead of tabs
     /// opened since launch.

@@ -41,9 +41,9 @@ struct ContentView: View {
             ExternalEditorStore.shared.refresh()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
-            store.saveTabsForNextLaunch()
-            store.closeAllTerminals()
+            store.prepareTabsForTermination()
         }
+        .onDisappear { store.closeWorkspace() }
         .alert("Rename conversation", isPresented: Binding(isPresenting: $renamingConversation)) {
             TextField("Name", text: $editedTitle)
             Button("Cancel", role: .cancel) { renamingConversation = nil }

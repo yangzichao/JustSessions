@@ -8,23 +8,30 @@ import Foundation
 extension ConversationStore {
     /// Every open tab with something to reopen, then the tabs from the last quit that have not reopened yet.
     var reopenableTabs: [ReopenableTerminalTab] {
-        terminalSessions.compactMap { ReopenableTerminalTab(tab: $0, selectedTerminalID: selectedTerminalID) }
-            + pendingTabReopening.waitingTabs.map(\.tab)
+        let openTabs = terminalSessions.compactMap { terminal -> (UUID, ReopenableTerminalTab)? in
+            guard let tab = ReopenableTerminalTab(tab: terminal, selectedTerminalID: selectedTerminalID) else { return nil }
+            return (terminal.id, tab)
+        }
+        return pendingTabReopening.snapshot(openTabs: openTabs, hasSelectedOpenTab: selectedTerminalID != nil)
     }
 
-    /// As the app quits, before its tabs close.
-    func saveTabsForNextLaunch(to tabsSavedAtQuit: TabsSavedAtQuit = .shared) {
-        tabsSavedAtQuit.save(reopenableTabs, to: userDefaults)
+    /// Replace this window's part of the recovery snapshot, including tabs still waiting for a host.
+    func saveTabsForNextLaunch(to persistence: OpenTabPersistence = .shared) {
+        persistence.update(reopenableTabs, for: tabPersistenceWindowID, in: userDefaults)
     }
 
     /// At launch, before the first refresh.
     func reopenTabsFromLastQuit(
-        from tabsSavedAtQuit: TabsSavedAtQuit = .shared,
+        from persistence: OpenTabPersistence = .shared,
         isEnabled: Bool = TabReopeningSettingsStore.shared.reopensTabsAtLaunch
     ) {
-        let tabs = tabsSavedAtQuit.take(from: userDefaults)
-        guard isEnabled else { return }
-        beginReopening(tabs)
+        guard openTabPersistence == nil else { return }
+        // The packaged launch check explicitly disables reopening through launch arguments. That disposable
+        // process must not replace the user's recovery snapshot with its empty workspace.
+        guard userDefaults.volatileDomain(forName: UserDefaults.argumentDomain)[TabReopeningSettingsStore.userDefaultsKey] as? Bool != false else { return }
+        let tabs = persistence.take(from: userDefaults)
+        openTabPersistence = persistence
+        beginReopening(isEnabled ? tabs : [])
     }
 
     /// Plain terminals reopen right away. Session tabs wait for their host to list its sessions; a host no longer in
@@ -41,9 +48,22 @@ extension ConversationStore {
     }
 
     private func reopenWaitingTabs(where shouldReopen: (ReopenableTerminalTab) -> Bool) {
-        guard !pendingTabReopening.waitingTabs.isEmpty else { return }
+        // Save only after the entire batch; intermediate inserts must not drop the other waiting tabs.
+        isRestoringTabBatch = true
+        defer {
+            isRestoringTabBatch = false
+            persistOpenTabs()
+        }
         for waitingTab in pendingTabReopening.takeWaitingTabs(where: shouldReopen) {
-            guard let session = makeReopenedTerminal(for: waitingTab.tab) else { continue }
+            guard let session = makeReopenedTerminal(for: waitingTab.tab) else {
+                if let conversationID = waitingTab.tab.conversationID,
+                   conversation(withID: conversationID) != nil,
+                   !terminalSessions.contains(where: { $0.conversation?.id == conversationID }) {
+                    // A missing CLI or temporarily unavailable project can become usable on a later refresh.
+                    pendingTabReopening.returnWaitingTab(waitingTab)
+                }
+                continue
+            }
             let index = pendingTabReopening.insertionIndex(
                 forSavedPosition: waitingTab.savedPosition,
                 amongOpenTabIDs: terminalSessions.map(\.id)

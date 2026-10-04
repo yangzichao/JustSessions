@@ -59,6 +59,10 @@ final class ConversationStore: ObservableObject {
     var sessionAttentionTracker = SessionAttentionTracker()
     /// Tabs from the last quit still waiting for their host's sessions; see `ConversationStore+TabReopening`.
     var pendingTabReopening = PendingTabReopening()
+    let tabPersistenceWindowID = UUID()
+    var openTabPersistence: OpenTabPersistence?
+    var isRestoringTabBatch = false
+    var isTerminatingWorkspace = false
     let sessionNotifier: any SessionNotifying
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
@@ -138,7 +142,7 @@ final class ConversationStore: ObservableObject {
                 self.tmuxSessionNamesByHost[.thisMac] = Set(tmuxPaneProcessIDs.keys)
                 self.thisMacTmuxPaneProcessIDs = tmuxPaneProcessIDs
                 self.setInstalledProviders(installedProviders, on: .thisMac)
-                self.replaceConversations(on: .thisMac, with: found)
+                self.replaceConversations(on: .thisMac, with: found, reopenSavedTabs: failures.isEmpty)
                 self.linkWaitingTabsByAppearance(on: .thisMac)
                 self.hostRefreshStatuses[.thisMac] = failures.isEmpty
                     ? .refreshed(.now)
@@ -155,13 +159,13 @@ final class ConversationStore: ObservableObject {
     }
 
     /// Swaps in what one host lists now, keeping every other host's sessions.
-    func replaceConversations(on host: SessionHost, with hostConversations: [Conversation]) {
+    func replaceConversations(on host: SessionHost, with hostConversations: [Conversation], reopenSavedTabs: Bool = true) {
         rememberSidebarProjects(Set(hostConversations.map(\.projectDirectoryKey)))
         let updatedConversations = (conversations.filter { $0.host != host } + hostConversations)
             .sorted { $0.updatedAt > $1.updatedAt }
         if conversations != updatedConversations { conversations = updatedConversations }
         synchronizeTerminalTitles()
-        reopenWaitingTabs(on: host)
+        if reopenSavedTabs { reopenWaitingTabs(on: host) }
     }
 
     func adapter(for provider: ConversationProvider) -> (any ConversationAdapter)? {
@@ -439,6 +443,7 @@ final class ConversationStore: ObservableObject {
 
     /// Swaps a tab for another in the same place, closing the old one; keeps it selected if it was.
     func replaceTerminal(at index: Int, with session: TerminalSession) {
+        defer { persistOpenTabs() }
         let replacedID = terminalSessions[index].id
         terminalSessions[index].close()
         terminalSessions[index] = session
@@ -447,6 +452,7 @@ final class ConversationStore: ObservableObject {
 
     /// Adds the tab after its project's other tabs, or at the end, and shows it.
     func openTerminal(_ session: TerminalSession) {
+        defer { persistOpenTabs() }
         showProjectInSidebar(session.projectDirectoryKey)
         let insertionIndex = TerminalTabOrder.insertionIndex(
             forProjectKey: session.projectDirectoryKey,
@@ -458,6 +464,7 @@ final class ConversationStore: ObservableObject {
 
     /// Puts a tab reopened from the last quit at `index` without showing it, unless `selecting`.
     func insertReopenedTerminal(_ session: TerminalSession, at index: Int, selecting: Bool) {
+        defer { persistOpenTabs() }
         showProjectInSidebar(session.projectDirectoryKey)
         terminalSessions.insert(session, at: min(index, terminalSessions.count))
         if selecting { selectedTerminalID = session.id }
@@ -470,6 +477,7 @@ final class ConversationStore: ObservableObject {
     /// Leaving a new session's tab refreshes its host, so what its CLI saved so far is listed.
     func selectTerminal(_ id: UUID?) {
         guard selectedTerminalID != id else { return }
+        defer { persistOpenTabs() }
         let leftNewSessionTab = selectedTerminalID == id ? nil : selectedTerminal.flatMap { $0.startsNewSession ? $0 : nil }
         selectedTerminalID = id
         if let leftNewSessionTab { refresh(leftNewSessionTab.host) }
@@ -477,6 +485,7 @@ final class ConversationStore: ObservableObject {
 
     func closeTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }) else { return }
+        defer { persistOpenTabs() }
         let closedTab = terminalSessions[index]
         let indexToSelect = TerminalTabOrder.indexToSelect(
             afterClosingTabAt: index,
@@ -489,6 +498,7 @@ final class ConversationStore: ObservableObject {
     }
 
     func closeAllTerminals() {
+        defer { persistOpenTabs() }
         for session in terminalSessions { session.close() }
         terminalSessions = []
         selectedTerminalID = nil

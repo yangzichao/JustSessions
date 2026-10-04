@@ -119,7 +119,7 @@ struct TabReopeningStoreTests {
         let remote = sandbox.conversation(host: .ssh("devbox"))
 
         store.beginReopening([.session(remote, wasSelected: true)])
-        store.saveTabsForNextLaunch(to: TabsSavedAtQuit())
+        store.saveTabsForNextLaunch(to: OpenTabPersistence())
 
         #expect(TerminalTabsToReopen.load(from: sandbox.userDefaults).tabs == [.session(remote, wasSelected: true)])
     }
@@ -131,7 +131,7 @@ struct TabReopeningStoreTests {
         defer { store.closeAllTerminals() }
         TerminalTabsToReopen(tabs: [.plainTerminal(in: sandbox.projectLocation)]).save(to: sandbox.userDefaults)
 
-        store.reopenTabsFromLastQuit(from: TabsSavedAtQuit(), isEnabled: false)
+        store.reopenTabsFromLastQuit(from: OpenTabPersistence(), isEnabled: false)
 
         #expect(store.terminalSessions.isEmpty)
         #expect(store.pendingTabReopening.waitingTabs.isEmpty)
@@ -144,7 +144,7 @@ struct TabReopeningStoreTests {
         defer { store.closeAllTerminals() }
         TerminalTabsToReopen(tabs: [.plainTerminal(in: sandbox.projectLocation)]).save(to: sandbox.userDefaults)
 
-        store.reopenTabsFromLastQuit(from: TabsSavedAtQuit(), isEnabled: true)
+        store.reopenTabsFromLastQuit(from: OpenTabPersistence(), isEnabled: true)
 
         let tab = try #require(store.terminalSessions.first)
         #expect(tab.isPlainTerminal)

@@ -63,6 +63,7 @@ extension ConversationStore {
         session.synchronize(conversation: conversation, displayTitle: title(for: conversation))
         adoptSessionTmuxName(for: session)
         // Sidebar rows look up open terminals through the store, which does not see a tab's own changes.
+        persistOpenTabs()
         objectWillChange.send()
         return true
     }

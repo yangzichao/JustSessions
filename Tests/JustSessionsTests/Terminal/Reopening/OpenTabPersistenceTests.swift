@@ -2,9 +2,9 @@ import Foundation
 import Testing
 @testable import JustSessions
 
-/// One window per launch reopens the last quit's tabs, and every window's tabs are saved at quit.
+/// One window restores the snapshot, and live updates merge every window without appending duplicates.
 @MainActor
-struct TabsSavedAtQuitTests {
+struct OpenTabPersistenceTests {
     private let first = ReopenableTerminalTab(conversationID: "claude:a", projectDirectoryKey: "/a", wasSelected: true)
     private let second = ReopenableTerminalTab(conversationID: nil, projectDirectoryKey: "/b", wasSelected: false)
 
@@ -12,7 +12,7 @@ struct TabsSavedAtQuitTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         TerminalTabsToReopen(tabs: [first]).save(to: settings.userDefaults)
-        let tabsSavedAtQuit = TabsSavedAtQuit()
+        let tabsSavedAtQuit = OpenTabPersistence()
 
         #expect(tabsSavedAtQuit.take(from: settings.userDefaults) == [first])
         #expect(tabsSavedAtQuit.take(from: settings.userDefaults).isEmpty)
@@ -22,10 +22,13 @@ struct TabsSavedAtQuitTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         TerminalTabsToReopen(tabs: [first, second]).save(to: settings.userDefaults)
-        let tabsSavedAtQuit = TabsSavedAtQuit()
+        let tabsSavedAtQuit = OpenTabPersistence()
+        let firstWindow = UUID()
+        let secondWindow = UUID()
 
-        tabsSavedAtQuit.save([second], to: settings.userDefaults)
-        tabsSavedAtQuit.save([first], to: settings.userDefaults)
+        tabsSavedAtQuit.update([second], for: firstWindow, in: settings.userDefaults)
+        tabsSavedAtQuit.update([first], for: secondWindow, in: settings.userDefaults)
+        tabsSavedAtQuit.update([second], for: firstWindow, in: settings.userDefaults)
 
         #expect(TerminalTabsToReopen.load(from: settings.userDefaults).tabs == [second, first])
     }
@@ -35,6 +38,6 @@ struct TabsSavedAtQuitTests {
         defer { settings.removeSuite() }
         settings.userDefaults.set(Data("not json".utf8), forKey: TerminalTabsToReopen.userDefaultsKey)
 
-        #expect(TabsSavedAtQuit().take(from: settings.userDefaults).isEmpty)
+        #expect(OpenTabPersistence().take(from: settings.userDefaults).isEmpty)
     }
 }
