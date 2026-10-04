@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The themes, three to a row, each drawn as the window in that theme and the current appearance. Choosing one also
-/// gives terminals its colors.
+/// The themes, three to a row, each drawn as the window in that theme, light and dark split on a slant, so a theme
+/// shows both whatever the current appearance. Choosing one also gives terminals its colors.
 struct AppThemePicker: View {
     @ObservedObject var appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
@@ -19,7 +19,7 @@ struct AppThemePicker: View {
                             .choose(theme)
                     }
                 ) {
-                    AppWindowSketch().environment(\.appTheme, theme)
+                    LightAndDarkWindowSketch().environment(\.appTheme, theme)
                 }
             }
         }
