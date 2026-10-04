@@ -20,6 +20,26 @@
         }
       }
     },
+    "%@ - Left view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ - 左侧视图"
+          }
+        }
+      }
+    },
+    "%@ - Right view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ - 右侧视图"
+          }
+        }
+      }
+    },
     "%@ could not be refreshed: %@": {
       "localizations": {
         "zh-Hans": {
@@ -447,6 +467,16 @@
         }
       }
     },
+    "Add tab to new split view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向新拆分视图添加标签页"
+          }
+        }
+      }
+    },
     "All sessions": {
       "localizations": {
         "zh-Hans": {
@@ -633,6 +663,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 上已归档的项目"
+          }
+        }
+      }
+    },
+    "Arrange split view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调整拆分视图"
           }
         }
       }
@@ -888,6 +928,26 @@
         }
       }
     },
+    "Close Left View": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭左侧视图"
+          }
+        }
+      }
+    },
+    "Close Right View": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭右侧视图"
+          }
+        }
+      }
+    },
     "Close Tab…": {
       "localizations": {
         "zh-Hans": {
@@ -924,6 +984,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭查找"
+          }
+        }
+      }
+    },
+    "Close left view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭左侧视图"
+          }
+        }
+      }
+    },
+    "Close right view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭右侧视图"
           }
         }
       }
@@ -984,6 +1064,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭标签页；没有标签页时关闭窗口"
+          }
+        }
+      }
+    },
+    "Close this view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭此视图"
           }
         }
       }
@@ -2226,6 +2316,16 @@
         }
       }
     },
+    "Move tab into split view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将标签页移至拆分视图"
+          }
+        }
+      }
+    },
     "Name": {
       "localizations": {
         "zh-Hans": {
@@ -2302,6 +2402,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "在 %@ 中新建会话"
+          }
+        }
+      }
+    },
+    "New split view with current tab": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用当前标签页创建新的拆分视图"
           }
         }
       }
@@ -3110,6 +3220,26 @@
         }
       }
     },
+    "Reverse Views": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "反转视图"
+          }
+        }
+      }
+    },
+    "Reverse views": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "反转视图"
+          }
+        }
+      }
+    },
     "Right-click a selected row in the sidebar to resume, branch, or delete them.": {
       "localizations": {
         "zh-Hans": {
@@ -3286,6 +3416,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "选择多个会话或项目"
+          }
+        }
+      }
+    },
+    "Separate Views": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消拆分视图"
+          }
+        }
+      }
+    },
+    "Separate views": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消拆分视图"
           }
         }
       }
@@ -3470,6 +3620,16 @@
         }
       }
     },
+    "Split View Resize Handle (draggable)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拆分视图下大小调整手柄（可拖动）"
+          }
+        }
+      }
+    },
     "Start a native CLI or a plain terminal in a project folder.": {
       "localizations": {
         "zh-Hans": {
@@ -3572,6 +3732,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在停止…"
+          }
+        }
+      }
+    },
+    "Swap with left view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与左侧视图交换"
+          }
+        }
+      }
+    },
+    "Swap with right view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与右侧视图交换"
           }
         }
       }

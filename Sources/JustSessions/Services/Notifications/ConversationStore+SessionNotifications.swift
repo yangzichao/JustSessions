@@ -23,10 +23,11 @@ extension ConversationStore {
         showRunningCLI(for: conversation)
     }
 
-    /// The app is in front with the CLI's tab selected.
+    /// The app is in front with the CLI's terminal on screen: its tab is selected, or it is the other half of the
+    /// split shown beside the selected tab.
     private func isInView(_ source: SessionAttentionSource) -> Bool {
         guard let tabID = source.tabID else { return false }
-        return sessionNotifier.isApplicationActive && selectedTerminalID == tabID
+        return sessionNotifier.isApplicationActive && (selectedTerminalID == tabID || shownSplit?.contains(tabID) == true)
     }
 
     /// The tab the source names, or else a tab opened on the same session since, such as by reattaching.

@@ -35,16 +35,22 @@ struct TerminalTabGroupSection: View {
             .padding(.trailing, 6)
             .onGeometryChange(for: CGFloat.self, of: \.size.width, action: onLabelWidthChange)
             ForEach(Array(shownTabs.enumerated()), id: \.element.id) { index, session in
+                let split = store.split(containing: session.id)
                 TerminalTab(
                     session: session,
-                    projectDisplayName: projectName,
+                    projectDisplayName: store.projectDisplayName(forProjectPath: session.projectDirectoryKey),
                     hostDisplayName: store.hasRemoteHosts ? session.host.displayName : nil,
-                    width: tabWidth,
+                    width: split == nil ? tabWidth : WorkspaceTabWidth.splitTabWidth(forTabWidth: tabWidth),
                     isSelected: store.selectedTerminalID == session.id,
-                    showsLeadingSeparator: index > 0 && !standsOut(session.id) && !standsOut(shownTabs[index - 1].id),
+                    isActive: isActive(session.id),
+                    splitSide: split.flatMap { store.sides(of: $0)?.side(of: session.id) },
+                    isSplitPartnerHovered: hoveredTabID.map { split?.partner(of: session.id) == $0 } ?? false,
+                    showsLeadingSeparator: index > 0 && showsSeparator(between: shownTabs[index - 1].id, and: session.id),
+                    splitMenu: splitMenu(for: session.id),
                     onHoverChange: { trackHover(of: session.id, isHovering: $0) },
                     onSelect: { store.selectTerminal(session.id) },
                     onRename: onRenameConversation,
+                    onSplitAction: { perform($0, from: session.id) },
                     onClose: { onCloseTab(session.id) }
                 )
                 .id(session.id)
@@ -57,9 +63,56 @@ struct TerminalTabGroupSection: View {
         }
     }
 
-    /// The selected and the hovered tab draw a shape of their own, so no separator runs beside them.
-    private func standsOut(_ tabID: UUID) -> Bool {
-        tabID == store.selectedTerminalID || tabID == hoveredTabID
+    /// The split entries Chrome's tab menu offers for the tab: a tab in a split arranges it; any other tab can open
+    /// in a new split with the selected tab while that is in none, or take a place in its split while it is in one.
+    private func splitMenu(for tabID: UUID) -> TerminalTabSplitMenu? {
+        if store.split(containing: tabID) != nil { return .arrangeSplit }
+        guard let selectedTerminalID = store.selectedTerminalID else { return nil }
+        if store.split(containing: selectedTerminalID) != nil { return .moveIntoShownSplit }
+        guard tabID == selectedTerminalID else { return .newSplitWithSelectedTab }
+        let candidates = store.terminalSessions
+            .filter { $0.id != tabID && store.split(containing: $0.id) == nil }
+            .map { TerminalTabSplitCandidate(session: $0, projectDisplayName: store.projectDisplayName(forProjectPath: $0.projectDirectoryKey)) }
+        return .addTabToNewSplit(candidates: candidates)
+    }
+
+    /// Acts on the tab's split entry. The views a split entry closes go through the same close request as their ×.
+    private func perform(_ action: TerminalTabSplitAction, from tabID: UUID) {
+        switch action {
+        case .newSplitWithSelectedTab:
+            store.splitSelectedTerminal(with: tabID)
+        case .addToNewSplit(let otherTabID):
+            store.splitSelectedTerminal(with: otherTabID)
+        case .moveIntoShownSplit(let side):
+            store.moveIntoShownSplit(tabID, swappingWith: side)
+        case .separateViews:
+            if let split = store.split(containing: tabID) { store.separateSplit(split.id) }
+        case .closeView(let side):
+            if let split = store.split(containing: tabID), let sides = store.sides(of: split) {
+                onCloseTab(sides.tabID(on: side))
+            }
+        case .reverseViews:
+            if let split = store.split(containing: tabID) { store.reverseSplit(split.id) }
+        }
+    }
+
+    /// Drawn as the selected tab: the selected tab and the other tab of its split.
+    private func isActive(_ tabID: UUID) -> Bool {
+        tabID == store.selectedTerminalID || store.shownSplit?.contains(tabID) == true
+    }
+
+    /// Under the pointer, itself or through the other tab of its split.
+    private func isLitByHover(_ tabID: UUID) -> Bool {
+        guard let hoveredTabID else { return false }
+        return tabID == hoveredTabID || store.split(containing: hoveredTabID)?.contains(tabID) == true
+    }
+
+    /// No separator runs beside a tab drawing a shape of its own, active or under the pointer, nor between a split's
+    /// two tabs, which join into one shape.
+    private func showsSeparator(between previousTabID: UUID, and tabID: UUID) -> Bool {
+        let standsOut = { (tabID: UUID) in self.isActive(tabID) || self.isLitByHover(tabID) }
+        let isSameSplit = store.split(containing: tabID)?.contains(previousTabID) == true
+        return !standsOut(previousTabID) && !standsOut(tabID) && !isSameSplit
     }
 
     private func trackHover(of tabID: UUID, isHovering: Bool) {

@@ -32,6 +32,9 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var selectedTerminalID: UUID? {
         didSet { selectedTerminal?.startNowThatItIsShown() }
     }
+    /// Pairs of tabs linked side by side, as in Chrome's split view, any number of them, with a tab in at most one.
+    /// A split outlives the selection; both its terminals show only while one of them is selected, see `shownSplit`.
+    @Published private(set) var terminalSplits: [TerminalSplit] = []
     /// Every conversation queued in the running deletion, of one session or several. It changes only when a
     /// deletion starts and ends; `deletionProgress` follows the sessions in between.
     @Published private(set) var pendingDeletionConversationIDs: Set<String> = []
@@ -442,32 +445,35 @@ final class ConversationStore: ObservableObject {
 
     // MARK: - Tabs
 
-    /// Swaps a tab for another in the same place, closing the old one; keeps it selected if it was.
+    /// Swaps a tab for another in the same place, closing the old one; keeps it selected if it was, and hands it the
+    /// old tab's place in a split.
     func replaceTerminal(at index: Int, with session: TerminalSession) {
         defer { persistOpenTabs() }
         let replacedID = terminalSessions[index].id
         terminalSessions[index].close()
         terminalSessions[index] = session
+        if terminalSplits.contains(where: { $0.contains(replacedID) }) {
+            terminalSplits = terminalSplits.map { $0.replacing(replacedID, with: session.id) }
+        }
         if selectedTerminalID == replacedID { selectedTerminalID = session.id }
     }
 
-    /// Adds the tab after its project's other tabs, or at the end, and shows it.
+    /// Adds the tab after the last tab of its project's group, which may be a split's, or at the end, and shows it.
     func openTerminal(_ session: TerminalSession) {
         defer { persistOpenTabs() }
         showProjectInSidebar(session.projectDirectoryKey)
-        let insertionIndex = TerminalTabOrder.insertionIndex(
-            forProjectKey: session.projectDirectoryKey,
-            amongTabProjectKeys: terminalSessions.map(\.projectDirectoryKey)
-        )
-        terminalSessions.insert(session, at: insertionIndex)
+        terminalSessions.insert(session, at: tabStrip.insertionIndex(forNewTabOfProject: session.projectDirectoryKey))
         selectedTerminalID = session.id
     }
 
-    /// Puts a tab reopened from the last quit at `index` without showing it, unless `selecting`.
+    /// Puts a tab reopened from the last quit at `index` without showing it, unless `selecting`. Where a tab at
+    /// `index` would part a split's two tabs or sit among another group's tabs, it goes where a new tab of its
+    /// project opens instead.
     func insertReopenedTerminal(_ session: TerminalSession, at index: Int, selecting: Bool) {
         defer { persistOpenTabs() }
         showProjectInSidebar(session.projectDirectoryKey)
-        terminalSessions.insert(session, at: min(index, terminalSessions.count))
+        let index = tabStrip.insertionIndex(forReopenedTabOfProject: session.projectDirectoryKey, at: index)
+        terminalSessions.insert(session, at: index)
         if selecting { selectedTerminalID = session.id }
     }
 
@@ -475,32 +481,159 @@ final class ConversationStore: ObservableObject {
         terminalSessions.first { $0.id == selectedTerminalID }
     }
 
-    /// Leaving a new session's tab refreshes its host, so what its CLI saved so far is listed.
+    // MARK: - Split view
+
+    /// The tabs and splits as `TerminalTabStrip` orders them.
+    var tabStrip: TerminalTabStrip {
+        TerminalTabStrip(
+            tabs: terminalSessions.map { TerminalTabStrip.Tab(id: $0.id, projectKey: $0.projectDirectoryKey) },
+            splits: terminalSplits
+        )
+    }
+
+    /// Takes on the strip's order and splits, changing only what differs.
+    private func apply(_ strip: TerminalTabStrip) {
+        let tabIDs = strip.tabIDs
+        if tabIDs != terminalSessions.map(\.id) {
+            let tabsByID = Dictionary(uniqueKeysWithValues: terminalSessions.map { ($0.id, $0) })
+            terminalSessions = tabIDs.compactMap { tabsByID[$0] }
+        }
+        if strip.splits != terminalSplits { terminalSplits = strip.splits }
+    }
+
+    func split(containing tabID: UUID) -> TerminalSplit? {
+        terminalSplits.first { $0.contains(tabID) }
+    }
+
+    /// The split's left and right tabs: the one that comes first in the tab bar shows on the left, as in Chrome.
+    func sides(of split: TerminalSplit) -> TerminalSplit.Sides? {
+        tabStrip.sides(of: split)
+    }
+
+    /// The tab group the tab shows in, by project key: its split's group while it is in one, or else its project's.
+    /// Tabs of one group always sit together in `terminalSessions`.
+    func tabGroupKey(of tab: TerminalSession) -> String {
+        split(containing: tab.id)?.groupKey ?? tab.projectDirectoryKey
+    }
+
+    /// Every tab's group key, in tab bar order.
+    var tabGroupKeys: [String] {
+        terminalSessions.map(tabGroupKey(of:))
+    }
+
+    /// The split while the selected tab is in it, when both its panes show side by side.
+    var shownSplit: TerminalSplit? {
+        selectedTerminalID.flatMap(split(containing:))
+    }
+
+    /// The tabs in the order they would take with every split separated. Splits are not saved across quits, so
+    /// this is the order the tabs reopen in, with no tab inside another project's group.
+    var terminalSessionsWithSplitsSeparated: [TerminalSession] {
+        var strip = tabStrip
+        strip.separateAllSplits()
+        let tabsByID = Dictionary(uniqueKeysWithValues: terminalSessions.map { ($0.id, $0) })
+        return strip.tabIDs.compactMap { tabsByID[$0] }
+    }
+
+    /// Shows another tab side by side with the selected tab, which stays selected, as Chrome's AddToNewSplit; see
+    /// `TerminalTabStrip.addSplit(joining:beside:splitID:)` for where the other tab moves. Neither tab may be in a
+    /// split already. A reopened tab still waiting to be shown starts as it joins.
+    func splitSelectedTerminal(with id: UUID) {
+        guard let selectedTerminalID, let joiningTab = terminalSessions.first(where: { $0.id == id }) else { return }
+        var strip = tabStrip
+        guard strip.addSplit(joining: id, beside: selectedTerminalID) != nil else { return }
+        defer { persistOpenTabs() }
+        apply(strip)
+        joiningTab.startNowThatItIsShown()
+    }
+
+    /// The split's tabs trade places in the tab bar, so its panes trade sides. The selection stays.
+    func reverseSplit(_ splitID: UUID) {
+        var strip = tabStrip
+        strip.reverseSplit(splitID)
+        guard strip != tabStrip else { return }
+        defer { persistOpenTabs() }
+        apply(strip)
+    }
+
+    /// Unlinks the split, keeping both tabs open and the selection; a tab from another project goes back to its
+    /// project's tabs. The shown split's tab that is not selected goes off screen.
+    func separateSplit(_ splitID: UUID) {
+        guard terminalSplits.contains(where: { $0.id == splitID }) else { return }
+        defer { persistOpenTabs() }
+        var strip = tabStrip
+        strip.separateSplit(splitID)
+        refreshingHostsOfNewSessionsLeavingTheScreen { apply(strip) }
+    }
+
+    /// Puts a tab in no split into the shown split in place of the tab on `side`, as Chrome's "Move tab into split
+    /// view": the two trade places in the tab bar, and the tab swapped out goes back to its project's tabs when it
+    /// lands among another project's, and goes off screen. When the tab swapped out was selected, the incoming tab is
+    /// selected instead. A reopened tab still waiting to be shown starts as it joins.
+    func moveIntoShownSplit(_ tabID: UUID, swappingWith side: TerminalSplit.Side) {
+        guard let shownSplit, let sides = sides(of: shownSplit),
+              let incomingTab = terminalSessions.first(where: { $0.id == tabID }) else { return }
+        let outgoingID = sides.tabID(on: side)
+        var strip = tabStrip
+        guard strip.swap(tabID, intoSplit: shownSplit.id, replacing: outgoingID) else { return }
+        defer { persistOpenTabs() }
+        refreshingHostsOfNewSessionsLeavingTheScreen {
+            apply(strip)
+            if selectedTerminalID == outgoingID { selectedTerminalID = tabID }
+        }
+        incomingTab.startNowThatItIsShown()
+    }
+
+    /// The tabs whose terminals are on screen: both tabs of a shown split, or else the selected tab.
+    private var terminalIDsOnScreen: Set<UUID> {
+        if let shownSplit { return shownSplit.tabIDs }
+        return selectedTerminalID.map { [$0] } ?? []
+    }
+
+    /// Makes `change`, then refreshes the host of every new session's tab it took off screen, so what its CLI saved so
+    /// far is listed.
+    private func refreshingHostsOfNewSessionsLeavingTheScreen(_ change: () -> Void) {
+        let shownBefore = terminalIDsOnScreen
+        change()
+        let shownAfter = terminalIDsOnScreen
+        var hostsToRefresh: [SessionHost] = []
+        for tab in terminalSessions where tab.startsNewSession && shownBefore.contains(tab.id) && !shownAfter.contains(tab.id) {
+            if !hostsToRefresh.contains(tab.host) { hostsToRefresh.append(tab.host) }
+        }
+        for host in hostsToRefresh { refresh(host) }
+    }
+
+    /// A new session's tab that goes off screen refreshes its host, so what its CLI saved so far is listed.
+    /// Moving between the two panes of a shown split keeps both on screen, so it refreshes nothing.
     func selectTerminal(_ id: UUID?) {
         guard selectedTerminalID != id else { return }
         defer { persistOpenTabs() }
-        let leftNewSessionTab = selectedTerminalID == id ? nil : selectedTerminal.flatMap { $0.startsNewSession ? $0 : nil }
-        selectedTerminalID = id
-        if let leftNewSessionTab { refresh(leftNewSessionTab.host) }
+        refreshingHostsOfNewSessionsLeavingTheScreen { selectedTerminalID = id }
     }
 
+    /// Closing a tab of a split unlinks it, and the other tab goes back to its project's tabs; closing the selected
+    /// one leaves the other in front, full width. Closing any other selected tab shows a neighbor in its group.
     func closeTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }) else { return }
         defer { persistOpenTabs() }
         let closedTab = terminalSessions[index]
-        let indexToSelect = TerminalTabOrder.indexToSelect(
-            afterClosingTabAt: index,
-            amongTabProjectKeys: terminalSessions.map(\.projectDirectoryKey)
-        )
+        var remainingTabIDs = terminalSessions.map(\.id)
+        remainingTabIDs.remove(at: index)
+        let neighborToSelect = TerminalTabOrder.indexToSelect(afterClosingTabAt: index, amongTabProjectKeys: tabGroupKeys)
+            .map { remainingTabIDs[$0] }
+        let tabToSelect = split(containing: id)?.partner(of: id) ?? neighborToSelect
+        var strip = tabStrip
+        strip.removeTab(id)
         closedTab.close()
-        terminalSessions.remove(at: index)
-        if selectedTerminalID == id { selectedTerminalID = indexToSelect.map { terminalSessions[$0].id } }
+        apply(strip)
+        if selectedTerminalID == id { selectedTerminalID = tabToSelect }
         if closedTab.startsNewSession { refresh(closedTab.host) }
     }
 
     func closeAllTerminals() {
         defer { persistOpenTabs() }
         for session in terminalSessions { session.close() }
+        terminalSplits = []
         terminalSessions = []
         selectedTerminalID = nil
     }

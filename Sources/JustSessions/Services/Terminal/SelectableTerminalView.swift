@@ -10,6 +10,9 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     var sendsShiftReturnAsCSIu = false
     /// Called after the terminal's colors are set, so the margin around it can match its background.
     var onBackgroundColorChange: (() -> Void)?
+    /// Called when a click lands on the terminal or its margin, before the terminal takes the keyboard, so a split
+    /// pane whose tab is not selected can select it.
+    var onMouseDown: (() -> Void)?
 
     private var appearancePreferences = TerminalAppearancePreferences()
     private var theme = AppTheme.justSessions
@@ -61,6 +64,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     }
 
     override func mouseDown(with event: NSEvent) {
+        onMouseDown?()
         window?.makeFirstResponder(self)
         super.mouseDown(with: event)
     }

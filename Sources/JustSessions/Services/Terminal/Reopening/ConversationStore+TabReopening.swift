@@ -6,9 +6,11 @@ import Foundation
 /// the CLI, and a plain terminal opens a new shell in its folder. A New session or Branch tab whose session was never
 /// known has nothing to reopen.
 extension ConversationStore {
-    /// Every open tab with something to reopen, then the tabs from the last quit that have not reopened yet.
+    /// Every open tab with something to reopen, then the tabs from the last quit that have not reopened yet. Splits
+    /// are not saved across quits, so the open tabs are saved in the order they would take with every split
+    /// separated, and none is saved among another project's tabs.
     var reopenableTabs: [ReopenableTerminalTab] {
-        let openTabs = terminalSessions.compactMap { terminal -> (UUID, ReopenableTerminalTab)? in
+        let openTabs = terminalSessionsWithSplitsSeparated.compactMap { terminal -> (UUID, ReopenableTerminalTab)? in
             guard let tab = ReopenableTerminalTab(tab: terminal, selectedTerminalID: selectedTerminalID) else { return nil }
             return (terminal.id, tab)
         }

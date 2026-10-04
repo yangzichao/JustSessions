@@ -1,14 +1,15 @@
 import SwiftUI
 
 extension View {
-    /// Shows the column-resize pointer over the sidebar divider. At the narrowest or widest sidebar the pointer
-    /// only points the way the divider can still move, like a native split view divider.
-    func sidebarResizeCursor(canShrink: Bool, canGrow: Bool) -> some View {
-        modifier(SidebarResizeCursor(canShrink: canShrink, canGrow: canGrow))
+    /// Shows the column-resize pointer over a divider between two columns, such as the sidebar's edge or the gutter
+    /// between split panes. When the column before the divider is as narrow or as wide as it gets, the pointer only
+    /// points the way the divider can still move, like a native split view divider.
+    func columnResizeCursor(canShrink: Bool, canGrow: Bool) -> some View {
+        modifier(ColumnResizeCursor(canShrink: canShrink, canGrow: canGrow))
     }
 }
 
-private struct SidebarResizeCursor: ViewModifier {
+private struct ColumnResizeCursor: ViewModifier {
     let canShrink: Bool
     let canGrow: Bool
 

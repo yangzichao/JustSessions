@@ -12,6 +12,18 @@ extension View {
     }
 }
 
+extension TerminalPalette {
+    /// The terminals' background, which the selected tab, a shown split's tabs, and the split area around its panes take.
+    var backgroundColor: Color {
+        Color(nsColor: NSColor(hexValue: background))
+    }
+
+    /// The look of what sits on the terminals' background, which can be dark in a light window or the reverse.
+    var colorScheme: ColorScheme {
+        isDark ? .dark : .light
+    }
+}
+
 /// Picks the palette as `TerminalAppearanceStyling` does for each terminal.
 private struct TabBarTerminalPalette: ViewModifier {
     @ObservedObject var appearanceStore: TerminalAppearanceStore

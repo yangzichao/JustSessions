@@ -6,6 +6,9 @@ enum WorkspaceTabMetrics {
     static let maximumWidth: CGFloat = 200
     /// The narrowest a tab gets: its status and the start of its title still show. Past this, the bar scrolls.
     static let minimumWidth: CGFloat = 72
+    /// The narrowest a split's tab gets, each half of one tab's width: its 10-point leading padding, 10-point status,
+    /// 6-point gap, and 10-point trailing padding leave 20 points, about three characters of its title.
+    static let minimumSplitTabWidth: CGFloat = 56
     /// Tabs narrower than this show their × only when selected or under the pointer, leaving the title more room.
     static let minimumWidthForCloseButton: CGFloat = 100
     /// From a tab's top to the bottom of the tab bar, where the selected tab meets its terminal.

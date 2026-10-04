@@ -1,7 +1,8 @@
 import Foundation
 
 /// Where tabs open and which tab shows after one closes or its group collapses, so each project's tabs stay side by
-/// side, like a tab group in a browser. Tabs are given by their project keys, in tab bar order.
+/// side, like a tab group in a browser. Tabs are given by their group keys, in tab bar order: a tab's project key, or
+/// while it is in a split, its split's group key; see `TerminalSplit.groupKey`.
 enum TerminalTabOrder {
     /// Right after the project's last tab, or at the end when the project has none open.
     static func insertionIndex(forProjectKey projectKey: String, amongTabProjectKeys tabProjectKeys: [String]) -> Int {
