@@ -53,6 +53,7 @@ struct ContentView: View {
         } message: {
             Text("This changes the display name in JustSessions.")
         }
+        .dismissesOnClickOutside(item: $renamingConversation)
         .alert("Rename project", isPresented: Binding(isPresenting: $renamingProject)) {
             TextField("Name", text: $editedProjectName)
             Button("Cancel", role: .cancel) { renamingProject = nil }
@@ -63,6 +64,7 @@ struct ContentView: View {
         } message: {
             Text("This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (\(renamingProject?.folderName ?? "")).")
         }
+        .dismissesOnClickOutside(item: $renamingProject)
         .sessionDeletionDialog(for: $deletionRequest, store: store)
         .storeAlert(store)
     }

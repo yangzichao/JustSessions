@@ -36,6 +36,7 @@ private struct SessionDeletionDialog: ViewModifier {
                 Text(message(for: request))
             }
         }
+        .dismissesOnClickOutside(item: $request)
     }
 
     private func deleteButton(title: String, delete: @escaping () -> Void) -> some View {

@@ -89,6 +89,7 @@ struct ConversationBrowserView: View {
                 try await store.launchNewSession(provider: provider, host: host, folder: folder)
             }
         }
+        .dismissesOnClickOutside(item: $newSessionSheetHost)
         .focusedSceneValue(\.workspaceTabActions, WorkspaceTabActions(
             tabCount: store.terminalSessions.count,
             hasSelectedTab: store.selectedTerminal != nil,

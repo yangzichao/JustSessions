@@ -136,6 +136,8 @@ struct NewSessionSheet: View {
             if let errorMessage { Text(verbatim: errorMessage) }
             else { Text("Unknown error") }
         }
+        // The alert covers this sheet, so a click on the sheet around it closes only the alert.
+        .dismissesOnClickOutside(item: $errorMessage)
     }
 
     private var projectFolderSection: some View {

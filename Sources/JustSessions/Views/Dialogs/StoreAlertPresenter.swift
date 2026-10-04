@@ -7,12 +7,13 @@ private struct StoreAlertPresenter: ViewModifier {
 
     func body(content: Content) -> some View {
         let shownAlert = store.alert
-        content.alert(Text(shownAlert?.title ?? StoreAlert.defaultTitle), isPresented: Binding(
+        let isPresented = Binding(
             get: { store.alert != nil },
             set: { isPresented in
                 if !isPresented, let shownAlert { store.dismissAlert(shownAlert) }
             }
-        ), presenting: shownAlert) { alert in
+        )
+        content.alert(Text(shownAlert?.title ?? StoreAlert.defaultTitle), isPresented: isPresented, presenting: shownAlert) { alert in
             // Return keeps OK: Try Again deletes, permanently on SSH hosts, so it is never the default.
             Button("OK") { store.dismissAlert(alert) }
                 .keyboardShortcut(.defaultAction)
@@ -25,6 +26,7 @@ private struct StoreAlertPresenter: ViewModifier {
         } message: { alert in
             Text(alert.message)
         }
+        .dismissesOnClickOutside(isPresented: isPresented)
     }
 }
 

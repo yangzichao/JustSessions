@@ -166,9 +166,11 @@ struct ConversationSidebarView: View {
         .sheet(isPresented: $isAddRemoteHostSheetPresented) {
             AddRemoteHostSheet(store: store)
         }
+        .dismissesOnClickOutside(isPresented: $isAddRemoteHostSheetPresented)
         .sheet(item: $hostShowingArchivedProjects) { host in
             ArchivedProjectsSheet(store: store, host: host)
         }
+        .dismissesOnClickOutside(item: $hostShowingArchivedProjects)
         .onAppear { expandProjectsWithOpenTerminals() }
         .onChange(of: store.terminalSessions.map(\.id)) { _, _ in
             expandProjectsWithOpenTerminals()

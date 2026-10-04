@@ -102,6 +102,29 @@ struct StoreAlertPresentationTests {
         try await scenario.click("OK", in: alert)
         try await scenario.expectNoAlert()
     }
+
+    @Test func aClickOnTheWindowAroundTheAlertClosesItAndClearsIt() async throws {
+        let scenario = try StoreAlertScenario()
+        defer { scenario.remove() }
+
+        scenario.store.delete(scenario.session)
+        _ = try await scenario.alertOnScreen(showing: StoreAlertScenario.notFoundMessage)
+        try scenario.clickBesideTheSheet()
+
+        try await scenario.expectNoAlert()
+    }
+
+    @Test func aClickOnTheWindowAroundTheDeletionConfirmationCancelsIt() async throws {
+        let scenario = try StoreAlertScenario(confirming: true)
+        defer { scenario.remove() }
+
+        _ = try await scenario.sheetOnScreen(withButton: SessionDeletionConfirmationText.oneSessionButtonTitle)
+        try scenario.clickBesideTheSheet()
+
+        try await scenario.expectNoAlert()
+        #expect(!scenario.store.isDeletingSessions)
+        #expect(scenario.hosts.attempts(on: "devbox") == 0)
+    }
 }
 
 /// One session on devbox in a store whose deletions there fail at once: the first because the host can't be
@@ -168,6 +191,15 @@ private final class StoreAlertScenario {
             if tookEffect() { return }
         }
         Issue.record("Clicking “\(title)” had no effect after 5 tries")
+    }
+
+    /// Clicks the window's content beside its sheet, which AppKit alone would only answer with a beep.
+    func clickBesideTheSheet() throws {
+        NSApp.sendEvent(try #require(NSEvent.mouseEvent(
+            with: .leftMouseDown, location: CGPoint(x: 20, y: 20), modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
+            context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+        )))
     }
 
     /// Lets any closing finish, then expects neither an alert on screen nor one in the store.

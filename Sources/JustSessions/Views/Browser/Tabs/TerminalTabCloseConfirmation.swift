@@ -42,5 +42,6 @@ struct TerminalTabCloseConfirmation: ViewModifier {
                 Text("The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.")
             }
         }
+        .dismissesOnClickOutside(item: $closingSessionID)
     }
 }

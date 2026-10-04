@@ -59,7 +59,12 @@ final class ConversationSharingController: ObservableObject {
                 alert.messageText = AppLocalization.string(failureTitle)
                 alert.informativeText = error.localizedDescription
                 if let window, window.isVisible, window.attachedSheet == nil {
+                    let clickOutsideMonitor = SheetClickOutsideMonitor(window: window) {
+                        window.endSheet(alert.window)
+                        return true
+                    }
                     await alert.beginSheetModal(for: window)
+                    clickOutsideMonitor.stop()
                 } else {
                     alert.runModal()
                 }

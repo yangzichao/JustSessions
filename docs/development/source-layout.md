@@ -56,6 +56,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Preview/Reading/` and `ReadingPosition/`: text size, reading width, first/latest-message controls, and reading-position restoration.
 - `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.
 - `Models/Transcript/Search/`, `Services/Transcript/Search/`, and `Views/Preview/Search/`: temporary per-reader text matching, keyboard shortcuts, highlights, and navigation to occurrences in the displayed transcript.
+- `Views/Dialogs/`: the store's alert and the deletion confirmation. `ClickOutside/` closes a sheet, alert, or dialog, as Cancel would, when you click the window around it.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
 - `Views/Settings/`: General (language, launch behavior, and notifications), Appearance, and Permissions tabs, each in a `SettingsTabPage` of the one size they share.
