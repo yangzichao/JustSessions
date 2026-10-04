@@ -1,8 +1,10 @@
 import SwiftUI
 
-/// The themes, three to a row, each drawn as the window in that theme and the current appearance.
+/// The themes, three to a row, each drawn as the window in that theme and the current appearance. Choosing one also
+/// gives terminals its colors.
 struct AppThemePicker: View {
     @ObservedObject var appThemeStore: AppThemeStore
+    let terminalAppearanceStore: TerminalAppearanceStore
 
     private let columns = Array(repeating: GridItem(.fixed(ThumbnailChoiceMetrics.buttonWidth), spacing: 14), count: 3)
 
@@ -12,7 +14,10 @@ struct AppThemePicker: View {
                 ThumbnailChoiceButton(
                     title: LocalizedStringKey(theme.displayName),
                     isSelected: appThemeStore.theme == theme,
-                    onSelect: { appThemeStore.setTheme(theme) }
+                    onSelect: {
+                        AppThemeChooser(appThemeStore: appThemeStore, terminalAppearanceStore: terminalAppearanceStore)
+                            .choose(theme)
+                    }
                 ) {
                     AppWindowSketch().environment(\.appTheme, theme)
                 }

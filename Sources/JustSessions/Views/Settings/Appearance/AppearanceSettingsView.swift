@@ -10,7 +10,11 @@ struct AppearanceSettingsView: View {
     var body: some View {
         // One grid, so the terminal's labels line up with the app's.
         Grid(alignment: .leading, horizontalSpacing: 20, verticalSpacing: 16) {
-            AppAppearanceSection(appAppearanceStore: appAppearanceStore, appThemeStore: appThemeStore)
+            AppAppearanceSection(
+                appAppearanceStore: appAppearanceStore,
+                appThemeStore: appThemeStore,
+                terminalAppearanceStore: terminalAppearanceStore
+            )
             GridRow {
                 ThemeDivider().gridCellColumns(2)
             }

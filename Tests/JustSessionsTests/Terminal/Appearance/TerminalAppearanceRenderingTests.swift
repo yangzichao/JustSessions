@@ -103,14 +103,14 @@ struct TerminalAppearanceRenderingTests {
         terminalView.feed(text: "Keep this output")
 
         store.setColorChoice(.preset(.gitHub))
-        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: TerminalPalette.gitHubLight.background))
+        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: AppThemeColors.gitHubLight.contentSurface))
         themeStore.setTheme(.gruvbox)
-        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: TerminalPalette.gitHubLight.background))
+        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: AppThemeColors.gitHubLight.contentSurface))
 
         store.setMode(.dark)
-        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: TerminalPalette.gitHubDark.background))
-        #expect(terminalView.nativeForegroundColor == NSColor(hexValue: TerminalPalette.gitHubDark.scheme.foreground))
-        #expect(terminalView.selectedTextBackgroundColor == NSColor(hexValue: TerminalPalette.gitHubDark.scheme.selectionBackground))
+        #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: AppThemeColors.gitHubDark.contentSurface))
+        #expect(terminalView.nativeForegroundColor == NSColor(hexValue: AppThemeColors.gitHubDark.terminal.foreground))
+        #expect(terminalView.selectedTextBackgroundColor == NSColor(hexValue: AppThemeColors.gitHubDark.terminal.selectionBackground))
         terminalView.selectAll()
         #expect(terminalView.getSelection()?.contains("Keep this output") == true)
     }

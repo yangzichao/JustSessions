@@ -4,11 +4,11 @@ import Foundation
 /// Appearance setting picks between them.
 enum AppTheme: String, CaseIterable, Identifiable, Sendable {
     case justSessions
-    case solarized
-    case gruvbox
-    case catppuccin
+    case gitHub
+    case atomOne
     case tokyoNight
-    case rosePine
+    case catppuccin
+    case gruvbox
 
     static let userDefaultsKey = "appTheme"
 
@@ -17,22 +17,22 @@ enum AppTheme: String, CaseIterable, Identifiable, Sendable {
     var displayName: String {
         switch self {
         case .justSessions: "JustSessions"
-        case .solarized: "Solarized"
-        case .gruvbox: "Gruvbox"
-        case .catppuccin: "Catppuccin"
+        case .gitHub: "GitHub"
+        case .atomOne: "Atom One"
         case .tokyoNight: "Tokyo Night"
-        case .rosePine: "Rosé Pine"
+        case .catppuccin: "Catppuccin"
+        case .gruvbox: "Gruvbox"
         }
     }
 
     func colors(isDark: Bool) -> AppThemeColors {
         switch self {
         case .justSessions: isDark ? .justSessionsDark : .justSessionsLight
-        case .solarized: isDark ? .solarizedDark : .solarizedLight
-        case .gruvbox: isDark ? .gruvboxDark : .gruvboxLight
-        case .catppuccin: isDark ? .catppuccinMocha : .catppuccinLatte
+        case .gitHub: isDark ? .gitHubDark : .gitHubLight
+        case .atomOne: isDark ? .atomOneDark : .atomOneLight
         case .tokyoNight: isDark ? .tokyoNightNight : .tokyoNightDay
-        case .rosePine: isDark ? .rosePineMain : .rosePineDawn
+        case .catppuccin: isDark ? .catppuccinMocha : .catppuccinLatte
+        case .gruvbox: isDark ? .gruvboxDark : .gruvboxLight
         }
     }
 

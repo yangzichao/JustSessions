@@ -16,14 +16,14 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
-- `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the preset colors in `Presets/`.
+- `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
 - `Services/Permissions/`: reads each permission's status without asking for it, and the System Settings page that changes it.
-- `Services/Appearance/`: saves the app's appearance and theme, and sets the appearance on every window.
+- `Services/Appearance/`: saves the app's appearance and theme, sets the appearance on every window, and gives terminals a newly chosen theme's colors.
 - `Services/Adapters/`: provider discovery and native arguments, one folder per CLI. Separate adapters make adding another CLI straightforward.
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
 - `Services/Hosts/InstalledCLIs/`: which CLIs each host has, so new sessions offer only those.

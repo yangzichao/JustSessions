@@ -2,45 +2,39 @@
 /// for terminals.
 enum TerminalColorPreset: String, CaseIterable, Identifiable, Sendable {
     case justSessions
-    case solarized
-    case gruvbox
-    case catppuccin
+    case gitHub
+    case atomOne
     case tokyoNight
-    case rosePine
+    case catppuccin
+    case gruvbox
     case dracula
     case nord
-    case oneHalf
-    case gitHub
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
         case .justSessions: AppTheme.justSessions.displayName
-        case .solarized: AppTheme.solarized.displayName
-        case .gruvbox: AppTheme.gruvbox.displayName
-        case .catppuccin: AppTheme.catppuccin.displayName
+        case .gitHub: AppTheme.gitHub.displayName
+        case .atomOne: AppTheme.atomOne.displayName
         case .tokyoNight: AppTheme.tokyoNight.displayName
-        case .rosePine: AppTheme.rosePine.displayName
+        case .catppuccin: AppTheme.catppuccin.displayName
+        case .gruvbox: AppTheme.gruvbox.displayName
         case .dracula: "Dracula"
         case .nord: "Nord"
-        case .oneHalf: "One Half"
-        case .gitHub: "GitHub"
         }
     }
 
     var variants: TerminalPaletteVariants {
         switch self {
         case .justSessions: TerminalPaletteVariants(appTheme: .justSessions)
-        case .solarized: TerminalPaletteVariants(appTheme: .solarized)
-        case .gruvbox: TerminalPaletteVariants(appTheme: .gruvbox)
-        case .catppuccin: TerminalPaletteVariants(appTheme: .catppuccin)
+        case .gitHub: TerminalPaletteVariants(appTheme: .gitHub)
+        case .atomOne: TerminalPaletteVariants(appTheme: .atomOne)
         case .tokyoNight: TerminalPaletteVariants(appTheme: .tokyoNight)
-        case .rosePine: TerminalPaletteVariants(appTheme: .rosePine)
+        case .catppuccin: TerminalPaletteVariants(appTheme: .catppuccin)
+        case .gruvbox: TerminalPaletteVariants(appTheme: .gruvbox)
         case .dracula: .single(.dracula)
         case .nord: .single(.nord)
-        case .oneHalf: .lightAndDark(light: .oneHalfLight, dark: .oneHalfDark)
-        case .gitHub: .lightAndDark(light: .gitHubLight, dark: .gitHubDark)
         }
     }
 }

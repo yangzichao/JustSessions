@@ -5,6 +5,8 @@ import SwiftUI
 struct AppAppearanceSection: View {
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
+    /// Choosing a theme gives terminals its colors too.
+    let terminalAppearanceStore: TerminalAppearanceStore
 
     var body: some View {
         GridRow {
@@ -16,7 +18,7 @@ struct AppAppearanceSection: View {
         }
         GridRow(alignment: .top) {
             Text("Theme").levelWithThumbnails()
-            AppThemePicker(appThemeStore: appThemeStore)
+            AppThemePicker(appThemeStore: appThemeStore, terminalAppearanceStore: terminalAppearanceStore)
         }
     }
 }

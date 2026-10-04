@@ -12,8 +12,8 @@ struct AppThemeReadabilityTests {
                 let variant = "\(theme) \(isDark ? "dark" : "light")"
 
                 #expect(terminal.ansiHexColors.count == 16, "\(variant)")
-                // Solarized's light body text is the palest of these, just above 4.
-                #expect(contrastRatio(terminal.foreground, colors.contentSurface) >= 4, "\(variant) terminal text")
+                // Tokyo Night Day's body text is the palest of these, just above 4.5.
+                #expect(contrastRatio(terminal.foreground, colors.contentSurface) >= 4.5, "\(variant) terminal text")
                 #expect(contrastRatio(terminal.selectionForeground, terminal.selectionBackground) >= 3, "\(variant) selection")
                 // Bright black carries hints and dim text in many CLIs, so it must not vanish into the background.
                 #expect(contrastRatio(terminal.ansiHexColors[8], colors.contentSurface) >= 1.5, "\(variant) bright black")

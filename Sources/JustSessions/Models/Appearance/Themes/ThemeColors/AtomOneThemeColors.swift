@@ -1,8 +1,16 @@
-/// One Half Light and One Half Dark, from sonph/onehalf 75eb2e9's iTerm2 colors.
-extension TerminalPalette {
-    static let oneHalfLight = TerminalPalette(
-        background: 0xFAFAFA,
-        scheme: TerminalColorScheme(
+/// Atom's One Light and One Dark. The surfaces are the editor background and the One UI themes' tree view, button,
+/// and highlight colors, and the ink is their active tab text, from atom/atom 1c3bd35 compiled with Less. The ANSI
+/// colors are One Half's, the terminal port of One, from sonph/onehalf 75eb2e9's iTerm2 colors.
+extension AppThemeColors {
+    static let atomOneLight = AppThemeColors(
+        sidebarSurface: 0xEAEAEB,
+        contentSurface: 0xFAFAFA,
+        raisedSurface: 0xFFFFFF,
+        userMessageSurface: 0xE5E5E6,
+        ink: 0x232324,
+        inkForeground: 0xFAFAFA,
+        line: 0x232324,
+        terminal: TerminalColorScheme(
             foreground: 0x383A42,
             selectionBackground: 0xBFCEFF,
             selectionForeground: 0x383A42,
@@ -15,9 +23,15 @@ extension TerminalPalette {
         )
     )
 
-    static let oneHalfDark = TerminalPalette(
-        background: 0x282C34,
-        scheme: TerminalColorScheme(
+    static let atomOneDark = AppThemeColors(
+        sidebarSurface: 0x21252B,
+        contentSurface: 0x282C34,
+        raisedSurface: 0x353B45,
+        userMessageSurface: 0x31363F,
+        ink: 0xD7DAE0,
+        inkForeground: 0x282C34,
+        line: 0xD7DAE0,
+        terminal: TerminalColorScheme(
             foreground: 0xDCDFE4,
             selectionBackground: 0x474E5D,
             selectionForeground: 0xDCDFE4,
