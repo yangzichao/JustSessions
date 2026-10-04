@@ -1,14 +1,13 @@
 # Product website
 
-The public website is at <https://yangzichao.github.io/JustSessions/>. Its source is plain HTML and CSS in `website/`; it has no JavaScript runtime, external fonts, analytics, or package dependencies. Downloads point to the latest GitHub Release, so an app release does not require a website update.
+The public website is at <https://yangzichao.github.io/JustSessions/>. Its source is static HTML and CSS in `website/`, with small native JavaScript modules for the screenshot gallery. It has no framework, external fonts, analytics, or package dependencies. Downloads point to the latest GitHub Release, so an app release does not require a website update.
 
 ## Build and preview
 
-From the repository root, with Python 3.10 or later:
+From the repository root, with Python 3.10 or later and Node.js 22.7 or later for gallery tests:
 
 ```sh
-python3 -m unittest discover -s Scripts/Website/tests -v
-python3 Scripts/Website/build_site.py
+make website-check
 python3 -m http.server 8765 --bind 127.0.0.1 --directory dist
 ```
 
@@ -18,7 +17,13 @@ It also checks visible CLI names, commands, and preview/branch/SSH/deletion cell
 
 The homepage's capability summary uses `data-capability` and `data-support="all|some|none"` on its reading, deletion, SSH, and branching claims. The same check compares these markers with the app's capabilities, so a stale homepage summary also blocks publication. Keep each marker on the sentence or phrase describing that capability.
 
-The website reuses screenshots from `docs/images/` and existing `Branding/` assets at build time. Local stylesheet and image links include a content hash so a new page loads the matching CSS and screenshots after an update. The build validates those versions. Keep the sample-data captions and feature limitations accurate when replacing them. See [screenshot provenance](../images/README.md).
+The website reuses screenshots from `docs/images/` and existing `Branding/` assets at build time. Local stylesheet, script, module import, and image links include a content hash so a new page loads matching assets after an update. The build versions script imports before their parent modules and validates all versions. Keep the sample-data captions and feature limitations accurate when replacing them. See [screenshot provenance](../images/README.md).
+
+The homepage groups the real CLI, reader, SSH, and tmux screenshots into one horizontal gallery, keeping the CLI first. The supported-agent panel overlays the screenshot on desktop and moves inside the frame below it on mobile. Original screenshots stay unedited. The gallery supports swipe/trackpad scrolling, previous/next buttons, direct feature buttons, and arrow/Home/End keys when the track has focus. Without JavaScript, native scrolling and full-size image links still work.
+
+`make website-check` also runs dependency-free Node tests for rotation timing, visibility, manual stop/resume, and reduced motion. Python tests reject stale screenshot, script, and imported-module cache versions. Both website validation workflows set up Node 22 explicitly.
+
+Automatic rotation advances every 6.5 seconds while the gallery is visible. Hovering pauses it; keyboard focus or manual navigation stops it until the user starts it again. Background tabs and offscreen galleries pause the timer. Reduced-motion users start with rotation off; explicit playback remains available without animated scrolling. Keep the pause button, sample captions, stable image dimensions, and `#terminal`, `#reading`, and `#remote` links working when adding slides. Check autoplay, pause/resume, wraparound, resizing, keyboard navigation, and reduced motion in addition to desktop and mobile layout.
 
 `help.html` is linked from the main navigation and footer, and included in the sitemap. It briefly lists features and highlights installing tmux on remote hosts. It links to the full guide, offers **Create a GitHub issue**, and opens an email to `zichaoyangphys@gmail.com` through **Email feedback**. Keep these feedback destinations aligned with `Models/App/AppLinks.swift`. The old `feedback.html` URL redirects to Help, uses `noindex`, and stays out of the sitemap. Check both the homepage navigation and the Help page at mobile widths after changing either.
 

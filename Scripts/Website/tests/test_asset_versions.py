@@ -23,6 +23,26 @@ class ScreenshotCacheVersionTests(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, "Asset cache version mismatch: .*session-overview"):
                 validate_site(website_directory)
 
+    def test_replacing_gallery_script_without_updating_page_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            website_directory = Path(temporary_directory)
+            with patch("build_site.WEBSITE_OUTPUT_DIRECTORY", website_directory):
+                build_site()
+            script_path = website_directory / "scripts/screenshot-gallery.js"
+            script_path.write_text(script_path.read_text() + "\n// changed\n")
+            with self.assertRaisesRegex(AssertionError, "Asset cache version mismatch: .*screenshot-gallery"):
+                validate_site(website_directory)
+
+    def test_replacing_imported_script_without_updating_parent_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            website_directory = Path(temporary_directory)
+            with patch("build_site.WEBSITE_OUTPUT_DIRECTORY", website_directory):
+                build_site()
+            script_path = website_directory / "scripts/gallery-rotation.js"
+            script_path.write_text(script_path.read_text() + "\n// changed\n")
+            with self.assertRaisesRegex(AssertionError, "Script import cache version mismatch: .*gallery-rotation"):
+                validate_site(website_directory)
+
 
 if __name__ == "__main__":
     unittest.main()

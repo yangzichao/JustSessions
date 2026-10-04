@@ -3,8 +3,6 @@
   .hero h1 { font-size: 46px; }
   .hero-description { font-size: 17px; }
   .hero-actions { gap: 8px 14px; }
-  .remote-layout { gap: 32px; }
-  .persistence-section { gap: 36px; }
   .workflow-grid article { padding: 22px; }
   .questions { gap: 36px; }
 }
@@ -21,11 +19,6 @@
   .workflow-grid { gap: 14px; }
   .workflow-grid article { padding: 20px; }
   .workflow-grid h3 { font-size: 21px; }
-  .remote-layout, .persistence-section { grid-template-columns: 1fr; gap: 28px; }
-  .feature-copy { max-width: 640px; }
-  .persistence-section .feature-copy { grid-row: 1; }
-  .remote-preview, .persistence-visual { width: 100%; }
-  .persistence-visual img { width: 290px; }
   .questions { grid-template-columns: 1fr; gap: 0; }
   .questions h2 { max-width: none; }
 }
@@ -47,9 +40,6 @@
   .hero-actions { gap: 8px 18px; }
   .hero-actions .button { font-size: 14px; padding-inline: 18px; }
   .download-note { font-size: 12px; }
-  .hero-preview { padding: 6px 6px 0; border-radius: 11px; }
-  .hero-preview img { border-radius: 6px; }
-  .hero-preview figcaption { font-size: 12px; margin: 11px 6px; }
   .section-heading { margin-bottom: 26px; }
   .section-heading p { font-size: 16px; }
   .eyebrow { font-size: 11px; }
@@ -58,8 +48,6 @@
   .workflow-grid article { padding: 23px; }
   .feature-icon { position: absolute; right: 23px; top: 20px; width: 24px; height: 24px; }
   .workflow-grid h3 { font-size: 23px; }
-  .persistence-visual { padding: 24px 15px; }
-  .persistence-visual img { width: 260px; }
   summary { font-size: 16px; }
   .download-section { padding: 32px 20px; }
   .download-section h2 { font-size: 31px; }
