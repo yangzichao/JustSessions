@@ -15,7 +15,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
-- `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
+- `Models/Sidebar/`: the sidebar's filters, projects with their sessions, multi-selection, and which Open tabs groups are collapsed.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
@@ -60,7 +60,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, and multi-selection.
 - `Views/Browser/Sidebar/Header/`: the app mark with the search and new session icons; search opens into a field across that line.
 - `Views/Browser/Sidebar/Navigation/`: the Projects / Open tabs switch and persistent view containers that retain both lists' scroll positions.
-- `Views/Browser/Sidebar/OpenTabs/`: the full-height open-tab list, grouped by project under headings in the tab bar's group colors without indenting the rows, independent search, and empty states.
+- `Views/Browser/Sidebar/OpenTabs/`: the full-height open-tab list, grouped by project under headings in the tab bar's group colors that collapse their groups, without indenting the rows, independent search, and empty states.
 - `Views/Browser/Sidebar/Hosts/`: host headings with their own refresh buttons and progress, and the Add SSH host button and sheet. `Menu/` holds a heading's menu, which its ⋯ button and a right-click both open. `AddProject/` holds the heading's +, a menu that also restores archived projects while the host has any, and the sheet that types the path of a project to add on an SSH host; this Mac's is picked with the folder panel in `Views/Browser/ProjectFolders/`, which the New session sheet uses too.
 - `Views/Terminal/`: a tab's embedded terminal, inset from the window's edges, and the bar above it once its CLI ends.
 - `Views/Preview/`: conversation preview for the selected session.
