@@ -1,12 +1,13 @@
 import SwiftUI
 
 /// The General tab of Settings: interface language, what the app does at startup, when it notifies you, and a link to
-/// the website.
+/// software updates.
 struct GeneralSettingsView: View {
     @ObservedObject var languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
     let notificationSettingsStore: SessionNotificationSettingsStore
+    let onCheckForUpdates: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -37,8 +38,7 @@ struct GeneralSettingsView: View {
 
             ThemeDivider()
 
-            Link("JustSessions website ↗", destination: AppLinks.websiteURL)
-                .help("Open the JustSessions website")
+            SoftwareUpdateSettingsSection(onCheckForUpdates: onCheckForUpdates)
         }
     }
 }

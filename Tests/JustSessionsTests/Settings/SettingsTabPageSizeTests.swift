@@ -16,7 +16,8 @@ struct SettingsTabPageSizeTests {
                 languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
                 tabReopeningSettingsStore: TabReopeningSettingsStore(userDefaults: settings.userDefaults),
                 launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
-                notificationSettingsStore: SessionNotificationSettingsStore(userDefaults: settings.userDefaults)
+                notificationSettingsStore: SessionNotificationSettingsStore(userDefaults: settings.userDefaults),
+                onCheckForUpdates: {}
             ))),
             ("Permissions", AnyView(PermissionsSettingsView())),
         ]

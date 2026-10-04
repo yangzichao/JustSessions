@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Settings as a sheet on a workspace window: the tabs, then Done.
 struct SettingsSheet: View {
+    let onCheckForUpdates: () -> Void
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -13,7 +14,8 @@ struct SettingsSheet: View {
                 appAppearanceStore: .shared,
                 appThemeStore: .shared,
                 terminalAppearanceStore: .shared,
-                notificationSettingsStore: .shared
+                notificationSettingsStore: .shared,
+                onCheckForUpdates: onCheckForUpdates
             )
             ThemeDivider()
             HStack {
@@ -25,5 +27,6 @@ struct SettingsSheet: View {
             .padding(.vertical, 12)
         }
         .background(ThemePalette.contentSurface)
+        .appLanguage(from: .shared)
     }
 }

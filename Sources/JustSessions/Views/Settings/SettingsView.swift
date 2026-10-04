@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Settings (⌘,): language, launch, and notifications; how the app and its terminals look; and what macOS allows the
+/// Settings (⌘,): language, launch, notifications, and updates; how the app and its terminals look; and what macOS allows the
 /// app. A switcher at the top picks the page.
 struct SettingsView: View {
     let languageStore: AppLanguageStore
@@ -10,6 +10,7 @@ struct SettingsView: View {
     let appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
     let notificationSettingsStore: SessionNotificationSettingsStore
+    let onCheckForUpdates: () -> Void
 
     @State private var selectedTab = SettingsTab.general
 
@@ -34,7 +35,8 @@ struct SettingsView: View {
                         languageStore: languageStore,
                         tabReopeningSettingsStore: tabReopeningSettingsStore,
                         launchAtLoginSettingsStore: launchAtLoginSettingsStore,
-                        notificationSettingsStore: notificationSettingsStore
+                        notificationSettingsStore: notificationSettingsStore,
+                        onCheckForUpdates: onCheckForUpdates
                     )
                 case .appearance:
                     AppearanceSettingsView(

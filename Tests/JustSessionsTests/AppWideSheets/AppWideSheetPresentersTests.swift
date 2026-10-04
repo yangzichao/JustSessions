@@ -96,6 +96,6 @@ private struct AppWideSheetHostingStandIn: View {
     @ObservedObject var state: AppWideSheetState
 
     var body: some View {
-        Color.clear.showsAppWideSheets($state.sheet)
+        Color.clear.showsAppWideSheets($state.sheet, onCheckForUpdates: {})
     }
 }

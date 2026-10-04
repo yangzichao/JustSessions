@@ -64,7 +64,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Dialogs/`: the store's alert and the deletion confirmation. `ClickOutside/` closes a sheet, alert, or dialog, as Cancel would, when you click the window around it.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
-- `Views/Settings/`: the Settings sheet, with General (language, startup, and notifications), Appearance, and Permissions pages, each in a `SettingsTabPage` of the one size they share.
+- `Views/Settings/`: the Settings sheet, with General (language, startup, notifications, and software updates), Appearance, and Permissions pages, each in a `SettingsTabPage` of the one size they share.
 - `Views/Settings/Appearance/`: the app's appearance and theme in `App/`, then its terminals' colors, font, and preview in `Terminal/`, with the color scheme and iTerm2 import menus in `Terminal/Colors/`.
 - `Views/Settings/Permissions/`: each permission's status and a link to its page in System Settings.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).

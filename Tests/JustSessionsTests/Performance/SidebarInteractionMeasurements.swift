@@ -502,7 +502,6 @@ private struct SidebarPerfBrowserHarness: View {
                 projects: filteredProjection.projects,
                 allSessionCount: filteredProjection.allSessionCount,
                 recentSessionCount: filteredProjection.recentSessionCount,
-                onCheckForUpdates: {},
                 onNewSession: {},
                 onSelectConversation: { conversation in
                     if store.showRunningCLI(for: conversation) {

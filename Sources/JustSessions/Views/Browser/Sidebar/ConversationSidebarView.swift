@@ -10,7 +10,6 @@ struct ConversationSidebarView: View {
     let projects: [ProjectConversationGroup]
     let allSessionCount: Int
     let recentSessionCount: Int
-    let onCheckForUpdates: () -> Void
     let onNewSession: () -> Void
     let onSelectConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void
@@ -163,8 +162,7 @@ struct ConversationSidebarView: View {
 
             ThemeDivider()
             SidebarFooter(
-                onAddRemoteHost: { isAddRemoteHostSheetPresented = true },
-                onCheckForUpdates: onCheckForUpdates
+                onAddRemoteHost: { isAddRemoteHostSheetPresented = true }
             )
         }
         .background(sidebarBackground)

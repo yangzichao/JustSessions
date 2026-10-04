@@ -19,7 +19,8 @@ struct ThemeSurfaceRenderingTests {
             tabReopeningSettingsStore: tabReopeningStore,
             launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
             appAppearanceStore: appearanceStore, appThemeStore: themeStore,
-            terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore
+            terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore,
+            onCheckForUpdates: {}
         ))
         // Help and Settings have a fixed size, so each renders at it and the reference strip lands at its bottom edge.
         let views: [(String, AnyView, CGSize)] = [

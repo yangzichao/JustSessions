@@ -566,6 +566,8 @@
 	<string>Smaller reading text</string>
 	<key>Smaller text</key>
 	<string>Smaller text</string>
+	<key>Software updates</key>
+	<string>Software updates</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>Some colors are missing, such as the text or background color.</string>
 	<key>Start a native CLI or a plain terminal in a project folder.</key>
@@ -646,14 +648,14 @@
 	<string>Unpin project</string>
 	<key>Unpin session</key>
 	<string>Unpin session</string>
-	<key>Update</key>
-	<string>Update</string>
 	<key>Use a readable width</key>
 	<string>Use a readable width</string>
 	<key>Use the full window width</key>
 	<string>Use the full window width</string>
 	<key>User guide ↗</key>
 	<string>User guide ↗</string>
+	<key>Version %@</key>
+	<string>Version %@</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
 	<string>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
 	<key>You</key>

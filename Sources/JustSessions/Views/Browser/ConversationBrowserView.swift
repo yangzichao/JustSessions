@@ -49,7 +49,6 @@ struct ConversationBrowserView: View {
                 projects: filteredProjection.projects,
                 allSessionCount: filteredProjection.allSessionCount,
                 recentSessionCount: filteredProjection.recentSessionCount,
-                onCheckForUpdates: { updateManager.checkForUpdates() },
                 onNewSession: { newSessionSheetHost = defaultNewSessionHost },
                 onSelectConversation: { conversation in
                     // A session whose CLI runs opens on its terminal. Its row stays highlighted through its tab, so,
@@ -95,7 +94,7 @@ struct ConversationBrowserView: View {
             }
         }
         .dismissesOnClickOutside(item: $newSessionSheetHost)
-        .showsAppWideSheets($appWideSheet)
+        .showsAppWideSheets($appWideSheet, onCheckForUpdates: { updateManager.checkForUpdates() })
         .focusedSceneValue(\.workspaceTabActions, WorkspaceTabActions(
             tabCount: store.terminalSessions.count,
             hasSelectedTab: store.selectedTerminal != nil,
