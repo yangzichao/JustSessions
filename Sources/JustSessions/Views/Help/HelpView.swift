@@ -26,7 +26,7 @@ struct HelpView: View {
             HStack {
                 Link("User guide ↗", destination: AppLinks.userGuideURL)
                 Spacer()
-                Link("Report an issue ↗", destination: AppLinks.githubIssuesURL)
+                HelpFeedbackLinks()
             }
             .buttonStyle(.plain)
             .font(.callout)

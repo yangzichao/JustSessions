@@ -112,6 +112,8 @@
 	<string>Branch</string>
 	<key>Browse…</key>
 	<string>Browse…</string>
+	<key>Bug report</key>
+	<string>Bug report</string>
 	<key>Can't check</key>
 	<string>Can't check</string>
 	<key>Cancel</key>
@@ -194,6 +196,8 @@
 	<string>Could not start session</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</string>
+	<key>Create a GitHub issue ↗</key>
+	<string>Create a GitHub issue ↗</string>
 	<key>Dark</key>
 	<string>Dark</string>
 	<key>Delete 1 session</key>
@@ -216,6 +220,8 @@
 	<string>Deletion progress</string>
 	<key>Done</key>
 	<string>Done</string>
+	<key>Email a bug report</key>
+	<string>Email a bug report</string>
 	<key>End and close this terminal</key>
 	<string>End and close this terminal</string>
 	<key>End on %@</key>
@@ -464,8 +470,6 @@
 	<string>Rename project…</string>
 	<key>Reopen the tabs that were open when JustSessions quit</key>
 	<string>Reopen the tabs that were open when JustSessions quit</string>
-	<key>Report an issue ↗</key>
-	<string>Report an issue ↗</string>
 	<key>Restore</key>
 	<string>Restore</string>
 	<key>Restore %@</key>

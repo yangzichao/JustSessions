@@ -98,6 +98,8 @@
 	<string>为 %lld 个会话创建分支</string>
 	<key>Browse…</key>
 	<string>浏览…</string>
+	<key>Bug report</key>
+	<string>报告问题</string>
 	<key>Can't check</key>
 	<string>无法检查</string>
 	<key>Cancel</key>
@@ -182,6 +184,8 @@
 	<string>无法启动会话</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>找不到 iTerm2 的默认 Profile。动态 Profile 无法导入。</string>
+	<key>Create a GitHub issue ↗</key>
+	<string>创建 GitHub Issue ↗</string>
 	<key>Dark</key>
 	<string>深色</string>
 	<key>Delete %lld sessions</key>
@@ -208,6 +212,8 @@
 	<string>删除进度</string>
 	<key>Done</key>
 	<string>完成</string>
+	<key>Email a bug report</key>
+	<string>通过邮件报告问题</string>
 	<key>End and close this terminal</key>
 	<string>结束并关闭此终端</string>
 	<key>End on %@</key>
@@ -456,8 +462,6 @@
 	<string>重命名项目…</string>
 	<key>Reopen the tabs that were open when JustSessions quit</key>
 	<string>重新打开上次退出 JustSessions 时的标签</string>
-	<key>Report an issue ↗</key>
-	<string>报告问题 ↗</string>
 	<key>Restore</key>
 	<string>恢复</string>
 	<key>Restore %@</key>

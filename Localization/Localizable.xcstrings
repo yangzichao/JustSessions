@@ -375,22 +375,22 @@
         }
       }
     },
-    "App": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "应用"
-          }
-        }
-      }
-    },
     "An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "已归档的项目会从侧栏中隐藏。其文件夹和会话仍保留在磁盘上，恢复后会重新列出。在其文件夹中新建会话也会恢复该项目。"
+          }
+        }
+      }
+    },
+    "App": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用"
           }
         }
       }
@@ -411,16 +411,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "立即应用到所有终端。部分 CLI 应用使用自己的配色。"
-          }
-        }
-      }
-    },
-    "Ask Now": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "立即请求"
           }
         }
       }
@@ -525,6 +515,16 @@
         }
       }
     },
+    "Ask Now": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即请求"
+          }
+        }
+      }
+    },
     "At launch": {
       "localizations": {
         "zh-Hans": {
@@ -582,6 +582,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "浏览…"
+          }
+        }
+      }
+    },
+    "Bug report": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告问题"
           }
         }
       }
@@ -1024,6 +1034,16 @@
         }
       }
     },
+    "Create a GitHub issue ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建 GitHub Issue ↗"
+          }
+        }
+      }
+    },
     "Dark": {
       "localizations": {
         "zh-Hans": {
@@ -1186,6 +1206,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "完成"
+          }
+        }
+      }
+    },
+    "Email a bug report": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过邮件报告问题"
           }
         }
       }
@@ -2460,16 +2490,6 @@
         }
       }
     },
-    "Report an issue ↗": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "报告问题 ↗"
-          }
-        }
-      }
-    },
     "Restore": {
       "localizations": {
         "zh-Hans": {
@@ -2500,22 +2520,22 @@
         }
       }
     },
-    "Restores the terminal colors, font, and size.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "恢复终端的配色、字体和字号。"
-          }
-        }
-      }
-    },
     "Restore archived projects to the sidebar": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "将已归档的项目恢复到侧栏"
+          }
+        }
+      }
+    },
+    "Restores the terminal colors, font, and size.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复终端的配色、字体和字号。"
           }
         }
       }

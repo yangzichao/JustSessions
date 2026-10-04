@@ -20,7 +20,7 @@ The homepage's capability summary uses `data-capability` and `data-support="all|
 
 The website reuses screenshots from `docs/images/` and existing `Branding/` assets at build time. Local stylesheet and image links include a content hash so a new page loads the matching CSS and screenshots after an update. The build validates those versions. Keep the sample-data captions and feature limitations accurate when replacing them. See [screenshot provenance](../images/README.md).
 
-`help.html` is linked from the main navigation and footer, and included in the sitemap. It briefly lists features and highlights installing tmux on remote hosts. It links to the full guide and GitHub issues. The old `feedback.html` URL redirects to Help, uses `noindex`, and stays out of the sitemap. Check both the homepage navigation and the Help page at mobile widths after changing either.
+`help.html` is linked from the main navigation and footer, and included in the sitemap. It briefly lists features and highlights installing tmux on remote hosts. It links to the full guide, offers **Create a GitHub issue**, and opens an email to `zichaoyangphys@gmail.com` through **Bug report**. Keep these feedback destinations aligned with `Models/App/AppLinks.swift`. The old `feedback.html` URL redirects to Help, uses `noindex`, and stays out of the sitemap. Check both the homepage navigation and the Help page at mobile widths after changing either.
 
 ## Pages and app colors
 
