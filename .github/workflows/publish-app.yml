@@ -1,22 +1,44 @@
-name: Publish signed JustSessions update
+name: Publish JustSessions release
 
 # Publishes only when a version tag such as v0.17.0 is pushed.
-# A manual run must also be started from a version tag.
+# PRs and branch pushes are verified locally with make verify.
 on:
   push:
     tags: ['v*']
-  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: publish-app-update
   cancel-in-progress: false
 
 jobs:
+  website-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate release tag
+        run: |
+          if [[ "$GITHUB_REF_TYPE" != "tag" || ! "$GITHUB_REF_NAME" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Releases must run from a version tag like v0.17.0." >&2
+            exit 1
+          fi
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Test and build website
+        run: make website-check
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/JustSessions
+
   publish:
+    needs: website-build
     runs-on: macos-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -29,10 +51,12 @@ jobs:
           fi
           printf 'APP_VERSION=%s\n' "${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
 
-      # Tests and localization checks already ran: tag a commit that passed the Test workflow and `make verify`.
       # The shipped tmux is built from source, never restored from a cache.
-      - name: Build and verify bundled tmux
-        run: ./Scripts/Tmux/build-runtime.sh
+      - name: Test with bundled tmux
+        run: make test
+
+      - name: Check localization
+        run: make localization-check
 
       - name: Import Developer ID certificate
         env:
@@ -163,3 +187,19 @@ jobs:
               --notes "Signed, notarized JustSessions build. Includes tmux for local session persistence without a separate install; SSH hosts still need their own tmux. To install, open JustSessions.dmg and drag JustSessions into Applications. Sparkle updates use appcast.xml and JustSessions.zip." \
               --latest
           fi
+
+  website-deploy:
+    needs: [website-build, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -14,7 +14,7 @@ python3 -m http.server 8765 --bind 127.0.0.1 --directory dist
 
 Open <http://127.0.0.1:8765/JustSessions/>. The build checks local links and anchors across five pages, image references and dimensions, unique titles and descriptions, canonical and share metadata, structured app data, social-card dimensions, and sitemap completeness. The generated artifact is `dist/JustSessions/`, separate from the macOS app output. Only that website directory is uploaded to Pages.
 
-It also checks visible CLI names, commands, and preview/branch/SSH/deletion cells in the online guide, README, and storage guide against `ConversationProvider.swift` and `TranscriptLoader.swift`. This runs without compiling Swift, including on the Pages Linux runner. The source reader recognizes their explicit case switches and fails if the representation changes; update it rather than skipping validation. Provider or transcript-support changes trigger the website workflow, and conflicting claims block publication.
+It also checks visible CLI names, commands, and preview/branch/SSH/deletion cells in the online guide, README, and storage guide against `ConversationProvider.swift` and `TranscriptLoader.swift`. This runs without compiling Swift, including on the release workflow's Linux runner. The source reader recognizes their explicit case switches and fails if the representation changes; update it rather than skipping validation. `make website-check` runs both the website tests and build, and is included in local `make verify`. Conflicting claims block verification and release publication.
 
 The homepage's capability summary uses `data-capability` and `data-support="all|some|none"` on its reading, deletion, SSH, and branching claims. The same check compares these markers with the app's capabilities, so a stale homepage summary also blocks publication. Keep each marker on the sentence or phrase describing that capability.
 
@@ -46,7 +46,9 @@ Before publishing, build the site and check the homepage, guide, and Help page a
 
 ## Deployment and discovery
 
-The `Publish website` GitHub Actions workflow validates relevant pull requests and publishes relevant changes on `main`. It can also be run manually. Repository **Settings → Pages → Source** must be **GitHub Actions**. The deployment job uses the `github-pages` environment and narrowly scoped Pages and identity-token permissions.
+The `Publish JustSessions release` GitHub Actions workflow builds the website from a pushed version tag and deploys it after the signed app is published. Pull requests and branch pushes do not run Actions; website changes on `main` become public at the next release. Run `make verify` locally and attach the results to the PR before merging. See [build and release](build-and-release.md).
+
+Repository **Settings → Pages → Source** must be **GitHub Actions**. The `github-pages` environment's selected deployment branches and tags must include a tag rule for `v*`, so release tags can deploy. The deployment job uses narrowly scoped Pages and identity-token permissions.
 
 The canonical URLs, Open Graph tags, JSON-LD, 404 home link, and `WEBSITE_URL` in `Scripts/Website/validate_metadata.py` share the public URL. Update all of them together if introducing a custom domain. The repository Website field and README link should match. Keep the repository description and topics current with supported tools and the SSH/tmux workflow.
 
