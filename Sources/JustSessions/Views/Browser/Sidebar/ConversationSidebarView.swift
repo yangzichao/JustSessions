@@ -26,8 +26,8 @@ struct ConversationSidebarView: View {
     @State private var hostShowingArchivedProjects: SessionHost?
     /// The SSH host a folder path is being typed for, from its heading's +.
     @State private var sshHostAddingProject: SessionHost?
-    /// A project just added from a host's heading, scrolled into view once it is listed. A project with no sessions
-    /// sorts last under its host, so it could otherwise be added out of sight.
+    /// A project to scroll into view once it is listed: one just added from a host's heading, as a project with no
+    /// sessions sorts last under its host and could otherwise be added out of sight, or the onboarding tour's.
     @State var projectToReveal: String?
     /// Set once a deletion of several sessions has run for `deletionProgressBarDelay`, so a quick one never
     /// flashes the progress bar.
@@ -42,6 +42,11 @@ struct ConversationSidebarView: View {
 
     var hostSections: [HostProjectSection] {
         HostProjectSection.sections(hosts: store.hosts, projects: projects)
+    }
+
+    /// The project the onboarding tour shows sessions in: the first listed one that has any.
+    var onboardingTourProjectID: String? {
+        hostSections.lazy.flatMap(\.projects).first { !$0.conversations.isEmpty }?.id
     }
 
     private var visibleProjectIDs: [String] {
@@ -145,6 +150,7 @@ struct ConversationSidebarView: View {
         }
         .dismissesOnClickOutside(item: $sshHostAddingProject)
         .onAppear { expandProjectsWithOpenTerminals() }
+        .onOnboardingTourStop(showOnboardingTourStop)
         .onChange(of: contentMode) { _, _ in
             isSidebarListFocused = false
             dismissSidebarSelection()
@@ -264,6 +270,16 @@ struct ConversationSidebarView: View {
     func removeSelectedProjects() {
         store.removeProjectsFromSidebar(projectSelection.selectedProjectIDs.intersection(listedProjectIDs))
         projectSelection.clear()
+    }
+
+    /// A tour stop among the projects needs the project list in front, with the tour's project in sight and, for its
+    /// sessions, open.
+    private func showOnboardingTourStop(_ stop: OnboardingTourStop) {
+        guard stop.isInProjectList else { return }
+        contentMode = .projects
+        guard let onboardingTourProjectID else { return }
+        if stop == .sessions { projectExpansion.expand([onboardingTourProjectID]) }
+        projectToReveal = onboardingTourProjectID
     }
 
     private func expandProjectsWithOpenTerminals() {

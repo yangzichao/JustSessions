@@ -327,6 +327,16 @@
         }
       }
     },
+    "Add a server you reach with passwordless SSH to browse and resume its sessions here.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加一台可通过免密 SSH 连接的服务器，就能在这里浏览并继续它上面的会话。"
+          }
+        }
+      }
+    },
     "Add host": {
       "localizations": {
         "zh-Hans": {
@@ -778,6 +788,16 @@
         }
       }
     },
+    "Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单击会话即可阅读，不会运行任何东西。双击则在原文件夹中用它的 CLI 继续。"
+          }
+        }
+      }
+    },
     "Close %@": {
       "localizations": {
         "zh-Hans": {
@@ -854,6 +874,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭终端…"
+          }
+        }
+      }
+    },
+    "Close the tab, keep the CLI": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关掉标签页，CLI 照常运行"
           }
         }
       }
@@ -1610,6 +1640,16 @@
         }
       }
     },
+    "Got it": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "知道了"
+          }
+        }
+      }
+    },
     "Help & feedback": {
       "localizations": {
         "zh-Hans": {
@@ -1749,6 +1789,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "JustSessions 及其终端中的 CLI 需要它来访问你所在网络中的设备，例如本地地址上的 SSH 主机。macOS 不允许应用检查这项权限，请在「隐私与安全性 > 本地网络」中找到 JustSessions。"
+          }
+        }
+      }
+    },
+    "JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JustSessions 读取了各 CLI 自己保存的历史，并按项目分组。没有导入或上传任何内容。"
           }
         }
       }
@@ -2046,6 +2096,16 @@
         }
       }
     },
+    "Next": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一步"
+          }
+        }
+      }
+    },
     "Next Tab": {
       "localizations": {
         "zh-Hans": {
@@ -2248,6 +2308,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "好"
+          }
+        }
+      }
+    },
+    "Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude Code、Codex 或其他支持的 CLI 保存对话后，它会按项目出现在这里。"
           }
         }
       }
@@ -2508,6 +2578,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "阅读"
+          }
+        }
+      }
+    },
+    "Read first, then resume": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先阅读，再继续"
           }
         }
       }
@@ -2910,6 +2990,16 @@
         }
       }
     },
+    "Sessions on other machines": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他机器上的会话"
+          }
+        }
+      }
+    },
     "Settings": {
       "localizations": {
         "zh-Hans": {
@@ -3000,6 +3090,16 @@
         }
       }
     },
+    "Skip tour": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳过引导"
+          }
+        }
+      }
+    },
     "Smaller reading text": {
       "localizations": {
         "zh-Hans": {
@@ -3076,12 +3176,32 @@
         }
       }
     },
+    "Start a session in any installed CLI, or open a plain terminal, in a project folder. ⌘N does the same.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在项目文件夹中用任一已安装的 CLI 开始会话，或打开普通终端。⌘N 也可以。"
+          }
+        }
+      }
+    },
     "Start session": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "开始会话"
+          }
+        }
+      }
+    },
+    "Start something new": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始新的工作"
           }
         }
       }
@@ -3172,6 +3292,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "标签"
+          }
+        }
+      }
+    },
+    "Take the Tour": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看引导"
+          }
+        }
+      }
+    },
+    "Take the tour": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看引导"
           }
         }
       }
@@ -3476,6 +3616,16 @@
         }
       }
     },
+    "When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。"
+          }
+        }
+      }
+    },
     "Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.": {
       "localizations": {
         "zh-Hans": {
@@ -3502,6 +3652,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的登录 shell，不运行 CLI"
+          }
+        }
+      }
+    },
+    "Your sessions will appear here": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的会话会显示在这里"
+          }
+        }
+      }
+    },
+    "Your sessions, already here": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的会话已经在这里"
           }
         }
       }

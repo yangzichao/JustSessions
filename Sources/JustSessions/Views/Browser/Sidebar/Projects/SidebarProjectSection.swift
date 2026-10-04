@@ -5,6 +5,8 @@ struct SidebarProjectSection: View {
     let project: ProjectConversationGroup
     let parentLabel: String?
     let isExpanded: Bool
+    /// The project whose row and first session the onboarding tour points at.
+    let isOnboardingTourProject: Bool
     let projectSelection: ProjectMultiSelection
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
@@ -35,6 +37,7 @@ struct SidebarProjectSection: View {
             onRemoveProjectAndDeleteSessions: { onRequestDeletion(.projectRemoval(project.id)) },
             onRemoveSelectedProjects: onRemoveSelectedProjects
         )
+        .onboardingTourStop(isOnboardingTourProject ? .projects : nil)
 
         if isExpanded {
             let pendingNewSessionTerminals = pendingNewSessionTerminals
@@ -72,6 +75,9 @@ struct SidebarProjectSection: View {
                 .sidebarIndentGuide(
                     isFirstRow: pendingNewSessionTerminals.isEmpty && conversation.id == project.conversations.first?.id,
                     isLastRow: conversation.id == project.conversations.last?.id
+                )
+                .onboardingTourStop(
+                    isOnboardingTourProject && conversation.id == project.conversations.first?.id ? .sessions : nil
                 )
             }
         }

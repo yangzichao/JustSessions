@@ -17,6 +17,7 @@ struct ConversationBrowserView: View {
     @State private var closingTerminalID: UUID?
     @SceneStorage("isSidebarHidden") private var isSidebarHidden = false
     @StateObject private var updateManager = SparkleUpdateManager()
+    @StateObject private var onboardingTour = OnboardingTour()
 
     private var filteredProjection: FilteredSidebarProjection {
         store.filteredSidebarProjection(
@@ -109,6 +110,14 @@ struct ConversationBrowserView: View {
             onSelectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) }
         ))
         .modifier(TerminalTabCloseConfirmation(store: store, closingSessionID: $closingTerminalID))
+        .modifier(OnboardingTipsPresenter(
+            store: store,
+            tour: onboardingTour,
+            tipsStore: .shared,
+            listsProjectWithSessions: filteredProjection.projects.contains { !$0.conversations.isEmpty },
+            isReadyForTips: workspaceTabCommandsEnabled,
+            onStartTour: { isSidebarHidden = false }
+        ))
     }
 
     /// A tab still waiting to be shown runs nothing, so it closes without asking what to do with its CLI.

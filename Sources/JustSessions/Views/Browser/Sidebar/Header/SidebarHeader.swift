@@ -44,6 +44,7 @@ struct SidebarHeader: View {
             HStack(spacing: 4) {
                 searchButton
                 SidebarNewSessionButton(action: onNewSession)
+                    .onboardingTourStop(.newSession)
             }
             .layoutPriority(1)
         }

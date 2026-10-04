@@ -7,6 +7,7 @@ struct SidebarFooter: View {
     var body: some View {
         HStack(spacing: 4) {
             SidebarAddRemoteHostButton(action: onAddRemoteHost)
+                .onboardingTourStop(.sshHosts)
             Spacer(minLength: 4)
             SidebarSettingsButton()
         }

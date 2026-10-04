@@ -3,6 +3,8 @@ import SwiftUI
 /// Help in Settings: the main flow, in the order a session is found, read, resumed, and kept running.
 struct HelpFeatureOverview: View {
     @Environment(\.locale) private var locale
+    @Environment(\.startOnboardingTour) private var startOnboardingTour
+    @Environment(\.dismiss) private var dismiss
 
     private var providerList: String {
         let formatter = ListFormatter()
@@ -13,7 +15,18 @@ struct HelpFeatureOverview: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("How it works").font(.headline)
+            HStack(alignment: .firstTextBaseline) {
+                Text("How it works").font(.headline)
+                Spacer(minLength: 12)
+                Button("Take the tour") {
+                    // The tour points at the window, so Settings closes first; its tips show once the sheet is gone.
+                    dismiss()
+                    startOnboardingTour()
+                }
+                .buttonStyle(QuietBorderedButtonStyle())
+                .controlSize(.small)
+                .accessibilityIdentifier("help.take-the-tour")
+            }
 
             HelpFeatureRow(title: "Find", systemImage: "square.stack.3d.up",
                            detail: "Sessions from \(providerList), grouped by host and project.")

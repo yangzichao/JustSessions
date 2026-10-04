@@ -54,6 +54,8 @@
 	<string>在 %@ 上添加项目文件夹</string>
 	<key>Add a project folder on this Mac</key>
 	<string>在此 Mac 上添加项目文件夹</string>
+	<key>Add a server you reach with passwordless SSH to browse and resume its sessions here.</key>
+	<string>添加一台可通过免密 SSH 连接的服务器，就能在这里浏览并继续它上面的会话。</string>
 	<key>Add host</key>
 	<string>添加主机</string>
 	<key>Add project</key>
@@ -140,6 +142,8 @@
 	<string>清除筛选</string>
 	<key>Click a session to read it. Nothing runs.</key>
 	<string>点击会话即可阅读，不会启动任何 CLI。</string>
+	<key>Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.</key>
+	<string>单击会话即可阅读，不会运行任何东西。双击则在原文件夹中用它的 CLI 继续。</string>
 	<key>Close %@</key>
 	<string>关闭 %@</string>
 	<key>Close Tab…</key>
@@ -156,6 +160,8 @@
 	<string>关闭终端</string>
 	<key>Close terminal…</key>
 	<string>关闭终端…</string>
+	<key>Close the tab, keep the CLI</key>
+	<string>关掉标签页，CLI 照常运行</string>
 	<key>Collapse Group</key>
 	<string>折叠标签组</string>
 	<key>Collapse project</key>
@@ -292,6 +298,8 @@
 	<string>跳到第一条可用消息</string>
 	<key>Go to the latest message</key>
 	<string>跳到最新消息</string>
+	<key>Got it</key>
+	<string>知道了</string>
 	<key>Help &amp; feedback</key>
 	<string>帮助与反馈</string>
 	<key>Hide Sidebar</key>
@@ -320,6 +328,8 @@
 	<string>JustSessions 网站</string>
 	<key>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</key>
 	<string>JustSessions 及其终端中的 CLI 需要它来访问你所在网络中的设备，例如本地地址上的 SSH 主机。macOS 不允许应用检查这项权限，请在「隐私与安全性 &gt; 本地网络」中找到 JustSessions。</string>
+	<key>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</key>
+	<string>JustSessions 读取了各 CLI 自己保存的历史，并按项目分组。没有导入或上传任何内容。</string>
 	<key>JustSessions website ↗</key>
 	<string>JustSessions 网站 ↗</string>
 	<key>Keep running</key>
@@ -378,6 +388,8 @@
 	<string>在 %@ 中新建会话</string>
 	<key>New terminal</key>
 	<string>新建终端</string>
+	<key>Next</key>
+	<string>下一步</string>
 	<key>Next Tab</key>
 	<string>下一个标签</string>
 	<key>Next match</key>
@@ -418,6 +430,8 @@
 	<string>在以下情况通知我</string>
 	<key>OK</key>
 	<string>好</string>
+	<key>Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.</key>
+	<string>Claude Code、Codex 或其他支持的 CLI 保存对话后，它会按项目出现在这里。</string>
 	<key>Open Login Items Settings</key>
 	<string>打开登录项设置</string>
 	<key>Open System Settings</key>
@@ -470,6 +484,8 @@
 	<string>项目</string>
 	<key>Read</key>
 	<string>阅读</string>
+	<key>Read first, then resume</key>
+	<string>先阅读，再继续</string>
 	<key>Read only</key>
 	<string>只读</string>
 	<key>Readable</key>
@@ -546,6 +562,8 @@
 	<string>会话 %lld / %lld</string>
 	<key>Sessions from %@, grouped by host and project.</key>
 	<string>来自 %@ 的会话，按主机和项目分组。</string>
+	<key>Sessions on other machines</key>
+	<string>其他机器上的会话</string>
 	<key>Settings</key>
 	<string>设置</string>
 	<key>Settings (⌘,)</key>
@@ -564,6 +582,8 @@
 	<string>侧栏宽度</string>
 	<key>Size</key>
 	<string>字号</string>
+	<key>Skip tour</key>
+	<string>跳过引导</string>
 	<key>Smaller reading text</key>
 	<string>减小阅读字号</string>
 	<key>Smaller text</key>
@@ -578,8 +598,12 @@
 	<string>在 %@ 中新建会话</string>
 	<key>Start a new session in %@ on %@</key>
 	<string>在 %2$@ 的 %1$@ 中新建会话</string>
+	<key>Start a session in any installed CLI, or open a plain terminal, in a project folder. ⌘N does the same.</key>
+	<string>在项目文件夹中用任一已安装的 CLI 开始会话，或打开普通终端。⌘N 也可以。</string>
 	<key>Start session</key>
 	<string>开始会话</string>
+	<key>Start something new</key>
+	<string>开始新的工作</string>
 	<key>Startup</key>
 	<string>启动</string>
 	<key>Stop deleting after the current session; the rest stay listed</key>
@@ -598,6 +622,10 @@
 	<string>标签 %lld</string>
 	<key>Tabs</key>
 	<string>标签</string>
+	<key>Take the Tour</key>
+	<string>查看引导</string>
+	<key>Take the tour</key>
+	<string>查看引导</string>
 	<key>Terminal</key>
 	<string>终端</string>
 	<key>Terminal appearance preview</key>
@@ -658,12 +686,18 @@
 	<string>用户指南 ↗</string>
 	<key>Version %@</key>
 	<string>版本 %@</string>
+	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
+	<string>关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
 	<string>支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
 	<key>You</key>
 	<string>你</string>
 	<key>Your login shell, with no CLI</key>
 	<string>你的登录 shell，不运行 CLI</string>
+	<key>Your sessions will appear here</key>
+	<string>你的会话会显示在这里</string>
+	<key>Your sessions, already here</key>
+	<string>你的会话已经在这里</string>
 	<key>iTerm2 Color Preset File…</key>
 	<string>iTerm2 配色预设文件…</string>
 	<key>iTerm2 Default Profile</key>

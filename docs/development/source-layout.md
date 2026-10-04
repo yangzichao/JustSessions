@@ -11,6 +11,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Transcript/`: the reading width, a readable column or the full window, shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
 - `Models/Customizations/`: session and project names you set, and pins.
+- `Models/Onboarding/`: the onboarding tour's stops, which of them a tour includes, and the tips a fresh install shows once.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
@@ -22,6 +23,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
+- `Services/Onboarding/`: saves which onboarding tips are still to show, decided once from whether the install is fresh.
 - `Services/Permissions/`: reads each permission's status without asking for it, and the System Settings page that changes it.
 - `Services/Startup/`: registers the app as a macOS login item and reads its current system approval status.
 - `Services/Appearance/`: saves the app's appearance and theme, sets the appearance on every window, and gives terminals a newly chosen theme's colors.
@@ -63,6 +65,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.
 - `Models/Transcript/Search/`, `Services/Transcript/Search/`, and `Views/Preview/Search/`: temporary per-reader text matching, keyboard shortcuts, highlights, and navigation to occurrences in the displayed transcript.
 - `Views/Dialogs/`: the store's alert and the deletion confirmation. `ClickOutside/` closes a sheet, alert, or dialog, as Cancel would, when you click the window around it.
+- `Views/Onboarding/`: starts the tour on a fresh install's first window and the Keep running tip on its first CLI tab, or from Help, and the tip card with its copy. `Popover/` shows the card beside the control it is about, hiding it while a sheet is open or the control is scrolled out of sight.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
 - `Views/Settings/`: the Settings sheet, with General (language, startup, notifications, and software updates), Appearance, Permissions, and Help & feedback pages, each in a `SettingsTabPage` of the one size they share.

@@ -71,6 +71,7 @@ struct TerminalTab: View {
             isHovered = isHovering
             onHoverChange(isHovering)
         }
+        .onboardingTourStop(isSelected ? .keepRunning : nil)
     }
 
     /// A narrow tab hides its × until selected or pointed at, as in Chrome, so its title keeps the room.

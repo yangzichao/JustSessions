@@ -4,6 +4,7 @@ extension ConversationSidebarView {
     @ViewBuilder
     var projectList: some View {
         let selectedConversations = selectedConversations
+        let onboardingTourProjectID = onboardingTourProjectID
 
         ScrollViewReader { scrollProxy in
             SidebarSelectionScrollView(
@@ -23,6 +24,7 @@ extension ConversationSidebarView {
                                 isSearching: isSearching,
                                 recencyFilter: recencyFilter
                             ))
+                            .onboardingTourStop(section.host == .thisMac ? .noSessionsYet : nil)
                         }
 
                         let parentLabels = ProjectParentLabels(projectsOnOneHost: section.projects)
@@ -32,6 +34,7 @@ extension ConversationSidebarView {
                                 project: project,
                                 parentLabel: parentLabels.label(for: project),
                                 isExpanded: isExpanded(project),
+                                isOnboardingTourProject: project.id == onboardingTourProjectID,
                                 projectSelection: projectSelection,
                                 sessionSelection: sessionSelection,
                                 selectedConversations: selectedConversations,

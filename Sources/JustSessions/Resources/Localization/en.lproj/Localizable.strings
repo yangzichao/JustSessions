@@ -70,6 +70,8 @@
 	<string>Add a project folder on %@</string>
 	<key>Add a project folder on this Mac</key>
 	<string>Add a project folder on this Mac</string>
+	<key>Add a server you reach with passwordless SSH to browse and resume its sessions here.</key>
+	<string>Add a server you reach with passwordless SSH to browse and resume its sessions here.</string>
 	<key>Add host</key>
 	<string>Add host</string>
 	<key>Add project</key>
@@ -156,6 +158,8 @@
 	<string>Clear filters</string>
 	<key>Click a session to read it. Nothing runs.</key>
 	<string>Click a session to read it. Nothing runs.</string>
+	<key>Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.</key>
+	<string>Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.</string>
 	<key>Close %@</key>
 	<string>Close %@</string>
 	<key>Close Tab…</key>
@@ -172,6 +176,8 @@
 	<string>Close terminal</string>
 	<key>Close terminal…</key>
 	<string>Close terminal…</string>
+	<key>Close the tab, keep the CLI</key>
+	<string>Close the tab, keep the CLI</string>
 	<key>Collapse Group</key>
 	<string>Collapse Group</string>
 	<key>Collapse project</key>
@@ -300,6 +306,8 @@
 	<string>Go to the first available message</string>
 	<key>Go to the latest message</key>
 	<string>Go to the latest message</string>
+	<key>Got it</key>
+	<string>Got it</string>
 	<key>Help &amp; feedback</key>
 	<string>Help &amp; feedback</string>
 	<key>Hide Sidebar</key>
@@ -330,6 +338,8 @@
 	<string>JustSessions Website</string>
 	<key>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</key>
 	<string>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</string>
+	<key>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</key>
+	<string>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</string>
 	<key>JustSessions website ↗</key>
 	<string>JustSessions website ↗</string>
 	<key>Keep running</key>
@@ -390,6 +400,8 @@
 	<string>New session in %@</string>
 	<key>New terminal</key>
 	<string>New terminal</string>
+	<key>Next</key>
+	<string>Next</string>
 	<key>Next Tab</key>
 	<string>Next Tab</string>
 	<key>Next match</key>
@@ -428,6 +440,8 @@
 	<string>Notify me when a session</string>
 	<key>OK</key>
 	<string>OK</string>
+	<key>Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.</key>
+	<string>Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.</string>
 	<key>Open Login Items Settings</key>
 	<string>Open Login Items Settings</string>
 	<key>Open System Settings</key>
@@ -480,6 +494,8 @@
 	<string>Projects</string>
 	<key>Read</key>
 	<string>Read</string>
+	<key>Read first, then resume</key>
+	<string>Read first, then resume</string>
 	<key>Read only</key>
 	<string>Read only</string>
 	<key>Readable</key>
@@ -554,6 +570,8 @@
 	<string>Session %lld of %lld</string>
 	<key>Sessions from %@, grouped by host and project.</key>
 	<string>Sessions from %@, grouped by host and project.</string>
+	<key>Sessions on other machines</key>
+	<string>Sessions on other machines</string>
 	<key>Settings</key>
 	<string>Settings</string>
 	<key>Settings (⌘,)</key>
@@ -572,6 +590,8 @@
 	<string>Sidebar width</string>
 	<key>Size</key>
 	<string>Size</string>
+	<key>Skip tour</key>
+	<string>Skip tour</string>
 	<key>Smaller reading text</key>
 	<string>Smaller reading text</string>
 	<key>Smaller text</key>
@@ -584,8 +604,12 @@
 	<string>Start a native CLI or a plain terminal in a project folder.</string>
 	<key>Start a new session in %@</key>
 	<string>Start a new session in %@</string>
+	<key>Start a session in any installed CLI, or open a plain terminal, in a project folder. ⌘N does the same.</key>
+	<string>Start a session in any installed CLI, or open a plain terminal, in a project folder. ⌘N does the same.</string>
 	<key>Start session</key>
 	<string>Start session</string>
+	<key>Start something new</key>
+	<string>Start something new</string>
 	<key>Startup</key>
 	<string>Startup</string>
 	<key>Stop deleting after the current session; the rest stay listed</key>
@@ -604,6 +628,10 @@
 	<string>Tab %lld</string>
 	<key>Tabs</key>
 	<string>Tabs</string>
+	<key>Take the Tour</key>
+	<string>Take the Tour</string>
+	<key>Take the tour</key>
+	<string>Take the tour</string>
 	<key>Terminal</key>
 	<string>Terminal</string>
 	<key>Terminal appearance preview</key>
@@ -664,12 +692,18 @@
 	<string>User guide ↗</string>
 	<key>Version %@</key>
 	<string>Version %@</string>
+	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
+	<string>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
 	<string>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
 	<key>You</key>
 	<string>You</string>
 	<key>Your login shell, with no CLI</key>
 	<string>Your login shell, with no CLI</string>
+	<key>Your sessions will appear here</key>
+	<string>Your sessions will appear here</string>
+	<key>Your sessions, already here</key>
+	<string>Your sessions, already here</string>
 	<key>devbox or user@devbox.example.com</key>
 	<string>devbox or user@devbox.example.com</string>
 	<key>iTerm2 Color Preset File…</key>
