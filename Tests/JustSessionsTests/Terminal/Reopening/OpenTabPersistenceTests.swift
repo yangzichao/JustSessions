@@ -33,6 +33,25 @@ struct OpenTabPersistenceTests {
         #expect(TerminalTabsToReopen.load(from: settings.userDefaults).tabs == [second, first])
     }
 
+    @Test func closingAWindowDropsItsTabsUnlessItIsTheLastWindow() throws {
+        let settings = try IsolatedUserDefaults()
+        defer { settings.removeSuite() }
+        let persistence = OpenTabPersistence()
+        let firstWindow = UUID()
+        let secondWindow = UUID()
+        #expect(persistence.take(from: settings.userDefaults).isEmpty)
+        persistence.update([first], for: firstWindow, in: settings.userDefaults)
+        persistence.update([second], for: secondWindow, in: settings.userDefaults)
+
+        persistence.closeWindow(firstWindow, in: settings.userDefaults)
+        #expect(TerminalTabsToReopen.load(from: settings.userDefaults).tabs == [second])
+
+        persistence.closeWindow(secondWindow, in: settings.userDefaults)
+        #expect(TerminalTabsToReopen.load(from: settings.userDefaults).tabs == [second])
+        #expect(persistence.take(from: settings.userDefaults) == [second])
+        #expect(persistence.take(from: settings.userDefaults).isEmpty)
+    }
+
     @Test func unreadableSavedTabsReopenNothing() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

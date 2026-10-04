@@ -9,7 +9,7 @@ final class OpenTabPersistence {
     private var windowOrder: [UUID] = []
     private var tabsByWindow: [UUID: [ReopenableTerminalTab]] = [:]
 
-    /// The tabs the last quit saved, the first time it is asked; empty after that.
+    /// The tabs the last quit, or the last window closed, saved, the first time it is asked; empty after that.
     func take(from userDefaults: UserDefaults) -> [ReopenableTerminalTab] {
         guard !haveBeenTaken else { return [] }
         haveBeenTaken = true
@@ -22,10 +22,16 @@ final class OpenTabPersistence {
         save(to: userDefaults)
     }
 
-    func removeWindow(_ windowID: UUID, from userDefaults: UserDefaults) {
+    /// Closing one of several windows drops its tabs. Closing the last one keeps them saved, as a quit does, and the
+    /// next window to open, in this launch or the next, takes them again.
+    func closeWindow(_ windowID: UUID, in userDefaults: UserDefaults) {
         tabsByWindow[windowID] = nil
         windowOrder.removeAll { $0 == windowID }
-        save(to: userDefaults)
+        if windowOrder.isEmpty {
+            haveBeenTaken = false
+        } else {
+            save(to: userDefaults)
+        }
     }
 
     private func save(to userDefaults: UserDefaults) {

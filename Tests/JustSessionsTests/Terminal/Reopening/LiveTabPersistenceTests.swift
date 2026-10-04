@@ -69,6 +69,29 @@ struct LiveTabPersistenceTests {
         #expect(savedTabs(in: sandbox).count == 1)
     }
 
+    @Test func closingTheLastWindowKeepsItsTabsForTheNextWindowToReopen() throws {
+        let sandbox = try TabReopeningSandbox()
+        defer { sandbox.tearDown() }
+        let persistence = OpenTabPersistence()
+        let closedWindow = sandbox.makeStore()
+        closedWindow.reopenTabsFromLastQuit(from: persistence, isEnabled: true)
+        closedWindow.openPlainTerminal(in: sandbox.projectLocation)
+        let snapshot = savedTabs(in: sandbox)
+        #expect(snapshot.count == 1)
+
+        closedWindow.closeWorkspace()
+        #expect(closedWindow.terminalSessions.isEmpty)
+        #expect(savedTabs(in: sandbox) == snapshot)
+
+        // Clicking the Dock icon opens a new window in the same launch.
+        let reopenedWindow = sandbox.makeStore()
+        defer { reopenedWindow.closeAllTerminals() }
+        reopenedWindow.reopenTabsFromLastQuit(from: persistence, isEnabled: true)
+        #expect(reopenedWindow.terminalSessions.count == 1)
+        #expect(reopenedWindow.selectedTerminal != nil)
+        #expect(savedTabs(in: sandbox) == snapshot)
+    }
+
     @Test func aPartialHostRefreshKeepsWaitingTabsAndTheirOriginalOrder() throws {
         let sandbox = try TabReopeningSandbox(remoteHosts: ["devbox"])
         defer { sandbox.tearDown() }

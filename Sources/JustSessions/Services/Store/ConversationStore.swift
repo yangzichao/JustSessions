@@ -62,7 +62,7 @@ final class ConversationStore: ObservableObject {
     let tabPersistenceWindowID = UUID()
     var openTabPersistence: OpenTabPersistence?
     var isRestoringTabBatch = false
-    var isTerminatingWorkspace = false
+    var isTearingDownWorkspace = false
     let sessionNotifier: any SessionNotifying
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
