@@ -12,25 +12,28 @@ struct SettingsView: View {
 
     var body: some View {
         TabView {
-            GeneralSettingsView(
-                languageStore: languageStore,
-                tabReopeningSettingsStore: tabReopeningSettingsStore,
-                notificationSettingsStore: notificationSettingsStore
-            )
-            .background(ThemePalette.contentSurface)
+            SettingsTabPage {
+                GeneralSettingsView(
+                    languageStore: languageStore,
+                    tabReopeningSettingsStore: tabReopeningSettingsStore,
+                    notificationSettingsStore: notificationSettingsStore
+                )
+            }
             .tabItem { Label("General", systemImage: "gearshape") }
 
-            AppearanceSettingsView(
-                appAppearanceStore: appAppearanceStore,
-                appThemeStore: appThemeStore,
-                terminalAppearanceStore: terminalAppearanceStore
-            )
-            .background(ThemePalette.contentSurface)
+            SettingsTabPage {
+                AppearanceSettingsView(
+                    appAppearanceStore: appAppearanceStore,
+                    appThemeStore: appThemeStore,
+                    terminalAppearanceStore: terminalAppearanceStore
+                )
+            }
             .tabItem { Label("Appearance", systemImage: "circle.lefthalf.filled") }
 
-            PermissionsSettingsView()
-                .background(ThemePalette.contentSurface)
-                .tabItem { Label("Permissions", systemImage: "lock.shield") }
+            SettingsTabPage {
+                PermissionsSettingsView()
+            }
+            .tabItem { Label("Permissions", systemImage: "lock.shield") }
         }
         .background(ThemePalette.contentSurface)
     }

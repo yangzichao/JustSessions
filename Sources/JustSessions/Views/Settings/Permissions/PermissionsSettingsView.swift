@@ -30,9 +30,6 @@ struct PermissionsSettingsView: View {
                 Button("Check Again") { Task { await checkAll() } }
             }
         }
-        .padding(24)
-        .frame(width: 540, alignment: .leading)
-        .fixedSize(horizontal: false, vertical: true)
         .task { await checkAll() }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             Task { await checkAll() }

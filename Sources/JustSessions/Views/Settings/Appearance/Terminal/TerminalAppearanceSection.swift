@@ -69,7 +69,8 @@ struct TerminalAppearanceSection: View {
             Text("Preview")
             VStack(alignment: .leading, spacing: 6) {
                 TerminalAppearancePreview(appearanceStore: appearanceStore, themeStore: themeStore)
-                    .frame(height: max(130, appearanceStore.preferences.fontSize * 8))
+                    // A fixed height, so a bigger font shows fewer lines instead of making the tab taller.
+                    .frame(height: 130)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(ThemePalette.hairline))
                     .allowsHitTesting(false)

@@ -45,10 +45,5 @@ struct GeneralSettingsView: View {
             Link("JustSessions website ↗", destination: AppLinks.websiteURL)
                 .help("Open the JustSessions website")
         }
-        .padding(24)
-        .frame(width: 540, alignment: .leading)
-        .fixedSize(horizontal: false, vertical: true)
-        // The window fits the tab, but a taller one shows the theme's surface below it, not the system's tab box.
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }

@@ -16,8 +16,5 @@ struct AppearanceSettingsView: View {
             }
             TerminalAppearanceSection(appearanceStore: terminalAppearanceStore, themeStore: appThemeStore)
         }
-        .padding(24)
-        .frame(width: 540, alignment: .leading)
-        .fixedSize(horizontal: false, vertical: true)
     }
 }
