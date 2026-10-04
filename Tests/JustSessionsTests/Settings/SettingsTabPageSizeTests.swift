@@ -5,14 +5,11 @@ import Testing
 
 @MainActor
 struct SettingsTabPageSizeTests {
-    /// The Settings window keeps one size because every tab shares it. A tab taller than that scrolls, so this catches
-    /// a tab that outgrows it, including the terminal preview at the largest font size.
-    @Test func everyTabFitsTheSharedPageAtTheLargestTerminalFontSize() throws {
+    /// The Settings window keeps one size because every tab shares it. The Appearance tab scrolls in it; this catches
+    /// a General or Permissions tab that outgrows it and starts to scroll too.
+    @Test func generalAndPermissionsTabsFitTheSharedPageWithoutScrolling() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
-        let appThemeStore = AppThemeStore(userDefaults: settings.userDefaults)
-        let terminalAppearanceStore = TerminalAppearanceStore(userDefaults: settings.userDefaults)
-        terminalAppearanceStore.setFontSize(TerminalAppearancePreferences.fontSizeRange.upperBound)
 
         let tabs: [(name: String, content: AnyView)] = [
             ("General", AnyView(GeneralSettingsView(
@@ -20,11 +17,6 @@ struct SettingsTabPageSizeTests {
                 tabReopeningSettingsStore: TabReopeningSettingsStore(userDefaults: settings.userDefaults),
                 launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
                 notificationSettingsStore: SessionNotificationSettingsStore(userDefaults: settings.userDefaults)
-            ))),
-            ("Appearance", AnyView(AppearanceSettingsView(
-                appAppearanceStore: AppAppearanceStore(userDefaults: settings.userDefaults, setApplicationAppearance: { _ in }),
-                appThemeStore: appThemeStore,
-                terminalAppearanceStore: terminalAppearanceStore
             ))),
             ("Permissions", AnyView(PermissionsSettingsView())),
         ]

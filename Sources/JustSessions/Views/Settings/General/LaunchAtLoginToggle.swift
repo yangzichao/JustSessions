@@ -2,7 +2,8 @@ import AppKit
 import ServiceManagement
 import SwiftUI
 
-struct LaunchAtLoginSettingsSection: View {
+/// Whether JustSessions opens when you log in, with what to do when macOS still needs your approval or refuses.
+struct LaunchAtLoginToggle: View {
     @ObservedObject var settingsStore: LaunchAtLoginSettingsStore
 
     var body: some View {
@@ -12,11 +13,6 @@ struct LaunchAtLoginSettingsSection: View {
                 set: { settingsStore.setLaunchesAtLogin($0) }
             ))
             .accessibilityIdentifier("settings.launchAtLogin")
-
-            Text("Automatically open JustSessions when you log in to your Mac.")
-                .font(.caption)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
 
             if settingsStore.status == .requiresApproval {
                 Text("Allow JustSessions in macOS Login Items to finish enabling automatic launch.")

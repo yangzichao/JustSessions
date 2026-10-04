@@ -535,26 +535,6 @@
         }
       }
     },
-    "At launch": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "启动时"
-          }
-        }
-      }
-    },
-    "Automatically open JustSessions when you log in to your Mac.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "登录 Mac 时自动打开 JustSessions。"
-          }
-        }
-      }
-    },
     "A−": {
       "shouldTranslate": false
     },
@@ -3010,6 +2990,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "开始会话"
+          }
+        }
+      }
+    },
+    "Startup": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启动"
           }
         }
       }

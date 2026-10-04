@@ -106,10 +106,6 @@
 	<string>Archived projects on %@</string>
 	<key>Ask Now</key>
 	<string>Ask Now</string>
-	<key>At launch</key>
-	<string>At launch</string>
-	<key>Automatically open JustSessions when you log in to your Mac.</key>
-	<string>Automatically open JustSessions when you log in to your Mac.</string>
 	<key>A−</key>
 	<string>A−</string>
 	<key>Branch</key>
@@ -566,6 +562,8 @@
 	<string>Start an installed coding CLI in a project folder</string>
 	<key>Start session</key>
 	<string>Start session</string>
+	<key>Startup</key>
+	<string>Startup</string>
 	<key>Stop deleting after the current session; the rest stay listed</key>
 	<string>Stop deleting after the current session; the rest stay listed</string>
 	<key>Stopping deletion</key>

@@ -92,10 +92,6 @@
 	<string>%@ 上已归档的项目</string>
 	<key>Ask Now</key>
 	<string>立即请求</string>
-	<key>At launch</key>
-	<string>启动时</string>
-	<key>Automatically open JustSessions when you log in to your Mac.</key>
-	<string>登录 Mac 时自动打开 JustSessions。</string>
 	<key>Branch</key>
 	<string>分支</string>
 	<key>Branch %lld sessions</key>
@@ -562,6 +558,8 @@
 	<string>在项目文件夹中启动已安装的编程 CLI</string>
 	<key>Start session</key>
 	<string>开始会话</string>
+	<key>Startup</key>
+	<string>启动</string>
 	<key>Stop deleting after the current session; the rest stay listed</key>
 	<string>删除当前会话后停止；保留其余会话</string>
 	<key>Stopping deletion</key>

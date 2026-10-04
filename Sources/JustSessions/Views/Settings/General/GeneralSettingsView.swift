@@ -1,10 +1,10 @@
 import SwiftUI
 
-/// The General tab of Settings: interface language, what the app does at launch, when it notifies you, and a link to
+/// The General tab of Settings: interface language, what the app does at startup, when it notifies you, and a link to
 /// the website.
 struct GeneralSettingsView: View {
     @ObservedObject var languageStore: AppLanguageStore
-    @ObservedObject var tabReopeningSettingsStore: TabReopeningSettingsStore
+    let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
     let notificationSettingsStore: SessionNotificationSettingsStore
 
@@ -26,17 +26,10 @@ struct GeneralSettingsView: View {
 
             ThemeDivider()
 
-            Text("At launch")
-                .font(.subheadline.weight(.medium))
-            LaunchAtLoginSettingsSection(settingsStore: launchAtLoginSettingsStore)
-            Toggle("Reopen the tabs that were open when JustSessions quit", isOn: Binding(
-                get: { tabReopeningSettingsStore.reopensTabsAtLaunch },
-                set: { tabReopeningSettingsStore.setReopensTabsAtLaunch($0) }
-            ))
-            Text("A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.")
-                .font(.caption)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
+            StartupSettingsSection(
+                launchAtLoginSettingsStore: launchAtLoginSettingsStore,
+                tabReopeningSettingsStore: tabReopeningSettingsStore
+            )
 
             ThemeDivider()
 
