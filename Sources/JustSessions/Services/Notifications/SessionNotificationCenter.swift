@@ -16,7 +16,7 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
     }
 
     /// Whether the app runs from its bundle, which macOS posts notifications for.
-    static var isAvailable: Bool {
+    nonisolated static var isAvailable: Bool {
         Bundle.main.bundleURL.pathExtension == "app"
     }
 
@@ -42,8 +42,7 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
     /// Asks for permission the first time. macOS asks you once and gives the same answer from then on, so a
     /// notification you turned off in System Settings is dropped here.
     nonisolated private static func post(_ notification: SessionNotification) async {
-        let center = UNUserNotificationCenter.current()
-        guard (try? await center.requestAuthorization(options: [.alert, .sound])) == true else { return }
+        guard await requestAuthorization() else { return }
         let content = UNMutableNotificationContent()
         content.title = notification.title
         content.subtitle = notification.subtitle
@@ -55,7 +54,13 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
             content: content,
             trigger: nil
         )
-        try? await center.add(request)
+        try? await UNUserNotificationCenter.current().add(request)
+    }
+
+    /// Shows macOS's prompt if it hasn't asked yet, and returns whether notifications are allowed.
+    nonisolated static func requestAuthorization() async -> Bool {
+        guard isAvailable else { return false }
+        return (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])) == true
     }
 
     /// Shows the session in the window whose tab runs it, or else reattaches to it in the first window.

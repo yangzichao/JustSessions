@@ -1,9 +1,10 @@
 import SwiftUI
 
-/// The General tab of Settings: interface language and what the app does at launch.
+/// The General tab of Settings: interface language, what the app does at launch, and when it notifies you.
 struct GeneralSettingsView: View {
     @ObservedObject var languageStore: AppLanguageStore
     @ObservedObject var tabReopeningSettingsStore: TabReopeningSettingsStore
+    let notificationSettingsStore: SessionNotificationSettingsStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -33,6 +34,10 @@ struct GeneralSettingsView: View {
                 .font(.caption)
                 .foregroundStyle(ThemePalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
+
+            ThemeDivider()
+
+            NotificationSettingsSection(settingsStore: notificationSettingsStore)
         }
         .padding(24)
         .frame(width: 540, alignment: .leading)

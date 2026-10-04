@@ -3,7 +3,7 @@ import SwiftUI
 /// The right side of `AppWindowSketch`: the tab bar with a session's terminal tab selected, and output in the theme's
 /// terminal colors, where each theme looks most like itself.
 struct TerminalTabSketch: View {
-    /// Like the Terminal tab's preview: a title and a prompt, then green, yellow, and red lines, then blue, magenta,
+    /// Like the terminal preview in Settings: a title and a prompt, then green, yellow, and red lines, then blue, magenta,
     /// and cyan. Each bar is a width and an ANSI color index, or no index for plain text.
     private static let outputLines: [[(width: CGFloat, ansiIndex: Int?)]] = [
         [(22, nil)],

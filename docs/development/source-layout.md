@@ -12,6 +12,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
 - `Models/Customizations/`: session and project names you set, and pins.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
+- `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, and multi-selection.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
@@ -21,6 +22,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
+- `Services/Permissions/`: reads each permission's status without asking for it, and the System Settings page that changes it.
 - `Services/Appearance/`: saves the app's appearance and theme, and sets the appearance on every window.
 - `Services/Adapters/`: provider discovery and native arguments, one folder per CLI. Separate adapters make adding another CLI straightforward.
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
@@ -55,8 +57,9 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Transcript/Search/`, `Services/Transcript/Search/`, and `Views/Preview/Search/`: temporary per-reader text matching, keyboard shortcuts, highlights, and navigation to occurrences in the displayed transcript.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
-- `Views/Settings/`: General (language and launch behavior), Appearance, Terminal, and Notifications tabs.
-- `Views/Settings/Terminal/Colors/`: the terminal color scheme menu and the iTerm2 import menu.
+- `Views/Settings/`: General (language, launch behavior, and notifications), Appearance, and Permissions tabs.
+- `Views/Settings/Appearance/`: the app's appearance and theme in `App/`, then its terminals' colors, font, and preview in `Terminal/`, with the color scheme and iTerm2 import menus in `Terminal/Colors/`.
+- `Views/Settings/Permissions/`: each permission's status and a link to its page in System Settings.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
 - `Views/Feedback/`: prepares bug reports, feature requests, and feedback for the user to review on GitHub.

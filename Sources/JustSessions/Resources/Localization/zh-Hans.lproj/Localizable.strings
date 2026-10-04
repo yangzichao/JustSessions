@@ -58,8 +58,12 @@
 	<string>全部</string>
 	<key>All tools</key>
 	<string>所有工具</string>
+	<key>Allowed</key>
+	<string>已允许</string>
 	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
 	<string>已归档的项目会从侧栏中隐藏。其文件夹和会话仍保留在磁盘上，恢复后会重新列出。在其文件夹中新建会话也会恢复该项目。</string>
+	<key>App</key>
+	<string>应用</string>
 	<key>Appearance</key>
 	<string>外观</string>
 	<key>Applies immediately to all terminals. Some CLI apps use their own colors.</key>
@@ -84,6 +88,8 @@
 	<string>已归档的项目</string>
 	<key>Archived projects (%lld)…</key>
 	<string>已归档的项目（%lld）…</string>
+	<key>Ask Now</key>
+	<string>立即请求</string>
 	<key>At launch</key>
 	<string>启动时</string>
 	<key>Branch</key>
@@ -92,10 +98,14 @@
 	<string>为 %lld 个会话创建分支</string>
 	<key>Browse…</key>
 	<string>浏览…</string>
+	<key>Can't check</key>
+	<string>无法检查</string>
 	<key>Cancel</key>
 	<string>取消</string>
 	<key>Cancel deletion</key>
 	<string>取消删除</string>
+	<key>Check Again</key>
+	<string>重新检查</string>
 	<key>Check for updates</key>
 	<string>检查更新</string>
 	<key>Checking the folder on %@…</key>
@@ -246,6 +256,8 @@
 	<string>在原生 CLI 中创建分支</string>
 	<key>Full</key>
 	<string>全宽</string>
+	<key>Full Disk Access</key>
+	<string>完全磁盘访问权限</string>
 	<key>General</key>
 	<string>通用</string>
 	<key>Go to the first available message</key>
@@ -280,6 +292,8 @@
 	<string>JustSessions 帮助</string>
 	<key>JustSessions Website</key>
 	<string>JustSessions 网站</string>
+	<key>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</key>
+	<string>JustSessions 及其终端中的 CLI 需要它来访问你所在网络中的设备，例如本地地址上的 SSH 主机。macOS 不允许应用检查这项权限，请在「隐私与安全性 &gt; 本地网络」中找到 JustSessions。</string>
 	<key>Keep running</key>
 	<string>保持运行</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
@@ -292,14 +306,20 @@
 	<string>最后一个标签</string>
 	<key>Latest message</key>
 	<string>最新消息</string>
+	<key>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</key>
+	<string>让 JustSessions 在会话需要你的输入或完成本轮回复时通知你。在「通用」中选择通知哪些情况。</string>
 	<key>Light</key>
 	<string>浅色</string>
+	<key>Light or dark</key>
+	<string>浅色或深色</string>
 	<key>List the sessions on another machine you reach with ssh</key>
 	<string>列出可通过 SSH 连接的另一台机器上的会话</string>
 	<key>Load earlier messages</key>
 	<string>加载更早的消息</string>
 	<key>Load later messages</key>
 	<string>加载后续消息</string>
+	<key>Local Network</key>
+	<string>本地网络</string>
 	<key>Match app</key>
 	<string>与应用一致</string>
 	<key>Match app theme</key>
@@ -352,6 +372,10 @@
 	<string>在 %@ 上未找到支持的 CLI。请在该主机安装 %@，然后刷新。</string>
 	<key>No supported CLI found on this Mac. Install %@, then refresh.</key>
 	<string>本机未找到支持的 CLI。请安装 %@，然后刷新。</string>
+	<key>Not allowed</key>
+	<string>未允许</string>
+	<key>Not asked yet</key>
+	<string>尚未请求</string>
 	<key>Notifications</key>
 	<string>通知</string>
 	<key>Notifications for JustSessions are turned off in System Settings &gt; Notifications.</key>
@@ -360,6 +384,8 @@
 	<string>在以下情况通知我</string>
 	<key>OK</key>
 	<string>好</string>
+	<key>Open System Settings</key>
+	<string>打开系统设置</string>
 	<key>Open in a separate reading window</key>
 	<string>在独立阅读窗口中打开</string>
 	<key>Open in new window</key>
@@ -370,8 +396,12 @@
 	<string>在 Finder 中打开项目</string>
 	<key>Open the JustSessions website</key>
 	<string>打开 JustSessions 网站</string>
+	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
+	<string>可选。没有它时，终端中的 CLI 第一次打开受保护文件夹（例如「文稿」或外置磁盘）中的文件，macOS 会逐个询问。</string>
 	<key>Path on the host, such as ~/code/app</key>
 	<string>主机上的路径，例如 ~/code/app</string>
+	<key>Permissions</key>
+	<string>权限</string>
 	<key>Picks the light or dark version of color schemes that have both.</key>
 	<string>为同时有浅色和深色版本的配色方案选择其中一个版本。</string>
 	<key>Pin project</key>
@@ -436,6 +466,8 @@
 	<string>恢复默认设置</string>
 	<key>Restore archived projects to the sidebar</key>
 	<string>将已归档的项目恢复到侧栏</string>
+	<key>Restores the terminal colors, font, and size.</key>
+	<string>恢复终端的配色、字体和字号。</string>
 	<key>Resume</key>
 	<string>继续</string>
 	<key>Resume %lld sessions</key>
@@ -528,14 +560,6 @@
 	<string>终端</string>
 	<key>Terminal appearance preview</key>
 	<string>终端外观预览</string>
-	<key>Terminals use the color scheme chosen in the Terminal tab.</key>
-	<string>终端使用「终端」标签中选择的配色方案。</string>
-	<key>Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab.</key>
-	<string>终端使用主题配色并与应用外观一致，除非你在「终端」标签中设为浅色或深色。</string>
-	<key>Terminals use the theme's dark colors, as set in the Terminal tab.</key>
-	<string>终端使用主题的深色配色，与「终端」标签中的设置一致。</string>
-	<key>Terminals use the theme's light colors, as set in the Terminal tab.</key>
-	<string>终端使用主题的浅色配色，与「终端」标签中的设置一致。</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
 	<string>Antigravity 会话数据库、关联文件夹和注释将移到 macOS 废纸篓，并从 Antigravity 本地索引中移除。</string>
 	<key>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</key>
@@ -604,5 +628,11 @@
 	<string>iTerm2 默认 Profile</string>
 	<key>iTerm2 has no saved settings on this Mac.</key>
 	<string>这台 Mac 上没有 iTerm2 的设置。</string>
+	<key>macOS asks for these on behalf of JustSessions, also when a CLI in one of its terminals needs one. Checking here never shows a prompt.</key>
+	<string>macOS 以 JustSessions 的名义请求这些权限，终端中的 CLI 需要时也是如此。在这里检查不会弹出任何请求。</string>
+	<key>macOS asks the first time JustSessions needs it.</key>
+	<string>macOS 会在 JustSessions 第一次需要时询问。</string>
+	<key>macOS doesn't let apps check this. Look for JustSessions in System Settings.</key>
+	<string>macOS 不允许应用检查这项权限。请在系统设置中找到 JustSessions。</string>
 </dict>
 </plist>

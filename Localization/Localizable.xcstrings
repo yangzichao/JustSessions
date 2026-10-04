@@ -365,6 +365,26 @@
         }
       }
     },
+    "Allowed": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许"
+          }
+        }
+      }
+    },
+    "App": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用"
+          }
+        }
+      }
+    },
     "An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.": {
       "localizations": {
         "zh-Hans": {
@@ -391,6 +411,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "立即应用到所有终端。部分 CLI 应用使用自己的配色。"
+          }
+        }
+      }
+    },
+    "Ask Now": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即请求"
           }
         }
       }
@@ -556,6 +586,16 @@
         }
       }
     },
+    "Can't check": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法检查"
+          }
+        }
+      }
+    },
     "Cancel": {
       "localizations": {
         "zh-Hans": {
@@ -572,6 +612,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "取消删除"
+          }
+        }
+      }
+    },
+    "Check Again": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新检查"
           }
         }
       }
@@ -1398,6 +1448,16 @@
         }
       }
     },
+    "Full Disk Access": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完全磁盘访问权限"
+          }
+        }
+      }
+    },
     "General": {
       "localizations": {
         "zh-Hans": {
@@ -1571,6 +1631,16 @@
         }
       }
     },
+    "JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy & Security > Local Network.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JustSessions 及其终端中的 CLI 需要它来访问你所在网络中的设备，例如本地地址上的 SSH 主机。macOS 不允许应用检查这项权限，请在「隐私与安全性 > 本地网络」中找到 JustSessions。"
+          }
+        }
+      }
+    },
     "Keep running": {
       "localizations": {
         "zh-Hans": {
@@ -1631,12 +1701,32 @@
         }
       }
     },
+    "Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "让 JustSessions 在会话需要你的输入或完成本轮回复时通知你。在「通用」中选择通知哪些情况。"
+          }
+        }
+      }
+    },
     "Light": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "浅色"
+          }
+        }
+      }
+    },
+    "Light or dark": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "浅色或深色"
           }
         }
       }
@@ -1667,6 +1757,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "加载后续消息"
+          }
+        }
+      }
+    },
+    "Local Network": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地网络"
           }
         }
       }
@@ -1940,6 +2040,26 @@
         }
       }
     },
+    "Not allowed": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未允许"
+          }
+        }
+      }
+    },
+    "Not asked yet": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未请求"
+          }
+        }
+      }
+    },
     "Notifications": {
       "localizations": {
         "zh-Hans": {
@@ -1976,6 +2096,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "好"
+          }
+        }
+      }
+    },
+    "Open System Settings": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开系统设置"
           }
         }
       }
@@ -2030,12 +2160,32 @@
         }
       }
     },
+    "Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可选。没有它时，终端中的 CLI 第一次打开受保护文件夹（例如「文稿」或外置磁盘）中的文件，macOS 会逐个询问。"
+          }
+        }
+      }
+    },
     "Path on the host, such as ~/code/app": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "主机上的路径，例如 ~/code/app"
+          }
+        }
+      }
+    },
+    "Permissions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "权限"
           }
         }
       }
@@ -2346,6 +2496,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "恢复默认设置"
+          }
+        }
+      }
+    },
+    "Restores the terminal colors, font, and size.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复终端的配色、字体和字号。"
           }
         }
       }
@@ -2844,46 +3004,6 @@
         }
       }
     },
-    "Terminals use the color scheme chosen in the Terminal tab.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "终端使用「终端」标签中选择的配色方案。"
-          }
-        }
-      }
-    },
-    "Terminals use the theme's colors and match the app unless you set Light or Dark in the Terminal tab.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "终端使用主题配色并与应用外观一致，除非你在「终端」标签中设为浅色或深色。"
-          }
-        }
-      }
-    },
-    "Terminals use the theme's dark colors, as set in the Terminal tab.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "终端使用主题的深色配色，与「终端」标签中的设置一致。"
-          }
-        }
-      }
-    },
-    "Terminals use the theme's light colors, as set in the Terminal tab.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "终端使用主题的浅色配色，与「终端」标签中的设置一致。"
-          }
-        }
-      }
-    },
     "The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.": {
       "localizations": {
         "zh-Hans": {
@@ -3223,6 +3343,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "这台 Mac 上没有 iTerm2 的设置。"
+          }
+        }
+      }
+    },
+    "macOS asks for these on behalf of JustSessions, also when a CLI in one of its terminals needs one. Checking here never shows a prompt.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 以 JustSessions 的名义请求这些权限，终端中的 CLI 需要时也是如此。在这里检查不会弹出任何请求。"
+          }
+        }
+      }
+    },
+    "macOS asks the first time JustSessions needs it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 会在 JustSessions 第一次需要时询问。"
+          }
+        }
+      }
+    },
+    "macOS doesn't let apps check this. Look for JustSessions in System Settings.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 不允许应用检查这项权限。请在系统设置中找到 JustSessions。"
           }
         }
       }

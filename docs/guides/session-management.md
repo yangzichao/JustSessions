@@ -57,7 +57,7 @@ JustSessions posts a macOS notification when a Claude Code or Codex session on t
 - Sessions running in tmux with no tab open notify too.
 - A session whose tab is selected while JustSessions is in front sends none; you already see it.
 - macOS asks for permission the first time there is something to notify about.
-- Turn either kind off in **Settings > Notifications**. Banners, sounds, and Do Not Disturb follow **System Settings > Notifications**.
+- Turn either kind off in **Settings > General**. Banners, sounds, and Do Not Disturb follow **System Settings > Notifications**. **Settings > Permissions** shows whether macOS allows them.
 - SSH hosts, Antigravity CLI, Kiro CLI, OpenCode, and Pi don't report what their CLI is doing, so they send no notifications.
 
 ## SSH hosts
@@ -82,13 +82,13 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 - Claude Code, Antigravity, and Pi sessions on this Mac go to the macOS Trash; a Pi session's folder beside its file goes too, if there is one. Codex uses `codex delete --force`, Kiro CLI uses `kiro-cli chat --delete-session <session-id>`, and OpenCode uses `opencode session delete <session-id>`, which also deletes the session's subagent sessions. SSH hosts have no Trash, so deletions there are permanent.
 - Sessions with an open terminal tab, or still running in tmux, can't be deleted.
 
-## Appearance
+## Settings
 
 Open **Settings** at the bottom of the sidebar, or press ⌘,.
 
 - **General > Interface language**: **Follow System** by default, or choose **English** or **Chinese**. Switching updates the interface in place and preserves running terminal tabs. System languages without a matching translation fall back to English.
-
-- **Appearance**: choose **System** to switch between light and dark with your Mac, or keep the app **Light** or **Dark**.
-- **Theme**: choose the app's colors: JustSessions, Solarized, Gruvbox, Catppuccin, Tokyo Night, or Rosé Pine. Each theme has light and dark colors, and **Appearance** picks between them. Terminals use the theme's colors too.
-- **Terminal > Colors**: terminals use the app theme's colors unless you pick a color scheme of their own: one of the app themes, Dracula, Nord, One Half, or GitHub. **Import** copies the colors of iTerm2's default profile, or of an iTerm2 color preset (`.itermcolors`) file. JustSessions reads iTerm2's settings only when you choose that, and never again after.
-- **Terminal > Appearance**: terminals match the app unless you give them the **Light** or **Dark** version of their colors. A scheme with only one version, such as Dracula or Nord, keeps it. The font and size are set here too. Changes apply to open terminals right away.
+- **General** also sets whether tabs reopen at launch, and which [notifications](#notifications) to send.
+- **Appearance > App**: choose **System** to switch between light and dark with your Mac, or keep the app **Light** or **Dark**, and choose its theme: JustSessions, Solarized, Gruvbox, Catppuccin, Tokyo Night, or Rosé Pine. Each theme has light and dark colors, and the app's appearance picks between them. Terminals use the theme's colors too.
+- **Appearance > Terminal > Colors**: terminals use the app theme's colors unless you pick a color scheme of their own: one of the app themes, Dracula, Nord, One Half, or GitHub. **Import** copies the colors of iTerm2's default profile, or of an iTerm2 color preset (`.itermcolors`) file. JustSessions reads iTerm2's settings only when you choose that, and never again after.
+- **Appearance > Terminal > Light or dark**: terminals match the app unless you give them the **Light** or **Dark** version of their colors. A scheme with only one version, such as Dracula or Nord, keeps it. The font and size are set below it. Changes apply to open terminals right away.
+- **Permissions**: whether macOS allows notifications and, optionally, Full Disk Access, which lets CLIs in terminals open files in protected folders such as Documents without macOS asking about each one. On macOS 15 and later it also lists Local Network, which JustSessions and its CLIs need to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check that one, so look for JustSessions in **System Settings > Privacy & Security > Local Network**. The tab checks again when you come back from System Settings, and checking never shows a prompt.

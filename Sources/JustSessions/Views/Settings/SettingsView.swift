@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The Settings window (⌘,): what happens at launch, how the whole app looks, how its terminals look, and when it
-/// notifies you.
+/// The Settings window (⌘,): language, launch, and notifications; how the app and its terminals look; and what macOS
+/// allows the app.
 struct SettingsView: View {
     let languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
@@ -12,11 +12,15 @@ struct SettingsView: View {
 
     var body: some View {
         TabView {
-            GeneralSettingsView(languageStore: languageStore, tabReopeningSettingsStore: tabReopeningSettingsStore)
-                .background(ThemePalette.contentSurface)
-                .tabItem { Label("General", systemImage: "gearshape") }
+            GeneralSettingsView(
+                languageStore: languageStore,
+                tabReopeningSettingsStore: tabReopeningSettingsStore,
+                notificationSettingsStore: notificationSettingsStore
+            )
+            .background(ThemePalette.contentSurface)
+            .tabItem { Label("General", systemImage: "gearshape") }
 
-            AppAppearanceSettingsView(
+            AppearanceSettingsView(
                 appAppearanceStore: appAppearanceStore,
                 appThemeStore: appThemeStore,
                 terminalAppearanceStore: terminalAppearanceStore
@@ -24,13 +28,9 @@ struct SettingsView: View {
             .background(ThemePalette.contentSurface)
             .tabItem { Label("Appearance", systemImage: "circle.lefthalf.filled") }
 
-            TerminalAppearanceSettingsView(appearanceStore: terminalAppearanceStore, themeStore: appThemeStore)
+            PermissionsSettingsView()
                 .background(ThemePalette.contentSurface)
-                .tabItem { Label("Terminal", systemImage: "terminal") }
-
-            NotificationSettingsView(settingsStore: notificationSettingsStore)
-                .background(ThemePalette.contentSurface)
-                .tabItem { Label("Notifications", systemImage: "bell.badge") }
+                .tabItem { Label("Permissions", systemImage: "lock.shield") }
         }
         .background(ThemePalette.contentSurface)
     }
