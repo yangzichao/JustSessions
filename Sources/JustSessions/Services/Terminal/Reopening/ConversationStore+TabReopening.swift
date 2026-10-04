@@ -43,8 +43,13 @@ extension ConversationStore {
     }
 
     /// Once the host lists its sessions, its waiting tabs reopen, except those whose session is gone.
-    func reopenWaitingTabs(on host: SessionHost) {
-        reopenWaitingTabs { $0.host == host }
+    func reopenWaitingTabs(on host: SessionHost, discardMissingSessions: Bool = true) {
+        reopenWaitingTabs { tab in
+            guard tab.host == host else { return false }
+            // A failed adapter may have omitted sessions. Restore those it did find, and retain the rest.
+            guard !discardMissingSessions, let conversationID = tab.conversationID else { return true }
+            return conversation(withID: conversationID) != nil
+        }
     }
 
     private func reopenWaitingTabs(where shouldReopen: (ReopenableTerminalTab) -> Bool) {

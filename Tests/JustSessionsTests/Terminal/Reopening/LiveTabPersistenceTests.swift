@@ -80,7 +80,7 @@ struct LiveTabPersistenceTests {
         defer { store.closeAllTerminals() }
         store.reopenTabsFromLastQuit(from: OpenTabPersistence(), isEnabled: true)
         #expect(savedTabs(in: sandbox) == original)
-        store.replaceConversations(on: .thisMac, with: [], reopenSavedTabs: false)
+        store.replaceConversations(on: .thisMac, with: [], discardMissingReopeningTabs: false)
         #expect(savedTabs(in: sandbox) == original)
         store.replaceConversations(on: .thisMac, with: [local])
         #expect(savedTabs(in: sandbox) == original)
@@ -111,6 +111,23 @@ struct LiveTabPersistenceTests {
         #expect(savedTabs(in: sandbox).isEmpty)
         #expect(store.linkWaitingNewSessionTab(tab, toSessionID: conversation.sessionID))
         #expect(savedTabs(in: sandbox) == [.session(conversation, wasSelected: true)])
+    }
+
+    @Test func aFailedAdapterDoesNotBlockOtherTabsOnTheSameHost() throws {
+        let sandbox = try TabReopeningSandbox()
+        defer { sandbox.tearDown() }
+        let found = sandbox.conversation(title: "Found")
+        let missing = sandbox.conversation(title: "Not loaded")
+        let original: [ReopenableTerminalTab] = [.session(missing), .session(found)]
+        TerminalTabsToReopen(tabs: original).save(to: sandbox.userDefaults)
+        let store = sandbox.makeStore()
+        defer { store.closeAllTerminals() }
+        store.reopenTabsFromLastQuit(from: OpenTabPersistence(), isEnabled: true)
+        store.replaceConversations(on: .thisMac, with: [found], discardMissingReopeningTabs: false)
+        #expect(store.terminalSessions.map { $0.conversation?.id } == [found.id])
+        #expect(savedTabs(in: sandbox) == original)
+        store.replaceConversations(on: .thisMac, with: [found, missing])
+        #expect(store.terminalSessions.map { $0.conversation?.id } == [missing.id, found.id])
     }
 
     @Test func anUnavailableCLIDoesNotEraseTheTabBeforeALaterSuccessfulRefresh() throws {

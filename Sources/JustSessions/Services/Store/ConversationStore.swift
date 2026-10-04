@@ -142,7 +142,7 @@ final class ConversationStore: ObservableObject {
                 self.tmuxSessionNamesByHost[.thisMac] = Set(tmuxPaneProcessIDs.keys)
                 self.thisMacTmuxPaneProcessIDs = tmuxPaneProcessIDs
                 self.setInstalledProviders(installedProviders, on: .thisMac)
-                self.replaceConversations(on: .thisMac, with: found, reopenSavedTabs: failures.isEmpty)
+                self.replaceConversations(on: .thisMac, with: found, discardMissingReopeningTabs: failures.isEmpty)
                 self.linkWaitingTabsByAppearance(on: .thisMac)
                 self.hostRefreshStatuses[.thisMac] = failures.isEmpty
                     ? .refreshed(.now)
@@ -159,13 +159,13 @@ final class ConversationStore: ObservableObject {
     }
 
     /// Swaps in what one host lists now, keeping every other host's sessions.
-    func replaceConversations(on host: SessionHost, with hostConversations: [Conversation], reopenSavedTabs: Bool = true) {
+    func replaceConversations(on host: SessionHost, with hostConversations: [Conversation], discardMissingReopeningTabs: Bool = true) {
         rememberSidebarProjects(Set(hostConversations.map(\.projectDirectoryKey)))
         let updatedConversations = (conversations.filter { $0.host != host } + hostConversations)
             .sorted { $0.updatedAt > $1.updatedAt }
         if conversations != updatedConversations { conversations = updatedConversations }
         synchronizeTerminalTitles()
-        if reopenSavedTabs { reopenWaitingTabs(on: host) }
+        reopenWaitingTabs(on: host, discardMissingSessions: discardMissingReopeningTabs)
     }
 
     func adapter(for provider: ConversationProvider) -> (any ConversationAdapter)? {
