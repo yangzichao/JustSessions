@@ -42,6 +42,7 @@ final class TerminalInsetView: NSView {
 
     /// A click in the margin puts the keyboard in the terminal, as a click on its text does.
     override func mouseDown(with event: NSEvent) {
+        terminalView.onMouseDown?()
         window?.makeFirstResponder(terminalView)
     }
 }

@@ -46,6 +46,7 @@ struct TerminalTabGroupSection: View {
                     hostDisplayName: store.hasRemoteHosts ? session.host.displayName : nil,
                     width: tabWidth,
                     isSelected: store.selectedTerminalID == session.id,
+                    isShownInSplit: isShownInSplit(session.id),
                     showsLeadingSeparator: index > 0 && !standsOut(session.id) && !standsOut(shownTabs[index - 1].id),
                     splitMenu: splitMenu(for: session.id),
                     onHoverChange: { trackHover(of: session.id, isHovering: $0) },
@@ -66,16 +67,23 @@ struct TerminalTabGroupSection: View {
         }
     }
 
-    /// A pair tab offers the split's own actions; any other tab beside the selected one can join it in a split.
+    /// A tab of the split on screen offers the split's own actions; any other tab but the selected one, wherever it
+    /// sits in the bar, can open in a split with the selected tab.
     private func splitMenu(for tabID: UUID) -> TerminalTabSplitMenu? {
-        if store.terminalSplitPair?.contains(tabID) == true { return .linkedInPair }
+        if store.shownSplitPair?.contains(tabID) == true { return .linkedInPair }
         guard let selectedTerminalID = store.selectedTerminalID, selectedTerminalID != tabID else { return nil }
         return .joinsSelectedTab
     }
 
-    /// The selected and the hovered tab draw a shape of their own, so no separator runs beside them.
+    /// The tab whose terminal shows in the split beside the selected tab's.
+    private func isShownInSplit(_ tabID: UUID) -> Bool {
+        tabID != store.selectedTerminalID && store.shownSplitPair?.contains(tabID) == true
+    }
+
+    /// The selected, the hovered, and the split partner's tab draw a shape of their own, so no separator runs beside
+    /// them.
     private func standsOut(_ tabID: UUID) -> Bool {
-        tabID == store.selectedTerminalID || tabID == hoveredTabID
+        tabID == store.selectedTerminalID || tabID == hoveredTabID || isShownInSplit(tabID)
     }
 
     private func trackHover(of tabID: UUID, isHovering: Bool) {

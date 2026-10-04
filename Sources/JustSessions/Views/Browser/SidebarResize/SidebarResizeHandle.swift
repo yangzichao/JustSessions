@@ -26,7 +26,7 @@ struct SidebarResizeHandle: View {
             }
             .ignoresSafeArea(edges: .top)
             .contentShape(Rectangle())
-            .sidebarResizeCursor(canShrink: width > minimumWidth, canGrow: width < maximumWidth)
+            .columnResizeCursor(canShrink: width > minimumWidth, canGrow: width < maximumWidth)
             .onHover { isHovering = $0 }
             .gesture(
                 // Global coordinates, because the handle itself moves with the width it changes: a translation in

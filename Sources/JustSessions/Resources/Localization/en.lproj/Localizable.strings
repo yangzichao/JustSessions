@@ -372,6 +372,8 @@
 	<string>Latest message</string>
 	<key>Launch JustSessions at login</key>
 	<string>Launch JustSessions at login</string>
+	<key>Leave Split View</key>
+	<string>Leave Split View</string>
 	<key>Leave split view</key>
 	<string>Leave split view</string>
 	<key>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</key>
@@ -616,6 +618,8 @@
 	<string>Show sidebar</string>
 	<key>Show sidebar (⌃⌘S)</key>
 	<string>Show sidebar (⌃⌘S)</string>
+	<key>Shown in split view</key>
+	<string>Shown in split view</string>
 	<key>Sidebar width</key>
 	<string>Sidebar width</string>
 	<key>Size</key>
@@ -650,6 +654,8 @@
 	<string>Stopping deletion</string>
 	<key>Stopping…</key>
 	<string>Stopping…</string>
+	<key>Swap Split Sides</key>
+	<string>Swap Split Sides</string>
 	<key>Swap split sides</key>
 	<string>Swap split sides</string>
 	<key>Switches between a readable width and the full window width</key>

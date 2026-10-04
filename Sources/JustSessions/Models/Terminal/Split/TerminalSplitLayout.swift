@@ -4,10 +4,9 @@ import CoreGraphics
 /// width beside the divider; it is kept where both panes stay wide enough for a terminal, and the split starts
 /// even, as in Chrome.
 enum TerminalSplitLayout {
-    /// The drawn line between the panes.
-    static let dividerWidth: CGFloat = 1
-    /// The strip around the line that takes the drag, wider than the line so it is easy to grab.
-    static let dividerGrabWidth: CGFloat = 9
+    /// The gutter between the panes, which takes the drag. It has a place of its own in the layout, so no terminal
+    /// lies under it to take the click first.
+    static let dividerWidth: CGFloat = 8
     /// Neither pane gets narrower than this while the window has room for both.
     static let minimumPaneWidth: CGFloat = 200
     static let evenFraction: CGFloat = 0.5

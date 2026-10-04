@@ -48,6 +48,13 @@ struct WorkspaceTabCommands: Commands {
                 .keyboardShortcut(KeyEquivalent(Character(String(shortcutNumber))), modifiers: .command)
                 .disabled(actions?.isEnabled != true || (actions?.tabCount ?? 0) < (shortcutNumber == 9 ? 1 : shortcutNumber))
             }
+
+            Divider()
+
+            Button(AppLocalization.string("Swap Split Sides", language: languageStore.language)) { actions?.swapSplitSides() }
+                .disabled(actions?.isEnabled != true || actions?.isSplitShown != true)
+            Button(AppLocalization.string("Leave Split View", language: languageStore.language)) { actions?.leaveSplitView() }
+                .disabled(actions?.isEnabled != true || actions?.isSplitShown != true)
         }
     }
 }

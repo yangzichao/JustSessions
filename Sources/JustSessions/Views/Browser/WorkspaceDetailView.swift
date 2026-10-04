@@ -2,8 +2,10 @@ import SwiftUI
 
 /// Right side of the window: the tab bar while tabs are open, above the selected tab's terminal or, with no tab
 /// selected, the selected session's preview. Every tab's terminal stays in the view tree; only the selected one
-/// shows, or both halves of a split while a split tab is selected, side by side around a draggable divider as in
-/// Chrome's split view. Clicking the pane whose tab is not selected selects it, bringing it the keyboard.
+/// shows, or both halves of a split while a split tab is selected, side by side around a draggable gutter as in
+/// Chrome's split view. A click in the pane whose tab is not selected selects it, bringing it the keyboard, and still
+/// reaches its terminal, so scrolling and selecting text work there too; that pane is dimmed slightly. A split tab
+/// keeps its pane's width while another tab shows, so coming back resizes no terminal.
 /// The tab bar runs up into the title bar beside the window buttons; with no tabs open, the title bar stays clear.
 struct WorkspaceDetailView: View {
     @ObservedObject var store: ConversationStore
@@ -16,8 +18,6 @@ struct WorkspaceDetailView: View {
     @Environment(\.titleBarRow) private var titleBarRow
     /// The leading pane's share of the split's width; even until the divider is dragged.
     @State private var splitFraction: CGFloat = TerminalSplitLayout.evenFraction
-    /// Where the divider sat as its drag began.
-    @State private var splitDragStartFraction: CGFloat = TerminalSplitLayout.evenFraction
 
     var body: some View {
         VStack(spacing: 0) {
@@ -33,6 +33,7 @@ struct WorkspaceDetailView: View {
                 )
             }
             GeometryReader { geometry in
+                let splitPair = store.terminalSplitPair
                 let shownSplitPair = store.shownSplitPair
                 let paneWidths = TerminalSplitLayout.paneWidths(fraction: splitFraction, totalWidth: geometry.size.width)
                 ZStack(alignment: .topLeading) {
@@ -46,102 +47,77 @@ struct WorkspaceDetailView: View {
 
                     ForEach(store.terminalSessions) { session in
                         let isActive = store.selectedTerminalID == session.id
-                        let placement = placement(of: session.id, in: shownSplitPair)
+                        let isShown = isActive || shownSplitPair?.contains(session.id) == true
+                        let side = splitSide(of: session.id, in: splitPair)
                         TerminalWorkspaceView(
                             session: session,
+                            isShown: isShown,
                             isActive: isActive,
-                            onReconnect: session.host == .thisMac ? nil : { store.reconnectRemoteTerminal(session.id) }
+                            onReconnect: session.host == .thisMac ? nil : { store.reconnectRemoteTerminal(session.id) },
+                            onFocus: { store.selectTerminal(session.id) }
                         )
-                        .allowsHitTesting(isActive)
                         .overlay {
-                            // The pane whose tab is not selected focuses on click, like an unfocused window;
-                            // a slight tint sets it back from the pane with the keyboard.
-                            if !isActive, placement == .leading || placement == .trailing {
-                                SplitPaneFocusOverlay(onFocus: { store.selectTerminal(session.id) })
-                            }
+                            if isShown && !isActive { SplitPaneDimming() }
                         }
-                        .opacity(placement == .hidden ? 0 : 1)
-                        .accessibilityHidden(placement == .hidden)
-                        .frame(width: paneWidth(of: placement, paneWidths: paneWidths, totalWidth: geometry.size.width), height: geometry.size.height)
-                        .offset(x: placement == .trailing ? paneWidths.leading + TerminalSplitLayout.dividerWidth : 0)
+                        .shown(isShown)
+                        .frame(width: paneWidth(of: side, paneWidths: paneWidths, totalWidth: geometry.size.width), height: geometry.size.height)
+                        .offset(x: side == .trailing ? paneWidths.leading + TerminalSplitLayout.dividerWidth : 0)
                     }
 
                     if shownSplitPair != nil {
-                        splitDivider(paneWidths: paneWidths, size: geometry.size)
+                        WorkspaceSplitDivider(fraction: $splitFraction, totalWidth: geometry.size.width)
+                            .frame(height: geometry.size.height)
+                            .padding(.leading, paneWidths.leading)
                     }
                 }
             }
+            .tabBarTerminalPalette(from: .shared)
         }
         .ignoresSafeArea(edges: .top)
         .onChange(of: store.terminalSplitPair) { oldPair, newPair in
             guard let newPair, newPair != oldPair else { return }
-            // Swapped panes keep their widths as they trade sides; a new pair starts even, as in Chrome.
-            splitFraction = oldPair?.swapped == newPair ? 1 - splitFraction : TerminalSplitLayout.evenFraction
+            if oldPair?.swapped == newPair {
+                // Swapped panes keep their widths as they trade sides.
+                splitFraction = 1 - splitFraction
+            } else if let oldPair, newPair.sharesTab(with: oldPair) {
+                // A tab replaced in place, or a new partner for the selected tab, keeps the divider where it was.
+                return
+            } else {
+                // A pair of tabs new to the split starts even, as in Chrome.
+                splitFraction = TerminalSplitLayout.evenFraction
+            }
         }
     }
 
-    /// The divider's thin line with its wider grab strip, between the split's panes.
-    private func splitDivider(paneWidths: TerminalSplitLayout.PaneWidths, size: CGSize) -> some View {
-        ZStack(alignment: .topLeading) {
-            Rectangle()
-                .fill(ThemePalette.hairline)
-                .frame(width: TerminalSplitLayout.dividerWidth, height: size.height)
-                .offset(x: paneWidths.leading)
-            WorkspaceSplitDivider(
-                onDragBegan: { splitDragStartFraction = splitFraction },
-                onDragMoved: { delta in
-                    splitFraction = TerminalSplitLayout.fraction(
-                        startingAt: splitDragStartFraction,
-                        draggedBy: delta,
-                        totalWidth: size.width
-                    )
-                }
-            )
-            .frame(width: TerminalSplitLayout.dividerGrabWidth, height: size.height)
-            .offset(x: paneWidths.leading - (TerminalSplitLayout.dividerGrabWidth - TerminalSplitLayout.dividerWidth) / 2)
-        }
-        .accessibilityElement()
-        .accessibilityLabel("Split view divider")
-        .accessibilityValue(Text(verbatim: "\(Int((splitFraction * 100).rounded()))%"))
-        .accessibilityAdjustableAction { direction in
-            let step: CGFloat = direction == .increment ? 0.05 : -0.05
-            splitFraction = TerminalSplitLayout.clampedFraction(splitFraction + step, totalWidth: size.width)
-        }
+    private enum SplitSide {
+        case leading, trailing
     }
 
-    private enum SplitPanePlacement {
-        case hidden, full, leading, trailing
+    /// The tab's side of the split pair, kept while the pair is not shown, or nil for a tab outside it.
+    private func splitSide(of tabID: UUID, in splitPair: TerminalSplitPair?) -> SplitSide? {
+        if tabID == splitPair?.leadingID { return .leading }
+        if tabID == splitPair?.trailingID { return .trailing }
+        return nil
     }
 
-    private func placement(of tabID: UUID, in shownSplitPair: TerminalSplitPair?) -> SplitPanePlacement {
-        if let shownSplitPair {
-            if tabID == shownSplitPair.leadingID { return .leading }
-            if tabID == shownSplitPair.trailingID { return .trailing }
-            return .hidden
-        }
-        return store.selectedTerminalID == tabID ? .full : .hidden
-    }
-
-    private func paneWidth(of placement: SplitPanePlacement, paneWidths: TerminalSplitLayout.PaneWidths, totalWidth: CGFloat) -> CGFloat {
-        switch placement {
+    private func paneWidth(of side: SplitSide?, paneWidths: TerminalSplitLayout.PaneWidths, totalWidth: CGFloat) -> CGFloat {
+        switch side {
         case .leading: paneWidths.leading
         case .trailing: paneWidths.trailing
-        case .full, .hidden: totalWidth
+        case nil: totalWidth
         }
     }
 }
 
-/// Lies over the split pane whose tab is not selected and takes the click that selects it, before the
-/// terminal underneath can swallow it.
-private struct SplitPaneFocusOverlay: View {
-    let onFocus: () -> Void
+/// Sets the split pane whose tab is not selected back from the one with the keyboard. It darkens in the terminal's
+/// colors, not the app's, so it reads on a dark terminal in a light window too; clicks pass through to the terminal.
+private struct SplitPaneDimming: View {
+    @Environment(\.tabBarTerminalPalette) private var terminalPalette
 
     var body: some View {
         Rectangle()
-            .fill(ThemePalette.hoverFill)
-            .contentShape(Rectangle())
-            // Focus moves on mouse down, as it does between windows, not on mouse up as a tap gesture would.
-            .gesture(DragGesture(minimumDistance: 0).onChanged { _ in onFocus() })
+            .fill(Color.black.opacity(terminalPalette.isDark ? 0.25 : 0.06))
+            .allowsHitTesting(false)
             .accessibilityHidden(true)
     }
 }

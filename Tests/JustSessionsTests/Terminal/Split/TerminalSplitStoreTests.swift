@@ -175,6 +175,69 @@ struct TerminalSplitStoreTests {
         #expect(store.terminalSplitPair == TerminalSplitPair(leadingID: first.id, trailingID: third.id))
     }
 
+    @Test func splittingAgainFromAPairTabReplacesOnlyItsCounterpart() throws {
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        defer { store.closeAllTerminals() }
+        let first = makeTab()
+        let second = makeTab()
+        let third = makeTab()
+        store.openTerminal(first)
+        store.openTerminal(second)
+        store.openTerminal(third)
+        store.selectTerminal(first.id)
+        store.splitSelectedTerminal(with: second.id)
+        store.selectTerminal(second.id)
+
+        store.splitSelectedTerminal(with: third.id)
+
+        // The selected tab keeps the right pane, where it had the keyboard.
+        #expect(store.terminalSplitPair == TerminalSplitPair(leadingID: third.id, trailingID: second.id))
+        #expect(store.selectedTerminalID == second.id)
+    }
+
+    @Test func splittingFromATabOutsideThePairMakesANewPair() throws {
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        defer { store.closeAllTerminals() }
+        let first = makeTab()
+        let second = makeTab()
+        let third = makeTab()
+        store.openTerminal(first)
+        store.openTerminal(second)
+        store.openTerminal(third)
+        store.selectTerminal(first.id)
+        store.splitSelectedTerminal(with: second.id)
+        store.selectTerminal(third.id)
+
+        store.splitSelectedTerminal(with: first.id)
+
+        #expect(store.terminalSplitPair == TerminalSplitPair(leadingID: third.id, trailingID: first.id))
+    }
+
+    @Test func aReopenedTabWaitingToBeShownStartsAsItJoinsTheSplit() throws {
+        let sandbox = try TabReopeningSandbox()
+        defer { sandbox.tearDown() }
+        let store = sandbox.makeStore()
+        defer { store.closeAllTerminals() }
+        let conversation = sandbox.conversation()
+        store.replaceConversations(on: .thisMac, with: [conversation])
+        let selectedTab = makeTab()
+        store.openTerminal(selectedTab)
+        let waitingTab = try #require(try store.makeTerminal(for: conversation, action: .resume, startsOnceShown: true))
+        store.insertReopenedTerminal(waitingTab, at: 0, selecting: false)
+        #expect(waitingTab.isWaitingToBeShown)
+
+        store.splitSelectedTerminal(with: waitingTab.id)
+
+        #expect(store.selectedTerminalID == selectedTab.id)
+        #expect(!waitingTab.isWaitingToBeShown)
+        #expect(waitingTab.isRunning)
+        #expect(waitingTab.processID > 0)
+    }
+
     @Test func aTabReplacedInPlaceKeepsItsSideOfTheSplit() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }

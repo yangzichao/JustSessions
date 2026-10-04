@@ -1963,12 +1963,22 @@
         }
       }
     },
+    "Leave Split View": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退出分屏"
+          }
+        }
+      }
+    },
     "Leave split view": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "退出拆分视图"
+            "value": "退出分屏"
           }
         }
       }
@@ -2467,7 +2477,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在拆分视图中打开"
+            "value": "在分屏中打开"
           }
         }
       }
@@ -3220,6 +3230,16 @@
         }
       }
     },
+    "Shown in split view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在分屏中显示"
+          }
+        }
+      }
+    },
     "Sidebar width": {
       "localizations": {
         "zh-Hans": {
@@ -3295,7 +3315,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "拆分视图分隔条"
+            "value": "分屏分隔条"
           }
         }
       }
@@ -3406,12 +3426,22 @@
         }
       }
     },
+    "Swap Split Sides": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "交换左右位置"
+          }
+        }
+      }
+    },
     "Swap split sides": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "交换拆分两侧"
+            "value": "交换左右位置"
           }
         }
       }

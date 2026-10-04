@@ -2,9 +2,9 @@ import SwiftUI
 
 /// The split items a tab's context menu offers; see Chrome's split view, which these follow.
 enum TerminalTabSplitMenu {
-    /// Not the selected tab and outside the pair: it can open in a split beside the selected tab.
+    /// Any tab but the selected one, outside the split on screen: it can open in a split with the selected tab.
     case joinsSelectedTab
-    /// Half of the linked pair: it can trade sides or leave the split.
+    /// Half of the split on screen: it can trade sides or leave the split.
     case linkedInPair
 }
 
@@ -18,7 +18,9 @@ struct TerminalTab: View {
     let hostDisplayName: String?
     let width: CGFloat
     let isSelected: Bool
-    /// The line that parts this tab from the one before. It hides beside the selected or hovered tab.
+    /// Not selected, but its terminal shows in the split beside the selected tab's, so the tab is lit as if pointed at.
+    let isShownInSplit: Bool
+    /// The line that parts this tab from the one before. It hides beside the selected, hovered, or split partner's tab.
     let showsLeadingSeparator: Bool
     /// The split items this tab's context menu offers, or nil for none.
     let splitMenu: TerminalTabSplitMenu?
@@ -47,8 +49,9 @@ struct TerminalTab: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(ThemePlainButtonStyle(showsHover: false))
-            .help(Text("Show \(session.displayTitle)") + Text(verbatim: "\n" + details))
+            .help(helpText)
             .accessibilityAddTraits(isSelected ? .isSelected : [])
+            .accessibilityValue(isShownInSplit ? Text("Shown in split view") : Text(verbatim: ""))
             .contextMenu {
                 if session.isPlainTerminal {
                     splitMenuItems
@@ -80,7 +83,11 @@ struct TerminalTab: View {
         .padding(.trailing, showsCloseButton ? 6 : 10)
         .frame(width: width, height: WorkspaceTabMetrics.height)
         .background {
-            WorkspaceTabBackground(isSelected: isSelected, isHovered: isHovered, showsLeadingSeparator: showsLeadingSeparator)
+            WorkspaceTabBackground(
+                isSelected: isSelected,
+                isHovered: isHovered || isShownInSplit,
+                showsLeadingSeparator: showsLeadingSeparator
+            )
         }
         .onHover { isHovering in
             isHovered = isHovering
@@ -107,6 +114,12 @@ struct TerminalTab: View {
     /// A narrow tab hides its × until selected or pointed at, as in Chrome, so its title keeps the room.
     private var showsCloseButton: Bool {
         isSelected || isHovered || width >= WorkspaceTabMetrics.minimumWidthForCloseButton
+    }
+
+    /// The tab's title and details, and a line saying it shows in the split view.
+    private var helpText: Text {
+        let help = Text("Show \(session.displayTitle)") + Text(verbatim: "\n" + details)
+        return isShownInSplit ? help + Text(verbatim: "\n") + Text("Shown in split view") : help
     }
 
     /// Where the tab runs and what it runs, such as "JustSessions · Claude Code · Resume".

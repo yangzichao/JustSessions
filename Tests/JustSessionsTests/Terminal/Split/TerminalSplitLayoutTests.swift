@@ -5,7 +5,7 @@ import Testing
 /// The divider parts the split's width beside it; each pane keeps a workable minimum while the window has room.
 struct TerminalSplitLayoutTests {
     @Test func anEvenFractionPartsTheAvailableWidthEvenly() {
-        let widths = TerminalSplitLayout.paneWidths(fraction: 0.5, totalWidth: 1001)
+        let widths = TerminalSplitLayout.paneWidths(fraction: 0.5, totalWidth: 1008)
         #expect(widths.leading == 500)
         #expect(widths.trailing == 500)
     }
@@ -18,10 +18,10 @@ struct TerminalSplitLayoutTests {
     }
 
     @Test func neitherPaneGetsNarrowerThanTheMinimum() {
-        let narrow = TerminalSplitLayout.paneWidths(fraction: 0.01, totalWidth: 1001)
+        let narrow = TerminalSplitLayout.paneWidths(fraction: 0.01, totalWidth: 1008)
         #expect(narrow.leading == TerminalSplitLayout.minimumPaneWidth)
 
-        let wide = TerminalSplitLayout.paneWidths(fraction: 0.99, totalWidth: 1001)
+        let wide = TerminalSplitLayout.paneWidths(fraction: 0.99, totalWidth: 1008)
         #expect(wide.trailing == TerminalSplitLayout.minimumPaneWidth)
     }
 
@@ -32,15 +32,15 @@ struct TerminalSplitLayoutTests {
     }
 
     @Test func draggingTheDividerMovesTheFractionByTheTravelledShare() {
-        let total: CGFloat = 1001
+        let total: CGFloat = 1008
         let availableWidth = TerminalSplitLayout.availableWidth(totalWidth: total)
         let dragged = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: availableWidth / 10, totalWidth: total)
         #expect(abs(dragged - 0.6) < 0.0001)
     }
 
     @Test func aDragPastTheEdgeStopsAtTheMinimumPane() {
-        let dragged = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: -5000, totalWidth: 1001)
-        let widths = TerminalSplitLayout.paneWidths(fraction: dragged, totalWidth: 1001)
+        let dragged = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: -5000, totalWidth: 1008)
+        let widths = TerminalSplitLayout.paneWidths(fraction: dragged, totalWidth: 1008)
         #expect(widths.leading == TerminalSplitLayout.minimumPaneWidth)
     }
 }

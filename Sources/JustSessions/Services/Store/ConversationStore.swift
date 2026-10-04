@@ -487,12 +487,19 @@ final class ConversationStore: ObservableObject {
         return terminalSplitPair
     }
 
-    /// Links the tab beside the selected tab, which keeps the keyboard and the left pane, as Chrome adds a tab
-    /// to a split view. A pair already linked is replaced; there is one split at a time.
+    /// Shows another tab side by side with the selected tab, which keeps the keyboard, as Chrome adds a tab to a
+    /// split view. While the selected tab is half of the pair, the new tab takes its counterpart's place, so the
+    /// selected tab keeps its side; otherwise the selected tab takes the left pane of a new pair, which replaces
+    /// any other, as there is one split at a time. A reopened tab still waiting to be shown starts as it joins.
     func splitSelectedTerminal(with id: UUID) {
         guard let selectedTerminalID, selectedTerminalID != id,
-              terminalSessions.contains(where: { $0.id == id }) else { return }
-        terminalSplitPair = TerminalSplitPair(leadingID: selectedTerminalID, trailingID: id)
+              let joiningTab = terminalSessions.first(where: { $0.id == id }) else { return }
+        if let terminalSplitPair, let counterpart = terminalSplitPair.counterpart(of: selectedTerminalID) {
+            self.terminalSplitPair = terminalSplitPair.replacing(counterpart, with: id)
+        } else {
+            terminalSplitPair = TerminalSplitPair(leadingID: selectedTerminalID, trailingID: id)
+        }
+        joiningTab.startNowThatItIsShown()
     }
 
     func swapSplitSides() {

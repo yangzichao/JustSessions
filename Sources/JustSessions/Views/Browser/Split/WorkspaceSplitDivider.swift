@@ -1,42 +1,53 @@
-import AppKit
 import SwiftUI
 
-/// The grab strip between a split's two panes. It is an AppKit view so that it sits above the terminals'
-/// views and takes the drag and the resize cursor before they can; the thin line itself is drawn by the
-/// detail view underneath.
-struct WorkspaceSplitDivider: NSViewRepresentable {
-    /// Called with the pointer's horizontal travel since the drag began, for each movement.
-    let onDragBegan: () -> Void
-    let onDragMoved: (CGFloat) -> Void
+/// The gutter between a split's two panes, in the tab bar's surface like Chrome's gutter between split tabs. It has
+/// its own place in the layout, so the panes' terminals never lie under it; dragging it resizes both terminals live,
+/// as the sidebar's resize handle does.
+struct WorkspaceSplitDivider: View {
+    /// The leading pane's share of the split's width.
+    @Binding var fraction: CGFloat
+    /// The whole split's width, the panes' and the divider's.
+    let totalWidth: CGFloat
 
-    func makeNSView(context: Context) -> SplitDividerStripView {
-        let view = SplitDividerStripView()
-        view.onDragBegan = onDragBegan
-        view.onDragMoved = onDragMoved
-        return view
-    }
+    /// Where the divider sat as the current drag began, or nil between drags.
+    @State private var dragStartFraction: CGFloat?
+    @State private var isHovering = false
 
-    func updateNSView(_ view: SplitDividerStripView, context: Context) {
-        view.onDragBegan = onDragBegan
-        view.onDragMoved = onDragMoved
-    }
-
-    final class SplitDividerStripView: NSView {
-        var onDragBegan: () -> Void = {}
-        var onDragMoved: (CGFloat) -> Void = { _ in }
-        private var dragStartX: CGFloat = 0
-
-        override func resetCursorRects() {
-            addCursorRect(bounds, cursor: .resizeLeftRight)
-        }
-
-        override func mouseDown(with event: NSEvent) {
-            dragStartX = event.locationInWindow.x
-            onDragBegan()
-        }
-
-        override func mouseDragged(with event: NSEvent) {
-            onDragMoved(event.locationInWindow.x - dragStartX)
-        }
+    var body: some View {
+        let paneWidths = TerminalSplitLayout.paneWidths(fraction: fraction, totalWidth: totalWidth)
+        Rectangle()
+            .fill(ThemePalette.sidebarSurface)
+            .overlay {
+                if isHovering { Rectangle().fill(ThemePalette.hoverFill) }
+            }
+            .frame(width: TerminalSplitLayout.dividerWidth)
+            .contentShape(Rectangle())
+            .columnResizeCursor(
+                canShrink: paneWidths.leading > TerminalSplitLayout.minimumPaneWidth,
+                canGrow: paneWidths.trailing > TerminalSplitLayout.minimumPaneWidth
+            )
+            .onHover { isHovering = $0 }
+            .gesture(
+                // Global coordinates, because the divider moves with the fraction it changes: a translation in its
+                // own space would shrink as it slides under the pointer, pulling the panes back each event.
+                DragGesture(minimumDistance: 1, coordinateSpace: .global)
+                    .onChanged { gesture in
+                        let startFraction = dragStartFraction ?? fraction
+                        if dragStartFraction == nil { dragStartFraction = startFraction }
+                        fraction = TerminalSplitLayout.fraction(
+                            startingAt: startFraction,
+                            draggedBy: gesture.translation.width,
+                            totalWidth: totalWidth
+                        )
+                    }
+                    .onEnded { _ in dragStartFraction = nil }
+            )
+            .accessibilityElement()
+            .accessibilityLabel("Split view divider")
+            .accessibilityValue(Text(verbatim: "\(Int((fraction * 100).rounded()))%"))
+            .accessibilityAdjustableAction { direction in
+                let step: CGFloat = direction == .increment ? 0.05 : -0.05
+                fraction = TerminalSplitLayout.clampedFraction(fraction + step, totalWidth: totalWidth)
+            }
     }
 }
