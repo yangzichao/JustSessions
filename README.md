@@ -39,6 +39,14 @@
 - **Stay informed:** local Claude Code and Codex sessions can notify when a turn finishes or needs your input.
 - **Make it yours:** system, English, or Chinese interface language; six app themes, light and dark appearances, terminal color schemes or your own iTerm2 colors, and terminal font settings that update open terminals.
 
+## Native terminal
+
+**Your agents and shell, in project tabs.** JustSessions embeds SwiftTerm's native AppKit terminal. Run your CLI or open a plain project shell, switch with **Open tabs**, and import your iTerm2 colors.
+
+![Claude Code's interactive help screen in the native terminal, with project tabs and sessions from six coding agents](docs/images/native-terminal.jpg)
+
+*Real Claude Code in a sample project. The screenshot shows its local help screen.*
+
 ## Remote sessions over SSH
 
 **Use your Mac to continue Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on a desktop or development server.** Add a passwordless SSH host with `rsync` and the CLI installed. The code and CLI stay on that machine; JustSessions caches session history locally.

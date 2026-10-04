@@ -1,0 +1,18 @@
+.terminal-section { border-top: 1px solid var(--line); }
+.terminal-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-bottom: 28px; }
+.terminal-heading h2 { margin-bottom: 0; }
+.terminal-heading p { margin-bottom: 14px; }
+.terminal-preview { padding: 16px 16px 0; border: 1px solid var(--line); border-radius: 18px; background: var(--sidebar-surface); }
+.terminal-preview a { display: block; }
+.terminal-preview img { width: 100%; border: 1px solid var(--line); border-radius: 9px; box-shadow: 0 12px 36px var(--shadow); }
+.terminal-preview figcaption { margin: 14px 4px; text-align: center; }
+
+@media (max-width: 850px) {
+  .terminal-heading { grid-template-columns: 1fr; gap: 18px; }
+}
+
+@media (max-width: 600px) {
+  .terminal-preview { padding: 6px 6px 0; border-radius: 11px; }
+  .terminal-preview img { border-radius: 6px; }
+  .terminal-preview figcaption { font-size: 12px; margin: 11px 6px; }
+}

@@ -25,7 +25,7 @@ def build_site():
     if stylesheet_directory.exists():
         shutil.rmtree(stylesheet_directory)
     shutil.copytree(WEBSITE_SOURCE_DIRECTORY / "styles", stylesheet_directory)
-    for image_name in ("session-overview.jpg", "remote-desktop-sessions.jpg", "tmux-keep-running.jpg"):
+    for image_name in ("session-overview.jpg", "native-terminal.jpg", "remote-desktop-sessions.jpg", "tmux-keep-running.jpg"):
         shutil.copy2(REPOSITORY_DIRECTORY / "docs/images" / image_name, asset_directory / image_name)
     for asset_path in ("Branding/SVG/mark.svg", "Branding/PNG/app-icon-256.png", "website/social/social-preview.png"):
         shutil.copy2(REPOSITORY_DIRECTORY / asset_path, asset_directory / Path(asset_path).name)
