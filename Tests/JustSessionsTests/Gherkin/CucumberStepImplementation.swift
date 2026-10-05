@@ -12,5 +12,6 @@ extension Cucumber: @retroactive StepImplementation {
         ClaudeLiveRenameSteps.register()
         CodexThreadSteps.register()
         LiveSessionSteps.register()
+        AppendedSessionNameSteps.register()
     }
 }
