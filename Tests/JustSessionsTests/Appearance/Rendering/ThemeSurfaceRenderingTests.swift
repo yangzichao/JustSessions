@@ -25,7 +25,7 @@ struct ThemeSurfaceRenderingTests {
             ))
         }
         let generalView = settingsView(selectedTab: .general)
-        let helpView = settingsView(selectedTab: .helpAndFeedback)
+        let helpView = settingsView(selectedTab: .help)
         // Settings pages share a fixed size, so the reference strip lands at the same bottom edge.
         let views: [(String, AnyView, CGSize)] = [
             ("help", helpView, fittingSize(of: helpView)),

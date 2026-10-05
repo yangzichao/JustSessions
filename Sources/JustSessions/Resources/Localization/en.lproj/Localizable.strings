@@ -72,6 +72,8 @@
 	<string>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</string>
 	<key>A+</key>
 	<string>A+</string>
+	<key>About JustSessions</key>
+	<string>About JustSessions</string>
 	<key>Add SSH host</key>
 	<string>Add SSH host</string>
 	<key>Add SSH host…</key>
@@ -272,8 +274,6 @@
 	<string>Could not start session</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</string>
-	<key>Create a GitHub issue</key>
-	<string>Create a GitHub issue</string>
 	<key>Dark</key>
 	<string>Dark</string>
 	<key>Delete 1 session</key>
@@ -296,10 +296,6 @@
 	<string>Deletion progress</string>
 	<key>Done</key>
 	<string>Done</string>
-	<key>Email feedback</key>
-	<string>Email feedback</string>
-	<key>Email feedback ↗</key>
-	<string>Email feedback ↗</string>
 	<key>End and close this terminal</key>
 	<string>End and close this terminal</string>
 	<key>End on %@</key>
@@ -324,8 +320,8 @@
 	<string>Export conversation</string>
 	<key>Export conversations</key>
 	<string>Export conversations</string>
-	<key>Feedback</key>
-	<string>Feedback</string>
+	<key>Feedback and issues start with these versions filled in.</key>
+	<string>Feedback and issues start with these versions filled in.</string>
 	<key>Filter project sessions</key>
 	<string>Filter project sessions</string>
 	<key>Filters active</key>
@@ -356,14 +352,14 @@
 	<string>Font size</string>
 	<key>Fork in the native CLI</key>
 	<string>Fork in the native CLI</string>
-	<key>Found a bug, or missing something? Open a GitHub issue or send an email. Both start with your versions filled in.</key>
-	<string>Found a bug, or missing something? Open a GitHub issue or send an email. Both start with your versions filled in.</string>
 	<key>Full</key>
 	<string>Full</string>
 	<key>Full Disk Access</key>
 	<string>Full Disk Access</string>
 	<key>General</key>
 	<string>General</string>
+	<key>GitHub ↗</key>
+	<string>GitHub ↗</string>
 	<key>Go to a tab by its position</key>
 	<string>Go to a tab by its position</string>
 	<key>Go to the first available message</key>
@@ -372,8 +368,8 @@
 	<string>Go to the latest message</string>
 	<key>Got it</key>
 	<string>Got it</string>
-	<key>Help &amp; feedback</key>
-	<string>Help &amp; feedback</string>
+	<key>Help</key>
+	<string>Help</string>
 	<key>Hide Sidebar</key>
 	<string>Hide Sidebar</string>
 	<key>Hide or show the sidebar</key>
@@ -410,8 +406,6 @@
 	<string>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</string>
 	<key>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</key>
 	<string>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</string>
-	<key>JustSessions website ↗</key>
-	<string>JustSessions website ↗</string>
 	<key>Keep running</key>
 	<string>Keep running</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
@@ -536,8 +530,8 @@
 	<string>Open Login Items Settings</string>
 	<key>Open System Settings</key>
 	<string>Open System Settings</string>
-	<key>Open a GitHub issue ↗</key>
-	<string>Open a GitHub issue ↗</string>
+	<key>Open a new issue on GitHub</key>
+	<string>Open a new issue on GitHub</string>
 	<key>Open in a separate reading window</key>
 	<string>Open in a separate reading window</string>
 	<key>Open in new window</key>
@@ -552,6 +546,8 @@
 	<string>Open terminal</string>
 	<key>Open the JustSessions website</key>
 	<string>Open the JustSessions website</string>
+	<key>Open the source code on GitHub</key>
+	<string>Open the source code on GitHub</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
 	<string>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</string>
 	<key>Organize</key>
@@ -630,6 +626,8 @@
 	<string>Rename project…</string>
 	<key>Reopen the tabs that were open when JustSessions quit</key>
 	<string>Reopen the tabs that were open when JustSessions quit</string>
+	<key>Report an issue ↗</key>
+	<string>Report an issue ↗</string>
 	<key>Restore</key>
 	<string>Restore</string>
 	<key>Restore %@</key>
@@ -690,6 +688,8 @@
 	<string>Select a range</string>
 	<key>Select several sessions or projects</key>
 	<string>Select several sessions or projects</string>
+	<key>Send us feedback ↗</key>
+	<string>Send us feedback ↗</string>
 	<key>Separate Views</key>
 	<string>Separate Views</string>
 	<key>Separate views</key>
@@ -724,8 +724,6 @@
 	<string>Smaller reading text</string>
 	<key>Smaller text</key>
 	<string>Smaller text</string>
-	<key>Software updates</key>
-	<string>Software updates</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>Some colors are missing, such as the text or background color.</string>
 	<key>Split View Resize Handle (draggable)</key>
@@ -842,8 +840,8 @@
 	<string>Use the full window width</string>
 	<key>User guide ↗</key>
 	<string>User guide ↗</string>
-	<key>Version %@</key>
-	<string>Version %@</string>
+	<key>Website ↗</key>
+	<string>Website ↗</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>

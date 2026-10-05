@@ -3,7 +3,7 @@ struct AppWideSheet: Identifiable, Equatable {
     let selectedSettingsTab: SettingsTab
 
     static let settings = AppWideSheet(selectedSettingsTab: .general)
-    static let help = AppWideSheet(selectedSettingsTab: .helpAndFeedback)
+    static let help = AppWideSheet(selectedSettingsTab: .help)
 
     var id: String { "settings" }
 }

@@ -56,6 +56,8 @@
 	<string>1 次工具调用</string>
 	<key>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</key>
 	<string>仍在 tmux 中运行的 CLI 会重新连接。其他标签会在选中时继续会话，包括 Mac 重启后的会话。普通终端会在原文件夹中打开新 shell。</string>
+	<key>About JustSessions</key>
+	<string>关于 JustSessions</string>
 	<key>Add SSH host</key>
 	<string>添加 SSH 主机</string>
 	<key>Add SSH host…</key>
@@ -262,8 +264,6 @@
 	<string>无法启动会话</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>找不到 iTerm2 的默认 Profile。动态 Profile 无法导入。</string>
-	<key>Create a GitHub issue</key>
-	<string>创建 GitHub Issue</string>
 	<key>Dark</key>
 	<string>深色</string>
 	<key>Delete %lld sessions</key>
@@ -290,10 +290,6 @@
 	<string>删除进度</string>
 	<key>Done</key>
 	<string>完成</string>
-	<key>Email feedback</key>
-	<string>通过邮件反馈</string>
-	<key>Email feedback ↗</key>
-	<string>通过邮件反馈 ↗</string>
 	<key>End and close this terminal</key>
 	<string>结束并关闭此终端</string>
 	<key>End on %@</key>
@@ -320,8 +316,8 @@
 	<string>导出对话</string>
 	<key>Export conversations</key>
 	<string>导出对话</string>
-	<key>Feedback</key>
-	<string>反馈</string>
+	<key>Feedback and issues start with these versions filled in.</key>
+	<string>反馈和问题报告会自动附上以上版本信息。</string>
 	<key>Filter project sessions</key>
 	<string>筛选项目中的会话</string>
 	<key>Filters active</key>
@@ -352,8 +348,6 @@
 	<string>字号</string>
 	<key>Fork in the native CLI</key>
 	<string>在原生 CLI 中创建分支</string>
-	<key>Found a bug, or missing something? Open a GitHub issue or send an email. Both start with your versions filled in.</key>
-	<string>发现了 bug，或缺少什么功能？可以创建 GitHub Issue 或发送邮件，两者都会自动附上你的版本信息。</string>
 	<key>Full</key>
 	<string>全宽</string>
 	<key>Full Disk Access</key>
@@ -368,8 +362,8 @@
 	<string>跳到最新消息</string>
 	<key>Got it</key>
 	<string>知道了</string>
-	<key>Help &amp; feedback</key>
-	<string>帮助与反馈</string>
+	<key>Help</key>
+	<string>帮助</string>
 	<key>Hide Sidebar</key>
 	<string>隐藏侧栏</string>
 	<key>Hide or show the sidebar</key>
@@ -404,8 +398,6 @@
 	<string>JustSessions 及其终端中的 CLI 需要它来访问你所在网络中的设备，例如本地地址上的 SSH 主机。macOS 不允许应用检查这项权限，请在「隐私与安全性 &gt; 本地网络」中找到 JustSessions。</string>
 	<key>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</key>
 	<string>JustSessions 读取了各 CLI 自己保存的历史，并按项目分组。没有导入或上传任何内容。</string>
-	<key>JustSessions website ↗</key>
-	<string>JustSessions 网站 ↗</string>
 	<key>Keep running</key>
 	<string>保持运行</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
@@ -530,8 +522,8 @@
 	<string>打开登录项设置</string>
 	<key>Open System Settings</key>
 	<string>打开系统设置</string>
-	<key>Open a GitHub issue ↗</key>
-	<string>创建 GitHub Issue ↗</string>
+	<key>Open a new issue on GitHub</key>
+	<string>在 GitHub 上报告问题</string>
 	<key>Open in a separate reading window</key>
 	<string>在独立阅读窗口中打开</string>
 	<key>Open in new window</key>
@@ -546,6 +538,8 @@
 	<string>打开终端</string>
 	<key>Open the JustSessions website</key>
 	<string>打开 JustSessions 网站</string>
+	<key>Open the source code on GitHub</key>
+	<string>在 GitHub 上查看源代码</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
 	<string>可选。没有它时，终端中的 CLI 第一次打开受保护文件夹（例如「文稿」或外置磁盘）中的文件，macOS 会逐个询问。</string>
 	<key>Organize</key>
@@ -624,6 +618,8 @@
 	<string>重命名项目…</string>
 	<key>Reopen the tabs that were open when JustSessions quit</key>
 	<string>重新打开上次退出 JustSessions 时的标签</string>
+	<key>Report an issue ↗</key>
+	<string>报告问题 ↗</string>
 	<key>Restore</key>
 	<string>恢复</string>
 	<key>Restore %@</key>
@@ -686,6 +682,8 @@
 	<string>选择一个范围</string>
 	<key>Select several sessions or projects</key>
 	<string>选择多个会话或项目</string>
+	<key>Send us feedback ↗</key>
+	<string>发送反馈 ↗</string>
 	<key>Separate Views</key>
 	<string>取消拆分视图</string>
 	<key>Separate views</key>
@@ -720,8 +718,6 @@
 	<string>减小阅读字号</string>
 	<key>Smaller text</key>
 	<string>减小字号</string>
-	<key>Software updates</key>
-	<string>软件更新</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>缺少部分颜色，例如文字或背景颜色。</string>
 	<key>Split View Resize Handle (draggable)</key>
@@ -840,8 +836,8 @@
 	<string>使用窗口全宽</string>
 	<key>User guide ↗</key>
 	<string>用户指南 ↗</string>
-	<key>Version %@</key>
-	<string>版本 %@</string>
+	<key>Website ↗</key>
+	<string>网站 ↗</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>

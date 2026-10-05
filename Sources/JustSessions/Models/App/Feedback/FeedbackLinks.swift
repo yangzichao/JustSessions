@@ -1,6 +1,6 @@
 import Foundation
 
-/// Where Help sends feedback: a new GitHub issue or an email, each started with the versions it is about, below the
+/// Where General sends feedback: a new GitHub issue or an email, each started with the versions it is about, below the
 /// space for the report itself.
 enum FeedbackLinks {
     static func gitHubIssueURL(for environment: FeedbackEnvironment) -> URL {

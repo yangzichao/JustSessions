@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Settings… (⌘,) opens General; JustSessions Help opens Help & feedback in the same Settings sheet. Take the Tour
+/// Settings… (⌘,) opens General; JustSessions Help opens Help in the same Settings sheet. Take the Tour
 /// starts the active workspace window's onboarding tour.
 struct AppWideSheetCommands: Commands {
     @ObservedObject private var languageStore = AppLanguageStore.shared

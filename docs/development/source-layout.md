@@ -62,7 +62,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, joined for a split's two tabs, how tabs narrow to share the bar as more open, and the terminal colors the selected tab takes on.
 - `Views/Browser/Split/`: what a shown split view draws around its panes, as Chrome does: the area's terminal-colored background, each pane's rounded outline with its mini toolbar in the corner, and the resize area between the panes, which you drag to resize them.
 - `Views/Browser/DockMenu/`: the Dock icon's right-click menu, whose New Window opens a workspace window through SwiftUI's `openWindow`, handed over by each workspace window as it appears.
-- `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help & feedback in the same sheet.
+- `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help in the same sheet.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
 - `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, and multi-selection. `SidebarRowMoreActionsMenu` is the ⋯ that project and session rows show under the pointer, which opens the row's right-click menu.
 - `Views/Browser/Sidebar/Header/`: the app mark with the search and new session icons; search opens into a field across that line.
@@ -79,12 +79,12 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Onboarding/`: starts the tour on a fresh install's first window, or from Help, then each tip the first time its part of the window comes into use, such as reading a session, opening a tab, or opening a second one for split view; and the tip card with its copy. `Popover/` shows the card beside the control it is about, hiding it while a sheet is open or the control is scrolled out of sight.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
-- `Views/Settings/`: the Settings sheet, with General (language, startup, notifications, and software updates), Appearance, Permissions, and Help & feedback pages, each in a `SettingsTabPage` of the one size they share.
+- `Views/Settings/`: the Settings sheet, with General, Appearance, Permissions, and Help pages, each in a `SettingsTabPage` of the one size they share. General holds language, startup, and notifications, then About: the app and macOS versions, software updates, and links to send feedback or open the website and GitHub. `Models/App/Feedback/` starts a feedback email or GitHub issue with those versions.
 - `Views/Settings/Appearance/`: the app's appearance and theme in `App/`, then its terminals' colors, font, and preview in `Terminal/`, with the color scheme and iTerm2 import menus in `Terminal/Colors/`.
 - `Views/Settings/Permissions/`: each permission's status and a link to its page in System Settings.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
-- `Views/Settings/Help/`: the Help & feedback page, one `HelpSection` each: the tour and user guide, how each part of the window works, SSH setup, what to check when a session is missing, feedback, and the keyboard shortcut list (`Shortcuts/`). `Models/App/AppLinks.swift` holds the destinations, and `Models/App/Feedback/` starts a GitHub issue or email with the app and macOS versions.
+- `Views/Settings/Help/`: the Help page, one `HelpSection` each: the tour and user guide, how each part of the window works, SSH setup, what to check when a session is missing, and the keyboard shortcut list (`Shortcuts/`). `Models/App/AppLinks.swift` holds the destinations of Help and About.
 - `Views/Theme/`: the chosen theme's colors, and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 

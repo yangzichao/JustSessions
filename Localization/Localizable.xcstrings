@@ -337,6 +337,16 @@
     "A+": {
       "shouldTranslate": false
     },
+    "About JustSessions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关于 JustSessions"
+          }
+        }
+      }
+    },
     "Add SSH host": {
       "localizations": {
         "zh-Hans": {
@@ -1418,16 +1428,6 @@
         }
       }
     },
-    "Create a GitHub issue": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "创建 GitHub Issue"
-          }
-        }
-      }
-    },
     "Dark": {
       "localizations": {
         "zh-Hans": {
@@ -1594,26 +1594,6 @@
         }
       }
     },
-    "Email feedback": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通过邮件反馈"
-          }
-        }
-      }
-    },
-    "Email feedback ↗": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通过邮件反馈 ↗"
-          }
-        }
-      }
-    },
     "End and close this terminal": {
       "localizations": {
         "zh-Hans": {
@@ -1762,12 +1742,12 @@
         }
       }
     },
-    "Feedback": {
+    "Feedback and issues start with these versions filled in.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "反馈"
+            "value": "反馈和问题报告会自动附上以上版本信息。"
           }
         }
       }
@@ -1922,16 +1902,6 @@
         }
       }
     },
-    "Found a bug, or missing something? Open a GitHub issue or send an email. Both start with your versions filled in.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "发现了 bug，或缺少什么功能？可以创建 GitHub Issue 或发送邮件，两者都会自动附上你的版本信息。"
-          }
-        }
-      }
-    },
     "Full": {
       "localizations": {
         "zh-Hans": {
@@ -1961,6 +1931,9 @@
           }
         }
       }
+    },
+    "GitHub ↗": {
+      "shouldTranslate": false
     },
     "Go to a tab by its position": {
       "localizations": {
@@ -2002,12 +1975,12 @@
         }
       }
     },
-    "Help & feedback": {
+    "Help": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "帮助与反馈"
+            "value": "帮助"
           }
         }
       }
@@ -2181,16 +2154,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "JustSessions 读取了各 CLI 自己保存的历史，并按项目分组。没有导入或上传任何内容。"
-          }
-        }
-      }
-    },
-    "JustSessions website ↗": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JustSessions 网站 ↗"
           }
         }
       }
@@ -2824,12 +2787,12 @@
         }
       }
     },
-    "Open a GitHub issue ↗": {
+    "Open a new issue on GitHub": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "创建 GitHub Issue ↗"
+            "value": "在 GitHub 上报告问题"
           }
         }
       }
@@ -2900,6 +2863,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开 JustSessions 网站"
+          }
+        }
+      }
+    },
+    "Open the source code on GitHub": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 GitHub 上查看源代码"
           }
         }
       }
@@ -3294,6 +3267,16 @@
         }
       }
     },
+    "Report an issue ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告问题 ↗"
+          }
+        }
+      }
+    },
     "Restore": {
       "localizations": {
         "zh-Hans": {
@@ -3622,6 +3605,16 @@
         }
       }
     },
+    "Send us feedback ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送反馈 ↗"
+          }
+        }
+      }
+    },
     "Separate Views": {
       "localizations": {
         "zh-Hans": {
@@ -3788,16 +3781,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "减小字号"
-          }
-        }
-      }
-    },
-    "Software updates": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "软件更新"
           }
         }
       }
@@ -4398,12 +4381,12 @@
         }
       }
     },
-    "Version %@": {
+    "Website ↗": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "版本 %@"
+            "value": "网站 ↗"
           }
         }
       }
