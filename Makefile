@@ -43,7 +43,7 @@ website-traffic-deploy: website-traffic-test
 	cd Cloudflare/WebsiteTraffic && wrangler d1 migrations apply justsessions-website-traffic --remote && wrangler deploy
 
 website-traffic:
-	./Cloudflare/WebsiteTraffic/show-website-traffic.sh
+	@./Cloudflare/WebsiteTraffic/show-website-traffic.sh
 
 localization:
 	python3 Scripts/Localization/sync_catalog.py

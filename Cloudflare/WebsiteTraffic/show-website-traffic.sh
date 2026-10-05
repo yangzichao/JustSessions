@@ -21,4 +21,4 @@ wrangler d1 execute justsessions-website-traffic --remote --command "
     GROUP BY country ORDER BY page_views DESC;
     SELECT device, SUM(page_views) AS page_views
     FROM daily_website_traffic WHERE utc_day >= date('now', '-$previous_days days')
-    GROUP BY device ORDER BY page_views DESC;"
+    GROUP BY device ORDER BY page_views DESC;" --json | python3 format-website-traffic.py
