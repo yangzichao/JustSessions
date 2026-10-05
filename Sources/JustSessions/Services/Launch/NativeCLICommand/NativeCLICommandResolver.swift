@@ -38,30 +38,42 @@ struct NativeCLICommandResolver: @unchecked Sendable {
         searchDirectories.joined(separator: ":")
     }
 
+    /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable.
     func resolve(
         conversation: Conversation,
         action: ConversationAction,
-        adapter: any ConversationAdapter
+        adapter: any ConversationAdapter,
+        startCommand: String? = nil
     ) throws -> NativeCLICommand {
         try resolve(
             provider: conversation.provider,
             projectPath: conversation.projectPath,
-            arguments: adapter.arguments(for: conversation, action: action)
+            arguments: adapter.arguments(for: conversation, action: action),
+            startCommand: startCommand
         )
     }
 
-    func resolveNewSession(provider: ConversationProvider, projectPath: String) throws -> NativeCLICommand {
-        try resolve(provider: provider, projectPath: projectPath, arguments: [])
+    func resolveNewSession(
+        provider: ConversationProvider,
+        projectPath: String,
+        startCommand: String? = nil
+    ) throws -> NativeCLICommand {
+        try resolve(provider: provider, projectPath: projectPath, arguments: [], startCommand: startCommand)
     }
 
     private func resolve(
         provider: ConversationProvider,
         projectPath: String,
-        arguments: [String]
+        arguments: [String],
+        startCommand: String?
     ) throws -> NativeCLICommand {
         try requireProjectDirectory(projectPath)
 
-        guard let executablePath = executablePath(named: provider.executableName) else {
+        // A start command of your own is not looked up: the shell that runs it reports a missing one in the tab.
+        let customStartCommand = CLIStartCommandLine.customCommand(startCommand)
+        guard let executablePath = customStartCommand == nil
+                ? executablePath(named: provider.executableName)
+                : CLIStartCommandLine.thisMacShellPath else {
             throw NativeCLICommandError.missingExecutable(provider.executableName)
         }
 
@@ -72,10 +84,13 @@ struct NativeCLICommandResolver: @unchecked Sendable {
         environment.merge(reporterLaunch?.environment ?? [:]) { _, reporterValue in reporterValue }
         // Codex names the thread its CLI is in only in the terminal title, and only when asked.
         let followingArguments = provider == .codex ? CodexThreadTitle.launchArguments : reporterLaunch?.arguments ?? []
+        let cliArguments = followingArguments + arguments
 
         return NativeCLICommand(
             executablePath: executablePath,
-            arguments: followingArguments + arguments,
+            arguments: customStartCommand.map {
+                CLIStartCommandLine.thisMacShellArguments(startCommand: $0, arguments: cliArguments)
+            } ?? cliArguments,
             workingDirectory: projectPath,
             environment: NativeCLICommand.environmentEntries(environment)
         )

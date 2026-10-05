@@ -86,11 +86,16 @@ struct ConversationBrowserView: View {
                 initialProjectPath: newSessionProjectPath(on: host, startableProjects: startableProjects),
                 hosts: store.hosts,
                 providersByHost: store.newSessionProvidersByHost,
-                recentProjects: startableProjects
-            ) { kind, host, folder in
-                switch kind {
-                case .cli(let provider): try await store.launchNewSession(provider: provider, host: host, folder: folder)
-                case .plainTerminal: try await store.openPlainTerminal(host: host, folder: folder)
+                recentProjects: startableProjects,
+                startCommands: store.cliStartCommands
+            ) { request in
+                switch request.kind {
+                case .cli(let provider):
+                    try await store.launchNewSession(
+                        provider: provider, host: request.host, folder: request.folder, startCommand: request.startCommand
+                    )
+                case .plainTerminal:
+                    try await store.openPlainTerminal(host: request.host, folder: request.folder)
                 }
             }
         }

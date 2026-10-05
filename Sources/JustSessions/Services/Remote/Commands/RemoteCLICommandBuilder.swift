@@ -10,12 +10,14 @@ struct RemoteCLICommandBuilder {
         self.inheritedEnvironment = inheritedEnvironment
     }
 
+    /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable.
     func command(
         host: String,
         provider: ConversationProvider,
         projectPath: String,
         arguments: [String],
-        tmuxSessionName: String? = nil
+        tmuxSessionName: String? = nil,
+        startCommand: String? = nil
     ) -> NativeCLICommand {
         sshCommand(
             host: host,
@@ -23,7 +25,8 @@ struct RemoteCLICommandBuilder {
                 provider: provider,
                 projectPath: projectPath,
                 arguments: arguments,
-                tmuxSessionName: tmuxSessionName
+                tmuxSessionName: tmuxSessionName,
+                startCommand: startCommand
             )
         )
     }
@@ -53,9 +56,13 @@ struct RemoteCLICommandBuilder {
         provider: ConversationProvider,
         projectPath: String,
         arguments: [String],
-        tmuxSessionName: String? = nil
+        tmuxSessionName: String? = nil,
+        startCommand: String? = nil
     ) -> String {
-        let cliInvocation = ([provider.executableName] + arguments.map(ShellQuoting.quoted)).joined(separator: " ")
+        let customStartCommand = CLIStartCommandLine.customCommand(startCommand)
+        let cliInvocation = customStartCommand.map {
+            CLIStartCommandLine.remoteInvocation(startCommand: $0, arguments: arguments)
+        } ?? ([provider.executableName] + arguments.map(ShellQuoting.quoted)).joined(separator: " ")
         let directCommand = "cd \(ShellQuoting.quoted(projectPath)) && exec \(cliInvocation)"
         guard let tmuxSessionName else { return loginShellCommand(directCommand) }
         // `-A` attaches when the session already runs. The status line and mouse settings make it look and

@@ -3,15 +3,16 @@ import Foundation
 /// Whether an installed `claude` accepts `--session-id <uuid>` for a new session. With the flag the app
 /// knows a new tab's session id before the CLI writes anything, so linking the tab does not depend on
 /// process ids or registry files. An older or wrapped install could reject an unknown flag and fail to
-/// start, so the flag is only passed once the executable's `--help` lists it.
+/// start, so the flag is only passed once the executable's `--help` lists it. A start command of your own, see
+/// `CLIStartCommands`, is checked with its own arguments, since they can pick another CLI or another version of it.
 final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
     static let shared = ClaudeSessionIDFlagSupport()
     static let flag = "--session-id"
 
     private let helpTimeout: TimeInterval
     private let lock = NSLock()
-    private var answersByExecutablePath: [String: Bool] = [:]
-    private var executablePathsBeingChecked: Set<String> = []
+    private var answersByCommandLine: [String: Bool] = [:]
+    private var commandLinesBeingChecked: Set<String> = []
 
     init(helpTimeout: TimeInterval = 10) {
         self.helpTimeout = helpTimeout
@@ -36,21 +37,22 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
         }
     }
 
-    /// Runs `<claude> --help` and records whether it lists the flag. Returns nil when the check could not
-    /// finish, so a later launch tries again.
+    /// Runs `<claude> <its arguments> --help` and records whether it lists the flag. Returns nil when the check
+    /// could not finish, so a later launch tries again.
     @discardableResult
     func check(_ command: NativeCLICommand) -> Bool? {
         let helpText = BoundedProcessRunner.output(
             ofExecutable: command.executablePath,
-            arguments: ["--help"],
+            arguments: command.arguments + ["--help"],
             environment: command.environmentVariables,
             includesStandardError: true,
             timeout: helpTimeout
         )
         let answer = helpText.map(Self.helpTextListsFlag)
+        let commandLine = Self.commandLine(of: command)
         lock.withLock {
-            executablePathsBeingChecked.remove(command.executablePath)
-            if let answer { answersByExecutablePath[command.executablePath] = answer }
+            commandLinesBeingChecked.remove(commandLine)
+            if let answer { answersByCommandLine[commandLine] = answer }
         }
         return answer
     }
@@ -62,18 +64,24 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
     }
 
     private func isKnownToAcceptFlag(_ command: NativeCLICommand) -> Bool {
-        if let answer = lock.withLock({ answersByExecutablePath[command.executablePath] }) { return answer }
+        if let answer = lock.withLock({ answersByCommandLine[Self.commandLine(of: command)] }) { return answer }
         if beginCheckIfUnanswered(command) {
             Task.detached(priority: .utility) { [self] in check(command) }
         }
         return false
     }
 
-    /// Marks the executable as being checked; false when it already has an answer or a running check.
+    /// Marks the command as being checked; false when it already has an answer or a running check.
     private func beginCheckIfUnanswered(_ command: NativeCLICommand) -> Bool {
-        lock.withLock {
-            guard answersByExecutablePath[command.executablePath] == nil else { return false }
-            return executablePathsBeingChecked.insert(command.executablePath).inserted
+        let commandLine = Self.commandLine(of: command)
+        return lock.withLock {
+            guard answersByCommandLine[commandLine] == nil else { return false }
+            return commandLinesBeingChecked.insert(commandLine).inserted
         }
+    }
+
+    /// The executable and its arguments, which no argument can make ambiguous.
+    private static func commandLine(of command: NativeCLICommand) -> String {
+        ([command.executablePath] + command.arguments).joined(separator: "\u{0}")
     }
 }

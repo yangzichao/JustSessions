@@ -10,7 +10,8 @@ extension ConversationStore {
             provider: provider,
             projectPath: projectPath,
             arguments: [],
-            tmuxSessionName: tmuxSessionName
+            tmuxSessionName: tmuxSessionName,
+            startCommand: customStartCommand(for: provider, on: .ssh(host))
         )
         let session = TerminalSession(
             conversation: nil,

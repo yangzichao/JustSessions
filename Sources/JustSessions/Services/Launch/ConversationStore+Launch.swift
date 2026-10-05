@@ -83,9 +83,12 @@ extension ConversationStore {
         adapter: any ConversationAdapter
     ) throws -> (command: NativeCLICommand, tmuxSessionName: String?) {
         let tmuxSessionName = tmuxSessionName(forLaunching: conversation, action: action)
+        let startCommand = customStartCommand(for: conversation.provider, on: conversation.host)
         switch conversation.host {
         case .thisMac:
-            let command = try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
+            let command = try commandResolver.resolve(
+                conversation: conversation, action: action, adapter: adapter, startCommand: startCommand
+            )
             return thisMacTabCommand(running: command, tmuxSessionName: tmuxSessionName)
         case .ssh(let destination):
             let command = RemoteCLICommandBuilder().command(
@@ -93,7 +96,8 @@ extension ConversationStore {
                 provider: conversation.provider,
                 projectPath: conversation.projectPath,
                 arguments: adapter.arguments(for: conversation, action: action),
-                tmuxSessionName: tmuxSessionName
+                tmuxSessionName: tmuxSessionName,
+                startCommand: startCommand
             )
             return (command, tmuxSessionName)
         }
@@ -121,8 +125,12 @@ extension ConversationStore {
     private func launchNewSessionOnThisMac(provider: ConversationProvider, projectPath: String) throws {
         let expandedPath = (projectPath as NSString).expandingTildeInPath
         let standardizedPath = URL(fileURLWithPath: expandedPath).standardizedFileURL.path
-        let command = try commandResolver.resolveNewSession(provider: provider, projectPath: standardizedPath)
-        // Before tmux wraps the command: the flag check looks at the CLI's own executable.
+        let command = try commandResolver.resolveNewSession(
+            provider: provider,
+            projectPath: standardizedPath,
+            startCommand: customStartCommand(for: provider, on: .thisMac)
+        )
+        // Before tmux wraps the command: the flag check runs the CLI, or the start command set for it.
         let preassignment = provider == .claude
             ? ClaudeSessionIDFlagSupport.shared.preassigningSessionID(to: command)
             : nil
