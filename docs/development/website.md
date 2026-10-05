@@ -1,6 +1,6 @@
 # Product website
 
-The public website is at <https://yangzichao.github.io/JustSessions/>. Its source is static HTML and CSS in `website/`, with small native JavaScript modules for the screenshot gallery. It has no framework, external fonts, analytics, or package dependencies. Downloads point to the latest GitHub Release, so an app release does not require a website update.
+The public website is at <https://yangzichao.github.io/JustSessions/>. Its source is static HTML and CSS in `website/`, with small native JavaScript modules for the screenshot gallery. It has no framework, external fonts, analytics, or package dependencies. Every Download button, including the homepage, Guide, and Help navigation bars, points directly to the latest GitHub Release DMG. It starts a download rather than scrolling to a section or opening a release page, so an app release does not require a website update.
 
 ## Build and preview
 
