@@ -10,6 +10,9 @@ struct SidebarProjectSection: View {
     let projectSelection: ProjectMultiSelection
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
+    /// Which sessions show their subagents' sessions under them.
+    let subagentRows: SidebarSubagentRows
+    let onToggleSubagents: (Conversation) -> Void
     let onToggleExpansion: () -> Void
     let onClickProject: () -> Void
     let onNewSession: (ConversationProvider) -> Void
@@ -63,23 +66,40 @@ struct SidebarProjectSection: View {
                 )
             }
             ForEach(project.conversations) { conversation in
+                let isLastSession = conversation.id == project.conversations.last?.id
+                let rowsUnder = subagentRows.rows(under: conversation, subagents: store.subagents(of:))
                 SidebarSessionRow(
                     store: store,
                     conversation: conversation,
                     sessionSelection: sessionSelection,
                     selectedConversations: selectedConversations,
+                    subagentCount: store.subagents(of: conversation).count,
+                    isShowingSubagents: subagentRows.isExpanded(conversation.id),
                     onClick: onClickConversation,
+                    onToggleSubagents: { onToggleSubagents(conversation) },
                     onRename: onRenameConversation,
                     onRequestDeletion: onRequestDeletion
                 )
                 .sidebarIndentGuide(
                     isFirstRow: pendingNewSessionTerminals.isEmpty && conversation.id == project.conversations.first?.id,
-                    isLastRow: conversation.id == project.conversations.last?.id
+                    isLastRow: isLastSession && rowsUnder.isEmpty
                 )
                 .onboardingTourStop(
                     isOnboardingTourProject && conversation.id == project.conversations.first?.id ? .sessions : nil
                 )
                 .onboardingTourStop(sessionSelection.onlySelectedConversationID == conversation.id ? .sessionMenu : nil)
+
+                ForEach(rowsUnder) { row in
+                    SidebarSubagentRow(
+                        store: store,
+                        row: row,
+                        isSelected: sessionSelection.contains(row.id),
+                        isExpanded: subagentRows.isExpanded(row.id),
+                        onClick: onClickConversation,
+                        onToggleSubagents: { onToggleSubagents(row.conversation) }
+                    )
+                    .sidebarIndentGuide(isFirstRow: false, isLastRow: isLastSession && row.id == rowsUnder.last?.id)
+                }
             }
         }
     }

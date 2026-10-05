@@ -16,7 +16,9 @@ struct CodexAdapter: ConversationAdapter {
     }
 
     /// Shared by every Codex adapter, this Mac's and each SSH host's mirror, which keep their files apart.
-    private static let rolloutHeads = SessionFileSummaryCache<CodexRolloutHead>(persistenceFile: SessionSummaryCacheLocation.file(named: "codex-heads"))
+    /// Named for the version of the head it keeps: heads kept before spawned threads were read would list them as
+    /// sessions of their own.
+    private static let rolloutHeads = SessionFileSummaryCache<CodexRolloutHead>(persistenceFile: SessionSummaryCacheLocation.file(named: "codex-heads-2"))
     private static let firstUserPrompts = SessionFileSummaryCache<String>(persistenceFile: SessionSummaryCacheLocation.file(named: "codex-prompts"))
 
     func discover() throws -> [Conversation] {
@@ -35,7 +37,9 @@ struct CodexAdapter: ConversationAdapter {
             guard let head = Self.rolloutHeads.summary(of: file, read: CodexRolloutHead.init(file:)) else { continue }
             let indexEntry = index.entry(forSessionID: head.sessionID)
             let title = ConversationMetadata.cleanTitle(
-                indexEntry?.threadName ?? Self.firstUserPrompts.summary(of: file, read: CodexFirstUserPrompt.find(in:)),
+                indexEntry?.threadName
+                    ?? head.spawnedAgentTitle
+                    ?? Self.firstUserPrompts.summary(of: file, read: CodexFirstUserPrompt.find(in:)),
                 fallback: ConversationMetadata.untitledConversationTitle
             )
             let updatedAt = max(indexEntry?.updatedAt ?? .distantPast, ConversationMetadata.fileModificationDate(file))
@@ -45,7 +49,8 @@ struct CodexAdapter: ConversationAdapter {
                 projectPath: head.projectPath,
                 suggestedTitle: title,
                 updatedAt: updatedAt,
-                sourceFile: file
+                sourceFile: file,
+                parentSessionID: head.spawn?.parentThreadID
             ))
         }
         Self.rolloutHeads.forgetFiles(in: sessionsDirectory, except: rolloutFiles)

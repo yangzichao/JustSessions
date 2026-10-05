@@ -38,6 +38,8 @@ extension ConversationSidebarView {
                                 projectSelection: projectSelection,
                                 sessionSelection: sessionSelection,
                                 selectedConversations: selectedConversations,
+                                subagentRows: subagentRows,
+                                onToggleSubagents: { subagentRows.toggle($0.id) },
                                 onToggleExpansion: { projectExpansion.toggle(project.id) },
                                 onClickProject: { handleProjectClick(project) },
                                 onNewSession: { provider in

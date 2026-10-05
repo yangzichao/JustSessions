@@ -4,7 +4,7 @@ import Testing
 @testable import JustSessions
 
 struct OpenCodeAdapterTests {
-    @Test func listsTopLevelSessionsThatAreNotArchived() throws {
+    @Test func listsSessionsThatAreNotArchivedAndSubagentsUnderTheSessionThatStartedThem() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let databaseFile = root.appendingPathComponent("opencode.db")
@@ -15,7 +15,8 @@ struct OpenCodeAdapterTests {
             """,
             "INSERT INTO session VALUES ('ses_titled0001', 'p', NULL, '/Users/me/app', 'Fix login', 1, 1790000000500, NULL)",
             "INSERT INTO session VALUES ('ses_untitled01', 'p', NULL, '/Users/me/app', 'New session - 2026-09-30T10:00:00.000Z', 1, 1790000000000, NULL)",
-            "INSERT INTO session VALUES ('ses_subagent01', 'p', 'ses_titled0001', '/Users/me/app', 'Subtask', 1, 1, NULL)",
+            "INSERT INTO session VALUES ('ses_subagent01', 'p', 'ses_titled0001', '/Users/me/app', 'Subtask (@explore subagent)', 1, 1, NULL)",
+            "INSERT INTO session VALUES ('ses_oddparent1', 'p', 'not-an-opencode-id', '/Users/me/app', 'Odd parent', 1, 1, NULL)",
             "INSERT INTO session VALUES ('ses_archived01', 'p', NULL, '/Users/me/app', 'Archived', 1, 1, 1790000000000)",
             "INSERT INTO session VALUES ('not-an-opencode-id', 'p', NULL, '/Users/me/app', 'Odd', 1, 1, NULL)",
             "INSERT INTO session VALUES ('ses_relative01', 'p', NULL, 'relative/app', 'Odd', 1, 1, NULL)",
@@ -23,8 +24,13 @@ struct OpenCodeAdapterTests {
 
         let found = try OpenCodeAdapter(databaseFile: databaseFile).discover()
 
-        #expect(Set(found.map(\.sessionID)) == ["ses_titled0001", "ses_untitled01"])
+        #expect(Set(found.map(\.sessionID)) == ["ses_titled0001", "ses_untitled01", "ses_subagent01"])
+        let subagent = try #require(found.first { $0.sessionID == "ses_subagent01" })
+        #expect(subagent.parentSessionID == "ses_titled0001")
+        #expect(subagent.suggestedTitle == "Subtask (@explore subagent)")
+        #expect(subagent.sourceFile == databaseFile)
         let titled = try #require(found.first { $0.sessionID == "ses_titled0001" })
+        #expect(titled.parentSessionID == nil)
         #expect(titled.provider == .opencode)
         #expect(titled.projectPath == "/Users/me/app")
         #expect(titled.suggestedTitle == "Fix login")

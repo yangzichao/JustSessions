@@ -24,6 +24,26 @@ struct TranscriptProviderPagingTests {
         #expect((first.entries + latest.entries).map(\.content) == (try ClaudeTranscriptReader().read(fixture.file)).entries.map(\.content))
     }
 
+    /// A subagent's own transcript is all sidechain records, which a session's transcript leaves out.
+    @Test func aClaudeSubagentsTranscriptShowsItsSidechainRecords() async throws {
+        let fixture = try TranscriptPagingFixture(count: 0)
+        defer { fixture.remove() }
+        let lines = [
+            #"{"type":"user","isSidechain":true,"message":{"content":"Fix the refund bug"}}"#,
+            #"{"type":"assistant","isSidechain":true,"message":{"content":[{"type":"text","text":"Fixed"}]}}"#,
+        ]
+        try Data(lines.joined(separator: "\n").utf8).write(to: fixture.file)
+        let subagent = Conversation.fixture(provider: .claude, sourceFile: fixture.file, parentSessionID: UUID().uuidString)
+
+        let paged = try await TranscriptPageSource(file: fixture.file, provider: .claude, isSubagentTranscript: true).read(.latest)
+        let loaded = try await TranscriptLoader.load(subagent)
+        let asSession = try await TranscriptPageSource(file: fixture.file, provider: .claude).read(.latest)
+
+        #expect(paged.entries.map(\.content) == [.userMessage("Fix the refund bug"), .assistantMessage("Fixed")])
+        #expect(loaded.entries.map(\.content) == paged.entries.map(\.content))
+        #expect(asSession.entries.isEmpty)
+    }
+
     @Test func piPagesOnlyTheActiveBranchIncludingReorderedJSON() async throws {
         let fixture = try TranscriptPagingFixture(count: 0)
         defer { fixture.remove() }

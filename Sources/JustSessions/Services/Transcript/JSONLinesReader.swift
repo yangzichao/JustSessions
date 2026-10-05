@@ -24,6 +24,37 @@ enum JSONLinesReader {
         if !buffer.isEmpty { try body(buffer) }
     }
 
+    /// Calls `body` with each non-empty line in the first `maximumByteCount` bytes of `file`, oldest first, until it
+    /// returns false, reading only as far as that. The last line may be cut off at the limit. Nothing is read when
+    /// the file cannot be opened.
+    static func forEachLeadingLine(
+        in file: URL,
+        maximumByteCount: Int,
+        chunkSize: Int = 65_536,
+        _ body: (Data) -> Bool
+    ) {
+        guard let handle = try? FileHandle(forReadingFrom: file) else { return }
+        defer { try? handle.close() }
+        var buffer = Data()
+        var bytesKnownWithoutNewline = 0
+        var remainingByteCount = maximumByteCount
+        while remainingByteCount > 0,
+              let chunk = try? handle.read(upToCount: min(chunkSize, remainingByteCount)), !chunk.isEmpty {
+            remainingByteCount -= chunk.count
+            buffer.append(chunk)
+            var lineStart = buffer.startIndex
+            var searchStart = buffer.startIndex + bytesKnownWithoutNewline
+            while let newline = buffer[searchStart...].firstIndex(of: UInt8(ascii: "\n")) {
+                if newline > lineStart, !body(Data(buffer[lineStart..<newline])) { return }
+                lineStart = newline + 1
+                searchStart = lineStart
+            }
+            buffer.removeSubrange(buffer.startIndex..<lineStart)
+            bytesKnownWithoutNewline = buffer.count
+        }
+        if !buffer.isEmpty { _ = body(buffer) }
+    }
+
     /// The non-empty lines in the first `maximumByteCount` bytes of `file`, or none when it cannot be read. The last
     /// line may be cut off at the limit.
     static func leadingLines(in file: URL, maximumByteCount: Int) -> [Data] {

@@ -5,17 +5,21 @@ import SwiftUI
 struct SidebarSessionRowLayout<Title: View, Trailing: View>: View {
     let provider: ConversationProvider
     let isSelected: Bool
+    /// 0 for a session, 1 for a subagent's session under it, and so on.
+    let indentLevel: Int
     let title: Title
     let trailing: Trailing
 
     init(
         provider: ConversationProvider,
         isSelected: Bool,
+        indentLevel: Int = 0,
         @ViewBuilder title: () -> Title,
         @ViewBuilder trailing: () -> Trailing
     ) {
         self.provider = provider
         self.isSelected = isSelected
+        self.indentLevel = indentLevel
         self.title = title()
         self.trailing = trailing()
     }
@@ -33,7 +37,7 @@ struct SidebarSessionRowLayout<Title: View, Trailing: View>: View {
             Spacer(minLength: 6)
             trailing
         }
-        .padding(.leading, 28)
+        .padding(.leading, SidebarSessionRowMetrics.leadingPadding(indentLevel: indentLevel))
         .padding(.trailing, SidebarSessionRowMetrics.trailingPadding)
         .frame(height: 28)
         .contentShape(Rectangle())
@@ -43,4 +47,11 @@ struct SidebarSessionRowLayout<Title: View, Trailing: View>: View {
 enum SidebarSessionRowMetrics {
     /// The room after a row's trailing status, which a session row's ⋯ lines up with.
     static let trailingPadding: CGFloat = 10
+    /// How far each level of subagents sits in from the row above it.
+    static let indentStep: CGFloat = 14
+
+    /// Where the tool's icon starts.
+    static func leadingPadding(indentLevel: Int) -> CGFloat {
+        28 + CGFloat(indentLevel) * indentStep
+    }
 }

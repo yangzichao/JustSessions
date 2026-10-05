@@ -13,8 +13,23 @@ struct PiAdapter: ConversationAdapter {
         self.moveToTrash = moveToTrash
     }
 
+    /// Shared by every Pi adapter, this Mac's and each SSH host's mirror, which keep their files apart. Subagents' files
+    /// can be large and are rarely written to once their run ends.
+    private static let subagentSessions = SessionFileSummaryCache<PiSubagentSession>(persistenceFile: SessionSummaryCacheLocation.file(named: "pi-subagents"))
+
+    /// Each session, then the sessions its subagents ran in.
     func discover() throws -> [Conversation] {
-        PiSessionsDirectory.sessionFiles(in: sessionsDirectory).compactMap(conversation(in:))
+        var subagentFiles: [URL] = []
+        let conversations = PiSessionsDirectory.sessionFiles(in: sessionsDirectory).flatMap { file -> [Conversation] in
+            guard let conversation = conversation(in: file) else { return [] }
+            let subagents = PiSubagentSessions.find(startedBy: file, sessionID: conversation.sessionID) { subagentFile in
+                Self.subagentSessions.summary(of: subagentFile, read: PiSubagentSession.init(file:))
+            }
+            subagentFiles += subagents.map(\.file)
+            return [conversation] + subagents.map(subagentConversation(_:))
+        }
+        Self.subagentSessions.forgetFiles(in: sessionsDirectory, except: subagentFiles)
+        return conversations
     }
 
     func arguments(for conversation: Conversation, action: ConversationAction) -> [String] {
@@ -48,6 +63,18 @@ struct PiAdapter: ConversationAdapter {
             suggestedTitle: title,
             updatedAt: ConversationMetadata.fileModificationDate(file),
             sourceFile: file
+        )
+    }
+
+    private func subagentConversation(_ found: PiSubagentSessions.Found) -> Conversation {
+        Conversation(
+            provider: provider,
+            sessionID: found.session.sessionID,
+            projectPath: found.session.projectPath,
+            suggestedTitle: found.session.title,
+            updatedAt: ConversationMetadata.fileModificationDate(found.file),
+            sourceFile: found.file,
+            parentSessionID: found.parentSessionID
         )
     }
 }

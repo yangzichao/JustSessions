@@ -80,6 +80,22 @@
         }
       }
     },
+    "%@ · %@ subagent · %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ · %2$@ subagent · %3$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@ 子代理 · %3$@"
+          }
+        }
+      }
+    },
     "%@ · %@ · %@%@": {
       "shouldTranslate": false
     },
@@ -101,6 +117,22 @@
     },
     "%@, %@": {
       "shouldTranslate": false
+    },
+    "%@, %@ subagent": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@, %2$@ subagent"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@，%2$@ 子代理"
+          }
+        }
+      }
     },
     "%@, %@%@%@": {
       "shouldTranslate": false
@@ -320,6 +352,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "仍在 tmux 中运行的 CLI 会重新连接。其他标签会在选中时继续会话，包括 Mac 重启后的会话。普通终端会在原文件夹中打开新 shell。"
+          }
+        }
+      }
+    },
+    "A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "子代理为启动它的会话运行了此会话。可以在这里阅读，但不能单独继续或删除。"
           }
         }
       }
@@ -1910,6 +1952,34 @@
         }
       }
     },
+    "Hide %lld subagent sessions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏 %lld 个子代理会话"
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Hide %lld subagent session"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Hide %lld subagent sessions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Hide Sidebar": {
       "localizations": {
         "zh-Hans": {
@@ -1946,6 +2016,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "隐藏侧栏（⌘B）"
+          }
+        }
+      }
+    },
+    "Hide subagent sessions of %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏 %@ 的子代理会话"
           }
         }
       }
@@ -3510,6 +3590,34 @@
         }
       }
     },
+    "Show %lld subagent sessions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示 %lld 个子代理会话"
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Show %lld subagent session"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Show %lld subagent sessions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Show Sidebar": {
       "localizations": {
         "zh-Hans": {
@@ -3536,6 +3644,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "显示侧栏（⌘B）"
+          }
+        }
+      }
+    },
+    "Show subagent sessions of %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示 %@ 的子代理会话"
           }
         }
       }
@@ -3732,6 +3850,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在停止…"
+          }
+        }
+      }
+    },
+    "Subagent": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "子代理"
+          }
+        }
+      }
+    },
+    "Subagent of %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的子代理"
           }
         }
       }

@@ -24,7 +24,12 @@ final class TranscriptPagingModel {
         if key != sourceKey {
             cancel()
             sourceKey = key
-            source = TranscriptPageSource(file: conversation.sourceFile, provider: conversation.provider, sessionID: conversation.sessionID)
+            source = TranscriptPageSource(
+                file: conversation.sourceFile,
+                provider: conversation.provider,
+                sessionID: conversation.sessionID,
+                isSubagentTranscript: conversation.isSubagent
+            )
             pages = []
             transcript = nil
         }

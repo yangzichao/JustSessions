@@ -11,6 +11,7 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 - Choose **Projects** to browse the library or **Open tabs** to switch between this window's open terminals. Each view keeps its search and scroll position when switching; each window remembers the selected view.
 - In **Projects**, use the filter menu beside the switch to choose **Last 7 days** or one CLI. These filters do not hide open tabs. The menu lists only CLIs that are installed or have sessions. Refresh each machine using its own heading's refresh button.
 - Pin projects and sessions to keep them at the top. Rename any session locally without touching the CLI's own title.
+- A session whose subagents ran sessions of their own shows a chevron before its icon. Click it to list them under the session, newest first; they stay hidden until you do. Click one to read it in the preview. A subagent's session is only read: it has no Resume, Branch, Rename, Pin, or Delete. Deleting a Claude Code, Codex, OpenCode, or Pi session deletes its subagents' sessions too. [Which subagents are listed](session-storage.md#session-locations).
 - Hide the sidebar to give the terminal or preview the whole window: click the sidebar button next to the window's close, minimize, and zoom buttons, choose **View → Hide Sidebar**, or press **⌘B**. Each window keeps its own choice, and the sidebar comes back with the same projects expanded.
 
 ## Preview before you resume

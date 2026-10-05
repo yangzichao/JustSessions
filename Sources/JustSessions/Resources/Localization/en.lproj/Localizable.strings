@@ -68,6 +68,8 @@
 	<string>1 tool call</string>
 	<key>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</key>
 	<string>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</string>
+	<key>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</key>
+	<string>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</string>
 	<key>A+</key>
 	<string>A+</string>
 	<key>Add SSH host</key>
@@ -368,6 +370,8 @@
 	<string>Hide sidebar</string>
 	<key>Hide sidebar (⌘B)</key>
 	<string>Hide sidebar (⌘B)</string>
+	<key>Hide subagent sessions of %@</key>
+	<string>Hide subagent sessions of %@</string>
 	<key>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌘B does the same.</key>
 	<string>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌘B does the same.</string>
 	<key>Host</key>
@@ -680,6 +684,8 @@
 	<string>Show sidebar</string>
 	<key>Show sidebar (⌘B)</key>
 	<string>Show sidebar (⌘B)</string>
+	<key>Show subagent sessions of %@</key>
+	<string>Show subagent sessions of %@</string>
 	<key>Sidebar</key>
 	<string>Sidebar</string>
 	<key>Sidebar width</key>
@@ -716,6 +722,10 @@
 	<string>Stopping deletion</string>
 	<key>Stopping…</key>
 	<string>Stopping…</string>
+	<key>Subagent</key>
+	<string>Subagent</string>
+	<key>Subagent of %@</key>
+	<string>Subagent of %@</string>
 	<key>Swap with left view</key>
 	<string>Swap with left view</string>
 	<key>Swap with right view</key>

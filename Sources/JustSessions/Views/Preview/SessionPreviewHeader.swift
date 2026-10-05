@@ -70,21 +70,49 @@ struct SessionPreviewHeader: View {
         .frame(minWidth: 180, maxWidth: .infinity, alignment: .leading)
     }
 
+    /// A subagent's session names the session that started it instead, since it is only read.
     private var sessionActions: some View {
         HStack(spacing: 10) {
-            Button("Resume", systemImage: "play.fill") { store.launch(conversation, action: .resume) }
-                .buttonStyle(ProviderProminentButtonStyle(tint: conversation.provider.emphasisTintColor))
-                .disabled(!store.canLaunch(conversation, action: .resume))
-                .onboardingTourStop(.resume)
-            if conversation.provider.supportsBranchFromLauncher {
-                Button("Branch", systemImage: "arrow.triangle.branch") { store.launch(conversation, action: .branch) }
-                    .buttonStyle(QuietBorderedButtonStyle())
-                    .disabled(!store.canLaunch(conversation, action: .branch))
-                    .help("Fork in the native CLI")
+            if conversation.isSubagent {
+                subagentLabel
+            } else {
+                launchActions
             }
             moreActionsMenu
         }
         .fixedSize(horizontal: true, vertical: false)
+    }
+
+    private var subagentLabel: some View {
+        let parent = conversation.parentID.flatMap(store.conversation(withID:))
+        return Label {
+            if let parent {
+                Text("Subagent of \(store.title(for: parent))")
+            } else {
+                Text("Subagent")
+            }
+        } icon: {
+            Image(systemName: "arrow.turn.down.right")
+        }
+        .font(.callout)
+        .foregroundStyle(.secondary)
+        .lineLimit(1)
+        .frame(maxWidth: 260, alignment: .trailing)
+        .help("A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.")
+    }
+
+    @ViewBuilder
+    private var launchActions: some View {
+        Button("Resume", systemImage: "play.fill") { store.launch(conversation, action: .resume) }
+            .buttonStyle(ProviderProminentButtonStyle(tint: conversation.provider.emphasisTintColor))
+            .disabled(!store.canLaunch(conversation, action: .resume))
+            .onboardingTourStop(.resume)
+        if conversation.provider.supportsBranchFromLauncher {
+            Button("Branch", systemImage: "arrow.triangle.branch") { store.launch(conversation, action: .branch) }
+                .buttonStyle(QuietBorderedButtonStyle())
+                .disabled(!store.canLaunch(conversation, action: .branch))
+                .help("Fork in the native CLI")
+        }
     }
 
     private var moreActionsMenu: some View {

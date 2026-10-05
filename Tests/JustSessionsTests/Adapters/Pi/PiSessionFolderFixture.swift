@@ -23,6 +23,25 @@ struct PiSessionFolderFixture {
         return file
     }
 
+    /// Writes a subagent's session file at `relativePath` in the folder beside `sessionFile`, as Pi extensions keep
+    /// them. A fork's header names the file of the session it came from.
+    @discardableResult
+    func writeSubagentSession(
+        id sessionID: String,
+        at relativePath: String,
+        inFolderOf sessionFile: URL,
+        projectPath: String = "/Users/me/app",
+        forkedFrom parentFile: URL? = nil,
+        lines: [String] = []
+    ) throws -> URL {
+        let file = sessionFile.deletingPathExtension().appendingPathComponent(relativePath)
+        try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let parentSession = parentFile.map { #","parentSession":"\#($0.path)""# } ?? ""
+        let header = #"{"type":"session","version":3,"id":"\#(sessionID)","timestamp":"2026-09-30T10:05:00.000Z","cwd":"\#(projectPath)"\#(parentSession)}"#
+        try ([header] + lines).map { $0 + "\n" }.joined().write(to: file, atomically: true, encoding: .utf8)
+        return file
+    }
+
     static func userMessage(_ text: String) -> String {
         #"{"type":"message","id":"a1","parentId":null,"timestamp":"2026-09-30T10:00:01.000Z","message":{"role":"user","content":[{"type":"text","text":"\#(text)"}]}}"#
     }
