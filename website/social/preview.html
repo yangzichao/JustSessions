@@ -8,30 +8,27 @@
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #15171c; }
-    .social-card { position: relative; width: 1200px; height: 630px; overflow: hidden; background: #fcfbf8; padding: 65px 70px; }
-    .brand { display: flex; align-items: center; gap: 17px; font-size: 28px; font-weight: 600; letter-spacing: -1px; }
-    .brand img { width: 48px; }
-    h1 { position: relative; z-index: 1; margin: 57px 0 25px; font-size: 66px; line-height: 1.06; letter-spacing: -3px; font-weight: 650; }
-    h1 span { color: #303139; }
-    p { position: relative; z-index: 1; font-size: 20px; line-height: 1.65; color: #303139; }
-    .providers { position: absolute; bottom: 66px; left: 70px; display: flex; gap: 22px; font-size: 15px; color: #303139; }
-    i { display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; }
-    .claude { background: #ff8a1f; } .codex { background: #2f6bff; } .antigravity { background: #a64df0; }
-    .kiro { background: #e0408a; } .opencode { background: #12a08f; } .pi { background: #3f9f2f; }
-    .side { position: absolute; top: 0; right: 0; width: 260px; height: 100%; border-left: 1px solid #15171c17; background: #f3f1ec; }
-    .side img { position: absolute; width: 180px; left: 40px; top: 206px; }
-    .side p { position: absolute; left: 0; right: 0; bottom: 52px; text-align: center; font-size: 12px; letter-spacing: 1px; }
-    .rule { position: absolute; left: 70px; width: 800px; bottom: 114px; border-top: 1px solid #15171c17; }
+    .social-card { position: relative; width: 1200px; height: 630px; overflow: hidden; background: #fcfbf8; padding: 44px 48px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 27px; font-weight: 650; letter-spacing: -1px; }
+    .brand img { width: 40px; height: 40px; }
+    .copy { position: relative; z-index: 1; width: 350px; }
+    h1 { margin: 115px 0 24px; font-size: 58px; line-height: 1.07; letter-spacing: -2.5px; font-weight: 750; }
+    h1 span { display: block; white-space: nowrap; }
+    p { margin: 0; font-size: 24px; line-height: 1.5; font-weight: 600; color: #303139; }
+    .app-window { position: absolute; top: 108px; left: 430px; width: 820px; overflow: hidden; border: 1px solid #15171c17; border-radius: 14px; background: #fcfbf8; box-shadow: 0 14px 38px #15171c15, 0 3px 8px #15171c08; }
+    .app-window img { display: block; width: 100%; height: auto; }
   </style>
 </head>
 <body>
   <main class="social-card">
     <div class="brand"><img src="../../Branding/SVG/mark.svg" alt="">JustSessions</div>
-    <h1>Your CLI.<br><span>A lighter workspace.</span></h1>
-    <p>Native terminal. Project tabs. SSH. tmux.</p>
-    <div class="rule"></div>
-    <div class="providers"><span><i class="claude"></i>Claude Code</span><span><i class="codex"></i>Codex CLI</span><span><i class="antigravity"></i>Antigravity</span><span><i class="kiro"></i>Kiro CLI</span><span><i class="opencode"></i>OpenCode</span><span><i class="pi"></i>Pi</span></div>
-    <div class="side"><img src="../../Branding/PNG/app-icon-256.png" alt=""><p>FREE & OPEN SOURCE</p></div>
+    <div class="copy">
+      <h1><span>Nothing extra.</span><span>Just sessions.</span></h1>
+      <p>Multiple agents.<br>Your CLI. Native tabs.</p>
+    </div>
+    <div class="app-window">
+      <img src="../../docs/images/native-terminal.jpg" width="2400" height="1440" alt="JustSessions running Claude Code, with Claude Code, Codex, OpenCode and Pi sessions grouped under one project.">
+    </div>
   </main>
 </body>
 </html>
