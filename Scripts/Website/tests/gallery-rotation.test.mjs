@@ -9,7 +9,7 @@ afterEach(() => {
   globalThis.document = originalDocument;
 });
 
-function createHarness(reducedMotion = false) {
+function createHarness(reducedMotion = false, intervals = [8000]) {
   const timers = new Map();
   const listeners = new Map();
   const preference = { matches: reducedMotion, addEventListener: (_, listener) => listeners.set("motion", listener) };
@@ -18,6 +18,7 @@ function createHarness(reducedMotion = false) {
   let clock = 0;
   let timerIdentifier = 0;
   let advanceCount = 0;
+  let slideIndex = 0;
   globalThis.document = { hidden: false, addEventListener: (event, listener) => listeners.set(event, listener) };
   globalThis.window = {
     matchMedia: () => preference,
@@ -29,7 +30,8 @@ function createHarness(reducedMotion = false) {
     },
   };
   const rotation = createGalleryRotation({
-    advance: () => advanceCount++,
+    advance: () => { advanceCount++; slideIndex = (slideIndex + 1) % intervals.length; },
+    getInterval: () => intervals[slideIndex],
     updateControl: (requested, running) => controlStates.push({ requested, running }),
     updateProgress: (state) => progressStates.push(state),
     now: () => clock,
@@ -39,6 +41,7 @@ function createHarness(reducedMotion = false) {
     get advanceCount() { return advanceCount; },
     get controlState() { return controlStates.at(-1); },
     get progressState() { return progressStates.at(-1); },
+    selectSlide(index) { slideIndex = index; rotation.reset(); },
     elapse(milliseconds) { clock += milliseconds; },
     tick() {
       const [identifier, timer] = timers.entries().next().value;
@@ -139,4 +142,44 @@ test("selecting another screenshot while explicitly paused keeps it paused", () 
   assert.equal(harness.timers.size, 0);
   harness.rotation.toggle();
   assert.equal([...harness.timers.values()][0].delay, 8000);
+});
+
+test("automatic transitions give each demo its full countdown", () => {
+  const harness = createHarness(false, [8000, 12000, 8000]);
+  harness.tick();
+  assert.deepEqual(harness.progressState, { elapsed: 0, duration: 12000, running: true });
+  assert.equal([...harness.timers.values()][0].delay, 12000);
+  harness.tick();
+  assert.deepEqual(harness.progressState, { elapsed: 0, duration: 8000, running: true });
+  assert.equal(harness.timers.size, 1);
+});
+
+test("pausing a longer demo preserves its remaining time and duration", () => {
+  const harness = createHarness(false, [12000]);
+  harness.elapse(4500);
+  harness.rotation.toggle();
+  assert.deepEqual(harness.progressState, { elapsed: 4500, duration: 12000, running: false });
+  harness.elapse(20000);
+  harness.rotation.toggle();
+  assert.equal([...harness.timers.values()][0].delay, 7500);
+});
+
+test("manual selection updates the duration without resuming an explicit pause", () => {
+  const harness = createHarness(false, [8000, 12000]);
+  harness.rotation.toggle();
+  harness.selectSlide(1);
+  assert.deepEqual(harness.progressState, { elapsed: 0, duration: 12000, running: false });
+  assert.equal(harness.timers.size, 0);
+  harness.rotation.toggle();
+  assert.equal([...harness.timers.values()][0].delay, 12000);
+  harness.selectSlide(0);
+  assert.equal([...harness.timers.values()][0].delay, 8000);
+});
+
+test("an invalid demo duration falls back to the default countdown", () => {
+  const harness = createHarness(false, [NaN, -1, Infinity]);
+  for (let index = 0; index < 3; index++) {
+    assert.equal([...harness.timers.values()][0].delay, 8000);
+    harness.tick();
+  }
 });
