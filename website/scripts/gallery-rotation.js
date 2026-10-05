@@ -1,7 +1,6 @@
-// Start automatically and keep one timer while the gallery is visible.
+// Start automatically; only the playback control can pause rotation.
 export function createGalleryRotation({ advance, updateControl, updateProgress = () => {}, interval = 8000, now = () => performance.now() }) {
   let requested = true;
-  let visible = false;
   let running = false;
   let remaining = interval;
   let startedAt = 0;
@@ -10,7 +9,7 @@ export function createGalleryRotation({ advance, updateControl, updateProgress =
   function refresh() {
     if (running) remaining = Math.max(0, remaining - (now() - startedAt));
     window.clearTimeout(timer);
-    running = requested && visible && !document.hidden;
+    running = requested;
     startedAt = now();
     updateControl(requested, running);
     updateProgress({ elapsed: interval - remaining, duration: interval, running });
@@ -24,12 +23,10 @@ export function createGalleryRotation({ advance, updateControl, updateProgress =
     }
   }
 
-  document.addEventListener("visibilitychange", refresh);
+  refresh();
 
   return {
-    stop() { requested = false; refresh(); },
     toggle() { requested = !requested; refresh(); },
-    setVisible(value) { visible = value; refresh(); },
     reset() { running = false; remaining = interval; refresh(); },
   };
 }

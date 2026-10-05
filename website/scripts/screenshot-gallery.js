@@ -35,6 +35,7 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
     updateSelection(targetIndex);
   }
 
+  updateSelection(0);
   const rotation = createGalleryRotation({
     advance: () => showSlide(currentIndex + 1),
     updateProgress: createGalleryProgress(pageButtons),
@@ -46,7 +47,6 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   });
 
   function manuallyShow(index) {
-    rotation.stop();
     showSlide(index);
     rotation.reset();
   }
@@ -55,13 +55,6 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   gallery.querySelector("[data-gallery-next]").addEventListener("click", () => manuallyShow(currentIndex + 1));
   pageButtons.forEach((button, index) => button.addEventListener("click", () => manuallyShow(index)));
   rotationButton.addEventListener("click", () => rotation.toggle());
-  gallery.addEventListener("focusin", (event) => {
-    if (event.target !== rotationButton) rotation.stop();
-  });
-  track.addEventListener("pointerdown", () => rotation.stop(), { passive: true });
-  track.addEventListener("wheel", (event) => {
-    if (Math.abs(event.deltaX) > Math.abs(event.deltaY) || event.shiftKey) rotation.stop();
-  }, { passive: true });
   track.addEventListener("keydown", (event) => {
     if (event.target !== track || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
     event.preventDefault();
@@ -83,7 +76,6 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   function showLinkedSlide() {
     const linkedIndex = slides.findIndex((slide) => `#${slide.id}` === window.location.hash);
     if (linkedIndex >= 0) {
-      rotation.stop();
       showSlide(linkedIndex, false);
       rotation.reset();
     }
@@ -91,9 +83,6 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   window.addEventListener("hashchange", showLinkedSlide);
   const resizeObserver = new ResizeObserver(() => showSlide(currentIndex, false));
   resizeObserver.observe(track);
-  const visibilityObserver = new IntersectionObserver(([entry]) => rotation.setVisible(entry.isIntersecting && entry.intersectionRatio >= .25), { threshold: .25 });
-  visibilityObserver.observe(gallery);
   gallery.querySelector("[data-gallery-controls]").hidden = false;
-  updateSelection(0);
   showLinkedSlide();
 }

@@ -24,7 +24,7 @@ function createHarness(reducedMotion = false) {
     clearTimeout: (identifier) => timers.delete(identifier),
     setTimeout: (callback, delay) => {
       const identifier = ++timerIdentifier;
-      timers.set(identifier, { callback, delay });
+      timers.set(identifier, { callback, delay, deadline: clock + delay });
       return identifier;
     },
   };
@@ -43,40 +43,38 @@ function createHarness(reducedMotion = false) {
     tick() {
       const [identifier, timer] = timers.entries().next().value;
       timers.delete(identifier);
-      clock += timer.delay;
+      clock = Math.max(clock, timer.deadline);
       timer.callback();
     },
-    setHidden(hidden) { document.hidden = hidden; listeners.get("visibilitychange")(); },
+    setHidden(hidden) { document.hidden = hidden; listeners.get("visibilitychange")?.(); },
   };
 }
 
-test("rotation waits until visible and always keeps exactly one timer", () => {
+test("rotation starts immediately and always keeps exactly one timer", () => {
   const harness = createHarness();
-  assert.equal(harness.timers.size, 0);
-  harness.rotation.setVisible(true);
-  harness.rotation.setVisible(true);
   assert.equal(harness.timers.size, 1);
+  assert.deepEqual(harness.controlState, { requested: true, running: true });
   assert.equal([...harness.timers.values()][0].delay, 8000);
   harness.tick();
   assert.equal(harness.advanceCount, 1);
   assert.equal(harness.timers.size, 1);
 });
 
-test("background tabs and leaving the viewport suspend automatic rotation", () => {
+test("background tabs keep advancing without changing playback state", () => {
   const harness = createHarness();
-  harness.rotation.setVisible(true);
   harness.setHidden(true);
-  assert.equal(harness.timers.size, 0);
+  assert.equal(harness.timers.size, 1);
+  harness.tick();
+  harness.tick();
+  assert.equal(harness.advanceCount, 2);
+  assert.deepEqual(harness.controlState, { requested: true, running: true });
   harness.setHidden(false);
   assert.equal(harness.timers.size, 1);
-  harness.rotation.setVisible(false);
-  assert.equal(harness.timers.size, 0);
 });
 
-test("manual stop survives visibility changes until explicitly restarted", () => {
+test("explicit pause survives visibility changes until explicitly restarted", () => {
   const harness = createHarness();
-  harness.rotation.setVisible(true);
-  harness.rotation.stop();
+  harness.rotation.toggle();
   harness.setHidden(true);
   harness.setHidden(false);
   assert.equal(harness.timers.size, 0);
@@ -89,7 +87,6 @@ test("manual stop survives visibility changes until explicitly restarted", () =>
 
 test("automatic playback starts even when reduced motion is preferred", () => {
   const harness = createHarness(true);
-  harness.rotation.setVisible(true);
   assert.equal(harness.timers.size, 1);
   harness.tick();
   assert.equal(harness.advanceCount, 1);
@@ -98,7 +95,6 @@ test("automatic playback starts even when reduced motion is preferred", () => {
 
 test("pause freezes the countdown and resume uses only the remaining time", () => {
   const harness = createHarness();
-  harness.rotation.setVisible(true);
   harness.elapse(3000);
   harness.rotation.toggle();
   assert.deepEqual(harness.progressState, { elapsed: 3000, duration: 8000, running: false });
@@ -110,27 +106,34 @@ test("pause freezes the countdown and resume uses only the remaining time", () =
   assert.deepEqual(harness.progressState, { elapsed: 0, duration: 8000, running: true });
 });
 
-test("visibility changes preserve progress without restarting the countdown", () => {
+test("visibility changes do not restart the running countdown", () => {
   const harness = createHarness();
-  harness.rotation.setVisible(true);
+  const originalTimer = [...harness.timers.entries()][0];
   harness.elapse(2000);
-  harness.rotation.setVisible(true);
-  assert.equal([...harness.timers.values()][0].delay, 6000);
   harness.setHidden(true);
-  harness.elapse(20000);
+  harness.elapse(2000);
   harness.setHidden(false);
-  assert.equal([...harness.timers.values()][0].delay, 6000);
-  harness.rotation.setVisible(false);
-  harness.elapse(20000);
-  harness.rotation.setVisible(true);
-  assert.equal([...harness.timers.values()][0].delay, 6000);
+  assert.deepEqual([...harness.timers.entries()][0], originalTimer);
+  harness.tick();
+  assert.equal(harness.advanceCount, 1);
 });
 
-test("selecting a different screenshot starts its full countdown when playback resumes", () => {
+test("selecting another screenshot resets the countdown and keeps playing", () => {
   const harness = createHarness();
-  harness.rotation.setVisible(true);
   harness.elapse(6000);
-  harness.rotation.stop();
+  harness.rotation.reset();
+  harness.rotation.reset();
+  assert.equal(harness.timers.size, 1);
+  assert.equal([...harness.timers.values()][0].delay, 8000);
+  assert.deepEqual(harness.progressState, { elapsed: 0, duration: 8000, running: true });
+  harness.tick();
+  assert.equal(harness.advanceCount, 1);
+});
+
+test("selecting another screenshot while explicitly paused keeps it paused", () => {
+  const harness = createHarness();
+  harness.elapse(6000);
+  harness.rotation.toggle();
   harness.rotation.reset();
   assert.deepEqual(harness.progressState, { elapsed: 0, duration: 8000, running: false });
   assert.equal(harness.timers.size, 0);
