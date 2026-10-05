@@ -1,16 +1,19 @@
 # README screenshots
 
-These are unedited JPEG captures of the actual JustSessions SwiftUI interface. The overview, SSH, and native terminal captures were refreshed on October 4, 2026, using the current production views and models in a separate local screenshot app. The capture build was based on revision `78c924c`, including local sidebar and button styling changes in progress at capture time. The tmux dialog was captured from revision `7439345` on September 29, 2026. The normal app and its saved conversations were not used as screenshot content.
+These are unedited JPEG captures of the actual JustSessions SwiftUI and AppKit interface, refreshed on October 4, 2026. The separate sample-data app links the production views and models from revision `d14311dce0af7ac94c3222851cfafb8a383e46f1`. The normal app and its saved conversations were not used as screenshot content.
 
 | Image | What it shows |
 | --- | --- |
-| [session-overview.jpg](session-overview.jpg) | All six CLI icons, pinned sessions, Projects / Open tabs navigation, per-host refresh buttons, and the reading toolbar with Find and Open in new window. |
-| [native-terminal.jpg](native-terminal.jpg) | The homepage and README's primary screenshot: the installed Claude Code CLI's real interactive `/help` screen in the native terminal, with project tab groups, agent icons, and a plain shell tab. |
-| [remote-desktop-sessions.jpg](remote-desktop-sessions.jpg) | A selected Claude Code conversation under the sample `dev-desktop` SSH host with the current sidebar and reading controls. |
-| [tmux-keep-running.jpg](tmux-keep-running.jpg) | The real close-tab confirmation with **Keep running**, **End session**, and **Cancel**. |
+| [native-terminal.jpg](native-terminal.jpg) | The installed Claude Code CLI's real interactive `/help` screen in the native terminal, with current project tab groups and all six agent icons. |
+| [split-terminal.jpg](split-terminal.jpg) | Actual split view: the same Claude Code CLI's command input on the left and a real shell displaying `git diff` in the sample project on the right. |
+| [session-overview.jpg](session-overview.jpg) | The current conversation reader, pinned projects and sessions, Projects / Open tabs navigation, per-host refresh, and reading controls. |
+| [remote-desktop-sessions.jpg](remote-desktop-sessions.jpg) | A selected Claude Code conversation under the sample `dev-desktop` SSH host. |
+| [tmux-keep-running.jpg](tmux-keep-running.jpg) | The current close-tab confirmation with **Keep running**, **End session**, and **Cancel**, shown for an actual sample shell in tmux. |
 
-`orbit-web`, `orbit-api`, `orbit-infra`, the host names, and all saved conversation text are illustrative. The remote host data was supplied as a fixture; these images do not document a live SSH connection.
+The main window captures are 2400 × 1440 pixels; the dialog is 520 × 476 pixels. The homepage presents smaller previews beside feature explanations and links to the originals.
 
-The native terminal screenshot runs the installed Claude Code CLI in the sample project and displays its local help screen. No model prompt was submitted. The other agent-associated tabs use sample shell processes to illustrate navigation; they do not show Codex or Pi model activity. The plain terminal runs a shell in a temporary sample Git project. The older tmux dialog used a sample process in a separate tmux server, which remained running after the screenshot app quit.
+`orbit-web`, `orbit-api`, `orbit-infra`, the host names, and all saved conversation text are illustrative. Remote host data is a fixture; these images do not document a live SSH connection.
 
-When replacing these images, capture the current native interface with sample data, retain the real feature labels, and update the source revision above. The October 4 captures used debug objects from `make check`, excluding the normal app entry point, linked to a temporary sample-data app with background polling disabled. Only the native terminal capture launches Claude Code; none makes an SSH connection. Keep each screenshot's descriptive alt text and sample-data caption in the [main README](../../README.md).
+Claude Code 2.1.289 runs in an isolated sample configuration. Its screenshots show local help and command input; no model prompt was submitted. The split-view shell runs in a temporary sample Git repository with an actual uncommitted change. The tmux screenshot uses a sample shell in a separate server: **Keep running** left that process alive after the screenshot app quit, verified with `tmux list-sessions`, then the sample server was stopped.
+
+The capture app was linked from the debug objects produced by `make check`, excluding the normal app entry point, with fixture data and background polling disabled. When replacing these images, capture the current native interface, retain the real feature labels, update the source revision, and keep each screenshot's descriptive alt text and sample caption in the [main README](../../README.md).

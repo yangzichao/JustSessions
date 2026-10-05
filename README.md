@@ -43,6 +43,12 @@
 
 **Your agents and shell, in project tabs.** JustSessions embeds SwiftTerm's native AppKit terminal. Run your CLI or open a plain project shell, switch with **Open tabs**, and import your iTerm2 colors.
 
+**Two terminals, side by side.** Keep an agent beside your shell, or compare sessions. Click a pane to focus it and drag the divider to make room. [Split view](docs/guides/session-management.md#resume-branch-and-start-sessions).
+
+![JustSessions split view with the real Claude Code CLI on the left and a project shell displaying Git diff on the right](docs/images/split-terminal.jpg)
+
+*Real Claude Code CLI and shell in split view, using a sample Git project.*
+
 ## Read before you resume
 
 ![JustSessions' conversation reader, with reading controls and sessions grouped by project and machine](docs/images/session-overview.jpg)

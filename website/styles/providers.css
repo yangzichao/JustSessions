@@ -1,6 +1,6 @@
 /* Shapes and colors mirror the app's Branding/Providers icons and provider tint colors. */
-.provider-support { position: absolute; z-index: 1; inset: auto 32px 92px; padding: 16px 20px; border: 1px solid var(--line); border-radius: 12px; background: rgba(252, 251, 248, .96); box-shadow: 0 6px 24px var(--shadow); }
-.provider-caption { margin-bottom: 10px; text-align: center; font-size: 14px; font-weight: 600; color: var(--ink); }
+.provider-support { padding: 14px 20px 18px; border-top: 1px solid var(--line); background: var(--paper); }
+.provider-caption { margin-bottom: 10px; text-align: center; font-size: 12px; font-weight: 600; color: var(--ink); }
 .provider-list { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px 24px; margin: 0; padding: 0; list-style: none; }
 .provider-item { display: flex; align-items: center; gap: 7px; white-space: nowrap; font-size: 13px; font-weight: 500; color: var(--secondary); }
 .provider-icon { flex: none; }
@@ -12,7 +12,7 @@
 .provider-pi .provider-icon { color: var(--provider-pi); }
 
 @media (max-width: 600px) {
-  .provider-support { position: static; margin: 0 6px 6px; padding: 14px 10px; box-shadow: none; }
+  .provider-support { padding: 14px 16px 18px; }
   .provider-caption { font-size: 12px; }
   .provider-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; max-width: 300px; margin-inline: auto; }
   .provider-item { font-size: 12px; }

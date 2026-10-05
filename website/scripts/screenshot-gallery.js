@@ -26,9 +26,10 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
 
   function showSlide(index, animate = true) {
     const targetIndex = (index + slides.length) % slides.length;
+    const isAdjacent = Math.abs(targetIndex - currentIndex) === 1;
     track.scrollTo({
       left: slides[targetIndex].offsetLeft,
-      behavior: animate && !motionPreference.matches ? "smooth" : "instant",
+      behavior: animate && isAdjacent && !motionPreference.matches ? "smooth" : "instant",
     });
     updateSelection(targetIndex);
   }

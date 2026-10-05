@@ -1,5 +1,5 @@
 // Keep one timer, and reset its delay whenever visibility or interaction changes.
-export function createGalleryRotation({ advance, updateControl, interval = 6500 }) {
+export function createGalleryRotation({ advance, updateControl, interval = 8000 }) {
   const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   let requested = !motionPreference.matches;
   let visible = false;

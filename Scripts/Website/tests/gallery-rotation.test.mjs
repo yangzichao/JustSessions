@@ -50,7 +50,7 @@ test("rotation waits until visible and always keeps exactly one timer", () => {
   harness.rotation.setVisible(true);
   harness.rotation.setVisible(true);
   assert.equal(harness.timers.size, 1);
-  assert.equal([...harness.timers.values()][0].delay, 6500);
+  assert.equal([...harness.timers.values()][0].delay, 8000);
   harness.tick();
   assert.equal(harness.advanceCount, 1);
   assert.equal(harness.timers.size, 1);
