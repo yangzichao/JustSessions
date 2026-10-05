@@ -61,7 +61,7 @@ Before publishing, build the site and check the homepage and Guide at desktop an
 
 ### Traffic counts
 
-The homepage and Guide each send one background request per page load to the independent Cloudflare Worker in `Cloudflare/WebsiteTraffic/`, on the same account as the update-feed Worker. The client in `website/scripts/traffic/` runs only on the published origin and known page paths; local previews, redirect/error pages, browser automation, Global Privacy Control, and Do Not Track produce no count. Slideshow changes do not trigger requests. It sends no cookies, credentials, full page URL, full referrer, or visitor identifier, and a blocked or failed request does not affect the website.
+The homepage and Guide each send one background request per page load to the independent Cloudflare Worker in `Cloudflare/WebsiteTraffic/`, on the same account as the update-feed Worker. The client in `website/scripts/traffic/` runs only on the published origin and known page paths; local previews, redirect/error pages, browsers declaring WebDriver automation, Global Privacy Control, and Do Not Track produce no count. Slideshow changes do not trigger requests. It sends no cookies, credentials, full page URL, full referrer, or visitor identifier, and a blocked or failed request does not affect the website.
 
 The `justsessions-website-traffic` D1 database stores aggregate counts keyed by UTC day, page (`home` or `guide`), a fixed referral category, country, and coarse device type. The Worker never stores IP addresses, raw user agents, or individual events; persisted logs and traces are disabled. A daily scheduled task removes totals older than 180 days. Cloudflare and GitHub still serve requests under their own policies. The Guide includes a concise disclosure.
 
