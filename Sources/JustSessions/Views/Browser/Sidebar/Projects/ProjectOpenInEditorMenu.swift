@@ -1,10 +1,11 @@
 import SwiftUI
 
-/// "Open project in" submenu of the project right-click menu, listing the editors installed on this Mac.
+/// "Open project in" submenu of a project's menus, listing the editors installed on this Mac.
 /// Shows nothing when no known editor is installed.
 struct ProjectOpenInEditorMenu: View {
     @ObservedObject var editorStore: ExternalEditorStore
-    let project: ProjectConversationGroup
+    let location: ProjectLocation
+    let projectDisplayName: String
     let onError: @MainActor (String) -> Void
 
     var body: some View {
@@ -24,13 +25,13 @@ struct ProjectOpenInEditorMenu: View {
             } label: {
                 Label("Open project in", systemImage: "chevron.left.forwardslash.chevron.right")
             }
-            .disabled(!project.location.folderExistsOnThisMac)
+            .disabled(!location.folderExistsOnThisMac)
         }
     }
 
     private func open(in editor: InstalledExternalEditor) {
-        let folderPath = project.location.path
-        let projectName = project.displayName
+        let folderPath = location.path
+        let projectName = projectDisplayName
         Task {
             do {
                 try await editorStore.open(folderPath: folderPath, in: editor)

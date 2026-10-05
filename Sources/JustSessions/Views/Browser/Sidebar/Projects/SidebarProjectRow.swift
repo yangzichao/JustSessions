@@ -110,20 +110,13 @@ struct SidebarProjectRow: View {
                 .font(.system(size: 11).monospacedDigit())
                 .foregroundStyle(.secondary)
                 .opacity(isHovered ? 0 : 1)
-            HStack(spacing: 0) {
-                SidebarRowMoreActionsMenu(accessibilityLabel: "More actions for \(project.displayName)") {
-                    menuItems
-                }
-                ProjectNewSessionMenu(
-                    project: project,
-                    providers: store.newSessionProviders(on: project.host),
-                    showsTitle: false,
-                    onStart: onNewSession,
-                    onOpenTerminal: { store.openPlainTerminal(in: project.location) }
-                )
-                .menuStyle(.borderlessButton)
-                .menuIndicator(.hidden)
-                .fixedSize()
+            ProjectHoverActions(
+                store: store,
+                location: project.location,
+                projectDisplayName: project.displayName,
+                onNewSession: onNewSession
+            ) {
+                menuItems
             }
             .opacity(isHovered ? 1 : 0)
             .allowsHitTesting(isHovered)
