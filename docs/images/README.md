@@ -4,7 +4,7 @@ These are unedited captures of the actual JustSessions SwiftUI and AppKit interf
 
 | Image | What it shows |
 | --- | --- |
-| [native-terminal.jpg](native-terminal.jpg) | The installed Claude Code CLI's real interactive `/help` screen beside five Open tabs under the same `orbit-web` project: two Claude Code sessions, Codex, OpenCode, and Pi. Refreshed from the same existing sample app on October 4, 2026. |
+| [native-terminal.jpg](native-terminal.jpg) | The installed Claude Code CLI's real interactive `/help` screen with **Projects** selected in the sidebar. The expanded `orbit-web` project lists five new sessions: two Claude Code sessions, Codex, OpenCode, and Pi. Refreshed from the same existing sample app on October 4, 2026. |
 | [split-terminal.jpg](split-terminal.jpg) | The selected Open tabs sidebar lists five tabs across two projects: Claude Code, a shell, Codex, OpenCode, and Pi. The split view pairs the real Claude Code CLI's command input with a shell displaying `git diff`. Refreshed from the same existing sample app on October 4, 2026. |
 | [session-overview.jpg](session-overview.jpg) | The current conversation reader, pinned projects and sessions, Projects / Open tabs navigation, per-host refresh, and reading controls. |
 | [remote-desktop-sessions.jpg](remote-desktop-sessions.jpg) | A selected Claude Code conversation under the sample `dev-desktop` SSH host. |
