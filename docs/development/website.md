@@ -1,6 +1,6 @@
 # Product website
 
-The public website is at <https://yangzichao.github.io/JustSessions/>. Its source is static HTML and CSS in `website/`, with small native JavaScript modules for the screenshot gallery. It has no framework, external fonts, analytics, or package dependencies. Every Download button, including the homepage and Guide navigation bars, points directly to the latest GitHub Release DMG. It starts a download rather than scrolling to a section or opening a release page, so an app release does not require a website update.
+The public website is at <https://yangzichao.github.io/JustSessions/>. Its source is static HTML and CSS in `website/`, with small native JavaScript modules for the screenshot gallery and anonymous traffic counts. It has no framework, external fonts, or package dependencies. Every Download button, including the homepage and Guide navigation bars, points directly to the latest GitHub Release DMG. It starts a download rather than scrolling to a section or opening a release page, so an app release does not require a website update.
 
 ## Build and preview
 
@@ -58,6 +58,23 @@ Before publishing, build the site and check the homepage and Guide at desktop an
 `website/social/preview.html` is the editable source for the checked-in `website/social/social-preview.png`. Serve the repository root locally, open the source in a browser with a 1200 × 630 viewport and device scale factor 1, then capture the `.social-card` element as a 1200 × 630 PNG. Only the PNG is published. The image uses the existing brand artwork; it does not contain a fabricated app screenshot.
 
 ## Deployment and discovery
+
+### Traffic counts
+
+The homepage and Guide each send one background request per page load to the independent Cloudflare Worker in `Cloudflare/WebsiteTraffic/`, on the same account as the update-feed Worker. The client in `website/scripts/traffic/` runs only on the published origin and known page paths; local previews, redirect/error pages, browser automation, Global Privacy Control, and Do Not Track produce no count. Slideshow changes do not trigger requests. It sends no cookies, credentials, full page URL, full referrer, or visitor identifier, and a blocked or failed request does not affect the website.
+
+The `justsessions-website-traffic` D1 database stores aggregate counts keyed by UTC day, page (`home` or `guide`), a fixed referral category, country, and coarse device type. The Worker never stores IP addresses, raw user agents, or individual events; persisted logs and traces are disabled. A daily scheduled task removes totals older than 180 days. Cloudflare and GitHub still serve requests under their own policies. The Guide includes a concise disclosure.
+
+```sh
+make website-traffic         # Daily page views, sources, countries, and devices for the last 30 days
+make website-traffic-test    # Worker boundary tests, also included in make website-check
+make website-traffic-deploy  # Apply D1 migrations and deploy the independent Worker
+./Cloudflare/WebsiteTraffic/show-website-traffic.sh 90
+```
+
+These are page views, not unique visitors: reloads count again, and blocked scripts or privacy opt-outs are absent. Known bot user agents are excluded, but the public collection endpoint is not proof of human traffic. Source categories depend on the referrer the browser exposes; missing referrers appear as direct. Read aggregate data through the authenticated D1 command or Cloudflare dashboard; the Worker exposes no public statistics endpoint.
+
+### Publishing
 
 The independent `Publish JustSessions website` workflow tests, builds, and deploys the website when relevant files change on `main`. This includes website sources, screenshots, branding, website scripts, and the app capability sources and documentation checked by the website build. It does not build or publish the app. Run `make verify` and, for workflow changes, `actionlint` locally before pushing. See [build and release](build-and-release.md).
 

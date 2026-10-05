@@ -1,0 +1,24 @@
+{
+	"$schema": "https://unpkg.com/wrangler@4/config-schema.json",
+	"name": "justsessions-website-traffic",
+	"account_id": "8b165b15e729dc4442baca8094edc756",
+	"main": "src/worker.js",
+	"compatibility_date": "2026-10-04",
+	"workers_dev": true,
+	"d1_databases": [
+		{
+			"binding": "WEBSITE_TRAFFIC_DATABASE",
+			"database_name": "justsessions-website-traffic",
+			"database_id": "f38e7815-16f1-46c9-a799-24acab270615"
+		}
+	],
+	"triggers": {
+		"crons": [
+			"17 3 * * *"
+		]
+	},
+	// Store aggregate counts only; persisted request logs and traces are disabled.
+	"observability": {
+		"enabled": false
+	}
+}
