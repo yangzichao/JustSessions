@@ -40,7 +40,6 @@ function createHarness(reducedMotion = false) {
       timer.callback();
     },
     setHidden(hidden) { document.hidden = hidden; listeners.get("visibilitychange")(); },
-    setReducedMotion(matches) { preference.matches = matches; listeners.get("motion")(); },
   };
 }
 
@@ -56,14 +55,9 @@ test("rotation waits until visible and always keeps exactly one timer", () => {
   assert.equal(harness.timers.size, 1);
 });
 
-test("hover, background tabs, and leaving the viewport suspend automatic rotation", () => {
+test("background tabs and leaving the viewport suspend automatic rotation", () => {
   const harness = createHarness();
   harness.rotation.setVisible(true);
-  harness.rotation.setHovered(true);
-  assert.equal(harness.timers.size, 0);
-  assert.deepEqual(harness.controlState, { requested: true, running: false });
-  harness.rotation.setHovered(false);
-  assert.equal(harness.timers.size, 1);
   harness.setHidden(true);
   assert.equal(harness.timers.size, 0);
   harness.setHidden(false);
@@ -72,12 +66,10 @@ test("hover, background tabs, and leaving the viewport suspend automatic rotatio
   assert.equal(harness.timers.size, 0);
 });
 
-test("manual stop survives visibility and hover changes until explicitly restarted", () => {
+test("manual stop survives visibility changes until explicitly restarted", () => {
   const harness = createHarness();
   harness.rotation.setVisible(true);
   harness.rotation.stop();
-  harness.rotation.setHovered(true);
-  harness.rotation.setHovered(false);
   harness.setHidden(true);
   harness.setHidden(false);
   assert.equal(harness.timers.size, 0);
@@ -88,14 +80,11 @@ test("manual stop survives visibility and hover changes until explicitly restart
   assert.equal(harness.timers.size, 0);
 });
 
-test("reduced motion disables initial playback and cancels an active timer when enabled", () => {
+test("automatic playback starts even when reduced motion is preferred", () => {
   const harness = createHarness(true);
   harness.rotation.setVisible(true);
-  assert.equal(harness.timers.size, 0);
-  harness.rotation.toggle();
   assert.equal(harness.timers.size, 1);
-  harness.setReducedMotion(true);
-  assert.equal(harness.timers.size, 0);
-  harness.setReducedMotion(false);
-  assert.equal(harness.timers.size, 0);
+  harness.tick();
+  assert.equal(harness.advanceCount, 1);
+  assert.deepEqual(harness.controlState, { requested: true, running: true });
 });

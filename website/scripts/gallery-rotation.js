@@ -1,14 +1,12 @@
-// Keep one timer, and reset its delay whenever visibility or interaction changes.
+// Start automatically and keep one timer while the gallery is visible.
 export function createGalleryRotation({ advance, updateControl, interval = 8000 }) {
-  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
-  let requested = !motionPreference.matches;
+  let requested = true;
   let visible = false;
-  let hovered = false;
   let timer;
 
   function refresh() {
     window.clearTimeout(timer);
-    const running = requested && visible && !hovered && !document.hidden;
+    const running = requested && visible && !document.hidden;
     updateControl(requested, running);
     if (running) {
       timer = window.setTimeout(() => {
@@ -19,15 +17,10 @@ export function createGalleryRotation({ advance, updateControl, interval = 8000 
   }
 
   document.addEventListener("visibilitychange", refresh);
-  motionPreference.addEventListener("change", () => {
-    if (motionPreference.matches) requested = false;
-    refresh();
-  });
 
   return {
     stop() { requested = false; refresh(); },
     toggle() { requested = !requested; refresh(); },
     setVisible(value) { visible = value; refresh(); },
-    setHovered(value) { hovered = value; refresh(); },
   };
 }

@@ -32,7 +32,7 @@
 
 @media (max-width: 650px) {
   .gallery-slide { grid-template-columns: 1fr; gap: 18px; padding: 20px; }
-  .gallery-caption { padding: 0; min-height: 215px; }
+  .gallery-caption { padding: 0; min-height: 180px; }
   .gallery-caption .eyebrow { margin-bottom: 10px; }
   .gallery-caption h2 { margin-bottom: 10px; font-size: 25px; }
   .gallery-description { font-size: 14px; margin-bottom: 2px; }
@@ -47,7 +47,7 @@
 
 @media (max-width: 360px) {
   .gallery-slide { padding: 16px; }
-  .gallery-caption { min-height: 250px; }
+  .gallery-caption { min-height: 210px; }
   .gallery-pagination button { padding-inline: 4px; }
   .gallery-arrow, .gallery-rotation { width: 26px; }
 }

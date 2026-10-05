@@ -52,13 +52,13 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   gallery.querySelector("[data-gallery-next]").addEventListener("click", () => manuallyShow(currentIndex + 1));
   pageButtons.forEach((button, index) => button.addEventListener("click", () => manuallyShow(index)));
   rotationButton.addEventListener("click", () => rotation.toggle());
-  gallery.addEventListener("mouseenter", () => rotation.setHovered(true));
-  gallery.addEventListener("mouseleave", () => rotation.setHovered(false));
   gallery.addEventListener("focusin", (event) => {
     if (event.target !== rotationButton) rotation.stop();
   });
   track.addEventListener("pointerdown", () => rotation.stop(), { passive: true });
-  track.addEventListener("wheel", () => rotation.stop(), { passive: true });
+  track.addEventListener("wheel", (event) => {
+    if (Math.abs(event.deltaX) > Math.abs(event.deltaY) || event.shiftKey) rotation.stop();
+  }, { passive: true });
   track.addEventListener("keydown", (event) => {
     if (event.target !== track || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
     event.preventDefault();
