@@ -1,11 +1,11 @@
 /* Pair the real close-tab choice with the terminal that can be reattached. */
 .gallery-terminal-persistence { position: relative; }
-.gallery-close-choice { position: absolute; top: 18%; right: 7%; width: min(36%, 340px); padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); box-shadow: 0 12px 36px var(--shadow); }
-.gallery-close-choice a { display: block; border-radius: 10px; overflow: hidden; }
+.gallery-close-choice { position: absolute; top: 18%; right: 7%; width: min(36%, 340px); filter: drop-shadow(0 8px 20px var(--shadow)); }
+/* Match the captured dialog's 52px corners at its original 520 × 476 size. */
+.gallery-close-choice a { display: block; border-radius: 10% / 11%; overflow: hidden; }
 .gallery-close-choice a:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .gallery-close-choice img { display: block; width: 100%; height: auto; }
 
 @media (max-width: 650px) {
-  .gallery-close-choice { top: 3%; right: 3%; width: 52%; padding: 4px; border-radius: 8px; }
-  .gallery-close-choice a { border-radius: 6px; }
+  .gallery-close-choice { top: 3%; right: 3%; width: 52%; }
 }
