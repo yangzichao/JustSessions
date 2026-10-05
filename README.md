@@ -5,7 +5,7 @@
 <h1 align="center">JustSessions — AI Coding Session Manager for macOS</h1>
 
 <p align="center">
-  <b>Find the right AI coding session. Pick up where you left off.</b><br>
+  <b>Lightweight. All your sessions.</b><br>
   A lightweight, native macOS app for Claude Code, OpenAI Codex CLI, Google Antigravity CLI, Kiro CLI, OpenCode, and Pi.<br>
   Local projects, remote machines over SSH, and sessions that keep running with tmux.
 </p>
@@ -22,7 +22,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yangzichao/JustSessions" alt="MIT license"></a>
 </p>
 
-**Find the conversation you need without hunting through terminal tabs.** JustSessions brings your AI coding history into one native Mac app. Search projects and sessions, preview their conversations, and resume in the original CLI and project folder.
+**A lightweight home for your coding sessions.** JustSessions organizes the history your CLIs already create in one native Mac app. Search projects and sessions, preview their conversations, and resume in the original CLI and project folder.
 
 [Website](https://yangzichao.github.io/JustSessions/) · [Download](#download) · [Getting started](docs/guides/getting-started.md) · [SSH](#remote-sessions-over-ssh) · [tmux](#keep-sessions-running-with-tmux) · [Supported CLIs](#supported-clis) · [Documentation](docs/README.md)
 
