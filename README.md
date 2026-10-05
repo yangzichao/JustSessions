@@ -74,10 +74,10 @@ Use a `~/.ssh/config` alias or `user@hostname`. [Set up an SSH host](docs/guides
 3. Click the session in the sidebar to reattach to the running process.
 
 <p align="center">
-  <img src="docs/images/tmux-keep-running.jpg" width="360" alt="JustSessions close-tab dialog offering Keep running to leave a terminal session running in tmux">
+  <img src="docs/images/tmux-keep-running.jpg" width="900" alt="The full JustSessions window with the same Claude Code CLI reattached in tmux after quitting and reopening the app">
 </p>
 
-*The app's actual close-tab dialog, shown with a sample tmux process.*
+*Real Claude Code CLI, reattached after quitting and reopening the app. Sample project.*
 
 No separate local tmux install is needed. Direct `swift run` builds need **tmux 3.3+**; SSH hosts need their own tmux. Keep the machine awake. Without tmux, closing the tab ends the terminal process. [How session persistence works](docs/guides/session-storage.md#terminal-persistence).
 

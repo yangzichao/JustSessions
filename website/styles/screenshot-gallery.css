@@ -12,7 +12,6 @@
 .gallery-image img { width: 100%; height: 100%; object-fit: contain; }
 .gallery-zoom { position: absolute; right: 10px; bottom: 10px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--secondary); font-size: 10px; opacity: 0; }
 .gallery-image:hover .gallery-zoom, .gallery-image:focus-visible .gallery-zoom { opacity: 1; }
-.gallery-slide-dialog .gallery-image { padding: 16px; }
 .gallery-controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 20px 20px; }
 .gallery-controls[hidden] { display: none; }
 .gallery-controls button { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--secondary); font: inherit; cursor: pointer; }
