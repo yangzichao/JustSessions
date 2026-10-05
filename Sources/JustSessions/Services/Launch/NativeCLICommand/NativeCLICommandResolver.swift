@@ -38,7 +38,8 @@ struct NativeCLICommandResolver: @unchecked Sendable {
         searchDirectories.joined(separator: ":")
     }
 
-    /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable.
+    /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable. It stands in for
+    /// `defaultStartCommand`, so the app's arguments that follow leave out what it holds.
     func resolve(
         conversation: Conversation,
         action: ConversationAction,
@@ -84,13 +85,15 @@ struct NativeCLICommandResolver: @unchecked Sendable {
         environment.merge(reporterLaunch?.environment ?? [:]) { _, reporterValue in reporterValue }
         // Codex names the thread its CLI is in only in the terminal title, and only when asked.
         let followingArguments = provider == .codex ? CodexThreadTitle.launchArguments : reporterLaunch?.arguments ?? []
-        let cliArguments = followingArguments + arguments
 
         return NativeCLICommand(
             executablePath: executablePath,
             arguments: customStartCommand.map {
-                CLIStartCommandLine.thisMacShellArguments(startCommand: $0, arguments: cliArguments)
-            } ?? cliArguments,
+                CLIStartCommandLine.thisMacShellArguments(
+                    startCommand: $0,
+                    arguments: followingArguments + provider.argumentsAfterCustomStartCommand(arguments)
+                )
+            } ?? followingArguments + arguments,
             workingDirectory: projectPath,
             environment: NativeCLICommand.environmentEntries(environment)
         )

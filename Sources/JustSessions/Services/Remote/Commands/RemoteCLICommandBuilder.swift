@@ -10,7 +10,8 @@ struct RemoteCLICommandBuilder {
         self.inheritedEnvironment = inheritedEnvironment
     }
 
-    /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable.
+    /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable. It stands in for
+    /// `defaultStartCommand`, so the app's arguments that follow leave out what it holds.
     func command(
         host: String,
         provider: ConversationProvider,
@@ -61,7 +62,10 @@ struct RemoteCLICommandBuilder {
     ) -> String {
         let customStartCommand = CLIStartCommandLine.customCommand(startCommand)
         let cliInvocation = customStartCommand.map {
-            CLIStartCommandLine.remoteInvocation(startCommand: $0, arguments: arguments)
+            CLIStartCommandLine.remoteInvocation(
+                startCommand: $0,
+                arguments: provider.argumentsAfterCustomStartCommand(arguments)
+            )
         } ?? ([provider.executableName] + arguments.map(ShellQuoting.quoted)).joined(separator: " ")
         let directCommand = "cd \(ShellQuoting.quoted(projectPath)) && exec \(cliInvocation)"
         guard let tmuxSessionName else { return loginShellCommand(directCommand) }

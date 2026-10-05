@@ -1,9 +1,9 @@
 import Foundation
 
-/// The command each tool's CLI starts with on each host, when it is not the tool's own executable name: a wrapper,
-/// another path, or the CLI with flags of your own, such as `~/bin/claude --dangerously-skip-permissions`. It is set
-/// in the New session sheet and starts new sessions, resumes, and branches alike. The app adds its own arguments
-/// after it, such as the session to resume.
+/// The command each tool's CLI starts with on each host, when it is not the one the app uses, `defaultStartCommand`:
+/// a wrapper, another path, or the CLI with flags of your own, such as `~/bin/claude --dangerously-skip-permissions`
+/// or `kiro-cli chat --trust-all-tools`. It is set in the New session sheet and starts new sessions, resumes, and
+/// branches alike, for every tool. The app adds its own arguments after it, such as the session to resume.
 struct CLIStartCommands: Equatable {
     static let userDefaultsKey = "cliStartCommands"
 
@@ -22,16 +22,17 @@ struct CLIStartCommands: Equatable {
         userDefaults.set(commandsByHostAndTool, forKey: Self.userDefaultsKey)
     }
 
-    /// The command set for the tool on the host; nil when it starts as its executable name.
+    /// The command set for the tool on the host; nil when it starts as the app starts it, see `defaultStartCommand`.
     func customCommand(for provider: ConversationProvider, on host: SessionHost) -> String? {
         commandsByHostAndTool[Self.storageKey(provider: provider, host: host)]
     }
 
-    /// An empty command, or the tool's executable name alone, goes back to starting the tool as that name.
+    /// An empty command, the tool's executable name alone, or the command the app starts it with goes back to that
+    /// command.
     mutating func setCommand(_ proposedCommand: String, for provider: ConversationProvider, on host: SessionHost) {
         let command = Self.normalizedCommand(proposedCommand)
         let key = Self.storageKey(provider: provider, host: host)
-        if command.isEmpty || command == provider.executableName {
+        if command.isEmpty || command == provider.executableName || command == provider.defaultStartCommand {
             commandsByHostAndTool.removeValue(forKey: key)
         } else {
             commandsByHostAndTool[key] = command

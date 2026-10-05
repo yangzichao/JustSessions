@@ -14,13 +14,16 @@ struct CLIStartCommandsTests {
         #expect(commands.customCommand(for: .codex, on: .ssh("cloud")) == nil)
     }
 
-    @Test func anEmptyCommandOrTheExecutableNameAloneGoesBackToTheExecutable() {
+    @Test func anEmptyCommandOrTheToolsOwnGoesBackToIt() {
         var commands = CLIStartCommands()
         commands.setCommand("claude --dangerously-skip-permissions", for: .claude, on: .thisMac)
         commands.setCommand("codex --yolo", for: .codex, on: .thisMac)
 
+        commands.setCommand("kiro-cli chat --trust-all-tools", for: .kiro, on: .thisMac)
+
         commands.setCommand("  ", for: .claude, on: .thisMac)
         commands.setCommand(" codex ", for: .codex, on: .thisMac)
+        commands.setCommand("kiro-cli chat", for: .kiro, on: .thisMac)
 
         #expect(commands == CLIStartCommands())
     }

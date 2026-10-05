@@ -11,7 +11,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Transcript/`: the reading width, a readable column or the full window, shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
 - `Models/Customizations/`: session and project names you set, and pins.
-- `Models/StartCommands/`: the command each tool's CLI starts with on each host, when it is not the tool's own name, set in the New session sheet.
+- `Models/StartCommands/`: the command each tool's CLI starts with on each host, when it is not the one the app uses, set in the New session sheet; and what that command stands in for, `kiro-cli chat` for Kiro CLI and the executable for the other tools.
 - `Models/Onboarding/`: the onboarding tour's stops, the tips a fresh install shows once each, and when each tip is due from what the window shows.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
