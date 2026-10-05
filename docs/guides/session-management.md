@@ -44,7 +44,7 @@ Use the sidebar to find a conversation, read its preview, and resume it in its o
 | Shortcut | Action |
 | --- | --- |
 | ⌘T or ⌘N | Open the new session sheet using the current tab's host, CLI, and project folder. |
-| ⌘⇧N | Open another workspace window. |
+| ⌘⇧N | Open another workspace window, as **New Window** in the Dock icon's right-click menu does. |
 | ⌘W | Close the selected terminal tab, with the same **Keep running / End session** confirmation as its close button. |
 | ⌘⇧] or Ctrl+Tab | Select the next terminal tab, wrapping to the first. |
 | ⌘⇧[ or Ctrl+Shift+Tab | Select the previous terminal tab, wrapping to the last. |

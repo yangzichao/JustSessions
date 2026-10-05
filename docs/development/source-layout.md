@@ -60,6 +60,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/Tabs/Dragging/`: the drag gesture tabs and group labels share, which takes over from their buttons once the pointer moves.
 - `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, joined for a split's two tabs, how tabs narrow to share the bar as more open, and the terminal colors the selected tab takes on.
 - `Views/Browser/Split/`: what a shown split view draws around its panes, as Chrome does: the area's terminal-colored background, each pane's rounded outline with its mini toolbar in the corner, and the resize area between the panes, which you drag to resize them.
+- `Views/Browser/DockMenu/`: the Dock icon's right-click menu, whose New Window opens a workspace window through SwiftUI's `openWindow`, handed over by each workspace window as it appears.
 - `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help & feedback in the same sheet.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
 - `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, and multi-selection. `SidebarRowMoreActionsMenu` is the ⋯ that project and session rows show under the pointer, which opens the row's right-click menu.
