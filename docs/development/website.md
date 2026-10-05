@@ -57,7 +57,11 @@ Before publishing, build the site and check the homepage and Guide at desktop an
 
 ## Social preview
 
-`website/social/preview.html` is the editable source for the checked-in `website/social/social-preview.png`. Serve the repository root locally, open the source in a browser with a 1200 × 630 viewport and device scale factor 1, then capture the `.social-card` element as a 1200 × 630 PNG. Only the PNG is published. The image uses the existing brand artwork; it does not contain a fabricated app screenshot.
+`website/social/preview.html` is the editable source for the checked-in `website/social/social-preview.png`. Serve the repository root locally, open the source in a browser with a 1200 × 630 viewport and device scale factor 1, then capture the `.social-card` element as a 1200 × 630 PNG. Only the PNG is published. The card pairs “Nothing extra. Just sessions.” with the existing brand artwork and the real app capture in `docs/images/native-terminal.jpg`: Claude Code's terminal and several agents under one project. The app window extends slightly beyond the card's right edge; its sidebar and CLI remain visible. Keep the headline aligned with the homepage and replace the capture when the app UI changes. Update the matching Open Graph and Twitter image alt text on both the homepage and Guide. Recording and sample-data details remain in [screenshot provenance](../images/README.md).
+
+Slack and other sharing clients read the published Open Graph / Twitter metadata to select this image; they do not capture the homepage slideshow. The build gives the shared PNG a content-hashed URL, including in structured app data. After deployment, check both page metadata and the PNG with a Slackbot-style request. This proves the resources are accessible, rather than verifying the final Slack message layout. Slack can cache link metadata; use its [URL debugger](https://api.slack.com/tools/unfurl-debugger) or a private Slack message to inspect the actual preview.
+
+If the browser exports JPEG, convert it before saving the published PNG: `sips -s format png /path/to/capture.jpg --out website/social/social-preview.png`. Confirm the output is a 1200 × 630 PNG with `file website/social/social-preview.png`; changing the extension alone does not change the format.
 
 ## Deployment and discovery
 
