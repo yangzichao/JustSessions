@@ -7,7 +7,7 @@ A page asks for a partial with a line like `<!-- partial: site-header -->`. The 
 import re
 
 PARTIAL_PLACEHOLDER_PATTERN = re.compile(r"^(?P<indentation> *)<!-- partial: (?P<partial_name>[\w-]+) -->$", re.MULTILINE)
-PAGES_WITH_SHARED_PARTIALS = ("index.html", "guide.html", "help.html")
+PAGES_WITH_SHARED_PARTIALS = ("index.html", "guide.html")
 # Each shared partial: the element only it may define, and a readable name for errors.
 SHARED_PARTIALS = {"site-header": ("<header", "top bar"), "site-footer": ("<footer", "footer")}
 

@@ -39,7 +39,6 @@ class SharedPartialTests(unittest.TestCase):
                     self.assertEqual(len(comparable_markup), 1)
                     self.assertNotIn("aria-current", markup["index.html"])
                     self.assertIn('href="./guide.html" aria-current="page"', markup["guide.html"])
-                    self.assertIn('href="./help.html" aria-current="page"', markup["help.html"])
 
     def test_page_with_its_own_top_bar_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary_directory:

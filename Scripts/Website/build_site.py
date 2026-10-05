@@ -21,7 +21,7 @@ def build_site():
     WEBSITE_OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
     asset_directory = WEBSITE_OUTPUT_DIRECTORY / "assets"
     asset_directory.mkdir(exist_ok=True)
-    document_names = tuple(page_path or "index.html" for page_path in PUBLIC_PAGE_PATHS) + ("404.html", "feedback.html")
+    document_names = tuple(page_path or "index.html" for page_path in PUBLIC_PAGE_PATHS) + ("404.html", "help.html", "feedback.html")
     for document_name in document_names:
         shutil.copy2(WEBSITE_SOURCE_DIRECTORY / document_name, WEBSITE_OUTPUT_DIRECTORY / document_name)
         insert_shared_partials(WEBSITE_OUTPUT_DIRECTORY / document_name, WEBSITE_SOURCE_DIRECTORY / "partials")
@@ -36,7 +36,7 @@ def build_site():
     version_script_imports(script_directory)
     for image_name in ("session-overview.jpg", "native-terminal.jpg", "split-terminal.jpg", "remote-desktop-sessions.jpg", "tmux-keep-running.jpg", "tmux-close-choice.jpg"):
         shutil.copy2(REPOSITORY_DIRECTORY / "docs/images" / image_name, asset_directory / image_name)
-    for asset_path in ("Branding/SVG/mark.svg", "Branding/PNG/app-icon-256.png", "website/social/social-preview.png"):
+    for asset_path in ("Branding/SVG/mark.svg", "Branding/ThirdParty/Octicons/mark-github-16.svg", "Branding/PNG/app-icon-256.png", "website/social/social-preview.png"):
         shutil.copy2(REPOSITORY_DIRECTORY / asset_path, asset_directory / Path(asset_path).name)
     for document_path in WEBSITE_OUTPUT_DIRECTORY.glob("*.html"):
         document_content = document_path.read_text()

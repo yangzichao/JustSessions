@@ -130,11 +130,11 @@ Build locally with `make`; the app is written to `dist/JustSessions.app`. Use `m
 - [Source layout](docs/development/source-layout.md): where each feature lives.
 - [Counting update checks](docs/development/update-checks.md): how daily update checks estimate active installs without collecting user data.
 - [Website development](docs/development/website.md): preview, validate, and publish the GitHub Pages site.
-- [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Help](https://yangzichao.github.io/JustSessions/help.html)
+- [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Guide](https://yangzichao.github.io/JustSessions/guide.html)
 
 On first launch, a short tour points out your sessions, **New session**, and SSH hosts, and later tips explain each feature the first time you reach it; choose **Help → Take the Tour** to see the tour and its tips again. In the app, open **Settings → Help** or **Help → JustSessions Help** for a brief feature overview, SSH setup, what to check when a session is missing, and every keyboard shortcut. Install **tmux on each remote host** to keep its sessions running after a disconnect or closing a tab.
 
-For feedback, choose **Send us feedback** at the bottom of **Settings → General** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com), or **Report an issue** to open a GitHub issue. Both start with your app and macOS versions filled in, and both are also on the website's Help page.
+For feedback, choose **Send us feedback** at the bottom of **Settings → General** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com), or **Report an issue** to open a GitHub issue. Both start with your app and macOS versions filled in, and both are also in the website Guide’s [Feedback section](https://yangzichao.github.io/JustSessions/guide.html#feedback).
 
 ## License
 

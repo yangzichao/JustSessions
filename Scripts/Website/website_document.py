@@ -37,7 +37,7 @@ class WebsiteDocument(HTMLParser):
             assert "alt" in attributes, "Image is missing alt text"
             assert "width" in attributes and "height" in attributes, "Image needs dimensions"
         if tag == "meta":
-            metadata_name = attributes.get("name", attributes.get("property"))
+            metadata_name = attributes.get("name") or attributes.get("property") or attributes.get("http-equiv")
             if metadata_name:
                 assert metadata_name not in self.metadata, f"Duplicate metadata: {metadata_name}"
                 self.metadata[metadata_name] = attributes.get("content")

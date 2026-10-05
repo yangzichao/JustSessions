@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 WEBSITE_URL = "https://yangzichao.github.io/JustSessions/"
-PUBLIC_PAGE_PATHS = ("", "guide.html", "help.html")
+PUBLIC_PAGE_PATHS = ("", "guide.html")
 
 
 def validate_metadata(documents, website_directory: Path):
@@ -46,7 +46,7 @@ def validate_metadata(documents, website_directory: Path):
     assert structured_data["operatingSystem"] == "macOS 14 or later (Apple Silicon)"
     assert structured_data["offers"]["price"] == "0"
     assert structured_data["downloadUrl"] in homepage.references
-    assert structured_data["softwareHelp"]["url"] == WEBSITE_URL + "help.html"
+    assert structured_data["softwareHelp"]["url"] == WEBSITE_URL + "guide.html"
     assert "./guide.html" in homepage.references, "Homepage needs a guide entry"
 
     not_found_page = documents[(website_directory / "404.html").resolve()]
