@@ -18,6 +18,7 @@ struct SidebarSessionRow: View {
     let onClick: (Conversation) -> Void
     let onRename: (Conversation) -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
+    let onCloseTab: (UUID) -> Void
 
     @State private var isHovered = false
 
@@ -92,7 +93,8 @@ struct SidebarSessionRow: View {
                 store: store,
                 conversation: conversation,
                 onRename: { onRename(conversation) },
-                onDelete: { onRequestDeletion(.conversation(conversation)) }
+                onDelete: { onRequestDeletion(.conversation(conversation)) },
+                onCloseTab: onCloseTab
             )
         }
     }

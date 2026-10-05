@@ -20,6 +20,7 @@ struct SidebarProjectSection: View {
     let onRemoveSelectedProjects: () -> Void
     let onRemoveSelectedProjectsAndDeleteSessions: () -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
+    let onCloseTab: (UUID) -> Void
 
     /// The project row, then its sessions while it is expanded, as separate views: the sidebar's lazy list then
     /// builds only the rows in sight, even for a project with hundreds of sessions.
@@ -72,7 +73,8 @@ struct SidebarProjectSection: View {
                     selectedConversations: selectedConversations,
                     onClick: onClickConversation,
                     onRename: onRenameConversation,
-                    onRequestDeletion: onRequestDeletion
+                    onRequestDeletion: onRequestDeletion,
+                    onCloseTab: onCloseTab
                 )
                 .sidebarIndentGuide(
                     isFirstRow: pendingNewSessionTerminals.isEmpty && conversation.id == project.conversations.first?.id,
