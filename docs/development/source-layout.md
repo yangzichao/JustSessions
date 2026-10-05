@@ -25,7 +25,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
-- `Services/Onboarding/`: saves which onboarding tips have shown, and whether the install shows them at all, decided once from whether it was fresh.
+- `Services/Onboarding/`: saves which onboarding tips have shown, and whether the install shows them at all, decided once from whether it was fresh; Help's Take the tour shows them all again.
 - `Services/Permissions/`: reads each permission's status without asking for it, and the System Settings page that changes it.
 - `Services/Startup/`: registers the app as a macOS login item and reads its current system approval status.
 - `Services/Appearance/`: saves the app's appearance and theme, sets the appearance on every window, and gives terminals a newly chosen theme's colors.
@@ -76,7 +76,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.
 - `Models/Transcript/Search/`, `Services/Transcript/Search/`, and `Views/Preview/Search/`: temporary per-reader text matching, keyboard shortcuts, highlights, and navigation to occurrences in the displayed transcript.
 - `Views/Dialogs/`: the store's alert and the deletion confirmation. `ClickOutside/` closes a sheet, alert, or dialog, as Cancel would, when you click the window around it.
-- `Views/Onboarding/`: starts the tour on a fresh install's first window, or from Help, then each tip the first time its part of the window comes into use, such as reading a session or opening a tab; and the tip card with its copy. `Popover/` shows the card beside the control it is about, hiding it while a sheet is open or the control is scrolled out of sight.
+- `Views/Onboarding/`: starts the tour on a fresh install's first window, or from Help, then each tip the first time its part of the window comes into use, such as reading a session, opening a tab, or opening a second one for split view; and the tip card with its copy. `Popover/` shows the card beside the control it is about, hiding it while a sheet is open or the control is scrolled out of sight.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
 - `Views/Settings/`: the Settings sheet, with General (language, startup, notifications, and software updates), Appearance, Permissions, and Help & feedback pages, each in a `SettingsTabPage` of the one size they share.
@@ -84,7 +84,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Settings/Permissions/`: each permission's status and a link to its page in System Settings.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
-- `Views/Settings/Help/`: the Help & feedback page: feature overview, SSH setup, the keyboard shortcut list (`Shortcuts/`), the user guide, and links to create a GitHub issue or email feedback. `Models/App/AppLinks.swift` holds the destinations.
+- `Views/Settings/Help/`: the Help & feedback page, one `HelpSection` each: the tour and user guide, how each part of the window works, SSH setup, what to check when a session is missing, feedback, and the keyboard shortcut list (`Shortcuts/`). `Models/App/AppLinks.swift` holds the destinations, and `Models/App/Feedback/` starts a GitHub issue or email with the app and macOS versions.
 - `Views/Theme/`: the chosen theme's colors, and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 

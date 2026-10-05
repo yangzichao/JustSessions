@@ -13,4 +13,6 @@ enum OnboardingTip: String, CaseIterable, Sendable {
     case keepRunning
     /// A second tab: Open tabs, which lists them all.
     case openTabs
+    /// A second tab, while the selected one is in no split: split view, which shows two tabs side by side.
+    case splitView
 }

@@ -132,9 +132,9 @@ Build locally with `make`; the app is written to `dist/JustSessions.app`. Use `m
 - [Website development](docs/development/website.md): preview, validate, and publish the GitHub Pages site.
 - [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases) · [Help](https://yangzichao.github.io/JustSessions/help.html)
 
-On first launch, a short tour points out your sessions, **New session**, and SSH hosts, and later tips explain each feature the first time you reach it; choose **Help → Take the Tour** to see the tour again. In the app, open **Settings → Help & feedback** or **Help → JustSessions Help** for a brief feature overview, SSH setup, and every keyboard shortcut. Install **tmux on each remote host** to keep its sessions running after a disconnect or closing a tab.
+On first launch, a short tour points out your sessions, **New session**, and SSH hosts, and later tips explain each feature the first time you reach it; choose **Help → Take the Tour** to see the tour and its tips again. In the app, open **Settings → Help & feedback** or **Help → JustSessions Help** for a brief feature overview, SSH setup, what to check when a session is missing, and every keyboard shortcut. Install **tmux on each remote host** to keep its sessions running after a disconnect or closing a tab.
 
-For feedback, choose **GitHub issue** in Help, or **Email** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com). Both options are also on the website's Help page.
+For feedback, choose **Open a GitHub issue** in Help, or **Email feedback** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com). Both start with your app and macOS versions filled in, and both are also on the website's Help page.
 
 ## License
 

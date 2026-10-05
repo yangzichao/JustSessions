@@ -131,6 +131,7 @@ struct TerminalTab: View {
             onHoverChange(isHovering)
         }
         .onboardingTourStop(isSelected ? .keepRunning : nil)
+        .onboardingTourStop(isSelected ? .splitView : nil)
     }
 
     /// The split view entries, as Chrome's tab menu offers them, each a submenu but the first.

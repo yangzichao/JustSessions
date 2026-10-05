@@ -54,12 +54,14 @@
 	<string>%lld sessions with open terminals will be skipped.</string>
 	<key>%lld tool calls</key>
 	<string>%lld tool calls</string>
-	<key>**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs.</key>
-	<string>**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs.</string>
-	<key>**Resume** continues in the original CLI and folder. **Branch** tries another approach.</key>
-	<string>**Resume** continues in the original CLI and folder. **Branch** tries another approach.</string>
+	<key>**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘8 go to a tab by its position, and ⌘9 to the last.</key>
+	<string>**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘8 go to a tab by its position, and ⌘9 to the last.</string>
 	<key>**Resume** continues this conversation in its CLI, in its original folder. Double-clicking the session in the sidebar does the same.</key>
 	<string>**Resume** continues this conversation in its CLI, in its original folder. Double-clicking the session in the sidebar does the same.</string>
+	<key>**Resume**, or a double-click, continues the conversation in its CLI and original folder. **Branch**, where the CLI supports it, starts a new session from a copy and leaves the original as it was.</key>
+	<string>**Resume**, or a double-click, continues the conversation in its CLI and original folder. **Branch**, where the CLI supports it, starts a new session from a copy and leaves the original as it was.</string>
+	<key>**⌘N** starts a session in any installed CLI, or a plain terminal. Tabs group by project, and **Open tabs** in the sidebar lists them all. Right-click a tab to show two side by side.</key>
+	<string>**⌘N** starts a session in any installed CLI, or a plain terminal. Tabs group by project, and **Open tabs** in the sidebar lists them all. Right-click a tab to show two side by side.</string>
 	<key>1 message</key>
 	<string>1 message</string>
 	<key>1 session with an open terminal will be skipped.</key>
@@ -166,16 +168,20 @@
 	<string>Check Again</string>
 	<key>Check for updates</key>
 	<string>Check for updates</string>
+	<key>Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.</key>
+	<string>Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.</string>
 	<key>Checking the folder on %@…</key>
 	<string>Checking the folder on %@…</string>
 	<key>Choose</key>
 	<string>Choose</string>
-	<key>Choose **Add SSH host…** in the sidebar. The host needs passwordless SSH, rsync, and the CLI.</key>
-	<string>Choose **Add SSH host…** in the sidebar. The host needs passwordless SSH, rsync, and the CLI.</string>
+	<key>Choose **Add SSH host…** at the bottom of the sidebar, then enter `user@hostname` or an alias from `~/.ssh/config`. Your code and CLIs run on the host; its history is cached on this Mac.</key>
+	<string>Choose **Add SSH host…** at the bottom of the sidebar, then enter `user@hostname` or an alias from `~/.ssh/config`. Your code and CLIs run on the host; its history is cached on this Mac.</string>
 	<key>Choose a session in the sidebar to read its conversation.</key>
 	<string>Choose a session in the sidebar to read its conversation.</string>
 	<key>Choose or enter a folder</key>
 	<string>Choose or enter a folder</string>
+	<key>Claude Code and Codex on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</key>
+	<string>Claude Code and Codex on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</string>
 	<key>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.</key>
 	<string>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.</string>
 	<key>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</key>
@@ -186,10 +192,10 @@
 	<string>Clear filters</string>
 	<key>Clear the selection, or close search</key>
 	<string>Clear the selection, or close search</string>
-	<key>Click a session to read it. Nothing runs.</key>
-	<string>Click a session to read it. Nothing runs.</string>
 	<key>Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.</key>
 	<string>Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.</string>
+	<key>Click a session to read its conversation; no CLI starts. **Open in new window** gives it a window of its own.</key>
+	<string>Click a session to read its conversation; no CLI starts. **Open in new window** gives it a window of its own.</string>
 	<key>Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you.</key>
 	<string>Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you.</string>
 	<key>Close %@</key>
@@ -202,8 +208,8 @@
 	<string>Close Tab…</string>
 	<key>Close Window</key>
 	<string>Close Window</string>
-	<key>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</key>
-	<string>Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.</string>
+	<key>Close a tab with **Keep running**, or quit the app, and the CLI carries on in tmux. Click its session to return. A plain terminal ends with its tab.</key>
+	<string>Close a tab with **Keep running**, or quit the app, and the CLI carries on in tmux. Click its session to return. A plain terminal ends with its tab.</string>
 	<key>Close find</key>
 	<string>Close find</string>
 	<key>Close left view</key>
@@ -292,8 +298,8 @@
 	<string>Done</string>
 	<key>Email feedback</key>
 	<string>Email feedback</string>
-	<key>Email ↗</key>
-	<string>Email ↗</string>
+	<key>Email feedback ↗</key>
+	<string>Email feedback ↗</string>
 	<key>End and close this terminal</key>
 	<string>End and close this terminal</string>
 	<key>End on %@</key>
@@ -318,14 +324,14 @@
 	<string>Export conversation</string>
 	<key>Export conversations</key>
 	<string>Export conversations</string>
-	<key>Feedback:</key>
-	<string>Feedback:</string>
+	<key>Feedback</key>
+	<string>Feedback</string>
 	<key>Filter project sessions</key>
 	<string>Filter project sessions</string>
 	<key>Filters active</key>
 	<string>Filters active</string>
-	<key>Find</key>
-	<string>Find</string>
+	<key>Find a session</key>
+	<string>Find a session</string>
 	<key>Find any session</key>
 	<string>Find any session</string>
 	<key>Find in conversation</key>
@@ -350,14 +356,14 @@
 	<string>Font size</string>
 	<key>Fork in the native CLI</key>
 	<string>Fork in the native CLI</string>
+	<key>Found a bug, or missing something? Open a GitHub issue or send an email. Both start with your versions filled in.</key>
+	<string>Found a bug, or missing something? Open a GitHub issue or send an email. Both start with your versions filled in.</string>
 	<key>Full</key>
 	<string>Full</string>
 	<key>Full Disk Access</key>
 	<string>Full Disk Access</string>
 	<key>General</key>
 	<string>General</string>
-	<key>GitHub issue ↗</key>
-	<string>GitHub issue ↗</string>
 	<key>Go to a tab by its position</key>
 	<string>Go to a tab by its position</string>
 	<key>Go to the first available message</key>
@@ -382,14 +388,16 @@
 	<string>Host</string>
 	<key>How it works</key>
 	<string>How it works</string>
+	<key>If a session is missing</key>
+	<string>If a session is missing</string>
 	<key>Image</key>
 	<string>Image</string>
 	<key>Image can't be shown</key>
 	<string>Image can't be shown</string>
 	<key>Import</key>
 	<string>Import</string>
-	<key>Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.</key>
-	<string>Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.</string>
+	<key>In **Projects**, clear the time and CLI filters, then click the host's refresh button.</key>
+	<string>In **Projects**, clear the time and CLI filters, then click the host's refresh button.</string>
 	<key>Interface language</key>
 	<string>Interface language</string>
 	<key>JustSessions</key>
@@ -450,6 +458,8 @@
 	<string>More actions for %@</string>
 	<key>More in the right-click menu</key>
 	<string>More in the right-click menu</string>
+	<key>More in the user guide ↗</key>
+	<string>More in the user guide ↗</string>
 	<key>More room for the terminal</key>
 	<string>More room for the terminal</string>
 	<key>Move tab into split view</key>
@@ -518,12 +528,16 @@
 	<string>Notify me when a session</string>
 	<key>OK</key>
 	<string>OK</string>
+	<key>On an SSH host, check passwordless SSH, rsync, and the CLI there. A host at a local address also needs **Local Network** in Permissions.</key>
+	<string>On an SSH host, check passwordless SSH, rsync, and the CLI there. A host at a local address also needs **Local Network** in Permissions.</string>
 	<key>Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.</key>
 	<string>Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.</string>
 	<key>Open Login Items Settings</key>
 	<string>Open Login Items Settings</string>
 	<key>Open System Settings</key>
 	<string>Open System Settings</string>
+	<key>Open a GitHub issue ↗</key>
+	<string>Open a GitHub issue ↗</string>
 	<key>Open in a separate reading window</key>
 	<string>Open in a separate reading window</string>
 	<key>Open in new window</key>
@@ -540,6 +554,10 @@
 	<string>Open the JustSessions website</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
 	<string>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</string>
+	<key>Organize</key>
+	<string>Organize</string>
+	<key>Passwordless SSH from this Mac</key>
+	<string>Passwordless SSH from this Mac</string>
 	<key>Path on the host, such as ~/code/app</key>
 	<string>Path on the host, such as ~/code/app</string>
 	<key>Permissions</key>
@@ -574,8 +592,8 @@
 	<string>Project folder on %@</string>
 	<key>Projects</key>
 	<string>Projects</string>
-	<key>Read</key>
-	<string>Read</string>
+	<key>Read a session</key>
+	<string>Read a session</string>
 	<key>Read first, then resume</key>
 	<string>Read first, then resume</string>
 	<key>Read only</key>
@@ -622,6 +640,8 @@
 	<string>Restores the terminal colors, font, and size.</string>
 	<key>Resume</key>
 	<string>Resume</string>
+	<key>Resume or branch</key>
+	<string>Resume or branch</string>
 	<key>Reveal session file in Finder</key>
 	<string>Reveal session file in Finder</string>
 	<key>Reverse Views</key>
@@ -630,12 +650,18 @@
 	<string>Reverse views</string>
 	<key>Right-click a selected row in the sidebar to resume, branch, or delete them.</key>
 	<string>Right-click a selected row in the sidebar to resume, branch, or delete them.</string>
+	<key>Right-click a session to rename, pin, export, or delete it, and a project to rename, pin, or archive it. ⌘-click or ⇧-click selects several.</key>
+	<string>Right-click a session to rename, pin, export, or delete it, and a project to rename, pin, or archive it. ⌘-click or ⇧-click selects several.</string>
 	<key>Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.</key>
 	<string>Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.</string>
+	<key>Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.</key>
+	<string>Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.</string>
 	<key>SSH hosts</key>
 	<string>SSH hosts</string>
 	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
 	<string>SSH hosts have no Trash, so every session is permanently deleted.</string>
+	<key>SSH setup in the user guide ↗</key>
+	<string>SSH setup in the user guide ↗</string>
 	<key>Save</key>
 	<string>Save</string>
 	<key>Save messages and tool-call summaries to a file</key>
@@ -670,8 +696,6 @@
 	<string>Separate views</string>
 	<key>Session %lld of %lld</key>
 	<string>Session %lld of %lld</string>
-	<key>Sessions from %@, grouped by host and project.</key>
-	<string>Sessions from %@, grouped by host and project.</string>
 	<key>Sessions on other machines</key>
 	<string>Sessions on other machines</string>
 	<key>Settings</key>
@@ -738,6 +762,8 @@
 	<string>Tab %lld</string>
 	<key>Tabs</key>
 	<string>Tabs</string>
+	<key>Tabs and split view</key>
+	<string>Tabs and split view</string>
 	<key>Tabs and windows</key>
 	<string>Tabs and windows</string>
 	<key>Tabs grouped by project</key>
@@ -760,6 +786,8 @@
 	<string>The Pi session file and its associated folder will move to the macOS Trash.</string>
 	<key>The folder is listed under %@ in the sidebar, ready for new sessions.</key>
 	<string>The folder is listed under %@ in the sidebar, ready for new sessions.</string>
+	<key>The host needs:</key>
+	<string>The host needs:</string>
 	<key>The project folder no longer exists</key>
 	<string>The project folder no longer exists</string>
 	<key>The project will be archived; skipped sessions stay on disk and come back when it is restored.</key>
@@ -770,8 +798,12 @@
 	<string>The projects will be archived; skipped sessions stay on disk and come back when they are restored.</string>
 	<key>The shell and anything still running in it will stop.</key>
 	<string>The shell and anything still running in it will stop.</string>
+	<key>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles, and IDs.</key>
+	<string>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles, and IDs.</string>
 	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
 	<string>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</string>
+	<key>The tour points at the main controls in the window. Afterwards, tips show again the first time you use each part, such as tabs or split view.</key>
+	<string>The tour points at the main controls in the window. Afterwards, tips show again the first time you use each part, such as tabs or split view.</string>
 	<key>Theme</key>
 	<string>Theme</string>
 	<key>This Mac</key>
@@ -796,6 +828,8 @@
 	<string>Try Again</string>
 	<key>Try again</key>
 	<string>Try again</string>
+	<key>Two tabs side by side</key>
+	<string>Two tabs side by side</string>
 	<key>Unknown error</key>
 	<string>Unknown error</string>
 	<key>Unpin project</key>
@@ -822,6 +856,12 @@
 	<string>Your sessions will appear here</string>
 	<key>Your sessions, already here</key>
 	<string>Your sessions, already here</string>
+	<key>`python3`, for Antigravity and OpenCode</key>
+	<string>`python3`, for Antigravity and OpenCode</string>
+	<key>`rsync`, and the CLIs you use</key>
+	<string>`rsync`, and the CLIs you use</string>
+	<key>`tmux`, so a CLI keeps running when the connection drops</key>
+	<string>`tmux`, so a CLI keeps running when the connection drops</string>
 	<key>devbox or user@devbox.example.com</key>
 	<string>devbox or user@devbox.example.com</string>
 	<key>iTerm2 Color Preset File…</key>

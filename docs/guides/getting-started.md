@@ -21,7 +21,7 @@ You need **macOS 14 Sonoma or later on Apple Silicon**, plus at least one instal
 2. Open the disk image and drag **JustSessions** into **Applications**.
 3. Launch the app. Existing local sessions appear under **This Mac**, grouped by project.
 
-On first launch, a short tour points out your sessions, **New session**, and SSH hosts beside the controls themselves. After that, tips show the first time you need them: reading a session points out **Resume** and find, reading another points out its right-click menu and search, and your first tabs point out tab groups, hiding the sidebar, **Keep running**, and **Open tabs**. Each shows once; skip any of them. To see it again, choose **Help → Take the Tour**, or **Take the tour** in **Settings → Help & feedback**.
+On first launch, a short tour points out your sessions, **New session**, and SSH hosts beside the controls themselves. After that, tips show the first time you need them: reading a session points out **Resume** and find, reading another points out its right-click menu and search, and your first tabs point out tab groups, hiding the sidebar, **Keep running**, **Open tabs**, and split view. Each shows once; skip any of them. To see the tour again, choose **Help → Take the Tour**, or **Take the tour** in **Settings → Help & feedback**; the tips then show again too, the next time you reach each part.
 
 Sparkle delivers subsequent app updates. Your CLI provider's plans and charges still apply.
 
@@ -69,4 +69,4 @@ Open **Settings** in the sidebar or press ⌘,. **General > Interface language**
 
 JustSessions reads local CLI files and caches supported remote history over SSH. It does not upload conversations to a JustSessions service. The CLIs still communicate with their providers. Sparkle checks for app updates through a JustSessions update server that counts checks per day and app version, without storing IP addresses or identifiers. [Storage and privacy](session-storage.md).
 
-Open **Settings → Help & feedback** or **Help → JustSessions Help** for a brief feature overview, remote host setup, and every keyboard shortcut. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The same overview is on the [website Help page](https://yangzichao.github.io/JustSessions/help.html); its issue link opens GitHub.
+Open **Settings → Help & feedback** or **Help → JustSessions Help** for a brief feature overview, remote host setup, what to check when a session is missing, feedback links, and every keyboard shortcut. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The same overview is on the [website Help page](https://yangzichao.github.io/JustSessions/help.html); its issue link opens GitHub.

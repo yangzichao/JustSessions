@@ -33,6 +33,8 @@ extension OnboardingTip {
             stops = [.keepRunning]
         case .openTabs:
             stops = [.openTabs]
+        case .splitView:
+            stops = [.splitView]
         }
         return stops.filter { $0.canShow(in: context) }
     }

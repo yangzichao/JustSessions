@@ -1,10 +1,9 @@
 import SwiftUI
 
-/// Help in Settings: the main flow, in the order a session is found, read, resumed, and kept running.
+/// Help in Settings: what each part of the window does, in the order a session is found, read, resumed, and kept
+/// running, then organizing sessions and notifications.
 struct HelpFeatureOverview: View {
     @Environment(\.locale) private var locale
-    @Environment(\.startOnboardingTour) private var startOnboardingTour
-    @Environment(\.dismiss) private var dismiss
 
     private var providerList: String {
         let formatter = ListFormatter()
@@ -14,28 +13,23 @@ struct HelpFeatureOverview: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("How it works").font(.headline)
-                Spacer(minLength: 12)
-                Button("Take the tour") {
-                    // The tour points at the window, so Settings closes first; its tips show once the sheet is gone.
-                    dismiss()
-                    startOnboardingTour()
-                }
-                .buttonStyle(QuietBorderedButtonStyle())
-                .controlSize(.small)
-                .accessibilityIdentifier("help.take-the-tour")
+        HelpSection(title: "How it works") {
+            VStack(alignment: .leading, spacing: 12) {
+                HelpFeatureRow(title: "Find a session", systemImage: "magnifyingglass",
+                               detail: "The sidebar lists sessions from \(providerList) by host and project. Search matches project names and paths, session titles, and IDs.")
+                HelpFeatureRow(title: "Read a session", systemImage: "book",
+                               detail: "Click a session to read its conversation; no CLI starts. **Open in new window** gives it a window of its own.")
+                HelpFeatureRow(title: "Resume or branch", systemImage: "play",
+                               detail: "**Resume**, or a double-click, continues the conversation in its CLI and original folder. **Branch**, where the CLI supports it, starts a new session from a copy and leaves the original as it was.")
+                HelpFeatureRow(title: "Tabs and split view", systemImage: "rectangle.split.2x1",
+                               detail: "**⌘N** starts a session in any installed CLI, or a plain terminal. Tabs group by project, and **Open tabs** in the sidebar lists them all. Right-click a tab to show two side by side.")
+                HelpFeatureRow(title: "Keep running", systemImage: "arrow.triangle.2.circlepath",
+                               detail: "Close a tab with **Keep running**, or quit the app, and the CLI carries on in tmux. Click its session to return. A plain terminal ends with its tab.")
+                HelpFeatureRow(title: "Organize", systemImage: "pin",
+                               detail: "Right-click a session to rename, pin, export, or delete it, and a project to rename, pin, or archive it. ⌘-click or ⇧-click selects several.")
+                HelpFeatureRow(title: "Notifications", systemImage: "bell",
+                               detail: "Claude Code and Codex on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.")
             }
-
-            HelpFeatureRow(title: "Find", systemImage: "square.stack.3d.up",
-                           detail: "Sessions from \(providerList), grouped by host and project.")
-            HelpFeatureRow(title: "Read", systemImage: "book",
-                           detail: "Click a session to read it. Nothing runs.")
-            HelpFeatureRow(title: "Resume", systemImage: "terminal",
-                           detail: "**Resume** continues in the original CLI and folder. **Branch** tries another approach.")
-            HelpFeatureRow(title: "Keep running", systemImage: "arrow.triangle.2.circlepath",
-                           detail: "Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.")
         }
     }
 }
@@ -55,8 +49,6 @@ private struct HelpFeatureRow: View {
                 Text(title).fontWeight(.medium)
                 Text(detail).foregroundStyle(ThemePalette.secondaryText)
             }
-            .fixedSize(horizontal: false, vertical: true)
         }
-        .font(.callout)
     }
 }

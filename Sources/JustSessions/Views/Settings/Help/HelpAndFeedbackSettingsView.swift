@@ -1,20 +1,15 @@
 import SwiftUI
 
-/// The Help & feedback tab: the guide and feedback links, session basics, SSH host setup, and keyboard shortcuts.
+/// The Help & feedback tab: the tour and the guide, how the window works, SSH host setup, what to check when a
+/// session is missing, feedback, and keyboard shortcuts.
 struct HelpAndFeedbackSettingsView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HStack(alignment: .firstTextBaseline, spacing: 16) {
-                Link("User guide ↗", destination: AppLinks.userGuideURL)
-                    .accessibilityIdentifier("help.user-guide")
-                HelpFeedbackLinks()
-                Spacer(minLength: 0)
-            }
-            .buttonStyle(ThemePlainButtonStyle(verticalPadding: 2))
-            .font(.callout)
-
+        VStack(alignment: .leading, spacing: 24) {
+            HelpTourSection()
             HelpFeatureOverview()
             HelpRemoteHostSection()
+            HelpTroubleshootingSection()
+            HelpFeedbackSection()
             HelpKeyboardShortcutsSection()
         }
         .foregroundStyle(ThemePalette.ink)

@@ -27,6 +27,8 @@ enum OnboardingTourStop: CaseIterable, Sendable {
     case hideSidebar
     /// Open tabs at the top of the sidebar.
     case openTabs
+    /// The selected tab, while it is in no split and another tab could open in one with it.
+    case splitView
 
     /// The window's tour: its sessions when it lists some, or else where they will appear; then starting a session and
     /// adding an SSH host; then Keep running, when the selected tab can.
@@ -42,7 +44,7 @@ enum OnboardingTourStop: CaseIterable, Sendable {
         switch self {
         case .noSessionsYet, .projects, .sessions: true
         case .newSession, .sshHosts, .keepRunning, .resume, .findInConversation, .sessionMenu, .searchSessions, .tabGroup,
-             .hideSidebar, .openTabs: false
+             .hideSidebar, .openTabs, .splitView: false
         }
     }
 
@@ -58,6 +60,7 @@ enum OnboardingTourStop: CaseIterable, Sendable {
         case .tabGroup: context.hasSelectedTab
         case .hideSidebar: context.hasSelectedTab && context.isSidebarShown
         case .openTabs: context.openTabCount > 1 && context.isSidebarShown
+        case .splitView: context.hasSelectedTab && context.openTabCount > 1 && !context.isSelectedTabInSplit
         }
     }
 }
