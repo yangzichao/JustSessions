@@ -14,11 +14,15 @@ struct CodexSessionIndex {
         self.init(text: text ?? "")
     }
 
-    /// When a session has more than one line, the last one wins.
     init(text: String) {
+        self.init(lines: text.split(separator: "\n").map { Data($0.utf8) })
+    }
+
+    /// When a session has more than one line, the last one wins.
+    init(lines: [Data]) {
         var entriesBySessionID: [String: Entry] = [:]
-        for line in text.split(separator: "\n") {
-            guard let record = ConversationMetadata.object(from: Data(line.utf8)),
+        for line in lines {
+            guard let record = ConversationMetadata.object(from: line),
                   let sessionID = record["id"] as? String,
                   let threadName = record["thread_name"] as? String else { continue }
             entriesBySessionID[sessionID] = Entry(
