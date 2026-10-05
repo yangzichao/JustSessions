@@ -45,6 +45,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
 - `Services/Terminal/Closing/`: waits for a closed tab's process to exit, so it leaves no zombie behind.
 - `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal.
+- `Services/Terminal/Appearance/ThemeReports/`: answers a program that asks whether the terminal is light or dark (`CSI ? 996 n`), and tells one that subscribes (`CSI ? 2031 h`), such as tmux, each time the terminal's colors change. SwiftTerm handles neither; on each report tmux reads the new background, so a CLI in tmux sees it.
 - `Services/Terminal/Appearance/Import/`: reads colors from iTerm2's default profile or an `.itermcolors` file, only when asked.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
 - `Services/Terminal/ClaudeLiveSession/`: reads Claude Code's live registry for names chosen with `/rename`, and makes a tab follow its CLI to the session `/clear` starts.

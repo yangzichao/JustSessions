@@ -17,9 +17,12 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     private var appearancePreferences = TerminalAppearancePreferences()
     private var theme = AppTheme.justSessions
     private var appearanceSubscription: AnyCancellable?
+    /// The colors the terminal last took on, so a theme report goes out only when they change.
+    private var appliedPalette: TerminalPalette?
+    private var themeReporting = TerminalThemeReporting()
     private lazy var outputCoalescer: TerminalOutputCoalescer = {
         let coalescer = TerminalOutputCoalescer()
-        coalescer.consume = { [weak self] bytes in self?.feed(byteArray: bytes) }
+        coalescer.consume = { [weak self] bytes in self?.consumeOutput(bytes) }
         return coalescer
     }()
 
@@ -32,6 +35,18 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     }
 
     override func dataReceived(slice: ArraySlice<UInt8>) { outputCoalescer.receive(slice) }
+
+    /// Feeds output to the terminal and answers the theme report requests in it, which SwiftTerm ignores.
+    private func consumeOutput(_ bytes: ArraySlice<UInt8>) {
+        let themeReports = themeReporting.reports(answering: bytes, isDark: appliedPalette?.isDark ?? false)
+        feed(byteArray: bytes)
+        themeReports.forEach(sendTerminalReport)
+    }
+
+    /// Goes out as SwiftTerm's own replies do: unlike typing, it leaves the scroll position and selection alone.
+    private func sendTerminalReport(_ report: String) {
+        getTerminal().sendResponse(text: report)
+    }
 
     override func setFrameSize(_ newSize: NSSize) {
         // Interpret queued output at the dimensions it arrived under before resizing the terminal grid.
@@ -90,7 +105,10 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     }
 
     private func applyAppearance() {
-        TerminalAppearanceStyling.apply(appearancePreferences, theme: theme, to: self)
+        let palette = TerminalAppearanceStyling.apply(appearancePreferences, theme: theme, to: self)
         onBackgroundColorChange?()
+        guard palette != appliedPalette else { return }
+        appliedPalette = palette
+        if let report = themeReporting.reportAfterColorChange(isDark: palette.isDark) { sendTerminalReport(report) }
     }
 }
