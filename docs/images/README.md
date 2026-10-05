@@ -11,7 +11,7 @@ These are unedited captures of the actual JustSessions SwiftUI and AppKit interf
 | [tmux-keep-running.jpg](tmux-keep-running.jpg) | The full app window after quitting and reopening: the same Claude Code CLI reattached in the sample tmux session, with the sidebar, project tabs, and tmux status bar visible. |
 | [tmux-close-choice.jpg](tmux-close-choice.jpg) | The actual close-tab dialog for a local tmux session: Keep running, End session, and Cancel. Captured from the same existing sample app on October 4, 2026. |
 
-Full window captures are 2400 × 1440 pixels; the close-tab dialog capture is 520 × 476. The homepage presents full-width screenshots and links to the originals. Its tmux slide pairs the unedited close-tab dialog with the unedited reattached terminal capture in HTML, under “When you close a tab”, to explain the choice and the result. These are two separate captures, not one captured window state.
+Full window captures are 2400 × 1440 pixels; the close-tab dialog capture is 520 × 476. The homepage presents full-width screenshots and links to the originals. Its tmux slide pairs the unedited close-tab dialog with the unedited reattached terminal capture in HTML to explain the choice and the result. These are two separate captures, not one captured window state.
 
 `orbit-web`, `orbit-api`, `orbit-infra`, the host names, and all saved conversation text are illustrative. Remote host data is a fixture; these images do not document a live SSH connection.
 
