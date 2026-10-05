@@ -113,6 +113,7 @@ final class ConversationStore: ObservableObject {
         if startsBackgroundPolling {
             startClaudeLiveNameSync()
             startCodexThreadFollowing()
+            startLiveSessionFollowing()
             startNewSessionDiscovery()
             startRemoteNewSessionPolling()
             startTmuxPaneProcessLookup()

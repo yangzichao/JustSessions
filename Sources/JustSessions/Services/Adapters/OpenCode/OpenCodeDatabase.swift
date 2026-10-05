@@ -52,6 +52,20 @@ enum OpenCodeDatabase {
         }
     }
 
+    /// Whether the session is in the database as a top-level session, in any project folder.
+    static func containsTopLevelSession(_ sessionID: String, in file: URL) throws -> Bool {
+        let database = try open(file)
+        defer { sqlite3_close(database) }
+        let statement = try prepare("SELECT 1 FROM session WHERE id = ? AND parent_id IS NULL", in: database)
+        defer { sqlite3_finalize(statement) }
+        bind(sessionID, at: 1, in: statement)
+        switch sqlite3_step(statement) {
+        case SQLITE_ROW: return true
+        case SQLITE_DONE: return false
+        default: throw OpenCodeDatabaseError.unreadable
+        }
+    }
+
     /// Whether any row for the session is left, so a deletion can confirm it is gone.
     static func containsSession(_ sessionID: String, in file: URL) throws -> Bool {
         let database = try open(file)

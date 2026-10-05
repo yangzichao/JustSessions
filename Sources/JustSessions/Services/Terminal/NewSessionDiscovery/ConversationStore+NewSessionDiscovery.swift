@@ -4,7 +4,7 @@ import Foundation
 /// a branch runs a fork with an id of its own. The sidebar lists such a tab under its project right away
 /// (`pendingNewSessions`). Meanwhile this finds the file the tab's CLI is writing, refreshes so the real
 /// session shows up, and links the tab to it. A Codex tab whose CLI names its thread in the terminal title is also
-/// linked by `followCodexThreads`.
+/// linked by `followCodexThreads`, and an Antigravity, Pi, or OpenCode tab by `followLiveSessions`.
 extension ConversationStore {
     /// Claude Code writes a new transcript before the first prompt, so a freshly listed session can still be
     /// untitled. This many refreshes after its file changes are enough to pick up the first prompt.
@@ -65,11 +65,11 @@ extension ConversationStore {
         return true
     }
 
+    /// Also for a tab whose CLI moved to a session as new, as with `/clear`; see `followLiveSessions`.
     private func needsRefreshForFirstPromptTitle(_ session: TerminalSession) -> Bool {
-        guard session.startsNewSession, !session.hasExited, session.host == .thisMac,
+        guard !session.hasExited, session.host == .thisMac,
               session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
-              let conversation = session.conversation,
-              conversation.suggestedTitle == ConversationMetadata.untitledConversationTitle else { return false }
+              let conversation = session.conversation, conversation.isAwaitingFirstPromptTitle else { return false }
         // A SQLite source, such as OpenCode's, writes to its `-wal` file first.
         return wasModifiedSinceLastRefresh(max(
             ConversationMetadata.fileModificationDate(conversation.sourceFile),

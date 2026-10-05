@@ -7,17 +7,21 @@ struct NativeCLICommandResolver: @unchecked Sendable {
     let inheritedEnvironment: [String: String]
     let bundledTmuxRuntime: BundledTmuxRuntime?
     let tmuxSelection = ThisMacTmuxSelection()
+    /// Nil starts Pi and OpenCode without the extension that reports their session.
+    let liveSessionReporting: LiveSessionReporting?
     private let searchDirectoriesOverride: [String]?
 
     init(
         fileManager: FileManager = .default,
         searchDirectories: [String]? = nil,
         inheritedEnvironment: [String: String] = ProcessInfo.processInfo.environment,
-        bundledTmuxDirectory: URL? = BundledTmuxRuntime.appBundleDirectory
+        bundledTmuxDirectory: URL? = BundledTmuxRuntime.appBundleDirectory,
+        liveSessionReporting: LiveSessionReporting? = .thisApp
     ) {
         self.fileManager = fileManager
         self.inheritedEnvironment = inheritedEnvironment
         self.bundledTmuxRuntime = bundledTmuxDirectory.map { BundledTmuxRuntime(directory: $0) }
+        self.liveSessionReporting = liveSessionReporting
         self.searchDirectoriesOverride = searchDirectories
     }
 
@@ -63,11 +67,15 @@ struct NativeCLICommandResolver: @unchecked Sendable {
 
         var environment = TerminalColorEnvironment.embeddedTerminalEnvironment(from: inheritedEnvironment)
         environment["PATH"] = pathEnvironmentValue
+        // The session a CLI is in can change while it runs; see `followLiveSessions` and `followCodexThreads`.
+        let reporterLaunch = liveSessionReporting?.launchAdditions(for: provider, environment: environment)
+        environment.merge(reporterLaunch?.environment ?? [:]) { _, reporterValue in reporterValue }
+        // Codex names the thread its CLI is in only in the terminal title, and only when asked.
+        let followingArguments = provider == .codex ? CodexThreadTitle.launchArguments : reporterLaunch?.arguments ?? []
 
         return NativeCLICommand(
             executablePath: executablePath,
-            // Codex names the thread its CLI is in only in the terminal title, and only when asked.
-            arguments: provider == .codex ? CodexThreadTitle.launchArguments + arguments : arguments,
+            arguments: followingArguments + arguments,
             workingDirectory: projectPath,
             environment: NativeCLICommand.environmentEntries(environment)
         )

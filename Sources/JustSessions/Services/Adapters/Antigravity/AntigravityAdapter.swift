@@ -30,12 +30,11 @@ struct AntigravityAdapter: ConversationAdapter {
                   localSession.sessionID == file.deletingPathExtension().lastPathComponent else { return nil }
 
             let summary = summaries[localSession.sessionID]
-            let fallbackTitle = "Antigravity session \(localSession.sessionID.prefix(8))"
             let title = ConversationMetadata.cleanTitle(
                 summary?.title.flatMap { $0.isEmpty ? nil : $0 }
                     ?? summary?.preview.flatMap { $0.isEmpty ? nil : $0 }
                     ?? localSession.firstPrompt,
-                fallback: fallbackTitle
+                fallback: Self.fallbackTitle(forSessionID: localSession.sessionID)
             )
             let updatedAt = max(
                 summary?.updatedAt ?? .distantPast,
@@ -51,6 +50,11 @@ struct AntigravityAdapter: ConversationAdapter {
                 sourceFile: file
             )
         }
+    }
+
+    /// The title of a conversation with no title and no prompt yet, such as one `/clear` just started.
+    static func fallbackTitle(forSessionID sessionID: String) -> String {
+        "Antigravity session \(sessionID.prefix(8))"
     }
 
     func arguments(for conversation: Conversation, action: ConversationAction) -> [String] {
