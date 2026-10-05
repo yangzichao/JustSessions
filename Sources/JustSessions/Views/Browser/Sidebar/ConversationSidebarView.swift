@@ -120,13 +120,15 @@ struct ConversationSidebarView: View {
                 ThemeDivider()
                 SidebarProjectSelectionActionBar(
                     selectedCount: projectSelection.selectedProjectIDs.count,
-                    onRemove: removeSelectedProjects
+                    onRemove: removeSelectedProjects,
+                    onRemoveAndDeleteSessions: requestRemovalOfSelectedProjectsAndTheirSessions
                 )
-            } else if contentMode == .projects && sessionSelection.hasMultipleSelected && !isDeletionProgressBarShown {
+            } else if contentMode == .projects && sessionSelection.hasMultipleSelected
+                && !selectedConversations.allSatisfy(store.isDeletionPending(for:)) {
+                // Hidden while every selected session is already being deleted, as after deleting the selection.
                 ThemeDivider()
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
-                    isDeleteDisabled: !store.canStartDeletion(of: selectedConversations),
                     onDelete: { onRequestDeletion(.conversations(selectedConversations)) }
                 )
             }
@@ -165,16 +167,15 @@ struct ConversationSidebarView: View {
         .onChange(of: listedProjectIDs) { _, newListedProjectIDs in
             projectSelection.keepOnly(newListedProjectIDs)
         }
-        .task(id: store.isDeletingSessions) {
-            // One session has nothing to cancel between, so only a deletion of several shows the bar.
-            guard store.isDeletingSessions, store.pendingDeletionConversationIDs.count > 1 else {
+        .task(id: store.isDeletingSeveralSessions) {
+            guard store.isDeletingSeveralSessions else {
                 isDeletionProgressBarShown = false
                 return
             }
             do { try await Task.sleep(for: Self.deletionProgressBarDelay) } catch { return }
             // A deletion ending right at the delay can resume the sleep just before the task is cancelled;
             // showing the bar then would leave it stuck at "0 of 0", as nothing restarts this task.
-            guard !Task.isCancelled, store.isDeletingSessions else { return }
+            guard !Task.isCancelled, store.isDeletingSeveralSessions else { return }
             isDeletionProgressBarShown = true
         }
     }
@@ -273,6 +274,11 @@ struct ConversationSidebarView: View {
     func removeSelectedProjects() {
         store.removeProjectsFromSidebar(projectSelection.selectedProjectIDs.intersection(listedProjectIDs))
         projectSelection.clear()
+    }
+
+    /// Asks to confirm first; once confirmed, the archived projects leave the list and so the selection.
+    func requestRemovalOfSelectedProjectsAndTheirSessions() {
+        onRequestDeletion(.selectedProjectsRemoval(projectSelection.selectedProjectIDs.intersection(listedProjectIDs)))
     }
 
     /// A tour stop among the projects needs the project list in front, with the tour's project in sight and, for its

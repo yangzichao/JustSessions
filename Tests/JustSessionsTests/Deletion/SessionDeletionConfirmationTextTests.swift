@@ -80,6 +80,28 @@ struct SessionDeletionConfirmationTextTests {
         #expect(SessionDeletionConfirmationText.message(forDeleting: conversation) == expectedMessage)
     }
 
+    @Test func selectedProjectsRemovalSaysWhereTheirSessionsGoByHost() {
+        let plan = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: 2)
+        let onThisMac = [ProjectLocation(host: .thisMac, path: "/a"), ProjectLocation(host: .thisMac, path: "/b")]
+        let onBoth = [ProjectLocation(host: .thisMac, path: "/a"), ProjectLocation(host: .ssh("devbox"), path: "/b")]
+        let onSSHHosts = [ProjectLocation(host: .ssh("devbox"), path: "/a"), ProjectLocation(host: .ssh("build"), path: "/b")]
+        let opening = "This affects all tools in 2 projects, including sessions hidden by the current filter. "
+            + "The projects will be archived; skipped sessions stay on disk and come back when they are restored. "
+        let closing = " 2 sessions with open terminals will be skipped."
+
+        #expect(SessionDeletionConfirmationText.message(forRemovingSelectedProjectsAt: onThisMac, plan: plan) == opening
+            + "Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted."
+            + closing)
+        #expect(SessionDeletionConfirmationText.message(forRemovingSelectedProjectsAt: onBoth, plan: plan) == opening
+            + "Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted."
+            + closing)
+        #expect(SessionDeletionConfirmationText.message(forRemovingSelectedProjectsAt: onSSHHosts, plan: plan) == opening
+            + "SSH hosts have no Trash, so every session is permanently deleted."
+            + closing)
+        #expect(SessionDeletionConfirmationText.selectedProjectsRemovalButtonTitle(projectCount: 2, plan: plan)
+            == "Archive 2 projects and delete 1 session")
+    }
+
     /// The dialog used to say "Delete 1 sessions" and "0 with open terminals will be skipped." Every count is
     /// checked for zeros and for stray spaces.
     @Test func noMessageMentionsZeroSessionsOrHasStraySpaces() {
@@ -88,6 +110,7 @@ struct SessionDeletionConfirmationTextTests {
             let plan = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: openTerminalCount)
             let messages = locations.map { SessionDeletionConfirmationText.message(forDeletingProjectAt: $0, plan: plan) }
                 + [SessionDeletionConfirmationText.message(forDeletingSelectionWith: plan)]
+                + [SessionDeletionConfirmationText.message(forRemovingSelectedProjectsAt: locations, plan: plan)]
             for message in messages {
                 #expect(!message.contains(" 0 ") && !message.hasPrefix("0 "), "\(message)")
                 #expect(!message.contains("  ") && message == message.trimmingCharacters(in: .whitespaces), "\(message)")

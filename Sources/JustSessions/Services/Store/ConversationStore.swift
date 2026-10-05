@@ -36,8 +36,11 @@ final class ConversationStore: ObservableObject {
     /// A split outlives the selection; both its terminals show only while one of them is selected, see `shownSplit`.
     @Published private(set) var terminalSplits: [TerminalSplit] = []
     /// Every conversation queued in the running deletion, of one session or several. It changes only when a
-    /// deletion starts and ends; `deletionProgress` follows the sessions in between.
+    /// deletion starts, when sessions join it, and when it ends; `deletionProgress` follows the sessions in between.
     @Published private(set) var pendingDeletionConversationIDs: Set<String> = []
+    /// Sessions asked to be deleted while a host they are on was refreshing, or while a deletion was stopping.
+    /// They are deleted when that ends; see `startQueuedDeletion()`.
+    @Published private(set) var queuedDeletionConversationIDs: Set<String> = []
     /// How far the running deletion has got. Only the sidebar's progress bar observes it.
     let deletionProgress = SessionDeletionProgress()
     /// The SSH hosts listed after this Mac.
@@ -73,9 +76,12 @@ final class ConversationStore: ObservableObject {
     /// The hosts the running deletion deletes from. A refresh of one waits until it ends, see `deferRefreshWhileDeleting(on:)`.
     private var hostsWithRunningDeletion: Set<SessionHost> = []
     private var hostsToRefreshAfterDeletion: Set<SessionHost> = []
-    /// Sessions Try Again asked to delete while a deletion ran or a host they are on was refreshing. They are
-    /// deleted when that ends; see `retryDeletion(of:)`.
-    private(set) var queuedRetryConversationIDs: Set<String> = []
+    /// Sessions asked to be deleted while a deletion ran. It goes on to them once it has deleted those before
+    /// them, so they share its progress bar and its report; see `joinRunningDeletion(_:)`.
+    private var sessionsJoiningRunningDeletion: [Conversation] = []
+    /// What the running deletion's finished rounds did. Each round after the first deletes the sessions that
+    /// joined during the one before.
+    private var finishedDeletionRounds: SessionDeletionReport?
     private var deletionTask: Task<Void, Never>?
     /// Deleted sessions leave the list, and the progress bar moves, at most this often while a deletion runs, and
     /// once more when it ends. Tests set it to zero to follow each session.
@@ -158,7 +164,7 @@ final class ConversationStore: ObservableObject {
                 } else {
                     Task { await self.discoverNewSessions(mayRefresh: false) }
                 }
-                self.startQueuedRetry()
+                self.startQueuedDeletion()
             }
         }
     }
@@ -225,31 +231,38 @@ final class ConversationStore: ObservableObject {
         !pendingDeletionConversationIDs.isEmpty
     }
 
-    /// A deletion waits for the deletion already running, and for the refresh of any host it deletes from: that
-    /// refresh may have read a session before it was deleted and would list it again.
-    func canStartDeletion(of candidateConversations: [Conversation]) -> Bool {
-        !isDeletingSessions && !candidateConversations.contains { hostRefreshStatuses[$0.host] == .refreshing }
+    /// One session has nothing to cancel between, so only a deletion of several shows the sidebar's progress bar.
+    var isDeletingSeveralSessions: Bool {
+        pendingDeletionConversationIDs.count > 1
     }
 
-    /// Returns true when a deletion runs on `host`; its refresh then starts once the deletion ends, for the same reason.
+    /// Returns true when a deletion runs on `host`; its refresh then starts once the deletion ends: it may read a
+    /// session before it is deleted and list it again.
     func deferRefreshWhileDeleting(on host: SessionHost) -> Bool {
         guard hostsWithRunningDeletion.contains(host) else { return false }
         hostsToRefreshAfterDeletion.insert(host)
         return true
     }
 
+    /// Being deleted, or waiting to be.
     func isDeletionPending(for conversation: Conversation) -> Bool {
-        pendingDeletionConversationIDs.contains(conversation.id)
+        pendingDeletionConversationIDs.contains(conversation.id) || queuedDeletionConversationIDs.contains(conversation.id)
     }
 
     func deletionPlan(for projectPath: String) -> SessionDeletionPlan {
-        deletionPlan(for: conversations.filter { $0.projectDirectoryKey == projectPath })
+        deletionPlan(forProjects: [projectPath])
     }
 
+    func deletionPlan(forProjects projectPaths: Set<String>) -> SessionDeletionPlan {
+        deletionPlan(for: conversations.filter { projectPaths.contains($0.projectDirectoryKey) })
+    }
+
+    /// Sessions already being deleted, or waiting to be, are left out: they are not deleted twice.
     func deletionPlan(for candidateConversations: [Conversation]) -> SessionDeletionPlan {
-        SessionDeletionPlan(
-            deletableConversations: candidateConversations.filter { !hasTerminal(for: $0) },
-            openTerminalCount: candidateConversations.filter { hasTerminal(for: $0) }.count
+        let notYetPending = candidateConversations.filter { !isDeletionPending(for: $0) }
+        return SessionDeletionPlan(
+            deletableConversations: notYetPending.filter { !hasTerminal(for: $0) },
+            openTerminalCount: notYetPending.filter { hasTerminal(for: $0) }.count
         )
     }
 
@@ -261,65 +274,83 @@ final class ConversationStore: ObservableObject {
             ))
             return
         }
-        guard canStartDeletion(of: [conversation]), adapter(for: conversation.provider) != nil else { return }
-        deleteInBackground([conversation])
+        guard adapter(for: conversation.provider) != nil else { return }
+        deleteConversations([conversation])
     }
 
     func deleteSessions(in projectPath: String) {
         deleteConversations(conversations.filter { $0.projectDirectoryKey == projectPath })
     }
 
-    /// Deletes every conversation in the list except those with open terminals.
+    /// Deletes every conversation in the list except those with open terminals and those already being deleted.
     func deleteConversations(_ candidateConversations: [Conversation]) {
         let candidateIDs = Set(candidateConversations.map(\.id))
         let deletionPlan = deletionPlan(for: conversations.filter { candidateIDs.contains($0.id) })
-        guard deletionPlan.hasDeletableConversations, canStartDeletion(of: deletionPlan.deletableConversations) else { return }
-
-        deleteInBackground(deletionPlan.deletableConversations)
+        startOrQueueDeletion(of: deletionPlan.deletableConversations)
     }
 
     /// Try Again in the alert after a deletion: deletes again those of the sessions still listed and still
-    /// deletable, through the same path as any deletion; does nothing when none are. While a deletion runs, or a
-    /// host they are on is refreshing, the sessions wait and are deleted when that ends.
+    /// deletable, through the same path as any deletion; does nothing when none are.
     func retryDeletion(of conversationIDs: Set<String>) {
-        let deletionPlan = deletionPlan(for: conversations.filter { conversationIDs.contains($0.id) })
-        guard deletionPlan.hasDeletableConversations else { return }
-        guard canStartDeletion(of: deletionPlan.deletableConversations) else {
-            queuedRetryConversationIDs.formUnion(conversationIDs)
-            return
-        }
-        deleteInBackground(deletionPlan.deletableConversations)
+        deleteConversations(conversations.filter { conversationIDs.contains($0.id) })
     }
 
-    /// Starts the Try Again that waited, when a deletion or a host's refresh ends. Still held up, it waits again;
-    /// it is taken off the queue first, so it starts at most once.
-    func startQueuedRetry() {
-        guard !queuedRetryConversationIDs.isEmpty else { return }
-        let conversationIDs = queuedRetryConversationIDs
-        queuedRetryConversationIDs = []
+    /// Starts the sessions that waited, when a deletion or a host's refresh ends. Still held up, they wait again;
+    /// they are taken off the queue first, so each wait ends at most once.
+    func startQueuedDeletion() {
+        guard !queuedDeletionConversationIDs.isEmpty else { return }
+        let conversationIDs = queuedDeletionConversationIDs
+        queuedDeletionConversationIDs = []
         retryDeletion(of: conversationIDs)
     }
 
-    /// Stops the running deletion after the session it is deleting, never during one. The sessions after it are
-    /// not attempted and stay listed.
+    /// Stops the running deletion after the session it is deleting, never during one. The sessions after it,
+    /// including those that joined it, are not attempted and stay listed.
     func cancelDeletion() {
         guard let deletionTask, !deletionProgress.isStopping else { return }
         deletionProgress.markStopping()
         deletionTask.cancel()
     }
 
+    /// Starts deleting the sessions, or adds them to the running deletion. Sessions on a host being refreshed wait
+    /// for the refresh to end, as it may have read a session before it was deleted and would list it again; those
+    /// asked for while a deletion stops wait for it to end.
+    private func startOrQueueDeletion(of deletableConversations: [Conversation]) {
+        guard !deletableConversations.isEmpty else { return }
+        let isHostRefreshing = deletableConversations.contains { hostRefreshStatuses[$0.host] == .refreshing }
+        if isHostRefreshing || deletionProgress.isStopping {
+            queuedDeletionConversationIDs.formUnion(deletableConversations.map(\.id))
+        } else if isDeletingSessions {
+            joinRunningDeletion(deletableConversations)
+        } else {
+            pendingDeletionConversationIDs = Set(deletableConversations.map(\.id))
+            hostsWithRunningDeletion = Set(deletableConversations.map(\.host))
+            deletionProgress.start(totalCount: deletableConversations.count)
+            deleteRoundInBackground(deletableConversations)
+        }
+    }
+
+    /// The running deletion deletes these sessions once it has deleted those before them. Their hosts' refreshes
+    /// wait from now on, so nothing holds them up when their turn comes.
+    private func joinRunningDeletion(_ deletableConversations: [Conversation]) {
+        sessionsJoiningRunningDeletion += deletableConversations
+        pendingDeletionConversationIDs.formUnion(deletableConversations.map(\.id))
+        hostsWithRunningDeletion.formUnion(deletableConversations.map(\.host))
+        deletionProgress.add(sessionCount: deletableConversations.count)
+    }
+
     /// Deletes the conversations one at a time off the main actor, then shows an alert if any could not be
     /// deleted; see `SessionDeletionReport`. A session already gone counts as deleted, and one whose file is gone
     /// leaves the list even when its deletion reported an error. Once an SSH host cannot be reached or does not
-    /// respond in time, its remaining sessions are not attempted. Deleted sessions leave the list in groups, at
-    /// most every `deletionListUpdateInterval`, so a long deletion does not re-render the sidebar per session.
-    private func deleteInBackground(_ deletableConversations: [Conversation]) {
-        pendingDeletionConversationIDs = Set(deletableConversations.map(\.id))
-        hostsWithRunningDeletion = Set(deletableConversations.map(\.host))
-        deletionProgress.start(totalCount: deletableConversations.count)
+    /// respond in time, its remaining sessions are not attempted, in this round or a later one. Deleted sessions
+    /// leave the list in groups, at most every `deletionListUpdateInterval`, so a long deletion does not
+    /// re-render the sidebar per session.
+    private func deleteRoundInBackground(_ deletableConversations: [Conversation]) {
         let adapters = self.adapters
         let remoteDeletion = self.remoteDeletion
         let listUpdateInterval = deletionListUpdateInterval
+        let completedCountBeforeRound = deletionProgress.completedCount
+        let unresponsiveHostsBeforeRound = finishedDeletionRounds?.unresponsiveHosts ?? [:]
         deletionTask = Task.detached(priority: .userInitiated) {
             let claudeIndexBatch = ClaudeDeletionIndexBatch()
             let clock = ContinuousClock()
@@ -329,7 +360,7 @@ final class ConversationStore: ObservableObject {
             var attemptedCount = 0
             var wasCanceled = false
             var failures: [ConversationDeletionFailure] = []
-            var unresponsiveHosts: [String: UnresponsiveSSHHost] = [:]
+            var unresponsiveHosts = unresponsiveHostsBeforeRound
             for conversation in deletableConversations {
                 // Cancel takes effect between sessions, so no session is left half deleted.
                 if Task.isCancelled {
@@ -366,7 +397,7 @@ final class ConversationStore: ObservableObject {
                 if clock.now - lastListUpdate >= listUpdateInterval || claudeIndexBatch.pendingCount >= ClaudeDeletionIndexBatch.maximumSessionCount {
                     failures += claudeIndexBatch.flush()
                     let deleted = deletedSinceListUpdate
-                    let completedCount = attemptedCount
+                    let completedCount = completedCountBeforeRound + attemptedCount
                     deletedCount += deleted.count
                     deletedSinceListUpdate = []
                     lastListUpdate = clock.now
@@ -381,7 +412,7 @@ final class ConversationStore: ObservableObject {
                 failures: failures,
                 wasCanceled: wasCanceled
             )
-            await self.finishDeletion(removing: deleted, report: report)
+            await self.finishDeletionRound(removing: deleted, report: report)
         }
     }
 
@@ -406,13 +437,36 @@ final class ConversationStore: ObservableObject {
         deletionProgress.update(completedCount: completedCount)
     }
 
+    /// Goes on to the sessions that joined the deletion during this round, unless Cancel was chosen; then they are
+    /// not attempted, and the deletion ends.
+    private func finishDeletionRound(removing deleted: [Conversation], report roundReport: SessionDeletionReport) {
+        var report = finishedDeletionRounds.map { $0.followed(by: roundReport) } ?? roundReport
+        let joinedSessions = sessionsJoiningRunningDeletion
+        sessionsJoiningRunningDeletion = []
+        guard !joinedSessions.isEmpty else {
+            finishDeletion(removing: deleted, report: report)
+            return
+        }
+        guard !report.wasCanceled, !deletionProgress.isStopping else {
+            report = report.followed(by: SessionDeletionReport(
+                requestedCount: joinedSessions.count, deletedCount: 0, failures: [], wasCanceled: true
+            ))
+            finishDeletion(removing: deleted, report: report)
+            return
+        }
+        applyDeletionProgress(removing: deleted, completedCount: report.requestedCount)
+        finishedDeletionRounds = report
+        deleteRoundInBackground(joinedSessions)
+    }
+
     /// Always runs when a deletion ends, canceled or not, so another can start; then refreshes the hosts whose
-    /// refresh waited for it, and starts a Try Again that waited, if nothing holds it up any more.
+    /// refresh waited for it, and starts the sessions that waited, if nothing holds them up any more.
     private func finishDeletion(removing deleted: [Conversation], report: SessionDeletionReport) {
         // Before the deleted sessions' custom titles are forgotten, so the alert names them as the sidebar did.
         let reportAlert = report.alert(titleOf: title(for:))
         removeDeletedConversations(deleted)
         pendingDeletionConversationIDs = []
+        finishedDeletionRounds = nil
         deletionTask = nil
         deletionProgress.finish()
         if let reportAlert { show(reportAlert) }
@@ -421,7 +475,7 @@ final class ConversationStore: ObservableObject {
         let hostsToRefresh = hostsToRefreshAfterDeletion
         hostsToRefreshAfterDeletion = []
         for host in hosts where hostsToRefresh.contains(host) { refresh(host) }
-        startQueuedRetry()
+        startQueuedDeletion()
     }
 
     /// Takes the deleted sessions off the list in one change, and forgets their custom titles and pins.

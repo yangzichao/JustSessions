@@ -21,6 +21,11 @@ final class SessionDeletionProgress: ObservableObject {
         isStopping = false
     }
 
+    /// Sessions that joined the running deletion; it goes on to them after the others.
+    func add(sessionCount: Int) {
+        totalCount += sessionCount
+    }
+
     func update(completedCount: Int) {
         guard completedCount != self.completedCount else { return }
         self.completedCount = completedCount

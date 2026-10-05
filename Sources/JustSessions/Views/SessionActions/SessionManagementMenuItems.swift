@@ -26,6 +26,6 @@ struct SessionManagementMenuItems: View {
         }
         Divider()
         Button("Delete session…", systemImage: "trash", role: .destructive, action: onDelete)
-            .disabled(store.hasTerminal(for: conversation) || !store.canStartDeletion(of: [conversation]))
+            .disabled(store.hasTerminal(for: conversation) || store.isDeletionPending(for: conversation))
     }
 }

@@ -122,6 +122,10 @@
 	<string>Archive</string>
 	<key>Archive %lld projects</key>
 	<string>Archive %lld projects</string>
+	<key>Archive %lld projects and delete 1 session</key>
+	<string>Archive %lld projects and delete 1 session</string>
+	<key>Archive and delete sessions…</key>
+	<string>Archive and delete sessions…</string>
 	<key>Archive project</key>
 	<string>Archive project</string>
 	<key>Archive project and delete %lld sessions</key>
@@ -132,6 +136,10 @@
 	<string>Archive project and delete all sessions (%lld)…</string>
 	<key>Archive selected projects</key>
 	<string>Archive selected projects</string>
+	<key>Archive selected projects and delete their sessions</key>
+	<string>Archive selected projects and delete their sessions</string>
+	<key>Archive the selected projects and delete their sessions, except those with open terminals</key>
+	<string>Archive the selected projects and delete their sessions, except those with open terminals</string>
 	<key>Archive the selected projects; keep sessions and open terminals</key>
 	<string>Archive the selected projects; keep sessions and open terminals</string>
 	<key>Archived projects (%lld)…</key>
@@ -758,6 +766,8 @@
 	<string>The project will be archived; skipped sessions stay on disk and come back when it is restored.</string>
 	<key>The project will stay in the sidebar.</key>
 	<string>The project will stay in the sidebar.</string>
+	<key>The projects will be archived; skipped sessions stay on disk and come back when they are restored.</key>
+	<string>The projects will be archived; skipped sessions stay on disk and come back when they are restored.</string>
 	<key>The shell and anything still running in it will stop.</key>
 	<string>The shell and anything still running in it will stop.</string>
 	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
@@ -768,6 +778,8 @@
 	<string>This Mac</string>
 	<key>This affects all tools in %@, including sessions hidden by the current filter.</key>
 	<string>This affects all tools in %@, including sessions hidden by the current filter.</string>
+	<key>This affects all tools in %lld projects, including sessions hidden by the current filter.</key>
+	<string>This affects all tools in %lld projects, including sessions hidden by the current filter.</string>
 	<key>This changes the display name in JustSessions.</key>
 	<string>This changes the display name in JustSessions.</string>
 	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>

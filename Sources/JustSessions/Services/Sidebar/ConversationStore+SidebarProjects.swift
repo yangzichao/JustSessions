@@ -103,14 +103,18 @@ extension ConversationStore {
         updateSidebarProjectList(updatedList)
     }
 
-    /// Starts deleting the project's deletable sessions, then archives the project right away.
-    /// Skipped sessions, such as those with open terminals, stay on disk and come back if the project is restored.
-    /// When the deletion cannot start, the project stays.
     func deleteSessionsAndRemoveProject(_ projectPath: String) {
-        let plan = deletionPlan(for: projectPath)
-        guard plan.hasDeletableConversations, canStartDeletion(of: plan.deletableConversations) else { return }
-        deleteSessions(in: projectPath)
-        removeProjectFromSidebar(projectPath)
+        deleteSessionsAndRemoveProjects([projectPath])
+    }
+
+    /// Deletes the projects' deletable sessions, now or after what holds them up, and archives the projects
+    /// right away. Skipped sessions, such as those with open terminals, stay on disk and come back if a project is
+    /// restored. When none of the sessions is deletable, the projects stay.
+    func deleteSessionsAndRemoveProjects(_ projectPaths: Set<String>) {
+        let plan = deletionPlan(forProjects: projectPaths)
+        guard plan.hasDeletableConversations else { return }
+        deleteConversations(plan.deletableConversations)
+        removeProjectsFromSidebar(projectPaths)
     }
 
     private func updateSidebarProjectList(_ updatedList: SidebarProjectList) {

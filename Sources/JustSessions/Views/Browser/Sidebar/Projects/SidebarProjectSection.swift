@@ -18,6 +18,7 @@ struct SidebarProjectSection: View {
     let onRenameConversation: (Conversation) -> Void
     let onRenameProject: () -> Void
     let onRemoveSelectedProjects: () -> Void
+    let onRemoveSelectedProjectsAndDeleteSessions: () -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     /// The project row, then its sessions while it is expanded, as separate views: the sidebar's lazy list then
@@ -35,7 +36,8 @@ struct SidebarProjectSection: View {
             onRename: onRenameProject,
             onDeleteSessions: { onRequestDeletion(.project(project.id)) },
             onRemoveProjectAndDeleteSessions: { onRequestDeletion(.projectRemoval(project.id)) },
-            onRemoveSelectedProjects: onRemoveSelectedProjects
+            onRemoveSelectedProjects: onRemoveSelectedProjects,
+            onRemoveSelectedProjectsAndDeleteSessions: onRemoveSelectedProjectsAndDeleteSessions
         )
         .onboardingTourStop(isOnboardingTourProject ? .projects : nil)
 

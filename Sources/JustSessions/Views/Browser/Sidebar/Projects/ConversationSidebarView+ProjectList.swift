@@ -48,6 +48,7 @@ extension ConversationSidebarView {
                                 onRenameConversation: onRenameConversation,
                                 onRenameProject: { onRenameProject(project) },
                                 onRemoveSelectedProjects: removeSelectedProjects,
+                                onRemoveSelectedProjectsAndDeleteSessions: requestRemovalOfSelectedProjectsAndTheirSessions,
                                 onRequestDeletion: onRequestDeletion
                             )
                         }

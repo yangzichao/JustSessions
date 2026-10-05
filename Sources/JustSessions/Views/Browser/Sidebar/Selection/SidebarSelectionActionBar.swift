@@ -3,7 +3,6 @@ import SwiftUI
 /// Shown at the bottom of the sidebar while several sessions are selected.
 struct SidebarSelectionActionBar: View {
     let selectedCount: Int
-    let isDeleteDisabled: Bool
     let onDelete: () -> Void
 
     var body: some View {
@@ -16,7 +15,6 @@ struct SidebarSelectionActionBar: View {
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
-            .disabled(isDeleteDisabled)
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 10)

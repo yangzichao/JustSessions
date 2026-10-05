@@ -47,17 +47,13 @@ struct ProjectContextMenu: View {
             role: .destructive,
             action: onDeleteSessions
         )
-        .disabled(!canDeleteSessions(deletionPlan))
+        .disabled(!deletionPlan.hasDeletableConversations)
         Button(
             "Archive project and delete all sessions (\(deletionPlan.deletableConversations.count))…",
             systemImage: "trash",
             role: .destructive,
             action: onRemoveProjectAndDeleteSessions
         )
-        .disabled(!canDeleteSessions(deletionPlan))
-    }
-
-    private func canDeleteSessions(_ deletionPlan: SessionDeletionPlan) -> Bool {
-        deletionPlan.hasDeletableConversations && store.canStartDeletion(of: deletionPlan.deletableConversations)
+        .disabled(!deletionPlan.hasDeletableConversations)
     }
 }

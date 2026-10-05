@@ -14,6 +14,7 @@ struct SidebarProjectRow: View {
     let onDeleteSessions: () -> Void
     let onRemoveProjectAndDeleteSessions: () -> Void
     let onRemoveSelectedProjects: () -> Void
+    let onRemoveSelectedProjectsAndDeleteSessions: () -> Void
 
     @State private var isHovered = false
 
@@ -84,8 +85,10 @@ struct SidebarProjectRow: View {
     private var menuItems: some View {
         if isSelected && projectSelection.hasMultipleSelected {
             SelectedProjectsContextMenu(
-                selectedCount: projectSelection.selectedProjectIDs.count,
-                onRemove: onRemoveSelectedProjects
+                store: store,
+                selectedProjectIDs: projectSelection.selectedProjectIDs,
+                onRemove: onRemoveSelectedProjects,
+                onRemoveAndDeleteSessions: onRemoveSelectedProjectsAndDeleteSessions
             )
         } else {
             ProjectContextMenu(

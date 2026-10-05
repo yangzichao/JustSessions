@@ -106,6 +106,14 @@
 	<string>归档</string>
 	<key>Archive %lld projects</key>
 	<string>归档 %lld 个项目</string>
+	<key>Archive %lld projects and delete %lld sessions</key>
+	<string>归档 %1$lld 个项目并删除 %2$lld 个会话</string>
+	<key>Archive %lld projects and delete 1 session</key>
+	<string>归档 %lld 个项目并删除 1 个会话</string>
+	<key>Archive %lld projects and delete all sessions (%lld)…</key>
+	<string>归档 %1$lld 个项目并删除所有会话（%2$lld）…</string>
+	<key>Archive and delete sessions…</key>
+	<string>归档并删除会话…</string>
 	<key>Archive project</key>
 	<string>归档项目</string>
 	<key>Archive project and delete %lld sessions</key>
@@ -116,6 +124,10 @@
 	<string>归档项目并删除所有会话（%lld）…</string>
 	<key>Archive selected projects</key>
 	<string>归档所选项目</string>
+	<key>Archive selected projects and delete their sessions</key>
+	<string>归档所选项目并删除其会话</string>
+	<key>Archive the selected projects and delete their sessions, except those with open terminals</key>
+	<string>归档所选项目并删除其会话，已打开终端的会话除外</string>
 	<key>Archive the selected projects; keep sessions and open terminals</key>
 	<string>归档所选项目；保留会话和已打开的终端</string>
 	<key>Archived projects (%lld)…</key>
@@ -752,6 +764,8 @@
 	<string>项目将被归档；被跳过的会话仍保留在磁盘上，恢复项目后会重新显示。</string>
 	<key>The project will stay in the sidebar.</key>
 	<string>项目仍会保留在侧栏中。</string>
+	<key>The projects will be archived; skipped sessions stay on disk and come back when they are restored.</key>
+	<string>项目将被归档；被跳过的会话仍保留在磁盘上，恢复项目后会重新显示。</string>
 	<key>The shell and anything still running in it will stop.</key>
 	<string>shell 及其中仍在运行的进程都会停止。</string>
 	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
@@ -762,6 +776,8 @@
 	<string>此 Mac</string>
 	<key>This affects all tools in %@, including sessions hidden by the current filter.</key>
 	<string>此操作会影响 %@ 中所有工具的会话，包括被当前筛选条件隐藏的会话。</string>
+	<key>This affects all tools in %lld projects, including sessions hidden by the current filter.</key>
+	<string>此操作会影响 %lld 个项目中所有工具的会话，包括被当前筛选条件隐藏的会话。</string>
 	<key>This changes the display name in JustSessions.</key>
 	<string>仅修改 JustSessions 中的显示名称。</string>
 	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>

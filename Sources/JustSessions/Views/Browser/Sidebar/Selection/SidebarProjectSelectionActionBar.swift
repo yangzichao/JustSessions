@@ -3,6 +3,7 @@ import SwiftUI
 struct SidebarProjectSelectionActionBar: View {
     let selectedCount: Int
     let onRemove: () -> Void
+    let onRemoveAndDeleteSessions: () -> Void
 
     var body: some View {
         VStack(spacing: 8) {
@@ -20,6 +21,14 @@ struct SidebarProjectSelectionActionBar: View {
             .controlSize(.small)
             .help("Archive the selected projects; keep sessions and open terminals")
             .accessibilityLabel("Archive selected projects")
+            Button(role: .destructive, action: onRemoveAndDeleteSessions) {
+                Label("Archive and delete sessions…", systemImage: "trash")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .help("Archive the selected projects and delete their sessions, except those with open terminals")
+            .accessibilityLabel("Archive selected projects and delete their sessions")
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 10)
