@@ -1,0 +1,17 @@
+.download-section { display: flex; justify-content: center; padding-block: 32px; }
+.homepage .button { font-size: 18px; }
+.homepage .site-header { min-height: 72px; }
+.homepage .site-header nav { font-size: 18px; }
+.homepage .site-footer { justify-content: center; margin-top: 0; padding-block: 28px; border-top: 1px solid var(--line); }
+.homepage .site-footer nav { justify-content: center; font-size: 18px; }
+
+@media (max-width: 600px) {
+  .homepage .button, .homepage .site-header nav, .homepage .site-footer nav { font-size: 16px; }
+  .homepage .site-footer { align-items: center; }
+}
+
+@media (max-width: 360px) {
+  .homepage .site-header { flex-wrap: nowrap; padding-block: 0; }
+  .homepage .site-header nav { width: auto; }
+  .homepage .site-header .help-link { display: none; }
+}

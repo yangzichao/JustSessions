@@ -1,26 +1,7 @@
-@media (max-width: 1050px) {
-  .hero-introduction { gap: 32px; grid-template-columns: 1.1fr 1fr; }
-  .hero h1 { font-size: 46px; }
-  .hero-description { font-size: 17px; }
-  .hero-actions { gap: 8px 14px; }
-  .workflow-grid article { padding: 22px; }
-  .questions { gap: 36px; }
-}
-
 @media (max-width: 850px) {
   .page-width { width: calc(100% - 48px); }
   .site-header nav { gap: 18px; }
   .site-header .nav-detail { display: none; }
-  .hero-introduction { grid-template-columns: 1fr; gap: 20px; text-align: center; }
-  .hero h1 { font-size: 54px; }
-  .hero-copy { max-width: 600px; margin-inline: auto; }
-  .hero-description { max-width: none; }
-  .hero-actions { justify-content: center; }
-  .workflow-grid { gap: 14px; }
-  .workflow-grid article { padding: 20px; }
-  .workflow-grid h3 { font-size: 21px; }
-  .questions { grid-template-columns: 1fr; gap: 0; }
-  .questions h2 { max-width: none; }
 }
 
 @media (max-width: 600px) {
@@ -32,25 +13,8 @@
   .site-header nav { gap: 15px; font-size: 13px; }
   .site-header .github-link { display: none; }
   .button-small { font-size: 13px; padding-inline: 12px; }
-  .hero { padding-top: 34px; }
-  .hero-introduction { gap: 18px; margin-bottom: 26px; }
-  .hero .eyebrow { font-size: 11px; margin-bottom: 14px; }
-  .hero h1 { font-size: clamp(34px, 9.8vw, 48px); line-height: 1.14; letter-spacing: -.025em; }
-  .hero-description { font-size: 16px; line-height: 1.65; margin-bottom: 18px; }
-  .hero-actions { gap: 8px 18px; }
-  .hero-actions .button { font-size: 14px; padding-inline: 18px; }
-  .download-note { font-size: 12px; }
-  .section-heading { margin-bottom: 26px; }
-  .section-heading p { font-size: 16px; }
   .eyebrow { font-size: 11px; }
   h2 { font-size: 31px; letter-spacing: -.025em; }
-  .workflow-grid { grid-template-columns: 1fr; gap: 14px; }
-  .workflow-grid article { padding: 23px; }
-  .feature-icon { position: absolute; right: 23px; top: 20px; width: 24px; height: 24px; }
-  .workflow-grid h3 { font-size: 23px; }
-  summary { font-size: 16px; }
-  .download-section { padding: 32px 20px; }
-  .download-section h2 { font-size: 31px; }
   .site-footer { align-items: flex-start; flex-direction: column; gap: 24px; padding-block: 30px; }
   .site-footer nav { gap: 20px; font-size: 13px; }
 }
@@ -59,6 +23,4 @@
   .site-header { flex-wrap: wrap; padding-block: 14px; }
   .site-header nav { width: 100%; justify-content: space-between; }
   .site-header .github-link { display: none; }
-  .hero-actions { flex-direction: column; gap: 6px; }
-  .hero-actions .button { width: 100%; }
 }

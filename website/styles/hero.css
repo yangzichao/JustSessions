@@ -1,7 +1,11 @@
-.hero { padding-top: 48px; }
-.hero-introduction { display: grid; grid-template-columns: 1.22fr 1fr; align-items: end; gap: 48px; margin-bottom: 36px; }
-.hero h1 { margin-bottom: 0; font-size: clamp(40px, 4.7vw, 64px); line-height: 1.12; letter-spacing: -.035em; }
-.hero h1 span { color: var(--ink); }
-.hero-description { margin-bottom: 20px; max-width: 470px; font-size: 18px; line-height: 1.65; }
-.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px; }
-.download-note { margin: 14px 0 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
+.hero { padding-top: 24px; }
+.hero-introduction { margin-bottom: 24px; }
+.hero h1 { margin: 0; font-size: 36px; font-weight: 750; line-height: 1.15; letter-spacing: -.025em; }
+
+@media (max-width: 1000px) {
+  .hero h1 { font-size: 32px; }
+}
+
+@media (max-width: 650px) {
+  .hero h1 { font-size: 28px; }
+}

@@ -31,7 +31,7 @@ Automatic rotation starts by default and advances every 8 seconds. Only the play
 
 ## Pages and app colors
 
-Keep the homepage brief. `guide.html` provides indexable setup instructions, the six-CLI compatibility table, SSH and tmux requirements, troubleshooting, and privacy details. The README and [getting-started guide](../guides/getting-started.md) link to it. Keep its behavior descriptions aligned with the repository guides and `ConversationProvider` capabilities when support changes.
+Keep the homepage to one compact positioning line, the screenshot gallery, four concise FAQ answers, and a download action. The positioning line uses the same type size as the gallery headings; do not restore an oversized hero, eyebrow labels, download footnotes, or duplicate feature cards. Detailed setup and feature descriptions belong in the Guide. `guide.html` provides indexable setup instructions, the six-CLI compatibility table, SSH and tmux requirements, troubleshooting, and privacy details. The README and [getting-started guide](../guides/getting-started.md) link to it. Keep its behavior descriptions aligned with the repository guides and `ConversationProvider` capabilities when support changes.
 
 When a user-facing feature changes, update its guide and README entry in the same change. Mention its benefit on the homepage with a short sentence or guide link, then update page summaries and GitHub About only where needed. Source builds can be ahead of the latest signed installer: label unreleased controls in the guides and check release notes before presenting them as available in the download. Keep screenshot captions accurate until the actual interface captures are refreshed.
 
