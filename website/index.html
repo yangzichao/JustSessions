@@ -85,6 +85,18 @@
         </div>
       </div>
       <section class="screenshot-gallery" id="screenshots" aria-label="JustSessions features" aria-roledescription="carousel" data-screenshot-gallery>
+        <div class="gallery-controls" hidden data-gallery-controls>
+          <button class="gallery-arrow" type="button" aria-label="Previous screenshot" data-gallery-previous><span aria-hidden="true">←</span></button>
+          <div class="gallery-pagination" role="group" aria-label="Screenshot progress">
+            <button type="button" aria-controls="terminal" aria-current="true" aria-label="Native terminal screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="remote" aria-label="SSH sessions screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="persistence" aria-label="tmux persistence screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="split" aria-label="Split view screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="reading" aria-label="Session reader screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+          </div>
+          <button class="gallery-arrow" type="button" aria-label="Next screenshot" data-gallery-next><span aria-hidden="true">→</span></button>
+          <button class="gallery-rotation" type="button" aria-label="Pause automatic slideshow" data-gallery-rotation><span aria-hidden="true">Ⅱ</span></button>
+        </div>
         <div class="gallery-stage">
           <div class="gallery-track" tabindex="0" aria-label="Screenshots. Use the left and right arrow keys to browse." data-gallery-track>
             <figure class="gallery-slide" id="terminal" role="group" aria-roledescription="slide" aria-label="1 of 5: Native terminal">
@@ -153,18 +165,6 @@
               </a>
             </figure>
           </div>
-        </div>
-        <div class="gallery-controls" hidden data-gallery-controls>
-          <button class="gallery-arrow" type="button" aria-label="Previous screenshot" data-gallery-previous><span aria-hidden="true">←</span></button>
-          <div class="gallery-pagination" role="group" aria-label="Choose a screenshot">
-            <button type="button" aria-controls="terminal" aria-current="true" data-gallery-page>Terminal</button>
-            <button type="button" aria-controls="remote" data-gallery-page>SSH</button>
-            <button type="button" aria-controls="persistence" data-gallery-page>tmux</button>
-            <button type="button" aria-controls="split" data-gallery-page>Split</button>
-            <button type="button" aria-controls="reading" data-gallery-page>Read</button>
-          </div>
-          <button class="gallery-arrow" type="button" aria-label="Next screenshot" data-gallery-next><span aria-hidden="true">→</span></button>
-          <button class="gallery-rotation" type="button" aria-label="Pause automatic slideshow" data-gallery-rotation><span aria-hidden="true">Ⅱ</span></button>
         </div>
         <div class="provider-support">
           <p class="provider-caption">Multiple agents. All your sessions.</p>

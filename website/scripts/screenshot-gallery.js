@@ -1,4 +1,5 @@
 import { createGalleryRotation } from "./gallery-rotation.js";
+import { createGalleryProgress } from "./gallery-progress.js";
 
 for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   const track = gallery.querySelector("[data-gallery-track]");
@@ -36,6 +37,7 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
 
   const rotation = createGalleryRotation({
     advance: () => showSlide(currentIndex + 1),
+    updateProgress: createGalleryProgress(pageButtons),
     updateControl: (requested, running) => {
       rotationButton.setAttribute("aria-label", requested ? "Pause automatic slideshow" : "Start automatic slideshow");
       rotationButton.firstElementChild.textContent = requested ? "Ⅱ" : "▶";
@@ -46,6 +48,7 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   function manuallyShow(index) {
     rotation.stop();
     showSlide(index);
+    rotation.reset();
   }
 
   gallery.querySelector("[data-gallery-previous]").addEventListener("click", () => manuallyShow(currentIndex - 1));
@@ -70,7 +73,10 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
     scrollTimer = window.setTimeout(() => {
       const nearestIndex = slides.reduce((nearest, slide, index) =>
         Math.abs(slide.offsetLeft - track.scrollLeft) < Math.abs(slides[nearest].offsetLeft - track.scrollLeft) ? index : nearest, 0);
-      updateSelection(nearestIndex);
+      if (nearestIndex !== currentIndex) {
+        updateSelection(nearestIndex);
+        rotation.reset();
+      }
     }, 150);
   }, { passive: true });
 
@@ -79,6 +85,7 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
     if (linkedIndex >= 0) {
       rotation.stop();
       showSlide(linkedIndex, false);
+      rotation.reset();
     }
   }
   window.addEventListener("hashchange", showLinkedSlide);
