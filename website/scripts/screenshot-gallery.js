@@ -1,5 +1,6 @@
 import { createGalleryRotation } from "./gallery-rotation.js";
 import { createGalleryProgress } from "./gallery-progress.js";
+import { createGalleryMedia } from "./gallery-media.js";
 
 for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   const track = gallery.querySelector("[data-gallery-track]");
@@ -8,6 +9,7 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   const rotationButton = gallery.querySelector("[data-gallery-rotation]");
   const status = gallery.querySelector("[data-gallery-status]");
   const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const media = createGalleryMedia(slides);
   let currentIndex = 0;
   let scrollTimer;
 
@@ -23,6 +25,7 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
       // Inactive screenshots remain available to touch scrolling but not tab navigation.
       for (const link of slide.querySelectorAll("a")) link.tabIndex = slideIndex === index ? 0 : -1;
     });
+    media.select(index);
   }
 
   function showSlide(index, animate = true) {
@@ -40,6 +43,7 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
     advance: () => showSlide(currentIndex + 1),
     updateProgress: createGalleryProgress(pageButtons),
     updateControl: (requested, running) => {
+      media.setPlaying(requested);
       rotationButton.setAttribute("aria-label", requested ? "Pause automatic slideshow" : "Start automatic slideshow");
       rotationButton.firstElementChild.textContent = requested ? "Ⅱ" : "▶";
       status.setAttribute("aria-live", running ? "off" : "polite");

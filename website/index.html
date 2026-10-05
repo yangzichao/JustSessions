@@ -4,23 +4,23 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fcfbf8">
-  <title>JustSessions — Claude Code & Codex Session Manager for macOS</title>
-  <meta name="description" content="Your familiar command line, with native tabs, split view, and multi-agent session management. A lightweight macOS workspace for Claude Code, Codex and more.">
+  <title>JustSessions — Claude Code &amp; Codex CLI Workspace for macOS</title>
+  <meta name="description" content="Manage Claude Code, Codex and other agent sessions in a lightweight Mac app. Keep your CLI workflow, with native tabs, split view, SSH and bundled tmux.">
   <link rel="canonical" href="https://yangzichao.github.io/JustSessions/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="JustSessions">
-  <meta property="og:title" content="JustSessions — Claude Code &amp; Codex Session Manager for macOS">
-  <meta property="og:description" content="Your familiar command line, with native tabs, split view, and multi-agent session management. A lightweight macOS workspace for Claude Code, Codex and more.">
+  <meta property="og:title" content="JustSessions — Claude Code &amp; Codex CLI Workspace for macOS">
+  <meta property="og:description" content="Manage Claude Code, Codex and other agent sessions in a lightweight Mac app. Keep your CLI workflow, with native tabs, split view, SSH and bundled tmux.">
   <meta property="og:url" content="https://yangzichao.github.io/JustSessions/">
   <meta property="og:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="JustSessions — Lightweight. All your sessions. Six AI coding tools in one native Mac app.">
+  <meta property="og:image:alt" content="JustSessions — Your CLI. A lighter workspace. Native terminal, project tabs, SSH and tmux for six coding agents.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="JustSessions — Claude Code &amp; Codex Session Manager for macOS">
-  <meta name="twitter:description" content="Your familiar command line, with native tabs, split view, and multi-agent session management. A lightweight macOS workspace for Claude Code, Codex and more.">
+  <meta name="twitter:title" content="JustSessions — Claude Code &amp; Codex CLI Workspace for macOS">
+  <meta name="twitter:description" content="Manage Claude Code, Codex and other agent sessions in a lightweight Mac app. Keep your CLI workflow, with native tabs, split view, SSH and bundled tmux.">
   <meta name="twitter:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
-  <meta name="twitter:image:alt" content="JustSessions, a native macOS home for your AI coding sessions.">
+  <meta name="twitter:image:alt" content="JustSessions — Your CLI. A lighter workspace. Native terminal, project tabs, SSH and tmux for six coding agents.">
   <link rel="icon" type="image/svg+xml" href="./assets/mark.svg">
   <link rel="apple-touch-icon" href="./assets/app-icon-256.png">
   <link rel="stylesheet" href="./styles/app-theme.css">
@@ -30,7 +30,6 @@
   <link rel="stylesheet" href="./styles/hero.css">
   <link rel="stylesheet" href="./styles/providers.css">
   <link rel="stylesheet" href="./styles/screenshot-gallery.css">
-  <link rel="stylesheet" href="./styles/gallery-persistence.css">
   <script type="module" src="./scripts/screenshot-gallery.js"></script>
   <script type="module" src="./scripts/traffic/traffic-monitor.js"></script>
   <link rel="stylesheet" href="./styles/details.css">
@@ -43,10 +42,27 @@
       "name": "JustSessions",
       "url": "https://yangzichao.github.io/JustSessions/",
       "image": "https://yangzichao.github.io/JustSessions/assets/social-preview.png",
-      "screenshot": "https://yangzichao.github.io/JustSessions/assets/native-terminal.jpg",
-      "description": "A lightweight, native macOS wrapper for existing coding CLIs: find, read, resume, and manage sessions locally or over SSH, with bundled local tmux.",
+      "screenshot": [
+        "https://yangzichao.github.io/JustSessions/assets/multi-agent-sessions.jpg",
+        "https://yangzichao.github.io/JustSessions/assets/session-reader.jpg",
+        "https://yangzichao.github.io/JustSessions/assets/ssh-sessions.jpg",
+        "https://yangzichao.github.io/JustSessions/assets/tmux-persistence.jpg",
+        "https://yangzichao.github.io/JustSessions/assets/tabs-split.jpg"
+      ],
+      "description": "Manage Claude Code, Codex and other agent sessions in a lightweight Mac app. Keep your CLI workflow, with native tabs, split view, SSH and bundled tmux.",
       "operatingSystem": "macOS 14 or later (Apple Silicon)",
       "applicationCategory": "DeveloperApplication",
+      "softwareRequirements": "A supported coding CLI installed and signed in",
+      "featureList": [
+        "Multiple coding agents organized by project",
+        "Native terminal for existing coding CLIs",
+        "Local and SSH sessions in one workspace",
+        "Bundled local tmux for persistent CLI sessions",
+        "Project tabs, vertical tab list and split view",
+        "Automatically reopen tabs on launch",
+        "Conversation previews and search"
+      ],
+      "isAccessibleForFree": true,
       "license": "https://github.com/yangzichao/JustSessions/blob/main/LICENSE",
       "downloadUrl": "https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg",
       "softwareHelp": { "@type": "WebPage", "url": "https://yangzichao.github.io/JustSessions/guide.html" },
@@ -60,8 +76,8 @@
 
   <main id="main">
     <section class="hero page-width" aria-labelledby="hero-title">
-      <h1 id="hero-title">Your CLI. <span class="hero-title-line">A lighter workspace.</span></h1>
-      <p class="hero-description">Your familiar command line, with native tabs, split view, and multi-agent session management.</p>
+      <h1 id="hero-title">Nothing extra. <span class="hero-title-line">Just sessions.</span></h1>
+      <p class="hero-description">Multiple agents, all your sessions in one place. Your familiar command line, with native tabs.</p>
       <section class="screenshot-gallery" id="screenshots" aria-label="JustSessions features" aria-roledescription="carousel" data-screenshot-gallery>
         <div class="gallery-stage">
           <div class="gallery-track" tabindex="0" aria-label="Screenshots. Use the left and right arrow keys to browse." data-gallery-track>
@@ -95,12 +111,28 @@
                   </li>
                 </ul>
               </figcaption>
-              <a class="gallery-image" href="./assets/native-terminal.jpg" aria-label="View the native terminal screenshot at full size">
-                <img src="./assets/native-terminal.jpg" width="2400" height="1440" fetchpriority="high" alt="JustSessions Projects sidebar groups five agent sessions under orbit-web: two Claude Code sessions, Codex, OpenCode, and Pi. An orange outline highlights the project and its sessions beside the real Claude Code CLI help screen.">
-                <img class="gallery-annotation" src="./assets/project-agents-highlight.svg" width="2400" height="1440" decoding="async" alt="" aria-hidden="true">
+              <a class="gallery-image" href="./assets/multi-agent-sessions.mp4" aria-label="View the multi-agent session demo at full size">
+                <video src="./assets/multi-agent-sessions.mp4" poster="./assets/multi-agent-sessions.jpg" width="1600" height="960" autoplay loop muted playsinline preload="metadata" data-gallery-video aria-label="Real JustSessions clicks switch between Claude Code, Codex, and OpenCode CLIs. The Projects sidebar keeps four sessions, including two Claude Code sessions, together under orbit-web.">
+                  <img src="./assets/multi-agent-sessions.jpg" width="2400" height="1440" alt="Four agent sessions grouped under orbit-web in JustSessions: two Claude Code sessions, Codex, and OpenCode.">
+                </video>
               </a>
             </figure>
-            <figure class="gallery-slide" id="remote" role="group" aria-roledescription="slide" aria-label="2 of 5: SSH sessions">
+            <figure class="gallery-slide" id="reading" role="group" aria-roledescription="slide" aria-label="2 of 5: Session management">
+              <figcaption class="gallery-caption">
+                <h2>New. Resume. Delete.</h2>
+                <ul class="gallery-feature-list">
+                  <li>Start with any agent</li>
+                  <li>Read, then resume</li>
+                  <li>Delete saved sessions</li>
+                </ul>
+              </figcaption>
+              <a class="gallery-image" href="./assets/session-reader.mp4" aria-label="View the session reader demo at full size">
+                <video src="./assets/session-reader.mp4" poster="./assets/session-reader.jpg" width="1600" height="960" loop muted playsinline preload="metadata" data-gallery-video aria-label="Browse the first and latest messages in a saved conversation, then return to the running Claude Code CLI tab.">
+                  <img src="./assets/session-reader.jpg" width="2400" height="1440" alt="A saved conversation in the native JustSessions reader, beside projects and agent sessions.">
+                </video>
+              </a>
+            </figure>
+            <figure class="gallery-slide" id="remote" role="group" aria-roledescription="slide" aria-label="3 of 5: SSH sessions">
               <figcaption class="gallery-caption">
                 <h2>Work on any host.</h2>
                 <ul class="gallery-feature-list">
@@ -109,12 +141,14 @@
                   <li>Resume remotely</li>
                 </ul>
               </figcaption>
-              <a class="gallery-image" href="./assets/remote-desktop-sessions.jpg" aria-label="View the ssh sessions screenshot at full size">
-                  <img src="./assets/remote-desktop-sessions.jpg" width="2400" height="1440" loading="lazy" decoding="async" alt="The current JustSessions reader with the dev-desktop SSH host and its project sessions outlined in orange in the sidebar.">
+              <a class="gallery-image" href="./assets/ssh-sessions.mp4" aria-label="View the SSH sessions demo at full size">
+                <video src="./assets/ssh-sessions.mp4" poster="./assets/ssh-sessions.jpg" width="1600" height="960" loop muted playsinline preload="metadata" data-gallery-video aria-label="Expand the dev-desktop project, switch to a local Claude Code CLI, and return to the remote conversation in the same sidebar.">
+                  <img src="./assets/ssh-sessions.jpg" width="2400" height="1440" alt="The dev-desktop host and its sessions beside a remote conversation in JustSessions.">
+                </video>
                   <img class="gallery-annotation" src="./assets/ssh-host-highlight.svg" width="2400" height="1440" loading="lazy" decoding="async" alt="" aria-hidden="true">
               </a>
             </figure>
-            <figure class="gallery-slide" id="persistence" role="group" aria-roledescription="slide" aria-label="3 of 5: tmux persistence">
+            <figure class="gallery-slide" id="persistence" role="group" aria-roledescription="slide" aria-label="4 of 5: tmux persistence">
               <figcaption class="gallery-caption">
                 <h2>Close a tab. Keep the work.</h2>
                 <ul class="gallery-feature-list">
@@ -123,18 +157,13 @@
                   <li>Click to reattach</li>
                 </ul>
               </figcaption>
-              <div class="gallery-terminal-persistence">
-                <a class="gallery-image" href="./assets/tmux-keep-running.jpg" aria-label="View the tmux persistence screenshot at full size">
-                  <img src="./assets/tmux-keep-running.jpg" width="2400" height="1440" loading="lazy" decoding="async" alt="The full JustSessions window after quitting and reopening the app, with the sidebar, project tabs, and the same Claude Code CLI reattached in a sample tmux session.">
-                </a>
-                <aside class="gallery-close-choice" aria-label="Choice when closing a terminal tab">
-                  <a href="./assets/tmux-close-choice.jpg" aria-label="View the Keep running close-tab dialog at full size">
-                    <img src="./assets/tmux-close-choice.jpg" width="520" height="476" loading="lazy" decoding="async" alt="The real Close this tab dialog: Keep running leaves the CLI running in tmux; End session stops it; Cancel returns to the tab.">
-                  </a>
-                </aside>
-              </div>
+              <a class="gallery-image" href="./assets/tmux-persistence.mp4" aria-label="View the tmux persistence demo at full size">
+                <video src="./assets/tmux-persistence.mp4" poster="./assets/tmux-persistence.jpg" width="1600" height="960" loop muted playsinline preload="metadata" data-gallery-video aria-label="Close the Claude Code tab, choose Keep running, and reconnect to the same tmux CLI after reopening the sample app.">
+                  <img src="./assets/tmux-persistence.jpg" width="2400" height="1440" alt="The real Close this tab dialog over its terminal, with Keep running, End session, and Cancel.">
+                </video>
+              </a>
             </figure>
-            <figure class="gallery-slide" id="split" role="group" aria-roledescription="slide" aria-label="4 of 5: Tabs and split view">
+            <figure class="gallery-slide" id="split" role="group" aria-roledescription="slide" aria-label="5 of 5: Tabs and split view">
               <figcaption class="gallery-caption">
                 <h2>Tabs like Chrome. Split view.</h2>
                 <ul class="gallery-feature-list">
@@ -143,21 +172,10 @@
                   <li>Agent + shell, side by side</li>
                 </ul>
               </figcaption>
-              <a class="gallery-image" href="./assets/split-terminal.jpg" aria-label="View the Open tabs and split view screenshot at full size">
-                <img src="./assets/split-terminal.jpg" width="2400" height="1440" loading="lazy" decoding="async" alt="JustSessions Open tabs sidebar lists five tabs across two projects, including Claude Code, Codex, OpenCode, Pi, and a shell. The split view shows the real Claude Code CLI beside a project shell displaying Git diff.">
-              </a>
-            </figure>
-            <figure class="gallery-slide" id="reading" role="group" aria-roledescription="slide" aria-label="5 of 5: Session reader">
-              <figcaption class="gallery-caption">
-                <h2>Read. Then resume.</h2>
-                <ul class="gallery-feature-list">
-                  <li>Browse your conversations</li>
-                  <li>Search within messages</li>
-                  <li>Resume when ready</li>
-                </ul>
-              </figcaption>
-              <a class="gallery-image" href="./assets/session-overview.jpg" aria-label="View the session reader screenshot at full size">
-                <img src="./assets/session-overview.jpg" width="2400" height="1440" loading="lazy" decoding="async" alt="The current JustSessions conversation reader with search, reading window controls, and sessions from six agents organized by project.">
+              <a class="gallery-image" href="./assets/tabs-split.mp4" aria-label="View the tabs and split view demo at full size">
+                <video src="./assets/tabs-split.mp4" poster="./assets/tabs-split.jpg" width="1600" height="960" loop muted playsinline preload="metadata" data-gallery-video aria-label="Switch between four tabs in the vertical Open tabs list, then use the tab menu to split Claude Code beside a project shell showing Git diff.">
+                  <img src="./assets/tabs-split.jpg" width="2400" height="1440" alt="The Open tabs sidebar lists Claude Code, a shell, Codex, and OpenCode. Claude Code and the shell share a split view.">
+                </video>
               </a>
             </figure>
           </div>
@@ -166,10 +184,10 @@
           <button class="gallery-arrow" type="button" aria-label="Previous screenshot" data-gallery-previous><span aria-hidden="true">←</span></button>
           <div class="gallery-pagination" role="group" aria-label="Screenshot progress">
             <button type="button" aria-controls="terminal" aria-current="true" aria-label="Your CLIs screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="reading" aria-label="Session management screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
             <button type="button" aria-controls="remote" aria-label="SSH sessions screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
             <button type="button" aria-controls="persistence" aria-label="tmux persistence screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
             <button type="button" aria-controls="split" aria-label="Tabs and split view screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
-            <button type="button" aria-controls="reading" aria-label="Session reader screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
           </div>
           <button class="gallery-arrow" type="button" aria-label="Next screenshot" data-gallery-next><span aria-hidden="true">→</span></button>
           <button class="gallery-rotation" type="button" aria-label="Pause automatic slideshow" data-gallery-rotation><span aria-hidden="true">Ⅱ</span></button>
