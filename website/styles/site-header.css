@@ -1,0 +1,25 @@
+/* The one top bar every page shares. Its markup lives in website/partials/site-header.html; keep all of its styles here. */
+.site-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 72px; border-bottom: 1px solid var(--line); }
+.site-header nav { display: flex; align-items: center; gap: 25px; font-size: 18px; font-weight: 500; }
+.site-header nav > a[aria-current="page"] { font-weight: 650; }
+.site-header-help { display: inline-flex; align-items: center; gap: 6px; }
+.site-header .button { min-height: 42px; padding: 10px 16px; font-size: 18px; }
+
+@media (max-width: 850px) {
+  .site-header nav { gap: 18px; }
+  .site-header-guide { display: none; }
+}
+
+@media (max-width: 600px) {
+  .site-header { gap: 12px; }
+  .site-header .wordmark { gap: 8px; font-size: 18px; }
+  .site-header .wordmark img { width: 28px; }
+  .site-header nav { gap: 15px; font-size: 16px; }
+  .site-header .button { padding-inline: 12px; font-size: 16px; }
+  /* Phones cannot install the app, and the full label does not fit beside the wordmark. */
+  .site-header-platform { display: none; }
+}
+
+@media (max-width: 360px) {
+  .site-header-help { display: none; }
+}

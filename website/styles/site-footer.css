@@ -1,0 +1,8 @@
+/* The one footer every page shares. Its markup lives in website/partials/site-footer.html; keep all of its styles here. */
+.site-footer { display: flex; justify-content: center; padding-block: 28px; margin-top: 32px; border-top: 1px solid var(--line); }
+.site-footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; font-size: 18px; color: var(--secondary); }
+.site-footer nav a:hover { color: var(--ink); }
+
+@media (max-width: 600px) {
+  .site-footer nav { gap: 20px; font-size: 16px; }
+}

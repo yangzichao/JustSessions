@@ -1,11 +1,11 @@
-.hero { padding-top: 24px; }
-.hero-introduction { margin-bottom: 24px; }
-.hero h1 { margin: 0; font-size: 36px; font-weight: 750; line-height: 1.15; letter-spacing: -.025em; }
-
-@media (max-width: 1000px) {
-  .hero h1 { font-size: 32px; }
-}
+/* One line above the screenshots says what the app is; the slides show the rest. */
+.hero { padding-top: 28px; }
+.hero h1 { margin: 0 0 24px; font-size: clamp(30px, 3.2vw, 44px); font-weight: 750; line-height: 1.1; letter-spacing: -.03em; }
+/* On narrow screens the title breaks after the comma instead of inside "organized by project". */
+.hero-title-line { display: inline-block; }
 
 @media (max-width: 650px) {
-  .hero h1 { font-size: 28px; }
+  .hero { padding-top: 20px; }
+  /* Scales with the screen so each half of the title keeps to one line down to 320px wide. */
+  .hero h1 { margin-bottom: 18px; font-size: min(30px, 6.6vw); }
 }

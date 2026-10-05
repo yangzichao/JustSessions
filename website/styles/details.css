@@ -1,14 +1,15 @@
-.questions { padding-top: 48px; }
+.questions { padding-block: 40px 48px; }
 .question-list { border-top: 1px solid var(--line); }
 details { border-bottom: 1px solid var(--line); }
-summary { position: relative; padding: 20px 34px 20px 0; font-size: 22px; font-weight: 650; line-height: 1.35; cursor: pointer; list-style: none; }
+summary { position: relative; padding: 18px 34px 18px 0; font-size: 19px; font-weight: 600; line-height: 1.35; cursor: pointer; list-style: none; }
 summary::-webkit-details-marker { display: none; }
-summary::after { content: "+"; position: absolute; top: 20px; right: 4px; font-size: inherit; font-weight: 400; }
+summary::after { content: "+"; position: absolute; top: 18px; right: 4px; font-size: inherit; font-weight: 400; }
 details[open] summary::after { content: "−"; }
-details p { margin-bottom: 20px; padding-right: 34px; font-size: 22px; line-height: 1.5; }
+details p { margin-bottom: 18px; padding-right: 34px; font-size: 17px; line-height: 1.6; }
 details a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 650px) {
-  .questions { padding-top: 32px; }
-  summary, details p { font-size: 18px; }
+  .questions { padding-block: 32px; }
+  summary { font-size: 17px; }
+  details p { font-size: 16px; }
 }

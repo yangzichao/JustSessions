@@ -1,26 +1,10 @@
 @media (max-width: 850px) {
   .page-width { width: calc(100% - 48px); }
-  .site-header nav { gap: 18px; }
-  .site-header .nav-detail { display: none; }
 }
 
 @media (max-width: 600px) {
   .page-width { width: calc(100% - 36px); }
   .section-space { padding-block: 48px; }
-  .site-header { min-height: 72px; gap: 12px; }
-  .site-header .wordmark { gap: 8px; font-size: 18px; }
-  .site-header .wordmark img { width: 28px; }
-  .site-header nav { gap: 15px; font-size: 13px; }
-  .site-header .github-link { display: none; }
-  .button-small { font-size: 13px; padding-inline: 12px; }
   .eyebrow { font-size: 11px; }
   h2 { font-size: 31px; letter-spacing: -.025em; }
-  .site-footer { align-items: flex-start; flex-direction: column; gap: 24px; padding-block: 30px; }
-  .site-footer nav { gap: 20px; font-size: 13px; }
-}
-
-@media (max-width: 360px) {
-  .site-header { flex-wrap: wrap; padding-block: 14px; }
-  .site-header nav { width: 100%; justify-content: space-between; }
-  .site-header .github-link { display: none; }
 }

@@ -1,14 +1,18 @@
-.screenshot-gallery { overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--sidebar-surface); }
+/* Wide screens show each slide like a presentation page: text in a left column, the screenshot on the right.
+   The gutter keeps screenshot shadows inside the scroll track while the slides stay aligned with the page edges. */
+.screenshot-gallery { --gallery-gutter: 24px; --gallery-caption-width: 300px; --gallery-column-gap: 40px; margin-inline: calc(var(--gallery-gutter) * -1); }
 .gallery-track { position: relative; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
 .gallery-track::-webkit-scrollbar { display: none; }
-.gallery-slide { flex: 0 0 100%; min-width: 0; display: grid; grid-template-columns: 1fr; align-content: start; gap: 16px; padding: 0 16px 20px; scroll-snap-align: start; scroll-snap-stop: always; }
-.gallery-caption { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 12px; min-height: 116px; margin: 0; padding: 4px; }
-.gallery-caption h2 { margin: 0; font-size: 36px; font-weight: 750; color: var(--ink); letter-spacing: -.025em; line-height: 1.15; }
-.gallery-description { margin: 0; font-size: 22px; font-weight: 650; color: var(--ink); line-height: 1.35; }
-.gallery-caption-agents .provider-list { justify-content: flex-start; margin: 0; max-width: none; }
-.gallery-image { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 5 / 3; overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: var(--message-surface); box-shadow: 0 8px 24px var(--shadow); cursor: zoom-in; }
+.gallery-slide { flex: 0 0 100%; min-width: 0; display: grid; grid-template-columns: var(--gallery-caption-width) minmax(0, 1fr); align-items: start; column-gap: var(--gallery-column-gap); padding: 0 var(--gallery-gutter) 32px; scroll-snap-align: start; scroll-snap-stop: always; }
+.gallery-caption { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 0; padding-top: 4px; }
+.gallery-caption h2 { margin: 0; font-size: 30px; font-weight: 700; color: var(--ink); letter-spacing: -.025em; line-height: 1.15; text-wrap: balance; }
+.gallery-description { margin: 0; font-size: 17px; line-height: 1.5; color: var(--secondary); }
+.gallery-description strong { font-weight: 650; color: var(--ink); }
+.gallery-caption .provider-list { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 10px; }
+.gallery-image { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 5 / 3; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--message-surface); box-shadow: 0 1px 2px var(--shadow), 0 12px 30px -14px rgb(21 23 28 / 24%); cursor: zoom-in; }
 .gallery-image img { width: 100%; height: 100%; object-fit: contain; }
-.gallery-controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px 16px; }
+/* The controls sit centered under the screenshot column. */
+.gallery-controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 var(--gallery-gutter) 0 calc(var(--gallery-gutter) + var(--gallery-caption-width) + var(--gallery-column-gap)); }
 .gallery-controls[hidden] { display: none; }
 .gallery-controls button { display: inline-flex; align-items: center; justify-content: center; height: 40px; border: 0; border-radius: 8px; background: transparent; color: var(--secondary); font: inherit; cursor: pointer; }
 .gallery-controls button:hover { background: var(--message-surface); color: var(--ink); }
@@ -21,22 +25,24 @@
 .gallery-pagination button span { background: var(--ink); transform: scaleX(0); transform-origin: left; }
 .gallery-rotation { font-size: 14px; }
 
+/* Narrower screens stack the text above the screenshot. Every slide is as tall as the tallest one,
+   and the caption row absorbs the difference so the screenshots line up. */
 @media (max-width: 1000px) {
-  .gallery-caption { min-height: 144px; }
-  .gallery-caption h2 { font-size: 32px; }
+  .gallery-slide { grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr auto; row-gap: 16px; }
+  .gallery-caption { align-self: start; gap: 8px; padding-top: 0; }
+  .gallery-caption h2 { font-size: 22px; }
+  .gallery-caption .provider-list { flex-direction: row; flex-wrap: wrap; gap: 10px 24px; }
+  .gallery-controls { padding-inline: 16px; }
 }
 
 @media (max-width: 650px) {
-  .gallery-slide { gap: 12px; padding: 0 10px 16px; }
-  .gallery-caption { gap: 12px; min-height: 184px; padding: 0 6px; }
-  .gallery-caption-agents .provider-list { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .gallery-caption h2 { font-size: 28px; }
-  .gallery-description { font-size: 18px; }
-  .gallery-controls { gap: 6px; padding: 6px 10px; }
+  .screenshot-gallery { --gallery-gutter: 12px; }
+  .gallery-slide { row-gap: 12px; padding-bottom: 20px; }
+  .gallery-caption h2 { font-size: 20px; }
+  .gallery-description { font-size: 15px; }
+  .gallery-caption .provider-list { width: 100%; max-width: none; margin: 0; gap: 8px 12px; }
+  .gallery-image { border-radius: 8px; box-shadow: 0 1px 2px var(--shadow), 0 8px 18px -10px rgb(21 23 28 / 24%); }
+  .gallery-controls { gap: 6px; padding-inline: 10px; }
   .gallery-pagination { gap: 6px; }
   .gallery-arrow, .gallery-rotation { width: 32px; }
-}
-
-@media (max-width: 360px) {
-  .gallery-caption { min-height: 196px; }
 }

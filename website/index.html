@@ -25,7 +25,8 @@
   <link rel="apple-touch-icon" href="./assets/app-icon-256.png">
   <link rel="stylesheet" href="./styles/app-theme.css">
   <link rel="stylesheet" href="./styles/foundation.css">
-  <link rel="stylesheet" href="./styles/navigation.css">
+  <link rel="stylesheet" href="./styles/site-header.css">
+  <link rel="stylesheet" href="./styles/site-footer.css">
   <link rel="stylesheet" href="./styles/hero.css">
   <link rel="stylesheet" href="./styles/providers.css">
   <link rel="stylesheet" href="./styles/screenshot-gallery.css">
@@ -33,7 +34,6 @@
   <script type="module" src="./scripts/screenshot-gallery.js"></script>
   <link rel="stylesheet" href="./styles/details.css">
   <link rel="stylesheet" href="./styles/responsive.css">
-  <link rel="stylesheet" href="./styles/homepage-layout.css">
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -54,43 +54,18 @@
     }
   </script>
 </head>
-<body class="homepage">
-  <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header page-width">
-    <a class="wordmark" href="./" aria-label="JustSessions home">
-      <img src="./assets/mark.svg" width="34" height="30" alt="">
-      <span>JustSessions</span>
-    </a>
-    <nav aria-label="Main navigation">
-      <a class="nav-detail" href="./guide.html">Guide</a>
-      <a class="help-link" href="./help.html"><span class="help-icon" aria-hidden="true">?</span> Help</a>
-      <a class="button button-small" href="https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg" download="JustSessions.dmg">Download <span aria-hidden="true">↓</span></a>
-    </nav>
-  </header>
+<body>
+  <!-- partial: site-header -->
 
   <main id="main">
     <section class="hero page-width" aria-labelledby="hero-title">
-      <div class="hero-introduction">
-        <h1 id="hero-title">Lightweight. All your sessions.</h1>
-      </div>
+      <h1 id="hero-title">Agent sessions and terminals, <span class="hero-title-line">organized by project.</span></h1>
       <section class="screenshot-gallery" id="screenshots" aria-label="JustSessions features" aria-roledescription="carousel" data-screenshot-gallery>
-        <div class="gallery-controls" hidden data-gallery-controls>
-          <button class="gallery-arrow" type="button" aria-label="Previous screenshot" data-gallery-previous><span aria-hidden="true">←</span></button>
-          <div class="gallery-pagination" role="group" aria-label="Screenshot progress">
-            <button type="button" aria-controls="terminal" aria-current="true" aria-label="Multiple agents screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
-            <button type="button" aria-controls="remote" aria-label="SSH sessions screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
-            <button type="button" aria-controls="persistence" aria-label="tmux persistence screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
-            <button type="button" aria-controls="split" aria-label="Tabs and split view screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
-            <button type="button" aria-controls="reading" aria-label="Session reader screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
-          </div>
-          <button class="gallery-arrow" type="button" aria-label="Next screenshot" data-gallery-next><span aria-hidden="true">→</span></button>
-          <button class="gallery-rotation" type="button" aria-label="Pause automatic slideshow" data-gallery-rotation><span aria-hidden="true">Ⅱ</span></button>
-        </div>
         <div class="gallery-stage">
           <div class="gallery-track" tabindex="0" aria-label="Screenshots. Use the left and right arrow keys to browse." data-gallery-track>
-            <figure class="gallery-slide" id="terminal" role="group" aria-roledescription="slide" aria-label="1 of 5: Multiple agents">
-              <figcaption class="gallery-caption gallery-caption-agents">
-                <h2>Multiple agents. One place.</h2>
+            <figure class="gallery-slide" id="terminal" role="group" aria-roledescription="slide" aria-label="1 of 5: Your CLIs">
+              <figcaption class="gallery-caption">
+                <h2>The CLIs you already use.</h2>
                 <ul class="provider-list" role="list" aria-label="Supported coding agents">
                   <li class="provider-item provider-claude">
                     <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg>
@@ -125,7 +100,7 @@
             <figure class="gallery-slide" id="remote" role="group" aria-roledescription="slide" aria-label="2 of 5: SSH sessions">
               <figcaption class="gallery-caption">
                 <h2>Work on any host.</h2>
-                <p class="gallery-description">Local and SSH sessions. One workspace.</p>
+                <p class="gallery-description">SSH hosts sit next to your local projects in the same sidebar.</p>
               </figcaption>
               <a class="gallery-image" href="./assets/remote-desktop-sessions.jpg" aria-label="View the ssh sessions screenshot at full size">
                 <img src="./assets/remote-desktop-sessions.jpg" width="2400" height="1440" loading="lazy" decoding="async" alt="The current JustSessions reader with a selected Claude Code conversation under the sample dev-desktop SSH host alongside local projects.">
@@ -134,7 +109,7 @@
             <figure class="gallery-slide" id="persistence" role="group" aria-roledescription="slide" aria-label="3 of 5: tmux persistence">
               <figcaption class="gallery-caption">
                 <h2>Close a tab. Keep the work.</h2>
-                <p class="gallery-description">Close tab → <strong>Keep running</strong> → Reattach.</p>
+                <p class="gallery-description">Choose <strong>Keep running</strong> and the CLI stays alive in tmux. Click the session to reattach.</p>
               </figcaption>
               <div class="gallery-terminal-persistence">
                 <a class="gallery-image" href="./assets/tmux-keep-running.jpg" aria-label="View the tmux persistence screenshot at full size">
@@ -147,10 +122,10 @@
                 </aside>
               </div>
             </figure>
-            <figure class="gallery-slide" id="split" role="group" aria-roledescription="slide" aria-label="4 of 5: Tabs and split view">
+            <figure class="gallery-slide" id="split" role="group" aria-roledescription="slide" aria-label="4 of 5: Agent and shell side by side">
               <figcaption class="gallery-caption">
-                <h2>Tabs like Chrome. Split view.</h2>
-                <p class="gallery-description">Create. Switch. Split.</p>
+                <h2>Agent and shell, side by side.</h2>
+                <p class="gallery-description">A project’s agent sessions and terminals open as tabs together. Split any two.</p>
               </figcaption>
               <a class="gallery-image" href="./assets/split-terminal.jpg" aria-label="View the split view screenshot at full size">
                 <img src="./assets/split-terminal.jpg" width="2400" height="1440" loading="lazy" decoding="async" alt="JustSessions actual split view with Claude Code on the left and a project shell showing a real Git diff on the right, with joined tabs and a resize handle.">
@@ -159,7 +134,7 @@
             <figure class="gallery-slide" id="reading" role="group" aria-roledescription="slide" aria-label="5 of 5: Session reader">
               <figcaption class="gallery-caption">
                 <h2>Read. Then resume.</h2>
-                <p class="gallery-description">Read history before launching the CLI.</p>
+                <p class="gallery-description">Read the whole history without launching the CLI, then resume.</p>
               </figcaption>
               <a class="gallery-image" href="./assets/session-overview.jpg" aria-label="View the session reader screenshot at full size">
                 <img src="./assets/session-overview.jpg" width="2400" height="1440" loading="lazy" decoding="async" alt="The current JustSessions conversation reader with search, reading window controls, and sessions from six agents organized by project.">
@@ -167,7 +142,19 @@
             </figure>
           </div>
         </div>
-        <p class="visually-hidden" aria-live="off" aria-atomic="true" data-gallery-status>1 of 5: Multiple agents</p>
+        <div class="gallery-controls" hidden data-gallery-controls>
+          <button class="gallery-arrow" type="button" aria-label="Previous screenshot" data-gallery-previous><span aria-hidden="true">←</span></button>
+          <div class="gallery-pagination" role="group" aria-label="Screenshot progress">
+            <button type="button" aria-controls="terminal" aria-current="true" aria-label="Your CLIs screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="remote" aria-label="SSH sessions screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="persistence" aria-label="tmux persistence screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="split" aria-label="Agent and shell side by side screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="reading" aria-label="Session reader screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+          </div>
+          <button class="gallery-arrow" type="button" aria-label="Next screenshot" data-gallery-next><span aria-hidden="true">→</span></button>
+          <button class="gallery-rotation" type="button" aria-label="Pause automatic slideshow" data-gallery-rotation><span aria-hidden="true">Ⅱ</span></button>
+        </div>
+        <p class="visually-hidden" aria-live="off" aria-atomic="true" data-gallery-status>1 of 5: Your CLIs</p>
       </section>
     </section>
 
@@ -180,19 +167,8 @@
         <details><summary>Is my history private?</summary><p>JustSessions doesn’t upload conversations. SSH history is cached on your Mac.</p></details>
       </div>
     </section>
-
-    <section class="download-section page-width" id="download" aria-label="Download JustSessions">
-      <a class="button" href="https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg" download="JustSessions.dmg"><span aria-hidden="true">↓</span> Download for macOS</a>
-    </section>
   </main>
 
-  <footer class="site-footer page-width">
-    <nav aria-label="Footer navigation">
-      <a href="https://github.com/yangzichao/JustSessions">Source</a>
-      <a href="./guide.html">Guide</a>
-      <a href="./help.html">Help</a>
-      <a href="https://github.com/yangzichao/JustSessions/releases/latest">Releases</a>
-    </nav>
-  </footer>
+  <!-- partial: site-footer -->
 </body>
 </html>

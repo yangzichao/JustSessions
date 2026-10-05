@@ -5,6 +5,7 @@ import shutil
 from pathlib import Path
 
 from script_assets import version_script_imports
+from shared_partials import insert_shared_partials, validate_partial_placeholders
 from validate_metadata import PUBLIC_PAGE_PATHS, WEBSITE_URL
 from validate_product_content import validate_product_content
 from validate_site import validate_site
@@ -16,12 +17,14 @@ WEBSITE_OUTPUT_DIRECTORY = REPOSITORY_DIRECTORY / "dist/JustSessions"
 
 def build_site():
     validate_product_content(REPOSITORY_DIRECTORY)
+    validate_partial_placeholders(WEBSITE_SOURCE_DIRECTORY)
     WEBSITE_OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
     asset_directory = WEBSITE_OUTPUT_DIRECTORY / "assets"
     asset_directory.mkdir(exist_ok=True)
     document_names = tuple(page_path or "index.html" for page_path in PUBLIC_PAGE_PATHS) + ("404.html", "feedback.html")
     for document_name in document_names:
         shutil.copy2(WEBSITE_SOURCE_DIRECTORY / document_name, WEBSITE_OUTPUT_DIRECTORY / document_name)
+        insert_shared_partials(WEBSITE_OUTPUT_DIRECTORY / document_name, WEBSITE_SOURCE_DIRECTORY / "partials")
     stylesheet_directory = WEBSITE_OUTPUT_DIRECTORY / "styles"
     if stylesheet_directory.exists():
         shutil.rmtree(stylesheet_directory)
