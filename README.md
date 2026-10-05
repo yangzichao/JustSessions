@@ -26,7 +26,7 @@
 
 [Website](https://yangzichao.github.io/JustSessions/) · [Download](#download) · [Getting started](docs/guides/getting-started.md) · [SSH](#remote-sessions-over-ssh) · [tmux](#keep-sessions-running-with-tmux) · [Supported CLIs](#supported-clis) · [Documentation](docs/README.md)
 
-![The real Claude Code CLI running in JustSessions' native terminal, with project tabs and sessions from six coding agents](docs/images/native-terminal.jpg)
+![The real Claude Code CLI running in JustSessions, with two Claude Code sessions, Codex, OpenCode, and Pi grouped under one project in Open tabs](docs/images/native-terminal.jpg)
 
 *Real Claude Code CLI, showing its local help screen in a sample project.*
 
