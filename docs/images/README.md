@@ -13,6 +13,8 @@ These are unedited captures of the actual JustSessions SwiftUI and AppKit interf
 
 Full window captures are 2400 × 1440 pixels; the close-tab dialog capture is 520 × 476. The homepage presents full-width screenshots and links to the originals. Its tmux slide pairs the unedited close-tab dialog with the unedited reattached terminal capture in HTML to explain the choice and the result. CSS clips the dialog to its native rounded corners, hiding the gray capture background without adding another frame. These are two separate captures, not one captured window state.
 
+The homepage's SSH slide overlays [an orange outline](../../website/annotations/ssh-host-highlight.svg) around `DEV-DESKTOP`, its project, and its sessions. This website annotation uses the screenshot's original coordinates and scales with it; it is not part of the app UI. The underlying capture and its full-size link remain unedited.
+
 `orbit-web`, `orbit-api`, `orbit-infra`, the host names, and all saved conversation text are illustrative. Remote host data is a fixture; these images do not document a live SSH connection.
 
 Claude Code 2.1.289 runs in an isolated sample configuration. Its screenshots show local help and command input; no model prompt was submitted. The split-view shell runs in a temporary sample Git repository with an actual uncommitted change. The tmux screenshot uses Claude Code in a separate sample server. The screenshot app was quit and reopened, then attached to the same running CLI before its local help screen was captured. The sample server was stopped after capture.
