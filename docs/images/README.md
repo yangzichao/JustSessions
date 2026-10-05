@@ -1,6 +1,6 @@
 # README screenshots
 
-These are unedited JPEG captures of the actual JustSessions SwiftUI and AppKit interface, refreshed on October 4, 2026. The separate sample-data app links the production views and models from revision `d14311dce0af7ac94c3222851cfafb8a383e46f1`. The normal app and its saved conversations were not used as screenshot content.
+These are unedited captures of the actual JustSessions SwiftUI and AppKit interface, refreshed on October 4, 2026. The separate sample-data app links the production views and models from revision `d14311dce0af7ac94c3222851cfafb8a383e46f1`. The normal app and its saved conversations were not used as screenshot content.
 
 | Image | What it shows |
 | --- | --- |
@@ -9,8 +9,9 @@ These are unedited JPEG captures of the actual JustSessions SwiftUI and AppKit i
 | [session-overview.jpg](session-overview.jpg) | The current conversation reader, pinned projects and sessions, Projects / Open tabs navigation, per-host refresh, and reading controls. |
 | [remote-desktop-sessions.jpg](remote-desktop-sessions.jpg) | A selected Claude Code conversation under the sample `dev-desktop` SSH host. |
 | [tmux-keep-running.jpg](tmux-keep-running.jpg) | The full app window after quitting and reopening: the same Claude Code CLI reattached in the sample tmux session, with the sidebar, project tabs, and tmux status bar visible. |
+| [tmux-close-choice.jpg](tmux-close-choice.jpg) | The actual close-tab dialog for a local tmux session: Keep running, End session, and Cancel. Captured from the same existing sample app on October 4, 2026. |
 
-All window captures are 2400 × 1440 pixels. The homepage presents smaller previews beside feature explanations and links to the originals.
+Full window captures are 2400 × 1440 pixels; the close-tab dialog capture is 520 × 476. The homepage presents full-width screenshots and links to the originals. Its tmux slide pairs the unedited close-tab dialog with the unedited reattached terminal capture in HTML, under “When you close a tab”, to explain the choice and the result. These are two separate captures, not one captured window state.
 
 `orbit-web`, `orbit-api`, `orbit-infra`, the host names, and all saved conversation text are illustrative. Remote host data is a fixture; these images do not document a live SSH connection.
 

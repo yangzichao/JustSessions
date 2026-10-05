@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="./styles/providers.css">
   <link rel="stylesheet" href="./styles/features.css">
   <link rel="stylesheet" href="./styles/screenshot-gallery.css">
+  <link rel="stylesheet" href="./styles/gallery-persistence.css">
   <script type="module" src="./scripts/screenshot-gallery.js"></script>
   <link rel="stylesheet" href="./styles/details.css">
   <link rel="stylesheet" href="./styles/responsive.css">
@@ -152,15 +153,23 @@
             <figure class="gallery-slide" id="persistence" role="group" aria-roledescription="slide" aria-label="3 of 5: tmux persistence">
               <figcaption class="gallery-caption">
                 <p class="eyebrow">tmux persistence</p>
-                <h2>Close the app. Keep running.</h2>
-                <p class="gallery-description">Your CLI keeps running in tmux. Reopen and reattach.</p>
+                <h2>Close a tab. Keep the work.</h2>
+                <p class="gallery-description">Close tab → <strong>Keep running</strong> → Reattach.</p>
                 <a class="text-link" href="./guide.html#terminal-persistence">How it works <span aria-hidden="true">↗</span></a>
-                <p class="gallery-provenance">Real Claude Code CLI · Reattached after app quit</p>
+                <p class="gallery-provenance">Real app · Close-tab choice + reattached CLI · Sample project</p>
               </figcaption>
-              <a class="gallery-image" href="./assets/tmux-keep-running.jpg" aria-label="View the tmux persistence screenshot at full size">
-                <img src="./assets/tmux-keep-running.jpg" width="2400" height="1440" loading="lazy" decoding="async" alt="The full JustSessions window after quitting and reopening the app, with the sidebar, project tabs, and the same Claude Code CLI reattached in a sample tmux session.">
-                <span class="gallery-zoom" aria-hidden="true">View full size ↗</span>
-              </a>
+              <div class="gallery-terminal-persistence">
+                <a class="gallery-image" href="./assets/tmux-keep-running.jpg" aria-label="View the tmux persistence screenshot at full size">
+                  <img src="./assets/tmux-keep-running.jpg" width="2400" height="1440" loading="lazy" decoding="async" alt="The full JustSessions window after quitting and reopening the app, with the sidebar, project tabs, and the same Claude Code CLI reattached in a sample tmux session.">
+                  <span class="gallery-zoom" aria-hidden="true">View full size ↗</span>
+                </a>
+                <aside class="gallery-close-choice" aria-label="Choice when closing a terminal tab">
+                  <p>When you close a tab</p>
+                  <a href="./assets/tmux-close-choice.jpg" aria-label="View the Keep running close-tab dialog at full size">
+                    <img src="./assets/tmux-close-choice.jpg" width="520" height="476" loading="lazy" decoding="async" alt="The real Close this tab dialog: Keep running leaves the CLI running in tmux; End session stops it; Cancel returns to the tab.">
+                  </a>
+                </aside>
+              </div>
             </figure>
             <figure class="gallery-slide" id="split" role="group" aria-roledescription="slide" aria-label="4 of 5: Split view">
               <figcaption class="gallery-caption">
