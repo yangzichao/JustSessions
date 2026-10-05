@@ -19,7 +19,7 @@ class WebsiteDocument(HTMLParser):
 
     def handle_starttag(self, tag, attributes):
         attributes = dict(attributes)
-        for reference in (attributes.get("href"), attributes.get("src")):
+        for reference in (attributes.get("href"), attributes.get("src"), attributes.get("poster")):
             if reference is not None:
                 assert reference.strip(), "Empty link or asset reference"
                 self.references.append(reference)

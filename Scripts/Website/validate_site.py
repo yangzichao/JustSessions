@@ -31,7 +31,7 @@ def validate_site(website_directory: Path):
                 referenced_path /= "index.html"
             assert referenced_path.is_relative_to(website_directory.resolve()), f"Asset leaves published directory: {reference}"
             assert referenced_path.is_file(), f"Missing local target: {reference}"
-            if referenced_path.suffix in (".css", ".js", ".jpg", ".png", ".svg"):
+            if referenced_path.suffix in (".css", ".js", ".jpg", ".png", ".svg", ".mp4"):
                 expected_version = hashlib.sha256(referenced_path.read_bytes()).hexdigest()[:12]
                 assert parse_qs(parsed_reference.query).get("v") == [expected_version], f"Asset cache version mismatch: {reference}"
             if parsed_reference.fragment and referenced_path in documents:

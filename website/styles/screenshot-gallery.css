@@ -10,7 +10,7 @@
 .gallery-feature-list strong { font-weight: 750; }
 .gallery-caption .provider-list { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 10px; }
 .gallery-image { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 5 / 3; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--message-surface); box-shadow: 0 1px 2px var(--shadow), 0 12px 30px -14px rgb(21 23 28 / 24%); cursor: zoom-in; }
-.gallery-image img { width: 100%; height: 100%; object-fit: contain; }
+.gallery-image img, .gallery-image video { width: 100%; height: 100%; object-fit: contain; }
 .gallery-image .gallery-annotation { position: absolute; inset: 0; pointer-events: none; }
 /* The controls sit centered under the screenshot column. */
 .gallery-controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 var(--gallery-gutter) 0 calc(var(--gallery-gutter) + var(--gallery-caption-width) + var(--gallery-column-gap)); }

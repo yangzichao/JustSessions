@@ -5,8 +5,8 @@
 <h1 align="center">JustSessions</h1>
 
 <p align="center">
-  <b>Your CLI. A lighter workspace.</b><br>
-  Your familiar command line, with native tabs, split view, and multi-agent session management.
+  <b>Nothing extra. Just sessions.</b><br>
+  Multiple agents, all your sessions in one place. Your familiar command line, with native tabs.
 </p>
 
 <p align="center">
@@ -34,6 +34,16 @@ For people who prefer the command line. JustSessions adds a native Mac workspace
 - Start or resume a session in its original CLI and project folder.
 
 ![The real Claude Code CLI running in JustSessions, with the Projects sidebar grouping two Claude Code sessions, Codex, OpenCode, and Pi under one project](docs/images/native-terminal.jpg)
+
+## New. Resume. Delete.
+
+- Start with any installed agent.
+- Read a conversation, then resume in its original CLI.
+- Delete saved sessions from the app.
+
+![JustSessions' conversation reader, with reading controls and sessions grouped by project and machine](docs/images/session-overview.jpg)
+
+[Reading controls](docs/guides/session-management.md#preview-before-you-resume) cover text size, images, history paging, and search limits.
 
 ## Work on any host.
 
@@ -65,16 +75,6 @@ The packaged app includes tmux for this Mac. Install tmux on each SSH host to su
 ![JustSessions Open tabs sidebar with five tabs across two projects, alongside the real Claude Code CLI and a project shell displaying Git diff in split view](docs/images/split-terminal.jpg)
 
 Tab recovery is controlled in **Settings → General**; split layouts reopen as separate tabs. [Tabs and split view](docs/guides/session-management.md#resume-branch-and-start-sessions).
-
-## Read. Then resume.
-
-- Browse conversations without starting the CLI.
-- Find text in loaded messages with **⌘F**; copy code or open a reading window.
-- Resume when ready, or branch a supported conversation.
-
-![JustSessions' conversation reader, with reading controls and sessions grouped by project and machine](docs/images/session-overview.jpg)
-
-[Reading controls](docs/guides/session-management.md#preview-before-you-resume) cover text size, images, history paging, and search limits.
 
 ## Lightweight by design
 

@@ -38,6 +38,9 @@ def build_site():
         shutil.copy2(REPOSITORY_DIRECTORY / "docs/images" / image_name, asset_directory / image_name)
     for asset_path in ("Branding/SVG/mark.svg", "Branding/ThirdParty/Octicons/mark-github-16.svg", "Branding/PNG/app-icon-256.png", "website/social/social-preview.png", "website/annotations/ssh-host-highlight.svg", "website/annotations/project-agents-highlight.svg"):
         shutil.copy2(REPOSITORY_DIRECTORY / asset_path, asset_directory / Path(asset_path).name)
+    for media_path in (WEBSITE_SOURCE_DIRECTORY / "media").iterdir():
+        if media_path.suffix in (".mp4", ".jpg"):
+            shutil.copy2(media_path, asset_directory / media_path.name)
     for document_path in WEBSITE_OUTPUT_DIRECTORY.glob("*.html"):
         document_content = document_path.read_text()
         for resource_path in (*stylesheet_directory.glob("*.css"), *script_directory.rglob("*.js"), *asset_directory.iterdir()):
