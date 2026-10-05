@@ -16,10 +16,11 @@
   .site-header .wordmark img { width: 28px; }
   .site-header nav { gap: 15px; font-size: 16px; }
   .site-header .button { padding-inline: 12px; font-size: 16px; }
+  .site-header-help { display: none; }
   /* Phones cannot install the app, and the full label does not fit beside the wordmark. */
   .site-header-platform { display: none; }
 }
 
-@media (max-width: 360px) {
-  .site-header-help { display: none; }
+@media (max-width: 380px) {
+  .site-header .wordmark span { display: none; }
 }
