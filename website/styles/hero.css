@@ -1,11 +1,12 @@
-/* One line above the screenshots says what the app is; the slides show the rest. */
+/* Keep the CLI positioning compact so the screenshots stay prominent. */
 .hero { padding-top: 28px; }
-.hero h1 { margin: 0 0 24px; font-size: clamp(30px, 3.2vw, 44px); font-weight: 750; line-height: 1.1; letter-spacing: -.03em; }
-/* On narrow screens the title breaks after the comma instead of inside "organized by project". */
+.hero h1 { margin: 0 0 10px; font-size: clamp(30px, 3.2vw, 44px); font-weight: 750; line-height: 1.1; letter-spacing: -.03em; }
+.hero-description { margin: 0 0 24px; font-size: clamp(18px, 1.6vw, 22px); font-weight: 600; line-height: 1.4; }
+/* Keep the positioning phrase together when the title wraps. */
 .hero-title-line { display: inline-block; }
 
 @media (max-width: 650px) {
   .hero { padding-top: 20px; }
-  /* Scales with the screen so each half of the title keeps to one line down to 320px wide. */
-  .hero h1 { margin-bottom: 18px; font-size: min(30px, 6.6vw); }
+  .hero h1 { font-size: 30px; }
+  .hero-description { margin-bottom: 20px; }
 }
