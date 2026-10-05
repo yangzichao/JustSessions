@@ -41,6 +41,7 @@ for (const gallery of document.querySelectorAll("[data-screenshot-gallery]")) {
   updateSelection(0);
   const rotation = createGalleryRotation({
     advance: () => showSlide(currentIndex + 1),
+    getInterval: () => Number(slides[currentIndex].dataset.galleryDuration) || 8000,
     updateProgress: createGalleryProgress(pageButtons),
     updateControl: (requested, running) => {
       media.setPlaying(requested);

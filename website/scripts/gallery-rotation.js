@@ -1,8 +1,13 @@
 // Start automatically; only the playback control can pause rotation.
-export function createGalleryRotation({ advance, updateControl, updateProgress = () => {}, interval = 8000, now = () => performance.now() }) {
+export function createGalleryRotation({ advance, updateControl, updateProgress = () => {}, interval = 8000, getInterval = () => interval, now = () => performance.now() }) {
+  function currentDuration() {
+    const value = getInterval();
+    return Number.isFinite(value) && value > 0 ? value : interval;
+  }
   let requested = true;
   let running = false;
-  let remaining = interval;
+  let duration = currentDuration();
+  let remaining = duration;
   let startedAt = 0;
   let timer;
 
@@ -12,12 +17,13 @@ export function createGalleryRotation({ advance, updateControl, updateProgress =
     running = requested;
     startedAt = now();
     updateControl(requested, running);
-    updateProgress({ elapsed: interval - remaining, duration: interval, running });
+    updateProgress({ elapsed: duration - remaining, duration, running });
     if (running) {
       timer = window.setTimeout(() => {
         running = false;
-        remaining = interval;
         advance();
+        duration = currentDuration();
+        remaining = duration;
         refresh();
       }, remaining);
     }
@@ -27,6 +33,6 @@ export function createGalleryRotation({ advance, updateControl, updateProgress =
 
   return {
     toggle() { requested = !requested; refresh(); },
-    reset() { running = false; remaining = interval; refresh(); },
+    reset() { running = false; duration = currentDuration(); remaining = duration; refresh(); },
   };
 }
