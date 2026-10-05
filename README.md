@@ -45,7 +45,7 @@
 
 **Two terminals, side by side.** Keep an agent beside your shell, or compare sessions. Click a pane to focus it and drag the divider to make room. [Split view](docs/guides/session-management.md#resume-branch-and-start-sessions).
 
-![JustSessions split view with the real Claude Code CLI on the left and a project shell displaying Git diff on the right](docs/images/split-terminal.jpg)
+![JustSessions Open tabs sidebar with five tabs across two projects, alongside the real Claude Code CLI and a project shell displaying Git diff in split view](docs/images/split-terminal.jpg)
 
 *Real Claude Code CLI and shell in split view, using a sample Git project.*
 
