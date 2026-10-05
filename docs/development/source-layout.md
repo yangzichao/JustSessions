@@ -11,6 +11,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Transcript/`: the reading width, a readable column or the full window, shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
 - `Models/Customizations/`: session and project names you set, and pins.
+- `Models/StartCommands/`: the command each tool's CLI starts with on each host, when it is not the tool's own name, set in the New session sheet.
 - `Models/Onboarding/`: the onboarding tour's stops, the tips a fresh install shows once each, and when each tip is due from what the window shows.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
@@ -34,6 +35,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Hosts/InstalledCLIs/`: which CLIs each host has, so new sessions offer only those.
 - `Services/Launch/`: CLI executable resolution and process environment.
 - `Services/Launch/PlainTerminal/`: opens a plain terminal, a login shell in a project folder that is no session.
+- `Services/Launch/StartCommand/`: runs a start command of your own through a shell, on this Mac and on SSH hosts, with the app's arguments after it; `env` then runs the CLI in the shell's place, so the tab's process is still the CLI's. The New session sheet's field is in `Views/Browser/NewSession/StartCommand/`.
 - `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there.
 - `Services/Remote/HostStatus/`: one SSH call per refresh that lists the host's tmux sessions and installed CLIs.
 - `Services/Tmux/ThisMac/`: bundled runtime discovery, terminal database environment, compatible server selection, and local persistence.

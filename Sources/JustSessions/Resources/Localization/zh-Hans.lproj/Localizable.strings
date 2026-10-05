@@ -98,6 +98,10 @@
 	<string>请在 macOS 的“登录项”中允许 JustSessions，以完成自动启动设置。</string>
 	<key>Allowed</key>
 	<string>已允许</string>
+	<key>Also resumes %@ sessions on %@. JustSessions adds its own arguments after it.</key>
+	<string>在 %2$@ 上恢复 %1$@ 会话时也会用它。JustSessions 会在它后面加上自己的参数。</string>
+	<key>Also resumes %@ sessions on this Mac. JustSessions adds its own arguments after it.</key>
+	<string>在这台 Mac 上恢复 %@ 会话时也会用它。JustSessions 会在它后面加上自己的参数。</string>
 	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
 	<string>已归档的项目会从侧栏中隐藏。其文件夹和会话仍保留在磁盘上，恢复后会重新列出。在其文件夹中新建会话也会恢复该项目。</string>
 	<key>App</key>
@@ -730,6 +734,8 @@
 	<string>在 %2$@ 的 %1$@ 中新建会话</string>
 	<key>Start a session in any installed CLI, or open a plain terminal, in a project folder. ⌘N does the same.</key>
 	<string>在项目文件夹中用任一已安装的 CLI 开始会话，或打开普通终端。⌘N 也可以。</string>
+	<key>Start command</key>
+	<string>启动命令</string>
 	<key>Start session</key>
 	<string>开始会话</string>
 	<key>Start something new</key>

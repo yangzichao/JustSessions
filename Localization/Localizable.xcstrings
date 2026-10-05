@@ -547,6 +547,32 @@
         }
       }
     },
+    "Also resumes %@ sessions on %@. JustSessions adds its own arguments after it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Also resumes %1$@ sessions on %2$@. JustSessions adds its own arguments after it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 %2$@ 上恢复 %1$@ 会话时也会用它。JustSessions 会在它后面加上自己的参数。"
+          }
+        }
+      }
+    },
+    "Also resumes %@ sessions on this Mac. JustSessions adds its own arguments after it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在这台 Mac 上恢复 %@ 会话时也会用它。JustSessions 会在它后面加上自己的参数。"
+          }
+        }
+      }
+    },
     "An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.": {
       "localizations": {
         "zh-Hans": {
@@ -3847,6 +3873,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "在项目文件夹中用任一已安装的 CLI 开始会话，或打开普通终端。⌘N 也可以。"
+          }
+        }
+      }
+    },
+    "Start command": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启动命令"
           }
         }
       }

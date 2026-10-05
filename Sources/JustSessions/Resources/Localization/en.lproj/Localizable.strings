@@ -114,6 +114,8 @@
 	<string>Allow JustSessions in macOS Login Items to finish enabling automatic launch.</string>
 	<key>Allowed</key>
 	<string>Allowed</string>
+	<key>Also resumes %@ sessions on this Mac. JustSessions adds its own arguments after it.</key>
+	<string>Also resumes %@ sessions on this Mac. JustSessions adds its own arguments after it.</string>
 	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
 	<string>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</string>
 	<key>App</key>
@@ -734,6 +736,8 @@
 	<string>Start a new session in %@</string>
 	<key>Start a session in any installed CLI, or open a plain terminal, in a project folder. ⌘N does the same.</key>
 	<string>Start a session in any installed CLI, or open a plain terminal, in a project folder. ⌘N does the same.</string>
+	<key>Start command</key>
+	<string>Start command</string>
 	<key>Start session</key>
 	<string>Start session</string>
 	<key>Start something new</key>

@@ -45,6 +45,8 @@ final class ConversationStore: ObservableObject {
     let deletionProgress = SessionDeletionProgress()
     /// The SSH hosts listed after this Mac.
     @Published var remoteHostList: RemoteHostList
+    /// Commands of your own that tools' CLIs start with, per host; see `ConversationStore+StartCommands`.
+    @Published var cliStartCommands: CLIStartCommands
     /// Each host's last refresh, this Mac's included.
     @Published var hostRefreshStatuses: [SessionHost: HostRefreshStatus] = [:]
     /// tmux sessions JustSessions started that still run, per host, as of the host's last refresh. On this Mac, one
@@ -91,7 +93,7 @@ final class ConversationStore: ObservableObject {
     let commandResolver: NativeCLICommandResolver
     /// Deletes sessions on SSH hosts.
     private let remoteDeletion: RemoteConversationDeletion
-    /// Where custom titles, project names, pins, sidebar projects, and SSH hosts are kept.
+    /// Where custom titles, project names, pins, sidebar projects, SSH hosts, and start commands are kept.
     let userDefaults: UserDefaults
 
     init(
@@ -114,6 +116,7 @@ final class ConversationStore: ObservableObject {
         self.pinnedItems = PinnedItems.load(from: userDefaults)
         self.sidebarProjectList = SidebarProjectList.load(from: userDefaults)
         self.remoteHostList = RemoteHostList.load(from: userDefaults)
+        self.cliStartCommands = CLIStartCommands.load(from: userDefaults)
         LoginShellPathReader.warmUpInBackground()
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
         if startsBackgroundPolling {

@@ -8,13 +8,17 @@ struct NewSessionSheet: View {
     @State private var projectPath: String
     @State private var isStarting = false
     @State private var errorMessage: String?
+    /// Start commands typed in this sheet, per tool and host, so switching back to a tool shows what was typed.
+    @State private var typedStartCommands: [StartCommandTarget: String] = [:]
 
     let hosts: [SessionHost]
     /// The tools installed on each host; the picker offers the selected host's.
     let providersByHost: [SessionHost: [ConversationProvider]]
     /// Projects on every host; the menu shows the selected host's.
     let recentProjects: [ProjectConversationGroup]
-    let onStart: (NewSessionKind, SessionHost, String) async throws -> Void
+    /// The start commands kept from earlier sessions, which the field starts from.
+    let startCommands: CLIStartCommands
+    let onStart: (NewSessionRequest) async throws -> Void
 
     init(
         initialKind: NewSessionKind,
@@ -23,7 +27,8 @@ struct NewSessionSheet: View {
         hosts: [SessionHost],
         providersByHost: [SessionHost: [ConversationProvider]],
         recentProjects: [ProjectConversationGroup],
-        onStart: @escaping (NewSessionKind, SessionHost, String) async throws -> Void
+        startCommands: CLIStartCommands,
+        onStart: @escaping (NewSessionRequest) async throws -> Void
     ) {
         _selectedKind = State(initialValue: initialKind)
         _selectedHost = State(initialValue: initialHost)
@@ -31,6 +36,7 @@ struct NewSessionSheet: View {
         self.hosts = hosts
         self.providersByHost = providersByHost
         self.recentProjects = recentProjects
+        self.startCommands = startCommands
         self.onStart = onStart
     }
 
@@ -50,6 +56,18 @@ struct NewSessionSheet: View {
         Binding(
             get: { startingKind },
             set: { selectedKind = $0 }
+        )
+    }
+
+    private func startCommand(for provider: ConversationProvider) -> String {
+        let target = StartCommandTarget(provider: provider, host: selectedHost)
+        return typedStartCommands[target] ?? startCommands.customCommand(for: provider, on: selectedHost) ?? ""
+    }
+
+    private func startCommandBinding(for provider: ConversationProvider) -> Binding<String> {
+        Binding(
+            get: { startCommand(for: provider) },
+            set: { typedStartCommands[StartCommandTarget(provider: provider, host: selectedHost)] = $0 }
         )
     }
 
@@ -102,6 +120,14 @@ struct NewSessionSheet: View {
                 providers: providersOnSelectedHost,
                 noCLIFoundMessage: NewSessionProviderAvailability.noCLIFoundMessage(on: selectedHost, language: AppInterfaceLanguage(identifier: locale.identifier))
             )
+
+            if case .cli(let provider) = startingKind {
+                NewSessionStartCommandSection(
+                    command: startCommandBinding(for: provider),
+                    provider: provider,
+                    host: selectedHost
+                )
+            }
 
             projectFolderSection
 
@@ -164,13 +190,19 @@ struct NewSessionSheet: View {
     }
 
     private func start() {
-        let kind = startingKind
-        let host = selectedHost
-        let folder = trimmedProjectPath
+        let request = NewSessionRequest(
+            kind: startingKind,
+            host: selectedHost,
+            folder: trimmedProjectPath,
+            startCommand: {
+                guard case .cli(let provider) = startingKind else { return nil }
+                return startCommand(for: provider)
+            }()
+        )
         isStarting = true
         Task {
             do {
-                try await onStart(kind, host, folder)
+                try await onStart(request)
                 dismiss()
             } catch {
                 errorMessage = error.localizedDescription
@@ -184,4 +216,10 @@ struct NewSessionSheet: View {
             projectPath = chosenFolder
         }
     }
+}
+
+/// A tool on a host, whose start command the sheet keeps while it is open.
+private struct StartCommandTarget: Hashable {
+    let provider: ConversationProvider
+    let host: SessionHost
 }

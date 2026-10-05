@@ -39,6 +39,29 @@ struct ClaudeSessionIDFlagSupportTests {
         #expect(support.preassigningSessionID(to: command) == nil)
     }
 
+    /// A start command of your own can pick another CLI with its arguments, so it gets an answer of its own.
+    @Test func aStartCommandIsCheckedWithItsOwnArguments() throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let wrapper = try fakeClaude(
+            in: root,
+            script: "#!/bin/sh\nif [ \"$1\" = --new-cli ]; then echo '  --session-id <uuid>  Use a specific session ID'; fi\n"
+        )
+        let wrapperWithArgument = NativeCLICommand(
+            executablePath: wrapper.executablePath,
+            arguments: ["--new-cli"],
+            workingDirectory: wrapper.workingDirectory,
+            environment: wrapper.environment
+        )
+        let support = ClaudeSessionIDFlagSupport(helpTimeout: 5)
+
+        #expect(support.check(wrapper) == false)
+        #expect(support.check(wrapperWithArgument) == true)
+        #expect(support.preassigningSessionID(to: wrapper) == nil)
+        let preassignment = try #require(support.preassigningSessionID(to: wrapperWithArgument))
+        #expect(preassignment.command.arguments == ["--new-cli", "--session-id", preassignment.sessionID])
+    }
+
     @Test func hungHelpLeavesTheAnswerOpenForALaterLaunch() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }

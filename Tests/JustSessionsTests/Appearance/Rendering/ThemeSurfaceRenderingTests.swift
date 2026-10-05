@@ -32,7 +32,8 @@ struct ThemeSurfaceRenderingTests {
             ("settings", generalView, fittingSize(of: generalView)),
             ("new-session", AnyView(NewSessionSheet(
                 initialKind: .cli(.codex), initialHost: .thisMac, initialProjectPath: "/tmp/theme-check",
-                hosts: [.thisMac], providersByHost: [.thisMac: [.codex]], recentProjects: [], onStart: { _, _, _ in }
+                hosts: [.thisMac], providersByHost: [.thisMac: [.codex]], recentProjects: [],
+                startCommands: CLIStartCommands(), onStart: { _ in }
             )), CGSize(width: 520, height: 260)),
         ]
         for (name, content, size) in views {
