@@ -67,6 +67,10 @@ struct TranscriptView: View {
             loadingMatchReveal = matchReveal
             readingPositionStore.record(.entry(index: matchReveal.entryID, offset: -6), for: conversation.id)
         }
-        paging.refresh(conversation, position: readingPositionStore.position(for: conversation.id))
+        // Until the reveal's pages arrive, the pages shown before still record where they are, such as the bottom.
+        // A refresh in the meantime, as when the session's file changes, must not load those instead.
+        let position = loadingMatchReveal.map { TranscriptReadingPosition.entry(index: $0.entryID, offset: -6) }
+            ?? readingPositionStore.position(for: conversation.id)
+        paging.refresh(conversation, position: position)
     }
 }
