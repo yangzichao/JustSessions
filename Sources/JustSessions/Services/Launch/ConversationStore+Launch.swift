@@ -40,10 +40,27 @@ extension ConversationStore {
         }
         do {
             guard let session = try makeTerminal(for: conversation, action: action) else { return }
-            openTerminal(session)
+            if action == .resume, let endedTab = endedTerminal(for: conversation) {
+                restartEndedTerminal(endedTab, with: session)
+            } else {
+                openTerminal(session)
+            }
         } catch {
             showError(error.localizedDescription)
         }
+    }
+
+    /// An open tab of the session whose CLI has ended, as one does when an SSH host's connection drops.
+    private func endedTerminal(for conversation: Conversation) -> TerminalSession? {
+        terminalSessions.first { $0.conversation?.id == conversation.id && $0.hasExited }
+    }
+
+    /// Resuming a session whose tab ended starts it again in that tab, keeping its place, its split, and the
+    /// selection, rather than opening a second tab of the session beside it.
+    private func restartEndedTerminal(_ endedTab: TerminalSession, with session: TerminalSession) {
+        guard let index = terminalSessions.firstIndex(where: { $0.id == endedTab.id }) else { return }
+        replaceTerminal(at: index, with: session)
+        selectTerminal(session.id)
     }
 
     /// A tab that runs the session's CLI, not opened yet; nil when no adapter reads the session's tool.
