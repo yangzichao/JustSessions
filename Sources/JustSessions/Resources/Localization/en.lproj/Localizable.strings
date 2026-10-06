@@ -414,6 +414,8 @@
 	<string>JustSessions Website</string>
 	<key>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</key>
 	<string>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</string>
+	<key>JustSessions quit unexpectedly</key>
+	<string>JustSessions quit unexpectedly</string>
 	<key>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</key>
 	<string>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</string>
 	<key>Keep running</key>
@@ -520,6 +522,8 @@
 	<string>No sessions in the past seven days</string>
 	<key>No supported CLI found on this Mac. Install %@, then refresh.</key>
 	<string>No supported CLI found on this Mac. Install %@, then refresh.</string>
+	<key>Not Now</key>
+	<string>Not Now</string>
 	<key>Not allowed</key>
 	<string>Not allowed</string>
 	<key>Not asked yet</key>
@@ -638,6 +642,12 @@
 	<string>Reopen the tabs that were open when JustSessions quit</string>
 	<key>Report an issue ↗</key>
 	<string>Report an issue ↗</string>
+	<key>Report by Email</key>
+	<string>Report by Email</string>
+	<key>Report on GitHub</key>
+	<string>Report on GitHub</string>
+	<key>Reporting the crash helps get it fixed. The report opens with the crash details filled in: add what you were doing, then send it. The crash report file shows in Finder, so you can attach it.</key>
+	<string>Reporting the crash helps get it fixed. The report opens with the crash details filled in: add what you were doing, then send it. The crash report file shows in Finder, so you can attach it.</string>
 	<key>Restore</key>
 	<string>Restore</string>
 	<key>Restore %@</key>
