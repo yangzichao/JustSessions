@@ -97,6 +97,7 @@ extension ConversationStore {
                 projectPath: conversation.projectPath,
                 arguments: adapter.arguments(for: conversation, action: action),
                 tmuxSessionName: tmuxSessionName,
+                usesHostTmuxPrefix: usesTmuxPrefix(on: conversation.host),
                 startCommand: startCommand
             )
             return (command, tmuxSessionName)

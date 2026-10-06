@@ -12,6 +12,7 @@ struct HelpRemoteHostSection: View {
                 "`tmux`, so a CLI keeps running when the connection drops",
                 "`python3`, for Antigravity and OpenCode",
             ])
+            Text("The tmux sessions the app starts on a host have no prefix key, so every key reaches the CLI. To use your own tmux prefix there, right-click the host's heading and choose **Use this host's tmux prefix**.")
             Link("SSH setup in the user guide ↗", destination: AppLinks.userGuideSSHHostsURL)
                 .buttonStyle(ThemePlainButtonStyle(verticalPadding: 2))
         }

@@ -11,13 +11,15 @@ struct RemoteCLICommandBuilder {
     }
 
     /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable. It stands in for
-    /// `defaultStartCommand`, so the app's arguments that follow leave out what it holds.
+    /// `defaultStartCommand`, so the app's arguments that follow leave out what it holds. `usesHostTmuxPrefix` is the
+    /// host's choice in `RemoteHostsUsingTmuxPrefix`, so every tab's command passes it.
     func command(
         host: String,
         provider: ConversationProvider,
         projectPath: String,
         arguments: [String],
         tmuxSessionName: String? = nil,
+        usesHostTmuxPrefix: Bool,
         startCommand: String? = nil
     ) -> NativeCLICommand {
         sshCommand(
@@ -27,6 +29,7 @@ struct RemoteCLICommandBuilder {
                 projectPath: projectPath,
                 arguments: arguments,
                 tmuxSessionName: tmuxSessionName,
+                usesHostTmuxPrefix: usesHostTmuxPrefix,
                 startCommand: startCommand
             )
         )
@@ -58,6 +61,7 @@ struct RemoteCLICommandBuilder {
         projectPath: String,
         arguments: [String],
         tmuxSessionName: String? = nil,
+        usesHostTmuxPrefix: Bool = false,
         startCommand: String? = nil
     ) -> String {
         let customStartCommand = CLIStartCommandLine.customCommand(startCommand)
@@ -69,12 +73,15 @@ struct RemoteCLICommandBuilder {
         } ?? ([provider.executableName] + arguments.map(ShellQuoting.quoted)).joined(separator: " ")
         let directCommand = "cd \(ShellQuoting.quoted(projectPath)) && exec \(cliInvocation)"
         guard let tmuxSessionName else { return loginShellCommand(directCommand) }
-        // `-A` attaches when the session already runs. The status line and mouse settings make it look and
-        // scroll like the CLI on its own, and with no prefix key Ctrl-B reaches the CLI. These are options of
-        // this session only; the host's other tmux sessions keep theirs.
+        // `-A` attaches when the session already runs, and the options after it are set again on every attach.
+        // The status line and mouse settings make it look and scroll like the CLI on its own, and with no prefix
+        // key Ctrl-B reaches the CLI, unless the host uses its own; see `RemoteTmuxPrefixOptions`. These are
+        // options of this session only; the host's other tmux sessions keep theirs.
+        let sessionOptions = ["set-option status off", "set-option mouse on"]
+            + RemoteTmuxPrefixOptions.setOptionCommands(usingHostPrefix: usesHostTmuxPrefix)
         let tmuxCommand = "exec tmux new-session -A -s \(ShellQuoting.quoted(tmuxSessionName)) "
             + ShellQuoting.quoted(loginShellCommand(directCommand))
-            + " \\; set-option status off \\; set-option mouse on \\; set-option prefix None"
+            + sessionOptions.map { " \\; \($0)" }.joined()
         return loginShellCommand("if command -v tmux >/dev/null 2>&1; then \(tmuxCommand); else \(directCommand); fi")
     }
 

@@ -41,6 +41,8 @@ extension ConversationStore {
     func removeRemoteHost(_ host: String, mirror: RemoteSessionMirror = RemoteSessionMirror()) {
         remoteHostList.remove(host)
         remoteHostList.save(to: userDefaults)
+        remoteHostsUsingTmuxPrefix.setUsesTmuxPrefix(false, for: host)
+        remoteHostsUsingTmuxPrefix.save(to: userDefaults)
         hostRefreshStatuses.removeValue(forKey: .ssh(host))
         tmuxSessionNamesByHost.removeValue(forKey: .ssh(host))
         installedProvidersByHost.removeValue(forKey: .ssh(host))
