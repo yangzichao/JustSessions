@@ -1,7 +1,7 @@
 import Foundation
 
 /// SSH hosts whose JustSessions tmux sessions keep the host's own prefix keys, as its `~/.tmux.conf` sets them,
-/// chosen in the host heading's right-click menu. On every other host those sessions have no prefix key, so each key
+/// chosen from the host heading's ⋯ or right-click menu. On every other host those sessions have no prefix key, so each key
 /// reaches the CLI; see `RemoteTmuxPrefixOptions`.
 struct RemoteHostsUsingTmuxPrefix: Equatable {
     static let userDefaultsKey = "remoteHostsUsingTmuxPrefix"

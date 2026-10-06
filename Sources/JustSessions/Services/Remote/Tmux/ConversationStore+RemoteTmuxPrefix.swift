@@ -1,7 +1,7 @@
 import Foundation
 
-/// Whether an SSH host's JustSessions tmux sessions use the host's own prefix keys, chosen in the host heading's
-/// right-click menu; see `RemoteHostsUsingTmuxPrefix`. This Mac's sessions never do: its tmux server reads no
+/// Whether an SSH host's JustSessions tmux sessions use the host's own prefix keys, chosen from the host heading's
+/// ⋯ or right-click menu; see `RemoteHostsUsingTmuxPrefix`. This Mac's sessions never do: its tmux server reads no
 /// configuration, so it has no prefix of yours to use.
 extension ConversationStore {
     func usesTmuxPrefix(on host: SessionHost) -> Bool {

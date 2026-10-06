@@ -824,8 +824,8 @@
 	<string>侧边栏按主机和项目列出来自 %@ 的会话。搜索可匹配项目名称和路径、会话标题和 ID，以及消息内容。</string>
 	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
 	<string>终端进程会停止。CLI 已保存的会话将在刷新后出现在项目列表中。</string>
-	<key>The tmux sessions the app starts on a host have no prefix key, so every key reaches the CLI. To use your own tmux prefix there, right-click the host's heading and choose **Use this host's tmux prefix**.</key>
-	<string>App 在主机上启动的 tmux 会话没有前缀键，所以每个按键都会传给 CLI。如果想在那里使用你自己的 tmux 前缀键，请右键单击该主机的标题，选择 **使用此主机的 tmux 前缀键**。</string>
+	<key>The tmux sessions the app starts on a host have no prefix key, so every key reaches the CLI. To use your own tmux prefix there, point at the host's heading, click its **⋯**, and choose **Use this host's tmux prefix**.</key>
+	<string>App 在主机上启动的 tmux 会话没有前缀键，所以每个按键都会传给 CLI。如果想在那里使用你自己的 tmux 前缀键，请将指针移到该主机的标题上，点按它的 **⋯**，然后选择 **使用此主机的 tmux 前缀键**。</string>
 	<key>The tour points at the main controls in the window. Afterwards, tips show again the first time you use each part, such as tabs or split view.</key>
 	<string>引导会指出窗口中的主要控件。之后，你第一次用到各个部分时（例如标签页或拆分视图），提示会再次出现。</string>
 	<key>Theme</key>
