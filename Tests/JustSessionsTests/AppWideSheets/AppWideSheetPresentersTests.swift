@@ -19,7 +19,7 @@ struct AppWideSheetPresentersTests {
 
         AppWideSheetPresenters.show(.help) { openedAWorkspaceWindow = true }
 
-        try await expectEventually(timeout: .seconds(5)) { frontWindow.window.attachedSheet != nil }
+        try await expectEventually { frontWindow.window.attachedSheet != nil }
         #expect(frontWindow.state.sheet == .help)
         #expect(backWindow.state.sheet == nil)
         #expect(!openedAWorkspaceWindow)
@@ -30,7 +30,7 @@ struct AppWideSheetPresentersTests {
         defer { workspaceWindow.close() }
         try await workspaceWindow.waitUntilRegistered()
         AppWideSheetPresenters.show(.settings) {}
-        try await expectEventually(timeout: .seconds(5)) { workspaceWindow.window.attachedSheet != nil }
+        try await expectEventually { workspaceWindow.window.attachedSheet != nil }
         let originalSheet = try #require(workspaceWindow.window.attachedSheet)
 
         AppWideSheetPresenters.show(.help) {}
@@ -70,7 +70,7 @@ struct AppWideSheetPresentersTests {
         AppWideSheetPresenters.show(.help) { newWorkspaceWindow = WorkspaceWindowStandIn() }
 
         let openedWindow = try #require(newWorkspaceWindow)
-        try await expectEventually(timeout: .seconds(5)) { openedWindow.window.attachedSheet != nil }
+        try await expectEventually { openedWindow.window.attachedSheet != nil }
         #expect(openedWindow.state.sheet == .help)
         #expect(closedWindow.state.sheet == nil)
         #expect(AppWideSheetPresenters.takeSheetForNewWorkspaceWindow() == nil)

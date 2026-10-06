@@ -21,7 +21,7 @@ struct DismissesOnClickOutsideTests {
         defer { window.close() }
 
         presentation.isPresented = true
-        try await expectEventually(timeout: .seconds(5)) { window.attachedSheet != nil }
+        try await expectEventually { window.attachedSheet != nil }
         let click = try #require(NSEvent.mouseEvent(
             with: .leftMouseDown, location: CGPoint(x: 40, y: 40), modifierFlags: [],
             timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
@@ -30,7 +30,7 @@ struct DismissesOnClickOutsideTests {
         NSApp.sendEvent(click)
 
         #expect(!presentation.isPresented)
-        try await expectEventually(timeout: .seconds(5)) { window.attachedSheet == nil }
+        try await expectEventually { window.attachedSheet == nil }
     }
 }
 

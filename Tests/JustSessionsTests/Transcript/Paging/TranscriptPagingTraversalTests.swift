@@ -22,7 +22,7 @@ struct TranscriptPagingTraversalTests {
             let clipView = scrollView.contentView
             let offset = earlier ? 100 : clipView.documentRect.maxY - clipView.bounds.height - 100
             try await fixture.scroll(scrollView, to: offset)
-            try await expectEventually(timeout: .seconds(5)) { model.revision > revision }
+            try await expectEventually { model.revision > revision }
             try await fixture.settleLayout()
             #expect(model.pages.count <= TranscriptPagingModel.maximumPageCount)
             #expect(model.transcript!.entries.count <= 240)
