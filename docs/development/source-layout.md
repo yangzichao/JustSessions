@@ -35,7 +35,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Hosts/InstalledCLIs/`: which CLIs each host has, so new sessions offer only those.
 - `Services/Launch/`: CLI executable resolution and process environment.
 - `Services/Launch/PlainTerminal/`: opens a plain terminal, a login shell in a project folder that is no session.
-- `Services/Launch/StartCommand/`: runs a start command of your own through a shell, on this Mac and on SSH hosts, with the app's arguments after it; `env` then runs the CLI in the shell's place, so the tab's process is still the CLI's. The New session sheet's field is in `Views/Browser/NewSession/StartCommand/`.
+- `Services/Launch/StartCommand/`: runs a start command of your own through a shell, on this Mac and on SSH hosts, with the app's arguments after it; `env` then runs the CLI in the shell's place, so the tab's process is still the CLI's. `Check/` reads a command before it is kept, without running it, and looks up its program where the CLI runs. The New session sheet's field, locked until Edit, is in `Views/Browser/NewSession/StartCommand/`.
 - `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there.
 - `Services/Remote/HostStatus/`: one SSH call per refresh that lists the host's tmux sessions and installed CLIs.
 - `Services/Tmux/ThisMac/`: bundled runtime discovery, terminal database environment, compatible server selection, and local persistence.

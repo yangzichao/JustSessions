@@ -88,7 +88,7 @@ struct ConversationBrowserView: View {
                 providersByHost: store.newSessionProvidersByHost,
                 recentProjects: startableProjects,
                 startCommands: store.cliStartCommands,
-                onSaveStartCommand: { store.setStartCommand($0, for: $1, on: $2) }
+                onSaveStartCommand: { try await store.saveStartCommand($0, for: $1, on: $2) }
             ) { request in
                 switch request.kind {
                 case .cli(let provider):

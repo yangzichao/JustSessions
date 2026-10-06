@@ -18,7 +18,8 @@ struct NewSessionSheet: View {
     let recentProjects: [ProjectConversationGroup]
     /// The kept start commands, which the locked field shows.
     let startCommands: CLIStartCommands
-    let onSaveStartCommand: (_ command: String, _ provider: ConversationProvider, _ host: SessionHost) -> Void
+    /// Checks a start command where the tool runs, then keeps it; throws when it would not start.
+    let onSaveStartCommand: (_ command: String, _ provider: ConversationProvider, _ host: SessionHost) async throws -> Void
     let onStart: (NewSessionRequest) async throws -> Void
 
     init(
@@ -29,7 +30,7 @@ struct NewSessionSheet: View {
         providersByHost: [SessionHost: [ConversationProvider]],
         recentProjects: [ProjectConversationGroup],
         startCommands: CLIStartCommands,
-        onSaveStartCommand: @escaping (_ command: String, _ provider: ConversationProvider, _ host: SessionHost) -> Void,
+        onSaveStartCommand: @escaping (_ command: String, _ provider: ConversationProvider, _ host: SessionHost) async throws -> Void,
         onStart: @escaping (NewSessionRequest) async throws -> Void
     ) {
         _selectedKind = State(initialValue: initialKind)
@@ -132,8 +133,10 @@ struct NewSessionSheet: View {
                     editedCommand: editedStartCommandBinding(for: provider),
                     provider: provider,
                     host: selectedHost,
-                    onSave: { [selectedHost] in onSaveStartCommand($0, provider, selectedHost) }
+                    onSave: { [selectedHost] in try await onSaveStartCommand($0, provider, selectedHost) }
                 )
+                // A check in progress or its failure belongs to one tool on one host.
+                .id(StartCommandTarget(provider: provider, host: selectedHost))
             }
 
             projectFolderSection

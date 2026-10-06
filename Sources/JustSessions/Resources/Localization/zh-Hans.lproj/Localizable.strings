@@ -166,6 +166,10 @@
 	<string>确认 CLI 能在你常用的终端里运行，并且已保存过对话。**新建会话** 只提供检测到已安装的 CLI。</string>
 	<key>Checking the folder on %@…</key>
 	<string>正在检查 %@ 上的文件夹…</string>
+	<key>Checking the start command on %@…</key>
+	<string>正在检查 %@ 上的启动命令…</string>
+	<key>Checking the start command…</key>
+	<string>正在检查启动命令…</string>
 	<key>Choose</key>
 	<string>选择</string>
 	<key>Choose **Add SSH host…** at the bottom of the sidebar, then enter `user@hostname` or an alias from `~/.ssh/config`. Your code and CLIs run on the host; its history is cached on this Mac.</key>
@@ -840,6 +844,8 @@
 	<string>取消置顶会话</string>
 	<key>Use a readable width</key>
 	<string>使用适合阅读的宽度</string>
+	<key>Use default</key>
+	<string>使用默认</string>
 	<key>Use the full window width</key>
 	<string>使用窗口全宽</string>
 	<key>User guide ↗</key>

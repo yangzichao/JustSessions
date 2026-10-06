@@ -926,6 +926,26 @@
         }
       }
     },
+    "Checking the start command on %@…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在检查 %@ 上的启动命令…"
+          }
+        }
+      }
+    },
+    "Checking the start command…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在检查启动命令…"
+          }
+        }
+      }
+    },
     "Choose": {
       "localizations": {
         "zh-Hans": {
@@ -4403,6 +4423,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "使用适合阅读的宽度"
+          }
+        }
+      }
+    },
+    "Use default": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用默认"
           }
         }
       }

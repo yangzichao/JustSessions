@@ -32,11 +32,16 @@ struct CLIStartCommands: Equatable {
     mutating func setCommand(_ proposedCommand: String, for provider: ConversationProvider, on host: SessionHost) {
         let command = Self.normalizedCommand(proposedCommand)
         let key = Self.storageKey(provider: provider, host: host)
-        if command.isEmpty || command == provider.executableName || command == provider.defaultStartCommand {
+        if Self.startsAsTheAppDoes(command, provider: provider) {
             commandsByHostAndTool.removeValue(forKey: key)
         } else {
             commandsByHostAndTool[key] = command
         }
+    }
+
+    /// Whether a normalized command is empty, the tool's executable name alone, or the command the app starts it with.
+    static func startsAsTheAppDoes(_ command: String, provider: ConversationProvider) -> Bool {
+        command.isEmpty || command == provider.executableName || command == provider.defaultStartCommand
     }
 
     /// One line, since the command is placed in a shell command line before the app's arguments.

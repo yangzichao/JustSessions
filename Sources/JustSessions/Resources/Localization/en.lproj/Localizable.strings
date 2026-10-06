@@ -176,6 +176,10 @@
 	<string>Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.</string>
 	<key>Checking the folder on %@…</key>
 	<string>Checking the folder on %@…</string>
+	<key>Checking the start command on %@…</key>
+	<string>Checking the start command on %@…</string>
+	<key>Checking the start command…</key>
+	<string>Checking the start command…</string>
 	<key>Choose</key>
 	<string>Choose</string>
 	<key>Choose **Add SSH host…** at the bottom of the sidebar, then enter `user@hostname` or an alias from `~/.ssh/config`. Your code and CLIs run on the host; its history is cached on this Mac.</key>
@@ -842,6 +846,8 @@
 	<string>Unpin session</string>
 	<key>Use a readable width</key>
 	<string>Use a readable width</string>
+	<key>Use default</key>
+	<string>Use default</string>
 	<key>Use the full window width</key>
 	<string>Use the full window width</string>
 	<key>User guide ↗</key>
