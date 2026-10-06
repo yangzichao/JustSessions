@@ -24,6 +24,42 @@ struct RemoteFolderResolverTests {
         }
     }
 
+    /// Adding a project can create its folder with any missing parents. A folder that cannot be made, here because a
+    /// file has its parent's name, is reported as such rather than as missing.
+    @Test func createsAMissingFolderOnlyWhenAsked() throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let home = root.appendingPathComponent("home")
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        try Data().write(to: home.appendingPathComponent("notes.txt"))
+        let resolver = RemoteFolderResolver(runner: localShell(home: home))
+        let newApp = home.appendingPathComponent("code/new app")
+
+        #expect(throws: RemoteFolderResolutionError.missingFolder(host: "devbox", folder: "~/code/new app")) {
+            try resolver.resolvedPath(of: "~/code/new app", host: "devbox")
+        }
+        #expect(!FileManager.default.fileExists(atPath: newApp.path))
+
+        #expect(try resolver.resolvedPath(of: "~/code/new app", host: "devbox", creatingMissingFolder: true)
+            == physicalPath(of: newApp))
+        var isDirectory: ObjCBool = false
+        #expect(FileManager.default.fileExists(atPath: newApp.path, isDirectory: &isDirectory) && isDirectory.boolValue)
+        #expect(try resolver.resolvedPath(of: "~/code/new app", host: "devbox", creatingMissingFolder: true)
+            == physicalPath(of: newApp))
+
+        #expect(throws: RemoteFolderResolutionError.couldNotCreateFolder(host: "devbox", folder: "~/notes.txt/app")) {
+            try resolver.resolvedPath(of: "~/notes.txt/app", host: "devbox", creatingMissingFolder: true)
+        }
+    }
+
+    @Test func creatingAFolderRunsMkdirBeforeTheLookup() throws {
+        let recorder = RemoteCommandRecorder()
+        let resolver = RemoteFolderResolver(runner: recorder.runner(answering: (0, "/home/me/new\n")))
+
+        #expect(try resolver.resolvedPath(of: "~/new", host: "devbox", creatingMissingFolder: true) == "/home/me/new")
+        #expect(recorder.commands.map(\.command) == [#"sh -c 'mkdir -p -- "$1" && cd -- "$1" && pwd -P' sh 'new'"#])
+    }
+
     @Test func linesAShellProfilePrintsAreSkipped() throws {
         let recorder = RemoteCommandRecorder()
         let resolver = RemoteFolderResolver(runner: recorder.runner(answering: (0, "Welcome to devbox\n/home/me/app\n")))

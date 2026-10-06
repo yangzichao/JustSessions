@@ -4,6 +4,7 @@ enum RemoteFolderResolutionError: LocalizedError, Equatable {
     case couldNotRun(host: String)
     case sshFailed(host: String)
     case missingFolder(host: String, folder: String)
+    case couldNotCreateFolder(host: String, folder: String)
 
     var errorDescription: String? {
         switch self {
@@ -13,6 +14,8 @@ enum RemoteFolderResolutionError: LocalizedError, Equatable {
             "Could not connect to \(host). Check that `ssh \(host)` works in Terminal without a password prompt."
         case .missingFolder(let host, let folder):
             "There is no folder \(folder) on \(host)."
+        case .couldNotCreateFolder(let host, let folder):
+            "Could not create the folder \(folder) on \(host). Check that you can write to its parent folder."
         }
     }
 }

@@ -280,6 +280,10 @@
 	<string>Could not start session</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</string>
+	<key>Create folder and add</key>
+	<string>Create folder and add</string>
+	<key>Creating the folder on %@…</key>
+	<string>Creating the folder on %@…</string>
 	<key>Dark</key>
 	<string>Dark</string>
 	<key>Delete 1 session</key>
