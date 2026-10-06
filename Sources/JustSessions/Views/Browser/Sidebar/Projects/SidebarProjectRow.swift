@@ -40,7 +40,8 @@ struct SidebarProjectRow: View {
 
             Button(action: onClick) {
                 HStack(spacing: 7) {
-                    Image(systemName: "folder")
+                    // A pinned project's pin takes the folder's place, rather than joining the status and actions at the end.
+                    Image(systemName: project.isPinned ? "pin.fill" : "folder")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                         .frame(width: 16)
@@ -57,7 +58,6 @@ struct SidebarProjectRow: View {
                         }
                     }
                     Spacer(minLength: 4)
-                    if project.isPinned { PinnedIndicator() }
                     if let status = activitySummary.mostPressingStatus {
                         SessionStatusIndicator(status: status, description: activitySummary.summary)
                     }

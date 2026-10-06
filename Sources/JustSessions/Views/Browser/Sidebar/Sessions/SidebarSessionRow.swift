@@ -58,10 +58,15 @@ struct SidebarSessionRow: View {
             SidebarSessionRowLayout(
                 provider: conversation.provider,
                 isSelected: isHighlighted,
-                title: { Text(title) },
+                title: {
+                    // Beside the title, as in the preview's header, so the pin isn't taken for one of the status icons.
+                    HStack(spacing: 4) {
+                        Text(title)
+                        if isPinned { PinnedIndicator() }
+                    }
+                },
                 detail: messageMatch.map { SidebarSessionMessageSnippet(snippet: $0.snippet) }
             ) {
-                if isPinned { PinnedIndicator() }
                 statusOrMoreActionsRoom(statusSource, description: statusDescription)
             }
         }
