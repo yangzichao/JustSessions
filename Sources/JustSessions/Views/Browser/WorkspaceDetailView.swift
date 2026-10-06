@@ -14,6 +14,7 @@ import SwiftUI
 struct WorkspaceDetailView: View {
     @ObservedObject var store: ConversationStore
     let sessionSelection: SessionMultiSelection
+    var transcriptMatchReveal: TranscriptMatchReveal? = nil
     let isSidebarHidden: Bool
     let onRename: (Conversation) -> Void
     let onCloseTerminal: (UUID) -> Void
@@ -43,6 +44,7 @@ struct WorkspaceDetailView: View {
                     SessionPreviewPane(
                         store: store,
                         sessionSelection: sessionSelection,
+                        transcriptMatchReveal: transcriptMatchReveal,
                         onRename: onRename,
                         onDelete: onDelete
                     )

@@ -30,7 +30,7 @@ For people who prefer the command line. JustSessions adds a native Mac workspace
 **Claude Code · Codex CLI · Antigravity CLI · Kiro CLI · OpenCode · Pi**
 
 - Group sessions from different agents under the same project.
-- Search projects and sessions; pin and rename favorites.
+- Search projects and sessions, down to the text of their messages; pin and rename favorites.
 - Start or resume a session in its original CLI and project folder.
 
 ![The real Claude Code CLI running in JustSessions, with the Projects sidebar grouping two Claude Code sessions, Codex, OpenCode, and Pi under one project](docs/images/native-terminal.jpg)
@@ -107,7 +107,7 @@ Updates arrive through Sparkle; check manually in **Settings → General**. [Get
 
 New session menus offer only installed CLIs. See the [storage guide](docs/guides/session-storage.md#session-locations) for discovery paths and deletion requirements.
 
-Search matches project names and paths, session titles, and session IDs. It does not search the full conversation text. **Branch** forks a conversation; it does not create a Git branch.
+Search matches project names and paths, session titles, session IDs, and message text: what you wrote, the CLI's replies, and tool call summaries. **Branch** forks a conversation; it does not create a Git branch.
 
 ## Documentation and development
 

@@ -1,7 +1,7 @@
 import Foundation
 
 /// The projects and filter-bar counts the browser shows for one combination of its tool, recency, and search
-/// filters. The browser re-renders on every keystroke, click, and poll tick, and filtering a few thousand sessions
+/// filters, with the sessions a search found in messages. The browser re-renders on every keystroke, click, and poll tick, and filtering a few thousand sessions
 /// takes milliseconds, so the store keeps the last answer until one of `Inputs` changes.
 struct FilteredSidebarProjection {
     struct Inputs: Equatable {
@@ -10,6 +10,8 @@ struct FilteredSidebarProjection {
         let providerFilter: ConversationProviderFilter
         let recencyFilter: SessionRecencyFilter
         let searchText: String
+        /// Sessions whose messages hold the search text, listed along with those whose title or ID does.
+        let messageMatchConversationIDs: Set<String>
         /// `Date.now` rounded down to the minute. The Recent filter classifies against the current time, so the
         /// time belongs to the inputs; minute precision re-classifies an aging session at most a minute late
         /// without making every render a cache miss.
@@ -37,6 +39,11 @@ struct FilteredSidebarProjection {
             recencyFilter: inputs.recencyFilter,
             now: inputs.recencyNow
         )
-        projects = SidebarProjectFiltering.projects(filteredProjects, matching: inputs.searchText, title: title)
+        projects = SidebarProjectFiltering.projects(
+            filteredProjects,
+            matching: inputs.searchText,
+            title: title,
+            messageMatchConversationIDs: inputs.messageMatchConversationIDs
+        )
     }
 }

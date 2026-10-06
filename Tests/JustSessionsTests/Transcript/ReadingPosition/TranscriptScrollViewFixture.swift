@@ -32,6 +32,23 @@ final class TranscriptScrollViewFixture {
         return try #require(descendant(ofType: NSScrollView.self, in: hostingView))
     }
 
+    /// Hosts the whole reader, which loads its own pages, as the preview does.
+    func showReader(_ conversation: Conversation, matchReveal: TranscriptMatchReveal? = nil) {
+        hostingView.rootView = AnyView(TranscriptView(
+            conversation: conversation, readingPositionStore: positionStore, matchReveal: matchReveal
+        ).defaultAppStorage(settings.userDefaults))
+    }
+
+    /// The reader's scroll view, once its first page has loaded.
+    var readerScrollView: NSScrollView? {
+        descendant(ofType: NSScrollView.self, in: hostingView)
+    }
+
+    /// What the text fields show, such as Find's query.
+    var textFieldValues: [String] {
+        descendants(ofType: NSTextField.self, in: hostingView).filter(\.isEditable).map(\.stringValue)
+    }
+
     func settleLayout() async throws {
         for _ in 0..<8 {
             hostingView.layoutSubtreeIfNeeded()

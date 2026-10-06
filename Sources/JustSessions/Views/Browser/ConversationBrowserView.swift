@@ -10,6 +10,9 @@ struct ConversationBrowserView: View {
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     @State private var sessionSelection = SessionMultiSelection()
+    @State private var messageSearch = SidebarMessageSearch()
+    /// The match a click on a session row found in messages opens the reader at.
+    @State private var transcriptMatchReveal: TranscriptMatchReveal?
     /// The host the New Session sheet opened on; nil while it is closed.
     @State private var newSessionSheetHost: SessionHost?
     /// Settings or Help while either shows as a sheet on this window.
@@ -23,7 +26,8 @@ struct ConversationBrowserView: View {
         store.filteredSidebarProjection(
             providerFilter: providerFilter,
             recencyFilter: recencyFilter,
-            searchText: searchText
+            searchText: searchText,
+            messageMatchConversationIDs: Set(messageSearch.results.matchesByConversationID.keys)
         )
     }
 
@@ -50,11 +54,19 @@ struct ConversationBrowserView: View {
                 projects: filteredProjection.projects,
                 allSessionCount: filteredProjection.allSessionCount,
                 recentSessionCount: filteredProjection.recentSessionCount,
+                messageMatches: searchText.isEmpty ? [:] : messageSearch.results.matchesByConversationID,
                 onNewSession: { newSessionSheetHost = defaultNewSessionHost },
                 onSelectConversation: { conversation in
+                    // A session a search found in messages opens its reader at the match, even while its CLI runs.
+                    if !searchText.isEmpty, let match = messageSearch.match(for: conversation.id) {
+                        sessionSelection.selectOnly(conversation.id)
+                        store.selectTerminal(nil)
+                        transcriptMatchReveal = TranscriptMatchReveal(
+                            conversationID: conversation.id, entryID: match.entryID, query: messageSearch.results.query
+                        )
                     // A session whose CLI runs opens on its terminal. Its row stays highlighted through its tab, so,
                     // as for a new session's row, the selection clears and the highlight follows the tabs.
-                    if store.showRunningCLI(for: conversation) {
+                    } else if store.showRunningCLI(for: conversation) {
                         sessionSelection.clear()
                     } else {
                         sessionSelection.selectOnly(conversation.id)
@@ -70,11 +82,23 @@ struct ConversationBrowserView: View {
             WorkspaceDetailView(
                 store: store,
                 sessionSelection: sessionSelection,
+                transcriptMatchReveal: transcriptMatchReveal,
                 isSidebarHidden: isSidebarHidden,
                 onRename: onRename,
                 onCloseTerminal: { requestClosingTerminal($0) },
                 onDelete: { onRequestDeletion(.conversation($0)) }
             )
+        }
+        .background(SidebarMessageSearchDriver(
+            indexer: store.messageIndexer,
+            search: messageSearch,
+            typedQuery: searchText,
+            conversations: store.sidebarConversations,
+            conversationsRevision: store.conversationsRevision
+        ))
+        // A reveal opens the reader only for the session it was made for, and only once.
+        .onChange(of: sessionSelection.onlySelectedConversationID) { _, conversationID in
+            if conversationID != transcriptMatchReveal?.conversationID { transcriptMatchReveal = nil }
         }
         .titleBarSidebarToggle(isSidebarHidden: $isSidebarHidden)
         .focusedSceneValue(\.isSidebarHidden, $isSidebarHidden)

@@ -16,7 +16,7 @@ struct HelpFeatureOverview: View {
         HelpSection(title: "How it works") {
             VStack(alignment: .leading, spacing: 12) {
                 HelpFeatureRow(title: "Find a session", systemImage: "magnifyingglass",
-                               detail: "The sidebar lists sessions from \(providerList) by host and project. Search matches project names and paths, session titles, and IDs.")
+                               detail: "The sidebar lists sessions from \(providerList) by host and project. Search matches project names and paths, session titles and IDs, and message text.")
                 HelpFeatureRow(title: "Read a session", systemImage: "book",
                                detail: "Click a session to read its conversation; no CLI starts. **Open in new window** gives it a window of its own.")
                 HelpFeatureRow(title: "Resume or branch", systemImage: "play",

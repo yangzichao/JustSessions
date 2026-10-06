@@ -4,6 +4,7 @@ import SwiftUI
 struct SessionPreviewPane: View {
     @ObservedObject var store: ConversationStore
     let sessionSelection: SessionMultiSelection
+    var transcriptMatchReveal: TranscriptMatchReveal?
     let onRename: (Conversation) -> Void
     let onDelete: (Conversation) -> Void
 
@@ -35,6 +36,7 @@ struct SessionPreviewPane: View {
                         conversation: conversation,
                         readingPositionStore: readingPositionStore,
                         isActive: store.selectedTerminalID == nil,
+                        matchReveal: transcriptMatchReveal?.conversationID == conversation.id ? transcriptMatchReveal : nil,
                         onOpenInNewWindow: {
                             SessionReadingWindowManager.shared.open(
                                 conversation, store: store, initialPosition: readingPositionStore.position(for: conversation.id)

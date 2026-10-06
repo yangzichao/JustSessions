@@ -18,6 +18,8 @@ final class ConversationStore: ObservableObject {
     var cachedSidebarProjection: SidebarProjection?
     /// What the browser last showed for its filters, kept the same way; see `ConversationStore+SidebarProjects`.
     var cachedFilteredSidebarProjection: FilteredSidebarProjection?
+    /// Every listed session's messages, read while a window's search has text; see `SessionMessageIndexer`.
+    let messageIndexer = SessionMessageIndexer()
     /// What the main window's alert shows, if anything.
     @Published private(set) var alert: StoreAlert?
     /// Alerts that came while `alert` was shown. Each is shown once the ones before it are dismissed, since

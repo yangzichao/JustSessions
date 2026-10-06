@@ -22,7 +22,7 @@ struct SidebarHeader: View {
                     text: $searchText,
                     placeholder: searchLabel,
                     accessibilityLabel: contentMode == .projects
-                        ? "Search projects by name or path and sessions by title or ID"
+                        ? "Search projects by name or path and sessions by title, ID, or message text"
                         : "Search open tabs by title, project, or host",
                     onClose: closeSearch
                 )

@@ -33,6 +33,10 @@ The app keeps a session's reading position, including an offset within a long me
 
 Reading uses up to three nearby pages, normally about 80 entries per page. Pages also have byte and source-record budgets; all parts of one source record stay together. JSONL readers build a lightweight byte-offset index instead of decoding the entire history. Pi also resolves its active branch from parent links, and Antigravity reads selected step payloads from a consistent SQLite snapshot. A source record above 16 MiB is not decoded for preview; Pi reports an error if such a record prevents correct branch selection. Export continues to use the full transcript loader rather than the page window.
 
+## Message search
+
+Searching message text reads each listed session once, with the same code as the reader, and keeps the text it searches in `~/Library/Caches/dev.zichaoyang.justsessions/SessionMessages`, one file per session. Later searches, after a relaunch too, read again only sessions whose files changed; an SSH host's sessions are read from its local cache. The text of a session that is no longer listed is removed after 30 days. The text leaves memory a minute after the last window closes its search. Nothing is sent anywhere, and the CLIs' files are not changed.
+
 ## CLI launch and discovery
 
 The app runs each CLI in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it combines the inherited `PATH` with the user's login-shell `PATH` and common installation folders, including Homebrew and Node version manager locations. Session discovery reads existing files; app startup also reads the login shell's `PATH`, and tmux integration checks its version and running sessions.

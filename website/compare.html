@@ -61,7 +61,7 @@
         <caption class="visually-hidden">JustSessions, Agent Sessions, and opcode compared by history, continuation, remote workflow, and focus</caption>
         <thead><tr><th scope="col">Your workflow</th><th scope="col">JustSessions</th><th scope="col"><a href="https://github.com/jazzyalex/agent-sessions#what-it-does">Agent Sessions</a></th><th scope="col"><a href="https://github.com/winfunc/opcode#readme">opcode</a></th></tr></thead>
         <tbody>
-          <tr><th scope="row">Find and read past work</th><td>Existing history from six CLIs, grouped by project</td><td>16 active local agent formats; full transcript search</td><td>Existing Claude Code projects and session history</td></tr>
+          <tr><th scope="row">Find and read past work</th><td>Existing history from six CLIs, grouped by project; message search</td><td>16 active local agent formats; full transcript search</td><td>Existing Claude Code projects and session history</td></tr>
           <tr><th scope="row">Continue a conversation</th><td>Original CLI inside native tabs, in the original project folder</td><td>Supported CLI sessions in Terminal, iTerm2, or Warp</td><td>Claude Code through a graphical session interface</td></tr>
           <tr><th scope="row">Work on your own SSH host</th><td>Browse cached history; resume the CLI on the host</td><td>SSH history workflow not documented*</td><td>SSH history workflow not documented*</td></tr>
           <tr><th scope="row">Main focus</th><td>Read history and work in familiar CLIs, local or remote</td><td>Search history across tools and inspect usage</td><td>Claude Code sessions, custom agents, and checkpoints</td></tr>
@@ -100,8 +100,8 @@
     <section class="comparison-fit" aria-labelledby="comparison-fit-title">
       <h2 id="comparison-fit-title">A good fit for your workflow?</h2>
       <p>JustSessions is for Mac developers who switch between coding CLIs and return to work across projects or their own SSH machines. Read an existing conversation, then continue in the CLI you already know, in the same app. No Git worktree workflow is required.</p>
-      <p>Choose Agent Sessions when searching across transcript contents matters most. Choose opcode when you want a Claude Code GUI with custom agents and checkpoints.</p>
-      <p class="fine-print">JustSessions searches session names, paths, titles, and IDs; reader Find covers loaded messages. SSH requires passwordless access, rsync, and the installed CLI; some providers also need Python 3. With tmux, agent processes can keep running after you quit the app while their machine stays awake.</p>
+      <p>Choose Agent Sessions when you want more agent formats or usage insights. Choose opcode when you want a Claude Code GUI with custom agents and checkpoints.</p>
+      <p class="fine-print">JustSessions searches project names and paths, session titles and IDs, and message text up to each message's preview limit. SSH requires passwordless access, rsync, and the installed CLI; some providers also need Python 3. With tmux, agent processes can keep running after you quit the app while their machine stays awake.</p>
       <a class="text-link" href="./guide.html">See supported CLIs and setup <span aria-hidden="true">→</span></a>
     </section>
     <p class="fine-print comparison-sources">Sources: <a href="./guide.html#resume">JustSessions guide</a>, <a href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-storage.md">session storage</a>, <a href="https://github.com/jazzyalex/agent-sessions#readme">Agent Sessions README</a>, <a href="https://github.com/winfunc/opcode#readme">opcode README</a>.</p>
