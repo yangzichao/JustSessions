@@ -45,7 +45,7 @@ When a user-facing feature changes, update its guide and README entry in the sam
 
 The homepage's agent list pairs each visible name with a decorative inline SVG matching the app's sidebar symbol in `Views/Branding/Providers/`. Its color variables in `styles/app-theme.css` mirror the light colors in `Views/Theme/ConversationProvider+TintColor.swift`. Keep both aligned when the app's provider identity changes. The list is the first slide's second line: a column beside the screenshot on wide screens, a row on tablets, and two columns on phones. `styles/providers.css` and `styles/screenshot-gallery.css` handle these layouts.
 
-The footer links to `compare.html`, a short comparison with Agent Sessions and opcode. Keep the scope on finding, reading, and resuming existing conversations. Link primary documentation next to the matrix, record the check date, and describe undocumented capabilities without claiming they are absent. The comparison page has no traffic-count script. Its focused stylesheet lives in `styles/comparison/`; the build versions nested CSS files too.
+The footer links to `compare.html`, with one-sentence differences from Agent Sessions, opcode, cmux, and Superset, followed by a matrix of the two closest history tools. Keep the scope on finding, reading, and resuming existing conversations. Link primary documentation next to the comparisons, record the check date, and describe undocumented capabilities without claiming they are absent. The comparison page has no traffic-count script. Its focused stylesheet lives in `styles/comparison/`; the build versions nested CSS files too.
 
 ## Search and sharing metadata
 
