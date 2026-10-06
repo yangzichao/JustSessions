@@ -23,7 +23,7 @@
 
 For people who prefer the command line. JustSessions adds a native Mac workspace around your existing CLIs. Keep their terminal interface, configuration, and provider authentication.
 
-[Website](https://yangzichao.github.io/JustSessions/) · [Guide](https://yangzichao.github.io/JustSessions/guide.html) · [Download](#download) · [Supported CLIs](#supported-clis) · [Documentation](docs/README.md)
+[Website](https://yangzichao.github.io/JustSessions/) · [Guide](https://yangzichao.github.io/JustSessions/guide.html) · [Compare](https://yangzichao.github.io/JustSessions/compare.html) · [Download](#download) · [Supported CLIs](#supported-clis) · [Documentation](docs/README.md)
 
 ## Multiple agents. One project.
 

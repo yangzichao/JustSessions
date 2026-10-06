@@ -43,7 +43,7 @@ def build_site():
             shutil.copy2(media_path, asset_directory / media_path.name)
     for document_path in WEBSITE_OUTPUT_DIRECTORY.glob("*.html"):
         document_content = document_path.read_text()
-        for resource_path in (*stylesheet_directory.glob("*.css"), *script_directory.rglob("*.js"), *asset_directory.iterdir()):
+        for resource_path in (*stylesheet_directory.rglob("*.css"), *script_directory.rglob("*.js"), *asset_directory.iterdir()):
             if not resource_path.is_file():
                 continue
             resource_version = hashlib.sha256(resource_path.read_bytes()).hexdigest()[:12]

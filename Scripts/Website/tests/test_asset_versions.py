@@ -13,6 +13,16 @@ from validate_site import validate_site
 
 
 class ScreenshotCacheVersionTests(unittest.TestCase):
+    def test_replacing_nested_stylesheet_without_updating_page_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            website_directory = Path(temporary_directory)
+            with patch("build_site.WEBSITE_OUTPUT_DIRECTORY", website_directory):
+                build_site()
+            stylesheet_path = website_directory / "styles/comparison/comparison.css"
+            stylesheet_path.write_text(stylesheet_path.read_text() + "\n/* changed */\n")
+            with self.assertRaisesRegex(AssertionError, "Asset cache version mismatch: .*comparison.css"):
+                validate_site(website_directory)
+
     def test_replacing_demo_video_without_updating_page_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             website_directory = Path(temporary_directory)
