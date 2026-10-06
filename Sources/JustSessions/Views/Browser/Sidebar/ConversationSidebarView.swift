@@ -197,13 +197,15 @@ struct ConversationSidebarView: View {
             isRefreshDisabled: store.isDeletingSessions,
             archivedProjectCount: store.archivedProjectPaths(on: section.host).count,
             onShowArchivedProjects: { hostShowingArchivedProjects = section.host },
-            usesTmuxPrefix: section.host.sshDestination.map { destination in
-                Binding(
-                    get: { store.usesTmuxPrefix(on: section.host) },
-                    set: { store.setUsesTmuxPrefix($0, on: destination) }
+            sshHostActions: section.host.sshDestination.map { destination in
+                SidebarSSHHostActions(
+                    usesTmuxPrefix: Binding(
+                        get: { store.usesTmuxPrefix(on: section.host) },
+                        set: { store.setUsesTmuxPrefix($0, on: destination) }
+                    ),
+                    onRemove: { store.removeRemoteHost(destination) }
                 )
-            },
-            onRemove: section.host.sshDestination.map { destination in { store.removeRemoteHost(destination) } }
+            }
         )
     }
 

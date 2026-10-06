@@ -76,6 +76,7 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 - Resume, branch, start, and delete sessions on the host over SSH, just like on this Mac. SSH hosts have no Trash, so deleting a session there is permanent; for Pi, the folder beside the session file goes too.
 - Refresh updates every host at once. A host that can't be reached shows the error on its heading; the others still list.
 - Install **tmux on the remote host** so a session there keeps running when the connection drops or the tab closes. The app's bundled tmux is only for this Mac. Run `tmux -V` on the host to check installation, then select the session to reattach.
+- Point at a host's heading and click its **⋯** for the host's own settings: **Use this host's tmux prefix** (see [terminal persistence](session-storage.md#terminal-persistence)) and **Remove host**. The heading's right-click menu has them too, after **Add project…** and **Refresh**.
 
 ## Clean up
 
