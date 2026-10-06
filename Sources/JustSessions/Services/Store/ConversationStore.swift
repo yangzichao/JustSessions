@@ -47,6 +47,8 @@ final class ConversationStore: ObservableObject {
     let deletionProgress = SessionDeletionProgress()
     /// The SSH hosts listed after this Mac.
     @Published var remoteHostList: RemoteHostList
+    /// SSH hosts whose tmux sessions keep the host's own prefix keys; see `ConversationStore+RemoteTmuxPrefix`.
+    @Published var remoteHostsUsingTmuxPrefix: RemoteHostsUsingTmuxPrefix
     /// Commands of your own that tools' CLIs start with, per host; see `ConversationStore+StartCommands`.
     @Published var cliStartCommands: CLIStartCommands
     /// Each host's last refresh, this Mac's included.
@@ -118,6 +120,7 @@ final class ConversationStore: ObservableObject {
         self.pinnedItems = PinnedItems.load(from: userDefaults)
         self.sidebarProjectList = SidebarProjectList.load(from: userDefaults)
         self.remoteHostList = RemoteHostList.load(from: userDefaults)
+        self.remoteHostsUsingTmuxPrefix = RemoteHostsUsingTmuxPrefix.load(from: userDefaults)
         self.cliStartCommands = CLIStartCommands.load(from: userDefaults)
         LoginShellPathReader.warmUpInBackground()
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()

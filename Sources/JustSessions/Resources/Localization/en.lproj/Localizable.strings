@@ -814,6 +814,8 @@
 	<string>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles and IDs, and message text.</string>
 	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
 	<string>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</string>
+	<key>The tmux sessions the app starts on a host have no prefix key, so every key reaches the CLI. To use your own tmux prefix there, right-click the host's heading and choose **Use this host's tmux prefix**.</key>
+	<string>The tmux sessions the app starts on a host have no prefix key, so every key reaches the CLI. To use your own tmux prefix there, right-click the host's heading and choose **Use this host's tmux prefix**.</string>
 	<key>The tour points at the main controls in the window. Afterwards, tips show again the first time you use each part, such as tabs or split view.</key>
 	<string>The tour points at the main controls in the window. Afterwards, tips show again the first time you use each part, such as tabs or split view.</string>
 	<key>Theme</key>
@@ -854,6 +856,8 @@
 	<string>Use default</string>
 	<key>Use the full window width</key>
 	<string>Use the full window width</string>
+	<key>Use this host's tmux prefix</key>
+	<string>Use this host's tmux prefix</string>
 	<key>User guide ↗</key>
 	<string>User guide ↗</string>
 	<key>Website ↗</key>

@@ -14,6 +14,8 @@ struct SidebarHostHeading: View {
     let isRefreshDisabled: Bool
     let archivedProjectCount: Int
     let onShowArchivedProjects: () -> Void
+    /// Nil for this Mac; see `SidebarHostMenuItems`.
+    let usesTmuxPrefix: Binding<Bool>?
     /// Nil for this Mac, which is always listed.
     let onRemove: (() -> Void)?
 
@@ -60,6 +62,7 @@ struct SidebarHostHeading: View {
                 onAddProject: onAddProject,
                 onShowArchivedProjects: onShowArchivedProjects,
                 onRefresh: onRefresh,
+                usesTmuxPrefix: usesTmuxPrefix,
                 onRemove: onRemove
             )
         }

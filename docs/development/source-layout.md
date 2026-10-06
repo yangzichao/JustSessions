@@ -15,7 +15,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Onboarding/`: the onboarding tour's stops, the tips a fresh install shows once each, and when each tip is due from what the window shows.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
-- `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
+- `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, each host's refresh status, and the SSH hosts whose tmux sessions use the host's own prefix keys.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, multi-selection, and which Open tabs groups are collapsed.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
@@ -36,7 +36,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Launch/`: CLI executable resolution and process environment.
 - `Services/Launch/PlainTerminal/`: opens a plain terminal, a login shell in a project folder that is no session.
 - `Services/Launch/StartCommand/`: runs a start command of your own through a shell, on this Mac and on SSH hosts, with the app's arguments after it; `env` then runs the CLI in the shell's place, so the tab's process is still the CLI's. `Check/` reads a command before it is kept, without running it, and looks up its program where the CLI runs. The New session sheet's field, locked until Edit, is in `Views/Browser/NewSession/StartCommand/`.
-- `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there.
+- `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there, including its prefix keys.
 - `Services/Remote/HostStatus/`: one SSH call per refresh that lists the host's tmux sessions and installed CLIs.
 - `Services/Tmux/ThisMac/`: bundled runtime discovery, terminal database environment, compatible server selection, and local persistence.
 - `Cloudflare/UpdateFeed/`: the Worker at the app's `SUFeedURL`, which counts update checks per day and app version and redirects to the appcast on GitHub. See [Counting update checks](update-checks.md).
