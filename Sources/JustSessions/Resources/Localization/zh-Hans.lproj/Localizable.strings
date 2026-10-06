@@ -294,6 +294,8 @@
 	<string>删除进度</string>
 	<key>Done</key>
 	<string>完成</string>
+	<key>Edit</key>
+	<string>编辑</string>
 	<key>End and close this terminal</key>
 	<string>结束并关闭此终端</string>
 	<key>End on %@</key>

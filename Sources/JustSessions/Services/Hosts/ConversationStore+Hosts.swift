@@ -20,17 +20,13 @@ extension ConversationStore {
     }
 
     /// From the New Session sheet. A folder typed for an SSH host is looked up there first, so a missing folder is
-    /// reported before a tab opens, and the tab waits under the path the CLI records for its session. The sheet's
-    /// start command is kept for the tool on the host, so later launches there start the same way; nil keeps the
-    /// one kept already.
+    /// reported before a tab opens, and the tab waits under the path the CLI records for its session.
     func launchNewSession(
         provider: ConversationProvider,
         host: SessionHost,
         folder: String,
-        startCommand: String? = nil,
         resolver: RemoteFolderResolver = RemoteFolderResolver()
     ) async throws {
-        if let startCommand { setStartCommand(startCommand, for: provider, on: host) }
         try launchNewSession(provider: provider, in: try await projectLocation(of: folder, on: host, resolver: resolver))
     }
 

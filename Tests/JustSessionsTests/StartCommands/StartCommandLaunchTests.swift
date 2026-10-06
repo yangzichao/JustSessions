@@ -2,22 +2,23 @@ import Foundation
 import Testing
 @testable import JustSessions
 
-/// The New session sheet's start command is kept for the tool on the host, so resumes there start the same way.
+/// A start command saved in the New session sheet is kept for the tool on the host, so new sessions and resumes
+/// there start the same way.
 @MainActor
 struct StartCommandLaunchTests {
     private static let startCommand = #"~/.toolbox/bin/claude --aws-profile "dev""#
 
-    @Test func aNewSessionsStartCommandAlsoResumesSessionsOnThatHost() async throws {
+    @Test func aSavedStartCommandStartsNewSessionsAndResumesOnThatHost() async throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let store = ConversationStore(adapters: [ClaudeAdapter()], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
         defer { store.closeAllTerminals() }
+        store.setStartCommand(Self.startCommand, for: .claude, on: .ssh("cloud"))
 
         try await store.launchNewSession(
             provider: .claude,
             host: .ssh("cloud"),
             folder: "~/api",
-            startCommand: Self.startCommand,
             resolver: RemoteFolderResolver(runner: RemoteCommandRecorder().runner(answering: (0, "/home/me/api\n")))
         )
         let saved = Conversation.fixture(provider: .claude, projectPath: "/home/me/api", host: .ssh("cloud"))

@@ -87,13 +87,12 @@ struct ConversationBrowserView: View {
                 hosts: store.hosts,
                 providersByHost: store.newSessionProvidersByHost,
                 recentProjects: startableProjects,
-                startCommands: store.cliStartCommands
+                startCommands: store.cliStartCommands,
+                onSaveStartCommand: { store.setStartCommand($0, for: $1, on: $2) }
             ) { request in
                 switch request.kind {
                 case .cli(let provider):
-                    try await store.launchNewSession(
-                        provider: provider, host: request.host, folder: request.folder, startCommand: request.startCommand
-                    )
+                    try await store.launchNewSession(provider: provider, host: request.host, folder: request.folder)
                 case .plainTerminal:
                     try await store.openPlainTerminal(host: request.host, folder: request.folder)
                 }

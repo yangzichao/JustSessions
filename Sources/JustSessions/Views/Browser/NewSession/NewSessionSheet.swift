@@ -8,16 +8,17 @@ struct NewSessionSheet: View {
     @State private var projectPath: String
     @State private var isStarting = false
     @State private var errorMessage: String?
-    /// Start commands typed in this sheet, per tool and host, so switching back to a tool shows what was typed.
-    @State private var typedStartCommands: [StartCommandTarget: String] = [:]
+    /// Start commands being edited, per tool and host, so switching back to a tool shows the edit in progress.
+    @State private var editedStartCommands: [StartCommandTarget: String] = [:]
 
     let hosts: [SessionHost]
     /// The tools installed on each host; the picker offers the selected host's.
     let providersByHost: [SessionHost: [ConversationProvider]]
     /// Projects on every host; the menu shows the selected host's.
     let recentProjects: [ProjectConversationGroup]
-    /// The start commands kept from earlier sessions, which the field starts from.
+    /// The kept start commands, which the locked field shows.
     let startCommands: CLIStartCommands
+    let onSaveStartCommand: (_ command: String, _ provider: ConversationProvider, _ host: SessionHost) -> Void
     let onStart: (NewSessionRequest) async throws -> Void
 
     init(
@@ -28,6 +29,7 @@ struct NewSessionSheet: View {
         providersByHost: [SessionHost: [ConversationProvider]],
         recentProjects: [ProjectConversationGroup],
         startCommands: CLIStartCommands,
+        onSaveStartCommand: @escaping (_ command: String, _ provider: ConversationProvider, _ host: SessionHost) -> Void,
         onStart: @escaping (NewSessionRequest) async throws -> Void
     ) {
         _selectedKind = State(initialValue: initialKind)
@@ -37,6 +39,7 @@ struct NewSessionSheet: View {
         self.providersByHost = providersByHost
         self.recentProjects = recentProjects
         self.startCommands = startCommands
+        self.onSaveStartCommand = onSaveStartCommand
         self.onStart = onStart
     }
 
@@ -59,16 +62,18 @@ struct NewSessionSheet: View {
         )
     }
 
-    private func startCommand(for provider: ConversationProvider) -> String {
+    private func editedStartCommandBinding(for provider: ConversationProvider) -> Binding<String?> {
         let target = StartCommandTarget(provider: provider, host: selectedHost)
-        return typedStartCommands[target] ?? startCommands.customCommand(for: provider, on: selectedHost) ?? ""
+        return Binding(
+            get: { editedStartCommands[target] },
+            set: { editedStartCommands[target] = $0 }
+        )
     }
 
-    private func startCommandBinding(for provider: ConversationProvider) -> Binding<String> {
-        Binding(
-            get: { startCommand(for: provider) },
-            set: { typedStartCommands[StartCommandTarget(provider: provider, host: selectedHost)] = $0 }
-        )
+    /// A session starts with the kept command, so it waits until an edit to the shown one is saved or cancelled.
+    private var isEditingShownStartCommand: Bool {
+        guard case .cli(let provider) = startingKind else { return false }
+        return editedStartCommands[StartCommandTarget(provider: provider, host: selectedHost)] != nil
     }
 
     private var trimmedProjectPath: String {
@@ -123,9 +128,11 @@ struct NewSessionSheet: View {
 
             if case .cli(let provider) = startingKind {
                 NewSessionStartCommandSection(
-                    command: startCommandBinding(for: provider),
+                    savedCommand: startCommands.customCommand(for: provider, on: selectedHost) ?? "",
+                    editedCommand: editedStartCommandBinding(for: provider),
                     provider: provider,
-                    host: selectedHost
+                    host: selectedHost,
+                    onSave: { [selectedHost] in onSaveStartCommand($0, provider, selectedHost) }
                 )
             }
 
@@ -144,7 +151,7 @@ struct NewSessionSheet: View {
                 Button(startingKind == .plainTerminal ? "Open terminal" : "Start session", action: start)
                     .buttonStyle(ProviderProminentButtonStyle(tint: startingKind.emphasisTintColor))
                     .keyboardShortcut(.defaultAction)
-                    .disabled(trimmedProjectPath.isEmpty || isStarting)
+                    .disabled(trimmedProjectPath.isEmpty || isStarting || isEditingShownStartCommand)
             }
         }
         .padding(24)
@@ -190,15 +197,7 @@ struct NewSessionSheet: View {
     }
 
     private func start() {
-        let request = NewSessionRequest(
-            kind: startingKind,
-            host: selectedHost,
-            folder: trimmedProjectPath,
-            startCommand: {
-                guard case .cli(let provider) = startingKind else { return nil }
-                return startCommand(for: provider)
-            }()
-        )
+        let request = NewSessionRequest(kind: startingKind, host: selectedHost, folder: trimmedProjectPath)
         isStarting = true
         Task {
             do {
@@ -218,7 +217,7 @@ struct NewSessionSheet: View {
     }
 }
 
-/// A tool on a host, whose start command the sheet keeps while it is open.
+/// A tool on a host, whose start command edit the sheet keeps while it is open.
 private struct StartCommandTarget: Hashable {
     let provider: ConversationProvider
     let host: SessionHost

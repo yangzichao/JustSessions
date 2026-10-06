@@ -1620,6 +1620,16 @@
         }
       }
     },
+    "Edit": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑"
+          }
+        }
+      }
+    },
     "End and close this terminal": {
       "localizations": {
         "zh-Hans": {

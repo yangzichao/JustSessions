@@ -298,6 +298,8 @@
 	<string>Deletion progress</string>
 	<key>Done</key>
 	<string>Done</string>
+	<key>Edit</key>
+	<string>Edit</string>
 	<key>End and close this terminal</key>
 	<string>End and close this terminal</string>
 	<key>End on %@</key>

@@ -3,6 +3,4 @@ struct NewSessionRequest {
     let kind: NewSessionKind
     let host: SessionHost
     let folder: String
-    /// What the start command field holds for the tool; nil for a terminal, which has none.
-    let startCommand: String?
 }
