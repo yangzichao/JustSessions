@@ -10,6 +10,8 @@ struct ConversationSidebarView: View {
     let projects: [ProjectConversationGroup]
     let allSessionCount: Int
     let recentSessionCount: Int
+    /// While searching, the first match in each session whose messages hold the search text.
+    var messageMatches: [String: SessionMessageMatch] = [:]
     let onNewSession: () -> Void
     let onSelectConversation: (Conversation) -> Void
     let onRenameConversation: (Conversation) -> Void

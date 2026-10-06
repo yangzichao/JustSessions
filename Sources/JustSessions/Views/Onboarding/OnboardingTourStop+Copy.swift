@@ -41,7 +41,7 @@ extension OnboardingTourStop {
         case .sessionMenu:
             "Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once."
         case .searchSessions:
-            "Search projects by name or path, and sessions by title or ID."
+            "Search projects by name or path, and sessions by title, ID, or message text."
         case .tabGroup:
             "Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you."
         case .hideSidebar:

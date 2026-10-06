@@ -15,6 +15,8 @@ struct SidebarSessionRow: View {
     let conversation: Conversation
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
+    /// While searching, the session's first match in its messages, shown under the title.
+    var messageMatch: SessionMessageMatch? = nil
     let onClick: (Conversation) -> Void
     let onRename: (Conversation) -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
@@ -53,9 +55,12 @@ struct SidebarSessionRow: View {
         Button {
             onClick(conversation)
         } label: {
-            SidebarSessionRowLayout(provider: conversation.provider, isSelected: isHighlighted) {
-                Text(title)
-            } trailing: {
+            SidebarSessionRowLayout(
+                provider: conversation.provider,
+                isSelected: isHighlighted,
+                title: { Text(title) },
+                detail: messageMatch.map { SidebarSessionMessageSnippet(snippet: $0.snippet) }
+            ) {
                 if isPinned { PinnedIndicator() }
                 statusOrMoreActionsRoom(statusSource, description: statusDescription)
             }
@@ -63,6 +68,7 @@ struct SidebarSessionRow: View {
         .buttonStyle(ThemePlainButtonStyle(showsHover: false))
         .help("\(title) · \(conversation.provider.rawValue) · \(SidebarSessionDateText.shared.text(for: conversation.updatedAt))\(statusDescription.map { " · \($0)" } ?? "")")
         .accessibilityLabel("\(title), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(statusDescription.map { ", \($0)" } ?? "")")
+        .accessibilityValue(Text(verbatim: messageMatch?.snippet.text ?? ""))
         // Over the button rather than in it, so a click on the ⋯ opens its menu instead of selecting the session.
         .overlay(alignment: .trailing) {
             SidebarRowMoreActionsMenu(accessibilityLabel: "More actions for \(title)") {

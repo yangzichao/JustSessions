@@ -3601,22 +3601,22 @@
         }
       }
     },
-    "Search projects by name or path and sessions by title or ID": {
+    "Search projects by name or path and sessions by title, ID, or message text": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按名称或路径搜索项目，按标题或 ID 搜索会话"
+            "value": "按名称或路径搜索项目，按标题、ID 或消息内容搜索会话"
           }
         }
       }
     },
-    "Search projects by name or path, and sessions by title or ID.": {
+    "Search projects by name or path, and sessions by title, ID, or message text.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按名称或路径搜索项目，按标题或 ID 搜索会话。"
+            "value": "按名称或路径搜索项目，按标题、ID 或消息内容搜索会话。"
           }
         }
       }
@@ -3627,6 +3627,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "在正在阅读的对话中搜索文字。⌘F 也可以。"
+          }
+        }
+      }
+    },
+    "Searching messages… %lld of %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Searching messages… %1$lld of %2$lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在搜索消息… %1$lld / %2$lld"
           }
         }
       }
@@ -4227,12 +4243,12 @@
         }
       }
     },
-    "The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles, and IDs.": {
+    "The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles and IDs, and message text.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "侧边栏按主机和项目列出来自 %@ 的会话。搜索可匹配项目名称和路径、会话标题及 ID。"
+            "value": "侧边栏按主机和项目列出来自 %@ 的会话。搜索可匹配项目名称和路径、会话标题和 ID，以及消息内容。"
           }
         }
       }

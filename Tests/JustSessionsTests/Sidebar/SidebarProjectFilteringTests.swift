@@ -50,6 +50,22 @@ struct SidebarProjectFilteringTests {
         #expect(SidebarProjectFiltering.projects(projects, matching: "nothing", title: title).isEmpty)
     }
 
+    @Test func sessionsWhoseMessagesMatchStayAlongWithTitleMatches() {
+        let titleMatch = conversation(project: "/tmp/api", title: "Fix the cache key")
+        let messageMatch = conversation(project: "/tmp/api", title: "Refactor storage")
+        let noMatch = conversation(project: "/tmp/api", title: "Add logging")
+        let otherProjectMessageMatch = conversation(project: "/tmp/website", title: "Header")
+        let projects = ProjectConversationGroup.grouped([titleMatch, messageMatch, noMatch, otherProjectMessageMatch])
+
+        let filtered = SidebarProjectFiltering.projects(
+            projects, matching: "cache key", title: \.suggestedTitle,
+            messageMatchConversationIDs: [messageMatch.id, otherProjectMessageMatch.id]
+        )
+
+        #expect(Set(filtered.flatMap(\.conversations).map(\.id)) == [titleMatch.id, messageMatch.id, otherProjectMessageMatch.id])
+        #expect(filtered.count == 2)
+    }
+
     @Test func newSessionsAwaitingTheirConversationFollowTheSameRules() {
         let website = conversation(project: "/tmp/website", title: "Fix header")
         let newSession = PendingNewSession(

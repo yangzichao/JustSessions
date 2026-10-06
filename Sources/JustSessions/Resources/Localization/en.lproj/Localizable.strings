@@ -684,10 +684,10 @@
 	<string>Search open tabs by title, project, or host</string>
 	<key>Search projects and sessions</key>
 	<string>Search projects and sessions</string>
-	<key>Search projects by name or path and sessions by title or ID</key>
-	<string>Search projects by name or path and sessions by title or ID</string>
-	<key>Search projects by name or path, and sessions by title or ID.</key>
-	<string>Search projects by name or path, and sessions by title or ID.</string>
+	<key>Search projects by name or path and sessions by title, ID, or message text</key>
+	<string>Search projects by name or path and sessions by title, ID, or message text</string>
+	<key>Search projects by name or path, and sessions by title, ID, or message text.</key>
+	<string>Search projects by name or path, and sessions by title, ID, or message text.</string>
 	<key>Search the text of the conversation you are reading. ⌘F does the same.</key>
 	<string>Search the text of the conversation you are reading. ⌘F does the same.</string>
 	<key>Searching…</key>
@@ -806,8 +806,8 @@
 	<string>The projects will be archived; skipped sessions stay on disk and come back when they are restored.</string>
 	<key>The shell and anything still running in it will stop.</key>
 	<string>The shell and anything still running in it will stop.</string>
-	<key>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles, and IDs.</key>
-	<string>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles, and IDs.</string>
+	<key>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles and IDs, and message text.</key>
+	<string>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles and IDs, and message text.</string>
 	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
 	<string>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</string>
 	<key>The tour points at the main controls in the window. Afterwards, tips show again the first time you use each part, such as tabs or split view.</key>

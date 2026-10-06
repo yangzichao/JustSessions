@@ -10,6 +10,7 @@ struct SidebarProjectSection: View {
     let projectSelection: ProjectMultiSelection
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
+    let messageMatches: [String: SessionMessageMatch]
     let onToggleExpansion: () -> Void
     let onClickProject: () -> Void
     let onNewSession: (ConversationProvider) -> Void
@@ -71,6 +72,7 @@ struct SidebarProjectSection: View {
                     conversation: conversation,
                     sessionSelection: sessionSelection,
                     selectedConversations: selectedConversations,
+                    messageMatch: messageMatches[conversation.id],
                     onClick: onClickConversation,
                     onRename: onRenameConversation,
                     onRequestDeletion: onRequestDeletion,

@@ -14,7 +14,8 @@ extension ConversationStore {
     func filteredSidebarProjection(
         providerFilter: ConversationProviderFilter,
         recencyFilter: SessionRecencyFilter,
-        searchText: String
+        searchText: String,
+        messageMatchConversationIDs: Set<String> = []
     ) -> FilteredSidebarProjection {
         let projection = sidebarProjection
         let inputs = FilteredSidebarProjection.Inputs(
@@ -23,6 +24,7 @@ extension ConversationStore {
             providerFilter: providerFilter,
             recencyFilter: recencyFilter,
             searchText: searchText,
+            messageMatchConversationIDs: messageMatchConversationIDs,
             recencyNow: Date(timeIntervalSinceReferenceDate: (Date.now.timeIntervalSinceReferenceDate / 60).rounded(.down) * 60)
         )
         if let cachedFilteredSidebarProjection, cachedFilteredSidebarProjection.inputs == inputs {

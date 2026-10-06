@@ -12,6 +12,9 @@ extension ConversationSidebarView {
                 onDismissSelection: dismissSidebarSelection
             ) {
                 LazyVStack(alignment: .leading, spacing: SidebarIndentGuide.rowSpacing) {
+                    if isSearching {
+                        SidebarMessageSearchProgress(indexer: store.messageIndexer)
+                    }
                     ForEach(hostSections) { section in
                         hostHeading(for: section)
                             .padding(.top, 14)
@@ -38,6 +41,7 @@ extension ConversationSidebarView {
                                 projectSelection: projectSelection,
                                 sessionSelection: sessionSelection,
                                 selectedConversations: selectedConversations,
+                                messageMatches: messageMatches,
                                 onToggleExpansion: { projectExpansion.toggle(project.id) },
                                 onClickProject: { handleProjectClick(project) },
                                 onNewSession: { provider in
