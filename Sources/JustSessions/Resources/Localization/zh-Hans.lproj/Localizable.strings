@@ -272,6 +272,10 @@
 	<string>无法启动会话</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>找不到 iTerm2 的默认 Profile。动态 Profile 无法导入。</string>
+	<key>Create folder and add</key>
+	<string>创建文件夹并添加</string>
+	<key>Creating the folder on %@…</key>
+	<string>正在 %@ 上创建文件夹…</string>
 	<key>Dark</key>
 	<string>深色</string>
 	<key>Delete %lld sessions</key>
@@ -814,6 +818,8 @@
 	<string>引导会指出窗口中的主要控件。之后，你第一次用到各个部分时（例如标签页或拆分视图），提示会再次出现。</string>
 	<key>Theme</key>
 	<string>主题</string>
+	<key>There is no folder %@ on %@. Create it to add the project.</key>
+	<string>%2$@ 上没有文件夹 %1$@。创建它即可添加此项目。</string>
 	<key>This Mac</key>
 	<string>此 Mac</string>
 	<key>This affects all tools in %@, including sessions hidden by the current filter.</key>

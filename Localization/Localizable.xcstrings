@@ -1474,6 +1474,26 @@
         }
       }
     },
+    "Create folder and add": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建文件夹并添加"
+          }
+        }
+      }
+    },
+    "Creating the folder on %@…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在 %@ 上创建文件夹…"
+          }
+        }
+      }
+    },
     "Dark": {
       "localizations": {
         "zh-Hans": {
@@ -4279,6 +4299,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "主题"
+          }
+        }
+      }
+    },
+    "There is no folder %@ on %@. Create it to add the project.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "There is no folder %1$@ on %2$@. Create it to add the project."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ 上没有文件夹 %1$@。创建它即可添加此项目。"
           }
         }
       }

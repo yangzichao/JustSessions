@@ -81,14 +81,21 @@ extension ConversationStore {
 
     /// From a host heading's +: lists a folder under its host before it has any sessions, or brings it back from the
     /// archive, and returns its project key. A folder typed for an SSH host is looked up there first, so a missing
-    /// folder is reported and the project is keyed by the path the CLIs record.
+    /// folder is reported, or created when `creatingMissingFolder` is set, and the project is keyed by the path the
+    /// CLIs record. On this Mac the folder panel creates a new folder itself.
     @discardableResult
     func addProjectToSidebar(
         folder: String,
         on host: SessionHost,
+        creatingMissingFolder: Bool = false,
         resolver: RemoteFolderResolver = RemoteFolderResolver()
     ) async throws -> String {
-        let projectPath = try await projectLocation(of: folder, on: host, resolver: resolver).key
+        let projectPath = try await projectLocation(
+            of: folder,
+            on: host,
+            creatingMissingFolder: creatingMissingFolder,
+            resolver: resolver
+        ).key
         showProjectInSidebar(projectPath)
         return projectPath
     }
