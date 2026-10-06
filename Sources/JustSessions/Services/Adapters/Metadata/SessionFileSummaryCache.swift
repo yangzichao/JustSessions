@@ -99,7 +99,9 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         do {
             try FileManager.default.createDirectory(at: persistenceFile.deletingLastPathComponent(), withIntermediateDirectories: true,
                                                     attributes: [.posixPermissions: 0o700])
-            try data.write(to: persistenceFile, options: [.atomic, .completeFileProtectionUnlessOpen])
+            // No data protection class: on macOS 26.5 a file written with `.completeFileProtectionUnlessOpen` could not
+            // be read again ("Operation not permitted"), so no launch reused the cache. The owner-only permissions keep it private.
+            try data.write(to: persistenceFile, options: .atomic)
             try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: persistenceFile.path)
             needsSaving = false
         } catch { /* Rebuild from the source files when a cache cannot be saved. */ }
