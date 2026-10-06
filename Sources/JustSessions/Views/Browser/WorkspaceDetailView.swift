@@ -37,6 +37,10 @@ struct WorkspaceDetailView: View {
                     onRenameConversation: onRename,
                     onCloseTerminal: onCloseTerminal
                 )
+                // Above the area below it, which sits in the title bar's safe area too, since the bar is shorter than
+                // the title bar. A background there extends up through that safe area, as the preview's and a tab's
+                // ended bar do, and it covered the bar whenever one of them showed.
+                .zIndex(1)
             }
             GeometryReader { geometry in
                 let shownSplit = store.shownSplit
