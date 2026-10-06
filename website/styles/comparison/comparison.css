@@ -8,6 +8,7 @@
 .comparison-differences dd { margin: 0 0 22px; font-size: 17px; line-height: 1.7; color: var(--secondary); }
 .comparison-differences a { text-decoration: underline; text-underline-offset: 3px; }
 .comparison-differences .fine-print { margin-bottom: 0; }
+.comparison-adjacent h3 { margin-bottom: 18px; font-size: 20px; }
 .comparison-table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
 .comparison-table-scroll table { width: 100%; min-width: 820px; table-layout: fixed; border-collapse: collapse; text-align: left; font-size: 15px; line-height: 1.6; }
 .comparison-table-scroll th, .comparison-table-scroll td { padding: 18px 20px; border-bottom: 1px solid var(--line); vertical-align: top; }

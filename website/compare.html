@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fcfbf8">
   <title>JustSessions Comparison — Find, Read, and Resume Sessions</title>
-  <meta name="description" content="Compare JustSessions with Agent Sessions, opcode, cmux, and Superset: saved history, familiar CLIs, project folders, and SSH workflows.">
+  <meta name="description" content="Compare JustSessions with session browsers, agent workspaces, mobile clients, and terminals for reading history and continuing work in familiar CLIs.">
   <link rel="canonical" href="https://yangzichao.github.io/JustSessions/compare.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="JustSessions">
   <meta property="og:title" content="JustSessions Comparison — Find, Read, and Resume Sessions">
-  <meta property="og:description" content="Compare JustSessions with Agent Sessions, opcode, cmux, and Superset: saved history, familiar CLIs, project folders, and SSH workflows.">
+  <meta property="og:description" content="Compare JustSessions with session browsers, agent workspaces, mobile clients, and terminals for reading history and continuing work in familiar CLIs.">
   <meta property="og:url" content="https://yangzichao.github.io/JustSessions/compare.html">
   <meta property="og:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
   <meta property="og:image:width" content="1200">
@@ -18,7 +18,7 @@
   <meta property="og:image:alt" content="JustSessions — Nothing extra. Just sessions. Claude Code in a native terminal, with multiple agents grouped under one project.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="JustSessions Comparison — Find, Read, and Resume Sessions">
-  <meta name="twitter:description" content="Compare JustSessions with Agent Sessions, opcode, cmux, and Superset: saved history, familiar CLIs, project folders, and SSH workflows.">
+  <meta name="twitter:description" content="Compare JustSessions with session browsers, agent workspaces, mobile clients, and terminals for reading history and continuing work in familiar CLIs.">
   <meta name="twitter:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
   <meta name="twitter:image:alt" content="JustSessions — Nothing extra. Just sessions. Claude Code in a native terminal, with multiple agents grouped under one project.">
   <link rel="icon" type="image/svg+xml" href="./assets/mark.svg">
@@ -69,6 +69,33 @@
       </table>
     </div>
     <p class="fine-print comparison-evidence">Documentation checked October 5, 2026. *Not documented means the reviewed sources do not establish that workflow. Capabilities vary by CLI; this is a documentation comparison.</p>
+
+    <section class="comparison-differences comparison-adjacent" aria-labelledby="comparison-adjacent-title">
+      <h2 id="comparison-adjacent-title">Other ways to work with agents</h2>
+      <p>These tools solve adjacent needs, from phone access to parallel tasks and everyday terminal work.</p>
+      <h3>Remote clients</h3>
+      <dl>
+        <dt><a href="https://github.com/getpaseo/paseo#readme">Paseo</a></dt>
+        <dd>Paseo controls daemon-managed agents from desktop, web, and mobile; JustSessions browses existing history and resumes the original CLI on your Mac or SSH host.</dd>
+        <dt><a href="https://github.com/slopus/happy#how-does-it-work">Happy</a></dt>
+        <dd>Happy lets you take over wrapped Claude Code and Codex sessions from your phone; JustSessions keeps your saved conversations and original CLI terminals together on your Mac.</dd>
+      </dl>
+      <h3>Parallel agents</h3>
+      <dl>
+        <dt><a href="https://github.com/smtg-ai/claude-squad#how-it-works">Claude Squad</a></dt>
+        <dd>Claude Squad runs parallel agents through a terminal UI with tmux and Git worktrees; JustSessions adds a native history reader and resumes work in existing project folders.</dd>
+      </dl>
+      <h3>Terminals</h3>
+      <dl>
+        <dt><a href="https://docs.warp.dev/agents/cli-agents/overview">Warp</a></dt>
+        <dd>Warp enhances running CLI agents with rich input, notifications, and code review; JustSessions focuses on finding saved conversations, reading them, and reopening the original CLI.</dd>
+        <dt><a href="https://ghostty.org/docs">Ghostty</a></dt>
+        <dd>Ghostty provides a general-purpose terminal with native UI; JustSessions adds a project-organized conversation library and reader around your coding CLIs.</dd>
+        <dt><a href="https://iterm2.com/documentation-tmux-integration.html">iTerm2</a></dt>
+        <dd>iTerm2 integrates persistent tmux sessions into native windows; JustSessions pairs keep-running agent terminals with a library of readable, resumable conversations.</dd>
+      </dl>
+      <p class="fine-print">JustSessions has no mobile client or integrated code review. Its tmux processes keep running while their machine stays awake; a resumable conversation and a live process are different things.</p>
+    </section>
 
     <section class="comparison-fit" aria-labelledby="comparison-fit-title">
       <h2 id="comparison-fit-title">A good fit for your workflow?</h2>
