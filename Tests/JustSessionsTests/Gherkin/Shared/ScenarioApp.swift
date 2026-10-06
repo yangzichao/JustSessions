@@ -20,7 +20,8 @@ final class ScenarioApp {
         temporaryDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("gherkin-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: temporaryDirectory, withIntermediateDirectories: true)
         adapter = ChangingConversationAdapter(provider: provider)
-        let suiteName = "JustSessionsGherkin-\(UUID().uuidString)"
+        // Named by a path in the scenario's folder, as `IsolatedUserDefaults` is, so no plist is left behind.
+        let suiteName = temporaryDirectory.appendingPathComponent("settings").path
         userDefaultsSuiteName = suiteName
         // No tmux in reach, so a tab that follows its CLI never renames a session on the app's own tmux server.
         let commandResolver = NativeCLICommandResolver(
