@@ -35,10 +35,11 @@ struct TabBarVisibilityTests {
             window.contentView = hostingView
         }
 
-        func openTab(running executablePath: String) -> TerminalSession {
+        func openTab(running executablePath: String, on host: SessionHost = .thisMac) -> TerminalSession {
             let tab = TerminalSession(
                 conversation: nil, provider: nil, projectPath: "/tmp", action: nil, displayTitle: "Tab",
-                command: NativeCLICommand(executablePath: executablePath, arguments: [], workingDirectory: "/tmp", environment: [])
+                command: NativeCLICommand(executablePath: executablePath, arguments: [], workingDirectory: "/tmp", environment: []),
+                host: host
             )
             store.openTerminal(tab)
             return tab
@@ -88,14 +89,16 @@ struct TabBarVisibilityTests {
         #expect(barBehindThePreview == barBehindATerminal)
     }
 
-    @Test func theBarStaysInSightWhileATabWhoseCLIEndedShows() async throws {
+    /// On this Mac, the ended bar says how the CLI exited; on an SSH host, whose connection dropped, it offers Reconnect.
+    @Test(arguments: [SessionHost.thisMac, .ssh("devbox")])
+    func theBarStaysInSightWhileATabWhoseCLIEndedShows(on host: SessionHost) async throws {
         let fixture = try Fixture()
         defer { fixture.close() }
         let runningTab = fixture.openTab(running: "/bin/cat")
         fixture.store.selectTerminal(runningTab.id)
         let barBehindATerminal = try await fixture.barColor(selecting: SessionMultiSelection())
 
-        let endedTab = fixture.openTab(running: "/usr/bin/true")
+        let endedTab = fixture.openTab(running: "/usr/bin/true", on: host)
         fixture.store.selectTerminal(endedTab.id)
         _ = try await fixture.barColor(selecting: SessionMultiSelection())
         try await expectEventually { endedTab.hasExited }
