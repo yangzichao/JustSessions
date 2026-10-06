@@ -3,8 +3,9 @@ import SwiftUI
 /// The command the picked tool's CLI starts with on the picked host: a wrapper, another path, or the CLI with flags
 /// of your own. Empty starts the tool as the app does, which the empty field shows, such as `claude` or
 /// `kiro-cli chat`. It is kept for the tool's later launches on the host, resumes included; see `CLIStartCommands`.
-/// The field stays locked until Edit, and Save keeps the command only once it checks out where the tool runs, so a
-/// stray keystroke or a typo never changes how the tool starts.
+/// The field stays locked until Edit, and only Save changes the command, going back to the default included. Save keeps
+/// a command only once it checks out where the tool runs, so a stray click, keystroke, or typo never changes how the
+/// tool starts.
 struct NewSessionStartCommandSection: View {
     /// The kept command; empty when the tool starts as the app does.
     let savedCommand: String
@@ -23,10 +24,17 @@ struct NewSessionStartCommandSection: View {
             Text("Start command")
                 .font(.subheadline.weight(.medium))
             HStack(spacing: 8) {
-                if editedCommand != nil {
+                if let editedCommand {
                     editingField
+                    // Only empties the field; Save keeps it, and Cancel brings the saved command back.
+                    Button("Use default") {
+                        self.editedCommand = ""
+                        checkFailure = nil
+                        isFieldFocused = true
+                    }
+                    .disabled(isChecking || CLIStartCommands.normalizedCommand(editedCommand).isEmpty)
                     Button("Cancel") {
-                        editedCommand = nil
+                        self.editedCommand = nil
                         checkFailure = nil
                     }
                     .disabled(isChecking)
@@ -35,9 +43,6 @@ struct NewSessionStartCommandSection: View {
                 } else {
                     lockedCommand
                     Button("Edit") { editedCommand = savedCommand }
-                    if !savedCommand.isEmpty {
-                        Button("Use default") { Task { try? await onSave("") } }
-                    }
                 }
             }
             if isChecking {
