@@ -120,7 +120,9 @@ Build locally with `make`; the app is written to `dist/JustSessions.app`. Use `m
 - [Website development and traffic](docs/development/website.md) · [Counting update checks](docs/development/update-checks.md)
 - [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases)
 
-Submit changes through a pull request. Run `make verify` on the final commit and include the results in the PR template.
+See [Contributing](CONTRIBUTING.md) for setup and pull requests. Run `make verify` on the final commit and include the results in the PR template. Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+[Security reports](SECURITY.md) · [Accessibility](ACCESSIBILITY.md) · [Report a bug or suggest a feature](https://github.com/yangzichao/JustSessions/issues/new/choose)
 
 For in-app help, open **Settings → Help**. Send feedback or report an issue from **Settings → General**, or the [website Guide](https://yangzichao.github.io/JustSessions/guide.html#feedback).
 

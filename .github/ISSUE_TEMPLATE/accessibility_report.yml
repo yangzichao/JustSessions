@@ -1,0 +1,47 @@
+name: Accessibility report
+description: Report a barrier in the app, website, or documentation.
+labels: [accessibility]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        See our [accessibility statement](https://github.com/yangzichao/JustSessions/blob/main/ACCESSIBILITY.md).
+        If this form is difficult to use, email [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com).
+        Share only the settings needed to reproduce the barrier, and redact private content from attachments.
+  - type: input
+    id: affected-surface
+    attributes:
+      label: Affected screen or page
+      description: Name the app screen, website URL, or documentation page.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the app and macOS versions or browser, and relevant assistive technology or accessibility settings, if any.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce the barrier
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: supporting-details
+    attributes:
+      label: Additional context
+      description: Optional. Include suggested improvements or redacted screenshots or recordings.
