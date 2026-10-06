@@ -21,15 +21,22 @@ enum TranscriptPageAssembler {
         return entries
     }
 
-    /// Speaker continuity is recalculated across page boundaries without changing source identities.
+    /// Who an entry is from, for the label that starts each turn: 0 for the user, 1 for the agent, nil for a note.
+    static func speaker(of entry: TranscriptEntry) -> Int? {
+        switch entry.content {
+        case .userMessage, .userImage: 0
+        case .assistantMessage, .toolCalls, .toolResultImage: 1
+        case .note: nil
+        }
+    }
+
+    /// Speaker continuity is recalculated across page boundaries without changing source identities. It starts from
+    /// the entry before the first page, so an entry keeps its label as pages load and leave around it; a label that
+    /// came or went moved everything below it while the reader scrolled.
     static func transcript(pages: [TranscriptPage]) -> TranscriptContent {
-        var previousSpeaker: Int?
+        var previousSpeaker = pages.first?.precedingSpeaker
         let entries = pages.flatMap(\.entries).map { entry in
-            let speaker: Int? = switch entry.content {
-            case .userMessage, .userImage: 0
-            case .assistantMessage, .toolCalls, .toolResultImage: 1
-            case .note: nil
-            }
+            let speaker = speaker(of: entry)
             defer { previousSpeaker = speaker }
             return TranscriptEntry(id: entry.id, content: entry.content, timestamp: entry.timestamp,
                                    startsTurn: speaker != nil && speaker != previousSpeaker, markdown: entry.markdown)

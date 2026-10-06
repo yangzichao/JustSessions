@@ -5,6 +5,9 @@ import Observation
 @Observable
 final class TranscriptPagingModel {
     nonisolated static let maximumPageCount = 3
+    /// Pages near the viewport stay past `maximumPageCount`, up to this many; see
+    /// `TranscriptPagingViewport.retainedPageCount(afterLoading:pageStarts:)`.
+    nonisolated static let maximumRetainedPageCount = 8
     private(set) var transcript: TranscriptContent?
     private(set) var pages: [TranscriptPage] = []
     private(set) var isLoading = false
@@ -32,14 +35,22 @@ final class TranscriptPagingModel {
         request(position.entryIndex.map(TranscriptPageRequest.around) ?? .latest, preserving: position, refreshIndex: true)
     }
 
-    func earlier(preserving position: TranscriptReadingPosition, currentPosition: (() -> TranscriptReadingPosition?)? = nil) {
+    /// Keeps `keepingPages` pages once the earlier page loads, dropping later ones.
+    func earlier(
+        preserving position: TranscriptReadingPosition, currentPosition: (() -> TranscriptReadingPosition?)? = nil,
+        keepingPages: Int = maximumPageCount
+    ) {
         guard !isLoading, let first = pages.first, first.hasEarlier else { return }
-        request(.before(first.records.lowerBound), preserving: position, currentPosition: currentPosition)
+        request(.before(first.records.lowerBound), preserving: position, currentPosition: currentPosition, keepingPages: keepingPages)
     }
 
-    func later(preserving position: TranscriptReadingPosition, currentPosition: (() -> TranscriptReadingPosition?)? = nil) {
+    /// Keeps `keepingPages` pages once the later page loads, dropping earlier ones.
+    func later(
+        preserving position: TranscriptReadingPosition, currentPosition: (() -> TranscriptReadingPosition?)? = nil,
+        keepingPages: Int = maximumPageCount
+    ) {
         guard !isLoading, let last = pages.last, last.hasLater else { return }
-        request(.after(last.records.upperBound), preserving: position, currentPosition: currentPosition)
+        request(.after(last.records.upperBound), preserving: position, currentPosition: currentPosition, keepingPages: keepingPages)
     }
 
     func first() { request(.first, preserving: .entry(index: 0, offset: -6)) }
@@ -54,7 +65,7 @@ final class TranscriptPagingModel {
 
     private func request(
         _ request: TranscriptPageRequest, preserving position: TranscriptReadingPosition, refreshIndex: Bool = false,
-        currentPosition: (() -> TranscriptReadingPosition?)? = nil
+        currentPosition: (() -> TranscriptReadingPosition?)? = nil, keepingPages: Int = maximumPageCount
     ) {
         guard let source else { return }
         cancel()
@@ -71,10 +82,10 @@ final class TranscriptPagingModel {
                 switch request {
                 case .before:
                     self.pages.insert(page, at: 0)
-                    self.pages = Array(self.pages.prefix(Self.maximumPageCount))
+                    self.pages = Array(self.pages.prefix(keepingPages))
                 case .after:
                     self.pages.append(page)
-                    self.pages = Array(self.pages.suffix(Self.maximumPageCount))
+                    self.pages = Array(self.pages.suffix(keepingPages))
                 default: self.pages = [page]
                 }
                 let transcript = TranscriptPageAssembler.transcript(pages: self.pages)

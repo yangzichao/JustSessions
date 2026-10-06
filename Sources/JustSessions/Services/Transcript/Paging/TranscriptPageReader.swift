@@ -47,6 +47,18 @@ enum TranscriptPageReader {
             if entries.isEmpty { records.removeLast() }
         }
         return TranscriptPage(entries: TranscriptPageAssembler.entries(in: records), records: lowerBound..<upperBound,
-                              totalRecordCount: recordCount, decodedByteCount: byteCount)
+                              totalRecordCount: recordCount, decodedByteCount: byteCount,
+                              precedingSpeaker: try speaker(before: lowerBound, limit: limits.maximumRecordCount, decode: decode))
+    }
+
+    /// The speaker of the last entry before `position`, looking back at most `limit` records past hidden ones.
+    private static func speaker(before position: Int, limit: Int, decode: (Int) throws -> ([TranscriptEntry], Int)) throws -> Int? {
+        var record = position - 1
+        while record >= 0, position - record <= limit {
+            try Task.checkCancellation()
+            if let entry = try decode(record).0.last { return TranscriptPageAssembler.speaker(of: entry) }
+            record -= 1
+        }
+        return nil
     }
 }

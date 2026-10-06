@@ -134,8 +134,12 @@ struct TranscriptScrollView: View {
         .onDisappear { positionController.stop() }
     }
 
+    /// Every loaded entry is laid out, rather than only those near the viewport: the reader keeps only a few pages, at
+    /// most `TranscriptPagingModel.maximumRetainedPageCount`. A lazy stack estimates the heights of rows it has not laid out
+    /// and corrects them as they appear. That made scrolling jump, most of all past tall images, and the stack could
+    /// keep correcting without end inside one update, freezing the window, with images or with text alone.
     private var transcriptEntries: some View {
-        LazyVStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
             ForEach(transcript.positionedEntries) { positionedEntry in
                 let entryIndex = positionedEntry.id
                 TranscriptEntryView(
