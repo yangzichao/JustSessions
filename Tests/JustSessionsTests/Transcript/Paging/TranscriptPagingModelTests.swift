@@ -44,6 +44,26 @@ struct TranscriptPagingModelTests {
         #expect(model.transcript?.entries.last?.id == latestID)
     }
 
+    @Test func keepsAsManyPagesAsALoadAsksFor() async throws {
+        let fixture = try TranscriptPagingFixture(count: 600)
+        defer { fixture.remove() }
+        let model = TranscriptPagingModel()
+        model.refresh(fixture.conversation, position: nil)
+        try await expectEventually { !model.isLoading }
+        for expectedCount in 2...5 {
+            let anchor = try #require(model.transcript?.entries.first?.id)
+            model.earlier(preserving: .entry(index: anchor, offset: 0), keepingPages: 5)
+            try await expectEventually { !model.isLoading }
+            #expect(model.pages.count == expectedCount)
+        }
+        let latestPage = try #require(model.pages.last?.records)
+        let anchor = try #require(model.transcript?.entries.first?.id)
+        model.earlier(preserving: .entry(index: anchor, offset: 0), keepingPages: 5)
+        try await expectEventually { !model.isLoading }
+        #expect(model.pages.count == 5)
+        #expect(model.pages.last?.records != latestPage)
+    }
+
     @Test func firstLatestAndRefreshingKeepTheRequestedPosition() async throws {
         let fixture = try TranscriptPagingFixture(count: 500)
         defer { fixture.remove() }

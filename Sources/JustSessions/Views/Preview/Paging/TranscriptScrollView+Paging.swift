@@ -16,12 +16,23 @@ extension TranscriptScrollView {
 
     func loadEarlierPage() {
         paging?.earlier(preserving: positionController.recordedPosition ?? .bottom,
-                        currentPosition: { positionController.recordedPosition })
+                        currentPosition: { positionController.recordedPosition },
+                        keepingPages: retainedPageCount(afterLoading: .earlier))
     }
 
     func loadLaterPage() {
         paging?.later(preserving: positionController.recordedPosition ?? .bottom,
-                      currentPosition: { positionController.recordedPosition })
+                      currentPosition: { positionController.recordedPosition },
+                      keepingPages: retainedPageCount(afterLoading: .later))
+    }
+
+    /// Keeps the pages the reader is near, so the one that loads does not push out a page it would load straight back.
+    private func retainedPageCount(afterLoading direction: TranscriptPagingViewport.Direction) -> Int {
+        guard let paging, let viewport = positionController.pagingViewport else { return TranscriptPagingModel.maximumPageCount }
+        let pageStarts = paging.pages.map { page in
+            page.entries.first.flatMap { positionController.documentMinY(ofEntryAt: $0.id) }
+        }
+        return viewport.retainedPageCount(afterLoading: direction, pageStarts: pageStarts)
     }
 
     func prefetchIfNeeded(in viewport: TranscriptPagingViewport? = nil) {
@@ -42,8 +53,14 @@ extension TranscriptScrollView {
         searchIndex = nil
         indexedTranscript = nil
         positionController.tracksTranscriptBottom = !paging.hasLater
-        positionController.restore(paging.restorationPosition)
-        visibleEntryIndex = paging.restorationPosition.entryIndex
-        if let index = paging.restorationPosition.entryIndex { scrollProxy.scrollTo(index, anchor: .top) }
+        let position = paging.restorationPosition
+        if let index = position.entryIndex, positionController.documentMinY(ofEntryAt: index) == nil {
+            // The entry is new, as after going to the first message: SwiftUI brings its row into view first.
+            positionController.restore(position)
+            visibleEntryIndex = index
+            scrollProxy.scrollTo(index, anchor: .top)
+        } else {
+            positionController.restore(position, duringNextLayout: true)
+        }
     }
 }
