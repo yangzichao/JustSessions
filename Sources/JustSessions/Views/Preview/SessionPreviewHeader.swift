@@ -5,24 +5,44 @@ struct SessionPreviewHeader: View {
     let conversation: Conversation
     let onRename: () -> Void
     let onDelete: () -> Void
+    /// The project folder last found gone: checked when the session shows and whenever the app comes back to the
+    /// front, so a folder moved back in Finder turns Resume on again without picking the session again.
+    @State private var missingProjectFolder: ProjectLocation?
+
+    private var isProjectFolderMissing: Bool {
+        missingProjectFolder == conversation.projectLocation
+    }
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 12) {
-                sessionTitle
-                Spacer(minLength: 8)
-                sessionActions
-            }
-            VStack(alignment: .leading, spacing: 12) {
-                sessionTitle
-                HStack {
-                    Spacer(minLength: 0)
+        VStack(alignment: .leading, spacing: 12) {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    sessionTitle
+                    Spacer(minLength: 8)
                     sessionActions
                 }
+                VStack(alignment: .leading, spacing: 12) {
+                    sessionTitle
+                    HStack {
+                        Spacer(minLength: 0)
+                        sessionActions
+                    }
+                }
+            }
+            if isProjectFolderMissing {
+                MissingProjectFolderNote(projectPath: conversation.projectPath)
             }
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
+        .onChange(of: conversation.projectLocation, initial: true) { checkProjectFolder() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            checkProjectFolder()
+        }
+    }
+
+    private func checkProjectFolder() {
+        missingProjectFolder = conversation.isProjectAvailable ? nil : conversation.projectLocation
     }
 
     private var sessionTitle: some View {
@@ -56,10 +76,6 @@ struct SessionPreviewHeader: View {
                         .help(conversation.projectLocation.copyablePath)
                     Text("·")
                     Text(conversation.updatedAt, style: .relative)
-                    if !conversation.isProjectAvailable {
-                        Text("·")
-                        Text("Folder missing").foregroundStyle(.red)
-                    }
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)

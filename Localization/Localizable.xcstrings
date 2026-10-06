@@ -1928,16 +1928,6 @@
         }
       }
     },
-    "Folder missing": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "文件夹不存在"
-          }
-        }
-      }
-    },
     "Follow System": {
       "localizations": {
         "zh-Hans": {
@@ -4209,6 +4199,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "主机需要："
+          }
+        }
+      }
+    },
+    "The project folder is no longer at %@. Move it back there to resume this session.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "项目文件夹已不在 %@。把它移回原处即可继续这个会话。"
           }
         }
       }

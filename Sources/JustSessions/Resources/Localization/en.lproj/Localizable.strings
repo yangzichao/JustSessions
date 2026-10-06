@@ -354,8 +354,6 @@
 	<string>Finishes its turn</string>
 	<key>First message</key>
 	<string>First message</string>
-	<key>Folder missing</key>
-	<string>Folder missing</string>
 	<key>Follow System</key>
 	<string>Follow System</string>
 	<key>Font</key>
@@ -800,6 +798,8 @@
 	<string>The folder is listed under %@ in the sidebar, ready for new sessions.</string>
 	<key>The host needs:</key>
 	<string>The host needs:</string>
+	<key>The project folder is no longer at %@. Move it back there to resume this session.</key>
+	<string>The project folder is no longer at %@. Move it back there to resume this session.</string>
 	<key>The project folder no longer exists</key>
 	<string>The project folder no longer exists</string>
 	<key>The project will be archived; skipped sessions stay on disk and come back when it is restored.</key>
