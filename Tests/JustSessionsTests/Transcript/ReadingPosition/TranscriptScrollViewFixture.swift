@@ -59,9 +59,10 @@ final class TranscriptScrollViewFixture {
     /// Lays out until the condition has held for `stableDuration`, so a step that takes several layout passes, such as
     /// restoring a reading position, has finished rather than passed through. A slow machine, such as a CI runner, can
     /// outlast `settleLayout()`'s fixed wait. Gives up after `timeout`, leaving the expectations that follow to report
-    /// what the transcript shows.
+    /// what the transcript shows. While other AppKit suites render on the main actor, a reader that loads its own pages
+    /// can start loading them many seconds after it is shown, so the deadline is long; a passing test never waits for it.
     func waitUntil(
-        stableFor stableDuration: Duration = .milliseconds(150), timeout: Duration = .seconds(10),
+        stableFor stableDuration: Duration = .milliseconds(150), timeout: Duration = .seconds(60),
         _ condition: () -> Bool
     ) async throws {
         let clock = ContinuousClock()
