@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 WEBSITE_URL = "https://yangzichao.github.io/JustSessions/"
-PUBLIC_PAGE_PATHS = ("", "guide.html")
+PUBLIC_PAGE_PATHS = ("", "guide.html", "compare.html")
 
 
 def validate_metadata(documents, website_directory: Path):
