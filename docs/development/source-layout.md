@@ -74,6 +74,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/Sidebar/Hosts/`: host headings with their own refresh buttons and progress, and the Add SSH host button and sheet. `Menu/` holds a heading's right-click menu. `AddProject/` holds the heading's +, a menu that also restores archived projects while the host has any, and the sheet that types the path of a project to add on an SSH host and offers to create the folder there when it is missing; this Mac's is picked with the folder panel in `Views/Browser/ProjectFolders/`, which the New session sheet uses too.
 - `Views/Terminal/`: a tab's embedded terminal, inset from the window's edges, and the bar above it once its CLI ends.
 - `Views/Preview/`: conversation preview for the selected session.
+- `Views/Preview/MissingFolder/`: the note under a session's header when its project folder is gone from this Mac.
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
 - `Views/Preview/Reading/` and `ReadingPosition/`: text size, reading width, first/latest-message controls, and reading-position restoration.
 - `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.

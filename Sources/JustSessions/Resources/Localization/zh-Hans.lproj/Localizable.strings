@@ -352,8 +352,6 @@
 	<string>完成一轮任务</string>
 	<key>First message</key>
 	<string>第一条消息</string>
-	<key>Folder missing</key>
-	<string>文件夹不存在</string>
 	<key>Follow System</key>
 	<string>跟随系统</string>
 	<key>Font</key>
@@ -800,6 +798,8 @@
 	<string>该文件夹会列在侧边栏的 %@ 下，可直接在其中新建会话。</string>
 	<key>The host needs:</key>
 	<string>主机需要：</string>
+	<key>The project folder is no longer at %@. Move it back there to resume this session.</key>
+	<string>项目文件夹已不在 %@。把它移回原处即可继续这个会话。</string>
 	<key>The project folder no longer exists</key>
 	<string>项目文件夹已不存在</string>
 	<key>The project will be archived; skipped sessions stay on disk and come back when it is restored.</key>
