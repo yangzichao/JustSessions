@@ -1,0 +1,82 @@
+name: Bug report
+description: Report a reproducible problem with JustSessions.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search existing issues first. Remove credentials, private conversation text, and identifying paths or hostnames from anything you share.
+        For vulnerabilities, use [private security reporting](https://github.com/yangzichao/JustSessions/security/advisories/new).
+  - type: input
+    id: app-version
+    attributes:
+      label: JustSessions version
+      description: Find this in Settings → General. For a source build, include the commit SHA.
+    validations:
+      required: true
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version
+    validations:
+      required: true
+  - type: dropdown
+    id: affected-cli
+    attributes:
+      label: Affected CLI
+      multiple: true
+      options:
+        - Claude Code
+        - OpenAI Codex CLI
+        - Google Antigravity CLI
+        - Kiro CLI
+        - OpenCode
+        - Pi
+        - Plain shell
+        - Not CLI-specific
+    validations:
+      required: true
+  - type: input
+    id: cli-version
+    attributes:
+      label: CLI version
+      description: Include the affected CLI versions when relevant.
+  - type: dropdown
+    id: session-location
+    attributes:
+      label: Session location
+      options:
+        - This Mac
+        - SSH host
+        - Both
+        - Not session-specific
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the affected feature and a minimal synthetic example when possible.
+      placeholder: |
+        1. Open…
+        2. Choose…
+        3. Observe…
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: supporting-details
+    attributes:
+      label: Logs, screenshots, or other context
+      description: Optional. Redact sensitive information before pasting logs or attaching files.

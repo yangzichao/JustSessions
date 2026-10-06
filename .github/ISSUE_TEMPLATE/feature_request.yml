@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest an improvement to JustSessions.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search existing issues first. Describe the workflow you want to improve and keep private session content out of examples.
+        For an accessibility barrier, use the [accessibility report](https://github.com/yangzichao/JustSessions/issues/new?template=accessibility_report.yml).
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe what you are trying to do and where the current behavior gets in the way.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Explain how the change would help, with a concrete example if possible.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional. Include workarounds or other approaches you have tried.
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Optional. Include affected CLIs, local or SSH workflows, or redacted screenshots.
