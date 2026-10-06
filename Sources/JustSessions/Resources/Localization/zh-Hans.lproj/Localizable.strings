@@ -408,6 +408,8 @@
 	<string>JustSessions 网站</string>
 	<key>JustSessions and the CLIs in its terminals need it to reach a device on your network, such as an SSH host at a local address. macOS doesn't let apps check it, so look for JustSessions in Privacy &amp; Security &gt; Local Network.</key>
 	<string>JustSessions 及其终端中的 CLI 需要它来访问你所在网络中的设备，例如本地地址上的 SSH 主机。macOS 不允许应用检查这项权限，请在「隐私与安全性 &gt; 本地网络」中找到 JustSessions。</string>
+	<key>JustSessions quit unexpectedly</key>
+	<string>JustSessions 意外退出了</string>
 	<key>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</key>
 	<string>JustSessions 读取了各 CLI 自己保存的历史，并按项目分组。没有导入或上传任何内容。</string>
 	<key>Keep running</key>
@@ -514,6 +516,8 @@
 	<string>在 %@ 上未找到支持的 CLI。请在该主机安装 %@，然后刷新。</string>
 	<key>No supported CLI found on this Mac. Install %@, then refresh.</key>
 	<string>本机未找到支持的 CLI。请安装 %@，然后刷新。</string>
+	<key>Not Now</key>
+	<string>以后再说</string>
 	<key>Not allowed</key>
 	<string>未允许</string>
 	<key>Not asked yet</key>
@@ -632,6 +636,12 @@
 	<string>重新打开上次退出 JustSessions 时的标签</string>
 	<key>Report an issue ↗</key>
 	<string>报告问题 ↗</string>
+	<key>Report by Email</key>
+	<string>通过邮件报告</string>
+	<key>Report on GitHub</key>
+	<string>在 GitHub 上报告</string>
+	<key>Reporting the crash helps get it fixed. The report opens with the crash details filled in: add what you were doing, then send it. The crash report file shows in Finder, so you can attach it.</key>
+	<string>报告这次崩溃，能帮我们修复它。报告打开时已填好崩溃详情：补充你当时在做什么，然后发送。崩溃报告文件会在访达中显示，方便你附上。</string>
 	<key>Restore</key>
 	<string>恢复</string>
 	<key>Restore %@</key>

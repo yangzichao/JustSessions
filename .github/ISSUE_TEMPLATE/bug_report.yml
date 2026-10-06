@@ -79,4 +79,4 @@ body:
     id: supporting-details
     attributes:
       label: Logs, screenshots, or other context
-      description: Optional. Redact sensitive information before pasting logs or attaching files.
+      description: Optional. For a crash, attach the JustSessions .ips file from ~/Library/Logs/DiagnosticReports. Redact sensitive information before pasting logs or attaching files.

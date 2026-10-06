@@ -11,6 +11,10 @@ final class JustSessionsAppDelegate: NSObject, NSApplicationDelegate {
         SessionNotificationCenter.shared.startHandlingClicks()
     }
 
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        LaunchCrashReportOffer.offerIfTheLastRunCrashed()
+    }
+
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
         WorkspaceDockMenu.shared.makeMenu()
     }

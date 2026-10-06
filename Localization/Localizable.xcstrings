@@ -2214,6 +2214,16 @@
         }
       }
     },
+    "JustSessions quit unexpectedly": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JustSessions 意外退出了"
+          }
+        }
+      }
+    },
     "JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.": {
       "localizations": {
         "zh-Hans": {
@@ -2749,6 +2759,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "本机未找到支持的 CLI。请安装 %@，然后刷新。"
+          }
+        }
+      }
+    },
+    "Not Now": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以后再说"
           }
         }
       }
@@ -3339,6 +3359,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "报告问题 ↗"
+          }
+        }
+      }
+    },
+    "Report by Email": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过邮件报告"
+          }
+        }
+      }
+    },
+    "Report on GitHub": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 GitHub 上报告"
+          }
+        }
+      }
+    },
+    "Reporting the crash helps get it fixed. The report opens with the crash details filled in: add what you were doing, then send it. The crash report file shows in Finder, so you can attach it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告这次崩溃，能帮我们修复它。报告打开时已填好崩溃详情：补充你当时在做什么，然后发送。崩溃报告文件会在访达中显示，方便你附上。"
           }
         }
       }
