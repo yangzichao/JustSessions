@@ -61,6 +61,7 @@ struct TerminalTabGroupSection: View {
                     isSplitPartnerHovered: hoveredTabID.map { split?.partner(of: session.id) == $0 } ?? false,
                     showsLeadingSeparator: tabBefore(session.id, in: tabIDsInSight).map { showsSeparator(between: $0, and: session.id) } ?? false,
                     splitMenu: splitMenu(for: session.id),
+                    newSessionMenu: newSessionMenu(inGroupOf: session, projectName: projectName),
                     onHoverChange: { trackHover(of: session.id, isHovering: $0) },
                     onSelect: { store.selectTerminal(session.id) },
                     onRename: onRenameConversation,
@@ -84,6 +85,20 @@ struct TerminalTabGroupSection: View {
                 .fill(color.opacity(0.8))
                 .frame(height: 2)
         }
+    }
+
+    /// The new session menu of a tab's context menu, the same as its project's + in the sidebar, which opens the new
+    /// tab in this group.
+    private func newSessionMenu(inGroupOf tab: TerminalSession, projectName: String) -> ProjectNewSessionMenu {
+        let location = store.groupLocation(of: tab)
+        return ProjectNewSessionMenu(
+            location: location,
+            projectDisplayName: projectName,
+            providers: store.newSessionProviders(on: location.host),
+            showsTitle: true,
+            onStart: { store.launchNewSession(provider: $0, inGroupOf: tab) },
+            onOpenTerminal: { store.openPlainTerminal(inGroupOf: tab) }
+        )
     }
 
     /// A split's tab is half as wide as the others, so the split's two take one tab's place.
