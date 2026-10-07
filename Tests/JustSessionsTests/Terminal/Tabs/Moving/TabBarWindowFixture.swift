@@ -68,15 +68,56 @@ final class TabBarWindowFixture {
         try await settle()
     }
 
-    /// Presses at `x`, moves the pointer `distance` along the bar in steps, and lets go.
-    func drag(fromX x: CGFloat, by distance: CGFloat) async throws {
+    /// Presses at `x`, moves the pointer `distance` along the bar in steps, and lets go. With `drop`, the pointer also
+    /// moves that far down, out of the bar and the window.
+    func drag(fromX x: CGFloat, by distance: CGFloat, droppingBy drop: CGFloat = 0) async throws {
         try await send(.leftMouseDown, atX: x)
         let stepCount = 10
         for step in 1...stepCount {
-            try await send(.leftMouseDragged, atX: x + distance * CGFloat(step) / CGFloat(stepCount))
+            let fraction = CGFloat(step) / CGFloat(stepCount)
+            try await send(.leftMouseDragged, atX: x + distance * fraction, droppedBy: drop * fraction)
         }
-        try await send(.leftMouseUp, atX: x + distance)
+        try await send(.leftMouseUp, atX: x + distance, droppedBy: drop)
         try await settle()
+    }
+
+    func press(atX x: CGFloat) async throws {
+        try await send(.leftMouseDown, atX: x)
+    }
+
+    func release(atX x: CGFloat, droppedBy drop: CGFloat = 0) async throws {
+        try await send(.leftMouseUp, atX: x, droppedBy: drop)
+        try await settle()
+    }
+
+    // MARK: - Moving the window
+
+    var isWindowMovable: Bool { window.isMovable }
+
+    /// Attaches a sheet to the window, as the New Session sheet covers it, and returns a call that ends it.
+    func beginSheet() async throws -> () -> Void {
+        let sheet = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 200, height: 100), styleMask: [.titled], backing: .buffered, defer: false)
+        sheet.isReleasedWhenClosed = false
+        window.beginSheet(sheet, completionHandler: nil)
+        try await expectEventually { self.window.attachedSheet != nil }
+        return { [window] in window.endSheet(sheet) }
+    }
+
+    /// What a press at `x` would do, worked out without sending it, so it moves no window.
+    func response(toPressAtX x: CGFloat) throws -> WindowMoveZoneMonitor.Response {
+        WindowMoveZoneMonitor.shared.response(to: try event(.leftMouseDown, atX: x))
+    }
+
+    /// Moves the pointer into or out of the bar's window move zone, as its tracking area reports it.
+    func movePointer(intoTheBar isIntoTheBar: Bool) throws {
+        let zone = try #require(hostingView.flatMap { Self.zone(in: $0) })
+        eventTimestamp += 0.02
+        let event = try #require(NSEvent.enterExitEvent(
+            with: isIntoTheBar ? .mouseEntered : .mouseExited, location: .zero, modifierFlags: [],
+            timestamp: eventTimestamp, windowNumber: window.windowNumber, context: nil, eventNumber: 0,
+            trackingNumber: 0, userData: nil
+        ))
+        if isIntoTheBar { zone.mouseEntered(with: event) } else { zone.mouseExited(with: event) }
     }
 
     // MARK: - Places in the bar
@@ -97,6 +138,19 @@ final class TabBarWindowFixture {
         try groupLeadingEdge(groupKey) + (labelWidth(groupKey) - 6) / 2
     }
 
+    /// Between the group's label and its first tab.
+    func gap(afterGroupLabel groupKey: String) throws -> CGFloat {
+        try groupLeadingEdge(groupKey) + labelWidth(groupKey) - 3
+    }
+
+    /// Between the group and the one before it.
+    func gap(beforeGroup groupKey: String) throws -> CGFloat {
+        try groupLeadingEdge(groupKey) - WorkspaceTabMetrics.groupSpacing / 2
+    }
+
+    /// Past every tab.
+    var emptyEndOfTheBar: CGFloat { Self.barSize.width - 20 }
+
     func close() {
         hostingView?.rootView = AnyView(EmptyView())
         window.close()
@@ -106,14 +160,26 @@ final class TabBarWindowFixture {
 
     // MARK: - Helpers
 
-    private func send(_ type: NSEvent.EventType, atX x: CGFloat) async throws {
+    /// Halfway down the tabs, in window coordinates.
+    private static let pointerY = barSize.height / 2 - 2
+
+    private func send(_ type: NSEvent.EventType, atX x: CGFloat, droppedBy drop: CGFloat = 0) async throws {
+        NSApp.sendEvent(try event(type, atX: x, droppedBy: drop))
+        try await Task.sleep(for: .milliseconds(20))
+    }
+
+    private func event(_ type: NSEvent.EventType, atX x: CGFloat, droppedBy drop: CGFloat = 0) throws -> NSEvent {
         eventTimestamp += 0.02
-        NSApp.sendEvent(try #require(NSEvent.mouseEvent(
-            with: type, location: CGPoint(x: x, y: Self.barSize.height / 2 - 2), modifierFlags: [],
+        return try #require(NSEvent.mouseEvent(
+            with: type, location: CGPoint(x: x, y: Self.pointerY - drop), modifierFlags: [],
             timestamp: eventTimestamp, windowNumber: window.windowNumber, context: nil, eventNumber: 0,
             clickCount: 1, pressure: type == .leftMouseUp ? 0 : 1
-        )))
-        try await Task.sleep(for: .milliseconds(20))
+        ))
+    }
+
+    private static func zone(in view: NSView) -> WindowMoveZoneView? {
+        if let zone = view as? WindowMoveZoneView { return zone }
+        return view.subviews.lazy.compactMap { zone(in: $0) }.first
     }
 
     private func settle() async throws {

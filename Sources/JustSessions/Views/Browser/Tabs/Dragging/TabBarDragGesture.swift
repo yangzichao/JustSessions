@@ -4,7 +4,8 @@ extension View {
     /// Follows a drag of a tab or a group along the tab bar; see `TabBarDrag`. Once the pointer has moved a few
     /// points, the drag takes over from the buttons inside, so letting go neither selects nor closes a tab, nor
     /// collapses a group, while a click still does. `onEnded` comes when the drag ends, or when it is cancelled, so a
-    /// drag never stays half done.
+    /// drag never stays half done. The drag moves the tab or group, not the window, though the bar is in the title bar.
+    /// The drag continues wherever the pointer goes, even off the bar.
     func tabBarDrag(onChanged: @escaping (_ translation: CGFloat) -> Void, onEnded: @escaping () -> Void) -> some View {
         modifier(TabBarDragGesture(onChanged: onChanged, onEnded: onEnded))
     }
@@ -26,6 +27,7 @@ private struct TabBarDragGesture: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .windowMoveZoneExclusion()
             .highPriorityGesture(
                 // Measured in the window, since the view it moves is the one it is on.
                 DragGesture(minimumDistance: TabBarDragMetrics.minimumDistance, coordinateSpace: .global)
