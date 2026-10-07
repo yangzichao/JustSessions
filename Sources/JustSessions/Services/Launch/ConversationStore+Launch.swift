@@ -56,8 +56,22 @@ extension ConversationStore {
     }
 
     /// Resuming a session whose tab ended starts it again in that tab, keeping its place, its split, and the
-    /// selection, rather than opening a second tab of the session beside it.
+    /// selection, rather than opening a second tab of the session beside it. A tab still showing a failed CLI's tmux
+    /// session first lets that session go, since the new CLI's client would otherwise attach to its dead pane.
     private func restartEndedTerminal(_ endedTab: TerminalSession, with session: TerminalSession) {
+        guard let keptSessionName = endedTab.tmuxSessionKeptForEndedCLI,
+              let tmuxServer = commandResolver.thisMacTmuxServer() else {
+            replaceEndedTerminal(endedTab, with: session)
+            return
+        }
+        endedTab.close()
+        tmuxCommandQueues.run(on: .thisMac) { [weak self] in
+            tmuxServer.killSession(named: keptSessionName)
+            Task { @MainActor [weak self] in self?.replaceEndedTerminal(endedTab, with: session) }
+        }
+    }
+
+    private func replaceEndedTerminal(_ endedTab: TerminalSession, with session: TerminalSession) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == endedTab.id }) else { return }
         replaceTerminal(at: index, with: session)
         selectTerminal(session.id)
