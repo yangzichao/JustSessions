@@ -21,6 +21,9 @@ struct ThisMacTmuxServerTests {
         for option in ThisMacTmuxServer.globalOptions {
             #expect(command.arguments.containsSubsequence(["set-option", "-gq", option.name, option.value, ";"]))
         }
+        for hook in ThisMacTmuxServer.globalHooks {
+            #expect(command.arguments.containsSubsequence(["set-hook", "-g", hook.name, hook.command, ";"]))
+        }
         let sessionStart = try #require(command.arguments.firstIndex(of: "new-session"))
         #expect(Array(command.arguments[sessionStart...]) == [
             "new-session", "-A", "-s", "justsessions-claude-abc",
@@ -65,8 +68,9 @@ struct ThisMacTmuxServerTests {
         #expect(!ThisMacTmuxVersionCheck.isSupported(versionOutput: ""))
     }
 
-    @Test func paneListingMapsEachSessionToItsCLIProcess() {
-        let output = "justsessions-claude-abc 4242\njustsessions-codex-new-1a2b3c4d 77\nbroken line here\nno-pid\n"
+    /// A failed CLI's dead pane, kept while a tab shows it, runs no CLI.
+    @Test func paneListingMapsEachSessionToItsCLIProcessLeavingOutDeadPanes() {
+        let output = "justsessions-claude-abc 4242 0\njustsessions-codex-new-1a2b3c4d 77 0\njustsessions-pi-dead 91 1\nbroken line here now\nno-pid\n"
 
         #expect(ThisMacTmuxServer.paneProcessIDs(inListOutput: output) == [
             "justsessions-claude-abc": 4242,

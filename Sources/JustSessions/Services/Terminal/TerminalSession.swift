@@ -42,13 +42,17 @@ final class TerminalSession: ObservableObject, Identifiable {
     /// A tab reopened at launch for a session whose CLI no longer runs starts it only once shown, the way a browser
     /// loads a restored tab once you select it. Until then it runs nothing.
     @Published private(set) var isWaitingToBeShown: Bool
+    /// The tab's CLI has ended. Its tmux client can still run, showing a failed CLI's output; see `ThisMacTmuxDeadPane`.
     @Published private(set) var hasExited = false
+    /// How the CLI ended: a failed CLI's own status in tmux on this Mac, and otherwise the tab's process's.
     @Published private(set) var exitCode: Int32?
     /// What the tab's CLI is doing, while it runs and tells; see `ConversationStore+CLIActivitySync`.
     @Published private(set) var cliActivity: CLIActivity?
 
     private let processObserver: TerminalProcessObserver
     private var hasStarted = false
+    /// The tab's own process has ended, which for a CLI in tmux is the tmux client.
+    private var hasProcessExited = false
     private var isClosed = false
 
     var processID: Int32 { terminalView.process.shellPid }
@@ -60,6 +64,11 @@ final class TerminalSession: ObservableObject, Identifiable {
         ProjectLocation(host: host, path: projectPath).key
     }
     var isPlainTerminal: Bool { provider == nil }
+    /// The tmux session on this Mac still showing the tab's failed CLI, whose pane tmux keeps while the tab's client is
+    /// attached. Nil once the client has gone, and for any other tab.
+    var tmuxSessionKeptForEndedCLI: String? {
+        host == .thisMac && hasExited && hasStarted && !hasProcessExited ? tmuxSessionName : nil
+    }
     /// Its process runs, or starts once the tab's view appears: not ended, and not waiting to be shown.
     var isRunning: Bool { !hasExited && !isWaitingToBeShown }
     var runStatus: SessionRunStatus {
@@ -121,15 +130,27 @@ final class TerminalSession: ObservableObject, Identifiable {
     }
 
     func processFinished(exitCode: Int32?) {
-        guard !isClosed else { return }
+        hasProcessExited = true
+        // A failed CLI in tmux ended before its client did, and its tab keeps the CLI's own status.
+        guard !isClosed, !hasExited else { return }
+        cliEnded(exitCode: exitCode)
+    }
+
+    /// tmux names a failed CLI's status in the title; see `ThisMacTmuxDeadPane`.
+    func updateTerminalTitle(_ title: String) {
+        if host == .thisMac, tmuxSessionName != nil, let deadPane = ThisMacTmuxDeadPane(terminalTitle: title) {
+            guard !isClosed, !hasExited else { return }
+            cliEnded(exitCode: deadPane.exitCode)
+            return
+        }
+        terminalTitle = title
+    }
+
+    private func cliEnded(exitCode: Int32?) {
         self.exitCode = exitCode
         hasExited = true
         cliActivity = nil
         onProcessFinished?()
-    }
-
-    func updateTerminalTitle(_ title: String) {
-        terminalTitle = title
     }
 
     /// Returns whether the activity changed. An ended CLI keeps none.
@@ -152,11 +173,12 @@ final class TerminalSession: ObservableObject, Identifiable {
 
     /// Hangs up on the tab's process with SIGHUP, as closing a terminal window does. An interactive shell ignores the
     /// SIGTERM of SwiftTerm's `terminate()`, which also leaves the terminal open, so a plain terminal's shell would
-    /// otherwise outlive its tab. A tmux client detaches on SIGHUP and leaves its CLI running.
+    /// otherwise outlive its tab. A tmux client detaches on SIGHUP and leaves its CLI running, or ends the session of a
+    /// failed CLI it still shows.
     func close() {
         guard !isClosed else { return }
         isClosed = true
-        guard hasStarted && !hasExited else { return }
+        guard hasStarted && !hasProcessExited else { return }
         let processID = self.processID
         // kill(0) or kill(-1) would signal the app itself or every process of the user.
         if processID > 0 { kill(processID, SIGHUP) }

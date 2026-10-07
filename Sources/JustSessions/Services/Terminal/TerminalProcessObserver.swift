@@ -14,8 +14,10 @@ final class TerminalProcessObserver: LocalProcessTerminalViewDelegate, @unchecke
         }
     }
 
+    /// `exitCode` is the raw wait status; see `ProcessWaitStatus`.
     func processTerminated(source: TerminalView, exitCode: Int32?) {
         let target = session
+        let exitCode = exitCode.flatMap(ProcessWaitStatus.exitCode(fromWaitStatus:))
         Task { @MainActor [weak target] in
             target?.processFinished(exitCode: exitCode)
         }
