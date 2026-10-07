@@ -94,6 +94,15 @@ final class TabBarWindowFixture {
 
     var isWindowMovable: Bool { window.isMovable }
 
+    /// Attaches a sheet to the window, as the New Session sheet covers it, and returns a call that ends it.
+    func beginSheet() async throws -> () -> Void {
+        let sheet = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 200, height: 100), styleMask: [.titled], backing: .buffered, defer: false)
+        sheet.isReleasedWhenClosed = false
+        window.beginSheet(sheet, completionHandler: nil)
+        try await expectEventually { self.window.attachedSheet != nil }
+        return { [window] in window.endSheet(sheet) }
+    }
+
     /// What a press at `x` would do, worked out without sending it, so it moves no window.
     func response(toPressAtX x: CGFloat) throws -> WindowMoveZoneMonitor.Response {
         WindowMoveZoneMonitor.shared.response(to: try event(.leftMouseDown, atX: x))

@@ -38,6 +38,20 @@ struct TabBarDragInteractionTests {
         }
     }
 
+    /// A sheet's click-outside monitor closes it on a press anywhere in the window, the tab bar included. Both monitors
+    /// see presses first, in an order AppKit doesn't promise, so the bar lets them pass rather than move the window.
+    @Test func whileASheetCoversTheWindowPressesOnTheBarPassToIt() async throws {
+        let fixture = try TabBarWindowFixture()
+        defer { fixture.close() }
+        let first = fixture.openTab("First", in: "/tmp/app")
+        try await fixture.showTabBar()
+        let endSheet = try await fixture.beginSheet()
+        defer { endSheet() }
+
+        #expect(try fixture.response(toPressAtX: fixture.emptyEndOfTheBar) == .pass)
+        #expect(try fixture.response(toPressAtX: fixture.middle(ofTab: first.id)) == .pass)
+    }
+
     /// The window server can start moving the window from the title bar before the app sees a press, so the window is
     /// unmovable for as long as the pointer is over the bar, and movable again once it leaves, as the Window menu's
     /// Move & Resize items need.

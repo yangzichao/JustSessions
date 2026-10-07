@@ -9,7 +9,9 @@ import AppKit
 /// zone moves the window, handed to the system with `performDrag(with:)` as a title bar does, or zooms or minimizes it
 /// on a double-click, as chosen in System Settings. Out of the zones, the window moves as usual, and is movable, which
 /// the Window menu's Move & Resize items and tiling need: they turn off for a window that can't move, as Zed found
-/// when it made its windows unmovable.
+/// when it made its windows unmovable. While a sheet covers the window, presses pass, for `SheetClickOutsideMonitor` to
+/// close the sheet as a click elsewhere in the window does; both monitors see presses first, in an order AppKit
+/// doesn't promise.
 @MainActor
 final class WindowMoveZoneMonitor {
     static let shared = WindowMoveZoneMonitor()
@@ -68,7 +70,7 @@ final class WindowMoveZoneMonitor {
     }
 
     func response(to event: NSEvent) -> Response {
-        guard event.type == .leftMouseDown, let window = event.window else { return .pass }
+        guard event.type == .leftMouseDown, let window = event.window, window.attachedSheet == nil else { return .pass }
         let point = event.locationInWindow
         guard isInZone(point, of: window) else { return .pass }
         if isOnExclusion(point, in: window) || window.contentView?.superview?.hitTest(point) is NSControl {
