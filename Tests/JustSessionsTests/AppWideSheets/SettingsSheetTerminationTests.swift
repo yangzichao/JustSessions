@@ -15,15 +15,15 @@ extension AppWideSheetPresentersTests {
         // Test reopening too: SwiftUI may create a new native sheet each time.
         for _ in 0..<2 {
             workspaceWindow.state.sheet = requestedSheet
-            try await expectEventually(timeout: .seconds(5)) { workspaceWindow.window.attachedSheet != nil }
+            try await expectEventually { workspaceWindow.window.attachedSheet != nil }
             let settingsWindow = try #require(workspaceWindow.window.attachedSheet)
-            try await expectEventually(timeout: .seconds(5)) {
+            try await expectEventually {
                 !settingsWindow.preventsApplicationTerminationWhenModal
             }
             #expect(workspaceWindow.window.preventsApplicationTerminationWhenModal)
 
             workspaceWindow.state.sheet = nil
-            try await expectEventually(timeout: .seconds(5)) { workspaceWindow.window.attachedSheet == nil }
+            try await expectEventually { workspaceWindow.window.attachedSheet == nil }
         }
 
         // Only Settings opts out. Confirmation sheets must retain AppKit's protection.
