@@ -178,7 +178,6 @@ struct TabBarDragInteractionTests {
         #expect(fixture.closeRequests == [first.id])
     }
 
-    /// Collapsing the selected tab's group shows the nearest tab still in sight.
     /// A tab started from a tab's menu in a collapsed group is selected, so its group expands to show it.
     @Test func aTabStartedFromATabsMenuExpandsItsCollapsedGroup() async throws {
         let project = try makeTemporaryDirectory()
@@ -203,6 +202,7 @@ struct TabBarDragInteractionTests {
         #expect(fixture.store.selectedTerminalID == app.id)
     }
 
+    /// Collapsing the selected tab's group shows the nearest tab still in sight.
     @Test func aClickOnAGroupLabelStillCollapsesTheGroup() async throws {
         let fixture = try TabBarWindowFixture()
         defer { fixture.close() }
