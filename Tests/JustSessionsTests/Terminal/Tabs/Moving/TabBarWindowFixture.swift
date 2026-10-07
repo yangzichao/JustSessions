@@ -182,7 +182,8 @@ final class TabBarWindowFixture {
         return view.subviews.lazy.compactMap { zone(in: $0) }.first
     }
 
-    private func settle() async throws {
+    /// Lets the bar lay out what the store changed.
+    func settle() async throws {
         for _ in 0..<6 {
             hostingView?.layoutSubtreeIfNeeded()
             try await Task.sleep(for: .milliseconds(30))
