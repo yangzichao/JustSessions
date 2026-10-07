@@ -3,9 +3,89 @@ import Testing
 @testable import JustSessions
 
 /// Mouse events on the tab bar itself: a drag moves a tab within its group, a split's two tabs together, or a whole
-/// group by its label, while a click still selects a tab, closes it from its ×, or collapses a group.
+/// group by its label, while a click still selects a tab, closes it from its ×, or collapses a group. The bar's space
+/// around and past them moves the window instead.
 @MainActor
 struct TabBarDragInteractionTests {
+    @Test func theBarsEmptySpaceMovesTheWindowButItsTabsAndLabelsDont() async throws {
+        let fixture = try TabBarWindowFixture()
+        defer { fixture.close() }
+        let first = fixture.openTab("First", in: "/tmp/app")
+        let second = fixture.openTab("Second", in: "/tmp/app")
+        let tools = fixture.openTab("Tools", in: "/tmp/tools")
+        try await fixture.showTabBar()
+
+        var keptPlaces = [
+            "the app label": try fixture.middle(ofGroupLabel: "/tmp/app"),
+            "the tools label": try fixture.middle(ofGroupLabel: "/tmp/tools"),
+        ]
+        for tab in [first, second, tools] {
+            keptPlaces[tab.displayTitle] = try fixture.middle(ofTab: tab.id)
+            keptPlaces["\(tab.displayTitle)'s ×"] = try fixture.middle(ofCloseButtonOf: tab.id)
+        }
+        for (name, x) in keptPlaces {
+            #expect(try fixture.response(toPressAtX: x) == .holdWindowStill, "\(name)")
+        }
+
+        let emptyPlaces = [
+            "the bar's leading inset": WorkspaceTabMetrics.horizontalInset / 2,
+            "after the app label": try fixture.gap(afterGroupLabel: "/tmp/app"),
+            "between the groups": try fixture.gap(beforeGroup: "/tmp/tools"),
+            "the bar's empty end": fixture.emptyEndOfTheBar,
+        ]
+        for (name, x) in emptyPlaces {
+            #expect(try fixture.response(toPressAtX: x) == .moveWindow, "\(name)")
+        }
+    }
+
+    /// The window server can start moving the window from the title bar before the app sees a press, so the window is
+    /// unmovable for as long as the pointer is over the bar, and movable again once it leaves, as the Window menu's
+    /// Move & Resize items need.
+    @Test func theWindowCantMoveWhileThePointerIsOverTheBar() async throws {
+        let fixture = try TabBarWindowFixture()
+        defer { fixture.close() }
+        fixture.openTab("First", in: "/tmp/app")
+        try await fixture.showTabBar()
+        #expect(fixture.isWindowMovable)
+
+        try fixture.movePointer(intoTheBar: true)
+        #expect(!fixture.isWindowMovable)
+
+        try fixture.movePointer(intoTheBar: false)
+        #expect(fixture.isWindowMovable)
+    }
+
+    /// The pointer can be over the bar without having entered it, as when the window opens under it.
+    @Test func aPressOnATabHoldsTheWindowStillUntilLetGoOffTheBar() async throws {
+        let fixture = try TabBarWindowFixture()
+        defer { fixture.close() }
+        let first = fixture.openTab("First", in: "/tmp/app")
+        try await fixture.showTabBar()
+
+        let x = try fixture.middle(ofTab: first.id)
+        try await fixture.press(atX: x)
+        #expect(!fixture.isWindowMovable)
+
+        try await fixture.release(atX: x, droppedBy: 200)
+        #expect(fixture.isWindowMovable)
+    }
+
+    /// The pointer can leave the bar, as it does dragging across the window, and the tab still follows it along the bar.
+    @Test func aTabDraggedOutOfTheBarStillMovesAlongIt() async throws {
+        let fixture = try TabBarWindowFixture()
+        defer { fixture.close() }
+        let first = fixture.openTab("First", in: "/tmp/app")
+        let second = fixture.openTab("Second", in: "/tmp/app")
+        let third = fixture.openTab("Third", in: "/tmp/app")
+        try await fixture.showTabBar()
+
+        try await fixture.drag(
+            fromX: fixture.middle(ofTab: first.id), by: WorkspaceTabMetrics.maximumWidth * 1.3, droppingBy: 400
+        )
+
+        #expect(fixture.store.terminalSessions.map(\.id) == [second.id, first.id, third.id])
+    }
+
     @Test func aClickSelectsATabAndADragMovesItPastHalfItsNeighbor() async throws {
         let fixture = try TabBarWindowFixture()
         defer { fixture.close() }

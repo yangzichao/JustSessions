@@ -63,6 +63,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
 - `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
 - `Views/Browser/Tabs/Dragging/`: the drag gesture tabs and group labels share, which takes over from their buttons once the pointer moves.
+- `Views/Browser/WindowDragging/`: the tab bar's window move zone. AppKit would move the window from a press on a tab, since the bar is in the title bar, so while the pointer is over the bar the window can't be moved, and the app moves it itself from the bar's empty space.
 - `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, joined for a split's two tabs, how tabs narrow to share the bar as more open, and the terminal colors the selected tab takes on.
 - `Views/Browser/Split/`: what a shown split view draws around its panes, as Chrome does: the area's terminal-colored background, each pane's rounded outline with its mini toolbar in the corner, and the resize area between the panes, which you drag to resize them.
 - `Views/Browser/DockMenu/`: the Dock icon's right-click menu, whose New Window opens a workspace window through SwiftUI's `openWindow`, handed over by each workspace window as it appears.

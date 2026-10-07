@@ -7,7 +7,7 @@ import SwiftUI
 /// the selected tab takes its terminal's color and runs down into it, through the bar's bottom line. As in Chrome,
 /// tabs narrow together to fit the bar as more open, and the bar scrolls once they are as narrow as they get; a split's
 /// two tabs share one tab's width. Dragging a group's label moves the whole group among the others; tabs drag within
-/// their group, see `TerminalTabGroupSection`.
+/// their group, see `TerminalTabGroupSection`. Dragging the bar's space around and past them moves the window.
 struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
     /// Width at the leading edge that tabs never enter, even when scrolled, so the window buttons and sidebar toggle
@@ -74,6 +74,8 @@ struct WorkspaceTabBar: View {
                 .animation(.easeOut(duration: 0.15), value: shownTabCount)
             }
             .onGeometryChange(for: CGFloat.self, of: \.size.width) { barWidth = $0 }
+            // Past the leading clearance, which the window buttons and sidebar toggle can lie over.
+            .windowMoveZone()
             .onChange(of: store.selectedTerminalID) { revealSelectedTab(scrollProxy) }
             .onChange(of: store.selectedTerminal.map(store.tabGroupKey(of:))) { revealSelectedTab(scrollProxy) }
         }
