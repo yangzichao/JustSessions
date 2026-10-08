@@ -1,0 +1,148 @@
+import AppKit
+import SwiftUI
+import Testing
+@testable import JustSessions
+
+/// Return answers the dialog that asks before a tab closes, and Escape cancels it. The dialog is shown on a window on
+/// screen, as the browser shows it; no tab starts a process, since no terminal is shown.
+@MainActor
+@Suite(.serialized)
+struct TerminalTabCloseConfirmationTests {
+    /// A CLI tmux can keep running closes that way: its tab goes, and the CLI can be reattached.
+    @Test func returnKeepsATmuxCLIRunning() async throws {
+        let scenario = try CloseConfirmationScenario()
+        defer { scenario.remove() }
+        let tab = scenario.openTab(provider: .claude, tmuxSessionName: "justsessions-close-confirmation-test")
+
+        let sheet = try await scenario.confirmClosing(tab)
+        #expect(scenario.defaultButtonTitle(in: sheet) == "Keep running")
+        try await scenario.pressReturn(in: sheet) { !scenario.isOpen(tab) }
+
+        #expect(scenario.store.tmuxSessionNamesByHost[.thisMac]?.contains("justsessions-close-confirmation-test") == true)
+    }
+
+    @Test(arguments: [(ConversationProvider?.some(.claude), "End session"), (nil, "Close terminal")])
+    func returnClosesATabThatCannotKeepRunning(provider: ConversationProvider?, buttonTitle: String) async throws {
+        let scenario = try CloseConfirmationScenario()
+        defer { scenario.remove() }
+        let tab = scenario.openTab(provider: provider, tmuxSessionName: nil)
+
+        let sheet = try await scenario.confirmClosing(tab)
+        #expect(scenario.defaultButtonTitle(in: sheet) == buttonTitle)
+        try await scenario.pressReturn(in: sheet) { !scenario.isOpen(tab) }
+    }
+
+    @Test func escapeLeavesTheTabOpen() async throws {
+        let scenario = try CloseConfirmationScenario()
+        defer { scenario.remove() }
+        let tab = scenario.openTab(provider: .claude, tmuxSessionName: nil)
+
+        let sheet = try await scenario.confirmClosing(tab)
+        try await scenario.pressEscape(in: sheet)
+
+        #expect(scenario.isOpen(tab))
+    }
+}
+
+@MainActor
+private final class CloseConfirmationScenario {
+    let store: ConversationStore
+    private let settings: IsolatedUserDefaults
+    private let window: NSWindow
+    private let hostingView = NSHostingView(rootView: AnyView(EmptyView()))
+
+    init() throws {
+        _ = NSApplication.shared
+        settings = try IsolatedUserDefaults()
+        store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled, .closable], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentView = hostingView
+        window.center()
+        window.orderFrontRegardless()
+    }
+
+    func openTab(provider: ConversationProvider?, tmuxSessionName: String?) -> TerminalSession {
+        let tab = TerminalSession(
+            conversation: nil, provider: provider, projectPath: "/tmp", action: nil, displayTitle: "Tab",
+            command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [], workingDirectory: "/tmp", environment: []),
+            tmuxSessionName: tmuxSessionName
+        )
+        store.openTerminal(tab)
+        return tab
+    }
+
+    func isOpen(_ tab: TerminalSession) -> Bool {
+        store.terminalSessions.contains { $0.id == tab.id }
+    }
+
+    /// Asks to close `tab`, as its close button does, and returns the dialog once it is on screen.
+    func confirmClosing(_ tab: TerminalSession) async throws -> NSWindow {
+        hostingView.rootView = AnyView(CloseConfirmationHost(store: store, closingSessionID: tab.id))
+        let clock = ContinuousClock()
+        let deadline = clock.now + .seconds(20)
+        while clock.now < deadline {
+            hostingView.layoutSubtreeIfNeeded()
+            if let sheet = window.attachedSheet, sheet.isVisible, !Self.buttons(in: sheet).isEmpty { return sheet }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        Issue.record("The close confirmation never appeared")
+        throw CancellationError()
+    }
+
+    /// The button Return presses, or a description of every button when none has Return.
+    func defaultButtonTitle(in sheet: NSWindow) -> String {
+        let buttons = Self.buttons(in: sheet)
+        return buttons.first { $0.keyEquivalent == "\r" }?.title
+            ?? "none; buttons: " + buttons.map { "\($0.title) [\($0.keyEquivalent.debugDescription)]" }.joined(separator: ", ")
+    }
+
+    /// Presses Return as the keyboard does, through the dialog's key equivalents, then waits for `tookEffect`.
+    func pressReturn(in sheet: NSWindow, until tookEffect: () -> Bool) async throws {
+        try press("\r", keyCode: 36, in: sheet)
+        try await expectEventually(timeout: .seconds(20)) { tookEffect() }
+    }
+
+    func pressEscape(in sheet: NSWindow) async throws {
+        try press("\u{1B}", keyCode: 53, in: sheet)
+        try await expectEventually(timeout: .seconds(20)) { self.window.attachedSheet == nil }
+    }
+
+    private func press(_ characters: String, keyCode: UInt16, in sheet: NSWindow) throws {
+        let event = try #require(NSEvent.keyEvent(
+            with: .keyDown, location: .zero, modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
+            windowNumber: sheet.windowNumber, context: nil, characters: characters, charactersIgnoringModifiers: characters,
+            isARepeat: false, keyCode: keyCode
+        ))
+        #expect(sheet.performKeyEquivalent(with: event), "No button answers \(characters.debugDescription)")
+    }
+
+    func remove() {
+        if let sheet = window.attachedSheet { window.endSheet(sheet) }
+        store.closeAllTerminals()
+        hostingView.rootView = AnyView(EmptyView())
+        window.close()
+        settings.removeSuite()
+    }
+
+    private static func buttons(in sheet: NSWindow) -> [NSButton] {
+        descendants(of: sheet.contentView).compactMap { $0 as? NSButton }.filter { !$0.title.isEmpty }
+    }
+
+    private static func descendants(of view: NSView?) -> [NSView] {
+        guard let view else { return [] }
+        return [view] + view.subviews.flatMap { descendants(of: $0) }
+    }
+}
+
+/// The browser's close confirmation, asking about `closingSessionID` from the start.
+private struct CloseConfirmationHost: View {
+    @ObservedObject var store: ConversationStore
+    @State var closingSessionID: UUID?
+
+    var body: some View {
+        Color.clear
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .modifier(TerminalTabCloseConfirmation(store: store, closingSessionID: $closingSessionID))
+    }
+}
