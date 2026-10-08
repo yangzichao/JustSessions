@@ -141,8 +141,8 @@ struct UnseenFinishedTurnSyncTests {
                 action: .resume,
                 displayTitle: conversation.suggestedTitle,
                 command: NativeCLICommand(
-                    executablePath: "/bin/sleep",
-                    arguments: ["30"],
+                    executablePath: StandInCLI.executablePath,
+                    arguments: StandInCLI.arguments,
                     workingDirectory: conversation.projectPath,
                     environment: []
                 )
