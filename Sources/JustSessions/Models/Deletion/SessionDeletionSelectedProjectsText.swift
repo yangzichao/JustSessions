@@ -30,13 +30,13 @@ extension SessionDeletionConfirmationText {
         } else {
             deletionSentence = AppLocalization.string("SSH hosts have no Trash, so every session is permanently deleted.", language: language)
         }
-        return [
+        let sentences: [String?] = [
             AppLocalization.string("This affects all tools in \(locations.count) projects, including sessions hidden by the current filter.", language: language),
             AppLocalization.string("The projects will be archived; skipped sessions stay on disk and come back when they are restored.", language: language),
             deletionSentence,
+        ] + subagentSentences(for: plan, language: language) + [
             skippedSessionsSentence(for: plan, language: language),
         ]
-        .compactMap { $0 }
-        .joined(separator: " ")
+        return sentences.compactMap { $0 }.joined(separator: " ")
     }
 }

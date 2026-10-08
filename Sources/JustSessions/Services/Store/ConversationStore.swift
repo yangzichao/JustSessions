@@ -288,9 +288,13 @@ final class ConversationStore: ObservableObject {
     /// sessions, which go only with the session that started them.
     func deletionPlan(for candidateConversations: [Conversation]) -> SessionDeletionPlan {
         let notYetPending = candidateConversations.filter { !$0.isSubagent && !isDeletionPending(for: $0) }
+        let deletable = notYetPending.filter { !hasTerminal(for: $0) }
+        let deletesSubagents = Dictionary(grouping: deletable, by: \.provider.deletesSubagentsWithSession)
         return SessionDeletionPlan(
-            deletableConversations: notYetPending.filter { !hasTerminal(for: $0) },
-            openTerminalCount: notYetPending.filter { hasTerminal(for: $0) }.count
+            deletableConversations: deletable,
+            openTerminalCount: notYetPending.filter { hasTerminal(for: $0) }.count,
+            deletedSubagentCount: (deletesSubagents[true] ?? []).reduce(0) { $0 + descendantSubagentCount(of: $1) },
+            keptSubagentCount: (deletesSubagents[false] ?? []).reduce(0) { $0 + descendantSubagentCount(of: $1) }
         )
     }
 

@@ -43,6 +43,33 @@ struct SubagentConversationsTests {
         #expect(remoteSubagent.parentID == remoteParent.id)
     }
 
+    /// The delete confirmation names the subagent sessions, at any depth, that go with the sessions it deletes, and
+    /// the ones that stay on disk, as Antigravity's do.
+    @Test func aDeletionPlanCountsTheSubagentSessionsThatGoOrStay() throws {
+        let settings = try IsolatedUserDefaults()
+        defer { settings.removeSuite() }
+        let store = ConversationStore(adapters: [], userDefaults: settings.userDefaults)
+        let claude = Conversation.fixture(provider: .claude, projectPath: "/work/app")
+        let claudeSubagents = (0..<2).map { _ in
+            Conversation.fixture(provider: .claude, projectPath: "/work/app", parentSessionID: claude.sessionID)
+        }
+        let nested = Conversation.fixture(provider: .claude, projectPath: "/work/app", parentSessionID: claudeSubagents[0].sessionID)
+        let antigravity = Conversation.fixture(provider: .antigravity, projectPath: "/work/app")
+        let antigravitySubagent = Conversation.fixture(provider: .antigravity, projectPath: "/work/app", parentSessionID: antigravity.sessionID)
+        let alone = Conversation.fixture(provider: .codex, projectPath: "/work/app")
+        store.replaceConversations(on: .thisMac, with: [claude, nested, antigravity, antigravitySubagent, alone] + claudeSubagents)
+
+        let oneSession = store.deletionPlan(for: [claude])
+        let project = store.deletionPlan(for: claude.projectDirectoryKey)
+
+        #expect(oneSession.deletedSubagentCount == 3)
+        #expect(oneSession.keptSubagentCount == 0)
+        #expect(project.deletableConversations.count == 3)
+        #expect(project.deletedSubagentCount == 3)
+        #expect(project.keptSubagentCount == 1)
+        #expect(store.deletionPlan(for: [alone]).deletedSubagentCount == 0)
+    }
+
     @Test func aSubagentIsNeitherLaunchedNorDeletedOnItsOwn() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
