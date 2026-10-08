@@ -1,7 +1,7 @@
 import Foundation
 
 /// Lists every session, or only those whose CLI waits on you: stopped for your answer, or done with a turn you have
-/// not seen. Only CLIs that tell what they are doing can wait on you: Claude Code and Codex on this Mac.
+/// not seen. Only CLIs that tell what they are doing can wait on you: Claude Code, Codex, Pi, and OpenCode on this Mac.
 enum SessionWaitingFilter: Hashable {
     case all
     case waitingForYou

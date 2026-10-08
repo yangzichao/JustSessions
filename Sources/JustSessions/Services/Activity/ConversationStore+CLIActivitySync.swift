@@ -17,7 +17,10 @@ extension ConversationStore {
         runPeriodically(every: interval) { await $0.synchronizeCLIActivity() }
     }
 
-    func synchronizeCLIActivity(claudeRegistry: ClaudeLiveSessionRegistry = ClaudeLiveSessionRegistry()) async {
+    func synchronizeCLIActivity(
+        claudeRegistry: ClaudeLiveSessionRegistry = ClaudeLiveSessionRegistry(),
+        liveSessionReporting: LiveSessionReporting? = .thisApp
+    ) async {
         let probedTabs = terminalSessions.compactMap { tab in
             tab.isRunning ? tab.cliActivityProbe.map { (tab: tab, probe: $0) } : nil
         }
@@ -31,7 +34,11 @@ extension ConversationStore {
             CLIActivityProbe(provider: $0.conversation.provider, processID: $0.paneProcessID ?? 0, sessionFile: $0.conversation.sourceFile)
         }
         let paneProcessIDs = detachedSessions.map(\.paneProcessID)
-        let reader = CLIActivityReader(claudeRegistry: claudeRegistry, codexTurnTracker: codexTurnTracker)
+        let reader = CLIActivityReader(
+            claudeRegistry: claudeRegistry,
+            codexTurnTracker: codexTurnTracker,
+            liveSessionReporting: liveSessionReporting
+        )
         let (activities, endedPanes) = await Task.detached(priority: .utility) {
             (
                 reader.activities(for: probes),

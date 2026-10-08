@@ -28,7 +28,7 @@ struct ClaudeLiveSessionActivityTests {
 
     @Test func shortensALongWaitReason() throws {
         let activity = try Self.activity(status: "waiting", waitingFor: String(repeating: "x", count: 500))
-        #expect(activity == .needsInput(reason: String(repeating: "x", count: ClaudeLiveSessionRecord.maximumWaitReasonLength)))
+        #expect(activity == .needsInput(reason: String(repeating: "x", count: CLIActivity.maximumWaitReasonLength)))
     }
 
     @Test func anUnknownOrMissingStatusTellsNothing() throws {

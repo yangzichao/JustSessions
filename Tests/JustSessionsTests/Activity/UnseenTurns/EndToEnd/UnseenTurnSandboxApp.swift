@@ -2,15 +2,16 @@ import Foundation
 import Testing
 @testable import JustSessions
 
-/// The app as it runs on this Mac, in a tmux sandbox: the real Claude Code and Codex adapters list sessions saved in
-/// the sandbox's home, tabs start their CLI in the sandbox's tmux server, and the CLIs are `StandInActivityCLI`s that
-/// report what they do as the real ones do. Sessions are called by their title. `make()` returns nil where tmux is
-/// missing; see `ThisMacTmuxSandbox`.
+/// The app as it runs on this Mac, in a tmux sandbox: the real Claude Code, Codex, Pi, and OpenCode adapters list
+/// sessions saved in the sandbox's home, tabs start their CLI in the sandbox's tmux server, Pi and OpenCode with the
+/// app's reporting extension, and the CLIs are `StandInActivityCLI`s that report what they do as the real ones do.
+/// Sessions are called by their title. `make()` returns nil where tmux is missing; see `ThisMacTmuxSandbox`.
 @MainActor
 final class UnseenTurnSandboxApp {
     let sandbox: ThisMacTmuxSandbox
     let store: ConversationStore
     let notifier = RecordingSessionNotifier()
+    let liveSessionReporting: LiveSessionReporting
     private let settings: IsolatedUserDefaults
     private let claudeRegistry: ClaudeLiveSessionRegistry
 
@@ -23,16 +24,25 @@ final class UnseenTurnSandboxApp {
         self.sandbox = sandbox
         try sandbox.writeExecutable(named: "claude", script: StandInActivityCLI.claude)
         try sandbox.writeExecutable(named: "codex", script: StandInActivityCLI.codex)
+        try sandbox.writeExecutable(named: "pi", script: StandInActivityCLI.pi)
+        try sandbox.writeExecutable(named: "opencode", script: StandInActivityCLI.opencode)
         try FileManager.default.createDirectory(at: sandbox.root.appendingPathComponent("turn-ends"), withIntermediateDirectories: true)
         settings = try IsolatedUserDefaults()
         claudeRegistry = ClaudeLiveSessionRegistry(configurationDirectory: sandbox.root.appendingPathComponent(".claude"))
+        liveSessionReporting = LiveSessionReporting(directory: sandbox.root.appendingPathComponent("LiveSessionReporting"))
         notifier.isApplicationActive = true
         store = ConversationStore(
             adapters: [
                 ClaudeAdapter(configurationDirectory: sandbox.root.appendingPathComponent(".claude")),
                 CodexAdapter(codexDirectory: sandbox.root.appendingPathComponent(".codex")),
+                PiAdapter(sessionsDirectory: sandbox.root.appendingPathComponent(Self.piSessionsFolder)),
+                OpenCodeAdapter(databaseFile: sandbox.root.appendingPathComponent(Self.openCodeDatabaseFile)),
             ],
-            commandResolver: sandbox.resolver,
+            commandResolver: NativeCLICommandResolver(
+                searchDirectories: [sandbox.binaryDirectory.path],
+                inheritedEnvironment: sandbox.environment,
+                liveSessionReporting: liveSessionReporting
+            ),
             userDefaults: settings.userDefaults,
             sessionNotifier: notifier,
             startsBackgroundPolling: false
@@ -47,37 +57,11 @@ final class UnseenTurnSandboxApp {
 
     // MARK: Sessions
 
-    /// Saves a session as its CLI does with its first prompt, which titles it, and refreshes until it is listed.
-    func saveSession(_ title: String, of provider: ConversationProvider) async throws {
-        let sessionID = UUID().uuidString.lowercased()
-        switch provider {
-        case .claude:
-            let projectFolder = sandbox.root.appendingPathComponent(".claude/projects/sandbox-project")
-            try FileManager.default.createDirectory(at: projectFolder, withIntermediateDirectories: true)
-            try #"{"type":"user","cwd":"\#(sandbox.project.path)","message":{"content":"\#(title)"}}"#.appending("\n")
-                .write(to: projectFolder.appendingPathComponent("\(sessionID).jsonl"), atomically: true, encoding: .utf8)
-        case .codex:
-            let dayFolder = sandbox.root.appendingPathComponent(".codex/sessions/2026/10/08")
-            try FileManager.default.createDirectory(at: dayFolder, withIntermediateDirectories: true)
-            let lines = [
-                #"{"timestamp":"2026-10-08T10:00:00.000Z","type":"session_meta","payload":{"id":"\#(sessionID)","cwd":"\#(sandbox.project.path)"}}"#,
-                #"{"timestamp":"2026-10-08T10:00:01.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"\#(title)"}]}}"#,
-            ]
-            try (lines.joined(separator: "\n") + "\n")
-                .write(to: dayFolder.appendingPathComponent("rollout-2026-10-08T10-00-00-\(sessionID).jsonl"), atomically: true, encoding: .utf8)
-        default:
-            Issue.record("Only Claude Code and Codex tell what they are doing")
-            return
-        }
-        store.refreshThisMac()
-        try #require(await sandbox.waitUntil { !self.store.isScanningThisMac && self.listedConversation(title) != nil })
-    }
-
     func conversation(_ title: String) throws -> Conversation {
         try #require(listedConversation(title), "\"\(title)\" is not listed")
     }
 
-    private func listedConversation(_ title: String) -> Conversation? {
+    func listedConversation(_ title: String) -> Conversation? {
         store.conversations.first { store.title(for: $0) == title }
     }
 
@@ -138,7 +122,10 @@ final class UnseenTurnSandboxApp {
 
     /// The CLI stops in the middle of its turn for your answer, and the activity sync sees it.
     func stopForAnswer(in title: String) async throws {
-        try await endTurn(of: title, as: "waiting") { [self] in activity(of: title) == .needsInput(reason: "permission prompt") }
+        try await endTurn(of: title, as: "waiting") { [self] in
+            if case .needsInput = activity(of: title) { return true }
+            return false
+        }
     }
 
     func quitCLI(in title: String) async throws {
@@ -150,7 +137,7 @@ final class UnseenTurnSandboxApp {
 
     /// The app does this every second.
     func followCLIsOnce() async {
-        await store.synchronizeCLIActivity(claudeRegistry: claudeRegistry)
+        await store.synchronizeCLIActivity(claudeRegistry: claudeRegistry, liveSessionReporting: liveSessionReporting)
     }
 
     func bringAppToFront() async {
@@ -164,9 +151,12 @@ final class UnseenTurnSandboxApp {
         try #require(await followCLIs(until: hasEnded), "\"\(title)\"'s turn never ended as \(ending)")
     }
 
-    /// Follows the CLIs as the app does every second, until `condition` holds or 10 seconds pass.
+    /// Follows the CLIs as the app does every second, until `condition` holds or 120 seconds pass, as
+    /// `expectEventually` allows for the release runner's busy start.
     private func followCLIs(until condition: () -> Bool) async -> Bool {
-        for _ in 0..<100 {
+        let clock = ContinuousClock()
+        let deadline = clock.now + .seconds(120)
+        while clock.now < deadline {
             await followCLIsOnce()
             if condition() { return true }
             try? await Task.sleep(for: .milliseconds(100))
@@ -188,9 +178,14 @@ final class UnseenTurnSandboxApp {
             "\(name): " + ((try? String(contentsOf: registry.appendingPathComponent(name), encoding: .utf8)) ?? "unreadable")
         }
         let sessionFile = tab.conversation.flatMap { try? String(contentsOf: $0.sourceFile, encoding: .utf8) } ?? "none"
+        let reports = liveSessionReporting.reportsDirectory
+        let reportEntries = ((try? FileManager.default.contentsOfDirectory(atPath: reports.path)) ?? []).map { name in
+            "\(name): " + ((try? String(contentsOf: reports.appendingPathComponent(name), encoding: .utf8)) ?? "unreadable")
+        }
         let panes = sandbox.tmuxOutput(["list-panes", "-a", "-F", "#{pane_pid} #{pane_start_command}"])
         return "activity: \(String(describing: tab.cliActivity)); pane process: \(String(describing: tab.tmuxPaneProcessID)); "
-            + "Claude Code registry: \(entries); session file: \(sessionFile); panes: \(panes); "
+            + "Claude Code registry: \(entries); Pi and OpenCode reports: \(reportEntries); "
+            + "session file: \(sessionFile); panes: \(panes); "
             + sandbox.launchDiagnostics(for: tab)
     }
 

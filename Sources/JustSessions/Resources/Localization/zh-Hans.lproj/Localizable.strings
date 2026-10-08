@@ -182,14 +182,14 @@
 	<string>在侧栏中选择一个会话，阅读其对话内容。</string>
 	<key>Choose or enter a folder</key>
 	<string>选择或输入文件夹</string>
-	<key>Claude Code and Codex on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</key>
-	<string>这台 Mac 上的 Claude Code 和 Codex 完成一轮回复或需要你输入时会通知你，正在查看其标签页时除外。可在通用设置中选择通知哪些情况。</string>
 	<key>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.</key>
 	<string>Claude Code、Antigravity 和 Pi 会话将移到废纸篓；Codex、Kiro CLI 和 OpenCode 会话将被永久删除。</string>
 	<key>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</key>
 	<string>本机的 Claude Code、Antigravity 和 Pi 会话将移到废纸篓。Codex、Kiro CLI、OpenCode 会话和 SSH 主机上的所有会话将被永久删除。</string>
 	<key>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
 	<string>主机上的 Claude Code、Codex、Antigravity、Kiro CLI、OpenCode 和 Pi 会话会列在侧栏中，并通过 SSH 打开。请使用 ~/.ssh/config 中的主机别名或 user@hostname。`ssh &lt;host&gt;` 必须能够免密连接，主机还需要 rsync。Antigravity 和 OpenCode 还需要 python3；删除 Antigravity 会话还需要 lsof。在远程主机上安装 tmux，可让会话在断线或关闭标签后继续运行；点击会话即可重新连接。应用内置的 tmux 仅适用于此 Mac。</string>
+	<key>Claude Code, Codex, Pi, and OpenCode on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</key>
+	<string>这台 Mac 上的 Claude Code、Codex、Pi 和 OpenCode 完成一轮回复或需要你输入时会通知你，正在查看其标签页时除外。可在通用设置中选择通知哪些情况。</string>
 	<key>Clear filters</key>
 	<string>清除筛选</string>
 	<key>Clear the selection, or close search</key>
@@ -488,8 +488,8 @@
 	<string>将标签页移至拆分视图</string>
 	<key>Name</key>
 	<string>名称</string>
-	<key>Needs my input, such as a permission prompt (Claude Code only)</key>
-	<string>需要我的输入，例如权限确认（仅 Claude Code）</string>
+	<key>Needs my input, such as a permission prompt (not Codex)</key>
+	<string>需要我的输入，例如权限确认（Codex 除外）</string>
 	<key>New</key>
 	<string>新增</string>
 	<key>New Session…</key>
@@ -520,8 +520,8 @@
 	<string>下一个匹配项（⌘G 或 Return）</string>
 	<key>Next tab</key>
 	<string>下一个标签页</string>
-	<key>No Claude Code or Codex session is waiting for you</key>
-	<string>没有等待你处理的 Claude Code 或 Codex 会话</string>
+	<key>No Claude Code, Codex, Pi, or OpenCode session is waiting for you</key>
+	<string>没有等待你处理的 Claude Code、Codex、Pi 或 OpenCode 会话</string>
 	<key>No archived projects</key>
 	<string>没有已归档的项目</string>
 	<key>No matches</key>
@@ -916,8 +916,8 @@
 	<string>关闭标签时</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。</string>
-	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
-	<string>支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
+	<key>Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
+	<string>支持本机的 Claude Code、Codex、Pi 和 OpenCode，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
 	<key>You</key>
 	<string>你</string>
 	<key>Your login shell, with no CLI</key>

@@ -3,8 +3,6 @@ import Foundation
 /// One entry of Claude Code's live process registry, `~/.claude/sessions/<pid>.json`.
 /// The file format belongs to Claude Code, so every field is read defensively.
 struct ClaudeLiveSessionRecord: Sendable, Equatable {
-    static let maximumWaitReasonLength = 60
-
     let sessionID: String
     /// Set only when the user chose the name, e.g. with `/rename`.
     let userChosenName: String?
@@ -35,8 +33,7 @@ struct ClaudeLiveSessionRecord: Sendable, Equatable {
         case "busy":
             return .working
         case "waiting":
-            let reason = (object["waitingFor"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            return .needsInput(reason: reason.isEmpty ? nil : String(reason.prefix(maximumWaitReasonLength)))
+            return .needsInput(reportedReason: object["waitingFor"] as? String)
         case "idle", "shell":
             return .idle
         default:

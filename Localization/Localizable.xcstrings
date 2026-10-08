@@ -1006,16 +1006,6 @@
         }
       }
     },
-    "Claude Code and Codex on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这台 Mac 上的 Claude Code 和 Codex 完成一轮回复或需要你输入时会通知你，正在查看其标签页时除外。可在通用设置中选择通知哪些情况。"
-          }
-        }
-      }
-    },
     "Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.": {
       "localizations": {
         "zh-Hans": {
@@ -1042,6 +1032,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "主机上的 Claude Code、Codex、Antigravity、Kiro CLI、OpenCode 和 Pi 会话会列在侧栏中，并通过 SSH 打开。请使用 ~/.ssh/config 中的主机别名或 user@hostname。`ssh <host>` 必须能够免密连接，主机还需要 rsync。Antigravity 和 OpenCode 还需要 python3；删除 Antigravity 会话还需要 lsof。在远程主机上安装 tmux，可让会话在断线或关闭标签后继续运行；点击会话即可重新连接。应用内置的 tmux 仅适用于此 Mac。"
+          }
+        }
+      }
+    },
+    "Claude Code, Codex, Pi, and OpenCode on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 上的 Claude Code、Codex、Pi 和 OpenCode 完成一轮回复或需要你输入时会通知你，正在查看其标签页时除外。可在通用设置中选择通知哪些情况。"
           }
         }
       }
@@ -2617,12 +2617,12 @@
         }
       }
     },
-    "Needs my input, such as a permission prompt (Claude Code only)": {
+    "Needs my input, such as a permission prompt (not Codex)": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "需要我的输入，例如权限确认（仅 Claude Code）"
+            "value": "需要我的输入，例如权限确认（Codex 除外）"
           }
         }
       }
@@ -2777,12 +2777,12 @@
         }
       }
     },
-    "No Claude Code or Codex session is waiting for you": {
+    "No Claude Code, Codex, Pi, or OpenCode session is waiting for you": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "没有等待你处理的 Claude Code 或 Codex 会话"
+            "value": "没有等待你处理的 Claude Code、Codex、Pi 或 OpenCode 会话"
           }
         }
       }
@@ -4799,12 +4799,12 @@
         }
       }
     },
-    "Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.": {
+    "Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。"
+            "value": "支持本机的 Claude Code、Codex、Pi 和 OpenCode，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。"
           }
         }
       }

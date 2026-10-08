@@ -26,7 +26,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, and where a shown split's panes and the resize area between them sit.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
-- `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files. `UnseenTurns/` marks a session after each sync and clears the mark once its tab is on screen.
+- `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry, Codex session files, and the reports of the app's Pi and OpenCode extensions. `UnseenTurns/` marks a session after each sync and clears the mark once its tab is on screen.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
 - `Services/Onboarding/`: saves which onboarding tips have shown, and whether the install shows them at all, decided once from whether it was fresh; Help's Take the tour shows them all again.
 - `Services/Permissions/`: reads each permission's status without asking for it, and the System Settings page that changes it.
@@ -57,7 +57,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Terminal/ClaudeLiveSession/`: reads Claude Code's live registry for names chosen with `/rename`, and makes a tab follow its CLI to the session `/clear` starts.
 - `Services/Terminal/AppendedSessionNames/`: shows a name an open tab's CLI on this Mac appends to a file as soon as it does: Claude Code's `/rename` and Pi's `/name` in the session's own file, and a Codex thread's name in `session_index.jsonl`. For Claude Code it backs up the live registry, which some setups leave without the name.
 - `Services/Terminal/CodexLiveThread/`: starts Codex on this Mac with its thread's id in the terminal title, and reads that title so a new tab finds its thread and a tab follows its CLI to the thread `/new`, `/clear`, `/resume`, or `/fork` moves it to.
-- `Services/Terminal/LiveSessionFollowing/`: makes an Antigravity, Pi, or OpenCode tab on this Mac follow the session its CLI is in: Antigravity's from the log it holds open, in `Antigravity/`; Pi's and OpenCode's from the extension the app starts them with, which reports it to a file, in `Reporting/`.
+- `Services/Terminal/LiveSessionFollowing/`: makes an Antigravity, Pi, or OpenCode tab on this Mac follow the session its CLI is in: Antigravity's from the log it holds open, in `Antigravity/`; Pi's and OpenCode's from the extension the app starts them with, which reports it to a file, in `Reporting/`, along with what the CLI is doing.
 - `Services/Terminal/Tabs/`: moving between tabs, and linking a tab to the session its CLI is in.
 - `Services/Terminal/AppearingSessions/`: links a new tab to the first session that appears in its project, for SSH hosts and for CLIs that don't reveal the session they write.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
