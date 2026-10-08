@@ -7,7 +7,8 @@ struct EmbeddedTerminalView: NSViewRepresentable {
     let isShown: Bool
     /// The tab is selected, so its terminal gets the keyboard.
     let isActive: Bool
-    /// Called when a click lands on the terminal or its margin, before the terminal takes the keyboard.
+    /// Called when a click lands on the terminal or its margin, or files are dropped on it, before the terminal takes
+    /// the keyboard.
     let onFocus: () -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator() }
@@ -15,7 +16,7 @@ struct EmbeddedTerminalView: NSViewRepresentable {
     func makeNSView(context: Context) -> TerminalInsetView {
         let terminalView = session.terminalView
         terminalView.setWorkspaceActive(isShown)
-        terminalView.onMouseDown = onFocus
+        terminalView.onFocus = onFocus
         session.startIfNeeded()
         context.coordinator.wasActive = isActive
         if isActive { focus(terminalView, coordinator: context.coordinator) }
@@ -24,7 +25,7 @@ struct EmbeddedTerminalView: NSViewRepresentable {
 
     func updateNSView(_ insetView: TerminalInsetView, context: Context) {
         insetView.terminalView.setWorkspaceActive(isShown)
-        insetView.terminalView.onMouseDown = onFocus
+        insetView.terminalView.onFocus = onFocus
         if isActive && !context.coordinator.wasActive {
             focus(insetView.terminalView, coordinator: context.coordinator)
         }
