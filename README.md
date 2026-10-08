@@ -118,7 +118,7 @@ Build locally with `make`; the app is written to `dist/JustSessions.app`. Use `m
 - [Session storage and privacy](docs/guides/session-storage.md)
 - [Build and release](docs/development/build-and-release.md) · [Source layout](docs/development/source-layout.md)
 - [Website development and traffic](docs/development/website.md) · [Counting update checks](docs/development/update-checks.md)
-- [All documentation](docs/README.md) · [Release notes](https://github.com/yangzichao/JustSessions/releases)
+- [All documentation](docs/README.md) · [Release notes](https://yangzichao.github.io/JustSessions/release-notes.html)
 
 See [Contributing](CONTRIBUTING.md) for setup and pull requests. Run `make verify` on the final commit and include the results in the PR template. Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 

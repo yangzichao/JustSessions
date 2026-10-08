@@ -4,6 +4,7 @@ struct AppWideSheet: Identifiable, Equatable {
 
     static let settings = AppWideSheet(selectedSettingsTab: .general)
     static let help = AppWideSheet(selectedSettingsTab: .help)
+    static let releaseNotes = AppWideSheet(selectedSettingsTab: .releaseNotes)
 
     var id: String { "settings" }
 }

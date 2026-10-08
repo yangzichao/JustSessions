@@ -1928,6 +1928,16 @@
         }
       }
     },
+    "Fixed": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "修复"
+          }
+        }
+      }
+    },
     "Follow System": {
       "localizations": {
         "zh-Hans": {
@@ -2161,6 +2171,16 @@
         }
       }
     },
+    "Improved": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "改进"
+          }
+        }
+      }
+    },
     "In **Projects**, clear the time and CLI filters, then click the host's refresh button.": {
       "localizations": {
         "zh-Hans": {
@@ -2320,6 +2340,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "最新消息"
+          }
+        }
+      }
+    },
+    "Latest release notes ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最新更新说明 ↗"
           }
         }
       }
@@ -2503,6 +2533,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "需要我的输入，例如权限确认"
+          }
+        }
+      }
+    },
+    "New": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增"
           }
         }
       }
@@ -3289,6 +3329,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在刷新此 Mac"
+          }
+        }
+      }
+    },
+    "Release history could not be loaded. Read the latest notes on the website.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法加载更新历史。请在网站查看最新说明。"
+          }
+        }
+      }
+    },
+    "Release notes": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新说明"
           }
         }
       }

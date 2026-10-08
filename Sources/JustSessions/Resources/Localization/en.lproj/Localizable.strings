@@ -354,6 +354,8 @@
 	<string>Finishes its turn</string>
 	<key>First message</key>
 	<string>First message</string>
+	<key>Fixed</key>
+	<string>Fixed</string>
 	<key>Follow System</key>
 	<string>Follow System</string>
 	<key>Font</key>
@@ -402,6 +404,8 @@
 	<string>Image can't be shown</string>
 	<key>Import</key>
 	<string>Import</string>
+	<key>Improved</key>
+	<string>Improved</string>
 	<key>In **Projects**, clear the time and CLI filters, then click the host's refresh button.</key>
 	<string>In **Projects**, clear the time and CLI filters, then click the host's refresh button.</string>
 	<key>Interface language</key>
@@ -436,6 +440,8 @@
 	<string>Last tab</string>
 	<key>Latest message</key>
 	<string>Latest message</string>
+	<key>Latest release notes ↗</key>
+	<string>Latest release notes ↗</string>
 	<key>Launch JustSessions at login</key>
 	<string>Launch JustSessions at login</string>
 	<key>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</key>
@@ -474,6 +480,8 @@
 	<string>Name</string>
 	<key>Needs my input, such as a permission prompt</key>
 	<string>Needs my input, such as a permission prompt</string>
+	<key>New</key>
+	<string>New</string>
 	<key>New Session…</key>
 	<string>New Session…</string>
 	<key>New Tab…</key>
@@ -628,6 +636,10 @@
 	<string>Refreshing %@</string>
 	<key>Refreshing this Mac</key>
 	<string>Refreshing this Mac</string>
+	<key>Release history could not be loaded. Read the latest notes on the website.</key>
+	<string>Release history could not be loaded. Read the latest notes on the website.</string>
+	<key>Release notes</key>
+	<string>Release notes</string>
 	<key>Remove host</key>
 	<string>Remove host</string>
 	<key>Rename</key>
