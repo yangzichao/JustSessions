@@ -66,7 +66,8 @@ make website
 
 The release workflow fails before signing if the tag has no curated entry or the copy fails the automated editorial checks. It publishes the rendered Markdown as the GitHub release body
 and gives Sparkle a matching `JustSessions.html` beside `JustSessions.zip`, which `generate_appcast --embed-release-notes` embeds in the feed.
-The native history is bundled and works offline; its website link opens newer notes. Adding entries triggers the independent website build.
+The native history is bundled and works offline; its website link opens newer notes. Adding entries triggers the independent website build, but the website lists only versions whose GitHub release is published;
+after publishing, the release workflow redeploys it. Local website builds show every entry.
 Historical GitHub release bodies are not changed by a source commit and need a separate publication when backfilling notes.
 
 ### Signed publication
@@ -75,7 +76,7 @@ App release Actions run for pushed version tags (`vX.Y.Z`). Website changes on `
 
 Use the PR template to record the tested commit SHA, verification date, macOS and Swift versions, commands, results, and a concise log summary. Refresh the evidence after each PR update, including rebases and conflict resolution. Workflow changes also require local `actionlint`. Required checks must pass before merging or pushing; report the same evidence in the delivery summary for direct pushes to `main`. Repository merge rules must not require the retired `Test` or website CI checks.
 
-The `Publish JustSessions release` workflow first validates the tag and website on Linux, then runs Swift tests and localization checks on macOS before Developer ID signing, notarization, and app publication. It does not deploy Pages. App releases have no scheduled or manual triggers; use GitHub's rerun facility to retry a failed tag run. To update or redeploy the website independently, use the [website workflow](website.md#deployment-and-discovery). The tag sets the app version. Choose a new, unused semantic version for each release:
+The `Publish JustSessions release` workflow first validates the tag and website on Linux, then runs Swift tests and localization checks on macOS before Developer ID signing, notarization, and app publication. It does not deploy Pages itself; after publishing, it starts the website workflow so the release notes page lists the new version. App releases have no scheduled or manual triggers; use GitHub's rerun facility to retry a failed tag run. To update or redeploy the website independently, use the [website workflow](website.md#deployment-and-discovery). The tag sets the app version. Choose a new, unused semantic version for each release:
 
 Before tagging user-facing changes, update the README, affected user guides, and concise homepage copy or guide links in the same change. Run `python3 Scripts/Website/build_site.py` to check capability claims against the app and validate the Pages artifact. After the signed installer is published, update any source-build availability notes that became part of the release. See [website maintenance](website.md).
 

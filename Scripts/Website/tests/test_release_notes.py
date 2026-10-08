@@ -30,6 +30,18 @@ class ReleaseNotesTests(unittest.TestCase):
             self.assertIn('href="./release-notes.html" aria-current="page"', page)
             self.assertIn("release-notes.html", (output_directory / "sitemap.xml").read_text())
 
+    def test_website_hides_notes_merged_before_their_release_is_published(self):
+        releases = load_catalog()
+        unpublished_version, latest_published_version = releases[0]["version"], releases[1]["version"]
+        with tempfile.TemporaryDirectory() as directory:
+            output_directory = Path(directory)
+            with patch("build_site.WEBSITE_OUTPUT_DIRECTORY", output_directory):
+                build_site(latest_published_release_tag="v" + latest_published_version)
+            page = (output_directory / "release-notes.html").read_text()
+            self.assertNotIn(f'id="v{unpublished_version}"', page)
+            self.assertIn(f'>v{latest_published_version}</a><span class="release-latest">', page)
+            self.assertEqual(page.count('class="release-latest"'), 1)
+
     def test_missing_version_stops_publication_before_writing_files(self):
         with tempfile.TemporaryDirectory() as directory:
             output_directory = Path(directory) / "notes"
