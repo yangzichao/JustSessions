@@ -29,7 +29,7 @@ enum TranscriptMarkdownParser {
             }
             let content: TranscriptMarkdownBlock.Content = switch leaf.kind {
             case .header(let level): .text(text, headingLevel: level)
-            case .codeBlock(let language): .code(String(text.characters), language: language)
+            case .codeBlock(let language): .code(text.plainText, language: language)
             case .thematicBreak: .divider
             default: .text(text, headingLevel: nil)
             }

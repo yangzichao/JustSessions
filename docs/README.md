@@ -16,6 +16,7 @@
 | --- | --- |
 | [Build and release](development/build-and-release.md) | Swift builds, tests, signed installers, notarization, and Sparkle updates. |
 | [Source layout](development/source-layout.md) | Feature folders and responsibilities. |
+| [Performance](development/performance.md) | Profiling baseline, known hotspots, the status of each optimization, and how to profile. |
 | [Counting update checks](development/update-checks.md) | The Cloudflare Worker that counts daily update checks, what it stores, and how to read the numbers. |
 | [Interface localization](development/localization.md) | String Catalog, language discovery, adding translations, and automated checks. |
 | [Website development](development/website.md) | Static Pages builds, app colors, metadata, sitemap, previews, and publishing. |
