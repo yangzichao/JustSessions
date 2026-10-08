@@ -128,4 +128,4 @@ For in-app help, open **Settings → Help**. Send feedback or report an issue fr
 
 ## License
 
-[MIT](LICENSE). The embedded terminal uses [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm) under its MIT license.
+[MIT](LICENSE). The embedded terminal uses [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm) under its MIT license. Terminals draw Nerd Font icons with Symbols Nerd Font Mono from [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts), which the app includes with its license and the licenses of its icon sets.
