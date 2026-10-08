@@ -47,6 +47,8 @@ struct SettingsView: View {
                     PermissionsSettingsView()
                 case .help:
                     HelpSettingsView()
+                case .releaseNotes:
+                    ReleaseNotesSettingsView()
                 }
             }
             // A fresh scroll position for each page.

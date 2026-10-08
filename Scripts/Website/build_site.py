@@ -2,6 +2,7 @@
 
 import hashlib
 import shutil
+import sys
 from pathlib import Path
 
 from script_assets import version_script_imports
@@ -14,6 +15,10 @@ REPOSITORY_DIRECTORY = Path(__file__).resolve().parents[2]
 WEBSITE_SOURCE_DIRECTORY = REPOSITORY_DIRECTORY / "website"
 WEBSITE_OUTPUT_DIRECTORY = REPOSITORY_DIRECTORY / "dist/JustSessions"
 
+sys.path.insert(0, str(REPOSITORY_DIRECTORY / "Scripts/ReleaseNotes"))
+from catalog import load_catalog
+from render_notes import render_website_history
+
 
 def build_site():
     validate_product_content(REPOSITORY_DIRECTORY)
@@ -25,6 +30,10 @@ def build_site():
     for document_name in document_names:
         shutil.copy2(WEBSITE_SOURCE_DIRECTORY / document_name, WEBSITE_OUTPUT_DIRECTORY / document_name)
         insert_shared_partials(WEBSITE_OUTPUT_DIRECTORY / document_name, WEBSITE_SOURCE_DIRECTORY / "partials")
+    release_notes_path = WEBSITE_OUTPUT_DIRECTORY / "release-notes.html"
+    release_notes_template = release_notes_path.read_text()
+    assert release_notes_template.count("<!-- release-history -->") == 1, "Release page needs one history placeholder"
+    release_notes_path.write_text(release_notes_template.replace("<!-- release-history -->", render_website_history(load_catalog())))
     stylesheet_directory = WEBSITE_OUTPUT_DIRECTORY / "styles"
     if stylesheet_directory.exists():
         shutil.rmtree(stylesheet_directory)

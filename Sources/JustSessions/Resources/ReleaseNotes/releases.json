@@ -1,0 +1,239 @@
+[
+  {
+    "version": "1.0.9",
+    "publishedOn": "2026-10-08",
+    "title": {
+      "en": "Smoother transcript reading",
+      "zh-Hans": "更流畅的对话阅读"
+    },
+    "sections": [
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Long transcripts scroll more smoothly, with less work repeated for messages already on screen.",
+            "zh-Hans": "减少屏幕上已有消息的重复处理，让长对话滚动更流畅。"
+          },
+          {
+            "en": "Faster timestamp parsing and text conversion when loading conversation history.",
+            "zh-Hans": "加载对话历史时，时间解析与文本转换更快。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "1.0.8",
+    "publishedOn": "2026-10-07",
+    "title": {
+      "en": "Better control of your tabs",
+      "zh-Hans": "更便捷的标签页操作"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Start a new agent session or plain terminal from a tab’s right-click menu.",
+            "zh-Hans": "从标签页右键菜单新建代理会话或普通终端。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Dragging a tab no longer moves the whole window; drag empty space in the tab bar to move the window.",
+            "zh-Hans": "拖动标签页不再移动整个窗口；可拖动标签栏空白处移动窗口。"
+          },
+          {
+            "en": "Failed CLI launches keep their error and exit status visible in the tab.",
+            "zh-Hans": "CLI 启动失败时，标签页保留错误信息和退出状态。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "1.0.7",
+    "publishedOn": "2026-10-06",
+    "title": {
+      "en": "Installer refresh",
+      "zh-Hans": "安装包更新"
+    },
+    "sections": [
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "A refreshed signed installer and update package with the same app changes as v1.0.6.",
+            "zh-Hans": "更新签名安装包和自动更新包；应用功能与 v1.0.6 相同。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "1.0.6",
+    "publishedOn": "2026-10-06",
+    "title": {
+      "en": "A steadier workspace",
+      "zh-Hans": "更稳定的工作区"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Review and choose to report the previous launch’s crash when the app reopens.",
+            "zh-Hans": "重新打开应用时，可查看并选择报告上次运行的崩溃。"
+          }
+        ]
+      },
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "SSH host settings are grouped under the heading’s more-actions menu, and sidebar pins are easier to distinguish.",
+            "zh-Hans": "SSH 主机设置集中到标题的更多操作菜单，侧边栏置顶标记更易辨认。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Keep open tabs visible while reading a session preview or viewing a disconnected SSH session.",
+            "zh-Hans": "阅读会话预览或查看已断开的 SSH 会话时，已打开的标签页仍然可见。"
+          },
+          {
+            "en": "Resume an ended session in its existing tab instead of opening a duplicate.",
+            "zh-Hans": "在原标签页恢复已结束的会话，避免重复打开。"
+          },
+          {
+            "en": "Keep transcript reading positions steady and prevent freezes while reading image messages.",
+            "zh-Hans": "保持对话阅读位置稳定，并修复阅读图片消息时的卡顿。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "1.0.5",
+    "publishedOn": "2026-10-06",
+    "title": {
+      "en": "Find messages across sessions",
+      "zh-Hans": "跨会话查找消息"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Search saved message text from the sidebar and open the matching passage in its conversation.",
+            "zh-Hans": "从侧边栏搜索已保存的消息文本，并打开对话中的匹配段落。"
+          },
+          {
+            "en": "Create a missing folder when adding a project.",
+            "zh-Hans": "添加项目时可创建缺失的文件夹。"
+          },
+          {
+            "en": "Let SSH sessions use the host’s own tmux prefix.",
+            "zh-Hans": "允许 SSH 会话使用主机自己的 tmux 前缀键。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Fix a crash when opening Find in the transcript reader, and keep search matches loading after switching sessions.",
+            "zh-Hans": "修复在对话阅读器打开查找时的崩溃，并在切换会话后继续加载搜索匹配位置。"
+          },
+          {
+            "en": "Explain which project folder is missing when a saved session cannot resume.",
+            "zh-Hans": "已保存的会话无法恢复时，说明缺失的项目文件夹。"
+          },
+          {
+            "en": "Save a restored default start command correctly.",
+            "zh-Hans": "正确保存恢复为默认值的启动命令。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "1.0.4",
+    "publishedOn": "2026-10-05",
+    "title": {
+      "en": "Safer start-command editing",
+      "zh-Hans": "更可靠的启动命令编辑"
+    },
+    "sections": [
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Custom start commands require Edit and Save, and are checked before saving.",
+            "zh-Hans": "自定义启动命令需通过编辑和保存修改，并在保存前进行检查。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "1.0.3",
+    "publishedOn": "2026-10-05",
+    "title": {
+      "en": "Your tools, your start commands",
+      "zh-Hans": "自定义工具启动命令"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Set a custom start command for each coding CLI on each host, including Kiro CLI.",
+            "zh-Hans": "为每台主机的编程 CLI 设置自定义启动命令，包括 Kiro CLI。"
+          }
+        ]
+      },
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Session names written by a CLI appear promptly in the sidebar.",
+            "zh-Hans": "CLI 写入的会话名称会及时显示在侧边栏。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "publishedOn": "2026-10-04",
+    "title": {
+      "en": "Just sessions, on your Mac",
+      "zh-Hans": "在 Mac 上管理会话"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Browse saved conversations by project, read them in a dedicated window, and continue in the original coding CLI.",
+            "zh-Hans": "按项目浏览已保存的对话，在独立窗口阅读，并在原编程 CLI 中继续工作。"
+          },
+          {
+            "en": "Keep agent sessions and plain terminals together in native tabs and split views.",
+            "zh-Hans": "在原生标签页和分屏中统一管理代理会话与普通终端。"
+          },
+          {
+            "en": "Browse and resume sessions on your own SSH hosts, with tmux support for processes that keep running.",
+            "zh-Hans": "浏览并恢复自己 SSH 主机上的会话，支持通过 tmux 保持进程运行。"
+          }
+        ]
+      }
+    ]
+  }
+]

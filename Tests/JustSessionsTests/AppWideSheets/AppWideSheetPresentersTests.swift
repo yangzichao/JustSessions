@@ -25,7 +25,8 @@ struct AppWideSheetPresentersTests {
         #expect(!openedAWorkspaceWindow)
     }
 
-    @Test func aMenuRequestSwitchesPagesInTheExistingSettingsSheet() async throws {
+    @Test(arguments: [AppWideSheet.help, .releaseNotes])
+    func aMenuRequestSwitchesPagesInTheExistingSettingsSheet(requestedSheet: AppWideSheet) async throws {
         let workspaceWindow = WorkspaceWindowStandIn()
         defer { workspaceWindow.close() }
         try await workspaceWindow.waitUntilRegistered()
@@ -33,9 +34,9 @@ struct AppWideSheetPresentersTests {
         try await expectEventually { workspaceWindow.window.attachedSheet != nil }
         let originalSheet = try #require(workspaceWindow.window.attachedSheet)
 
-        AppWideSheetPresenters.show(.help) {}
+        AppWideSheetPresenters.show(requestedSheet) {}
 
-        #expect(workspaceWindow.state.sheet == .help)
+        #expect(workspaceWindow.state.sheet == requestedSheet)
         #expect(workspaceWindow.window.attachedSheet === originalSheet)
     }
 

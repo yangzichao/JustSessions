@@ -47,6 +47,29 @@ Discovery metadata is cached under the app's macOS Caches directory in `SessionS
 
 ## Releases
 
+### Curated release notes
+
+`Sources/JustSessions/Resources/ReleaseNotes/releases.json` is the shared editorial history for Settings → Release notes,
+the [website release notes](https://yangzichao.github.io/JustSessions/release-notes.html), GitHub release bodies, and Sparkle's update window.
+Before tagging, add the version, release date (the publication day in America/Los_Angeles), a short title, and user-facing changes under
+`new`, `improved`, or `fixed`. Keep newest versions first and include English and Simplified Chinese copy. Use the changes actually
+shipped between tags; omit internal tests and avoid claiming measured speedups without evidence. The initial history covers the published
+1.0 releases; v1.0.7 repackaged the same source as v1.0.6.
+
+Preview a version's GitHub Markdown and Sparkle HTML with:
+
+```sh
+python3 Scripts/ReleaseNotes/prepare_release_notes.py v1.0.9 --output-directory dist/release-notes
+make website
+```
+
+The release workflow fails before signing if the tag has no curated entry. It publishes the rendered Markdown as the GitHub release body
+and gives Sparkle a matching `JustSessions.html` beside `JustSessions.zip`, which `generate_appcast --embed-release-notes` embeds in the feed.
+The native history is bundled and works offline; its website link opens newer notes. Adding entries triggers the independent website build.
+Historical GitHub release bodies are not changed by a source commit and need a separate publication when backfilling notes.
+
+### Signed publication
+
 App release Actions run for pushed version tags (`vX.Y.Z`). Website changes on `main` also run an independent website workflow, which can be triggered manually from `main`. Pull requests and other branch pushes run no workflows. Run `make verify` locally on the final commit before opening or updating a pull request, merging, pushing to `main`, or tagging a release; website Actions do not replace it. It runs the website tests and build, the [update feed Worker](update-checks.md) tests, Swift tests against bundled tmux, and localization checks, then builds the app and opens it with `Scripts/Release/check-app-launches.sh`. The check hides the resource bundles in `.build/release`, because SwiftPM's `Bundle.module` falls back to that absolute path on the build machine but not on users' Macs.
 
 Use the PR template to record the tested commit SHA, verification date, macOS and Swift versions, commands, results, and a concise log summary. Refresh the evidence after each PR update, including rebases and conflict resolution. Workflow changes also require local `actionlint`. Required checks must pass before merging or pushing; report the same evidence in the delivery summary for direct pushes to `main`. Repository merge rules must not require the retired `Test` or website CI checks.

@@ -6,7 +6,7 @@ import Testing
 /// app delegate if Settings is a termination-blocking sheet, even though its changes have already been saved.
 // Use the same serialized suite as the menu tests: both register real workspace windows with the shared presenter.
 extension AppWideSheetPresentersTests {
-    @Test(arguments: [AppWideSheet.settings, .help])
+    @Test(arguments: [AppWideSheet.settings, .help, .releaseNotes])
     func settingsAllowsUpdateRelaunchWhileOpen(requestedSheet: AppWideSheet) async throws {
         let workspaceWindow = WorkspaceWindowStandIn()
         defer { workspaceWindow.close() }

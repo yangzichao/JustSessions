@@ -18,6 +18,7 @@ struct AppWideSheetCommands: Commands {
                    systemImage: "questionmark.circle") { show(.help) }
             Button(AppLocalization.string("Take the Tour", language: languageStore.language)) { startOnboardingTour?() }
                 .disabled(startOnboardingTour == nil)
+            Button(AppLocalization.string("Release notes", language: languageStore.language)) { show(.releaseNotes) }
             Divider()
             Link("JustSessions Website", destination: AppLinks.websiteURL)
                 .environment(\.locale, languageStore.locale)

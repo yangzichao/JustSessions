@@ -30,6 +30,8 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
+      - name: Require curated release notes
+        run: python3 Scripts/ReleaseNotes/prepare_release_notes.py "$GITHUB_REF_NAME" --output-directory dist/release-notes
       - name: Test and build website
         run: make website-check
 
@@ -146,6 +148,7 @@ jobs:
           set -euo pipefail
           tag="$GITHUB_REF_NAME"
           mkdir -p dist/sparkle-updates
+          python3 Scripts/ReleaseNotes/prepare_release_notes.py "$tag" --output-directory dist/sparkle-updates
           update_archive="dist/sparkle-updates/JustSessions.zip"
           ditto -c -k --sequesterRsrc --keepParent dist/JustSessions.app "$update_archive"
           if gh release download --repo yangzichao/JustSessions --pattern appcast.xml \
@@ -160,6 +163,7 @@ jobs:
               --ed-key-file - \
               --download-url-prefix "$download_prefix" \
               --embed-release-notes \
+              --full-release-notes-url "https://yangzichao.github.io/JustSessions/release-notes.html" \
               dist/sparkle-updates
           grep -Fq "${download_prefix}JustSessions.zip" dist/sparkle-updates/appcast.xml
           codesign --verify --deep --strict dist/JustSessions.app
@@ -174,15 +178,18 @@ jobs:
           tag="$GITHUB_REF_NAME"
           update_archive="dist/sparkle-updates/JustSessions.zip"
           if gh release view "$tag" --repo yangzichao/JustSessions >/dev/null 2>&1; then
+            gh release edit "$tag" --repo yangzichao/JustSessions --notes-file dist/sparkle-updates/release-notes.md
+            gh release upload "$tag" dist/sparkle-updates/JustSessions.html --repo yangzichao/JustSessions --clobber
             echo "Release already published: $tag"
           else
             gh release create "$tag" \
               dist/JustSessions.dmg \
               "$update_archive" \
               dist/sparkle-updates/appcast.xml \
+              dist/sparkle-updates/JustSessions.html \
               --repo yangzichao/JustSessions \
               --verify-tag \
               --title "JustSessions $tag" \
-              --notes "Signed, notarized JustSessions build. Includes tmux for local session persistence without a separate install; SSH hosts still need their own tmux. To install, open JustSessions.dmg and drag JustSessions into Applications. Sparkle updates use appcast.xml and JustSessions.zip." \
+              --notes-file dist/sparkle-updates/release-notes.md \
               --latest
           fi

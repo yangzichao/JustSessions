@@ -352,6 +352,8 @@
 	<string>完成一轮任务</string>
 	<key>First message</key>
 	<string>第一条消息</string>
+	<key>Fixed</key>
+	<string>修复</string>
 	<key>Follow System</key>
 	<string>跟随系统</string>
 	<key>Font</key>
@@ -398,6 +400,8 @@
 	<string>无法显示图片</string>
 	<key>Import</key>
 	<string>导入</string>
+	<key>Improved</key>
+	<string>改进</string>
 	<key>In **Projects**, clear the time and CLI filters, then click the host's refresh button.</key>
 	<string>在 **项目** 中清除时间和 CLI 筛选，然后单击该主机的刷新按钮。</string>
 	<key>Interface language</key>
@@ -430,6 +434,8 @@
 	<string>最后一个标签页</string>
 	<key>Latest message</key>
 	<string>最新消息</string>
+	<key>Latest release notes ↗</key>
+	<string>最新更新说明 ↗</string>
 	<key>Launch JustSessions at login</key>
 	<string>开机启动 JustSessions</string>
 	<key>Lets JustSessions tell you when a session needs your input or finishes its turn. Choose which in General.</key>
@@ -466,6 +472,8 @@
 	<string>名称</string>
 	<key>Needs my input, such as a permission prompt</key>
 	<string>需要我的输入，例如权限确认</string>
+	<key>New</key>
+	<string>新增</string>
 	<key>New Session…</key>
 	<string>新建会话…</string>
 	<key>New Tab…</key>
@@ -622,6 +630,10 @@
 	<string>正在刷新 %@</string>
 	<key>Refreshing this Mac</key>
 	<string>正在刷新此 Mac</string>
+	<key>Release history could not be loaded. Read the latest notes on the website.</key>
+	<string>无法加载更新历史。请在网站查看最新说明。</string>
+	<key>Release notes</key>
+	<string>更新说明</string>
 	<key>Remove host</key>
 	<string>移除主机</string>
 	<key>Rename</key>
