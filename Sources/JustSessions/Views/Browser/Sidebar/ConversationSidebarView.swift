@@ -5,11 +5,13 @@ struct ConversationSidebarView: View {
     @Binding var searchText: String
     @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
+    @Binding var waitingFilter: SessionWaitingFilter
     @Binding var sessionSelection: SessionMultiSelection
-    /// Already narrowed by the tool, recency, and search filters.
+    /// Already narrowed by the tool, recency, waiting, and search filters.
     let projects: [ProjectConversationGroup]
     let allSessionCount: Int
     let recentSessionCount: Int
+    let waitingSessionCount: Int
     /// While searching, the first match in each session whose messages hold the search text.
     var messageMatches: [String: SessionMessageMatch] = [:]
     let onNewSession: () -> Void
@@ -91,9 +93,11 @@ struct ConversationSidebarView: View {
                 SidebarProjectFilterMenu(
                     recencyFilter: $recencyFilter,
                     providerFilter: $providerFilter,
+                    waitingFilter: $waitingFilter,
                     offeredProviders: store.filterableProviders,
                     allSessionCount: allSessionCount,
-                    recentSessionCount: recentSessionCount
+                    recentSessionCount: recentSessionCount,
+                    waitingSessionCount: waitingSessionCount
                 )
                 .opacity(contentMode == .projects ? 1 : 0)
                 .allowsHitTesting(contentMode == .projects)

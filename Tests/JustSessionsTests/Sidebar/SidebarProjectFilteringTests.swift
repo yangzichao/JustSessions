@@ -32,6 +32,39 @@ struct SidebarProjectFilteringTests {
         #expect(allRecentProjects.map(\.id) == [recentCodex.projectDirectoryKey, "/work/empty"])
     }
 
+    @Test func waitingForYouKeepsOnlyWaitingSessionsAndNewSessionTabsAndDropsEmptyProjects() {
+        let waiting = Conversation.fixture(provider: .claude, projectPath: "/work/app")
+        let quiet = Conversation.fixture(provider: .claude, projectPath: "/work/app")
+        let otherQuiet = Conversation.fixture(provider: .codex, projectPath: "/work/site")
+        let waitingNewSession = PendingNewSession(
+            terminalID: UUID(), provider: .codex, projectDirectoryKey: "/work/site", title: "New session", startedAt: .now
+        )
+        let quietNewSession = PendingNewSession(
+            terminalID: UUID(), provider: .codex, projectDirectoryKey: "/work/site", title: "New session", startedAt: .now
+        )
+        let projects = ProjectConversationGroup.grouped(
+            [waiting, quiet, otherQuiet],
+            pendingNewSessions: [waitingNewSession, quietNewSession],
+            retainedProjectPaths: ["/work/empty", "/work/app", "/work/site"]
+        )
+        let waitingSessions = SessionsWaitingForYou(conversationIDs: [waiting.id], terminalIDs: [waitingNewSession.terminalID])
+
+        let filtered = SidebarProjectFiltering.projects(
+            projects,
+            providerFilter: .all,
+            recencyFilter: .all,
+            waitingFilter: .waitingForYou,
+            waiting: waitingSessions
+        )
+
+        #expect(Set(filtered.map(\.id)) == ["/work/app", "/work/site"])
+        #expect(filtered.flatMap(\.conversations).map(\.id) == [waiting.id])
+        #expect(filtered.flatMap(\.pendingNewSessions).map(\.id) == [waitingNewSession.id])
+        let unfiltered = SidebarProjectFiltering.projects(projects, providerFilter: .all, recencyFilter: .all, waiting: waitingSessions)
+        #expect(unfiltered.contains { $0.id == "/work/empty" })
+        #expect(unfiltered.flatMap(\.conversations).count == 3)
+    }
+
     @Test func projectMatchKeepsAllSessionsAndSessionMatchKeepsOnlyMatches() {
         let website = conversation(project: "/tmp/website", title: "Fix header")
         let websiteOther = conversation(project: "/tmp/website", title: "Update footer")

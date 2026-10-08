@@ -4,7 +4,7 @@
 
 Application paths below are relative to `Sources/JustSessions/`. Tests live in `Tests/JustSessionsTests/`, with Gherkin features and their steps in `Tests/JustSessionsTests/Gherkin/`; see [Gherkin features](build-and-release.md#gherkin-features).
 
-- `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up.
+- `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up. `UnseenTurns/` holds the CLIs that finished a turn while their terminal was off screen, until you look, and which running CLIs wait on you: stopped for your answer, or done with a turn you have not seen.
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
 - `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
@@ -24,7 +24,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, and where a shown split's panes and the resize area between them sit.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
-- `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
+- `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files. `UnseenTurns/` marks a session after each sync and clears the mark once its tab is on screen.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
 - `Services/Onboarding/`: saves which onboarding tips have shown, and whether the install shows them at all, decided once from whether it was fresh; Help's Take the tour shows them all again.
 - `Services/Permissions/`: reads each permission's status without asking for it, and the System Settings page that changes it.

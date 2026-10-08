@@ -64,8 +64,8 @@
           <li>Select a session to read its conversation preview.</li>
           <li>Double-click a session or choose <strong>Resume</strong> to continue in its original CLI and project folder.</li>
         </ol>
-        <p>A session whose CLI is already running opens on that process with one click. The <strong>+</strong> at the top of the sidebar starts an installed CLI, or <strong>Terminal</strong> for your login shell; a project's <strong>+</strong> menu offers the same. Switch between <strong>Projects</strong> to browse saved sessions and <strong>Open tabs</strong> to switch terminals. Open tabs are grouped by project, with the remote host when applicable. Both views retain their search and scroll position. Time and CLI filters live beside the switch in Projects and do not hide open tabs. Search also matches message text and opens a matching session at that message.</p>
-        <p>Pin, rename, or export sessions as Markdown. Local Claude Code and Codex sessions can notify you when they finish or need input.</p>
+        <p>A session whose CLI is already running opens on that process with one click. The <strong>+</strong> at the top of the sidebar starts an installed CLI, or <strong>Terminal</strong> for your login shell; a project's <strong>+</strong> menu offers the same. Switch between <strong>Projects</strong> to browse saved sessions and <strong>Open tabs</strong> to switch terminals. Open tabs are grouped by project, with the remote host when applicable. Both views retain their search and scroll position. Time and CLI filters live beside the switch in Projects, with <strong>Waiting for you</strong> for sessions stopped for your answer or done with a turn you haven't seen; filters do not hide open tabs. Search also matches message text and opens a matching session at that message.</p>
+        <p>Pin, rename, or export sessions as Markdown. Local Claude Code and Codex sessions can notify you when a turn finishes, and Claude Code also when it needs input.</p>
       </section>
 
       <section id="reading" aria-labelledby="reading-title">
@@ -128,7 +128,7 @@
       <section id="troubleshooting" aria-labelledby="troubleshooting-title">
         <h2 id="troubleshooting-title">If a session or CLI is missing</h2>
         <ul>
-          <li>In <strong>Projects</strong>, clear the time and CLI filters, then click the affected host's refresh button.</li>
+          <li>In <strong>Projects</strong>, clear the filters, then click the affected host's refresh button.</li>
           <li>Confirm the CLI runs in your usual terminal. New session menus offer only installed tools.</li>
           <li>Start one conversation so the CLI creates history. Kiro sessions need a message; archived and subagent OpenCode sessions are excluded.</li>
           <li>For SSH, check passwordless access, <code>rsync</code>, and the remote CLI. Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders, and the OpenCode database its login shell points to.</li>

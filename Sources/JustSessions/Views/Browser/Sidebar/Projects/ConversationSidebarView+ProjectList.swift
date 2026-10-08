@@ -25,7 +25,8 @@ extension ConversationSidebarView {
                                 host: section.host,
                                 refreshStatus: store.hostRefreshStatuses[section.host],
                                 isSearching: isSearching,
-                                recencyFilter: recencyFilter
+                                recencyFilter: recencyFilter,
+                                waitingFilter: waitingFilter
                             ))
                             .onboardingTourStop(section.host == .thisMac ? .noSessionsYet : nil)
                         }

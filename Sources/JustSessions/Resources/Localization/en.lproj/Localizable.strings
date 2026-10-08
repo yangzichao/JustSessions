@@ -406,8 +406,8 @@
 	<string>Import</string>
 	<key>Improved</key>
 	<string>Improved</string>
-	<key>In **Projects**, clear the time and CLI filters, then click the host's refresh button.</key>
-	<string>In **Projects**, clear the time and CLI filters, then click the host's refresh button.</string>
+	<key>In **Projects**, clear the filters, then click the host's refresh button.</key>
+	<string>In **Projects**, clear the filters, then click the host's refresh button.</string>
 	<key>Interface language</key>
 	<string>Interface language</string>
 	<key>JustSessions</key>
@@ -478,8 +478,8 @@
 	<string>Move tab into split view</string>
 	<key>Name</key>
 	<string>Name</string>
-	<key>Needs my input, such as a permission prompt</key>
-	<string>Needs my input, such as a permission prompt</string>
+	<key>Needs my input, such as a permission prompt (Claude Code only)</key>
+	<string>Needs my input, such as a permission prompt (Claude Code only)</string>
 	<key>New</key>
 	<string>New</string>
 	<key>New Session…</key>
@@ -510,6 +510,8 @@
 	<string>Next match (⌘G or Return)</string>
 	<key>Next tab</key>
 	<string>Next tab</string>
+	<key>No Claude Code or Codex session is waiting for you</key>
+	<string>No Claude Code or Codex session is waiting for you</string>
 	<key>No archived projects</key>
 	<string>No archived projects</string>
 	<key>No matches</key>
@@ -688,6 +690,8 @@
 	<string>Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.</string>
 	<key>SSH hosts</key>
 	<string>SSH hosts</string>
+	<key>SSH hosts don't tell when a session waits for you</key>
+	<string>SSH hosts don't tell when a session waits for you</string>
 	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
 	<string>SSH hosts have no Trash, so every session is permanently deleted.</string>
 	<key>SSH setup in the user guide ↗</key>
@@ -882,6 +886,8 @@
 	<string>Use this host's tmux prefix</string>
 	<key>User guide ↗</key>
 	<string>User guide ↗</string>
+	<key>Waiting for you</key>
+	<string>Waiting for you</string>
 	<key>Website ↗</key>
 	<string>Website ↗</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>

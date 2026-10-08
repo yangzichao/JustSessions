@@ -8,7 +8,7 @@ struct SidebarSessionRow: View {
         /// A tab's CLI, running or ended.
         case tab(TerminalSession)
         /// A CLI running in tmux with no tab open.
-        case detachedCLI(CLIActivity?)
+        case detachedCLI(SessionRunStatus)
     }
 
     @ObservedObject var store: ConversationStore
@@ -31,7 +31,7 @@ struct SidebarSessionRow: View {
         if let runningTab = runningTabs.first(where: { $0.id == store.selectedTerminalID }) ?? runningTabs.first {
             return .tab(runningTab)
         }
-        if store.isRunningInTmux(conversation) { return .detachedCLI(store.detachedCLIActivities[conversation.id]) }
+        if store.isRunningInTmux(conversation) { return .detachedCLI(store.detachedCLIStatus(of: conversation)) }
         return tabs.first.map { .tab($0) }
     }
 
@@ -39,8 +39,8 @@ struct SidebarSessionRow: View {
         switch source {
         case .tab(let tab):
             tab.runStatus.summary
-        case .detachedCLI(let activity):
-            SessionStatusIndicator.descriptionOfDetachedCLI(.running(activity), on: conversation.host)
+        case .detachedCLI(let status):
+            SessionStatusIndicator.descriptionOfDetachedCLI(status, on: conversation.host)
         }
     }
 
@@ -126,8 +126,8 @@ struct SidebarSessionRow: View {
         switch source {
         case .tab(let tab):
             TerminalStatusIndicator(session: tab)
-        case .detachedCLI(let activity):
-            SessionStatusIndicator(status: .running(activity), description: description)
+        case .detachedCLI(let status):
+            SessionStatusIndicator(status: status, description: description)
         case nil:
             SessionAgeLabel(lastActivity: conversation.updatedAt)
         }
