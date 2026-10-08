@@ -28,9 +28,10 @@ struct SessionMessageIndexerTests {
         try await indexer.index.matches(for: try #require(SessionMessageQuery(text)))
     }
 
-    /// Waits for the update started after `revision` to finish.
+    /// Waits for the update started after `revision` to finish. The update publishes on the main actor, which the
+    /// suite's window tests keep busy for half a minute or more on shared CI runners as the suite starts.
     private func waitForUpdate(of indexer: SessionMessageIndexer, after revision: Int) async throws {
-        try await expectEventually { indexer.revision > revision && indexer.progress == nil }
+        try await expectEventually(timeout: .seconds(120)) { indexer.revision > revision && indexer.progress == nil }
     }
 
     @Test func findsTheSessionsWhoseMessagesHoldTheText() async throws {
