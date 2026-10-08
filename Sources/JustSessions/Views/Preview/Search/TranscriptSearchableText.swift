@@ -53,7 +53,9 @@ private struct TranscriptSearchMatchesText: View {
             ),
             selectedRange: selectedRange,
             navigationRevision: searchContext.navigationRevision,
-            reveal: { view, range in searchContext.reveal?(view, range, entryIndex) ?? false }
+            reveal: { view, range in
+                searchContext.positionController?.revealSearchMatch(in: view, range: range, entryIndex: entryIndex) ?? false
+            }
         )
     }
 

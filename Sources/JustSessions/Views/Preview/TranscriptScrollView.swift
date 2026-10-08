@@ -67,9 +67,7 @@ struct TranscriptScrollView: View {
                     query: searchState.isPresented ? searchState.query : "",
                     selectedMatch: searchState.isSearching ? nil : searchState.selectedMatch,
                     navigationRevision: searchState.navigationRevision,
-                    reveal: { view, range, entryIndex in
-                        positionController.revealSearchMatch(in: view, range: range, entryIndex: entryIndex)
-                    }
+                    positionController: positionController
                 ))
                 .background(TranscriptSearchKeyboardShortcuts(searchState: searchState, isActive: isActive))
                 .task(id: SearchRequest(query: searchState.query, isPresented: searchState.isPresented && isActive, transcript: transcript)) {
@@ -113,7 +111,8 @@ struct TranscriptScrollView: View {
                         .padding(.bottom, 8)
                 }
                 // Only messages participate in scroll targeting; the omitted-entry notice has no message index.
-                transcriptEntries
+                TranscriptEntriesStack(transcript: transcript, provider: conversation.provider, positionController: positionController)
+                    .equatable()
                 if let paging, paging.hasLater {
                     TranscriptPageBoundary(isEarlier: false, isLoading: paging.isLoading, action: loadLaterPage)
                         .disabled(!isActive)
@@ -132,27 +131,6 @@ struct TranscriptScrollView: View {
         .defaultScrollAnchor(.top)
         .scrollPosition(id: scrollTarget, anchor: .top)
         .onDisappear { positionController.stop() }
-    }
-
-    /// Every loaded entry is laid out, rather than only those near the viewport: the reader keeps only a few pages, at
-    /// most `TranscriptPagingModel.maximumRetainedPageCount`. A lazy stack estimates the heights of rows it has not laid out
-    /// and corrects them as they appear. That made scrolling jump, most of all past tall images, and the stack could
-    /// keep correcting without end inside one update, freezing the window, with images or with text alone.
-    private var transcriptEntries: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ForEach(transcript.positionedEntries) { positionedEntry in
-                let entryIndex = positionedEntry.id
-                TranscriptEntryView(
-                    entry: positionedEntry.entry,
-                    assistantName: conversation.provider.rawValue,
-                    assistantTint: conversation.provider.tintColor
-                )
-                .environment(\.transcriptSearchEntryIndex, entryIndex)
-                .background(TranscriptEntryPositionMarker(entryIndex: entryIndex, controller: positionController))
-                .id(entryIndex)
-            }
-        }
-        .scrollTargetLayout()
     }
 
     var displayedEntryIndices: [Int] { transcript.positionIDs }
