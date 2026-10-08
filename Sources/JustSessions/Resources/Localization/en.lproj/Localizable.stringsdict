@@ -114,6 +114,22 @@
 			<string>Export %lld conversations</string>
 		</dict>
 	</dict>
+	<key>Hide %lld subagent sessions</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@value@</string>
+		<key>value</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>Hide %lld subagent session</string>
+			<key>other</key>
+			<string>Hide %lld subagent sessions</string>
+		</dict>
+	</dict>
 	<key>Resume %lld sessions</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -128,6 +144,22 @@
 			<string>Resume %lld session</string>
 			<key>other</key>
 			<string>Resume %lld sessions</string>
+		</dict>
+	</dict>
+	<key>Show %lld subagent sessions</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@value@</string>
+		<key>value</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>Show %lld subagent session</string>
+			<key>other</key>
+			<string>Show %lld subagent sessions</string>
 		</dict>
 	</dict>
 </dict>

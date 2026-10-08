@@ -31,6 +31,58 @@ struct PiAdapterTests {
         #expect(found.first { $0.sessionID == emptyID }?.suggestedTitle == ConversationMetadata.untitledConversationTitle)
     }
 
+    /// Subagent runs and forks sit in the folder named after the session file that started them, at any depth.
+    @Test func listsEachSubagentsSessionUnderTheSessionThatStartedIt() throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let fixture = PiSessionFolderFixture(sessionsDirectory: root)
+        let parentID = UUID().uuidString.lowercased()
+        let runID = UUID().uuidString.lowercased()
+        let nestedID = UUID().uuidString.lowercased()
+        let forkID = UUID().uuidString.lowercased()
+        let parentFile = try fixture.writeSession(id: parentID, projectPath: "/Users/me/app", lines: [
+            PiSessionFolderFixture.userMessage("Plan the release"),
+        ])
+        let runFile = try fixture.writeSubagentSession(id: runID, at: "run-a/run-0/session.jsonl", inFolderOf: parentFile, lines: [
+            PiSessionFolderFixture.userMessage("Task: Review the diff"),
+            PiSessionFolderFixture.sessionName("subagent-reviewer-run-a-1"),
+        ])
+        try fixture.writeSubagentSession(
+            id: nestedID,
+            at: "run-a/run-0/session/run-b/run-0/session.jsonl",
+            inFolderOf: parentFile,
+            projectPath: "/Users/me/other",
+            lines: [PiSessionFolderFixture.userMessage("Task: Check the tests")]
+        )
+        try fixture.writeSubagentSession(
+            id: forkID,
+            at: "forks/2026-09-30T10-05-00-000Z_\(forkID).jsonl",
+            inFolderOf: parentFile,
+            forkedFrom: parentFile,
+            lines: [PiSessionFolderFixture.userMessage("Plan the release"), PiSessionFolderFixture.userMessage("Task: Write the notes")]
+        )
+        // An extension's own record of a run is no Pi session.
+        let artifacts = parentFile.deletingPathExtension().appendingPathComponent("run-a/run-0/subagent-artifacts")
+        try FileManager.default.createDirectory(at: artifacts, withIntermediateDirectories: true)
+        try #"{"recordType":"message","runId":"run-a"}"#.appending("\n")
+            .write(to: artifacts.appendingPathComponent("run-a_worker_transcript.jsonl"), atomically: true, encoding: .utf8)
+
+        let found = Dictionary(uniqueKeysWithValues: try PiAdapter(sessionsDirectory: root).discover().map { ($0.sessionID, $0) })
+
+        #expect(Set(found.keys) == [parentID, runID, nestedID, forkID])
+        #expect(found[parentID]?.parentSessionID == nil)
+        let run = try #require(found[runID])
+        #expect(run.parentSessionID == parentID)
+        #expect(run.suggestedTitle == "Task: Review the diff")
+        #expect(run.sourceFile.resolvingSymlinksInPath() == runFile.resolvingSymlinksInPath())
+        #expect(run.projectPath == "/Users/me/app")
+        #expect(found[nestedID]?.parentSessionID == runID)
+        #expect(found[nestedID]?.projectPath == "/Users/me/other")
+        // A fork opens with its parent's history, so its own task is its latest prompt.
+        #expect(found[forkID]?.parentSessionID == parentID)
+        #expect(found[forkID]?.suggestedTitle == "Task: Write the notes")
+    }
+
     @Test func skipsFilesThatAreNotPiSessions() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }

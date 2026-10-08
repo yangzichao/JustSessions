@@ -31,6 +31,32 @@ struct CodexAdapterTests {
         #expect(adapter.arguments(for: conversations[0], action: .branch) == ["fork", conversations[0].sessionID])
     }
 
+    /// A spawned thread opens with its parent's history, so its agent's nickname and path title it, not the first prompt.
+    @Test func aSpawnedThreadIsListedUnderTheThreadThatSpawnedIt() throws {
+        let folder = try CodexRolloutFolderFixture()
+        defer { folder.remove() }
+        let parentID = UUID().uuidString.lowercased()
+        let spawnedID = UUID().uuidString.lowercased()
+        let reviewID = UUID().uuidString.lowercased()
+        let prompt = #"{"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Plan the port"}]}}"#
+        try folder.writeRollout(sessionID: parentID, laterLines: [prompt])
+        try folder.writeRollout(named: "rollout-2026-09-24T10-05-00-\(spawnedID).jsonl", lines: [
+            #"{"type":"session_meta","payload":{"id":"\#(spawnedID)","cwd":"/Users/me/app","forked_from_id":"\#(parentID)","source":{"subagent":{"thread_spawn":{"parent_thread_id":"\#(parentID)","depth":1,"agent_path":"/root/decode_plan","agent_nickname":"Bohr","agent_role":null}}}}}"#,
+            prompt,
+        ])
+        try folder.writeRollout(named: "rollout-2026-09-24T10-06-00-\(reviewID).jsonl", lines: [
+            #"{"type":"session_meta","payload":{"id":"\#(reviewID)","cwd":"/Users/me/app","source":{"subagent":"review"}}}"#,
+        ])
+
+        let found = Dictionary(uniqueKeysWithValues: try folder.discover().map { ($0.sessionID, $0) })
+
+        #expect(found[parentID]?.parentSessionID == nil)
+        #expect(found[parentID]?.suggestedTitle == "Plan the port")
+        #expect(found[spawnedID]?.parentSessionID == parentID)
+        #expect(found[spawnedID]?.suggestedTitle == "Bohr \u{00B7} decode_plan")
+        #expect(found[reviewID]?.parentSessionID == nil)
+    }
+
     @Test func onlyRolloutsThatStartWithAValidSessionMetaLineAreListed() throws {
         let home = try CodexRolloutFolderFixture()
         defer { home.remove() }

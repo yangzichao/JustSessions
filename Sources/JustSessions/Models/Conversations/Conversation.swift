@@ -9,6 +9,9 @@ struct Conversation: Identifiable, Sendable, Equatable {
     /// For a session on this Mac, the file the CLI wrote. For one on an SSH host, its copy in the local mirror.
     let sourceFile: URL
     private(set) var host: SessionHost
+    /// The session that started this one as a subagent, with the same CLI on the same host. Nil for a session
+    /// started on its own.
+    let parentSessionID: String?
     /// A session on an SSH host adds the host, so the same session id on two hosts stays two sessions.
     private(set) var id: String
     /// Worked out once: on this Mac it resolves symlinks on disk, and the sidebar asks for it for every session.
@@ -21,7 +24,8 @@ struct Conversation: Identifiable, Sendable, Equatable {
         suggestedTitle: String,
         updatedAt: Date,
         sourceFile: URL,
-        host: SessionHost = .thisMac
+        host: SessionHost = .thisMac,
+        parentSessionID: String? = nil
     ) {
         self.provider = provider
         self.sessionID = sessionID
@@ -30,6 +34,7 @@ struct Conversation: Identifiable, Sendable, Equatable {
         self.updatedAt = updatedAt
         self.sourceFile = sourceFile
         self.host = host
+        self.parentSessionID = parentSessionID
         self.id = Self.id(provider: provider, sessionID: sessionID, host: host)
         self.projectDirectoryKey = ProjectLocation(host: host, path: projectPath).key
     }
@@ -47,8 +52,15 @@ struct Conversation: Identifiable, Sendable, Equatable {
             suggestedTitle: suggestedTitle,
             updatedAt: updatedAt,
             sourceFile: sourceFile,
-            host: host
+            host: host,
+            parentSessionID: parentSessionID
         )
+    }
+    /// A subagent's session, listed under the session that started it and only read, never resumed or deleted on its own.
+    var isSubagent: Bool { parentSessionID != nil }
+    /// The `id` of the session that started this one.
+    var parentID: String? {
+        parentSessionID.map { Self.id(provider: provider, sessionID: $0, host: host) }
     }
     var projectLocation: ProjectLocation {
         ProjectLocation(host: host, path: projectPath)
