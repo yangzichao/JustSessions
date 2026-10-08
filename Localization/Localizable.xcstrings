@@ -2527,12 +2527,12 @@
         }
       }
     },
-    "Needs my input, such as a permission prompt": {
+    "Needs my input, such as a permission prompt (Claude Code only)": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "需要我的输入，例如权限确认"
+            "value": "需要我的输入，例如权限确认（仅 Claude Code）"
           }
         }
       }
@@ -4689,12 +4689,12 @@
         }
       }
     },
-    "Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open; Codex tells only when its turn finishes. A session whose tab you are looking at sends none. Click a notification to open the session.": {
+    "Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话；Codex 只在一轮结束时通知。正在查看的会话不会发送通知。点击通知即可打开会话。"
+            "value": "支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。"
           }
         }
       }

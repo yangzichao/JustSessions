@@ -478,8 +478,8 @@
 	<string>Move tab into split view</string>
 	<key>Name</key>
 	<string>Name</string>
-	<key>Needs my input, such as a permission prompt</key>
-	<string>Needs my input, such as a permission prompt</string>
+	<key>Needs my input, such as a permission prompt (Claude Code only)</key>
+	<string>Needs my input, such as a permission prompt (Claude Code only)</string>
 	<key>New</key>
 	<string>New</string>
 	<key>New Session…</key>
@@ -892,8 +892,8 @@
 	<string>Website ↗</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</string>
-	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open; Codex tells only when its turn finishes. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
-	<string>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open; Codex tells only when its turn finishes. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
+	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
+	<string>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
 	<key>You</key>
 	<string>You</string>
 	<key>Your login shell, with no CLI</key>
