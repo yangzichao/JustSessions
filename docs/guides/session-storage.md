@@ -47,6 +47,8 @@ Each refresh also checks which CLIs are installed: on this Mac with the same loo
 
 Claude Code, Codex, and Antigravity CLI reveal which session a new tab's CLI is writing. Kiro CLI, OpenCode, and Pi don't, so a new tab for one of them takes the first session that appears in its project after the tab started. While such a tab waits, this Mac refreshes about every 6 seconds.
 
+On an SSH host the app can't see which session a CLI writes. A new Claude Code tab there starts its CLI with a session ID of its own, and takes only that session, once a refresh finds `--session-id` in the host's `claude --help` (or in your start command's). Other new tabs and Branch tabs on an SSH host take the first session that appears in their project after they started. While one waits, the app refreshes its host about every 10 seconds.
+
 ## Terminal persistence
 
 The packaged app contains tmux and its terminal database in `Contents/Resources/Tmux`, with its third-party libraries statically linked. It needs no Homebrew, separate installer, system-directory changes, or runtime download. Direct `swift run` builds use an installed tmux 3.3 or later; without a supported tmux, the CLI runs directly.

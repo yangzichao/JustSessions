@@ -111,6 +111,8 @@ final class ConversationStore: ObservableObject {
     let commandResolver: NativeCLICommandResolver
     /// Deletes sessions on SSH hosts.
     private let remoteDeletion: RemoteConversationDeletion
+    /// Which SSH hosts' `claude` takes a new session's id; see `ConversationStore+RemoteClaudeSessionIDs`.
+    let remoteClaudeSessionIDFlagSupport: RemoteClaudeSessionIDFlagSupport
     /// Where custom titles, project names, pins, sidebar projects, SSH hosts, and start commands are kept.
     let userDefaults: UserDefaults
 
@@ -122,11 +124,13 @@ final class ConversationStore: ObservableObject {
         userDefaults: UserDefaults = .standard,
         sessionNotifier: any SessionNotifying = SessionNotificationCenter.shared,
         remoteDeletion: RemoteConversationDeletion = RemoteConversationDeletion(),
+        remoteClaudeSessionIDFlagSupport: RemoteClaudeSessionIDFlagSupport = .shared,
         startsBackgroundPolling: Bool = true
     ) {
         self.adapters = adapters
         self.commandResolver = commandResolver
         self.remoteDeletion = remoteDeletion
+        self.remoteClaudeSessionIDFlagSupport = remoteClaudeSessionIDFlagSupport
         self.userDefaults = userDefaults
         self.sessionNotifier = sessionNotifier
         self.titleAliases = ConversationTitleAliases.load(from: userDefaults)

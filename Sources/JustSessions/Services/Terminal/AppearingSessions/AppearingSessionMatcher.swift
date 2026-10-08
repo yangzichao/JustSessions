@@ -1,7 +1,8 @@
 import Foundation
 
 /// Links waiting "New session" and "Branch" tabs whose CLI leaves no trace of the session it writes: tabs on SSH
-/// hosts, whose `ssh` process says nothing, and tabs of tools that link by appearance on this Mac (see
+/// hosts, whose `ssh` process says nothing, unless they started with their session's id (see
+/// `RemoteClaudeSessionIDFlagSupport`), and tabs of tools that link by appearance on this Mac (see
 /// `ConversationProvider.linksNewSessionsByAppearance`). Such a tab takes the first session that appears in its
 /// project, for its tool, after it started.
 enum AppearingSessionMatcher {

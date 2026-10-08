@@ -2,8 +2,10 @@ import Foundation
 
 extension TerminalSession {
     /// Whether the tab waits for a session that it can only recognize by its appearance; see `AppearingSessionMatcher`.
+    /// A tab started with its session's id waits for that one instead.
     var isWaitingForAppearingSession: Bool {
-        isNewSessionAwaitingConversation && (host != .thisMac || provider?.linksNewSessionsByAppearance == true)
+        isNewSessionAwaitingConversation && preassignedSessionID == nil
+            && (host != .thisMac || provider?.linksNewSessionsByAppearance == true)
     }
 
     /// Nil for a plain terminal.
