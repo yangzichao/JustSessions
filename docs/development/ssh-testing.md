@@ -73,13 +73,13 @@ Create a disposable project, including a space in its path to exercise quoting:
 ssh justsessions-test 'mkdir -p "$HOME/justsessions-test/project with spaces"'
 ```
 
-The app looks up CLIs in the host's login shell. For example, when testing Claude Code, verify it is available there:
+The app runs CLIs and looks them up through the host's interactive login shell, `exec "$SHELL" -lic`, so the PATH set in `~/.bashrc`, such as nvm's, is in effect. A non-interactive `bash -lc` skips Ubuntu's `~/.bashrc` and can miss a CLI the app finds. For example, when testing Claude Code, check it the same way the app does:
 
 ```sh
-ssh -o BatchMode=yes justsessions-test 'bash -lc "command -v claude && claude --version"'
+ssh -o BatchMode=yes justsessions-test 'exec "$SHELL" -lic "command -v claude && claude --version"'
 ```
 
-Substitute the executable for the provider being tested. Keep its session storage at the locations documented in [session storage](../guides/session-storage.md#ssh-session-cache). `rsync` is required for history mirroring; Antigravity and OpenCode also require `python3`, and Antigravity deletion requires `lsof`. Remote persistence uses the VM's `tmux`, not the app's bundled Mac binary.
+Without a terminal, bash first prints `cannot set terminal process group` and `no job control in this shell`; those two lines are expected. Substitute the executable for the provider being tested. Keep its session storage at the locations documented in [session storage](../guides/session-storage.md#ssh-session-cache). `rsync` is required for history mirroring; Antigravity and OpenCode also require `python3`, and Antigravity deletion requires `lsof`. Remote persistence uses the VM's `tmux`, not the app's bundled Mac binary.
 
 In JustSessions, choose **Add SSH host…**, enter `justsessions-test`, then add `/home/ubuntu/justsessions-test/project with spaces` under that host. Start a small disposable conversation so the host has real session history to discover and preview.
 
@@ -97,6 +97,19 @@ Run the checks relevant to the change and record the result of each:
 | Unavailable host | After finishing the persistence check, stop the VM and refresh. Verify the failure is reported, then start the VM, check its IP, and verify recovery. |
 
 A VM shutdown ends its processes; restarting it is an unavailable-host test, not proof that tmux survives an SSH disconnect. For an actual connection-interruption check, end only the test tab's SSH client process and reconnect; confirm the remote tmux pane PID and running CLI are unchanged. Avoid commands that kill all SSH clients or all tmux sessions.
+
+Record the pane PIDs of the app's tmux sessions on the VM before and after the interruption:
+
+```sh
+ssh justsessions-test 'tmux list-panes -a -F "#{session_name} #{pane_pid} #{pane_current_command}" | grep "^justsessions-"'
+```
+
+Tabs connect with `/usr/bin/ssh -t`; refreshes and history mirroring connect without `-t`, so this lists only the host's tabs. Pick the test tab's PID and end that one process:
+
+```sh
+pgrep -fl '^/usr/bin/ssh -t .*justsessions-test'
+kill PID
+```
 
 ## macOS target coverage
 
