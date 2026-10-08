@@ -34,13 +34,15 @@ The tree is large because the transcript lays out every loaded entry, up to `Tra
 
 | # | Item | Status |
 | --- | --- | --- |
-| 1 | [Timestamp parsing](#1-timestamp-parsing) | In progress: quick-wins PR |
-| 2 | [Transcript text searches only during Find](#2-transcript-text-searches-only-during-find) | In progress: quick-wins PR |
-| 3 | [Fast `AttributedString` to `String` conversion](#3-fast-attributedstring-to-string-conversion) | In progress: quick-wins PR |
+| 1 | [Timestamp parsing](#1-timestamp-parsing) | Done: #46 |
+| 2 | [Transcript text searches only during Find](#2-transcript-text-searches-only-during-find) | Done: #46 |
+| 3 | [Fast `AttributedString` to `String` conversion](#3-fast-attributedstring-to-string-conversion) | Done: #46 |
 | 4 | [One position marker view per transcript entry](#4-one-position-marker-view-per-transcript-entry) | Planned |
 | 5 | [Text selection on very long blocks](#5-text-selection-on-very-long-blocks) | Planned |
 | 6 | [Terminal drawing: SwiftTerm upgrade, then Metal](#6-terminal-drawing-swiftterm-upgrade-then-metal) | Planned |
-| 7 | [The search context changes on every transcript update](#7-the-search-context-changes-on-every-transcript-update) | To investigate |
+| 7 | [The search context changes on every transcript update](#7-the-search-context-changes-on-every-transcript-update) | Done: scrolling PR |
+| 8 | [Scrolling re-rendered every transcript entry](#8-scrolling-re-rendered-every-transcript-entry) | Done: scrolling PR |
+| 9 | [SwiftUI's scroll position tracking](#9-swiftuis-scroll-position-tracking) | To investigate |
 
 ### 1. Timestamp parsing
 
@@ -79,18 +81,27 @@ The Markdown parse itself stays. The search index stores the text as the reader 
 
 ### 4. One position marker view per transcript entry
 
-**Evidence:** each transcript entry has a `TranscriptEntryPositionMarker` background, an `NSViewRepresentable` that records the reading position. Each one adds an AppKit view and a platform responder, and the profile shows every one of them visited:
-- by the accessibility focus walk;
-- by hit testing on every mouse move;
-- by AppKit's tracking-area updates.
+**Evidence:** each transcript entry has a `TranscriptEntryPositionMarker` background, an `NSViewRepresentable` that records the reading position. Each one adds two AppKit views, the marker and SwiftUI's host for it, and the profile shows them visited by:
+- the accessibility focus walk;
+- hit testing on every mouse move;
+- AppKit's tracking-area updates.
 
-**Plan:** track the reading position from the scroll view's geometry instead, so loaded entries add no AppKit views. Measure before and after with the same transcript and a running accessibility client.
+In `TranscriptInteractionMeasurements`, after item 8, removing the markers takes the median scroll step from 9.7 to 4.8 ms with 240 entries, and from 34 to 17 ms with 640. It takes 200 hit tests from 494 to 417 ms. Those runs also skip the reader's own scroll handling, such as recording the reading position, so not all of the difference is the views.
+
+**Plan:** track the reading position from the scroll view's geometry instead, so loaded entries add no AppKit views. The position controller uses each marker for more than recording the position:
+- restoring a position within an entry;
+- finding where a page's first entry starts;
+- revealing search matches.
+
+It also restores the position from the marker's `layout()`, in the same layout pass as a page loading above, so the reader never sees the content jump. A replacement must keep that timing. The reading-position and paging tests cover these cases.
 
 ### 5. Text selection on very long blocks
 
 **Evidence:** cmux found that `Text(...).textSelection(.enabled)` on macOS lays out the whole text, and drag-selecting a long block can freeze the app ([cmux #4625](https://github.com/manaflow-ai/cmux/issues/4625)). The transcript enables selection on every Markdown block.
 
-**Plan:** keep live selection under a size limit, and offer **Copy Text** for longer blocks. This is lower priority: the profile caught no selection freezes.
+Every selectable block is a `SelectionTextField` in a host view. Of the window's 2,082 AppKit views with 240 entries, 840 are these, against 480 for the position markers. In `TranscriptInteractionMeasurements`, after item 8, turning selection off takes the median scroll step from 9.7 to 6.0 ms with 240 entries, and from 34 to 25 ms with 640. It also takes opening Find from 27 to 21 ms.
+
+**Plan:** keep live selection under a size limit, and offer **Copy Text** for longer blocks. Measure first whether one selectable view per entry, instead of one per block, keeps selection usable with fewer views.
 
 ### 6. Terminal drawing: SwiftTerm upgrade, then Metal
 
@@ -105,9 +116,27 @@ The draft line-layout cache ([SwiftTerm #449](https://github.com/migueldeicaza/S
 
 ### 7. The search context changes on every transcript update
 
-**Evidence:** `TranscriptScrollView` sets `transcriptSearchContext` with a new `reveal` closure on every body evaluation. SwiftUI can't compare closures, so each transcript update, such as the visible entry changing while you scroll, likely re-runs every text block and tool-call list. Item 2 makes those runs cheap; this item would stop them.
+**Evidence:** `TranscriptScrollView` set `transcriptSearchContext` with a new `reveal` closure on every body evaluation. SwiftUI can't compare closures, so each transcript update re-ran every text block and tool-call list, and remeasured them. With the closure removed, the median scroll step halved: from 71 to 37 ms with 240 entries.
 
-**Plan:** confirm with the SwiftUI instrument. If confirmed, make the context compare equal while only the closure differs: for example, hold the position controller and compare it by identity.
+**Change:** the context holds the position controller instead of a closure, and is `Equatable`. It compares the query, the selected match, the navigation revision, and the controller by identity, which is everything text blocks read. See item 8 for the measurements together.
+
+### 8. Scrolling re-rendered every transcript entry
+
+**Evidence:** scrolling changes `visibleEntryIndex`, the `@State` behind the transcript's `.scrollPosition(id:)`, each time a new entry reaches the top. Each change re-ran `TranscriptScrollView.body`, which rebuilt every entry, and SwiftUI then remeasured the whole non-lazy stack. In `TranscriptInteractionMeasurements`, one scroll step took a median of 71 ms with 240 entries, and 187 ms with 640. The window can't draw during those steps, so scrolling a long transcript ran at about 14 frames a second or fewer.
+
+**Change:** the entries are their own view, `TranscriptEntriesStack`, compared by its inputs: the transcript, the provider, and the position controller. These stay the same while you scroll, so SwiftUI skips the entries. Together with item 7:
+
+| Measure | 240 entries, before → after | 640 entries, before → after |
+| --- | --- | --- |
+| Median scroll step | 71 → 9.7 ms | 187 → 34 ms |
+| Worst scroll step, accessibility on | 172 → 15 ms | 459 → 62 ms |
+| Opening Find | 82 → 27 ms | 222 → 70 ms |
+
+### 9. SwiftUI's scroll position tracking
+
+**Evidence:** after item 8, much of each scroll step is SwiftUI's own tracking for `.scrollPosition(id:)` and `.scrollTargetLayout()`. On every scroll it searches the entries for the one closest to the anchor (`ScrollStateRequestTransform.findClosestSubview`), then marks the state that changed as dirty. Both grow with the number of entries.
+
+**Plan:** check whether the reader still needs `.scrollPosition(id:)`. It already calls `ScrollViewProxy.scrollTo` wherever it sets `visibleEntryIndex`. The initial position, Find's navigation, and paging all depend on it, so test each before removing it.
 
 ## How to profile
 
@@ -125,4 +154,7 @@ Or open the trace in Instruments. Keep these points in mind:
 - **Leave the SwiftUI instrument out of CPU profiles.** Its tracing shows up in the samples. Record it separately and briefly to find which state changes cause updates.
 - **Profile a build made like the release.** The release is built on GitHub's `macos-latest` runner, with the macOS 26.5 SDK for v1.0.8. A build with a newer local SDK can compile some calls differently, as item 3 shows. Check a binary's SDK with `otool -l <binary> | grep -A4 LC_BUILD_VERSION`, and build with the Command Line Tools' SDK by setting `DEVELOPER_DIR=/Library/Developer/CommandLineTools`.
 - **Test with an accessibility client running.** Many users run Raycast or a window manager, and SwiftUI's accessibility work only happens while one is connected.
-- **Measurement suites:** `SidebarInteractionMeasurements` and `TerminalVisibilityMeasurements` in `Tests/JustSessionsTests/Performance/` measure sidebar interactions and hidden terminals. They record only with `JUSTSESSIONS_PERF=1`; see their doc comments.
+- **Measurement suites:** the suites in `Tests/JustSessionsTests/Performance/` record only with `JUSTSESSIONS_PERF=1`; see their doc comments.
+  - `SidebarInteractionMeasurements`: sidebar interactions.
+  - `TerminalVisibilityMeasurements`: hidden terminals.
+  - `TranscriptInteractionMeasurements`: scrolling, hit testing, and opening Find in a 240- and 640-entry transcript, with SwiftUI's accessibility off and on. Run it with `JUSTSESSIONS_PERF=1 swift test -c release --filter TranscriptInteractionMeasurements`.
