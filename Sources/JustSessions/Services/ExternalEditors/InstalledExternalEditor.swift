@@ -6,13 +6,16 @@ struct InstalledExternalEditor: Identifiable, Equatable {
 
     let name: String
     let applicationURL: URL
+    /// Nil when the editor can't open a project on an SSH host from this Mac.
+    let remoteProjectOpening: RemoteProjectOpening?
     let icon: NSImage
 
     var id: URL { applicationURL }
 
-    init(name: String, applicationURL: URL) {
+    init(name: String, applicationURL: URL, remoteProjectOpening: RemoteProjectOpening? = nil) {
         self.name = name
         self.applicationURL = applicationURL
+        self.remoteProjectOpening = remoteProjectOpening
         icon = NSWorkspace.shared.icon(forFile: applicationURL.path)
         icon.size = Self.menuIconSize
     }
@@ -20,5 +23,6 @@ struct InstalledExternalEditor: Identifiable, Equatable {
     /// The icon is derived from the app, so two entries for the same app are equal.
     static func == (lhs: InstalledExternalEditor, rhs: InstalledExternalEditor) -> Bool {
         lhs.name == rhs.name && lhs.applicationURL == rhs.applicationURL
+            && lhs.remoteProjectOpening == rhs.remoteProjectOpening
     }
 }

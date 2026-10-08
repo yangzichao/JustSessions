@@ -45,6 +45,44 @@ struct ExternalEditorStoreTests {
         #expect(editorStore.installedEditors.map(\.name) == ["Cursor"])
     }
 
+    @Test func listsOnlyEditorsThatOpenProjectsOverSSHForAProjectOnAHost() {
+        let editorStore = ExternalEditorStore(
+            applicationURLForBundleIdentifier: { Self.installedForRemoteTests[$0] },
+            applicationURLForURLScheme: { $0 == "jetbrains" ? URL(fileURLWithPath: "/Applications/JetBrains Toolbox.app") : nil }
+        )
+        let remoteProject = ProjectLocation(host: .ssh("jryates@max"), path: "/home/jryates/app")
+        let localProject = ProjectLocation(host: .thisMac, path: "/Users/me/app")
+
+        #expect(editorStore.editors(for: remoteProject).map(\.name) == ["Antigravity IDE", "GoLand", "Zed"])
+        #expect(editorStore.editors(for: localProject).map(\.name) == [
+            "Antigravity", "Antigravity IDE", "GoLand", "IntelliJ IDEA CE", "Sublime Text", "Xcode", "Zed",
+        ])
+        // Zed's link can't name this host; Antigravity IDE's can.
+        let oddHostProject = ProjectLocation(host: .ssh("my,host"), path: "/srv")
+        #expect(editorStore.editors(for: oddHostProject).map(\.name) == ["Antigravity IDE", "GoLand"])
+    }
+
+    @Test func jetBrainsIDEsOpenNoSSHProjectWithoutJetBrainsToolbox() {
+        let editorStore = ExternalEditorStore(
+            applicationURLForBundleIdentifier: { Self.installedForRemoteTests[$0] },
+            applicationURLForURLScheme: { _ in nil }
+        )
+        let remoteProject = ProjectLocation(host: .ssh("max"), path: "/srv")
+
+        #expect(editorStore.editors(for: remoteProject).map(\.name) == ["Antigravity IDE", "Zed"])
+        #expect(editorStore.installedEditors.first { $0.name == "GoLand" }?.remoteProjectOpening == nil)
+    }
+
+    private static let installedForRemoteTests = [
+        "com.google.antigravity": URL(fileURLWithPath: "/Applications/Antigravity.app"),
+        "com.google.antigravity-ide": URL(fileURLWithPath: "/Applications/Antigravity IDE.app"),
+        "com.jetbrains.goland": URL(fileURLWithPath: "/Users/me/Applications/GoLand.app"),
+        "com.jetbrains.intellij.ce": URL(fileURLWithPath: "/Applications/IntelliJ IDEA CE.app"),
+        "com.sublimetext.4": URL(fileURLWithPath: "/Applications/Sublime Text.app"),
+        "com.apple.dt.Xcode": URL(fileURLWithPath: "/Applications/Xcode.app"),
+        "dev.zed.Zed": URL(fileURLWithPath: "/Applications/Zed.app"),
+    ]
+
     @Test func catalogNamesAndBundleIdentifiersAreUnique() {
         let names = ExternalEditor.knownEditors.map(\.name)
         let bundleIdentifiers = ExternalEditor.knownEditors.flatMap(\.bundleIdentifiers)
