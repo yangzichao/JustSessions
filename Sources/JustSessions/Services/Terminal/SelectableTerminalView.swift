@@ -10,9 +10,17 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     var sendsShiftReturnAsCSIu = false
     /// Called after the terminal's colors are set, so the margin around it can match its background.
     var onBackgroundColorChange: (() -> Void)?
-    /// Called when a click lands on the terminal or its margin, before the terminal takes the keyboard, so a split
-    /// pane whose tab is not selected can select it.
-    var onMouseDown: (() -> Void)?
+    /// Called when a click lands on the terminal or its margin, or files are dropped on it, before the terminal takes
+    /// the keyboard, so a split pane whose tab is not selected can select it.
+    var onFocus: (() -> Void)?
+    /// Files dropped on the terminal type their paths into it; see `SelectableTerminalView+FileDrop`. Only a tab whose
+    /// CLI runs on this Mac turns it on, since a CLI on an SSH host can't open this Mac's files.
+    var acceptsDroppedFiles = false {
+        didSet {
+            guard acceptsDroppedFiles != oldValue else { return }
+            if acceptsDroppedFiles { registerForDraggedTypes([.fileURL]) } else { unregisterDraggedTypes() }
+        }
+    }
 
     private var appearancePreferences = TerminalAppearancePreferences()
     private var theme = AppTheme.justSessions
@@ -79,7 +87,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     }
 
     override func mouseDown(with event: NSEvent) {
-        onMouseDown?()
+        onFocus?()
         window?.makeFirstResponder(self)
         super.mouseDown(with: event)
     }

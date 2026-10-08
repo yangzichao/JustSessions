@@ -107,6 +107,7 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.terminalView = SelectableTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.processObserver = TerminalProcessObserver()
         terminalView.sendsShiftReturnAsCSIu = host == .thisMac && tmuxSessionName != nil
+        terminalView.acceptsDroppedFiles = host == .thisMac
         terminalView.processDelegate = processObserver
         processObserver.session = self
     }
