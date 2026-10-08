@@ -15,7 +15,9 @@ JustSessions reads the session files your CLIs already create. It does not uploa
 | OpenCode | `~/.local/share/opencode/opencode.db`, read-only (honors `OPENCODE_DB` and `XDG_DATA_HOME`) | Yes | Yes | Yes |
 | Pi | `~/.pi/agent/sessions` (honors `PI_CODING_AGENT_SESSION_DIR`, `sessionDir` in Pi's `settings.json`, and `PI_CODING_AGENT_DIR`) | Yes | Yes | Yes |
 
-Kiro CLI sessions are listed once they have a message; sessions a subagent started are left out. OpenCode subagent sessions and archived sessions are left out too.
+Sessions that subagents ran are listed under the session that started them, hidden until you expand it: Claude Code's transcripts in `<session-id>/subagents` beside the session file, Codex threads another thread spawned, OpenCode sessions with a parent, Antigravity conversations whose summary names a parent conversation, and Pi sessions that extensions keep in the folder beside a session file, such as subagent runs and forks. They can be read but not resumed, renamed, pinned, or deleted on their own. Over SSH, only Codex and Antigravity list them; the mirror leaves the other CLIs' subagent files on the host.
+
+Kiro CLI sessions are listed once they have a message. Sessions Kiro marks as started by a subagent are left out, since Kiro doesn't record which session started them. Archived OpenCode sessions are left out.
 
 Kiro previews show prompts, replies, and collapsed tool calls from the session's `.jsonl` log. Thinking blocks, system context, and raw tool outputs are left out, as in the other supported previews.
 

@@ -17,7 +17,17 @@ enum SessionDeletionConfirmationText {
         )
     }
 
-    static func message(forDeleting conversation: Conversation, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
+    /// With `plan`, also says how many of the session's subagent sessions go with it, or stay.
+    static func message(
+        forDeleting conversation: Conversation,
+        plan: SessionDeletionPlan? = nil,
+        language: AppInterfaceLanguage = AppLocalization.developmentLanguage
+    ) -> String {
+        joined([oneSessionSentence(forDeleting: conversation, language: language)]
+            + (plan.map { subagentSentences(for: $0, language: language) } ?? []))
+    }
+
+    private static func oneSessionSentence(forDeleting conversation: Conversation, language: AppInterfaceLanguage) -> String {
         if let sshDestination = conversation.host.sshDestination {
             // The folder beside a Pi session holds subagent runs and forks that are never mirrored or listed.
             if conversation.provider == .pi {
@@ -40,6 +50,7 @@ enum SessionDeletionConfirmationText {
     static func message(forDeletingSelectionWith plan: SessionDeletionPlan, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
         joined([
             AppLocalization.string("Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.", language: language),
+        ] + subagentSentences(for: plan, language: language) + [
             skippedSessionsSentence(for: plan, language: language),
         ])
     }
@@ -58,6 +69,7 @@ enum SessionDeletionConfirmationText {
             location.host == .thisMac
                 ? AppLocalization.string("Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.", language: language)
                 : AppLocalization.string("SSH hosts have no Trash, so every session is permanently deleted.", language: language),
+        ] + subagentSentences(for: plan, language: language) + [
             skippedSessionsSentence(for: plan, language: language),
         ])
     }

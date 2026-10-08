@@ -31,6 +31,7 @@ For people who prefer the command line. JustSessions adds a native Mac workspace
 
 - Group sessions from different agents under the same project.
 - Search projects and sessions, down to the text of their messages; pin and rename favorites.
+- Expand a session to read the sessions its subagents ran.
 - Start or resume a session in its original CLI and project folder.
 
 ![The real Claude Code CLI running in JustSessions, with the Projects sidebar grouping two Claude Code sessions, Codex, OpenCode, and Pi under one project](docs/images/native-terminal.jpg)

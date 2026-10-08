@@ -6,6 +6,8 @@ import SwiftUI
 struct SidebarSessionRowLayout<Title: View, Detail: View, Trailing: View>: View {
     let provider: ConversationProvider
     let isSelected: Bool
+    /// 0 for a session, 1 for a subagent's session under it, and so on.
+    let indentLevel: Int
     let title: Title
     let detail: Detail?
     let trailing: Trailing
@@ -13,12 +15,14 @@ struct SidebarSessionRowLayout<Title: View, Detail: View, Trailing: View>: View 
     init(
         provider: ConversationProvider,
         isSelected: Bool,
+        indentLevel: Int = 0,
         @ViewBuilder title: () -> Title,
         detail: Detail?,
         @ViewBuilder trailing: () -> Trailing
     ) {
         self.provider = provider
         self.isSelected = isSelected
+        self.indentLevel = indentLevel
         self.title = title()
         self.detail = detail
         self.trailing = trailing()
@@ -47,7 +51,7 @@ struct SidebarSessionRowLayout<Title: View, Detail: View, Trailing: View>: View 
                     .padding(.bottom, 6)
             }
         }
-        .padding(.leading, 28)
+        .padding(.leading, SidebarSessionRowMetrics.leadingPadding(indentLevel: indentLevel))
         .padding(.trailing, SidebarSessionRowMetrics.trailingPadding)
         .contentShape(Rectangle())
     }
@@ -57,15 +61,24 @@ extension SidebarSessionRowLayout where Detail == EmptyView {
     init(
         provider: ConversationProvider,
         isSelected: Bool,
+        indentLevel: Int = 0,
         @ViewBuilder title: () -> Title,
         @ViewBuilder trailing: () -> Trailing
     ) {
-        self.init(provider: provider, isSelected: isSelected, title: title, detail: nil, trailing: trailing)
+        self.init(provider: provider, isSelected: isSelected, indentLevel: indentLevel, title: title, detail: nil, trailing: trailing)
     }
 }
 
 enum SidebarSessionRowMetrics {
     /// The room after a row's trailing status, which a session row's ⋯ lines up with.
     static let trailingPadding: CGFloat = 10
+    /// How far each level of subagents sits in from the row above it.
+    static let indentStep: CGFloat = 14
+
+    /// Where the tool's icon starts.
+    static func leadingPadding(indentLevel: Int) -> CGFloat {
+        28 + CGFloat(indentLevel) * indentStep
+    }
+
     static let iconWidth: CGFloat = 14
 }

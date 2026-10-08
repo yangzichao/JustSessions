@@ -3,6 +3,8 @@ import Foundation
 struct TranscriptRecordDecoder {
     let provider: ConversationProvider
     let maximumTextLength: Int
+    /// Reads a subagent's transcript; see `ClaudeTranscriptReader.includesSidechains`.
+    var isSubagentTranscript = false
     private let jsonDecoder = JSONDecoder()
 
     func entries(from data: Data?) -> [TranscriptEntry] {
@@ -18,7 +20,7 @@ struct TranscriptRecordDecoder {
             if provider == .codex, !CodexTranscriptReader.mightContainTranscriptItem(data) { return [] }
             guard let record = ConversationMetadata.object(from: data) else { return [] }
             switch provider {
-            case .claude: ClaudeTranscriptReader().append(record, to: &builder)
+            case .claude: ClaudeTranscriptReader(includesSidechains: isSubagentTranscript).append(record, to: &builder)
             case .codex: CodexTranscriptReader().append(record, to: &builder)
             case .kiro: KiroTranscriptReader().append(record, to: &builder)
             default: break

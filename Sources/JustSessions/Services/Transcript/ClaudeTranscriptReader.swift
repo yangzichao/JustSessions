@@ -4,6 +4,9 @@ import Foundation
 struct ClaudeTranscriptReader {
     var maximumEntryCount = 2_000
     var maximumTextLength = 12_000
+    /// A subagent's own transcript, in its session's `subagents` folder, is all sidechain records. A session's
+    /// transcript leaves out any it holds.
+    var includesSidechains = false
 
     func read(_ file: URL) throws -> TranscriptContent {
         var builder = TranscriptBuilder(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength)
@@ -17,7 +20,7 @@ struct ClaudeTranscriptReader {
     func append(_ record: [String: Any], to builder: inout TranscriptBuilder) {
         let recordType = record["type"] as? String
         guard recordType == "user" || recordType == "assistant",
-              record["isSidechain"] as? Bool != true,
+              includesSidechains || record["isSidechain"] as? Bool != true,
               record["isMeta"] as? Bool != true,
               let message = record["message"] as? [String: Any] else { return }
         let timestamp = ConversationMetadata.date(record["timestamp"])

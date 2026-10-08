@@ -12,6 +12,13 @@ final class ConversationStore: ObservableObject {
         }
     }
     private(set) var conversationIndex = ConversationIndex([])
+    /// Sessions subagents ran in, newest first. They stay out of `conversations`, so only the rows of the sessions that
+    /// started them list them, and nothing that follows listed sessions, such as linking a new tab, mistakes one for
+    /// a session of its own.
+    @Published private(set) var subagentConversations: [Conversation] = [] {
+        didSet { subagentIndex = SubagentConversationIndex(subagentConversations) }
+    }
+    private(set) var subagentIndex = SubagentConversationIndex([])
     /// Changes with every change to `conversations`, so what is worked out from them knows when to work it out again.
     private(set) var conversationsRevision = 0
     /// What the sidebar lists, kept until what it was worked out from changes; see `ConversationStore+SidebarProjects`.
@@ -187,9 +194,13 @@ final class ConversationStore: ObservableObject {
 
     /// Swaps in what one host lists now, keeping every other host's sessions.
     func replaceConversations(on host: SessionHost, with hostConversations: [Conversation], discardMissingReopeningTabs: Bool = true) {
-        rememberSidebarProjects(Set(hostConversations.map(\.projectDirectoryKey)))
-        let updatedConversations = (conversations.filter { $0.host != host } + hostConversations)
+        let topLevelConversations = hostConversations.filter { !$0.isSubagent }
+        rememberSidebarProjects(Set(topLevelConversations.map(\.projectDirectoryKey)))
+        let updatedConversations = (conversations.filter { $0.host != host } + topLevelConversations)
             .sorted { $0.updatedAt > $1.updatedAt }
+        let updatedSubagents = (subagentConversations.filter { $0.host != host } + hostConversations.filter(\.isSubagent))
+            .sorted { $0.updatedAt > $1.updatedAt }
+        if subagentConversations != updatedSubagents { subagentConversations = updatedSubagents }
         if conversations != updatedConversations { conversations = updatedConversations }
         synchronizeTerminalTitles()
         reopenWaitingTabs(on: host, discardMissingSessions: discardMissingReopeningTabs)
@@ -273,12 +284,17 @@ final class ConversationStore: ObservableObject {
         deletionPlan(for: conversations.filter { projectPaths.contains($0.projectDirectoryKey) })
     }
 
-    /// Sessions already being deleted, or waiting to be, are left out: they are not deleted twice.
+    /// Sessions already being deleted, or waiting to be, are left out: they are not deleted twice. So are subagents'
+    /// sessions, which go only with the session that started them.
     func deletionPlan(for candidateConversations: [Conversation]) -> SessionDeletionPlan {
-        let notYetPending = candidateConversations.filter { !isDeletionPending(for: $0) }
+        let notYetPending = candidateConversations.filter { !$0.isSubagent && !isDeletionPending(for: $0) }
+        let deletable = notYetPending.filter { !hasTerminal(for: $0) }
+        let deletesSubagents = Dictionary(grouping: deletable, by: \.provider.deletesSubagentsWithSession)
         return SessionDeletionPlan(
-            deletableConversations: notYetPending.filter { !hasTerminal(for: $0) },
-            openTerminalCount: notYetPending.filter { hasTerminal(for: $0) }.count
+            deletableConversations: deletable,
+            openTerminalCount: notYetPending.filter { hasTerminal(for: $0) }.count,
+            deletedSubagentCount: (deletesSubagents[true] ?? []).reduce(0) { $0 + descendantSubagentCount(of: $1) },
+            keptSubagentCount: (deletesSubagents[false] ?? []).reduce(0) { $0 + descendantSubagentCount(of: $1) }
         )
     }
 

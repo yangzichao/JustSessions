@@ -16,6 +16,7 @@ struct ClaudeAdapter: ConversationAdapter {
     /// Shared by every Claude Code adapter, this Mac's and each SSH host's mirror, which keep their files apart.
     private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-heads"))
     private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-tails"))
+    private static let subagentSessions = SessionFileSummaryCache<ClaudeSubagentSession>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-subagents"))
 
     func discover() throws -> [Conversation] {
         let projectsDirectory = configurationDirectory.appendingPathComponent("projects")
@@ -26,6 +27,7 @@ struct ClaudeAdapter: ConversationAdapter {
         ) else { return [] }
 
         var transcriptFiles: [URL] = []
+        var subagentFiles: [URL] = []
         let conversations = projectDirectories.flatMap { projectDirectory -> [Conversation] in
             let index = ClaudeSessionsIndex(projectDirectory: projectDirectory)
             let files = (try? FileManager.default.contentsOfDirectory(
@@ -34,10 +36,15 @@ struct ClaudeAdapter: ConversationAdapter {
                 options: [.skipsHiddenFiles]
             )) ?? []
             transcriptFiles += files
-            return files.compactMap { conversation(in: $0, index: index) }
+            return files.compactMap { conversation(in: $0, index: index) }.flatMap { conversation -> [Conversation] in
+                let sessionSubagentFiles = ClaudeSubagentSessions.files(ofSessionID: conversation.sessionID, inProjectDirectory: projectDirectory)
+                subagentFiles += sessionSubagentFiles
+                return [conversation] + sessionSubagentFiles.compactMap { subagentConversation(in: $0, startedBy: conversation) }
+            }
         }
         Self.transcriptHeads.forgetFiles(in: projectsDirectory, except: transcriptFiles)
         Self.transcriptTails.forgetFiles(in: projectsDirectory, except: transcriptFiles)
+        Self.subagentSessions.forgetFiles(in: projectsDirectory, except: subagentFiles)
         return conversations
     }
 
@@ -82,6 +89,20 @@ struct ClaudeAdapter: ConversationAdapter {
             suggestedTitle: title,
             updatedAt: updatedAt,
             sourceFile: file
+        )
+    }
+
+    private func subagentConversation(in file: URL, startedBy parent: Conversation) -> Conversation? {
+        guard let agentID = ClaudeSubagentSessions.agentID(of: file),
+              let session = Self.subagentSessions.summary(of: file, read: ClaudeSubagentSession.init(file:)) else { return nil }
+        return Conversation(
+            provider: provider,
+            sessionID: agentID,
+            projectPath: session.workingDirectory ?? parent.projectPath,
+            suggestedTitle: session.title,
+            updatedAt: ConversationMetadata.fileModificationDate(file),
+            sourceFile: file,
+            parentSessionID: parent.sessionID
         )
     }
 }

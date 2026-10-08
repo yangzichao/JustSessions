@@ -24,6 +24,8 @@ struct ConversationSidebarView: View {
     @SceneStorage("sidebarContentMode") private var contentMode: SidebarContentMode = .projects
     @SceneStorage("sidebarOpenTabSearch") private var openTabSearchText = ""
     @State var projectExpansion = ProjectExpansion()
+    /// Sessions start with their subagents' sessions hidden; each shows them once you expand it.
+    @State var subagentRows = SidebarSubagentRows()
     @State var projectSelection = ProjectMultiSelection()
     @State private var isAddRemoteHostSheetPresented = false
     /// The host whose archived projects are listed, from its heading's context menu.
@@ -240,10 +242,13 @@ struct ConversationSidebarView: View {
         projectExpansion.isExpanded(project.id, whileSearching: isSearching)
     }
 
+    /// A subagent's session is only read, so a click on its row, with or without Shift or Command, just shows it.
     func handleConversationClick(_ conversation: Conversation) {
         projectSelection.clear()
         let modifiers = NSEvent.modifierFlags
-        if modifiers.contains(.shift) {
+        if conversation.isSubagent {
+            onSelectConversation(conversation)
+        } else if modifiers.contains(.shift) {
             isSidebarListFocused = true
             sessionSelection.selectRange(to: conversation.id, in: visibleConversationIDs)
         } else if modifiers.contains(.command) {

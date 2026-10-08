@@ -16,4 +16,12 @@ struct SessionDeletionLocalizationTests {
         #expect(SessionDeletionConfirmationText.skippedSessionsSentence(for: plan, language: chinese)
             == "将跳过 2 个终端已打开的会话。")
     }
+
+    @Test func subagentCountsAreTranslatedAsCompleteSentences() {
+        let plan = SessionDeletionPlan(
+            deletableConversations: [.fixture()], openTerminalCount: 0, deletedSubagentCount: 118, keptSubagentCount: 2
+        )
+        #expect(SessionDeletionConfirmationText.subagentSentences(for: plan, language: chinese)
+            == ["同时会删除 118 个子代理会话。", "2 个子代理会话将保留在磁盘上。"])
+    }
 }
