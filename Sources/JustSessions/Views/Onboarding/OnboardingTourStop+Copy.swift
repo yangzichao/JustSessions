@@ -16,6 +16,7 @@ extension OnboardingTourStop {
         case .tabGroup: "Tabs grouped by project"
         case .hideSidebar: "More room for the terminal"
         case .openTabs: "Every open tab in one list"
+        case .splitView: "Two tabs side by side"
         }
     }
 
@@ -40,13 +41,15 @@ extension OnboardingTourStop {
         case .sessionMenu:
             "Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once."
         case .searchSessions:
-            "Search projects by name or path, and sessions by title or ID."
+            "Search projects by name or path, and sessions by title, ID, or message text."
         case .tabGroup:
             "Click the project's name to collapse its tabs. A collapsed group still shows when a CLI is waiting on you."
         case .hideSidebar:
             "Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌘B does the same."
         case .openTabs:
-            "**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs."
+            "**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘8 go to a tab by its position, and ⌘9 to the last."
+        case .splitView:
+            "Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them."
         }
     }
 
@@ -54,7 +57,7 @@ extension OnboardingTourStop {
     /// and beside the sidebar's other controls, into the window.
     var tipEdge: Edge {
         switch self {
-        case .newSession, .keepRunning, .resume, .findInConversation, .searchSessions, .tabGroup, .hideSidebar: .bottom
+        case .newSession, .keepRunning, .resume, .findInConversation, .searchSessions, .tabGroup, .hideSidebar, .splitView: .bottom
         case .noSessionsYet, .projects, .sessions, .sshHosts, .sessionMenu, .openTabs: .trailing
         }
     }

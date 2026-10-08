@@ -2,7 +2,8 @@ import SwiftUI
 
 struct ProjectNewSessionMenu: View {
     @Environment(\.locale) private var locale
-    let project: ProjectConversationGroup
+    let location: ProjectLocation
+    let projectDisplayName: String
     /// The tools installed on the project's host.
     let providers: [ConversationProvider]
     let showsTitle: Bool
@@ -11,11 +12,9 @@ struct ProjectNewSessionMenu: View {
     var onOpenTerminal: (() -> Void)?
 
     var body: some View {
-        let canStartNewSession = project.canStartNewSession
-
         Menu {
             if providers.isEmpty {
-                Text(NewSessionProviderAvailability.noCLIFoundMessage(on: project.host, language: AppInterfaceLanguage(identifier: locale.identifier)))
+                Text(NewSessionProviderAvailability.noCLIFoundMessage(on: location.host, language: AppInterfaceLanguage(identifier: locale.identifier)))
             }
             ForEach(providers) { provider in
                 Button {
@@ -41,15 +40,15 @@ struct ProjectNewSessionMenu: View {
                     .contentShape(Rectangle())
             }
         }
-        .disabled(!canStartNewSession)
+        .disabled(!location.canStartSessions)
         .help(helpText)
-        .accessibilityLabel("New session in \(project.displayName)")
+        .accessibilityLabel("New session in \(projectDisplayName)")
     }
 
     private var helpText: LocalizedStringKey {
-        guard project.canStartNewSession else { return "The project folder no longer exists" }
-        return project.host == .thisMac
-            ? "Start a new session in \(project.location.path)"
-            : "Start a new session in \(project.location.path) on \(project.host.displayName)"
+        guard location.canStartSessions else { return "The project folder no longer exists" }
+        return location.host == .thisMac
+            ? "Start a new session in \(location.path)"
+            : "Start a new session in \(location.path) on \(location.host.displayName)"
     }
 }

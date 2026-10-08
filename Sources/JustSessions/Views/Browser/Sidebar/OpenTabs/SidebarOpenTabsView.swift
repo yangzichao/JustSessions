@@ -46,13 +46,17 @@ struct SidebarOpenTabsView: View {
                     let projectName = store.projectDisplayName(forProjectPath: group.projectDirectoryKey)
                     let isCollapsed = groupCollapse.isCollapsed(group.projectDirectoryKey, whileSearching: isSearching)
                     SidebarOpenTabGroupHeading(
+                        store: store,
                         projectName: projectName,
                         location: ProjectLocation(key: group.projectDirectoryKey),
                         color: colorsByProjectKey[group.projectDirectoryKey] ?? ThemePalette.ink,
                         tabCount: group.tabs.count,
                         isCollapsed: isCollapsed,
                         hiddenTabsActivity: isCollapsed ? SessionActivitySummary(tabs: group.tabs) : SessionActivitySummary(activities: []),
-                        onToggleCollapsed: { groupCollapse.toggle(group.projectDirectoryKey) }
+                        onToggleCollapsed: { groupCollapse.toggle(group.projectDirectoryKey) },
+                        onNewSession: { provider in
+                            store.launchNewSessionFromProject(provider: provider, projectPath: group.projectDirectoryKey)
+                        }
                     )
                     .padding(.top, group.id == groups.first?.id ? 0 : Self.groupSpacing)
                     if !isCollapsed {

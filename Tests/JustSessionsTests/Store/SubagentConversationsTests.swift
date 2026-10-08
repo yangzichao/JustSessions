@@ -56,8 +56,8 @@ struct SubagentConversationsTests {
         #expect(store.canLaunch(parent, action: .resume))
         #expect(!store.canLaunch(subagent, action: .resume))
         #expect(!store.canLaunch(subagent, action: .branch))
-        #expect(store.canStartDeletion(of: [parent]))
-        #expect(!store.canStartDeletion(of: [subagent]))
-        #expect(!store.canStartDeletion(of: [parent, subagent]))
+        #expect(store.deletionPlan(for: [parent]).deletableConversations.map(\.id) == [parent.id])
+        #expect(!store.deletionPlan(for: [subagent]).hasDeletableConversations)
+        #expect(store.deletionPlan(for: [parent, subagent]).deletableConversations.map(\.id) == [parent.id])
     }
 }

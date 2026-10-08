@@ -4,33 +4,34 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fcfbf8">
-  <title>JustSessions — Claude Code & Codex Session Manager for macOS</title>
-  <meta name="description" content="Find, read and resume Claude Code, Codex, Antigravity, Kiro, OpenCode and Pi sessions. A native macOS wrapper for your CLIs, with SSH and bundled tmux.">
+  <title>JustSessions — Claude Code &amp; Codex CLI Workspace for macOS</title>
+  <meta name="description" content="Manage Claude Code, Codex and other agent sessions in a lightweight Mac app. Keep your CLI workflow, with native tabs, split view, SSH and bundled tmux.">
   <link rel="canonical" href="https://yangzichao.github.io/JustSessions/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="JustSessions">
-  <meta property="og:title" content="JustSessions — Claude Code &amp; Codex Session Manager for macOS">
-  <meta property="og:description" content="Find, read and resume Claude Code, Codex, Antigravity, Kiro, OpenCode and Pi sessions. A native macOS wrapper for your CLIs, with SSH and bundled tmux.">
+  <meta property="og:title" content="JustSessions — Claude Code &amp; Codex CLI Workspace for macOS">
+  <meta property="og:description" content="Manage Claude Code, Codex and other agent sessions in a lightweight Mac app. Keep your CLI workflow, with native tabs, split view, SSH and bundled tmux.">
   <meta property="og:url" content="https://yangzichao.github.io/JustSessions/">
   <meta property="og:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="JustSessions — Find your session. Pick up your work. Six AI coding tools in one native Mac app.">
+  <meta property="og:image:alt" content="JustSessions — Nothing extra. Just sessions. Claude Code in a native terminal, with multiple agents grouped under one project.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="JustSessions — Claude Code &amp; Codex Session Manager for macOS">
-  <meta name="twitter:description" content="Find, read and resume Claude Code, Codex, Antigravity, Kiro, OpenCode and Pi sessions. A native macOS wrapper for your CLIs, with SSH and bundled tmux.">
+  <meta name="twitter:title" content="JustSessions — Claude Code &amp; Codex CLI Workspace for macOS">
+  <meta name="twitter:description" content="Manage Claude Code, Codex and other agent sessions in a lightweight Mac app. Keep your CLI workflow, with native tabs, split view, SSH and bundled tmux.">
   <meta name="twitter:image" content="https://yangzichao.github.io/JustSessions/assets/social-preview.png">
-  <meta name="twitter:image:alt" content="JustSessions, a native macOS home for your AI coding sessions.">
+  <meta name="twitter:image:alt" content="JustSessions — Nothing extra. Just sessions. Claude Code in a native terminal, with multiple agents grouped under one project.">
   <link rel="icon" type="image/svg+xml" href="./assets/mark.svg">
   <link rel="apple-touch-icon" href="./assets/app-icon-256.png">
   <link rel="stylesheet" href="./styles/app-theme.css">
   <link rel="stylesheet" href="./styles/foundation.css">
-  <link rel="stylesheet" href="./styles/navigation.css">
+  <link rel="stylesheet" href="./styles/site-header.css">
+  <link rel="stylesheet" href="./styles/site-footer.css">
   <link rel="stylesheet" href="./styles/hero.css">
   <link rel="stylesheet" href="./styles/providers.css">
-  <link rel="stylesheet" href="./styles/features.css">
   <link rel="stylesheet" href="./styles/screenshot-gallery.css">
   <script type="module" src="./scripts/screenshot-gallery.js"></script>
+  <script type="module" src="./scripts/traffic/traffic-monitor.js"></script>
   <link rel="stylesheet" href="./styles/details.css">
   <link rel="stylesheet" href="./styles/responsive.css">
   <script type="application/ld+json">
@@ -41,174 +42,171 @@
       "name": "JustSessions",
       "url": "https://yangzichao.github.io/JustSessions/",
       "image": "https://yangzichao.github.io/JustSessions/assets/social-preview.png",
-      "screenshot": "https://yangzichao.github.io/JustSessions/assets/native-terminal.jpg",
-      "description": "A native macOS wrapper for existing coding CLIs: find, read, resume, and manage sessions locally or over SSH, with bundled local tmux.",
+      "screenshot": [
+        "https://yangzichao.github.io/JustSessions/assets/multi-agent-sessions.jpg",
+        "https://yangzichao.github.io/JustSessions/assets/session-reader.jpg",
+        "https://yangzichao.github.io/JustSessions/assets/ssh-sessions.jpg",
+        "https://yangzichao.github.io/JustSessions/assets/tmux-persistence.jpg",
+        "https://yangzichao.github.io/JustSessions/assets/tabs-split.jpg"
+      ],
+      "description": "Manage Claude Code, Codex and other agent sessions in a lightweight Mac app. Keep your CLI workflow, with native tabs, split view, SSH and bundled tmux.",
       "operatingSystem": "macOS 14 or later (Apple Silicon)",
       "applicationCategory": "DeveloperApplication",
+      "softwareRequirements": "A supported coding CLI installed and signed in",
+      "featureList": [
+        "Multiple coding agents organized by project",
+        "Native terminal for existing coding CLIs",
+        "Local and SSH sessions in one workspace",
+        "Bundled local tmux for persistent CLI sessions",
+        "Project tabs, vertical tab list and split view",
+        "Automatically reopen tabs on launch",
+        "Conversation previews and search"
+      ],
+      "isAccessibleForFree": true,
       "license": "https://github.com/yangzichao/JustSessions/blob/main/LICENSE",
       "downloadUrl": "https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg",
-      "softwareHelp": { "@type": "WebPage", "url": "https://yangzichao.github.io/JustSessions/help.html" },
+      "softwareHelp": { "@type": "WebPage", "url": "https://yangzichao.github.io/JustSessions/guide.html" },
       "sameAs": "https://github.com/yangzichao/JustSessions",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     }
   </script>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header page-width">
-    <a class="wordmark" href="./" aria-label="JustSessions home">
-      <img src="./assets/mark.svg" width="34" height="30" alt="">
-      <span>JustSessions</span>
-    </a>
-    <nav aria-label="Main navigation">
-      <a class="nav-detail" href="./guide.html">Guide</a>
-      <a class="nav-detail" href="#questions">FAQ</a>
-      <a class="help-link" href="./help.html"><span class="help-icon" aria-hidden="true">?</span> Help</a>
-      <a class="github-link" href="https://github.com/yangzichao/JustSessions">GitHub <span aria-hidden="true">↗</span></a>
-      <a class="button button-small" href="#download">Download <span aria-hidden="true">↓</span></a>
-    </nav>
-  </header>
+  <!-- partial: site-header -->
 
   <main id="main">
     <section class="hero page-width" aria-labelledby="hero-title">
-      <div class="hero-introduction">
-        <div class="hero-heading">
-          <p class="eyebrow">AI session manager for macOS</p>
-          <h1 id="hero-title">Find your session.<br><span>Pick up your work.</span></h1>
-        </div>
-        <div class="hero-copy">
-          <p class="hero-description">Your existing CLIs, organized by project and machine.</p>
-          <div class="hero-actions">
-            <a class="button" href="https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg"><span aria-hidden="true">↓</span> Download for macOS</a>
-          </div>
-          <p class="download-note">Free & open source · macOS 14+ · Apple Silicon</p>
-        </div>
-      </div>
+      <h1 id="hero-title">Nothing extra. <span class="hero-title-line">Just sessions.</span></h1>
+      <p class="hero-description">Multiple agents, all your sessions in one place. Your familiar command line, with native tabs.</p>
       <section class="screenshot-gallery" id="screenshots" aria-label="JustSessions features" aria-roledescription="carousel" data-screenshot-gallery>
         <div class="gallery-stage">
           <div class="gallery-track" tabindex="0" aria-label="Screenshots. Use the left and right arrow keys to browse." data-gallery-track>
-            <figure class="gallery-slide" id="terminal" role="group" aria-roledescription="slide" aria-label="1 of 4: Native terminal">
-              <a class="gallery-image" href="./assets/native-terminal.jpg" aria-label="View the Claude Code CLI screenshot at full size">
-                <img src="./assets/native-terminal.jpg" width="2560" height="1640" fetchpriority="high" alt="The real Claude Code CLI running in JustSessions' native terminal, showing its interactive help screen alongside project tabs, a shell, and sessions from six coding agents.">
+            <figure class="gallery-slide" id="terminal" role="group" aria-roledescription="slide" aria-label="1 of 5: Your CLIs">
+              <figcaption class="gallery-caption">
+                <h2>Multiple agents. One project.</h2>
+                <ul class="provider-list" role="list" aria-label="Supported coding agents">
+                  <li class="provider-item provider-claude">
+                    <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg>
+                    <span>Claude Code</span>
+                  </li>
+                  <li class="provider-item provider-codex">
+                    <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m6.5 9 3 3-3 3m6 .5h4"/></svg>
+                    <span>Codex CLI</span>
+                  </li>
+                  <li class="provider-item provider-antigravity">
+                    <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 1.5c1.4 7.2 3.3 9.1 10.5 10.5-7.2 1.4-9.1 3.3-10.5 10.5C10.6 15.3 8.7 13.4 1.5 12 8.7 10.6 10.6 8.7 12 1.5Z"/></svg>
+                    <span>Antigravity CLI</span>
+                  </li>
+                  <li class="provider-item provider-kiro">
+                    <svg class="provider-icon" width="22" height="22" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M2.5 14.5v-8C2.5 3.5 5 1 8 1s5.5 2.5 5.5 5.5v8l-2.75-2L8 14.5l-2.75-2Z M5 7.375a1 1.375 0 1 0 2 0 1 1.375 0 1 0-2 0 M9 7.375a1 1.375 0 1 0 2 0 1 1.375 0 1 0-2 0"/></svg>
+                    <span>Kiro CLI</span>
+                  </li>
+                  <li class="provider-item provider-opencode">
+                    <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6.5 6-5 6 5 6m11-12 5 6-5 6M14.5 3l-5 18"/></svg>
+                    <span>OpenCode</span>
+                  </li>
+                  <li class="provider-item provider-pi">
+                    <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 7.5C5 6 6 6 8 6h12M8 6v14m9-14v11c0 2 1 3 3 3"/></svg>
+                    <span>Pi</span>
+                  </li>
+                </ul>
+              </figcaption>
+              <a class="gallery-image" href="./assets/multi-agent-sessions.mp4" aria-label="View the multi-agent session demo at full size">
+                <video src="./assets/multi-agent-sessions.mp4" poster="./assets/multi-agent-sessions.jpg" width="1600" height="960" autoplay loop muted playsinline preload="metadata" data-gallery-video aria-label="Real JustSessions clicks switch between Claude Code, Codex, and OpenCode CLIs. The Projects sidebar keeps four sessions, including two Claude Code sessions, together under orbit-web.">
+                  <img src="./assets/multi-agent-sessions.jpg" width="2400" height="1440" alt="Four agent sessions grouped under orbit-web in JustSessions: two Claude Code sessions, Codex, and OpenCode.">
+                </video>
               </a>
-              <figcaption class="gallery-caption"><strong>Native terminal.</strong><span>Real Claude Code CLI. Sample project.</span></figcaption>
             </figure>
-            <figure class="gallery-slide" id="reading" role="group" aria-roledescription="slide" aria-label="2 of 4: Read before you resume">
-              <a class="gallery-image" href="./assets/session-overview.jpg" aria-label="View the conversation reader screenshot at full size">
-                <img src="./assets/session-overview.jpg" width="2560" height="1640" loading="lazy" decoding="async" alt="JustSessions' conversation reader with Find, text size, width, and reading window controls, alongside six types of agent sessions grouped by project and host.">
+            <figure class="gallery-slide" id="reading" role="group" aria-roledescription="slide" aria-label="2 of 5: Session management" data-gallery-duration="12000">
+              <figcaption class="gallery-caption">
+                <h2>New. Resume. Delete.</h2>
+                <ul class="gallery-feature-list">
+                  <li>Start with any agent</li>
+                  <li>Read, then resume</li>
+                  <li>Delete saved sessions</li>
+                </ul>
+              </figcaption>
+              <a class="gallery-image" href="./assets/session-reader.mp4" aria-label="View the session management demo at full size">
+                <video src="./assets/session-reader.mp4" poster="./assets/session-reader.jpg" width="1600" height="960" loop muted playsinline preload="metadata" data-gallery-video aria-label="Create a Claude Code session, read and resume a saved conversation in the CLI, then delete an old session into the macOS Trash.">
+                  <img src="./assets/session-reader.jpg" width="1600" height="960" alt="The New session dialog with agent choices, over the project and its saved conversations.">
+                </video>
               </a>
-              <figcaption class="gallery-caption"><strong>Read before you resume.</strong><span>Find text. Copy code. Sample conversations.</span><a class="text-link" href="./guide.html#reading">Reading guide <span aria-hidden="true">↗</span></a></figcaption>
             </figure>
-            <figure class="gallery-slide" id="remote" role="group" aria-roledescription="slide" aria-label="3 of 4: Sessions over SSH">
-              <a class="gallery-image" href="./assets/remote-desktop-sessions.jpg" aria-label="View the remote sessions screenshot at full size">
-                <img src="./assets/remote-desktop-sessions.jpg" width="2560" height="1640" loading="lazy" decoding="async" alt="The current JustSessions reading toolbar above a Claude Code conversation on the sample dev-desktop SSH host, alongside local and remote projects.">
+            <figure class="gallery-slide" id="remote" role="group" aria-roledescription="slide" aria-label="3 of 5: SSH sessions">
+              <figcaption class="gallery-caption">
+                <h2>Work on any host.</h2>
+                <ul class="gallery-feature-list">
+                  <li>Local + SSH sessions</li>
+                  <li>Projects in one sidebar</li>
+                  <li>Resume remotely</li>
+                </ul>
+              </figcaption>
+              <a class="gallery-image" href="./assets/ssh-sessions.mp4" aria-label="View the SSH sessions demo at full size">
+                <video src="./assets/ssh-sessions.mp4" poster="./assets/ssh-sessions.jpg" width="1600" height="960" loop muted playsinline preload="metadata" data-gallery-video aria-label="Expand the dev-desktop project, switch to a local Claude Code CLI, and return to the remote conversation in the same sidebar.">
+                  <img src="./assets/ssh-sessions.jpg" width="2400" height="1440" alt="The dev-desktop host and its sessions beside a remote conversation in JustSessions.">
+                </video>
+                  <img class="gallery-annotation" src="./assets/ssh-host-highlight.svg" width="2400" height="1440" loading="lazy" decoding="async" alt="" aria-hidden="true">
               </a>
-              <figcaption class="gallery-caption"><strong>Sessions over SSH.</strong><span>Your code stays on the host. Sample hosts.</span><a class="text-link" href="./guide.html#ssh-hosts">SSH setup <span aria-hidden="true">↗</span></a></figcaption>
             </figure>
-            <figure class="gallery-slide gallery-slide-dialog" id="persistence" role="group" aria-roledescription="slide" aria-label="4 of 4: Keep it running">
-              <a class="gallery-image" href="./assets/tmux-keep-running.jpg" aria-label="View the keep running dialog at full size">
-                <img src="./assets/tmux-keep-running.jpg" width="520" height="476" loading="lazy" decoding="async" alt="JustSessions asks whether to keep a terminal session running, with Keep running, End session, and Cancel choices.">
+            <figure class="gallery-slide" id="persistence" role="group" aria-roledescription="slide" aria-label="4 of 5: tmux persistence" data-gallery-duration="12000">
+              <figcaption class="gallery-caption">
+                <h2>Close a tab. Keep the work.</h2>
+                <ul class="gallery-feature-list">
+                  <li>Close → <strong>Keep running</strong></li>
+                  <li>Quit the app. CLI stays alive.</li>
+                  <li>Click to reattach</li>
+                </ul>
+              </figcaption>
+              <a class="gallery-image" href="./assets/tmux-persistence.mp4" aria-label="View the tmux persistence demo at full size">
+                <video src="./assets/tmux-persistence.mp4" poster="./assets/tmux-persistence.jpg" width="1600" height="960" loop muted playsinline preload="metadata" data-gallery-video aria-label="A local file-indexing task advances in Claude Code. Close its tab, choose Keep running, then click the session to reattach and see that its progress has continued.">
+                  <img src="./assets/tmux-persistence.jpg" width="1600" height="960" alt="Keep running in the close-tab dialog over a Claude Code terminal running a local file-indexing task.">
+                </video>
               </a>
-              <figcaption class="gallery-caption"><strong>Close the app. Keep it running.</strong><span>Local tmux included. Sample process.</span><a class="text-link" href="./guide.html#terminal-persistence">How it works <span aria-hidden="true">↗</span></a></figcaption>
             </figure>
-          </div>
-          <div class="provider-support">
-            <p class="provider-caption">Multiple agents. All your sessions.</p>
-            <ul class="provider-list" role="list" aria-label="Supported coding agents">
-              <li class="provider-item provider-claude">
-                <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg>
-                <span>Claude Code</span>
-              </li>
-              <li class="provider-item provider-codex">
-                <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m6.5 9 3 3-3 3m6 .5h4"/></svg>
-                <span>Codex CLI</span>
-              </li>
-              <li class="provider-item provider-antigravity">
-                <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 1.5c1.4 7.2 3.3 9.1 10.5 10.5-7.2 1.4-9.1 3.3-10.5 10.5C10.6 15.3 8.7 13.4 1.5 12 8.7 10.6 10.6 8.7 12 1.5Z"/></svg>
-                <span>Antigravity CLI</span>
-              </li>
-              <li class="provider-item provider-kiro">
-                <svg class="provider-icon" width="22" height="22" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M2.5 14.5v-8C2.5 3.5 5 1 8 1s5.5 2.5 5.5 5.5v8l-2.75-2L8 14.5l-2.75-2Z M5 7.375a1 1.375 0 1 0 2 0 1 1.375 0 1 0-2 0 M9 7.375a1 1.375 0 1 0 2 0 1 1.375 0 1 0-2 0"/></svg>
-                <span>Kiro CLI</span>
-              </li>
-              <li class="provider-item provider-opencode">
-                <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6.5 6-5 6 5 6m11-12 5 6-5 6M14.5 3l-5 18"/></svg>
-                <span>OpenCode</span>
-              </li>
-              <li class="provider-item provider-pi">
-                <svg class="provider-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 7.5C5 6 6 6 8 6h12M8 6v14m9-14v11c0 2 1 3 3 3"/></svg>
-                <span>Pi</span>
-              </li>
-            </ul>
+            <figure class="gallery-slide" id="split" role="group" aria-roledescription="slide" aria-label="5 of 5: Tabs and split view">
+              <figcaption class="gallery-caption">
+                <h2>Tabs like Chrome. Split view.</h2>
+                <ul class="gallery-feature-list">
+                  <li>Create and switch tabs</li>
+                  <li>Automatically reopen tabs on launch</li>
+                  <li>Agent + shell, side by side</li>
+                </ul>
+              </figcaption>
+              <a class="gallery-image" href="./assets/tabs-split.mp4" aria-label="View the tabs and split view demo at full size">
+                <video src="./assets/tabs-split.mp4" poster="./assets/tabs-split.jpg" width="1600" height="960" loop muted playsinline preload="metadata" data-gallery-video aria-label="Switch between four tabs in the vertical Open tabs list, then use the tab menu to split Claude Code beside a project shell showing Git diff.">
+                  <img src="./assets/tabs-split.jpg" width="2400" height="1440" alt="The Open tabs sidebar lists Claude Code, a shell, Codex, and OpenCode. Claude Code and the shell share a split view.">
+                </video>
+              </a>
+            </figure>
           </div>
         </div>
         <div class="gallery-controls" hidden data-gallery-controls>
           <button class="gallery-arrow" type="button" aria-label="Previous screenshot" data-gallery-previous><span aria-hidden="true">←</span></button>
-          <div class="gallery-pagination" role="group" aria-label="Choose a screenshot">
-            <button type="button" aria-controls="terminal" aria-current="true" data-gallery-page>Terminal</button>
-            <button type="button" aria-controls="reading" data-gallery-page>Read</button>
-            <button type="button" aria-controls="remote" data-gallery-page>SSH</button>
-            <button type="button" aria-controls="persistence" data-gallery-page>tmux</button>
+          <div class="gallery-pagination" role="group" aria-label="Screenshot progress">
+            <button type="button" aria-controls="terminal" aria-current="true" aria-label="Your CLIs screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="reading" aria-label="Session management screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="remote" aria-label="SSH sessions screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="persistence" aria-label="tmux persistence screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
+            <button type="button" aria-controls="split" aria-label="Tabs and split view screenshot" data-gallery-page><span data-gallery-progress-fill aria-hidden="true"></span></button>
           </div>
           <button class="gallery-arrow" type="button" aria-label="Next screenshot" data-gallery-next><span aria-hidden="true">→</span></button>
           <button class="gallery-rotation" type="button" aria-label="Pause automatic slideshow" data-gallery-rotation><span aria-hidden="true">Ⅱ</span></button>
         </div>
-        <p class="visually-hidden" aria-live="off" aria-atomic="true" data-gallery-status>1 of 4: Native terminal</p>
+        <p class="visually-hidden" aria-live="off" aria-atomic="true" data-gallery-status>1 of 5: Your CLIs</p>
       </section>
     </section>
 
-    <section class="workflow section-space page-width" id="workflow" aria-labelledby="workflow-title">
-      <h2 class="visually-hidden" id="workflow-title">How it works</h2>
-      <div class="workflow-grid">
-        <article>
-          <svg class="feature-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
-          <h3>Find.</h3>
-          <p>Switch between projects and open tabs. Search, pin, rename, and clean up.</p>
-        </article>
-        <article>
-          <svg class="feature-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg>
-          <h3>Read.</h3>
-          <p>No CLI launch. Long sessions load as you scroll. Find text with ⌘F.</p>
-          <a class="text-link" href="./guide.html#reading">Reading guide <span aria-hidden="true">→</span></a>
-        </article>
-        <article>
-          <svg class="feature-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m7 9 3 3-3 3m6 0h4"/></svg>
-          <h3>Resume.</h3>
-          <p>Your original CLI and folder. Tabs grouped by project, or two side by side.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="questions section-space page-width" id="questions" aria-labelledby="questions-title">
-      <div class="section-heading">
-        <h2 id="questions-title">Good to know.</h2>
-      </div>
+    <section class="questions page-width" id="questions" aria-labelledby="questions-title">
+      <h2 class="visually-hidden" id="questions-title">FAQ</h2>
       <div class="question-list">
-        <details><summary>Which features work with my CLI?</summary><p>Every CLI supports browsing, <span data-capability="preview" data-support="all">reading</span>, resume, <span data-capability="delete" data-support="all">deletion</span>, and <span data-capability="ssh" data-support="all">SSH</span>. <span data-capability="branch" data-support="some">In-app branching varies.</span> <a href="./guide.html#supported-clis">Full compatibility.</a></p></details>
-        <details><summary>What do I need?</summary><p>macOS 14+ on Apple Silicon, with your CLI installed and signed in. Keep your existing configuration and accounts. <a href="./guide.html#ssh-hosts">Remote setup.</a></p></details>
-        <details><summary>Can I change the language and appearance?</summary><p>Follow System, English, or 简体中文. Six themes, light or dark, terminal color schemes or your iTerm2 colors, and terminal fonts. Changes apply in place. <a href="./guide.html#settings">Settings.</a></p></details>
-        <details><summary>Is it free?</summary><p>Yes. No JustSessions account or subscription. Your CLI provider’s charges still apply.</p></details>
-        <details><summary>Where is my history stored?</summary><p>JustSessions reads your CLI files and caches SSH history locally. It does not upload conversations to a JustSessions service. <a href="./guide.html#privacy">Storage & privacy.</a></p></details>
+        <details><summary>Which CLIs work?</summary><p>All six support <span data-capability="preview" data-support="all">reading</span>, resume, <span data-capability="delete" data-support="all">deletion</span>, and <span data-capability="ssh" data-support="all">SSH</span>. <span data-capability="branch" data-support="some">Branch support varies.</span> <a href="./guide.html#supported-clis">Compatibility.</a></p></details>
+        <details><summary>What do I need?</summary><p>macOS 14+ on Apple Silicon. Your CLI, installed and signed in.</p></details>
+        <details><summary>Is it free?</summary><p>Free and open source. Your CLI provider’s charges still apply.</p></details>
+        <details><summary>Is my history private?</summary><p>JustSessions doesn’t upload conversations. SSH history is cached on your Mac.</p></details>
       </div>
-    </section>
-
-    <section class="download-section page-width" id="download" aria-labelledby="download-title">
-      <img class="download-icon" src="./assets/app-icon-256.png" width="88" height="88" loading="lazy" alt="">
-      <h2 id="download-title">Get back to work.</h2>
-      <a class="button" href="https://github.com/yangzichao/JustSessions/releases/latest/download/JustSessions.dmg"><span aria-hidden="true">↓</span> Download for macOS</a>
-      <p class="download-note">macOS 14+ · Apple Silicon · Signed & notarized</p>
-      <a class="release-link" href="https://github.com/yangzichao/JustSessions/releases/latest">Release notes <span aria-hidden="true">↗</span></a>
     </section>
   </main>
 
-  <footer class="site-footer page-width">
-    <a class="wordmark" href="./"><img src="./assets/mark.svg" width="28" height="24" alt="">JustSessions</a>
-    <nav aria-label="Footer navigation">
-      <a href="https://github.com/yangzichao/JustSessions">Source</a>
-      <a href="./guide.html">User guide</a>
-      <a href="./help.html">Help</a>
-      <a href="https://github.com/yangzichao/JustSessions/blob/main/LICENSE">MIT license</a>
-    </nav>
-  </footer>
+  <!-- partial: site-footer -->
 </body>
 </html>

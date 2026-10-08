@@ -32,10 +32,53 @@ final class TranscriptScrollViewFixture {
         return try #require(descendant(ofType: NSScrollView.self, in: hostingView))
     }
 
+    /// Hosts the whole reader, which loads its own pages, as the preview does.
+    func showReader(_ conversation: Conversation, matchReveal: TranscriptMatchReveal? = nil) {
+        hostingView.rootView = AnyView(TranscriptView(
+            conversation: conversation, readingPositionStore: positionStore, matchReveal: matchReveal
+        ).defaultAppStorage(settings.userDefaults))
+    }
+
+    /// The reader's scroll view, once its first page has loaded.
+    var readerScrollView: NSScrollView? {
+        descendant(ofType: NSScrollView.self, in: hostingView)
+    }
+
+    /// What the text fields show, such as Find's query.
+    var textFieldValues: [String] {
+        descendants(ofType: NSTextField.self, in: hostingView).filter(\.isEditable).map(\.stringValue)
+    }
+
     func settleLayout() async throws {
         for _ in 0..<8 {
             hostingView.layoutSubtreeIfNeeded()
             try await Task.sleep(for: .milliseconds(25))
+        }
+    }
+
+    /// Lays out until the condition has held for `stableDuration`, so a step that takes several layout passes, such as
+    /// restoring a reading position, has finished rather than passed through. A slow machine, such as a CI runner, can
+    /// outlast `settleLayout()`'s fixed wait. Gives up after `timeout`, leaving the expectations that follow to report
+    /// what the transcript shows. The timeout is generous because a reader that loads in under a second on its own can
+    /// take far longer at the start of a full run, when every suite starts at once: on a CI runner, the first match
+    /// reveal test once spent its whole 10 seconds waiting for its first page.
+    func waitUntil(
+        stableFor stableDuration: Duration = .milliseconds(150), timeout: Duration = .seconds(60),
+        _ condition: () -> Bool
+    ) async throws {
+        let clock = ContinuousClock()
+        let deadline = clock.now + timeout
+        var heldSince: ContinuousClock.Instant?
+        while clock.now < deadline {
+            hostingView.layoutSubtreeIfNeeded()
+            if condition() {
+                let start = heldSince ?? clock.now
+                heldSince = start
+                if clock.now - start >= stableDuration { return }
+            } else {
+                heldSince = nil
+            }
+            try await Task.sleep(for: .milliseconds(10))
         }
     }
 

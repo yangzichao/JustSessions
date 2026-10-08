@@ -16,6 +16,9 @@ struct TranscriptReadingFontSizePositionTests {
         }, omittedEntryCount: 0)
         fixture.positionStore.record(.entry(index: 40, offset: 0), for: conversation.id)
         let scrollView = try await fixture.show(conversation, transcript: transcript)
+        // Restoring the saved position takes several layout passes, and a scroll cancels a restoration still under way,
+        // so the scroll waits for it to finish instead of for a fixed time that a slow machine can outlast.
+        try await fixture.waitUntil { fixture.visiblePosition(in: scrollView) == .entry(index: 40, offset: 0) }
         try await fixture.scroll(scrollView, to: scrollView.contentView.bounds.minY + 300)
         let readingPosition = TranscriptReadingPosition.entry(index: 40, offset: 300)
         #expect(fixture.visiblePosition(in: scrollView) == readingPosition)
@@ -24,11 +27,19 @@ struct TranscriptReadingFontSizePositionTests {
         // A− comes first: the system font has the same line height at the default 15 points as at 16, so A+ from the
         // default can leave the message's height unchanged, while 14 points is shorter.
         try await fixture.pressButton(labeled: "Smaller reading text")
+        try await fixture.waitUntil {
+            (fixture.visibleEntryFrames(in: scrollView).first?.height ?? defaultHeight) < defaultHeight
+                && fixture.visiblePosition(in: scrollView) == readingPosition
+        }
         #expect(fixture.visiblePosition(in: scrollView) == readingPosition)
         let smallerHeight = try #require(fixture.visibleEntryFrames(in: scrollView).first).height
         #expect(smallerHeight < defaultHeight)
 
         try await fixture.pressButton(labeled: "Larger reading text")
+        try await fixture.waitUntil {
+            (fixture.visibleEntryFrames(in: scrollView).first?.height ?? smallerHeight) > smallerHeight
+                && fixture.visiblePosition(in: scrollView) == readingPosition
+        }
         #expect(fixture.visiblePosition(in: scrollView) == readingPosition)
         let largerHeight = try #require(fixture.visibleEntryFrames(in: scrollView).first).height
         #expect(largerHeight > smallerHeight)

@@ -3,8 +3,8 @@ import Foundation
 /// Notifies you when a CLI on this Mac finishes its turn or stops to wait on you, unless its tab is in view, and
 /// shows that session when you click the notification. The CLI activity sync reports what each CLI does.
 extension ConversationStore {
-    func notifyOfSessionsWantingAttention(after observations: [SessionActivityObservation]) {
-        for event in sessionAttentionTracker.events(after: observations) where !isInView(event.source) {
+    func notifyOfSessionsWantingAttention(_ events: [SessionAttentionEvent]) {
+        for event in events where !isInView(event.source) {
             guard let notification = sessionNotification(for: event) else { continue }
             sessionNotifier.notify(notification)
         }
@@ -25,9 +25,9 @@ extension ConversationStore {
 
     /// The app is in front with the CLI's terminal on screen: its tab is selected, or it is the other half of the
     /// split shown beside the selected tab.
-    private func isInView(_ source: SessionAttentionSource) -> Bool {
+    func isInView(_ source: SessionAttentionSource) -> Bool {
         guard let tabID = source.tabID else { return false }
-        return sessionNotifier.isApplicationActive && (selectedTerminalID == tabID || shownSplit?.contains(tabID) == true)
+        return sessionNotifier.isApplicationActive && terminalIDsOnScreen.contains(tabID)
     }
 
     /// The tab the source names, or else a tab opened on the same session since, such as by reattaching.

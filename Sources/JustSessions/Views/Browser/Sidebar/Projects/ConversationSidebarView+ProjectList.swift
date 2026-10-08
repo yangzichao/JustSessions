@@ -12,6 +12,9 @@ extension ConversationSidebarView {
                 onDismissSelection: dismissSidebarSelection
             ) {
                 LazyVStack(alignment: .leading, spacing: SidebarIndentGuide.rowSpacing) {
+                    if isSearching {
+                        SidebarMessageSearchProgress(indexer: store.messageIndexer)
+                    }
                     ForEach(hostSections) { section in
                         hostHeading(for: section)
                             .padding(.top, 14)
@@ -22,7 +25,8 @@ extension ConversationSidebarView {
                                 host: section.host,
                                 refreshStatus: store.hostRefreshStatuses[section.host],
                                 isSearching: isSearching,
-                                recencyFilter: recencyFilter
+                                recencyFilter: recencyFilter,
+                                waitingFilter: waitingFilter
                             ))
                             .onboardingTourStop(section.host == .thisMac ? .noSessionsYet : nil)
                         }
@@ -40,6 +44,7 @@ extension ConversationSidebarView {
                                 selectedConversations: selectedConversations,
                                 subagentRows: subagentRows,
                                 onToggleSubagents: { subagentRows.toggle($0.id) },
+                                messageMatches: messageMatches,
                                 onToggleExpansion: { projectExpansion.toggle(project.id) },
                                 onClickProject: { handleProjectClick(project) },
                                 onNewSession: { provider in
@@ -50,7 +55,9 @@ extension ConversationSidebarView {
                                 onRenameConversation: onRenameConversation,
                                 onRenameProject: { onRenameProject(project) },
                                 onRemoveSelectedProjects: removeSelectedProjects,
-                                onRequestDeletion: onRequestDeletion
+                                onRemoveSelectedProjectsAndDeleteSessions: requestRemovalOfSelectedProjectsAndTheirSessions,
+                                onRequestDeletion: onRequestDeletion,
+                                onCloseTab: onCloseTerminal
                             )
                         }
                         .padding(.horizontal, 8)

@@ -13,6 +13,7 @@ struct SidebarProjectSection: View {
     /// Which sessions show their subagents' sessions under them.
     let subagentRows: SidebarSubagentRows
     let onToggleSubagents: (Conversation) -> Void
+    let messageMatches: [String: SessionMessageMatch]
     let onToggleExpansion: () -> Void
     let onClickProject: () -> Void
     let onNewSession: (ConversationProvider) -> Void
@@ -21,7 +22,9 @@ struct SidebarProjectSection: View {
     let onRenameConversation: (Conversation) -> Void
     let onRenameProject: () -> Void
     let onRemoveSelectedProjects: () -> Void
+    let onRemoveSelectedProjectsAndDeleteSessions: () -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
+    let onCloseTab: (UUID) -> Void
 
     /// The project row, then its sessions while it is expanded, as separate views: the sidebar's lazy list then
     /// builds only the rows in sight, even for a project with hundreds of sessions.
@@ -38,7 +41,8 @@ struct SidebarProjectSection: View {
             onRename: onRenameProject,
             onDeleteSessions: { onRequestDeletion(.project(project.id)) },
             onRemoveProjectAndDeleteSessions: { onRequestDeletion(.projectRemoval(project.id)) },
-            onRemoveSelectedProjects: onRemoveSelectedProjects
+            onRemoveSelectedProjects: onRemoveSelectedProjects,
+            onRemoveSelectedProjectsAndDeleteSessions: onRemoveSelectedProjectsAndDeleteSessions
         )
         .onboardingTourStop(isOnboardingTourProject ? .projects : nil)
 
@@ -75,10 +79,12 @@ struct SidebarProjectSection: View {
                     selectedConversations: selectedConversations,
                     subagentCount: store.subagents(of: conversation).count,
                     isShowingSubagents: subagentRows.isExpanded(conversation.id),
+                    messageMatch: messageMatches[conversation.id],
                     onClick: onClickConversation,
                     onToggleSubagents: { onToggleSubagents(conversation) },
                     onRename: onRenameConversation,
-                    onRequestDeletion: onRequestDeletion
+                    onRequestDeletion: onRequestDeletion,
+                    onCloseTab: onCloseTab
                 )
                 .sidebarIndentGuide(
                     isFirstRow: pendingNewSessionTerminals.isEmpty && conversation.id == project.conversations.first?.id,

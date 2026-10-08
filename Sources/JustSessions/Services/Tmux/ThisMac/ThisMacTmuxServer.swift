@@ -24,9 +24,21 @@ struct ThisMacTmuxServer: Sendable {
         // so the CLI can tell it from Return.
         ("extended-keys", "always"),
         ("extended-keys-format", "csi-u"),
-        // The tab's terminal gets the title the CLI sets, where a Codex CLI names its thread; see `CodexThreadTitle`.
+        // The tab's terminal gets the title the CLI sets, where a Codex CLI names its thread, and, once the CLI has
+        // failed, how it ended; see `ThisMacTmuxDeadPane`.
         ("set-titles", "on"),
-        ("set-titles-string", "#{pane_title}"),
+        ("set-titles-string", ThisMacTmuxDeadPane.titleFormat),
+        // A CLI that fails keeps its pane, so its tab still shows what it printed. tmux prints no line of its own
+        // under it, which would scroll the CLI's first line out of sight; the tab's bar tells the status.
+        ("remain-on-exit", "failed"),
+        ("remain-on-exit-format", ""),
+    ]
+
+    /// Set on every attach, like `globalOptions`. tmux 3.3, the oldest the app runs, has them all.
+    static let globalHooks: [(name: String, command: String)] = [
+        // A failed CLI's dead pane stays only while a tab shows it: its session ends once its last tab detaches,
+        // and at once when none is attached, as the session of a CLI that exits cleanly does.
+        ("pane-died", ##"if-shell -F "#{session_attached}" "set-option destroy-unattached on" "kill-session""##),
     ]
 
     /// tmux sets these in a session itself: `TERM` names tmux's own terminal type, the rest say the CLI runs in tmux.
@@ -42,6 +54,7 @@ struct ThisMacTmuxServer: Sendable {
     func command(attachingTo sessionName: String, running command: NativeCLICommand) -> NativeCLICommand {
         let serverArguments = ["-L", Self.socketName, "-f", "/dev/null", "-u", "-T", "RGB"]
         let optionArguments = Self.globalOptions.flatMap { ["set-option", "-gq", $0.name, $0.value, ";"] }
+            + Self.globalHooks.flatMap { ["set-hook", "-g", $0.name, $0.command, ";"] }
         let clientEnvironment = runtimeEnvironment(from: command.environmentVariables)
         let sessionEnvironment = clientEnvironment
             .filter { !Self.variablesTmuxSetsInSessions.contains($0.key) }
@@ -73,9 +86,10 @@ struct ThisMacTmuxServer: Sendable {
         output(of: ["list-sessions", "-F", "#{session_name}"]) != nil
     }
 
-    /// The CLI of each session: the process of its pane. The tab's own process is only the tmux client.
+    /// The CLI of each session: the process of its pane. The tab's own process is only the tmux client. A session
+    /// whose CLI failed, and whose pane stays while a tab shows it, runs no CLI and is left out.
     func paneProcessIDsBySessionName() -> [String: Int32] {
-        Self.paneProcessIDs(inListOutput: output(of: ["list-panes", "-a", "-F", "#{session_name} #{pane_pid}"]) ?? "")
+        Self.paneProcessIDs(inListOutput: output(of: ["list-panes", "-a", "-F", "#{session_name} #{pane_pid} #{pane_dead}"]) ?? "")
     }
 
     /// `paneProcessIDsBySessionName()` for the JustSessions sessions alone, as `sessionNames()` lists them.
@@ -105,12 +119,13 @@ struct ThisMacTmuxServer: Sendable {
         ThisMacTmuxVersionCheck.shared.answer(forExecutablePath: executablePath) == true
     }
 
-    /// Parses `list-panes -F '#{session_name} #{pane_pid}'`. The app's session names have no spaces.
+    /// Parses `list-panes -F '#{session_name} #{pane_pid} #{pane_dead}'`, leaving out dead panes. The app's session
+    /// names have no spaces.
     static func paneProcessIDs(inListOutput output: String) -> [String: Int32] {
         var processIDs: [String: Int32] = [:]
         for line in output.split(whereSeparator: \.isNewline) {
             let fields = line.split(separator: " ")
-            guard fields.count == 2, let processID = Int32(fields[1]), processID > 0 else { continue }
+            guard fields.count == 3, fields[2] == "0", let processID = Int32(fields[1]), processID > 0 else { continue }
             processIDs[String(fields[0])] = processID
         }
         return processIDs

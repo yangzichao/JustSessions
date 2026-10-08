@@ -6,23 +6,27 @@ import Testing
 /// from a host and refreshing it never overlap.
 @MainActor
 struct DeletionDuringRefreshTests {
-    @Test func aSessionWaitsForItsOwnHostsRefreshOnly() throws {
+    @Test func aSessionWaitsForItsOwnHostsRefreshOnly() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
         let local = try sandbox.savedConversation()
         let remote = Conversation.fixture(host: .ssh("devbox"))
         let store = sandbox.makeStore(listing: [local])
         store.replaceConversations(on: .ssh("devbox"), with: [remote])
-
         store.hostRefreshStatuses[.ssh("devbox")] = .refreshing
-        #expect(!store.canStartDeletion(of: [remote]))
-        #expect(!store.canStartDeletion(of: [local, remote]))
-        #expect(store.canStartDeletion(of: [local]))
 
-        store.hostRefreshStatuses[.ssh("devbox")] = .refreshed(.now)
-        store.hostRefreshStatuses[.thisMac] = .refreshing
-        #expect(store.canStartDeletion(of: [remote]))
-        #expect(!store.canStartDeletion(of: [local]))
+        store.deleteConversations([remote])
+        #expect(!store.isDeletingSessions)
+        #expect(store.queuedDeletionConversationIDs == [remote.id])
+
+        store.deleteConversations([local])
+        #expect(store.pendingDeletionConversationIDs == [local.id])
+        try await expectEventually { !store.isDeletingSessions }
+
+        // The deletion's end did not start the session still waiting for devbox's refresh.
+        #expect(!sandbox.fileExists(for: local))
+        #expect(store.queuedDeletionConversationIDs == [remote.id])
+        #expect(store.conversations.map(\.id) == [remote.id])
     }
 
     @Test func aRefreshAskedForDuringADeletionRunsOnceItEnds() async throws {

@@ -1,9 +1,11 @@
 import SwiftUI
 
-/// A host's heading above its projects: its name, how its last refresh went, and its project count, which gives way
-/// to a + while the pointer is over it. The + adds a project there, or restores an archived one; a right-click opens
-/// the heading's other actions. New sessions start from a project's own +, so the heading manages the host's projects
-/// instead. Its refresh button refreshes this host alone, and shows its progress.
+/// A host's heading above its projects: its name, how its last refresh went, and its project count. A failed refresh
+/// shows a warning after the name; see `SidebarHostRefreshFailureWarning`. While the pointer is over the heading, the
+/// count gives way to a +, and an SSH host's refresh status to a ⋯. The + adds a project there, or
+/// restores an archived one; the ⋯ holds the host's own settings, and a right-click opens all the heading's actions.
+/// New sessions start from a project's own +, so the heading manages the host's projects instead. Its refresh button
+/// refreshes this host alone, and shows its progress.
 struct SidebarHostHeading: View {
     let host: SessionHost
     let refreshStatus: HostRefreshStatus?
@@ -14,8 +16,8 @@ struct SidebarHostHeading: View {
     let isRefreshDisabled: Bool
     let archivedProjectCount: Int
     let onShowArchivedProjects: () -> Void
-    /// Nil for this Mac, which is always listed.
-    let onRemove: (() -> Void)?
+    /// Nil for this Mac; see `SidebarHostMenuItems`.
+    let sshHostActions: SidebarSSHHostActions?
 
     @State private var isHovered = false
 
@@ -35,8 +37,11 @@ struct SidebarHostHeading: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .truncationMode(.middle)
+            if case .failed(let failureMessage)? = refreshStatus {
+                SidebarHostRefreshFailureWarning(host: host, failureMessage: failureMessage)
+            }
             Spacer(minLength: 6)
-            refreshStatusIndicator
+            refreshStatusOrMoreActions
             SidebarHostRefreshButton(
                 host: host,
                 refreshStatus: refreshStatus,
@@ -60,21 +65,30 @@ struct SidebarHostHeading: View {
                 onAddProject: onAddProject,
                 onShowArchivedProjects: onShowArchivedProjects,
                 onRefresh: onRefresh,
-                onRemove: onRemove
+                sshHostActions: sshHostActions
             )
+        }
+    }
+
+    /// The ⋯ takes the refresh status's place rather than room of its own, which the host's name would lose. The
+    /// heading's tooltip still says when the host was refreshed, or why it could not be.
+    private var refreshStatusOrMoreActions: some View {
+        ZStack(alignment: .trailing) {
+            refreshStatusIndicator
+                .opacity(isHovered && sshHostActions != nil ? 0 : 1)
+            if let sshHostActions {
+                SidebarSSHHostMoreActionsMenu(host: host, actions: sshHostActions)
+                    .opacity(isHovered ? 1 : 0)
+                    .allowsHitTesting(isHovered)
+            }
         }
     }
 
     @ViewBuilder
     private var refreshStatusIndicator: some View {
         switch refreshStatus {
-        case .refreshing?:
+        case .refreshing?, .failed?:
             EmptyView()
-        case .failed(let message)?:
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(ThemePalette.warning)
-                .help(message)
-                .accessibilityLabel("\(host.displayName) could not be refreshed: \(message)")
         case .refreshed(let syncDate)?:
             // This Mac's files are read in place; only an SSH host's copy can be behind.
             if host != .thisMac {

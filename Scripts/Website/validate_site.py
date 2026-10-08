@@ -31,7 +31,7 @@ def validate_site(website_directory: Path):
                 referenced_path /= "index.html"
             assert referenced_path.is_relative_to(website_directory.resolve()), f"Asset leaves published directory: {reference}"
             assert referenced_path.is_file(), f"Missing local target: {reference}"
-            if referenced_path.suffix in (".css", ".js", ".jpg", ".png", ".svg"):
+            if referenced_path.suffix in (".css", ".js", ".jpg", ".png", ".svg", ".mp4"):
                 expected_version = hashlib.sha256(referenced_path.read_bytes()).hexdigest()[:12]
                 assert parse_qs(parsed_reference.query).get("v") == [expected_version], f"Asset cache version mismatch: {reference}"
             if parsed_reference.fragment and referenced_path in documents:
@@ -40,14 +40,17 @@ def validate_site(website_directory: Path):
     validate_script_imports(website_directory)
     validate_metadata(documents, website_directory)
     homepage = documents[(website_directory / "index.html").resolve()]
-    help_page = documents[(website_directory / "help.html").resolve()]
-    assert "./help.html" in homepage.references, "Homepage needs a Help entry"
-    assert "remote-hosts" in help_page.identifiers, "Help needs remote host setup"
-    assert "./guide.html#ssh-hosts" in help_page.references, "Help needs detailed SSH instructions"
-    legacy_feedback = documents[(website_directory / "feedback.html").resolve()]
-    assert "./help.html" in legacy_feedback.references, "Old Feedback URL needs a Help link"
-    assert legacy_feedback.canonical_url == WEBSITE_URL + "help.html"
-    assert "noindex" in legacy_feedback.metadata.get("robots", ""), "Old Feedback URL should not be indexed"
+    guide_page = documents[(website_directory / "guide.html").resolve()]
+    assert "./help.html" not in homepage.references + guide_page.references, "Use Guide instead of a separate Help entry"
+    assert {"ssh-hosts", "feedback"} <= guide_page.identifiers, "Guide needs SSH setup and feedback"
+    assert "https://github.com/yangzichao/JustSessions/issues/new" in guide_page.references, "Guide needs issue reporting"
+    assert "mailto:zichaoyangphys@gmail.com?subject=JustSessions%20feedback" in guide_page.references, "Guide needs email feedback"
+    for document_name, destination in (("help.html", "./guide.html"), ("feedback.html", "./guide.html#feedback")):
+        legacy_page = documents[(website_directory / document_name).resolve()]
+        assert destination in legacy_page.references, f"{document_name} needs a Guide link"
+        assert legacy_page.metadata.get("refresh") == f"0; url={destination}", f"{document_name} must redirect directly to Guide"
+        assert legacy_page.canonical_url == WEBSITE_URL + "guide.html"
+        assert "noindex" in legacy_page.metadata.get("robots", ""), f"{document_name} should not be indexed"
     image_header = (website_directory / "assets/social-preview.png").read_bytes()[:24]
     assert image_header[:8] == b"\x89PNG\r\n\x1a\n", "Social card must be a PNG"
     assert struct.unpack(">II", image_header[16:24]) == (1200, 630), "Social card must be 1200 x 630"

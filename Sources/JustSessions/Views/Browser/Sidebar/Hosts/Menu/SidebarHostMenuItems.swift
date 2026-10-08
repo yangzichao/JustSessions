@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// A host heading's right-click menu: add a project, restore archived projects, refresh the host, or remove an SSH
-/// host.
+/// A host heading's right-click menu: add a project, restore archived projects, refresh the host, and, for an SSH
+/// host, its own settings; see `SidebarSSHHostMenuItems`.
 struct SidebarHostMenuItems: View {
     let refreshStatus: HostRefreshStatus?
     let isRefreshDisabled: Bool
@@ -9,8 +9,8 @@ struct SidebarHostMenuItems: View {
     let onAddProject: () -> Void
     let onShowArchivedProjects: () -> Void
     let onRefresh: () -> Void
-    /// Nil for this Mac, which is always listed.
-    let onRemove: (() -> Void)?
+    /// Nil for this Mac, which is always listed and whose tmux server reads no configuration.
+    let sshHostActions: SidebarSSHHostActions?
 
     var body: some View {
         Button("Add project…", systemImage: "plus", action: onAddProject)
@@ -21,9 +21,9 @@ struct SidebarHostMenuItems: View {
         Divider()
         Button("Refresh", systemImage: "arrow.clockwise", action: onRefresh)
             .disabled(refreshStatus == .refreshing || isRefreshDisabled)
-        if let onRemove {
+        if let sshHostActions {
             Divider()
-            Button("Remove host", systemImage: "minus.circle", role: .destructive, action: onRemove)
+            SidebarSSHHostMenuItems(actions: sshHostActions)
         }
     }
 }

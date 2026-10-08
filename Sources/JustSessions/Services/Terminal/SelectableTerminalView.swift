@@ -10,16 +10,27 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     var sendsShiftReturnAsCSIu = false
     /// Called after the terminal's colors are set, so the margin around it can match its background.
     var onBackgroundColorChange: (() -> Void)?
-    /// Called when a click lands on the terminal or its margin, before the terminal takes the keyboard, so a split
-    /// pane whose tab is not selected can select it.
-    var onMouseDown: (() -> Void)?
+    /// Called when a click lands on the terminal or its margin, or files are dropped on it, before the terminal takes
+    /// the keyboard, so a split pane whose tab is not selected can select it.
+    var onFocus: (() -> Void)?
+    /// Files dropped on the terminal type their paths into it; see `SelectableTerminalView+FileDrop`. Only a tab whose
+    /// CLI runs on this Mac turns it on, since a CLI on an SSH host can't open this Mac's files.
+    var acceptsDroppedFiles = false {
+        didSet {
+            guard acceptsDroppedFiles != oldValue else { return }
+            if acceptsDroppedFiles { registerForDraggedTypes([.fileURL]) } else { unregisterDraggedTypes() }
+        }
+    }
 
     private var appearancePreferences = TerminalAppearancePreferences()
     private var theme = AppTheme.justSessions
     private var appearanceSubscription: AnyCancellable?
+    /// The colors the terminal last took on, so a theme report goes out only when they change.
+    private var appliedPalette: TerminalPalette?
+    private var themeReporting = TerminalThemeReporting()
     private lazy var outputCoalescer: TerminalOutputCoalescer = {
         let coalescer = TerminalOutputCoalescer()
-        coalescer.consume = { [weak self] bytes in self?.feed(byteArray: bytes) }
+        coalescer.consume = { [weak self] bytes in self?.consumeOutput(bytes) }
         return coalescer
     }()
 
@@ -32,6 +43,18 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     }
 
     override func dataReceived(slice: ArraySlice<UInt8>) { outputCoalescer.receive(slice) }
+
+    /// Feeds output to the terminal and answers the theme report requests in it, which SwiftTerm ignores.
+    private func consumeOutput(_ bytes: ArraySlice<UInt8>) {
+        let themeReports = themeReporting.reports(answering: bytes, isDark: appliedPalette?.isDark ?? false)
+        feed(byteArray: bytes)
+        themeReports.forEach(sendTerminalReport)
+    }
+
+    /// Goes out as SwiftTerm's own replies do: unlike typing, it leaves the scroll position and selection alone.
+    private func sendTerminalReport(_ report: String) {
+        getTerminal().sendResponse(text: report)
+    }
 
     override func setFrameSize(_ newSize: NSSize) {
         // Interpret queued output at the dimensions it arrived under before resizing the terminal grid.
@@ -64,7 +87,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     }
 
     override func mouseDown(with event: NSEvent) {
-        onMouseDown?()
+        onFocus?()
         window?.makeFirstResponder(self)
         super.mouseDown(with: event)
     }
@@ -90,7 +113,10 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     }
 
     private func applyAppearance() {
-        TerminalAppearanceStyling.apply(appearancePreferences, theme: theme, to: self)
+        let palette = TerminalAppearanceStyling.apply(appearancePreferences, theme: theme, to: self)
         onBackgroundColorChange?()
+        guard palette != appliedPalette else { return }
+        appliedPalette = palette
+        if let report = themeReporting.reportAfterColorChange(isDark: palette.isDark) { sendTerminalReport(report) }
     }
 }

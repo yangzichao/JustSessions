@@ -41,10 +41,41 @@ extension ConversationStore {
         }
         do {
             guard let session = try makeTerminal(for: conversation, action: action) else { return }
-            openTerminal(session)
+            if action == .resume, let endedTab = endedTerminal(for: conversation) {
+                restartEndedTerminal(endedTab, with: session)
+            } else {
+                openTerminal(session)
+            }
         } catch {
             showError(error.localizedDescription)
         }
+    }
+
+    /// An open tab of the session whose CLI has ended, as one does when an SSH host's connection drops.
+    private func endedTerminal(for conversation: Conversation) -> TerminalSession? {
+        terminalSessions.first { $0.conversation?.id == conversation.id && $0.hasExited }
+    }
+
+    /// Resuming a session whose tab ended starts it again in that tab, keeping its place, its split, and the
+    /// selection, rather than opening a second tab of the session beside it. A tab still showing a failed CLI's tmux
+    /// session first lets that session go, since the new CLI's client would otherwise attach to its dead pane.
+    private func restartEndedTerminal(_ endedTab: TerminalSession, with session: TerminalSession) {
+        guard let keptSessionName = endedTab.tmuxSessionKeptForEndedCLI,
+              let tmuxServer = commandResolver.thisMacTmuxServer() else {
+            replaceEndedTerminal(endedTab, with: session)
+            return
+        }
+        endedTab.close()
+        tmuxCommandQueues.run(on: .thisMac) { [weak self] in
+            tmuxServer.killSession(named: keptSessionName)
+            Task { @MainActor [weak self] in self?.replaceEndedTerminal(endedTab, with: session) }
+        }
+    }
+
+    private func replaceEndedTerminal(_ endedTab: TerminalSession, with session: TerminalSession) {
+        guard let index = terminalSessions.firstIndex(where: { $0.id == endedTab.id }) else { return }
+        replaceTerminal(at: index, with: session)
+        selectTerminal(session.id)
     }
 
     /// A tab that runs the session's CLI, not opened yet; nil when no adapter reads the session's tool.
@@ -84,9 +115,12 @@ extension ConversationStore {
         adapter: any ConversationAdapter
     ) throws -> (command: NativeCLICommand, tmuxSessionName: String?) {
         let tmuxSessionName = tmuxSessionName(forLaunching: conversation, action: action)
+        let startCommand = customStartCommand(for: conversation.provider, on: conversation.host)
         switch conversation.host {
         case .thisMac:
-            let command = try commandResolver.resolve(conversation: conversation, action: action, adapter: adapter)
+            let command = try commandResolver.resolve(
+                conversation: conversation, action: action, adapter: adapter, startCommand: startCommand
+            )
             return thisMacTabCommand(running: command, tmuxSessionName: tmuxSessionName)
         case .ssh(let destination):
             let command = RemoteCLICommandBuilder().command(
@@ -94,7 +128,9 @@ extension ConversationStore {
                 provider: conversation.provider,
                 projectPath: conversation.projectPath,
                 arguments: adapter.arguments(for: conversation, action: action),
-                tmuxSessionName: tmuxSessionName
+                tmuxSessionName: tmuxSessionName,
+                usesHostTmuxPrefix: usesTmuxPrefix(on: conversation.host),
+                startCommand: startCommand
             )
             return (command, tmuxSessionName)
         }
@@ -122,8 +158,12 @@ extension ConversationStore {
     private func launchNewSessionOnThisMac(provider: ConversationProvider, projectPath: String) throws {
         let expandedPath = (projectPath as NSString).expandingTildeInPath
         let standardizedPath = URL(fileURLWithPath: expandedPath).standardizedFileURL.path
-        let command = try commandResolver.resolveNewSession(provider: provider, projectPath: standardizedPath)
-        // Before tmux wraps the command: the flag check looks at the CLI's own executable.
+        let command = try commandResolver.resolveNewSession(
+            provider: provider,
+            projectPath: standardizedPath,
+            startCommand: customStartCommand(for: provider, on: .thisMac)
+        )
+        // Before tmux wraps the command: the flag check runs the CLI, or the start command set for it.
         let preassignment = provider == .claude
             ? ClaudeSessionIDFlagSupport.shared.preassigningSessionID(to: command)
             : nil

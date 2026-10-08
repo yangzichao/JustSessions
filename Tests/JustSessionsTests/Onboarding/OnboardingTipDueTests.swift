@@ -64,13 +64,20 @@ struct OnboardingTipDueTests {
         #expect(dueStops(in: plainTerminal, among: [.keepRunning]).isEmpty)
     }
 
-    @Test func secondTabPointsAtOpenTabs() {
+    @Test func secondTabPointsAtOpenTabsThenSplitView() {
         let tipsToShow = everyTipButTheTour.subtracting([.terminalTab, .keepRunning])
         let oneTab = OnboardingWindowContext(hasSelectedTab: true, openTabCount: 1)
         #expect(dueStops(in: oneTab, among: tipsToShow).isEmpty)
 
         let twoTabs = OnboardingWindowContext(hasSelectedTab: true, openTabCount: 2)
-        #expect(dueStops(in: twoTabs, among: tipsToShow) == [.openTabs])
+        let dueTips = OnboardingTip.due(in: twoTabs, among: tipsToShow)
+        #expect(dueTips.map(\.tip) == [.openTabs, .splitView])
+        #expect(dueTips.flatMap(\.stops) == [.openTabs, .splitView])
+    }
+
+    @Test func splitViewTipWaitsWhileTheSelectedTabIsInASplit() {
+        let alreadySplit = OnboardingWindowContext(hasSelectedTab: true, isSelectedTabInSplit: true, openTabCount: 2)
+        #expect(dueStops(in: alreadySplit, among: [.splitView]).isEmpty)
     }
 
     @Test func shownTipsAreNotDueAgain() {

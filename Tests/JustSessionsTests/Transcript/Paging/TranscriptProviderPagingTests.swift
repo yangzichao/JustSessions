@@ -44,6 +44,37 @@ struct TranscriptProviderPagingTests {
         #expect(asSession.entries.isEmpty)
     }
 
+    /// A turn's label depends on the entry before it in the session, not on whether the page holding that entry is
+    /// loaded, so no entry gains or loses its label, and moves what is below it, as pages load and leave.
+    @Test func turnLabelsDoNotDependOnWhichPagesAreLoaded() async throws {
+        let fixture = try TranscriptPagingFixture(count: 0)
+        defer { fixture.remove() }
+        let lines = [
+            #"{"type":"user","message":{"content":"Question"}}"#,
+            #"{"type":"assistant","message":{"content":[{"type":"text","text":"First"}]}}"#,
+            #"{"type":"assistant","message":{"content":[{"type":"text","text":"Second"}]}}"#,
+            #"{"type":"system","content":"Hidden between pages"}"#,
+            #"{"type":"assistant","message":{"content":[{"type":"text","text":"Third"}]}}"#,
+            #"{"type":"assistant","message":{"content":[{"type":"text","text":"Fourth"}]}}"#,
+        ]
+        try Data(lines.joined(separator: "\n").utf8).write(to: fixture.file)
+        var limits = TranscriptPageLimits()
+        limits.targetEntryCount = 2
+        let source = TranscriptPageSource(file: fixture.file, provider: .claude, limits: limits)
+
+        let latest = try await source.read(.latest)
+        let earlier = try await source.read(.before(latest.records.lowerBound))
+
+        // The record just before the latest page shows nothing, so its speaker comes from the one before that.
+        #expect(latest.precedingSpeaker == 1)
+        #expect(earlier.precedingSpeaker == 0)
+        let alone = TranscriptPageAssembler.transcript(pages: [latest])
+        let joined = TranscriptPageAssembler.transcript(pages: [earlier, latest])
+        #expect(alone.entries.map(\.startsTurn) == [false, false])
+        #expect(joined.entries.map(\.startsTurn) == [true, false, false, false])
+        #expect(TranscriptPageAssembler.transcript(pages: [earlier]).entries.map(\.startsTurn) == [true, false])
+    }
+
     @Test func piPagesOnlyTheActiveBranchIncludingReorderedJSON() async throws {
         let fixture = try TranscriptPagingFixture(count: 0)
         defer { fixture.remove() }

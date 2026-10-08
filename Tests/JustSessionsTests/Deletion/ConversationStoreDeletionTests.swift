@@ -148,7 +148,7 @@ struct ConversationStoreDeletionTests {
         #expect(sandbox.fileExists(for: running))
     }
 
-    @Test func aSecondDeletionIsIgnoredWhileOneRuns() async throws {
+    @Test func aSecondDeletionJoinsTheRunningOne() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
         let first = try sandbox.savedConversation()
@@ -156,29 +156,38 @@ struct ConversationStoreDeletionTests {
         let store = sandbox.makeStore(listing: [first, second])
 
         store.delete(first)
-        #expect(!store.canStartDeletion(of: [second]))
         store.delete(second)
-        store.deleteConversations([second])
-        #expect(!store.isDeletionPending(for: second))
+        #expect(store.isDeletionPending(for: second))
+        #expect(store.deletionProgress.totalCount == 2)
+        // Asked for again, it is not deleted twice.
+        store.deleteConversations([first, second])
+        #expect(store.deletionProgress.totalCount == 2)
         try await expectEventually { !store.isDeletingSessions }
 
-        #expect(store.canStartDeletion(of: [second]))
-        #expect(store.conversations.map(\.id) == [second.id])
-        #expect(sandbox.fileExists(for: second))
+        #expect(store.conversations.isEmpty)
+        #expect(!sandbox.fileExists(for: first) && !sandbox.fileExists(for: second))
+        #expect(store.alert == nil)
     }
 
-    @Test func nothingIsDeletedWhileThisMacIsBeingScanned() throws {
+    @Test func aDeletionWaitsWhileThisMacIsBeingScanned() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
         let conversation = try sandbox.savedConversation()
         let store = sandbox.makeStore(listing: [conversation])
         store.hostRefreshStatuses[.thisMac] = .refreshing
-        #expect(!store.canStartDeletion(of: [conversation]))
 
         store.delete(conversation)
         store.deleteConversations([conversation])
 
         #expect(!store.isDeletingSessions)
+        #expect(store.queuedDeletionConversationIDs == [conversation.id])
+        #expect(store.isDeletionPending(for: conversation))
         #expect(sandbox.fileExists(for: conversation))
+
+        store.hostRefreshStatuses[.thisMac] = .refreshed(.now)
+        store.startQueuedDeletion()
+        try await expectEventually { !store.isDeletingSessions }
+        #expect(store.queuedDeletionConversationIDs.isEmpty)
+        #expect(!sandbox.fileExists(for: conversation))
     }
 }

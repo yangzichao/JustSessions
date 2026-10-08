@@ -1,8 +1,8 @@
 import Foundation
 
 /// The onboarding tips shown so far. An install that was fresh when this was first read shows each tip once, those
-/// added in later versions too. One that already had saved settings had been used, so it shows none; Help still
-/// starts the tour.
+/// added in later versions too. One that already had saved settings had been used, so it shows none until Help's
+/// Take the tour shows them all again.
 @MainActor
 final class OnboardingTipsStore {
     /// Created at launch, before anything else saves a setting, so a fresh install still looks like one.
@@ -13,7 +13,7 @@ final class OnboardingTipsStore {
     static let showsTipsKey = "showsOnboardingTips"
     static let shownTipsKey = "onboardingTipsShown"
 
-    private let showsTips: Bool
+    private var showsTips: Bool
     private var shownTips: Set<OnboardingTip>
     private let userDefaults: UserDefaults
 
@@ -32,6 +32,14 @@ final class OnboardingTipsStore {
 
     func shouldShow(_ tip: OnboardingTip) -> Bool {
         showsTips && !shownTips.contains(tip)
+    }
+
+    /// Shows every tip once more, the tour's too, also on an install that showed none.
+    func showEveryTipAgain() {
+        showsTips = true
+        shownTips = []
+        userDefaults.set(true, forKey: Self.showsTipsKey)
+        userDefaults.removeObject(forKey: Self.shownTipsKey)
     }
 
     func markShown(_ tip: OnboardingTip) {

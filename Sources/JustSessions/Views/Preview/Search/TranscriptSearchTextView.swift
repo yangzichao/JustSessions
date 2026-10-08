@@ -24,6 +24,12 @@ final class TranscriptSearchTextView: NSTextView {
         setAccessibilityElement(true)
     }
 
+    /// AppKit's `init(frame:)` sets up the text system through this initializer, called on the subclass, so it must be
+    /// overridden for `init()` to return.
+    override init(frame frameRect: NSRect, textContainer container: NSTextContainer?) {
+        super.init(frame: frameRect, textContainer: container)
+    }
+
     required init?(coder: NSCoder) { nil }
 
     func measuredSize(width: CGFloat?) -> CGSize {

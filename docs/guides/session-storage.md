@@ -2,7 +2,7 @@
 
 [Back to JustSessions](../../README.md) · [Session management guide](session-management.md)
 
-JustSessions reads the session files your CLIs already create. It does not upload conversation history to a JustSessions service. When you add an SSH host, its supported session files are copied to a cache on your Mac over SSH. The CLIs you run keep their own network behavior and provider accounts. Sparkle checks for app updates through a JustSessions update server that counts checks per day and app version, without storing IP addresses or identifiers; the downloads come from GitHub Releases.
+JustSessions reads the session files your CLIs already create. It does not upload conversation history to a JustSessions service. When you add an SSH host, its supported session files are copied to a cache on your Mac over SSH. The CLIs you run keep their own network behavior and provider accounts. Sparkle checks for app updates through a JustSessions update server that counts checks per day and app version, without storing IP addresses or identifiers; the downloads come from GitHub Releases. After a crash, JustSessions offers to report it with a GitHub issue or an email filled in from the crash report macOS saved; nothing is sent unless you send it.
 
 ## Session locations
 
@@ -35,6 +35,10 @@ The app keeps a session's reading position, including an offset within a long me
 
 Reading uses up to three nearby pages, normally about 80 entries per page. Pages also have byte and source-record budgets; all parts of one source record stay together. JSONL readers build a lightweight byte-offset index instead of decoding the entire history. Pi also resolves its active branch from parent links, and Antigravity reads selected step payloads from a consistent SQLite snapshot. A source record above 16 MiB is not decoded for preview; Pi reports an error if such a record prevents correct branch selection. Export continues to use the full transcript loader rather than the page window.
 
+## Message search
+
+Searching message text reads each listed session once, with the same code as the reader, and keeps the text it searches in `~/Library/Caches/dev.zichaoyang.justsessions/SessionMessages`, one file per session. Later searches, after a relaunch too, read again only sessions whose files changed; an SSH host's sessions are read from its local cache. The text of a session that is no longer listed is removed after 30 days. The text leaves memory a minute after the last window closes its search. Nothing is sent anywhere, and the CLIs' files are not changed.
+
 ## CLI launch and discovery
 
 The app runs each CLI in a pseudo-terminal with the original project as its working directory, using the CLI's own resume and fork commands. When started from Finder, it combines the inherited `PATH` with the user's login-shell `PATH` and common installation folders, including Homebrew and Node version manager locations. Session discovery reads existing files; app startup also reads the login shell's `PATH`, and tmux integration checks its version and running sessions.
@@ -47,7 +51,7 @@ Claude Code, Codex, and Antigravity CLI reveal which session a new tab's CLI is 
 
 The packaged app contains tmux and its terminal database in `Contents/Resources/Tmux`, with its third-party libraries statically linked. It needs no Homebrew, separate installer, system-directory changes, or runtime download. Direct `swift run` builds use an installed tmux 3.3 or later; without a supported tmux, the CLI runs directly.
 
-The first background refresh checks the available versions. The app prefers its bundled runtime, but uses the installed client when needed to reconnect to an existing JustSessions server, so migration does not restart running work. Each CLI runs in the app's own server (`-L justsessions`), which ignores `~/.tmux.conf` and leaves your other tmux sessions alone. SSH sessions use the host's tmux; the bundled Mac executable is not copied to remote hosts.
+The first background refresh checks the available versions. The app prefers its bundled runtime, but uses the installed client when needed to reconnect to an existing JustSessions server, so migration does not restart running work. Each CLI runs in the app's own server (`-L justsessions`), which ignores `~/.tmux.conf` and leaves your other tmux sessions alone. A CLI that exits with an error keeps its tmux pane while its tab is open (`remain-on-exit failed`), so the tab still shows the CLI's output rather than only tmux's `[exited]`; tmux reports the CLI's exit status to the tab, and the session ends once the tab closes or detaches. SSH hosts keep tmux's default, so a failed CLI's output there still disappears with its session. SSH sessions use the host's tmux; the bundled Mac executable is not copied to remote hosts. Their tmux sessions have no prefix key, so every key reaches the CLI. To use the prefix keys from the host's `~/.tmux.conf` in them instead, point at the host's heading, click its **⋯** (or right-click the heading), and choose **Use this host's tmux prefix**; the change reaches the host's running JustSessions sessions at once, and your other tmux sessions keep their own settings either way.
 
 For a bundled server, `"/Applications/JustSessions.app/Contents/Resources/Tmux/bin/tmux" -L justsessions ls` lists its sessions. Use the original installed client for a server started by an older release until those sessions finish. In a tmux tab, dragging selects through tmux and copies to the clipboard when you let go; hold Shift while dragging to select the usual way. Shift-Return still adds a new line in Claude Code.
 

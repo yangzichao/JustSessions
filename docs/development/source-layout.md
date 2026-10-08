@@ -4,50 +4,60 @@
 
 Application paths below are relative to `Sources/JustSessions/`. Tests live in `Tests/JustSessionsTests/`, with Gherkin features and their steps in `Tests/JustSessionsTests/Gherkin/`; see [Gherkin features](build-and-release.md#gherkin-features).
 
-- `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up.
+- `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up. `UnseenTurns/` holds the CLIs that finished a turn while their terminal was off screen, until you look, and which running CLIs wait on you: stopped for your answer, or done with a turn you have not seen.
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
 - `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
 - `Models/Transcript/`: the reading width, a readable column or the full window, shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
 - `Models/Customizations/`: session and project names you set, and pins.
+- `Models/StartCommands/`: the command each tool's CLI starts with on each host, when it is not the one the app uses, set in the New session sheet; and what that command stands in for, `kiro-cli chat` for Kiro CLI and the executable for the other tools.
 - `Models/Onboarding/`: the onboarding tour's stops, the tips a fresh install shows once each, and when each tip is due from what the window shows.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
-- `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, and each host's refresh status.
+- `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, each host's refresh status, and the SSH hosts whose tmux sessions use the host's own prefix keys.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, multi-selection, which Open tabs groups are collapsed, and, in `Subagents/`, which sessions list their subagents' sessions under them.
+- `Services/Sidebar/`: the sidebar's projects as the filters and search leave them. `Sessions/` picks what a session row shows as its CLI's status: its running tab's, the selected one first, then its CLI's in tmux with no tab open.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
+- `Models/Terminal/Tabs/Moving/`: dragging in the tab bar: a tab moves within its group, a split's two tabs together, and a group whole by its label; and where a dragged tab or group lands as the pointer moves.
+- `Models/Terminal/Closing/`: what closing a tab does when its CLI can keep running in tmux: ask each time, keep it running, or end it.
 - `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, and where a shown split's panes and the resize area between them sit.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
-- `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files.
+- `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files. `UnseenTurns/` marks a session after each sync and clears the mark once its tab is on screen.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
-- `Services/Onboarding/`: saves which onboarding tips have shown, and whether the install shows them at all, decided once from whether it was fresh.
+- `Services/Onboarding/`: saves which onboarding tips have shown, and whether the install shows them at all, decided once from whether it was fresh; Help's Take the tour shows them all again.
 - `Services/Permissions/`: reads each permission's status without asking for it, and the System Settings page that changes it.
 - `Services/Startup/`: registers the app as a macOS login item and reads its current system approval status.
+- `Services/CrashReports/`: at launch, finds the crash macOS recorded for the app since the last launch, in `~/Library/Logs/DiagnosticReports`, and offers once to report it.
 - `Services/Appearance/`: saves the app's appearance and theme, sets the appearance on every window, and gives terminals a newly chosen theme's colors.
 - `Services/Adapters/`: provider discovery and native arguments, one folder per CLI. Separate adapters make adding another CLI straightforward.
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
 - `Services/Hosts/InstalledCLIs/`: which CLIs each host has, so new sessions offer only those.
 - `Services/Launch/`: CLI executable resolution and process environment.
 - `Services/Launch/PlainTerminal/`: opens a plain terminal, a login shell in a project folder that is no session.
-- `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there.
+- `Services/Launch/StartCommand/`: runs a start command of your own through a shell, on this Mac and on SSH hosts, with the app's arguments after it; `env` then runs the CLI in the shell's place, so the tab's process is still the CLI's. `Check/` reads a command before it is kept, without running it, and looks up its program where the CLI runs. The New session sheet's field, locked until Edit, is in `Views/Browser/NewSession/StartCommand/`.
+- `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there, including its prefix keys.
 - `Services/Remote/HostStatus/`: one SSH call per refresh that lists the host's tmux sessions and installed CLIs.
 - `Services/Tmux/ThisMac/`: bundled runtime discovery, terminal database environment, compatible server selection, and local persistence.
 - `Cloudflare/UpdateFeed/`: the Worker at the app's `SUFeedURL`, which counts update checks per day and app version and redirects to the appcast on GitHub. See [Counting update checks](update-checks.md).
 - `Scripts/Release/`: release checks, such as opening the packaged app without the build machine's resource bundles.
 - `Scripts/Tmux/`: pinned source builds, license collection, and relocated runtime verification for app packaging and CI.
 - `Services/Tmux/`: tmux session names, and keeping a CLI running after its tab closes, on any host.
-- `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, and finding each tab's CLI process.
+- `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, finding each tab's CLI process, and keeping a failed CLI's output and exit status in its tab.
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
-- `Services/Terminal/Closing/`: waits for a closed tab's process to exit, so it leaves no zombie behind.
+- `Services/Terminal/Closing/`: waits for a closed tab's process to exit, so it leaves no zombie behind, and saves what closing a tab whose CLI can keep running does, chosen with Don't ask again in the close dialog or in General settings.
+- `Services/Terminal/FileDrop/`: files dropped on a tab on this Mac type their paths, each as its own paste, so Claude Code and Codex attach a dropped image. Tabs on SSH hosts take no drops, since the host can't open this Mac's files.
 - `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal.
+- `Services/Terminal/Appearance/ThemeReports/`: answers a program that asks whether the terminal is light or dark (`CSI ? 996 n`), and tells one that subscribes (`CSI ? 2031 h`), such as tmux, each time the terminal's colors change. SwiftTerm handles neither; on each report tmux reads the new background, so a CLI in tmux sees it.
 - `Services/Terminal/Appearance/Import/`: reads colors from iTerm2's default profile or an `.itermcolors` file, only when asked.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
 - `Services/Terminal/ClaudeLiveSession/`: reads Claude Code's live registry for names chosen with `/rename`, and makes a tab follow its CLI to the session `/clear` starts.
+- `Services/Terminal/AppendedSessionNames/`: shows a name an open tab's CLI on this Mac appends to a file as soon as it does: Claude Code's `/rename` and Pi's `/name` in the session's own file, and a Codex thread's name in `session_index.jsonl`. For Claude Code it backs up the live registry, which some setups leave without the name.
 - `Services/Terminal/CodexLiveThread/`: starts Codex on this Mac with its thread's id in the terminal title, and reads that title so a new tab finds its thread and a tab follows its CLI to the thread `/new`, `/clear`, `/resume`, or `/fork` moves it to.
+- `Services/Terminal/LiveSessionFollowing/`: makes an Antigravity, Pi, or OpenCode tab on this Mac follow the session its CLI is in: Antigravity's from the log it holds open, in `Antigravity/`; Pi's and OpenCode's from the extension the app starts them with, which reports it to a file, in `Reporting/`.
 - `Services/Terminal/Tabs/`: moving between tabs, and linking a tab to the session its CLI is in.
 - `Services/Terminal/AppearingSessions/`: links a new tab to the first session that appears in its project, for SSH hosts and for CLIs that don't reveal the session they write.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
@@ -55,31 +65,36 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Transcript/Markdown/`: splits Markdown into prose, code blocks, and tables for the native views.
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
 - `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
+- `Views/Browser/Tabs/Dragging/`: the drag gesture tabs and group labels share, which takes over from their buttons once the pointer moves.
 - `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, joined for a split's two tabs, how tabs narrow to share the bar as more open, and the terminal colors the selected tab takes on.
+- `Views/Browser/WindowDragging/`: the tab bar's window move zone. AppKit would move the window from a press on a tab, since the bar is in the title bar, so while the pointer is over the bar the window can't be moved, and the app moves it itself from the bar's empty space.
 - `Views/Browser/Split/`: what a shown split view draws around its panes, as Chrome does: the area's terminal-colored background, each pane's rounded outline with its mini toolbar in the corner, and the resize area between the panes, which you drag to resize them.
-- `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help & feedback in the same sheet.
+- `Views/Browser/DockMenu/`: the Dock icon's right-click menu, whose New Window opens a workspace window through SwiftUI's `openWindow`, handed over by each workspace window as it appears.
+- `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help in the same sheet.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
 - `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, subagents' session rows with the chevron that shows them, and multi-selection. `SidebarRowMoreActionsMenu` is the ⋯ that project and session rows show under the pointer, which opens the row's right-click menu.
 - `Views/Browser/Sidebar/Header/`: the app mark with the search and new session icons; search opens into a field across that line.
 - `Views/Browser/Sidebar/Navigation/`: the Projects / Open tabs switch and persistent view containers that retain both lists' scroll positions.
 - `Views/Browser/Sidebar/OpenTabs/`: the full-height open-tab list, grouped by project under headings in the tab bar's group colors that collapse their groups, without indenting the rows, independent search, and empty states.
-- `Views/Browser/Sidebar/Hosts/`: host headings with their own refresh buttons and progress, and the Add SSH host button and sheet. `Menu/` holds a heading's right-click menu. `AddProject/` holds the heading's +, a menu that also restores archived projects while the host has any, and the sheet that types the path of a project to add on an SSH host; this Mac's is picked with the folder panel in `Views/Browser/ProjectFolders/`, which the New session sheet uses too.
+- `Views/Browser/Sidebar/Hosts/`: host headings with their own refresh buttons and progress, a warning after the name whose tooltip says why the last refresh failed, and the Add SSH host button and sheet. `Menu/` holds a heading's right-click menu, and an SSH host's own settings, which the heading's ⋯ shows alone in place of the refresh status under the pointer, because its + and refresh buttons offer the rest. `AddProject/` holds the heading's +, a menu that also restores archived projects while the host has any, and the sheet that types the path of a project to add on an SSH host and offers to create the folder there when it is missing; this Mac's is picked with the folder panel in `Views/Browser/ProjectFolders/`, which the New session sheet uses too.
 - `Views/Terminal/`: a tab's embedded terminal, inset from the window's edges, and the bar above it once its CLI ends.
 - `Views/Preview/`: conversation preview for the selected session.
+- `Views/Preview/MissingFolder/`: the note under a session's header when its project folder is gone from this Mac.
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
 - `Views/Preview/Reading/` and `ReadingPosition/`: text size, reading width, first/latest-message controls, and reading-position restoration.
 - `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.
 - `Models/Transcript/Search/`, `Services/Transcript/Search/`, and `Views/Preview/Search/`: temporary per-reader text matching, keyboard shortcuts, highlights, and navigation to occurrences in the displayed transcript.
-- `Views/Dialogs/`: the store's alert and the deletion confirmation. `ClickOutside/` closes a sheet, alert, or dialog, as Cancel would, when you click the window around it.
-- `Views/Onboarding/`: starts the tour on a fresh install's first window, or from Help, then each tip the first time its part of the window comes into use, such as reading a session or opening a tab; and the tip card with its copy. `Popover/` shows the card beside the control it is about, hiding it while a sheet is open or the control is scrolled out of sight.
+- `Models/MessageSearch/`, `Services/MessageSearch/`, and `Views/Browser/Sidebar/MessageSearch/`: searching every listed session's messages from the sidebar. `Text/` reads a whole session the way the reader pages through it, `Cache/` keeps that text on disk per session until its file changes, and `Matching/` finds a query in it. `SessionMessageIndexer` reads the sessions while a window searches, and the sidebar shows a matching line under each session; clicking one opens the reader at that message with Find showing the search.
+- `Views/Dialogs/`: the store's alert and the deletion confirmation, and in `CrashReports/` the offer to report the last crash. `ClickOutside/` closes a sheet, alert, or dialog, as Cancel would, when you click the window around it.
+- `Views/Onboarding/`: starts the tour on a fresh install's first window, or from Help, then each tip the first time its part of the window comes into use, such as reading a session, opening a tab, or opening a second one for split view; and the tip card with its copy. `Popover/` shows the card beside the control it is about, hiding it while a sheet is open or the control is scrolled out of sight.
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
-- `Views/Settings/`: the Settings sheet, with General (language, startup, notifications, and software updates), Appearance, Permissions, and Help & feedback pages, each in a `SettingsTabPage` of the one size they share.
+- `Views/Settings/`: the Settings sheet, with General, Appearance, Permissions, and Help pages, each in a `SettingsTabPage` of the one size they share. General holds language, startup, and notifications, then About: the app and macOS versions, software updates, and links to send feedback or open the website and GitHub. `Models/App/Feedback/` starts a feedback email or GitHub issue with those versions; `CrashReports/` there reads what a macOS crash report says about a crash of the app and fills a bug report or email with it.
 - `Views/Settings/Appearance/`: the app's appearance and theme in `App/`, then its terminals' colors, font, and preview in `Terminal/`, with the color scheme and iTerm2 import menus in `Terminal/Colors/`.
 - `Views/Settings/Permissions/`: each permission's status and a link to its page in System Settings.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
-- `Views/Settings/Help/`: the Help & feedback page: feature overview, SSH setup, the keyboard shortcut list (`Shortcuts/`), the user guide, and links to create a GitHub issue or email feedback. `Models/App/AppLinks.swift` holds the destinations.
+- `Views/Settings/Help/`: the Help page, one `HelpSection` each: the tour and user guide, how each part of the window works, SSH setup, what to check when a session is missing, and the keyboard shortcut list (`Shortcuts/`). `Models/App/AppLinks.swift` holds the destinations of Help and About.
 - `Views/Theme/`: the chosen theme's colors, and button styles.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 

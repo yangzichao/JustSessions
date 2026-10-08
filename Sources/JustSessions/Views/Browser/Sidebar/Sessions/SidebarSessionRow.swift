@@ -3,14 +3,6 @@ import SwiftUI
 /// A session under its project: tool icon and title, then a pin and either its CLI's status or how long ago it was active.
 /// The status gives way to a ⋯ while the pointer is over the row, which opens the same menu as a right-click.
 struct SidebarSessionRow: View {
-    /// What the row's trailing status follows.
-    private enum StatusSource {
-        /// A tab's CLI, running or ended.
-        case tab(TerminalSession)
-        /// A CLI running in tmux with no tab open.
-        case detachedCLI(CLIActivity?)
-    }
-
     @ObservedObject var store: ConversationStore
     let conversation: Conversation
     let sessionSelection: SessionMultiSelection
@@ -18,37 +10,29 @@ struct SidebarSessionRow: View {
     /// The sessions its subagents ran in; a chevron before its icon shows or hides them.
     let subagentCount: Int
     let isShowingSubagents: Bool
+    /// While searching, the session's first match in its messages, shown under the title.
+    var messageMatch: SessionMessageMatch? = nil
     let onClick: (Conversation) -> Void
     let onToggleSubagents: () -> Void
     let onRename: (Conversation) -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
+    let onCloseTab: (UUID) -> Void
 
     @State private var isHovered = false
 
-    /// A tab whose CLI runs comes first, the selected one among them; then a CLI running in tmux with no tab; then a
-    /// tab whose CLI ended or has not started. Nil when nothing runs the session.
-    private func statusSource(tabs: [TerminalSession]) -> StatusSource? {
-        let runningTabs = tabs.filter(\.isRunning)
-        if let runningTab = runningTabs.first(where: { $0.id == store.selectedTerminalID }) ?? runningTabs.first {
-            return .tab(runningTab)
-        }
-        if store.isRunningInTmux(conversation) { return .detachedCLI(store.detachedCLIActivities[conversation.id]) }
-        return tabs.first.map { .tab($0) }
-    }
-
-    private func statusDescription(of source: StatusSource) -> String {
+    private func statusDescription(of source: SessionRowStatusSource) -> String {
         switch source {
         case .tab(let tab):
             tab.runStatus.summary
-        case .detachedCLI(let activity):
-            SessionStatusIndicator.descriptionOfDetachedCLI(.running(activity), on: conversation.host)
+        case .detachedCLI(let status):
+            SessionStatusIndicator.descriptionOfDetachedCLI(status, on: conversation.host)
         }
     }
 
     var body: some View {
         let title = store.title(for: conversation)
         let tabs = store.terminalSessions.filter { $0.conversation?.id == conversation.id }
-        let statusSource = statusSource(tabs: tabs)
+        let statusSource = store.sessionRowStatusSource(of: conversation)
         let isHighlighted = sessionSelection.contains(conversation.id) || tabs.contains { $0.id == store.selectedTerminalID }
         let isPinned = store.pinnedItems.isPinned(conversationID: conversation.id)
         let statusDescription = statusSource.map(statusDescription(of:))
@@ -56,10 +40,18 @@ struct SidebarSessionRow: View {
         Button {
             onClick(conversation)
         } label: {
-            SidebarSessionRowLayout(provider: conversation.provider, isSelected: isHighlighted) {
-                Text(title)
-            } trailing: {
-                if isPinned { PinnedIndicator() }
+            SidebarSessionRowLayout(
+                provider: conversation.provider,
+                isSelected: isHighlighted,
+                title: {
+                    // Beside the title, as in the preview's header, so the pin isn't taken for one of the status icons.
+                    HStack(spacing: 4) {
+                        Text(title)
+                        if isPinned { PinnedIndicator() }
+                    }
+                },
+                detail: messageMatch.map { SidebarSessionMessageSnippet(snippet: $0.snippet) }
+            ) {
                 statusOrMoreActionsRoom(statusSource, description: statusDescription)
             }
         }
@@ -77,6 +69,7 @@ struct SidebarSessionRow: View {
                 )
             }
         }
+        .accessibilityValue(Text(verbatim: messageMatch?.snippet.text ?? ""))
         // Over the button rather than in it, so a click on the ⋯ opens its menu instead of selecting the session.
         .overlay(alignment: .trailing) {
             SidebarRowMoreActionsMenu(accessibilityLabel: "More actions for \(title)") {
@@ -107,14 +100,15 @@ struct SidebarSessionRow: View {
                 store: store,
                 conversation: conversation,
                 onRename: { onRename(conversation) },
-                onDelete: { onRequestDeletion(.conversation(conversation)) }
+                onDelete: { onRequestDeletion(.conversation(conversation)) },
+                onCloseTab: onCloseTab
             )
         }
     }
 
     /// The status hides while the ⋯ is laid over its place. The row keeps the ⋯'s room either way, so the title doesn't
     /// move as the pointer passes over it.
-    private func statusOrMoreActionsRoom(_ source: StatusSource?, description: String?) -> some View {
+    private func statusOrMoreActionsRoom(_ source: SessionRowStatusSource?, description: String?) -> some View {
         ZStack(alignment: .trailing) {
             statusIndicator(source, description: description)
                 .opacity(isHovered ? 0 : 1)
@@ -124,12 +118,12 @@ struct SidebarSessionRow: View {
     }
 
     @ViewBuilder
-    private func statusIndicator(_ source: StatusSource?, description: String?) -> some View {
+    private func statusIndicator(_ source: SessionRowStatusSource?, description: String?) -> some View {
         switch source {
         case .tab(let tab):
             TerminalStatusIndicator(session: tab)
-        case .detachedCLI(let activity):
-            SessionStatusIndicator(status: .running(activity), description: description)
+        case .detachedCLI(let status):
+            SessionStatusIndicator(status: status, description: description)
         case nil:
             SessionAgeLabel(lastActivity: conversation.updatedAt)
         }

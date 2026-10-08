@@ -27,6 +27,14 @@ private struct SessionDeletionDialog: ViewModifier {
                     store.deleteSessionsAndRemoveProject(projectPath)
                 }
                 .disabled(!plan.hasDeletableConversations)
+            case .selectedProjectsRemoval(let projectPaths):
+                let plan = store.deletionPlan(forProjects: projectPaths)
+                deleteButton(title: SessionDeletionConfirmationText.selectedProjectsRemovalButtonTitle(
+                    projectCount: projectPaths.count, plan: plan, language: language
+                )) {
+                    store.deleteSessionsAndRemoveProjects(projectPaths)
+                }
+                .disabled(!plan.hasDeletableConversations)
             case nil:
                 EmptyView()
             }
@@ -67,6 +75,11 @@ private struct SessionDeletionDialog: ViewModifier {
             SessionDeletionConfirmationText.message(
                 forDeletingProjectAt: ProjectLocation(key: projectPath),
                 plan: store.deletionPlan(for: projectPath), removesProjectFromSidebar: true, language: language
+            )
+        case .selectedProjectsRemoval(let projectPaths):
+            SessionDeletionConfirmationText.message(
+                forRemovingSelectedProjectsAt: projectPaths.map(ProjectLocation.init(key:)),
+                plan: store.deletionPlan(forProjects: projectPaths), language: language
             )
         }
     }

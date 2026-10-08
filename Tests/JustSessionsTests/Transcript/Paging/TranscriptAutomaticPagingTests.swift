@@ -20,7 +20,7 @@ struct TranscriptAutomaticPagingTests {
         #expect(fixture.visiblePosition(in: scrollView) == anchor)
         #expect(model.pages.count == 1)
         try await fixture.scroll(scrollView, to: 100)
-        try await expectEventually(timeout: .seconds(5)) { model.pages.first!.records.lowerBound < firstBoundary }
+        try await expectEventually { model.pages.first!.records.lowerBound < firstBoundary }
         try await fixture.settleLayout()
         #expect(fixture.positionStore.position(for: files.conversation.id)?.entryIndex == anchor.entryIndex)
     }
@@ -43,7 +43,7 @@ struct TranscriptAutomaticPagingTests {
         let scrollView = try await fixture.show(files.conversation, transcript: try #require(model.transcript), paging: model, searchState: searchState)
         #expect(model.pages.count == 1)
         searchState.close()
-        try await expectEventually(timeout: .seconds(5)) { model.pages.last!.records.upperBound > lastBoundary }
+        try await expectEventually { model.pages.last!.records.upperBound > lastBoundary }
         try await fixture.settleLayout()
         #expect(fixture.visiblePosition(in: scrollView) == anchor)
     }
@@ -62,6 +62,6 @@ struct TranscriptAutomaticPagingTests {
         _ = try await fixture.show(files.conversation, transcript: try #require(model.transcript), paging: model, isActive: false)
         #expect(model.pages.count == 1)
         _ = try await fixture.show(files.conversation, transcript: try #require(model.transcript), paging: model)
-        try await expectEventually(timeout: .seconds(5)) { model.pages.first!.records.lowerBound < firstBoundary }
+        try await expectEventually { model.pages.first!.records.lowerBound < firstBoundary }
     }
 }

@@ -34,7 +34,8 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
     /// Whether a new session's tab on this Mac is linked to the first session that appears in its project after it
     /// started, as on SSH hosts. The other tools leave evidence of the session a process writes; see
     /// `NewSessionFileFinder`. These write their sessions without keeping the file open, or into a database that
-    /// every session shares.
+    /// every session shares. A Pi or OpenCode tab that the app started with its reporting extension then moves to the
+    /// session its CLI reports; see `followLiveSessions`.
     var linksNewSessionsByAppearance: Bool {
         switch self {
         case .claude, .codex, .antigravity: false

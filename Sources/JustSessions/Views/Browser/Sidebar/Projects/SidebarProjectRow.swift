@@ -14,6 +14,7 @@ struct SidebarProjectRow: View {
     let onDeleteSessions: () -> Void
     let onRemoveProjectAndDeleteSessions: () -> Void
     let onRemoveSelectedProjects: () -> Void
+    let onRemoveSelectedProjectsAndDeleteSessions: () -> Void
 
     @State private var isHovered = false
 
@@ -39,7 +40,8 @@ struct SidebarProjectRow: View {
 
             Button(action: onClick) {
                 HStack(spacing: 7) {
-                    Image(systemName: "folder")
+                    // A pinned project's pin takes the folder's place, rather than joining the status and actions at the end.
+                    Image(systemName: project.isPinned ? "pin.fill" : "folder")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                         .frame(width: 16)
@@ -56,7 +58,6 @@ struct SidebarProjectRow: View {
                         }
                     }
                     Spacer(minLength: 4)
-                    if project.isPinned { PinnedIndicator() }
                     if let status = activitySummary.mostPressingStatus {
                         SessionStatusIndicator(status: status, description: activitySummary.summary)
                     }
@@ -84,8 +85,10 @@ struct SidebarProjectRow: View {
     private var menuItems: some View {
         if isSelected && projectSelection.hasMultipleSelected {
             SelectedProjectsContextMenu(
-                selectedCount: projectSelection.selectedProjectIDs.count,
-                onRemove: onRemoveSelectedProjects
+                store: store,
+                selectedProjectIDs: projectSelection.selectedProjectIDs,
+                onRemove: onRemoveSelectedProjects,
+                onRemoveAndDeleteSessions: onRemoveSelectedProjectsAndDeleteSessions
             )
         } else {
             ProjectContextMenu(
@@ -107,20 +110,13 @@ struct SidebarProjectRow: View {
                 .font(.system(size: 11).monospacedDigit())
                 .foregroundStyle(.secondary)
                 .opacity(isHovered ? 0 : 1)
-            HStack(spacing: 0) {
-                SidebarRowMoreActionsMenu(accessibilityLabel: "More actions for \(project.displayName)") {
-                    menuItems
-                }
-                ProjectNewSessionMenu(
-                    project: project,
-                    providers: store.newSessionProviders(on: project.host),
-                    showsTitle: false,
-                    onStart: onNewSession,
-                    onOpenTerminal: { store.openPlainTerminal(in: project.location) }
-                )
-                .menuStyle(.borderlessButton)
-                .menuIndicator(.hidden)
-                .fixedSize()
+            ProjectHoverActions(
+                store: store,
+                location: project.location,
+                projectDisplayName: project.displayName,
+                onNewSession: onNewSession
+            ) {
+                menuItems
             }
             .opacity(isHovered ? 1 : 0)
             .allowsHitTesting(isHovered)

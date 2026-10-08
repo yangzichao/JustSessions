@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// The General tab of Settings: interface language, what the app does at startup, when it notifies you, and a link to
-/// software updates.
+/// The General tab of Settings: interface language, what the app does at startup, what closing a tab does, and when
+/// it notifies you; then the installed versions, software updates, and feedback.
 struct GeneralSettingsView: View {
     @ObservedObject var languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
+    let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
     let notificationSettingsStore: SessionNotificationSettingsStore
     let onCheckForUpdates: () -> Void
 
@@ -34,11 +35,15 @@ struct GeneralSettingsView: View {
 
             ThemeDivider()
 
+            TabClosingSettingsSection(settingsStore: tabCloseChoiceSettingsStore)
+
+            ThemeDivider()
+
             NotificationSettingsSection(settingsStore: notificationSettingsStore)
 
             ThemeDivider()
 
-            SoftwareUpdateSettingsSection(onCheckForUpdates: onCheckForUpdates)
+            AboutSettingsSection(onCheckForUpdates: onCheckForUpdates)
         }
         .toggleStyle(ThemedCheckboxToggleStyle())
     }

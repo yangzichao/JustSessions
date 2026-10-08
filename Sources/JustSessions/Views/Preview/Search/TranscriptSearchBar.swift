@@ -55,7 +55,7 @@ struct TranscriptSearchBar: View {
         .padding(.horizontal, 24)
         .padding(.vertical, 8)
         .accessibilityIdentifier("preview.search-bar")
-        .onAppear { isFieldFocused = true }
+        .onAppear { if searchState.focusesFieldOnOpen { isFieldFocused = true } }
         .onChange(of: searchState.focusRevision) { isFieldFocused = true }
         .onChange(of: isFieldFocused) { searchState.isFieldFocused = isFieldFocused }
         .onDisappear { searchState.isFieldFocused = false }

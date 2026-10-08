@@ -10,7 +10,7 @@ struct NotificationSettingsSection: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Notify me when a session")
                 .font(.subheadline.weight(.medium))
-            Toggle("Needs my input, such as a permission prompt", isOn: Binding(
+            Toggle("Needs my input, such as a permission prompt (Claude Code only)", isOn: Binding(
                 get: { settingsStore.preferences.notifiesWhenInputNeeded },
                 set: { settingsStore.setNotifiesWhenInputNeeded($0) }
             ))

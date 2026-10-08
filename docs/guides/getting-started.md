@@ -21,17 +21,17 @@ You need **macOS 14 Sonoma or later on Apple Silicon**, plus at least one instal
 2. Open the disk image and drag **JustSessions** into **Applications**.
 3. Launch the app. Existing local sessions appear under **This Mac**, grouped by project.
 
-On first launch, a short tour points out your sessions, **New session**, and SSH hosts beside the controls themselves. After that, tips show the first time you need them: reading a session points out **Resume** and find, reading another points out its right-click menu and search, and your first tabs point out tab groups, hiding the sidebar, **Keep running**, and **Open tabs**. Each shows once; skip any of them. To see it again, choose **Help → Take the Tour**, or **Take the tour** in **Settings → Help & feedback**.
+On first launch, a short tour points out your sessions, **New session**, and SSH hosts beside the controls themselves. After that, tips show the first time you need them: reading a session points out **Resume** and find, reading another points out its right-click menu and search, and your first tabs point out tab groups, hiding the sidebar, **Keep running**, **Open tabs**, and split view. Each shows once; skip any of them. To see the tour again, choose **Help → Take the Tour**, or **Take the tour** in **Settings → Help**; the tips then show again too, the next time you reach each part.
 
 Sparkle delivers subsequent app updates. Your CLI provider's plans and charges still apply.
 
 ## Resume your first session
 
-1. Choose **Projects** in the sidebar, then search a project name or path, session title, or session ID.
+1. Choose **Projects** in the sidebar, then search a project name or path, session title, session ID, or something said in the session.
 2. Select a supported session to read its conversation preview.
 3. Double-click a session or choose **Resume** to open its CLI in the original working directory.
 
-Choose **Open tabs** to switch between this window's terminals, grouped by project like the tab bar; each group's heading shows its project and, for SSH, its host. Switching views keeps each list's search and scroll position. A session whose CLI is already running opens on that process with one click. Search does not include conversation text. All six support local browsing, preview, and resume. See the [full capability table](../../README.md#supported-clis).
+Choose **Open tabs** to switch between this window's terminals, grouped by project like the tab bar; each group's heading shows its project and, for SSH, its host. Switching views keeps each list's search and scroll position. A session whose CLI is already running opens on that process with one click. All six support local browsing, preview, and resume. See the [full capability table](../../README.md#supported-clis).
 
 Click the new-window button in the preview's reading toolbar to open a dedicated reading window. Adjust text with **A− / A+**, switch between a readable column and the full window width, jump to the first or latest message, and copy code without starting the CLI. [Reading controls and position memory](session-management.md#preview-before-you-resume).
 
@@ -57,7 +57,7 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 
 ## If a session or CLI is missing
 
-- In **Projects**, clear the time and CLI filters, then click the affected host's refresh button.
+- In **Projects**, clear the filters, then click the affected host's refresh button.
 - Confirm the CLI executable works in your usual terminal. New session menus offer only installed CLIs.
 - Start one conversation in the CLI so it has history for the app to discover. Kiro sessions need at least one message; OpenCode archived sessions are excluded. Subagents' sessions are listed under the session that started them: expand it with the chevron before its icon.
 - Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders, and the OpenCode database its login shell points to.
@@ -67,6 +67,6 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 
 Open **Settings** in the sidebar or press ⌘,. **General > Interface language** offers **Follow System** (default), **English**, and **Chinese**. The interface updates immediately and remembers your choice. Appearance and terminal settings also update open terminals in place. **Permissions** shows what macOS allows JustSessions, such as notifications.
 
-JustSessions reads local CLI files and caches supported remote history over SSH. It does not upload conversations to a JustSessions service. The CLIs still communicate with their providers. Sparkle checks for app updates through a JustSessions update server that counts checks per day and app version, without storing IP addresses or identifiers. [Storage and privacy](session-storage.md).
+JustSessions reads local CLI files and caches supported remote history over SSH. It does not upload conversations to a JustSessions service. The CLIs still communicate with their providers. Sparkle checks for app updates through a JustSessions update server that counts checks per day and app version, without storing IP addresses or identifiers. After a crash, JustSessions offers to report it with a GitHub issue or an email filled in from the crash report macOS saved; nothing is sent unless you send it. [Storage and privacy](session-storage.md).
 
-Open **Settings → Help & feedback** or **Help → JustSessions Help** for a brief feature overview, remote host setup, and every keyboard shortcut. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The same overview is on the [website Help page](https://yangzichao.github.io/JustSessions/help.html); its issue link opens GitHub.
+Open **Settings → Help** or **Help → JustSessions Help** for a brief feature overview, remote host setup, what to check when a session is missing, and every keyboard shortcut. To send feedback, use **Send us feedback** or **Report an issue** at the bottom of **Settings → General**. Install **tmux on the remote host** so sessions survive disconnections or closing a tab. The [website Guide](https://yangzichao.github.io/JustSessions/guide.html) covers the same features and SSH setup, with issue reporting and email in its [Feedback section](https://yangzichao.github.io/JustSessions/guide.html#feedback).

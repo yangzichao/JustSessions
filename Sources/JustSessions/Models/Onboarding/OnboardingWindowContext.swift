@@ -7,6 +7,7 @@ struct OnboardingWindowContext: Equatable {
     var sessionReadAtReadingTip: String?
     var hasSelectedTab = false
     var selectedTabCanKeepRunning = false
+    var isSelectedTabInSplit = false
     var openTabCount = 0
     var isSidebarShown = true
 }

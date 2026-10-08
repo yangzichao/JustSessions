@@ -9,12 +9,11 @@ enum TranscriptSearchAttributedText {
     ) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = lineSpacing
-        let text = NSMutableAttributedString(string: String(source.characters), attributes: [
+        let text = NSMutableAttributedString(string: source.plainText, attributes: [
             .font: font, .foregroundColor: foreground, .paragraphStyle: paragraphStyle,
         ])
         for run in source.runs {
-            let offset = String(source[source.startIndex..<run.range.lowerBound].characters).utf16.count
-            let range = NSRange(location: offset, length: String(source[run.range].characters).utf16.count)
+            let range = NSRange(run.range, in: source)
             var runFont = font
             if let intent = run.inlinePresentationIntent {
                 if intent.contains(.code) { runFont = .monospacedSystemFont(ofSize: font.pointSize - 1, weight: .regular) }

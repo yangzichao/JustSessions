@@ -25,7 +25,7 @@ struct BulkSessionDeletionTests {
             Choose Try Again once devbox is reachable.
             """)
         #expect(store.alert?.retryConversationIDs == Set(sessions.map(\.id)))
-        #expect(store.canStartDeletion(of: sessions))
+        #expect(store.deletionPlan(for: sessions).deletableConversations.count == 150)
         #expect(!store.deferRefreshWhileDeleting(on: .ssh("devbox")))
         #expect(!sessions.contains { store.isDeletionPending(for: $0) })
     }
@@ -147,7 +147,6 @@ struct BulkSessionDeletionTests {
         #expect(store.conversations.map(\.id) == sessions.dropFirst().map(\.id))
         #expect(store.errorMessage == nil)
         #expect(!store.deletionProgress.isStopping)
-        #expect(store.canStartDeletion(of: sessions))
 
         // A later deletion starts as usual.
         store.deleteConversations([sessions[1]])

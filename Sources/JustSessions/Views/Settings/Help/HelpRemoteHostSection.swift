@@ -1,22 +1,20 @@
 import SwiftUI
 
-/// SSH setup guidance in the Help & feedback page.
+/// SSH setup guidance in the Help page: adding a host, and what it needs.
 struct HelpRemoteHostSection: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label("SSH hosts", systemImage: "network")
-                .font(.headline)
-            Text("Choose **Add SSH host…** in the sidebar. The host needs passwordless SSH, rsync, and the CLI.")
-            Text("Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.")
-                .foregroundStyle(ThemePalette.secondaryText)
-        }
-        .font(.callout)
-        .fixedSize(horizontal: false, vertical: true)
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(ThemePalette.raisedSurface, in: RoundedRectangle(cornerRadius: 10))
-        .overlay {
-            RoundedRectangle(cornerRadius: 10).stroke(ThemePalette.hairline)
+        HelpSection(title: "SSH hosts") {
+            Text("Choose **Add SSH host…** at the bottom of the sidebar, then enter `user@hostname` or an alias from `~/.ssh/config`. Your code and CLIs run on the host; its history is cached on this Mac.")
+            Text("The host needs:")
+            HelpBulletList(items: [
+                "Passwordless SSH from this Mac",
+                "`rsync`, and the CLIs you use",
+                "`tmux`, so a CLI keeps running when the connection drops",
+                "`python3`, for Antigravity and OpenCode",
+            ])
+            Text("The tmux sessions the app starts on a host have no prefix key, so every key reaches the CLI. To use your own tmux prefix there, point at the host's heading, click its **⋯**, and choose **Use this host's tmux prefix**.")
+            Link("SSH setup in the user guide ↗", destination: AppLinks.userGuideSSHHostsURL)
+                .buttonStyle(ThemePlainButtonStyle(verticalPadding: 2))
         }
         .accessibilityIdentifier("help.remote-hosts")
     }

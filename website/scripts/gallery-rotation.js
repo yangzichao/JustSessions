@@ -1,33 +1,38 @@
-// Keep one timer, and reset its delay whenever visibility or interaction changes.
-export function createGalleryRotation({ advance, updateControl, interval = 6500 }) {
-  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
-  let requested = !motionPreference.matches;
-  let visible = false;
-  let hovered = false;
+// Start automatically; only the playback control can pause rotation.
+export function createGalleryRotation({ advance, updateControl, updateProgress = () => {}, interval = 8000, getInterval = () => interval, now = () => performance.now() }) {
+  function currentDuration() {
+    const value = getInterval();
+    return Number.isFinite(value) && value > 0 ? value : interval;
+  }
+  let requested = true;
+  let running = false;
+  let duration = currentDuration();
+  let remaining = duration;
+  let startedAt = 0;
   let timer;
 
   function refresh() {
+    if (running) remaining = Math.max(0, remaining - (now() - startedAt));
     window.clearTimeout(timer);
-    const running = requested && visible && !hovered && !document.hidden;
+    running = requested;
+    startedAt = now();
     updateControl(requested, running);
+    updateProgress({ elapsed: duration - remaining, duration, running });
     if (running) {
       timer = window.setTimeout(() => {
+        running = false;
         advance();
+        duration = currentDuration();
+        remaining = duration;
         refresh();
-      }, interval);
+      }, remaining);
     }
   }
 
-  document.addEventListener("visibilitychange", refresh);
-  motionPreference.addEventListener("change", () => {
-    if (motionPreference.matches) requested = false;
-    refresh();
-  });
+  refresh();
 
   return {
-    stop() { requested = false; refresh(); },
     toggle() { requested = !requested; refresh(); },
-    setVisible(value) { visible = value; refresh(); },
-    setHovered(value) { hovered = value; refresh(); },
+    reset() { running = false; duration = currentDuration(); remaining = duration; refresh(); },
   };
 }

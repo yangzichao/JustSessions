@@ -8,6 +8,7 @@ struct JustSessionsApp: App {
     var body: some Scene {
         WindowGroup(id: "workspace") {
             ContentView()
+                .opensWindowsFromDockMenu()
                 .appTheme(from: .shared)
                 .appLanguage(from: languageStore)
         }

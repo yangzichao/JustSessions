@@ -54,11 +54,11 @@ struct DeletionTryAgainTests {
         #expect(store.isScanningThisMac)
         store.retryDeletion(of: [session.id])
         #expect(!store.isDeletingSessions)
-        #expect(store.queuedRetryConversationIDs == [session.id])
+        #expect(store.queuedDeletionConversationIDs == [session.id])
         try await expectEventually { !store.isScanningThisMac && !store.isDeletingSessions && store.conversations.isEmpty }
 
         #expect(!sandbox.fileExists(for: session))
-        #expect(store.queuedRetryConversationIDs.isEmpty)
+        #expect(store.queuedDeletionConversationIDs.isEmpty)
         #expect(store.alert == nil)
     }
 
@@ -90,11 +90,11 @@ struct DeletionTryAgainTests {
         store.dismissError()
         store.retryDeletion(of: retryConversationIDs)
         #expect(!store.isDeletingSessions)
-        #expect(store.queuedRetryConversationIDs == [session.id])
+        #expect(store.queuedDeletionConversationIDs == [session.id])
         try await expectEventually { hosts.attempts(on: "devbox") == 3 && !store.isDeletingSessions }
 
         #expect(store.conversations.map(\.id) == [onBuildbox.id])
-        #expect(store.queuedRetryConversationIDs.isEmpty)
+        #expect(store.queuedDeletionConversationIDs.isEmpty)
         #expect(store.alert == nil)
         // Started once: later refreshes find nothing waiting.
         store.refreshRemoteHost("devbox", discovery: try Self.discoveryThatFailsWithoutSSH(in: sandbox))
@@ -123,7 +123,7 @@ struct DeletionTryAgainTests {
         store.removeRemoteHost("devbox", mirror: RemoteSessionMirror(cacheRoot: sandbox.directory.appendingPathComponent("mirrors")))
 
         #expect(store.pendingDeletionConversationIDs == [onBuildbox.id])
-        #expect(store.queuedRetryConversationIDs.isEmpty)
+        #expect(store.queuedDeletionConversationIDs.isEmpty)
         try await expectEventually { !store.isDeletingSessions }
         #expect(hosts.attempts(on: "buildbox") == 2)
         #expect(store.conversations.isEmpty)

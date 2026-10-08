@@ -23,7 +23,7 @@ final class WorkspaceWindowStandIn {
 
     /// SwiftUI builds the view that registers the window on its first update, after the window is on screen.
     func waitUntilRegistered() async throws {
-        try await expectEventually(timeout: .seconds(5)) { containsRegistrationView(window.contentView) }
+        try await expectEventually { containsRegistrationView(window.contentView) }
     }
 
     func close() {

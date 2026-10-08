@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Runs a workspace window's onboarding: the tour once a fresh install has listed This Mac's sessions at its first
 /// launch, then each tip the first time what it is about comes into use, such as reading a session or opening a tab.
-/// Help and the Help menu start the tour again.
+/// Help and the Help menu start the tour again, and show every tip again after it.
 struct OnboardingTipsPresenter: ViewModifier {
     @ObservedObject var store: ConversationStore
     @ObservedObject var tour: OnboardingTour
@@ -50,6 +50,10 @@ struct OnboardingTipsPresenter: ViewModifier {
         store.selectedTerminal?.canKeepCLIRunningAfterClose == true
     }
 
+    private var isSelectedTabInSplit: Bool {
+        store.selectedTerminalID.map { store.split(containing: $0) != nil } ?? false
+    }
+
     private var windowContext: OnboardingWindowContext {
         OnboardingWindowContext(
             readSessionID: readSession?.id,
@@ -57,6 +61,7 @@ struct OnboardingTipsPresenter: ViewModifier {
             sessionReadAtReadingTip: sessionReadAtReadingTip,
             hasSelectedTab: store.selectedTerminal != nil,
             selectedTabCanKeepRunning: selectedTabCanKeepRunning,
+            isSelectedTabInSplit: isSelectedTabInSplit,
             openTabCount: store.terminalSessions.count,
             isSidebarShown: isSidebarShown
         )
@@ -66,8 +71,8 @@ struct OnboardingTipsPresenter: ViewModifier {
         let windowContext = windowContext
         content
             .environment(\.onboardingTour, tour)
-            .environment(\.startOnboardingTour, StartOnboardingTourAction(start: startTour))
-            .focusedSceneValue(\.startOnboardingTour, isReadyForTips ? StartOnboardingTourAction(start: startTour) : nil)
+            .environment(\.startOnboardingTour, StartOnboardingTourAction(start: restartTour))
+            .focusedSceneValue(\.startOnboardingTour, isReadyForTips ? StartOnboardingTourAction(start: restartTour) : nil)
             .task(id: FirstLaunchTourTrigger(hasListedThisMac: hasListedThisMac, isReadyForTips: isReadyForTips)) {
                 await startTourAtFirstLaunch()
             }
@@ -84,6 +89,13 @@ struct OnboardingTipsPresenter: ViewModifier {
         do { try await Task.sleep(for: Self.tourStartDelay) } catch { return }
         // Another workspace window may have started it meanwhile.
         guard tipsStore.shouldShow(.tour) else { return }
+        startTour()
+    }
+
+    /// Help's Take the tour: the tour now, then every tip again the next time its part of the window comes into use,
+    /// also on an install that showed none.
+    private func restartTour() {
+        tipsStore.showEveryTipAgain()
         startTour()
     }
 

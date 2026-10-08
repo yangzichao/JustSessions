@@ -20,6 +20,16 @@
         }
       }
     },
+    "%@ (not installed)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@（未安装）"
+          }
+        }
+      }
+    },
     "%@ - Left view": {
       "localizations": {
         "zh-Hans": {
@@ -286,22 +296,12 @@
         }
       }
     },
-    "**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘9 switch between tabs.": {
+    "**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘8 go to a tab by its position, and ⌘9 to the last.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "**已打开** 列出每个标签页，以及它的 CLI 正在做什么。⌘1 到 ⌘9 可在标签页之间切换。"
-          }
-        }
-      }
-    },
-    "**Resume** continues in the original CLI and folder. **Branch** tries another approach.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "**继续** 会在原来的 CLI 和文件夹中接着运行。**分支** 可以换一种思路尝试。"
+            "value": "**已打开** 列出每个标签页及其 CLI 正在做什么。⌘1 到 ⌘8 按位置切换标签页，⌘9 切换到最后一个。"
           }
         }
       }
@@ -312,6 +312,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "**继续** 会在原来的文件夹中用它的 CLI 接着这段对话。在侧栏双击这个会话也可以。"
+          }
+        }
+      }
+    },
+    "**Resume**, or a double-click, continues the conversation in its CLI and original folder. **Branch**, where the CLI supports it, starts a new session from a copy and leaves the original as it was.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**继续**（或双击会话）会在原来的 CLI 和文件夹中接着这段对话。**分支** 会从对话的副本开始一个新会话，原会话保持不变，仅部分 CLI 支持。"
+          }
+        }
+      }
+    },
+    "**⌘N** starts a session in any installed CLI, or a plain terminal. Tabs group by project, and **Open tabs** in the sidebar lists them all. Right-click a tab to show two side by side.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**⌘N** 可用任一已安装的 CLI 开始会话，或打开普通终端。标签页按项目分组，侧边栏的 **已打开** 会列出全部标签页。右键单击标签页可将两个并排显示。"
           }
         }
       }
@@ -368,6 +388,16 @@
     },
     "A+": {
       "shouldTranslate": false
+    },
+    "About JustSessions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关于 JustSessions"
+          }
+        }
+      }
     },
     "Add SSH host": {
       "localizations": {
@@ -569,6 +599,32 @@
         }
       }
     },
+    "Also resumes %@ sessions on %@. JustSessions adds its own arguments after it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Also resumes %1$@ sessions on %2$@. JustSessions adds its own arguments after it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 %2$@ 上恢复 %1$@ 会话时也会用它。JustSessions 会在它后面加上自己的参数。"
+          }
+        }
+      }
+    },
+    "Also resumes %@ sessions on this Mac. JustSessions adds its own arguments after it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在这台 Mac 上恢复 %@ 会话时也会用它。JustSessions 会在它后面加上自己的参数。"
+          }
+        }
+      }
+    },
     "An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.": {
       "localizations": {
         "zh-Hans": {
@@ -629,6 +685,58 @@
         }
       }
     },
+    "Archive %lld projects and delete %lld sessions": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Archive %1$lld projects and delete %2$lld sessions"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档 %1$lld 个项目并删除 %2$lld 个会话"
+          }
+        }
+      }
+    },
+    "Archive %lld projects and delete 1 session": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档 %lld 个项目并删除 1 个会话"
+          }
+        }
+      }
+    },
+    "Archive %lld projects and delete all sessions (%lld)…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Archive %1$lld projects and delete all sessions (%2$lld)…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档 %1$lld 个项目并删除所有会话（%2$lld）…"
+          }
+        }
+      }
+    },
+    "Archive and delete sessions…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档并删除会话…"
+          }
+        }
+      }
+    },
     "Archive project": {
       "localizations": {
         "zh-Hans": {
@@ -679,6 +787,26 @@
         }
       }
     },
+    "Archive selected projects and delete their sessions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档所选项目并删除其会话"
+          }
+        }
+      }
+    },
+    "Archive the selected projects and delete their sessions, except those with open terminals": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档所选项目并删除其会话，已打开终端的会话除外"
+          }
+        }
+      }
+    },
     "Archive the selected projects; keep sessions and open terminals": {
       "localizations": {
         "zh-Hans": {
@@ -725,6 +853,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "立即请求"
+          }
+        }
+      }
+    },
+    "Ask each time": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每次询问"
           }
         }
       }
@@ -830,12 +968,42 @@
         }
       }
     },
+    "Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确认 CLI 能在你常用的终端里运行，并且已保存过对话。**新建会话** 只提供检测到已安装的 CLI。"
+          }
+        }
+      }
+    },
     "Checking the folder on %@…": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "正在检查 %@ 上的文件夹…"
+          }
+        }
+      }
+    },
+    "Checking the start command on %@…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在检查 %@ 上的启动命令…"
+          }
+        }
+      }
+    },
+    "Checking the start command…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在检查启动命令…"
           }
         }
       }
@@ -850,12 +1018,12 @@
         }
       }
     },
-    "Choose **Add SSH host…** in the sidebar. The host needs passwordless SSH, rsync, and the CLI.": {
+    "Choose **Add SSH host…** at the bottom of the sidebar, then enter `user@hostname` or an alias from `~/.ssh/config`. Your code and CLIs run on the host; its history is cached on this Mac.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在侧边栏选择 **添加 SSH 主机…**。主机需要免密码 SSH、rsync 和对应的 CLI。"
+            "value": "在侧边栏底部选择 **添加 SSH 主机…**，然后输入 `user@hostname` 或 `~/.ssh/config` 中的别名。代码和 CLI 在主机上运行，它的历史记录会缓存到这台 Mac。"
           }
         }
       }
@@ -876,6 +1044,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "选择或输入文件夹"
+          }
+        }
+      }
+    },
+    "Claude Code and Codex on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 上的 Claude Code 和 Codex 完成一轮回复或需要你输入时会通知你，正在查看其标签页时除外。可在通用设置中选择通知哪些情况。"
           }
         }
       }
@@ -930,22 +1108,22 @@
         }
       }
     },
-    "Click a session to read it. Nothing runs.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "点击会话即可阅读，不会启动任何 CLI。"
-          }
-        }
-      }
-    },
     "Click a session to read it; nothing runs. Double-click it to continue in its CLI, in the original folder.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "单击会话即可阅读，不会运行任何东西。双击则在原文件夹中用它的 CLI 继续。"
+          }
+        }
+      }
+    },
+    "Click a session to read its conversation; no CLI starts. **Open in new window** gives it a window of its own.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单击会话即可阅读对话，不会启动 CLI。**在新窗口中打开** 可以让它单独占一个窗口。"
           }
         }
       }
@@ -1010,12 +1188,12 @@
         }
       }
     },
-    "Close a tab with **Keep running**, or quit. The CLI keeps going; click the session to return.": {
+    "Close a tab with **Keep running**, or quit the app, and the CLI carries on in tmux. Click its session to return. A plain terminal ends with its tab.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "用 **保持运行** 关闭标签页，或直接退出应用，CLI 会继续运行；点击会话即可回到它。"
+            "value": "关闭标签页时选择 **保持运行**，或直接退出应用，CLI 都会在 tmux 中继续运行。单击它的会话即可回去。普通终端会随标签页一起结束。"
           }
         }
       }
@@ -1110,12 +1288,42 @@
         }
       }
     },
+    "Close this tab?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭此标签？"
+          }
+        }
+      }
+    },
+    "Close this terminal?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭此终端？"
+          }
+        }
+      }
+    },
     "Close this view": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "关闭此视图"
+          }
+        }
+      }
+    },
+    "Closing tabs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭标签"
           }
         }
       }
@@ -1358,12 +1566,22 @@
         }
       }
     },
-    "Create a GitHub issue": {
+    "Create folder and add": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "创建 GitHub Issue"
+            "value": "创建文件夹并添加"
+          }
+        }
+      }
+    },
+    "Creating the folder on %@…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在 %@ 上创建文件夹…"
           }
         }
       }
@@ -1524,6 +1742,16 @@
         }
       }
     },
+    "Don't ask again": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不再询问"
+          }
+        }
+      }
+    },
     "Done": {
       "localizations": {
         "zh-Hans": {
@@ -1534,22 +1762,12 @@
         }
       }
     },
-    "Email feedback": {
+    "Edit": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "通过邮件反馈"
-          }
-        }
-      }
-    },
-    "Email ↗": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "邮件 ↗"
+            "value": "编辑"
           }
         }
       }
@@ -1590,6 +1808,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "结束会话…"
+          }
+        }
+      }
+    },
+    "End this CLI session?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束此 CLI 会话？"
           }
         }
       }
@@ -1702,12 +1930,12 @@
         }
       }
     },
-    "Feedback:": {
+    "Feedback and issues start with these versions filled in.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "反馈："
+            "value": "反馈和问题报告会自动附上以上版本信息。"
           }
         }
       }
@@ -1732,12 +1960,12 @@
         }
       }
     },
-    "Find": {
+    "Find a session": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "查找"
+            "value": "查找会话"
           }
         }
       }
@@ -1812,12 +2040,12 @@
         }
       }
     },
-    "Folder missing": {
+    "Fixed": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "文件夹不存在"
+            "value": "修复"
           }
         }
       }
@@ -1848,6 +2076,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "字号"
+          }
+        }
+      }
+    },
+    "For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "适用于 CLI 可在 tmux 中保持运行的标签。关闭对话框中的“不再询问”也会设置此项。"
           }
         }
       }
@@ -1892,15 +2130,8 @@
         }
       }
     },
-    "GitHub issue ↗": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GitHub Issue ↗"
-          }
-        }
-      }
+    "GitHub ↗": {
+      "shouldTranslate": false
     },
     "Go to a tab by its position": {
       "localizations": {
@@ -1942,12 +2173,12 @@
         }
       }
     },
-    "Help & feedback": {
+    "Help": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "帮助与反馈"
+            "value": "帮助"
           }
         }
       }
@@ -2060,6 +2291,16 @@
         }
       }
     },
+    "If a session is missing": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找不到会话时"
+          }
+        }
+      }
+    },
     "Image": {
       "localizations": {
         "zh-Hans": {
@@ -2090,12 +2331,22 @@
         }
       }
     },
-    "Install tmux there too, or a dropped connection stops the CLI. Antigravity and OpenCode also need python3.": {
+    "Improved": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "也请在主机上安装 tmux，否则连接断开时 CLI 会停止。Antigravity 和 OpenCode 还需要 python3。"
+            "value": "改进"
+          }
+        }
+      }
+    },
+    "In **Projects**, clear the filters, then click the host's refresh button.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 **项目** 中清除所有筛选，然后单击该主机的刷新按钮。"
           }
         }
       }
@@ -2143,22 +2394,22 @@
         }
       }
     },
+    "JustSessions quit unexpectedly": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JustSessions 意外退出了"
+          }
+        }
+      }
+    },
     "JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "JustSessions 读取了各 CLI 自己保存的历史，并按项目分组。没有导入或上传任何内容。"
-          }
-        }
-      }
-    },
-    "JustSessions website ↗": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JustSessions 网站 ↗"
           }
         }
       }
@@ -2253,6 +2504,16 @@
         }
       }
     },
+    "Latest release notes ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最新更新说明 ↗"
+          }
+        }
+      }
+    },
     "Launch JustSessions at login": {
       "localizations": {
         "zh-Hans": {
@@ -2299,6 +2560,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "列出可通过 SSH 连接的另一台机器上的会话"
+          }
+        }
+      }
+    },
+    "Lists the monospaced fonts installed on this Mac.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "列出此 Mac 上安装的等宽字体。"
           }
         }
       }
@@ -2386,6 +2657,16 @@
         }
       }
     },
+    "More in the user guide ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在用户指南中查看更多 ↗"
+          }
+        }
+      }
+    },
     "More room for the terminal": {
       "localizations": {
         "zh-Hans": {
@@ -2416,12 +2697,22 @@
         }
       }
     },
-    "Needs my input, such as a permission prompt": {
+    "Needs my input, such as a permission prompt (Claude Code only)": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "需要我的输入，例如权限确认"
+            "value": "需要我的输入，例如权限确认（仅 Claude Code）"
+          }
+        }
+      }
+    },
+    "New": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增"
           }
         }
       }
@@ -2566,6 +2857,16 @@
         }
       }
     },
+    "No Claude Code or Codex session is waiting for you": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有等待你处理的 Claude Code 或 Codex 会话"
+          }
+        }
+      }
+    },
     "No archived projects": {
       "localizations": {
         "zh-Hans": {
@@ -2682,6 +2983,16 @@
         }
       }
     },
+    "Not Now": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以后再说"
+          }
+        }
+      }
+    },
     "Not allowed": {
       "localizations": {
         "zh-Hans": {
@@ -2742,6 +3053,16 @@
         }
       }
     },
+    "On an SSH host, check passwordless SSH, rsync, and the CLI there. A host at a local address also needs **Local Network** in Permissions.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "对于 SSH 主机，检查免密码 SSH、rsync 以及主机上的 CLI。位于本地地址的主机还需要在权限中开启 **本地网络**。"
+          }
+        }
+      }
+    },
     "Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.": {
       "localizations": {
         "zh-Hans": {
@@ -2768,6 +3089,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开系统设置"
+          }
+        }
+      }
+    },
+    "Open a new issue on GitHub": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 GitHub 上报告问题"
           }
         }
       }
@@ -2842,12 +3173,42 @@
         }
       }
     },
+    "Open the source code on GitHub": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 GitHub 上查看源代码"
+          }
+        }
+      }
+    },
     "Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "可选。没有它时，终端中的 CLI 第一次打开受保护文件夹（例如「文稿」或外置磁盘）中的文件，macOS 会逐个询问。"
+          }
+        }
+      }
+    },
+    "Organize": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "整理"
+          }
+        }
+      }
+    },
+    "Passwordless SSH from this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从这台 Mac 免密码 SSH 登录"
           }
         }
       }
@@ -3022,12 +3383,12 @@
         }
       }
     },
-    "Read": {
+    "Read a session": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "阅读"
+            "value": "阅读会话"
           }
         }
       }
@@ -3152,6 +3513,26 @@
         }
       }
     },
+    "Release history could not be loaded. Read the latest notes on the website.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法加载更新历史。请在网站查看最新说明。"
+          }
+        }
+      }
+    },
+    "Release notes": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新说明"
+          }
+        }
+      }
+    },
     "Remove host": {
       "localizations": {
         "zh-Hans": {
@@ -3208,6 +3589,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "重新打开上次退出 JustSessions 时的标签"
+          }
+        }
+      }
+    },
+    "Report an issue ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告问题 ↗"
+          }
+        }
+      }
+    },
+    "Report by Email": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过邮件报告"
+          }
+        }
+      }
+    },
+    "Report on GitHub": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 GitHub 上报告"
+          }
+        }
+      }
+    },
+    "Reporting the crash helps get it fixed. The report opens with the crash details filled in: add what you were doing, then send it. The crash report file shows in Finder, so you can attach it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告这次崩溃，能帮我们修复它。报告打开时已填好崩溃详情：补充你当时在做什么，然后发送。崩溃报告文件会在访达中显示，方便你附上。"
           }
         }
       }
@@ -3290,6 +3711,16 @@
         }
       }
     },
+    "Resume or branch": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续或分支"
+          }
+        }
+      }
+    },
     "Reveal session file in Finder": {
       "localizations": {
         "zh-Hans": {
@@ -3330,12 +3761,32 @@
         }
       }
     },
+    "Right-click a session to rename, pin, export, or delete it, and a project to rename, pin, or archive it. ⌘-click or ⇧-click selects several.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右键单击会话可以重命名、置顶、导出或删除；右键单击项目可以重命名、置顶或归档。按住 ⌘ 或 ⇧ 单击可选择多个。"
+          }
+        }
+      }
+    },
     "Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "右键单击会话可以重命名、置顶、导出或删除。按住 ⌘ 或 Shift 单击可一次选择多个。"
+          }
+        }
+      }
+    },
+    "Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右键单击另一个标签页，选择 **使用当前标签页创建新的拆分视图**。在两个视图之间拖动可调整大小。"
           }
         }
       }
@@ -3350,12 +3801,32 @@
         }
       }
     },
+    "SSH hosts don't tell when a session waits for you": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SSH 主机不会告知会话何时在等待你"
+          }
+        }
+      }
+    },
     "SSH hosts have no Trash, so every session is permanently deleted.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "SSH 主机没有废纸篓，因此所有会话都将被永久删除。"
+          }
+        }
+      }
+    },
+    "SSH setup in the user guide ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用户指南中的 SSH 设置 ↗"
           }
         }
       }
@@ -3440,22 +3911,22 @@
         }
       }
     },
-    "Search projects by name or path and sessions by title or ID": {
+    "Search projects by name or path and sessions by title, ID, or message text": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按名称或路径搜索项目，按标题或 ID 搜索会话"
+            "value": "按名称或路径搜索项目，按标题、ID 或消息内容搜索会话"
           }
         }
       }
     },
-    "Search projects by name or path, and sessions by title or ID.": {
+    "Search projects by name or path, and sessions by title, ID, or message text.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按名称或路径搜索项目，按标题或 ID 搜索会话。"
+            "value": "按名称或路径搜索项目，按标题、ID 或消息内容搜索会话。"
           }
         }
       }
@@ -3466,6 +3937,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "在正在阅读的对话中搜索文字。⌘F 也可以。"
+          }
+        }
+      }
+    },
+    "Searching messages… %lld of %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Searching messages… %1$lld of %2$lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在搜索消息… %1$lld / %2$lld"
           }
         }
       }
@@ -3500,6 +3987,16 @@
         }
       }
     },
+    "Send us feedback ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送反馈 ↗"
+          }
+        }
+      }
+    },
     "Separate Views": {
       "localizations": {
         "zh-Hans": {
@@ -3526,16 +4023,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "会话 %lld / %lld"
-          }
-        }
-      }
-    },
-    "Sessions from %@, grouped by host and project.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来自 %@ 的会话，按主机和项目分组。"
           }
         }
       }
@@ -3718,16 +4205,6 @@
         }
       }
     },
-    "Software updates": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "软件更新"
-          }
-        }
-      }
-    },
     "Some colors are missing, such as the text or background color.": {
       "localizations": {
         "zh-Hans": {
@@ -3790,6 +4267,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "在项目文件夹中用任一已安装的 CLI 开始会话，或打开普通终端。⌘N 也可以。"
+          }
+        }
+      }
+    },
+    "Start command": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启动命令"
           }
         }
       }
@@ -3924,6 +4411,16 @@
         }
       }
     },
+    "System Monospaced can't show the included Nerd Font icons. To see them, as in shell prompts, choose another font, such as Menlo.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统等宽字体无法显示内置的 Nerd Font 图标。若要显示这些图标（例如 shell 提示符中的图标），请选择其他字体，例如 Menlo。"
+          }
+        }
+      }
+    },
     "Tab %lld": {
       "localizations": {
         "zh-Hans": {
@@ -3940,6 +4437,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "标签"
+          }
+        }
+      }
+    },
+    "Tabs and split view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "标签页与拆分视图"
           }
         }
       }
@@ -4054,6 +4561,26 @@
         }
       }
     },
+    "The host needs:": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主机需要："
+          }
+        }
+      }
+    },
+    "The project folder is no longer at %@. Move it back there to resume this session.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "项目文件夹已不在 %@。把它移回原处即可继续这个会话。"
+          }
+        }
+      }
+    },
     "The project folder no longer exists": {
       "localizations": {
         "zh-Hans": {
@@ -4084,12 +4611,32 @@
         }
       }
     },
+    "The projects will be archived; skipped sessions stay on disk and come back when they are restored.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "项目将被归档；被跳过的会话仍保留在磁盘上，恢复项目后会重新显示。"
+          }
+        }
+      }
+    },
     "The shell and anything still running in it will stop.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "shell 及其中仍在运行的进程都会停止。"
+          }
+        }
+      }
+    },
+    "The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles and IDs, and message text.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "侧边栏按主机和项目列出来自 %@ 的会话。搜索可匹配项目名称和路径、会话标题和 ID，以及消息内容。"
           }
         }
       }
@@ -4104,12 +4651,48 @@
         }
       }
     },
+    "The tmux sessions the app starts on a host have no prefix key, so every key reaches the CLI. To use your own tmux prefix there, point at the host's heading, click its **⋯**, and choose **Use this host's tmux prefix**.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App 在主机上启动的 tmux 会话没有前缀键，所以每个按键都会传给 CLI。如果想在那里使用你自己的 tmux 前缀键，请将指针移到该主机的标题上，点按它的 **⋯**，然后选择 **使用此主机的 tmux 前缀键**。"
+          }
+        }
+      }
+    },
+    "The tour points at the main controls in the window. Afterwards, tips show again the first time you use each part, such as tabs or split view.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "引导会指出窗口中的主要控件。之后，你第一次用到各个部分时（例如标签页或拆分视图），提示会再次出现。"
+          }
+        }
+      }
+    },
     "Theme": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "主题"
+          }
+        }
+      }
+    },
+    "There is no folder %@ on %@. Create it to add the project.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "There is no folder %1$@ on %2$@. Create it to add the project."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ 上没有文件夹 %1$@。创建它即可添加此项目。"
           }
         }
       }
@@ -4130,6 +4713,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "此操作会影响 %@ 中所有工具的会话，包括被当前筛选条件隐藏的会话。"
+          }
+        }
+      }
+    },
+    "This affects all tools in %lld projects, including sessions hidden by the current filter.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此操作会影响 %lld 个项目中所有工具的会话，包括被当前筛选条件隐藏的会话。"
           }
         }
       }
@@ -4214,6 +4807,16 @@
         }
       }
     },
+    "Two tabs side by side": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "两个标签页并排显示"
+          }
+        }
+      }
+    },
     "Unknown error": {
       "localizations": {
         "zh-Hans": {
@@ -4254,12 +4857,32 @@
         }
       }
     },
+    "Use default": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用默认"
+          }
+        }
+      }
+    },
     "Use the full window width": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "使用窗口全宽"
+          }
+        }
+      }
+    },
+    "Use this host's tmux prefix": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用此主机的 tmux 前缀键"
           }
         }
       }
@@ -4274,12 +4897,32 @@
         }
       }
     },
-    "Version %@": {
+    "Waiting for you": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "版本 %@"
+            "value": "等待我处理"
+          }
+        }
+      }
+    },
+    "Website ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网站 ↗"
+          }
+        }
+      }
+    },
+    "When you close a tab": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭标签时"
           }
         }
       }
@@ -4340,6 +4983,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的会话已经在这里"
+          }
+        }
+      }
+    },
+    "`python3`, for Antigravity and OpenCode": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "`python3`，用于 Antigravity 和 OpenCode"
+          }
+        }
+      }
+    },
+    "`rsync`, and the CLIs you use": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "`rsync`，以及你使用的 CLI"
+          }
+        }
+      }
+    },
+    "`tmux`, so a CLI keeps running when the connection drops": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "`tmux`，这样连接断开时 CLI 也会继续运行"
           }
         }
       }

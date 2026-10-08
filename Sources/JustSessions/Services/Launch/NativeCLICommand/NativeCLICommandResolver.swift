@@ -7,17 +7,21 @@ struct NativeCLICommandResolver: @unchecked Sendable {
     let inheritedEnvironment: [String: String]
     let bundledTmuxRuntime: BundledTmuxRuntime?
     let tmuxSelection = ThisMacTmuxSelection()
+    /// Nil starts Pi and OpenCode without the extension that reports their session.
+    let liveSessionReporting: LiveSessionReporting?
     private let searchDirectoriesOverride: [String]?
 
     init(
         fileManager: FileManager = .default,
         searchDirectories: [String]? = nil,
         inheritedEnvironment: [String: String] = ProcessInfo.processInfo.environment,
-        bundledTmuxDirectory: URL? = BundledTmuxRuntime.appBundleDirectory
+        bundledTmuxDirectory: URL? = BundledTmuxRuntime.appBundleDirectory,
+        liveSessionReporting: LiveSessionReporting? = .thisApp
     ) {
         self.fileManager = fileManager
         self.inheritedEnvironment = inheritedEnvironment
         self.bundledTmuxRuntime = bundledTmuxDirectory.map { BundledTmuxRuntime(directory: $0) }
+        self.liveSessionReporting = liveSessionReporting
         self.searchDirectoriesOverride = searchDirectories
     }
 
@@ -34,40 +38,62 @@ struct NativeCLICommandResolver: @unchecked Sendable {
         searchDirectories.joined(separator: ":")
     }
 
+    /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable. It stands in for
+    /// `defaultStartCommand`, so the app's arguments that follow leave out what it holds.
     func resolve(
         conversation: Conversation,
         action: ConversationAction,
-        adapter: any ConversationAdapter
+        adapter: any ConversationAdapter,
+        startCommand: String? = nil
     ) throws -> NativeCLICommand {
         try resolve(
             provider: conversation.provider,
             projectPath: conversation.projectPath,
-            arguments: adapter.arguments(for: conversation, action: action)
+            arguments: adapter.arguments(for: conversation, action: action),
+            startCommand: startCommand
         )
     }
 
-    func resolveNewSession(provider: ConversationProvider, projectPath: String) throws -> NativeCLICommand {
-        try resolve(provider: provider, projectPath: projectPath, arguments: [])
+    func resolveNewSession(
+        provider: ConversationProvider,
+        projectPath: String,
+        startCommand: String? = nil
+    ) throws -> NativeCLICommand {
+        try resolve(provider: provider, projectPath: projectPath, arguments: [], startCommand: startCommand)
     }
 
     private func resolve(
         provider: ConversationProvider,
         projectPath: String,
-        arguments: [String]
+        arguments: [String],
+        startCommand: String?
     ) throws -> NativeCLICommand {
         try requireProjectDirectory(projectPath)
 
-        guard let executablePath = executablePath(named: provider.executableName) else {
+        // A start command of your own is not looked up: the shell that runs it reports a missing one in the tab.
+        let customStartCommand = CLIStartCommandLine.customCommand(startCommand)
+        guard let executablePath = customStartCommand == nil
+                ? executablePath(named: provider.executableName)
+                : CLIStartCommandLine.thisMacShellPath else {
             throw NativeCLICommandError.missingExecutable(provider.executableName)
         }
 
         var environment = TerminalColorEnvironment.embeddedTerminalEnvironment(from: inheritedEnvironment)
         environment["PATH"] = pathEnvironmentValue
+        // The session a CLI is in can change while it runs; see `followLiveSessions` and `followCodexThreads`.
+        let reporterLaunch = liveSessionReporting?.launchAdditions(for: provider, environment: environment)
+        environment.merge(reporterLaunch?.environment ?? [:]) { _, reporterValue in reporterValue }
+        // Codex names the thread its CLI is in only in the terminal title, and only when asked.
+        let followingArguments = provider == .codex ? CodexThreadTitle.launchArguments : reporterLaunch?.arguments ?? []
 
         return NativeCLICommand(
             executablePath: executablePath,
-            // Codex names the thread its CLI is in only in the terminal title, and only when asked.
-            arguments: provider == .codex ? CodexThreadTitle.launchArguments + arguments : arguments,
+            arguments: customStartCommand.map {
+                CLIStartCommandLine.thisMacShellArguments(
+                    startCommand: $0,
+                    arguments: followingArguments + provider.argumentsAfterCustomStartCommand(arguments)
+                )
+            } ?? followingArguments + arguments,
             workingDirectory: projectPath,
             environment: NativeCLICommand.environmentEntries(environment)
         )

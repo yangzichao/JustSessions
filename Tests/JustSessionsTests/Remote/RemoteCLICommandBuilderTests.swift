@@ -5,7 +5,7 @@ import Testing
 struct RemoteCLICommandBuilderTests {
     @Test func buildsAnSSHCommandWithATerminal() {
         let command = RemoteCLICommandBuilder(inheritedEnvironment: ["NO_COLOR": "1", "SSH_AUTH_SOCK": "/tmp/agent"])
-            .command(host: "devbox", provider: .codex, projectPath: "/home/me/api", arguments: ["resume", "abc"])
+            .command(host: "devbox", provider: .codex, projectPath: "/home/me/api", arguments: ["resume", "abc"], usesHostTmuxPrefix: false)
 
         #expect(command.executablePath == "/usr/bin/ssh")
         #expect(command.arguments.first == "-t")

@@ -20,7 +20,8 @@ final class ScenarioApp {
         temporaryDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("gherkin-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: temporaryDirectory, withIntermediateDirectories: true)
         adapter = ChangingConversationAdapter(provider: provider)
-        let suiteName = "JustSessionsGherkin-\(UUID().uuidString)"
+        // Named by a path in the scenario's folder, as `IsolatedUserDefaults` is, so no plist is left behind.
+        let suiteName = temporaryDirectory.appendingPathComponent("settings").path
         userDefaultsSuiteName = suiteName
         // No tmux in reach, so a tab that follows its CLI never renames a session on the app's own tmux server.
         let commandResolver = NativeCLICommandResolver(
@@ -67,7 +68,7 @@ final class ScenarioApp {
     /// A session a CLI is in that no file names yet, such as a thread Codex saves with its first prompt.
     @discardableResult
     func reserveSessionID(labeled label: String) -> String {
-        let sessionID = UUID().uuidString.lowercased()
+        let sessionID = makeSessionID()
         sessionIDsByLabel[label] = sessionID
         return sessionID
     }
@@ -80,7 +81,7 @@ final class ScenarioApp {
     /// The next refresh lists it. Without a `sessionID`, it keeps one reserved for `label`.
     @discardableResult
     func addSessionWithoutListing(labeled label: String, sessionID: String? = nil) -> String {
-        let sessionID = sessionID ?? sessionIDsByLabel[label] ?? UUID().uuidString.lowercased()
+        let sessionID = sessionID ?? sessionIDsByLabel[label] ?? makeSessionID()
         sessionIDsByLabel[label] = sessionID
         adapter.add(Conversation(
             provider: provider,
@@ -101,6 +102,12 @@ final class ScenarioApp {
             try await Task.sleep(for: .milliseconds(20))
         }
         return true
+    }
+
+    /// In the tool's own format; see `ConversationProvider.isValidSessionID`.
+    private func makeSessionID() -> String {
+        let uuid = UUID().uuidString.lowercased()
+        return provider == .opencode ? "ses_" + uuid.replacingOccurrences(of: "-", with: "").prefix(26) : uuid
     }
 
     private func refreshUntilListed(_ sessionID: String) async throws {

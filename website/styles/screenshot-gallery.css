@@ -1,50 +1,48 @@
-.screenshot-gallery { overflow: hidden; padding: 14px 14px 0; border: 1px solid var(--line); border-radius: 18px; background: var(--sidebar-surface); }
-.gallery-stage { position: relative; }
-.gallery-track { position: relative; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; border-radius: 9px; }
+/* Wide screens show each slide like a presentation page: text in a left column, the screenshot on the right.
+   The gutter keeps screenshot shadows inside the scroll track while the slides stay aligned with the page edges. */
+.screenshot-gallery { --gallery-gutter: 24px; --gallery-caption-width: 320px; --gallery-column-gap: 20px; margin-inline: calc(var(--gallery-gutter) * -1); }
+.gallery-track { position: relative; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
 .gallery-track::-webkit-scrollbar { display: none; }
-.gallery-slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; }
-.gallery-image { display: flex; align-items: center; justify-content: center; aspect-ratio: 2560 / 1640; overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: var(--message-surface); }
-.gallery-image img { width: 100%; height: 100%; object-fit: contain; }
-.gallery-slide-dialog .gallery-image { padding-bottom: 110px; }
-.gallery-slide-dialog img { width: min(45%, 520px); height: auto; max-height: 90%; border-radius: 12px; box-shadow: 0 12px 36px var(--shadow); }
-.gallery-caption { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 12px; min-height: 72px; margin: 0; padding: 12px 8px; text-align: center; }
-.gallery-caption strong { font-size: 14px; font-weight: 600; color: var(--ink); }
-.gallery-caption .text-link { padding-block: 0; font-size: 13px; }
-.gallery-controls { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 64px; padding: 0 8px 12px; }
+.gallery-slide { flex: 0 0 100%; min-width: 0; display: grid; grid-template-columns: var(--gallery-caption-width) minmax(0, 1fr); align-items: start; column-gap: var(--gallery-column-gap); padding: 0 var(--gallery-gutter) 32px; scroll-snap-align: start; scroll-snap-stop: always; }
+.gallery-caption { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 0; padding-top: 4px; }
+.gallery-caption h2 { margin: 0; font-size: 30px; font-weight: 700; color: var(--ink); letter-spacing: -.025em; line-height: 1.15; text-wrap: balance; }
+.gallery-feature-list { display: grid; gap: 10px; margin: 0; padding-inline-start: 18px; font-size: 17px; font-weight: 600; line-height: 1.5; color: var(--ink); }
+.gallery-feature-list strong { font-weight: 750; }
+.gallery-caption .provider-list { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 10px; }
+.gallery-image { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 5 / 3; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--message-surface); box-shadow: 0 1px 2px var(--shadow), 0 12px 30px -14px rgb(21 23 28 / 24%); cursor: zoom-in; }
+.gallery-image img, .gallery-image video { width: 100%; height: 100%; object-fit: contain; }
+.gallery-image .gallery-annotation { position: absolute; inset: 0; pointer-events: none; }
+/* The controls sit centered under the screenshot column. */
+.gallery-controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 var(--gallery-gutter) 0 calc(var(--gallery-gutter) + var(--gallery-caption-width) + var(--gallery-column-gap)); }
 .gallery-controls[hidden] { display: none; }
-.gallery-controls button { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--secondary); font: inherit; cursor: pointer; }
+.gallery-controls button { display: inline-flex; align-items: center; justify-content: center; height: 40px; border: 0; border-radius: 8px; background: transparent; color: var(--secondary); font: inherit; cursor: pointer; }
 .gallery-controls button:hover { background: var(--message-surface); color: var(--ink); }
 .gallery-controls button:focus-visible, .gallery-track:focus-visible { outline: 3px solid var(--ink); outline-offset: -3px; }
 .gallery-arrow, .gallery-rotation { flex: none; width: 40px; }
-.gallery-pagination { display: flex; align-items: center; justify-content: center; gap: 4px; }
-.gallery-pagination button { padding: 8px 16px; font-size: 13px; font-weight: 500; }
-.gallery-pagination button[aria-current="true"] { border-color: var(--line); background: var(--surface); color: var(--ink); box-shadow: 0 2px 6px var(--shadow); }
-.gallery-rotation { margin-left: 8px; font-size: 14px; }
+.gallery-pagination { display: flex; flex: 1; max-width: 340px; align-items: center; gap: 8px; }
+.gallery-pagination button { position: relative; flex: 1; min-width: 0; padding: 0; overflow: hidden; }
+.gallery-pagination button::before, .gallery-pagination button span { position: absolute; inset-inline: 0; top: 18px; height: 4px; border-radius: 2px; }
+.gallery-pagination button::before { content: ""; background: var(--line); }
+.gallery-pagination button span { background: var(--ink); transform: scaleX(0); transform-origin: left; }
+.gallery-rotation { font-size: 14px; }
 
-@media (max-width: 850px) and (min-width: 601px) {
-  .provider-support { inset-inline: 16px; padding: 12px; }
-  .provider-list { gap: 8px 16px; }
-  .provider-item { font-size: 11px; }
-  .provider-icon { width: 18px; height: 18px; }
+/* Narrower screens stack the text above the screenshot. Every slide is as tall as the tallest one,
+   and the caption row absorbs the difference so the screenshots line up. */
+@media (max-width: 1000px) {
+  .gallery-slide { grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr auto; row-gap: 16px; }
+  .gallery-caption { align-self: start; gap: 8px; padding-top: 0; }
+  .gallery-caption h2 { font-size: 22px; }
+  .gallery-caption .provider-list { flex-direction: row; flex-wrap: wrap; gap: 10px 24px; }
+  .gallery-controls { padding-inline: 16px; }
 }
 
-@media (max-width: 600px) {
-  .screenshot-gallery { padding: 6px 6px 0; border-radius: 12px; }
-  .gallery-image { border-radius: 6px; }
-  .gallery-slide-dialog .gallery-image { padding-bottom: 0; }
-  .gallery-slide-dialog img { width: 45%; }
-  .gallery-caption { min-height: 96px; flex-direction: column; gap: 3px; padding: 10px 4px; font-size: 11px; }
-  .gallery-caption strong { font-size: 12px; }
-  .gallery-caption .text-link { font-size: 11px; }
-  .gallery-controls { gap: 2px; min-height: 56px; padding: 0 0 8px; }
-  .gallery-controls button { min-height: 40px; }
-  .gallery-pagination { gap: 0; }
-  .gallery-pagination button { padding: 8px; font-size: 11px; }
+@media (max-width: 650px) {
+  .screenshot-gallery { --gallery-gutter: 12px; }
+  .gallery-slide { row-gap: 12px; padding-bottom: 20px; }
+  .gallery-caption h2 { font-size: 20px; }
+  .gallery-caption .provider-list { width: 100%; max-width: none; margin: 0; gap: 8px 12px; }
+  .gallery-image { border-radius: 8px; box-shadow: 0 1px 2px var(--shadow), 0 8px 18px -10px rgb(21 23 28 / 24%); }
+  .gallery-controls { gap: 6px; padding-inline: 10px; }
+  .gallery-pagination { gap: 6px; }
   .gallery-arrow, .gallery-rotation { width: 32px; }
-  .gallery-rotation { margin-left: 0; }
-}
-
-@media (max-width: 360px) {
-  .gallery-pagination button { padding-inline: 6px; }
-  .gallery-arrow, .gallery-rotation { width: 28px; }
 }

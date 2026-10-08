@@ -41,6 +41,8 @@ extension ConversationStore {
     func removeRemoteHost(_ host: String, mirror: RemoteSessionMirror = RemoteSessionMirror()) {
         remoteHostList.remove(host)
         remoteHostList.save(to: userDefaults)
+        remoteHostsUsingTmuxPrefix.setUsesTmuxPrefix(false, for: host)
+        remoteHostsUsingTmuxPrefix.save(to: userDefaults)
         hostRefreshStatuses.removeValue(forKey: .ssh(host))
         tmuxSessionNamesByHost.removeValue(forKey: .ssh(host))
         installedProvidersByHost.removeValue(forKey: .ssh(host))
@@ -48,7 +50,7 @@ extension ConversationStore {
         Task.detached(priority: .utility) { mirror.removeMirror(host: host) }
         // A Try Again that waited for this host's refresh can start for the other hosts' sessions; the refresh
         // ends without reporting, now that the host is gone.
-        startQueuedRetry()
+        startQueuedDeletion()
     }
 
     private func applyRemoteHostConversations(_ hostConversations: [Conversation], host: String) {
@@ -62,6 +64,6 @@ extension ConversationStore {
         guard remoteHostList.hosts.contains(host) else { return }
         hostRefreshStatuses[.ssh(host)] = status
         // A Try Again that waited for this refresh can start now.
-        startQueuedRetry()
+        startQueuedDeletion()
     }
 }

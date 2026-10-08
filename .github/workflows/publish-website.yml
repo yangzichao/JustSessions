@@ -7,6 +7,8 @@ on:
       - '.github/workflows/publish-website.yml'
       - 'website/**'
       - 'Scripts/Website/**'
+      - 'Scripts/ReleaseNotes/**'
+      - 'Sources/JustSessions/Resources/ReleaseNotes/**'
       - 'docs/images/**'
       - 'Branding/**'
       - 'README.md'
@@ -43,8 +45,14 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
+      # Release notes merge before their tag, so list only versions whose GitHub release is published.
       - name: Test and build website
-        run: make website-check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LATEST_PUBLISHED_RELEASE_TAG="$(gh release view --repo yangzichao/JustSessions --json tagName --jq .tagName)"
+          export LATEST_PUBLISHED_RELEASE_TAG
+          make website-check
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:

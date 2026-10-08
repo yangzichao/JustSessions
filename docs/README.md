@@ -15,7 +15,9 @@
 | Guide | Covers |
 | --- | --- |
 | [Build and release](development/build-and-release.md) | Swift builds, tests, signed installers, notarization, and Sparkle updates. |
+| [SSH development testing](development/ssh-testing.md) | A local Ubuntu test host for Mac contributors, macOS coverage, and live SSH checks. |
 | [Source layout](development/source-layout.md) | Feature folders and responsibilities. |
+| [Performance](development/performance.md) | Profiling baseline, known hotspots, the status of each optimization, and how to profile. |
 | [Counting update checks](development/update-checks.md) | The Cloudflare Worker that counts daily update checks, what it stores, and how to read the numbers. |
 | [Interface localization](development/localization.md) | String Catalog, language discovery, adding translations, and automated checks. |
 | [Website development](development/website.md) | Static Pages builds, app colors, metadata, sitemap, previews, and publishing. |
@@ -24,4 +26,4 @@
 
 ## Help
 
-Use [Help](https://yangzichao.github.io/JustSessions/help.html) for a brief feature overview and remote host setup, including installing tmux on the host. In the app, open **Settings → Help & feedback** or **Help → JustSessions Help**. Under **Feedback**, choose **GitHub issue** to open one on GitHub, or **Email** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com).
+Use the [Guide](https://yangzichao.github.io/JustSessions/guide.html) for features, SSH setup, and feedback, including installing tmux on the remote host. In the app, open **Settings → Help** or **Help → JustSessions Help**. For feedback, choose **Send us feedback** at the bottom of **Settings → General** to open an email to [zichaoyangphys@gmail.com](mailto:zichaoyangphys@gmail.com), or **Report an issue** to open one on GitHub. Both start with your app and macOS versions filled in.

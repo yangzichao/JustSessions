@@ -5,7 +5,6 @@
 .guide-introduction h1 { margin-bottom: 20px; font-size: clamp(36px, 4.5vw, 56px); line-height: 1.15; letter-spacing: -.035em; }
 .guide-sections { display: flex; flex-wrap: wrap; gap: 12px 24px; padding-block: 20px 28px; margin-bottom: 40px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--secondary); }
 .guide-sections a:hover { text-decoration: underline; text-underline-offset: 4px; }
-.guide-current { font-weight: 650; }
 .guide-content { max-width: 860px; }
 .guide-content section { margin-bottom: 48px; }
 .guide-content h2 { font-size: clamp(26px, 3vw, 32px); }
@@ -22,7 +21,7 @@
 .guide-table-scroll tbody th code { display: block; margin-top: 5px; color: var(--muted); font-weight: 400; }
 .guide-table-scroll tbody tr:last-child > * { border-bottom: 0; }
 .guide-table-scroll + p { margin-top: 16px; }
-.guide-more { padding: 28px; border: 1px solid var(--line); border-radius: 12px; background: var(--sidebar-surface); }
+.guide-more { margin-bottom: 48px; padding: 28px; border: 1px solid var(--line); border-radius: 12px; background: var(--sidebar-surface); }
 .guide-more p:last-child { margin-bottom: 0; }
 
 @media (max-width: 600px) {
@@ -30,5 +29,5 @@
   .guide-sections { gap: 14px 20px; margin-bottom: 32px; }
   .guide-content section { margin-bottom: 36px; }
   .guide-table-scroll th, .guide-table-scroll td { padding: 14px 16px; }
-  .guide-more { padding: 22px; }
+  .guide-more { margin-bottom: 48px; padding: 22px; }
 }

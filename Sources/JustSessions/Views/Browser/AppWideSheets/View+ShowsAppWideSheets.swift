@@ -1,7 +1,7 @@
 import SwiftUI
 
 extension View {
-    /// Shows Settings while `sheet` holds a selected page. Help opens its Help & feedback tab in the same sheet.
+    /// Shows Settings while `sheet` holds a selected page. Help opens its Help tab in the same sheet.
     func showsAppWideSheets(
         _ sheet: Binding<AppWideSheet?>,
         onCheckForUpdates: @escaping () -> Void

@@ -13,6 +13,7 @@ struct SettingsSheet: View {
                 languageStore: .shared,
                 tabReopeningSettingsStore: .shared,
                 launchAtLoginSettingsStore: .shared,
+                tabCloseChoiceSettingsStore: .shared,
                 appAppearanceStore: .shared,
                 appThemeStore: .shared,
                 terminalAppearanceStore: .shared,
@@ -31,6 +32,9 @@ struct SettingsSheet: View {
         }
         .background(ThemePalette.contentSurface)
         .background(SettingsSheetTerminationPolicy())
+        .environment(\.showAppWideSheet, ShowAppWideSheetAction { requestedSheet in
+            selectedTab = requestedSheet.selectedSettingsTab
+        })
         .appLanguage(from: .shared)
     }
 }

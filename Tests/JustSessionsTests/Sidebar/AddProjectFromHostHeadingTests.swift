@@ -71,4 +71,23 @@ struct AddProjectFromHostHeadingTests {
         }
         #expect(store.sidebarProjectGroups.isEmpty)
     }
+
+    @Test func aMissingFolderOnAnSSHHostIsCreatedThereWhenAsked() async throws {
+        let isolatedUserDefaults = try IsolatedUserDefaults()
+        defer { isolatedUserDefaults.removeSuite() }
+        RemoteHostList(hosts: ["devbox"]).save(to: isolatedUserDefaults.userDefaults)
+        let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        let recorder = RemoteCommandRecorder()
+
+        let projectPath = try await store.addProjectToSidebar(
+            folder: "~/new",
+            on: .ssh("devbox"),
+            creatingMissingFolder: true,
+            resolver: RemoteFolderResolver(runner: recorder.runner(answering: (0, "/home/me/new\n")))
+        )
+
+        #expect(recorder.commands.map(\.command) == [RemoteFolderResolver.lookupCommand(for: "~/new", creatingMissingFolder: true)])
+        #expect(projectPath == "ssh://devbox/home/me/new")
+        #expect(store.sidebarProjectGroups.map(\.id) == ["ssh://devbox/home/me/new"])
+    }
 }

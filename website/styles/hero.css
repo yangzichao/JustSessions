@@ -1,7 +1,12 @@
-.hero { padding-top: 48px; }
-.hero-introduction { display: grid; grid-template-columns: 1.22fr 1fr; align-items: end; gap: 48px; margin-bottom: 36px; }
-.hero h1 { margin-bottom: 0; font-size: clamp(40px, 4.7vw, 64px); line-height: 1.12; letter-spacing: -.035em; }
-.hero h1 span { color: var(--ink); }
-.hero-description { margin-bottom: 20px; max-width: 470px; font-size: 18px; line-height: 1.65; }
-.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px; }
-.download-note { margin: 14px 0 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
+/* Keep the CLI positioning compact so the screenshots stay prominent. */
+.hero { padding-top: 28px; }
+.hero h1 { margin: 0 0 10px; font-size: clamp(30px, 3.2vw, 44px); font-weight: 750; line-height: 1.1; letter-spacing: -.03em; }
+.hero-description { margin: 0 0 24px; font-size: clamp(18px, 1.6vw, 22px); font-weight: 600; line-height: 1.4; }
+/* Keep the positioning phrase together when the title wraps. */
+.hero-title-line { display: inline-block; }
+
+@media (max-width: 650px) {
+  .hero { padding-top: 20px; }
+  .hero h1 { font-size: 30px; }
+  .hero-description { margin-bottom: 20px; }
+}

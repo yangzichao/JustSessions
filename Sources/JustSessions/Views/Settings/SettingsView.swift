@@ -1,12 +1,13 @@
 import SwiftUI
 
-/// Settings (⌘,): language, launch, notifications, and updates; how the app and its terminals look; and what macOS allows the
-/// app, plus help and feedback. A switcher at the top picks the page.
+/// Settings (⌘,): language, launch, notifications, updates, and feedback; how the app and its terminals look; what macOS
+/// allows the app; and help. A switcher at the top picks the page.
 struct SettingsView: View {
     @Binding var selectedTab: SettingsTab
     let languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
+    let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
@@ -34,6 +35,7 @@ struct SettingsView: View {
                         languageStore: languageStore,
                         tabReopeningSettingsStore: tabReopeningSettingsStore,
                         launchAtLoginSettingsStore: launchAtLoginSettingsStore,
+                        tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
                         notificationSettingsStore: notificationSettingsStore,
                         onCheckForUpdates: onCheckForUpdates
                     )
@@ -45,8 +47,10 @@ struct SettingsView: View {
                     )
                 case .permissions:
                     PermissionsSettingsView()
-                case .helpAndFeedback:
-                    HelpAndFeedbackSettingsView()
+                case .help:
+                    HelpSettingsView()
+                case .releaseNotes:
+                    ReleaseNotesSettingsView()
                 }
             }
             // A fresh scroll position for each page.

@@ -1,11 +1,23 @@
 import SwiftUI
 
 struct SelectedProjectsContextMenu: View {
-    let selectedCount: Int
+    @ObservedObject var store: ConversationStore
+    let selectedProjectIDs: Set<String>
     let onRemove: () -> Void
+    let onRemoveAndDeleteSessions: () -> Void
 
     var body: some View {
-        Text("\(selectedCount) projects selected")
-        Button("Archive \(selectedCount) projects", systemImage: "archivebox", action: onRemove)
+        let deletableSessionCount = store.deletionPlan(forProjects: selectedProjectIDs).deletableConversations.count
+
+        Text("\(selectedProjectIDs.count) projects selected")
+        Button("Archive \(selectedProjectIDs.count) projects", systemImage: "archivebox", action: onRemove)
+        Divider()
+        Button(
+            "Archive \(selectedProjectIDs.count) projects and delete all sessions (\(deletableSessionCount))…",
+            systemImage: "trash",
+            role: .destructive,
+            action: onRemoveAndDeleteSessions
+        )
+        .disabled(deletableSessionCount == 0)
     }
 }

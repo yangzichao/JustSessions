@@ -5,11 +5,15 @@ struct ConversationBrowserView: View {
     @Binding var searchText: String
     @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
+    @Binding var waitingFilter: SessionWaitingFilter
     let onRename: (Conversation) -> Void
     let onRenameProject: (ProjectConversationGroup) -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     @State private var sessionSelection = SessionMultiSelection()
+    @State private var messageSearch = SidebarMessageSearch()
+    /// The match a click on a session row found in messages opens the reader at.
+    @State private var transcriptMatchReveal: TranscriptMatchReveal?
     /// The host the New Session sheet opened on; nil while it is closed.
     @State private var newSessionSheetHost: SessionHost?
     /// Settings or Help while either shows as a sheet on this window.
@@ -23,7 +27,9 @@ struct ConversationBrowserView: View {
         store.filteredSidebarProjection(
             providerFilter: providerFilter,
             recencyFilter: recencyFilter,
-            searchText: searchText
+            waitingFilter: waitingFilter,
+            searchText: searchText,
+            messageMatchConversationIDs: Set(messageSearch.results.matchesByConversationID.keys)
         )
     }
 
@@ -46,15 +52,25 @@ struct ConversationBrowserView: View {
                 searchText: $searchText,
                 recencyFilter: $recencyFilter,
                 providerFilter: $providerFilter,
+                waitingFilter: $waitingFilter,
                 sessionSelection: $sessionSelection,
                 projects: filteredProjection.projects,
                 allSessionCount: filteredProjection.allSessionCount,
                 recentSessionCount: filteredProjection.recentSessionCount,
+                waitingSessionCount: filteredProjection.waitingSessionCount,
+                messageMatches: searchText.isEmpty ? [:] : messageSearch.results.matchesByConversationID,
                 onNewSession: { newSessionSheetHost = defaultNewSessionHost },
                 onSelectConversation: { conversation in
+                    // A session a search found in messages opens its reader at the match, even while its CLI runs.
+                    if !searchText.isEmpty, let match = messageSearch.match(for: conversation.id) {
+                        sessionSelection.selectOnly(conversation.id)
+                        store.selectTerminal(nil)
+                        transcriptMatchReveal = TranscriptMatchReveal(
+                            conversationID: conversation.id, entryID: match.entryID, query: messageSearch.results.query
+                        )
                     // A session whose CLI runs opens on its terminal. Its row stays highlighted through its tab, so,
                     // as for a new session's row, the selection clears and the highlight follows the tabs.
-                    if store.showRunningCLI(for: conversation) {
+                    } else if store.showRunningCLI(for: conversation) {
                         sessionSelection.clear()
                     } else {
                         sessionSelection.selectOnly(conversation.id)
@@ -70,11 +86,23 @@ struct ConversationBrowserView: View {
             WorkspaceDetailView(
                 store: store,
                 sessionSelection: sessionSelection,
+                transcriptMatchReveal: transcriptMatchReveal,
                 isSidebarHidden: isSidebarHidden,
                 onRename: onRename,
                 onCloseTerminal: { requestClosingTerminal($0) },
                 onDelete: { onRequestDeletion(.conversation($0)) }
             )
+        }
+        .background(SidebarMessageSearchDriver(
+            indexer: store.messageIndexer,
+            search: messageSearch,
+            typedQuery: searchText,
+            conversations: store.sidebarConversations,
+            conversationsRevision: store.conversationsRevision
+        ))
+        // A reveal opens the reader only for the session it was made for, and only once.
+        .onChange(of: sessionSelection.onlySelectedConversationID) { _, conversationID in
+            if conversationID != transcriptMatchReveal?.conversationID { transcriptMatchReveal = nil }
         }
         .titleBarSidebarToggle(isSidebarHidden: $isSidebarHidden)
         .focusedSceneValue(\.isSidebarHidden, $isSidebarHidden)
@@ -86,11 +114,15 @@ struct ConversationBrowserView: View {
                 initialProjectPath: newSessionProjectPath(on: host, startableProjects: startableProjects),
                 hosts: store.hosts,
                 providersByHost: store.newSessionProvidersByHost,
-                recentProjects: startableProjects
-            ) { kind, host, folder in
-                switch kind {
-                case .cli(let provider): try await store.launchNewSession(provider: provider, host: host, folder: folder)
-                case .plainTerminal: try await store.openPlainTerminal(host: host, folder: folder)
+                recentProjects: startableProjects,
+                startCommands: store.cliStartCommands,
+                onSaveStartCommand: { try await store.saveStartCommand($0, for: $1, on: $2) }
+            ) { request in
+                switch request.kind {
+                case .cli(let provider):
+                    try await store.launchNewSession(provider: provider, host: request.host, folder: request.folder)
+                case .plainTerminal:
+                    try await store.openPlainTerminal(host: request.host, folder: request.folder)
                 }
             }
         }
@@ -117,7 +149,11 @@ struct ConversationBrowserView: View {
             isEnabled: workspaceTabCommandsEnabled && !store.terminalSessions.isEmpty,
             onSelectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) }
         ))
-        .modifier(TerminalTabCloseConfirmation(store: store, closingSessionID: $closingTerminalID))
+        .modifier(TerminalTabCloseConfirmation(
+            store: store,
+            closingSessionID: $closingTerminalID,
+            tabCloseChoiceSettingsStore: .shared
+        ))
         .modifier(OnboardingTipsPresenter(
             store: store,
             tour: onboardingTour,
@@ -130,11 +166,16 @@ struct ConversationBrowserView: View {
         ))
     }
 
-    /// A tab still waiting to be shown runs nothing, so it closes without asking what to do with its CLI.
+    /// A tab still waiting to be shown runs nothing, so it closes without asking what to do with its CLI. A tab whose
+    /// CLI can keep running in tmux closes without asking too once you chose Don't ask again, doing what you chose.
     private func requestClosingTerminal(_ id: UUID?) {
         guard let id else { return }
-        if store.terminalSessions.first(where: { $0.id == id })?.isWaitingToBeShown == true {
+        let closingTab = store.terminalSessions.first { $0.id == id }
+        if closingTab?.isWaitingToBeShown == true {
             store.closeTerminal(id)
+        } else if closingTab?.canKeepCLIRunningAfterClose == true,
+                  let endsTmuxSession = TabCloseChoiceSettingsStore.shared.choice.endsTmuxSessionWithoutAsking {
+            store.closeTerminal(id, endingTmuxSession: endsTmuxSession)
         } else {
             closingTerminalID = id
         }

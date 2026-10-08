@@ -61,6 +61,9 @@ struct TerminalTab: View {
     let showsLeadingSeparator: Bool
     /// The split items this tab's context menu offers, or nil for none.
     let splitMenu: TerminalTabSplitMenu?
+    /// Starts a new session or a plain terminal in the tab's group, first in its context menu, as Chrome's tab menu
+    /// starts with New tab.
+    let newSessionMenu: ProjectNewSessionMenu
     let onHoverChange: (Bool) -> Void
     let onSelect: () -> Void
     let onRename: (Conversation) -> Void
@@ -89,6 +92,8 @@ struct TerminalTab: View {
             .help(helpText)
             .accessibilityAddTraits(isSelected ? .isSelected : [])
             .contextMenu {
+                newSessionMenu
+                Divider()
                 if session.isPlainTerminal {
                     splitMenuItems
                     Button("Close terminal…", systemImage: "xmark", role: .destructive, action: onClose)
@@ -131,6 +136,7 @@ struct TerminalTab: View {
             onHoverChange(isHovering)
         }
         .onboardingTourStop(isSelected ? .keepRunning : nil)
+        .onboardingTourStop(isSelected ? .splitView : nil)
     }
 
     /// The split view entries, as Chrome's tab menu offers them, each a submenu but the first.

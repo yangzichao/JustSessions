@@ -4,7 +4,8 @@ import Foundation
 /// A Codex CLI that runs its threads itself (`--no-daemon`, or a Codex from before its background server) keeps
 /// `sessions/YYYY/MM/DD/rollout-<timestamp>-<session id>.jsonl` open while it runs; one whose threads run in the
 /// background server names its thread in the terminal title instead, see `CodexThreadTitle`. Antigravity keeps its
-/// SQLite `conversations/<session id>.db` open, with `-wal` and `-shm` companions.
+/// SQLite `conversations/<session id>.db` open, with `-wal` and `-shm` companions, while the conversation is busy;
+/// which conversation it is in later, its log says, see `AntigravityCLILog`.
 /// Claude Code does not keep its transcript open; its tabs are matched by session id instead. Kiro CLI, OpenCode,
 /// and Pi leave no such trace; see `ConversationProvider.linksNewSessionsByAppearance`.
 enum OpenSessionFileName {

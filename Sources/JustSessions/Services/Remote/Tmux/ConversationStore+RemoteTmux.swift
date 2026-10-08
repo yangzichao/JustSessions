@@ -38,7 +38,9 @@ extension ConversationStore {
             provider: conversation.provider,
             projectPath: conversation.projectPath,
             arguments: adapter.arguments(for: conversation, action: .resume),
-            tmuxSessionName: tmuxName
+            tmuxSessionName: tmuxName,
+            usesHostTmuxPrefix: usesTmuxPrefix(on: ended.host),
+            startCommand: customStartCommand(for: conversation.provider, on: ended.host)
         )
     }
 }

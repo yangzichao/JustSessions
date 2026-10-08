@@ -5,7 +5,7 @@ extension ConversationStore {
         sidebarProjection.conversations
     }
 
-    /// Includes saved empty projects; provider, recency, and search filters are applied by the browser.
+    /// Includes saved empty projects; provider, recency, waiting, and search filters are applied by the browser.
     var sidebarProjectGroups: [ProjectConversationGroup] {
         sidebarProjection.projectGroups
     }
@@ -14,7 +14,9 @@ extension ConversationStore {
     func filteredSidebarProjection(
         providerFilter: ConversationProviderFilter,
         recencyFilter: SessionRecencyFilter,
-        searchText: String
+        waitingFilter: SessionWaitingFilter = .all,
+        searchText: String,
+        messageMatchConversationIDs: Set<String> = []
     ) -> FilteredSidebarProjection {
         let projection = sidebarProjection
         let inputs = FilteredSidebarProjection.Inputs(
@@ -22,7 +24,10 @@ extension ConversationStore {
             titleAliases: titleAliases,
             providerFilter: providerFilter,
             recencyFilter: recencyFilter,
+            waitingFilter: waitingFilter,
+            waiting: sessionsWaitingForYou,
             searchText: searchText,
+            messageMatchConversationIDs: messageMatchConversationIDs,
             recencyNow: Date(timeIntervalSinceReferenceDate: (Date.now.timeIntervalSinceReferenceDate / 60).rounded(.down) * 60)
         )
         if let cachedFilteredSidebarProjection, cachedFilteredSidebarProjection.inputs == inputs {
@@ -79,14 +84,21 @@ extension ConversationStore {
 
     /// From a host heading's +: lists a folder under its host before it has any sessions, or brings it back from the
     /// archive, and returns its project key. A folder typed for an SSH host is looked up there first, so a missing
-    /// folder is reported and the project is keyed by the path the CLIs record.
+    /// folder is reported, or created when `creatingMissingFolder` is set, and the project is keyed by the path the
+    /// CLIs record. On this Mac the folder panel creates a new folder itself.
     @discardableResult
     func addProjectToSidebar(
         folder: String,
         on host: SessionHost,
+        creatingMissingFolder: Bool = false,
         resolver: RemoteFolderResolver = RemoteFolderResolver()
     ) async throws -> String {
-        let projectPath = try await projectLocation(of: folder, on: host, resolver: resolver).key
+        let projectPath = try await projectLocation(
+            of: folder,
+            on: host,
+            creatingMissingFolder: creatingMissingFolder,
+            resolver: resolver
+        ).key
         showProjectInSidebar(projectPath)
         return projectPath
     }
@@ -103,14 +115,18 @@ extension ConversationStore {
         updateSidebarProjectList(updatedList)
     }
 
-    /// Starts deleting the project's deletable sessions, then archives the project right away.
-    /// Skipped sessions, such as those with open terminals, stay on disk and come back if the project is restored.
-    /// When the deletion cannot start, the project stays.
     func deleteSessionsAndRemoveProject(_ projectPath: String) {
-        let plan = deletionPlan(for: projectPath)
-        guard plan.hasDeletableConversations, canStartDeletion(of: plan.deletableConversations) else { return }
-        deleteSessions(in: projectPath)
-        removeProjectFromSidebar(projectPath)
+        deleteSessionsAndRemoveProjects([projectPath])
+    }
+
+    /// Deletes the projects' deletable sessions, now or after what holds them up, and archives the projects
+    /// right away. Skipped sessions, such as those with open terminals, stay on disk and come back if a project is
+    /// restored. When none of the sessions is deletable, the projects stay.
+    func deleteSessionsAndRemoveProjects(_ projectPaths: Set<String>) {
+        let plan = deletionPlan(forProjects: projectPaths)
+        guard plan.hasDeletableConversations else { return }
+        deleteConversations(plan.deletableConversations)
+        removeProjectsFromSidebar(projectPaths)
     }
 
     private func updateSidebarProjectList(_ updatedList: SidebarProjectList) {

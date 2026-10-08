@@ -19,20 +19,22 @@ struct ThemeSurfaceRenderingTests {
                 languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
                 tabReopeningSettingsStore: tabReopeningStore,
                 launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
+                tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore(userDefaults: settings.userDefaults),
                 appAppearanceStore: appearanceStore, appThemeStore: themeStore,
                 terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore,
                 onCheckForUpdates: {}
             ))
         }
         let generalView = settingsView(selectedTab: .general)
-        let helpView = settingsView(selectedTab: .helpAndFeedback)
+        let helpView = settingsView(selectedTab: .help)
         // Settings pages share a fixed size, so the reference strip lands at the same bottom edge.
         let views: [(String, AnyView, CGSize)] = [
             ("help", helpView, fittingSize(of: helpView)),
             ("settings", generalView, fittingSize(of: generalView)),
             ("new-session", AnyView(NewSessionSheet(
                 initialKind: .cli(.codex), initialHost: .thisMac, initialProjectPath: "/tmp/theme-check",
-                hosts: [.thisMac], providersByHost: [.thisMac: [.codex]], recentProjects: [], onStart: { _, _, _ in }
+                hosts: [.thisMac], providersByHost: [.thisMac: [.codex]], recentProjects: [],
+                startCommands: CLIStartCommands(), onSaveStartCommand: { _, _, _ in }, onStart: { _ in }
             )), CGSize(width: 520, height: 260)),
         ]
         for (name, content, size) in views {

@@ -18,7 +18,7 @@ let package = Package(
                 .product(name: "Sparkle", package: "Sparkle"),
                 .product(name: "SwiftTerm", package: "SwiftTerm"),
             ],
-            resources: [.process("Resources/Localization")],
+            resources: [.process("Resources/Localization"), .copy("Resources/ReleaseNotes"), .copy("Resources/Fonts")],
             linkerSettings: [.linkedLibrary("sqlite3")]
         ),
         .testTarget(

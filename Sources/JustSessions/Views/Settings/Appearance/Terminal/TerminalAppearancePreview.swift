@@ -13,7 +13,8 @@ struct TerminalAppearancePreview: NSViewRepresentable {
         )
         terminalView.feed(text: [
             " JustSessions",
-            " $ run project",
+            // A Powerline branch icon, as shell prompts show, which the bundled Nerd Font symbols draw with any font.
+            " \u{E0A0} main $ run project",
             " \u{1B}[32mReady\u{1B}[0m to work",
             " \u{1B}[33mWarning\u{1B}[0m · review changes",
             " \u{1B}[31mError\u{1B}[0m · sample message",

@@ -12,7 +12,7 @@ struct CLIActivitySyncTests {
         let conversation = Conversation.fixture(provider: .codex, projectPath: directory.path, sourceFile: rolloutFile)
         let store = Self.makeStore(listing: [conversation], searching: directory)
         defer { store.closeAllTerminals() }
-        let tab = Self.startTab(for: conversation, running: "/bin/sleep", ["30"])
+        let tab = Self.startTab(for: conversation, running: StandInCLI.executablePath, StandInCLI.arguments)
         store.openTerminal(tab)
         let cliStartedAt = try #require(RunningProcessInfo.startDate(of: tab.cliProcessID))
         try CodexRolloutLines.write([CodexRolloutLines.sessionMeta], to: rolloutFile)
@@ -76,7 +76,7 @@ struct CLIActivitySyncTests {
         await store.synchronizeCLIActivity(claudeRegistry: Self.emptyClaudeRegistry(in: directory))
         #expect(store.detachedCLIActivities == [conversation.id: .idle])
 
-        store.openTerminal(Self.startTab(for: conversation, running: "/bin/sleep", ["30"]))
+        store.openTerminal(Self.startTab(for: conversation, running: StandInCLI.executablePath, StandInCLI.arguments))
         await store.synchronizeCLIActivity(claudeRegistry: Self.emptyClaudeRegistry(in: directory))
         #expect(store.detachedCLIActivities.isEmpty)
         #expect(store.activitySummary(forProjectDirectoryKey: conversation.projectDirectoryKey).summary == "1 idle")

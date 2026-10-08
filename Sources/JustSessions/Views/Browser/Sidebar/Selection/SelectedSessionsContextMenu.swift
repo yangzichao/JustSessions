@@ -24,7 +24,7 @@ struct SelectedSessionsContextMenu: View {
         })
         Divider()
         Button("Delete \(selectedConversations.count) sessions…", systemImage: "trash", role: .destructive, action: onDelete)
-            .disabled(!store.canStartDeletion(of: selectedConversations))
+            .disabled(selectedConversations.allSatisfy(store.isDeletionPending(for:)))
     }
 
 }

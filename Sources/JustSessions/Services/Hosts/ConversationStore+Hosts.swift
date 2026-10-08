@@ -30,14 +30,20 @@ extension ConversationStore {
         try launchNewSession(provider: provider, in: try await projectLocation(of: folder, on: host, resolver: resolver))
     }
 
-    /// A folder typed in the New Session sheet. On an SSH host it is looked up there, which fails when it is missing.
-    func projectLocation(of folder: String, on host: SessionHost, resolver: RemoteFolderResolver) async throws -> ProjectLocation {
+    /// A folder typed in the New Session sheet. On an SSH host it is looked up there, which fails when it is missing
+    /// unless `creatingMissingFolder` asks for it to be created there first.
+    func projectLocation(
+        of folder: String,
+        on host: SessionHost,
+        creatingMissingFolder: Bool = false,
+        resolver: RemoteFolderResolver
+    ) async throws -> ProjectLocation {
         switch host {
         case .thisMac:
             return ProjectLocation(host: .thisMac, path: folder)
         case .ssh(let destination):
             let resolvedPath = try await Task.detached(priority: .userInitiated) {
-                try resolver.resolvedPath(of: folder, host: destination)
+                try resolver.resolvedPath(of: folder, host: destination, creatingMissingFolder: creatingMissingFolder)
             }.value
             return ProjectLocation(host: host, path: resolvedPath)
         }

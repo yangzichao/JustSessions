@@ -38,7 +38,7 @@ struct CLIArgumentContractTests {
     @Test(arguments: argumentCases)
     func eachToolStartsWithItsOwnArguments(_ argumentCase: ArgumentCase) {
         let conversation = Conversation.fixture(provider: argumentCase.provider, sessionID: Self.sessionID)
-        let arguments = adapter(for: argumentCase.provider).arguments(for: conversation, action: argumentCase.action)
+        let arguments = adapterWithoutSessions(for: argumentCase.provider).arguments(for: conversation, action: argumentCase.action)
         #expect(arguments == argumentCase.expectedArguments)
     }
 
@@ -50,17 +50,5 @@ struct CLIArgumentContractTests {
     @Test func onlyResumeContinuesTheSameSession() {
         #expect(ConversationAction.allCases.map(\.displayName) == ["New", "Resume", "Branch"])
         #expect(ConversationAction.allCases.filter(\.startsNewSession) == [.new, .branch])
-    }
-
-    private func adapter(for provider: ConversationProvider) -> any ConversationAdapter {
-        let unusedDirectory = URL(fileURLWithPath: "/nonexistent/justsessions-tests")
-        return switch provider {
-        case .claude: ClaudeAdapter(configurationDirectory: unusedDirectory)
-        case .codex: CodexAdapter(codexDirectory: unusedDirectory)
-        case .antigravity: AntigravityAdapter(configurationDirectory: unusedDirectory)
-        case .kiro: KiroAdapter(sessionsDirectory: unusedDirectory)
-        case .opencode: OpenCodeAdapter(databaseFile: unusedDirectory.appendingPathComponent("opencode.db"))
-        case .pi: PiAdapter(sessionsDirectory: unusedDirectory)
-        }
     }
 }

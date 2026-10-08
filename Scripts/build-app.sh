@@ -39,6 +39,8 @@ if [[ -d "$swiftterm_resources" ]]; then
 fi
 cp -f "$project_directory/.build/checkouts/SwiftTerm/LICENSE" "$app_directory/Contents/Resources/SwiftTerm-LICENSE.txt"
 cp -f "$project_directory/Branding/ThirdParty/Octicons/LICENSE" "$app_directory/Contents/Resources/Octicons-LICENSE.txt"
+# The font itself ships in the resource bundle above; keep its license with the other third-party licenses.
+cp -f "$project_directory/Sources/JustSessions/Resources/Fonts/SymbolsNerdFontMono-LICENSE.txt" "$app_directory/Contents/Resources/SymbolsNerdFontMono-LICENSE.txt"
 cp -f "$project_directory/Branding/AppIcon.icns" "$app_directory/Contents/Resources/AppIcon.icns"
 tmux_runtime_directory="$("$project_directory/Scripts/Tmux/build-runtime.sh")"
 ditto "$tmux_runtime_directory" "$app_directory/Contents/Resources/Tmux"

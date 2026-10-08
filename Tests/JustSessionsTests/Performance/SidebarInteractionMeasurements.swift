@@ -498,10 +498,12 @@ private struct SidebarPerfBrowserHarness: View {
                 searchText: $controls.searchText,
                 recencyFilter: $controls.recencyFilter,
                 providerFilter: $controls.providerFilter,
+                waitingFilter: .constant(.all),
                 sessionSelection: $controls.sessionSelection,
                 projects: filteredProjection.projects,
                 allSessionCount: filteredProjection.allSessionCount,
                 recentSessionCount: filteredProjection.recentSessionCount,
+                waitingSessionCount: filteredProjection.waitingSessionCount,
                 onNewSession: {},
                 onSelectConversation: { conversation in
                     if store.showRunningCLI(for: conversation) {

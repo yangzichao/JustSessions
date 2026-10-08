@@ -38,19 +38,7 @@ struct TerminalAppearanceSection: View {
         }
         GridRow {
             Text("Font")
-            Picker("Font", selection: Binding(
-                get: { appearanceStore.preferences.fontFamily },
-                set: { appearanceStore.setFontFamily($0) }
-            )) {
-                ForEach(TerminalFontFamily.allCases) { family in
-                    if family == .system {
-                        Text("System Monospaced").tag(family)
-                    } else {
-                        Text(verbatim: family.displayName).tag(family)
-                    }
-                }
-            }
-            .labelsHidden()
+            TerminalFontPicker(appearanceStore: appearanceStore)
         }
         GridRow {
             Text("Size")

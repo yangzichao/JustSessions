@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var searchText = ""
     @State private var recencyFilter: SessionRecencyFilter = .all
     @State private var providerFilter: ConversationProviderFilter = .all
+    @State private var waitingFilter: SessionWaitingFilter = .all
     @State private var renamingConversation: Conversation?
     @State private var renamingProject: ProjectConversationGroup?
     @State private var editedProjectName = ""
@@ -19,6 +20,7 @@ struct ContentView: View {
             searchText: $searchText,
             recencyFilter: $recencyFilter,
             providerFilter: $providerFilter,
+            waitingFilter: $waitingFilter,
             onRename: { conversation in
                 editedTitle = store.title(for: conversation)
                 renamingConversation = conversation

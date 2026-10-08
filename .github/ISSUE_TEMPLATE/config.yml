@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability privately
+    url: https://github.com/yangzichao/JustSessions/security/advisories/new
+    about: Send vulnerability details directly to maintainers instead of opening a public issue.
+  - name: User guide and troubleshooting
+    url: https://yangzichao.github.io/JustSessions/guide.html
+    about: Find setup instructions, shortcuts, SSH help, and troubleshooting.
+  - name: Email feedback or report a conduct concern
+    url: mailto:zichaoyangphys@gmail.com
+    about: Contact the maintainer privately or get help when GitHub is difficult to use.
