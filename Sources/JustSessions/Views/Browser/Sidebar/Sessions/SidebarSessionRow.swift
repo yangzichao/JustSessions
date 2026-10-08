@@ -7,9 +7,13 @@ struct SidebarSessionRow: View {
     let conversation: Conversation
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
+    /// The sessions its subagents ran in; a chevron before its icon shows or hides them.
+    let subagentCount: Int
+    let isShowingSubagents: Bool
     /// While searching, the session's first match in its messages, shown under the title.
     var messageMatch: SessionMessageMatch? = nil
     let onClick: (Conversation) -> Void
+    let onToggleSubagents: () -> Void
     let onRename: (Conversation) -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
     let onCloseTab: (UUID) -> Void
@@ -54,6 +58,17 @@ struct SidebarSessionRow: View {
         .buttonStyle(ThemePlainButtonStyle(showsHover: false))
         .help("\(title) · \(conversation.provider.rawValue) · \(SidebarSessionDateText.shared.text(for: conversation.updatedAt))\(statusDescription.map { " · \($0)" } ?? "")")
         .accessibilityLabel("\(title), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(statusDescription.map { ", \($0)" } ?? "")")
+        .overlay(alignment: .leading) {
+            if subagentCount > 0 {
+                SubagentDisclosureButton(
+                    isExpanded: isShowingSubagents,
+                    subagentCount: subagentCount,
+                    sessionTitle: title,
+                    indentLevel: 0,
+                    action: onToggleSubagents
+                )
+            }
+        }
         .accessibilityValue(Text(verbatim: messageMatch?.snippet.text ?? ""))
         // Over the button rather than in it, so a click on the ⋯ opens its menu instead of selecting the session.
         .overlay(alignment: .trailing) {

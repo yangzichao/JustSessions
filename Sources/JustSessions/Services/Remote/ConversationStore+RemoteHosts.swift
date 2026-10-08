@@ -21,6 +21,7 @@ extension ConversationStore {
                     if let installedProviders = status.installedProviders {
                         await self.setInstalledProviders(installedProviders, on: .ssh(host))
                     }
+                    await self.checkClaudeSessionIDFlagIfUnanswered(on: host)
                 }
                 await self.setRemoteHostRefreshStatus(.refreshed(.now), host: host)
             } catch {
@@ -53,10 +54,12 @@ extension ConversationStore {
         startQueuedDeletion()
     }
 
-    private func applyRemoteHostConversations(_ hostConversations: [Conversation], host: String) {
+    /// Lists a host's sessions from its copy, and links the tabs waiting for them.
+    func applyRemoteHostConversations(_ hostConversations: [Conversation], host: String) {
         // The host may have been removed while its copy ran.
         guard remoteHostList.hosts.contains(host) else { return }
         replaceConversations(on: .ssh(host), with: hostConversations)
+        linkWaitingTabsToPreassignedSessions(on: .ssh(host))
         linkWaitingTabsByAppearance(on: .ssh(host))
     }
 

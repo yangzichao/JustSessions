@@ -12,6 +12,13 @@ final class ConversationStore: ObservableObject {
         }
     }
     private(set) var conversationIndex = ConversationIndex([])
+    /// Sessions subagents ran in, newest first. They stay out of `conversations`, so only the rows of the sessions that
+    /// started them list them, and nothing that follows listed sessions, such as linking a new tab, mistakes one for
+    /// a session of its own.
+    @Published private(set) var subagentConversations: [Conversation] = [] {
+        didSet { subagentIndex = SubagentConversationIndex(subagentConversations) }
+    }
+    private(set) var subagentIndex = SubagentConversationIndex([])
     /// Changes with every change to `conversations`, so what is worked out from them knows when to work it out again.
     private(set) var conversationsRevision = 0
     /// What the sidebar lists, kept until what it was worked out from changes; see `ConversationStore+SidebarProjects`.
@@ -29,7 +36,9 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var projectDisplayNames: ProjectDisplayNames
     @Published private(set) var pinnedItems: PinnedItems
     @Published var sidebarProjectList: SidebarProjectList
-    @Published private(set) var terminalSessions: [TerminalSession] = []
+    @Published private(set) var terminalSessions: [TerminalSession] = [] {
+        didSet { windowRegistry.tabsChanged(in: self) }
+    }
     /// Selecting a tab that waited to be shown starts it; see `TerminalSession.isWaitingToBeShown`.
     @Published private(set) var selectedTerminalID: UUID? {
         didSet {
@@ -83,6 +92,8 @@ final class ConversationStore: ObservableObject {
     var isRestoringTabBatch = false
     var isTearingDownWorkspace = false
     let sessionNotifier: any SessionNotifying
+    /// The app's windows, whose tabs this window's count with its own; see `ConversationStore+OtherWindows`.
+    let windowRegistry: WorkspaceWindowRegistry
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
     private var isRefreshQueued = false
@@ -104,6 +115,8 @@ final class ConversationStore: ObservableObject {
     let commandResolver: NativeCLICommandResolver
     /// Deletes sessions on SSH hosts.
     private let remoteDeletion: RemoteConversationDeletion
+    /// Which SSH hosts' `claude` takes a new session's id; see `ConversationStore+RemoteClaudeSessionIDs`.
+    let remoteClaudeSessionIDFlagSupport: RemoteClaudeSessionIDFlagSupport
     /// Where custom titles, project names, pins, sidebar projects, SSH hosts, and start commands are kept.
     let userDefaults: UserDefaults
 
@@ -114,14 +127,18 @@ final class ConversationStore: ObservableObject {
         commandResolver: NativeCLICommandResolver = NativeCLICommandResolver(),
         userDefaults: UserDefaults = .standard,
         sessionNotifier: any SessionNotifying = SessionNotificationCenter.shared,
+        windowRegistry: WorkspaceWindowRegistry = WorkspaceWindowRegistry(),
         remoteDeletion: RemoteConversationDeletion = RemoteConversationDeletion(),
+        remoteClaudeSessionIDFlagSupport: RemoteClaudeSessionIDFlagSupport = .shared,
         startsBackgroundPolling: Bool = true
     ) {
         self.adapters = adapters
         self.commandResolver = commandResolver
         self.remoteDeletion = remoteDeletion
+        self.remoteClaudeSessionIDFlagSupport = remoteClaudeSessionIDFlagSupport
         self.userDefaults = userDefaults
         self.sessionNotifier = sessionNotifier
+        self.windowRegistry = windowRegistry
         self.titleAliases = ConversationTitleAliases.load(from: userDefaults)
         self.projectDisplayNames = ProjectDisplayNames.load(from: userDefaults)
         self.pinnedItems = PinnedItems.load(from: userDefaults)
@@ -141,7 +158,7 @@ final class ConversationStore: ObservableObject {
             startTmuxPaneProcessLookup()
             startCLIActivitySync()
         }
-        sessionNotifier.follow(self)
+        windowRegistry.add(self)
     }
 
     /// Scans the session folders on this Mac. SSH hosts refresh on their own, so a slow host never holds this up.
@@ -187,9 +204,13 @@ final class ConversationStore: ObservableObject {
 
     /// Swaps in what one host lists now, keeping every other host's sessions.
     func replaceConversations(on host: SessionHost, with hostConversations: [Conversation], discardMissingReopeningTabs: Bool = true) {
-        rememberSidebarProjects(Set(hostConversations.map(\.projectDirectoryKey)))
-        let updatedConversations = (conversations.filter { $0.host != host } + hostConversations)
+        let topLevelConversations = hostConversations.filter { !$0.isSubagent }
+        rememberSidebarProjects(Set(topLevelConversations.map(\.projectDirectoryKey)))
+        let updatedConversations = (conversations.filter { $0.host != host } + topLevelConversations)
             .sorted { $0.updatedAt > $1.updatedAt }
+        let updatedSubagents = (subagentConversations.filter { $0.host != host } + hostConversations.filter(\.isSubagent))
+            .sorted { $0.updatedAt > $1.updatedAt }
+        if subagentConversations != updatedSubagents { subagentConversations = updatedSubagents }
         if conversations != updatedConversations { conversations = updatedConversations }
         synchronizeTerminalTitles()
         reopenWaitingTabs(on: host, discardMissingSessions: discardMissingReopeningTabs)
@@ -238,9 +259,11 @@ final class ConversationStore: ObservableObject {
 
     // MARK: - Deletion
 
-    /// A tab in this window, or a CLI still running in tmux on the session's host.
+    /// A tab in any window, or a CLI still running in tmux on the session's host.
     func hasTerminal(for conversation: Conversation) -> Bool {
-        terminalSessions.contains { $0.conversation?.id == conversation.id } || isRunningInTmux(conversation)
+        terminalSessions.contains { $0.conversation?.id == conversation.id }
+            || hasTerminalInAnotherWindow(for: conversation)
+            || isRunningInTmux(conversation)
     }
 
     var isDeletingSessions: Bool {
@@ -273,12 +296,17 @@ final class ConversationStore: ObservableObject {
         deletionPlan(for: conversations.filter { projectPaths.contains($0.projectDirectoryKey) })
     }
 
-    /// Sessions already being deleted, or waiting to be, are left out: they are not deleted twice.
+    /// Sessions already being deleted, or waiting to be, are left out: they are not deleted twice. So are subagents'
+    /// sessions, which go only with the session that started them.
     func deletionPlan(for candidateConversations: [Conversation]) -> SessionDeletionPlan {
-        let notYetPending = candidateConversations.filter { !isDeletionPending(for: $0) }
+        let notYetPending = candidateConversations.filter { !$0.isSubagent && !isDeletionPending(for: $0) }
+        let deletable = notYetPending.filter { !hasTerminal(for: $0) }
+        let deletesSubagents = Dictionary(grouping: deletable, by: \.provider.deletesSubagentsWithSession)
         return SessionDeletionPlan(
-            deletableConversations: notYetPending.filter { !hasTerminal(for: $0) },
-            openTerminalCount: notYetPending.filter { hasTerminal(for: $0) }.count
+            deletableConversations: deletable,
+            openTerminalCount: notYetPending.filter { hasTerminal(for: $0) }.count,
+            deletedSubagentCount: (deletesSubagents[true] ?? []).reduce(0) { $0 + descendantSubagentCount(of: $1) },
+            keptSubagentCount: (deletesSubagents[false] ?? []).reduce(0) { $0 + descendantSubagentCount(of: $1) }
         )
     }
 

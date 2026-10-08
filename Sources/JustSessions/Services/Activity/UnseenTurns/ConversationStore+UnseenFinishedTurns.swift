@@ -34,12 +34,16 @@ extension ConversationStore {
             .markingUnseenFinishedTurn(hasUnseenFinishedTurn(detachedConversationID: conversation.id))
     }
 
-    /// Every session whose CLI waits on you, in a tab or in tmux with no tab open.
+    /// Every session whose CLI waits on you, in a tab of any window or in tmux with no tab open. Only this window's
+    /// tabs are listed by id.
     var sessionsWaitingForYou: SessionsWaitingForYou {
         var waiting = SessionsWaitingForYou()
         for tab in terminalSessions where tab.isWaitingForYou {
             waiting.terminalIDs.insert(tab.id)
             if let conversationID = tab.conversation?.id { waiting.conversationIDs.insert(conversationID) }
+        }
+        for (conversationID, tab) in runningTerminalsInOtherWindows where tab.isWaitingForYou {
+            waiting.conversationIDs.insert(conversationID)
         }
         for (conversationID, activity) in detachedCLIActivities where WaitingForYou.includes(
             activity: activity,
@@ -56,6 +60,8 @@ extension ConversationStore {
         for tab in terminalSessions {
             tab.updateHasUnseenFinishedTurn(next.contains(tab.attentionSource))
         }
+        // Other windows' Waiting for you filter counts these tabs' sessions too.
+        windowRegistry.tabsChanged(in: self)
     }
 }
 

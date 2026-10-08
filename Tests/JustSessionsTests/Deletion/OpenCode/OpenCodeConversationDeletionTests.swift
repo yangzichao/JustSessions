@@ -33,7 +33,11 @@ struct OpenCodeConversationDeletionTests {
 
         #expect(throws: expectedError) { try adapter.delete(try fixture.selectedConversation()) }
 
-        #expect(try adapter.discover().count == 2)
+        #expect(Set(try adapter.discover().map(\.sessionID)) == [
+            OpenCodeDeletionFixture.selectedSessionID,
+            OpenCodeDeletionFixture.subagentSessionID,
+            OpenCodeDeletionFixture.retainedSessionID,
+        ])
     }
 
     @Test func aHangingCLIIsStoppedAndTheSessionRemains() throws {

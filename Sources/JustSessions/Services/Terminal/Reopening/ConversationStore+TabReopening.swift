@@ -64,8 +64,9 @@ extension ConversationStore {
         for waitingTab in pendingTabReopening.takeWaitingTabs(where: shouldReopen) {
             guard let session = makeReopenedTerminal(for: waitingTab.tab) else {
                 if let conversationID = waitingTab.tab.conversationID,
-                   conversation(withID: conversationID) != nil,
-                   !terminalSessions.contains(where: { $0.conversation?.id == conversationID }) {
+                   let conversation = conversation(withID: conversationID),
+                   !terminalSessions.contains(where: { $0.conversation?.id == conversationID }),
+                   runningTerminalInAnotherWindow(for: conversation) == nil {
                     // A missing CLI or temporarily unavailable project can become usable on a later refresh.
                     pendingTabReopening.returnWaitingTab(waitingTab)
                 }
@@ -81,14 +82,16 @@ extension ConversationStore {
         }
     }
 
-    /// Nil when the session is no longer listed or already has a tab, or when the folder is gone.
+    /// Nil when the session is no longer listed or already has a tab, in this window or another, or when the folder
+    /// is gone.
     private func makeReopenedTerminal(for tab: ReopenableTerminalTab) -> TerminalSession? {
         guard let conversationID = tab.conversationID else {
             return try? makePlainTerminal(in: ProjectLocation(key: tab.projectDirectoryKey), startsOnceShown: true)
         }
         guard let conversation = conversation(withID: conversationID),
               canLaunch(conversation, action: .resume),
-              runningTerminal(for: conversation) == nil else { return nil }
+              runningTerminal(for: conversation) == nil,
+              runningTerminalInAnotherWindow(for: conversation) == nil else { return nil }
         // Reattaching costs nothing, and lets the tab report what the CLI does from the start.
         let reattachesNow = conversation.host == .thisMac && isRunningInTmux(conversation)
         return try? makeTerminal(for: conversation, action: .resume, startsOnceShown: !reattachesNow)

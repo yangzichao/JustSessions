@@ -15,7 +15,9 @@ JustSessions reads the session files your CLIs already create. It does not uploa
 | OpenCode | `~/.local/share/opencode/opencode.db`, read-only (honors `OPENCODE_DB` and `XDG_DATA_HOME`) | Yes | Yes | Yes |
 | Pi | `~/.pi/agent/sessions` (honors `PI_CODING_AGENT_SESSION_DIR`, `sessionDir` in Pi's `settings.json`, and `PI_CODING_AGENT_DIR`) | Yes | Yes | Yes |
 
-Kiro CLI sessions are listed once they have a message; sessions a subagent started are left out. OpenCode subagent sessions and archived sessions are left out too.
+Sessions that subagents ran are listed under the session that started them, hidden until you expand it: Claude Code's transcripts in `<session-id>/subagents` beside the session file, Codex threads another thread spawned, OpenCode sessions with a parent, Antigravity conversations whose summary names a parent conversation, and Pi sessions that extensions keep in the folder beside a session file, such as subagent runs and forks. They can be read but not resumed, renamed, pinned, or deleted on their own. Over SSH, only Codex and Antigravity list them; the mirror leaves the other CLIs' subagent files on the host.
+
+Kiro CLI sessions are listed once they have a message. Sessions Kiro marks as started by a subagent are left out, since Kiro doesn't record which session started them. Archived OpenCode sessions are left out.
 
 Kiro previews show prompts, replies, and collapsed tool calls from the session's `.jsonl` log. Thinking blocks, system context, and raw tool outputs are left out, as in the other supported previews.
 
@@ -44,6 +46,8 @@ The app runs each CLI in a pseudo-terminal with the original project as its work
 Each refresh also checks which CLIs are installed: on this Mac with the same lookup a launch uses, and on an SSH host with `command -v` in its login shell, in the same SSH call that lists its tmux sessions. New session menus offer only the CLIs found. Until a machine's first check finishes, they offer every CLI that runs there.
 
 Claude Code, Codex, and Antigravity CLI reveal which session a new tab's CLI is writing. Kiro CLI, OpenCode, and Pi don't, so a new tab for one of them takes the first session that appears in its project after the tab started. While such a tab waits, this Mac refreshes about every 6 seconds.
+
+On an SSH host the app can't see which session a CLI writes. A new Claude Code tab there starts its CLI with a session ID of its own, and takes only that session, once a refresh finds `--session-id` in the host's `claude --help` (or in your start command's). Other new tabs and Branch tabs on an SSH host take the first session that appears in their project after they started. While one waits, the app refreshes its host about every 10 seconds.
 
 ## Terminal persistence
 

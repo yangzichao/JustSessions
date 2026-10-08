@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var store = ConversationStore()
+    @StateObject private var store = ConversationStore(windowRegistry: .shared)
     @State private var searchText = ""
     @State private var recencyFilter: SessionRecencyFilter = .all
     @State private var providerFilter: ConversationProviderFilter = .all
@@ -45,6 +45,7 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
             store.prepareTabsForTermination()
         }
+        .background(WorkspaceWindowRegistration(store: store))
         .onDisappear { store.closeWorkspace() }
         .alert("Rename conversation", isPresented: Binding(isPresenting: $renamingConversation)) {
             TextField("Name", text: $editedTitle)

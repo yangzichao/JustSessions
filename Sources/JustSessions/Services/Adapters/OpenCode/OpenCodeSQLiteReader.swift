@@ -8,16 +8,16 @@ enum OpenCodeSQLiteReader {
         let projectPath: String
         let title: String?
         let updatedAt: Date
+        /// The session that started this one as a subagent; nil for a session started on its own.
+        var parentSessionID: String? = nil
     }
 
-    /// Top-level sessions only: a subagent's session has a parent and is not resumed on its own. Archived sessions
-    /// are left out where the database records archiving.
+    /// Archived sessions are left out where the database records archiving.
     static let sessionsQuery = """
-        SELECT id, directory, title, time_updated FROM session
-        WHERE parent_id IS NULL AND time_archived IS NULL
+        SELECT id, directory, title, time_updated, parent_id FROM session WHERE time_archived IS NULL
         """
     static let sessionsQueryWithoutArchiving = """
-        SELECT id, directory, title, time_updated FROM session WHERE parent_id IS NULL
+        SELECT id, directory, title, time_updated, parent_id FROM session
         """
 
     static func sessions(in databaseFile: URL) -> [Session] {
@@ -44,7 +44,8 @@ enum OpenCodeSQLiteReader {
                 sessionID: sessionID,
                 projectPath: projectPath,
                 title: textColumn(statement, at: 2),
-                updatedAt: Date(timeIntervalSince1970: Double(sqlite3_column_int64(statement, 3)) / 1_000)
+                updatedAt: Date(timeIntervalSince1970: Double(sqlite3_column_int64(statement, 3)) / 1_000),
+                parentSessionID: textColumn(statement, at: 4)
             ))
         }
         return sessions

@@ -47,7 +47,8 @@ struct AntigravityAdapter: ConversationAdapter {
                 projectPath: summary?.projectPath ?? localSession.projectPath,
                 suggestedTitle: title,
                 updatedAt: updatedAt,
-                sourceFile: file
+                sourceFile: file,
+                parentSessionID: summary?.parentConversationID.flatMap { $0 == localSession.sessionID ? nil : $0 }
             )
         }
     }

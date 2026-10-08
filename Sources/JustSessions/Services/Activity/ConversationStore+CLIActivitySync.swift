@@ -70,8 +70,12 @@ extension ConversationStore {
         }
         if detachedCLIActivities != detachedActivities { detachedCLIActivities = detachedActivities }
         followAttention(after: observations)
-        // Project rows sum up their tabs through the store, which does not see a tab's own changes.
-        if hasTabActivityChanged { objectWillChange.send() }
+        // Project rows sum up their tabs through the store, which does not see a tab's own changes. Other windows'
+        // rows show these tabs' CLIs too.
+        if hasTabActivityChanged {
+            objectWillChange.send()
+            windowRegistry.tabsChanged(in: self)
+        }
     }
 
     private func followAttention(after observations: [SessionActivityObservation]) {
@@ -80,10 +84,12 @@ extension ConversationStore {
         noteUnseenFinishedTurns(after: observations, events: events)
     }
 
-    /// Listed sessions of this Mac that run in tmux, as of the last refresh, with no running tab.
+    /// Listed sessions of this Mac that run in tmux, as of the last refresh, with no running tab in any window. The
+    /// window whose tab runs one follows what its CLI does and notifies about it.
     private func detachedThisMacTmuxSessions() -> [DetachedTmuxSession] {
         guard let runningNames = tmuxSessionNamesByHost[.thisMac], !runningNames.isEmpty else { return [] }
         let conversationIDsWithRunningTab = Set(terminalSessions.filter(\.isRunning).compactMap { $0.conversation?.id })
+            .union(runningTerminalsInOtherWindows.keys)
         return runningNames.sorted().compactMap { name in
             guard let session = TmuxSessionName.session(named: name),
                   let conversation = conversations.first(where: {

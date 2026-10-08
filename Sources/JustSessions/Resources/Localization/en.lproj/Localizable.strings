@@ -54,6 +54,8 @@
 	<string>%lld sessions selected</string>
 	<key>%lld sessions with open terminals will be skipped.</key>
 	<string>%lld sessions with open terminals will be skipped.</string>
+	<key>%lld subagent sessions stay on disk.</key>
+	<string>%lld subagent sessions stay on disk.</string>
 	<key>%lld tool calls</key>
 	<string>%lld tool calls</string>
 	<key>**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘8 go to a tab by its position, and ⌘9 to the last.</key>
@@ -68,10 +70,14 @@
 	<string>1 message</string>
 	<key>1 session with an open terminal will be skipped.</key>
 	<string>1 session with an open terminal will be skipped.</string>
+	<key>1 subagent session stays on disk.</key>
+	<string>1 subagent session stays on disk.</string>
 	<key>1 tool call</key>
 	<string>1 tool call</string>
 	<key>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</key>
 	<string>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</string>
+	<key>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</key>
+	<string>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</string>
 	<key>A+</key>
 	<string>A+</string>
 	<key>About JustSessions</key>
@@ -406,6 +412,8 @@
 	<string>Hide sidebar</string>
 	<key>Hide sidebar (⌘B)</key>
 	<string>Hide sidebar (⌘B)</string>
+	<key>Hide subagent sessions of %@</key>
+	<string>Hide subagent sessions of %@</string>
 	<key>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌘B does the same.</key>
 	<string>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌘B does the same.</string>
 	<key>Host</key>
@@ -758,14 +766,20 @@
 	<string>Settings (⌘,)</string>
 	<key>Settings…</key>
 	<string>Settings…</string>
+	<key>Show</key>
+	<string>Show</string>
 	<key>Show %@</key>
 	<string>Show %@</string>
 	<key>Show Sidebar</key>
 	<string>Show Sidebar</string>
+	<key>Show in Other Window</key>
+	<string>Show in Other Window</string>
 	<key>Show sidebar</key>
 	<string>Show sidebar</string>
 	<key>Show sidebar (⌘B)</key>
 	<string>Show sidebar (⌘B)</string>
+	<key>Show subagent sessions of %@</key>
+	<string>Show subagent sessions of %@</string>
 	<key>Sidebar</key>
 	<string>Sidebar</string>
 	<key>Sidebar width</key>
@@ -802,6 +816,10 @@
 	<string>Stopping deletion</string>
 	<key>Stopping…</key>
 	<string>Stopping…</string>
+	<key>Subagent</key>
+	<string>Subagent</string>
+	<key>Subagent of %@</key>
+	<string>Subagent of %@</string>
 	<key>Swap with left view</key>
 	<string>Swap with left view</string>
 	<key>Swap with right view</key>
@@ -872,12 +890,18 @@
 	<string>This affects all tools in %@, including sessions hidden by the current filter.</string>
 	<key>This affects all tools in %lld projects, including sessions hidden by the current filter.</key>
 	<string>This affects all tools in %lld projects, including sessions hidden by the current filter.</string>
+	<key>This also deletes %lld subagent sessions.</key>
+	<string>This also deletes %lld subagent sessions.</string>
+	<key>This also deletes 1 subagent session.</key>
+	<string>This also deletes 1 subagent session.</string>
 	<key>This changes the display name in JustSessions.</key>
 	<string>This changes the display name in JustSessions.</string>
 	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>
 	<string>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</string>
 	<key>This file isn't an iTerm2 color preset.</key>
 	<string>This file isn't an iTerm2 color preset.</string>
+	<key>This session is open in another window.</key>
+	<string>This session is open in another window.</string>
 	<key>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
 	<string>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</string>
 	<key>Time range</key>
