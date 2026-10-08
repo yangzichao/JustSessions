@@ -52,8 +52,9 @@ Discovery metadata is cached under the app's macOS Caches directory in `SessionS
 `Sources/JustSessions/Resources/ReleaseNotes/releases.json` is the shared editorial history for Settings → Release notes,
 the [website release notes](https://yangzichao.github.io/JustSessions/release-notes.html), GitHub release bodies, and Sparkle's update window.
 Before tagging, add the version, release date (the publication day in America/Los_Angeles), a short title, and user-facing changes under
-`new`, `improved`, or `fixed`. Keep newest versions first and include English and Simplified Chinese copy. Use the changes actually
-shipped between tags; omit internal tests and avoid claiming measured speedups without evidence. The initial history covers the published
+`new`, `improved`, or `fixed`. Keep newest versions first and include English and Simplified Chinese copy. Follow the required
+[release-note writing standard and editorial review](release-notes.md): aim for 1–3 concrete bullets, with at most 5, and verify each claim
+against the changes since the previous release. The initial history covers the published
 1.0 releases; v1.0.7 repackaged the same source as v1.0.6.
 
 Preview a version's GitHub Markdown and Sparkle HTML with:
@@ -63,7 +64,7 @@ python3 Scripts/ReleaseNotes/prepare_release_notes.py v1.0.9 --output-directory 
 make website
 ```
 
-The release workflow fails before signing if the tag has no curated entry. It publishes the rendered Markdown as the GitHub release body
+The release workflow fails before signing if the tag has no curated entry or the copy fails the automated editorial checks. It publishes the rendered Markdown as the GitHub release body
 and gives Sparkle a matching `JustSessions.html` beside `JustSessions.zip`, which `generate_appcast --embed-release-notes` embeds in the feed.
 The native history is bundled and works offline; its website link opens newer notes. Adding entries triggers the independent website build.
 Historical GitHub release bodies are not changed by a source commit and need a separate publication when backfilling notes.
@@ -80,6 +81,8 @@ Before tagging user-facing changes, update the README, affected user guides, and
 
 ```sh
 # Replace vX.Y.Z with the next release version.
+# Complete the editorial review, commit the notes, and check that exact commit.
+make release-check RELEASE_TAG=vX.Y.Z
 git tag vX.Y.Z
 git push origin vX.Y.Z
 ```

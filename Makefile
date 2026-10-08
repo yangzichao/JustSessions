@@ -6,7 +6,7 @@
 APP_BUNDLE_PATH ?= dist/JustSessions.app
 INSTALLER_PATH ?= dist/JustSessions.dmg
 
-.PHONY: build dev run check test verify dmg website website-check website-traffic-test website-traffic-deploy website-traffic localization localization-check update-feed-test update-feed-deploy update-checks help
+.PHONY: build dev run check test verify release-notes-check release-check dmg website website-check website-traffic-test website-traffic-deploy website-traffic localization localization-check update-feed-test update-feed-deploy update-checks help
 
 build:
 	./Scripts/build-app.sh "$(APP_BUNDLE_PATH)"
@@ -22,8 +22,16 @@ test:
 	JUSTSESSIONS_TEST_TMUX_RUNTIME="$$runtime_directory" swift test
 
 # Website deployment checks do not replace local app verification before delivering or tagging.
-verify: website-check update-feed-test test localization-check build
+verify: release-notes-check website-check update-feed-test test localization-check build
 	./Scripts/Release/check-app-launches.sh "$(APP_BUNDLE_PATH)"
+
+release-notes-check:
+	python3 Scripts/ReleaseNotes/check_release_notes.py $(if $(RELEASE_TAG),--tag "$(RELEASE_TAG)")
+
+release-check:
+	@test -n "$(RELEASE_TAG)" || { echo 'Use make release-check RELEASE_TAG=vX.Y.Z' >&2; exit 1; }
+	$(MAKE) release-notes-check RELEASE_TAG="$(RELEASE_TAG)"
+	$(MAKE) verify
 
 dmg: build
 	./Scripts/build-dmg.sh "$(APP_BUNDLE_PATH)" "$(INSTALLER_PATH)"
@@ -69,6 +77,8 @@ help:
 		'make check     Compile the Swift development build' \
 		'make test      Build bundled tmux and run the Swift tests' \
 		'make verify    Check the website, tests, localization, and packaged app launch' \
+		'make release-notes-check RELEASE_TAG=vX.Y.Z  Check and preview candidate release notes' \
+		'make release-check RELEASE_TAG=vX.Y.Z        Check candidate notes and run make verify before tagging' \
 		'make dmg       Build the app and dist/JustSessions.dmg' \
 		'make website   Build and validate the product website' \
 		'make website-check  Run the website tests and build' \

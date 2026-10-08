@@ -3,20 +3,16 @@
     "version": "1.0.9",
     "publishedOn": "2026-10-08",
     "title": {
-      "en": "Smoother transcript reading",
-      "zh-Hans": "更流畅的对话阅读"
+      "en": "Smoother conversation scrolling",
+      "zh-Hans": "更流畅的对话滚动"
     },
     "sections": [
       {
         "kind": "improved",
         "items": [
           {
-            "en": "Long transcripts scroll more smoothly, with less work repeated for messages already on screen.",
-            "zh-Hans": "减少屏幕上已有消息的重复处理，让长对话滚动更流畅。"
-          },
-          {
-            "en": "Faster timestamp parsing and text conversion when loading conversation history.",
-            "zh-Hans": "加载对话历史时，时间解析与文本转换更快。"
+            "en": "Long conversations scroll more smoothly.",
+            "zh-Hans": "长对话滚动更流畅。"
           }
         ]
       }
@@ -43,8 +39,8 @@
         "kind": "fixed",
         "items": [
           {
-            "en": "Dragging a tab no longer moves the whole window; drag empty space in the tab bar to move the window.",
-            "zh-Hans": "拖动标签页不再移动整个窗口；可拖动标签栏空白处移动窗口。"
+            "en": "Dragging a tab no longer moves the window. Drag empty tab-bar space to move it.",
+            "zh-Hans": "拖动标签页不再移动窗口。可拖动标签栏空白处移动窗口。"
           },
           {
             "en": "Failed CLI launches keep their error and exit status visible in the tab.",
@@ -77,8 +73,8 @@
     "version": "1.0.6",
     "publishedOn": "2026-10-06",
     "title": {
-      "en": "A steadier workspace",
-      "zh-Hans": "更稳定的工作区"
+      "en": "Session recovery and reading fixes",
+      "zh-Hans": "会话恢复与阅读修复"
     },
     "sections": [
       {
@@ -87,15 +83,6 @@
           {
             "en": "Review and choose to report the previous launch’s crash when the app reopens.",
             "zh-Hans": "重新打开应用时，可查看并选择报告上次运行的崩溃。"
-          }
-        ]
-      },
-      {
-        "kind": "improved",
-        "items": [
-          {
-            "en": "SSH host settings are grouped under the heading’s more-actions menu, and sidebar pins are easier to distinguish.",
-            "zh-Hans": "SSH 主机设置集中到标题的更多操作菜单，侧边栏置顶标记更易辨认。"
           }
         ]
       },
@@ -111,8 +98,12 @@
             "zh-Hans": "在原标签页恢复已结束的会话，避免重复打开。"
           },
           {
-            "en": "Keep transcript reading positions steady and prevent freezes while reading image messages.",
-            "zh-Hans": "保持对话阅读位置稳定，并修复阅读图片消息时的卡顿。"
+            "en": "Keep conversation reading positions steady.",
+            "zh-Hans": "保持对话阅读位置稳定。"
+          },
+          {
+            "en": "Fixed freezes when reading image messages.",
+            "zh-Hans": "修复阅读图片消息时的卡顿。"
           }
         ]
       }
@@ -147,16 +138,12 @@
         "kind": "fixed",
         "items": [
           {
-            "en": "Fix a crash when opening Find in the transcript reader, and keep search matches loading after switching sessions.",
-            "zh-Hans": "修复在对话阅读器打开查找时的崩溃，并在切换会话后继续加载搜索匹配位置。"
+            "en": "Fixed a crash when opening Find in the conversation reader.",
+            "zh-Hans": "修复在对话阅读器中打开查找时的崩溃。"
           },
           {
-            "en": "Explain which project folder is missing when a saved session cannot resume.",
-            "zh-Hans": "已保存的会话无法恢复时，说明缺失的项目文件夹。"
-          },
-          {
-            "en": "Save a restored default start command correctly.",
-            "zh-Hans": "正确保存恢复为默认值的启动命令。"
+            "en": "Keep search matches loading after switching sessions.",
+            "zh-Hans": "切换会话后继续加载搜索匹配位置。"
           }
         ]
       }
@@ -185,7 +172,7 @@
     "version": "1.0.3",
     "publishedOn": "2026-10-05",
     "title": {
-      "en": "Your tools, your start commands",
+      "en": "Custom CLI start commands",
       "zh-Hans": "自定义工具启动命令"
     },
     "sections": [

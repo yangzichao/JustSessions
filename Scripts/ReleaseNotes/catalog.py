@@ -5,6 +5,8 @@ import re
 from datetime import date
 from pathlib import Path
 
+from editorial_checks import validate_release_editorial_standard
+
 REPOSITORY_DIRECTORY = Path(__file__).resolve().parents[2]
 CATALOG_PATH = REPOSITORY_DIRECTORY / "Sources/JustSessions/Resources/ReleaseNotes/releases.json"
 WEBSITE_URL = "https://yangzichao.github.io/JustSessions/release-notes.html"
@@ -56,6 +58,7 @@ def load_catalog(path=CATALOG_PATH):
                 raise ValueError("Release sections must contain changes.")
             for item in section["items"]:
                 validate_text(item)
+        validate_release_editorial_standard(release)
     return releases
 
 
