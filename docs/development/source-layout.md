@@ -17,6 +17,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, each host's refresh status, and the SSH hosts whose tmux sessions use the host's own prefix keys.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, multi-selection, and which Open tabs groups are collapsed.
+- `Services/Sidebar/`: the sidebar's projects as the filters and search leave them. `Sessions/` picks what a session row shows as its CLI's status: its running tab's, the selected one first, then its CLI's in tmux with no tab open.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
