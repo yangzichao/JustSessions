@@ -6,14 +6,23 @@ actor TranscriptPageSource {
     let provider: ConversationProvider
     /// Picks the session out of a database that holds every session, as OpenCode's does.
     let sessionID: String?
+    /// Reads a subagent's transcript; see `ClaudeTranscriptReader.includesSidechains`.
+    let isSubagentTranscript: Bool
     let limits: TranscriptPageLimits
     private var fileIndex: TranscriptFileIndex?
     private var piRecordIndices: [Int]?
 
-    init(file: URL, provider: ConversationProvider, sessionID: String? = nil, limits: TranscriptPageLimits = TranscriptPageLimits()) {
+    init(
+        file: URL,
+        provider: ConversationProvider,
+        sessionID: String? = nil,
+        isSubagentTranscript: Bool = false,
+        limits: TranscriptPageLimits = TranscriptPageLimits()
+    ) {
         self.file = file
         self.provider = provider
         self.sessionID = sessionID
+        self.isSubagentTranscript = isSubagentTranscript
         self.limits = limits
     }
 
@@ -39,7 +48,11 @@ actor TranscriptPageSource {
         }
         let recordIndices = piRecordIndices
         let recordCount = recordIndices?.count ?? index.lineStarts.count
-        let decoder = TranscriptRecordDecoder(provider: provider, maximumTextLength: limits.maximumTextLength)
+        let decoder = TranscriptRecordDecoder(
+            provider: provider,
+            maximumTextLength: limits.maximumTextLength,
+            isSubagentTranscript: isSubagentTranscript
+        )
         return try TranscriptPageReader.read(
             request, recordCount: recordCount, limits: limits,
             sourceID: { recordIndices?[$0] ?? $0 },

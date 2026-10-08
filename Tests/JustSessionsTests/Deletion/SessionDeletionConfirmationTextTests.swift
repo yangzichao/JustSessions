@@ -12,6 +12,38 @@ struct SessionDeletionConfirmationTextTests {
         #expect(SessionDeletionConfirmationText.skippedSessionsSentence(for: plan) == expectedSentence)
     }
 
+    @Test(arguments: [
+        (0, 0, []),
+        (1, 0, ["This also deletes 1 subagent session."]),
+        (118, 0, ["This also deletes 118 subagent sessions."]),
+        (0, 1, ["1 subagent session stays on disk."]),
+        (3, 2, ["This also deletes 3 subagent sessions.", "2 subagent sessions stay on disk."]),
+    ] as [(Int, Int, [String])])
+    func namesTheSubagentSessionsThatGoOrStay(deletedCount: Int, keptCount: Int, expectedSentences: [String]) {
+        let plan = SessionDeletionPlan(
+            deletableConversations: [.fixture()], openTerminalCount: 0, deletedSubagentCount: deletedCount, keptSubagentCount: keptCount
+        )
+        #expect(SessionDeletionConfirmationText.subagentSentences(for: plan) == expectedSentences)
+    }
+
+    /// A session's subagent sessions are listed only under it, so every deletion message says they go with it.
+    @Test func everyDeletionMessageNamesTheSubagentSessionsBeforeTheSkippedOnes() {
+        let plan = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: 1, deletedSubagentCount: 118)
+        let subagents = "This also deletes 118 subagent sessions."
+        let skipped = "1 session with an open terminal will be skipped."
+
+        #expect(SessionDeletionConfirmationText.message(forDeleting: .fixture(provider: .claude), plan: plan)
+            == "The Claude Code session file and its associated folder will move to the macOS Trash. "
+            + "This also removes its entry from Claude Code's local index. " + subagents)
+        for message in [
+            SessionDeletionConfirmationText.message(forDeletingSelectionWith: plan),
+            SessionDeletionConfirmationText.message(forDeletingProjectAt: ProjectLocation(host: .thisMac, path: "/p"), plan: plan),
+            SessionDeletionConfirmationText.message(forRemovingSelectedProjectsAt: [ProjectLocation(host: .thisMac, path: "/p")], plan: plan),
+        ] {
+            #expect(message.hasSuffix(subagents + " " + skipped), "\(message)")
+        }
+    }
+
     @Test(arguments: [(1, "Delete 1 session"), (2, "Delete 2 sessions"), (12, "Delete 12 sessions")])
     func buttonCountsOnlyTheSessionsItDeletes(deletableCount: Int, expectedTitle: String) {
         let plan = SessionDeletionPlan(deletableConversations: (0..<deletableCount).map { _ in .fixture() }, openTerminalCount: 3)
@@ -107,15 +139,20 @@ struct SessionDeletionConfirmationTextTests {
     @Test func noMessageMentionsZeroSessionsOrHasStraySpaces() {
         let locations = [ProjectLocation(host: .thisMac, path: "/p"), ProjectLocation(host: .ssh("devbox"), path: "/p")]
         for openTerminalCount in 0...3 {
-            let plan = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: openTerminalCount)
+          for subagentCount in 0...2 {
+            let plan = SessionDeletionPlan(
+                deletableConversations: [.fixture()], openTerminalCount: openTerminalCount,
+                deletedSubagentCount: subagentCount, keptSubagentCount: subagentCount
+            )
             let messages = locations.map { SessionDeletionConfirmationText.message(forDeletingProjectAt: $0, plan: plan) }
                 + [SessionDeletionConfirmationText.message(forDeletingSelectionWith: plan)]
                 + [SessionDeletionConfirmationText.message(forRemovingSelectedProjectsAt: locations, plan: plan)]
             for message in messages {
                 #expect(!message.contains(" 0 ") && !message.hasPrefix("0 "), "\(message)")
                 #expect(!message.contains("  ") && message == message.trimmingCharacters(in: .whitespaces), "\(message)")
-                #expect(!message.contains("1 sessions"), "\(message)")
+                #expect(!message.contains("1 sessions") && !message.contains(" 1 subagent sessions"), "\(message)")
             }
+          }
         }
     }
 }

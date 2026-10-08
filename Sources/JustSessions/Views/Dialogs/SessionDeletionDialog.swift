@@ -63,7 +63,7 @@ private struct SessionDeletionDialog: ViewModifier {
     private func message(for request: SessionDeletionRequest) -> String {
         switch request {
         case .conversation(let conversation):
-            SessionDeletionConfirmationText.message(forDeleting: conversation, language: language)
+            SessionDeletionConfirmationText.message(forDeleting: conversation, plan: store.deletionPlan(for: [conversation]), language: language)
         case .conversations(let conversations):
             SessionDeletionConfirmationText.message(forDeletingSelectionWith: store.deletionPlan(for: conversations), language: language)
         case .project(let projectPath):

@@ -25,9 +25,11 @@ struct OpenCodeAdapter: ConversationAdapter {
         self.deletionExecutableURL = deletionExecutableURL
     }
 
+    /// Every session, a subagent's under the session that started it.
     func discover() throws -> [Conversation] {
         OpenCodeSQLiteReader.sessions(in: databaseFile).compactMap { session in
-            guard provider.isValidSessionID(session.sessionID), session.projectPath.hasPrefix("/") else { return nil }
+            guard provider.isValidSessionID(session.sessionID), session.projectPath.hasPrefix("/"),
+                  session.parentSessionID.map(provider.isValidSessionID) != false else { return nil }
             return Conversation(
                 provider: provider,
                 sessionID: session.sessionID,
@@ -37,7 +39,8 @@ struct OpenCodeAdapter: ConversationAdapter {
                     fallback: ConversationMetadata.untitledConversationTitle
                 ),
                 updatedAt: session.updatedAt,
-                sourceFile: databaseFile
+                sourceFile: databaseFile,
+                parentSessionID: session.parentSessionID
             )
         }
     }

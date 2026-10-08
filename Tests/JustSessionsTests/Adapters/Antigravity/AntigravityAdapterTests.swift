@@ -63,6 +63,34 @@ struct AntigravityAdapterTests {
         #expect(try AntigravityAdapter(configurationDirectory: root).discover().isEmpty)
     }
 
+    /// The summaries name the conversation that started a subagent's; a table without that column still lists them.
+    @Test func aSubagentsConversationIsListedUnderTheOneThatStartedIt() throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let projectURI = URL(fileURLWithPath: root.path).absoluteString
+        let conversations = root.appendingPathComponent("conversations")
+        try FileManager.default.createDirectory(at: conversations, withIntermediateDirectories: true)
+        let parentID = UUID().uuidString.lowercased()
+        let subagentID = UUID().uuidString.lowercased()
+        for (sessionID, prompt) in [(parentID, "Build the app"), (subagentID, "Review the build")] {
+            try makeSession(at: conversations.appendingPathComponent("\(sessionID).db"), sessionID: sessionID, projectURI: projectURI, firstPrompt: prompt)
+        }
+        try execute(
+            [
+                "CREATE TABLE conversation_summaries (conversation_id TEXT, title TEXT, preview TEXT, workspace_uris TEXT, last_modified_time TEXT, app_data_dir TEXT, parent_conversation_id TEXT NOT NULL DEFAULT '')",
+                "INSERT INTO conversation_summaries VALUES ('\(parentID)', 'Build', '', '[\"\(projectURI)\"]', '2026-09-23 10:00:00+00:00', 'antigravity-cli', '')",
+                "INSERT INTO conversation_summaries VALUES ('\(subagentID)', 'Review', '', '[\"\(projectURI)\"]', '2026-09-23 10:05:00+00:00', 'antigravity-cli', '\(parentID)')",
+            ],
+            at: root.appendingPathComponent("conversation_summaries.db")
+        )
+
+        let found = Dictionary(uniqueKeysWithValues: try AntigravityAdapter(configurationDirectory: root).discover().map { ($0.sessionID, $0) })
+
+        #expect(found[parentID]?.parentSessionID == nil)
+        #expect(found[subagentID]?.parentSessionID == parentID)
+        #expect(found[subagentID]?.suggestedTitle == "Review")
+    }
+
     private func makeSession(at file: URL, sessionID: String, projectURI: String, firstPrompt: String) throws {
         let metadata = field(1, containing: field(1, containing: Data(projectURI.utf8)))
         let prompt = field(19, containing: field(2, containing: Data(firstPrompt.utf8)))

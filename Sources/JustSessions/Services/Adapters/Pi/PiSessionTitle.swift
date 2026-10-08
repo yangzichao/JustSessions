@@ -23,26 +23,44 @@ enum PiSessionTitle {
         return nil
     }
 
+    /// Reads only as far as the first user message, which usually comes well before the limit.
     static func firstUserPrompt(in file: URL) -> String? {
-        firstUserPrompt(amongLines: JSONLinesReader.leadingLines(in: file, maximumByteCount: maximumLeadingByteCount))
+        var prompt: String?
+        JSONLinesReader.forEachLeadingLine(in: file, maximumByteCount: maximumLeadingByteCount) { line in
+            prompt = userPrompt(in: line)
+            return prompt == nil
+        }
+        return prompt
     }
 
     /// The text of the first user message; its content is a string or a list of text and image parts.
     static func firstUserPrompt(amongLines lines: [Data]) -> String? {
-        for line in lines {
-            guard let record = ConversationMetadata.object(from: line),
-                  record["type"] as? String == "message",
-                  let message = record["message"] as? [String: Any],
-                  message["role"] as? String == "user" else { continue }
-            let text: String? = if let content = message["content"] as? String {
-                content
-            } else if let parts = message["content"] as? [[String: Any]] {
-                parts.first { $0["type"] as? String == "text" }?["text"] as? String
-            } else {
-                nil
-            }
-            if let text = text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty { return text }
+        lines.lazy.compactMap(userPrompt(in:)).first
+    }
+
+    /// The last user message near the end of the file.
+    static func latestUserPrompt(in file: URL) -> String? {
+        latestUserPrompt(amongLines: JSONLinesReader.trailingLines(in: file, maximumByteCount: maximumTailByteCount))
+    }
+
+    /// `lines` are oldest first, as they are in the file.
+    static func latestUserPrompt(amongLines lines: [Data]) -> String? {
+        lines.reversed().lazy.compactMap(userPrompt(in:)).first
+    }
+
+    private static func userPrompt(in line: Data) -> String? {
+        guard let record = ConversationMetadata.object(from: line),
+              record["type"] as? String == "message",
+              let message = record["message"] as? [String: Any],
+              message["role"] as? String == "user" else { return nil }
+        let text: String? = if let content = message["content"] as? String {
+            content
+        } else if let parts = message["content"] as? [[String: Any]] {
+            parts.first { $0["type"] as? String == "text" }?["text"] as? String
+        } else {
+            nil
         }
-        return nil
+        guard let text = text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else { return nil }
+        return text
     }
 }

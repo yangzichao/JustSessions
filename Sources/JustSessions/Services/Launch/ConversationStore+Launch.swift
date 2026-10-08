@@ -2,8 +2,9 @@ import Foundation
 
 /// Opening tabs: resuming or branching a listed session, or starting a new one in a folder.
 extension ConversationStore {
+    /// A subagent's session is only read; its CLI ran it for the session that started it.
     func canLaunch(_ conversation: Conversation, action: ConversationAction) -> Bool {
-        conversation.isProjectAvailable && !isDeletionPending(for: conversation)
+        !conversation.isSubagent && conversation.isProjectAvailable && !isDeletionPending(for: conversation)
             && (action != .branch || conversation.provider.supportsBranchFromLauncher)
     }
 

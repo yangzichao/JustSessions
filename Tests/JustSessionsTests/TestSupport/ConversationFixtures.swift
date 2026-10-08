@@ -10,7 +10,8 @@ extension Conversation {
         title: String = "Session",
         updatedAt: Date = .now,
         sourceFile: URL? = nil,
-        host: SessionHost = .thisMac
+        host: SessionHost = .thisMac,
+        parentSessionID: String? = nil
     ) -> Conversation {
         Conversation(
             provider: provider,
@@ -19,7 +20,8 @@ extension Conversation {
             suggestedTitle: title,
             updatedAt: updatedAt,
             sourceFile: sourceFile ?? URL(fileURLWithPath: "/tmp/justsessions-tests/\(sessionID).jsonl"),
-            host: host
+            host: host,
+            parentSessionID: parentSessionID
         )
     }
 }

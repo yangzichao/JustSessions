@@ -18,8 +18,12 @@
 	<string>%@ 标签组</string>
 	<key>%@ will permanently delete this session using its native CLI. This cannot be undone.</key>
 	<string>%@ 将通过原生 CLI 永久删除此会话。此操作无法撤销。</string>
+	<key>%@ · %@ subagent · %@</key>
+	<string>%1$@ · %2$@ 子代理 · %3$@</string>
 	<key>%@ · ⌘-click to select multiple projects; Shift-click to select a range</key>
 	<string>%@ · 按住 ⌘ 点击选择多个项目；按住 Shift 点击选择一个范围</string>
+	<key>%@, %@ subagent</key>
+	<string>%1$@，%2$@ 子代理</string>
 	<key>%@, %@, open terminal, not saved yet</key>
 	<string>%@，%@，终端已打开，尚未保存</string>
 	<key>%lld earlier entries are not shown. Resume the session to see all of it.</key>
@@ -40,6 +44,8 @@
 	<string>已选择 %lld 个会话</string>
 	<key>%lld sessions with open terminals will be skipped.</key>
 	<string>将跳过 %lld 个终端已打开的会话。</string>
+	<key>%lld subagent sessions stay on disk.</key>
+	<string>%lld 个子代理会话将保留在磁盘上。</string>
 	<key>%lld tool calls</key>
 	<string>%lld 次工具调用</string>
 	<key>**Open tabs** lists every tab with what its CLI is doing. ⌘1 to ⌘8 go to a tab by its position, and ⌘9 to the last.</key>
@@ -54,10 +60,14 @@
 	<string>1 条消息</string>
 	<key>1 session with an open terminal will be skipped.</key>
 	<string>将跳过 1 个终端已打开的会话。</string>
+	<key>1 subagent session stays on disk.</key>
+	<string>1 个子代理会话将保留在磁盘上。</string>
 	<key>1 tool call</key>
 	<string>1 次工具调用</string>
 	<key>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</key>
 	<string>仍在 tmux 中运行的 CLI 会重新连接。其他标签会在选中时继续会话，包括 Mac 重启后的会话。普通终端会在原文件夹中打开新 shell。</string>
+	<key>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</key>
+	<string>子代理为启动它的会话运行了此会话。可以在这里阅读，但不能单独继续或删除。</string>
 	<key>About JustSessions</key>
 	<string>关于 JustSessions</string>
 	<key>Add SSH host</key>
@@ -394,6 +404,8 @@
 	<string>知道了</string>
 	<key>Help</key>
 	<string>帮助</string>
+	<key>Hide %lld subagent sessions</key>
+	<string>隐藏 %lld 个子代理会话</string>
 	<key>Hide Sidebar</key>
 	<string>隐藏侧栏</string>
 	<key>Hide or show the sidebar</key>
@@ -402,6 +414,8 @@
 	<string>隐藏侧栏</string>
 	<key>Hide sidebar (⌘B)</key>
 	<string>隐藏侧栏（⌘B）</string>
+	<key>Hide subagent sessions of %@</key>
+	<string>隐藏 %@ 的子代理会话</string>
 	<key>Hide the sidebar to give the terminal the whole window, and click again to bring it back. ⌘B does the same.</key>
 	<string>隐藏侧栏，让终端占满整个窗口；再点一次即可恢复。⌘B 也可以。</string>
 	<key>Host</key>
@@ -760,6 +774,8 @@
 	<string>显示</string>
 	<key>Show %@</key>
 	<string>显示 %@</string>
+	<key>Show %lld subagent sessions</key>
+	<string>显示 %lld 个子代理会话</string>
 	<key>Show Sidebar</key>
 	<string>显示侧栏</string>
 	<key>Show in Other Window</key>
@@ -768,6 +784,8 @@
 	<string>显示侧栏</string>
 	<key>Show sidebar (⌘B)</key>
 	<string>显示侧栏（⌘B）</string>
+	<key>Show subagent sessions of %@</key>
+	<string>显示 %@ 的子代理会话</string>
 	<key>Sidebar</key>
 	<string>侧栏</string>
 	<key>Sidebar width</key>
@@ -806,6 +824,10 @@
 	<string>正在停止删除</string>
 	<key>Stopping…</key>
 	<string>正在停止…</string>
+	<key>Subagent</key>
+	<string>子代理</string>
+	<key>Subagent of %@</key>
+	<string>%@ 的子代理</string>
 	<key>Swap with left view</key>
 	<string>与左侧视图交换</string>
 	<key>Swap with right view</key>
@@ -878,6 +900,10 @@
 	<string>此操作会影响 %@ 中所有工具的会话，包括被当前筛选条件隐藏的会话。</string>
 	<key>This affects all tools in %lld projects, including sessions hidden by the current filter.</key>
 	<string>此操作会影响 %lld 个项目中所有工具的会话，包括被当前筛选条件隐藏的会话。</string>
+	<key>This also deletes %lld subagent sessions.</key>
+	<string>同时会删除 %lld 个子代理会话。</string>
+	<key>This also deletes 1 subagent session.</key>
+	<string>同时会删除 1 个子代理会话。</string>
 	<key>This changes the display name in JustSessions.</key>
 	<string>仅修改 JustSessions 中的显示名称。</string>
 	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>

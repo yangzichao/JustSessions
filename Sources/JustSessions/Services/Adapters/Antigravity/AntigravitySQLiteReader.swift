@@ -27,12 +27,19 @@ enum AntigravitySQLiteReader {
         guard let database = openReadOnly(file) else { return [:] }
         defer { sqlite3_close(database) }
         var statement: OpaquePointer?
+        // A subagent's conversation names the one that started it, where the table records that.
         let query = """
+            SELECT conversation_id, title, preview, workspace_uris, last_modified_time, parent_conversation_id
+            FROM conversation_summaries WHERE app_data_dir = 'antigravity-cli'
+            """
+        let queryWithoutParents = """
             SELECT conversation_id, title, preview, workspace_uris, last_modified_time
             FROM conversation_summaries WHERE app_data_dir = 'antigravity-cli'
             """
-        guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK else { return [:] }
+        guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK
+            || sqlite3_prepare_v2(database, queryWithoutParents, -1, &statement, nil) == SQLITE_OK else { return [:] }
         defer { sqlite3_finalize(statement) }
+        let readsParents = sqlite3_column_count(statement) > 5
 
         var summaries: [String: AntigravityConversationSummary] = [:]
         while sqlite3_step(statement) == SQLITE_ROW {
@@ -48,7 +55,10 @@ enum AntigravitySQLiteReader {
                 title: textColumn(statement, at: 1),
                 preview: textColumn(statement, at: 2),
                 projectPath: projectPath,
-                updatedAt: ConversationMetadata.date(timestamp)
+                updatedAt: ConversationMetadata.date(timestamp),
+                parentConversationID: readsParents
+                    ? textColumn(statement, at: 5).flatMap { ConversationMetadata.isValidSessionID($0) ? $0 : nil }
+                    : nil
             )
         }
         return summaries
