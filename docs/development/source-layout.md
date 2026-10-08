@@ -41,6 +41,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Launch/StartCommand/`: runs a start command of your own through a shell, on this Mac and on SSH hosts, with the app's arguments after it; `env` then runs the CLI in the shell's place, so the tab's process is still the CLI's. `Check/` reads a command before it is kept, without running it, and looks up its program where the CLI runs. The New session sheet's field, locked until Edit, is in `Views/Browser/NewSession/StartCommand/`.
 - `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there, including its prefix keys.
 - `Services/Remote/HostStatus/`: one SSH call per refresh that lists the host's tmux sessions and installed CLIs.
+- `Services/Remote/NewSession/ClaudeSessionID/`: asks an SSH host whether its `claude` takes `--session-id`, so a new tab there starts with its session's id and is linked by it.
 - `Services/Tmux/ThisMac/`: bundled runtime discovery, terminal database environment, compatible server selection, and local persistence.
 - `Cloudflare/UpdateFeed/`: the Worker at the app's `SUFeedURL`, which counts update checks per day and app version and redirects to the appcast on GitHub. See [Counting update checks](update-checks.md).
 - `Scripts/Release/`: release checks, such as opening the packaged app without the build machine's resource bundles.
