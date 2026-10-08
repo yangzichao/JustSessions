@@ -10,7 +10,7 @@ struct NotificationSettingsSection: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Notify me when a session")
                 .font(.subheadline.weight(.medium))
-            Toggle("Needs my input, such as a permission prompt (Claude Code only)", isOn: Binding(
+            Toggle("Needs my input, such as a permission prompt (not Codex)", isOn: Binding(
                 get: { settingsStore.preferences.notifiesWhenInputNeeded },
                 set: { settingsStore.setNotifiesWhenInputNeeded($0) }
             ))
@@ -19,7 +19,7 @@ struct NotificationSettingsSection: View {
                 set: { settingsStore.setNotifiesWhenTurnFinishes($0) }
             ))
             VStack(alignment: .leading, spacing: 6) {
-                Text("Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.")
+                Text("Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.")
                 if isTurnedOffInSystemSettings {
                     Text("Notifications for JustSessions are turned off in System Settings > Notifications.")
                         .foregroundStyle(ThemePalette.warning)

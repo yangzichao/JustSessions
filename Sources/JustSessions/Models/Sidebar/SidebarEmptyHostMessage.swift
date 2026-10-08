@@ -24,10 +24,10 @@ struct SidebarEmptyHostMessage: Equatable {
             if isSearching {
                 self.init(text: "No matching projects or sessions")
             } else if waitingFilter == .waitingForYou {
-                // Only Claude Code and Codex on this Mac tell what they are doing, so say so rather than suggest
-                // nothing else waits.
+                // Only Claude Code, Codex, Pi, and OpenCode on this Mac tell what they are doing, so say so rather
+                // than suggest nothing else waits.
                 self.init(text: host == .thisMac
-                    ? "No Claude Code or Codex session is waiting for you"
+                    ? "No Claude Code, Codex, Pi, or OpenCode session is waiting for you"
                     : "SSH hosts don't tell when a session waits for you")
             } else {
                 self.init(text: recencyFilter == .recent ? "No sessions in the past seven days" : "No sessions")

@@ -31,9 +31,16 @@ struct CLIActivityReaderTests {
         try CodexRolloutLines.write([CodexRolloutLines.turnStarted(at: cliStartedAt + 1)], to: currentTurnFile)
         let leftOpenTurnFile = directory.appendingPathComponent("left-open.jsonl")
         try CodexRolloutLines.write([CodexRolloutLines.turnStarted(at: cliStartedAt - 60)], to: leftOpenTurnFile)
+        let reporting = LiveSessionReporting(directory: directory.appendingPathComponent("LiveSessionReporting"))
+        try FileManager.default.createDirectory(at: reporting.reportsDirectory, withIntermediateDirectories: true)
+        try #"{"pid":5151,"sessionId":"01a10925-abd5-7606-8b40-1c56e397895e","activity":"waiting","waitingFor":"Allow rm?"}"#
+            .write(to: reporting.reportsDirectory.appendingPathComponent("5151.json"), atomically: true, encoding: .utf8)
+        try #"{"pid":5252,"sessionId":"ses_2f3b1c4d5e6f7a8b9c0d1e2f3a","activity":"idle"}"#
+            .write(to: reporting.reportsDirectory.appendingPathComponent("5252.json"), atomically: true, encoding: .utf8)
         let reader = CLIActivityReader(
             claudeRegistry: ClaudeLiveSessionRegistry(configurationDirectory: directory),
-            codexTurnTracker: CodexRolloutTurnTracker()
+            codexTurnTracker: CodexRolloutTurnTracker(),
+            liveSessionReporting: reporting
         )
 
         let activities = reader.activities(for: [
@@ -42,9 +49,29 @@ struct CLIActivityReaderTests {
             CLIActivityProbe(provider: .codex, processID: cliProcessID, sessionFile: currentTurnFile),
             CLIActivityProbe(provider: .codex, processID: cliProcessID, sessionFile: leftOpenTurnFile),
             CLIActivityProbe(provider: .codex, processID: cliProcessID, sessionFile: nil),
+            CLIActivityProbe(provider: .pi, processID: 5151, sessionFile: nil),
+            CLIActivityProbe(provider: .opencode, processID: 5252, sessionFile: nil),
+            CLIActivityProbe(provider: .pi, processID: 5353, sessionFile: nil),
             CLIActivityProbe(provider: .antigravity, processID: cliProcessID, sessionFile: nil),
         ])
 
-        #expect(activities == [.working, nil, .working, .idle, nil, nil])
+        #expect(activities == [.working, nil, .working, .idle, nil, .needsInput(reason: "Allow rm?"), .idle, nil, nil])
+    }
+
+    @Test func piAndOpenCodeTellNothingWithoutTheAppsExtension() throws {
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let reader = CLIActivityReader(
+            claudeRegistry: ClaudeLiveSessionRegistry(configurationDirectory: directory),
+            codexTurnTracker: CodexRolloutTurnTracker(),
+            liveSessionReporting: nil
+        )
+
+        let activities = reader.activities(for: [
+            CLIActivityProbe(provider: .pi, processID: getpid(), sessionFile: nil),
+            CLIActivityProbe(provider: .opencode, processID: getpid(), sessionFile: nil),
+        ])
+
+        #expect(activities == [nil, nil])
     }
 }

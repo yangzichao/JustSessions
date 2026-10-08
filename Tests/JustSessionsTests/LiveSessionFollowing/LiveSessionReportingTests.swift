@@ -66,4 +66,30 @@ struct LiveSessionReportingTests {
         #expect(reporting.report(forProcessID: 4444)?.sessionID == nil)
         #expect(reporting.report(forProcessID: 4545) == nil)
     }
+
+    @Test func readsWhatTheCLIIsDoing() throws {
+        let activities = try [
+            #"{"pid":7,"sessionId":"s","activity":"working"}"#,
+            #"{"pid":7,"sessionId":"s","activity":"waiting","waitingFor":"permission"}"#,
+            #"{"pid":7,"sessionId":"s","activity":"waiting","waitingFor":" "}"#,
+            #"{"pid":7,"sessionId":"s","activity":"waiting","waitingFor":"Dangerous command:\n\n  rm -rf build\n\nAllow?"}"#,
+            #"{"pid":7,"sessionId":"s","activity":"idle"}"#,
+            #"{"pid":7,"sessionId":"s","activity":"compacting"}"#,
+            // Pi before 0.80.4 tells no activity.
+            #"{"pid":7,"sessionId":"s"}"#,
+            // OpenCode's home screen shows no session.
+            #"{"pid":7,"sessionId":null,"activity":"idle"}"#,
+        ].map { try #require(LiveSessionReport(jsonData: Data($0.utf8), processID: 7)).activity }
+
+        #expect(activities == [
+            .working,
+            .needsInput(reason: "permission"),
+            .needsInput(reason: nil),
+            .needsInput(reason: "Dangerous command: rm -rf build Allow?"),
+            .idle,
+            nil,
+            nil,
+            nil,
+        ])
+    }
 }

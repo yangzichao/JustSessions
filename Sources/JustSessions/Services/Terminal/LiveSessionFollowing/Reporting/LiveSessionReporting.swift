@@ -1,9 +1,9 @@
 import Foundation
 
-/// Pi and OpenCode say which session they are in only to code that runs inside them. The app starts them on this Mac
-/// with a small extension of its own, which writes that session to `reports/<pid>.json` whenever it changes; see
-/// `PiLiveSessionExtension` and `OpenCodeLiveSessionPlugin`. The app keeps the extensions in `directory` and rewrites
-/// them when they change.
+/// Pi and OpenCode say which session they are in, and what they are doing, only to code that runs inside them. The
+/// app starts them on this Mac with a small extension of its own, which writes both to `reports/<pid>.json` whenever
+/// they change; see `PiLiveSessionExtension` and `OpenCodeLiveSessionPlugin`. The app keeps the extensions in
+/// `directory` and rewrites them when they change.
 struct LiveSessionReporting: Sendable {
     static let reportsDirectoryVariable = "JUSTSESSIONS_LIVE_SESSION_REPORTS"
 

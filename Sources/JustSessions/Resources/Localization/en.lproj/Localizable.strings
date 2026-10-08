@@ -198,14 +198,14 @@
 	<string>Choose a session in the sidebar to read its conversation.</string>
 	<key>Choose or enter a folder</key>
 	<string>Choose or enter a folder</string>
-	<key>Claude Code and Codex on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</key>
-	<string>Claude Code and Codex on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</string>
 	<key>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.</key>
 	<string>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.</string>
 	<key>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</key>
 	<string>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</string>
 	<key>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
 	<string>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</string>
+	<key>Claude Code, Codex, Pi, and OpenCode on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</key>
+	<string>Claude Code, Codex, Pi, and OpenCode on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</string>
 	<key>Clear filters</key>
 	<string>Clear filters</string>
 	<key>Clear the selection, or close search</key>
@@ -504,8 +504,8 @@
 	<string>Move tab into split view</string>
 	<key>Name</key>
 	<string>Name</string>
-	<key>Needs my input, such as a permission prompt (Claude Code only)</key>
-	<string>Needs my input, such as a permission prompt (Claude Code only)</string>
+	<key>Needs my input, such as a permission prompt (not Codex)</key>
+	<string>Needs my input, such as a permission prompt (not Codex)</string>
 	<key>New</key>
 	<string>New</string>
 	<key>New Session…</key>
@@ -536,8 +536,8 @@
 	<string>Next match (⌘G or Return)</string>
 	<key>Next tab</key>
 	<string>Next tab</string>
-	<key>No Claude Code or Codex session is waiting for you</key>
-	<string>No Claude Code or Codex session is waiting for you</string>
+	<key>No Claude Code, Codex, Pi, or OpenCode session is waiting for you</key>
+	<string>No Claude Code, Codex, Pi, or OpenCode session is waiting for you</string>
 	<key>No archived projects</key>
 	<string>No archived projects</string>
 	<key>No matches</key>
@@ -938,8 +938,8 @@
 	<string>When you close a tab</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</string>
-	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
-	<string>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
+	<key>Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
+	<string>Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
 	<key>You</key>
 	<string>You</string>
 	<key>Your login shell, with no CLI</key>

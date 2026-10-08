@@ -26,7 +26,7 @@ struct SidebarEmptyHostMessageTests {
     }
 
     @Test func withNothingWaitingItNamesTheCLIsThatTellOrSaysAnSSHHostCannot() {
-        #expect(message(nil, waitingFilter: .waitingForYou).text == "No Claude Code or Codex session is waiting for you")
+        #expect(message(nil, waitingFilter: .waitingForYou).text == "No Claude Code, Codex, Pi, or OpenCode session is waiting for you")
         #expect(message(nil, on: .ssh("devbox"), waitingFilter: .waitingForYou).text == "SSH hosts don't tell when a session waits for you")
         #expect(message(nil, isSearching: true, waitingFilter: .waitingForYou).text == "No matching projects or sessions")
     }

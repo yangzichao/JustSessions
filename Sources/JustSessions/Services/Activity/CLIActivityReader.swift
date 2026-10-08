@@ -1,10 +1,13 @@
 import Foundation
 
 /// Tells what CLIs running on this Mac are doing. Claude Code says so in its live process registry; a Codex session
-/// file shows whether a turn is under way. Other CLIs, and CLIs whose process or file is not known yet, give nil.
+/// file shows whether a turn is under way; Pi and OpenCode say so through the extension the app starts them with.
+/// Other CLIs, and CLIs whose process or file is not known yet, give nil.
 struct CLIActivityReader: Sendable {
     let claudeRegistry: ClaudeLiveSessionRegistry
     let codexTurnTracker: CodexRolloutTurnTracker
+    /// Nil when the app starts Pi and OpenCode without its extension, as in tests and `swift run`.
+    let liveSessionReporting: LiveSessionReporting?
 
     /// One activity per probe, in order. Stops following the Codex files of CLIs that are no longer probed.
     func activities(for probes: [CLIActivityProbe]) -> [CLIActivity?] {
@@ -45,7 +48,9 @@ struct CLIActivityReader: Sendable {
                 turnState: codexTurnTracker.turnState(ofRolloutFile: sessionFile),
                 cliStartedAt: RunningProcessInfo.startDate(of: probe.processID)
             )
-        case .antigravity, .kiro, .opencode, .pi:
+        case .opencode, .pi:
+            return liveSessionReporting?.report(forProcessID: probe.processID)?.activity
+        case .antigravity, .kiro:
             return nil
         }
     }

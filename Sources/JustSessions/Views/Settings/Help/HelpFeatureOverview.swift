@@ -28,7 +28,7 @@ struct HelpFeatureOverview: View {
                 HelpFeatureRow(title: "Organize", systemImage: "pin",
                                detail: "Right-click a session to rename, pin, export, or delete it, and a project to rename, pin, or archive it. ⌘-click or ⇧-click selects several.")
                 HelpFeatureRow(title: "Notifications", systemImage: "bell",
-                               detail: "Claude Code and Codex on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.")
+                               detail: "Claude Code, Codex, Pi, and OpenCode on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.")
             }
         }
     }
