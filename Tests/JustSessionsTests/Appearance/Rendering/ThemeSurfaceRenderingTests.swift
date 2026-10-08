@@ -19,6 +19,7 @@ struct ThemeSurfaceRenderingTests {
                 languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
                 tabReopeningSettingsStore: tabReopeningStore,
                 launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
+                tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore(userDefaults: settings.userDefaults),
                 appAppearanceStore: appearanceStore, appThemeStore: themeStore,
                 terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore,
                 onCheckForUpdates: {}

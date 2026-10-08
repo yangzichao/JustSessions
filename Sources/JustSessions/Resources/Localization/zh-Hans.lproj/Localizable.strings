@@ -146,6 +146,8 @@
 	<string>调整拆分视图</string>
 	<key>Ask Now</key>
 	<string>立即请求</string>
+	<key>Ask each time</key>
+	<string>每次询问</string>
 	<key>Branch</key>
 	<string>分支</string>
 	<key>Branch %lld sessions</key>
@@ -226,8 +228,14 @@
 	<string>关掉标签页，CLI 照常运行</string>
 	<key>Close the tab, or the window when no tabs are open</key>
 	<string>关闭标签页；没有标签页时关闭窗口</string>
+	<key>Close this tab?</key>
+	<string>关闭此标签？</string>
+	<key>Close this terminal?</key>
+	<string>关闭此终端？</string>
 	<key>Close this view</key>
 	<string>关闭此视图</string>
+	<key>Closing tabs</key>
+	<string>关闭标签</string>
 	<key>Collapse Group</key>
 	<string>折叠标签组</string>
 	<key>Collapse project</key>
@@ -300,6 +308,8 @@
 	<string>正在删除会话</string>
 	<key>Deletion progress</key>
 	<string>删除进度</string>
+	<key>Don't ask again</key>
+	<string>不再询问</string>
 	<key>Done</key>
 	<string>完成</string>
 	<key>Edit</key>
@@ -312,6 +322,8 @@
 	<string>结束会话</string>
 	<key>End session…</key>
 	<string>结束会话…</string>
+	<key>End this CLI session?</key>
+	<string>结束此 CLI 会话？</string>
 	<key>Ended</key>
 	<string>已结束</string>
 	<key>Every open tab in one list</key>
@@ -360,6 +372,8 @@
 	<string>字体</string>
 	<key>Font size</key>
 	<string>字号</string>
+	<key>For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.</key>
+	<string>适用于 CLI 可在 tmux 中保持运行的标签。关闭对话框中的“不再询问”也会设置此项。</string>
 	<key>Fork in the native CLI</key>
 	<string>在原生 CLI 中创建分支</string>
 	<key>Full</key>
@@ -892,6 +906,8 @@
 	<string>等待我处理</string>
 	<key>Website ↗</key>
 	<string>网站 ↗</string>
+	<key>When you close a tab</key>
+	<string>关闭标签时</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>

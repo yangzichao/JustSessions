@@ -21,6 +21,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
 - `Models/Terminal/Tabs/Moving/`: dragging in the tab bar: a tab moves within its group, a split's two tabs together, and a group whole by its label; and where a dragged tab or group lands as the pointer moves.
+- `Models/Terminal/Closing/`: what closing a tab does when its CLI can keep running in tmux: ask each time, keep it running, or end it.
 - `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, and where a shown split's panes and the resize area between them sit.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
@@ -46,7 +47,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Tmux/`: tmux session names, and keeping a CLI running after its tab closes, on any host.
 - `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, finding each tab's CLI process, and keeping a failed CLI's output and exit status in its tab.
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
-- `Services/Terminal/Closing/`: waits for a closed tab's process to exit, so it leaves no zombie behind.
+- `Services/Terminal/Closing/`: waits for a closed tab's process to exit, so it leaves no zombie behind, and saves what closing a tab whose CLI can keep running does, chosen with Don't ask again in the close dialog or in General settings.
 - `Services/Terminal/FileDrop/`: files dropped on a tab on this Mac type their paths, each as its own paste, so Claude Code and Codex attach a dropped image. Tabs on SSH hosts take no drops, since the host can't open this Mac's files.
 - `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal.
 - `Services/Terminal/Appearance/ThemeReports/`: answers a program that asks whether the terminal is light or dark (`CSI ? 996 n`), and tells one that subscribes (`CSI ? 2031 h`), such as tmux, each time the terminal's colors change. SwiftTerm handles neither; on each report tmux reads the new background, so a CLI in tmux sees it.
