@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// The General tab of Settings: interface language, what the app does at startup, and when it notifies you; then the
-/// installed versions, software updates, and feedback.
+/// The General tab of Settings: interface language, what the app does at startup, what closing a tab does, and when
+/// it notifies you; then the installed versions, software updates, and feedback.
 struct GeneralSettingsView: View {
     @ObservedObject var languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
+    let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
     let notificationSettingsStore: SessionNotificationSettingsStore
     let onCheckForUpdates: () -> Void
 
@@ -31,6 +32,10 @@ struct GeneralSettingsView: View {
                 launchAtLoginSettingsStore: launchAtLoginSettingsStore,
                 tabReopeningSettingsStore: tabReopeningSettingsStore
             )
+
+            ThemeDivider()
+
+            TabClosingSettingsSection(settingsStore: tabCloseChoiceSettingsStore)
 
             ThemeDivider()
 

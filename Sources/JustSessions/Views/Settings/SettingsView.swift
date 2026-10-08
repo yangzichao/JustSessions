@@ -7,6 +7,7 @@ struct SettingsView: View {
     let languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
+    let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
@@ -34,6 +35,7 @@ struct SettingsView: View {
                         languageStore: languageStore,
                         tabReopeningSettingsStore: tabReopeningSettingsStore,
                         launchAtLoginSettingsStore: launchAtLoginSettingsStore,
+                        tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
                         notificationSettingsStore: notificationSettingsStore,
                         onCheckForUpdates: onCheckForUpdates
                     )
