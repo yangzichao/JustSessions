@@ -68,6 +68,10 @@ struct TerminalTabCloseConfirmationTests {
 
 @MainActor
 private final class CloseConfirmationScenario {
+    /// A dialog shows in well under a second, but at the start of a full run, when every suite starts at once, the
+    /// main thread can stay busy for far longer; 20 seconds once ran out. Passing runs still finish at once.
+    private static let timeoutSeconds = 120
+
     let store: ConversationStore
     let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
     private let settings: IsolatedUserDefaults
@@ -106,7 +110,7 @@ private final class CloseConfirmationScenario {
             store: store, tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore, closingSessionID: tab.id
         ))
         let clock = ContinuousClock()
-        let deadline = clock.now + .seconds(20)
+        let deadline = clock.now + .seconds(Self.timeoutSeconds)
         while clock.now < deadline {
             hostingView.layoutSubtreeIfNeeded()
             if let sheet = window.attachedSheet, sheet.isVisible, !Self.buttons(in: sheet).isEmpty { return sheet }
@@ -139,12 +143,12 @@ private final class CloseConfirmationScenario {
     /// Presses Return as the keyboard does, through the dialog's key equivalents, then waits for `tookEffect`.
     func pressReturn(in sheet: NSWindow, until tookEffect: () -> Bool) async throws {
         try press("\r", keyCode: 36, in: sheet)
-        try await expectEventually(timeout: .seconds(20)) { tookEffect() }
+        try await expectEventually(timeout: .seconds(Self.timeoutSeconds)) { tookEffect() }
     }
 
     func pressEscape(in sheet: NSWindow) async throws {
         try press("\u{1B}", keyCode: 53, in: sheet)
-        try await expectEventually(timeout: .seconds(20)) { self.window.attachedSheet == nil }
+        try await expectEventually(timeout: .seconds(Self.timeoutSeconds)) { self.window.attachedSheet == nil }
     }
 
     private func press(_ characters: String, keyCode: UInt16, in sheet: NSWindow) throws {
