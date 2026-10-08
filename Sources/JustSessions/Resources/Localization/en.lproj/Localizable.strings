@@ -10,6 +10,8 @@
 	<string>%@ %@ — %@</string>
 	<key>%@ (imported)</key>
 	<string>%@ (imported)</string>
+	<key>%@ (not installed)</key>
+	<string>%@ (not installed)</string>
 	<key>%@ - Left view</key>
 	<string>%@ - Left view</string>
 	<key>%@ - Right view</key>
@@ -452,6 +454,8 @@
 	<string>Light or dark</string>
 	<key>List the sessions on another machine you reach with ssh</key>
 	<string>List the sessions on another machine you reach with ssh</string>
+	<key>Lists the monospaced fonts installed on this Mac.</key>
+	<string>Lists the monospaced fonts installed on this Mac.</string>
 	<key>Load earlier messages</key>
 	<string>Load earlier messages</string>
 	<key>Load later messages</key>
@@ -794,6 +798,8 @@
 	<string>System</string>
 	<key>System Monospaced</key>
 	<string>System Monospaced</string>
+	<key>System Monospaced shows only some Nerd Font icons. To see them all, as in shell prompts, choose another font, such as Menlo.</key>
+	<string>System Monospaced shows only some Nerd Font icons. To see them all, as in shell prompts, choose another font, such as Menlo.</string>
 	<key>Tab %lld</key>
 	<string>Tab %lld</string>
 	<key>Tabs</key>
