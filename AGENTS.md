@@ -1,5 +1,11 @@
 # Working on JustSessions
 
+## SSH testing from a Mac
+
+Contributors develop and run JustSessions on macOS. Use a disposable local Ubuntu 24.04 VM in Multipass as the standard Linux SSH test target; follow [SSH development testing](docs/development/ssh-testing.md) for setup and the manual checklist. Use the `justsessions-test` SSH alias so instructions are consistent across contributors and coding agents.
+
+For SSH behavior changes, run the relevant checklist with disposable sessions and record the host OS, CLI versions, and results. Also test a separate macOS account or Mac when changing remote shell commands, paths, or platform-dependent tools. Simulated tests and `make verify` do not establish live SSH coverage; explicitly report any untested host or provider. SSH to your everyday Mac account accesses real session files, so use the isolated target for deletion tests.
+
 ## Checks before you push
 
 App release Actions run when a version tag is pushed. Website changes pushed to `main` run the independent website tests, build, and deployment; the website can also be deployed manually from `main`. Pull requests and other branch pushes do not run CI, and website Actions do not replace the required local app checks. Developers and coding agents must complete the checks locally:

@@ -15,6 +15,7 @@
 | Guide | Covers |
 | --- | --- |
 | [Build and release](development/build-and-release.md) | Swift builds, tests, signed installers, notarization, and Sparkle updates. |
+| [SSH development testing](development/ssh-testing.md) | A local Ubuntu test host for Mac contributors, macOS coverage, and live SSH checks. |
 | [Source layout](development/source-layout.md) | Feature folders and responsibilities. |
 | [Performance](development/performance.md) | Profiling baseline, known hotspots, the status of each optimization, and how to profile. |
 | [Counting update checks](development/update-checks.md) | The Cloudflare Worker that counts daily update checks, what it stores, and how to read the numbers. |
