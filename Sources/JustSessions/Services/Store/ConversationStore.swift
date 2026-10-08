@@ -32,11 +32,16 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var terminalSessions: [TerminalSession] = []
     /// Selecting a tab that waited to be shown starts it; see `TerminalSession.isWaitingToBeShown`.
     @Published private(set) var selectedTerminalID: UUID? {
-        didSet { selectedTerminal?.startNowThatItIsShown() }
+        didSet {
+            selectedTerminal?.startNowThatItIsShown()
+            markTerminalsOnScreenSeen()
+        }
     }
     /// Pairs of tabs linked side by side, as in Chrome's split view, any number of them, with a tab in at most one.
     /// A split outlives the selection; both its terminals show only while one of them is selected, see `shownSplit`.
-    @Published private(set) var terminalSplits: [TerminalSplit] = []
+    @Published private(set) var terminalSplits: [TerminalSplit] = [] {
+        didSet { markTerminalsOnScreenSeen() }
+    }
     /// Every conversation queued in the running deletion, of one session or several. It changes only when a
     /// deletion starts, when sessions join it, and when it ends; `deletionProgress` follows the sessions in between.
     @Published private(set) var pendingDeletionConversationIDs: Set<String> = []
@@ -67,8 +72,10 @@ final class ConversationStore: ObservableObject {
     /// Renames and kills of tmux sessions, in order per host; see `ConversationStore+Tmux`.
     let tmuxCommandQueues = TmuxCommandQueues()
     let codexTurnTracker = CodexRolloutTurnTracker()
-    /// What each CLI on this Mac did at the last activity sync; see `ConversationStore+SessionNotifications`.
+    /// What each CLI on this Mac did at the last activity sync; see `ConversationStore+CLIActivitySync`.
     var sessionAttentionTracker = SessionAttentionTracker()
+    /// CLIs on this Mac that finished a turn while off screen; see `ConversationStore+UnseenFinishedTurns`.
+    @Published var unseenFinishedTurns = UnseenFinishedTurns()
     /// Tabs from the last quit still waiting for their host's sessions; see `ConversationStore+TabReopening`.
     var pendingTabReopening = PendingTabReopening()
     let tabPersistenceWindowID = UUID()
@@ -649,7 +656,7 @@ final class ConversationStore: ObservableObject {
     }
 
     /// The tabs whose terminals are on screen: both tabs of a shown split, or else the selected tab.
-    private var terminalIDsOnScreen: Set<UUID> {
+    var terminalIDsOnScreen: Set<UUID> {
         if let shownSplit { return shownSplit.tabIDs }
         return selectedTerminalID.map { [$0] } ?? []
     }

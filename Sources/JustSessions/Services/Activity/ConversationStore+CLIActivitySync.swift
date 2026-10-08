@@ -2,7 +2,8 @@ import Foundation
 
 /// Once a second, reads what each CLI on this Mac is doing: every tab's, and every session's whose CLI runs in tmux
 /// with no tab open. A session whose CLI ended in tmux stops counting as running then, without waiting for a refresh.
-/// A CLI that just finished its turn or stopped to wait on you gets a notification.
+/// A CLI that just finished its turn or stopped to wait on you gets a notification, and one that finished its turn
+/// out of view stays marked until you look.
 extension ConversationStore {
     /// A session on this Mac whose CLI runs in tmux with no tab open.
     private struct DetachedTmuxSession {
@@ -22,7 +23,7 @@ extension ConversationStore {
         }
         let detachedSessions = detachedThisMacTmuxSessions()
         guard !probedTabs.isEmpty || !detachedSessions.isEmpty || !detachedCLIActivities.isEmpty else {
-            notifyOfSessionsWantingAttention(after: [])
+            followAttention(after: [])
             return
         }
 
@@ -43,10 +44,7 @@ extension ConversationStore {
             hasTabActivityChanged = true
         }
         var observations = probedTabs.enumerated().map { index, probedTab in
-            SessionActivityObservation(
-                source: .tab(id: probedTab.tab.id, conversationID: probedTab.tab.conversation?.id),
-                activity: activities[index]
-            )
+            SessionActivityObservation(source: probedTab.tab.attentionSource, activity: activities[index])
         }
         var detachedActivities: [String: CLIActivity] = [:]
         for (index, detachedSession) in detachedSessions.enumerated() {
@@ -64,9 +62,15 @@ extension ConversationStore {
             if let activity { detachedActivities[detachedSession.conversation.id] = activity }
         }
         if detachedCLIActivities != detachedActivities { detachedCLIActivities = detachedActivities }
-        notifyOfSessionsWantingAttention(after: observations)
+        followAttention(after: observations)
         // Project rows sum up their tabs through the store, which does not see a tab's own changes.
         if hasTabActivityChanged { objectWillChange.send() }
+    }
+
+    private func followAttention(after observations: [SessionActivityObservation]) {
+        let events = sessionAttentionTracker.events(after: observations)
+        notifyOfSessionsWantingAttention(events)
+        noteUnseenFinishedTurns(after: observations, events: events)
     }
 
     /// Listed sessions of this Mac that run in tmux, as of the last refresh, with no running tab.
