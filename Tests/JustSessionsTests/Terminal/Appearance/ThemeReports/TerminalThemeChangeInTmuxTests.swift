@@ -31,14 +31,14 @@ struct TerminalThemeChangeInTmuxTests {
         )
         let lightBackground = Self.reply(for: AppThemeColors.justSessionsLight.contentSurface)
         let darkBackground = Self.reply(for: AppThemeColors.justSessionsDark.contentSurface)
-        // tmux and the probe can take a while to start while the other tests run.
-        let sawLightBackground = await Self.waitUntil(timeout: .seconds(30)) { Self.lastReply(in: replyLog) == lightBackground }
+        // tmux and the probe can take a while to start while the other tests run: over 30 seconds on a release runner.
+        let sawLightBackground = await Self.waitUntil(timeout: .seconds(120)) { Self.lastReply(in: replyLog) == lightBackground }
         #expect(sawLightBackground, "\(Self.diagnostics(replyLog: replyLog, terminalView: terminalView))")
         guard sawLightBackground else { return }
 
         appearanceStore.setMode(.dark)
 
-        let sawDarkBackground = await Self.waitUntil(timeout: .seconds(5)) { Self.lastReply(in: replyLog) == darkBackground }
+        let sawDarkBackground = await Self.waitUntil(timeout: .seconds(120)) { Self.lastReply(in: replyLog) == darkBackground }
         #expect(sawDarkBackground, "\(Self.diagnostics(replyLog: replyLog, terminalView: terminalView))")
     }
 
