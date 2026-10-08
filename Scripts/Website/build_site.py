@@ -1,6 +1,7 @@
 """Assemble the static Pages artifact from the website and existing brand assets."""
 
 import hashlib
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -16,11 +17,11 @@ WEBSITE_SOURCE_DIRECTORY = REPOSITORY_DIRECTORY / "website"
 WEBSITE_OUTPUT_DIRECTORY = REPOSITORY_DIRECTORY / "dist/JustSessions"
 
 sys.path.insert(0, str(REPOSITORY_DIRECTORY / "Scripts/ReleaseNotes"))
-from catalog import load_catalog
+from catalog import load_catalog, releases_published_through
 from render_notes import render_website_history
 
 
-def build_site():
+def build_site(latest_published_release_tag=None):
     validate_product_content(REPOSITORY_DIRECTORY)
     validate_partial_placeholders(WEBSITE_SOURCE_DIRECTORY)
     WEBSITE_OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
@@ -33,7 +34,10 @@ def build_site():
     release_notes_path = WEBSITE_OUTPUT_DIRECTORY / "release-notes.html"
     release_notes_template = release_notes_path.read_text()
     assert release_notes_template.count("<!-- release-history -->") == 1, "Release page needs one history placeholder"
-    release_notes_path.write_text(release_notes_template.replace("<!-- release-history -->", render_website_history(load_catalog())))
+    releases = load_catalog()
+    if latest_published_release_tag:
+        releases = releases_published_through(releases, latest_published_release_tag)
+    release_notes_path.write_text(release_notes_template.replace("<!-- release-history -->", render_website_history(releases)))
     stylesheet_directory = WEBSITE_OUTPUT_DIRECTORY / "styles"
     if stylesheet_directory.exists():
         shutil.rmtree(stylesheet_directory)
@@ -77,4 +81,5 @@ def build_site():
 
 
 if __name__ == "__main__":
-    build_site()
+    # The Pages workflow sets this to hide notes merged ahead of their tag; local builds preview every entry.
+    build_site(os.environ.get("LATEST_PUBLISHED_RELEASE_TAG"))

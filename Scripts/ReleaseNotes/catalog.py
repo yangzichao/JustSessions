@@ -67,3 +67,9 @@ def release_for_tag(releases, tag):
         if tag == "v" + release["version"]:
             return release
     raise ValueError(f"Add curated release notes for {tag} to {CATALOG_PATH.relative_to(REPOSITORY_DIRECTORY)} before publishing.")
+
+
+def releases_published_through(releases, latest_published_tag):
+    """Drop entries merged ahead of their tag, so the website never links to a release that doesn't exist yet."""
+    latest_published_release = release_for_tag(releases, latest_published_tag)
+    return releases[releases.index(latest_published_release):]

@@ -84,7 +84,7 @@ These are page views, not unique visitors: reloads count again, and blocked scri
 
 ### Publishing
 
-The independent `Publish JustSessions website` workflow tests, builds, and deploys the website when relevant files change on `main`. This includes website sources, screenshots, branding, website scripts, and the app capability sources and documentation checked by the website build. It does not build or publish the app. Run `make verify` and, for workflow changes, `actionlint` locally before pushing. See [build and release](build-and-release.md).
+The independent `Publish JustSessions website` workflow tests, builds, and deploys the website when relevant files change on `main`. This includes website sources, screenshots, branding, website scripts, and the app capability sources and documentation checked by the website build. It does not build or publish the app. The release notes page lists only versions whose GitHub release is published, so notes merged before tagging stay hidden until the app release workflow redeploys the site; local builds show every entry. Run `make verify` and, for workflow changes, `actionlint` locally before pushing. See [build and release](build-and-release.md).
 
 To redeploy without changing files or creating a version tag, choose **Actions → Publish JustSessions website → Run workflow → main**, or run:
 
