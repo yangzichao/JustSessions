@@ -12,7 +12,7 @@ struct TerminalFontPicker: View {
             picker
             if appearanceStore.preferences.fontFamily == .system {
                 // macOS gives its system fonts no fallback fonts; see TerminalFontFamily.
-                Text("System Monospaced shows only some Nerd Font icons. To see them all, as in shell prompts, choose another font, such as Menlo.")
+                Text("System Monospaced can't show the included Nerd Font icons. To see them, as in shell prompts, choose another font, such as Menlo.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

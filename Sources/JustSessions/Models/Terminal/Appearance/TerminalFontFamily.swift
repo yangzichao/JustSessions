@@ -15,12 +15,11 @@ enum TerminalFontFamily: Hashable {
         return TerminalSymbolsFont.addingFallback(to: font)
     }
 
-    /// macOS ignores fallback fonts for its system fonts, so this one gets no symbols fallback. With the symbols font
-    /// registered, macOS's own fallback still finds the icons in the supplementary Private Use Areas, such as
-    /// Material Design's, but not the Powerline separators and most other icons.
+    /// macOS ignores fallback fonts for its system fonts, so this one gets no symbols fallback. macOS's own fallback
+    /// uses only installed fonts, never one an app registers for itself, so it draws Nerd Font icons only from a Nerd
+    /// Font installed on the Mac.
     private static func systemFont(size: CGFloat) -> NSFont {
-        TerminalSymbolsFont.register()
-        return .monospacedSystemFont(ofSize: size, weight: .regular)
+        .monospacedSystemFont(ofSize: size, weight: .regular)
     }
 
     /// A regular face on `NSFontManager`'s weight scale, which runs from 0 to 15.

@@ -4273,12 +4273,12 @@
         }
       }
     },
-    "System Monospaced shows only some Nerd Font icons. To see them all, as in shell prompts, choose another font, such as Menlo.": {
+    "System Monospaced can't show the included Nerd Font icons. To see them, as in shell prompts, choose another font, such as Menlo.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "系统等宽字体只能显示部分 Nerd Font 图标。若要全部显示（例如 shell 提示符中的图标），请选择其他字体，例如 Menlo。"
+            "value": "系统等宽字体无法显示内置的 Nerd Font 图标。若要显示这些图标（例如 shell 提示符中的图标），请选择其他字体，例如 Menlo。"
           }
         }
       }

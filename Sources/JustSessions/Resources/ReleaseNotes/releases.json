@@ -15,8 +15,8 @@
             "zh-Hans": "标记本机上有未查看的已完成回合的 Claude Code 和 Codex 会话，并可用“等待我处理”筛选。"
           },
           {
-            "en": "Choose any installed monospaced terminal font, with Nerd Font icons. System Monospaced shows only some icons.",
-            "zh-Hans": "终端可使用任意已安装的等宽字体，并显示 Nerd Font 图标；系统等宽字体仅显示部分图标。"
+            "en": "Choose any installed monospaced terminal font, with Nerd Font icons except in System Monospaced.",
+            "zh-Hans": "终端可使用任意已安装的等宽字体，并显示 Nerd Font 图标（系统等宽字体除外）。"
           },
           {
             "en": "Drop files on a terminal tab on this Mac to type their paths.",

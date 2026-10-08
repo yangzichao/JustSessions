@@ -812,8 +812,8 @@
 	<string>System</string>
 	<key>System Monospaced</key>
 	<string>System Monospaced</string>
-	<key>System Monospaced shows only some Nerd Font icons. To see them all, as in shell prompts, choose another font, such as Menlo.</key>
-	<string>System Monospaced shows only some Nerd Font icons. To see them all, as in shell prompts, choose another font, such as Menlo.</string>
+	<key>System Monospaced can't show the included Nerd Font icons. To see them, as in shell prompts, choose another font, such as Menlo.</key>
+	<string>System Monospaced can't show the included Nerd Font icons. To see them, as in shell prompts, choose another font, such as Menlo.</string>
 	<key>Tab %lld</key>
 	<string>Tab %lld</string>
 	<key>Tabs</key>

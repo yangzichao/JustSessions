@@ -219,8 +219,10 @@ private final class StoreAlertScenario {
 
     private func sheetOnScreen(where matches: (NSWindow) -> Bool) async throws -> NSWindow {
         let clock = ContinuousClock()
-        // As long as `expectEventually`'s default: shared CI runners can be slow to show a sheet.
-        let deadline = clock.now + .seconds(30)
+        // At the start of a full run, when every suite starts at once, a shared CI runner can take longer than
+        // `expectEventually`'s default 30 seconds to show a sheet: the v1.0.9 release run took 28 seconds here, and
+        // v1.0.10's first ran out. Passing runs still return as soon as the sheet shows.
+        let deadline = clock.now + .seconds(120)
         while clock.now < deadline {
             if let sheet = window.attachedSheet, sheet.isVisible, matches(sheet) { return sheet }
             try await Task.sleep(for: .milliseconds(20))
