@@ -22,3 +22,4 @@ For a faster loop while working, `make check` compiles the development build and
 
 - [Build and release](docs/development/build-and-release.md): Make commands, the bundled tmux runtime, CI, and release signing.
 - [Source layout](docs/development/source-layout.md): where each feature lives.
+- [Performance](docs/development/performance.md): known hotspots and the status of each optimization. Update it when performance work lands.

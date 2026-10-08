@@ -17,9 +17,9 @@ enum TranscriptSearchSegments {
 
     static func texts(in block: TranscriptMarkdownBlock) -> [String] {
         switch block.content {
-        case .text(let text, _): [String(text.characters)]
+        case .text(let text, _): [text.plainText]
         case .code(let text, _): [text]
-        case .table(let table): table.rows.flatMap { $0.cells.map { String($0.characters) } }
+        case .table(let table): table.rows.flatMap { $0.cells.map(\.plainText) }
         case .divider: []
         }
     }

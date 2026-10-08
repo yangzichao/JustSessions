@@ -19,14 +19,26 @@ struct ISO8601TimestampParserTests {
         "",
     ]
 
-    /// The shared formatters give the same dates as formatters made for each call, as the app used to make them.
+    /// The parser accepts and rejects what `ISO8601DateFormatter`, which the app used before, does, and gives the same
+    /// instants to the millisecond that formatter kept.
     @Test(arguments: timestamps)
-    func parsesLikeFormattersMadeForEachCall(_ text: String) {
+    func parsesTheSameInstantsAsISO8601DateFormatter(_ text: String) {
         let fractionalSecondsFormatter = ISO8601DateFormatter()
         fractionalSecondsFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let expectedDate = fractionalSecondsFormatter.date(from: text) ?? ISO8601DateFormatter().date(from: text)
+        let formatterDate = fractionalSecondsFormatter.date(from: text) ?? ISO8601DateFormatter().date(from: text)
+        let date = ISO8601TimestampParser.shared.date(from: text)
 
-        #expect(ISO8601TimestampParser.shared.date(from: text) == expectedDate)
+        #expect((date == nil) == (formatterDate == nil))
+        if let date, let formatterDate {
+            #expect(abs(date.timeIntervalSince(formatterDate)) < 0.001)
+        }
+    }
+
+    @Test func keepsFractionsFinerThanAMillisecond() throws {
+        let wholeSecond = try #require(ISO8601TimestampParser.shared.date(from: "2026-09-24T10:00:00Z"))
+        let date = try #require(ISO8601TimestampParser.shared.date(from: "2026-09-24T10:00:00.123456Z"))
+
+        #expect(abs(date.timeIntervalSince(wholeSecond) - 0.123456) < 0.000_001)
     }
 
     @Test func everyTaskGetsTheSameDatesFromTheSharedParser() async {

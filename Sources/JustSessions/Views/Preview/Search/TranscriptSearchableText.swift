@@ -10,29 +10,51 @@ struct TranscriptSearchableText: View {
     var isSemibold = false
     var lineSpacing: CGFloat = 4
     var isSecondary = false
+    @Environment(\.transcriptSearchContext) private var searchContext
+
+    var body: some View {
+        // Every text block in the transcript runs this body, so it searches, and copies its text to do so, only during Find.
+        let ranges = searchContext.query.isEmpty ? [] : TranscriptTextSearch.ranges(of: searchContext.query, in: source.plainText)
+        if ranges.isEmpty {
+            Text(source)
+        } else {
+            TranscriptSearchMatchesText(
+                source: source, ranges: ranges, segmentIndex: segmentIndex, fontSize: fontSize, isMonospaced: isMonospaced,
+                isSemibold: isSemibold, lineSpacing: lineSpacing, isSecondary: isSecondary
+            )
+        }
+    }
+}
+
+/// A text block with Find's matches highlighted. It alone reads the whole environment, to resolve theme colors, so an
+/// environment change does not rerun every text block in the transcript.
+private struct TranscriptSearchMatchesText: View {
+    let source: AttributedString
+    let ranges: [NSRange]
+    let segmentIndex: Int
+    let fontSize: CGFloat
+    let isMonospaced: Bool
+    let isSemibold: Bool
+    let lineSpacing: CGFloat
+    let isSecondary: Bool
     @Environment(\.self) private var environment
     @Environment(\.transcriptSearchContext) private var searchContext
     @Environment(\.transcriptSearchEntryIndex) private var entryIndex
 
     var body: some View {
-        let ranges = TranscriptTextSearch.ranges(of: searchContext.query, in: String(source.characters))
-        if ranges.isEmpty {
-            Text(source)
-        } else {
-            let selectedRange = selectedRange.flatMap { ranges.contains($0) ? $0 : nil }
-            TranscriptSearchTextSurface(
-                text: TranscriptSearchAttributedText.make(
-                    source: source, font: font, lineSpacing: lineSpacing,
-                    foreground: TranscriptSearchAttributedText.color(isSecondary ? ThemePalette.secondaryText : ThemePalette.ink, in: environment),
-                    highlight: TranscriptSearchAttributedText.color(ThemePalette.ink, in: environment),
-                    selectedForeground: TranscriptSearchAttributedText.color(ThemePalette.inkForeground, in: environment),
-                    ranges: ranges, selectedRange: selectedRange
-                ),
-                selectedRange: selectedRange,
-                navigationRevision: searchContext.navigationRevision,
-                reveal: { view, range in searchContext.reveal?(view, range, entryIndex) ?? false }
-            )
-        }
+        let selectedRange = selectedRange.flatMap { ranges.contains($0) ? $0 : nil }
+        TranscriptSearchTextSurface(
+            text: TranscriptSearchAttributedText.make(
+                source: source, font: font, lineSpacing: lineSpacing,
+                foreground: TranscriptSearchAttributedText.color(isSecondary ? ThemePalette.secondaryText : ThemePalette.ink, in: environment),
+                highlight: TranscriptSearchAttributedText.color(ThemePalette.ink, in: environment),
+                selectedForeground: TranscriptSearchAttributedText.color(ThemePalette.inkForeground, in: environment),
+                ranges: ranges, selectedRange: selectedRange
+            ),
+            selectedRange: selectedRange,
+            navigationRevision: searchContext.navigationRevision,
+            reveal: { view, range in searchContext.reveal?(view, range, entryIndex) ?? false }
+        )
     }
 
     private var selectedRange: NSRange? {
