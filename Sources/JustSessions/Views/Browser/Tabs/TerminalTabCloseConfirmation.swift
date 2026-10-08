@@ -2,6 +2,9 @@ import SwiftUI
 
 /// Mouse and keyboard closes share the same choice about keeping a tmux CLI running. Don't ask again saves the
 /// answer picked with it, so later closes do the same without asking; Settings can change it back.
+///
+/// Return closes the tab, and Escape cancels. The dialogs are alerts rather than confirmation dialogs: on macOS, a
+/// confirmation dialog gives no button Return.
 struct TerminalTabCloseConfirmation: ViewModifier {
     @ObservedObject var store: ConversationStore
     @Binding var closingSessionID: UUID?
@@ -19,12 +22,15 @@ struct TerminalTabCloseConfirmation: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .confirmationDialog(
+            .alert(
                 "Close this tab?",
                 isPresented: closingDialogPresentation(whileTmuxCanKeepCLIRunning: true)
             ) {
+                // Return keeps the CLI running: that close can be undone by reattaching.
                 Button("Keep running") { closeTab(endingTmuxSession: false) }
+                    .keyboardShortcut(.defaultAction)
                 Button("End session", role: .destructive) { closeTab(endingTmuxSession: true) }
+                Button("Cancel", role: .cancel) { closingSessionID = nil }
             } message: {
                 if let closingTabTmuxHost {
                     Text("Keep running leaves the CLI running in tmux on \(closingTabTmuxHost.nameInSentence); click the session to reattach. End session stops it.")
@@ -32,13 +38,15 @@ struct TerminalTabCloseConfirmation: ViewModifier {
             }
             // Only the dialog above shows the checkbox: a modifier applies to the dialogs it wraps.
             .dialogSuppressionToggle("Don't ask again", isSuppressed: $savesTabCloseChoice)
-            .confirmationDialog(
+            .alert(
                 isClosingPlainTerminal ? "Close this terminal?" : "End this CLI session?",
                 isPresented: closingDialogPresentation(whileTmuxCanKeepCLIRunning: false)
             ) {
                 Button(isClosingPlainTerminal ? "Close terminal" : "End session", role: .destructive) {
                     closeTab(endingTmuxSession: true)
                 }
+                .keyboardShortcut(.defaultAction)
+                Button("Cancel", role: .cancel) { closingSessionID = nil }
             } message: {
                 if isClosingPlainTerminal {
                     Text("The shell and anything still running in it will stop.")
