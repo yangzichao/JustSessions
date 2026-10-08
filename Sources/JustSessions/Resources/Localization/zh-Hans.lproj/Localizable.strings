@@ -402,8 +402,8 @@
 	<string>导入</string>
 	<key>Improved</key>
 	<string>改进</string>
-	<key>In **Projects**, clear the time and CLI filters, then click the host's refresh button.</key>
-	<string>在 **项目** 中清除时间和 CLI 筛选，然后单击该主机的刷新按钮。</string>
+	<key>In **Projects**, clear the filters, then click the host's refresh button.</key>
+	<string>在 **项目** 中清除所有筛选，然后单击该主机的刷新按钮。</string>
 	<key>Interface language</key>
 	<string>界面语言</string>
 	<key>JustSessions Help</key>
@@ -502,6 +502,8 @@
 	<string>下一个匹配项（⌘G 或 Return）</string>
 	<key>Next tab</key>
 	<string>下一个标签页</string>
+	<key>No Claude Code or Codex session is waiting for you</key>
+	<string>没有等待你处理的 Claude Code 或 Codex 会话</string>
 	<key>No archived projects</key>
 	<string>没有已归档的项目</string>
 	<key>No matches</key>
@@ -684,6 +686,8 @@
 	<string>右键单击另一个标签页，选择 **使用当前标签页创建新的拆分视图**。在两个视图之间拖动可调整大小。</string>
 	<key>SSH hosts</key>
 	<string>SSH 主机</string>
+	<key>SSH hosts don't tell when a session waits for you</key>
+	<string>SSH 主机不会告知会话何时在等待你</string>
 	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
 	<string>SSH 主机没有废纸篓，因此所有会话都将被永久删除。</string>
 	<key>SSH setup in the user guide ↗</key>
@@ -884,6 +888,8 @@
 	<string>使用此主机的 tmux 前缀键</string>
 	<key>User guide ↗</key>
 	<string>用户指南 ↗</string>
+	<key>Waiting for you</key>
+	<string>等待我处理</string>
 	<key>Website ↗</key>
 	<string>网站 ↗</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>

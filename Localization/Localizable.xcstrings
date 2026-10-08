@@ -2181,12 +2181,12 @@
         }
       }
     },
-    "In **Projects**, clear the time and CLI filters, then click the host's refresh button.": {
+    "In **Projects**, clear the filters, then click the host's refresh button.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 **项目** 中清除时间和 CLI 筛选，然后单击该主机的刷新按钮。"
+            "value": "在 **项目** 中清除所有筛选，然后单击该主机的刷新按钮。"
           }
         }
       }
@@ -2683,6 +2683,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "下一个标签页"
+          }
+        }
+      }
+    },
+    "No Claude Code or Codex session is waiting for you": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有等待你处理的 Claude Code 或 Codex 会话"
           }
         }
       }
@@ -3617,6 +3627,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "SSH 主机"
+          }
+        }
+      }
+    },
+    "SSH hosts don't tell when a session waits for you": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SSH 主机不会告知会话何时在等待你"
           }
         }
       }
@@ -4635,6 +4655,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "用户指南 ↗"
+          }
+        }
+      }
+    },
+    "Waiting for you": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待我处理"
           }
         }
       }

@@ -8,7 +8,13 @@ struct SidebarEmptyHostMessage: Equatable {
     /// The host's refresh failed, and `text` is its error.
     let isFailure: Bool
 
-    init(host: SessionHost, refreshStatus: HostRefreshStatus?, isSearching: Bool, recencyFilter: SessionRecencyFilter) {
+    init(
+        host: SessionHost,
+        refreshStatus: HostRefreshStatus?,
+        isSearching: Bool,
+        recencyFilter: SessionRecencyFilter,
+        waitingFilter: SessionWaitingFilter
+    ) {
         switch refreshStatus {
         case .failed(let error)?:
             self.init(failure: error)
@@ -17,6 +23,12 @@ struct SidebarEmptyHostMessage: Equatable {
         case .refreshed?, nil:
             if isSearching {
                 self.init(text: "No matching projects or sessions")
+            } else if waitingFilter == .waitingForYou {
+                // Only Claude Code and Codex on this Mac tell what they are doing, so say so rather than suggest
+                // nothing else waits.
+                self.init(text: host == .thisMac
+                    ? "No Claude Code or Codex session is waiting for you"
+                    : "SSH hosts don't tell when a session waits for you")
             } else {
                 self.init(text: recencyFilter == .recent ? "No sessions in the past seven days" : "No sessions")
             }

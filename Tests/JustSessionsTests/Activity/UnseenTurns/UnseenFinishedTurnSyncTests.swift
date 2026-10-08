@@ -14,17 +14,25 @@ struct UnseenFinishedTurnSyncTests {
         #expect(store.selectedTerminalID != fixture.tab.id)
 
         try await fixture.startTurn()
-        #expect(!store.isWaitingForYou(fixture.conversation))
+        #expect(!fixture.isWaitingForYou)
         try await fixture.finishTurn()
-        #expect(store.hasUnseenFinishedTurn(fixture.tab))
-        #expect(store.isWaitingForYou(fixture.conversation))
+        #expect(fixture.tab.hasUnseenFinishedTurn)
+        #expect(fixture.tab.runStatus == .finishedUnseen)
+        #expect(fixture.isWaitingForYou)
+        #expect(store.activitySummary(forProjectDirectoryKey: fixture.tab.projectDirectoryKey).mostPressingStatus == .finishedUnseen)
+        let waitingOnly = store.filteredSidebarProjection(
+            providerFilter: .all, recencyFilter: .all, waitingFilter: .waitingForYou, searchText: ""
+        )
+        #expect(waitingOnly.projects.flatMap(\.conversations).map(\.id) == [fixture.conversation.id])
+        #expect(waitingOnly.waitingSessionCount == 1)
         await fixture.synchronize()
-        #expect(store.hasUnseenFinishedTurn(fixture.tab))
+        #expect(fixture.tab.hasUnseenFinishedTurn)
 
         // Seen as soon as it is selected, without waiting for the next sync.
         store.selectTerminal(fixture.tab.id)
-        #expect(!store.hasUnseenFinishedTurn(fixture.tab))
-        #expect(!store.isWaitingForYou(fixture.conversation))
+        #expect(!fixture.tab.hasUnseenFinishedTurn)
+        #expect(fixture.tab.runStatus == .running(.idle))
+        #expect(!fixture.isWaitingForYou)
     }
 
     @Test func showingTheTabInASplitBesideTheSelectedOneMarksItSeen() async throws {
@@ -34,11 +42,11 @@ struct UnseenFinishedTurnSyncTests {
         store.openTerminal(Fixture.makeTab(for: fixture.otherConversation))
         try await fixture.startTurn()
         try await fixture.finishTurn()
-        #expect(store.hasUnseenFinishedTurn(fixture.tab))
+        #expect(fixture.tab.hasUnseenFinishedTurn)
 
         store.splitSelectedTerminal(with: fixture.tab.id)
         #expect(store.shownSplit?.contains(fixture.tab.id) == true)
-        #expect(!store.hasUnseenFinishedTurn(fixture.tab))
+        #expect(!fixture.tab.hasUnseenFinishedTurn)
     }
 
     @Test func aTurnThatFinishesWhileTheAppIsBehindIsSeenOnceTheAppComesToTheFront() async throws {
@@ -49,11 +57,11 @@ struct UnseenFinishedTurnSyncTests {
 
         try await fixture.startTurn()
         try await fixture.finishTurn()
-        #expect(store.hasUnseenFinishedTurn(fixture.tab))
+        #expect(fixture.tab.hasUnseenFinishedTurn)
 
         fixture.notifier.isApplicationActive = true
         await fixture.synchronize()
-        #expect(!store.hasUnseenFinishedTurn(fixture.tab))
+        #expect(!fixture.tab.hasUnseenFinishedTurn)
     }
 
     @Test func aTurnThatFinishesInViewIsNeverMarked() async throws {
@@ -62,8 +70,8 @@ struct UnseenFinishedTurnSyncTests {
 
         try await fixture.startTurn()
         try await fixture.finishTurn()
-        #expect(!fixture.store.hasUnseenFinishedTurn(fixture.tab))
-        #expect(!fixture.store.isWaitingForYou(fixture.conversation))
+        #expect(!fixture.tab.hasUnseenFinishedTurn)
+        #expect(!fixture.isWaitingForYou)
     }
 
     /// A store with a running Codex tab, selected, whose turns come from the rollout file the test writes.
@@ -102,6 +110,11 @@ struct UnseenFinishedTurnSyncTests {
         func tearDown() {
             store.closeAllTerminals()
             try? FileManager.default.removeItem(at: directory)
+        }
+
+        /// The Codex tab's session is among those the Waiting for you filter keeps.
+        var isWaitingForYou: Bool {
+            store.sessionsWaitingForYou.conversationIDs.contains(conversation.id)
         }
 
         func synchronize() async {

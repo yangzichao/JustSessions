@@ -8,9 +8,9 @@ extension ConversationStore {
             $0.projectDirectoryKey == projectDirectoryKey && !$0.isPlainTerminal && $0.isRunning
         }
         let conversationIDsWithRunningTab = Set(runningTabs.compactMap { $0.conversation?.id })
-        let detachedActivities = conversationIndex.conversations(inProject: projectDirectoryKey)
+        let detachedStatuses = conversationIndex.conversations(inProject: projectDirectoryKey)
             .filter { isRunningInTmux($0) && !conversationIDsWithRunningTab.contains($0.id) }
-            .map { detachedCLIActivities[$0.id] }
-        return SessionActivitySummary(activities: runningTabs.map(\.cliActivity) + detachedActivities)
+            .map(detachedCLIStatus(of:))
+        return SessionActivitySummary(statuses: runningTabs.map(\.runStatus) + detachedStatuses)
     }
 }

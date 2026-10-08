@@ -48,6 +48,9 @@ final class TerminalSession: ObservableObject, Identifiable {
     @Published private(set) var exitCode: Int32?
     /// What the tab's CLI is doing, while it runs and tells; see `ConversationStore+CLIActivitySync`.
     @Published private(set) var cliActivity: CLIActivity?
+    /// The tab's CLI finished a turn while the tab was off screen, and you have not looked since. The store keeps
+    /// the marks and sets this one; see `ConversationStore+UnseenFinishedTurns`.
+    @Published private(set) var hasUnseenFinishedTurn = false
 
     private let processObserver: TerminalProcessObserver
     private var hasStarted = false
@@ -73,7 +76,11 @@ final class TerminalSession: ObservableObject, Identifiable {
     var isRunning: Bool { !hasExited && !isWaitingToBeShown }
     var runStatus: SessionRunStatus {
         if isWaitingToBeShown { return .waitingToBeShown }
-        return hasExited ? .ended : .running(cliActivity)
+        return hasExited ? .ended : SessionRunStatus.running(cliActivity).markingUnseenFinishedTurn(hasUnseenFinishedTurn)
+    }
+    /// Its CLI runs and waits on you: stopped for your answer, or done with a turn you have not seen.
+    var isWaitingForYou: Bool {
+        isRunning && WaitingForYou.includes(activity: cliActivity, hasUnseenFinishedTurn: hasUnseenFinishedTurn)
     }
     /// A New session or Branch tab, whose session id the app learns once the CLI writes it.
     var startsNewSession: Bool { action?.startsNewSession ?? false }
@@ -151,6 +158,7 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.exitCode = exitCode
         hasExited = true
         cliActivity = nil
+        hasUnseenFinishedTurn = false
         onProcessFinished?()
     }
 
@@ -160,6 +168,11 @@ final class TerminalSession: ObservableObject, Identifiable {
         guard !hasExited, cliActivity != activity else { return false }
         cliActivity = activity
         return true
+    }
+
+    func updateHasUnseenFinishedTurn(_ isUnseen: Bool) {
+        guard !hasExited, hasUnseenFinishedTurn != isUnseen else { return }
+        hasUnseenFinishedTurn = isUnseen
     }
 
     func synchronize(conversation: Conversation, displayTitle: String) {

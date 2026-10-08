@@ -16,6 +16,16 @@ struct SessionActivitySummaryTests {
         #expect(SessionActivitySummary(activities: [nil, nil]).mostPressingStatus == .running(nil))
     }
 
+    @Test func aTurnYouHaveNotSeenComesAfterInputAndBeforeWork() {
+        let summary = SessionActivitySummary(statuses: [.running(.working), .finishedUnseen, .running(.idle), .ended])
+
+        #expect(summary.runningCount == 3)
+        #expect(summary.mostPressingStatus == .finishedUnseen)
+        #expect(summary.summary == "1 not seen yet, 1 working, 1 idle")
+        #expect(SessionActivitySummary(statuses: [.finishedUnseen, .running(.needsInput(reason: nil))]).mostPressingStatus
+            == .running(.needsInput(reason: nil)))
+    }
+
     @Test func wordsSeveralCLIsThatNeedYou() {
         let summary = SessionActivitySummary(activities: [.needsInput(reason: nil), .needsInput(reason: "dialog open")])
 

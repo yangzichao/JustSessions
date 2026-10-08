@@ -5,7 +5,7 @@ extension ConversationStore {
         sidebarProjection.conversations
     }
 
-    /// Includes saved empty projects; provider, recency, and search filters are applied by the browser.
+    /// Includes saved empty projects; provider, recency, waiting, and search filters are applied by the browser.
     var sidebarProjectGroups: [ProjectConversationGroup] {
         sidebarProjection.projectGroups
     }
@@ -14,6 +14,7 @@ extension ConversationStore {
     func filteredSidebarProjection(
         providerFilter: ConversationProviderFilter,
         recencyFilter: SessionRecencyFilter,
+        waitingFilter: SessionWaitingFilter = .all,
         searchText: String,
         messageMatchConversationIDs: Set<String> = []
     ) -> FilteredSidebarProjection {
@@ -23,6 +24,8 @@ extension ConversationStore {
             titleAliases: titleAliases,
             providerFilter: providerFilter,
             recencyFilter: recencyFilter,
+            waitingFilter: waitingFilter,
+            waiting: sessionsWaitingForYou,
             searchText: searchText,
             messageMatchConversationIDs: messageMatchConversationIDs,
             recencyNow: Date(timeIntervalSinceReferenceDate: (Date.now.timeIntervalSinceReferenceDate / 60).rounded(.down) * 60)

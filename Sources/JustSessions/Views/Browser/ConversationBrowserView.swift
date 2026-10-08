@@ -5,6 +5,7 @@ struct ConversationBrowserView: View {
     @Binding var searchText: String
     @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
+    @Binding var waitingFilter: SessionWaitingFilter
     let onRename: (Conversation) -> Void
     let onRenameProject: (ProjectConversationGroup) -> Void
     let onRequestDeletion: (SessionDeletionRequest) -> Void
@@ -26,6 +27,7 @@ struct ConversationBrowserView: View {
         store.filteredSidebarProjection(
             providerFilter: providerFilter,
             recencyFilter: recencyFilter,
+            waitingFilter: waitingFilter,
             searchText: searchText,
             messageMatchConversationIDs: Set(messageSearch.results.matchesByConversationID.keys)
         )
@@ -50,10 +52,12 @@ struct ConversationBrowserView: View {
                 searchText: $searchText,
                 recencyFilter: $recencyFilter,
                 providerFilter: $providerFilter,
+                waitingFilter: $waitingFilter,
                 sessionSelection: $sessionSelection,
                 projects: filteredProjection.projects,
                 allSessionCount: filteredProjection.allSessionCount,
                 recentSessionCount: filteredProjection.recentSessionCount,
+                waitingSessionCount: filteredProjection.waitingSessionCount,
                 messageMatches: searchText.isEmpty ? [:] : messageSearch.results.matchesByConversationID,
                 onNewSession: { newSessionSheetHost = defaultNewSessionHost },
                 onSelectConversation: { conversation in
