@@ -62,15 +62,15 @@ struct TerminalFontFamilyTests {
         #expect(!Self.drawingFonts(of: "\u{23FB}", in: font).contains(TerminalSymbolsFont.postScriptName))
     }
 
-    /// macOS ignores fallback fonts for its system fonts, so System Monospaced stays exactly the system's font. Its own
-    /// fallback still finds an icon font for the supplementary Private Use Areas, as Settings says: the registered
-    /// symbols font, or a Nerd Font installed on the Mac, rather than its LastResort placeholder.
-    @Test func systemMonospacedIsTheSystemFontAndShowsSomeIcons() {
+    /// macOS ignores fallback fonts for its system fonts, so System Monospaced stays exactly the system's font, as
+    /// Settings says. Which icons it draws depends on the Nerd Fonts installed on the Mac, so this checks none: macOS's
+    /// own fallback never uses the font the app registers. On a Mac without Nerd Fonts, as on the release runner, it
+    /// drew a supplementary-area icon as the LastResort placeholder.
+    @Test func systemMonospacedIsExactlyTheSystemFont() {
         let font = TerminalFontFamily.system.font(size: 13)
 
         #expect(font == NSFont.monospacedSystemFont(ofSize: 13, weight: .regular))
         #expect(font.fontDescriptor.object(forKey: .cascadeList) == nil)
-        #expect(!Self.drawingFonts(of: "\u{F0001}", in: font).contains("LastResort"))
     }
 
     @Test func installedFamiliesAreTheMonospacedOnesWithLetters() {
