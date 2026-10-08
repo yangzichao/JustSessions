@@ -24,6 +24,8 @@ multipass exec justsessions-ssh-test -- sudo apt-get install -y rsync tmux pytho
 
 Use `multipass list` first if the VM may already exist; start an existing one with `multipass start justsessions-ssh-test`. Keep projects inside the VM rather than mounting your Mac's working folders into it.
 
+If `multipass exec`, `transfer`, or `shell` fails with `No route to host` while `multipass list` shows the VM running, run the Multipass commands from Terminal.app. On macOS 26.5, they failed inside a tmux session and worked from Terminal.app; `ping` and `ssh` to the VM worked from both.
+
 ## Configure passwordless SSH
 
 Each contributor uses their own key. In a Mac terminal, create a dedicated test key if it does not already exist; choose a passphrase when prompted and load it into the macOS keychain and SSH agent:
@@ -81,7 +83,7 @@ ssh -o BatchMode=yes justsessions-test 'exec "$SHELL" -lic "command -v claude &&
 
 Without a terminal, bash first prints `cannot set terminal process group` and `no job control in this shell`; those two lines are expected. Substitute the executable for the provider being tested. Keep its session storage at the locations documented in [session storage](../guides/session-storage.md#ssh-session-cache). `rsync` is required for history mirroring; Antigravity and OpenCode also require `python3`, and Antigravity deletion requires `lsof`. Remote persistence uses the VM's `tmux`, not the app's bundled Mac binary.
 
-In JustSessions, choose **Add SSH host…**, enter `justsessions-test`, then add `/home/ubuntu/justsessions-test/project with spaces` under that host. Start a small disposable conversation so the host has real session history to discover and preview.
+The VM has a local network address, so on macOS 15 and later JustSessions needs Local Network access to reach it, as for any SSH host on your network; see **Settings → Permissions**. In JustSessions, choose **Add SSH host…**, enter `justsessions-test`, then add `/home/ubuntu/justsessions-test/project with spaces` under that host. Start a small disposable conversation so the host has real session history to discover and preview.
 
 ## Manual checks for an SSH change
 
