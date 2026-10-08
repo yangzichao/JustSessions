@@ -13,9 +13,15 @@ struct SingleSessionContextMenu: View {
         // Resuming a session a tab already runs would only show that tab, which clicking the row does; closing it is
         // what is left to do from here.
         let openTab = store.runningTerminal(for: conversation)
+        // A session runs in one tab across the app's windows; another window's tab is shown there, not opened here.
+        let otherWindowTab = openTab == nil ? store.runningTerminalInAnotherWindow(for: conversation) : nil
         if let openTab {
             Button("Close terminal…", systemImage: "xmark", role: .destructive) {
                 onCloseTab(openTab.id)
+            }
+        } else if otherWindowTab != nil {
+            Button("Show in Other Window", systemImage: "macwindow") {
+                store.showRunningTerminalInAnotherWindow(for: conversation)
             }
         } else {
             Button("Resume", systemImage: "play") {
@@ -29,8 +35,8 @@ struct SingleSessionContextMenu: View {
             }
             .disabled(!store.canLaunch(conversation, action: .branch))
         }
-        // An open tab's close already offers to end its CLI.
-        if openTab == nil && store.isRunningInTmux(conversation) {
+        // An open tab's close, in this window or another, already offers to end its CLI.
+        if openTab == nil && otherWindowTab == nil && store.isRunningInTmux(conversation) {
             Button("End on \(conversation.host.nameInSentence)", systemImage: "stop.circle") {
                 store.endTmuxSession(for: conversation)
             }

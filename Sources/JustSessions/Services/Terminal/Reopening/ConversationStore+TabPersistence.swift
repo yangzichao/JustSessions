@@ -21,6 +21,7 @@ extension ConversationStore {
         persistOpenTabs()
         isTearingDownWorkspace = true
         closeAllTerminals()
+        windowRegistry.remove(self)
         openTabPersistence?.closeWindow(tabPersistenceWindowID, in: userDefaults)
         openTabPersistence = nil
     }

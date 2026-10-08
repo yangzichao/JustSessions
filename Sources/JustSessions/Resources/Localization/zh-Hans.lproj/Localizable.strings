@@ -770,12 +770,16 @@
 	<string>设置（⌘,）</string>
 	<key>Settings…</key>
 	<string>设置…</string>
+	<key>Show</key>
+	<string>显示</string>
 	<key>Show %@</key>
 	<string>显示 %@</string>
 	<key>Show %lld subagent sessions</key>
 	<string>显示 %lld 个子代理会话</string>
 	<key>Show Sidebar</key>
 	<string>显示侧栏</string>
+	<key>Show in Other Window</key>
+	<string>在另一个窗口中显示</string>
 	<key>Show sidebar</key>
 	<string>显示侧栏</string>
 	<key>Show sidebar (⌘B)</key>
@@ -906,6 +910,8 @@
 	<string>修改 JustSessions 中的显示名称，文件夹保持原样。留空可使用文件夹名称（%@）。</string>
 	<key>This file isn't an iTerm2 color preset.</key>
 	<string>此文件不是 iTerm2 配色预设。</string>
+	<key>This session is open in another window.</key>
+	<string>这个会话已在另一个窗口中打开。</string>
 	<key>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
 	<string>%@ 上的此会话将被永久删除。SSH 主机没有废纸篓，此操作无法撤销。</string>
 	<key>Time range</key>

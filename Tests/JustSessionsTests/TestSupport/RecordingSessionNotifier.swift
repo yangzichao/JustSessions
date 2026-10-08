@@ -10,6 +10,4 @@ final class RecordingSessionNotifier: SessionNotifying {
     func notify(_ notification: SessionNotification) {
         notifications.append(notification)
     }
-
-    func follow(_ store: ConversationStore) {}
 }

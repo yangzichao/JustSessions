@@ -9,8 +9,10 @@ extension ConversationStore {
         if session.conversation?.id != conversation.id { session.titleRefreshCount = 0 }
         session.synchronize(conversation: conversation, displayTitle: title(for: conversation))
         adoptSessionTmuxName(for: session)
-        // Sidebar rows look up open terminals through the store, which does not see a tab's own changes.
+        // Sidebar rows look up open terminals through the store, which does not see a tab's own changes; other
+        // windows' rows look up this window's.
         persistOpenTabs()
         objectWillChange.send()
+        windowRegistry.tabsChanged(in: self)
     }
 }

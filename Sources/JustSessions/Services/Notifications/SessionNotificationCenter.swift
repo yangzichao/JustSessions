@@ -8,11 +8,12 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
     static let shared = SessionNotificationCenter()
 
     private let settingsStore: SessionNotificationSettingsStore
-    /// Each window's store, oldest first.
-    private let followedStores = NSHashTable<ConversationStore>.weakObjects()
+    /// The windows a clicked notification shows its session in.
+    private let windowRegistry: WorkspaceWindowRegistry
 
-    init(settingsStore: SessionNotificationSettingsStore = .shared) {
+    init(settingsStore: SessionNotificationSettingsStore = .shared, windowRegistry: WorkspaceWindowRegistry = .shared) {
         self.settingsStore = settingsStore
+        self.windowRegistry = windowRegistry
     }
 
     /// Whether the app runs from its bundle, which macOS posts notifications for.
@@ -28,10 +29,6 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
     func startHandlingClicks() {
         guard Self.isAvailable else { return }
         UNUserNotificationCenter.current().delegate = self
-    }
-
-    func follow(_ store: ConversationStore) {
-        followedStores.add(store)
     }
 
     func notify(_ notification: SessionNotification) {
@@ -63,11 +60,16 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
         return (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])) == true
     }
 
-    /// Shows the session in the window whose tab runs it, or else reattaches to it in the first window.
+    /// Shows the session in the window whose tab runs it, or else reattaches to it in the first window, and brings
+    /// that window forward.
     func showSession(notifiedAbout source: SessionAttentionSource) {
-        let stores = followedStores.allObjects
-        if stores.contains(where: { $0.showTab(notifiedAbout: source) }) { return }
-        stores.first?.reattach(notifiedAbout: source)
+        let stores = windowRegistry.stores
+        if let store = stores.first(where: { $0.showTab(notifiedAbout: source) }) {
+            windowRegistry.bringForward(store)
+        } else if let store = stores.first {
+            store.reattach(notifiedAbout: source)
+            windowRegistry.bringForward(store)
+        }
     }
 }
 
