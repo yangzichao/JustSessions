@@ -1,5 +1,45 @@
 [
   {
+    "version": "1.0.10",
+    "publishedOn": "2026-10-08",
+    "title": {
+      "en": "Unseen turns and terminal fonts",
+      "zh-Hans": "未查看的回合与终端字体"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Mark Claude Code and Codex sessions on this Mac with unseen finished turns, and filter with Waiting for you.",
+            "zh-Hans": "标记本机上有未查看的已完成回合的 Claude Code 和 Codex 会话，并可用“等待我处理”筛选。"
+          },
+          {
+            "en": "Choose any installed monospaced terminal font, with Nerd Font icons. System Monospaced shows only some icons.",
+            "zh-Hans": "终端可使用任意已安装的等宽字体，并显示 Nerd Font 图标；系统等宽字体仅显示部分图标。"
+          },
+          {
+            "en": "Drop files on a terminal tab on this Mac to type their paths.",
+            "zh-Hans": "将文件拖到本机的终端标签页，即可输入其路径。"
+          },
+          {
+            "en": "Read each version's changes in Settings → Release notes.",
+            "zh-Hans": "可在“设置 → 更新说明”中查看各版本的变化。"
+          }
+        ]
+      },
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Press Return to answer the close-tab dialog, or tick Don't ask again; change it in Settings → General.",
+            "zh-Hans": "按 Return 键即可确认关闭标签页的对话框，也可勾选“不再询问”；可在“设置 → 通用”中更改。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.0.9",
     "publishedOn": "2026-10-08",
     "title": {
