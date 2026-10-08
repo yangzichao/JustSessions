@@ -3987,6 +3987,16 @@
         }
       }
     },
+    "Show": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示"
+          }
+        }
+      }
+    },
     "Show %@": {
       "localizations": {
         "zh-Hans": {
@@ -4003,6 +4013,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "显示侧栏"
+          }
+        }
+      }
+    },
+    "Show in Other Window": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在另一个窗口中显示"
           }
         }
       }
@@ -4615,6 +4635,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "此文件不是 iTerm2 配色预设。"
+          }
+        }
+      }
+    },
+    "This session is open in another window.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个会话已在另一个窗口中打开。"
           }
         }
       }

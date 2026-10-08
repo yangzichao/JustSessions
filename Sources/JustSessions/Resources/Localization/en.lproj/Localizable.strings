@@ -758,10 +758,14 @@
 	<string>Settings (⌘,)</string>
 	<key>Settings…</key>
 	<string>Settings…</string>
+	<key>Show</key>
+	<string>Show</string>
 	<key>Show %@</key>
 	<string>Show %@</string>
 	<key>Show Sidebar</key>
 	<string>Show Sidebar</string>
+	<key>Show in Other Window</key>
+	<string>Show in Other Window</string>
 	<key>Show sidebar</key>
 	<string>Show sidebar</string>
 	<key>Show sidebar (⌘B)</key>
@@ -878,6 +882,8 @@
 	<string>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</string>
 	<key>This file isn't an iTerm2 color preset.</key>
 	<string>This file isn't an iTerm2 color preset.</string>
+	<key>This session is open in another window.</key>
+	<string>This session is open in another window.</string>
 	<key>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
 	<string>This session will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</string>
 	<key>Time range</key>

@@ -26,6 +26,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, and where a shown split's panes and the resize area between them sit.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
+- `Services/Windows/`: the open workspace windows, each with its store, so a session runs in one tab across them. Resuming a session another window's tab runs brings that window forward to the tab, and each window's session rows, project summaries, Waiting for you filter, and activity sync count other windows' tabs as the session's own.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry and Codex session files. `UnseenTurns/` marks a session after each sync and clears the mark once its tab is on screen.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
 - `Services/Onboarding/`: saves which onboarding tips have shown, and whether the install shows them at all, decided once from whether it was fresh; Help's Take the tour shows them all again.
@@ -70,6 +71,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/WindowDragging/`: the tab bar's window move zone. AppKit would move the window from a press on a tab, since the bar is in the title bar, so while the pointer is over the bar the window can't be moved, and the app moves it itself from the bar's empty space.
 - `Views/Browser/Split/`: what a shown split view draws around its panes, as Chrome does: the area's terminal-colored background, each pane's rounded outline with its mini toolbar in the corner, and the resize area between the panes, which you drag to resize them.
 - `Views/Browser/DockMenu/`: the Dock icon's right-click menu, whose New Window opens a workspace window through SwiftUI's `openWindow`, handed over by each workspace window as it appears.
+- `Views/Browser/WorkspaceWindows/`: tells the window registry in `Services/Windows/` which window shows each store, so another window can bring it forward.
 - `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help in the same sheet.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
 - `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, and multi-selection. `SidebarRowMoreActionsMenu` is the ⋯ that project and session rows show under the pointer, which opens the row's right-click menu.
@@ -80,6 +82,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Terminal/`: a tab's embedded terminal, inset from the window's edges, and the bar above it once its CLI ends.
 - `Views/Preview/`: conversation preview for the selected session.
 - `Views/Preview/MissingFolder/`: the note under a session's header when its project folder is gone from this Mac.
+- `Views/Preview/OtherWindow/`: the note under a session's header while a tab in another window runs it, whose **Show** brings that window forward.
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
 - `Views/Preview/Reading/` and `ReadingPosition/`: text size, reading width, first/latest-message controls, and reading-position restoration.
 - `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.

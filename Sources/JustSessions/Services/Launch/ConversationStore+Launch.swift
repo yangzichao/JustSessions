@@ -7,9 +7,15 @@ extension ConversationStore {
             && (action != .branch || conversation.provider.supportsBranchFromLauncher)
     }
 
-    /// Opens one terminal tab per launchable conversation, in list order; the last one ends up selected.
+    /// Opens one terminal tab per launchable conversation, in list order; the last one ends up selected. Resuming
+    /// leaves a session whose tab is in another window there, and brings that window forward only when every
+    /// session is in one.
     func launch(_ conversations: [Conversation], action: ConversationAction) {
-        for conversation in conversations where canLaunch(conversation, action: action) {
+        let launchable = conversations.filter { canLaunch($0, action: action) }
+        let launchableHere = action == .resume
+            ? launchable.filter { runningTerminalInAnotherWindow(for: $0) == nil }
+            : launchable
+        for conversation in launchableHere.isEmpty ? Array(launchable.suffix(1)) : launchableHere {
             launch(conversation, action: action)
         }
     }
@@ -20,12 +26,15 @@ extension ConversationStore {
     }
 
     /// Shows the CLI that runs the session: its open tab, or else a new tab that reattaches to it in tmux. Returns
-    /// whether a tab now shows it; false when no CLI runs the session or reattaching failed.
+    /// whether a tab now shows it; false when no CLI runs the session, when a tab in another window runs it, or when
+    /// reattaching failed.
     @discardableResult
     func showRunningCLI(for conversation: Conversation) -> Bool {
-        let hasRunningCLI = runningTerminal(for: conversation) != nil
-            || (isRunningInTmux(conversation) && canLaunch(conversation, action: .resume))
-        guard hasRunningCLI else { return false }
+        if runningTerminal(for: conversation) == nil {
+            // Clicking a session whose tab is in another window shows its preview here, which says where the tab is.
+            guard isRunningInTmux(conversation), canLaunch(conversation, action: .resume),
+                  runningTerminalInAnotherWindow(for: conversation) == nil else { return false }
+        }
         launch(conversation, action: .resume)
         guard let shownTerminal = runningTerminal(for: conversation) else { return false }
         return shownTerminal.id == selectedTerminalID
@@ -38,6 +47,8 @@ extension ConversationStore {
             selectTerminal(runningTerminal.id)
             return
         }
+        // A session runs in one tab across the app's windows, so another window's tab comes forward instead.
+        if action == .resume, showRunningTerminalInAnotherWindow(for: conversation) { return }
         do {
             guard let session = try makeTerminal(for: conversation, action: action) else { return }
             if action == .resume, let endedTab = endedTerminal(for: conversation) {

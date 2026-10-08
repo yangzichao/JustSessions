@@ -29,7 +29,9 @@ final class ConversationStore: ObservableObject {
     @Published private(set) var projectDisplayNames: ProjectDisplayNames
     @Published private(set) var pinnedItems: PinnedItems
     @Published var sidebarProjectList: SidebarProjectList
-    @Published private(set) var terminalSessions: [TerminalSession] = []
+    @Published private(set) var terminalSessions: [TerminalSession] = [] {
+        didSet { windowRegistry.tabsChanged(in: self) }
+    }
     /// Selecting a tab that waited to be shown starts it; see `TerminalSession.isWaitingToBeShown`.
     @Published private(set) var selectedTerminalID: UUID? {
         didSet {
@@ -83,6 +85,8 @@ final class ConversationStore: ObservableObject {
     var isRestoringTabBatch = false
     var isTearingDownWorkspace = false
     let sessionNotifier: any SessionNotifying
+    /// The app's windows, whose tabs this window's count with its own; see `ConversationStore+OtherWindows`.
+    let windowRegistry: WorkspaceWindowRegistry
     private(set) var lastRefreshStartedAt: Date?
     /// A refresh asked for while one runs; that one may have read the files before the change that prompted it.
     private var isRefreshQueued = false
@@ -114,6 +118,7 @@ final class ConversationStore: ObservableObject {
         commandResolver: NativeCLICommandResolver = NativeCLICommandResolver(),
         userDefaults: UserDefaults = .standard,
         sessionNotifier: any SessionNotifying = SessionNotificationCenter.shared,
+        windowRegistry: WorkspaceWindowRegistry = WorkspaceWindowRegistry(),
         remoteDeletion: RemoteConversationDeletion = RemoteConversationDeletion(),
         startsBackgroundPolling: Bool = true
     ) {
@@ -122,6 +127,7 @@ final class ConversationStore: ObservableObject {
         self.remoteDeletion = remoteDeletion
         self.userDefaults = userDefaults
         self.sessionNotifier = sessionNotifier
+        self.windowRegistry = windowRegistry
         self.titleAliases = ConversationTitleAliases.load(from: userDefaults)
         self.projectDisplayNames = ProjectDisplayNames.load(from: userDefaults)
         self.pinnedItems = PinnedItems.load(from: userDefaults)
@@ -141,7 +147,7 @@ final class ConversationStore: ObservableObject {
             startTmuxPaneProcessLookup()
             startCLIActivitySync()
         }
-        sessionNotifier.follow(self)
+        windowRegistry.add(self)
     }
 
     /// Scans the session folders on this Mac. SSH hosts refresh on their own, so a slow host never holds this up.
@@ -238,9 +244,11 @@ final class ConversationStore: ObservableObject {
 
     // MARK: - Deletion
 
-    /// A tab in this window, or a CLI still running in tmux on the session's host.
+    /// A tab in any window, or a CLI still running in tmux on the session's host.
     func hasTerminal(for conversation: Conversation) -> Bool {
-        terminalSessions.contains { $0.conversation?.id == conversation.id } || isRunningInTmux(conversation)
+        terminalSessions.contains { $0.conversation?.id == conversation.id }
+            || hasTerminalInAnotherWindow(for: conversation)
+            || isRunningInTmux(conversation)
     }
 
     var isDeletingSessions: Bool {
