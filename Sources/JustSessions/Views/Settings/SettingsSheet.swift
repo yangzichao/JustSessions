@@ -13,6 +13,7 @@ struct SettingsSheet: View {
                 languageStore: .shared,
                 tabReopeningSettingsStore: .shared,
                 launchAtLoginSettingsStore: .shared,
+                tabCloseChoiceSettingsStore: .shared,
                 appAppearanceStore: .shared,
                 appThemeStore: .shared,
                 terminalAppearanceStore: .shared,

@@ -815,6 +815,16 @@
         }
       }
     },
+    "Ask each time": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每次询问"
+          }
+        }
+      }
+    },
     "A−": {
       "shouldTranslate": false
     },
@@ -1236,12 +1246,42 @@
         }
       }
     },
+    "Close this tab?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭此标签？"
+          }
+        }
+      }
+    },
+    "Close this terminal?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭此终端？"
+          }
+        }
+      }
+    },
     "Close this view": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "关闭此视图"
+          }
+        }
+      }
+    },
+    "Closing tabs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭标签"
           }
         }
       }
@@ -1660,6 +1700,16 @@
         }
       }
     },
+    "Don't ask again": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不再询问"
+          }
+        }
+      }
+    },
     "Done": {
       "localizations": {
         "zh-Hans": {
@@ -1716,6 +1766,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "结束会话…"
+          }
+        }
+      }
+    },
+    "End this CLI session?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束此 CLI 会话？"
           }
         }
       }
@@ -1974,6 +2034,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "字号"
+          }
+        }
+      }
+    },
+    "For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "适用于 CLI 可在 tmux 中保持运行的标签。关闭对话框中的“不再询问”也会设置此项。"
           }
         }
       }
@@ -4705,6 +4775,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "网站 ↗"
+          }
+        }
+      }
+    },
+    "When you close a tab": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭标签时"
           }
         }
       }

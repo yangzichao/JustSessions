@@ -149,7 +149,11 @@ struct ConversationBrowserView: View {
             isEnabled: workspaceTabCommandsEnabled && !store.terminalSessions.isEmpty,
             onSelectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) }
         ))
-        .modifier(TerminalTabCloseConfirmation(store: store, closingSessionID: $closingTerminalID))
+        .modifier(TerminalTabCloseConfirmation(
+            store: store,
+            closingSessionID: $closingTerminalID,
+            tabCloseChoiceSettingsStore: .shared
+        ))
         .modifier(OnboardingTipsPresenter(
             store: store,
             tour: onboardingTour,
@@ -162,11 +166,16 @@ struct ConversationBrowserView: View {
         ))
     }
 
-    /// A tab still waiting to be shown runs nothing, so it closes without asking what to do with its CLI.
+    /// A tab still waiting to be shown runs nothing, so it closes without asking what to do with its CLI. A tab whose
+    /// CLI can keep running in tmux closes without asking too once you chose Don't ask again, doing what you chose.
     private func requestClosingTerminal(_ id: UUID?) {
         guard let id else { return }
-        if store.terminalSessions.first(where: { $0.id == id })?.isWaitingToBeShown == true {
+        let closingTab = store.terminalSessions.first { $0.id == id }
+        if closingTab?.isWaitingToBeShown == true {
             store.closeTerminal(id)
+        } else if closingTab?.canKeepCLIRunningAfterClose == true,
+                  let endsTmuxSession = TabCloseChoiceSettingsStore.shared.choice.endsTmuxSessionWithoutAsking {
+            store.closeTerminal(id, endingTmuxSession: endsTmuxSession)
         } else {
             closingTerminalID = id
         }

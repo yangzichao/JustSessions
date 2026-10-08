@@ -158,6 +158,8 @@
 	<string>Arrange split view</string>
 	<key>Ask Now</key>
 	<string>Ask Now</string>
+	<key>Ask each time</key>
+	<string>Ask each time</string>
 	<key>A−</key>
 	<string>A−</string>
 	<key>Branch</key>
@@ -238,8 +240,14 @@
 	<string>Close the tab, keep the CLI</string>
 	<key>Close the tab, or the window when no tabs are open</key>
 	<string>Close the tab, or the window when no tabs are open</string>
+	<key>Close this tab?</key>
+	<string>Close this tab?</string>
+	<key>Close this terminal?</key>
+	<string>Close this terminal?</string>
 	<key>Close this view</key>
 	<string>Close this view</string>
+	<key>Closing tabs</key>
+	<string>Closing tabs</string>
 	<key>Collapse Group</key>
 	<string>Collapse Group</string>
 	<key>Collapse project</key>
@@ -306,6 +314,8 @@
 	<string>Deleting sessions</string>
 	<key>Deletion progress</key>
 	<string>Deletion progress</string>
+	<key>Don't ask again</key>
+	<string>Don't ask again</string>
 	<key>Done</key>
 	<string>Done</string>
 	<key>Edit</key>
@@ -318,6 +328,8 @@
 	<string>End session</string>
 	<key>End session…</key>
 	<string>End session…</string>
+	<key>End this CLI session?</key>
+	<string>End this CLI session?</string>
 	<key>Ended</key>
 	<string>Ended</string>
 	<key>Every open tab in one list</key>
@@ -364,6 +376,8 @@
 	<string>Font</string>
 	<key>Font size</key>
 	<string>Font size</string>
+	<key>For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.</key>
+	<string>For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.</string>
 	<key>Fork in the native CLI</key>
 	<string>Fork in the native CLI</string>
 	<key>Full</key>
@@ -896,6 +910,8 @@
 	<string>Waiting for you</string>
 	<key>Website ↗</key>
 	<string>Website ↗</string>
+	<key>When you close a tab</key>
+	<string>When you close a tab</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</string>
 	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>

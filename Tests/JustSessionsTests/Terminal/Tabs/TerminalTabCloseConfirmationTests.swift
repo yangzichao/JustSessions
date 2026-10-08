@@ -32,6 +32,28 @@ struct TerminalTabCloseConfirmationTests {
         try await scenario.pressReturn(in: sheet) { !scenario.isOpen(tab) }
     }
 
+    /// Don't ask again stays in the dialog for a CLI tmux can keep running, and Return with it ticked saves Keep
+    /// running, so later closes keep the CLI running without asking.
+    @Test func returnWithDontAskAgainTickedSavesKeepRunning() async throws {
+        let scenario = try CloseConfirmationScenario()
+        defer { scenario.remove() }
+        let tab = scenario.openTab(provider: .claude, tmuxSessionName: "justsessions-close-confirmation-test")
+
+        let sheet = try await scenario.confirmClosing(tab)
+        try scenario.tick("Don't ask again", in: sheet)
+        try await scenario.pressReturn(in: sheet) { !scenario.isOpen(tab) }
+
+        #expect(scenario.tabCloseChoiceSettingsStore.choice == .keepRunning)
+    }
+
+    @Test func aTabThatCannotKeepRunningOffersNoDontAskAgain() async throws {
+        let scenario = try CloseConfirmationScenario()
+        defer { scenario.remove() }
+        let sheet = try await scenario.confirmClosing(scenario.openTab(provider: .claude, tmuxSessionName: nil))
+
+        #expect(!scenario.hasButton(titled: "Don't ask again", in: sheet))
+    }
+
     @Test func escapeLeavesTheTabOpen() async throws {
         let scenario = try CloseConfirmationScenario()
         defer { scenario.remove() }
@@ -47,6 +69,7 @@ struct TerminalTabCloseConfirmationTests {
 @MainActor
 private final class CloseConfirmationScenario {
     let store: ConversationStore
+    let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
     private let settings: IsolatedUserDefaults
     private let window: NSWindow
     private let hostingView = NSHostingView(rootView: AnyView(EmptyView()))
@@ -55,6 +78,7 @@ private final class CloseConfirmationScenario {
         _ = NSApplication.shared
         settings = try IsolatedUserDefaults()
         store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
+        tabCloseChoiceSettingsStore = TabCloseChoiceSettingsStore(userDefaults: settings.userDefaults)
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
@@ -78,7 +102,9 @@ private final class CloseConfirmationScenario {
 
     /// Asks to close `tab`, as its close button does, and returns the dialog once it is on screen.
     func confirmClosing(_ tab: TerminalSession) async throws -> NSWindow {
-        hostingView.rootView = AnyView(CloseConfirmationHost(store: store, closingSessionID: tab.id))
+        hostingView.rootView = AnyView(CloseConfirmationHost(
+            store: store, tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore, closingSessionID: tab.id
+        ))
         let clock = ContinuousClock()
         let deadline = clock.now + .seconds(20)
         while clock.now < deadline {
@@ -95,6 +121,19 @@ private final class CloseConfirmationScenario {
         let buttons = Self.buttons(in: sheet)
         return buttons.first { $0.keyEquivalent == "\r" }?.title
             ?? "none; buttons: " + buttons.map { "\($0.title) [\($0.keyEquivalent.debugDescription)]" }.joined(separator: ", ")
+    }
+
+    func hasButton(titled title: String, in sheet: NSWindow) -> Bool {
+        Self.buttons(in: sheet).contains { $0.title == title }
+    }
+
+    /// Ticks a checkbox in the dialog, such as Don't ask again, leaving it as a click does: on, with its action sent.
+    /// Not with `performClick`, whose event tracking loop runs blocks queued for the main run loop; one of them stops
+    /// the run loop, which ends this test process, silently, partway through the next test.
+    func tick(_ title: String, in sheet: NSWindow) throws {
+        let checkbox = try #require(Self.buttons(in: sheet).first { $0.title == title })
+        checkbox.state = .on
+        if let action = checkbox.action { #expect(checkbox.sendAction(action, to: checkbox.target)) }
     }
 
     /// Presses Return as the keyboard does, through the dialog's key equivalents, then waits for `tookEffect`.
@@ -138,11 +177,14 @@ private final class CloseConfirmationScenario {
 /// The browser's close confirmation, asking about `closingSessionID` from the start.
 private struct CloseConfirmationHost: View {
     @ObservedObject var store: ConversationStore
+    let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
     @State var closingSessionID: UUID?
 
     var body: some View {
         Color.clear
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .modifier(TerminalTabCloseConfirmation(store: store, closingSessionID: $closingSessionID))
+            .modifier(TerminalTabCloseConfirmation(
+                store: store, closingSessionID: $closingSessionID, tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore
+            ))
     }
 }

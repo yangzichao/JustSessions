@@ -32,6 +32,10 @@ Behavior that reads best as a story is written as Gherkin in `Tests/JustSessions
 
 CucumberSwift makes an XCTest case for each step when the run starts, so `swift test list` does not show them, `swift test --filter` cannot pick a scenario, and `swift test --parallel` runs none of them while still passing. Run them with plain `swift test`, as `make test` does. `CUCUMBER_VERBOSE=1 make test` prints each scenario's result; `CUCUMBER_TAGS=<tag> swift test` runs only the scenarios with that tag.
 
+## End-to-end tests in a tmux sandbox
+
+Tests that need the app's own launch, tmux, and CLI activity sync run in `ThisMacTmuxSandbox`: a private tmux server with its own home folder and a `bin` folder of stand-in CLIs, so the app's own server and your sessions are never touched. `Activity/UnseenTurns/EndToEnd/` runs the unseen-turn dot and the Waiting for you filter this way. Its `StandInActivityCLI` scripts report what they do as Claude Code and Codex do, in the live registry and the rollout file, and a test drives them by typing in their tab's terminal. A tab starts its CLI with only that `bin` folder on `PATH`, so a stand-in sets its own. These tests pass without running where tmux is missing or too old, so run them through `make test`, which provides the bundled tmux.
+
 ## Performance measurements
 
 Run these opt-in suites separately, with a release build, so their visible test windows do not compete for the main thread:
@@ -66,7 +70,8 @@ make website
 
 The release workflow fails before signing if the tag has no curated entry or the copy fails the automated editorial checks. It publishes the rendered Markdown as the GitHub release body
 and gives Sparkle a matching `JustSessions.html` beside `JustSessions.zip`, which `generate_appcast --embed-release-notes` embeds in the feed.
-The native history is bundled and works offline; its website link opens newer notes. Adding entries triggers the independent website build.
+The native history is bundled and works offline; its website link opens newer notes. Adding entries triggers the independent website build, but the website lists only versions whose GitHub release is published;
+after publishing, the release workflow redeploys it. Local website builds show every entry.
 Historical GitHub release bodies are not changed by a source commit and need a separate publication when backfilling notes.
 
 ### Signed publication
@@ -75,7 +80,7 @@ App release Actions run for pushed version tags (`vX.Y.Z`). Website changes on `
 
 Use the PR template to record the tested commit SHA, verification date, macOS and Swift versions, commands, results, and a concise log summary. Refresh the evidence after each PR update, including rebases and conflict resolution. Workflow changes also require local `actionlint`. Required checks must pass before merging or pushing; report the same evidence in the delivery summary for direct pushes to `main`. Repository merge rules must not require the retired `Test` or website CI checks.
 
-The `Publish JustSessions release` workflow first validates the tag and website on Linux, then runs Swift tests and localization checks on macOS before Developer ID signing, notarization, and app publication. It does not deploy Pages. App releases have no scheduled or manual triggers; use GitHub's rerun facility to retry a failed tag run. To update or redeploy the website independently, use the [website workflow](website.md#deployment-and-discovery). The tag sets the app version. Choose a new, unused semantic version for each release:
+The `Publish JustSessions release` workflow first validates the tag and website on Linux, then runs Swift tests and localization checks on macOS before Developer ID signing, notarization, and app publication. It does not deploy Pages itself; after publishing, it starts the website workflow so the release notes page lists the new version. App releases have no scheduled or manual triggers; use GitHub's rerun facility to retry a failed tag run. To update or redeploy the website independently, use the [website workflow](website.md#deployment-and-discovery). The tag sets the app version. Choose a new, unused semantic version for each release:
 
 Before tagging user-facing changes, update the README, affected user guides, and concise homepage copy or guide links in the same change. Run `python3 Scripts/Website/build_site.py` to check capability claims against the app and validate the Pages artifact. After the signed installer is published, update any source-build availability notes that became part of the release. See [website maintenance](website.md).
 

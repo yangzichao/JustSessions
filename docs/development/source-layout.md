@@ -17,10 +17,12 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, each host's refresh status, and the SSH hosts whose tmux sessions use the host's own prefix keys.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, multi-selection, and which Open tabs groups are collapsed.
+- `Services/Sidebar/`: the sidebar's projects as the filters and search leave them. `Sessions/` picks what a session row shows as its CLI's status: its running tab's, the selected one first, then its CLI's in tmux with no tab open.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
 - `Models/Terminal/Tabs/Moving/`: dragging in the tab bar: a tab moves within its group, a split's two tabs together, and a group whole by its label; and where a dragged tab or group lands as the pointer moves.
+- `Models/Terminal/Closing/`: what closing a tab does when its CLI can keep running in tmux: ask each time, keep it running, or end it.
 - `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, and where a shown split's panes and the resize area between them sit.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
@@ -46,7 +48,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Tmux/`: tmux session names, and keeping a CLI running after its tab closes, on any host.
 - `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, finding each tab's CLI process, and keeping a failed CLI's output and exit status in its tab.
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
-- `Services/Terminal/Closing/`: waits for a closed tab's process to exit, so it leaves no zombie behind.
+- `Services/Terminal/Closing/`: waits for a closed tab's process to exit, so it leaves no zombie behind, and saves what closing a tab whose CLI can keep running does, chosen with Don't ask again in the close dialog or in General settings.
 - `Services/Terminal/FileDrop/`: files dropped on a tab on this Mac type their paths, each as its own paste, so Claude Code and Codex attach a dropped image. Tabs on SSH hosts take no drops, since the host can't open this Mac's files.
 - `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal.
 - `Services/Terminal/Appearance/ThemeReports/`: answers a program that asks whether the terminal is light or dark (`CSI ? 996 n`), and tells one that subscribes (`CSI ? 2031 h`), such as tmux, each time the terminal's colors change. SwiftTerm handles neither; on each report tmux reads the new background, so a CLI in tmux sees it.

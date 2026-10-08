@@ -25,6 +25,8 @@ make dev    # Package and open dist/JustSessions.app
 
 The first tmux build downloads checksum-verified upstream sources. See [build and release](docs/development/build-and-release.md) for dependencies, Gherkin scenarios, and packaging, and [source layout](docs/development/source-layout.md) for the feature folders. [Website development](docs/development/website.md) covers the product site.
 
+For SSH work, keep the app on your Mac and use a disposable local Ubuntu VM as the standard Linux target. [SSH development testing](docs/development/ssh-testing.md) gives the Multipass setup, shared `justsessions-test` alias, macOS target guidance, and manual checks. Record which host OS and providers you actually tested in the PR; automated tests alone do not establish live SSH coverage.
+
 Use descriptive names and small, focused files grouped by feature. Keep each pull request focused on one problem, preserve unrelated work, and include regression tests when they help verify a behavior change. Do not commit real session history, credentials, or generated build artifacts.
 
 For UI copy or translations, follow [interface localization](docs/development/localization.md). Edit `Localization/Localizable.xcstrings`, run `make localization`, and commit the catalog with its generated resources. Do not edit generated localization files directly.
