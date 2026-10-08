@@ -93,8 +93,8 @@ struct SessionNotificationSyncTests {
         let store = Self.makeStore(listing: [conversation], searching: directory, notifier: notifier)
         // Stands in for the CLI in a tmux session whose tab closed.
         let cli = Process()
-        cli.executableURL = URL(fileURLWithPath: "/bin/sleep")
-        cli.arguments = ["30"]
+        cli.executableURL = URL(fileURLWithPath: StandInCLI.executablePath)
+        cli.arguments = StandInCLI.arguments
         try cli.run()
         defer { if cli.isRunning { cli.terminate() } }
         let tmuxSessionName = TmuxSessionName.forConversation(conversation)
@@ -164,8 +164,8 @@ struct SessionNotificationSyncTests {
             action: .resume,
             displayTitle: conversation.suggestedTitle,
             command: NativeCLICommand(
-                executablePath: "/bin/sleep",
-                arguments: ["30"],
+                executablePath: StandInCLI.executablePath,
+                arguments: StandInCLI.arguments,
                 workingDirectory: conversation.projectPath,
                 environment: []
             )
