@@ -61,12 +61,13 @@ To copy terminal text, hold Shift while dragging to select it, then press ⌘C. 
 
 ## Notifications
 
-JustSessions posts a macOS notification when a Claude Code or Codex session on this Mac finishes its turn, or stops in the middle of one to wait on you, such as at a permission prompt. Click the notification to open the session: its tab, or a new tab that reattaches to its CLI in tmux.
+JustSessions posts a macOS notification when a Claude Code or Codex session on this Mac finishes its turn. Claude Code also notifies when it stops in the middle of a turn to wait on you, such as at a permission prompt. Click the notification to open the session: its tab, or a new tab that reattaches to its CLI in tmux.
 
 - Sessions running in tmux with no tab open notify too.
 - A session whose tab is selected while JustSessions is in front sends none; you already see it.
 - macOS asks for permission the first time there is something to notify about.
 - Turn either kind off in **Settings > General**. Banners, sounds, and Do Not Disturb follow **System Settings > Notifications**. **Settings > Permissions** shows whether macOS allows them.
+- Codex records only when a turn starts and ends, not when it waits for your approval, so it never sends the first kind. While it waits, its tab shows it still working.
 - SSH hosts, Antigravity CLI, Kiro CLI, OpenCode, and Pi don't report what their CLI is doing, so they send no notifications.
 
 ## SSH hosts

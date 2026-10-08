@@ -888,8 +888,8 @@
 	<string>网站 ↗</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。</string>
-	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
-	<string>支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
+	<key>Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open; Codex tells only when its turn finishes. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
+	<string>支持本机的 Claude Code 和 Codex，也支持在 tmux 中运行但未打开标签的会话；Codex 只在一轮结束时通知。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
 	<key>You</key>
 	<string>你</string>
 	<key>Your login shell, with no CLI</key>

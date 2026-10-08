@@ -19,7 +19,7 @@ struct NotificationSettingsSection: View {
                 set: { settingsStore.setNotifiesWhenTurnFinishes($0) }
             ))
             VStack(alignment: .leading, spacing: 6) {
-                Text("Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.")
+                Text("Works for Claude Code and Codex on this Mac, also while they run in tmux with no tab open; Codex tells only when its turn finishes. A session whose tab you are looking at sends none. Click a notification to open the session.")
                 if isTurnedOffInSystemSettings {
                     Text("Notifications for JustSessions are turned off in System Settings > Notifications.")
                         .foregroundStyle(ThemePalette.warning)
