@@ -1,5 +1,5 @@
 {
-  "originHash" : "bb820b13c9c4767aeba63c61863ac246d969c939311147856deb2dae270ee96e",
+  "originHash" : "2fb24c2f6457b02df6d3a5ef41477dddf9a7ed630641258810231fc2ecf6e8e9",
   "pins" : [
     {
       "identity" : "cucumberswift",
@@ -40,10 +40,10 @@
     {
       "identity" : "swiftterm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/migueldeicaza/SwiftTerm.git",
+      "location" : "https://github.com/yangzichao/SwiftTerm.git",
       "state" : {
-        "revision" : "dd2fb8ac5b861e7bf617c872895e338f38165648",
-        "version" : "1.15.0"
+        "revision" : "f5491a11368d5ea96b7ad36a04ad9b05cb6e7f38",
+        "version" : "1.15.0-justsessions.1"
       }
     }
   ],

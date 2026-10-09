@@ -8,7 +8,8 @@ let package = Package(
     products: [.executable(name: "JustSessions", targets: ["JustSessions"])],
     dependencies: [
         .package(url: "https://github.com/sparkle-project/Sparkle.git", exact: "2.10.0"),
-        .package(url: "https://github.com/migueldeicaza/SwiftTerm.git", exact: "1.15.0"),
+        // SwiftTerm 1.15.0 plus `minimumContrastRatio`; see docs/development/build-and-release.md#swiftterm-fork.
+        .package(url: "https://github.com/yangzichao/SwiftTerm.git", exact: "1.15.0-justsessions.1"),
         .package(url: "https://github.com/cucumberswift/CucumberSwift.git", exact: "6.3.0"),
     ],
     targets: [
