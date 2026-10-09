@@ -10,6 +10,9 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     var sendsShiftReturnAsCSIu = false
     /// Called after the terminal's colors are set, so the margin around it can match its background.
     var onBackgroundColorChange: (() -> Void)?
+    /// Called when the terminal's colors turn from light to dark or back while no program in it subscribes to theme
+    /// changes, as tmux before 3.6 does not; see `ConversationStore+RemoteTmuxColors`.
+    var onUnheardLightDarkChange: (() -> Void)?
     /// Called when a click lands on the terminal or its margin, or files are dropped on it, before the terminal takes
     /// the keyboard, so a split pane whose tab is not selected can select it.
     var onFocus: (() -> Void)?
@@ -54,6 +57,18 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     /// Goes out as SwiftTerm's own replies do: unlike typing, it leaves the scroll position and selection alone.
     private func sendTerminalReport(_ report: String) {
         getTerminal().sendResponse(text: report)
+    }
+
+    var reportsThemeAfterNextBackgroundQuery: Bool { themeReporting.reportsAfterNextBackgroundQuery }
+
+    /// Reports the current theme once the terminal has answered the next background query, even though no program
+    /// subscribes to theme changes.
+    func reportThemeAfterNextBackgroundQuery() {
+        themeReporting.reportAfterNextBackgroundQuery()
+    }
+
+    func cancelThemeReportAfterNextBackgroundQuery() {
+        themeReporting.cancelReportAfterNextBackgroundQuery()
     }
 
     override func setFrameSize(_ newSize: NSSize) {
@@ -116,7 +131,12 @@ final class SelectableTerminalView: LocalProcessTerminalView {
         let palette = TerminalAppearanceStyling.apply(appearancePreferences, theme: theme, to: self)
         onBackgroundColorChange?()
         guard palette != appliedPalette else { return }
+        let previousPalette = appliedPalette
         appliedPalette = palette
-        if let report = themeReporting.reportAfterColorChange(isDark: palette.isDark) { sendTerminalReport(report) }
+        if let report = themeReporting.reportAfterColorChange(isDark: palette.isDark) {
+            sendTerminalReport(report)
+        } else if let previousPalette, previousPalette.isDark != palette.isDark {
+            onUnheardLightDarkChange?()
+        }
     }
 }
