@@ -67,7 +67,10 @@ struct WorkspaceDetailView: View {
                             isShown: isShown,
                             isActive: isActive,
                             onReconnect: session.host == .thisMac ? nil : { store.reconnectRemoteTerminal(session.id) },
-                            onFocus: { store.selectTerminal(session.id) }
+                            onFocus: { store.selectTerminal(session.id) },
+                            makeContextMenu: {
+                                TerminalContextMenu(store: store, tab: session, onRename: onRename, onCloseTab: onCloseTerminal).makeMenu()
+                            }
                         )
                         // A split's terminal keeps its place inside the pane's outline, above the mini toolbar, while
                         // another tab shows too, so selecting another tab resizes no terminal.

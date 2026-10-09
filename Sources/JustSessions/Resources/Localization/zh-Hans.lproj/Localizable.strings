@@ -628,6 +628,8 @@
 	<string>整理</string>
 	<key>Passwordless SSH from this Mac</key>
 	<string>从这台 Mac 免密码 SSH 登录</string>
+	<key>Paste</key>
+	<string>粘贴</string>
 	<key>Path on the host, such as ~/code/app</key>
 	<string>主机上的路径，例如 ~/code/app</string>
 	<key>Permissions</key>
@@ -786,6 +788,8 @@
 	<string>正在搜索消息… %1$lld / %2$lld</string>
 	<key>Searching…</key>
 	<string>正在搜索…</string>
+	<key>Select All</key>
+	<string>全选</string>
 	<key>Select a range</key>
 	<string>选择一个范围</string>
 	<key>Select several sessions or projects</key>

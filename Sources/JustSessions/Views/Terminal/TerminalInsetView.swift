@@ -47,4 +47,9 @@ final class TerminalInsetView: NSView {
         terminalView.onFocus?()
         window?.makeFirstResponder(terminalView)
     }
+
+    /// So does a right-click there, which shows the terminal's menu.
+    override func menu(for event: NSEvent) -> NSMenu? {
+        terminalView.menu(for: event)
+    }
 }

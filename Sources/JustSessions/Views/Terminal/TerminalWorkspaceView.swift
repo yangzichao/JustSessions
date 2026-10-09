@@ -13,6 +13,8 @@ struct TerminalWorkspaceView: View {
     let onReconnect: (() -> Void)?
     /// Called when a click lands on the terminal, before it takes the keyboard.
     let onFocus: () -> Void
+    /// Builds the menu a right-click on the terminal shows.
+    let makeContextMenu: () -> NSMenu
 
     var body: some View {
         VStack(spacing: 0) {
@@ -20,7 +22,13 @@ struct TerminalWorkspaceView: View {
                 TerminalEndedBar(exitCode: session.exitCode, onReconnect: onReconnect.map { reconnect in { onFocus(); reconnect() } })
                 ThemeDivider()
             }
-            EmbeddedTerminalView(session: session, isShown: isShown, isActive: isActive, onFocus: onFocus)
+            EmbeddedTerminalView(
+                session: session,
+                isShown: isShown,
+                isActive: isActive,
+                onFocus: onFocus,
+                makeContextMenu: makeContextMenu
+            )
                 .id(session.id)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
