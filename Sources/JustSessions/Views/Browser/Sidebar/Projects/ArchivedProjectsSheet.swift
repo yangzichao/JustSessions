@@ -13,11 +13,14 @@ struct ArchivedProjectsSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Archived projects on \(host.nameInSentence)").font(.title3.weight(.semibold))
-            Text("An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.")
-                .font(.callout)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("Archived projects on \(host.nameInSentence)").font(.title3.weight(.semibold))
+                HelpPopoverButton(
+                    title: "Archived projects",
+                    explanation: "An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it."
+                )
+                .accessibilityIdentifier("archivedProjects.help")
+            }
 
             if archivedProjectPaths.isEmpty {
                 Text("No archived projects")

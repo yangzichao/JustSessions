@@ -66,7 +66,7 @@ struct ContentView: View {
                 renamingProject = nil
             }
         } message: {
-            Text("This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (\(renamingProject?.folderName ?? "")).")
+            Text("Only renames it in JustSessions. Leave empty to use the folder name (\(renamingProject?.folderName ?? "")).")
         }
         .dismissesOnClickOutside(item: $renamingProject)
         .sessionDeletionDialog(for: $deletionRequest, store: store)

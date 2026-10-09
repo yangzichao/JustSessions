@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Supplementary settings copy, opened explicitly so it stays readable until dismissed.
-struct SettingsHelpButton: View {
+/// Supplementary copy beside a heading or control, opened explicitly so it stays readable until dismissed.
+struct HelpPopoverButton: View {
     let title: LocalizedStringKey
     let explanation: LocalizedStringKey
     @Environment(\.locale) private var locale

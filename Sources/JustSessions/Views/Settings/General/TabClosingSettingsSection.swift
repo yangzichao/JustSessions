@@ -10,7 +10,7 @@ struct TabClosingSettingsSection: View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("Closing tabs")
                     .font(.subheadline.weight(.medium))
-                SettingsHelpButton(
+                HelpPopoverButton(
                     title: "Closing tabs",
                     explanation: "For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too."
                 )

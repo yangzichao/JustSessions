@@ -14,7 +14,7 @@ struct AboutLinksRow: View {
                 Link("Report an issue ↗", destination: FeedbackLinks.gitHubIssueURL(for: environment))
                     .help("Open a new issue on GitHub")
                     .accessibilityIdentifier("settings.reportIssue")
-                SettingsHelpButton(
+                HelpPopoverButton(
                     title: "Feedback",
                     explanation: "Feedback and issues start with these versions filled in."
                 )

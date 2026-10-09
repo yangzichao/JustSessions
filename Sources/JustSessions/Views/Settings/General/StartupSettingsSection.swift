@@ -16,7 +16,7 @@ struct StartupSettingsSection: View {
                     get: { tabReopeningSettingsStore.reopensTabsAtLaunch },
                     set: { tabReopeningSettingsStore.setReopensTabsAtLaunch($0) }
                 ))
-                SettingsHelpButton(
+                HelpPopoverButton(
                     title: "Reopening tabs",
                     explanation: "A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder."
                 )
