@@ -21,8 +21,12 @@ struct NewSessionStartCommandSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Start command")
-                .font(.subheadline.weight(.medium))
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("Start command")
+                    .font(.subheadline.weight(.medium))
+                HelpPopoverButton(title: "Start command", explanation: startCommandExplanation)
+                    .accessibilityIdentifier("newSession.help.startCommand")
+            }
             HStack(spacing: 8) {
                 if let editedCommand {
                     editingField
@@ -62,16 +66,14 @@ struct NewSessionStartCommandSection: View {
                     .foregroundStyle(ThemePalette.errorText)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Group {
-                if host == .thisMac {
-                    Text("Also resumes \(provider.rawValue) sessions on this Mac. JustSessions adds its own arguments after it.")
-                } else {
-                    Text("Also resumes \(provider.rawValue) sessions on \(host.displayName). JustSessions adds its own arguments after it.")
-                }
-            }
-            .font(.callout)
-            .foregroundStyle(ThemePalette.secondaryText)
-            .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var startCommandExplanation: LocalizedStringKey {
+        if host == .thisMac {
+            "Also resumes \(provider.rawValue) sessions on this Mac. JustSessions adds its own arguments after it."
+        } else {
+            "Also resumes \(provider.rawValue) sessions on \(host.displayName). JustSessions adds its own arguments after it."
         }
     }
 

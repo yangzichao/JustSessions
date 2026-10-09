@@ -867,6 +867,16 @@
         }
       }
     },
+    "Archived projects": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档的项目"
+          }
+        }
+      }
+    },
     "Archived projects (%lld)…": {
       "localizations": {
         "zh-Hans": {
@@ -2857,6 +2867,16 @@
         }
       }
     },
+    "Nerd Font icons": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nerd Font 图标"
+          }
+        }
+      }
+    },
     "New": {
       "localizations": {
         "zh-Hans": {
@@ -3219,6 +3239,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Claude Code、Codex 或其他支持的 CLI 保存对话后，它会按项目出现在这里。"
+          }
+        }
+      }
+    },
+    "Only renames it in JustSessions. Leave empty to use the folder name (%@).": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅在 JustSessions 中重命名。留空可使用文件夹名称（%@）。"
           }
         }
       }
@@ -4857,6 +4887,16 @@
         }
       }
     },
+    "Terminal colors": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "终端配色"
+          }
+        }
+      }
+    },
     "The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.": {
       "localizations": {
         "zh-Hans": {
@@ -5099,16 +5139,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "仅修改 JustSessions 中的显示名称。"
-          }
-        }
-      }
-    },
-    "This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "修改 JustSessions 中的显示名称，文件夹保持原样。留空可使用文件夹名称（%@）。"
           }
         }
       }

@@ -12,7 +12,7 @@ struct PermissionsSettingsView: View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("Permissions")
                     .font(.subheadline.weight(.medium))
-                SettingsHelpButton(
+                HelpPopoverButton(
                     title: "Permissions",
                     explanation: "macOS asks for these on behalf of JustSessions, also when a CLI in one of its terminals needs one. Checking here never shows a prompt."
                 )

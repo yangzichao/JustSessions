@@ -18,7 +18,7 @@ struct PermissionRow: View {
                         .font(.caption)
                         .foregroundStyle(ThemePalette.secondaryText)
                 }
-                SettingsHelpButton(title: permission.title, explanation: permission.explanation)
+                HelpPopoverButton(title: permission.title, explanation: permission.explanation)
                     .accessibilityIdentifier("settings.help.permission.\(permission.id)")
                 Spacer(minLength: 12)
                 if let status {

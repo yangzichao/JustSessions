@@ -34,6 +34,12 @@ struct TerminalColorSchemePicker: View {
                         importError = error
                     }
                 }
+
+                HelpPopoverButton(
+                    title: "Terminal colors",
+                    explanation: "Applies immediately to all terminals. Some CLI apps use their own colors."
+                )
+                .accessibilityIdentifier("settings.help.terminalColors")
             }
             if let importError {
                 Text(importError.localizedMessage)

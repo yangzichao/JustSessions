@@ -105,6 +105,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
 - `Views/Settings/Help/`: the Help page, one `HelpSection` each: the tour and user guide, how each part of the window works, SSH setup, what to check when a session is missing, and the keyboard shortcut list (`Shortcuts/`). `Models/App/AppLinks.swift` holds the destinations of Help and About.
+- `Views/HelpPopover/`: the ? beside a heading or control that opens its explanation in a popover, in Settings, the New session sheet, and the archived projects sheet.
 - `Views/Theme/`: the chosen theme's colors, and button styles. Views draw text in `ThemePalette`'s text colors, not the system's `.secondary` or `.tertiary`, which a contract test checks.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 

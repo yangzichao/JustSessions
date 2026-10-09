@@ -162,6 +162,8 @@
 	<string>Archive the selected projects and delete their sessions, except those with open terminals</string>
 	<key>Archive the selected projects; keep sessions and open terminals</key>
 	<string>Archive the selected projects; keep sessions and open terminals</string>
+	<key>Archived projects</key>
+	<string>Archived projects</string>
 	<key>Archived projects (%lld)…</key>
 	<string>Archived projects (%lld)…</string>
 	<key>Archived projects on %@</key>
@@ -532,6 +534,8 @@
 	<string>Name</string>
 	<key>Needs my input, such as a permission prompt (not Codex)</key>
 	<string>Needs my input, such as a permission prompt (not Codex)</string>
+	<key>Nerd Font icons</key>
+	<string>Nerd Font icons</string>
 	<key>New</key>
 	<string>New</string>
 	<key>New Session…</key>
@@ -602,6 +606,8 @@
 	<string>On an SSH host, check passwordless SSH, rsync, and the CLI there. A host at a local address also needs **Local Network** in Permissions.</string>
 	<key>Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.</key>
 	<string>Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.</string>
+	<key>Only renames it in JustSessions. Leave empty to use the folder name (%@).</key>
+	<string>Only renames it in JustSessions. Leave empty to use the folder name (%@).</string>
 	<key>Open Login Items Settings</key>
 	<string>Open Login Items Settings</string>
 	<key>Open System Settings</key>
@@ -908,6 +914,8 @@
 	<string>Terminal</string>
 	<key>Terminal appearance preview</key>
 	<string>Terminal appearance preview</string>
+	<key>Terminal colors</key>
+	<string>Terminal colors</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
 	<string>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</string>
 	<key>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</key>
@@ -954,8 +962,6 @@
 	<string>This also deletes 1 subagent session.</string>
 	<key>This changes the display name in JustSessions.</key>
 	<string>This changes the display name in JustSessions.</string>
-	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>
-	<string>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</string>
 	<key>This file isn't an iTerm2 color preset.</key>
 	<string>This file isn't an iTerm2 color preset.</string>
 	<key>This session is open in another window.</key>

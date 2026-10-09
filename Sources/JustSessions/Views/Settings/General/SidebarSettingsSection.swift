@@ -12,7 +12,7 @@ struct SidebarSettingsSection: View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Toggle("Show subagents under the sessions that started them", isOn: $showsSubagents)
                     .accessibilityIdentifier("settings.showsSubagents")
-                SettingsHelpButton(
+                HelpPopoverButton(
                     title: "Subagents",
                     explanation: "A session whose subagents ran sessions of their own gets a chevron before its icon. Click it to list them under the session and read them. Kiro's aren't listed; on SSH hosts, only Codex's and Antigravity's are."
                 )

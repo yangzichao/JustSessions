@@ -11,7 +11,7 @@ struct NotificationSettingsSection: View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("Notify me when a session")
                     .font(.subheadline.weight(.medium))
-                SettingsHelpButton(
+                HelpPopoverButton(
                     title: "Notifications",
                     explanation: "Supports local Claude Code, Codex, Pi, and OpenCode, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session."
                 )

@@ -156,6 +156,8 @@
 	<string>归档所选项目并删除其会话，已打开终端的会话除外</string>
 	<key>Archive the selected projects; keep sessions and open terminals</key>
 	<string>归档所选项目；保留会话和已打开的终端</string>
+	<key>Archived projects</key>
+	<string>已归档的项目</string>
 	<key>Archived projects (%lld)…</key>
 	<string>已归档的项目（%lld）…</string>
 	<key>Archived projects on %@</key>
@@ -530,6 +532,8 @@
 	<string>名称</string>
 	<key>Needs my input, such as a permission prompt (not Codex)</key>
 	<string>需要我的输入，例如权限确认（Codex 除外）</string>
+	<key>Nerd Font icons</key>
+	<string>Nerd Font 图标</string>
 	<key>New</key>
 	<string>新增</string>
 	<key>New Session…</key>
@@ -602,6 +606,8 @@
 	<string>对于 SSH 主机，检查免密码 SSH、rsync 以及主机上的 CLI。位于本地地址的主机还需要在权限中开启 **本地网络**。</string>
 	<key>Once Claude Code, Codex, or another supported CLI saves a conversation, it shows up here, grouped by project.</key>
 	<string>Claude Code、Codex 或其他支持的 CLI 保存对话后，它会按项目出现在这里。</string>
+	<key>Only renames it in JustSessions. Leave empty to use the folder name (%@).</key>
+	<string>仅在 JustSessions 中重命名。留空可使用文件夹名称（%@）。</string>
 	<key>Open Login Items Settings</key>
 	<string>打开登录项设置</string>
 	<key>Open System Settings</key>
@@ -918,6 +924,8 @@
 	<string>终端</string>
 	<key>Terminal appearance preview</key>
 	<string>终端外观预览</string>
+	<key>Terminal colors</key>
+	<string>终端配色</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
 	<string>Antigravity 会话数据库、关联文件夹和注释将移到 macOS 废纸篓，并从 Antigravity 本地索引中移除。</string>
 	<key>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</key>
@@ -966,8 +974,6 @@
 	<string>同时会删除 1 个子代理会话。</string>
 	<key>This changes the display name in JustSessions.</key>
 	<string>仅修改 JustSessions 中的显示名称。</string>
-	<key>This changes the display name in JustSessions. The folder stays the same. Leave empty to use the folder name (%@).</key>
-	<string>修改 JustSessions 中的显示名称，文件夹保持原样。留空可使用文件夹名称（%@）。</string>
 	<key>This file isn't an iTerm2 color preset.</key>
 	<string>此文件不是 iTerm2 配色预设。</string>
 	<key>This session is open in another window.</key>

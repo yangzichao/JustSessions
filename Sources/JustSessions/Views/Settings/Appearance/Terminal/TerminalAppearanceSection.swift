@@ -55,19 +55,13 @@ struct TerminalAppearanceSection: View {
         }
         GridRow(alignment: .top) {
             Text("Preview")
-            VStack(alignment: .leading, spacing: 6) {
-                TerminalAppearancePreview(appearanceStore: appearanceStore, themeStore: themeStore)
-                    // A fixed height, so a bigger font shows fewer lines instead of making the tab taller.
-                    .frame(height: 130)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(ThemePalette.hairline))
-                    .allowsHitTesting(false)
-                    .accessibilityLabel("Terminal appearance preview")
-                Text("Applies immediately to all terminals. Some CLI apps use their own colors.")
-                    .font(.caption)
-                    .foregroundStyle(ThemePalette.secondaryText)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            TerminalAppearancePreview(appearanceStore: appearanceStore, themeStore: themeStore)
+                // A fixed height, so a bigger font shows fewer lines instead of making the tab taller.
+                .frame(height: 130)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(ThemePalette.hairline))
+                .allowsHitTesting(false)
+                .accessibilityLabel("Terminal appearance preview")
         }
     }
 }
