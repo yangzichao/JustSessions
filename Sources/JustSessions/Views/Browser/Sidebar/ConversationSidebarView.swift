@@ -200,6 +200,7 @@ struct ConversationSidebarView: View {
         SidebarHostHeading(
             host: section.host,
             refreshStatus: store.hostRefreshStatuses[section.host],
+            copyStep: store.remoteSessionCopySteps[section.host],
             projectCount: section.projects.count,
             onAddProject: { addProject(on: section.host) },
             onRefresh: { store.refresh(section.host) },

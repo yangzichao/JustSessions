@@ -6,10 +6,13 @@ import SwiftUI
 /// count gives way to a +, and an SSH host's refresh status to a ⋯. The + adds a project there, or
 /// restores an archived one; the ⋯ holds the host's own settings, and a right-click opens all the heading's actions.
 /// New sessions start from a project's own +, so the heading manages the host's projects instead. Its refresh button
-/// refreshes this host alone, and shows its progress.
+/// refreshes this host alone, and shows its progress. While an SSH host's refresh copies its sessions, the refresh status
+/// says how far it is through the tools, and the tooltip which tool it is copying.
 struct SidebarHostHeading: View {
     let host: SessionHost
     let refreshStatus: HostRefreshStatus?
+    /// Nil unless an SSH host's refresh is copying its sessions.
+    let copyStep: RemoteSessionCopyStep?
     let projectCount: Int
     let onAddProject: () -> Void
     let onRefresh: () -> Void
@@ -91,7 +94,18 @@ struct SidebarHostHeading: View {
     @ViewBuilder
     private var refreshStatusIndicator: some View {
         switch refreshStatus {
-        case .refreshing?, .failed?:
+        case .refreshing?:
+            if let copyStep {
+                Text(verbatim: "\(copyStep.number)/\(copyStep.count)")
+                    .font(.system(size: 10))
+                    .monospacedDigit()
+                    .foregroundStyle(ThemePalette.tertiaryText)
+                    .fixedSize()
+                    .accessibilityLabel(Text(
+                        "Copying \(copyStep.provider.rawValue) sessions (\(copyStep.number) of \(copyStep.count))…"
+                    ))
+            }
+        case .failed?:
             EmptyView()
         case .refreshed(let syncDate)?:
             // This Mac's files are read in place; only an SSH host's copy can be behind.
@@ -130,7 +144,9 @@ struct SidebarHostHeading: View {
             ? "Sessions on this Mac"
             : "Sessions on \(host.displayName), copied over SSH"
         switch refreshStatus {
-        case .refreshing?: return "\(summary). Refreshing…"
+        case .refreshing?:
+            guard let copyStep else { return "\(summary). Refreshing…" }
+            return "\(summary). Copying \(copyStep.provider.rawValue) sessions (\(copyStep.number) of \(copyStep.count))…"
         case .failed(let message)?: return "\(summary). \(message)"
         case .refreshed(let date)?: return "\(summary). Refreshed at \(date.formatted(date: .omitted, time: .shortened))."
         case nil: return summary

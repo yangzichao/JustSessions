@@ -34,7 +34,7 @@ struct RemoteSessionMirror: Sendable {
         try? FileManager.default.removeItem(at: cacheRoot.appendingPathComponent(Self.directoryName(forHost: host)))
     }
 
-    private func synchronize(host: String, provider: ConversationProvider) throws {
+    func synchronize(host: String, provider: ConversationProvider) throws {
         let destination = mirrorDirectory(host: host, provider: provider)
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
         if provider == .antigravity {

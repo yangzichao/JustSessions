@@ -1586,6 +1586,16 @@
         }
       }
     },
+    "Copying %@ sessions (%lld of %lld)…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在复制 %@ 会话（%lld/%lld）…"
+          }
+        }
+      }
+    },
     "Copying sessions…": {
       "localizations": {
         "zh-Hans": {
