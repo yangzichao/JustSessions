@@ -3,6 +3,11 @@ import SwiftTerm
 
 @MainActor
 enum TerminalAppearanceStyling {
+    /// WCAG's minimum for body text, and VS Code's terminal default. A CLI picks its colors for a light or a dark
+    /// background, and keeps them after the theme changes until it redraws, which a CLI on an SSH host may never do.
+    /// The terminal darkens or lightens such text just enough to keep it readable.
+    static let minimumContrastRatio: CGFloat = 4.5
+
     /// Returns the palette the terminal took on.
     @discardableResult
     static func apply(_ preferences: TerminalAppearancePreferences, theme: AppTheme, to terminalView: TerminalView) -> TerminalPalette {
@@ -20,6 +25,7 @@ enum TerminalAppearanceStyling {
         terminalView.caretColor = NSColor(hexValue: scheme.foreground)
         terminalView.caretTextColor = NSColor(hexValue: palette.background)
         terminalView.installColors(scheme.ansiColors)
+        terminalView.minimumContrastRatio = minimumContrastRatio
         terminalView.layer?.backgroundColor = terminalView.nativeBackgroundColor.cgColor
         terminalView.needsDisplay = true
         return palette

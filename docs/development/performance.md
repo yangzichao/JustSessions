@@ -105,10 +105,10 @@ Every selectable block is a `SelectionTextField` in a host view. Of the window's
 
 ### 6. Terminal drawing: SwiftTerm upgrade, then Metal
 
-**Evidence:** this is the largest steady cost: 43% of the main thread's busy time over the whole recording, and up to a fifth of a core while new output took about 1%. When a change reaches the bottom row, SwiftTerm repaints from the changed rows down to the bottom of the view. TUI status lines and spinners do that constantly. The app uses SwiftTerm 1.15.0 with CPU drawing.
+**Evidence:** this is the largest steady cost: 43% of the main thread's busy time over the whole recording, and up to a fifth of a core while new output took about 1%. When a change reaches the bottom row, SwiftTerm repaints from the changed rows down to the bottom of the view. TUI status lines and spinners do that constantly. The app uses SwiftTerm 1.15.0, through its [fork](build-and-release.md#swiftterm-fork), with CPU drawing.
 
 **Plan:**
-1. Upgrade to SwiftTerm 1.20.0. Version 1.16.0 notes improved baseline performance, and 1.20.0 is the last release before breaking changes.
+1. Upgrade to SwiftTerm 1.20.0 by rebasing the fork onto it. Version 1.16.0 notes improved baseline performance, and 1.20.0 is the last release before breaking changes.
 2. Then try `setUseMetal(true)`. The Metal renderer caches each row and rebuilds only changed rows.
 3. Check visually: selection, insets, transparency, the cursor, and the app's own drawing.
 

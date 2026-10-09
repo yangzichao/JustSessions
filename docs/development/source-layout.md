@@ -53,7 +53,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Terminal/`: active pseudo-terminal sessions and process lifecycle.
 - `Services/Terminal/Closing/`: waits for a closed tab's process to exit, so it leaves no zombie behind, and saves what closing a tab whose CLI can keep running does, chosen with Don't ask again in the close dialog or in General settings.
 - `Services/Terminal/FileDrop/`: files dropped on a tab on this Mac type their paths, each as its own paste, so Claude Code and Codex attach a dropped image. Tabs on SSH hosts take no drops, since the host can't open this Mac's files.
-- `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal.
+- `Services/Terminal/Appearance/`: saves terminal colors, font, and size, and applies them with the theme's colors to every terminal, with a minimum contrast that keeps text readable when a CLI colored it for the other background.
 - `Services/Terminal/Appearance/ThemeReports/`: answers a program that asks whether the terminal is light or dark (`CSI ? 996 n`), and tells one that subscribes (`CSI ? 2031 h`), such as tmux, each time the terminal's colors change. SwiftTerm handles neither; on each report tmux reads the new background, so a CLI in tmux sees it.
 - `Services/Terminal/Appearance/Import/`: reads colors from iTerm2's default profile or an `.itermcolors` file, only when asked.
 - `Services/Terminal/NewSessionDiscovery/`: finds the session a new tab's CLI is writing and links the tab to it.
