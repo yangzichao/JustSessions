@@ -5,7 +5,7 @@ struct ProjectConversationGroup: Identifiable {
     let displayName: String
     let isPinned: Bool
     let conversations: [Conversation]
-    /// Newest first; listed above the conversations.
+    /// Newest first; listed below pinned sessions and above the other sessions.
     let pendingNewSessions: [PendingNewSession]
     /// Pinned sessions come first, so the newest one is not necessarily `conversations.first`. Stored, not worked
     /// out on each read: `orderedForSidebar` reads it on every comparison of a sort that runs on every render.
