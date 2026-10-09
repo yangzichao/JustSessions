@@ -62,8 +62,8 @@ struct RemoteSessionMirror: Sendable {
             // The tool was never used on this host.
             try? FileManager.default.removeItem(at: destination)
         case RemoteHostCommandRunner.connectionFailureExitStatus:
-            // rsync passes on the exit status of the `ssh` it runs.
-            throw RemoteSessionMirrorError.sshFailed(host: host)
+            // rsync passes on the exit status of the `ssh` it runs, and prints what `ssh` printed.
+            throw RemoteSessionMirrorError.sshFailed(host: host, problem: SSHConnectionProblem(sshOutput: result.output))
         case _ where result.output.contains("rsync: command not found") || result.output.contains("rsync: not found"):
             throw RemoteSessionMirrorError.rsyncMissingOnHost(host: host)
         default:
@@ -87,7 +87,9 @@ struct RemoteSessionMirror: Sendable {
     }
 
     /// The `ssh` command `rsync` connects with; none of the options has a space, so joining them needs no quoting.
-    static let rsyncRemoteShell = (["ssh"] + RemoteHostCommandRunner.nonInteractiveSSHOptions).joined(separator: " ")
+    static let rsyncRemoteShell = (
+        ["ssh", RemoteHostCommandRunner.noTerminalOption] + RemoteHostCommandRunner.nonInteractiveSSHOptions
+    ).joined(separator: " ")
 
     /// Only the files the adapters read; Claude Code's subagent transcripts and caches stay on the host, and so do
     /// the subagent runs, forks, and artifacts Pi extensions keep in folders inside a Pi project folder. OpenCode's

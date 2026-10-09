@@ -44,6 +44,8 @@ struct RemoteCLICommandBuilder {
                 "-t",
                 // Notice a dead connection within a minute, so the tab ends and offers to reconnect.
                 "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4",
+                // With a `RemoteCommand` in `~/.ssh/config`, `ssh` would refuse to run the tab's command.
+                "-o", "RemoteCommand=none",
                 host,
                 remoteCommand,
             ],

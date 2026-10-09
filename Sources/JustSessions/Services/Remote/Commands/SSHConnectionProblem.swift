@@ -41,6 +41,11 @@ enum SSHConnectionProblem: Hashable, Sendable {
             .problem ?? .other(sshMessage: sshMessage)
     }
 
+    /// Classifies all that `ssh` printed, or `rsync` with the `ssh` it ran, by the line `tellingLine(inOutput:)` picks.
+    init(sshOutput output: String) {
+        self.init(sshMessage: Self.tellingLine(inOutput: output) ?? "ssh exited without saying why.")
+    }
+
     /// Lines at the end of the output searched for a known problem. `ssh` can print a little after the cause, such
     /// as "Disconnected from …" after "Too many authentication failures"; earlier lines are more likely the remote
     /// command's own output.

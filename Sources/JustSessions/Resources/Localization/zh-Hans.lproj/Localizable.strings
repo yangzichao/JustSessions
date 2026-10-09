@@ -86,6 +86,8 @@
 	<string>在此 Mac 上添加项目文件夹，或恢复已归档的项目</string>
 	<key>Add a server you reach with passwordless SSH to browse and resume its sessions here.</key>
 	<string>添加一台可通过免密 SSH 连接的服务器，就能在这里浏览并继续它上面的会话。</string>
+	<key>Add anyway</key>
+	<string>仍然添加</string>
 	<key>Add host</key>
 	<string>添加主机</string>
 	<key>Add or restore a project on %@</key>
@@ -266,6 +268,8 @@
 	<string>配色</string>
 	<key>Connect again; a CLI still running in tmux on the host is reattached</key>
 	<string>重新连接；仍在主机 tmux 中运行的 CLI 会重新接入</string>
+	<key>Connecting to %@…</key>
+	<string>正在连接 %@…</string>
 	<key>Copied</key>
 	<string>已复制</string>
 	<key>Copies the colors once. JustSessions doesn't read iTerm2's settings again.</key>
