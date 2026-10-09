@@ -15,6 +15,14 @@ enum RemoteTmuxCommands {
         RemoteCLICommandBuilder.loginShellCommand("tmux has-session -t \(ShellQuoting.quoted("=" + name)) 2>/dev/null")
     }
 
+    /// Replaces each client attached to the session with a new client in the same terminal, which tmux asks for the
+    /// terminal's colors as it attaches. The session and its CLI run on. Exits with 0 once the clients have detached.
+    static func reattachClientsCommand(_ name: String) -> String {
+        let target = ShellQuoting.quoted("=" + name)
+        let attach = "exec tmux attach-session -t \(target)"
+        return RemoteCLICommandBuilder.loginShellCommand("tmux detach-client -s \(target) -E \(ShellQuoting.quoted(attach))")
+    }
+
     static func killSessionCommand(_ name: String) -> String {
         RemoteCLICommandBuilder.loginShellCommand(
             "tmux kill-session -t \(ShellQuoting.quoted(name)) 2>/dev/null; true"

@@ -550,6 +550,7 @@ final class ConversationStore: ObservableObject {
         defer { persistOpenTabs() }
         let replacedID = terminalSessions[index].id
         terminalSessions[index].close()
+        followLightDarkChanges(of: session)
         terminalSessions[index] = session
         if terminalSplits.contains(where: { $0.contains(replacedID) }) {
             terminalSplits = terminalSplits.map { $0.replacing(replacedID, with: session.id) }
@@ -561,6 +562,7 @@ final class ConversationStore: ObservableObject {
     func openTerminal(_ session: TerminalSession) {
         defer { persistOpenTabs() }
         showProjectInSidebar(session.projectDirectoryKey)
+        followLightDarkChanges(of: session)
         terminalSessions.insert(session, at: tabStrip.insertionIndex(forNewTabOfProject: session.projectDirectoryKey))
         selectedTerminalID = session.id
     }
@@ -572,6 +574,7 @@ final class ConversationStore: ObservableObject {
         defer { persistOpenTabs() }
         showProjectInSidebar(session.projectDirectoryKey)
         let index = tabStrip.insertionIndex(forReopenedTabOfProject: session.projectDirectoryKey, at: index)
+        followLightDarkChanges(of: session)
         terminalSessions.insert(session, at: index)
         if selecting { selectedTerminalID = session.id }
     }

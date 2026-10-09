@@ -95,6 +95,7 @@ Run the checks relevant to the change and record the result of each:
 | Launch and resume | New sessions and resumed sessions run in the VM's project, including its space-containing path. Branch only where the provider supports it. |
 | Keep running and reconnect | Close a running CLI tab with **Keep running**, then reattach to the same process and session. Also test interruption of just the SSH connection when changing reconnect behavior. Keep the VM running throughout. |
 | Plain terminal | A terminal opens in the remote project and closing its tab ends that shell, as described in the user guide. |
+| Light/dark switch | With a Claude Code tab open on the VM, whose tmux 3.4 predates theme reports, switch the app between a light and a dark theme. The tab's text keeps a readable contrast at once, and Claude Code redraws its screen in the new colors about 2 seconds later. Scrollback above the screen keeps the old colors. |
 | Deletion | Delete a disposable session and verify it disappears both on the VM and after refresh. Exercise batch deletion, cancel, and retry when those paths change. |
 | Unavailable host | After finishing the persistence check, stop the VM and refresh. Verify the failure is reported, then start the VM, check its IP, and verify recovery. |
 
