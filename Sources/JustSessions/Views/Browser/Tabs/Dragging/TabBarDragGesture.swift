@@ -5,8 +5,12 @@ extension View {
     /// points, the drag takes over from the buttons inside, so letting go neither selects nor closes a tab, nor
     /// collapses a group, while a click still does. `onEnded` comes when the drag ends, or when it is cancelled, so a
     /// drag never stays half done. The drag moves the tab or group, not the window, though the bar is in the title bar.
-    /// The drag continues wherever the pointer goes, even off the bar.
-    func tabBarDrag(onChanged: @escaping (_ translation: CGFloat) -> Void, onEnded: @escaping () -> Void) -> some View {
+    /// The drag continues wherever the pointer goes, even off the bar. `startLocation` is where it started in the
+    /// window, from the window's top-leading corner.
+    func tabBarDrag(
+        onChanged: @escaping (_ translation: CGFloat, _ startLocation: CGPoint) -> Void,
+        onEnded: @escaping () -> Void
+    ) -> some View {
         modifier(TabBarDragGesture(onChanged: onChanged, onEnded: onEnded))
     }
 }
@@ -19,7 +23,7 @@ enum TabBarDragMetrics {
 }
 
 private struct TabBarDragGesture: ViewModifier {
-    let onChanged: (CGFloat) -> Void
+    let onChanged: (CGFloat, CGPoint) -> Void
     let onEnded: () -> Void
 
     /// SwiftUI resets it as the drag ends, whether let go or cancelled; a gesture's own `onEnded` misses a cancel.
@@ -32,7 +36,7 @@ private struct TabBarDragGesture: ViewModifier {
                 // Measured in the window, since the view it moves is the one it is on.
                 DragGesture(minimumDistance: TabBarDragMetrics.minimumDistance, coordinateSpace: .global)
                     .updating($isDragging) { _, isDragging, _ in isDragging = true }
-                    .onChanged { onChanged($0.translation.width) }
+                    .onChanged { onChanged($0.translation.width, $0.startLocation) }
             )
             .onChange(of: isDragging) { _, isDragging in
                 if !isDragging { onEnded() }

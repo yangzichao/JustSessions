@@ -84,7 +84,8 @@ struct TabBarDragInteractionTests {
         #expect(fixture.isWindowMovable)
     }
 
-    /// The pointer can leave the bar, as it does dragging across the window, and the tab still follows it along the bar.
+    /// Where the tab cannot leave for another window, as here, where the bar's window is no workspace window, the
+    /// pointer can leave the bar and the tab still follows it along the bar.
     @Test func aTabDraggedOutOfTheBarStillMovesAlongIt() async throws {
         let fixture = try TabBarWindowFixture()
         defer { fixture.close() }
