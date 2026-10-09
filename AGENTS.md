@@ -30,7 +30,7 @@ Before creating or pushing any version tag, follow the [release-note writing sta
 
 - Aim for 1–3 bullets; use at most 5. Each bullet describes one concrete change a user will notice. English bullets have at most 20 words; Simplified Chinese bullets have at most 60 characters.
 - Compare each claim with the changes since the previous release. Preserve provider/host limitations and required user actions. Only claim performance gains supported by evidence.
-- Remove marketing, AI-style filler, implementation details, repeated points, and vague claims such as “bug fixes and improvements.” Read both languages for meaning and brevity.
+- Remove marketing, AI-style filler, implementation details, repeated points, and vague claims such as “bug fixes and improvements.” Group minor fixes into one final Fixed bullet, exactly “Small bug fixes.” / “修复了一些小问题。” Read both languages for meaning and brevity.
 - Record the previous tag, candidate commit, and evidence for the bullets in the release PR or delivery summary. Do not treat passing the automated style check as a factual review.
 
 Run `make release-check RELEASE_TAG=vX.Y.Z` on the exact commit to be tagged. This requires matching notes at the top of the catalog, previews both languages, and runs `make verify`. Do not tag until the editorial review and checks pass. Recheck after any change to the candidate commit.

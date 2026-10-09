@@ -83,12 +83,35 @@ class ReleaseNoteEditorialChecksTests(unittest.TestCase):
             ("en", "Improved performance."),
             ("en", "Bug fixes and improvements."),
             ("en", "Performance and stability improvements."),
+            ("en", "Minor bug fixes."),
+            ("en", "Small fixes."),
+            ("en", "Small bug fixes."),
             ("zh-Hans", "提升稳定性。"),
+            ("zh-Hans", "修复了一些问题。"),
+            ("zh-Hans", "修复了一些小问题。"),
         ):
             with self.subTest(value=value):
                 self.setUp()
                 self.release["sections"][0]["items"][0][language] = value
                 with self.assertRaisesRegex(ValueError, "Name the affected feature"):
+                    self.load_fixture()
+
+    def test_small_fixes_bullet_groups_minor_fixes_last_under_fixed(self):
+        small_fixes = {"en": "Small bug fixes.", "zh-Hans": "修复了一些小问题。"}
+        self.release["sections"][0]["items"].append(small_fixes)
+        self.load_fixture()
+        self.release["sections"] = [{"kind": "fixed", "items": [small_fixes]}]
+        self.load_fixture()
+
+    def test_small_fixes_bullet_must_close_the_fixed_section(self):
+        small_fixes = {"en": "Small bug fixes.", "zh-Hans": "修复了一些小问题。"}
+        for sections in (
+            [{"kind": "improved", "items": [small_fixes]}],
+            [{"kind": "fixed", "items": [small_fixes, {"en": "Fixed freezes when reading images.", "zh-Hans": "修复读取图片时卡顿。"}]}],
+        ):
+            with self.subTest(sections=sections):
+                self.release["sections"] = sections
+                with self.assertRaisesRegex(ValueError, "last under Fixed"):
                     self.load_fixture()
 
     def test_repeated_changes_are_rejected_in_either_language(self):
