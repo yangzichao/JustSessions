@@ -1,5 +1,37 @@
 [
   {
+    "version": "1.0.12",
+    "publishedOn": "2026-10-09",
+    "title": {
+      "en": "Tab dragging and SSH shell startup",
+      "zh-Hans": "拖动标签页与 SSH 启动检查"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Drag a tab out to a new window, or onto another window's tab bar; its terminal keeps running.",
+            "zh-Hans": "将标签页拖出到新窗口，或拖到另一个窗口的标签栏；其终端保持运行。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Open the CLI, not a shell, on SSH hosts whose interactive startup starts tmux or another shell.",
+            "zh-Hans": "SSH 主机的交互式启动文件会启动 tmux 或其他 shell 时，也能打开 CLI，而非 shell。"
+          },
+          {
+            "en": "If the app can't avoid a host's startup files, a warning beside the host links to the fix.",
+            "zh-Hans": "若应用无法绕开主机的启动文件，主机名旁会显示警告，并链接到修复方法。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.0.11",
     "publishedOn": "2026-10-09",
     "title": {
