@@ -34,9 +34,13 @@ struct SessionPreviewHeader: View {
             }
             if store.runningTerminal(for: conversation) == nil,
                let otherWindowTab = store.runningTerminalInAnotherWindow(for: conversation) {
-                SessionInAnotherWindowNote(tab: otherWindowTab) {
-                    store.showRunningTerminalInAnotherWindow(for: conversation)
-                }
+                SessionInAnotherWindowNote(
+                    tab: otherWindowTab,
+                    onShow: { store.showRunningTerminalInAnotherWindow(for: conversation) },
+                    onMoveHere: store.canMoveTerminalHere(for: conversation)
+                        ? { store.moveTerminalHere(for: conversation) }
+                        : nil
+                )
             }
         }
         .padding(.horizontal, 24)

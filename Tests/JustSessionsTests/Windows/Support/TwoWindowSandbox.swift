@@ -52,6 +52,14 @@ struct TwoWindowSandbox {
 
     var conversation: Conversation { conversations[0] }
 
+    /// A Claude Code session on the SSH host `devbox`, listed in both windows. Its tabs name a tmux session, as tabs
+    /// on any SSH host do.
+    func listSSHSession() -> Conversation {
+        let conversation = Conversation.fixture(projectPath: "/srv/project", host: .ssh("devbox"))
+        for store in [first, second] { store.replaceConversations(on: .ssh("devbox"), with: [conversation]) }
+        return conversation
+    }
+
     /// Resumes the session in `store`'s window and returns its tab, leaving no tab selected there, as when another
     /// tab or a preview shows.
     func openTab(of conversation: Conversation, in store: ConversationStore) -> TerminalSession? {

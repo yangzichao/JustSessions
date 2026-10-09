@@ -9,6 +9,12 @@ enum RemoteTmuxCommands {
         )
     }
 
+    /// Exits with 0 only while the host's tmux runs the session; a host without tmux fails it too. `=` matches the
+    /// whole name, not a session whose name starts with it.
+    static func hasSessionCommand(_ name: String) -> String {
+        RemoteCLICommandBuilder.loginShellCommand("tmux has-session -t \(ShellQuoting.quoted("=" + name)) 2>/dev/null")
+    }
+
     static func killSessionCommand(_ name: String) -> String {
         RemoteCLICommandBuilder.loginShellCommand(
             "tmux kill-session -t \(ShellQuoting.quoted(name)) 2>/dev/null; true"

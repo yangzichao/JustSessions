@@ -500,6 +500,10 @@
 	<string>More in the user guide ↗</string>
 	<key>More room for the terminal</key>
 	<string>More room for the terminal</string>
+	<key>Move Here</key>
+	<string>Move Here</string>
+	<key>Move Tab to This Window</key>
+	<string>Move Tab to This Window</string>
 	<key>Move tab into split view</key>
 	<string>Move tab into split view</string>
 	<key>Name</key>

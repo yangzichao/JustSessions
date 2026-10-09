@@ -11,20 +11,22 @@ extension ConversationStore {
 
     /// The tab in another window whose CLI still runs the session, or starts it once shown.
     func runningTerminalInAnotherWindow(for conversation: Conversation) -> TerminalSession? {
-        otherWindowStores.lazy.compactMap { $0.runningTerminal(for: conversation) }.first
+        otherWindowRunningTerminal(for: conversation)?.tab
+    }
+
+    /// That tab and the store of its window.
+    func otherWindowRunningTerminal(for conversation: Conversation) -> (store: ConversationStore, tab: TerminalSession)? {
+        otherWindowStores.lazy.compactMap { store in store.runningTerminal(for: conversation).map { (store, $0) } }.first
     }
 
     /// Selects the session's tab in the other window that runs it and brings that window forward. Returns false when
     /// no other window runs the session.
     @discardableResult
     func showRunningTerminalInAnotherWindow(for conversation: Conversation) -> Bool {
-        for store in otherWindowStores {
-            guard let tab = store.runningTerminal(for: conversation) else { continue }
-            store.selectTerminal(tab.id)
-            windowRegistry.bringForward(store)
-            return true
-        }
-        return false
+        guard let (store, tab) = otherWindowRunningTerminal(for: conversation) else { return false }
+        store.selectTerminal(tab.id)
+        windowRegistry.bringForward(store)
+        return true
     }
 
     /// Whether another window has a tab of the session, its CLI running or ended.
