@@ -4,7 +4,7 @@ import SQLite3
 enum RemoteOpenCodeConversationDeletion {
     /// Deletes with OpenCode's own CLI, from the database the mirror was copied from; it also deletes the session's
     /// subagent sessions. OpenCode's error for an unknown session means it is already gone.
-    static func command(sessionID: String) -> String {
+    static func command(sessionID: String, host: String) -> String {
         let script = OpenCodeRemoteDatabaseLocation.shellAssignment + """
 
             id=\(ShellQuoting.quoted(sessionID))
@@ -21,7 +21,7 @@ enum RemoteOpenCodeConversationDeletion {
               exit 1
             fi
             """
-        return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))")
+        return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
     }
 
     /// The host's mirror database, when `conversation` is one of its sessions.

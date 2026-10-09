@@ -33,6 +33,27 @@ enum BoundedProcessRunner {
         includesStandardError: Bool = false,
         timeout: TimeInterval
     ) -> (exitStatus: Int32, output: String)? {
+        guard let outcome = outcome(
+            ofExecutable: executablePath,
+            arguments: arguments,
+            environment: environment,
+            workingDirectory: workingDirectory,
+            includesStandardError: includesStandardError,
+            timeout: timeout
+        ), let exitStatus = outcome.exitStatus else { return nil }
+        return (exitStatus, outcome.output)
+    }
+
+    /// The exit status and output, or what the process printed before it was stopped at the timeout, with no exit
+    /// status. Nil when the process could not start.
+    static func outcome(
+        ofExecutable executablePath: String,
+        arguments: [String],
+        environment: [String: String]? = nil,
+        workingDirectory: URL? = nil,
+        includesStandardError: Bool = false,
+        timeout: TimeInterval
+    ) -> (exitStatus: Int32?, output: String)? {
         let outputFile = FileManager.default.temporaryDirectory
             .appendingPathComponent("justsessions-process-output-\(UUID().uuidString)")
         guard FileManager.default.createFile(atPath: outputFile.path, contents: nil),
@@ -53,12 +74,10 @@ enum BoundedProcessRunner {
         let finished = DispatchSemaphore(value: 0)
         process.terminationHandler = { _ in finished.signal() }
         do { try process.run() } catch { return nil }
-        if finished.wait(timeout: .now() + timeout) == .timedOut {
-            kill(process.processIdentifier, SIGKILL)
-            return nil
-        }
+        let timedOut = finished.wait(timeout: .now() + timeout) == .timedOut
+        if timedOut { kill(process.processIdentifier, SIGKILL) }
 
         guard let data = try? Data(contentsOf: outputFile) else { return nil }
-        return (process.terminationStatus, String(decoding: data, as: UTF8.self))
+        return (timedOut ? nil : process.terminationStatus, String(decoding: data, as: UTF8.self))
     }
 }

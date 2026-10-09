@@ -20,7 +20,7 @@ extension ConversationStore {
               let tmuxSessionName = tab.tmuxSessionName else { return }
         let terminalView = tab.terminalView
         terminalView.reportThemeAfterNextBackgroundQuery()
-        let command = RemoteTmuxCommands.reattachClientsCommand(tmuxSessionName)
+        let command = RemoteTmuxCommands.reattachClientsCommand(tmuxSessionName, on: destination)
         // After the host's other tmux commands, such as the rename that gave the session this name.
         tmuxCommandQueues.run(on: tab.host) {
             guard remoteRunner.run(destination, command, 30)?.exitStatus != 0 else { return }

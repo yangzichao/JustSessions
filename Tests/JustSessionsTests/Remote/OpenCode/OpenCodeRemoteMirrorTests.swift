@@ -48,7 +48,7 @@ struct OpenCodeRemoteMirrorTests {
             "type": "tool", "tool": "read", "state": ["input": ["filePath": "/srv/a.swift"], "output": "secret-tool-output"],
         ])
 
-        let result = try #require(fixture.runner().run("devbox", OpenCodeRemoteSnapshotCommand.create, 30))
+        let result = try #require(fixture.runner().run("devbox", OpenCodeRemoteSnapshotCommand.create(on: "devbox"), 30))
 
         #expect(result.exitStatus == 0, "\(result.output)")
         let path = try #require(OpenCodeRemoteSnapshotCommand.snapshotPath(in: result.output))
@@ -83,7 +83,7 @@ struct OpenCodeRemoteMirrorTests {
         // No python3 on this PATH: the command must stop before needing it.
         let runner = fixture.runner(environment: ["PATH": fixture.binaryDirectory.path + ":/bin"])
 
-        let result = try #require(runner.run("devbox", OpenCodeRemoteSnapshotCommand.create, 30))
+        let result = try #require(runner.run("devbox", OpenCodeRemoteSnapshotCommand.create(on: "devbox"), 30))
         try OpenCodeRemoteSessionMirror(runner: runner).synchronize(host: "devbox", sourceHomeOverride: nil, destination: destination)
 
         #expect(result.exitStatus == OpenCodeRemoteSnapshotCommand.noDatabaseExitStatus)

@@ -209,6 +209,9 @@ struct ConversationSidebarView: View {
                         get: { store.usesTmuxPrefix(on: section.host) },
                         set: { store.setUsesTmuxPrefix($0, on: destination) }
                     ),
+                    shellStartupCheck: store.shellStartupCheck(on: destination),
+                    isCheckingShellStartup: store.hostsCheckingShellStartup.contains(destination),
+                    onCheckShellStartupAgain: { store.checkRemoteShellStartupAgain(on: destination) },
                     onRemove: { store.removeRemoteHost(destination) }
                 )
             }

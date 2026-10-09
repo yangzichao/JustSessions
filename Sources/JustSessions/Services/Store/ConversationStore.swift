@@ -65,6 +65,13 @@ final class ConversationStore: ObservableObject {
     @Published var remoteHostsUsingTmuxPrefix: RemoteHostsUsingTmuxPrefix
     /// Commands of your own that tools' CLIs start with, per host; see `ConversationStore+StartCommands`.
     @Published var cliStartCommands: CLIStartCommands
+    /// Each SSH host's last shell startup check; see `ConversationStore+RemoteShellStartup`.
+    @Published var remoteShellStartupChecks: RemoteShellStartupChecks
+    /// SSH hosts whose shell startup is being checked now.
+    @Published var hostsCheckingShellStartup: Set<String> = []
+    /// SSH hosts checked again in this run because a refresh suggested their startup changed, so a host whose startup
+    /// keeps getting in the way is not checked on every refresh.
+    var hostsRecheckedShellStartup: Set<String> = []
     /// Each host's last refresh, this Mac's included.
     @Published var hostRefreshStatuses: [SessionHost: HostRefreshStatus] = [:]
     /// tmux sessions JustSessions started that still run, per host, as of the host's last refresh. On this Mac, one
@@ -146,6 +153,8 @@ final class ConversationStore: ObservableObject {
         self.remoteHostList = RemoteHostList.load(from: userDefaults)
         self.remoteHostsUsingTmuxPrefix = RemoteHostsUsingTmuxPrefix.load(from: userDefaults)
         self.cliStartCommands = CLIStartCommands.load(from: userDefaults)
+        self.remoteShellStartupChecks = RemoteShellStartupChecks.load(from: userDefaults)
+        applyRemoteShellStartups()
         LoginShellPathReader.warmUpInBackground()
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
         if startsBackgroundPolling {

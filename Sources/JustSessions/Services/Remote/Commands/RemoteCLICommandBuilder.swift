@@ -30,7 +30,8 @@ struct RemoteCLICommandBuilder {
                 arguments: arguments,
                 tmuxSessionName: tmuxSessionName,
                 usesHostTmuxPrefix: usesHostTmuxPrefix,
-                startCommand: startCommand
+                startCommand: startCommand,
+                shellStartup: RemoteHostShellStartups.shared.startup(on: host)
             )
         )
     }
@@ -53,8 +54,8 @@ struct RemoteCLICommandBuilder {
         )
     }
 
-    /// Runs the CLI through an interactive login shell, so the PATH set up in the host's shell profile
-    /// (for example `~/.local/bin` or an nvm-managed `node`) is in effect.
+    /// Runs the CLI through the host's login shell, so the PATH set up in the host's shell profile
+    /// (for example `~/.local/bin` or an nvm-managed `node`) is in effect; see `RemoteShellStartup`.
     /// Without tmux on the host, the CLI runs directly.
     static func remoteCommand(
         provider: ConversationProvider,
@@ -62,7 +63,8 @@ struct RemoteCLICommandBuilder {
         arguments: [String],
         tmuxSessionName: String? = nil,
         usesHostTmuxPrefix: Bool = false,
-        startCommand: String? = nil
+        startCommand: String? = nil,
+        shellStartup: RemoteShellStartup = .interactive
     ) -> String {
         let customStartCommand = CLIStartCommandLine.customCommand(startCommand)
         let cliInvocation = customStartCommand.map {
@@ -72,7 +74,7 @@ struct RemoteCLICommandBuilder {
             )
         } ?? ([provider.executableName] + arguments.map(ShellQuoting.quoted)).joined(separator: " ")
         let directCommand = "cd \(ShellQuoting.quoted(projectPath)) && exec \(cliInvocation)"
-        guard let tmuxSessionName else { return loginShellCommand(directCommand) }
+        guard let tmuxSessionName else { return shellStartup.command(running: directCommand) }
         // `-A` attaches when the session already runs, and the options after it are set again on every attach.
         // The status line and mouse settings make it look and scroll like the CLI on its own, and with no prefix
         // key Ctrl-B reaches the CLI, unless the host uses its own; see `RemoteTmuxPrefixOptions`. These are
@@ -80,12 +82,13 @@ struct RemoteCLICommandBuilder {
         let sessionOptions = ["set-option status off", "set-option mouse on"]
             + RemoteTmuxPrefixOptions.setOptionCommands(usingHostPrefix: usesHostTmuxPrefix)
         let tmuxCommand = "exec tmux new-session -A -s \(ShellQuoting.quoted(tmuxSessionName)) "
-            + ShellQuoting.quoted(loginShellCommand(directCommand))
+            + ShellQuoting.quoted(shellStartup.command(running: directCommand))
             + sessionOptions.map { " \\; \($0)" }.joined()
-        return loginShellCommand("if command -v tmux >/dev/null 2>&1; then \(tmuxCommand); else \(directCommand); fi")
+        return shellStartup.command(running: "if command -v tmux >/dev/null 2>&1; then \(tmuxCommand); else \(directCommand); fi")
     }
 
-    static func loginShellCommand(_ innerCommand: String) -> String {
-        "exec \"$SHELL\" -lic \(ShellQuoting.quoted(innerCommand))"
+    /// Runs `innerCommand` in the host's login shell, started as the host needs; see `RemoteShellStartup`.
+    static func loginShellCommand(_ innerCommand: String, on host: String) -> String {
+        RemoteHostShellStartups.shared.startup(on: host).command(running: innerCommand)
     }
 }

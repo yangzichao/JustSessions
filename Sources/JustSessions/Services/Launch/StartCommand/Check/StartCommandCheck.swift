@@ -49,7 +49,8 @@ struct StartCommandCheck: Sendable {
             )
         case .ssh(let destination):
             let remoteCommand = RemoteCLICommandBuilder.loginShellCommand(
-                "sh -c \(ShellQuoting.quoted(Self.lookupScript)) sh \(ShellQuoting.quoted(program))"
+                "sh -c \(ShellQuoting.quoted(Self.lookupScript)) sh \(ShellQuoting.quoted(program))",
+                on: destination
             )
             lookup = remoteRunner.run(destination, remoteCommand, Self.remoteTimeout)
             if lookup?.exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus {

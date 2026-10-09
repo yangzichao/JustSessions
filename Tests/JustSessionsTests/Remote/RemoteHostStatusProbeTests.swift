@@ -57,7 +57,7 @@ struct RemoteHostStatusProbeTests {
 
         let output = BoundedProcessRunner.output(
             ofExecutable: "/bin/sh",
-            arguments: ["-c", RemoteHostStatusProbe.command],
+            arguments: ["-c", RemoteHostStatusProbe.command(on: "devbox")],
             environment: ["HOME": root.path, "SHELL": bin.appendingPathComponent("login-shell").path, "PATH": "\(bin.path):/usr/bin:/bin"],
             timeout: 10
         )

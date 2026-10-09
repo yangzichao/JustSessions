@@ -10,7 +10,7 @@ struct RemoteCLICommandBuilderTests {
         #expect(command.executablePath == "/usr/bin/ssh")
         #expect(command.arguments.first == "-t")
         #expect(command.arguments.dropLast().last == "devbox")
-        #expect(command.arguments.last == #"exec "$SHELL" -lic 'cd '\''/home/me/api'\'' && exec codex '\''resume'\'' '\''abc'\'''"#)
+        #expect(command.arguments.last == #"exec /usr/bin/env JUSTSESSIONS=1 "$SHELL" -lic 'cd '\''/home/me/api'\'' && exec codex '\''resume'\'' '\''abc'\'''"#)
         #expect(command.environment.contains("SSH_AUTH_SOCK=/tmp/agent"))
         #expect(command.environment.contains("TERM=xterm-256color"))
         #expect(!command.environment.contains { $0.hasPrefix("NO_COLOR=") })

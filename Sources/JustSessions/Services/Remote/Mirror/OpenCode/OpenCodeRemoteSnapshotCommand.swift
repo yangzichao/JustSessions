@@ -7,13 +7,13 @@ enum OpenCodeRemoteSnapshotCommand {
     static let outputHeading = "JUSTSESSIONS_OPENCODE_SNAPSHOT="
     static let noDatabaseExitStatus: Int32 = 3
 
-    static var create: String {
+    static func create(on host: String) -> String {
         let script = OpenCodeRemoteDatabaseLocation.shellAssignment + """
 
             [ -f "$db" ] || exit \(noDatabaseExitStatus)
             exec python3 -c \(ShellQuoting.quoted(pythonScript)) "$db"
             """
-        return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))")
+        return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
     }
 
     static func snapshotPath(in output: String) -> String? {

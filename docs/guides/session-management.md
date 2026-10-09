@@ -83,6 +83,24 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 - Refresh updates every host at once. A host that can't be reached shows the error on its heading; the others still list.
 - Install **tmux on the remote host** so a session there keeps running when the connection drops or the tab closes. The app's bundled tmux is only for this Mac. Run `tmux -V` on the host to check installation, then select the session to reattach.
 - Point at a host's heading and click its **⋯** for the host's own settings: **Use this host's tmux prefix** (see [terminal persistence](session-storage.md#terminal-persistence)) and **Remove host**. The heading's right-click menu has them too, after **Add project…** and **Refresh**.
+- If a session opens a shell instead of its CLI, see [shell startup](#shell-startup-on-ssh-hosts) below.
+
+### Shell startup on SSH hosts
+
+Each CLI on a host starts through your login shell, as `$SHELL -lic`, so it is found wherever your shell's startup files put it. If those files start another program in every interactive shell, such as tmux or zsh, that program's prompt shows instead of the CLI.
+
+- JustSessions checks for this when you add a host, and once for hosts added before this check existed. It runs your shell in a terminal, as a tab does, and traces bash's or zsh's startup to find where it stopped. A refresh that can't tell which CLIs the host has checks it again, once per run.
+- If a login shell without your interactive startup, `$SHELL -lc`, still runs the CLIs, the app starts everything that way on that host, and the host's **⋯** menu says so. Otherwise a warning shows beside the host's name; point at it to see the line where the startup stopped, or click it for the [user guide](https://yangzichao.github.io/JustSessions/guide.html#ssh-shell-startup).
+- To fix it, make that line run only in interactive shells, and not in the ones JustSessions starts, which have `JUSTSESSIONS=1` set. Then choose **Check shell startup again** from the host's **⋯** menu:
+
+  ```sh
+  if [[ $- == *i* ]] && [ -z "$JUSTSESSIONS" ]; then exec zsh -l; fi
+  ```
+
+  Many hosts' bash, such as Fedora's and Debian's, also reads `~/.bashrc` for commands run over SSH, before JustSessions can set that variable, so checking for a terminal, `[ -t 1 ]`, isn't enough. A line that starts another program there blocks the host whichever way the app starts the shell.
+
+- Without your interactive startup, a CLI it puts on your `PATH`, as nvm's setup does, is missing from **New session**. Move that setup to `~/.profile`, or above the line in `~/.bashrc` that stops for non-interactive shells.
+- The check lets the startup run as a tab would, so what it starts, such as a tmux session, can stay running on the host.
 
 ## Clean up
 
