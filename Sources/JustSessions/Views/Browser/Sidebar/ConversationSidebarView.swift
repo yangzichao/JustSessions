@@ -211,7 +211,7 @@ struct ConversationSidebarView: View {
                     ),
                     shellStartupCheck: store.shellStartupCheck(on: destination),
                     isCheckingShellStartup: store.hostsCheckingShellStartup.contains(destination),
-                    onCheckShellStartupAgain: { store.checkRemoteShellStartupAgain(on: destination) },
+                    onCheckShellStartup: { store.checkRemoteShellStartupNow(on: destination) },
                     onRemove: { store.removeRemoteHost(destination) }
                 )
             }

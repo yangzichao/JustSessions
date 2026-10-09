@@ -184,8 +184,8 @@
 	<string>Check Again</string>
 	<key>Check for updates</key>
 	<string>Check for updates</string>
-	<key>Check shell startup again</key>
-	<string>Check shell startup again</string>
+	<key>Check shell startup</key>
+	<string>Check shell startup</string>
 	<key>Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.</key>
 	<string>Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.</string>
 	<key>Checking shell startup…</key>

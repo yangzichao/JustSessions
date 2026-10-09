@@ -89,9 +89,9 @@ The host must accept `ssh <host>` without a password prompt and have `rsync` plu
 
 Each CLI on a host starts through your login shell, as `$SHELL -lic`, so it is found wherever your shell's startup files put it. If those files start another program in every interactive shell, such as tmux or zsh, that program's prompt shows instead of the CLI.
 
-- JustSessions checks for this when you add a host, and once for hosts added before this check existed. It runs your shell in a terminal, as a tab does, and traces bash's or zsh's startup to find where it stopped. A refresh that can't tell which CLIs the host has checks it again, once per run.
+- JustSessions checks for this when you add a host, and once for hosts added before this check existed. It runs your shell in a terminal, as a tab does, and traces bash's or zsh's startup to find where it stopped. A refresh that fails, or can't tell which CLIs the host has, checks it again, once per run, and **Check shell startup** in the host's **⋯** menu checks it any time.
 - If a login shell without your interactive startup, `$SHELL -lc`, still runs the CLIs, the app starts everything that way on that host, and the host's **⋯** menu says so. Otherwise a warning shows beside the host's name; point at it to see the line where the startup stopped, or click it for the [user guide](https://yangzichao.github.io/JustSessions/guide.html#ssh-shell-startup).
-- To fix it, make that line run only in interactive shells, and not in the ones JustSessions starts, which have `JUSTSESSIONS=1` set. Then choose **Check shell startup again** from the host's **⋯** menu:
+- To fix it, make that line run only in interactive shells, and not in the ones JustSessions starts, which have `JUSTSESSIONS=1` set. Then choose **Check shell startup** from the host's **⋯** menu:
 
   ```sh
   if [[ $- == *i* ]] && [ -z "$JUSTSESSIONS" ]; then exec zsh -l; fi

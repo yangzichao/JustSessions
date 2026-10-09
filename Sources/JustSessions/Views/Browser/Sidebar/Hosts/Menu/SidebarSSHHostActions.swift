@@ -7,6 +7,6 @@ struct SidebarSSHHostActions {
     /// What the host's shell startup check found; nil before it ran. See `RemoteShellStartupCheck`.
     let shellStartupCheck: RemoteShellStartupCheckResult?
     let isCheckingShellStartup: Bool
-    let onCheckShellStartupAgain: () -> Void
+    let onCheckShellStartup: () -> Void
     let onRemove: () -> Void
 }

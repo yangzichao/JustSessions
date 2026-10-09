@@ -998,12 +998,12 @@
         }
       }
     },
-    "Check shell startup again": {
+    "Check shell startup": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "重新检查 shell 启动配置"
+            "value": "检查 shell 启动配置"
           }
         }
       }

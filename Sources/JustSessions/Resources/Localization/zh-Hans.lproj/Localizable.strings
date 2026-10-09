@@ -178,8 +178,8 @@
 	<string>重新检查</string>
 	<key>Check for updates</key>
 	<string>检查更新</string>
-	<key>Check shell startup again</key>
-	<string>重新检查 shell 启动配置</string>
+	<key>Check shell startup</key>
+	<string>检查 shell 启动配置</string>
 	<key>Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.</key>
 	<string>确认 CLI 能在你常用的终端里运行，并且已保存过对话。**新建会话** 只提供检测到已安装的 CLI。</string>
 	<key>Checking shell startup…</key>

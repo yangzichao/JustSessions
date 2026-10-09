@@ -124,6 +124,8 @@ final class ConversationStore: ObservableObject {
     private let remoteDeletion: RemoteConversationDeletion
     /// Which SSH hosts' `claude` takes a new session's id; see `ConversationStore+RemoteClaudeSessionIDs`.
     let remoteClaudeSessionIDFlagSupport: RemoteClaudeSessionIDFlagSupport
+    /// Finds out whether an SSH host's shell startup gets in the way; see `ConversationStore+RemoteShellStartup`.
+    let remoteShellStartupCheck: RemoteShellStartupCheck
     /// Where custom titles, project names, pins, sidebar projects, SSH hosts, and start commands are kept.
     let userDefaults: UserDefaults
 
@@ -137,12 +139,14 @@ final class ConversationStore: ObservableObject {
         windowRegistry: WorkspaceWindowRegistry = WorkspaceWindowRegistry(),
         remoteDeletion: RemoteConversationDeletion = RemoteConversationDeletion(),
         remoteClaudeSessionIDFlagSupport: RemoteClaudeSessionIDFlagSupport = .shared,
+        remoteShellStartupCheck: RemoteShellStartupCheck = RemoteShellStartupCheck(),
         startsBackgroundPolling: Bool = true
     ) {
         self.adapters = adapters
         self.commandResolver = commandResolver
         self.remoteDeletion = remoteDeletion
         self.remoteClaudeSessionIDFlagSupport = remoteClaudeSessionIDFlagSupport
+        self.remoteShellStartupCheck = remoteShellStartupCheck
         self.userDefaults = userDefaults
         self.sessionNotifier = sessionNotifier
         self.windowRegistry = windowRegistry

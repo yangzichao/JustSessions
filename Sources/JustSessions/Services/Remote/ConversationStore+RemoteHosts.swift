@@ -31,6 +31,7 @@ extension ConversationStore {
                 }
             } catch {
                 await self.setRemoteHostRefreshStatus(.failed(error.localizedDescription), host: host)
+                await self.checkRemoteShellStartupIfNeeded(on: host, statusListedCLIs: false)
             }
         }
     }
