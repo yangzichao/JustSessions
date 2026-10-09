@@ -37,4 +37,6 @@ enum ThemePalette {
     static let live = Color.adaptive(light: 0x1FA463, dark: 0x3DD68C)
     /// Something that needs your attention, such as a CLI waiting on your answer or an unreachable remote host.
     static let warning = Color.adaptive(light: 0xE0892B, dark: 0xF2A54A)
+    /// A turn a CLI finished that you have not looked at yet, blue as Mail, Claude, and Codex mark what is unread.
+    static let unseenTurn = Color.adaptive(light: 0x2A78D6, dark: 0x4C93EA)
 }
