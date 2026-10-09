@@ -17,12 +17,14 @@ ENGLISH_FILLER = (
 CHINESE_FILLER = (
     "重磅", "焕然一新", "赋能", "无缝体验", "全新体验", "体验全面升级", "多项优化", "多项改进",
 )
+# Minor fixes are grouped into this one bullet, the only generic copy allowed, instead of being listed.
+SMALL_FIXES_BULLET = {"en": "Small bug fixes.", "zh-Hans": "修复了一些小问题。"}
 GENERIC_ENGLISH_CHANGE = re.compile(
-    r"^(?:improved (?:performance|stability)|bug fixes(?: and improvements)?|"
+    r"^(?:improved (?:performance|stability)|(?:(?:minor|small|various|several|some) )?(?:bug )?fixes(?: and improvements)?|"
     r"(?:performance|stability)(?: and (?:performance|stability))? improvements)[.!]?$",
     re.IGNORECASE,
 )
-GENERIC_CHINESE_CHANGE = re.compile(r"^(?:修复错误|修复了一些错误|修复若干问题|性能优化|提升性能|提升稳定性|优化体验)[。！]?$")
+GENERIC_CHINESE_CHANGE = re.compile(r"^(?:修复了?(?:一些|若干|多个|部分)?小?(?:问题|错误|bug)|性能优化|提升性能|提升稳定性|优化体验)[。！]?$", re.IGNORECASE)
 
 
 def validate_copy_style(text, *, location, is_title):
@@ -42,10 +44,13 @@ def validate_copy_style(text, *, location, is_title):
     for phrase in CHINESE_FILLER:
         if phrase in text["zh-Hans"]:
             raise ValueError(f"{location} (zh-Hans): Replace filler '{phrase}' with the specific user-visible change.")
-    if not is_title and (
+    if not is_title and text != SMALL_FIXES_BULLET and (
         GENERIC_ENGLISH_CHANGE.fullmatch(text["en"]) or GENERIC_CHINESE_CHANGE.fullmatch(text["zh-Hans"])
     ):
-        raise ValueError(f"{location}: Name the affected feature and behavior; generic improvements are not release notes.")
+        raise ValueError(
+            f"{location}: Name the affected feature and behavior; generic improvements are not release notes. "
+            f"Group minor fixes as the last Fixed bullet: '{SMALL_FIXES_BULLET['en']}' / '{SMALL_FIXES_BULLET['zh-Hans']}'."
+        )
 
 
 def validate_release_editorial_standard(release):
@@ -54,6 +59,10 @@ def validate_release_editorial_standard(release):
     items = [item for section in release["sections"] for item in section["items"]]
     if len(items) > MAX_RELEASE_BULLETS:
         raise ValueError(f"v{version}: Use at most {MAX_RELEASE_BULLETS} bullets. Prioritize the changes users need to know.")
+    for section in release["sections"]:
+        for position, item in enumerate(section["items"], start=1):
+            if item == SMALL_FIXES_BULLET and (section["kind"] != "fixed" or position != len(section["items"])):
+                raise ValueError(f"v{version}: Put '{SMALL_FIXES_BULLET['en']}' last under Fixed, after the fixes worth naming.")
     seen_copy = {"en": set(), "zh-Hans": set()}
     for index, item in enumerate(items, start=1):
         location = f"v{version} bullet {index}"

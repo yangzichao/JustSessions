@@ -12,6 +12,7 @@ Release notes should tell a user what changed in a few seconds. Write the result
 - Use plain verbs: “Add,” “Keep,” “Show,” or “Fixed.” Omit introductions, closing remarks, repeated benefits, and promotional adjectives.
 - Keep both languages equally specific. A translation must retain the same limitations and meaning.
 - Select meaningful user-facing changes. Omit internal refactors, tests, dependency chores, and implementation explanations unless they change something users need to know.
+- Name only the fixes users would notice. Group the rest into one final bullet under Fixed, written exactly “Small bug fixes.” / “修复了一些小问题。” This is the only generic bullet allowed.
 
 | Avoid | Write |
 | --- | --- |
@@ -48,4 +49,4 @@ make release-check RELEASE_TAG=vX.Y.Z
 
 This checks the selected version, previews both languages, and runs `make verify`. It does not create or push a tag. Tag that exact commit only after the review and checks pass.
 
-The shared catalog validator rejects excessive length, too many bullets, duplicate bullets, common filler, generic improvement claims, and missing translations. It runs during `make verify`, website builds, and release preparation, so the publication workflow repeats it before signing. The validator checks measurable writing rules; the required editorial review checks truth, relevance, and natural wording.
+The shared catalog validator rejects excessive length, too many bullets, duplicate bullets, common filler, generic improvement claims other than the exact “Small bug fixes.” bullet last under Fixed, and missing translations. It runs during `make verify`, website builds, and release preparation, so the publication workflow repeats it before signing. The validator checks measurable writing rules; the required editorial review checks truth, relevance, and natural wording.
