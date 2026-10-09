@@ -8,14 +8,15 @@ enum RemoteHostStatusProbe {
     /// taken for a tmux session name.
     static let installedCLIsHeading = "JustSessions installed CLIs:"
 
-    static var command: String {
+    static func command(on host: String) -> String {
         let cliChecks = ConversationProvider.allCases.map { provider in
             let name = ShellQuoting.quoted(provider.executableName)
             return "command -v \(name) >/dev/null 2>&1 && echo \(name)"
         }
         return RemoteCLICommandBuilder.loginShellCommand(
             (["tmux list-sessions -F '#{session_name}' 2>/dev/null", "echo \(ShellQuoting.quoted(installedCLIsHeading))"] + cliChecks + ["true"])
-                .joined(separator: "; ")
+                .joined(separator: "; "),
+            on: host
         )
     }
 
@@ -24,7 +25,7 @@ enum RemoteHostStatusProbe {
         ofHost host: String,
         runner: RemoteHostCommandRunner = RemoteHostCommandRunner()
     ) -> RemoteHostStatus? {
-        guard let result = runner.run(host, command, 30),
+        guard let result = runner.run(host, command(on: host), 30),
               result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus else { return nil }
         return status(inOutput: result.output)
     }

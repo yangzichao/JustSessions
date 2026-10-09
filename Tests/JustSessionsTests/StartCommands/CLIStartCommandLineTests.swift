@@ -84,6 +84,6 @@ struct CLIStartCommandLineTests {
             provider: .codex, projectPath: "/home/me/api", arguments: ["resume", "abc"], startCommand: ""
         )
 
-        #expect(remoteCommand == #"exec "$SHELL" -lic 'cd '\''/home/me/api'\'' && exec codex '\''resume'\'' '\''abc'\'''"#)
+        #expect(remoteCommand == #"exec /usr/bin/env JUSTSESSIONS=1 "$SHELL" -lic 'cd '\''/home/me/api'\'' && exec codex '\''resume'\'' '\''abc'\'''"#)
     }
 }

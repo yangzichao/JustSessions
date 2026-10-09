@@ -55,7 +55,7 @@ struct TabMovingAcrossWindowsTests {
         // Closed there the way Keep running closes a tab.
         #expect(sandbox.first.isRunningInTmux(conversation))
         #expect(recorder.commands.map(\.host) == ["devbox"])
-        #expect(recorder.commands.first?.command == RemoteTmuxCommands.hasSessionCommand(tmuxSessionName))
+        #expect(recorder.commands.first?.command == RemoteTmuxCommands.hasSessionCommand(tmuxSessionName, on: "devbox"))
         let movedTab = try #require(sandbox.second.runningTerminal(for: conversation))
         #expect(movedTab.tmuxSessionName == tmuxSessionName)
         #expect(sandbox.second.selectedTerminalID == movedTab.id)

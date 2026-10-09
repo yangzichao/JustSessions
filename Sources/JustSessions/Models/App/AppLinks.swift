@@ -5,6 +5,7 @@ enum AppLinks {
     static let userGuideURL = websiteURL.appendingPathComponent("guide.html")
     static let releaseNotesURL = websiteURL.appendingPathComponent("release-notes.html")
     static let userGuideSSHHostsURL = userGuideSection("ssh-hosts")
+    static let userGuideSSHShellStartupURL = userGuideSection("ssh-shell-startup")
     static let userGuideTroubleshootingURL = userGuideSection("troubleshooting")
     static let gitHubRepositoryURL = URL(string: "https://github.com/yangzichao/JustSessions")!
     static let newGitHubIssueURL = gitHubRepositoryURL.appendingPathComponent("issues/new")

@@ -19,13 +19,14 @@ extension ConversationStore {
         remoteHostsUsingTmuxPrefix.setUsesTmuxPrefix(usesTmuxPrefix, for: host)
         remoteHostsUsingTmuxPrefix.save(to: userDefaults)
         remakeTabsWaitingToBeShown(on: .ssh(host))
-        let command = RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: usesTmuxPrefix)
+        let command = RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: usesTmuxPrefix, on: host)
         tmuxCommandQueues.run(on: .ssh(host)) { _ = remoteRunner.run(host, command, 30) }
     }
 
-    /// A tab reopened from the last quit holds the command it was made with, which sets the old choice again when it
-    /// attaches; it gets one made with the new choice, in its place in the tab bar.
-    private func remakeTabsWaitingToBeShown(on host: SessionHost) {
+    /// A tab reopened from the last quit holds the command it was made with, which uses the host's old settings when it
+    /// attaches, such as its tmux prefix choice or its shell startup; it gets one made with the new settings, in its
+    /// place in the tab bar.
+    func remakeTabsWaitingToBeShown(on host: SessionHost) {
         for index in terminalSessions.indices {
             let tab = terminalSessions[index]
             guard tab.host == host, tab.isWaitingToBeShown, tab.tmuxSessionName != nil,

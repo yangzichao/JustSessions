@@ -34,7 +34,7 @@ struct RemoteTmuxReattachSandboxTests {
 
         let reattach = BoundedProcessRunner.result(
             ofExecutable: "/bin/sh",
-            arguments: ["-c", RemoteTmuxCommands.reattachClientsCommand(tmuxName)],
+            arguments: ["-c", RemoteTmuxCommands.reattachClientsCommand(tmuxName, on: "devbox")],
             environment: sandbox.environment,
             includesStandardError: true,
             timeout: 10

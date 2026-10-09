@@ -30,7 +30,7 @@ struct RemoteTmuxPrefixKeysTests {
         #expect(prefixKeys(of: tmuxName) == ["None", "None"])
 
         // Choosing the host's prefix reaches the attached session at once.
-        _ = sandbox.run(RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: true))
+        _ = sandbox.run(RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: true, on: "devbox"))
         #expect(prefixKeys(of: tmuxName) == ["C-a", "C-q"])
 
         // Reattaching with the new choice keeps it, and does not start the CLI again.
@@ -43,7 +43,7 @@ struct RemoteTmuxPrefixKeysTests {
 
         // Going back to no prefix leaves the host's own tmux sessions alone.
         _ = sandbox.run("tmux new-session -d -s mine 'sleep 60'")
-        _ = sandbox.run(RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: false))
+        _ = sandbox.run(RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: false, on: "devbox"))
         #expect(prefixKeys(of: tmuxName) == ["None", "None"])
         #expect(prefixKeys(of: "mine") == ["C-a", "C-q"])
         secondClient.terminate()

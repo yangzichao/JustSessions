@@ -4,9 +4,10 @@ enum AntigravityRemoteSnapshotCommand {
     static let pathPrefix = "/tmp/justsessions-agy-"
     static let outputHeading = "JUSTSESSIONS_AGY_SNAPSHOT="
 
-    static var create: String {
+    static func create(on host: String) -> String {
         RemoteCLICommandBuilder.loginShellCommand(
-            "[ -d \"$HOME/.gemini/antigravity-cli/conversations\" ] || exit 3; python3 -c " + ShellQuoting.quoted(script)
+            "[ -d \"$HOME/.gemini/antigravity-cli/conversations\" ] || exit 3; python3 -c " + ShellQuoting.quoted(script),
+            on: host
         )
     }
 

@@ -27,7 +27,7 @@ struct FeedbackLinksTests {
 
     @Test func userGuideSectionLinksPointAtSectionsTheGuideHas() throws {
         let guide = try RepositoryFiles.contents(of: "website/guide.html")
-        for url in [AppLinks.userGuideSSHHostsURL, AppLinks.userGuideTroubleshootingURL] {
+        for url in [AppLinks.userGuideSSHHostsURL, AppLinks.userGuideSSHShellStartupURL, AppLinks.userGuideTroubleshootingURL] {
             #expect(url.absoluteString.hasPrefix(AppLinks.userGuideURL.absoluteString + "#"))
             let sectionID = try #require(url.fragment)
             #expect(guide.contains("id=\"\(sectionID)\""))

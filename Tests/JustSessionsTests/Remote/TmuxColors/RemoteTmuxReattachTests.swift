@@ -16,7 +16,7 @@ struct RemoteTmuxReattachTests {
 
         try await expectEventually { recorder.calls.count == 1 }
         #expect(recorder.calls.first?.host == "devbox")
-        #expect(recorder.calls.first?.command == RemoteTmuxCommands.reattachClientsCommand(tmuxSessionName))
+        #expect(recorder.calls.first?.command == RemoteTmuxCommands.reattachClientsCommand(tmuxSessionName, on: "devbox"))
         #expect(tab.terminalView.reportsThemeAfterNextBackgroundQuery)
     }
 

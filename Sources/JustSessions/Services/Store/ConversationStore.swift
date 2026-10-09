@@ -65,6 +65,13 @@ final class ConversationStore: ObservableObject {
     @Published var remoteHostsUsingTmuxPrefix: RemoteHostsUsingTmuxPrefix
     /// Commands of your own that tools' CLIs start with, per host; see `ConversationStore+StartCommands`.
     @Published var cliStartCommands: CLIStartCommands
+    /// Each SSH host's last shell startup check; see `ConversationStore+RemoteShellStartup`.
+    @Published var remoteShellStartupChecks: RemoteShellStartupChecks
+    /// SSH hosts whose shell startup is being checked now.
+    @Published var hostsCheckingShellStartup: Set<String> = []
+    /// SSH hosts checked again in this run because a refresh suggested their startup changed, so a host whose startup
+    /// keeps getting in the way is not checked on every refresh.
+    var hostsRecheckedShellStartup: Set<String> = []
     /// Each host's last refresh, this Mac's included.
     @Published var hostRefreshStatuses: [SessionHost: HostRefreshStatus] = [:]
     /// tmux sessions JustSessions started that still run, per host, as of the host's last refresh. On this Mac, one
@@ -117,6 +124,8 @@ final class ConversationStore: ObservableObject {
     private let remoteDeletion: RemoteConversationDeletion
     /// Which SSH hosts' `claude` takes a new session's id; see `ConversationStore+RemoteClaudeSessionIDs`.
     let remoteClaudeSessionIDFlagSupport: RemoteClaudeSessionIDFlagSupport
+    /// Finds out whether an SSH host's shell startup gets in the way; see `ConversationStore+RemoteShellStartup`.
+    let remoteShellStartupCheck: RemoteShellStartupCheck
     /// Where custom titles, project names, pins, sidebar projects, SSH hosts, and start commands are kept.
     let userDefaults: UserDefaults
 
@@ -130,12 +139,14 @@ final class ConversationStore: ObservableObject {
         windowRegistry: WorkspaceWindowRegistry = WorkspaceWindowRegistry(),
         remoteDeletion: RemoteConversationDeletion = RemoteConversationDeletion(),
         remoteClaudeSessionIDFlagSupport: RemoteClaudeSessionIDFlagSupport = .shared,
+        remoteShellStartupCheck: RemoteShellStartupCheck = RemoteShellStartupCheck(),
         startsBackgroundPolling: Bool = true
     ) {
         self.adapters = adapters
         self.commandResolver = commandResolver
         self.remoteDeletion = remoteDeletion
         self.remoteClaudeSessionIDFlagSupport = remoteClaudeSessionIDFlagSupport
+        self.remoteShellStartupCheck = remoteShellStartupCheck
         self.userDefaults = userDefaults
         self.sessionNotifier = sessionNotifier
         self.windowRegistry = windowRegistry
@@ -146,6 +157,8 @@ final class ConversationStore: ObservableObject {
         self.remoteHostList = RemoteHostList.load(from: userDefaults)
         self.remoteHostsUsingTmuxPrefix = RemoteHostsUsingTmuxPrefix.load(from: userDefaults)
         self.cliStartCommands = CLIStartCommands.load(from: userDefaults)
+        self.remoteShellStartupChecks = RemoteShellStartupChecks.load(from: userDefaults)
+        applyRemoteShellStartups()
         LoginShellPathReader.warmUpInBackground()
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
         if startsBackgroundPolling {

@@ -11,12 +11,12 @@ struct RemoteClaudeSessionIDFlagSupportTests {
     private static let helpWithoutFlag = "  -r, --resume [value]    Resume a conversation by session ID"
 
     @Test func runsTheHostsCLIOrTheStartCommandInItsLoginShell() {
-        #expect(RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: nil)
-            == RemoteCLICommandBuilder.loginShellCommand("claude --help"))
-        #expect(RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: "  ")
-            == RemoteCLICommandBuilder.loginShellCommand("claude --help"))
-        #expect(RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: "~/bin/claude --model opus")
-            == RemoteCLICommandBuilder.loginShellCommand("env ~/bin/claude --model opus '--help'"))
+        #expect(RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: nil, host: "devbox")
+            == RemoteCLICommandBuilder.loginShellCommand("claude --help", on: "devbox"))
+        #expect(RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: "  ", host: "devbox")
+            == RemoteCLICommandBuilder.loginShellCommand("claude --help", on: "devbox"))
+        #expect(RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: "~/bin/claude --model opus", host: "devbox")
+            == RemoteCLICommandBuilder.loginShellCommand("env ~/bin/claude --model opus '--help'", on: "devbox"))
     }
 
     @Test func preassignsALowercaseSessionIDOnceTheHostsHelpListsTheFlag() throws {

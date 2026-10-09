@@ -938,6 +938,16 @@
         }
       }
     },
+    "CLIs skip your interactive shell startup, which starts another program": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CLI 会跳过你的交互式 shell 启动配置，因为它会先启动其他程序"
+          }
+        }
+      }
+    },
     "Can't check": {
       "localizations": {
         "zh-Hans": {
@@ -988,12 +998,32 @@
         }
       }
     },
+    "Check shell startup": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "检查 shell 启动配置"
+          }
+        }
+      }
+    },
     "Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "确认 CLI 能在你常用的终端里运行，并且已保存过对话。**新建会话** 只提供检测到已安装的 CLI。"
+          }
+        }
+      }
+    },
+    "Checking shell startup…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在检查 shell 启动配置…"
           }
         }
       }
@@ -2317,6 +2347,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "找不到会话时"
+          }
+        }
+      }
+    },
+    "If a session opens a shell instead of its CLI, the host's shell startup starts another program first, such as tmux or zsh. The app checks for this and works around it when it can; the host's **⋯** says what it found.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "如果会话打开的是 shell 而不是它的 CLI，说明主机的 shell 启动配置先启动了另一个程序，例如 tmux 或 zsh。应用会检查这种情况，并尽可能绕过它；主机的 **⋯** 会显示检查结果。"
           }
         }
       }
@@ -4067,6 +4107,32 @@
         }
       }
     },
+    "Sessions on %@ open a shell instead of their CLI, because its shell startup runs %@ first. Click for how to fix it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sessions on %1$@ open a shell instead of their CLI, because its shell startup runs %2$@ first. Click for how to fix it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 上的会话会打开 shell 而不是它们的 CLI，因为它的 shell 启动配置会先运行 %2$@。单击查看修复方法。"
+          }
+        }
+      }
+    },
+    "Sessions on %@ open a shell instead of their CLI, because its shell startup starts another program first. Click for how to fix it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 上的会话会打开 shell 而不是它们的 CLI，因为它的 shell 启动配置会先启动另一个程序。单击查看修复方法。"
+          }
+        }
+      }
+    },
     "Sessions on other machines": {
       "localizations": {
         "zh-Hans": {
@@ -4103,6 +4169,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "设置…"
+          }
+        }
+      }
+    },
+    "Shell startup help": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shell 启动配置帮助"
+          }
+        }
+      }
+    },
+    "Shell startup in the user guide ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用户指南中的 shell 启动配置 ↗"
+          }
+        }
+      }
+    },
+    "Shell startup is fine": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shell 启动配置正常"
           }
         }
       }
@@ -5073,6 +5169,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的会话已经在这里"
+          }
+        }
+      }
+    },
+    "Your shell startup keeps CLIs from starting!": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的 shell 启动配置使 CLI 无法启动！"
           }
         }
       }

@@ -109,6 +109,11 @@
         <ol><li>Choose <strong>Add SSH host…</strong> in the sidebar.</li><li>Enter a <code>~/.ssh/config</code> alias or <code>user@hostname</code>.</li><li>Browse the host's projects and resume a session there.</li></ol>
         <p>The code and CLI run remotely; supported history is cached on your Mac. JustSessions provides terminal access, not graphical screen sharing.</p>
         <a class="text-link" href="https://github.com/yangzichao/JustSessions/blob/main/docs/guides/session-management.md#ssh-hosts">Detailed SSH setup <span aria-hidden="true">↗</span></a>
+        <h3 id="ssh-shell-startup">If a session opens a shell instead of its CLI</h3>
+        <p>Each CLI on a host starts through your login shell, so it is found wherever your shell's startup files put it. If those files start another program in every interactive shell, such as tmux or zsh, that program's prompt shows instead of the CLI.</p>
+        <p>JustSessions checks for this when you add a host. If a login shell without your interactive startup still runs the CLIs, the app starts them that way on that host, and the host's <strong>⋯</strong> menu says so. Otherwise a warning shows beside the host's name; point at it to see the line where the startup stopped.</p>
+        <p>To fix it, make that line run only in interactive shells, and not in the ones JustSessions starts, which have <code>JUSTSESSIONS=1</code> set: for example <code>if [[ $- == *i* ]] &amp;&amp; [ -z "$JUSTSESSIONS" ]; then exec zsh -l; fi</code>. Many hosts' bash also reads <code>~/.bashrc</code> for commands run over SSH, before JustSessions can set that variable, so checking for a terminal alone isn't enough. Then choose <strong>Check shell startup</strong> from the host's <strong>⋯</strong> menu.</p>
+        <p class="fine-print">Without your interactive startup, a CLI it puts on your <code>PATH</code>, as nvm's setup does, is missing from <strong>New session</strong>. Move that setup to <code>~/.profile</code>, or above the line in <code>~/.bashrc</code> that stops for non-interactive shells.</p>
       </section>
 
       <section id="terminal" aria-labelledby="terminal-title">

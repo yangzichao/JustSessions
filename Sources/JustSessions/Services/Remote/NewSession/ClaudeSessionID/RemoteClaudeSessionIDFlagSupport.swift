@@ -39,7 +39,7 @@ final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
     /// tell, as when the host is offline or the CLI fails, so a later refresh tries again.
     @discardableResult
     func check(host: String, startCommand: String?) -> Bool? {
-        let result = runner.run(host, Self.helpCommand(startCommand: startCommand), helpTimeout)
+        let result = runner.run(host, Self.helpCommand(startCommand: startCommand, host: host), helpTimeout)
         let answer = result.flatMap { $0.exitStatus == 0 ? ClaudeSessionIDFlagSupport.helpTextListsFlag($0.output) : nil }
         let key = Self.key(host: host, startCommand: startCommand)
         lock.withLock {
@@ -50,11 +50,11 @@ final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
     }
 
     /// What a new session's tab would start, with `--help` in place of the app's arguments.
-    static func helpCommand(startCommand: String?) -> String {
+    static func helpCommand(startCommand: String?, host: String) -> String {
         let invocation = CLIStartCommandLine.customCommand(startCommand).map {
             CLIStartCommandLine.remoteInvocation(startCommand: $0, arguments: ["--help"])
         } ?? "\(ConversationProvider.claude.executableName) --help"
-        return RemoteCLICommandBuilder.loginShellCommand(invocation)
+        return RemoteCLICommandBuilder.loginShellCommand(invocation, on: host)
     }
 
     private static func key(host: String, startCommand: String?) -> String {

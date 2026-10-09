@@ -48,7 +48,7 @@ struct RemoteConversationDeletionTests {
         try deletion.delete(remoteConversation(.codex, sessionID: sessionID, sourceFile: URL(fileURLWithPath: "/tmp/rollout-\(sessionID).jsonl")))
 
         #expect(recorder.commands.map(\.host) == ["devbox"])
-        #expect(recorder.commands.map(\.command) == [RemoteCLICommandBuilder.loginShellCommand("codex delete --force '\(sessionID)'")])
+        #expect(recorder.commands.map(\.command) == [RemoteCLICommandBuilder.loginShellCommand("codex delete --force '\(sessionID)'", on: "devbox")])
     }
 
     @Test func unreachableHostIsReportedAsAConnectionProblem() {

@@ -36,7 +36,7 @@ struct AntigravityRemoteMirrorTests {
     @Test func pythonSnapshotCommandProducesReadableDatabasesAndValidatesItsCleanupPath() throws {
         let fixture = try RemoteAntigravityFixture()
         defer { fixture.remove() }
-        let result = try #require(fixture.runner().run("devbox", AntigravityRemoteSnapshotCommand.create, 30))
+        let result = try #require(fixture.runner().run("devbox", AntigravityRemoteSnapshotCommand.create(on: "devbox"), 30))
         #expect(result.exitStatus == 0)
         let path = try #require(AntigravityRemoteSnapshotCommand.snapshotPath(in: result.output))
         defer { try? FileManager.default.removeItem(atPath: path) }
