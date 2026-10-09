@@ -1,10 +1,11 @@
 import Foundation
 
 enum RemoteAntigravityConversationDeletion {
-    static func command(sessionID: String, projectPath: String) -> String {
+    static func command(sessionID: String, projectPath: String, host: String) -> String {
         RemoteCLICommandBuilder.loginShellCommand(
             "python3 -c " + ShellQuoting.quoted(RemoteAntigravityDeletionMetadata.script + "\n" + script)
-                + " " + ShellQuoting.quoted(sessionID) + " " + ShellQuoting.quoted(projectPath)
+                + " " + ShellQuoting.quoted(sessionID) + " " + ShellQuoting.quoted(projectPath),
+            on: host
         )
     }
 

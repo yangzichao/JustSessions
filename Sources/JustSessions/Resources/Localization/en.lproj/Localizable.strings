@@ -172,6 +172,8 @@
 	<string>Branch</string>
 	<key>Browse…</key>
 	<string>Browse…</string>
+	<key>CLIs skip your interactive shell startup, which starts another program</key>
+	<string>CLIs skip your interactive shell startup, which starts another program</string>
 	<key>Can't check</key>
 	<string>Can't check</string>
 	<key>Cancel</key>
@@ -182,8 +184,12 @@
 	<string>Check Again</string>
 	<key>Check for updates</key>
 	<string>Check for updates</string>
+	<key>Check shell startup</key>
+	<string>Check shell startup</string>
 	<key>Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.</key>
 	<string>Check that the CLI runs in your usual terminal and has saved a conversation. **New session** offers only the CLIs it finds installed.</string>
+	<key>Checking shell startup…</key>
+	<string>Checking shell startup…</string>
 	<key>Checking the folder on %@…</key>
 	<string>Checking the folder on %@…</string>
 	<key>Checking the start command on %@…</key>
@@ -422,6 +428,8 @@
 	<string>How it works</string>
 	<key>If a session is missing</key>
 	<string>If a session is missing</string>
+	<key>If a session opens a shell instead of its CLI, the host's shell startup starts another program first, such as tmux or zsh. The app checks for this and works around it when it can; the host's **⋯** says what it found.</key>
+	<string>If a session opens a shell instead of its CLI, the host's shell startup starts another program first, such as tmux or zsh. The app checks for this and works around it when it can; the host's **⋯** says what it found.</string>
 	<key>Image</key>
 	<string>Image</string>
 	<key>Image can't be shown</key>
@@ -762,6 +770,8 @@
 	<string>Separate views</string>
 	<key>Session %lld of %lld</key>
 	<string>Session %lld of %lld</string>
+	<key>Sessions on %@ open a shell instead of their CLI, because its shell startup starts another program first. Click for how to fix it.</key>
+	<string>Sessions on %@ open a shell instead of their CLI, because its shell startup starts another program first. Click for how to fix it.</string>
 	<key>Sessions on other machines</key>
 	<string>Sessions on other machines</string>
 	<key>Settings</key>
@@ -770,6 +780,12 @@
 	<string>Settings (⌘,)</string>
 	<key>Settings…</key>
 	<string>Settings…</string>
+	<key>Shell startup help</key>
+	<string>Shell startup help</string>
+	<key>Shell startup in the user guide ↗</key>
+	<string>Shell startup in the user guide ↗</string>
+	<key>Shell startup is fine</key>
+	<string>Shell startup is fine</string>
 	<key>Show</key>
 	<string>Show</string>
 	<key>Show %@</key>
@@ -952,6 +968,8 @@
 	<string>Your sessions will appear here</string>
 	<key>Your sessions, already here</key>
 	<string>Your sessions, already here</string>
+	<key>Your shell startup keeps CLIs from starting!</key>
+	<string>Your shell startup keeps CLIs from starting!</string>
 	<key>`python3`, for Antigravity and OpenCode</key>
 	<string>`python3`, for Antigravity and OpenCode</string>
 	<key>`rsync`, and the CLIs you use</key>

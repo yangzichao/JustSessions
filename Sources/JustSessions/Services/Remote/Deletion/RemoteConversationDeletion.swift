@@ -29,7 +29,8 @@ struct RemoteConversationDeletion: Sendable {
             command = Self.claudeDeletionCommand(projectFolderName: projectFolderName, sessionID: conversation.sessionID)
         case .codex:
             command = RemoteCLICommandBuilder.loginShellCommand(
-                "codex delete --force \(ShellQuoting.quoted(conversation.sessionID))"
+                "codex delete --force \(ShellQuoting.quoted(conversation.sessionID))",
+                on: host
             )
         case .kiro:
             let metadataFile = conversation.sourceFile.deletingPathExtension().appendingPathExtension("json")
@@ -38,11 +39,15 @@ struct RemoteConversationDeletion: Sendable {
                   metadata.sessionID == conversation.sessionID,
                   metadata.projectPath == conversation.projectPath,
                   conversation.projectPath.hasPrefix("/") else { throw ConversationDeletionError.invalidSource }
-            command = RemoteKiroConversationDeletion.command(sessionID: conversation.sessionID, projectPath: conversation.projectPath)
+            command = RemoteKiroConversationDeletion.command(
+                sessionID: conversation.sessionID, projectPath: conversation.projectPath, host: host
+            )
         case .antigravity:
             let configurationDirectory = conversation.sourceFile.deletingLastPathComponent().deletingLastPathComponent()
             _ = try AntigravityDeletionFiles.validated(for: conversation, configurationDirectory: configurationDirectory)
-            command = RemoteAntigravityConversationDeletion.command(sessionID: conversation.sessionID, projectPath: conversation.projectPath)
+            command = RemoteAntigravityConversationDeletion.command(
+                sessionID: conversation.sessionID, projectPath: conversation.projectPath, host: host
+            )
         case .pi:
             let names = try RemotePiConversationDeletion.hostFileNames(
                 of: conversation,
@@ -55,7 +60,7 @@ struct RemoteConversationDeletion: Sendable {
             )
         case .opencode:
             _ = try RemoteOpenCodeConversationDeletion.validatedMirrorDatabase(for: conversation, mirror: mirror, host: host)
-            command = RemoteOpenCodeConversationDeletion.command(sessionID: conversation.sessionID)
+            command = RemoteOpenCodeConversationDeletion.command(sessionID: conversation.sessionID, host: host)
         }
 
         guard let result = runner.run(host, command, 60) else { throw RemoteConversationDeletionError.couldNotRun(host: host) }

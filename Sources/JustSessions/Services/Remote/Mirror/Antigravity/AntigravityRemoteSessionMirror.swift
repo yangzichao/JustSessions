@@ -17,7 +17,7 @@ struct AntigravityRemoteSessionMirror {
             }
             snapshotPath = snapshot.path
         } else {
-            guard let result = runner.run(host, AntigravityRemoteSnapshotCommand.create, 600) else {
+            guard let result = runner.run(host, AntigravityRemoteSnapshotCommand.create(on: host), 600) else {
                 throw RemoteSessionMirrorError.couldNotRun(host: host)
             }
             if result.exitStatus == 3 {

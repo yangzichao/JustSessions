@@ -20,14 +20,14 @@ struct RemoteTmuxPrefixChoiceTests {
         #expect(RemoteHostsUsingTmuxPrefix.load(from: settings.userDefaults).hosts == ["devbox"])
         try await expectEventually { recorder.commands.count == 1 }
         #expect(recorder.commands.first?.host == "devbox")
-        #expect(recorder.commands.first?.command == RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: true))
+        #expect(recorder.commands.first?.command == RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: true, on: "devbox"))
 
         // Choosing what the host already uses sends nothing.
         store.setUsesTmuxPrefix(true, on: "devbox", remoteRunner: recorder.runner(answering: (0, "")))
         store.setUsesTmuxPrefix(false, on: "buildbox", remoteRunner: recorder.runner(answering: (0, "")))
         store.setUsesTmuxPrefix(false, on: "devbox", remoteRunner: recorder.runner(answering: (0, "")))
         try await expectEventually { recorder.commands.count == 2 }
-        #expect(recorder.commands.last?.command == RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: false))
+        #expect(recorder.commands.last?.command == RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: false, on: "devbox"))
         #expect(!store.usesTmuxPrefix(on: .ssh("devbox")))
     }
 

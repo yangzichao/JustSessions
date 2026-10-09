@@ -25,7 +25,7 @@ extension ConversationStore {
         }
         // After that window's own tmux commands for the host, such as the rename that gave the session this name.
         otherStore.tmuxCommandQueues.run(on: tab.host) { [weak self] in
-            let runsInTmux = remoteRunner.run(destination, RemoteTmuxCommands.hasSessionCommand(tmuxSessionName), 30)?.exitStatus == 0
+            let runsInTmux = remoteRunner.run(destination, RemoteTmuxCommands.hasSessionCommand(tmuxSessionName, on: destination), 30)?.exitStatus == 0
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 guard runsInTmux else {

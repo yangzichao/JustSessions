@@ -35,7 +35,7 @@ extension ConversationStore {
             tmuxCommandQueues.run(on: .thisMac) { tmuxServer.renameSession(from: currentName, to: sessionName) }
         case .ssh(let host):
             tmuxCommandQueues.run(on: session.host) {
-                _ = remoteRunner.run(host, RemoteTmuxCommands.renameSessionCommand(from: currentName, to: sessionName), 30)
+                _ = remoteRunner.run(host, RemoteTmuxCommands.renameSessionCommand(from: currentName, to: sessionName, on: host), 30)
             }
         }
     }
@@ -57,7 +57,7 @@ extension ConversationStore {
             tmuxCommandQueues.run(on: .thisMac) { tmuxServer.killSession(named: name) }
         case .ssh(let destination):
             tmuxCommandQueues.run(on: host) {
-                _ = remoteRunner.run(destination, RemoteTmuxCommands.killSessionCommand(name), 30)
+                _ = remoteRunner.run(destination, RemoteTmuxCommands.killSessionCommand(name, on: destination), 30)
             }
         }
     }

@@ -2,7 +2,7 @@ import Foundation
 
 enum RemoteKiroConversationDeletion {
     /// Targets the standard Kiro home copied by the mirror, even if the login shell configures a different home.
-    static func command(sessionID: String, projectPath: String) -> String {
+    static func command(sessionID: String, projectPath: String, host: String) -> String {
         let script = """
             dir="$HOME/.kiro/sessions/cli"
             id=\(ShellQuoting.quoted(sessionID))
@@ -21,6 +21,6 @@ enum RemoteKiroConversationDeletion {
               exit 1
             fi
             """
-        return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))")
+        return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
     }
 }

@@ -16,7 +16,8 @@ extension ConversationStore {
             do {
                 let hostConversations = try discovery.discover(host: host)
                 await self.applyRemoteHostConversations(hostConversations, host: host)
-                if let status = RemoteHostStatusProbe.status(ofHost: host) {
+                let status = RemoteHostStatusProbe.status(ofHost: host)
+                if let status {
                     await self.setTmuxSessionNames(status.tmuxSessionNames, on: .ssh(host))
                     if let installedProviders = status.installedProviders {
                         await self.setInstalledProviders(installedProviders, on: .ssh(host))
@@ -24,8 +25,13 @@ extension ConversationStore {
                     await self.checkClaudeSessionIDFlagIfUnanswered(on: host)
                 }
                 await self.setRemoteHostRefreshStatus(.refreshed(.now), host: host)
+                // After the refresh, so a check that changes how the host's shell starts can refresh it again.
+                if let status {
+                    await self.checkRemoteShellStartupIfNeeded(on: host, statusListedCLIs: status.installedProviders != nil)
+                }
             } catch {
                 await self.setRemoteHostRefreshStatus(.failed(error.localizedDescription), host: host)
+                await self.checkRemoteShellStartupIfNeeded(on: host, statusListedCLIs: false)
             }
         }
     }
@@ -44,6 +50,7 @@ extension ConversationStore {
         remoteHostList.save(to: userDefaults)
         remoteHostsUsingTmuxPrefix.setUsesTmuxPrefix(false, for: host)
         remoteHostsUsingTmuxPrefix.save(to: userDefaults)
+        forgetRemoteShellStartup(on: host)
         hostRefreshStatuses.removeValue(forKey: .ssh(host))
         tmuxSessionNamesByHost.removeValue(forKey: .ssh(host))
         installedProvidersByHost.removeValue(forKey: .ssh(host))
