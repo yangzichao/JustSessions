@@ -1,15 +1,33 @@
 import SwiftUI
 
 /// Adds an SSH host. Its sessions are listed under a heading of their own, below this Mac's; refreshing and
-/// removing it are on that heading's right-click menu.
+/// removing it are on that heading's right-click menu. Adding first logs in to the host as the app's background
+/// commands do, so a host they can't reach says why here; Add anyway keeps it, as for a host that is only offline now.
 struct AddRemoteHostSheet: View {
     @ObservedObject var store: ConversationStore
     @Environment(\.dismiss) private var dismiss
     @State private var proposedHost = ""
+    /// The host being logged in to before it is added. The field is locked meanwhile.
+    @State private var hostBeingChecked: String?
+    @State private var connectionCheck: Task<Void, Never>?
+    /// Why the host could not be reached. Editing the host withdraws it, and with it Add anyway.
+    @State private var failedConnection: FailedConnection?
 
-    private var canAddProposedHost: Bool {
-        guard let host = RemoteHostList.normalizedHost(proposedHost) else { return false }
-        return !store.remoteHostList.hosts.contains(host)
+    private struct FailedConnection {
+        let host: String
+        let problem: SSHConnectionProblem
+    }
+
+    /// The host as it will be stored, or nil when it is invalid or already listed.
+    private var hostToAdd: String? {
+        guard let host = RemoteHostList.normalizedHost(proposedHost), !store.remoteHostList.hosts.contains(host)
+        else { return nil }
+        return host
+    }
+
+    private var failedConnectionToHostToAdd: FailedConnection? {
+        guard let failedConnection, failedConnection.host == hostToAdd else { return nil }
+        return failedConnection
     }
 
     var body: some View {
@@ -24,10 +42,18 @@ struct AddRemoteHostSheet: View {
                 TextField("SSH alias or user@hostname", text: $proposedHost)
                     .textFieldStyle(ThemedTextFieldStyle())
                     .accessibilityLabel("SSH host")
-                    .onSubmit(addProposedHost)
-                Text("Requires passwordless SSH.")
-                    .font(.caption)
-                    .foregroundStyle(ThemePalette.secondaryText)
+                    .disabled(hostBeingChecked != nil)
+                    .onSubmit(checkAndAddHost)
+                if let failedConnection = failedConnectionToHostToAdd {
+                    Text(verbatim: failedConnection.problem.explanation(host: failedConnection.host))
+                        .font(.callout)
+                        .foregroundStyle(ThemePalette.warningText)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text("Requires passwordless SSH.")
+                        .font(.caption)
+                        .foregroundStyle(ThemePalette.secondaryText)
+                }
             }
 
             DisclosureGroup("Setup requirements") {
@@ -36,18 +62,32 @@ struct AddRemoteHostSheet: View {
             .font(.callout)
             .foregroundStyle(ThemePalette.secondaryText)
 
-            HStack {
+            HStack(spacing: 8) {
+                if let hostBeingChecked {
+                    ProgressView().controlSize(.small)
+                    Text("Connecting to \(hostBeingChecked)…")
+                        .font(.callout)
+                        .foregroundStyle(ThemePalette.secondaryText)
+                }
                 Spacer()
                 Button("Cancel") { dismiss() }
                     .keyboardShortcut(.cancelAction)
-                Button("Add host", action: addProposedHost)
+                if let failedConnection = failedConnectionToHostToAdd {
+                    Button("Add anyway") { add(failedConnection.host) }
+                }
+                Button(addButtonTitle, action: checkAndAddHost)
                     .keyboardShortcut(.defaultAction)
-                    .disabled(!canAddProposedHost)
+                    .disabled(hostToAdd == nil || hostBeingChecked != nil)
             }
         }
         .padding(20)
         .frame(width: 480)
         .background(ThemePalette.contentSurface)
+        .onDisappear { connectionCheck?.cancel() }
+    }
+
+    private var addButtonTitle: LocalizedStringKey {
+        failedConnectionToHostToAdd == nil ? "Add host" : "Try again"
     }
 
     private var setupRequirements: some View {
@@ -64,9 +104,25 @@ struct AddRemoteHostSheet: View {
         .padding(.top, 6)
     }
 
-    private func addProposedHost() {
-        guard canAddProposedHost else { return }
-        store.addRemoteHost(proposedHost)
+    private func checkAndAddHost() {
+        guard let host = hostToAdd, hostBeingChecked == nil else { return }
+        hostBeingChecked = host
+        failedConnection = nil
+        connectionCheck = Task {
+            let problem = await store.connectionProblem(on: host)
+            // Cancel, or a click outside the sheet, closed it during the check.
+            guard !Task.isCancelled else { return }
+            hostBeingChecked = nil
+            if let problem {
+                failedConnection = FailedConnection(host: host, problem: problem)
+            } else {
+                add(host)
+            }
+        }
+    }
+
+    private func add(_ host: String) {
+        store.addRemoteHost(host)
         dismiss()
     }
 }

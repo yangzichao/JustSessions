@@ -33,7 +33,9 @@ struct OpenCodeRemoteSessionMirror {
                 try? FileManager.default.removeItem(at: destination)
                 return
             }
-            if result.exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus { throw RemoteSessionMirrorError.sshFailed(host: host) }
+            if result.exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus {
+                throw RemoteSessionMirrorError.sshFailed(host: host, problem: SSHConnectionProblem(sshOutput: result.output))
+            }
             guard result.exitStatus == 0, let path = OpenCodeRemoteSnapshotCommand.snapshotPath(in: result.output) else {
                 throw RemoteSessionMirrorError.rsyncFailed(host: host, output: "Could not snapshot OpenCode sessions. The SSH host needs python3 and a readable OpenCode database.")
             }
@@ -50,7 +52,9 @@ struct OpenCodeRemoteSessionMirror {
             includesStandardError: true, timeout: 600
         ) else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
         guard result.exitStatus == 0 else {
-            if result.exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus { throw RemoteSessionMirrorError.sshFailed(host: host) }
+            if result.exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus {
+                throw RemoteSessionMirrorError.sshFailed(host: host, problem: SSHConnectionProblem(sshOutput: result.output))
+            }
             throw RemoteSessionMirrorError.rsyncFailed(host: host, output: String(result.output.suffix(500)))
         }
     }

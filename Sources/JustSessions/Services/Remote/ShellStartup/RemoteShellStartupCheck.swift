@@ -22,7 +22,7 @@ struct RemoteShellStartupCheck: Sendable {
         self.run = run ?? { host, command, timeout in
             BoundedProcessRunner.outcome(
                 ofExecutable: "/usr/bin/ssh",
-                arguments: ["-tt"] + RemoteHostCommandRunner.sshArguments(host: host, command: command),
+                arguments: Self.sshArguments(host: host, command: command),
                 // A tab's terminal settings, which startup files may look at, such as TERM.
                 environment: TerminalColorEnvironment.embeddedTerminalEnvironment(from: ProcessInfo.processInfo.environment),
                 includesStandardError: true,
@@ -30,6 +30,11 @@ struct RemoteShellStartupCheck: Sendable {
             )
         }
         self.timeout = timeout
+    }
+
+    /// The background commands' options, with a terminal in place of their `-T`.
+    static func sshArguments(host: String, command: String) -> [String] {
+        ["-tt"] + RemoteHostCommandRunner.nonInteractiveSSHOptions + [host, command]
     }
 
     /// Nil when it could not tell, as when the host could not be reached; a later refresh checks again.

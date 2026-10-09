@@ -91,6 +91,8 @@ Run the checks relevant to the change and record the result of each:
 
 | Check | What to verify |
 | --- | --- |
+| Adding a host | Add the VM: the sheet shows **Connecting to…**, then adds it. Add a host that fails, such as a typo or the stopped VM: the sheet says why and offers **Try again** and **Add anyway**. |
+| `~/.ssh/config` written for logging in by hand | Give the VM an alias with `RemoteCommand`, `RequestTTY force`, and a `LocalForward`. Refresh lists its sessions, and a tab opens the CLI, not the `RemoteCommand`. |
 | Discovery and refresh | The installed provider is offered; the new session appears under the remote project and its preview matches the remote history. |
 | Launch and resume | New sessions and resumed sessions run in the VM's project, including its space-containing path. Branch only where the provider supports it. |
 | Keep running and reconnect | Close a running CLI tab with **Keep running**, then reattach to the same process and session. Also test interruption of just the SSH connection when changing reconnect behavior. Keep the VM running throughout. |

@@ -36,6 +36,14 @@ extension ConversationStore {
         }
     }
 
+    /// Why the app can't log in to `host` without a prompt, or nil when it can; checked before the host is added.
+    func connectionProblem(
+        on host: String,
+        check: RemoteHostConnectionCheck = RemoteHostConnectionCheck()
+    ) async -> SSHConnectionProblem? {
+        await Task.detached(priority: .userInitiated) { check.problem(connectingTo: host) }.value
+    }
+
     /// Returns false when the host is not a valid `ssh` destination or is already listed.
     @discardableResult
     func addRemoteHost(_ proposedHost: String) -> Bool {

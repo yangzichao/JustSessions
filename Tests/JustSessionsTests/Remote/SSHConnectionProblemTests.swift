@@ -59,6 +59,19 @@ struct SSHConnectionProblemTests {
             """) == "ssh_dispatch_run_fatal: Connection to 10.0.0.2 port 22: message authentication code incorrect")
     }
 
+    /// What macOS's `rsync` printed when the `ssh` it ran failed; the copy of a host's sessions reports the cause.
+    @Test(arguments: [
+        ("ssh: Could not resolve hostname devbox: nodename nor servname provided, or not known\nrsync(51043): error: unexpected end of file\n",
+         SSHConnectionProblem.hostNotFound),
+        ("ssh: connect to host 127.0.0.1 port 1: Connection refused\nrsync(51048): error: unexpected end of file\n", .refused),
+        ("No ED25519 host key is known for devbox and you have requested strict checking.\nHost key verification failed.\n"
+            + "rsync(51051): error: unexpected end of file\n", .hostKeyNotTrusted),
+        ("", .other(sshMessage: "ssh exited without saying why.")),
+    ])
+    func classifiesTheOutputOfRsyncsSSH(output: String, problem: SSHConnectionProblem) {
+        #expect(SSHConnectionProblem(sshOutput: output) == problem)
+    }
+
     @Test func keepsTheLastLineWithWordsWhenNoneNamesAKnownProblem() {
         #expect(SSHConnectionProblem.tellingLine(inOutput: "Warning: something\nBad owner or permissions on /Users/me/.ssh/config\n\n")
             == "Bad owner or permissions on /Users/me/.ssh/config")

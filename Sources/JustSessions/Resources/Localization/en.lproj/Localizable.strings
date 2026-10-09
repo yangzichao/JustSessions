@@ -98,6 +98,8 @@
 	<string>Add a project folder or restore an archived project on this Mac</string>
 	<key>Add a server you reach with passwordless SSH to browse and resume its sessions here.</key>
 	<string>Add a server you reach with passwordless SSH to browse and resume its sessions here.</string>
+	<key>Add anyway</key>
+	<string>Add anyway</string>
 	<key>Add host</key>
 	<string>Add host</string>
 	<key>Add or restore a project on %@</key>
@@ -272,6 +274,8 @@
 	<string>Colors</string>
 	<key>Connect again; a CLI still running in tmux on the host is reattached</key>
 	<string>Connect again; a CLI still running in tmux on the host is reattached</string>
+	<key>Connecting to %@…</key>
+	<string>Connecting to %@…</string>
 	<key>Copied</key>
 	<string>Copied</string>
 	<key>Copies the colors once. JustSessions doesn't read iTerm2's settings again.</key>

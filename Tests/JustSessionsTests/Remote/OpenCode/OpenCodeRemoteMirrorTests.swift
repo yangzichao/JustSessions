@@ -108,6 +108,19 @@ struct OpenCodeRemoteMirrorTests {
         #expect(recorder.commands.count == 2)
     }
 
+    @Test func aFailedConnectionSaysWhy() throws {
+        let fixture = try RemoteOpenCodeFixture()
+        defer { fixture.remove() }
+        let runner = RemoteCommandRecorder().runner(answering: (255, "ssh: Could not resolve hostname devbox: nodename nor servname provided, or not known\n"))
+
+        #expect(throws: RemoteSessionMirrorError.sshFailed(host: "devbox", problem: .hostNotFound)) {
+            try OpenCodeRemoteSessionMirror(runner: runner)
+                .synchronize(host: "devbox", sourceHomeOverride: nil, destination: fixture.mirrorDatabase.deletingLastPathComponent())
+        }
+        #expect(RemoteSessionMirrorError.sshFailed(host: "devbox", problem: .hostNotFound).errorDescription
+            == "devbox couldn't be found. Check the host name and your network or VPN.")
+    }
+
     @Test func theDatabaseLocationFollowsTheLoginShellsEnvironment() throws {
         let cases: [([String: String], String)] = [
             ([:], "/home/me/.local/share/opencode/opencode.db"),
