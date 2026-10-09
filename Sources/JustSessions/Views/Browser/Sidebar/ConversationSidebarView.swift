@@ -149,6 +149,7 @@ struct ConversationSidebarView: View {
         .background(sidebarBackground)
         .sheet(isPresented: $isAddRemoteHostSheetPresented) {
             AddRemoteHostSheet(store: store)
+                .appLanguage(from: .shared)
         }
         .dismissesOnClickOutside(isPresented: $isAddRemoteHostSheetPresented)
         .sheet(item: $hostShowingArchivedProjects) { host in
