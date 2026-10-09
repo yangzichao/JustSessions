@@ -59,7 +59,7 @@ Keep the machine doing the work awake. Without tmux, closing a terminal tab ends
 
 - In **Projects**, clear the filters, then click the affected host's refresh button.
 - Confirm the CLI executable works in your usual terminal. New session menus offer only installed CLIs.
-- Start one conversation in the CLI so it has history for the app to discover. Kiro sessions need at least one message; OpenCode archived sessions are excluded. Subagents' sessions are listed under the session that started them: expand it with the chevron before its icon.
+- Start one conversation in the CLI so it has history for the app to discover. Kiro sessions need at least one message; OpenCode archived sessions are excluded. Subagents' sessions are hidden until you turn them on in **Settings > General**; then expand the session that started them with the chevron before its icon.
 - Check [session locations and supported environment variables](session-storage.md#session-locations). Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders, and the OpenCode database its login shell points to.
 - For SSH, confirm passwordless access, `rsync`, and the remote CLI before adding the host.
 

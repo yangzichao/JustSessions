@@ -66,6 +66,8 @@
 	<string>1 次工具调用</string>
 	<key>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</key>
 	<string>仍在 tmux 中运行的 CLI 会重新连接。其他会话在选中标签时继续，包括 Mac 重启后的会话。普通终端会在原文件夹打开新 shell。</string>
+	<key>A session whose subagents ran sessions of their own gets a chevron before its icon. Click it to list them under the session and read them. Kiro's aren't listed; on SSH hosts, only Codex's and Antigravity's are.</key>
+	<string>若会话的子代理运行了自己的会话，该会话图标前会出现一个箭头。点击它即可在该会话下列出并阅读这些会话。不列出 Kiro 的子代理会话；SSH 主机上仅列出 Codex 和 Antigravity 的。</string>
 	<key>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</key>
 	<string>子代理为启动它的会话运行了此会话。可以在这里阅读，但不能单独继续或删除。</string>
 	<key>About JustSessions</key>
@@ -834,6 +836,8 @@
 	<string>显示侧栏（⌘B）</string>
 	<key>Show subagent sessions of %@</key>
 	<string>显示 %@ 的子代理会话</string>
+	<key>Show subagents under the sessions that started them</key>
+	<string>在启动子代理的会话下显示子代理</string>
 	<key>Sidebar</key>
 	<string>侧栏</string>
 	<key>Sidebar width</key>
@@ -876,6 +880,8 @@
 	<string>子代理</string>
 	<key>Subagent of %@</key>
 	<string>%@ 的子代理</string>
+	<key>Subagents</key>
+	<string>子代理</string>
 	<key>Supports local Claude Code, Codex, Pi, and OpenCode, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session.</key>
 	<string>支持本机的 Claude Code、Codex、Pi 和 OpenCode，包括在 tmux 中运行但未打开标签的会话。正在查看的会话不发送通知。点击通知可打开会话。</string>
 	<key>Swap with left view</key>

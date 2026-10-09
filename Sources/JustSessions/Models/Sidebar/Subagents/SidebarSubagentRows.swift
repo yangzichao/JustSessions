@@ -3,6 +3,10 @@ import Foundation
 /// The rows under a session for the subagents it started, shown only once you expand the session: each subagent, then,
 /// while that one is expanded too, its own.
 struct SidebarSubagentRows {
+    /// Whether sessions offer a chevron that lists their subagents' sessions, as set in Settings → General. Off until
+    /// you turn it on, so the sidebar lists only the sessions you started.
+    static let showsSubagentsUserDefaultsKey = "sidebarShowsSubagentSessions"
+
     struct Row: Identifiable, Equatable {
         let conversation: Conversation
         /// 1 for a subagent of a listed session, 2 for one of its subagents, and so on.

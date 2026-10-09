@@ -10,6 +10,8 @@ struct SidebarProjectSection: View {
     let projectSelection: ProjectMultiSelection
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
+    /// Whether sessions offer a chevron that lists their subagents' sessions; without it, none are listed.
+    let showsSubagents: Bool
     /// Which sessions show their subagents' sessions under them.
     let subagentRows: SidebarSubagentRows
     let onToggleSubagents: (Conversation) -> Void
@@ -87,13 +89,13 @@ struct SidebarProjectSection: View {
     /// A session's row, then its subagents' rows while they show.
     @ViewBuilder
     private func conversationRows(_ conversation: Conversation, isFirstRow: Bool, isLastRow: Bool) -> some View {
-        let rowsUnder = subagentRows.rows(under: conversation, subagents: store.subagents(of:))
+        let rowsUnder = subagentRows.rows(under: conversation, subagents: listedSubagents(of:))
         SidebarSessionRow(
             store: store,
             conversation: conversation,
             sessionSelection: sessionSelection,
             selectedConversations: selectedConversations,
-            subagentCount: store.subagents(of: conversation).count,
+            subagentCount: listedSubagents(of: conversation).count,
             isShowingSubagents: subagentRows.isExpanded(conversation.id),
             messageMatch: messageMatches[conversation.id],
             onClick: onClickConversation,
@@ -119,6 +121,10 @@ struct SidebarProjectSection: View {
             )
             .sidebarIndentGuide(isFirstRow: false, isLastRow: isLastRow && row.id == rowsUnder.last?.id)
         }
+    }
+
+    private func listedSubagents(of conversation: Conversation) -> [Conversation] {
+        showsSubagents ? store.subagents(of: conversation) : []
     }
 
     /// The tabs of the project's new sessions whose tab is still open, by the new session's id.
