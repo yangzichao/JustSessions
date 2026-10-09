@@ -166,8 +166,8 @@
 	<string>为 %lld 个会话创建分支</string>
 	<key>Browse…</key>
 	<string>浏览…</string>
-	<key>CLIs start without your interactive shell startup</key>
-	<string>CLI 启动时会跳过交互式 shell 启动配置</string>
+	<key>CLIs skip your interactive shell startup, which starts another program</key>
+	<string>CLI 会跳过你的交互式 shell 启动配置，因为它会先启动其他程序</string>
 	<key>Can't check</key>
 	<string>无法检查</string>
 	<key>Cancel</key>
@@ -790,6 +790,8 @@
 	<string>Shell 启动配置帮助</string>
 	<key>Shell startup in the user guide ↗</key>
 	<string>用户指南中的 shell 启动配置 ↗</string>
+	<key>Shell startup is fine</key>
+	<string>Shell 启动配置正常</string>
 	<key>Show</key>
 	<string>显示</string>
 	<key>Show %@</key>
@@ -978,8 +980,8 @@
 	<string>你的会话会显示在这里</string>
 	<key>Your sessions, already here</key>
 	<string>你的会话已经在这里</string>
-	<key>Your shell startup keeps CLIs from starting</key>
-	<string>你的 shell 启动配置使 CLI 无法启动</string>
+	<key>Your shell startup keeps CLIs from starting!</key>
+	<string>你的 shell 启动配置使 CLI 无法启动！</string>
 	<key>`python3`, for Antigravity and OpenCode</key>
 	<string>`python3`，用于 Antigravity 和 OpenCode</string>
 	<key>`rsync`, and the CLIs you use</key>

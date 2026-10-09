@@ -938,12 +938,12 @@
         }
       }
     },
-    "CLIs start without your interactive shell startup": {
+    "CLIs skip your interactive shell startup, which starts another program": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "CLI 启动时会跳过交互式 shell 启动配置"
+            "value": "CLI 会跳过你的交互式 shell 启动配置，因为它会先启动其他程序"
           }
         }
       }
@@ -4193,6 +4193,16 @@
         }
       }
     },
+    "Shell startup is fine": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shell 启动配置正常"
+          }
+        }
+      }
+    },
     "Show": {
       "localizations": {
         "zh-Hans": {
@@ -5163,12 +5173,12 @@
         }
       }
     },
-    "Your shell startup keeps CLIs from starting": {
+    "Your shell startup keeps CLIs from starting!": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "你的 shell 启动配置使 CLI 无法启动"
+            "value": "你的 shell 启动配置使 CLI 无法启动！"
           }
         }
       }

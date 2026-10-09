@@ -172,8 +172,8 @@
 	<string>Branch</string>
 	<key>Browse…</key>
 	<string>Browse…</string>
-	<key>CLIs start without your interactive shell startup</key>
-	<string>CLIs start without your interactive shell startup</string>
+	<key>CLIs skip your interactive shell startup, which starts another program</key>
+	<string>CLIs skip your interactive shell startup, which starts another program</string>
 	<key>Can't check</key>
 	<string>Can't check</string>
 	<key>Cancel</key>
@@ -784,6 +784,8 @@
 	<string>Shell startup help</string>
 	<key>Shell startup in the user guide ↗</key>
 	<string>Shell startup in the user guide ↗</string>
+	<key>Shell startup is fine</key>
+	<string>Shell startup is fine</string>
 	<key>Show</key>
 	<string>Show</string>
 	<key>Show %@</key>
@@ -966,8 +968,8 @@
 	<string>Your sessions will appear here</string>
 	<key>Your sessions, already here</key>
 	<string>Your sessions, already here</string>
-	<key>Your shell startup keeps CLIs from starting</key>
-	<string>Your shell startup keeps CLIs from starting</string>
+	<key>Your shell startup keeps CLIs from starting!</key>
+	<string>Your shell startup keeps CLIs from starting!</string>
 	<key>`python3`, for Antigravity and OpenCode</key>
 	<string>`python3`, for Antigravity and OpenCode</string>
 	<key>`rsync`, and the CLIs you use</key>
