@@ -27,7 +27,7 @@ struct LaunchAtLoginToggle: View {
             if let errorDescription = settingsStore.errorDescription {
                 Text("Could not change launch at login: \(errorDescription)")
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(ThemePalette.errorText)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

@@ -17,10 +17,54 @@ struct AppThemeReadabilityTests {
                 #expect(contrastRatio(terminal.selectionForeground, terminal.selectionBackground) >= 3, "\(variant) selection")
                 // Bright black carries hints and dim text in many CLIs, so it must not vanish into the background.
                 #expect(contrastRatio(terminal.ansiHexColors[8], colors.contentSurface) >= 1.5, "\(variant) bright black")
-                #expect(contrastRatio(colors.ink, colors.contentSurface) >= 4.5, "\(variant) ink")
                 #expect(contrastRatio(colors.inkForeground, colors.ink) >= 4.5, "\(variant) ink foreground")
-                #expect(contrastRatio(colors.secondaryText, colors.contentSurface) >= 4.5, "\(variant) secondary text")
-                #expect(contrastRatio(colors.secondaryText, colors.raisedSurface) >= 4.5, "\(variant) secondary text on a control")
+            }
+        }
+    }
+
+    @Test func everyTextColorIsReadableOnEverySurfaceTextSitsOn() {
+        for theme in AppTheme.allCases {
+            for isDark in [false, true] {
+                let colors = theme.colors(isDark: isDark)
+                var textColors: [(String, UInt32)] = [
+                    ("ink", colors.ink),
+                    ("secondary", colors.secondaryText),
+                    ("tertiary", colors.tertiaryText),
+                    ("warning", colors.warningText),
+                    ("error", colors.errorText),
+                ]
+                textColors += ConversationProvider.allCases.map { ($0.rawValue, colors.providerTextHexColors[$0] ?? 0) }
+                for (name, textColor) in textColors {
+                    for surface in colors.textSurfaces {
+                        let ratio = contrastRatio(textColor, surface)
+                        #expect(ratio >= 4.5, "\(theme) dark=\(isDark) \(name) on \(String(surface, radix: 16)): \(ratio)")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test func textSurfacesIncludeTheFaintFillsAndSelectedRows() {
+        let colors = AppTheme.atomOne.colors(isDark: false)
+        let hoveredRow = ThemeColorContrast.blend(colors.sidebarSurface, with: colors.line, fraction: ThemeFillOpacity.hover)
+        let selectedClaudeRow = ThemeColorContrast.blend(
+            colors.sidebarSurface, with: ConversationProvider.claude.tintHexColor.light, fraction: ThemeFillOpacity.selectedRow
+        )
+
+        #expect(colors.textSurfaces.contains(colors.sidebarSurface))
+        #expect(colors.textSurfaces.contains(colors.userMessageSurface))
+        #expect(colors.textSurfaces.contains(hoveredRow))
+        #expect(colors.textSurfaces.contains(selectedClaudeRow))
+    }
+
+    @Test func tertiaryTextStaysFainterThanSecondaryText() {
+        for theme in AppTheme.allCases {
+            for isDark in [false, true] {
+                let colors = theme.colors(isDark: isDark)
+                #expect(
+                    contrastRatio(colors.tertiaryText, colors.contentSurface) <= contrastRatio(colors.secondaryText, colors.contentSurface),
+                    "\(theme) dark=\(isDark)"
+                )
             }
         }
     }
@@ -30,16 +74,24 @@ struct AppThemeReadabilityTests {
             for isDark in [false, true] {
                 let colors = theme.colors(isDark: isDark)
                 #expect(colors.tabGroupHexColors.count == 8)
-                for foreground in colors.tabGroupHexColors {
-                    for fillOpacity in [0.0, 0.15, 0.24] {
-                        let background = [16, 8, 0].reduce(UInt32(0)) { result, shift in
-                            let surfaceChannel = Double((colors.contentSurface >> shift) & 0xFF)
-                            let foregroundChannel = Double((foreground >> shift) & 0xFF)
-                            let channel = UInt32((surfaceChannel * (1 - fillOpacity) + foregroundChannel * fillOpacity).rounded())
-                            return result << 8 | channel
+                // The tab bar's labels sit on the sidebar surface, and the open tabs list names groups in the sidebar.
+                for surface in [colors.contentSurface, colors.sidebarSurface] {
+                    for foreground in colors.tabGroupHexColors {
+                        for fillOpacity in [0.0, 0.15, 0.24] {
+                            let background = [16, 8, 0].reduce(UInt32(0)) { result, shift in
+                                let surfaceChannel = Double((surface >> shift) & 0xFF)
+                                let foregroundChannel = Double((foreground >> shift) & 0xFF)
+                                let channel = UInt32((surfaceChannel * (1 - fillOpacity) + foregroundChannel * fillOpacity).rounded())
+                                return result << 8 | channel
+                            }
+                            #expect(contrastRatio(foreground, background) >= 4.5, "\(theme) dark=\(isDark) fill=\(fillOpacity)")
                         }
-                        #expect(contrastRatio(foreground, background) >= 4.5, "\(theme) dark=\(isDark) fill=\(fillOpacity)")
                     }
+                }
+                // The open tabs list names a group in its color on a sidebar row, which the pointer fills faintly.
+                let hoveredHeading = ThemeColorContrast.blend(colors.sidebarSurface, with: colors.line, fraction: ThemeFillOpacity.hover)
+                for foreground in colors.tabGroupHexColors {
+                    #expect(contrastRatio(foreground, hoveredHeading) >= 4.5, "\(theme) dark=\(isDark) hovered heading")
                 }
             }
         }

@@ -18,7 +18,7 @@ struct SidebarToggleButton: View {
         Button { isSidebarHidden.toggle() } label: {
             Image(systemName: "sidebar.left")
                 .font(.system(size: 14))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .frame(width: Self.width, height: 22)
                 .contentShape(Rectangle())
         }

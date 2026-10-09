@@ -12,7 +12,7 @@ struct TerminalEndedBar: View {
                 else { Text("Ended") }
             }
             .font(.caption)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(ThemePalette.secondaryText)
             Spacer()
             if let onReconnect {
                 Button("Reconnect", systemImage: "arrow.triangle.2.circlepath", action: onReconnect)

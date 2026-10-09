@@ -80,7 +80,7 @@ struct SidebarSessionRow: View {
             .allowsHitTesting(isHovered)
         }
         .background(
-            SidebarRowBackground(isSelected: isHighlighted, isHovered: isHovered, selectionTint: conversation.provider.tintColor)
+            SidebarRowBackground(isSelected: isHighlighted, isHovered: isHovered, selectionProvider: conversation.provider)
         )
         .onHover { isHovered = $0 }
         .contextMenu { menuItems }

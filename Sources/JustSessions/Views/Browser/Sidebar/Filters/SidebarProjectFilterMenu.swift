@@ -10,6 +10,7 @@ struct SidebarProjectFilterMenu: View {
     let allSessionCount: Int
     let recentSessionCount: Int
     let waitingSessionCount: Int
+    @Environment(\.self) private var environment
 
     private var isFiltering: Bool {
         recencyFilter != .all || providerFilter.provider != nil || waitingFilter != .all
@@ -69,7 +70,7 @@ struct SidebarProjectFilterMenu: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
-        .foregroundStyle(filteredProvider?.tintColor ?? Color.secondary)
+        .foregroundStyle(filteredProvider?.tintColor ?? Color(ThemePalette.secondaryText.resolve(in: environment)))
         .frame(width: 26, height: 26)
         .background(
             filteredProvider.map { AnyShapeStyle($0.tintColor.opacity(0.15)) } ?? AnyShapeStyle(ThemePalette.trackFill),

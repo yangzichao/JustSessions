@@ -14,7 +14,7 @@ struct SubagentDisclosureButton: View {
         Button(action: action) {
             Image(systemName: "chevron.right")
                 .font(.system(size: 8, weight: .bold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .rotationEffect(.degrees(isExpanded ? 90 : 0))
                 .animation(.easeOut(duration: 0.12), value: isExpanded)
                 .frame(width: SidebarSessionRowMetrics.indentStep, height: 28)

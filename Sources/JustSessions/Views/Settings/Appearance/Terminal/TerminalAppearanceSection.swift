@@ -65,7 +65,7 @@ struct TerminalAppearanceSection: View {
                     .accessibilityLabel("Terminal appearance preview")
                 Text("Applies immediately to all terminals. Some CLI apps use their own colors.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ThemePalette.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

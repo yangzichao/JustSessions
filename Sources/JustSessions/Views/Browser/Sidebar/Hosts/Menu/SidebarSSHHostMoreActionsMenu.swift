@@ -11,7 +11,7 @@ struct SidebarSSHHostMoreActionsMenu: View {
         } label: {
             Image(systemName: "ellipsis")
                 .font(.system(size: 10, weight: .bold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .frame(width: 16, height: 16)
                 .contentShape(Rectangle())
         }

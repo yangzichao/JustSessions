@@ -9,16 +9,29 @@ struct AppThemeColors: Equatable, Sendable {
     let raisedSurface: UInt32
     /// Your messages in a transcript.
     let userMessageSurface: UInt32
-    /// Used where other apps put the system accent: the new-session badge and the selected tab text.
+    /// Used where other apps put the system accent: the new-session badge and the selected tab text. The theme's own
+    /// ink is darkened or lightened until it is readable on every surface in `textSurfaces`; Tokyo Night Day's blue is
+    /// 4.0 on its sidebar.
     let ink: UInt32
     /// Text and glyphs drawn on top of `ink`.
     let inkForeground: UInt32
-    /// Supporting text on either content or raised surfaces.
-    let secondaryText: UInt32
     /// Hover fills, tracks, and hairlines are this color at a low opacity.
     let line: UInt32
     let terminal: TerminalColorScheme
     let tabGroupHexColors: [UInt32]
+    /// Each selected sidebar row's background, by its CLI; nil for a row without one.
+    let selectedRowSurfaces: [ConversationProvider?: UInt32]
+    /// Every background the app sets text on. The text colors below are readable on each of them.
+    let textSurfaces: [UInt32]
+    /// Supporting text: the theme's ink, faded toward the surface.
+    let secondaryText: UInt32
+    /// The faintest text, such as timestamps and counts: faded further than `secondaryText`.
+    let tertiaryText: UInt32
+    /// Text in the status hues of `StatusHexColors`.
+    let warningText: UInt32
+    let errorText: UInt32
+    /// Text in each CLI's hue, such as its name above its messages.
+    let providerTextHexColors: [ConversationProvider: UInt32]
 
     init(
         sidebarSurface: UInt32, contentSurface: UInt32, raisedSurface: UInt32, userMessageSurface: UInt32,
@@ -28,14 +41,38 @@ struct AppThemeColors: Equatable, Sendable {
         self.contentSurface = contentSurface
         self.raisedSurface = raisedSurface
         self.userMessageSurface = userMessageSurface
-        self.ink = ink
         self.inkForeground = inkForeground
-        secondaryText = ThemeColorContrast.readableText(
-            ThemeColorContrast.blend(ink, with: contentSurface, fraction: 0.35), on: [contentSurface, raisedSurface]
-        )
         self.line = line
         self.terminal = terminal
-        // Each immutable theme variant prepares its accents once, instead of doing contrast work while drawing.
-        tabGroupHexColors = Self.tabGroupColors(ansiColors: terminal.ansiHexColors, contentSurface: contentSurface)
+        // Each immutable theme variant prepares its text colors and accents once, instead of doing contrast work while
+        // drawing.
+        let isDark = ThemeColorContrast.isDark(contentSurface)
+        let selectedRowSurfaces = Self.selectedRowSurfaces(sidebarSurface: sidebarSurface, ink: ink, isDark: isDark)
+        let textSurfaces = Self.textSurfaces(
+            sidebarSurface: sidebarSurface, contentSurface: contentSurface, raisedSurface: raisedSurface,
+            userMessageSurface: userMessageSurface, line: line, selectedRowSurfaces: selectedRowSurfaces
+        )
+        func readable(_ text: UInt32) -> UInt32 {
+            ThemeColorContrast.readableText(text, on: textSurfaces)
+        }
+        let readableInk = readable(ink)
+        self.selectedRowSurfaces = selectedRowSurfaces
+        self.textSurfaces = textSurfaces
+        self.ink = readableInk
+        let secondaryText = readable(ThemeColorContrast.blend(readableInk, with: contentSurface, fraction: 0.35))
+        let tertiaryText = readable(ThemeColorContrast.blend(readableInk, with: contentSurface, fraction: 0.55))
+        self.secondaryText = secondaryText
+        // Where both had to be made readable, tertiary can come out a shade stronger; it is never stronger than secondary.
+        let tertiaryIsFainter = ThemeColorContrast.ratio(tertiaryText, contentSurface)
+            <= ThemeColorContrast.ratio(secondaryText, contentSurface)
+        self.tertiaryText = tertiaryIsFainter ? tertiaryText : secondaryText
+        warningText = readable(StatusHexColors.warning.value(isDark: isDark))
+        errorText = readable(StatusHexColors.error.value(isDark: isDark))
+        providerTextHexColors = Dictionary(uniqueKeysWithValues: ConversationProvider.allCases.map { provider in
+            (provider, readable(provider.tintHexColor.value(isDark: isDark)))
+        })
+        tabGroupHexColors = Self.tabGroupColors(
+            ansiColors: terminal.ansiHexColors, labelSurfaces: [contentSurface, sidebarSurface]
+        )
     }
 }

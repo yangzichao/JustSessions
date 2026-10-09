@@ -22,7 +22,7 @@ struct ArchivedProjectsSheet: View {
             if archivedProjectPaths.isEmpty {
                 Text("No archived projects")
                     .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ThemePalette.secondaryText)
                     .frame(maxWidth: .infinity, minHeight: 60)
             } else {
                 // A short list keeps the sheet tight; a long one scrolls instead of growing past the window.
@@ -67,7 +67,7 @@ struct ArchivedProjectsSheet: View {
                     .lineLimit(1)
                 Text(verbatim: ProjectLocation(key: projectPath).copyablePath)
                     .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ThemePalette.secondaryText)
                     .lineLimit(1)
                     .truncationMode(.middle)
             }

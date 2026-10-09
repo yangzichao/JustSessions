@@ -88,7 +88,7 @@ struct SessionPreviewHeader: View {
                     Text(conversation.updatedAt, style: .relative)
                 }
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .lineLimit(1)
             }
 
@@ -121,7 +121,7 @@ struct SessionPreviewHeader: View {
             Image(systemName: "arrow.turn.down.right")
         }
         .font(.callout)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(ThemePalette.secondaryText)
         .lineLimit(1)
         .frame(maxWidth: 260, alignment: .trailing)
         .help("A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.")

@@ -26,7 +26,7 @@ struct SessionReadingView: View {
                     Text(store.projectDisplayName(forProjectPath: conversation.projectDirectoryKey))
                 }
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .lineLimit(1)
                 .help(conversation.projectLocation.copyablePath)
             }

@@ -15,7 +15,7 @@ struct NewSessionKindPicker: View {
             VStack(alignment: .leading, spacing: 10) {
                 if providers.isEmpty {
                     Label(noCLIFoundMessage, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(ThemePalette.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
                     Picker("Tool", selection: $selection) {
@@ -35,7 +35,7 @@ struct NewSessionKindPicker: View {
                     .fixedSize()
                     Text("Your login shell, with no CLI")
                         .font(.callout)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(ThemePalette.secondaryText)
                 }
             }
         }

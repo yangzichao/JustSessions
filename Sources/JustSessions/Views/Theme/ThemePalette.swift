@@ -21,22 +21,26 @@ enum ThemePalette {
     static let ink = ThemeColor(role: .ink)
     /// Text and glyphs drawn on top of `ink`.
     static let inkForeground = ThemeColor(role: .inkForeground)
-    /// Supporting copy, using the chosen theme's ink with sufficient contrast on its surfaces.
+    /// Supporting copy, using the chosen theme's ink with sufficient contrast on its surfaces. Use it in place of the
+    /// system's `.secondary`, which is 3.0 on light surfaces.
     static let secondaryText = ThemeColor(role: .secondaryText)
+    /// The faintest copy, such as timestamps and counts, still readable. Use it in place of the system's `.tertiary`,
+    /// which is 1.7 on light surfaces.
+    static let tertiaryText = ThemeColor(role: .tertiaryText)
     /// Faint fills: the pointer over a row, a track behind a segmented control.
-    static let hoverFill = ThemeColor(role: .line, opacity: 0.055)
+    static let hoverFill = ThemeColor(role: .line, opacity: ThemeFillOpacity.hover)
     /// Held-down controls: clearly stronger than the pointer's hover surface in either appearance.
-    static let pressedFill = ThemeColor(role: .line, opacity: 0.14)
-    static let trackFill = ThemeColor(role: .line, opacity: 0.06)
+    static let pressedFill = ThemeColor(role: .line, opacity: ThemeFillOpacity.pressed)
+    static let trackFill = ThemeColor(role: .line, opacity: ThemeFillOpacity.track)
     /// Hairlines between regions and around raised controls.
-    static let hairline = ThemeColor(role: .line, opacity: 0.09)
+    static let hairline = ThemeColor(role: .line, opacity: ThemeFillOpacity.hairline)
 
     // MARK: Status
 
-    /// A running CLI.
-    static let live = Color.adaptive(light: 0x1FA463, dark: 0x3DD68C)
-    /// Something that needs your attention, such as a CLI waiting on your answer or an unreachable remote host.
-    static let warning = Color.adaptive(light: 0xE0892B, dark: 0xF2A54A)
-    /// A turn a CLI finished that you have not looked at yet, blue as Mail, Claude, and Codex mark what is unread.
-    static let unseenTurn = Color.adaptive(light: 0x2A78D6, dark: 0x4C93EA)
+    /// Status glyphs, in the hues of `StatusHexColors`. Text in these hues uses the readable versions below.
+    static let live = Color.adaptive(StatusHexColors.live)
+    static let warning = Color.adaptive(StatusHexColors.warning)
+    static let unseenTurn = Color.adaptive(StatusHexColors.unseenTurn)
+    static let warningText = ThemeColor(role: .warningText)
+    static let errorText = ThemeColor(role: .errorText)
 }

@@ -47,12 +47,12 @@ struct AddProjectOnSSHHostSheet: View {
                 if offersToCreateMissingFolder {
                     Text("There is no folder \(trimmedFolder) on \(host.displayName). Create it to add the project.")
                         .font(.callout)
-                        .foregroundStyle(ThemePalette.warning)
+                        .foregroundStyle(ThemePalette.warningText)
                         .fixedSize(horizontal: false, vertical: true)
                 } else if let errorMessage {
                     Text(verbatim: errorMessage)
                         .font(.callout)
-                        .foregroundStyle(ThemePalette.warning)
+                        .foregroundStyle(ThemePalette.warningText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -62,7 +62,7 @@ struct AddProjectOnSSHHostSheet: View {
                     ProgressView().controlSize(.small)
                     Text(progressText(for: runningFolderRequest))
                         .font(.callout)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(ThemePalette.secondaryText)
                 }
                 Spacer()
                 Button("Cancel") { dismiss() }

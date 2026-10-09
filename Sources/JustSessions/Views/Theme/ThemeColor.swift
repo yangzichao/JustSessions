@@ -11,7 +11,14 @@ struct ThemeColor: ShapeStyle {
         case ink
         case inkForeground
         case secondaryText
+        case tertiaryText
+        case warningText
+        case errorText
+        /// Text in a CLI's hue.
+        case providerText(ConversationProvider)
         case line
+        /// A selected sidebar row's background, washed in its CLI's hue, or in the ink when nil.
+        case selectedRow(ConversationProvider?)
         case tabGroup(Int)
         case terminalForeground
         /// One of the terminal's 16 ANSI colors, by its index.
@@ -31,7 +38,12 @@ struct ThemeColor: ShapeStyle {
         case .ink: colors.ink
         case .inkForeground: colors.inkForeground
         case .secondaryText: colors.secondaryText
+        case .tertiaryText: colors.tertiaryText
+        case .warningText: colors.warningText
+        case .errorText: colors.errorText
+        case .providerText(let provider): colors.providerTextHexColors[provider, default: colors.ink]
         case .line: colors.line
+        case .selectedRow(let provider): colors.selectedRowSurfaces[provider, default: colors.sidebarSurface]
         case .tabGroup(let index): colors.tabGroupHexColors[index]
         case .terminalForeground: colors.terminal.foreground
         case .terminalANSI(let index): colors.terminal.ansiHexColors[index]

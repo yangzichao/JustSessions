@@ -106,7 +106,7 @@ struct TranscriptScrollView: View {
                 } else if transcript.omittedEntryCount > 0 {
                     Text("\(transcript.omittedEntryCount) earlier entries are not shown. Resume the session to see all of it.")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(ThemePalette.tertiaryText)
                         .frame(maxWidth: .infinity)
                         .padding(.bottom, 8)
                 }

@@ -12,7 +12,7 @@ struct SidebarSearchField: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
             TextField(placeholder, text: $text)
                 .textFieldStyle(.plain)
                 .focused($isFocused)
@@ -22,7 +22,7 @@ struct SidebarSearchField: View {
                 Image(systemName: "xmark.circle.fill")
             }
             .buttonStyle(ThemePlainButtonStyle(horizontalPadding: 2, verticalPadding: 2))
-            .foregroundStyle(.tertiary)
+            .foregroundStyle(ThemePalette.tertiaryText)
             .help("Close search")
             .accessibilityLabel("Close search")
         }
