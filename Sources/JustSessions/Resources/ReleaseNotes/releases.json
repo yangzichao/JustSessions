@@ -1,5 +1,50 @@
 [
   {
+    "version": "1.0.11",
+    "publishedOn": "2026-10-09",
+    "title": {
+      "en": "Subagents and readable themes",
+      "zh-Hans": "子代理与更易读的主题"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "List subagents under their session in the sidebar, except Kiro's; on SSH hosts, only Codex's and Antigravity's.",
+            "zh-Hans": "在侧边栏的会话下列出其子代理（Kiro 除外；SSH 主机上仅限 Codex 和 Antigravity）。"
+          },
+          {
+            "en": "Keep each session in one tab across windows, and move it to this window when tmux runs its CLI.",
+            "zh-Hans": "每个会话在所有窗口中只占一个标签页；tmux 运行其 CLI 时，可将该标签页移至此窗口。"
+          },
+          {
+            "en": "Show unseen turns, Waiting for you, and notifications for Pi 0.80.4+ and OpenCode sessions on this Mac.",
+            "zh-Hans": "本机上的 Pi 0.80.4+ 和 OpenCode 会话也会显示未查看的回合、“等待我处理”和通知。"
+          }
+        ]
+      },
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Keep app and terminal text readable in every theme; Claude Code on SSH hosts follows light/dark switches.",
+            "zh-Hans": "所有主题下应用和终端文字都清晰可读；SSH 主机上的 Claude Code 会跟随浅色/深色切换。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Small bug fixes.",
+            "zh-Hans": "修复了一些小问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.0.10",
     "publishedOn": "2026-10-08",
     "title": {
