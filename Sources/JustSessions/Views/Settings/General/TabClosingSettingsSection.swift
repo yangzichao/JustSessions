@@ -7,8 +7,15 @@ struct TabClosingSettingsSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Closing tabs")
-                .font(.subheadline.weight(.medium))
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("Closing tabs")
+                    .font(.subheadline.weight(.medium))
+                SettingsHelpButton(
+                    title: "Closing tabs",
+                    explanation: "For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too."
+                )
+                .accessibilityIdentifier("settings.help.closingTabs")
+            }
             Picker("When you close a tab", selection: Binding(
                 get: { settingsStore.choice },
                 set: { settingsStore.setChoice($0) }
@@ -19,10 +26,6 @@ struct TabClosingSettingsSection: View {
             }
             .fixedSize()
             .accessibilityIdentifier("settings.tabCloseChoice")
-            Text("For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.")
-                .font(.caption)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

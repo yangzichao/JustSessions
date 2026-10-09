@@ -11,14 +11,17 @@ struct StartupSettingsSection: View {
             Text("Startup")
                 .font(.subheadline.weight(.medium))
             LaunchAtLoginToggle(settingsStore: launchAtLoginSettingsStore)
-            Toggle("Reopen the tabs that were open when JustSessions quit", isOn: Binding(
-                get: { tabReopeningSettingsStore.reopensTabsAtLaunch },
-                set: { tabReopeningSettingsStore.setReopensTabsAtLaunch($0) }
-            ))
-            Text("A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.")
-                .font(.caption)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Toggle("Reopen the tabs that were open when JustSessions quit", isOn: Binding(
+                    get: { tabReopeningSettingsStore.reopensTabsAtLaunch },
+                    set: { tabReopeningSettingsStore.setReopensTabsAtLaunch($0) }
+                ))
+                SettingsHelpButton(
+                    title: "Reopening tabs",
+                    explanation: "A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder."
+                )
+                .accessibilityIdentifier("settings.help.reopeningTabs")
+            }
         }
     }
 }

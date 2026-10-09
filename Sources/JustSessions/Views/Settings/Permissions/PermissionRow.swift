@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// One permission: its name and status, what it is for, and the button that changes it.
+/// One permission: its name, on-demand explanation, status, and the button that changes it.
 struct PermissionRow: View {
     let permission: AppPermission
     /// Nil until the first check finishes.
@@ -10,18 +10,21 @@ struct PermissionRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(permission.title)
                     .font(.subheadline.weight(.medium))
+                if permission.isOptional {
+                    Text("Optional")
+                        .font(.caption)
+                        .foregroundStyle(ThemePalette.secondaryText)
+                }
+                SettingsHelpButton(title: permission.title, explanation: permission.explanation)
+                    .accessibilityIdentifier("settings.help.permission.\(permission.id)")
                 Spacer(minLength: 12)
                 if let status {
                     AppPermissionStatusLabel(status: status, isOptional: permission.isOptional)
                 }
             }
-            Text(permission.explanation)
-                .font(.caption)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 8) {
                 if permission == .notifications, status == .notAskedYet {
                     Button("Ask Now", action: onAskForNotifications)

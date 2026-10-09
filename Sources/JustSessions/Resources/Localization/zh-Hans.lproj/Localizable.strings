@@ -64,8 +64,8 @@
 	<string>1 个子代理会话将保留在磁盘上。</string>
 	<key>1 tool call</key>
 	<string>1 次工具调用</string>
-	<key>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</key>
-	<string>仍在 tmux 中运行的 CLI 会重新连接。其他标签会在选中时继续会话，包括 Mac 重启后的会话。普通终端会在原文件夹中打开新 shell。</string>
+	<key>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</key>
+	<string>仍在 tmux 中运行的 CLI 会重新连接。其他会话在选中标签时继续，包括 Mac 重启后的会话。普通终端会在原文件夹打开新 shell。</string>
 	<key>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</key>
 	<string>子代理为启动它的会话运行了此会话。可以在这里阅读，但不能单独继续或删除。</string>
 	<key>About JustSessions</key>
@@ -362,6 +362,8 @@
 	<string>导出对话</string>
 	<key>Export conversations</key>
 	<string>导出对话</string>
+	<key>Feedback</key>
+	<string>反馈</string>
 	<key>Feedback and issues start with these versions filled in.</key>
 	<string>反馈和问题报告会自动附上以上版本信息。</string>
 	<key>Filter project sessions</key>
@@ -616,6 +618,8 @@
 	<string>打开 JustSessions 网站</string>
 	<key>Open the source code on GitHub</key>
 	<string>在 GitHub 上查看源代码</string>
+	<key>Optional</key>
+	<string>可选</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
 	<string>可选。没有它时，终端中的 CLI 第一次打开受保护文件夹（例如「文稿」或外置磁盘）中的文件，macOS 会逐个询问。</string>
 	<key>Organize</key>
@@ -698,6 +702,8 @@
 	<string>重命名项目…</string>
 	<key>Reopen the tabs that were open when JustSessions quit</key>
 	<string>重新打开上次退出 JustSessions 时的标签</string>
+	<key>Reopening tabs</key>
+	<string>恢复标签</string>
 	<key>Report an issue ↗</key>
 	<string>报告问题 ↗</string>
 	<key>Report by Email</key>
@@ -818,6 +824,8 @@
 	<string>显示 %lld 个子代理会话</string>
 	<key>Show Sidebar</key>
 	<string>显示侧栏</string>
+	<key>Show explanation</key>
+	<string>查看说明</string>
 	<key>Show in Other Window</key>
 	<string>在另一个窗口中显示</string>
 	<key>Show sidebar</key>
@@ -868,6 +876,8 @@
 	<string>子代理</string>
 	<key>Subagent of %@</key>
 	<string>%@ 的子代理</string>
+	<key>Supports local Claude Code, Codex, Pi, and OpenCode, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session.</key>
+	<string>支持本机的 Claude Code、Codex、Pi 和 OpenCode，包括在 tmux 中运行但未打开标签的会话。正在查看的会话不发送通知。点击通知可打开会话。</string>
 	<key>Swap with left view</key>
 	<string>与左侧视图交换</string>
 	<key>Swap with right view</key>
@@ -988,8 +998,6 @@
 	<string>关闭标签时</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。</string>
-	<key>Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
-	<string>支持本机的 Claude Code、Codex、Pi 和 OpenCode，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。</string>
 	<key>You</key>
 	<string>你</string>
 	<key>Your login shell, with no CLI</key>

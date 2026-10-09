@@ -29,10 +29,6 @@ struct AboutSettingsSection: View {
                 }
             }
             AboutLinksRow(environment: environment)
-            Text("Feedback and issues start with these versions filled in.")
-                .font(.caption)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
