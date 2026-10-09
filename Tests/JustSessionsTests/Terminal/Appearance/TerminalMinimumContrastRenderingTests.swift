@@ -30,24 +30,37 @@ struct TerminalMinimumContrastRenderingTests {
         #expect(mostContrast >= 4.4)
     }
 
+    /// The terminal draws all selected text in one color, which Tokyo Night Day sets at 3.3 on its selection.
+    @Test func selectedTextIsDrawnReadableOnTheSelection() throws {
+        let colors = try renderedColors(isDark: false, theme: .tokyoNight, output: Self.hideCursor + "MMMM", selectsAll: true)
+        let selection = AppThemeColors.tokyoNightDay.terminal.selectionBackground
+        let mostContrast = colors.map { ThemeColorContrast.ratio($0, selection) }.max() ?? 0
+        #expect(mostContrast >= 4.4)
+    }
+
     @Test func blockElementsKeepTheColorTheProgramChose() throws {
         let colors = try renderedColors(isDark: false, output: Self.hideCursor + Self.paleBlocks)
         let paleLavenderPixelCount = colors.filter { Self.isClose($0, to: 0xE1E1FA) }.count
         #expect(paleLavenderPixelCount > 500)
     }
 
-    private func renderedColors(isDark: Bool, output: String) throws -> [UInt32] {
+    private func renderedColors(
+        isDark: Bool, theme: AppTheme = .justSessions, output: String, selectsAll: Bool = false
+    ) throws -> [UInt32] {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let store = TerminalAppearanceStore(userDefaults: settings.userDefaults)
+        let themeStore = AppThemeStore(userDefaults: settings.userDefaults)
+        themeStore.setTheme(theme)
         store.setMode(isDark ? .dark : .light)
         store.setFontSize(TerminalAppearancePreferences.fontSizeRange.upperBound)
         let terminalView = SelectableTerminalView(
             frame: NSRect(x: 0, y: 0, width: 400, height: 120),
             appearanceStore: store,
-            themeStore: AppThemeStore(userDefaults: settings.userDefaults)
+            themeStore: themeStore
         )
         terminalView.feed(text: output)
+        if selectsAll { terminalView.selectAll() }
         let representation = try #require(terminalView.bitmapImageRepForCachingDisplay(in: terminalView.bounds))
         terminalView.cacheDisplay(in: terminalView.bounds, to: representation)
         var colors: [UInt32] = []
