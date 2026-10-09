@@ -27,6 +27,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Windows/`: the open workspace windows, each with its store, so a session runs in one tab across them. Resuming a session another window's tab runs brings that window forward to the tab, and each window's session rows, project summaries, Waiting for you filter, and activity sync count other windows' tabs as the session's own.
+- `Services/Windows/MovingTabs/`: moves a session's tab here from another window when tmux keeps its CLI running: that tab closes and a tab here reattaches. Over SSH, the host first confirms its tmux runs the CLI.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry, Codex session files, and the reports of the app's Pi and OpenCode extensions. `UnseenTurns/` marks a session after each sync and clears the mark once its tab is on screen.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
 - `Services/Onboarding/`: saves which onboarding tips have shown, and whether the install shows them at all, decided once from whether it was fresh; Help's Take the tour shows them all again.
@@ -83,7 +84,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Terminal/`: a tab's embedded terminal, inset from the window's edges, and the bar above it once its CLI ends.
 - `Views/Preview/`: conversation preview for the selected session.
 - `Views/Preview/MissingFolder/`: the note under a session's header when its project folder is gone from this Mac.
-- `Views/Preview/OtherWindow/`: the note under a session's header while a tab in another window runs it, whose **Show** brings that window forward.
+- `Views/Preview/OtherWindow/`: the note under a session's header while a tab in another window runs it, whose **Show** brings that window forward and **Move Here** moves the tab to this window.
 - `Views/Preview/Markdown/`: formatted prose, horizontally scrolling code and tables, and code copying.
 - `Views/Preview/Reading/` and `ReadingPosition/`: text size, reading width, first/latest-message controls, and reading-position restoration.
 - `Views/Preview/ReadingWindow/`: one independent, read-only window per host-qualified session.
