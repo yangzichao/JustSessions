@@ -76,6 +76,8 @@
 	<string>1 tool call</string>
 	<key>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</key>
 	<string>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</string>
+	<key>A session whose subagents ran sessions of their own gets a chevron before its icon. Click it to list them under the session and read them. Kiro's aren't listed; on SSH hosts, only Codex's and Antigravity's are.</key>
+	<string>A session whose subagents ran sessions of their own gets a chevron before its icon. Click it to list them under the session and read them. Kiro's aren't listed; on SSH hosts, only Codex's and Antigravity's are.</string>
 	<key>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</key>
 	<string>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</string>
 	<key>A+</key>
@@ -826,6 +828,8 @@
 	<string>Show sidebar (⌘B)</string>
 	<key>Show subagent sessions of %@</key>
 	<string>Show subagent sessions of %@</string>
+	<key>Show subagents under the sessions that started them</key>
+	<string>Show subagents under the sessions that started them</string>
 	<key>Sidebar</key>
 	<string>Sidebar</string>
 	<key>Sidebar width</key>
@@ -866,6 +870,8 @@
 	<string>Subagent</string>
 	<key>Subagent of %@</key>
 	<string>Subagent of %@</string>
+	<key>Subagents</key>
+	<string>Subagents</string>
 	<key>Supports local Claude Code, Codex, Pi, and OpenCode, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session.</key>
 	<string>Supports local Claude Code, Codex, Pi, and OpenCode, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session.</string>
 	<key>Swap with left view</key>

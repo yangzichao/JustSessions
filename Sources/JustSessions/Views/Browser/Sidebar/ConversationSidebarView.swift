@@ -24,6 +24,8 @@ struct ConversationSidebarView: View {
     @SceneStorage("sidebarContentMode") private var contentMode: SidebarContentMode = .projects
     @SceneStorage("sidebarOpenTabSearch") private var openTabSearchText = ""
     @State var projectExpansion = ProjectExpansion()
+    /// Whether sessions offer a chevron that lists their subagents' sessions, set in Settings → General.
+    @AppStorage(SidebarSubagentRows.showsSubagentsUserDefaultsKey) var showsSubagents = false
     /// Sessions start with their subagents' sessions hidden; each shows them once you expand it.
     @State var subagentRows = SidebarSubagentRows()
     @State var projectSelection = ProjectMultiSelection()

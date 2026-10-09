@@ -396,6 +396,16 @@
         }
       }
     },
+    "A session whose subagents ran sessions of their own gets a chevron before its icon. Click it to list them under the session and read them. Kiro's aren't listed; on SSH hosts, only Codex's and Antigravity's are.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "若会话的子代理运行了自己的会话，该会话图标前会出现一个箭头。点击它即可在该会话下列出并阅读这些会话。不列出 Kiro 的子代理会话；SSH 主机上仅列出 Codex 和 Antigravity 的。"
+          }
+        }
+      }
+    },
     "A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.": {
       "localizations": {
         "zh-Hans": {
@@ -4431,6 +4441,16 @@
         }
       }
     },
+    "Show subagents under the sessions that started them": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在启动子代理的会话下显示子代理"
+          }
+        }
+      }
+    },
     "Sidebar": {
       "localizations": {
         "zh-Hans": {
@@ -4643,6 +4663,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 的子代理"
+          }
+        }
+      }
+    },
+    "Subagents": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "子代理"
           }
         }
       }

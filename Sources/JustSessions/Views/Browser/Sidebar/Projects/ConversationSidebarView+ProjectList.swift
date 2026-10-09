@@ -42,6 +42,7 @@ extension ConversationSidebarView {
                                 projectSelection: projectSelection,
                                 sessionSelection: sessionSelection,
                                 selectedConversations: selectedConversations,
+                                showsSubagents: showsSubagents,
                                 subagentRows: subagentRows,
                                 onToggleSubagents: { subagentRows.toggle($0.id) },
                                 messageMatches: messageMatches,
