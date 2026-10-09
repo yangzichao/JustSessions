@@ -498,6 +498,10 @@
 	<string>在用户指南中查看更多 ↗</string>
 	<key>More room for the terminal</key>
 	<string>给终端更多空间</string>
+	<key>Move Here</key>
+	<string>移到这里</string>
+	<key>Move Tab to This Window</key>
+	<string>将标签页移至此窗口</string>
 	<key>Move tab into split view</key>
 	<string>将标签页移至拆分视图</string>
 	<key>Name</key>

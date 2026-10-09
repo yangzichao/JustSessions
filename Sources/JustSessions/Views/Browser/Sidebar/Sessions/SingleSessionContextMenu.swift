@@ -23,6 +23,11 @@ struct SingleSessionContextMenu: View {
             Button("Show in Other Window", systemImage: "macwindow") {
                 store.showRunningTerminalInAnotherWindow(for: conversation)
             }
+            if store.canMoveTerminalHere(for: conversation) {
+                Button("Move Tab to This Window", systemImage: "macwindow.badge.plus") {
+                    store.moveTerminalHere(for: conversation)
+                }
+            }
         } else {
             Button("Resume", systemImage: "play") {
                 store.launch(conversation, action: .resume)

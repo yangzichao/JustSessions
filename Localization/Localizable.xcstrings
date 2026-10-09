@@ -2697,6 +2697,26 @@
         }
       }
     },
+    "Move Here": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移到这里"
+          }
+        }
+      }
+    },
+    "Move Tab to This Window": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将标签页移至此窗口"
+          }
+        }
+      }
+    },
     "Move tab into split view": {
       "localizations": {
         "zh-Hans": {
