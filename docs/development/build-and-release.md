@@ -28,7 +28,7 @@ The verifier relocates the runtime to a path with spaces, restricts `PATH` to sy
 
 ## SwiftTerm fork
 
-The terminal comes from [yangzichao/SwiftTerm](https://github.com/yangzichao/SwiftTerm), a fork of [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm). Its `minimum-contrast-1.15` branch is upstream `v1.15.0` plus one commit that adds `minimumContrastRatio`: text whose color falls below the ratio against its cell's background, after dimming, is darkened or lightened just enough to reach it, as in VS Code's terminal. Box drawing and block elements keep their colors. The app sets the ratio to 4.5 in `TerminalAppearanceStyling`.
+The terminal comes from [yangzichao/SwiftTerm](https://github.com/yangzichao/SwiftTerm), a fork of [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm). Its `minimum-contrast-1.15` branch is upstream `v1.15.0` plus one commit that adds `minimumContrastRatio`: text whose color falls below the ratio against its cell's background, after dimming, is darkened or lightened just enough to reach it, as in VS Code's terminal. Box drawing and block elements keep their colors. The app sets the ratio to 4.5 in `TerminalAppearanceStyling`. SwiftTerm draws selected text in the one selection text color without that minimum, so the app first makes that color readable on the selection (`TerminalColorScheme.readableSelectionForeground`).
 
 Fork tags are named `v<upstream version>-justsessions.<n>`, and `Package.swift` pins one exactly. To move to a newer SwiftTerm, rebase the commit onto the upstream tag, run `swift test` in the fork, push a new tag, and update `Package.swift` and `Package.resolved`. Drop the fork once upstream SwiftTerm has an equivalent setting.
 

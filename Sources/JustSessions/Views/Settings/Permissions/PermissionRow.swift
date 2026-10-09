@@ -20,7 +20,7 @@ struct PermissionRow: View {
             }
             Text(permission.explanation)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 8) {
                 if permission == .notifications, status == .notAskedYet {

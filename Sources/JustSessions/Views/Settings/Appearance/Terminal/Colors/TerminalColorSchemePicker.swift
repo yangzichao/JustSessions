@@ -38,7 +38,7 @@ struct TerminalColorSchemePicker: View {
             if let importError {
                 Text(importError.localizedMessage)
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(ThemePalette.errorText)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

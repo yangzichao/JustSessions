@@ -11,7 +11,7 @@ struct PermissionsSettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("macOS asks for these on behalf of JustSessions, also when a CLI in one of its terminals needs one. Checking here never shows a prompt.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
 
             ForEach(AppPermission.onThisMac) { permission in

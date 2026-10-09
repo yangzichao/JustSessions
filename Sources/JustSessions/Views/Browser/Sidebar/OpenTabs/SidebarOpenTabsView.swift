@@ -81,7 +81,7 @@ struct SidebarOpenTabsView: View {
                 VStack(spacing: 10) {
                     Image(systemName: "rectangle.on.rectangle")
                         .font(.system(size: 24))
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(ThemePalette.tertiaryText)
                     if store.terminalSessions.isEmpty {
                         Text("No open tabs")
                         Button("New session", action: onNewSession)
@@ -91,7 +91,7 @@ struct SidebarOpenTabsView: View {
                     }
                 }
                 .font(.system(size: 12))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .multilineTextAlignment(.center)
                 .padding(16)
             }

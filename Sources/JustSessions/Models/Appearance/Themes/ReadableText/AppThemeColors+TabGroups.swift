@@ -1,6 +1,6 @@
 extension AppThemeColors {
     /// Project accents use the theme's hues, with extra contrast for text on the tinted group label.
-    static func tabGroupColors(ansiColors: [UInt32], contentSurface: UInt32) -> [UInt32] {
+    static func tabGroupColors(ansiColors: [UInt32], labelSurfaces: [UInt32]) -> [UInt32] {
         let candidateColors = [
             ansiColors[4], // blue
             ansiColors[1], // red
@@ -12,7 +12,7 @@ extension AppThemeColors {
             ThemeColorContrast.blend(ansiColors[1], with: ansiColors[3], fraction: 0.5), // orange
         ]
         return candidateColors.map { candidateColor in
-            ThemeColorContrast.readableAccent(candidateColor, on: contentSurface)
+            ThemeColorContrast.readableAccent(candidateColor, on: labelSurfaces)
         }
     }
 }

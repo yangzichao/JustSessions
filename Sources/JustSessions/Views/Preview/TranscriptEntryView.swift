@@ -3,7 +3,8 @@ import SwiftUI
 struct TranscriptEntryView: View {
     let entry: TranscriptEntry
     let assistantName: String
-    let assistantTint: Color
+    /// The CLI's name above its messages is in its hue.
+    let assistantNameColor: ThemeColor
     @Environment(\.transcriptReadingFontSize) private var fontSize
 
     var body: some View {
@@ -34,7 +35,7 @@ struct TranscriptEntryView: View {
         case .note(let text):
             TranscriptSearchableText(source: AttributedString(text), fontSize: 12, isSecondary: true)
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(ThemePalette.tertiaryText)
                 .frame(maxWidth: .infinity)
         case .userImage(let image), .toolResultImage(let image):
             TranscriptImageView(image: image)
@@ -51,11 +52,11 @@ struct TranscriptEntryView: View {
                 if isUser { Text("You") } else { Text(verbatim: assistantName) }
             }
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(isUser ? Color.secondary : assistantTint)
+                .foregroundStyle(isUser ? ThemePalette.secondaryText : assistantNameColor)
             if let timestamp = entry.timestamp {
                 Text(timestamp, format: .dateTime.month(.abbreviated).day().hour().minute())
                     .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(ThemePalette.tertiaryText)
             }
         }
     }

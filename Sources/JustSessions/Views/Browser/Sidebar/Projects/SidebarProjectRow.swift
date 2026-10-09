@@ -28,7 +28,7 @@ struct SidebarProjectRow: View {
             Button(action: onToggleExpansion) {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(ThemePalette.tertiaryText)
                     .rotationEffect(.degrees(isExpanded ? 90 : 0))
                     .animation(.easeOut(duration: 0.12), value: isExpanded)
                     .frame(width: 27, height: rowHeight)
@@ -43,7 +43,7 @@ struct SidebarProjectRow: View {
                     // A pinned project's pin takes the folder's place, rather than joining the status and actions at the end.
                     Image(systemName: project.isPinned ? "pin.fill" : "folder")
                         .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(ThemePalette.secondaryText)
                         .frame(width: 16)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(project.displayName)
@@ -53,7 +53,7 @@ struct SidebarProjectRow: View {
                         if let parentLabel {
                             Text(parentLabel)
                                 .font(.system(size: 10))
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(ThemePalette.tertiaryText)
                                 .lineLimit(1)
                         }
                     }
@@ -108,7 +108,7 @@ struct SidebarProjectRow: View {
         ZStack(alignment: .trailing) {
             Text(project.sessionCount.formatted())
                 .font(.system(size: 11).monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .opacity(isHovered ? 0 : 1)
             ProjectHoverActions(
                 store: store,

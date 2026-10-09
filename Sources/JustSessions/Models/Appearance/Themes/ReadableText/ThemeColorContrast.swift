@@ -1,25 +1,37 @@
 import Foundation
 
 enum ThemeColorContrast {
-    /// Secondary text keeps the theme's ink hue while remaining readable on both flat and raised surfaces.
+    /// WCAG's minimum for body text.
+    static let minimumTextRatio = 4.5
+
+    /// The color, darkened on light surfaces or lightened on dark ones just enough to stay readable on every surface,
+    /// so it keeps as much of its hue as it can.
     static func readableText(_ text: UInt32, on surfaces: [UInt32]) -> UInt32 {
-        let contrastTarget: UInt32 = ratio(0x000000, surfaces[0]) > ratio(0xFFFFFF, surfaces[0]) ? 0x000000 : 0xFFFFFF
+        let contrastTarget: UInt32 = isDark(surfaces[0]) ? 0xFFFFFF : 0x000000
         for step in 0...100 {
             let foreground = blend(text, with: contrastTarget, fraction: Double(step) / 100)
-            if surfaces.allSatisfy({ ratio(foreground, $0) >= 4.5 }) { return foreground }
+            if surfaces.allSatisfy({ ratio(foreground, $0) >= minimumTextRatio }) { return foreground }
         }
         return contrastTarget
     }
 
-    /// Keeps the hue as close to the theme as possible while making the small group label readable when hovered.
-    static func readableAccent(_ accent: UInt32, on surface: UInt32) -> UInt32 {
-        let contrastTarget: UInt32 = ratio(0x000000, surface) > ratio(0xFFFFFF, surface) ? 0x000000 : 0xFFFFFF
+    /// Keeps the hue as close to the theme as possible while making the small group label readable when hovered, on
+    /// each surface the label sits on.
+    static func readableAccent(_ accent: UInt32, on surfaces: [UInt32]) -> UInt32 {
+        let contrastTarget: UInt32 = isDark(surfaces[0]) ? 0xFFFFFF : 0x000000
         for step in 0...100 {
             let foreground = blend(accent, with: contrastTarget, fraction: Double(step) / 100)
-            let labelBackground = blend(surface, with: foreground, fraction: 0.24)
-            if ratio(foreground, labelBackground) >= 4.5 { return foreground }
+            let isReadable = surfaces.allSatisfy { surface in
+                ratio(foreground, blend(surface, with: foreground, fraction: 0.24)) >= minimumTextRatio
+            }
+            if isReadable { return foreground }
         }
         return contrastTarget
+    }
+
+    /// Whether white text reads better than black on the surface.
+    static func isDark(_ surface: UInt32) -> Bool {
+        ratio(0xFFFFFF, surface) > ratio(0x000000, surface)
     }
 
     static func blend(_ first: UInt32, with second: UInt32, fraction: Double) -> UInt32 {

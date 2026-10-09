@@ -27,7 +27,7 @@ struct SidebarOpenTabRow: View {
             .padding(.horizontal, 10)
             .frame(height: Self.height)
             .contentShape(Rectangle())
-            .sidebarRowHighlight(isSelected: isSelected, selectionTint: tab.provider?.tintColor)
+            .sidebarRowHighlight(isSelected: isSelected, selectionProvider: tab.provider)
         }
         .buttonStyle(ThemePlainButtonStyle(showsHover: false))
         .help(Text("Show \(tab.displayTitle)") + Text(verbatim: "\n" + projectContext + "\n" + tab.projectPath))
@@ -56,7 +56,7 @@ struct SidebarOpenTabRow: View {
                 .foregroundStyle(provider.tintColor)
         } else {
             Image(systemName: "terminal")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
         }
     }
 }

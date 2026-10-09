@@ -41,11 +41,11 @@ struct SessionStatusIndicator: View {
         case .ended:
             Image(systemName: "circle")
                 .font(.system(size: 7, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
         case .waitingToBeShown:
             Image(systemName: "circle.dotted")
                 .font(.system(size: 8, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
         }
     }
 }

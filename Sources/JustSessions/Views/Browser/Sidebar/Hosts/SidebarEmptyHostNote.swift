@@ -8,7 +8,7 @@ struct SidebarEmptyHostNote: View {
     var body: some View {
         Group {
             if message.isFailure {
-                Text(message.text).foregroundStyle(ThemePalette.warning)
+                Text(message.text).foregroundStyle(ThemePalette.warningText)
             } else if let localizedText = message.localizedText {
                 Text(resourceWithChosenLocale(localizedText)).foregroundStyle(ThemePalette.secondaryText)
             }

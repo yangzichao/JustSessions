@@ -6,7 +6,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 
 - `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up. `UnseenTurns/` holds the CLIs that finished a turn while their terminal was off screen, until you look, and which running CLIs wait on you: stopped for your answer, or done with a turn you have not seen.
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
-- `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`.
+- `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`, the CLI and status hues every theme shares in `Hues/`, and in `ReadableText/` the text colors each theme prepares so text stays at 4.5 contrast on every surface it sits on.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
 - `Models/Transcript/`: the reading width, a readable column or the full window, shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
@@ -100,7 +100,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.
 - `Views/Settings/Help/`: the Help page, one `HelpSection` each: the tour and user guide, how each part of the window works, SSH setup, what to check when a session is missing, and the keyboard shortcut list (`Shortcuts/`). `Models/App/AppLinks.swift` holds the destinations of Help and About.
-- `Views/Theme/`: the chosen theme's colors, and button styles.
+- `Views/Theme/`: the chosen theme's colors, and button styles. Views draw text in `ThemePalette`'s text colors, not the system's `.secondary` or `.tertiary`, which a contract test checks.
 - `Views/Branding/`: the app mark drawn in the sidebar header.
 
 The product website is separate from the app: `website/` contains static pages and focused stylesheets, and `Scripts/Website/` assembles and validates its Pages artifact. Documentation is indexed in [docs/README.md](../README.md). See [website development](website.md) for page metadata, app colors, and publishing.

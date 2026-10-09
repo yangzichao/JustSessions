@@ -22,11 +22,11 @@ struct NotificationSettingsSection: View {
                 Text("Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.")
                 if isTurnedOffInSystemSettings {
                     Text("Notifications for JustSessions are turned off in System Settings > Notifications.")
-                        .foregroundStyle(ThemePalette.warning)
+                        .foregroundStyle(ThemePalette.warningText)
                 }
             }
             .font(.caption)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(ThemePalette.secondaryText)
             .fixedSize(horizontal: false, vertical: true)
         }
         .task { await readSystemSettings() }

@@ -57,7 +57,7 @@ struct SidebarProjectSection: View {
             if project.sessionCount == 0 {
                 Text("No sessions")
                     .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(ThemePalette.tertiaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.leading, 40)
                     .padding(.vertical, 5)

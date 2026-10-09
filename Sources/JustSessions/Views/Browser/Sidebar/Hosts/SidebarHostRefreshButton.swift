@@ -17,7 +17,7 @@ struct SidebarHostRefreshButton: View {
                 Button(action: action) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(ThemePalette.secondaryText)
                         .frame(width: 16, height: 20)
                         .contentShape(Rectangle())
                 }

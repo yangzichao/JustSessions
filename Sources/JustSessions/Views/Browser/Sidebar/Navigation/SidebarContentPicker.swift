@@ -25,11 +25,11 @@ struct SidebarContentPicker: View {
             HStack(spacing: 4) {
                 Text(title)
                     .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? .primary : .secondary)
+                    .foregroundStyle(isSelected ? AnyShapeStyle(.primary) : AnyShapeStyle(ThemePalette.secondaryText))
                 if let count {
                     Text(count.formatted())
                         .font(.system(size: 11).monospacedDigit())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(ThemePalette.secondaryText)
                 }
             }
             .lineLimit(1)

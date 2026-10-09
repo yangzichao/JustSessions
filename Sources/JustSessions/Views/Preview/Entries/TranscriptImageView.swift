@@ -40,7 +40,7 @@ struct TranscriptImageView: View {
             if failedToDecode {
                 Label("Image can't be shown", systemImage: "photo")
                     .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ThemePalette.secondaryText)
             } else {
                 ProgressView().controlSize(.small)
             }

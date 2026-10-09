@@ -21,7 +21,7 @@ enum TerminalAppearanceStyling {
         terminalView.nativeForegroundColor = NSColor(hexValue: scheme.foreground)
         terminalView.nativeBackgroundColor = NSColor(hexValue: palette.background)
         terminalView.selectedTextBackgroundColor = NSColor(hexValue: scheme.selectionBackground)
-        terminalView.selectedTextForegroundColor = NSColor(hexValue: scheme.selectionForeground)
+        terminalView.selectedTextForegroundColor = NSColor(hexValue: scheme.readableSelectionForeground)
         terminalView.caretColor = NSColor(hexValue: scheme.foreground)
         terminalView.caretTextColor = NSColor(hexValue: palette.background)
         terminalView.installColors(scheme.ansiColors)

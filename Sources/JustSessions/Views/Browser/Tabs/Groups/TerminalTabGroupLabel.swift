@@ -3,7 +3,7 @@ import SwiftUI
 
 /// The project's name in its group color, in front of its tabs. Clicking it collapses or expands the group. A
 /// collapsed group counts its hidden tabs and shows the most pressing status among them, so a CLI waiting on you
-/// still shows.
+/// still shows. It sits on the tab bar, whose surface its fill is blended with.
 struct TerminalTabGroupLabel: View {
     let projectName: String
     let location: ProjectLocation
@@ -34,7 +34,6 @@ struct TerminalTabGroupLabel: View {
                 if isCollapsed && hiddenTabCount > 0 {
                     Text("\(hiddenTabCount)")
                         .monospacedDigit()
-                        .opacity(0.75)
                     if let status = hiddenTabsActivity.mostPressingStatus {
                         SessionStatusIndicator(status: status, description: hiddenTabsActivity.summary)
                     }
@@ -44,7 +43,7 @@ struct TerminalTabGroupLabel: View {
             .foregroundStyle(color)
             .padding(.horizontal, 8)
             .frame(height: WorkspaceTabMetrics.height - 8)
-            .background(labelShape.fill(color.opacity(isHovered ? 0.24 : 0.15)))
+            .background(labelShape.fill(OpaqueWash(surface: ThemePalette.sidebarSurface, wash: color, opacity: isHovered ? 0.24 : 0.15)))
             // The click target runs the full height of the tabs beside it, not just the pill.
             .padding(.vertical, 4)
             .contentShape(Rectangle())

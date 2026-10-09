@@ -8,7 +8,7 @@ struct SessionAgeLabel: View {
         TimelineView(.everyMinute) { context in
             Text(CompactRelativeTimeFormatter.string(for: lastActivity, relativeTo: context.date))
                 .font(.system(size: 11).monospacedDigit())
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(ThemePalette.tertiaryText)
                 .fixedSize()
         }
     }

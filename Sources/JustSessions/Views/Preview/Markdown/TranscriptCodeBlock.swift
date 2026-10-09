@@ -13,7 +13,7 @@ struct TranscriptCodeBlock: View {
             HStack {
                 Text(language.flatMap { $0.isEmpty ? nil : $0 } ?? "Code")
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ThemePalette.secondaryText)
                 Spacer()
                 Button(hasCopied ? "Copied" : "Copy", systemImage: hasCopied ? "checkmark" : "doc.on.doc") {
                     NSPasteboard.general.clearContents()
