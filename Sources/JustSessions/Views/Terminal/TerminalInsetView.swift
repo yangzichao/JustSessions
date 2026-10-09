@@ -36,7 +36,9 @@ final class TerminalInsetView: NSView {
         layer?.backgroundColor = terminalView.nativeBackgroundColor.cgColor
     }
 
+    /// A tab moved to another window takes its terminal into that window's inset view.
     override func resizeSubviews(withOldSize oldSize: NSSize) {
+        guard terminalView.superview === self else { return }
         terminalView.frame = terminalFrame
     }
 

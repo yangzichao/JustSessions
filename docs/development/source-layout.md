@@ -22,12 +22,14 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
 - `Models/Terminal/Tabs/Moving/`: dragging in the tab bar: a tab moves within its group, a split's two tabs together, and a group whole by its label; and where a dragged tab or group lands as the pointer moves.
+- `Models/Terminal/Tabs/Moving/BetweenWindows/`: taking a tab, or a split's two tabs, out of a window's tabs whole, and where they go among another window's tabs or groups.
 - `Models/Terminal/Closing/`: what closing a tab does when its CLI can keep running in tmux: ask each time, keep it running, or end it.
 - `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, and where a shown split's panes and the resize area between them sit.
 - `Models/Wording/`: counts and relative times in labels.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Windows/`: the open workspace windows, each with its store, so a session runs in one tab across them. Resuming a session another window's tab runs brings that window forward to the tab, and each window's session rows, project summaries, Waiting for you filter, and activity sync count other windows' tabs as the session's own.
 - `Services/Windows/MovingTabs/`: moves a session's tab here from another window when tmux keeps its CLI running: that tab closes and a tab here reattaches. Over SSH, the host first confirms its tmux runs the CLI.
+- `Services/Windows/DraggingTabs/`: moves dragged tabs from one window's store to another's as they are, their terminals and CLIs still running, and keeps each window's selection and saved tabs right.
 - `Services/Activity/`: reads what each CLI on this Mac is doing, from Claude Code's live registry, Codex session files, and the reports of the app's Pi and OpenCode extensions. `UnseenTurns/` marks a session after each sync and clears the mark once its tab is on screen.
 - `Services/Notifications/`: posts notifications through macOS, opens the session a clicked one is about, and saves which moments notify.
 - `Services/Onboarding/`: saves which onboarding tips have shown, and whether the install shows them at all, decided once from whether it was fresh; Help's Take the tour shows them all again.
@@ -70,11 +72,12 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
 - `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
 - `Views/Browser/Tabs/Dragging/`: the drag gesture tabs and group labels share, which takes over from their buttons once the pointer moves.
+- `Views/Browser/Tabs/Dragging/BetweenWindows/`: dragging tabs out of the tab bar, as in Chrome: past the bar they leave in a window of their own that follows the pointer, and over another window's bar, or back over theirs, they join it. Each bar reports where its groups and tabs are, so the tabs arrive where its drag then keeps them.
 - `Views/Browser/Tabs/Appearance/`: the Chrome-style tab shape and sizes, joined for a split's two tabs, how tabs narrow to share the bar as more open, and the terminal colors the selected tab takes on.
 - `Views/Browser/WindowDragging/`: the tab bar's window move zone. AppKit would move the window from a press on a tab, since the bar is in the title bar, so while the pointer is over the bar the window can't be moved, and the app moves it itself from the bar's empty space.
 - `Views/Browser/Split/`: what a shown split view draws around its panes, as Chrome does: the area's terminal-colored background, each pane's rounded outline with its mini toolbar in the corner, and the resize area between the panes, which you drag to resize them.
-- `Views/Browser/DockMenu/`: the Dock icon's right-click menu, whose New Window opens a workspace window through SwiftUI's `openWindow`, handed over by each workspace window as it appears.
-- `Views/Browser/WorkspaceWindows/`: tells the window registry in `Services/Windows/` which window shows each store, so another window can bring it forward.
+- `Views/Browser/DockMenu/`: the Dock icon's right-click menu, whose New Window opens a workspace window.
+- `Views/Browser/WorkspaceWindows/`: tells the window registry in `Services/Windows/` which window shows each store, so another window can bring it forward, and hands over SwiftUI's `openWindow` as each workspace window appears, for the Dock menu's New Window and for tabs dragged out of their window.
 - `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help in the same sheet.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
 - `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, subagents' session rows with the chevron that shows them, and multi-selection. `SidebarRowMoreActionsMenu` is the ⋯ that project and session rows show under the pointer, which opens the row's right-click menu.

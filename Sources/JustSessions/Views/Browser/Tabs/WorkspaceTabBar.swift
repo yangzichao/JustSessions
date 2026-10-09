@@ -7,9 +7,12 @@ import SwiftUI
 /// the selected tab takes its terminal's color and runs down into it, through the bar's bottom line. As in Chrome,
 /// tabs narrow together to fit the bar as more open, and the bar scrolls once they are as narrow as they get; a split's
 /// two tabs share one tab's width. Dragging a group's label moves the whole group among the others; tabs drag within
-/// their group, see `TerminalTabGroupSection`. Dragging the bar's space around and past them moves the window.
+/// their group, see `TerminalTabGroupSection`, and between windows, see `TabDragBetweenWindows`, which also draws a tab
+/// dragged in from another window as its own group among the others. Dragging the bar's space around and past them
+/// moves the window.
 struct WorkspaceTabBar: View {
     @ObservedObject var store: ConversationStore
+    @ObservedObject private var tabDragBetweenWindows = TabDragBetweenWindows.shared
     /// Width at the leading edge that tabs never enter, even when scrolled, so the window buttons and sidebar toggle
     /// stay clear of them.
     let leadingClearance: CGFloat
@@ -29,7 +32,8 @@ struct WorkspaceTabBar: View {
         let groupKeys = groups.map(\.projectDirectoryKey)
         let colorsByProjectKey = TabGroupPalette.colorsByProjectKey(groupKeys)
         // A drag begun before a group appeared or went away is no longer drawn, and is let go once the bar catches up.
-        let currentGroupDrag = groupDrag.flatMap { $0.itemIDs == groupKeys ? $0 : nil }
+        let currentGroupDrag = (groupDrag ?? tabDragBetweenWindows.groupDrag(in: store))
+            .flatMap { $0.itemIDs == groupKeys ? $0 : nil }
         let shownTabs = groups
             .filter { !collapsedProjectKeys.contains($0.projectDirectoryKey) }
             .flatMap(\.tabs)
@@ -66,6 +70,7 @@ struct WorkspaceTabBar: View {
                         // The groups the dragged one passes slide over; it follows the pointer itself.
                         .animation(isDragged ? nil : TabBarDragMetrics.slideAnimation, value: currentGroupDrag?.targetIndex)
                         .zIndex(isDragged ? 1 : 0)
+                        .reportsTabBarGroupSpan(group.projectDirectoryKey, in: store)
                     }
                 }
                 .padding(.horizontal, WorkspaceTabMetrics.horizontalInset)

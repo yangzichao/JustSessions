@@ -606,11 +606,12 @@ final class ConversationStore: ObservableObject {
         )
     }
 
-    /// Takes on the strip's order and splits, changing only what differs.
-    func apply(_ strip: TerminalTabStrip) {
+    /// Takes on the strip's order and splits, changing only what differs. `incomingTabs` are tabs the strip has that
+    /// come from another window.
+    func apply(_ strip: TerminalTabStrip, bringingIn incomingTabs: [TerminalSession] = []) {
         let tabIDs = strip.tabIDs
         if tabIDs != terminalSessions.map(\.id) {
-            let tabsByID = Dictionary(uniqueKeysWithValues: terminalSessions.map { ($0.id, $0) })
+            let tabsByID = Dictionary(uniqueKeysWithValues: (terminalSessions + incomingTabs).map { ($0.id, $0) })
             terminalSessions = tabIDs.compactMap { tabsByID[$0] }
         }
         if strip.splits != terminalSplits { terminalSplits = strip.splits }
