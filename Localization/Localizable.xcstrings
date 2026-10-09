@@ -655,6 +655,16 @@
         }
       }
     },
+    "Antigravity and OpenCode need `python3`; deleting Antigravity sessions also needs `lsof`.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antigravity 和 OpenCode 需要 `python3`；删除 Antigravity 会话还需要 `lsof`。"
+          }
+        }
+      }
+    },
     "App": {
       "localizations": {
         "zh-Hans": {
@@ -928,6 +938,16 @@
         }
       }
     },
+    "Browse and resume sessions on another machine.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "浏览并继续其他机器上的会话。"
+          }
+        }
+      }
+    },
     "Browse…": {
       "localizations": {
         "zh-Hans": {
@@ -1114,16 +1134,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "本机的 Claude Code、Antigravity 和 Pi 会话将移到废纸篓。Codex、Kiro CLI、OpenCode 会话和 SSH 主机上的所有会话将被永久删除。"
-          }
-        }
-      }
-    },
-    "Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh <host>` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "主机上的 Claude Code、Codex、Antigravity、Kiro CLI、OpenCode 和 Pi 会话会列在侧栏中，并通过 SSH 打开。请使用 ~/.ssh/config 中的主机别名或 user@hostname。`ssh <host>` 必须能够免密连接，主机还需要 rsync。Antigravity 和 OpenCode 还需要 python3；删除 Antigravity 会话还需要 lsof。在远程主机上安装 tmux，可让会话在断线或关闭标签后继续运行；点击会话即可重新连接。应用内置的 tmux 仅适用于此 Mac。"
           }
         }
       }
@@ -2130,6 +2140,16 @@
         }
       }
     },
+    "For sessions to survive disconnects or closed tabs, install `tmux` on the host. Reopen a session to reattach.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在主机上安装 `tmux`，可让会话在断线或关闭标签后继续运行。再次打开会话即可重新连接。"
+          }
+        }
+      }
+    },
     "For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.": {
       "localizations": {
         "zh-Hans": {
@@ -2407,6 +2427,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "在 **项目** 中清除所有筛选，然后单击该主机的刷新按钮。"
+          }
+        }
+      }
+    },
+    "Install `rsync` and the CLIs you use on the host.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在主机上安装 `rsync` 和需要使用的 CLI。"
           }
         }
       }
@@ -3713,6 +3743,16 @@
         }
       }
     },
+    "Requires passwordless SSH.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要 SSH 免密登录。"
+          }
+        }
+      }
+    },
     "Restore": {
       "localizations": {
         "zh-Hans": {
@@ -3871,6 +3911,36 @@
         }
       }
     },
+    "SSH alias or user@hostname": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SSH 别名或 user@hostname"
+          }
+        }
+      }
+    },
+    "SSH aliases come from `~/.ssh/config`.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SSH 别名在 `~/.ssh/config` 中配置。"
+          }
+        }
+      }
+    },
+    "SSH host": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SSH 主机"
+          }
+        }
+      }
+    },
     "SSH hosts": {
       "localizations": {
         "zh-Hans": {
@@ -3897,6 +3967,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "SSH 主机没有废纸篓，因此所有会话都将被永久删除。"
+          }
+        }
+      }
+    },
+    "SSH setup guide ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SSH 配置指南 ↗"
           }
         }
       }
@@ -4169,6 +4249,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "设置…"
+          }
+        }
+      }
+    },
+    "Setup requirements": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配置要求"
           }
         }
       }
@@ -5212,9 +5302,6 @@
           }
         }
       }
-    },
-    "devbox or user@devbox.example.com": {
-      "shouldTranslate": false
     },
     "iTerm2 Color Preset File…": {
       "localizations": {

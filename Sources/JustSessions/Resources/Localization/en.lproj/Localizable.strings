@@ -126,6 +126,8 @@
 	<string>Also resumes %@ sessions on this Mac. JustSessions adds its own arguments after it.</string>
 	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
 	<string>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</string>
+	<key>Antigravity and OpenCode need `python3`; deleting Antigravity sessions also needs `lsof`.</key>
+	<string>Antigravity and OpenCode need `python3`; deleting Antigravity sessions also needs `lsof`.</string>
 	<key>App</key>
 	<string>App</string>
 	<key>Appearance</key>
@@ -170,6 +172,8 @@
 	<string>A−</string>
 	<key>Branch</key>
 	<string>Branch</string>
+	<key>Browse and resume sessions on another machine.</key>
+	<string>Browse and resume sessions on another machine.</string>
 	<key>Browse…</key>
 	<string>Browse…</string>
 	<key>CLIs skip your interactive shell startup, which starts another program</key>
@@ -208,8 +212,6 @@
 	<string>Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.</string>
 	<key>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</key>
 	<string>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</string>
-	<key>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
-	<string>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</string>
 	<key>Claude Code, Codex, Pi, and OpenCode on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</key>
 	<string>Claude Code, Codex, Pi, and OpenCode on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</string>
 	<key>Clear filters</key>
@@ -388,6 +390,8 @@
 	<string>Font</string>
 	<key>Font size</key>
 	<string>Font size</string>
+	<key>For sessions to survive disconnects or closed tabs, install `tmux` on the host. Reopen a session to reattach.</key>
+	<string>For sessions to survive disconnects or closed tabs, install `tmux` on the host. Reopen a session to reattach.</string>
 	<key>For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.</key>
 	<string>For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.</string>
 	<key>Fork in the native CLI</key>
@@ -440,6 +444,8 @@
 	<string>Improved</string>
 	<key>In **Projects**, clear the filters, then click the host's refresh button.</key>
 	<string>In **Projects**, clear the filters, then click the host's refresh button.</string>
+	<key>Install `rsync` and the CLIs you use on the host.</key>
+	<string>Install `rsync` and the CLIs you use on the host.</string>
 	<key>Interface language</key>
 	<string>Interface language</string>
 	<key>JustSessions</key>
@@ -700,6 +706,8 @@
 	<string>Report on GitHub</string>
 	<key>Reporting the crash helps get it fixed. The report opens with the crash details filled in: add what you were doing, then send it. The crash report file shows in Finder, so you can attach it.</key>
 	<string>Reporting the crash helps get it fixed. The report opens with the crash details filled in: add what you were doing, then send it. The crash report file shows in Finder, so you can attach it.</string>
+	<key>Requires passwordless SSH.</key>
+	<string>Requires passwordless SSH.</string>
 	<key>Restore</key>
 	<string>Restore</string>
 	<key>Restore %@</key>
@@ -726,12 +734,20 @@
 	<string>Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.</string>
 	<key>Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.</key>
 	<string>Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.</string>
+	<key>SSH alias or user@hostname</key>
+	<string>SSH alias or user@hostname</string>
+	<key>SSH aliases come from `~/.ssh/config`.</key>
+	<string>SSH aliases come from `~/.ssh/config`.</string>
+	<key>SSH host</key>
+	<string>SSH host</string>
 	<key>SSH hosts</key>
 	<string>SSH hosts</string>
 	<key>SSH hosts don't tell when a session waits for you</key>
 	<string>SSH hosts don't tell when a session waits for you</string>
 	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
 	<string>SSH hosts have no Trash, so every session is permanently deleted.</string>
+	<key>SSH setup guide ↗</key>
+	<string>SSH setup guide ↗</string>
 	<key>SSH setup in the user guide ↗</key>
 	<string>SSH setup in the user guide ↗</string>
 	<key>Save</key>
@@ -780,6 +796,8 @@
 	<string>Settings (⌘,)</string>
 	<key>Settings…</key>
 	<string>Settings…</string>
+	<key>Setup requirements</key>
+	<string>Setup requirements</string>
 	<key>Shell startup help</key>
 	<string>Shell startup help</string>
 	<key>Shell startup in the user guide ↗</key>
@@ -976,8 +994,6 @@
 	<string>`rsync`, and the CLIs you use</string>
 	<key>`tmux`, so a CLI keeps running when the connection drops</key>
 	<string>`tmux`, so a CLI keeps running when the connection drops</string>
-	<key>devbox or user@devbox.example.com</key>
-	<string>devbox or user@devbox.example.com</string>
 	<key>iTerm2 Color Preset File…</key>
 	<string>iTerm2 Color Preset File…</string>
 	<key>iTerm2 Default Profile</key>

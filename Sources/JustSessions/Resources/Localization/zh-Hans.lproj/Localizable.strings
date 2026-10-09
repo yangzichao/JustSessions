@@ -116,6 +116,8 @@
 	<string>在这台 Mac 上恢复 %@ 会话时也会用它。JustSessions 会在它后面加上自己的参数。</string>
 	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
 	<string>已归档的项目会从侧栏中隐藏。其文件夹和会话仍保留在磁盘上，恢复后会重新列出。在其文件夹中新建会话也会恢复该项目。</string>
+	<key>Antigravity and OpenCode need `python3`; deleting Antigravity sessions also needs `lsof`.</key>
+	<string>Antigravity 和 OpenCode 需要 `python3`；删除 Antigravity 会话还需要 `lsof`。</string>
 	<key>App</key>
 	<string>应用</string>
 	<key>Appearance</key>
@@ -164,6 +166,8 @@
 	<string>分支</string>
 	<key>Branch %lld sessions</key>
 	<string>为 %lld 个会话创建分支</string>
+	<key>Browse and resume sessions on another machine.</key>
+	<string>浏览并继续其他机器上的会话。</string>
 	<key>Browse…</key>
 	<string>浏览…</string>
 	<key>CLIs skip your interactive shell startup, which starts another program</key>
@@ -202,8 +206,6 @@
 	<string>Claude Code、Antigravity 和 Pi 会话将移到废纸篓；Codex、Kiro CLI 和 OpenCode 会话将被永久删除。</string>
 	<key>Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.</key>
 	<string>本机的 Claude Code、Antigravity 和 Pi 会话将移到废纸篓。Codex、Kiro CLI、OpenCode 会话和 SSH 主机上的所有会话将被永久删除。</string>
-	<key>Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh &lt;host&gt;` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.</key>
-	<string>主机上的 Claude Code、Codex、Antigravity、Kiro CLI、OpenCode 和 Pi 会话会列在侧栏中，并通过 SSH 打开。请使用 ~/.ssh/config 中的主机别名或 user@hostname。`ssh &lt;host&gt;` 必须能够免密连接，主机还需要 rsync。Antigravity 和 OpenCode 还需要 python3；删除 Antigravity 会话还需要 lsof。在远程主机上安装 tmux，可让会话在断线或关闭标签后继续运行；点击会话即可重新连接。应用内置的 tmux 仅适用于此 Mac。</string>
 	<key>Claude Code, Codex, Pi, and OpenCode on this Mac notify you when they finish a turn or need your input, unless you are looking at their tab. Choose which in General.</key>
 	<string>这台 Mac 上的 Claude Code、Codex、Pi 和 OpenCode 完成一轮回复或需要你输入时会通知你，正在查看其标签页时除外。可在通用设置中选择通知哪些情况。</string>
 	<key>Clear filters</key>
@@ -390,6 +392,8 @@
 	<string>字体</string>
 	<key>Font size</key>
 	<string>字号</string>
+	<key>For sessions to survive disconnects or closed tabs, install `tmux` on the host. Reopen a session to reattach.</key>
+	<string>在主机上安装 `tmux`，可让会话在断线或关闭标签后继续运行。再次打开会话即可重新连接。</string>
 	<key>For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.</key>
 	<string>适用于 CLI 可在 tmux 中保持运行的标签。关闭对话框中的“不再询问”也会设置此项。</string>
 	<key>Fork in the native CLI</key>
@@ -442,6 +446,8 @@
 	<string>改进</string>
 	<key>In **Projects**, clear the filters, then click the host's refresh button.</key>
 	<string>在 **项目** 中清除所有筛选，然后单击该主机的刷新按钮。</string>
+	<key>Install `rsync` and the CLIs you use on the host.</key>
+	<string>在主机上安装 `rsync` 和需要使用的 CLI。</string>
 	<key>Interface language</key>
 	<string>界面语言</string>
 	<key>JustSessions Help</key>
@@ -700,6 +706,8 @@
 	<string>在 GitHub 上报告</string>
 	<key>Reporting the crash helps get it fixed. The report opens with the crash details filled in: add what you were doing, then send it. The crash report file shows in Finder, so you can attach it.</key>
 	<string>报告这次崩溃，能帮我们修复它。报告打开时已填好崩溃详情：补充你当时在做什么，然后发送。崩溃报告文件会在访达中显示，方便你附上。</string>
+	<key>Requires passwordless SSH.</key>
+	<string>需要 SSH 免密登录。</string>
 	<key>Restore</key>
 	<string>恢复</string>
 	<key>Restore %@</key>
@@ -728,12 +736,20 @@
 	<string>右键单击会话可以重命名、置顶、导出或删除。按住 ⌘ 或 Shift 单击可一次选择多个。</string>
 	<key>Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.</key>
 	<string>右键单击另一个标签页，选择 **使用当前标签页创建新的拆分视图**。在两个视图之间拖动可调整大小。</string>
+	<key>SSH alias or user@hostname</key>
+	<string>SSH 别名或 user@hostname</string>
+	<key>SSH aliases come from `~/.ssh/config`.</key>
+	<string>SSH 别名在 `~/.ssh/config` 中配置。</string>
+	<key>SSH host</key>
+	<string>SSH 主机</string>
 	<key>SSH hosts</key>
 	<string>SSH 主机</string>
 	<key>SSH hosts don't tell when a session waits for you</key>
 	<string>SSH 主机不会告知会话何时在等待你</string>
 	<key>SSH hosts have no Trash, so every session is permanently deleted.</key>
 	<string>SSH 主机没有废纸篓，因此所有会话都将被永久删除。</string>
+	<key>SSH setup guide ↗</key>
+	<string>SSH 配置指南 ↗</string>
 	<key>SSH setup in the user guide ↗</key>
 	<string>用户指南中的 SSH 设置 ↗</string>
 	<key>Save</key>
@@ -786,6 +802,8 @@
 	<string>设置（⌘,）</string>
 	<key>Settings…</key>
 	<string>设置…</string>
+	<key>Setup requirements</key>
+	<string>配置要求</string>
 	<key>Shell startup help</key>
 	<string>Shell 启动配置帮助</string>
 	<key>Shell startup in the user guide ↗</key>

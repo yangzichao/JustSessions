@@ -15,14 +15,26 @@ struct AddRemoteHostSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Add SSH host").font(.title3.weight(.semibold))
-            Text("Claude Code, Codex, Antigravity, Kiro CLI, OpenCode, and Pi sessions on the host are listed under it in the sidebar, and open over SSH. Use a Host alias from ~/.ssh/config or user@hostname. `ssh <host>` must work without a password prompt, and the host needs rsync. Antigravity and OpenCode also need python3; deleting Antigravity sessions needs lsof. Install tmux on the remote host so sessions keep running when the connection drops or the tab closes; click the session to reattach. The app's bundled tmux is only for this Mac.")
+            Text("Browse and resume sessions on another machine.")
                 .font(.callout)
                 .foregroundStyle(ThemePalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
 
-            TextField("devbox or user@devbox.example.com", text: $proposedHost)
-                .textFieldStyle(ThemedTextFieldStyle())
-                .onSubmit(addProposedHost)
+            VStack(alignment: .leading, spacing: 6) {
+                TextField("SSH alias or user@hostname", text: $proposedHost)
+                    .textFieldStyle(ThemedTextFieldStyle())
+                    .accessibilityLabel("SSH host")
+                    .onSubmit(addProposedHost)
+                Text("Requires passwordless SSH.")
+                    .font(.caption)
+                    .foregroundStyle(ThemePalette.secondaryText)
+            }
+
+            DisclosureGroup("Setup requirements") {
+                setupRequirements
+            }
+            .font(.callout)
+            .foregroundStyle(ThemePalette.secondaryText)
 
             HStack {
                 Spacer()
@@ -36,6 +48,20 @@ struct AddRemoteHostSheet: View {
         .padding(20)
         .frame(width: 480)
         .background(ThemePalette.contentSurface)
+    }
+
+    private var setupRequirements: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("SSH aliases come from `~/.ssh/config`.")
+            Text("Install `rsync` and the CLIs you use on the host.")
+            Text("For sessions to survive disconnects or closed tabs, install `tmux` on the host. Reopen a session to reattach.")
+            Text("Antigravity and OpenCode need `python3`; deleting Antigravity sessions also needs `lsof`.")
+            Link("SSH setup guide ↗", destination: AppLinks.userGuideSSHHostsURL)
+                .buttonStyle(ThemePlainButtonStyle(verticalPadding: 2))
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 6)
     }
 
     private func addProposedHost() {
