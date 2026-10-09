@@ -53,7 +53,7 @@ Discovery metadata is cached under the app's macOS Caches directory in `SessionS
 
 ### Curated release notes
 
-`Sources/JustSessions/Resources/ReleaseNotes/releases.json` is the shared editorial history for Settings → Release notes,
+`Sources/JustSessions/Resources/ReleaseNotes/releases.json` is the shared editorial history for Settings → General → Release notes,
 the [website release notes](https://yangzichao.github.io/JustSessions/release-notes.html), GitHub release bodies, and Sparkle's update window.
 Before tagging, add the version, release date (the publication day in America/Los_Angeles), a short title, and user-facing changes under
 `new`, `improved`, or `fixed`. Keep newest versions first and include English and Simplified Chinese copy. Follow the required
