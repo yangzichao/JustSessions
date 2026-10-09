@@ -59,6 +59,8 @@ struct TerminalTab: View {
     /// The line that parts this tab from the one before. It hides beside a tab drawing a shape of its own, and between
     /// a split's two tabs.
     let showsLeadingSeparator: Bool
+    /// The color of the tab's group, which outlines the tab while it is active.
+    let groupColor: ThemeColor
     /// The split items this tab's context menu offers, or nil for none.
     let splitMenu: TerminalTabSplitMenu?
     /// Starts a new session or a plain terminal in the tab's group, first in its context menu, as Chrome's tab menu
@@ -116,7 +118,8 @@ struct TerminalTab: View {
                 TerminalTabCloseButton(title: session.displayTitle, action: onClose)
             }
         }
-        .font(.system(size: 12, weight: isActive ? .semibold : .medium))
+        // One weight for every tab, as in Chrome: the active tab stands out by its color and outline.
+        .font(.system(size: 12, weight: .medium))
         .foregroundStyle(isActive ? AnyShapeStyle(ThemePalette.ink) : AnyShapeStyle(.secondary))
         // An active tab sits on the terminal's background, which can be dark in a light window or the reverse.
         .environment(\.colorScheme, isActive ? terminalPalette.colorScheme : colorScheme)
@@ -128,6 +131,7 @@ struct TerminalTab: View {
                 isSelected: isActive,
                 isHovered: isHovered || isSplitPartnerHovered,
                 showsLeadingSeparator: showsLeadingSeparator,
+                groupColor: groupColor,
                 splitSide: splitSide
             )
         }
