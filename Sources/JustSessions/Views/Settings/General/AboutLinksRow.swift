@@ -10,9 +10,16 @@ struct AboutLinksRow: View {
             Link("Send us feedback ↗", destination: FeedbackLinks.emailURL(for: environment))
                 .help(AppLinks.feedbackEmailAddress)
                 .accessibilityIdentifier("settings.sendFeedback")
-            Link("Report an issue ↗", destination: FeedbackLinks.gitHubIssueURL(for: environment))
-                .help("Open a new issue on GitHub")
-                .accessibilityIdentifier("settings.reportIssue")
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Link("Report an issue ↗", destination: FeedbackLinks.gitHubIssueURL(for: environment))
+                    .help("Open a new issue on GitHub")
+                    .accessibilityIdentifier("settings.reportIssue")
+                SettingsHelpButton(
+                    title: "Feedback",
+                    explanation: "Feedback and issues start with these versions filled in."
+                )
+                .accessibilityIdentifier("settings.help.feedback")
+            }
             Link("Website ↗", destination: AppLinks.websiteURL)
                 .help("Open the JustSessions website")
                 .accessibilityIdentifier("settings.website")

@@ -8,8 +8,15 @@ struct NotificationSettingsSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Notify me when a session")
-                .font(.subheadline.weight(.medium))
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("Notify me when a session")
+                    .font(.subheadline.weight(.medium))
+                SettingsHelpButton(
+                    title: "Notifications",
+                    explanation: "Supports local Claude Code, Codex, Pi, and OpenCode, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session."
+                )
+                .accessibilityIdentifier("settings.help.notifications")
+            }
             Toggle("Needs my input, such as a permission prompt (not Codex)", isOn: Binding(
                 get: { settingsStore.preferences.notifiesWhenInputNeeded },
                 set: { settingsStore.setNotifiesWhenInputNeeded($0) }
@@ -18,16 +25,12 @@ struct NotificationSettingsSection: View {
                 get: { settingsStore.preferences.notifiesWhenTurnFinishes },
                 set: { settingsStore.setNotifiesWhenTurnFinishes($0) }
             ))
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.")
-                if isTurnedOffInSystemSettings {
-                    Text("Notifications for JustSessions are turned off in System Settings > Notifications.")
-                        .foregroundStyle(ThemePalette.warningText)
-                }
+            if isTurnedOffInSystemSettings {
+                Text("Notifications for JustSessions are turned off in System Settings > Notifications.")
+                    .font(.caption)
+                    .foregroundStyle(ThemePalette.warningText)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .font(.caption)
-            .foregroundStyle(ThemePalette.secondaryText)
-            .fixedSize(horizontal: false, vertical: true)
         }
         .task { await readSystemSettings() }
     }

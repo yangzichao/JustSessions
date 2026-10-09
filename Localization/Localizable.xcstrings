@@ -386,12 +386,12 @@
         }
       }
     },
-    "A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.": {
+    "A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "仍在 tmux 中运行的 CLI 会重新连接。其他标签会在选中时继续会话，包括 Mac 重启后的会话。普通终端会在原文件夹中打开新 shell。"
+            "value": "仍在 tmux 中运行的 CLI 会重新连接。其他会话在选中标签时继续，包括 Mac 重启后的会话。普通终端会在原文件夹打开新 shell。"
           }
         }
       }
@@ -1990,6 +1990,16 @@
         }
       }
     },
+    "Feedback": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "反馈"
+          }
+        }
+      }
+    },
     "Feedback and issues start with these versions filled in.": {
       "localizations": {
         "zh-Hans": {
@@ -3293,6 +3303,16 @@
         }
       }
     },
+    "Optional": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可选"
+          }
+        }
+      }
+    },
     "Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.": {
       "localizations": {
         "zh-Hans": {
@@ -3699,6 +3719,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "重新打开上次退出 JustSessions 时的标签"
+          }
+        }
+      }
+    },
+    "Reopening tabs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复标签"
           }
         }
       }
@@ -4351,6 +4381,16 @@
         }
       }
     },
+    "Show explanation": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看说明"
+          }
+        }
+      }
+    },
     "Show in Other Window": {
       "localizations": {
         "zh-Hans": {
@@ -4603,6 +4643,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 的子代理"
+          }
+        }
+      }
+    },
+    "Supports local Claude Code, Codex, Pi, and OpenCode, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支持本机的 Claude Code、Codex、Pi 和 OpenCode，包括在 tmux 中运行但未打开标签的会话。正在查看的会话不发送通知。点击通知可打开会话。"
           }
         }
       }
@@ -5209,16 +5259,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。"
-          }
-        }
-      }
-    },
-    "Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "支持本机的 Claude Code、Codex、Pi 和 OpenCode，也支持在 tmux 中运行但未打开标签的会话。正在查看的会话不会发送通知。点击通知即可打开会话。"
           }
         }
       }

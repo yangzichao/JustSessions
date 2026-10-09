@@ -9,10 +9,15 @@ struct PermissionsSettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("macOS asks for these on behalf of JustSessions, also when a CLI in one of its terminals needs one. Checking here never shows a prompt.")
-                .font(.caption)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("Permissions")
+                    .font(.subheadline.weight(.medium))
+                SettingsHelpButton(
+                    title: "Permissions",
+                    explanation: "macOS asks for these on behalf of JustSessions, also when a CLI in one of its terminals needs one. Checking here never shows a prompt."
+                )
+                .accessibilityIdentifier("settings.help.permissions")
+            }
 
             ForEach(AppPermission.onThisMac) { permission in
                 ThemeDivider()

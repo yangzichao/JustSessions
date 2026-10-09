@@ -74,8 +74,8 @@
 	<string>1 subagent session stays on disk.</string>
 	<key>1 tool call</key>
 	<string>1 tool call</string>
-	<key>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</key>
-	<string>A CLI still running in tmux reattaches. Any other tab, such as after a restart of your Mac, resumes its session when you select it. Plain terminals open a new shell in their folder.</string>
+	<key>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</key>
+	<string>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</string>
 	<key>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</key>
 	<string>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</string>
 	<key>A+</key>
@@ -360,6 +360,8 @@
 	<string>Export conversation</string>
 	<key>Export conversations</key>
 	<string>Export conversations</string>
+	<key>Feedback</key>
+	<string>Feedback</string>
 	<key>Feedback and issues start with these versions filled in.</key>
 	<string>Feedback and issues start with these versions filled in.</string>
 	<key>Filter project sessions</key>
@@ -616,6 +618,8 @@
 	<string>Open the JustSessions website</string>
 	<key>Open the source code on GitHub</key>
 	<string>Open the source code on GitHub</string>
+	<key>Optional</key>
+	<string>Optional</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
 	<string>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</string>
 	<key>Organize</key>
@@ -698,6 +702,8 @@
 	<string>Rename project…</string>
 	<key>Reopen the tabs that were open when JustSessions quit</key>
 	<string>Reopen the tabs that were open when JustSessions quit</string>
+	<key>Reopening tabs</key>
+	<string>Reopening tabs</string>
 	<key>Report an issue ↗</key>
 	<string>Report an issue ↗</string>
 	<key>Report by Email</key>
@@ -810,6 +816,8 @@
 	<string>Show %@</string>
 	<key>Show Sidebar</key>
 	<string>Show Sidebar</string>
+	<key>Show explanation</key>
+	<string>Show explanation</string>
 	<key>Show in Other Window</key>
 	<string>Show in Other Window</string>
 	<key>Show sidebar</key>
@@ -858,6 +866,8 @@
 	<string>Subagent</string>
 	<key>Subagent of %@</key>
 	<string>Subagent of %@</string>
+	<key>Supports local Claude Code, Codex, Pi, and OpenCode, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session.</key>
+	<string>Supports local Claude Code, Codex, Pi, and OpenCode, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session.</string>
 	<key>Swap with left view</key>
 	<string>Swap with left view</string>
 	<key>Swap with right view</key>
@@ -976,8 +986,6 @@
 	<string>When you close a tab</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</string>
-	<key>Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</key>
-	<string>Works for Claude Code, Codex, Pi, and OpenCode on this Mac, also while they run in tmux with no tab open. A session whose tab you are looking at sends none. Click a notification to open the session.</string>
 	<key>You</key>
 	<string>You</string>
 	<key>Your login shell, with no CLI</key>
