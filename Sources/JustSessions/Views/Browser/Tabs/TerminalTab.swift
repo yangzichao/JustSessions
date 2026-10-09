@@ -117,7 +117,7 @@ struct TerminalTab: View {
             }
         }
         .font(.system(size: 12, weight: isActive ? .semibold : .medium))
-        .foregroundStyle(isActive ? AnyShapeStyle(ThemePalette.ink) : AnyShapeStyle(.secondary))
+        .foregroundStyle(isActive ? ThemePalette.ink : ThemePalette.secondaryText)
         // An active tab sits on the terminal's background, which can be dark in a light window or the reverse.
         .environment(\.colorScheme, isActive ? terminalPalette.colorScheme : colorScheme)
         // Without the ×, the title ends as far from the tab's edge as it starts.

@@ -14,7 +14,7 @@ struct MissingProjectFolderNote: View {
             Image(systemName: "folder.badge.questionmark")
         }
         .font(.callout)
-        .foregroundStyle(ThemePalette.warning)
+        .foregroundStyle(ThemePalette.warningText)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 

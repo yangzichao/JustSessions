@@ -53,7 +53,7 @@ struct SidebarSubagentRow: View {
             .allowsHitTesting(isHovered)
         }
         .background(
-            SidebarRowBackground(isSelected: isSelected, isHovered: isHovered, selectionTint: conversation.provider.tintColor)
+            SidebarRowBackground(isSelected: isSelected, isHovered: isHovered, selectionProvider: conversation.provider)
         )
         .onHover { isHovered = $0 }
         .contextMenu { menuItems }

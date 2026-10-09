@@ -55,11 +55,11 @@ struct NewSessionStartCommandSection: View {
                     }
                 }
                 .font(.callout)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
             } else if let checkFailure {
                 Text(verbatim: checkFailure)
                     .font(.callout)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(ThemePalette.errorText)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Group {
@@ -70,7 +70,7 @@ struct NewSessionStartCommandSection: View {
                 }
             }
             .font(.callout)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(ThemePalette.secondaryText)
             .fixedSize(horizontal: false, vertical: true)
         }
     }
@@ -98,7 +98,7 @@ struct NewSessionStartCommandSection: View {
     private var lockedCommand: some View {
         Text(verbatim: savedCommand.isEmpty ? provider.defaultStartCommand : savedCommand)
             .font(.system(.body, design: .monospaced))
-            .foregroundStyle(savedCommand.isEmpty ? HierarchicalShapeStyle.tertiary : .secondary)
+            .foregroundStyle(savedCommand.isEmpty ? ThemePalette.tertiaryText : ThemePalette.secondaryText)
             .lineLimit(4)
             .fixedSize(horizontal: false, vertical: true)
             .textSelection(.enabled)

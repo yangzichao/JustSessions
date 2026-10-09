@@ -49,7 +49,7 @@ struct ThumbnailChoiceButton<Thumbnail: View>: View {
                     .overlay(ringShape.strokeBorder(ringStyle, lineWidth: 2))
                 Text(title)
                     .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? .primary : .secondary)
+                    .foregroundStyle(isSelected ? AnyShapeStyle(.primary) : AnyShapeStyle(ThemePalette.secondaryText))
             }
             .contentShape(Rectangle())
         }

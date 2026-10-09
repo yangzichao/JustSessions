@@ -14,7 +14,7 @@ struct TranscriptReadingToolbar: View {
         HStack(spacing: 14) {
             Text(messageCount == 1 ? "1 message" : "\(messageCount) messages")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
             Spacer(minLength: 8)
             if let onFind {
                 Button("Find in conversation", systemImage: "magnifyingglass", action: onFind)

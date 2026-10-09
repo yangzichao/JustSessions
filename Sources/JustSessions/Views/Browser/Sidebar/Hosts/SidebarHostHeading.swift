@@ -26,7 +26,7 @@ struct SidebarHostHeading: View {
             // One width for every host's symbol keeps the host names lined up.
             Image(systemName: host.symbolName)
                 .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(ThemePalette.tertiaryText)
                 .frame(width: 14)
             Group {
                 if host == .thisMac { Text("This Mac") }
@@ -34,7 +34,7 @@ struct SidebarHostHeading: View {
             }
             .textCase(.uppercase)
                 .tracking(0.8)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ThemePalette.secondaryText)
                 .lineLimit(1)
                 .truncationMode(.middle)
             if case .failed(let failureMessage)? = refreshStatus {
@@ -95,7 +95,7 @@ struct SidebarHostHeading: View {
                 TimelineView(.everyMinute) { context in
                     Text(HostSyncAgeFormatter.string(forSyncedAt: syncDate, relativeTo: context.date))
                         .font(.system(size: 10))
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(ThemePalette.tertiaryText)
                         .fixedSize()
                 }
             }
@@ -108,7 +108,7 @@ struct SidebarHostHeading: View {
         ZStack(alignment: .trailing) {
             Text(projectCount.formatted())
                 .monospacedDigit()
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(ThemePalette.tertiaryText)
                 .opacity(isHovered ? 0 : 1)
             SidebarHostAddProjectButton(
                 host: host,

@@ -17,7 +17,7 @@ struct TranscriptEntriesStack: View, Equatable {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(transcript.positionedEntries) { positionedEntry in
                 let entryIndex = positionedEntry.id
-                TranscriptEntryView(entry: positionedEntry.entry, assistantName: provider.rawValue, assistantTint: provider.tintColor)
+                TranscriptEntryView(entry: positionedEntry.entry, assistantName: provider.rawValue, assistantNameColor: provider.textColor)
                     .environment(\.transcriptSearchEntryIndex, entryIndex)
                     .background(TranscriptEntryPositionMarker(entryIndex: entryIndex, controller: positionController))
                     .id(entryIndex)

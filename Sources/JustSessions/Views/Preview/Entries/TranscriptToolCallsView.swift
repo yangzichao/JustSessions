@@ -22,7 +22,7 @@ struct TranscriptToolCallsView: View {
             Label(summaries.count == 1 ? "1 tool call" : "\(summaries.count) tool calls", systemImage: "wrench.and.screwdriver")
                 .font(.system(size: 12))
         }
-        .foregroundStyle(.secondary)
+        .foregroundStyle(ThemePalette.secondaryText)
         .padding(.vertical, 4)
         .onAppear(perform: revealMatchingTool)
         .onChange(of: searchContext.selectedMatch) { revealMatchingTool() }

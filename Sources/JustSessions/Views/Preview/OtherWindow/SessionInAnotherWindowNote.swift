@@ -13,7 +13,7 @@ struct SessionInAnotherWindowNote: View {
         if !tab.hasExited {
             HStack(spacing: 8) {
                 Label("This session is open in another window.", systemImage: "macwindow")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ThemePalette.secondaryText)
                 Button("Show", action: onShow)
                     .buttonStyle(QuietBorderedButtonStyle())
                 if let onMoveHere {

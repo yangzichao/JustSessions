@@ -42,7 +42,7 @@ struct SidebarOpenTabGroupHeading: View {
                             Text(verbatim: destination)
                         }
                     }
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ThemePalette.secondaryText)
                     .lineLimit(1)
                     .truncationMode(.middle)
                     Spacer(minLength: 6)
@@ -81,7 +81,7 @@ struct SidebarOpenTabGroupHeading: View {
         ZStack(alignment: .trailing) {
             Text(verbatim: "\(tabCount)")
                 .monospacedDigit()
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(ThemePalette.tertiaryText)
                 .opacity(isHovered ? 0 : 1)
             ProjectHoverActions(store: store, location: location, projectDisplayName: projectName, onNewSession: onNewSession) {
                 menuItems

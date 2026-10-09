@@ -25,4 +25,8 @@ extension Color {
     static func adaptive(light lightHexValue: UInt32, dark darkHexValue: UInt32) -> Color {
         Color(nsColor: .adaptive(light: NSColor(hexValue: lightHexValue), dark: NSColor(hexValue: darkHexValue)))
     }
+
+    static func adaptive(_ hexColor: AdaptiveHexColor) -> Color {
+        adaptive(light: hexColor.light, dark: hexColor.dark)
+    }
 }

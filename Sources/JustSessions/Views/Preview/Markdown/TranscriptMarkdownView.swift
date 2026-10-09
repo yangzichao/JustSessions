@@ -43,7 +43,7 @@ struct TranscriptMarkdownView: View {
                     }
                     if block.listDepth > 0 {
                         Text(block.listMarker ?? "")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(ThemePalette.secondaryText)
                             .frame(minWidth: 18, alignment: .trailing)
                     }
                     blockContent(block.content, segmentIndex: segmentStarts[block.id] ?? 0)

@@ -7,7 +7,7 @@ struct PinnedIndicator: View {
     var body: some View {
         Image(systemName: "pin.fill")
             .font(.system(size: size, weight: .semibold))
-            .foregroundStyle(.tertiary)
+            .foregroundStyle(ThemePalette.tertiaryText)
             .help("Pinned")
             .accessibilityLabel("Pinned")
     }

@@ -103,7 +103,7 @@ struct NewSessionSheet: View {
                 Text("New session")
                     .font(.title2.weight(.semibold))
                 Text("Start a native CLI or a plain terminal in a project folder.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ThemePalette.secondaryText)
             }
 
             // The host comes first: it decides which tools can run and which recent projects are offered.
@@ -146,7 +146,7 @@ struct NewSessionSheet: View {
                     ProgressView().controlSize(.small)
                     Text("Checking the folder on \(selectedHost.displayName)…")
                         .font(.callout)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(ThemePalette.secondaryText)
                 }
                 Spacer()
                 Button("Cancel") { dismiss() }

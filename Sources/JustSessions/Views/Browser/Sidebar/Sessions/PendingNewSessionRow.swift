@@ -12,11 +12,11 @@ struct PendingNewSessionRow: View {
             SidebarSessionRowLayout(provider: provider, isSelected: isSelected) {
                 Text(terminal.displayTitle)
                     .italic()
-                    .foregroundStyle(isSelected ? .primary : .secondary)
+                    .foregroundStyle(isSelected ? AnyShapeStyle(.primary) : AnyShapeStyle(ThemePalette.secondaryText))
             } trailing: {
                 TerminalStatusIndicator(session: terminal)
             }
-            .sidebarRowHighlight(isSelected: isSelected, selectionTint: provider.tintColor)
+            .sidebarRowHighlight(isSelected: isSelected, selectionProvider: provider)
         }
         .buttonStyle(ThemePlainButtonStyle(showsHover: false))
         .help("\(provider.rawValue) has not saved this session yet · click to open its terminal")

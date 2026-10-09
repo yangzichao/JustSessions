@@ -34,7 +34,7 @@ struct SidebarHostAddProjectButton: View {
     private var plusSymbol: some View {
         Image(systemName: "plus")
             .font(.system(size: 10, weight: .bold))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(ThemePalette.secondaryText)
             .frame(width: 16, height: 16)
             .contentShape(Rectangle())
     }
