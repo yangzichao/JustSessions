@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// One project's tabs behind its group label, underlined in the group color along the tab bar's bottom edge, where the
-/// selected tab covers the line as it joins its terminal. A collapsed group shows only its label. A tab drags among the
+/// One project's tabs behind its group label, underlined in the group color along the tab bar's bottom edge. The
+/// selected tab covers the line as it joins its terminal, and its outline in the group color rises from the line. A collapsed group shows only its label. A tab drags among the
 /// group's tabs, with the other tab of its split, and shows once dropped; the label drags the whole group, which the
 /// tab bar moves.
 struct TerminalTabGroupSection: View {
@@ -60,6 +60,7 @@ struct TerminalTabGroupSection: View {
                     splitSide: split.flatMap { store.sides(of: $0)?.side(of: session.id) },
                     isSplitPartnerHovered: hoveredTabID.map { split?.partner(of: session.id) == $0 } ?? false,
                     showsLeadingSeparator: tabBefore(session.id, in: tabIDsInSight).map { showsSeparator(between: $0, and: session.id) } ?? false,
+                    groupColor: color,
                     splitMenu: splitMenu(for: session.id),
                     newSessionMenu: newSessionMenu(inGroupOf: session, projectName: projectName),
                     onHoverChange: { trackHover(of: session.id, isHovering: $0) },
@@ -81,9 +82,10 @@ struct TerminalTabGroupSection: View {
         }
         .onChange(of: movingUnits) { tabDrag = nil }
         .background(alignment: .bottom) {
+            // Opaque, so it meets the selected tab's outline without a brighter seam where the two overlap.
             Capsule()
-                .fill(color.opacity(0.8))
-                .frame(height: 2)
+                .fill(color)
+                .frame(height: WorkspaceTabMetrics.groupLineWidth)
         }
     }
 
