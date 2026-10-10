@@ -54,7 +54,8 @@ struct TerminalTab: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(ThemePlainButtonStyle(showsHover: false))
-            .help(helpText)
+            // The tab's hover card shows its whole title and details; see `TabHoverCardOverlay`.
+            .accessibilityHint(Text(verbatim: details))
             .accessibilityAddTraits(isSelected ? .isSelected : [])
             .contextMenu {
                 newSessionMenu
@@ -167,11 +168,6 @@ struct TerminalTab: View {
         case .right: Text("\(session.displayTitle) - Right view")
         case nil: nil
         }
-    }
-
-    /// The tab's title and details.
-    private var helpText: Text {
-        Text("Show \(session.displayTitle)") + Text(verbatim: "\n" + details)
     }
 
     /// Where the tab runs and what it runs, such as "JustSessions · Claude Code · Resume".

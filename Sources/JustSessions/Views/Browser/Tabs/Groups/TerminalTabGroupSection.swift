@@ -8,6 +8,7 @@ import SwiftUI
 struct TerminalTabGroupSection: View {
     @ObservedObject var store: ConversationStore
     @ObservedObject private var tabDragBetweenWindows = TabDragBetweenWindows.shared
+    @Environment(\.tabHoverCards) private var hoverCards
     let group: TerminalTabGroup<TerminalSession>
     let color: ThemeColor
     let isCollapsed: Bool
@@ -45,6 +46,8 @@ struct TerminalTabGroupSection: View {
                 hiddenTabsActivity: SessionActivitySummary(tabs: hiddenTabs),
                 onToggleCollapsed: onToggleCollapsed
             )
+            .tabHoverCardAnchor(.group(group.projectDirectoryKey))
+            .onHover { trackHover(of: .group(group.projectDirectoryKey), isHovering: $0) }
             .tabBarDrag(onChanged: { translation, _ in onLabelDragChanged(translation) }, onEnded: onLabelDragEnded)
             .onboardingTourStop(group.tabs.contains { $0.id == store.selectedTerminalID } ? .tabGroup : nil)
             .padding(.trailing, 6)
@@ -72,6 +75,7 @@ struct TerminalTabGroupSection: View {
                     onSplitAction: { store.performSplitAction($0, fromTab: session.id, closeTab: onCloseTab) },
                     onClose: { onCloseTab(session.id) }
                 )
+                .tabHoverCardAnchor(.tab(session.id))
                 .id(session.id)
                 .offset(x: currentTabDrag?.offset(of: movingUnit) ?? 0)
                 // The tabs the dragged one passes slide over; it follows the pointer itself.
@@ -177,6 +181,16 @@ struct TerminalTabGroupSection: View {
             hoveredTabID = tabID
         } else if hoveredTabID == tabID {
             hoveredTabID = nil
+        }
+        trackHover(of: .tab(tabID), isHovering: isHovering)
+    }
+
+    /// Tells the window's hover card where the pointer is.
+    private func trackHover(of target: TabHoverCardTarget, isHovering: Bool) {
+        if isHovering {
+            hoverCards?.pointerEntered(target, tabWidth: tabWidth)
+        } else {
+            hoverCards?.pointerExited(target)
         }
     }
 }

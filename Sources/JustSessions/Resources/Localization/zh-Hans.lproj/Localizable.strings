@@ -32,6 +32,8 @@
 	<string>未显示前面的 %lld 条记录。继续会话可查看全部内容。</string>
 	<key>%lld messages</key>
 	<string>%lld 条消息</string>
+	<key>%lld more tabs</key>
+	<string>还有 %lld 个标签页</string>
 	<key>%lld of %lld</key>
 	<string>%lld / %lld</string>
 	<key>%lld points</key>

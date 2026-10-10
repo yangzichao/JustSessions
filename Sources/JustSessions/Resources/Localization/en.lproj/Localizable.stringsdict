@@ -18,6 +18,22 @@
 			<string>%lld messages</string>
 		</dict>
 	</dict>
+	<key>%lld more tabs</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@value@</string>
+		<key>value</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld more tab</string>
+			<key>other</key>
+			<string>%lld more tabs</string>
+		</dict>
+	</dict>
 	<key>%lld projects selected</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>

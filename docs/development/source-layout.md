@@ -21,6 +21,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
 - `Models/Terminal/Tabs/`: where tabs open and which shows after one closes, so each project's tabs stay together; tab groups and their colors.
+- `Models/Terminal/Tabs/HoverCard/`, `Views/Browser/Tabs/HoverCard/`: the card under a tab or group label the pointer rests on, as in Chrome. A tab's shows its whole title, project, CLI, and status; a group's lists its tabs. The models decide when it shows and hides; the views draw it over the terminal.
 - `Models/Terminal/Tabs/Moving/`: dragging in the tab bar: a tab moves within its group, a split's two tabs together, and a group whole by its label; and where a dragged tab or group lands as the pointer moves.
 - `Models/Terminal/Tabs/Moving/BetweenWindows/`: taking a tab, or a split's two tabs, out of a window's tabs whole, and where they go among another window's tabs or groups.
 - `Models/Terminal/Closing/`: what closing a tab does when its CLI can keep running in tmux: ask each time, keep it running, or end it; and whether closing a plain terminal asks first.
