@@ -41,6 +41,8 @@ cp -f "$project_directory/.build/checkouts/SwiftTerm/LICENSE" "$app_directory/Co
 cp -f "$project_directory/Branding/ThirdParty/Octicons/LICENSE" "$app_directory/Contents/Resources/Octicons-LICENSE.txt"
 # The font itself ships in the resource bundle above; keep its license with the other third-party licenses.
 cp -f "$project_directory/Sources/JustSessions/Resources/Fonts/SymbolsNerdFontMono-LICENSE.txt" "$app_directory/Contents/Resources/SymbolsNerdFontMono-LICENSE.txt"
+# Assets.car carries the light, dark and tinted icons for macOS 26; older macOS falls back to AppIcon.icns.
+cp -f "$project_directory/Branding/Assets.car" "$app_directory/Contents/Resources/Assets.car"
 cp -f "$project_directory/Branding/AppIcon.icns" "$app_directory/Contents/Resources/AppIcon.icns"
 tmux_runtime_directory="$("$project_directory/Scripts/Tmux/build-runtime.sh")"
 ditto "$tmux_runtime_directory" "$app_directory/Contents/Resources/Tmux"
@@ -62,6 +64,7 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
     <key>CFBundleIdentifier</key><string>dev.zichaoyang.justsessions</string>
     <key>CFBundleExecutable</key><string>JustSessions</string>
     <key>CFBundleIconFile</key><string>AppIcon</string>
+    <key>CFBundleIconName</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleDevelopmentRegion</key><string>en</string>
     <key>CFBundleShortVersionString</key><string>0.16.0</string>

@@ -1,6 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="608" height="520" viewBox="-24 -24 608 520">
-  <path d="M120,0 H440 A120,120 0 0 1 560,120 V272 A120,120 0 0 1 440,392 H186 L84,466 A10,10 0 0 1 68,456 L86,387.1 A120,120 0 0 1 0,272 V120 A120,120 0 0 1 120,0 Z" fill="#15171C"/>
-  <circle cx="156" cy="196" r="46" fill="#FF8A1F"/>
-    <circle cx="280" cy="196" r="46" fill="#2F6BFF"/>
-    <circle cx="404" cy="196" r="46" fill="#A64DF0"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="672" height="580" viewBox="-16 -16 672 580">
+  <path transform="translate(80 0)" d="M120,0 H440 A120,120 0 0 1 560,120 V272 A120,120 0 0 1 440,392 H186 L84,466 A10,10 0 0 1 68,456 L86,387.1 A120,120 0 0 1 0,272 V120 A120,120 0 0 1 120,0 Z" fill="#A64DF0" stroke="#15171C" stroke-width="28" stroke-linejoin="round"/>
+  <path transform="translate(40 40)" d="M120,0 H440 A120,120 0 0 1 560,120 V272 A120,120 0 0 1 440,392 H186 L84,466 A10,10 0 0 1 68,456 L86,387.1 A120,120 0 0 1 0,272 V120 A120,120 0 0 1 120,0 Z" fill="#FF8A1F" stroke="#15171C" stroke-width="28" stroke-linejoin="round"/>
+  <path transform="translate(0 80)" d="M120,0 H440 A120,120 0 0 1 560,120 V272 A120,120 0 0 1 440,392 H186 L84,466 A10,10 0 0 1 68,456 L86,387.1 A120,120 0 0 1 0,272 V120 A120,120 0 0 1 120,0 Z" fill="#FFFFFF" stroke="#15171C" stroke-width="28" stroke-linejoin="round"/>
+  <g transform="translate(0 80)">
+    <circle cx="140" cy="196" r="64" fill="#FF8A1F"/>
+    <circle cx="280" cy="196" r="64" fill="#2F6BFF"/>
+    <circle cx="420" cy="196" r="64" fill="#A64DF0"/>
+  </g>
 </svg>
