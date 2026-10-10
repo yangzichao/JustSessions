@@ -56,6 +56,12 @@ struct RemoteCLICommandBuilder {
         )
     }
 
+    /// What the tab's login shells on the host set for the CLI and for tmux. `ssh` gives the host the tab's `TERM` but
+    /// not its `COLORTERM`. Without it a CLI in tmux before 3.3, whose terminal is `screen`, keeps to the 16 ANSI
+    /// colors, and Claude Code draws its selection in ANSI black, the background of themes such as Atom One Dark.
+    /// tmux 3.6 and later also read it as the tab showing RGB colors.
+    static let terminalEnvironment = ["COLORTERM=truecolor"]
+
     /// Runs the CLI through the host's login shell, so the PATH set up in the host's shell profile
     /// (for example `~/.local/bin` or an nvm-managed `node`) is in effect; see `RemoteShellStartup`.
     /// Without tmux on the host, the CLI runs directly.
@@ -76,7 +82,10 @@ struct RemoteCLICommandBuilder {
             )
         } ?? ([provider.executableName] + arguments.map(ShellQuoting.quoted)).joined(separator: " ")
         let directCommand = "cd \(ShellQuoting.quoted(projectPath)) && exec \(cliInvocation)"
-        guard let tmuxSessionName else { return shellStartup.command(running: directCommand) }
+        func inLoginShell(_ command: String) -> String {
+            shellStartup.command(running: command, environment: terminalEnvironment)
+        }
+        guard let tmuxSessionName else { return inLoginShell(directCommand) }
         // `-A` attaches when the session already runs, and the options after it are set again on every attach.
         // The status line and mouse settings make it look and scroll like the CLI on its own, and with no prefix
         // key Ctrl-B reaches the CLI, unless the host uses its own; see `RemoteTmuxPrefixOptions`. These are
@@ -84,9 +93,9 @@ struct RemoteCLICommandBuilder {
         let sessionOptions = ["set-option status off", "set-option mouse on"]
             + RemoteTmuxPrefixOptions.setOptionCommands(usingHostPrefix: usesHostTmuxPrefix)
         let tmuxCommand = "exec tmux new-session -A -s \(ShellQuoting.quoted(tmuxSessionName)) "
-            + ShellQuoting.quoted(shellStartup.command(running: directCommand))
+            + ShellQuoting.quoted(inLoginShell(directCommand))
             + sessionOptions.map { " \\; \($0)" }.joined()
-        return shellStartup.command(running: "if command -v tmux >/dev/null 2>&1; then \(tmuxCommand); else \(directCommand); fi")
+        return inLoginShell("if command -v tmux >/dev/null 2>&1; then \(tmuxCommand); else \(directCommand); fi")
     }
 
     /// Runs `innerCommand` in the host's login shell, started as the host needs; see `RemoteShellStartup`.
