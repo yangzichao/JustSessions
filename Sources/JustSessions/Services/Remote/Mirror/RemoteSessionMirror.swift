@@ -6,10 +6,24 @@ struct RemoteSessionMirror: Sendable {
     let cacheRoot: URL
     /// Replaces `<host>:` as the source, so tests can copy from a local folder that stands in for the remote home.
     let sourceHomeOverride: String?
+    /// Finds where the host keeps each tool's files; see `RemoteToolFoldersLookup`.
+    let toolFoldersLookup: @Sendable (_ host: String) throws -> RemoteToolFolders
 
-    init(cacheRoot: URL = RemoteSessionMirror.defaultCacheRoot, sourceHomeOverride: String? = nil) {
+    /// Without a `toolFoldersLookup`, a host stood in for by `sourceHomeOverride` keeps the standard folders.
+    init(
+        cacheRoot: URL = RemoteSessionMirror.defaultCacheRoot,
+        sourceHomeOverride: String? = nil,
+        toolFoldersLookup: (@Sendable (_ host: String) throws -> RemoteToolFolders)? = nil
+    ) {
         self.cacheRoot = cacheRoot
         self.sourceHomeOverride = sourceHomeOverride
+        if let toolFoldersLookup {
+            self.toolFoldersLookup = toolFoldersLookup
+        } else if sourceHomeOverride == nil {
+            self.toolFoldersLookup = { host in try RemoteToolFoldersLookup.folders(on: host, runner: RemoteHostCommandRunner()) }
+        } else {
+            self.toolFoldersLookup = { _ in .standard }
+        }
     }
 
     static var defaultCacheRoot: URL {
@@ -25,8 +39,9 @@ struct RemoteSessionMirror: Sendable {
 
     /// Copies the host's session files for each tool.
     func synchronize(host: String) throws {
+        let folders = try lookUpToolFolders(host: host)
         for provider in ConversationProvider.allCases {
-            try synchronize(host: host, provider: provider)
+            try synchronize(host: host, provider: provider, folders: folders)
         }
     }
 
@@ -34,7 +49,8 @@ struct RemoteSessionMirror: Sendable {
         try? FileManager.default.removeItem(at: cacheRoot.appendingPathComponent(Self.directoryName(forHost: host)))
     }
 
-    func synchronize(host: String, provider: ConversationProvider) throws {
+    /// `folders` comes from `lookUpToolFolders(host:)`, once for all of the host's tools.
+    func synchronize(host: String, provider: ConversationProvider, folders: RemoteToolFolders) throws {
         let destination = mirrorDirectory(host: host, provider: provider)
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
         if provider == .antigravity {
@@ -45,8 +61,8 @@ struct RemoteSessionMirror: Sendable {
             try OpenCodeRemoteSessionMirror().synchronize(host: host, sourceHomeOverride: sourceHomeOverride, destination: destination)
             return
         }
-        let remoteFolder = Self.remoteFolder(for: provider)
-        let source = sourceHomeOverride.map { "\($0)/\(remoteFolder)/" } ?? "\(host):\(remoteFolder)/"
+        let source = sourceHomeOverride.map { folders.localPath(for: provider, sourceHome: $0) + "/" }
+            ?? folders.rsyncSource(host: host, provider: provider)
 
         guard let result = Self.runRsync(for: provider, source: source, destination: destination.path + "/", host: sourceHomeOverride == nil ? host : nil)
         else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
@@ -133,7 +149,8 @@ struct RemoteSessionMirror: Sendable {
         }
     }
 
-    /// Relative to the remote home directory.
+    /// Relative to the remote home directory, where the tool keeps its files unless the host's environment says
+    /// otherwise; see `RemoteToolFolders`.
     static func remoteFolder(for provider: ConversationProvider) -> String {
         switch provider {
         case .claude: ".claude"

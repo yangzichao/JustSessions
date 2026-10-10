@@ -22,10 +22,11 @@ struct RemoteSessionDiscovery: Sendable {
         copied: @Sendable (RemoteSessionCopyStep, [Conversation]) async -> Void
     ) async throws {
         let providers = ConversationProvider.allCases
+        let folders = try mirror.lookUpToolFolders(host: host)
         for (index, provider) in providers.enumerated() {
             let step = RemoteSessionCopyStep(provider: provider, number: index + 1, count: providers.count)
             await copying(step)
-            try mirror.synchronize(host: host, provider: provider)
+            try mirror.synchronize(host: host, provider: provider, folders: folders)
             await copied(step, try readMirror(host: host, provider: provider))
         }
     }

@@ -1,7 +1,7 @@
 import Foundation
 
-/// Deletes a Pi session in the host's standard `~/.pi/agent/sessions`, the only location the mirror copies: the
-/// folder of the same name beside its `.jsonl` file, where extensions keep subagent runs and forks, then the file.
+/// Deletes a Pi session in the host's sessions folder, the one the mirror copied from: the folder of the same name
+/// beside its `.jsonl` file, where extensions keep subagent runs and forks, then the file.
 enum RemotePiConversationDeletion {
     /// The project folder and file names of a mirrored session, which name the same file on the host. Only a file
     /// directly in a project folder of the host's Pi mirror, named for the session, is accepted.
@@ -28,9 +28,15 @@ enum RemotePiConversationDeletion {
     /// The folder goes first, so if removing the file then fails the session is still listed.
     ///
     /// The header is checked as text, not parsed: Pi writes it as flat, compact JSON whose first key is `type`.
-    static func command(projectFolderName: String, fileName: String, sessionID: String) -> String {
+    ///
+    /// `sessionsFolder` is absolute, or relative to the host's home; see `RemoteToolFolders`.
+    static func command(sessionsFolder: String, projectFolderName: String, fileName: String, sessionID: String) -> String {
         let script = #"""
             project=$1 file=$2 id=$3
+            case $4 in
+              /*) sessions=$4 ;;
+              *) sessions="$HOME/$4" ;;
+            esac
             for name in "$project" "$file"; do
               case $name in
                 ''|.|..|*/*) echo 'Refusing an unexpected session path.' >&2; exit 1 ;;
@@ -40,7 +46,7 @@ enum RemotePiConversationDeletion {
               *_"$id".jsonl) ;;
               *) echo 'The file name does not match the session.' >&2; exit 1 ;;
             esac
-            dir="$HOME/.pi/agent/sessions/$project"
+            dir="$sessions/$project"
             path="$dir/$file"
             if [ -L "$dir" ]; then echo 'The project folder is a symbolic link.' >&2; exit 1; fi
             [ -e "$path" ] || [ -L "$path" ] || exit \#(RemoteConversationDeletion.missingTranscriptExitStatus)
@@ -61,6 +67,6 @@ enum RemotePiConversationDeletion {
             rm -f "$path" || exit 1
             """#
         return "sh -c \(ShellQuoting.quoted(script)) sh "
-            + [projectFolderName, fileName, sessionID].map(ShellQuoting.quoted).joined(separator: " ")
+            + [projectFolderName, fileName, sessionID, sessionsFolder].map(ShellQuoting.quoted).joined(separator: " ")
     }
 }
