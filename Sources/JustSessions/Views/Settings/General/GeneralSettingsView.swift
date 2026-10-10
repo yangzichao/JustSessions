@@ -7,6 +7,7 @@ struct GeneralSettingsView: View {
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
     let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
+    let plainTerminalCloseChoiceSettingsStore: PlainTerminalCloseChoiceSettingsStore
     let notificationSettingsStore: SessionNotificationSettingsStore
     let onCheckForUpdates: () -> Void
 
@@ -35,7 +36,10 @@ struct GeneralSettingsView: View {
 
             ThemeDivider()
 
-            TabClosingSettingsSection(settingsStore: tabCloseChoiceSettingsStore)
+            TabClosingSettingsSection(
+                tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
+                plainTerminalCloseChoiceSettingsStore: plainTerminalCloseChoiceSettingsStore
+            )
 
             ThemeDivider()
 

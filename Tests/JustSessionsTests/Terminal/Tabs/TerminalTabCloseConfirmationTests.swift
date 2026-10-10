@@ -44,6 +44,22 @@ struct TerminalTabCloseConfirmationTests {
         try await scenario.pressReturn(in: sheet) { !scenario.isOpen(tab) }
 
         #expect(scenario.tabCloseChoiceSettingsStore.choice == .keepRunning)
+        #expect(scenario.plainTerminalCloseChoiceSettingsStore.choice == .askEachTime)
+    }
+
+    /// A plain terminal's dialog offers Don't ask again too, and Return with it ticked saves closing terminals without
+    /// asking; the choice for CLI tabs stays as it was.
+    @Test func returnWithDontAskAgainTickedClosesTerminalsWithoutAsking() async throws {
+        let scenario = try CloseConfirmationScenario()
+        defer { scenario.remove() }
+        let tab = scenario.openTab(provider: nil, tmuxSessionName: nil)
+
+        let sheet = try await scenario.confirmClosing(tab)
+        try scenario.tick("Don't ask again", in: sheet)
+        try await scenario.pressReturn(in: sheet) { !scenario.isOpen(tab) }
+
+        #expect(scenario.plainTerminalCloseChoiceSettingsStore.choice == .closeWithoutAsking)
+        #expect(scenario.tabCloseChoiceSettingsStore.choice == .askEachTime)
     }
 
     @Test func aTabThatCannotKeepRunningOffersNoDontAskAgain() async throws {
@@ -74,6 +90,7 @@ private final class CloseConfirmationScenario {
 
     let store: ConversationStore
     let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
+    let plainTerminalCloseChoiceSettingsStore: PlainTerminalCloseChoiceSettingsStore
     private let settings: IsolatedUserDefaults
     private let window: NSWindow
     private let hostingView = NSHostingView(rootView: AnyView(EmptyView()))
@@ -83,6 +100,7 @@ private final class CloseConfirmationScenario {
         settings = try IsolatedUserDefaults()
         store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
         tabCloseChoiceSettingsStore = TabCloseChoiceSettingsStore(userDefaults: settings.userDefaults)
+        plainTerminalCloseChoiceSettingsStore = PlainTerminalCloseChoiceSettingsStore(userDefaults: settings.userDefaults)
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
@@ -107,7 +125,10 @@ private final class CloseConfirmationScenario {
     /// Asks to close `tab`, as its close button does, and returns the dialog once it is on screen.
     func confirmClosing(_ tab: TerminalSession) async throws -> NSWindow {
         hostingView.rootView = AnyView(CloseConfirmationHost(
-            store: store, tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore, closingSessionID: tab.id
+            store: store,
+            tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
+            plainTerminalCloseChoiceSettingsStore: plainTerminalCloseChoiceSettingsStore,
+            closingSessionID: tab.id
         ))
         let clock = ContinuousClock()
         let deadline = clock.now + .seconds(Self.timeoutSeconds)
@@ -182,13 +203,17 @@ private final class CloseConfirmationScenario {
 private struct CloseConfirmationHost: View {
     @ObservedObject var store: ConversationStore
     let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
+    let plainTerminalCloseChoiceSettingsStore: PlainTerminalCloseChoiceSettingsStore
     @State var closingSessionID: UUID?
 
     var body: some View {
         Color.clear
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .modifier(TerminalTabCloseConfirmation(
-                store: store, closingSessionID: $closingSessionID, tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore
+                store: store,
+                closingSessionID: $closingSessionID,
+                tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
+                plainTerminalCloseChoiceSettingsStore: plainTerminalCloseChoiceSettingsStore
             ))
     }
 }

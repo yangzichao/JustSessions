@@ -14,6 +14,7 @@ struct SettingsSheet: View {
                 tabReopeningSettingsStore: .shared,
                 launchAtLoginSettingsStore: .shared,
                 tabCloseChoiceSettingsStore: .shared,
+                plainTerminalCloseChoiceSettingsStore: .shared,
                 appAppearanceStore: .shared,
                 appThemeStore: .shared,
                 terminalAppearanceStore: .shared,
