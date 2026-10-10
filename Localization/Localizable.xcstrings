@@ -70,6 +70,16 @@
         }
       }
     },
+    "%@ is already added.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已添加。"
+          }
+        }
+      }
+    },
     "%@ tab group": {
       "localizations": {
         "zh-Hans": {
@@ -396,6 +406,16 @@
         }
       }
     },
+    "A port goes in `~/.ssh/config`. Add these lines there, then enter %@.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "端口要写在 `~/.ssh/config` 中。把下面几行加进去，再输入 %@。"
+          }
+        }
+      }
+    },
     "A session whose subagents ran sessions of their own gets a chevron before its icon. Click it to list them under the session and read them. Kiro's aren't listed; on SSH hosts, only Codex's and Antigravity's are.": {
       "localizations": {
         "zh-Hans": {
@@ -635,6 +655,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "已允许"
+          }
+        }
+      }
+    },
+    "Already added as %@, which also connects to %@.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已作为 %@ 添加，它连接的也是 %@。"
           }
         }
       }
@@ -1468,6 +1498,26 @@
         }
       }
     },
+    "Connects to %@, port %@.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接到 %@，端口 %@。"
+          }
+        }
+      }
+    },
+    "Connects to %@.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接到 %@。"
+          }
+        }
+      }
+    },
     "Copied": {
       "localizations": {
         "zh-Hans": {
@@ -1938,6 +1988,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "已结束"
+          }
+        }
+      }
+    },
+    "Enter only the host, such as `devbox` or `me@devbox`. Options such as a key or a jump host go in `~/.ssh/config`.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只输入主机，例如 `devbox` 或 `me@devbox`。密钥、跳板机等选项写在 `~/.ssh/config` 中。"
           }
         }
       }

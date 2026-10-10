@@ -1,8 +1,10 @@
 import SwiftUI
 
 /// Adds an SSH host. Its sessions are listed under a heading of their own, below this Mac's; refreshing and
-/// removing it are on that heading's right-click menu. Adding first logs in to the host as the app's background
-/// commands do, so a host they can't reach says why here; Add anyway keeps it, as for a host that is only offline now.
+/// removing it are on that heading's right-click menu. What is typed is read as `ssh` would read it, so a pasted
+/// `ssh devbox` adds `devbox`, a port is shown how to put in `~/.ssh/config`, and a host that connects where a listed
+/// one does is refused. Adding first logs in to the host as the app's background commands do, so a host they can't
+/// reach says why here; Add anyway keeps it, as for a host that is only offline now.
 struct AddRemoteHostSheet: View {
     @ObservedObject var store: ConversationStore
     @Environment(\.dismiss) private var dismiss
@@ -12,16 +14,31 @@ struct AddRemoteHostSheet: View {
     @State private var connectionCheck: Task<Void, Never>?
     /// Why the host could not be reached. Editing the host withdraws it, and with it Add anyway.
     @State private var failedConnection: FailedConnection?
+    /// Where the typed host connects, read by `ssh -G` shortly after typing stops.
+    @State private var sameMachineCheck: (host: String, result: SSHHostSameMachineCheck)?
 
     private struct FailedConnection {
         let host: String
         let problem: SSHConnectionProblem
     }
 
-    /// The host as it will be stored, or nil when it is invalid or already listed.
+    private var input: RemoteHostInput {
+        RemoteHostInput(proposedHost)
+    }
+
+    private var isListed: Bool {
+        input.validDestination.map(store.remoteHostList.hosts.contains) ?? false
+    }
+
+    private var sameMachineCheckOfInput: SSHHostSameMachineCheck? {
+        guard let sameMachineCheck, sameMachineCheck.host == input.validDestination else { return nil }
+        return sameMachineCheck.result
+    }
+
+    /// The host as it will be stored, or nil when it is invalid or already listed, under its name or another.
     private var hostToAdd: String? {
-        guard let host = RemoteHostList.normalizedHost(proposedHost), !store.remoteHostList.hosts.contains(host)
-        else { return nil }
+        guard let host = input.validDestination, !isListed,
+              sameMachineCheckOfInput?.listedHostWithSameIdentity == nil else { return nil }
         return host
     }
 
@@ -44,16 +61,12 @@ struct AddRemoteHostSheet: View {
                     .accessibilityLabel("SSH host")
                     .disabled(hostBeingChecked != nil)
                     .onSubmit(checkAndAddHost)
-                if let failedConnection = failedConnectionToHostToAdd {
-                    Text(verbatim: failedConnection.problem.explanation(host: failedConnection.host))
-                        .font(.callout)
-                        .foregroundStyle(ThemePalette.warningText)
-                        .fixedSize(horizontal: false, vertical: true)
-                } else {
-                    Text("Requires passwordless SSH.")
-                        .font(.caption)
-                        .foregroundStyle(ThemePalette.secondaryText)
-                }
+                AddRemoteHostFieldNote(
+                    input: input,
+                    isListed: isListed,
+                    sameMachineCheck: sameMachineCheckOfInput,
+                    failedConnection: failedConnectionToHostToAdd.map { ($0.host, $0.problem) }
+                )
             }
 
             DisclosureGroup("Setup requirements") {
@@ -83,6 +96,7 @@ struct AddRemoteHostSheet: View {
         .padding(20)
         .frame(width: 480)
         .background(ThemePalette.contentSurface)
+        .task(id: input.validDestination) { await readWhereTheHostConnects() }
         .onDisappear { connectionCheck?.cancel() }
     }
 
@@ -104,11 +118,29 @@ struct AddRemoteHostSheet: View {
         .padding(.top, 6)
     }
 
+    /// Waits for typing to pause; a new host cancels the wait.
+    private func readWhereTheHostConnects() async {
+        guard let host = input.validDestination, !isListed else { return }
+        try? await Task.sleep(for: .milliseconds(250))
+        guard !Task.isCancelled else { return }
+        let result = await store.sameMachineCheck(for: host)
+        guard !Task.isCancelled else { return }
+        sameMachineCheck = (host, result)
+    }
+
     private func checkAndAddHost() {
         guard let host = hostToAdd, hostBeingChecked == nil else { return }
         hostBeingChecked = host
         failedConnection = nil
         connectionCheck = Task {
+            // Return can come before the read that follows typing.
+            let sameMachine = await store.sameMachineCheck(for: host)
+            guard !Task.isCancelled else { return }
+            sameMachineCheck = (host, sameMachine)
+            guard sameMachine.listedHostWithSameIdentity == nil else {
+                hostBeingChecked = nil
+                return
+            }
             let problem = await store.connectionProblem(on: host)
             // Cancel, or a click outside the sheet, closed it during the check.
             guard !Task.isCancelled else { return }

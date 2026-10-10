@@ -20,6 +20,8 @@
 	<string>%@ could not be refreshed: %@</string>
 	<key>%@ has not saved this session yet · click to open its terminal</key>
 	<string>%@ has not saved this session yet · click to open its terminal</string>
+	<key>%@ is already added.</key>
+	<string>%@ is already added.</string>
 	<key>%@ tab group</key>
 	<string>%@ tab group</string>
 	<key>%@ will permanently delete this session using its native CLI. This cannot be undone.</key>
@@ -76,6 +78,8 @@
 	<string>1 tool call</string>
 	<key>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</key>
 	<string>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</string>
+	<key>A port goes in `~/.ssh/config`. Add these lines there, then enter %@.</key>
+	<string>A port goes in `~/.ssh/config`. Add these lines there, then enter %@.</string>
 	<key>A session whose subagents ran sessions of their own gets a chevron before its icon. Click it to list them under the session and read them. Kiro's aren't listed; on SSH hosts, only Codex's and Antigravity's are.</key>
 	<string>A session whose subagents ran sessions of their own gets a chevron before its icon. Click it to list them under the session and read them. Kiro's aren't listed; on SSH hosts, only Codex's and Antigravity's are.</string>
 	<key>A subagent ran this session for the session that started it. It can be read here, but not resumed or deleted on its own.</key>
@@ -126,6 +130,8 @@
 	<string>Allow JustSessions in macOS Login Items to finish enabling automatic launch.</string>
 	<key>Allowed</key>
 	<string>Allowed</string>
+	<key>Already added as %@, which also connects to %@.</key>
+	<string>Already added as %@, which also connects to %@.</string>
 	<key>Also resumes %@ sessions on this Mac. JustSessions adds its own arguments after it.</key>
 	<string>Also resumes %@ sessions on this Mac. JustSessions adds its own arguments after it.</string>
 	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
@@ -278,6 +284,10 @@
 	<string>Connect again; a CLI still running in tmux on the host is reattached</string>
 	<key>Connecting to %@…</key>
 	<string>Connecting to %@…</string>
+	<key>Connects to %@, port %@.</key>
+	<string>Connects to %@, port %@.</string>
+	<key>Connects to %@.</key>
+	<string>Connects to %@.</string>
 	<key>Copied</key>
 	<string>Copied</string>
 	<key>Copies the colors once. JustSessions doesn't read iTerm2's settings again.</key>
@@ -356,6 +366,8 @@
 	<string>End this CLI session?</string>
 	<key>Ended</key>
 	<string>Ended</string>
+	<key>Enter only the host, such as `devbox` or `me@devbox`. Options such as a key or a jump host go in `~/.ssh/config`.</key>
+	<string>Enter only the host, such as `devbox` or `me@devbox`. Options such as a key or a jump host go in `~/.ssh/config`.</string>
 	<key>Every open tab in one list</key>
 	<string>Every open tab in one list</string>
 	<key>Exited (%d)</key>
