@@ -45,6 +45,21 @@ struct ExternalEditorStoreTests {
         #expect(editorStore.installedEditors.map(\.name) == ["Cursor"])
     }
 
+    @Test func offersOnlyEditorsWithAnSSHToolForSSHFolders() {
+        let vscode = URL(fileURLWithPath: "/Applications/Visual Studio Code.app")
+        let zed = URL(fileURLWithPath: "/Applications/Zed.app")
+        let codeTool = vscode.appendingPathComponent("Contents/Resources/app/bin/code")
+        let installedApplications = ["com.microsoft.VSCode": vscode, "dev.zed.Zed": zed]
+        let editorStore = ExternalEditorStore(
+            applicationURLForBundleIdentifier: { installedApplications[$0] },
+            sshFolderCommandLineToolForApplication: { $0 == vscode ? codeTool : nil }
+        )
+
+        #expect(editorStore.editors(opening: .thisMac).map(\.name) == ["Visual Studio Code", "Zed"])
+        #expect(editorStore.editors(opening: .ssh("devbox")).map(\.name) == ["Visual Studio Code"])
+        #expect(editorStore.editors(opening: .ssh("devbox")).first?.sshFolderCommandLineToolURL == codeTool)
+    }
+
     @Test func catalogNamesAndBundleIdentifiersAreUnique() {
         let names = ExternalEditor.knownEditors.map(\.name)
         let bundleIdentifiers = ExternalEditor.knownEditors.flatMap(\.bundleIdentifiers)
