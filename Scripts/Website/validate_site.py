@@ -45,6 +45,10 @@ def validate_site(website_directory: Path):
     assert {"ssh-hosts", "feedback"} <= guide_page.identifiers, "Guide needs SSH setup and feedback"
     assert "https://github.com/yangzichao/JustSessions/issues/new" in guide_page.references, "Guide needs issue reporting"
     assert "mailto:zichaoyangphys@gmail.com?subject=JustSessions%20feedback" in guide_page.references, "Guide needs email feedback"
+    assert any(reference.startswith("./scripts/feedback/guide-feedback-form.js?v=") for reference in guide_page.references), "Guide needs the feedback form"
+    app_verification_page = documents[(website_directory / "app-feedback-verification.html").resolve()]
+    assert "noindex" in app_verification_page.metadata.get("robots", ""), "The app's feedback check page should not be indexed"
+    assert any(reference.startswith("./scripts/feedback/app-verification.js?v=") for reference in app_verification_page.references), "The app's feedback check page needs its script"
     for document_name, destination in (("help.html", "./guide.html"), ("feedback.html", "./guide.html#feedback")):
         legacy_page = documents[(website_directory / document_name).resolve()]
         assert destination in legacy_page.references, f"{document_name} needs a Guide link"

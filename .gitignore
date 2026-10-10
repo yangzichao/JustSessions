@@ -5,3 +5,4 @@ dist/
 __pycache__/
 .playwright-mcp/
 .wrangler/
+.dev.vars

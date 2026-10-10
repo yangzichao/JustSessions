@@ -1,6 +1,6 @@
 # Product website
 
-The public website is at <https://yangzichao.github.io/JustSessions/>. Its source is static HTML and CSS in `website/`, with small native JavaScript modules for the screenshot gallery and anonymous traffic counts. It has no framework, external fonts, or package dependencies. Every Download button, including the homepage and Guide navigation bars, points directly to the latest GitHub Release DMG. It starts a download rather than scrolling to a section or opening a release page, so an app release does not require a website update.
+The public website is at <https://yangzichao.github.io/JustSessions/>. Its source is static HTML and CSS in `website/`, with small native JavaScript modules for the screenshot gallery, anonymous traffic counts, and the Guide's feedback form. It has no framework, external fonts, or package dependencies; the only third-party script is Cloudflare Turnstile, which the feedback form loads from Cloudflare when a visitor first moves into it. Every Download button, including the homepage and Guide navigation bars, points directly to the latest GitHub Release DMG. It starts a download rather than scrolling to a section or opening a release page, so an app release does not require a website update.
 
 ## Build and preview
 
@@ -29,7 +29,7 @@ The fourth slide runs a real local file-indexing task in Claude Code, records th
 
 Automatic rotation starts by default. Each slide has an eight-second countdown unless its `data-gallery-duration` specifies a longer duration; session management and tmux use 12000 milliseconds. Rotation and progress read the selected slide duration together, including after automatic transitions and manual navigation. Only the playback button pauses or resumes it; focus, pointer interaction, scrolling, navigation, offscreen galleries, and background tabs never change the playback state. The progress animation uses the same elapsed time as the rotation timer. Explicit pause preserves the remaining time. Choosing another screenshot resets its countdown and keeps the current playback state. Reduced-motion users receive direct slide changes without animated scrolling. Only adjacent slides animate; wraparound and distant selections switch directly so the page does not scroll through every intervening screenshot. Keep the pause button, stable image dimensions, and `#terminal`, `#split`, `#reading`, and `#remote` links working when adding slides. Check countdown synchronization, explicit pause/resume, continuous playback after other interactions, wraparound, resizing, keyboard navigation, and reduced motion in addition to desktop and mobile layout.
 
-`guide.html#feedback` offers **Report an issue** and **Email feedback**. Keep these destinations aligned with `Models/App/AppLinks.swift`. The old `help.html` URL redirects directly to Guide, and `feedback.html` redirects to its Feedback section. Both redirects use `noindex` and stay out of the sitemap. Check both old URLs after changing navigation or the Guide.
+`guide.html#feedback` offers a feedback form (see [Feedback](#feedback)), **Report an issue**, and **Email feedback**. The form stays hidden without JavaScript, leaving the two links. Keep these destinations aligned with `Models/App/AppLinks.swift`. The old `help.html` URL redirects directly to Guide, and `feedback.html` redirects to its Feedback section. Both redirects use `noindex` and stay out of the sitemap. Check both old URLs after changing navigation or the Guide.
 
 ## Shared top bar and footer
 
@@ -81,6 +81,24 @@ make website-traffic-deploy  # Apply D1 migrations and deploy the independent Wo
 ```
 
 These are page views, not unique visitors: reloads count again, and blocked scripts or privacy opt-outs are absent. Known bot user agents are excluded, but the public collection endpoint is not proof of human traffic. Source categories depend on the referrer the browser exposes; missing referrers appear as direct. Read aggregate data through the authenticated D1 command or Cloudflare dashboard; the Worker exposes no public statistics endpoint.
+
+### Feedback
+
+The Guide's form and the app's **Settings → Send feedback** page post to the `justsessions-feedback` Worker in `Cloudflare/Feedback/`, on the same account as the other Workers. Its endpoint, the Turnstile site key and action, and the length limits are in `website/scripts/feedback/feedback-contract.js`; the Worker imports them, and its tests check that `AppLinks.swift`, `FeedbackLimits.swift`, and the D1 schema agree.
+
+Each submission carries a [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) token. The Worker accepts only JSON of the exact website or app shape, up to 64 KiB, then applies a rate limit of 3 requests per minute per IP address and Cloudflare location, then checks the token with Siteverify: it must be valid, unused, solved on `yangzichao.github.io` for the `feedback` action, and carry the submission's source (`website` or `app`) as its cData. Only then does it store the message, the optional contact, the source, and the app's versions. It never stores IP addresses, user agents, or tokens; persisted logs are disabled. A daily scheduled task deletes feedback older than 365 days. Browsers on other sites are refused by `Origin`; the app sends none.
+
+The Guide loads Turnstile only after the visitor first focuses the form, renders it with `cData: "website"`, and uses each token once. The app shows `website/app-feedback-verification.html` (no index, not in the sitemap) in a 300 × 65 `WKWebView` with a non-persistent data store. The page renders Turnstile with `cData: "app"`, the app's light or dark appearance, and its interface language, then posts tokens, expiry, and errors to the app's `turnstile` message handler. The web view may load only that page in its main frame and `about:` or `https://challenges.cloudflare.com` frames; links the visitor follows open in the browser.
+
+```sh
+make feedback          # The newest 20 entries, newest first
+make feedback-test     # Worker and contract tests, also included in make website-check
+make feedback-deploy   # Apply D1 migrations and deploy the Worker
+./Cloudflare/Feedback/show-feedback.sh 100
+wrangler tail --config Cloudflare/Feedback/wrangler.jsonc   # Watch live errors; message text is never logged
+```
+
+The Turnstile widget **JustSessions feedback** is registered for `yangzichao.github.io` only, in Managed mode. Its secret is the Worker secret `TURNSTILE_SECRET_KEY` (`wrangler secret put TURNSTILE_SECRET_KEY` in `Cloudflare/Feedback/`); it is never committed. Without it, the Worker answers `unavailable`. A token from a local preview fails the hostname check, so test end to end on the published site, or locally with Cloudflare's [test keys](https://developers.cloudflare.com/turnstile/troubleshooting/testing/). If the website moves to a custom domain, add it to the widget, `turnstileHostname`, and `publishedWebsiteOrigin` together.
 
 ### Publishing
 

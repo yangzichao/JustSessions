@@ -39,7 +39,7 @@ Commit your final changes, then run:
 make verify
 ```
 
-This checks the website tests and build, update feed Worker tests, Swift tests against bundled tmux, and localization, then builds the packaged app and checks that it keeps running for eight seconds. The launch check disables reopening tabs so it starts no CLIs. After changing GitHub Actions workflows, also run `actionlint` locally.
+This checks the website tests and build, the traffic, feedback, and update feed Worker tests, Swift tests against bundled tmux, and localization, then builds the packaged app and checks that it keeps running for eight seconds. The launch check disables reopening tabs so it starts no CLIs. After changing GitHub Actions workflows, also run `actionlint` locally.
 
 Open a pull request against `main` and complete the [PR template](.github/pull_request_template.md): describe the problem and resulting behavior, provide the tested commit SHA, verification date, macOS and Swift versions, exact commands and results, a concise log summary, and relevant manual checks.
 

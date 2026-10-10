@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Settings… (⌘,) opens General; JustSessions Help opens Help in the same Settings sheet. Take the Tour
-/// starts the active workspace window's onboarding tour.
+/// Settings… (⌘,) opens General; JustSessions Help, Release notes, and Send Feedback… open their pages in the same
+/// Settings sheet. Take the Tour starts the active workspace window's onboarding tour.
 struct AppWideSheetCommands: Commands {
     @ObservedObject private var languageStore = AppLanguageStore.shared
     @Environment(\.openWindow) private var openWindow
@@ -19,6 +19,7 @@ struct AppWideSheetCommands: Commands {
             Button(AppLocalization.string("Take the Tour", language: languageStore.language)) { startOnboardingTour?() }
                 .disabled(startOnboardingTour == nil)
             Button(AppLocalization.string("Release notes", language: languageStore.language)) { show(.releaseNotes) }
+            Button(AppLocalization.string("Send Feedback…", language: languageStore.language)) { show(.feedback) }
             Divider()
             Link("JustSessions Website", destination: AppLinks.websiteURL)
                 .environment(\.locale, languageStore.locale)

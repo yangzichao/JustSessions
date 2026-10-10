@@ -1,14 +1,15 @@
 import SwiftUI
 
-/// Feedback first, by email or as a GitHub issue, each started with `environment`'s versions; then the website and
-/// the source code.
+/// Feedback first, written in Settings or as a GitHub issue, each sent with `environment`'s versions; then the website
+/// and the source code.
 struct AboutLinksRow: View {
     let environment: FeedbackEnvironment
+    @Environment(\.showAppWideSheet) private var showAppWideSheet
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 16) {
-            Link("Send us feedback ↗", destination: FeedbackLinks.emailURL(for: environment))
-                .help(AppLinks.feedbackEmailAddress)
+            Button("Send feedback") { showAppWideSheet(.feedback) }
+                .help("Write to the developer from here")
                 .accessibilityIdentifier("settings.sendFeedback")
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Link("Report an issue ↗", destination: FeedbackLinks.gitHubIssueURL(for: environment))
@@ -16,7 +17,7 @@ struct AboutLinksRow: View {
                     .accessibilityIdentifier("settings.reportIssue")
                 HelpPopoverButton(
                     title: "Feedback",
-                    explanation: "Feedback and issues start with these versions filled in."
+                    explanation: "Feedback and issues are sent with these versions."
                 )
                 .accessibilityIdentifier("settings.help.feedback")
             }
