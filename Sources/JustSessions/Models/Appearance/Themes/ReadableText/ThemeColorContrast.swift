@@ -29,6 +29,18 @@ enum ThemeColorContrast {
         return contrastTarget
     }
 
+    /// The color, lightened on a dark surface or darkened on a light one just enough to stand apart from the surface
+    /// as a fill, by `minimumRatio`. A color already that far apart is unchanged.
+    static func distinguishableFill(_ fill: UInt32, on surface: UInt32, minimumRatio: Double) -> UInt32 {
+        guard ratio(fill, surface) < minimumRatio else { return fill }
+        let contrastTarget: UInt32 = isDark(surface) ? 0xFFFFFF : 0x000000
+        for step in 1...100 {
+            let candidate = blend(fill, with: contrastTarget, fraction: Double(step) / 100)
+            if ratio(candidate, surface) >= minimumRatio { return candidate }
+        }
+        return contrastTarget
+    }
+
     /// Whether white text reads better than black on the surface.
     static func isDark(_ surface: UInt32) -> Bool {
         ratio(0xFFFFFF, surface) > ratio(0x000000, surface)
