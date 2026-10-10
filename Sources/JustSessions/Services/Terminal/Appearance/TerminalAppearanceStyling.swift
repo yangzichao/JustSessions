@@ -24,7 +24,7 @@ enum TerminalAppearanceStyling {
         terminalView.selectedTextForegroundColor = NSColor(hexValue: scheme.readableSelectionForeground)
         terminalView.caretColor = NSColor(hexValue: scheme.foreground)
         terminalView.caretTextColor = NSColor(hexValue: palette.background)
-        terminalView.installColors(scheme.ansiColors)
+        terminalView.installColors(palette.ansiColors)
         terminalView.minimumContrastRatio = minimumContrastRatio
         terminalView.layer?.backgroundColor = terminalView.nativeBackgroundColor.cgColor
         terminalView.needsDisplay = true
