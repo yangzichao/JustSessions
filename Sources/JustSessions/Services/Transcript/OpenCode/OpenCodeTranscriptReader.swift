@@ -16,13 +16,16 @@ struct OpenCodeTranscriptReader {
         try OpenCodeDatabase.execute("BEGIN", in: database)
         defer { try? OpenCodeDatabase.execute("ROLLBACK", in: database) }
         let index = try OpenCodeTranscriptIndex.read(sessionID: sessionID, in: database)
+        let messages = try OpenCodeTranscriptMessageReader(in: database)
+        defer { messages.close() }
         let partsStatement = try OpenCodeDatabase.prepare(OpenCodeTranscriptParts.query, in: database)
         defer { sqlite3_finalize(partsStatement) }
 
         var builder = TranscriptBuilder(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength)
-        for message in index.messages {
+        for messageID in index.messageIDs {
             try Task.checkCancellation()
             try autoreleasepool {
+                guard let message = try messages.message(id: messageID) else { return }
                 let parts = try OpenCodeTranscriptParts.read(messageID: message.id, with: partsStatement).parts
                 append(message, parts: parts, to: &builder)
             }

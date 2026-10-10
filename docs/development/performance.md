@@ -122,6 +122,7 @@ The footprint is what Activity Monitor's Memory column shows. Read the table wit
 | 9 | [SwiftUI's scroll position tracking](#9-swiftuis-scroll-position-tracking) | Done: issue #55 |
 | 10 | [Message search decoded every image](#10-message-search-decoded-every-image) | Done: issue #59 |
 | 11 | [Codex's compacted records are parsed in full](#11-codexs-compacted-records-are-parsed-in-full) | To investigate |
+| 13 | [Each OpenCode page read every message's data](#13-each-opencode-page-read-every-messages-data) | Done: issue #60 |
 
 ### 1. Timestamp parsing
 
@@ -255,6 +256,22 @@ The gain is smaller on real sessions. On one contributor's 46 Claude Code and 16
 **Evidence:** a Codex `compacted` record carries the conversation it replaced, images included. The reader only shows a note for it, but `CodexTranscriptReader.mightContainTranscriptItem` lets the line through, so the whole record is JSON-parsed. In the 163 Codex sessions of item 10, these records held 306 MiB of image base64, 16% of all of it, and more than the messages themselves.
 
 **Plan:** measure how much reading time these records take. If it matters, add the note from the line's start, which holds the timestamp and type, without parsing the rest.
+### 13. Each OpenCode page read every message's data
+
+**Evidence:** to read one page of an OpenCode session, `OpenCodeTranscriptIndex` read every message of the session. SQLite checked and rewrote each message's JSON, and the app then parsed it, before the page read the parts of its own few messages. A user's message keeps the diffs of the files it changed, whole files, in that JSON. Each page of a long session cost as much as reading all of its messages, and paging back through it read them all again for every page.
+
+**Change:** the index reads only the messages' ids, in order, from OpenCode's `(session_id, time_created, id)` index, without reading their data. A page then reads the data of only its own messages, one by one, by id. Nothing is cached between reads, so a message OpenCode rewrites, as when a reply fails, shows on the next read. Each message is a record, including one whose data is unreadable or isn't a user's or an assistant's message; such a record has no entries. OpenCode writes only those two kinds, so record numbers, and the entry ids made from them, stay the same.
+
+`OpenCodeTranscriptPagingMeasurements`, release build, median of five each, two runs before and two after:
+
+| Measure | 1,000 messages, before → after | 10,000 messages, before → after |
+| --- | --- | --- |
+| Latest page | 6.4–6.8 → 1.7 ms | 50 → 2.2 ms |
+| Latest page, then five earlier ones | 37 → 10 ms | 298–300 → 13 ms |
+| A page in the middle | 6.2–6.3 → 1.7 ms | 50 → 2.2 ms |
+| Whole session read for message search | 29 → 29 ms | 382–384 → 305–307 ms |
+
+Message search reads a session in pages of up to 5,000 entries, so it read the index only a few times before the change. Most of its time is reading every message's data and parts, which it still needs.
 
 ## How to profile
 
@@ -278,3 +295,4 @@ Or open the trace in Instruments. Keep these points in mind:
   - `TerminalVisibilityMeasurements`: hidden terminals.
   - `TerminalEngineMeasurements`: Ghostty and SwiftTerm tabs under the same output, and their memory; see [Terminal engines](#terminal-engines-ghostty-and-swiftterm) and [Build and release](build-and-release.md#performance-measurements) for the commands.
   - `TranscriptInteractionMeasurements`: scrolling, hit testing, and opening Find in a 240- and 640-entry transcript, with SwiftUI's accessibility off and on. Run it with `JUSTSESSIONS_PERF=1 swift test -c release --filter TranscriptInteractionMeasurements`.
+  - `OpenCodeTranscriptPagingMeasurements`: paging through OpenCode sessions of 1,000 and 10,000 messages, and reading them for message search.

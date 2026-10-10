@@ -33,6 +33,52 @@ struct OpenCodeTranscriptPagingTests {
         #expect(pages.last?.hasLater == false)
     }
 
+    /// Each message is a record, so an unreadable one keeps its place with no entries, and the pages still show what
+    /// the full read shows.
+    @Test func unreadableMessagesKeepTheirRecordsWithoutEntries() async throws {
+        let fixture = try OpenCodeTranscriptReaderFixture()
+        defer { fixture.remove() }
+        let database = fixture.database
+        try database.addSession("ses_session0001")
+        try database.addUserPrompt("msg_a", session: "ses_session0001", createdAt: 1, text: "First")
+        try database.addMessage("msg_b", session: "ses_session0001", createdAt: 2, rawData: "{not json")
+        try database.addMessage("msg_c", session: "ses_session0001", createdAt: 3, data: ["role": "system"])
+        try database.addAssistantReply("msg_d", session: "ses_session0001", createdAt: 4, text: "Reply")
+        var limits = TranscriptPageLimits()
+        limits.targetEntryCount = 1
+        let source = TranscriptPageSource(file: database.file, provider: .opencode, sessionID: "ses_session0001", limits: limits)
+
+        let latest = try await source.read(.latest)
+        let first = try await source.read(.before(latest.records.lowerBound))
+
+        #expect(latest.totalRecordCount == 4)
+        #expect(latest.entries.map(\.content) == [.assistantMessage("Reply")])
+        #expect(latest.entries.map(\.id) == [TranscriptPageIdentity.entryID(record: 3, part: 0)])
+        #expect(first.entries.map(\.content) == [.userMessage("First")])
+        #expect(!first.hasEarlier)
+    }
+
+    /// OpenCode rewrites a reply's data in place, such as when it fails. Each page reads its messages anew.
+    @Test func aReplyChangedInPlaceShowsOnTheNextRead() async throws {
+        let fixture = try OpenCodeTranscriptReaderFixture()
+        defer { fixture.remove() }
+        let database = fixture.database
+        try database.addSession("ses_session0001")
+        try database.addUserPrompt("msg_a", session: "ses_session0001", createdAt: 1, text: "Run it")
+        try database.addAssistantReply("msg_b", session: "ses_session0001", createdAt: 2, text: "Running")
+        let source = TranscriptPageSource(file: database.file, provider: .opencode, sessionID: "ses_session0001")
+        #expect(try await source.read(.latest).entries.map(\.content) == [.userMessage("Run it"), .assistantMessage("Running")])
+
+        try database.execute(
+            "UPDATE message SET data = ? WHERE id = 'msg_b'",
+            [#"{"role":"assistant","error":{"name":"APIError","data":{"message":"Rate limited"}}}"#]
+        )
+
+        #expect(try await source.read(.latest).entries.map(\.content) == [
+            .userMessage("Run it"), .assistantMessage("Running"), .note("Rate limited"),
+        ])
+    }
+
     @Test func aSessionIsRequiredToPageOpenCodesDatabase() async throws {
         let fixture = try OpenCodeTranscriptReaderFixture()
         defer { fixture.remove() }
