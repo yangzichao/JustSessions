@@ -204,7 +204,7 @@ final class UnseenTurnSandboxApp {
     /// The sessions Projects lists with Waiting for you on, and the count the filter menu shows beside it.
     var waitingForYou: (titles: [String], count: Int) {
         let projection = store.filteredSidebarProjection(
-            providerFilter: .all, recencyFilter: .all, waitingFilter: .waitingForYou, searchText: ""
+            providerFilter: .all, recencyFilter: .all, statusFilter: .waitingForYou, searchText: ""
         )
         return (projection.projects.flatMap(\.conversations).map(store.title(for:)), projection.waitingSessionCount)
     }

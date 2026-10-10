@@ -28,7 +28,7 @@ extension ConversationSidebarView {
                                 copyStep: store.remoteSessionCopySteps[section.host],
                                 isSearching: isSearching,
                                 recencyFilter: recencyFilter,
-                                waitingFilter: waitingFilter
+                                statusFilter: statusFilter
                             ))
                             .onboardingTourStop(section.host == .thisMac ? .noSessionsYet : nil)
                         }

@@ -3367,12 +3367,32 @@
         }
       }
     },
+    "No session is running": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有正在运行的会话"
+          }
+        }
+      }
+    },
     "No session selected": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "未选择会话"
+          }
+        }
+      }
+    },
+    "No session was running at the last refresh": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上次刷新时没有正在运行的会话"
           }
         }
       }
@@ -4307,6 +4327,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "右键单击另一个标签页，选择 **使用当前标签页创建新的拆分视图**。在两个视图之间拖动可调整大小。"
+          }
+        }
+      }
+    },
+    "Running": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "运行中"
           }
         }
       }

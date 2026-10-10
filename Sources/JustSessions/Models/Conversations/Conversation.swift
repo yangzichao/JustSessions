@@ -67,7 +67,8 @@ struct Conversation: Identifiable, Sendable, Equatable {
     }
     var isProjectAvailable: Bool { projectLocation.canStartSessions }
 
-    private static func id(provider: ConversationProvider, sessionID: String, host: SessionHost) -> String {
+    /// The id a session with this provider and session id has on the host; also for a session not listed yet.
+    static func id(provider: ConversationProvider, sessionID: String, host: SessionHost) -> String {
         let providerSessionID = "\(provider.rawValue):\(sessionID)"
         guard let sshDestination = host.sshDestination else { return providerSessionID }
         return "\(providerSessionID)@\(sshDestination)"
