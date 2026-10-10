@@ -2050,6 +2050,16 @@
         }
       }
     },
+    "Development build": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开发版本"
+          }
+        }
+      }
+    },
     "Don't ask again": {
       "localizations": {
         "zh-Hans": {
@@ -2812,6 +2822,16 @@
         }
       }
     },
+    "JustSessions website": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JustSessions 网站"
+          }
+        }
+      }
+    },
     "Keep running": {
       "localizations": {
         "zh-Hans": {
@@ -2998,6 +3018,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "本地网络"
+          }
+        }
+      }
+    },
+    "MIT License": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MIT 许可证"
           }
         }
       }
@@ -3641,6 +3671,26 @@
         }
       }
     },
+    "Open the license on GitHub": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 GitHub 上查看许可证"
+          }
+        }
+      }
+    },
+    "Open the release notes on the website": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在网站上查看更新说明"
+          }
+        }
+      }
+    },
     "Open the source code on GitHub": {
       "localizations": {
         "zh-Hans": {
@@ -4027,6 +4077,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "更新说明"
+          }
+        }
+      }
+    },
+    "Release notes ↗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新说明 ↗"
           }
         }
       }
@@ -5727,6 +5787,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "版本"
+          }
+        }
+      }
+    },
+    "Version %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本 %@"
           }
         }
       }

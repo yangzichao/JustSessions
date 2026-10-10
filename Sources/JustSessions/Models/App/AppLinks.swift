@@ -10,6 +10,7 @@ enum AppLinks {
     static let userGuideFeedbackURL = userGuideSection("feedback")
     static let gitHubRepositoryURL = URL(string: "https://github.com/yangzichao/JustSessions")!
     static let newGitHubIssueURL = gitHubRepositoryURL.appendingPathComponent("issues/new")
+    static let licenseURL = gitHubRepositoryURL.appendingPathComponent("blob/main/LICENSE")
     static let feedbackEmailAddress = "zichaoyangphys@gmail.com"
 
     /// The user guide at one of its sections, by the section's id in `website/guide.html`.

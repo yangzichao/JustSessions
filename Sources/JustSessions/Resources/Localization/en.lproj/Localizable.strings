@@ -372,6 +372,8 @@
 	<string>Deleting sessions</string>
 	<key>Deletion progress</key>
 	<string>Deletion progress</string>
+	<key>Development build</key>
+	<string>Development build</string>
 	<key>Don't ask again</key>
 	<string>Don't ask again</string>
 	<key>Done</key>
@@ -516,6 +518,8 @@
 	<string>JustSessions quit unexpectedly</string>
 	<key>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</key>
 	<string>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</string>
+	<key>JustSessions website</key>
+	<string>JustSessions website</string>
 	<key>Keep running</key>
 	<string>Keep running</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
@@ -554,6 +558,8 @@
 	<string>Load later messages</string>
 	<key>Local Network</key>
 	<string>Local Network</string>
+	<key>MIT License</key>
+	<string>MIT License</string>
 	<key>Markdown (.md)…</key>
 	<string>Markdown (.md)…</string>
 	<key>Match app</key>
@@ -680,6 +686,10 @@
 	<string>Open the JustSessions website</string>
 	<key>Open the feedback form on the website</key>
 	<string>Open the feedback form on the website</string>
+	<key>Open the license on GitHub</key>
+	<string>Open the license on GitHub</string>
+	<key>Open the release notes on the website</key>
+	<string>Open the release notes on the website</string>
 	<key>Open the source code on GitHub</key>
 	<string>Open the source code on GitHub</string>
 	<key>Optional</key>
@@ -758,6 +768,8 @@
 	<string>Release history could not be loaded. Read the latest notes on the website.</string>
 	<key>Release notes</key>
 	<string>Release notes</string>
+	<key>Release notes ↗</key>
+	<string>Release notes ↗</string>
 	<key>Remove host</key>
 	<string>Remove host</string>
 	<key>Rename</key>
@@ -1074,6 +1086,8 @@
 	<string>User guide ↗</string>
 	<key>Version</key>
 	<string>Version</string>
+	<key>Version %@</key>
+	<string>Version %@</string>
 	<key>Waiting for you</key>
 	<string>Waiting for you</string>
 	<key>Website ↗</key>

@@ -374,6 +374,8 @@
 	<string>正在删除会话</string>
 	<key>Deletion progress</key>
 	<string>删除进度</string>
+	<key>Development build</key>
+	<string>开发版本</string>
 	<key>Don't ask again</key>
 	<string>不再询问</string>
 	<key>Done</key>
@@ -518,6 +520,8 @@
 	<string>JustSessions 意外退出了</string>
 	<key>JustSessions read the history your CLIs keep and grouped it by project. Nothing was imported or uploaded.</key>
 	<string>JustSessions 读取了各 CLI 自己保存的历史，并按项目分组。没有导入或上传任何内容。</string>
+	<key>JustSessions website</key>
+	<string>JustSessions 网站</string>
 	<key>Keep running</key>
 	<string>保持运行</string>
 	<key>Keep running leaves the CLI running in tmux on %@; click the session to reattach. End session stops it.</key>
@@ -556,6 +560,8 @@
 	<string>加载后续消息</string>
 	<key>Local Network</key>
 	<string>本地网络</string>
+	<key>MIT License</key>
+	<string>MIT 许可证</string>
 	<key>Match app</key>
 	<string>与应用一致</string>
 	<key>Match app theme</key>
@@ -682,6 +688,10 @@
 	<string>打开 JustSessions 网站</string>
 	<key>Open the feedback form on the website</key>
 	<string>在网站上打开反馈表单</string>
+	<key>Open the license on GitHub</key>
+	<string>在 GitHub 上查看许可证</string>
+	<key>Open the release notes on the website</key>
+	<string>在网站上查看更新说明</string>
 	<key>Open the source code on GitHub</key>
 	<string>在 GitHub 上查看源代码</string>
 	<key>Optional</key>
@@ -760,6 +770,8 @@
 	<string>无法加载更新历史。请在网站查看最新说明。</string>
 	<key>Release notes</key>
 	<string>更新说明</string>
+	<key>Release notes ↗</key>
+	<string>更新说明 ↗</string>
 	<key>Remove host</key>
 	<string>移除主机</string>
 	<key>Rename</key>
@@ -1088,6 +1100,8 @@
 	<string>用户指南 ↗</string>
 	<key>Version</key>
 	<string>版本</string>
+	<key>Version %@</key>
+	<string>版本 %@</string>
 	<key>Waiting for you</key>
 	<string>等待我处理</string>
 	<key>Website ↗</key>
