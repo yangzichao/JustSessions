@@ -5,6 +5,8 @@ struct TranscriptRecordDecoder {
     let maximumTextLength: Int
     /// Reads a subagent's transcript; see `ClaudeTranscriptReader.includesSidechains`.
     var isSubagentTranscript = false
+    /// See `TranscriptBuilder.decodesImages`.
+    var decodesImages = true
     private let jsonDecoder = JSONDecoder()
 
     func entries(from data: Data?) -> [TranscriptEntry] {
@@ -12,6 +14,7 @@ struct TranscriptRecordDecoder {
             return [TranscriptEntry(id: 0, content: .note("This record is too large to preview."), timestamp: nil, startsTurn: false)]
         }
         var builder = TranscriptBuilder(maximumEntryCount: .max, maximumTextLength: maximumTextLength)
+        builder.decodesImages = decodesImages
         if provider == .pi {
             if let entry = try? jsonDecoder.decode(PiSessionEntry.self, from: data) {
                 PiTranscriptReader().append(entry, to: &builder)

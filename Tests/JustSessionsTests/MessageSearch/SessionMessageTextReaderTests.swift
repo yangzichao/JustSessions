@@ -8,6 +8,14 @@ struct SessionMessageTextReaderTests {
         (.codex, SampleTranscriptLines.codex),
         (.kiro, KiroTranscriptSamples.lines),
         (.pi, SampleTranscriptLines.pi),
+        (.claude, SampleImageTranscriptLines.claude),
+        (.codex, SampleImageTranscriptLines.codex),
+        (.pi, SampleImageTranscriptLines.pi),
+    ]
+    static let imageSamples: [(ConversationProvider, [String])] = [
+        (.claude, SampleImageTranscriptLines.claude),
+        (.codex, SampleImageTranscriptLines.codex),
+        (.pi, SampleImageTranscriptLines.pi),
     ]
 
     @Test(arguments: samples)
@@ -30,6 +38,30 @@ struct SessionMessageTextReaderTests {
         #expect(!page.hasLater)
         #expect(!expectedEntries.isEmpty)
         #expect(text.entries == expectedEntries)
+    }
+
+    /// Search leaves images undecoded, but every entry keeps the ID and turn the reader gives it, so a match opens
+    /// where it is.
+    @Test(arguments: imageSamples)
+    func leavesImagesUndecodedWithoutMovingAnyEntry(provider: ConversationProvider, lines: [String]) async throws {
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let file = directory.appendingPathComponent("session.jsonl")
+        try SampleTranscriptLines.fileContents(lines).write(to: file)
+
+        let shownPage = try await TranscriptPageSource(file: file, provider: provider).read(.first)
+        let searchedPage = try await TranscriptPageSource(file: file, provider: provider, decodesImages: false).read(.first)
+
+        #expect(shownPage.entries.contains { $0.content == .userImage(SampleTranscriptImage.image) })
+        #expect(searchedPage.entries.map(\.id) == shownPage.entries.map(\.id))
+        #expect(searchedPage.entries.map(\.startsTurn) == shownPage.entries.map(\.startsTurn))
+        #expect(searchedPage.entries.map(\.content) == shownPage.entries.map { entry in
+            switch entry.content {
+            case .userImage: .userImage(.undecoded)
+            case .toolResultImage: .toolResultImage(.undecoded)
+            default: entry.content
+            }
+        })
     }
 
     @Test func readsEveryPageOfALongSession() async throws {

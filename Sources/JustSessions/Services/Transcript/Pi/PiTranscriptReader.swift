@@ -39,8 +39,8 @@ struct PiTranscriptReader {
         switch previewedEntry {
         case .userMessage:
             builder.append(.userMessage, text: userText(from: message?.content), timestamp: timestamp)
-            for image in Self.images(in: message?.content) {
-                builder.appendUserImage(image, timestamp: timestamp)
+            for base64 in Self.imageBase64Strings(in: message?.content) {
+                builder.appendUserImage(TranscriptImage(base64Encoded: base64), timestamp: timestamp)
             }
         case .shellCommand:
             // `!!` runs a command whose output is kept out of the model's context.
@@ -67,8 +67,8 @@ struct PiTranscriptReader {
                 builder.append(.note, text: message?.errorMessage ?? "", timestamp: timestamp)
             }
         case .toolResult:
-            for image in Self.images(in: message?.content) {
-                builder.appendToolResultImage(image, timestamp: timestamp)
+            for base64 in Self.imageBase64Strings(in: message?.content) {
+                builder.appendToolResultImage(TranscriptImage(base64Encoded: base64), timestamp: timestamp)
             }
         case .compaction:
             builder.appendCompactionNote(timestamp: timestamp)
@@ -91,8 +91,8 @@ struct PiTranscriptReader {
         return parts
     }
 
-    private static func images(in content: PiSessionEntry.Message.Content?) -> [TranscriptImage] {
-        parts(of: content).compactMap(\.image)
+    private static func imageBase64Strings(in content: PiSessionEntry.Message.Content?) -> [String] {
+        parts(of: content).compactMap(\.imageBase64)
     }
 
     /// Pi expands `/skill:name arguments` into the skill's instructions, wrapped as

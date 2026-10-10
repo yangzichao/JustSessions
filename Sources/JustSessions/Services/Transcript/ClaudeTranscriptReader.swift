@@ -32,10 +32,14 @@ struct ClaudeTranscriptReader {
             for part in message["content"] as? [[String: Any]] ?? [] {
                 switch part["type"] as? String {
                 case "image":
-                    if let image = Self.image(from: part) { builder.appendUserImage(image, timestamp: timestamp) }
+                    if let base64 = Self.imageBase64(from: part) {
+                        builder.appendUserImage(TranscriptImage(base64Encoded: base64), timestamp: timestamp)
+                    }
                 case "tool_result":
                     for resultPart in part["content"] as? [[String: Any]] ?? [] {
-                        if let image = Self.image(from: resultPart) { builder.appendToolResultImage(image, timestamp: timestamp) }
+                        if let base64 = Self.imageBase64(from: resultPart) {
+                            builder.appendToolResultImage(TranscriptImage(base64Encoded: base64), timestamp: timestamp)
+                        }
                     }
                 default:
                     continue
@@ -60,12 +64,11 @@ struct ClaudeTranscriptReader {
             .joined(separator: "\n\n")
     }
 
-    /// The image of an `image` part, which Claude Code stores as `{"source":{"type":"base64","data":…}}`.
-    private static func image(from part: [String: Any]) -> TranscriptImage? {
+    /// The base64 of an `image` part, which Claude Code stores as `{"source":{"type":"base64","data":…}}`.
+    private static func imageBase64(from part: [String: Any]) -> String? {
         guard part["type"] as? String == "image",
-              let source = part["source"] as? [String: Any],
-              let data = source["data"] as? String else { return nil }
-        return TranscriptImage(base64Encoded: data)
+              let source = part["source"] as? [String: Any] else { return nil }
+        return source["data"] as? String
     }
 
     /// Claude Code stores slash commands, shell escapes, and injected context as tagged user text.
