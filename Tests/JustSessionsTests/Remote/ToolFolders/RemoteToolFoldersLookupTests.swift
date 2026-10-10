@@ -23,7 +23,6 @@ struct RemoteToolFoldersLookupTests {
         #expect(folders == RemoteToolFolders(
             claude: "/data/claude",
             codex: home.path + "/codex home",
-            antigravity: home.path + "/.gemini/antigravity-cli",
             kiro: home.path + "/.kiro/sessions/cli",
             pi: home.path + "/pi-sessions"
         ))
@@ -36,7 +35,6 @@ struct RemoteToolFoldersLookupTests {
         #expect(folders == RemoteToolFolders(
             claude: "/home/me/.claude",
             codex: "/home/me/.codex",
-            antigravity: "/home/me/.gemini/antigravity-cli",
             kiro: "/home/me/.kiro/sessions/cli",
             pi: "/home/me/.pi/agent/sessions"
         ))

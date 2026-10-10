@@ -6,7 +6,6 @@ struct RemoteToolFoldersTests {
     static let custom = RemoteToolFolders(
         claude: "/data/my claude",
         codex: "/home/me/.codex",
-        antigravity: ".gemini/antigravity-cli",
         kiro: "/opt/kiro/sessions/cli",
         pi: ".pi/agent/sessions"
     )

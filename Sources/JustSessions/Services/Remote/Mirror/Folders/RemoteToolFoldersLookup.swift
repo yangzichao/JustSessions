@@ -58,7 +58,6 @@ enum RemoteToolFoldersLookup {
         return RemoteToolFolders(
             claude: ClaudeAdapter.standardConfigurationDirectory(environment: environment, homeDirectory: home).path,
             codex: CodexAdapter.standardCodexDirectory(environment: environment, homeDirectory: home).path,
-            antigravity: home + "/" + RemoteSessionMirror.remoteFolder(for: .antigravity),
             kiro: KiroAdapter.standardSessionsDirectory(environment: environment, homeDirectory: home).path,
             // A relative `sessionDir` is relative to a folder the lookup doesn't know.
             pi: piPath.hasPrefix("/")

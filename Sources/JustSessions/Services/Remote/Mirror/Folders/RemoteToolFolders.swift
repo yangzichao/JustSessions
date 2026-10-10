@@ -1,12 +1,11 @@
 import Foundation
 
 /// Where an SSH host keeps each tool's session files, found from the host's login shell by `RemoteToolFoldersLookup`.
-/// A path is absolute, or relative to the host's home when the lookup could not tell. OpenCode's database is found by
-/// its own snapshot command; see `OpenCodeRemoteDatabaseLocation`.
+/// A path is absolute, or relative to the host's home when the lookup could not tell. Antigravity keeps the standard
+/// folder, and OpenCode's database is found by its own snapshot command; see `OpenCodeRemoteDatabaseLocation`.
 struct RemoteToolFolders: Codable, Equatable, Sendable {
     var claude: String
     var codex: String
-    var antigravity: String
     var kiro: String
     var pi: String
 
@@ -14,7 +13,6 @@ struct RemoteToolFolders: Codable, Equatable, Sendable {
     static let standard = RemoteToolFolders(
         claude: RemoteSessionMirror.remoteFolder(for: .claude),
         codex: RemoteSessionMirror.remoteFolder(for: .codex),
-        antigravity: RemoteSessionMirror.remoteFolder(for: .antigravity),
         kiro: RemoteSessionMirror.remoteFolder(for: .kiro),
         pi: RemoteSessionMirror.remoteFolder(for: .pi)
     )
@@ -23,10 +21,9 @@ struct RemoteToolFolders: Codable, Equatable, Sendable {
         switch provider {
         case .claude: claude
         case .codex: codex
-        case .antigravity: antigravity
         case .kiro: kiro
         case .pi: pi
-        case .opencode: RemoteSessionMirror.remoteFolder(for: .opencode)
+        case .antigravity, .opencode: RemoteSessionMirror.remoteFolder(for: provider)
         }
     }
 
