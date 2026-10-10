@@ -1,0 +1,36 @@
+{
+	"$schema": "https://unpkg.com/wrangler@4/config-schema.json",
+	"name": "justsessions-feedback",
+	// zichao.yang.phys@gmail.com's account, with the other JustSessions Workers.
+	"account_id": "8b165b15e729dc4442baca8094edc756",
+	"main": "src/worker.js",
+	"compatibility_date": "2026-10-04",
+	"workers_dev": true,
+	"d1_databases": [
+		{
+			"binding": "FEEDBACK_DATABASE",
+			"database_name": "justsessions-feedback",
+			"database_id": "c95baecf-a369-4308-94ce-039ceedb864e",
+			"migrations_dir": "migrations"
+		}
+	],
+	// Per Cloudflare location and eventually consistent: it slows one sender down; Turnstile stops bots.
+	"ratelimits": [
+		{
+			"name": "FEEDBACK_RATE_LIMITER",
+			"namespace_id": "20261009",
+			"simple": { "limit": 3, "period": 60 }
+		}
+	],
+	// Deletes feedback older than a year.
+	"triggers": {
+		"crons": [
+			"29 3 * * *"
+		]
+	},
+	// Persisted request logs would keep IP addresses and message metadata. Use `wrangler tail` to watch live errors.
+	// TURNSTILE_SECRET_KEY is a Worker secret: `wrangler secret put TURNSTILE_SECRET_KEY`.
+	"observability": {
+		"enabled": false
+	}
+}

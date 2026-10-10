@@ -1,0 +1,28 @@
+/* The Guide's feedback form. scripts/feedback/guide-feedback-form.js shows it and adds the Turnstile widget. */
+.feedback-form { display: grid; gap: 8px; max-width: 640px; margin-bottom: 20px; }
+.feedback-form[hidden] { display: none; }
+.feedback-form label { margin-top: 6px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.feedback-form .feedback-optional { font-weight: 400; color: var(--muted); }
+.feedback-form textarea, .feedback-form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.feedback-form textarea { min-height: 150px; resize: vertical; }
+.feedback-form textarea:focus-visible, .feedback-form input:focus-visible, .feedback-form button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+.feedback-form .feedback-verification:not(:empty) { min-height: 65px; margin-top: 6px; }
+.feedback-form .feedback-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 6px; }
+.feedback-form .button { font-family: inherit; cursor: pointer; }
+.feedback-form .button:disabled { opacity: .4; box-shadow: none; cursor: default; }
+.feedback-form .button:disabled:hover { background: var(--ink); }
+.guide-content .feedback-form .feedback-status { margin: 0; font-size: 14px; }
+.guide-content .feedback-form .fine-print { margin: 4px 0 0; }

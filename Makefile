@@ -6,7 +6,7 @@
 APP_BUNDLE_PATH ?= dist/JustSessions.app
 INSTALLER_PATH ?= dist/JustSessions.dmg
 
-.PHONY: build dev run check test verify release-notes-check release-check dmg website website-check website-traffic-test website-traffic-deploy website-traffic localization localization-check update-feed-test update-feed-deploy update-checks help
+.PHONY: build dev run check test verify release-notes-check release-check dmg website website-check website-traffic-test website-traffic-deploy website-traffic feedback-test feedback-deploy feedback localization localization-check update-feed-test update-feed-deploy update-checks help
 
 build:
 	./Scripts/build-app.sh "$(APP_BUNDLE_PATH)"
@@ -39,7 +39,7 @@ dmg: build
 website:
 	python3 Scripts/Website/build_site.py
 
-website-check: website-traffic-test
+website-check: website-traffic-test feedback-test
 	python3 -m unittest discover -s Scripts/Website/tests -v
 	node --test Scripts/Website/tests/*.test.mjs
 	$(MAKE) website
@@ -52,6 +52,15 @@ website-traffic-deploy: website-traffic-test
 
 website-traffic:
 	@./Cloudflare/WebsiteTraffic/show-website-traffic.sh
+
+feedback-test:
+	node --test Cloudflare/Feedback/tests/*.test.js
+
+feedback-deploy: feedback-test
+	cd Cloudflare/Feedback && wrangler d1 migrations apply justsessions-feedback --remote && wrangler deploy
+
+feedback:
+	@./Cloudflare/Feedback/show-feedback.sh
 
 localization:
 	python3 Scripts/Localization/sync_catalog.py
@@ -85,6 +94,9 @@ help:
 		'make website-traffic         Show daily website traffic, sources, countries, and devices' \
 		'make website-traffic-test    Test the website traffic Worker' \
 		'make website-traffic-deploy  Apply its database migrations and deploy it' \
+		'make feedback          Show the newest feedback sent from the Guide and the app' \
+		'make feedback-test     Test the feedback Worker, also included in make website-check' \
+		'make feedback-deploy   Apply its database migrations and deploy it' \
 		'make localization        Extract UI strings and compile translations' \
 		'make localization-check  Check UI strings, translations, and resources' \
 		'make update-feed-test    Test the Cloudflare Worker that counts update checks' \
