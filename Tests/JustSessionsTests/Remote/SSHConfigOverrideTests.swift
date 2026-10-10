@@ -24,7 +24,7 @@ struct SSHConfigOverrideTests {
     }
 
     @Test func backgroundCommandsRunWithoutTheRemoteCommandForwardsOrTerminal() throws {
-        let result = try Self.resolvedSettings(sshArguments: RemoteHostCommandRunner.sshArguments(host: "devbox", command: "true"))
+        let result = try Self.resolvedSettings(sshArguments: RemoteHostCommandRunner.sshArguments(host: "devbox", command: "true", connectionSharingOptions: []))
 
         #expect(result.exitStatus == 0)
         #expect(Self.setting("requesttty", in: result.output) == ["false"])
@@ -34,7 +34,8 @@ struct SSHConfigOverrideTests {
     }
 
     @Test func rsyncConnectsWithoutTheRemoteCommandForwardsOrTerminal() throws {
-        let remoteShell = RemoteSessionMirror.rsyncRemoteShell.split(separator: " ").dropFirst().map(String.init)
+        let remoteShell = RemoteSessionMirror.rsyncRemoteShell(connectionSharingOptions: [])
+            .split(separator: " ").dropFirst().map(String.init)
         let result = try Self.resolvedSettings(sshArguments: remoteShell + ["devbox", "rsync --server"])
 
         #expect(result.exitStatus == 0)
@@ -44,11 +45,25 @@ struct SSHConfigOverrideTests {
     }
 
     @Test func theShellStartupCheckGetsItsTerminalWithoutTheRemoteCommand() throws {
-        let result = try Self.resolvedSettings(sshArguments: RemoteShellStartupCheck.sshArguments(host: "devbox", command: "true"))
+        let result = try Self.resolvedSettings(sshArguments: RemoteShellStartupCheck.sshArguments(host: "devbox", command: "true", connectionSharingOptions: []))
 
         #expect(result.exitStatus == 0)
         #expect(Self.setting("requesttty", in: result.output) == ["force"])
         #expect(Self.setting("remotecommand", in: result.output).isEmpty)
+    }
+
+    @Test func backgroundCommandsShareTheHostsConnection() throws {
+        let sharingOptions = SSHConnectionSharing.options(userControlPath: nil, socketDirectory: "/tmp/justsessions-ssh-501")
+        let result = try Self.resolvedSettings(sshArguments: RemoteHostCommandRunner.sshArguments(
+            host: "devbox", command: "true", connectionSharingOptions: sharingOptions
+        ))
+
+        #expect(result.exitStatus == 0)
+        #expect(Self.setting("controlmaster", in: result.output) == ["auto"])
+        #expect(Self.setting("controlpersist", in: result.output) == ["60"])
+        let controlPath = try #require(Self.setting("controlpath", in: result.output).first)
+        #expect(controlPath.hasPrefix("/tmp/justsessions-ssh-501/"))
+        #expect(controlPath.count == "/tmp/justsessions-ssh-501/".count + 40)
     }
 
     /// A tab keeps the forwards, which the user may want while a session runs.

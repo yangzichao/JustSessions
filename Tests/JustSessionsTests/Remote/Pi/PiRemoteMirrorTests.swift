@@ -58,7 +58,7 @@ struct PiRemoteMirrorTests {
     @Test func copiesOnlyFoldersAndTheSessionFilesDirectlyInThem() {
         #expect(RemoteSessionMirror.includedPatterns(for: .pi) == ["/*/", "/*/*.jsonl"])
         #expect(RemoteSessionMirror.remoteFolder(for: .pi) == ".pi/agent/sessions")
-        #expect(RemoteSessionMirror.rsyncArguments(for: .pi, source: "devbox:.pi/agent/sessions/", destination: "/cache/pi/").suffix(5)
+        #expect(RemoteSessionMirror.rsyncArguments(for: .pi, source: "devbox:.pi/agent/sessions/", destination: "/cache/pi/", remoteShell: "ssh").suffix(5)
             == ["--include=/*/", "--include=/*/*.jsonl", "--exclude=*", "devbox:.pi/agent/sessions/", "/cache/pi/"])
     }
 }

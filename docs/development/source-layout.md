@@ -45,6 +45,8 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Launch/StartCommand/`: runs a start command of your own through a shell, on this Mac and on SSH hosts, with the app's arguments after it; `env` then runs the CLI in the shell's place, so the tab's process is still the CLI's. `Check/` reads a command before it is kept, without running it, and looks up its program where the CLI runs. The New session sheet's field, locked until Edit, is in `Views/Browser/NewSession/StartCommand/`.
 - `Services/Remote/`: SSH mirroring, commands on the host, new sessions and folder lookup, deletion, and tmux there, including its prefix keys and, for tmux before 3.6, attaching a Claude Code tab's client again after a light/dark change so the CLI redraws in the new colors.
 - `Services/Remote/HostStatus/`: one SSH call per refresh that lists the host's tmux sessions and installed CLIs.
+- `Services/Remote/ConnectionSharing/`: lets a host's background commands and copies share one SSH login through a socket in `/tmp/justsessions-ssh-<uid>`, unless `~/.ssh/config` sets the host's `ControlPath`.
+- `Services/Remote/SSHConfiguration/`: reads the settings `ssh` would use for a host with `ssh -G`, without connecting.
 - `Services/Remote/ConnectionCheck/`: logs in to a host before the Add SSH host sheet adds it, so the sheet can say why the host can't be reached.
 - `Services/Remote/ShellStartup/`: how every command starts the host's login shell, with `JUSTSESSIONS=1`, and the check that finds startup files that start another program, such as tmux or zsh, before the app's command. Such a host falls back to a login shell without its interactive startup; the heading's warning and ⋯ items are in `Views/Browser/Sidebar/Hosts/`.
 - `Services/Remote/NewSession/ClaudeSessionID/`: asks an SSH host whether its `claude` takes `--session-id`, so a new tab there starts with its session's id and is linked by it.
@@ -68,7 +70,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Terminal/Tabs/`: moving between tabs, and linking a tab to the session its CLI is in.
 - `Services/Terminal/AppearingSessions/`: links a new tab to the first session that appears in its project, for SSH hosts and for CLIs that don't reveal the session they write.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
-- `Services/Processes/LoginShell/`: reads the environment your login shell sets up, once per app run. CLI lookup takes its `PATH`, and every `ssh` and `rsync` runs with all of it (`Services/Remote/Commands/SSHProcessEnvironment.swift`).
+- `Services/Processes/LoginShell/`: reads the environment your login shell sets up, once per app run. CLI lookup takes its `PATH`, and every `ssh` and `rsync` runs with all of it (`Services/Remote/Environment/`).
 - `Services/Transcript/`: read-only conversation readers for the preview.
 - `Services/Transcript/Markdown/`: splits Markdown into prose, code blocks, and tables for the native views.
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.

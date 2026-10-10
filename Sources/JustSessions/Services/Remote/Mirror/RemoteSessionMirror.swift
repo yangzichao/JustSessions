@@ -48,7 +48,7 @@ struct RemoteSessionMirror: Sendable {
         let remoteFolder = Self.remoteFolder(for: provider)
         let source = sourceHomeOverride.map { "\($0)/\(remoteFolder)/" } ?? "\(host):\(remoteFolder)/"
 
-        guard let result = Self.runRsync(for: provider, source: source, destination: destination.path + "/")
+        guard let result = Self.runRsync(for: provider, source: source, destination: destination.path + "/", host: sourceHomeOverride == nil ? host : nil)
         else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
 
         switch result.exitStatus {
@@ -69,10 +69,17 @@ struct RemoteSessionMirror: Sendable {
     }
 
     /// Copies one tool's files, with `ssh` running in the login shell's environment like the app's other connections.
-    static func runRsync(for provider: ConversationProvider, source: String, destination: String) -> (exitStatus: Int32, output: String)? {
-        BoundedProcessRunner.result(
+    /// `host` is the SSH host the source is on, whose connection the copy shares, or nil for a local folder.
+    static func runRsync(
+        for provider: ConversationProvider,
+        source: String,
+        destination: String,
+        host: String?
+    ) -> (exitStatus: Int32, output: String)? {
+        let remoteShell = rsyncRemoteShell(connectionSharingOptions: host.map(SSHConnectionSharing.options(for:)) ?? [])
+        return BoundedProcessRunner.result(
             ofExecutable: "/usr/bin/rsync",
-            arguments: rsyncArguments(for: provider, source: source, destination: destination),
+            arguments: rsyncArguments(for: provider, source: source, destination: destination, remoteShell: remoteShell),
             environment: SSHProcessEnvironment.standard,
             includesStandardError: true,
             timeout: 600
@@ -83,20 +90,27 @@ struct RemoteSessionMirror: Sendable {
     /// and `--delete` then never removes that session from the mirror. OpenCode's snapshot is rebuilt for every
     /// copy, and macOS's `rsync` compares file dates in whole seconds, so a snapshot of the same size made within
     /// the same second would look unchanged; `--ignore-times` compares its contents instead.
-    static func rsyncArguments(for provider: ConversationProvider, source: String, destination: String) -> [String] {
+    static func rsyncArguments(
+        for provider: ConversationProvider,
+        source: String,
+        destination: String,
+        remoteShell: String
+    ) -> [String] {
         [
             "--archive", "--delete",
-            "-e", rsyncRemoteShell,
+            "-e", remoteShell,
         ]
             + (provider == .opencode ? ["--ignore-times"] : [])
             + includedPatterns(for: provider).map { "--include=\($0)" }
             + ["--exclude=*", source, destination]
     }
 
-    /// The `ssh` command `rsync` connects with; none of the options has a space, so joining them needs no quoting.
-    static let rsyncRemoteShell = (
-        ["ssh", RemoteHostCommandRunner.noTerminalOption] + RemoteHostCommandRunner.nonInteractiveSSHOptions
-    ).joined(separator: " ")
+    /// The `ssh` command `rsync` connects with; none of the options has a space, the socket folder's path included,
+    /// so joining them needs no quoting.
+    static func rsyncRemoteShell(connectionSharingOptions: [String]) -> String {
+        (["ssh", RemoteHostCommandRunner.noTerminalOption] + RemoteHostCommandRunner.nonInteractiveSSHOptions + connectionSharingOptions)
+            .joined(separator: " ")
+    }
 
     /// Only the files the adapters read; Claude Code's subagent transcripts and caches stay on the host, and so do
     /// the subagent runs, forks, and artifacts Pi extensions keep in folders inside a Pi project folder. OpenCode's
