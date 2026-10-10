@@ -16,6 +16,7 @@ struct AppPermissionStatusTests {
         #expect(AppPermission.onThisMac.contains(.localNetwork) == hasLocalNetworkPrivacy)
         #expect(AppPermission.onThisMac.contains(.notifications))
         #expect(AppPermission.onThisMac.contains(.fullDiskAccess))
+        #expect(AppPermission.onThisMac.contains(.accessibility))
     }
 
     @Test func checkingNeverReportsLocalNetwork() async {
@@ -27,6 +28,8 @@ struct AppPermissionStatusTests {
             == "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
         #expect(AppPermission.notifications.systemSettingsURL?.absoluteString
             .hasPrefix("x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=") == true)
+        #expect(AppPermission.accessibility.systemSettingsURL?.absoluteString
+            == "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
         #expect(AppPermission.localNetwork.systemSettingsURL != nil)
     }
 }
