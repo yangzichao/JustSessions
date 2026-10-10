@@ -76,6 +76,8 @@
 	<string>子代理为启动它的会话运行了此会话。可以在这里阅读，但不能单独继续或删除。</string>
 	<key>About JustSessions</key>
 	<string>关于 JustSessions</string>
+	<key>Accessibility</key>
+	<string>辅助功能</string>
 	<key>Actual Size</key>
 	<string>实际大小</string>
 	<key>Add SSH host</key>
@@ -650,6 +652,8 @@
 	<string>在 GitHub 上查看源代码</string>
 	<key>Optional</key>
 	<string>可选</string>
+	<key>Optional. Lets CLIs in terminals control apps, such as clicking a menu or typing keys through System Events with osascript. Every CLI in a terminal gets it, so allow it only if you want them to.</key>
+	<string>可选。允许终端中的 CLI 控制 app，例如用 osascript 通过 System Events 点按菜单或输入按键。终端中的每个 CLI 都会获得这项权限，所以只在你希望它们拥有时才允许。</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
 	<string>可选。没有它时，终端中的 CLI 第一次打开受保护文件夹（例如「文稿」或外置磁盘）中的文件，macOS 会逐个询问。</string>
 	<key>Organize</key>

@@ -9,6 +9,8 @@ extension AppPermission {
             return URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=\(bundleIdentifier)")
         case .fullDiskAccess:
             return URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+        case .accessibility:
+            return URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
         case .localNetwork:
             // System Settings has no link to the Local Network list itself, only to Privacy & Security.
             return URL(string: "x-apple.systempreferences:com.apple.preference.security")

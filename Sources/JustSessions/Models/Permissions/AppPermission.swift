@@ -7,6 +7,8 @@ enum AppPermission: CaseIterable, Identifiable, Sendable {
     case notifications
     /// Lets CLIs open files in the folders macOS protects without macOS asking about each folder.
     case fullDiskAccess
+    /// Lets CLIs control apps, as when a script clicks a menu or types keys through System Events.
+    case accessibility
     /// For CLIs that reach a device on your network, such as an SSH host at a local address.
     case localNetwork
 
@@ -22,6 +24,6 @@ enum AppPermission: CaseIterable, Identifiable, Sendable {
 
     /// Whether everything works without it, only less smoothly.
     var isOptional: Bool {
-        self == .fullDiskAccess
+        self == .fullDiskAccess || self == .accessibility
     }
 }
