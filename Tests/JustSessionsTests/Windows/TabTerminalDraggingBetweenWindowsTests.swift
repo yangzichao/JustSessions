@@ -19,7 +19,7 @@ struct TabTerminalDraggingBetweenWindowsTests {
         }
         let tab = first.openEchoingTab(engine: engine)
         try await first.show()
-        try await expectEventually(timeout: .seconds(30)) { screenText(of: tab.terminalView).contains("BEFORE-MOVE") }
+        try await expectEventually { screenText(of: tab.terminalView).contains("BEFORE-MOVE") }
         let ghosttyView = tab.terminalView as? GhosttyTabTerminalView
         let surface = ghosttyView?.terminalSurface
         let controller = ghosttyView?.controller
@@ -42,7 +42,7 @@ struct TabTerminalDraggingBetweenWindowsTests {
             tab.terminalView.keyDown(with: SyntheticKey.event(keyCode: 0, characters: String(character), window: second.window))
         }
         tab.terminalView.keyDown(with: SyntheticKey.event(keyCode: 36, characters: "\r", window: second.window))
-        try await expectEventually(timeout: .seconds(30)) { screenText(of: tab.terminalView).contains("GOT:moved") }
+        try await expectEventually { screenText(of: tab.terminalView).contains("GOT:moved") }
     }
 }
 

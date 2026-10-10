@@ -81,11 +81,11 @@ struct GhosttyTabTeardownTests {
 
         view = nil
 
-        try await expectEventually(timeout: .seconds(5)) { freeing.wasFreed }
-        try await expectEventually(timeout: .seconds(5)) { backpressure.unparsedByteCount > unparsedWhilePaused }
+        try await expectEventually { freeing.wasFreed }
+        try await expectEventually { backpressure.unparsedByteCount > unparsedWhilePaused }
         // A view the paused read held on to would go once Ghostty parsed the output; this parses it.
         try await Self.parseOutput(of: session, settings: settings)
-        try await expectEventually(timeout: .seconds(30)) { freeing.wasFreed }
+        try await expectEventually { freeing.wasFreed }
         #expect(freeing.wasFreedOnMainThread == true)
     }
 
@@ -159,7 +159,7 @@ struct GhosttyTabTeardownTests {
             window.contentView = nil
             window.close()
         }
-        try await expectEventually(timeout: .seconds(30)) { session.pendingOutputByteCount == 0 }
+        try await expectEventually { session.pendingOutputByteCount == 0 }
     }
 
     /// Returns whether the process ended within 10 seconds, and reaps it.

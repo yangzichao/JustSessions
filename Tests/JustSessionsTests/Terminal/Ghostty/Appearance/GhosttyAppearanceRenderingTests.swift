@@ -10,8 +10,11 @@ struct GhosttyAppearanceRenderingTests {
     private static let hideCursor = "\u{1B}[?25l"
     /// Full blocks fill their cells, so their color is drawn without antialiasing.
     private static let blocks = String(repeating: "\u{2588}", count: 4)
+    /// See `TestMachine.isVirtual`.
+    private static let exactColorsNeedAMac: Comment = "Checks exact text and cell colors, which a virtual machine's GPU draws differently"
 
-    @Test func theBackgroundAndTheColorsProgramsChooseAreDrawnAsConfigured() async throws {
+    @Test(.enabled(if: !TestMachine.isVirtual, Self.exactColorsNeedAMac))
+    func theBackgroundAndTheColorsProgramsChooseAreDrawnAsConfigured() async throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
         let terminal = GhosttyTestTerminal(controller: stores.controller(), appearance: .aqua)
@@ -28,7 +31,8 @@ struct GhosttyAppearanceRenderingTests {
     }
 
     /// As in SwiftTerm, bold text in one of the first ANSI colors is drawn in its bright version.
-    @Test func boldTextInTheFirstANSIColorsIsDrawnBright() async throws {
+    @Test(.enabled(if: !TestMachine.isVirtual, Self.exactColorsNeedAMac))
+    func boldTextInTheFirstANSIColorsIsDrawnBright() async throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
         let terminal = GhosttyTestTerminal(controller: stores.controller(), appearance: .aqua)
@@ -81,7 +85,8 @@ struct GhosttyAppearanceRenderingTests {
         }
     }
 
-    @Test func blockElementsKeepTheColorTheProgramChose() async throws {
+    @Test(.enabled(if: !TestMachine.isVirtual, Self.exactColorsNeedAMac))
+    func blockElementsKeepTheColorTheProgramChose() async throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
         let terminal = GhosttyTestTerminal(controller: stores.controller(), appearance: .aqua)
@@ -92,7 +97,8 @@ struct GhosttyAppearanceRenderingTests {
     }
 
     /// Select All from the Edit menu runs Ghostty's action directly, so it works with Ghostty's shortcuts cleared.
-    @Test func selectAllDrawsTheSelectionInTheThemesColors() async throws {
+    @Test(.enabled(if: !TestMachine.isVirtual, Self.exactColorsNeedAMac))
+    func selectAllDrawsTheSelectionInTheThemesColors() async throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
         let terminal = GhosttyTestTerminal(controller: stores.controller(), appearance: .aqua)
@@ -111,7 +117,8 @@ struct GhosttyAppearanceRenderingTests {
 
     /// Tokyo Night Day's own selection colors are 3.3 apart, so its selected text is drawn in the readable color, as
     /// in SwiftTerm; see `TerminalMinimumContrastRenderingTests`.
-    @Test func selectedTextIsDrawnReadableOnTheSelection() async throws {
+    @Test(.enabled(if: !TestMachine.isVirtual, Self.exactColorsNeedAMac))
+    func selectedTextIsDrawnReadableOnTheSelection() async throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
         stores.theme.setTheme(.tokyoNight)
@@ -121,7 +128,7 @@ struct GhosttyAppearanceRenderingTests {
 
         terminal.view.selectAll(nil)
 
-        try await expectEventually(timeout: .seconds(30)) {
+        try await expectEventually {
             let colors = terminal.drawnColors()
             return colors.covers(scheme.selectionBackground, pixels: 2_500) && colors.covers(scheme.readableSelectionForeground, pixels: 800)
         }
