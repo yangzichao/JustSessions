@@ -123,7 +123,7 @@ Each CLI on a host starts through your login shell, as `$SHELL -lic`, so it is f
 - Select several projects with ⌘-click, or select a continuous range with Shift-click, then click **Archive** at the bottom of the sidebar or choose **Archive … projects** from a selected project's **⋯** or right-click menu. Open terminals keep running. To also delete their sessions, click **Archive and delete sessions…** or choose **Archive … projects and delete all sessions (…)…**, then confirm. Sessions with an open terminal are skipped and come back if their project is restored. Use a project's arrow to expand or collapse it while keeping the selection.
 - Click empty space in the sidebar or press Escape while the sidebar is focused to cancel a project or session batch selection. A single session's conversation stays open.
 - Claude Code, Antigravity, and Pi sessions on this Mac go to the macOS Trash; a Pi session's folder beside its file goes too, if there is one. Codex uses `codex delete --force`, Kiro CLI uses `kiro-cli chat --delete-session <session-id>`, and OpenCode uses `opencode session delete <session-id>`, which also deletes the session's subagent sessions. SSH hosts have no Trash, so deletions there are permanent.
-- Sessions with an open terminal tab, or still running in tmux, can't be deleted.
+- For a session with an open terminal tab, in any window, or still running in tmux, a session's right-click or **⋯** menu offers **Close and delete session…** instead. After you confirm, it closes the tab, ends the CLI, waits up to 5 seconds for the CLI to exit, then deletes the session. Selections and projects still skip such sessions.
 
 ## Settings
 

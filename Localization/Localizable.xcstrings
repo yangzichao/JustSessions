@@ -1318,6 +1318,26 @@
         }
       }
     },
+    "Close and delete session": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭并删除会话"
+          }
+        }
+      }
+    },
+    "Close and delete session…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭并删除会话…"
+          }
+        }
+      }
+    },
     "Close find": {
       "localizations": {
         "zh-Hans": {
@@ -2567,6 +2587,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "界面语言"
+          }
+        }
+      }
+    },
+    "Its CLI, still running on %@, ends first.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会先结束它仍在 %@ 上运行的 CLI。"
+          }
+        }
+      }
+    },
+    "Its tab closes and its CLI ends first.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会先关闭它的标签页并结束它的 CLI。"
           }
         }
       }

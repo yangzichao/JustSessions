@@ -242,6 +242,10 @@
 	<string>关闭窗口</string>
 	<key>Close a tab with **Keep running**, or quit the app, and the CLI carries on in tmux. Click its session to return. A plain terminal ends with its tab.</key>
 	<string>关闭标签页时选择 **保持运行**，或直接退出应用，CLI 都会在 tmux 中继续运行。单击它的会话即可回去。普通终端会随标签页一起结束。</string>
+	<key>Close and delete session</key>
+	<string>关闭并删除会话</string>
+	<key>Close and delete session…</key>
+	<string>关闭并删除会话…</string>
 	<key>Close find</key>
 	<string>关闭查找</string>
 	<key>Close left view</key>
@@ -474,6 +478,10 @@
 	<string>在主机上安装 `rsync` 和需要使用的 CLI。</string>
 	<key>Interface language</key>
 	<string>界面语言</string>
+	<key>Its CLI, still running on %@, ends first.</key>
+	<string>会先结束它仍在 %@ 上运行的 CLI。</string>
+	<key>Its tab closes and its CLI ends first.</key>
+	<string>会先关闭它的标签页并结束它的 CLI。</string>
 	<key>JustSessions Help</key>
 	<string>JustSessions 帮助</string>
 	<key>JustSessions Website</key>

@@ -312,14 +312,15 @@ final class ConversationStore: ObservableObject {
     }
 
     /// Sessions already being deleted, or waiting to be, are left out: they are not deleted twice. So are subagents'
-    /// sessions, which go only with the session that started them.
-    func deletionPlan(for candidateConversations: [Conversation]) -> SessionDeletionPlan {
+    /// sessions, which go only with the session that started them. With `endingTheirCLIs`, as for Close and delete,
+    /// sessions with a tab or a CLI in tmux are deletable too.
+    func deletionPlan(for candidateConversations: [Conversation], endingTheirCLIs: Bool = false) -> SessionDeletionPlan {
         let notYetPending = candidateConversations.filter { !$0.isSubagent && !isDeletionPending(for: $0) }
-        let deletable = notYetPending.filter { !hasTerminal(for: $0) }
+        let deletable = endingTheirCLIs ? notYetPending : notYetPending.filter { !hasTerminal(for: $0) }
         let deletesSubagents = Dictionary(grouping: deletable, by: \.provider.deletesSubagentsWithSession)
         return SessionDeletionPlan(
             deletableConversations: deletable,
-            openTerminalCount: notYetPending.filter { hasTerminal(for: $0) }.count,
+            openTerminalCount: notYetPending.count - deletable.count,
             deletedSubagentCount: (deletesSubagents[true] ?? []).reduce(0) { $0 + descendantSubagentCount(of: $1) },
             keptSubagentCount: (deletesSubagents[false] ?? []).reduce(0) { $0 + descendantSubagentCount(of: $1) }
         )

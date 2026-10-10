@@ -37,6 +37,22 @@ enum RemoteTmuxCommands {
         )
     }
 
+    /// Ends the session as `killSessionCommand` does, then waits up to `timeoutSeconds` for its CLI, the pane's
+    /// process, to exit, so the session can be deleted without the CLI writing to it again. `sh` runs the script, as
+    /// the login shell may be fish.
+    static func killSessionWaitingForCLIExitCommand(_ name: String, on host: String, timeoutSeconds: Int) -> String {
+        let script = [
+            // `=name:` is the session's pane; a bare `=name` is no pane.
+            "pid=$(tmux display-message -p -t \(ShellQuoting.quoted("=" + name + ":")) '#{pane_pid}' 2>/dev/null)",
+            "tmux kill-session -t \(ShellQuoting.quoted("=" + name)) 2>/dev/null",
+            // A deadline rather than a count of polls: each poll starts `sleep`, which takes its own time.
+            "deadline=$(($(date +%s) + \(timeoutSeconds)))",
+            "while [ -n \"$pid\" ] && kill -0 \"$pid\" 2>/dev/null && [ \"$(date +%s)\" -lt \"$deadline\" ]; do sleep 0.1; done",
+            "true",
+        ].joined(separator: "; ")
+        return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
+    }
+
     /// Gives every JustSessions session on the host the prefix keys `RemoteTmuxPrefixOptions` describes, so a new
     /// choice reaches tabs already attached and sessions no tab shows, which you may attach to yourself.
     static func setPrefixOptionsCommand(usingHostPrefix: Bool, on host: String) -> String {

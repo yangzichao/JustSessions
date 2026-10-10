@@ -10,8 +10,14 @@ private struct SessionDeletionDialog: ViewModifier {
         content.confirmationDialog("Delete sessions?", isPresented: Binding(isPresenting: $request)) {
             switch request {
             case .conversation(let conversation):
-                deleteButton(title: AppLocalization.string("Delete session", language: language)) {
-                    store.delete(conversation)
+                if store.cliEndingBeforeDeletion(of: conversation) != nil {
+                    deleteButton(title: AppLocalization.string("Close and delete session", language: language)) {
+                        store.closeAndDelete(conversation)
+                    }
+                } else {
+                    deleteButton(title: AppLocalization.string("Delete session", language: language)) {
+                        store.delete(conversation)
+                    }
                 }
             case .conversations(let conversations):
                 deleteButton(for: store.deletionPlan(for: conversations)) {
@@ -63,7 +69,7 @@ private struct SessionDeletionDialog: ViewModifier {
     private func message(for request: SessionDeletionRequest) -> String {
         switch request {
         case .conversation(let conversation):
-            SessionDeletionConfirmationText.message(forDeleting: conversation, plan: store.deletionPlan(for: [conversation]), language: language)
+            message(forDeleting: conversation)
         case .conversations(let conversations):
             SessionDeletionConfirmationText.message(forDeletingSelectionWith: store.deletionPlan(for: conversations), language: language)
         case .project(let projectPath):
@@ -82,6 +88,17 @@ private struct SessionDeletionDialog: ViewModifier {
                 plan: store.deletionPlan(forProjects: projectPaths), language: language
             )
         }
+    }
+
+    /// For a session a tab or tmux runs, also says what Close and delete ends first.
+    private func message(forDeleting conversation: Conversation) -> String {
+        let cliEnding = store.cliEndingBeforeDeletion(of: conversation)
+        return SessionDeletionConfirmationText.message(
+            forDeleting: conversation,
+            plan: store.deletionPlan(for: [conversation], endingTheirCLIs: cliEnding != nil),
+            cliEnding: cliEnding,
+            language: language
+        )
     }
 
     private var language: AppInterfaceLanguage { AppInterfaceLanguage(identifier: locale.identifier) }
