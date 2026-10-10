@@ -9,8 +9,8 @@ struct AppThemeColorsEditor: View {
     @State private var isExpanded: Bool
     /// Nil follows the window's appearance, so the version you see is the one you edit.
     @State private var editedVersionIsDark: Bool?
-    /// The color whose last pick was refused, until a pick is taken or the version changes.
-    @State private var refusedColor: CustomizableThemeColor?
+    /// The last pick that was refused, until a pick is taken or the theme changes. It shows only in its own version.
+    @State private var refusedPick: RefusedThemeColorPick?
 
     init(appThemeStore: AppThemeStore) {
         self.appThemeStore = appThemeStore
@@ -27,10 +27,7 @@ struct AppThemeColorsEditor: View {
                 HStack(spacing: 12) {
                     Picker("Version", selection: Binding(
                         get: { editsDarkVersion },
-                        set: { isDark in
-                            editedVersionIsDark = isDark
-                            refusedColor = nil
-                        }
+                        set: { editedVersionIsDark = $0 }
                     )) {
                         Text("Light").tag(false)
                         Text("Dark").tag(true)
@@ -41,7 +38,7 @@ struct AppThemeColorsEditor: View {
                     Spacer(minLength: 0)
                     Button("Reset") {
                         appThemeStore.removeCustomization()
-                        refusedColor = nil
+                        refusedPick = nil
                     }
                     .controlSize(.small)
                     .disabled(appThemeStore.resolvedTheme.customization.isEmpty)
@@ -61,7 +58,10 @@ struct AppThemeColorsEditor: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .onChange(of: appThemeStore.theme) { refusedColor = nil }
+        .onChange(of: appThemeStore.theme) {
+            refusedPick = nil
+            if !appThemeStore.resolvedTheme.customization.isEmpty { isExpanded = true }
+        }
     }
 
     private var colorRows: some View {
@@ -72,16 +72,30 @@ struct AppThemeColorsEditor: View {
             ForEach(CustomizableThemeColor.allCases) { color in
                 ThemeColorWellRow(
                     color: color,
-                    value: color.value(in: colors.seeds),
+                    value: changes[color] ?? color.drawnValue(in: colors),
                     isChanged: changes[color] != nil,
-                    isAdjustedForReadability: color == .ink && colors.ink != colors.seeds.ink,
-                    refusal: refusedColor == color ? color.refusalMessage(isDark: isDark) : nil,
+                    isAdjustedForReadability: changes[color].map { $0 != color.drawnValue(in: colors) } ?? false,
+                    refusal: refusedPick == RefusedThemeColorPick(color: color, isDark: isDark)
+                        ? RefusedThemeColorPick.message(isDark: isDark) : nil,
                     onChange: { value in
                         let isTaken = appThemeStore.setColor(value, for: color, isDark: isDark)
-                        refusedColor = isTaken ? nil : color
+                        refusedPick = isTaken ? nil : RefusedThemeColorPick(color: color, isDark: isDark)
                     }
                 )
             }
         }
+    }
+}
+
+/// A surface color pick the theme store refused, and the version it was for.
+struct RefusedThemeColorPick: Equatable {
+    let color: CustomizableThemeColor
+    let isDark: Bool
+
+    /// Only surfaces are refused: of the wrong lightness, or too close to it for text to stay readable.
+    static func message(isDark: Bool) -> LocalizedStringKey {
+        isDark
+            ? "Text can't stay readable on that color. Choose a darker one."
+            : "Text can't stay readable on that color. Choose a lighter one."
     }
 }

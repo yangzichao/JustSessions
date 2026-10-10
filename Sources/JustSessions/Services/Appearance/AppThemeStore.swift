@@ -9,55 +9,80 @@ final class AppThemeStore: ObservableObject {
 
     /// The chosen theme with your changes to its colors.
     @Published private(set) var resolvedTheme: ResolvedAppTheme
-    /// Kept for every theme, so choosing another theme and coming back brings your changes back.
-    private var customizations: [AppTheme: AppThemeCustomization]
+    /// The chosen theme as terminals and the tab bar take it. It follows `resolvedTheme` at once, except while colors
+    /// are picked: then it waits until picking pauses, so a drag across the color panel restyles terminals, and tells
+    /// the CLIs that subscribe to theme changes, once rather than at every step.
+    @Published private(set) var terminalTheme: ResolvedAppTheme
+    /// The themes with your changes, kept when you choose another theme so they come back with it.
+    private var customizedThemes: [AppTheme: ResolvedAppTheme]
     private let userDefaults: UserDefaults
+    private let terminalThemeDelay: Duration
+    private var pendingTerminalTheme: Task<Void, Never>?
 
     var theme: AppTheme { resolvedTheme.theme }
 
-    init(userDefaults: UserDefaults = .standard) {
+    init(userDefaults: UserDefaults = .standard, terminalThemeDelay: Duration = .milliseconds(250)) {
         self.userDefaults = userDefaults
-        let customizations = AppThemeCustomization.loadAll(from: userDefaults)
+        self.terminalThemeDelay = terminalThemeDelay
+        let customizedThemes = AppThemeCustomization.loadAll(from: userDefaults).reduce(into: [AppTheme: ResolvedAppTheme]()) {
+            customizedThemes, saved in customizedThemes[saved.key] = ResolvedAppTheme(saved.key, customization: saved.value)
+        }
         let theme = AppTheme.load(from: userDefaults)
-        self.customizations = customizations
-        resolvedTheme = ResolvedAppTheme(theme, customization: customizations[theme] ?? AppThemeCustomization())
+        let resolvedTheme = customizedThemes[theme] ?? ResolvedAppTheme(theme)
+        self.customizedThemes = customizedThemes
+        self.resolvedTheme = resolvedTheme
+        terminalTheme = resolvedTheme
     }
 
     func setTheme(_ newTheme: AppTheme) {
         guard newTheme != theme else { return }
         newTheme.save(to: userDefaults)
-        resolvedTheme = resolvedTheme(for: newTheme)
+        publish(resolvedTheme(for: newTheme), terminalsWait: false)
     }
 
     /// Any theme with your changes, as the theme picker draws it.
     func resolvedTheme(for theme: AppTheme) -> ResolvedAppTheme {
-        theme == self.theme
-            ? resolvedTheme
-            : ResolvedAppTheme(theme, customization: customizations[theme] ?? AppThemeCustomization())
+        customizedThemes[theme] ?? ResolvedAppTheme(theme)
     }
 
     /// Changes one color of the chosen theme's light or dark version; nil, or the theme's own color, gives it back the
-    /// theme's own. Returns false, changing nothing, when the version would no longer suit its appearance: a surface
-    /// of the wrong lightness, or one text can't be made readable on.
+    /// theme's own. Returns false, changing nothing, when a surface would not suit the version: of the wrong lightness,
+    /// or too close to it for text to stay readable. Any text color, and going back to the theme's own, is taken.
     @discardableResult
     func setColor(_ value: UInt32?, for color: CustomizableThemeColor, isDark: Bool) -> Bool {
         let themeColors = theme.colors(isDark: isDark)
+        let isThemesOwn = value.map { $0 == color.value(in: themeColors.seeds) || $0 == color.drawnValue(in: themeColors) } ?? true
         var customization = resolvedTheme.customization
-        customization.setChange(value == color.value(in: themeColors.seeds) ? nil : value, for: color, isDark: isDark)
-        guard themeColors.applying(customization.changes(isDark: isDark)).suits(isDark: isDark) else { return false }
-        update(customization)
+        customization.setChange(isThemesOwn ? nil : value, for: color, isDark: isDark)
+        guard themeColors.seeds.applying(customization.changes(isDark: isDark)).surfacesSuit(isDark: isDark) else { return false }
+        guard customization != resolvedTheme.customization else { return true }
+        save(resolvedTheme.replacingCustomization(with: customization, changedVersionIsDark: isDark), terminalsWait: true)
         return true
     }
 
     /// Gives the chosen theme back all its own colors.
     func removeCustomization() {
-        update(AppThemeCustomization())
+        guard !resolvedTheme.customization.isEmpty else { return }
+        save(ResolvedAppTheme(theme), terminalsWait: false)
     }
 
-    private func update(_ customization: AppThemeCustomization) {
-        guard customization != resolvedTheme.customization else { return }
-        customizations[theme] = customization.isEmpty ? nil : customization
-        AppThemeCustomization.saveAll(customizations, to: userDefaults)
-        resolvedTheme = ResolvedAppTheme(theme, customization: customization)
+    private func save(_ newResolvedTheme: ResolvedAppTheme, terminalsWait: Bool) {
+        customizedThemes[theme] = newResolvedTheme.customization.isEmpty ? nil : newResolvedTheme
+        AppThemeCustomization.saveAll(customizedThemes.mapValues(\.customization), to: userDefaults)
+        publish(newResolvedTheme, terminalsWait: terminalsWait)
+    }
+
+    private func publish(_ newResolvedTheme: ResolvedAppTheme, terminalsWait: Bool) {
+        resolvedTheme = newResolvedTheme
+        pendingTerminalTheme?.cancel()
+        guard terminalsWait else {
+            terminalTheme = newResolvedTheme
+            return
+        }
+        pendingTerminalTheme = Task { [weak self, terminalThemeDelay] in
+            try? await Task.sleep(for: terminalThemeDelay)
+            guard !Task.isCancelled, let self else { return }
+            terminalTheme = resolvedTheme
+        }
     }
 }

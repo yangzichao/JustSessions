@@ -44,12 +44,14 @@ struct AppThemeReadabilityTests {
         }
     }
 
-    /// The check a customized theme must pass agrees with the tests above.
-    @Test func everyThemeSuitsItsOwnAppearanceAndNotTheOther() {
+    /// The check a customized theme's surfaces must pass takes every built-in theme's own, in its own version only.
+    @Test func everyThemesSurfacesSuitTheirOwnVersionAndNotTheOther() {
         for theme in AppTheme.allCases {
-            #expect(theme.colors(isDark: false).suits(isDark: false), "\(theme) light")
-            #expect(theme.colors(isDark: true).suits(isDark: true), "\(theme) dark")
-            #expect(!theme.colors(isDark: false).suits(isDark: true), "\(theme) light as dark")
+            for isDark in [false, true] {
+                let seeds = theme.colors(isDark: isDark).seeds
+                #expect(seeds.surfacesSuit(isDark: isDark), "\(theme) dark=\(isDark)")
+                #expect(!seeds.surfacesSuit(isDark: !isDark), "\(theme) dark=\(isDark) as the other version")
+            }
         }
     }
 

@@ -102,7 +102,7 @@ struct WorkspaceDetailView: View {
                     }
                 }
             }
-            .tabBarTerminalPalette(from: .shared)
+            .tabBarTerminalPalette(from: .shared, themeStore: .shared)
         }
         .ignoresSafeArea(edges: .top)
         .onChange(of: store.terminalSplits.map(\.id)) { _, splitIDs in

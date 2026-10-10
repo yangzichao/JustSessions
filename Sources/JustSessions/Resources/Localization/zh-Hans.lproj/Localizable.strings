@@ -966,8 +966,6 @@
 	<string>终端配色</string>
 	<key>Text and accents</key>
 	<string>文字和强调色</string>
-	<key>Text can't be made readable with that color.</key>
-	<string>用这个颜色无法让文字清晰可读。</string>
 	<key>Text can't stay readable on that color. Choose a darker one.</key>
 	<string>文字在这个颜色上无法清晰可读，请选更深的颜色。</string>
 	<key>Text can't stay readable on that color. Choose a lighter one.</key>

@@ -6,7 +6,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 
 - `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up. `UnseenTurns/` holds the CLIs that finished a turn while their terminal was off screen, until you look, and which running CLIs wait on you: stopped for your answer, or done with a turn you have not seen.
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
-- `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`, the CLI and status hues every theme shares in `Hues/`, and in `ReadableText/` the text colors each theme prepares so text stays at 4.5 contrast on every surface it sits on. `Customization/` holds your changes to a theme's colors, which `ResolvedAppTheme` applies to its light and dark colors, and the check that refuses a change text can't stay readable with.
+- `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`, the CLI and status hues every theme shares in `Hues/`, and in `ReadableText/` the text colors each theme prepares so text stays at 4.5 contrast on every surface it sits on. `Customization/` holds your changes to a theme's colors, which `ResolvedAppTheme` applies to its light and dark colors, and the check that refuses a surface color text can't stay readable on.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
 - `Models/Transcript/`: the reading width, a readable column or the full window, and the reading text size, both shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.

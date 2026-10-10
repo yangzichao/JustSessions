@@ -13,6 +13,7 @@ enum CustomizableThemeColor: String, CaseIterable, Identifiable, Sendable {
 
     var isSurface: Bool { self != .ink }
 
+    /// The color the variant was made from.
     func value(in seeds: AppThemeSeeds) -> UInt32 {
         switch self {
         case .contentSurface: seeds.contentSurface
@@ -22,24 +23,9 @@ enum CustomizableThemeColor: String, CaseIterable, Identifiable, Sendable {
         case .ink: seeds.ink
         }
     }
-}
 
-extension AppThemeSeeds {
-    /// These seeds with the changed colors in place of their own. Hairlines and hover fills follow a changed ink, as
-    /// they do in nearly every built-in theme.
-    func applying(_ changedColors: [CustomizableThemeColor: UInt32]) -> AppThemeSeeds {
-        var seeds = self
-        for (color, value) in changedColors {
-            switch color {
-            case .contentSurface: seeds.contentSurface = value
-            case .sidebarSurface: seeds.sidebarSurface = value
-            case .raisedSurface: seeds.raisedSurface = value
-            case .userMessageSurface: seeds.userMessageSurface = value
-            case .ink:
-                seeds.ink = value
-                seeds.line = value
-            }
-        }
-        return seeds
+    /// The color as the app draws it: a surface as it is, the ink once made readable.
+    func drawnValue(in colors: AppThemeColors) -> UInt32 {
+        self == .ink ? colors.ink : value(in: colors.seeds)
     }
 }

@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 /// One color of the theme you can change: its name, a color well, a button that gives it back the theme's own color
-/// once changed, and a note when the color was made readable or a pick was refused. A row of the editor's grid.
+/// once changed, and a note when your color was made readable or a pick was refused. A row of the editor's grid.
 struct ThemeColorWellRow: View {
     let color: CustomizableThemeColor
     let value: UInt32
@@ -66,13 +66,5 @@ extension CustomizableThemeColor {
         case .userMessageSurface: "Your messages"
         case .ink: "Text and accents"
         }
-    }
-
-    /// Why a pick was refused: a surface of the wrong lightness for the version, or one text can't be made readable on.
-    func refusalMessage(isDark: Bool) -> LocalizedStringKey {
-        guard isSurface else { return "Text can't be made readable with that color." }
-        return isDark
-            ? "Text can't stay readable on that color. Choose a darker one."
-            : "Text can't stay readable on that color. Choose a lighter one."
     }
 }

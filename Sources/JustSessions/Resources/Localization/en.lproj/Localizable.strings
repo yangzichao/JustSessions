@@ -956,8 +956,6 @@
 	<string>Terminal colors</string>
 	<key>Text and accents</key>
 	<string>Text and accents</string>
-	<key>Text can't be made readable with that color.</key>
-	<string>Text can't be made readable with that color.</string>
 	<key>Text can't stay readable on that color. Choose a darker one.</key>
 	<string>Text can't stay readable on that color. Choose a darker one.</string>
 	<key>Text can't stay readable on that color. Choose a lighter one.</key>
