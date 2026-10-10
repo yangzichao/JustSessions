@@ -42,7 +42,7 @@ The tree is large because the transcript lays out every loaded entry, up to `Tra
 | 6 | [Terminal drawing: SwiftTerm upgrade, then Metal](#6-terminal-drawing-swiftterm-upgrade-then-metal) | Planned |
 | 7 | [The search context changes on every transcript update](#7-the-search-context-changes-on-every-transcript-update) | Done: scrolling PR |
 | 8 | [Scrolling re-rendered every transcript entry](#8-scrolling-re-rendered-every-transcript-entry) | Done: scrolling PR |
-| 9 | [SwiftUI's scroll position tracking](#9-swiftuis-scroll-position-tracking) | To investigate |
+| 9 | [SwiftUI's scroll position tracking](#9-swiftuis-scroll-position-tracking) | Done: issue #55 |
 
 ### 1. Timestamp parsing
 
@@ -136,7 +136,22 @@ The draft line-layout cache ([SwiftTerm #449](https://github.com/migueldeicaza/S
 
 **Evidence:** after item 8, much of each scroll step is SwiftUI's own tracking for `.scrollPosition(id:)` and `.scrollTargetLayout()`. On every scroll it searches the entries for the one closest to the anchor (`ScrollStateRequestTransform.findClosestSubview`), then marks the state that changed as dirty. Both grow with the number of entries.
 
-**Plan:** check whether the reader still needs `.scrollPosition(id:)`. It already calls `ScrollViewProxy.scrollTo` wherever it sets `visibleEntryIndex`. The initial position, Find's navigation, and paging all depend on it, so test each before removing it.
+**Change:** the reader no longer uses `.scrollPosition(id:)`, `.scrollTargetLayout()`, or `visibleEntryIndex`. `TranscriptScrollPositionController` already recorded and restored the reading position on its own. Every entry is laid out, so it finds any loaded entry's marker without SwiftUI's help. Where the reader set `visibleEntryIndex`, it also either called `ScrollViewProxy.scrollTo` or asked the controller to restore a position:
+- the initial position;
+- Find's navigation;
+- a page loading or going to the first message with paging;
+- **First message** and **Latest message** without paging.
+
+Scrolling no longer updates `TranscriptScrollView` at all. `TranscriptInteractionMeasurements`, release build, median of three runs each:
+
+| Measure | 240 entries, before → after | 640 entries, before → after |
+| --- | --- | --- |
+| Median scroll step, accessibility off | 10.3 → 4.8 ms | 35.5 → 16.3 ms |
+| Median scroll step, accessibility on | 10.8 → 4.9 ms | 37.8 → 17.6 ms |
+| 60 scroll steps, accessibility off | 694 → 310 ms | 2,158 → 1,000 ms |
+| Worst scroll step, accessibility off | 59 → 22 ms | 56 → 37 ms |
+
+Hit testing and the view count are unchanged. With 240 entries and accessibility off, the first time Find opens after scrolling took 49 instead of 29 ms. Opening it again took 20 instead of 28 to 30 ms. With 640 entries, and with accessibility on, opening Find took about as long as before. The first update after scrolling seems to pay once for what each scroll step paid before.
 
 ## How to profile
 

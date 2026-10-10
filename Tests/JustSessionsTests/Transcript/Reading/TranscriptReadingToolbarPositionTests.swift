@@ -2,8 +2,31 @@ import AppKit
 import Testing
 @testable import JustSessions
 
+/// The reading toolbar's buttons move the reader or reflow it. Both tests press buttons through
+/// `TranscriptScrollViewFixture.pressButton(labeled:)`, which turns an app-wide accessibility setting on and off, so they
+/// run one at a time.
 @MainActor
-struct TranscriptReadingFontSizePositionTests {
+@Suite(.serialized)
+struct TranscriptReadingToolbarPositionTests {
+    /// A reader without paging moves through its position controller alone; nothing else tracks the entry at the top.
+    @Test func firstAndLatestMessageMoveAReaderWithoutPaging() async throws {
+        let fixture = try TranscriptScrollViewFixture()
+        defer { fixture.close() }
+        let conversation = TranscriptScrollViewFixture.conversation("first-and-latest")
+        let scrollView = try await fixture.show(conversation, transcript: TranscriptScrollViewFixture.transcript(count: 60))
+        try await fixture.waitUntil { fixture.visiblePosition(in: scrollView) == .bottom }
+        #expect(fixture.visiblePosition(in: scrollView) == .bottom)
+
+        try await fixture.pressButton(labeled: "First message")
+        try await fixture.waitUntil { fixture.visiblePosition(in: scrollView)?.entryIndex == 0 }
+        #expect(fixture.visiblePosition(in: scrollView)?.entryIndex == 0)
+        #expect(scrollView.contentView.bounds.minY < 1)
+
+        try await fixture.pressButton(labeled: "Latest message")
+        try await fixture.waitUntil { fixture.visiblePosition(in: scrollView) == .bottom }
+        #expect(fixture.visiblePosition(in: scrollView) == .bottom)
+    }
+
     @Test func changingTextSizeKeepsTheReaderWithinTheSameMessage() async throws {
         let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
