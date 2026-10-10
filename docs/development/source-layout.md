@@ -80,7 +80,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Terminal/AppearingSessions/`: links a new tab to the first session that appears in its project, for SSH hosts and for CLIs that don't reveal the session they write.
 - `Services/Processes/`: process tree, open files, and short helper processes with a timeout.
 - `Services/Processes/LoginShell/`: reads the environment your login shell sets up, once per app run. CLI lookup takes its `PATH`, and every `ssh` and `rsync` runs with all of it (`Services/Remote/Environment/`).
-- `Services/Transcript/`: read-only conversation readers for the preview.
+- `Services/Transcript/`: read-only conversation readers for the preview, and `TranscriptImageDecoder`, which decodes each image once for every reader that shows it.
 - `Services/Transcript/Markdown/`: splits Markdown into prose, code blocks, and tables for the native views.
 - `Views/Browser/`: window layout, with folders for the sidebar, the terminal tab bar, and the New session sheet.
 - `Views/Browser/Tabs/Groups/`: a project's tab group in the tab bar: its colored label and its tabs.
