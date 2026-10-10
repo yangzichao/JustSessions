@@ -1,5 +1,50 @@
 [
   {
+    "version": "1.0.13",
+    "publishedOn": "2026-10-09",
+    "title": {
+      "en": "Terminal menu and SSH host setup",
+      "zh-Hans": "终端右键菜单与 SSH 主机设置"
+    },
+    "sections": [
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Hide subagents in the sidebar by default; show them again in Settings → General.",
+            "zh-Hans": "侧栏默认隐藏子代理；可在“设置 → 通用”中重新显示。"
+          },
+          {
+            "en": "SSH hosts list each tool's sessions once copied, with progress such as 2/6 beside the host.",
+            "zh-Hans": "SSH 主机的各工具会话复制完即列出，主机名旁显示进度（如 2/6）。"
+          }
+        ]
+      },
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Right-click a terminal to copy, paste, select all, or use its tab's menu items.",
+            "zh-Hans": "右键点击终端可复制、粘贴、全选，或使用其标签页菜单中的操作。"
+          },
+          {
+            "en": "Add SSH host tests the login first, explains failures, and accepts a pasted ssh command.",
+            "zh-Hans": "添加 SSH 主机时会先测试登录并说明失败原因，也可直接粘贴 ssh 命令。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Fixed SSH hosts needing your shell profile's agent or PATH, or custom CLI history folders.",
+            "zh-Hans": "修复了依赖 shell 配置中 agent 或 PATH，或使用自定义 CLI 历史目录的 SSH 主机。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.0.12",
     "publishedOn": "2026-10-09",
     "title": {
