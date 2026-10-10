@@ -27,12 +27,12 @@ enum TerminalColorPreset: String, CaseIterable, Identifiable, Sendable {
 
     var variants: TerminalPaletteVariants {
         switch self {
-        case .justSessions: TerminalPaletteVariants(appTheme: .justSessions)
-        case .gitHub: TerminalPaletteVariants(appTheme: .gitHub)
-        case .atomOne: TerminalPaletteVariants(appTheme: .atomOne)
-        case .tokyoNight: TerminalPaletteVariants(appTheme: .tokyoNight)
-        case .catppuccin: TerminalPaletteVariants(appTheme: .catppuccin)
-        case .gruvbox: TerminalPaletteVariants(appTheme: .gruvbox)
+        case .justSessions: TerminalPaletteVariants(appTheme: ResolvedAppTheme(.justSessions))
+        case .gitHub: TerminalPaletteVariants(appTheme: ResolvedAppTheme(.gitHub))
+        case .atomOne: TerminalPaletteVariants(appTheme: ResolvedAppTheme(.atomOne))
+        case .tokyoNight: TerminalPaletteVariants(appTheme: ResolvedAppTheme(.tokyoNight))
+        case .catppuccin: TerminalPaletteVariants(appTheme: ResolvedAppTheme(.catppuccin))
+        case .gruvbox: TerminalPaletteVariants(appTheme: ResolvedAppTheme(.gruvbox))
         case .dracula: .single(.dracula)
         case .nord: .single(.nord)
         }

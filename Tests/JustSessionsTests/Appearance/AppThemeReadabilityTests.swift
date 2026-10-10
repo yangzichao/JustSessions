@@ -44,6 +44,17 @@ struct AppThemeReadabilityTests {
         }
     }
 
+    /// The check a customized theme's surfaces must pass takes every built-in theme's own, in its own version only.
+    @Test func everyThemesSurfacesSuitTheirOwnVersionAndNotTheOther() {
+        for theme in AppTheme.allCases {
+            for isDark in [false, true] {
+                let seeds = theme.colors(isDark: isDark).seeds
+                #expect(seeds.surfacesSuit(isDark: isDark), "\(theme) dark=\(isDark)")
+                #expect(!seeds.surfacesSuit(isDark: !isDark), "\(theme) dark=\(isDark) as the other version")
+            }
+        }
+    }
+
     @Test func textSurfacesIncludeTheFaintFillsAndSelectedRows() {
         let colors = AppTheme.atomOne.colors(isDark: false)
         let hoveredRow = ThemeColorContrast.blend(colors.sidebarSurface, with: colors.line, fraction: ThemeFillOpacity.hover)

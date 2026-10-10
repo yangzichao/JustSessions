@@ -32,7 +32,7 @@ struct TerminalAppearancePreferencesTests {
         #expect(reopened.preferences.colorChoice == .preset(.dracula))
         #expect(reopened.preferences.importedColors == importedColors)
         reopened.setColorChoice(.imported)
-        #expect(reopened.preferences.colorVariants(appTheme: .justSessions) == .single(.nord))
+        #expect(reopened.preferences.colorVariants(appTheme: ResolvedAppTheme(.justSessions)) == .single(.nord))
 
         reopened.restoreDefaults()
         #expect(TerminalAppearancePreferences.load(from: settings.userDefaults) == TerminalAppearancePreferences())

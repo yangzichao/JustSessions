@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The app part of the Appearance tab: System, Light, or Dark for the whole app, and the theme it is drawn in, each
-/// shown as a sketch of the window. Rows of the tab's grid.
+/// shown as a sketch of the window, with your changes to the theme's colors under it. Rows of the tab's grid.
 struct AppAppearanceSection: View {
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
@@ -18,7 +18,10 @@ struct AppAppearanceSection: View {
         }
         GridRow(alignment: .top) {
             Text("Theme").levelWithThumbnails()
-            AppThemePicker(appThemeStore: appThemeStore, terminalAppearanceStore: terminalAppearanceStore)
+            VStack(alignment: .leading, spacing: 14) {
+                AppThemePicker(appThemeStore: appThemeStore, terminalAppearanceStore: terminalAppearanceStore)
+                AppThemeColorsEditor(appThemeStore: appThemeStore)
+            }
         }
     }
 }

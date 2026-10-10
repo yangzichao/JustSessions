@@ -91,7 +91,7 @@ struct WorkspaceTabBar: View {
                 ThemeDivider()
             }
         }
-        .tabBarTerminalPalette(from: .shared)
+        .tabBarTerminalPalette(from: .shared, themeStore: .shared)
         .onChange(of: groups.map(\.projectDirectoryKey)) { _, openProjectKeys in
             // A project whose last tab closed opens expanded next time.
             collapsedProjectKeys.formIntersection(openProjectKeys)

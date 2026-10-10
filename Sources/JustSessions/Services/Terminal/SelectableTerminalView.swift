@@ -28,7 +28,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     }
 
     private var appearancePreferences = TerminalAppearancePreferences()
-    private var theme = AppTheme.justSessions
+    private var theme = ResolvedAppTheme(.justSessions)
     private var appearanceSubscription: AnyCancellable?
     /// The colors the terminal last took on, so a theme report goes out only when they change.
     private var appliedPalette: TerminalPalette?
@@ -130,7 +130,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     }
 
     private func observeAppearance(in store: TerminalAppearanceStore, themeStore: AppThemeStore) {
-        appearanceSubscription = store.$preferences.combineLatest(themeStore.$theme).sink { [weak self] preferences, theme in
+        appearanceSubscription = store.$preferences.combineLatest(themeStore.$terminalTheme).sink { [weak self] preferences, theme in
             guard let self else { return }
             appearancePreferences = preferences
             self.theme = theme

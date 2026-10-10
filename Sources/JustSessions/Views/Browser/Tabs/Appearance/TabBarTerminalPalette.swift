@@ -7,8 +7,8 @@ extension EnvironmentValues {
 
 extension View {
     /// Gives the tab bar the terminals' current colors, which follow Settings and the window's light or dark look.
-    func tabBarTerminalPalette(from appearanceStore: TerminalAppearanceStore) -> some View {
-        modifier(TabBarTerminalPalette(appearanceStore: appearanceStore))
+    func tabBarTerminalPalette(from appearanceStore: TerminalAppearanceStore, themeStore: AppThemeStore) -> some View {
+        modifier(TabBarTerminalPalette(appearanceStore: appearanceStore, themeStore: themeStore))
     }
 }
 
@@ -24,10 +24,10 @@ extension TerminalPalette {
     }
 }
 
-/// Picks the palette as `TerminalAppearanceStyling` does for each terminal.
+/// Picks the palette as `TerminalAppearanceStyling` does for each terminal, from the theme as terminals take it.
 private struct TabBarTerminalPalette: ViewModifier {
     @ObservedObject var appearanceStore: TerminalAppearanceStore
-    @Environment(\.appTheme) private var appTheme
+    @ObservedObject var themeStore: AppThemeStore
     @Environment(\.colorScheme) private var colorScheme
 
     func body(content: Content) -> some View {
@@ -35,7 +35,7 @@ private struct TabBarTerminalPalette: ViewModifier {
         let usesDarkColors = preferences.mode.usesDarkColors(whenAppIsDark: colorScheme == .dark)
         content.environment(
             \.tabBarTerminalPalette,
-            preferences.colorVariants(appTheme: appTheme).palette(usesDarkColors: usesDarkColors)
+            preferences.colorVariants(appTheme: themeStore.terminalTheme).palette(usesDarkColors: usesDarkColors)
         )
     }
 }

@@ -112,6 +112,8 @@
 	<string>添加项目…</string>
 	<key>Add tab to new split view</key>
 	<string>向新拆分视图添加标签页</string>
+	<key>Adjusted to stay readable</key>
+	<string>已调整为易读的颜色</string>
 	<key>All sessions</key>
 	<string>全部会话</string>
 	<key>All time</key>
@@ -178,6 +180,8 @@
 	<string>立即请求</string>
 	<key>Ask each time</key>
 	<string>每次询问</string>
+	<key>Background</key>
+	<string>背景</string>
 	<key>Branch</key>
 	<string>分支</string>
 	<key>Branch %lld sessions</key>
@@ -194,6 +198,8 @@
 	<string>取消</string>
 	<key>Cancel deletion</key>
 	<string>取消删除</string>
+	<key>Changes the chosen theme's colors, in its light or dark version. Your changes stay with the theme when you choose another one. Text is made readable on your colors, so the text color can come out darker or lighter than you chose. Terminals that match the app theme take its background.</key>
+	<string>修改所选主题浅色或深色版本的颜色。改选其他主题后，你的修改仍保留在这个主题上。文字会自动调整到在你的颜色上清晰可读，因此文字颜色可能比你选的更深或更浅。与应用主题一致的终端会使用它的背景。</string>
 	<key>Check Again</key>
 	<string>重新检查</string>
 	<key>Check for updates</key>
@@ -328,6 +334,10 @@
 	<string>创建文件夹并添加</string>
 	<key>Creating the folder on %@…</key>
 	<string>正在 %@ 上创建文件夹…</string>
+	<key>Customize colors</key>
+	<string>自定义颜色</string>
+	<key>Customized</key>
+	<string>已自定义</string>
 	<key>Dark</key>
 	<string>深色</string>
 	<key>Default size</key>
@@ -394,6 +404,8 @@
 	<string>反馈</string>
 	<key>Feedback and issues start with these versions filled in.</key>
 	<string>反馈和问题报告会自动附上以上版本信息。</string>
+	<key>Fields and buttons</key>
+	<string>输入框和按钮</string>
 	<key>Filter project sessions</key>
 	<string>筛选项目中的会话</string>
 	<key>Filters active</key>
@@ -434,6 +446,8 @@
 	<string>完全磁盘访问权限</string>
 	<key>General</key>
 	<string>通用</string>
+	<key>Gives the theme back its own colors, light and dark.</key>
+	<string>恢复主题自带的浅色和深色颜色。</string>
 	<key>Go to a tab by its position</key>
 	<string>按位置切换到标签页</string>
 	<key>Go to the first available message</key>
@@ -750,6 +764,8 @@
 	<string>报告这次崩溃，能帮我们修复它。报告打开时已填好崩溃详情：补充你当时在做什么，然后发送。崩溃报告文件会在访达中显示，方便你附上。</string>
 	<key>Requires passwordless SSH.</key>
 	<string>需要 SSH 免密登录。</string>
+	<key>Reset</key>
+	<string>重置</string>
 	<key>Restore</key>
 	<string>恢复</string>
 	<key>Restore %@</key>
@@ -952,6 +968,12 @@
 	<string>终端外观预览</string>
 	<key>Terminal colors</key>
 	<string>终端配色</string>
+	<key>Text and accents</key>
+	<string>文字和强调色</string>
+	<key>Text can't stay readable on that color. Choose a darker one.</key>
+	<string>文字在这个颜色上无法清晰可读，请选更深的颜色。</string>
+	<key>Text can't stay readable on that color. Choose a lighter one.</key>
+	<string>文字在这个颜色上无法清晰可读，请选更浅的颜色。</string>
 	<key>Text size, in the terminals or the conversation shown</key>
 	<string>字号：终端，或当前显示的对话</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
@@ -1030,10 +1052,14 @@
 	<string>使用默认</string>
 	<key>Use the full window width</key>
 	<string>使用窗口全宽</string>
+	<key>Use the theme's own color</key>
+	<string>使用主题自带的颜色</string>
 	<key>Use this host's tmux prefix</key>
 	<string>使用此主机的 tmux 前缀键</string>
 	<key>User guide ↗</key>
 	<string>用户指南 ↗</string>
+	<key>Version</key>
+	<string>版本</string>
 	<key>Waiting for you</key>
 	<string>等待我处理</string>
 	<key>Website ↗</key>
@@ -1046,6 +1072,8 @@
 	<string>你</string>
 	<key>Your login shell, with no CLI</key>
 	<string>你的登录 shell，不运行 CLI</string>
+	<key>Your messages</key>
+	<string>你的消息</string>
 	<key>Your sessions will appear here</key>
 	<string>你的会话会显示在这里</string>
 	<key>Your sessions, already here</key>

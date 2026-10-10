@@ -3,7 +3,7 @@ enum TerminalPaletteVariants: Codable, Equatable, Sendable {
     case single(TerminalPalette)
     case lightAndDark(light: TerminalPalette, dark: TerminalPalette)
 
-    init(appTheme: AppTheme) {
+    init(appTheme: ResolvedAppTheme) {
         self = .lightAndDark(light: appTheme.colors(isDark: false).terminalPalette, dark: appTheme.colors(isDark: true).terminalPalette)
     }
 

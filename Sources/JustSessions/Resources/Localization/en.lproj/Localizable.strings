@@ -124,6 +124,8 @@
 	<string>Add project…</string>
 	<key>Add tab to new split view</key>
 	<string>Add tab to new split view</string>
+	<key>Adjusted to stay readable</key>
+	<string>Adjusted to stay readable</string>
 	<key>All sessions</key>
 	<string>All sessions</string>
 	<key>All time</key>
@@ -186,6 +188,8 @@
 	<string>Ask each time</string>
 	<key>A−</key>
 	<string>A−</string>
+	<key>Background</key>
+	<string>Background</string>
 	<key>Branch</key>
 	<string>Branch</string>
 	<key>Browse and resume sessions on another machine.</key>
@@ -200,6 +204,8 @@
 	<string>Cancel</string>
 	<key>Cancel deletion</key>
 	<string>Cancel deletion</string>
+	<key>Changes the chosen theme's colors, in its light or dark version. Your changes stay with the theme when you choose another one. Text is made readable on your colors, so the text color can come out darker or lighter than you chose. Terminals that match the app theme take its background.</key>
+	<string>Changes the chosen theme's colors, in its light or dark version. Your changes stay with the theme when you choose another one. Text is made readable on your colors, so the text color can come out darker or lighter than you chose. Terminals that match the app theme take its background.</string>
 	<key>Check Again</key>
 	<string>Check Again</string>
 	<key>Check for updates</key>
@@ -332,6 +338,10 @@
 	<string>Create folder and add</string>
 	<key>Creating the folder on %@…</key>
 	<string>Creating the folder on %@…</string>
+	<key>Customize colors</key>
+	<string>Customize colors</string>
+	<key>Customized</key>
+	<string>Customized</string>
 	<key>Dark</key>
 	<string>Dark</string>
 	<key>Default size</key>
@@ -392,6 +402,8 @@
 	<string>Feedback</string>
 	<key>Feedback and issues start with these versions filled in.</key>
 	<string>Feedback and issues start with these versions filled in.</string>
+	<key>Fields and buttons</key>
+	<string>Fields and buttons</string>
 	<key>Filter project sessions</key>
 	<string>Filter project sessions</string>
 	<key>Filters active</key>
@@ -434,6 +446,8 @@
 	<string>General</string>
 	<key>GitHub ↗</key>
 	<string>GitHub ↗</string>
+	<key>Gives the theme back its own colors, light and dark.</key>
+	<string>Gives the theme back its own colors, light and dark.</string>
 	<key>Go to a tab by its position</key>
 	<string>Go to a tab by its position</string>
 	<key>Go to the first available message</key>
@@ -750,6 +764,8 @@
 	<string>Reporting the crash helps get it fixed. The report opens with the crash details filled in: add what you were doing, then send it. The crash report file shows in Finder, so you can attach it.</string>
 	<key>Requires passwordless SSH.</key>
 	<string>Requires passwordless SSH.</string>
+	<key>Reset</key>
+	<string>Reset</string>
 	<key>Restore</key>
 	<string>Restore</string>
 	<key>Restore %@</key>
@@ -942,6 +958,12 @@
 	<string>Terminal appearance preview</string>
 	<key>Terminal colors</key>
 	<string>Terminal colors</string>
+	<key>Text and accents</key>
+	<string>Text and accents</string>
+	<key>Text can't stay readable on that color. Choose a darker one.</key>
+	<string>Text can't stay readable on that color. Choose a darker one.</string>
+	<key>Text can't stay readable on that color. Choose a lighter one.</key>
+	<string>Text can't stay readable on that color. Choose a lighter one.</string>
 	<key>Text size, in the terminals or the conversation shown</key>
 	<string>Text size, in the terminals or the conversation shown</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
@@ -1018,10 +1040,14 @@
 	<string>Use default</string>
 	<key>Use the full window width</key>
 	<string>Use the full window width</string>
+	<key>Use the theme's own color</key>
+	<string>Use the theme's own color</string>
 	<key>Use this host's tmux prefix</key>
 	<string>Use this host's tmux prefix</string>
 	<key>User guide ↗</key>
 	<string>User guide ↗</string>
+	<key>Version</key>
+	<string>Version</string>
 	<key>Waiting for you</key>
 	<string>Waiting for you</string>
 	<key>Website ↗</key>
@@ -1034,6 +1060,8 @@
 	<string>You</string>
 	<key>Your login shell, with no CLI</key>
 	<string>Your login shell, with no CLI</string>
+	<key>Your messages</key>
+	<string>Your messages</string>
 	<key>Your sessions will appear here</key>
 	<string>Your sessions will appear here</string>
 	<key>Your sessions, already here</key>

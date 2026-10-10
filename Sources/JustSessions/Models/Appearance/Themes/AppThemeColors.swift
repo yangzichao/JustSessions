@@ -33,21 +33,30 @@ struct AppThemeColors: Equatable, Sendable {
     /// Text in each CLI's hue, such as its name above its messages.
     let providerTextHexColors: [ConversationProvider: UInt32]
 
+    /// What the theme variant was made from, before its text was made readable. A customized theme starts from it.
+    let seeds: AppThemeSeeds
+
     init(
         sidebarSurface: UInt32, contentSurface: UInt32, raisedSurface: UInt32, userMessageSurface: UInt32,
         ink: UInt32, inkForeground: UInt32, line: UInt32, terminal: TerminalColorScheme
     ) {
-        self.sidebarSurface = sidebarSurface
-        self.contentSurface = contentSurface
-        self.raisedSurface = raisedSurface
-        self.userMessageSurface = userMessageSurface
-        self.inkForeground = inkForeground
-        self.line = line
-        self.terminal = terminal
+        self.init(seeds: AppThemeSeeds(
+            sidebarSurface: sidebarSurface, contentSurface: contentSurface, raisedSurface: raisedSurface,
+            userMessageSurface: userMessageSurface, ink: ink, inkForeground: inkForeground, line: line, terminal: terminal
+        ))
+    }
+
+    init(seeds: AppThemeSeeds) {
+        self.seeds = seeds
+        sidebarSurface = seeds.sidebarSurface
+        contentSurface = seeds.contentSurface
+        raisedSurface = seeds.raisedSurface
+        userMessageSurface = seeds.userMessageSurface
+        line = seeds.line
         // Each immutable theme variant prepares its text colors and accents once, instead of doing contrast work while
         // drawing.
         let isDark = ThemeColorContrast.isDark(contentSurface)
-        let selectedRowSurfaces = Self.selectedRowSurfaces(sidebarSurface: sidebarSurface, ink: ink, isDark: isDark)
+        let selectedRowSurfaces = Self.selectedRowSurfaces(sidebarSurface: sidebarSurface, ink: seeds.ink, isDark: isDark)
         let textSurfaces = Self.textSurfaces(
             sidebarSurface: sidebarSurface, contentSurface: contentSurface, raisedSurface: raisedSurface,
             userMessageSurface: userMessageSurface, line: line, selectedRowSurfaces: selectedRowSurfaces
@@ -55,10 +64,18 @@ struct AppThemeColors: Equatable, Sendable {
         func readable(_ text: UInt32) -> UInt32 {
             ThemeColorContrast.readableText(text, on: textSurfaces)
         }
-        let readableInk = readable(ink)
+        let readableInk = readable(seeds.ink)
         self.selectedRowSurfaces = selectedRowSurfaces
         self.textSurfaces = textSurfaces
-        self.ink = readableInk
+        ink = readableInk
+        // The built-in themes' own pairs already read at 4.5, so only a customized theme's can change here.
+        inkForeground = ThemeColorContrast.readableText(seeds.inkForeground, on: [readableInk])
+        terminal = TerminalColorScheme(
+            foreground: ThemeColorContrast.readableText(seeds.terminal.foreground, on: [contentSurface]),
+            selectionBackground: seeds.terminal.selectionBackground,
+            selectionForeground: seeds.terminal.selectionForeground,
+            ansiHexColors: seeds.terminal.ansiHexColors
+        )
         let secondaryText = readable(ThemeColorContrast.blend(readableInk, with: contentSurface, fraction: 0.35))
         let tertiaryText = readable(ThemeColorContrast.blend(readableInk, with: contentSurface, fraction: 0.55))
         self.secondaryText = secondaryText
@@ -72,7 +89,7 @@ struct AppThemeColors: Equatable, Sendable {
             (provider, readable(provider.tintHexColor.value(isDark: isDark)))
         })
         tabGroupHexColors = Self.tabGroupColors(
-            ansiColors: terminal.ansiHexColors, labelSurfaces: [contentSurface, sidebarSurface]
+            ansiColors: seeds.terminal.ansiHexColors, labelSurfaces: [contentSurface, sidebarSurface]
         )
     }
 }
