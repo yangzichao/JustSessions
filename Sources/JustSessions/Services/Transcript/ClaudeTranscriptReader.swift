@@ -7,6 +7,8 @@ struct ClaudeTranscriptReader {
     /// A subagent's own transcript, in its session's `subagents` folder, is all sidechain records. A session's
     /// transcript leaves out any it holds.
     var includesSidechains = false
+    /// Off when only the text is read, as for message search: images become `TranscriptImage.unread`.
+    var readsImageData = true
 
     func read(_ file: URL) throws -> TranscriptContent {
         var builder = TranscriptBuilder(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength)
@@ -32,10 +34,14 @@ struct ClaudeTranscriptReader {
             for part in message["content"] as? [[String: Any]] ?? [] {
                 switch part["type"] as? String {
                 case "image":
-                    if let image = Self.image(from: part) { builder.appendUserImage(image, timestamp: timestamp) }
+                    if let image = Self.image(from: part, readingData: readsImageData) {
+                        builder.appendUserImage(image, timestamp: timestamp)
+                    }
                 case "tool_result":
                     for resultPart in part["content"] as? [[String: Any]] ?? [] {
-                        if let image = Self.image(from: resultPart) { builder.appendToolResultImage(image, timestamp: timestamp) }
+                        if let image = Self.image(from: resultPart, readingData: readsImageData) {
+                            builder.appendToolResultImage(image, timestamp: timestamp)
+                        }
                     }
                 default:
                     continue
@@ -61,11 +67,11 @@ struct ClaudeTranscriptReader {
     }
 
     /// The image of an `image` part, which Claude Code stores as `{"source":{"type":"base64","data":…}}`.
-    private static func image(from part: [String: Any]) -> TranscriptImage? {
+    private static func image(from part: [String: Any], readingData: Bool) -> TranscriptImage? {
         guard part["type"] as? String == "image",
               let source = part["source"] as? [String: Any],
               let data = source["data"] as? String else { return nil }
-        return TranscriptImage(base64Encoded: data)
+        return readingData ? TranscriptImage(base64Encoded: data) : .unread
     }
 
     /// Claude Code stores slash commands, shell escapes, and injected context as tagged user text.

@@ -43,6 +43,7 @@ The tree is large because the transcript lays out every loaded entry, up to `Tra
 | 7 | [The search context changes on every transcript update](#7-the-search-context-changes-on-every-transcript-update) | Done: scrolling PR |
 | 8 | [Scrolling re-rendered every transcript entry](#8-scrolling-re-rendered-every-transcript-entry) | Done: scrolling PR |
 | 9 | [SwiftUI's scroll position tracking](#9-swiftuis-scroll-position-tracking) | To investigate |
+| 10 | [Message search decoded every image](#10-message-search-decoded-every-image) | Done: issue #59 |
 
 ### 1. Timestamp parsing
 
@@ -138,6 +139,21 @@ The draft line-layout cache ([SwiftTerm #449](https://github.com/migueldeicaza/S
 
 **Plan:** check whether the reader still needs `.scrollPosition(id:)`. It already calls `ScrollViewProxy.scrollTo` wherever it sets `visibleEntryIndex`. The initial position, Find's navigation, and paging all depend on it, so test each before removing it.
 
+### 10. Message search decoded every image
+
+**Evidence:** `SessionMessageTextReader` reads a session through the reader's own page source, then drops images. The Claude Code, Codex, and Pi readers had already decoded each image's base64 and read its header with ImageIO by then. A page of the search's large pages held the decoded bytes of every image in it until the next page was read.
+
+**Change:** `TranscriptPageSource` takes `readsImageData`. Message search turns it off, and the readers then put `TranscriptImage.unread` in an image's entry instead of decoding it. The entry stays, so every entry keeps the id the reader gives it, and a match still opens in the right place. Tests compare the entries, ids, and search text with and without image data for all three CLIs.
+
+`MessageSearchImageMeasurements`, release build, median of five reads of a Claude Code session of 200 turns with 30 screenshots (123 MB):
+
+| Measure | Images decoded | Left undecoded |
+| --- | --- | --- |
+| Reading the session for search | 237 ms | 215 ms |
+| Decoded image bytes the largest page holds | 49.9 MB | none |
+
+The same session without screenshots read in 6 ms either way. Most of the remaining time is parsing each 4 MB line of JSON, which still has to happen to find the text around the images. The indexer reads several sessions at once, so the memory a page no longer holds adds up across them.
+
 ## How to profile
 
 Attach to a running copy, so you keep your windows and sessions. Record in chunks, so you can analyze finished chunks while still using the app:
@@ -158,3 +174,4 @@ Or open the trace in Instruments. Keep these points in mind:
   - `SidebarInteractionMeasurements`: sidebar interactions.
   - `TerminalVisibilityMeasurements`: hidden terminals.
   - `TranscriptInteractionMeasurements`: scrolling, hit testing, and opening Find in a 240- and 640-entry transcript, with SwiftUI's accessibility off and on. Run it with `JUSTSESSIONS_PERF=1 swift test -c release --filter TranscriptInteractionMeasurements`.
+  - `MessageSearchImageMeasurements`: reading a session full of screenshots for message search, with and without decoding the images.

@@ -6,6 +6,8 @@ import Foundation
 struct PiTranscriptReader {
     var maximumEntryCount = 2_000
     var maximumTextLength = 12_000
+    /// Off when only the text is read, as for message search: images become `TranscriptImage.unread`.
+    var readsImageData = true
     /// Marks where the user went back to an earlier message and Pi summarized the branch they left.
     static let branchSummaryNoteText = "Returned to an earlier message; the branch left behind was summarized"
 
@@ -39,7 +41,7 @@ struct PiTranscriptReader {
         switch previewedEntry {
         case .userMessage:
             builder.append(.userMessage, text: userText(from: message?.content), timestamp: timestamp)
-            for image in Self.images(in: message?.content) {
+            for image in images(in: message?.content) {
                 builder.appendUserImage(image, timestamp: timestamp)
             }
         case .shellCommand:
@@ -67,7 +69,7 @@ struct PiTranscriptReader {
                 builder.append(.note, text: message?.errorMessage ?? "", timestamp: timestamp)
             }
         case .toolResult:
-            for image in Self.images(in: message?.content) {
+            for image in images(in: message?.content) {
                 builder.appendToolResultImage(image, timestamp: timestamp)
             }
         case .compaction:
@@ -91,8 +93,8 @@ struct PiTranscriptReader {
         return parts
     }
 
-    private static func images(in content: PiSessionEntry.Message.Content?) -> [TranscriptImage] {
-        parts(of: content).compactMap(\.image)
+    private func images(in content: PiSessionEntry.Message.Content?) -> [TranscriptImage] {
+        Self.parts(of: content).compactMap { $0.image(readingData: readsImageData) }
     }
 
     /// Pi expands `/skill:name arguments` into the skill's instructions, wrapped as

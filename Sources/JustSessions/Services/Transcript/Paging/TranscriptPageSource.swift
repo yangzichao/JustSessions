@@ -9,6 +9,9 @@ actor TranscriptPageSource {
     /// Reads a subagent's transcript; see `ClaudeTranscriptReader.includesSidechains`.
     let isSubagentTranscript: Bool
     let limits: TranscriptPageLimits
+    /// Off when only the text is read, as for message search: images become `TranscriptImage.unread`, so their base64
+    /// isn't decoded and their headers aren't read.
+    let readsImageData: Bool
     private var fileIndex: TranscriptFileIndex?
     private var piRecordIndices: [Int]?
 
@@ -17,13 +20,15 @@ actor TranscriptPageSource {
         provider: ConversationProvider,
         sessionID: String? = nil,
         isSubagentTranscript: Bool = false,
-        limits: TranscriptPageLimits = TranscriptPageLimits()
+        limits: TranscriptPageLimits = TranscriptPageLimits(),
+        readsImageData: Bool = true
     ) {
         self.file = file
         self.provider = provider
         self.sessionID = sessionID
         self.isSubagentTranscript = isSubagentTranscript
         self.limits = limits
+        self.readsImageData = readsImageData
     }
 
     func read(_ request: TranscriptPageRequest, refreshIndex: Bool = false) throws -> TranscriptPage {
@@ -51,7 +56,8 @@ actor TranscriptPageSource {
         let decoder = TranscriptRecordDecoder(
             provider: provider,
             maximumTextLength: limits.maximumTextLength,
-            isSubagentTranscript: isSubagentTranscript
+            isSubagentTranscript: isSubagentTranscript,
+            readsImageData: readsImageData
         )
         return try TranscriptPageReader.read(
             request, recordCount: recordCount, limits: limits,

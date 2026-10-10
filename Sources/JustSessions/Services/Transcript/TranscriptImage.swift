@@ -14,6 +14,10 @@ struct TranscriptImage: Sendable, Equatable {
         pixelSize = Self.pixelSize(of: data)
     }
 
+    /// Stands in for an image whose base64 isn't decoded, as when a session is read only for the text a search finds.
+    /// The image keeps its entry, so the entries after it keep their ids.
+    static let unread = TranscriptImage(data: Data())
+
     init(base64Encoded string: String) {
         self.init(data: Data(base64Encoded: string, options: .ignoreUnknownCharacters) ?? Data())
     }

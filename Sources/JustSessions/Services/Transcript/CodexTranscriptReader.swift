@@ -4,6 +4,8 @@ import Foundation
 struct CodexTranscriptReader {
     var maximumEntryCount = 2_000
     var maximumTextLength = 12_000
+    /// Off when only the text is read, as for message search: images become `TranscriptImage.unread`.
+    var readsImageData = true
     private static let transcriptPayloadTypes: Set<String> = ["message", "function_call", "custom_tool_call"]
 
     func read(_ file: URL) throws -> TranscriptContent {
@@ -66,7 +68,7 @@ struct CodexTranscriptReader {
             switch payload["role"] as? String {
             case "user":
                 builder.append(.userMessage, text: userText(from: content), timestamp: timestamp)
-                for image in content.compactMap(Self.image(from:)) {
+                for image in content.compactMap({ Self.image(from: $0, readingData: readsImageData) }) {
                     builder.appendUserImage(image, timestamp: timestamp)
                 }
             case "assistant":
@@ -110,10 +112,10 @@ struct CodexTranscriptReader {
     }
 
     /// The image of an `input_image` part, whose `image_url` is a data URL: `data:image/png;base64,…`.
-    private static func image(from part: [String: Any]) -> TranscriptImage? {
+    private static func image(from part: [String: Any], readingData: Bool) -> TranscriptImage? {
         guard part["type"] as? String == "input_image",
               let url = part["image_url"] as? String, url.hasPrefix("data:"),
               let separator = url.firstIndex(of: ",") else { return nil }
-        return TranscriptImage(base64Encoded: String(url[url.index(after: separator)...]))
+        return readingData ? TranscriptImage(base64Encoded: String(url[url.index(after: separator)...])) : .unread
     }
 }
