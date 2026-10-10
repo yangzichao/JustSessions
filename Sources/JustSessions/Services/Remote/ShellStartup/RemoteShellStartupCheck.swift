@@ -24,7 +24,7 @@ struct RemoteShellStartupCheck: Sendable {
                 ofExecutable: "/usr/bin/ssh",
                 arguments: Self.sshArguments(host: host, command: command),
                 // A tab's terminal settings, which startup files may look at, such as TERM.
-                environment: TerminalColorEnvironment.embeddedTerminalEnvironment(from: ProcessInfo.processInfo.environment),
+                environment: TerminalColorEnvironment.embeddedTerminalEnvironment(from: SSHProcessEnvironment.standard),
                 includesStandardError: true,
                 timeout: timeout
             )
@@ -34,7 +34,11 @@ struct RemoteShellStartupCheck: Sendable {
 
     /// The background commands' options, with a terminal in place of their `-T`.
     static func sshArguments(host: String, command: String) -> [String] {
-        ["-tt"] + RemoteHostCommandRunner.nonInteractiveSSHOptions + [host, command]
+        sshArguments(host: host, command: command, connectionSharingOptions: SSHConnectionSharing.options(for: host))
+    }
+
+    static func sshArguments(host: String, command: String, connectionSharingOptions: [String]) -> [String] {
+        ["-tt"] + RemoteHostCommandRunner.nonInteractiveSSHOptions + connectionSharingOptions + [host, command]
     }
 
     /// Nil when it could not tell, as when the host could not be reached; a later refresh checks again.

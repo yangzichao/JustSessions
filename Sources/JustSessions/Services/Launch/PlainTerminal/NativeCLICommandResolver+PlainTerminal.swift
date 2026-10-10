@@ -5,7 +5,7 @@ extension NativeCLICommandResolver {
     /// window does, so PATH is left as inherited. It gets the color settings the CLIs get.
     func resolvePlainTerminal(
         projectPath: String,
-        shellPath: String = LoginShellPathReader.userLoginShellPath()
+        shellPath: String = LoginShellEnvironment.userLoginShellPath()
     ) throws -> NativeCLICommand {
         try requireProjectDirectory(projectPath)
         var environment = TerminalColorEnvironment.embeddedTerminalEnvironment(from: inheritedEnvironment)

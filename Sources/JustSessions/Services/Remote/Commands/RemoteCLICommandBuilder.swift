@@ -6,7 +6,7 @@ import Foundation
 struct RemoteCLICommandBuilder {
     let inheritedEnvironment: [String: String]
 
-    init(inheritedEnvironment: [String: String] = ProcessInfo.processInfo.environment) {
+    init(inheritedEnvironment: [String: String] = SSHProcessEnvironment.standard) {
         self.inheritedEnvironment = inheritedEnvironment
     }
 

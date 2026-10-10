@@ -195,6 +195,7 @@ struct PiRemoteDeletionTests {
             RemotePiFixture.projectFolderName,
             fixture.hostSessionFile.lastPathComponent,
             fixture.conversation.sessionID,
+            RemoteToolFolders.standard.pi,
         ].map(ShellQuoting.quoted).joined(separator: " ")
         #expect(command.hasPrefix("sh -c '"))
         #expect(command.hasSuffix(arguments))
@@ -256,6 +257,7 @@ struct PiRemoteDeletionTests {
 
         for scriptCase in cases {
             let result = fixture.runOnHost(RemotePiConversationDeletion.command(
+                sessionsFolder: RemoteToolFolders.standard.pi,
                 projectFolderName: scriptCase.project,
                 fileName: scriptCase.file,
                 sessionID: id
@@ -275,6 +277,7 @@ struct PiRemoteDeletionTests {
         defer { fixture.remove() }
 
         let result = fixture.runOnHost(RemotePiConversationDeletion.command(
+            sessionsFolder: RemoteToolFolders.standard.pi,
             projectFolderName: "--home-me-gone--",
             fileName: fixture.hostSessionFile.lastPathComponent,
             sessionID: fixture.conversation.sessionID

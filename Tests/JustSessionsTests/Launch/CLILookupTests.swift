@@ -3,44 +3,6 @@ import Testing
 @testable import JustSessions
 
 struct CLILookupTests {
-    @Test func parsePathKeepsOnlyAbsoluteDirectories() {
-        let directories = LoginShellPathReader.parsePathDirectories("/opt/homebrew/bin::.:relative/bin:/usr/bin\n")
-
-        #expect(directories == ["/opt/homebrew/bin", "/usr/bin"])
-    }
-
-    @Test func readsPathFromLoginShell() throws {
-        let root = try makeTemporaryDirectory()
-        defer { try? FileManager.default.removeItem(at: root) }
-        // Stands in for zsh: sets PATH the way an rc file would, then runs the `-c` command ($4).
-        let fakeShell = try writeExecutableScript("""
-        #!/bin/sh
-        PATH="/from/rc/file:/usr/bin"
-        export PATH
-        eval "$4"
-        """, to: root.appendingPathComponent("fake-shell"))
-
-        let directories = LoginShellPathReader.readPathDirectories(shellPath: fakeShell.path, timeout: 5)
-
-        #expect(directories == ["/from/rc/file", "/usr/bin"])
-    }
-
-    @Test func hungLoginShellTimesOutWithNoDirectories() throws {
-        let root = try makeTemporaryDirectory()
-        defer { try? FileManager.default.removeItem(at: root) }
-        let hungShell = try writeExecutableScript("""
-        #!/bin/sh
-        trap '' TERM
-        sleep 30
-        """, to: root.appendingPathComponent("hung-shell"))
-
-        let startedAt = Date()
-        let directories = LoginShellPathReader.readPathDirectories(shellPath: hungShell.path, timeout: 0.5)
-
-        #expect(directories.isEmpty)
-        #expect(Date().timeIntervalSince(startedAt) < 5)
-    }
-
     @Test func standardDirectoriesPutInheritedThenLoginShellThenFallbacks() throws {
         let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }

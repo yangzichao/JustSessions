@@ -21,12 +21,18 @@ struct RemoteConversationDeletion: Sendable {
               conversation.provider.isValidSessionID(conversation.sessionID) else {
             throw ConversationDeletionError.invalidSource
         }
+        // The folders the host's sessions were copied from.
+        let folders = mirror.savedToolFolders(host: host)
         let command: String
         switch conversation.provider {
         case .claude:
             let projectFolderName = conversation.sourceFile.deletingLastPathComponent().lastPathComponent
             guard Self.isSafeFolderName(projectFolderName) else { throw ConversationDeletionError.invalidSource }
-            command = Self.claudeDeletionCommand(projectFolderName: projectFolderName, sessionID: conversation.sessionID)
+            command = Self.claudeDeletionCommand(
+                claudeFolder: folders.shellPath(for: .claude),
+                projectFolderName: projectFolderName,
+                sessionID: conversation.sessionID
+            )
         case .codex:
             command = RemoteCLICommandBuilder.loginShellCommand(
                 "codex delete --force \(ShellQuoting.quoted(conversation.sessionID))",
@@ -40,7 +46,10 @@ struct RemoteConversationDeletion: Sendable {
                   metadata.projectPath == conversation.projectPath,
                   conversation.projectPath.hasPrefix("/") else { throw ConversationDeletionError.invalidSource }
             command = RemoteKiroConversationDeletion.command(
-                sessionID: conversation.sessionID, projectPath: conversation.projectPath, host: host
+                sessionID: conversation.sessionID,
+                projectPath: conversation.projectPath,
+                sessionsFolder: folders.shellPath(for: .kiro),
+                host: host
             )
         case .antigravity:
             let configurationDirectory = conversation.sourceFile.deletingLastPathComponent().deletingLastPathComponent()
@@ -54,6 +63,7 @@ struct RemoteConversationDeletion: Sendable {
                 piMirrorDirectory: mirror.mirrorDirectory(host: host, provider: .pi)
             )
             command = RemotePiConversationDeletion.command(
+                sessionsFolder: folders.path(for: .pi),
                 projectFolderName: names.projectFolderName,
                 fileName: names.fileName,
                 sessionID: conversation.sessionID
@@ -100,10 +110,11 @@ struct RemoteConversationDeletion: Sendable {
         }
     }
 
-    /// A POSIX `sh` script, so it runs the same whatever the host's login shell is.
-    static func claudeDeletionCommand(projectFolderName: String, sessionID: String) -> String {
+    /// A POSIX `sh` script, so it runs the same whatever the host's login shell is. `claudeFolder` is the folder in
+    /// `sh`; see `RemoteToolFolders.shellPath(for:)`.
+    static func claudeDeletionCommand(claudeFolder: String, projectFolderName: String, sessionID: String) -> String {
         let script = """
-            dir="$HOME/.claude/projects/"\(ShellQuoting.quoted(projectFolderName))
+            dir=\(claudeFolder)/projects/\(ShellQuoting.quoted(projectFolderName))
             id=\(ShellQuoting.quoted(sessionID))
             [ -f "$dir/$id.jsonl" ] || exit \(missingTranscriptExitStatus)
             rm -f "$dir/$id.jsonl" && rm -rf "$dir/$id" || exit 1

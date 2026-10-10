@@ -10,6 +10,7 @@ struct RemoteHostCommandRunner: Sendable {
             BoundedProcessRunner.result(
                 ofExecutable: "/usr/bin/ssh",
                 arguments: Self.sshArguments(host: host, command: command),
+                environment: SSHProcessEnvironment.standard,
                 includesStandardError: true,
                 timeout: timeout
             )
@@ -35,8 +36,13 @@ struct RemoteHostCommandRunner: Sendable {
     /// what passes through it, such as `rsync`'s transfer.
     static let noTerminalOption = "-T"
 
+    /// With the options that share the host's connection among background commands; see `SSHConnectionSharing`.
     static func sshArguments(host: String, command: String) -> [String] {
-        [noTerminalOption] + nonInteractiveSSHOptions + [host, command]
+        sshArguments(host: host, command: command, connectionSharingOptions: SSHConnectionSharing.options(for: host))
+    }
+
+    static func sshArguments(host: String, command: String, connectionSharingOptions: [String]) -> [String] {
+        [noTerminalOption] + nonInteractiveSSHOptions + connectionSharingOptions + [host, command]
     }
 
     /// `ssh` exits with this when it could not connect or authenticate.

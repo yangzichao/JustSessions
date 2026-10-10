@@ -49,6 +49,15 @@ extension ConversationStore {
         await Task.detached(priority: .userInitiated) { check.problem(connectingTo: host) }.value
     }
 
+    /// Where `ssh` would connect for the host, and the listed host that connects to the same place, read off the main
+    /// actor with `ssh -G`.
+    func sameMachineCheck(for host: String) async -> SSHHostSameMachineCheck {
+        let listedHosts = remoteHostList.hosts
+        return await Task.detached(priority: .userInitiated) {
+            SSHHostSameMachineCheck.check(host: host, listedHosts: listedHosts)
+        }.value
+    }
+
     /// Returns false when the host is not a valid `ssh` destination or is already listed.
     @discardableResult
     func addRemoteHost(_ proposedHost: String) -> Bool {
@@ -69,7 +78,10 @@ extension ConversationStore {
         tmuxSessionNamesByHost.removeValue(forKey: .ssh(host))
         installedProvidersByHost.removeValue(forKey: .ssh(host))
         replaceConversations(on: .ssh(host), with: [])
-        Task.detached(priority: .utility) { mirror.removeMirror(host: host) }
+        Task.detached(priority: .utility) {
+            mirror.removeMirror(host: host)
+            SSHConnectionSharing.closeSharedConnection(to: host)
+        }
         // A Try Again that waited for this host's refresh can start for the other hosts' sessions; the refresh
         // ends without reporting, now that the host is gone.
         startQueuedDeletion()

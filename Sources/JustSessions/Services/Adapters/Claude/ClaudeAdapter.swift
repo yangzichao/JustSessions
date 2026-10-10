@@ -5,8 +5,15 @@ struct ClaudeAdapter: ConversationAdapter {
     var provider: ConversationProvider { .claude }
 
     static var defaultConfigurationDirectory: URL {
-        let configured = ProcessInfo.processInfo.environment["CLAUDE_CONFIG_DIR"]
-        return URL(fileURLWithPath: configured ?? NSHomeDirectory() + "/.claude")
+        standardConfigurationDirectory()
+    }
+
+    /// `CLAUDE_CONFIG_DIR`, or `~/.claude`. An SSH host's is found with the host's environment and home.
+    static func standardConfigurationDirectory(
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        homeDirectory: String = NSHomeDirectory()
+    ) -> URL {
+        URL(fileURLWithPath: environment["CLAUDE_CONFIG_DIR"] ?? homeDirectory + "/.claude")
     }
 
     init(configurationDirectory: URL = ClaudeAdapter.defaultConfigurationDirectory) {

@@ -6,8 +6,15 @@ struct CodexAdapter: ConversationAdapter {
     var provider: ConversationProvider { .codex }
 
     static var defaultCodexDirectory: URL {
-        let configured = ProcessInfo.processInfo.environment["CODEX_HOME"]
-        return URL(fileURLWithPath: configured ?? NSHomeDirectory() + "/.codex")
+        standardCodexDirectory()
+    }
+
+    /// `CODEX_HOME`, or `~/.codex`. An SSH host's is found with the host's environment and home.
+    static func standardCodexDirectory(
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        homeDirectory: String = NSHomeDirectory()
+    ) -> URL {
+        URL(fileURLWithPath: environment["CODEX_HOME"] ?? homeDirectory + "/.codex")
     }
 
     init(codexDirectory: URL = CodexAdapter.defaultCodexDirectory, deletionExecutableURL: URL? = nil) {

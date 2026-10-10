@@ -37,11 +37,10 @@ struct AntigravityRemoteSessionMirror {
             else { _ = runner.run(host, "rm -rf -- " + ShellQuoting.quoted(snapshotPath), 30) }
         }
         let source = sourceHomeOverride != nil ? snapshotPath + "/" : host + ":" + snapshotPath + "/"
-        guard let result = BoundedProcessRunner.result(
-            ofExecutable: "/usr/bin/rsync",
-            arguments: RemoteSessionMirror.rsyncArguments(for: .antigravity, source: source, destination: destination.path + "/"),
-            includesStandardError: true, timeout: 600
-        ) else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
+        guard let result = RemoteSessionMirror.runRsync(
+            for: .antigravity, source: source, destination: destination.path + "/", host: sourceHomeOverride == nil ? host : nil
+        )
+        else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
         guard result.exitStatus == 0 else {
             if result.exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus {
                 throw RemoteSessionMirrorError.sshFailed(host: host, problem: SSHConnectionProblem(sshOutput: result.output))

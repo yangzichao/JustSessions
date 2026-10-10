@@ -6,10 +6,24 @@ struct RemoteSessionMirror: Sendable {
     let cacheRoot: URL
     /// Replaces `<host>:` as the source, so tests can copy from a local folder that stands in for the remote home.
     let sourceHomeOverride: String?
+    /// Finds where the host keeps each tool's files; see `RemoteToolFoldersLookup`.
+    let toolFoldersLookup: @Sendable (_ host: String) throws -> RemoteToolFolders
 
-    init(cacheRoot: URL = RemoteSessionMirror.defaultCacheRoot, sourceHomeOverride: String? = nil) {
+    /// Without a `toolFoldersLookup`, a host stood in for by `sourceHomeOverride` keeps the standard folders.
+    init(
+        cacheRoot: URL = RemoteSessionMirror.defaultCacheRoot,
+        sourceHomeOverride: String? = nil,
+        toolFoldersLookup: (@Sendable (_ host: String) throws -> RemoteToolFolders)? = nil
+    ) {
         self.cacheRoot = cacheRoot
         self.sourceHomeOverride = sourceHomeOverride
+        if let toolFoldersLookup {
+            self.toolFoldersLookup = toolFoldersLookup
+        } else if sourceHomeOverride == nil {
+            self.toolFoldersLookup = { host in try RemoteToolFoldersLookup.folders(on: host, runner: RemoteHostCommandRunner()) }
+        } else {
+            self.toolFoldersLookup = { _ in .standard }
+        }
     }
 
     static var defaultCacheRoot: URL {
@@ -25,8 +39,9 @@ struct RemoteSessionMirror: Sendable {
 
     /// Copies the host's session files for each tool.
     func synchronize(host: String) throws {
+        let folders = try lookUpToolFolders(host: host)
         for provider in ConversationProvider.allCases {
-            try synchronize(host: host, provider: provider)
+            try synchronize(host: host, provider: provider, folders: folders)
         }
     }
 
@@ -34,7 +49,8 @@ struct RemoteSessionMirror: Sendable {
         try? FileManager.default.removeItem(at: cacheRoot.appendingPathComponent(Self.directoryName(forHost: host)))
     }
 
-    func synchronize(host: String, provider: ConversationProvider) throws {
+    /// `folders` comes from `lookUpToolFolders(host:)`, once for all of the host's tools.
+    func synchronize(host: String, provider: ConversationProvider, folders: RemoteToolFolders) throws {
         let destination = mirrorDirectory(host: host, provider: provider)
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
         if provider == .antigravity {
@@ -45,15 +61,11 @@ struct RemoteSessionMirror: Sendable {
             try OpenCodeRemoteSessionMirror().synchronize(host: host, sourceHomeOverride: sourceHomeOverride, destination: destination)
             return
         }
-        let remoteFolder = Self.remoteFolder(for: provider)
-        let source = sourceHomeOverride.map { "\($0)/\(remoteFolder)/" } ?? "\(host):\(remoteFolder)/"
+        let source = sourceHomeOverride.map { folders.localPath(for: provider, sourceHome: $0) + "/" }
+            ?? folders.rsyncSource(host: host, provider: provider)
 
-        guard let result = BoundedProcessRunner.result(
-            ofExecutable: "/usr/bin/rsync",
-            arguments: Self.rsyncArguments(for: provider, source: source, destination: destination.path + "/"),
-            includesStandardError: true,
-            timeout: 600
-        ) else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
+        guard let result = Self.runRsync(for: provider, source: source, destination: destination.path + "/", host: sourceHomeOverride == nil ? host : nil)
+        else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
 
         switch result.exitStatus {
         case 0:
@@ -72,24 +84,49 @@ struct RemoteSessionMirror: Sendable {
         }
     }
 
+    /// Copies one tool's files, with `ssh` running in the login shell's environment like the app's other connections.
+    /// `host` is the SSH host the source is on, whose connection the copy shares, or nil for a local folder.
+    static func runRsync(
+        for provider: ConversationProvider,
+        source: String,
+        destination: String,
+        host: String?
+    ) -> (exitStatus: Int32, output: String)? {
+        let remoteShell = rsyncRemoteShell(connectionSharingOptions: host.map(SSHConnectionSharing.options(for:)) ?? [])
+        return BoundedProcessRunner.result(
+            ofExecutable: "/usr/bin/rsync",
+            arguments: rsyncArguments(for: provider, source: source, destination: destination, remoteShell: remoteShell),
+            environment: SSHProcessEnvironment.standard,
+            includesStandardError: true,
+            timeout: 600
+        )
+    }
+
     /// No `--prune-empty-dirs`: it drops a project folder whose last session was deleted from the transfer,
     /// and `--delete` then never removes that session from the mirror. OpenCode's snapshot is rebuilt for every
     /// copy, and macOS's `rsync` compares file dates in whole seconds, so a snapshot of the same size made within
     /// the same second would look unchanged; `--ignore-times` compares its contents instead.
-    static func rsyncArguments(for provider: ConversationProvider, source: String, destination: String) -> [String] {
+    static func rsyncArguments(
+        for provider: ConversationProvider,
+        source: String,
+        destination: String,
+        remoteShell: String
+    ) -> [String] {
         [
             "--archive", "--delete",
-            "-e", rsyncRemoteShell,
+            "-e", remoteShell,
         ]
             + (provider == .opencode ? ["--ignore-times"] : [])
             + includedPatterns(for: provider).map { "--include=\($0)" }
             + ["--exclude=*", source, destination]
     }
 
-    /// The `ssh` command `rsync` connects with; none of the options has a space, so joining them needs no quoting.
-    static let rsyncRemoteShell = (
-        ["ssh", RemoteHostCommandRunner.noTerminalOption] + RemoteHostCommandRunner.nonInteractiveSSHOptions
-    ).joined(separator: " ")
+    /// The `ssh` command `rsync` connects with; none of the options has a space, the socket folder's path included,
+    /// so joining them needs no quoting.
+    static func rsyncRemoteShell(connectionSharingOptions: [String]) -> String {
+        (["ssh", RemoteHostCommandRunner.noTerminalOption] + RemoteHostCommandRunner.nonInteractiveSSHOptions + connectionSharingOptions)
+            .joined(separator: " ")
+    }
 
     /// Only the files the adapters read; Claude Code's subagent transcripts and caches stay on the host, and so do
     /// the subagent runs, forks, and artifacts Pi extensions keep in folders inside a Pi project folder. OpenCode's
@@ -112,7 +149,8 @@ struct RemoteSessionMirror: Sendable {
         }
     }
 
-    /// Relative to the remote home directory.
+    /// Relative to the remote home directory, where the tool keeps its files unless the host's environment says
+    /// otherwise; see `RemoteToolFolders`.
     static func remoteFolder(for provider: ConversationProvider) -> String {
         switch provider {
         case .claude: ".claude"
