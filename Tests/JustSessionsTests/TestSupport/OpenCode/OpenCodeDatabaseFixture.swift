@@ -89,6 +89,25 @@ struct OpenCodeDatabaseFixture {
         try run("COMMIT", in: database)
     }
 
+    /// Adds messages and their parts in one transaction, with their data as JSON text, for sessions too long to add one
+    /// row at a time.
+    func addRows(
+        messages: [(id: String, session: String, createdAt: Int64, data: String)],
+        parts: [(id: String, message: String, session: String, data: String)]
+    ) throws {
+        let database = try open()
+        defer { sqlite3_close(database) }
+        try run("BEGIN", in: database)
+        for message in messages {
+            try run("INSERT INTO message VALUES (?, ?, ?, ?, ?)",
+                    [message.id, message.session, message.createdAt, message.createdAt, message.data], in: database)
+        }
+        for part in parts {
+            try run("INSERT INTO part VALUES (?, ?, ?, 1, 1, ?)", [part.id, part.message, part.session, part.data], in: database)
+        }
+        try run("COMMIT", in: database)
+    }
+
     func execute(_ sql: String, _ values: [Any?] = []) throws {
         let database = try open()
         defer { sqlite3_close(database) }
