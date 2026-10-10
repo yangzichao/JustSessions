@@ -16,6 +16,13 @@ struct SidebarEmptyHostMessageTests {
         #expect(!message(.refreshing, on: .thisMac, isSearching: true).isFailure)
     }
 
+    @Test func anSSHHostsCopySaysWhichToolItIsOnAndHowFarItIs() {
+        let step = RemoteSessionCopyStep(provider: .codex, number: 2, count: 6)
+
+        #expect(message(.refreshing, on: .ssh("devbox"), copyStep: step).text == "Copying Codex sessions (2 of 6)…")
+        #expect(message(.failed("Could not connect to devbox."), on: .ssh("devbox"), copyStep: step).text == "Could not connect to devbox.")
+    }
+
     @Test func withNothingLeftItSaysWhetherSearchOrTheRecentFilterHidItAll() {
         for refreshStatus in [HostRefreshStatus.refreshed(.now), nil] {
             #expect(message(refreshStatus, isSearching: true).text == "No matching projects or sessions")
@@ -34,6 +41,7 @@ struct SidebarEmptyHostMessageTests {
     private func message(
         _ refreshStatus: HostRefreshStatus?,
         on host: SessionHost = .thisMac,
+        copyStep: RemoteSessionCopyStep? = nil,
         isSearching: Bool = false,
         recencyFilter: SessionRecencyFilter = .all,
         waitingFilter: SessionWaitingFilter = .all
@@ -41,6 +49,7 @@ struct SidebarEmptyHostMessageTests {
         SidebarEmptyHostMessage(
             host: host,
             refreshStatus: refreshStatus,
+            copyStep: copyStep,
             isSearching: isSearching,
             recencyFilter: recencyFilter,
             waitingFilter: waitingFilter

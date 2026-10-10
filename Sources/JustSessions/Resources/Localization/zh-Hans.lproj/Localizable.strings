@@ -292,6 +292,8 @@
 	<string>复制会话 ID</string>
 	<key>Copy the selection. Hold ⇧ while dragging to select text.</key>
 	<string>复制所选内容。按住 ⇧ 拖动即可选择文字。</string>
+	<key>Copying %@ sessions (%lld of %lld)…</key>
+	<string>正在复制 %@ 会话（%lld/%lld）…</string>
 	<key>Copying sessions…</key>
 	<string>正在复制会话…</string>
 	<key>Could not change launch at login: %@</key>

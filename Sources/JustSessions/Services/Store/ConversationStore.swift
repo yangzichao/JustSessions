@@ -74,6 +74,8 @@ final class ConversationStore: ObservableObject {
     var hostsRecheckedShellStartup: Set<String> = []
     /// Each host's last refresh, this Mac's included.
     @Published var hostRefreshStatuses: [SessionHost: HostRefreshStatus] = [:]
+    /// The tool each SSH host's running refresh is copying; see `RemoteSessionCopyStep`.
+    @Published var remoteSessionCopySteps: [SessionHost: RemoteSessionCopyStep] = [:]
     /// tmux sessions JustSessions started that still run, per host, as of the host's last refresh. On this Mac, one
     /// whose CLI ends leaves within about a second; see `ConversationStore+CLIActivitySync`.
     @Published var tmuxSessionNamesByHost: [SessionHost: Set<String>] = [:]

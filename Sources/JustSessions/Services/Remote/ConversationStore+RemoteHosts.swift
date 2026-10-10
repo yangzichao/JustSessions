@@ -14,8 +14,13 @@ extension ConversationStore {
                 await self.applyRemoteHostConversations(mirroredConversations, host: host)
             }
             do {
-                let hostConversations = try discovery.discover(host: host)
-                await self.applyRemoteHostConversations(hostConversations, host: host)
+                try await discovery.discoverToolByTool(
+                    host: host,
+                    copying: { step in await self.setRemoteSessionCopyStep(step, host: host) },
+                    copied: { step, toolConversations in
+                        await self.applyRemoteHostConversations(toolConversations, of: step, host: host)
+                    }
+                )
                 let status = RemoteHostStatusProbe.status(ofHost: host)
                 if let status {
                     await self.setTmuxSessionNames(status.tmuxSessionNames, on: .ssh(host))
@@ -60,6 +65,7 @@ extension ConversationStore {
         remoteHostsUsingTmuxPrefix.save(to: userDefaults)
         forgetRemoteShellStartup(on: host)
         hostRefreshStatuses.removeValue(forKey: .ssh(host))
+        remoteSessionCopySteps.removeValue(forKey: .ssh(host))
         tmuxSessionNamesByHost.removeValue(forKey: .ssh(host))
         installedProvidersByHost.removeValue(forKey: .ssh(host))
         replaceConversations(on: .ssh(host), with: [])
@@ -70,17 +76,40 @@ extension ConversationStore {
     }
 
     /// Lists a host's sessions from its copy, and links the tabs waiting for them.
-    func applyRemoteHostConversations(_ hostConversations: [Conversation], host: String) {
+    func applyRemoteHostConversations(
+        _ hostConversations: [Conversation],
+        host: String,
+        discardMissingReopeningTabs: Bool = true
+    ) {
         // The host may have been removed while its copy ran.
         guard remoteHostList.hosts.contains(host) else { return }
-        replaceConversations(on: .ssh(host), with: hostConversations)
+        replaceConversations(on: .ssh(host), with: hostConversations, discardMissingReopeningTabs: discardMissingReopeningTabs)
         linkWaitingTabsToPreassignedSessions(on: .ssh(host))
         linkWaitingTabsByAppearance(on: .ssh(host))
+    }
+
+    /// Lists one tool's sessions as soon as they are copied, in place of that tool's earlier ones; the host's other
+    /// tools keep theirs until their own copy. A tab waiting to reopen is given up only once every tool is listed,
+    /// since its session may be one of a tool not copied yet.
+    func applyRemoteHostConversations(_ toolConversations: [Conversation], of step: RemoteSessionCopyStep, host: String) {
+        let otherToolsConversations = (conversations + subagentConversations)
+            .filter { $0.host == .ssh(host) && $0.provider != step.provider }
+        applyRemoteHostConversations(
+            otherToolsConversations + toolConversations,
+            host: host,
+            discardMissingReopeningTabs: step.isLast
+        )
+    }
+
+    private func setRemoteSessionCopyStep(_ step: RemoteSessionCopyStep, host: String) {
+        guard remoteHostList.hosts.contains(host) else { return }
+        remoteSessionCopySteps[.ssh(host)] = step
     }
 
     private func setRemoteHostRefreshStatus(_ status: HostRefreshStatus, host: String) {
         guard remoteHostList.hosts.contains(host) else { return }
         hostRefreshStatuses[.ssh(host)] = status
+        remoteSessionCopySteps.removeValue(forKey: .ssh(host))
         // A Try Again that waited for this refresh can start now.
         startQueuedDeletion()
     }

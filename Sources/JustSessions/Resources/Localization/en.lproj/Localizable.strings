@@ -296,6 +296,8 @@
 	<string>Copy session ID</string>
 	<key>Copy the selection. Hold ⇧ while dragging to select text.</key>
 	<string>Copy the selection. Hold ⇧ while dragging to select text.</string>
+	<key>Copying %@ sessions (%lld of %lld)…</key>
+	<string>Copying %@ sessions (%lld of %lld)…</string>
 	<key>Copying sessions…</key>
 	<string>Copying sessions…</string>
 	<key>Could not change launch at login: %@</key>

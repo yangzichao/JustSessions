@@ -11,6 +11,7 @@ struct SidebarEmptyHostMessage: Equatable {
     init(
         host: SessionHost,
         refreshStatus: HostRefreshStatus?,
+        copyStep: RemoteSessionCopyStep?,
         isSearching: Bool,
         recencyFilter: SessionRecencyFilter,
         waitingFilter: SessionWaitingFilter
@@ -19,7 +20,13 @@ struct SidebarEmptyHostMessage: Equatable {
         case .failed(let error)?:
             self.init(failure: error)
         case .refreshing?:
-            self.init(text: host == .thisMac ? "Scanning sessions…" : "Copying sessions…")
+            if host == .thisMac {
+                self.init(text: "Scanning sessions…")
+            } else if let copyStep {
+                self.init(text: "Copying \(copyStep.provider.rawValue) sessions (\(copyStep.number) of \(copyStep.count))…")
+            } else {
+                self.init(text: "Copying sessions…")
+            }
         case .refreshed?, nil:
             if isSearching {
                 self.init(text: "No matching projects or sessions")

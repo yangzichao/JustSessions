@@ -24,6 +24,7 @@ extension ConversationSidebarView {
                             SidebarEmptyHostNote(message: SidebarEmptyHostMessage(
                                 host: section.host,
                                 refreshStatus: store.hostRefreshStatuses[section.host],
+                                copyStep: store.remoteSessionCopySteps[section.host],
                                 isSearching: isSearching,
                                 recencyFilter: recencyFilter,
                                 waitingFilter: waitingFilter

@@ -15,7 +15,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Onboarding/`: the onboarding tour's stops, the tips a fresh install shows once each, and when each tip is due from what the window shows.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
-- `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, each host's refresh status, and the SSH hosts whose tmux sessions use the host's own prefix keys.
+- `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, each host's refresh status and the tool an SSH host's copy is on, and the SSH hosts whose tmux sessions use the host's own prefix keys.
 - `Models/Sidebar/`: the sidebar's filters, projects with their sessions, multi-selection, which Open tabs groups are collapsed, and, in `Subagents/`, which sessions list their subagents' sessions under them.
 - `Services/Sidebar/`: the sidebar's projects as the filters and search leave them. `Sessions/` picks what a session row shows as its CLI's status: its running tab's, the selected one first, then its CLI's in tmux with no tab open.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
