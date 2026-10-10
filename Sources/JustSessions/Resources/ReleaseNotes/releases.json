@@ -1,5 +1,33 @@
 [
   {
+    "version": "1.2.0",
+    "publishedOn": "2026-10-10",
+    "title": {
+      "en": "Ghostty terminal engine",
+      "zh-Hans": "Ghostty 终端引擎"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Choose Ghostty's GPU-drawn terminal in Settings → Appearance → Terminal → Engine; tabs opened afterwards use it.",
+            "zh-Hans": "可在“设置 → 外观 → 终端 → 引擎”中选用 GPU 绘制的 Ghostty 终端，之后打开的标签页会使用它。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Small bug fixes.",
+            "zh-Hans": "修复了一些小问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.1.1",
     "publishedOn": "2026-10-10",
     "title": {
