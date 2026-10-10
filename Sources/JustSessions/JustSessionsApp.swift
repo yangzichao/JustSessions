@@ -18,6 +18,7 @@ struct JustSessionsApp: App {
         .commands {
             WorkspaceTabCommands()
             SidebarToggleCommands()
+            TextZoomCommands()
             AppWideSheetCommands()
         }
     }

@@ -106,6 +106,7 @@ struct ConversationBrowserView: View {
         }
         .titleBarSidebarToggle(isSidebarHidden: $isSidebarHidden)
         .focusedSceneValue(\.isSidebarHidden, $isSidebarHidden)
+        .focusedSceneValue(\.textZoomTarget, store.selectedTerminalID == nil ? .conversation : .terminals)
         .sheet(item: $newSessionSheetHost) { host in
             let startableProjects = startableProjects
             NewSessionSheet(

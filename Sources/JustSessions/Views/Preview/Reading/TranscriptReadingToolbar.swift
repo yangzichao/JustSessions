@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TranscriptReadingToolbar: View {
-    @Binding var fontSize: CGFloat
+    @Binding var fontSize: Double
     @Binding var readingWidth: TranscriptReadingWidth
     let messageCount: Int
     let onFirstMessage: () -> Void
@@ -24,12 +24,12 @@ struct TranscriptReadingToolbar: View {
                     .onboardingTourStop(.findInConversation)
             }
             HStack(spacing: 12) {
-                Button { fontSize = max(12, fontSize - 1) } label: { Text("A−") }
-                    .disabled(fontSize <= 12)
+                Button { fontSize = TranscriptReadingTextSize.size(after: .zoomOut, from: fontSize) } label: { Text("A−") }
+                    .disabled(fontSize <= TranscriptReadingTextSize.range.lowerBound)
                     .help("Smaller text")
                     .accessibilityLabel("Smaller reading text")
-                Button { fontSize = min(22, fontSize + 1) } label: { Text("A+") }
-                    .disabled(fontSize >= 22)
+                Button { fontSize = TranscriptReadingTextSize.size(after: .zoomIn, from: fontSize) } label: { Text("A+") }
+                    .disabled(fontSize >= TranscriptReadingTextSize.range.upperBound)
                     .help("Larger text")
                     .accessibilityLabel("Larger reading text")
             }

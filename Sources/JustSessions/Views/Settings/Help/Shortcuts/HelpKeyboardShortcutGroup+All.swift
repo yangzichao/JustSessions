@@ -1,9 +1,9 @@
 import SwiftUI
 
 extension HelpKeyboardShortcutGroup {
-    /// Every shortcut JustSessions adds. The tab, sidebar, and Settings shortcuts are menu commands
-    /// (`WorkspaceTabCommands`, `SidebarToggleCommands`, `AppWideSheetCommands`); Control-Tab is
-    /// `WorkspaceTabCycleShortcuts`, and Find is `TranscriptSearchKeyboardShortcuts`.
+    /// Every shortcut JustSessions adds. The tab, sidebar, text size, and Settings shortcuts are menu commands
+    /// (`WorkspaceTabCommands`, `SidebarToggleCommands`, `TextZoomCommands`, `AppWideSheetCommands`); Control-Tab is
+    /// `WorkspaceTabCycleShortcuts`, ⌘= is `ZoomInEqualsKey`, and Find is `TranscriptSearchKeyboardShortcuts`.
     static var all: [HelpKeyboardShortcutGroup] {
         [
             HelpKeyboardShortcutGroup(title: "Tabs and windows", shortcuts: [
@@ -22,6 +22,11 @@ extension HelpKeyboardShortcutGroup {
                 HelpKeyboardShortcut(keys: "⌘G", "Return", action: "Next match"),
                 HelpKeyboardShortcut(keys: "⇧⌘G", "⇧Return", action: "Previous match"),
                 HelpKeyboardShortcut(keys: "Esc", action: "Close find"),
+            ]),
+            HelpKeyboardShortcutGroup(title: "Text size, in the terminals or the conversation shown", shortcuts: [
+                HelpKeyboardShortcut(keys: "⌘+", "⌘=", action: "Larger text"),
+                HelpKeyboardShortcut(keys: "⌘−", action: "Smaller text"),
+                HelpKeyboardShortcut(keys: "⌘0", action: "Default size"),
             ]),
             HelpKeyboardShortcutGroup(title: "Sidebar", shortcuts: [
                 HelpKeyboardShortcut(keys: [Text("⌘-click")], action: "Select several sessions or projects"),

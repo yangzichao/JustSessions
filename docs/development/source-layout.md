@@ -8,7 +8,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
 - `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`, the CLI and status hues every theme shares in `Hues/`, and in `ReadableText/` the text colors each theme prepares so text stays at 4.5 contrast on every surface it sits on.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
-- `Models/Transcript/`: the reading width, a readable column or the full window, shared by the preview and every reading window.
+- `Models/Transcript/`: the reading width, a readable column or the full window, and the reading text size, both shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
 - `Models/Customizations/`: session and project names you set, and pins.
 - `Models/StartCommands/`: the command each tool's CLI starts with on each host, when it is not the one the app uses, set in the New session sheet; and what that command stands in for, `kiro-cli chat` for Kiro CLI and the executable for the other tools.
@@ -26,6 +26,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Terminal/Closing/`: what closing a tab does when its CLI can keep running in tmux: ask each time, keep it running, or end it.
 - `Models/Terminal/Split/`: the pairs of tabs linked in split views, how splitting, reversing, separating, swapping, and closing reorder the tabs as Chrome does, where a shown split's panes and the resize area between them sit, and the split entries a tab's menus offer. `Services/Terminal/Split/` picks a tab's entries and does what each one asks, for the tab bar's menu and the terminal's.
 - `Models/Wording/`: counts and relative times in labels.
+- `Models/TextZoom/`, `Services/TextZoom/`, `Views/TextZoom/`: View → Actual Size, Zoom In, and Zoom Out (⌘0, ⌘+ or ⌘=, ⌘−), as in Chrome. They size the terminals' font while a tab shows, otherwise the conversation's text in the preview or a reading window.
 - `Services/Store/`: `ConversationStore`, the state the views observe. Each feature extends it from its own folder.
 - `Services/Windows/`: the open workspace windows, each with its store, so a session runs in one tab across them. Resuming a session another window's tab runs brings that window forward to the tab, and each window's session rows, project summaries, Waiting for you filter, and activity sync count other windows' tabs as the session's own.
 - `Services/Windows/MovingTabs/`: moves a session's tab here from another window when tmux keeps its CLI running: that tab closes and a tab here reattaches. Over SSH, the host first confirms its tmux runs the CLI.

@@ -10,7 +10,7 @@ struct TranscriptScrollView: View {
     /// `.scrollPosition(id:)`, searched every entry on each scroll step for the one at the top.
     @State var positionController: TranscriptScrollPositionController
     @State var restoredPagingRevision: Int?
-    @State private var readingFontSize: CGFloat = 15
+    @AppStorage(TranscriptReadingTextSize.userDefaultsKey) private var readingFontSize = TranscriptReadingTextSize.defaultSize
     @State var searchState: TranscriptSearchState
     @State var searchIndex: TranscriptSearchIndex?
     @State var indexedTranscript: TranscriptContent?
@@ -62,7 +62,7 @@ struct TranscriptScrollView: View {
                     }
                     .background(ThemePalette.contentSurface)
                 }
-                .environment(\.transcriptReadingFontSize, readingFontSize)
+                .environment(\.transcriptReadingFontSize, TranscriptReadingTextSize.clamped(readingFontSize))
                 .environment(\.transcriptSearchContext, TranscriptSearchContext(
                     query: searchState.isPresented ? searchState.query : "",
                     selectedMatch: searchState.isSearching ? nil : searchState.selectedMatch,
