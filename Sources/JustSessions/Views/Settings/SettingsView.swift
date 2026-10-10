@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Settings (⌘,): language, launch, notifications, updates, and feedback; how the app and its terminals look; what macOS
-/// allows the app; and help. A switcher at the top picks the page; release notes and the feedback form open from General.
+/// allows the app; and help. A switcher at the top picks the page; release notes open from General.
 struct SettingsView: View {
     @Binding var selectedTab: SettingsTab
     let languageStore: AppLanguageStore
@@ -56,8 +56,6 @@ struct SettingsView: View {
                     HelpSettingsView()
                 case .releaseNotes:
                     ReleaseNotesSettingsView(onShowGeneral: { selectedTab = .general })
-                case .feedback:
-                    FeedbackSettingsView(onShowGeneral: { selectedTab = .general }, model: .shared)
                 }
             }
             // A fresh scroll position for each page.

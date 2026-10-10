@@ -1,27 +1,22 @@
 import Foundation
 
-/// Where General sends feedback: a new GitHub issue or an email, each started with the versions it is about, below the
-/// space for the report itself.
+/// Where General sends feedback: the website's feedback form or a new GitHub issue, each started with the versions it
+/// is about.
 enum FeedbackLinks {
-    static func gitHubIssueURL(for environment: FeedbackEnvironment) -> URL {
-        var components = URLComponents(url: AppLinks.newGitHubIssueURL, resolvingAgainstBaseURL: false)!
-        components.queryItems = [URLQueryItem(name: "body", value: reportBody(for: environment))]
-        return components.url!
-    }
-
-    static func emailURL(for environment: FeedbackEnvironment) -> URL {
-        var components = URLComponents()
-        components.scheme = "mailto"
-        components.path = AppLinks.feedbackEmailAddress
+    /// The Guide's feedback form, which shows these versions and sends them with the message.
+    static func formURL(for environment: FeedbackEnvironment) -> URL {
+        var components = URLComponents(url: AppLinks.userGuideFeedbackURL, resolvingAgainstBaseURL: false)!
         components.queryItems = [
-            URLQueryItem(name: "subject", value: "JustSessions feedback"),
-            URLQueryItem(name: "body", value: reportBody(for: environment)),
+            URLQueryItem(name: "appVersion", value: environment.appVersion),
+            URLQueryItem(name: "macOSVersion", value: environment.macOSVersion),
         ]
         return components.url!
     }
 
     /// Two empty lines to write in, then the versions.
-    private static func reportBody(for environment: FeedbackEnvironment) -> String {
-        "\n\n\(environment.summary)"
+    static func gitHubIssueURL(for environment: FeedbackEnvironment) -> URL {
+        var components = URLComponents(url: AppLinks.newGitHubIssueURL, resolvingAgainstBaseURL: false)!
+        components.queryItems = [URLQueryItem(name: "body", value: "\n\n\(environment.summary)")]
+        return components.url!
     }
 }

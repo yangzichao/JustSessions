@@ -340,8 +340,6 @@
 	<string>Could not start session</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</string>
-	<key>Couldn't reach the feedback server. Check your connection, or email us.</key>
-	<string>Couldn't reach the feedback server. Check your connection, or email us.</string>
 	<key>Create folder and add</key>
 	<string>Create folder and add</string>
 	<key>Creating the folder on %@…</key>
@@ -378,12 +376,6 @@
 	<string>Done</string>
 	<key>Edit</key>
 	<string>Edit</string>
-	<key>Email for a reply</key>
-	<string>Email for a reply</string>
-	<key>Email for a reply (optional)</key>
-	<string>Email for a reply (optional)</string>
-	<key>Email us ↗</key>
-	<string>Email us ↗</string>
 	<key>End and close this terminal</key>
 	<string>End and close this terminal</string>
 	<key>End on %@</key>
@@ -414,10 +406,8 @@
 	<string>Export conversations</string>
 	<key>Feedback</key>
 	<string>Feedback</string>
-	<key>Feedback and issues are sent with these versions.</key>
-	<string>Feedback and issues are sent with these versions.</string>
-	<key>Feedback couldn't be sent right now. Try again later, or email us.</key>
-	<string>Feedback couldn't be sent right now. Try again later, or email us.</string>
+	<key>Feedback and issues start with these versions filled in.</key>
+	<string>Feedback and issues start with these versions filled in.</string>
 	<key>Fields and buttons</key>
 	<string>Fields and buttons</string>
 	<key>Filter project sessions</key>
@@ -566,8 +556,6 @@
 	<string>Match app</string>
 	<key>Match app theme</key>
 	<string>Match app theme</string>
-	<key>Message</key>
-	<string>Message</string>
 	<key>More actions</key>
 	<string>More actions</string>
 	<key>More actions for %@</key>
@@ -686,6 +674,8 @@
 	<string>Open terminal</string>
 	<key>Open the JustSessions website</key>
 	<string>Open the JustSessions website</string>
+	<key>Open the feedback form on the website</key>
+	<string>Open the feedback form on the website</string>
 	<key>Open the source code on GitHub</key>
 	<string>Open the source code on GitHub</string>
 	<key>Optional</key>
@@ -716,8 +706,6 @@
 	<string>Pinned</string>
 	<key>Plain text (.txt)…</key>
 	<string>Plain text (.txt)…</string>
-	<key>Prefer email or GitHub?</key>
-	<string>Prefer email or GitHub?</string>
 	<key>Preview</key>
 	<string>Preview</string>
 	<key>Previous Tab</key>
@@ -866,18 +854,10 @@
 	<string>Select a range</string>
 	<key>Select several sessions or projects</key>
 	<string>Select several sessions or projects</string>
-	<key>Send</key>
-	<string>Send</string>
-	<key>Send Feedback…</key>
-	<string>Send Feedback…</string>
-	<key>Send feedback</key>
-	<string>Send feedback</string>
-	<key>Send feedback (⌘↩)</key>
-	<string>Send feedback (⌘↩)</string>
-	<key>Sending…</key>
-	<string>Sending…</string>
-	<key>Sent with %@. Kept for up to a year; Cloudflare Turnstile checks that a person sent it.</key>
-	<string>Sent with %@. Kept for up to a year; Cloudflare Turnstile checks that a person sent it.</string>
+	<key>Send Feedback</key>
+	<string>Send Feedback</string>
+	<key>Send feedback ↗</key>
+	<string>Send feedback ↗</string>
 	<key>Separate Views</key>
 	<string>Separate Views</string>
 	<key>Separate views</key>
@@ -902,10 +882,6 @@
 	<string>Shell startup in the user guide ↗</string>
 	<key>Shell startup is fine</key>
 	<string>Shell startup is fine</string>
-	<key>Shorten the email to 200 characters or fewer.</key>
-	<string>Shorten the email to 200 characters or fewer.</string>
-	<key>Shorten the message to 5,000 characters or fewer.</key>
-	<string>Shorten the message to 5,000 characters or fewer.</string>
 	<key>Show</key>
 	<string>Show</string>
 	<key>Show %@</key>
@@ -938,8 +914,6 @@
 	<string>Smaller text</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>Some colors are missing, such as the text or background color.</string>
-	<key>Spam check</key>
-	<string>Spam check</string>
 	<key>Split View Resize Handle (draggable)</key>
 	<string>Split View Resize Handle (draggable)</string>
 	<key>Start a native CLI or a plain terminal in a project folder.</key>
@@ -996,8 +970,6 @@
 	<string>Take the Tour</string>
 	<key>Take the tour</key>
 	<string>Take the tour</string>
-	<key>Tell us what works, what doesn't, and what you'd like next. Only the developer reads it.</key>
-	<string>Tell us what works, what doesn't, and what you'd like next. Only the developer reads it.</string>
 	<key>Terminal</key>
 	<string>Terminal</string>
 	<key>Terminal appearance preview</key>
@@ -1012,10 +984,6 @@
 	<string>Text can't stay readable on that color. Choose a lighter one.</string>
 	<key>Text size, in the terminals or the conversation shown</key>
 	<string>Text size, in the terminals or the conversation shown</string>
-	<key>Thanks — your feedback was sent.</key>
-	<string>Thanks — your feedback was sent.</string>
-	<key>That's a lot of messages at once. Wait a minute, then send again.</key>
-	<string>That's a lot of messages at once. Wait a minute, then send again.</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
 	<string>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</string>
 	<key>The CLI tab choice is for tabs whose CLI can keep running in tmux. A terminal's shell always ends with its tab. Don't ask again in the close dialog sets these too.</key>
@@ -1030,8 +998,6 @@
 	<string>The folder is listed under %@ in the sidebar, ready for new sessions.</string>
 	<key>The host needs:</key>
 	<string>The host needs:</string>
-	<key>The message is empty or too long.</key>
-	<string>The message is empty or too long.</string>
 	<key>The project folder is no longer at %@. Move it back there to resume this session.</key>
 	<string>The project folder is no longer at %@. Move it back there to resume this session.</string>
 	<key>The project folder no longer exists</key>
@@ -1046,10 +1012,6 @@
 	<string>The shell and anything still running in it will stop.</string>
 	<key>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles and IDs, and message text.</key>
 	<string>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles and IDs, and message text.</string>
-	<key>The spam check couldn't load. Check your connection, or email us.</key>
-	<string>The spam check couldn't load. Check your connection, or email us.</string>
-	<key>The spam check didn't pass. Send again once it finishes.</key>
-	<string>The spam check didn't pass. Send again once it finishes.</string>
 	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
 	<string>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</string>
 	<key>The tmux sessions the app starts on a host have no prefix key, so every key reaches the CLI. To use your own tmux prefix there, point at the host's heading, click its **⋯**, and choose **Use this host's tmux prefix**.</key>
@@ -1116,8 +1078,6 @@
 	<string>When you close a terminal</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</string>
-	<key>Write to the developer from here</key>
-	<string>Write to the developer from here</string>
 	<key>You</key>
 	<string>You</string>
 	<key>Your login shell, with no CLI</key>
@@ -1152,8 +1112,6 @@
 	<string>macOS asks the first time JustSessions needs it.</string>
 	<key>macOS doesn't let apps check this. Look for JustSessions in System Settings.</key>
 	<string>macOS doesn't let apps check this. Look for JustSessions in System Settings.</string>
-	<key>you@example.com</key>
-	<string>you@example.com</string>
 	<key>·</key>
 	<string>·</string>
 	<key>⇧-click</key>

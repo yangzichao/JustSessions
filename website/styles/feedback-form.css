@@ -26,3 +26,4 @@
 .feedback-form .button:disabled:hover { background: var(--ink); }
 .guide-content .feedback-form .feedback-status { margin: 0; font-size: 14px; }
 .guide-content .feedback-form .fine-print { margin: 4px 0 0; }
+.guide-content .feedback-form .feedback-app-versions { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
