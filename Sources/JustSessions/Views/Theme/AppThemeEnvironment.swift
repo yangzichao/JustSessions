@@ -2,7 +2,7 @@ import SwiftUI
 
 extension EnvironmentValues {
     /// The theme `ThemePalette` colors are drawn in.
-    @Entry var appTheme: AppTheme = .justSessions
+    @Entry var appTheme = ResolvedAppTheme(.justSessions)
 }
 
 extension View {
@@ -18,6 +18,6 @@ private struct ChosenAppTheme: ViewModifier {
     func body(content: Content) -> some View {
         content
             .tint(ThemePalette.ink)
-            .environment(\.appTheme, themeStore.theme)
+            .environment(\.appTheme, themeStore.resolvedTheme)
     }
 }

@@ -6,7 +6,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 
 - `Models/Activity/`: what a running CLI is doing, and a project's running CLIs summed up. `UnseenTurns/` holds the CLIs that finished a turn while their terminal was off screen, until you look, and which running CLIs wait on you: stopped for your answer, or done with a turn you have not seen.
 - `Models/Appearance/`: the app's System, Light, or Dark appearance.
-- `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`, the CLI and status hues every theme shares in `Hues/`, and in `ReadableText/` the text colors each theme prepares so text stays at 4.5 contrast on every surface it sits on.
+- `Models/Appearance/Themes/`: the named themes, with each theme's light and dark colors in `ThemeColors/`, the CLI and status hues every theme shares in `Hues/`, and in `ReadableText/` the text colors each theme prepares so text stays at 4.5 contrast on every surface it sits on. `Customization/` holds your changes to a theme's colors, which `ResolvedAppTheme` applies to its light and dark colors, and the check that refuses a change text can't stay readable with.
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
 - `Models/Transcript/`: the reading width, a readable column or the full window, and the reading text size, both shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
@@ -37,7 +37,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Services/Permissions/`: reads each permission's status without asking for it, and the System Settings page that changes it.
 - `Services/Startup/`: registers the app as a macOS login item and reads its current system approval status.
 - `Services/CrashReports/`: at launch, finds the crash macOS recorded for the app since the last launch, in `~/Library/Logs/DiagnosticReports`, and offers once to report it.
-- `Services/Appearance/`: saves the app's appearance and theme, sets the appearance on every window, and gives terminals a newly chosen theme's colors.
+- `Services/Appearance/`: saves the app's appearance, theme, and your changes to each theme's colors, sets the appearance on every window, and gives terminals a newly chosen theme's colors.
 - `Services/Adapters/`: provider discovery and native arguments, one folder per CLI. Separate adapters make adding another CLI straightforward.
 - `Services/Hosts/`: refreshing every host and starting new sessions on any of them.
 - `Services/Hosts/InstalledCLIs/`: which CLIs each host has, so new sessions offer only those.
@@ -106,7 +106,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Indicators/`: a session's status glyphs, the working spinner among them, and the pin.
 - `Views/SessionActions/`: copying ids and paths, and showing files in Finder, for the menus.
 - `Views/Settings/`: the Settings sheet, with General, Appearance, Permissions, and Help pages, each in a `SettingsTabPage` of the one size they share. General holds language, startup, closing tabs, whether the sidebar shows subagents, and notifications, then About: the app and macOS versions, software updates, and links to send feedback or open the website and GitHub. `Models/App/Feedback/` starts a feedback email or GitHub issue with those versions; `CrashReports/` there reads what a macOS crash report says about a crash of the app and fills a bug report or email with it.
-- `Views/Settings/Appearance/`: the app's appearance and theme in `App/`, then its terminals' colors, font, and preview in `Terminal/`, with the color scheme and iTerm2 import menus in `Terminal/Colors/`.
+- `Views/Settings/Appearance/`: the app's appearance and theme in `App/`, with the editor for the theme's colors in `App/Customization/`, then its terminals' colors, font, and preview in `Terminal/`, with the color scheme and iTerm2 import menus in `Terminal/Colors/`.
 - `Views/Settings/Permissions/`: each permission's status and a link to its page in System Settings.
 - `Models/Localization/`, `Services/Localization/`, `Views/Localization/`: resource-driven language selection, native string resolution, and the shared SwiftUI locale. See [localization](localization.md).
 - `Localization/Localizable.xcstrings`: the authoritative String Catalog. `Sources/JustSessions/Resources/Localization/` contains generated SwiftPM resources.

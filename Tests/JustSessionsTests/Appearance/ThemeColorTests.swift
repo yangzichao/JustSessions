@@ -7,7 +7,7 @@ struct ThemeColorTests {
         for theme in AppTheme.allCases {
             for colorScheme in [ColorScheme.light, .dark] {
                 var environment = EnvironmentValues()
-                environment.appTheme = theme
+                environment.appTheme = ResolvedAppTheme(theme)
                 environment.colorScheme = colorScheme
                 let colors = theme.colors(isDark: colorScheme == .dark)
                 let expectedHexValues: [(ThemeColor, UInt32)] = [

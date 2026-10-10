@@ -11,7 +11,7 @@ struct TabGroupPaletteTests {
         for theme in AppTheme.allCases {
             for colorScheme in [ColorScheme.light, .dark] {
                 var environment = EnvironmentValues()
-                environment.appTheme = theme
+                environment.appTheme = ResolvedAppTheme(theme)
                 environment.colorScheme = colorScheme
                 let palette = projectKeys.compactMap { projectColors[$0] }.map {
                     hexValue(of: $0.resolve(in: environment))

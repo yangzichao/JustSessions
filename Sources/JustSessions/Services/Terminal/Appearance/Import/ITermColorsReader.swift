@@ -51,11 +51,6 @@ enum ITermColorsReader {
         default: .genericRGB
         }
         let components = [red, green, blue, 1].map { CGFloat($0) }
-        guard let sRGBColor = NSColor(colorSpace: colorSpace, components: components, count: 4).usingColorSpace(.sRGB) else {
-            return nil
-        }
-        return [sRGBColor.redComponent, sRGBColor.greenComponent, sRGBColor.blueComponent].reduce(0) { result, component in
-            result << 8 | UInt32((min(max(component, 0), 1) * 255).rounded())
-        }
+        return NSColor(colorSpace: colorSpace, components: components, count: 4).sRGBHexValue
     }
 }

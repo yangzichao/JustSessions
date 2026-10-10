@@ -22,7 +22,7 @@ struct TerminalAppearancePreferences: Codable, Equatable {
     }
 
     /// The chosen colors, in one version or in light and dark.
-    func colorVariants(appTheme: AppTheme) -> TerminalPaletteVariants {
+    func colorVariants(appTheme: ResolvedAppTheme) -> TerminalPaletteVariants {
         switch colorChoice {
         case .matchAppTheme: TerminalPaletteVariants(appTheme: appTheme)
         case .preset(let preset): preset.variants

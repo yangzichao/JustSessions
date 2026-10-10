@@ -44,6 +44,15 @@ struct AppThemeReadabilityTests {
         }
     }
 
+    /// The check a customized theme must pass agrees with the tests above.
+    @Test func everyThemeSuitsItsOwnAppearanceAndNotTheOther() {
+        for theme in AppTheme.allCases {
+            #expect(theme.colors(isDark: false).suits(isDark: false), "\(theme) light")
+            #expect(theme.colors(isDark: true).suits(isDark: true), "\(theme) dark")
+            #expect(!theme.colors(isDark: false).suits(isDark: true), "\(theme) light as dark")
+        }
+    }
+
     @Test func textSurfacesIncludeTheFaintFillsAndSelectedRows() {
         let colors = AppTheme.atomOne.colors(isDark: false)
         let hoveredRow = ThemeColorContrast.blend(colors.sidebarSurface, with: colors.line, fraction: ThemeFillOpacity.hover)

@@ -21,6 +21,8 @@ struct ThumbnailChoiceButton<Thumbnail: View>: View {
     let title: LocalizedStringKey
     let isSelected: Bool
     let onSelect: () -> Void
+    /// A short note under the name, such as that the theme has your changes.
+    var detail: LocalizedStringKey?
     @ViewBuilder let thumbnail: () -> Thumbnail
 
     @State private var isHovered = false
@@ -50,12 +52,19 @@ struct ThumbnailChoiceButton<Thumbnail: View>: View {
                 Text(title)
                     .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
                     .foregroundStyle(isSelected ? AnyShapeStyle(.primary) : AnyShapeStyle(ThemePalette.secondaryText))
+                if let detail {
+                    Text(detail)
+                        .font(.system(size: 10))
+                        .foregroundStyle(ThemePalette.tertiaryText)
+                        .padding(.top, -4)
+                }
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(ThemePressButtonStyle())
         .onHover { isHovered = $0 }
         .accessibilityLabel(title)
+        .accessibilityValue(detail.map { Text($0) } ?? Text(verbatim: ""))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

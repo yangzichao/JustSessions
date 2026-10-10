@@ -619,6 +619,16 @@
         }
       }
     },
+    "Adjusted to stay readable": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已调整为易读的颜色"
+          }
+        }
+      }
+    },
     "All sessions": {
       "localizations": {
         "zh-Hans": {
@@ -970,6 +980,16 @@
     "A−": {
       "shouldTranslate": false
     },
+    "Background": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "背景"
+          }
+        }
+      }
+    },
     "Branch": {
       "localizations": {
         "zh-Hans": {
@@ -1064,6 +1084,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "取消删除"
+          }
+        }
+      }
+    },
+    "Changes the chosen theme's colors, in its light or dark version. Your changes stay with the theme when you choose another one. Text is made readable on your colors, so the text color can come out darker or lighter than you chose. Terminals that match the app theme take its background.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "修改所选主题浅色或深色版本的颜色。改选其他主题后，你的修改仍保留在这个主题上。文字会自动调整到在你的颜色上清晰可读，因此文字颜色可能比你选的更深或更浅。与应用主题一致的终端会使用它的背景。"
           }
         }
       }
@@ -1756,6 +1786,26 @@
         }
       }
     },
+    "Customize colors": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自定义颜色"
+          }
+        }
+      }
+    },
+    "Customized": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已自定义"
+          }
+        }
+      }
+    },
     "Dark": {
       "localizations": {
         "zh-Hans": {
@@ -2140,6 +2190,16 @@
         }
       }
     },
+    "Fields and buttons": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入框和按钮"
+          }
+        }
+      }
+    },
     "Filter project sessions": {
       "localizations": {
         "zh-Hans": {
@@ -2342,6 +2402,16 @@
     },
     "GitHub ↗": {
       "shouldTranslate": false
+    },
+    "Gives the theme back its own colors, light and dark.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复主题自带的浅色和深色颜色。"
+          }
+        }
+      }
     },
     "Go to a tab by its position": {
       "localizations": {
@@ -3943,6 +4013,16 @@
         }
       }
     },
+    "Reset": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置"
+          }
+        }
+      }
+    },
     "Restore": {
       "localizations": {
         "zh-Hans": {
@@ -5007,6 +5087,46 @@
         }
       }
     },
+    "Text and accents": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字和强调色"
+          }
+        }
+      }
+    },
+    "Text can't be made readable with that color.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用这个颜色无法让文字清晰可读。"
+          }
+        }
+      }
+    },
+    "Text can't stay readable on that color. Choose a darker one.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字在这个颜色上无法清晰可读，请选更深的颜色。"
+          }
+        }
+      }
+    },
+    "Text can't stay readable on that color. Choose a lighter one.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字在这个颜色上无法清晰可读，请选更浅的颜色。"
+          }
+        }
+      }
+    },
     "Text size, in the terminals or the conversation shown": {
       "localizations": {
         "zh-Hans": {
@@ -5403,6 +5523,16 @@
         }
       }
     },
+    "Use the theme's own color": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用主题自带的颜色"
+          }
+        }
+      }
+    },
     "Use this host's tmux prefix": {
       "localizations": {
         "zh-Hans": {
@@ -5419,6 +5549,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "用户指南 ↗"
+          }
+        }
+      }
+    },
+    "Version": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本"
           }
         }
       }
@@ -5479,6 +5619,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的登录 shell，不运行 CLI"
+          }
+        }
+      }
+    },
+    "Your messages": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的消息"
           }
         }
       }

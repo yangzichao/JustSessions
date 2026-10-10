@@ -33,7 +33,7 @@ struct TerminalAppearanceSection: View {
             .pickerStyle(.segmented)
             .labelsHidden()
             // The theme only matters here for whether the scheme has both versions, and every app theme does.
-            .disabled(!appearanceStore.preferences.colorVariants(appTheme: themeStore.theme).hasLightAndDarkVersions)
+            .disabled(!appearanceStore.preferences.colorVariants(appTheme: themeStore.resolvedTheme).hasLightAndDarkVersions)
             .help("Picks the light or dark version of color schemes that have both.")
         }
         GridRow {
