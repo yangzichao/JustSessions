@@ -45,6 +45,15 @@ final class TerminalAppearanceStore: ObservableObject {
         update(updated)
     }
 
+    /// View → Zoom In, Zoom Out, and Actual Size while a tab shows. Every terminal shares the size, as in Settings.
+    func zoomFont(_ step: TextZoomStep) {
+        setFontSize(step.size(
+            after: preferences.fontSize,
+            in: TerminalAppearancePreferences.fontSizeRange,
+            defaultSize: TerminalAppearancePreferences.defaultFontSize
+        ))
+    }
+
     func restoreDefaults() {
         update(TerminalAppearancePreferences())
     }

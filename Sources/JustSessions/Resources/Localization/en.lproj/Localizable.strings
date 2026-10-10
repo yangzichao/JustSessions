@@ -88,6 +88,8 @@
 	<string>A+</string>
 	<key>About JustSessions</key>
 	<string>About JustSessions</string>
+	<key>Actual Size</key>
+	<string>Actual Size</string>
 	<key>Add SSH host</key>
 	<string>Add SSH host</string>
 	<key>Add SSH host…</key>
@@ -330,6 +332,8 @@
 	<string>Creating the folder on %@…</string>
 	<key>Dark</key>
 	<string>Dark</string>
+	<key>Default size</key>
+	<string>Default size</string>
 	<key>Delete 1 session</key>
 	<string>Delete 1 session</string>
 	<key>Delete all deletable sessions (%lld)…</key>
@@ -934,6 +938,8 @@
 	<string>Terminal appearance preview</string>
 	<key>Terminal colors</key>
 	<string>Terminal colors</string>
+	<key>Text size, in the terminals or the conversation shown</key>
+	<string>Text size, in the terminals or the conversation shown</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
 	<string>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</string>
 	<key>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</key>
@@ -1030,6 +1036,10 @@
 	<string>Your sessions, already here</string>
 	<key>Your shell startup keeps CLIs from starting!</key>
 	<string>Your shell startup keeps CLIs from starting!</string>
+	<key>Zoom In</key>
+	<string>Zoom In</string>
+	<key>Zoom Out</key>
+	<string>Zoom Out</string>
 	<key>`python3`, for Antigravity and OpenCode</key>
 	<string>`python3`, for Antigravity and OpenCode</string>
 	<key>`rsync`, and the CLIs you use</key>

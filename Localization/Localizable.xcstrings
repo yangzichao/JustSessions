@@ -449,6 +449,16 @@
         }
       }
     },
+    "Actual Size": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "实际大小"
+          }
+        }
+      }
+    },
     "Add SSH host": {
       "localizations": {
         "zh-Hans": {
@@ -1752,6 +1762,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "深色"
+          }
+        }
+      }
+    },
+    "Default size": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "默认字号"
           }
         }
       }
@@ -4987,6 +5007,16 @@
         }
       }
     },
+    "Text size, in the terminals or the conversation shown": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "字号：终端，或当前显示的对话"
+          }
+        }
+      }
+    },
     "The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.": {
       "localizations": {
         "zh-Hans": {
@@ -5479,6 +5509,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的 shell 启动配置使 CLI 无法启动！"
+          }
+        }
+      }
+    },
+    "Zoom In": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "放大"
+          }
+        }
+      }
+    },
+    "Zoom Out": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缩小"
           }
         }
       }

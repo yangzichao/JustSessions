@@ -13,6 +13,7 @@ final class JustSessionsAppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         LaunchCrashReportOffer.offerIfTheLastRunCrashed()
+        ZoomInEqualsKey.startForwarding()
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {

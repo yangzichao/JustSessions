@@ -76,6 +76,8 @@
 	<string>子代理为启动它的会话运行了此会话。可以在这里阅读，但不能单独继续或删除。</string>
 	<key>About JustSessions</key>
 	<string>关于 JustSessions</string>
+	<key>Actual Size</key>
+	<string>实际大小</string>
 	<key>Add SSH host</key>
 	<string>添加 SSH 主机</string>
 	<key>Add SSH host…</key>
@@ -326,6 +328,8 @@
 	<string>正在 %@ 上创建文件夹…</string>
 	<key>Dark</key>
 	<string>深色</string>
+	<key>Default size</key>
+	<string>默认字号</string>
 	<key>Delete %lld sessions</key>
 	<string>删除 %lld 个会话</string>
 	<key>Delete %lld sessions…</key>
@@ -944,6 +948,8 @@
 	<string>终端外观预览</string>
 	<key>Terminal colors</key>
 	<string>终端配色</string>
+	<key>Text size, in the terminals or the conversation shown</key>
+	<string>字号：终端，或当前显示的对话</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
 	<string>Antigravity 会话数据库、关联文件夹和注释将移到 macOS 废纸篓，并从 Antigravity 本地索引中移除。</string>
 	<key>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</key>
@@ -1042,6 +1048,10 @@
 	<string>你的会话已经在这里</string>
 	<key>Your shell startup keeps CLIs from starting!</key>
 	<string>你的 shell 启动配置使 CLI 无法启动！</string>
+	<key>Zoom In</key>
+	<string>放大</string>
+	<key>Zoom Out</key>
+	<string>缩小</string>
 	<key>`python3`, for Antigravity and OpenCode</key>
 	<string>`python3`，用于 Antigravity 和 OpenCode</string>
 	<key>`rsync`, and the CLIs you use</key>
