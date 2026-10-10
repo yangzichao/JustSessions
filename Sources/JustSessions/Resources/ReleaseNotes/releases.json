@@ -1,5 +1,45 @@
 [
   {
+    "version": "1.1.0",
+    "publishedOn": "2026-10-09",
+    "title": {
+      "en": "New icon, theme colors, text zoom",
+      "zh-Hans": "新图标、主题配色与文字缩放"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "New comic-style app icon and logo, with a dark version for macOS 26's dark icon style.",
+            "zh-Hans": "全新漫画风格的应用图标和标志，并为 macOS 26 的深色图标样式提供深色版本。"
+          },
+          {
+            "en": "Customize a theme's background, sidebar, text, and other colors in Settings → Appearance.",
+            "zh-Hans": "可在“设置 → 外观”中自定义主题的背景、侧栏、文字等颜色。"
+          },
+          {
+            "en": "Zoom text with ⌘+, ⌘−, and ⌘0 in terminals and while reading a conversation.",
+            "zh-Hans": "用 ⌘+、⌘− 和 ⌘0 缩放终端或正在阅读的对话中的文字。"
+          },
+          {
+            "en": "Open SSH projects in VS Code from “Open project in”; VS Code needs its Remote - SSH extension.",
+            "zh-Hans": "可从“打开项目于”在 VS Code 中打开 SSH 项目；VS Code 需要安装 Remote - SSH 扩展。"
+          }
+        ]
+      },
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Close and delete a session while its tab or tmux CLI is still running.",
+            "zh-Hans": "会话的标签页或 tmux 中的 CLI 仍在运行时，也可以关闭并删除它。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.0.13",
     "publishedOn": "2026-10-09",
     "title": {
