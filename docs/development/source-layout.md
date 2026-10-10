@@ -10,13 +10,13 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Models/Conversations/`: the session model, its CLI, and the New, Resume, and Branch actions.
 - `Models/Transcript/`: the reading width, a readable column or the full window, and the reading text size, both shared by the preview and every reading window.
 - `Models/Transcript/Markdown/`: parsed prose, fenced code, and table blocks used by conversation reading.
-- `Models/Customizations/`: session and project names you set, and pins.
+- `Models/Customizations/`: session and project names you set, and in `Pins/` the pinned projects and sessions, each in the order you put them.
 - `Models/StartCommands/`: the command each tool's CLI starts with on each host, when it is not the one the app uses, set in the New session sheet; and what that command stands in for, `kiro-cli chat` for Kiro CLI and the executable for the other tools.
 - `Models/Onboarding/`: the onboarding tour's stops, the tips a fresh install shows once each, and when each tip is due from what the window shows.
 - `Models/Notifications/`: which CLIs just finished a turn or stopped to wait on you, what their notification says, and which moments notify.
 - `Models/Permissions/`: the macOS permissions the app depends on, and what macOS says about each.
 - `Models/Hosts/`: this Mac and saved SSH hosts, project locations and keys, each host's refresh status and the tool an SSH host's copy is on, and the SSH hosts whose tmux sessions use the host's own prefix keys.
-- `Models/Sidebar/`: the sidebar's filters, projects with their sessions, multi-selection, which Open tabs groups are collapsed, and, in `Subagents/`, which sessions list their subagents' sessions under them.
+- `Models/Sidebar/`: the sidebar's filters, projects with their sessions, multi-selection, which Open tabs groups are collapsed, in `Subagents/`, which sessions list their subagents' sessions under them, and in `Reordering/`, where a project or session dragged among the pinned ones lands.
 - `Services/Sidebar/`: the sidebar's projects as the filters and search leave them. `Sessions/` picks what a session row shows as its CLI's status: its running tab's, the selected one first, then its CLI's in tmux with no tab open.
 - `Models/Terminal/Appearance/`: terminal colors, font, and size, and the terminal part of a theme's colors.
 - `Models/Terminal/Appearance/ColorSchemes/`: which colors terminals use, the app theme's, a preset, or imported ones, with the colors of presets that are not app themes, Dracula and Nord, in `Presets/`.
@@ -87,7 +87,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Views/Browser/WorkspaceWindows/`: tells the window registry in `Services/Windows/` which window shows each store, so another window can bring it forward, and hands over SwiftUI's `openWindow` as each workspace window appears, for the Dock menu's New Window and for tabs dragged out of their window.
 - `Views/Browser/AppWideSheets/`: opens Settings on a workspace window from the sidebar or the app menu, which picks the frontmost workspace window. The Help menu selects Help in the same sheet.
 - `Views/Browser/SidebarToggle/`: the title bar button and View menu command that hide or show the sidebar, and the title bar's height and toggle position, which the tab bar lines up with.
-- `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, subagents' session rows with the chevron that shows them, and multi-selection. `SidebarRowMoreActionsMenu` is the ⋯ that project and session rows show under the pointer, which opens the row's right-click menu.
+- `Views/Browser/Sidebar/`: the sidebar and its one-line footer, with a folder each for filters, hosts, projects, session rows, subagents' session rows with the chevron that shows them, and multi-selection. `SidebarRowMoreActionsMenu` is the ⋯ that project and session rows show under the pointer, which opens the row's right-click menu. `Reordering/` holds the drag that moves a project among its host's pinned projects, or a session among its project's pinned sessions, the line that shows where it lands, and the row frames that is worked out from.
 - `Views/Browser/Sidebar/Header/`: the app mark with the search and new session icons; search opens into a field across that line.
 - `Views/Browser/Sidebar/Navigation/`: the Projects / Open tabs switch and persistent view containers that retain both lists' scroll positions.
 - `Views/Browser/Sidebar/OpenTabs/`: the full-height open-tab list, grouped by project under headings in the tab bar's group colors that collapse their groups, without indenting the rows, independent search, and empty states.

@@ -33,15 +33,53 @@ struct PinnedItemsTests {
         #expect(pinnedItems.pinnedConversationsFirst([newer, older]).map(\.id) == [newer.id, older.id])
     }
 
-    @Test func pinsSurviveASaveAndLoad() throws {
+    @Test func pinnedProjectsKeepTheirOrderWhateverTheirActivity() {
+        let firstPinned = conversation(project: URL(fileURLWithPath: "/tmp/first-pinned").path, time: 10)
+        let secondPinned = conversation(project: URL(fileURLWithPath: "/tmp/second-pinned").path, time: 30)
+        let unpinned = conversation(project: URL(fileURLWithPath: "/tmp/unpinned").path, time: 20)
+        var pinnedItems = PinnedItems()
+        pinnedItems.setPinned(true, projectPath: firstPinned.projectDirectoryKey)
+        pinnedItems.setPinned(true, projectPath: secondPinned.projectDirectoryKey)
+
+        let groups = ProjectConversationGroup.grouped([firstPinned, secondPinned, unpinned], pinnedItems: pinnedItems)
+        #expect(groups.map(\.projectPath) == [
+            firstPinned.projectDirectoryKey, secondPinned.projectDirectoryKey, unpinned.projectDirectoryKey,
+        ])
+
+        pinnedItems.movePinnedProject(secondPinned.projectDirectoryKey, to: .before(firstPinned.projectDirectoryKey))
+        let movedGroups = ProjectConversationGroup.grouped([firstPinned, secondPinned, unpinned], pinnedItems: pinnedItems)
+        #expect(movedGroups.map(\.projectPath) == [
+            secondPinned.projectDirectoryKey, firstPinned.projectDirectoryKey, unpinned.projectDirectoryKey,
+        ])
+    }
+
+    @Test func pinnedSessionsKeepTheirOrderWhateverTheirActivity() {
+        let project = URL(fileURLWithPath: "/tmp/example-project").path
+        let older = conversation(project: project, time: 10)
+        let newer = conversation(project: project, time: 20)
+        let unpinnedNewest = conversation(project: project, time: 30)
+        let pinnedItems = PinnedItems(pinnedConversationIDs: [older.id, newer.id])
+
+        #expect(pinnedItems.pinnedConversationsFirst([unpinnedNewest, newer, older]).map(\.id) == [
+            older.id, newer.id, unpinnedNewest.id,
+        ])
+    }
+
+    @Test func pinsSurviveASaveAndLoadInTheirOrder() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
         let userDefaults = isolatedUserDefaults.userDefaults
-        let pinnedItems = PinnedItems(pinnedProjectPaths: ["/tmp/project"], pinnedConversationIDs: ["Codex:abc"])
+        let pinnedItems = PinnedItems(
+            pinnedProjectPaths: ["/tmp/zeta", "/tmp/alpha"],
+            pinnedConversationIDs: ["Codex:xyz", "Codex:abc"]
+        )
 
         pinnedItems.save(to: userDefaults)
 
-        #expect(PinnedItems.load(from: userDefaults) == pinnedItems)
+        let loaded = PinnedItems.load(from: userDefaults)
+        #expect(loaded == pinnedItems)
+        #expect(loaded.pinnedProjectPaths == ["/tmp/zeta", "/tmp/alpha"])
+        #expect(loaded.pinnedConversationIDs == ["Codex:xyz", "Codex:abc"])
     }
 
     private func conversation(project: String, time: TimeInterval) -> Conversation {

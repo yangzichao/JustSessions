@@ -29,6 +29,9 @@ struct ConversationSidebarView: View {
     /// Sessions start with their subagents' sessions hidden; each shows them once you expand it.
     @State var subagentRows = SidebarSubagentRows()
     @State var projectSelection = ProjectMultiSelection()
+    /// A project or session being dragged among the pinned ones.
+    @State var pinDrag: SidebarPinDrag?
+    @State var sidebarRowFrames = SidebarRowFrames()
     @State private var isAddRemoteHostSheetPresented = false
     /// The host whose archived projects are listed, from its heading's context menu.
     @State private var hostShowingArchivedProjects: SessionHost?

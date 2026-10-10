@@ -272,6 +272,18 @@ final class ConversationStore: ObservableObject {
         pinnedItems.save(to: userDefaults)
     }
 
+    /// From a drag in the sidebar: pins the project if it is not pinned yet, at `placement` among the pinned ones.
+    func movePinnedProject(_ projectPath: String, to placement: PinnedPlacement) {
+        pinnedItems.movePinnedProject(projectPath, to: placement)
+        pinnedItems.save(to: userDefaults)
+    }
+
+    /// From a drag in the sidebar: pins the session if it is not pinned yet, at `placement` among the pinned ones.
+    func movePinnedConversation(_ conversationID: String, to placement: PinnedPlacement) {
+        pinnedItems.movePinnedConversation(conversationID, to: placement)
+        pinnedItems.save(to: userDefaults)
+    }
+
     // MARK: - Deletion
 
     /// A tab in any window, or a CLI still running in tmux on the session's host.
