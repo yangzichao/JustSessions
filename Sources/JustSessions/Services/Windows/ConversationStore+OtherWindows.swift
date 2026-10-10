@@ -5,7 +5,7 @@ import Foundation
 /// own, so the session is not taken for a CLI running in tmux with no tab open.
 extension ConversationStore {
     /// The other open windows' stores, oldest first.
-    private var otherWindowStores: [ConversationStore] {
+    var otherWindowStores: [ConversationStore] {
         windowRegistry.stores.filter { $0 !== self }
     }
 

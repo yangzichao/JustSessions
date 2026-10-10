@@ -29,8 +29,10 @@ struct SessionManagementMenuItems: View {
         }
         if !conversation.isSubagent {
             Divider()
-            Button("Delete session…", systemImage: "trash", role: .destructive, action: onDelete)
-                .disabled(store.hasTerminal(for: conversation) || store.isDeletionPending(for: conversation))
+            // The deletion dialog closes the session's tab and ends its CLI first; see `closeAndDelete`.
+            let endsCLIFirst = store.cliEndingBeforeDeletion(of: conversation) != nil
+            Button(endsCLIFirst ? "Close and delete session…" : "Delete session…", systemImage: "trash", role: .destructive, action: onDelete)
+                .disabled(store.isDeletionPending(for: conversation))
         }
     }
 }

@@ -17,14 +17,26 @@ enum SessionDeletionConfirmationText {
         )
     }
 
-    /// With `plan`, also says how many of the session's subagent sessions go with it, or stay.
+    /// With `plan`, also says how many of the session's subagent sessions go with it, or stay. With
+    /// `cliEnding`, as for Close and delete, first says what ends before the deletion.
     static func message(
         forDeleting conversation: Conversation,
         plan: SessionDeletionPlan? = nil,
+        cliEnding: SessionCLIEndingBeforeDeletion? = nil,
         language: AppInterfaceLanguage = AppLocalization.developmentLanguage
     ) -> String {
-        joined([oneSessionSentence(forDeleting: conversation, language: language)]
+        joined([cliEnding.map { cliEndingSentence($0, host: conversation.host, language: language) }]
+            + [oneSessionSentence(forDeleting: conversation, language: language)]
             + (plan.map { subagentSentences(for: $0, language: language) } ?? []))
+    }
+
+    private static func cliEndingSentence(_ cliEnding: SessionCLIEndingBeforeDeletion, host: SessionHost, language: AppInterfaceLanguage) -> String {
+        switch cliEnding {
+        case .closingTab:
+            AppLocalization.string("Its tab closes and its CLI ends first.", language: language)
+        case .endingCLIInTmux:
+            AppLocalization.string("Its CLI, still running on \(host.nameInSentence), ends first.", language: language)
+        }
     }
 
     private static func oneSessionSentence(forDeleting conversation: Conversation, language: AppInterfaceLanguage) -> String {

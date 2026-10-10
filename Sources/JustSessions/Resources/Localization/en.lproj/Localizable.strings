@@ -258,6 +258,10 @@
 	<string>Close Window</string>
 	<key>Close a tab with **Keep running**, or quit the app, and the CLI carries on in tmux. Click its session to return. A plain terminal ends with its tab.</key>
 	<string>Close a tab with **Keep running**, or quit the app, and the CLI carries on in tmux. Click its session to return. A plain terminal ends with its tab.</string>
+	<key>Close and delete session</key>
+	<string>Close and delete session</string>
+	<key>Close and delete session…</key>
+	<string>Close and delete session…</string>
 	<key>Close find</key>
 	<string>Close find</string>
 	<key>Close left view</key>
@@ -492,6 +496,10 @@
 	<string>Install `rsync` and the CLIs you use on the host.</string>
 	<key>Interface language</key>
 	<string>Interface language</string>
+	<key>Its CLI, still running on %@, ends first.</key>
+	<string>Its CLI, still running on %@, ends first.</string>
+	<key>Its tab closes and its CLI ends first.</key>
+	<string>Its tab closes and its CLI ends first.</string>
 	<key>JustSessions</key>
 	<string>JustSessions</string>
 	<key>JustSessions Help</key>
