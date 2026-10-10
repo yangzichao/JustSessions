@@ -50,7 +50,8 @@ struct TerminalTabGroupLabel: View {
         }
         .buttonStyle(ThemePressButtonStyle())
         .onHover { isHovered = $0 }
-        .help("\(isCollapsed ? "Expand" : "Collapse") \(projectName) — \(location.copyablePath)")
+        // The group's hover card names its folder too; see `TabGroupHoverCard`.
+        .accessibilityHint(Text(verbatim: location.copyablePath))
         .accessibilityLabel("\(projectName) tab group")
         .accessibilityValue("\(isCollapsed ? "Collapsed" : "Expanded"), \(CountedNoun.phrase(count: tabCount, singular: "tab"))")
         .contextMenu {

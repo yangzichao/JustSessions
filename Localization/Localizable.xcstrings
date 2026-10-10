@@ -208,6 +208,34 @@
         }
       }
     },
+    "%lld more tabs": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more tab"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more tabs"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还有 %lld 个标签页"
+          }
+        }
+      }
+    },
     "%lld of %lld": {
       "localizations": {
         "zh-Hans": {

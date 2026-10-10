@@ -24,6 +24,7 @@ struct WorkspaceDetailView: View {
     /// Each split's left pane share of the panes' width, by split id: even until its resize area is dragged, and kept as
     /// its views are reversed or swapped, as Chrome keeps a split's sizes.
     @State private var splitFractions: [UUID: CGFloat] = [:]
+    @StateObject private var hoverCards = TabHoverCardController()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -105,6 +106,10 @@ struct WorkspaceDetailView: View {
             .tabBarTerminalPalette(from: .shared, themeStore: .shared)
         }
         .ignoresSafeArea(edges: .top)
+        .environment(\.tabHoverCards, hoverCards)
+        // Over the terminals too, which the card hangs over from the tab bar.
+        .overlay { TabHoverCardOverlay(store: store, controller: hoverCards) }
+        .background(TabHoverCardEventWatcher(controller: hoverCards))
         .onChange(of: store.terminalSplits.map(\.id)) { _, splitIDs in
             // Forget the pane widths of splits that are gone.
             splitFractions = splitFractions.filter { splitIDs.contains($0.key) }
