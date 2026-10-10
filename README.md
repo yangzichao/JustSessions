@@ -62,7 +62,7 @@ Add a `~/.ssh/config` alias or `user@hostname` with passwordless SSH, `rsync`, a
 - Quit the app. The CLI stays alive in tmux.
 - Click the session to reattach to the same process.
 
-![The full JustSessions window with the same Claude Code CLI reattached in tmux after quitting and reopening the app](docs/images/tmux-keep-running.jpg)
+![JustSessions reattached to the same tmux-backed Claude Code CLI after closing its tab, with a local file-indexing task still progressing](docs/images/tmux-keep-running.jpg)
 
 The packaged app includes tmux for this Mac. Install tmux on each SSH host to survive disconnects there. Keep the machine awake. Plain shell tabs do not use tmux. [Terminal persistence](docs/guides/session-storage.md#terminal-persistence).
 
@@ -73,7 +73,7 @@ The packaged app includes tmux for this Mac. Install tmux on each SSH host to su
 - Automatically reopen tabs on launch.
 - Keep an agent and shell side by side; drag the divider to resize.
 
-![JustSessions Open tabs sidebar with five tabs across two projects, alongside the real Claude Code CLI and a project shell displaying Git diff in split view](docs/images/split-terminal.jpg)
+![JustSessions Open tabs sidebar with six tabs under one project, alongside the real Claude Code CLI and a project shell displaying Git diff in split view](docs/images/split-terminal.jpg)
 
 Tab recovery is controlled in **Settings → General**; split layouts reopen as separate tabs. [Tabs and split view](docs/guides/session-management.md#resume-branch-and-start-sessions).
 
