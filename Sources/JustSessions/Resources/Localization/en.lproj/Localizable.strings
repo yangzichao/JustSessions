@@ -640,6 +640,8 @@
 	<string>Organize</string>
 	<key>Passwordless SSH from this Mac</key>
 	<string>Passwordless SSH from this Mac</string>
+	<key>Paste</key>
+	<string>Paste</string>
 	<key>Path on the host, such as ~/code/app</key>
 	<string>Path on the host, such as ~/code/app</string>
 	<key>Permissions</key>
@@ -794,6 +796,8 @@
 	<string>Search the text of the conversation you are reading. ⌘F does the same.</string>
 	<key>Searching…</key>
 	<string>Searching…</string>
+	<key>Select All</key>
+	<string>Select All</string>
 	<key>Select a range</key>
 	<string>Select a range</string>
 	<key>Select several sessions or projects</key>

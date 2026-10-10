@@ -10,6 +10,8 @@ struct EmbeddedTerminalView: NSViewRepresentable {
     /// Called when a click lands on the terminal or its margin, or files are dropped on it, before the terminal takes
     /// the keyboard.
     let onFocus: () -> Void
+    /// Builds the menu a right-click on the terminal or its margin shows.
+    let makeContextMenu: () -> NSMenu
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -17,6 +19,7 @@ struct EmbeddedTerminalView: NSViewRepresentable {
         let terminalView = session.terminalView
         terminalView.setWorkspaceActive(isShown)
         terminalView.onFocus = onFocus
+        terminalView.makeContextMenu = makeContextMenu
         session.startIfNeeded()
         context.coordinator.wasActive = isActive
         if isActive { focus(terminalView, coordinator: context.coordinator) }
@@ -26,6 +29,7 @@ struct EmbeddedTerminalView: NSViewRepresentable {
     func updateNSView(_ insetView: TerminalInsetView, context: Context) {
         insetView.terminalView.setWorkspaceActive(isShown)
         insetView.terminalView.onFocus = onFocus
+        insetView.terminalView.makeContextMenu = makeContextMenu
         if isActive && !context.coordinator.wasActive {
             focus(insetView.terminalView, coordinator: context.coordinator)
         }

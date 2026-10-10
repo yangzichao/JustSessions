@@ -3413,6 +3413,16 @@
         }
       }
     },
+    "Paste": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "粘贴"
+          }
+        }
+      }
+    },
     "Path on the host, such as ~/code/app": {
       "localizations": {
         "zh-Hans": {
@@ -4223,6 +4233,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在搜索…"
+          }
+        }
+      }
+    },
+    "Select All": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全选"
           }
         }
       }

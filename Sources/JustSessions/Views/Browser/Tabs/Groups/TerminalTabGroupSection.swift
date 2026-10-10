@@ -64,12 +64,12 @@ struct TerminalTabGroupSection: View {
                     isSplitPartnerHovered: hoveredTabID.map { split?.partner(of: session.id) == $0 } ?? false,
                     showsLeadingSeparator: tabBefore(session.id, in: tabIDsInSight).map { showsSeparator(between: $0, and: session.id) } ?? false,
                     groupColor: color,
-                    splitMenu: splitMenu(for: session.id),
+                    splitMenu: store.splitMenu(forTab: session.id),
                     newSessionMenu: newSessionMenu(inGroupOf: session, projectName: projectName),
                     onHoverChange: { trackHover(of: session.id, isHovering: $0) },
                     onSelect: { store.selectTerminal(session.id) },
                     onRename: onRenameConversation,
-                    onSplitAction: { perform($0, from: session.id) },
+                    onSplitAction: { store.performSplitAction($0, fromTab: session.id, closeTab: onCloseTab) },
                     onClose: { onCloseTab(session.id) }
                 )
                 .id(session.id)
@@ -151,39 +151,6 @@ struct TerminalTabGroupSection: View {
             self.tabDrag = nil
         }
         store.selectTerminal(tabID)
-    }
-
-    /// The split entries Chrome's tab menu offers for the tab: a tab in a split arranges it; any other tab can open
-    /// in a new split with the selected tab while that is in none, or take a place in its split while it is in one.
-    private func splitMenu(for tabID: UUID) -> TerminalTabSplitMenu? {
-        if store.split(containing: tabID) != nil { return .arrangeSplit }
-        guard let selectedTerminalID = store.selectedTerminalID else { return nil }
-        if store.split(containing: selectedTerminalID) != nil { return .moveIntoShownSplit }
-        guard tabID == selectedTerminalID else { return .newSplitWithSelectedTab }
-        let candidates = store.terminalSessions
-            .filter { $0.id != tabID && store.split(containing: $0.id) == nil }
-            .map { TerminalTabSplitCandidate(session: $0, projectDisplayName: store.projectDisplayName(forProjectPath: $0.projectDirectoryKey)) }
-        return .addTabToNewSplit(candidates: candidates)
-    }
-
-    /// Acts on the tab's split entry. The views a split entry closes go through the same close request as their ×.
-    private func perform(_ action: TerminalTabSplitAction, from tabID: UUID) {
-        switch action {
-        case .newSplitWithSelectedTab:
-            store.splitSelectedTerminal(with: tabID)
-        case .addToNewSplit(let otherTabID):
-            store.splitSelectedTerminal(with: otherTabID)
-        case .moveIntoShownSplit(let side):
-            store.moveIntoShownSplit(tabID, swappingWith: side)
-        case .separateViews:
-            if let split = store.split(containing: tabID) { store.separateSplit(split.id) }
-        case .closeView(let side):
-            if let split = store.split(containing: tabID), let sides = store.sides(of: split) {
-                onCloseTab(sides.tabID(on: side))
-            }
-        case .reverseViews:
-            if let split = store.split(containing: tabID) { store.reverseSplit(split.id) }
-        }
     }
 
     /// Drawn as the selected tab: the selected tab and the other tab of its split.
