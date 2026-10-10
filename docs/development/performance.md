@@ -122,6 +122,7 @@ The footprint is what Activity Monitor's Memory column shows. Read the table wit
 | 9 | [SwiftUI's scroll position tracking](#9-swiftuis-scroll-position-tracking) | Done: issue #55 |
 | 10 | [Message search decoded every image](#10-message-search-decoded-every-image) | Done: issue #59 |
 | 11 | [Codex's compacted records are parsed in full](#11-codexs-compacted-records-are-parsed-in-full) | To investigate |
+| 14 | [A CLI activity change updates only the rows in view](#14-a-cli-activity-change-updates-only-the-rows-in-view) | Measured, no change: issue #61 |
 
 ### 1. Timestamp parsing
 
@@ -255,6 +256,24 @@ The gain is smaller on real sessions. On one contributor's 46 Claude Code and 16
 **Evidence:** a Codex `compacted` record carries the conversation it replaced, images included. The reader only shows a note for it, but `CodexTranscriptReader.mightContainTranscriptItem` lets the line through, so the whole record is JSON-parsed. In the 163 Codex sessions of item 10, these records held 306 MiB of image base64, 16% of all of it, and more than the messages themselves.
 
 **Plan:** measure how much reading time these records take. If it matters, add the note from the line's start, which holds the timestamp and type, without parsing the rest.
+
+### 14. A CLI activity change updates only the rows in view
+
+**Question (issue #61):** when a CLI's activity changes, `ConversationStore` publishes, and every view that observes the store is invalidated. Does that re-render rows whose session didn't change, and would a narrower publication help?
+
+**Measured:** `SidebarInteractionMeasurements`' store-change scenario, release build, with `Self._printChanges()` added to the sidebar's and detail view's bodies for the run. One activity change at 300 and at 2,000 sessions re-ran these bodies, every project expanded by a search, and every project collapsed:
+
+| View | Expanded | Collapsed |
+| --- | --- | --- |
+| `ConversationSidebarView` | 1 | 1 |
+| `WorkspaceDetailView` | 1 | 1 |
+| `SidebarProjectSection` | 24–25 | 50 |
+| `SidebarProjectRow` | 24 | 24 |
+| `SidebarSessionRow` | 21–24 | 0 |
+
+The same at 300 and at 2,000 sessions: the sidebar's lazy list builds only the rows in its viewport, so the count is set by the window, not the library. The turn took 15–18 ms expanded and 8–10 ms collapsed. In a Time Profiler recording of the turn and the one that follows, the app's own bodies, which filter `terminalSessions` and sum up each project's activity, were the top frame in 13% of samples; about 60% were SwiftUI re-measuring the lazy stack's rows (`_LazyLayout_Subviews.apply`, `sizeThatFits`).
+
+**Conclusion:** the store already suppresses unchanged activity, and SwiftUI already limits the work to the rows in view. Cutting the turn further would mean making each row skip its body and layout when its own values didn't change, which needs the rows to stop observing the store and take their values from the section instead. That is a wider change to the sidebar's rows and their menus for a saving of perhaps 5–10 ms on an event that happens at most once a second per CLI. Not done.
 
 ## How to profile
 
