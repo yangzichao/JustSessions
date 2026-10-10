@@ -7,7 +7,6 @@ import SwiftUI
 /// `ZoomInEqualsKey`. Command shortcuts never reach a tab's CLI.
 struct TextZoomCommands: Commands {
     @ObservedObject private var languageStore = AppLanguageStore.shared
-    @FocusedValue(\.textZoomTarget) private var workspaceTarget
 
     var body: some Commands {
         CommandGroup(after: .sidebar) {
@@ -21,10 +20,11 @@ struct TextZoomCommands: Commands {
         }
     }
 
-    /// Read when the item is chosen. A Read window is AppKit's, outside the workspace windows' scene, and shows a
-    /// conversation.
+    /// Read when the item is chosen. A Read window is AppKit's, outside the workspace windows' scene.
     private func zoom(_ step: TextZoomStep) {
-        let target = NSApp.keyWindow?.windowController is SessionReadingWindowController ? .conversation : workspaceTarget
+        let target = TextZoomTargetRegistry.shared.target(keyWindow: NSApp.keyWindow, mainWindow: NSApp.mainWindow) {
+            $0.windowController is SessionReadingWindowController
+        }
         target?.zoom(step)
     }
 }
