@@ -53,7 +53,7 @@ struct SidebarProjectFilteringTests {
             projects,
             providerFilter: .all,
             recencyFilter: .all,
-            waitingFilter: .waitingForYou,
+            statusFilter: .waitingForYou,
             waiting: waitingSessions
         )
 
@@ -63,6 +63,43 @@ struct SidebarProjectFilteringTests {
         let unfiltered = SidebarProjectFiltering.projects(projects, providerFilter: .all, recencyFilter: .all, waiting: waitingSessions)
         #expect(unfiltered.contains { $0.id == "/work/empty" })
         #expect(unfiltered.flatMap(\.conversations).count == 3)
+    }
+
+    @Test func runningKeepsOnlySessionsWhoseCLIRunsAndRunningNewSessionTabsAndDropsEmptyProjects() {
+        let running = Conversation.fixture(provider: .claude, projectPath: "/work/app")
+        let ended = Conversation.fixture(provider: .claude, projectPath: "/work/app")
+        let runningOnDevbox = Conversation.fixture(provider: .codex, projectPath: "/work/site", host: .ssh("devbox"))
+        let runningNewSession = PendingNewSession(
+            terminalID: UUID(), provider: .codex, projectDirectoryKey: runningOnDevbox.projectDirectoryKey, title: "New session", startedAt: .now
+        )
+        let endedNewSession = PendingNewSession(
+            terminalID: UUID(), provider: .codex, projectDirectoryKey: runningOnDevbox.projectDirectoryKey, title: "New session", startedAt: .now
+        )
+        let projects = ProjectConversationGroup.grouped(
+            [running, ended, runningOnDevbox],
+            pendingNewSessions: [runningNewSession, endedNewSession],
+            retainedProjectPaths: ["/work/empty", "/work/app", runningOnDevbox.projectDirectoryKey]
+        )
+        let runningSessions = SessionsRunning(
+            conversationIDs: [running.id, runningOnDevbox.id], terminalIDs: [runningNewSession.terminalID]
+        )
+
+        let filtered = SidebarProjectFiltering.projects(
+            projects,
+            providerFilter: .all,
+            recencyFilter: .all,
+            statusFilter: .running,
+            running: runningSessions
+        )
+
+        #expect(Set(filtered.map(\.id)) == ["/work/app", runningOnDevbox.projectDirectoryKey])
+        #expect(Set(filtered.flatMap(\.conversations).map(\.id)) == [running.id, runningOnDevbox.id])
+        #expect(filtered.flatMap(\.pendingNewSessions).map(\.id) == [runningNewSession.id])
+        // A session that runs but does not wait on you is not listed by Waiting for you.
+        let waitingOnly = SidebarProjectFiltering.projects(
+            projects, providerFilter: .all, recencyFilter: .all, statusFilter: .waitingForYou, running: runningSessions
+        )
+        #expect(waitingOnly.isEmpty)
     }
 
     @Test func projectMatchKeepsAllSessionsAndSessionMatchKeepsOnlyMatches() {

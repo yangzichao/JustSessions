@@ -634,8 +634,12 @@
 	<string>No messages yet</string>
 	<key>No open tabs</key>
 	<string>No open tabs</string>
+	<key>No session is running</key>
+	<string>No session is running</string>
 	<key>No session selected</key>
 	<string>No session selected</string>
+	<key>No session was running at the last refresh</key>
+	<string>No session was running at the last refresh</string>
 	<key>No sessions</key>
 	<string>No sessions</string>
 	<key>No sessions in the past seven days</key>
@@ -814,6 +818,8 @@
 	<string>Right-click a session to rename, pin, export, or delete it. ⌘-click or Shift-click to select several at once.</string>
 	<key>Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.</key>
 	<string>Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.</string>
+	<key>Running</key>
+	<string>Running</string>
 	<key>SSH alias or user@hostname</key>
 	<string>SSH alias or user@hostname</string>
 	<key>SSH aliases come from `~/.ssh/config`.</key>

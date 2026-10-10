@@ -14,7 +14,7 @@ struct SidebarEmptyHostMessage: Equatable {
         copyStep: RemoteSessionCopyStep?,
         isSearching: Bool,
         recencyFilter: SessionRecencyFilter,
-        waitingFilter: SessionWaitingFilter
+        statusFilter: SessionStatusFilter
     ) {
         switch refreshStatus {
         case .failed(let error)?:
@@ -30,7 +30,13 @@ struct SidebarEmptyHostMessage: Equatable {
         case .refreshed?, nil:
             if isSearching {
                 self.init(text: "No matching projects or sessions")
-            } else if waitingFilter == .waitingForYou {
+            } else if statusFilter == .running {
+                // An SSH host's running sessions are known as of its last refresh, so say so rather than claim
+                // nothing runs there now.
+                self.init(text: host == .thisMac
+                    ? "No session is running"
+                    : "No session was running at the last refresh")
+            } else if statusFilter == .waitingForYou {
                 // Only Claude Code, Codex, Pi, and OpenCode on this Mac tell what they are doing, so say so rather
                 // than suggest nothing else waits.
                 self.init(text: host == .thisMac

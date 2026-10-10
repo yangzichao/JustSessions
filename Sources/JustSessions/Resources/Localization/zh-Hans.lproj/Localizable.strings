@@ -632,8 +632,12 @@
 	<string>暂无消息</string>
 	<key>No open tabs</key>
 	<string>暂无打开的标签</string>
+	<key>No session is running</key>
+	<string>没有正在运行的会话</string>
 	<key>No session selected</key>
 	<string>未选择会话</string>
+	<key>No session was running at the last refresh</key>
+	<string>上次刷新时没有正在运行的会话</string>
 	<key>No sessions</key>
 	<string>暂无会话</string>
 	<key>No sessions in the past seven days</key>
@@ -816,6 +820,8 @@
 	<string>右键单击会话可以重命名、置顶、导出或删除。按住 ⌘ 或 Shift 单击可一次选择多个。</string>
 	<key>Right-click another tab and choose **New split view with current tab**. Drag between the two views to resize them.</key>
 	<string>右键单击另一个标签页，选择 **使用当前标签页创建新的拆分视图**。在两个视图之间拖动可调整大小。</string>
+	<key>Running</key>
+	<string>运行中</string>
 	<key>SSH alias or user@hostname</key>
 	<string>SSH 别名或 user@hostname</string>
 	<key>SSH aliases come from `~/.ssh/config`.</key>

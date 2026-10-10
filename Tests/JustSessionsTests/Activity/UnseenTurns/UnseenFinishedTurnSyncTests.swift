@@ -21,7 +21,7 @@ struct UnseenFinishedTurnSyncTests {
         #expect(fixture.isWaitingForYou)
         #expect(store.activitySummary(forProjectDirectoryKey: fixture.tab.projectDirectoryKey).mostPressingStatus == .finishedUnseen)
         let waitingOnly = store.filteredSidebarProjection(
-            providerFilter: .all, recencyFilter: .all, waitingFilter: .waitingForYou, searchText: ""
+            providerFilter: .all, recencyFilter: .all, statusFilter: .waitingForYou, searchText: ""
         )
         #expect(waitingOnly.projects.flatMap(\.conversations).map(\.id) == [fixture.conversation.id])
         #expect(waitingOnly.waitingSessionCount == 1)

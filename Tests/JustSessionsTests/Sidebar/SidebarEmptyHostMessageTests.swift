@@ -32,10 +32,16 @@ struct SidebarEmptyHostMessageTests {
         }
     }
 
+    @Test func withNothingRunningItSaysSoAndThatAnSSHHostIsKnownAsOfItsLastRefresh() {
+        #expect(message(nil, statusFilter: .running).text == "No session is running")
+        #expect(message(nil, on: .ssh("devbox"), statusFilter: .running).text == "No session was running at the last refresh")
+        #expect(message(nil, isSearching: true, statusFilter: .running).text == "No matching projects or sessions")
+    }
+
     @Test func withNothingWaitingItNamesTheCLIsThatTellOrSaysAnSSHHostCannot() {
-        #expect(message(nil, waitingFilter: .waitingForYou).text == "No Claude Code, Codex, Pi, or OpenCode session is waiting for you")
-        #expect(message(nil, on: .ssh("devbox"), waitingFilter: .waitingForYou).text == "SSH hosts don't tell when a session waits for you")
-        #expect(message(nil, isSearching: true, waitingFilter: .waitingForYou).text == "No matching projects or sessions")
+        #expect(message(nil, statusFilter: .waitingForYou).text == "No Claude Code, Codex, Pi, or OpenCode session is waiting for you")
+        #expect(message(nil, on: .ssh("devbox"), statusFilter: .waitingForYou).text == "SSH hosts don't tell when a session waits for you")
+        #expect(message(nil, isSearching: true, statusFilter: .waitingForYou).text == "No matching projects or sessions")
     }
 
     private func message(
@@ -44,7 +50,7 @@ struct SidebarEmptyHostMessageTests {
         copyStep: RemoteSessionCopyStep? = nil,
         isSearching: Bool = false,
         recencyFilter: SessionRecencyFilter = .all,
-        waitingFilter: SessionWaitingFilter = .all
+        statusFilter: SessionStatusFilter = .all
     ) -> SidebarEmptyHostMessage {
         SidebarEmptyHostMessage(
             host: host,
@@ -52,7 +58,7 @@ struct SidebarEmptyHostMessageTests {
             copyStep: copyStep,
             isSearching: isSearching,
             recencyFilter: recencyFilter,
-            waitingFilter: waitingFilter
+            statusFilter: statusFilter
         )
     }
 }

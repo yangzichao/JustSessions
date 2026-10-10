@@ -1,25 +1,27 @@
 import SwiftUI
 
-/// Waiting, time, and tool filters apply only to the project library, never to open terminals.
+/// Status, time, and tool filters apply only to the project library, never to open terminals.
 struct SidebarProjectFilterMenu: View {
     @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
-    @Binding var waitingFilter: SessionWaitingFilter
+    @Binding var statusFilter: SessionStatusFilter
     /// Tools installed on a host or with listed sessions; the menu offers only these.
     let offeredProviders: Set<ConversationProvider>
     let allSessionCount: Int
     let recentSessionCount: Int
+    let runningSessionCount: Int
     let waitingSessionCount: Int
     @Environment(\.self) private var environment
 
     private var isFiltering: Bool {
-        recencyFilter != .all || providerFilter.provider != nil || waitingFilter != .all
+        recencyFilter != .all || providerFilter.provider != nil || statusFilter != .all
     }
 
-    private var isWaitingForYouOnly: Binding<Bool> {
+    /// Running and Waiting for you each list by the CLI's status, so turning one on turns the other off.
+    private func isStatusOnly(_ status: SessionStatusFilter) -> Binding<Bool> {
         Binding(
-            get: { waitingFilter == .waitingForYou },
-            set: { waitingFilter = $0 ? .waitingForYou : .all }
+            get: { statusFilter == status },
+            set: { statusFilter = $0 ? status : .all }
         )
     }
 
@@ -29,7 +31,10 @@ struct SidebarProjectFilterMenu: View {
         let filteredProvider = providerFilter.provider
 
         return Menu {
-            Toggle(isOn: isWaitingForYouOnly) {
+            Toggle(isOn: isStatusOnly(.running)) {
+                Text("Running") + Text(verbatim: " · \(runningSessionCount.formatted())")
+            }
+            Toggle(isOn: isStatusOnly(.waitingForYou)) {
                 Text("Waiting for you") + Text(verbatim: " · \(waitingSessionCount.formatted())")
             }
             Divider()
@@ -57,7 +62,7 @@ struct SidebarProjectFilterMenu: View {
                 Button("Clear filters") {
                     recencyFilter = .all
                     providerFilter = .all
-                    waitingFilter = .all
+                    statusFilter = .all
                 }
             }
         } label: {
@@ -78,7 +83,7 @@ struct SidebarProjectFilterMenu: View {
         )
         .overlay(alignment: .topTrailing) {
             // The tool's icon takes the chip, so a dot tells that another filter is on too.
-            if recencyFilter == .recent || waitingFilter != .all, filteredProvider != nil {
+            if recencyFilter == .recent || statusFilter != .all, filteredProvider != nil {
                 Circle().fill(.primary).frame(width: 4, height: 4)
             }
         }
