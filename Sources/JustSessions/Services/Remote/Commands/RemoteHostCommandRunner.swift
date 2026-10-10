@@ -10,6 +10,7 @@ struct RemoteHostCommandRunner: Sendable {
             BoundedProcessRunner.result(
                 ofExecutable: "/usr/bin/ssh",
                 arguments: Self.sshArguments(host: host, command: command),
+                environment: SSHProcessEnvironment.standard,
                 includesStandardError: true,
                 timeout: timeout
             )

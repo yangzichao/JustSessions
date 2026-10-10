@@ -161,7 +161,7 @@ final class ConversationStore: ObservableObject {
         self.cliStartCommands = CLIStartCommands.load(from: userDefaults)
         self.remoteShellStartupChecks = RemoteShellStartupChecks.load(from: userDefaults)
         applyRemoteShellStartups()
-        LoginShellPathReader.warmUpInBackground()
+        LoginShellEnvironment.warmUpInBackground()
         ClaudeSessionIDFlagSupport.shared.warmUpInBackground()
         if startsBackgroundPolling {
             startClaudeLiveNameSync()

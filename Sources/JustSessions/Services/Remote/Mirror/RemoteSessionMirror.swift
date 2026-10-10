@@ -48,12 +48,8 @@ struct RemoteSessionMirror: Sendable {
         let remoteFolder = Self.remoteFolder(for: provider)
         let source = sourceHomeOverride.map { "\($0)/\(remoteFolder)/" } ?? "\(host):\(remoteFolder)/"
 
-        guard let result = BoundedProcessRunner.result(
-            ofExecutable: "/usr/bin/rsync",
-            arguments: Self.rsyncArguments(for: provider, source: source, destination: destination.path + "/"),
-            includesStandardError: true,
-            timeout: 600
-        ) else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
+        guard let result = Self.runRsync(for: provider, source: source, destination: destination.path + "/")
+        else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
 
         switch result.exitStatus {
         case 0:
@@ -70,6 +66,17 @@ struct RemoteSessionMirror: Sendable {
             let lastLine = result.output.split(separator: "\n").last.map(String.init) ?? "exit status \(result.exitStatus)"
             throw RemoteSessionMirrorError.rsyncFailed(host: host, output: lastLine)
         }
+    }
+
+    /// Copies one tool's files, with `ssh` running in the login shell's environment like the app's other connections.
+    static func runRsync(for provider: ConversationProvider, source: String, destination: String) -> (exitStatus: Int32, output: String)? {
+        BoundedProcessRunner.result(
+            ofExecutable: "/usr/bin/rsync",
+            arguments: rsyncArguments(for: provider, source: source, destination: destination),
+            environment: SSHProcessEnvironment.standard,
+            includesStandardError: true,
+            timeout: 600
+        )
     }
 
     /// No `--prune-empty-dirs`: it drops a project folder whose last session was deleted from the transfer,

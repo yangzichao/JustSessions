@@ -24,7 +24,7 @@ struct RemoteShellStartupCheck: Sendable {
                 ofExecutable: "/usr/bin/ssh",
                 arguments: Self.sshArguments(host: host, command: command),
                 // A tab's terminal settings, which startup files may look at, such as TERM.
-                environment: TerminalColorEnvironment.embeddedTerminalEnvironment(from: ProcessInfo.processInfo.environment),
+                environment: TerminalColorEnvironment.embeddedTerminalEnvironment(from: SSHProcessEnvironment.standard),
                 includesStandardError: true,
                 timeout: timeout
             )

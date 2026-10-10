@@ -4,11 +4,11 @@ import Foundation
 enum CLISearchDirectories {
     static func standard(
         inheritedEnvironment: [String: String],
-        loginShellDirectories: [String] = LoginShellPathReader.cachedPathDirectories,
+        loginShellDirectories: [String] = LoginShellEnvironment.cachedPathDirectories,
         homeDirectory: String = NSHomeDirectory(),
         fileManager: FileManager = .default
     ) -> [String] {
-        let inheritedDirectories = LoginShellPathReader.parsePathDirectories(inheritedEnvironment["PATH"] ?? "")
+        let inheritedDirectories = LoginShellEnvironment.parsePathDirectories(inheritedEnvironment["PATH"] ?? "")
         return deduplicated(
             inheritedDirectories
                 + loginShellDirectories
