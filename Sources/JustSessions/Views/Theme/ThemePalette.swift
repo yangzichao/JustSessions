@@ -17,7 +17,7 @@ enum ThemePalette {
 
     // MARK: Ink
 
-    /// Used where other apps put the system accent: the new-session badge and the selected tab text.
+    /// Used where other apps put the system accent: prominent buttons and the selected tab text.
     static let ink = ThemeColor(role: .ink)
     /// Text and glyphs drawn on top of `ink`.
     static let inkForeground = ThemeColor(role: .inkForeground)

@@ -9,7 +9,7 @@ struct AppThemeColors: Equatable, Sendable {
     let raisedSurface: UInt32
     /// Your messages in a transcript.
     let userMessageSurface: UInt32
-    /// Used where other apps put the system accent: the new-session badge and the selected tab text. The theme's own
+    /// Used where other apps put the system accent: prominent buttons and the selected tab text. The theme's own
     /// ink is darkened or lightened until it is readable on every surface in `textSurfaces`; Tokyo Night Day's blue is
     /// 4.0 on its sidebar.
     let ink: UInt32
