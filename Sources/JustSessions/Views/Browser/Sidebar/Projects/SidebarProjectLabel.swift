@@ -9,7 +9,7 @@ struct SidebarProjectLabel: View {
     var body: some View {
         HStack(spacing: 7) {
             // A pinned project's pin takes the folder's place, rather than joining the status and actions at the end.
-            Image(systemName: project.isPinned ? "pin.fill" : "folder")
+            Image(systemName: project.isPinned ? "pin" : "folder")
                 .font(.system(size: 12))
                 .foregroundStyle(ThemePalette.secondaryText)
                 .frame(width: 16)
