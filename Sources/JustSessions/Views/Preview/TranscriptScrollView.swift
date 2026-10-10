@@ -6,7 +6,8 @@ struct TranscriptScrollView: View {
     let isActive: Bool
     let paging: TranscriptPagingModel?
     let onOpenInNewWindow: (() -> Void)?
-    @State var visibleEntryIndex: Int?
+    /// Records the reading position and restores it. Nothing else tracks where the reader is: SwiftUI's own tracking, with
+    /// `.scrollPosition(id:)`, searched every entry on each scroll step for the one at the top.
     @State var positionController: TranscriptScrollPositionController
     @State var restoredPagingRevision: Int?
     @State private var readingFontSize: CGFloat = 15
@@ -31,7 +32,6 @@ struct TranscriptScrollView: View {
         _searchState = State(initialValue: searchState)
         let initialPosition = (positionStore.position(for: conversation.id) ?? .bottom).resolved(in: transcript)
         self.initialPosition = initialPosition
-        _visibleEntryIndex = State(initialValue: initialPosition.entryIndex)
         _positionController = State(initialValue: TranscriptScrollPositionController(
             conversationID: conversation.id,
             positionStore: positionStore,
@@ -76,7 +76,6 @@ struct TranscriptScrollView: View {
                 .onChange(of: searchState.navigationRevision) {
                     guard let match = searchState.selectedMatch else { return }
                     positionController.restore(.entry(index: match.entryIndex, offset: -6))
-                    visibleEntryIndex = match.entryIndex
                     scrollProxy.scrollTo(match.entryIndex, anchor: .top)
                 }
                 .onChange(of: isActive) {
@@ -110,7 +109,6 @@ struct TranscriptScrollView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.bottom, 8)
                 }
-                // Only messages participate in scroll targeting; the omitted-entry notice has no message index.
                 TranscriptEntriesStack(transcript: transcript, provider: conversation.provider, positionController: positionController)
                     .equatable()
                 if let paging, paging.hasLater {
@@ -129,21 +127,10 @@ struct TranscriptScrollView: View {
         }
         // Short conversations start at the top; the explicit restoration still opens long ones on their latest entry.
         .defaultScrollAnchor(.top)
-        .scrollPosition(id: scrollTarget, anchor: .top)
         .onDisappear { positionController.stop() }
     }
 
     var displayedEntryIndices: [Int] { transcript.positionIDs }
-
-    private var scrollTarget: Binding<Int?> {
-        Binding(
-            get: { visibleEntryIndex },
-            set: { index in
-                // Estimated lazy heights must not replace the requested entry before its offset is restored.
-                if !positionController.isRestoring { visibleEntryIndex = index }
-            }
-        )
-    }
 
     private var messageCount: Int {
         transcript.entries.filter { entry in

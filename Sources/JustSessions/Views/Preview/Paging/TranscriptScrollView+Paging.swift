@@ -5,13 +5,11 @@ extension TranscriptScrollView {
         if let paging { paging.first(); return }
         guard let index = displayedEntryIndices.first else { return }
         positionController.restore(.entry(index: index, offset: -6))
-        visibleEntryIndex = index
     }
 
     func showLatestMessage() {
         if let paging { paging.latest(); return }
         positionController.restore(.bottom)
-        visibleEntryIndex = displayedEntryIndices.last
     }
 
     func loadEarlierPage() {
@@ -57,7 +55,6 @@ extension TranscriptScrollView {
         if let index = position.entryIndex, positionController.documentMinY(ofEntryAt: index) == nil {
             // The entry is new, as after going to the first message: SwiftUI brings its row into view first.
             positionController.restore(position)
-            visibleEntryIndex = index
             scrollProxy.scrollTo(index, anchor: .top)
         } else {
             positionController.restore(position, duringNextLayout: true)
