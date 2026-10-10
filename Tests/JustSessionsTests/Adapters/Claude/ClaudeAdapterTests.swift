@@ -33,6 +33,25 @@ struct ClaudeAdapterTests {
         #expect(adapter.arguments(for: conversations[0], action: .branch).last == "--fork-session")
     }
 
+    /// The session this fixes was started from a New session tab with a screenshot pasted into its first prompt:
+    /// unlisted, its tab stayed a New session row for good.
+    @Test func aSessionWhoseFirstPromptCarriesAScreenshotIsListedWithItsFolderAndText() throws {
+        let folder = try ClaudeProjectFolderFixture()
+        defer { folder.remove() }
+        let sessionID = UUID().uuidString
+        let imageData = String(repeating: "A", count: 300_000)
+        try folder.writeTranscript(sessionID, lines: [
+            #"{"type":"mode","mode":"normal","sessionId":"\#(sessionID)"}"#,
+            #"{"type":"file-history-snapshot","messageId":"m1"}"#,
+            #"{"type":"user","cwd":"/Users/me/app","message":{"role":"user","content":[{"type":"text","text":"[Image #1] Is this a bug?"},{"type":"image","source":{"type":"base64","data":"\#(imageData)"}}]},"timestamp":"2026-10-10T07:00:00Z"}"#,
+        ])
+
+        let found = try #require(folder.discoveredConversationsBySessionID()[sessionID])
+
+        #expect(found.projectPath == "/Users/me/app")
+        #expect(found.suggestedTitle == "[Image #1] Is this a bug?")
+    }
+
     @Test func sidechainSessionsAreLeftOut() throws {
         let folder = try ClaudeProjectFolderFixture()
         defer { folder.remove() }
@@ -126,7 +145,8 @@ struct ClaudeAdapterTests {
         try folder.writeTranscript(renamedInIndex, lines: [prompt])
         try folder.writeTranscript(promptInIndex, lines: [prompt])
         try folder.writeTranscript(promptInTranscript, lines: [prompt])
-        try folder.writeTranscript(untitled, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":[{"type":"text","text":"Sent as parts"}]}}"#])
+        // A tool result is a user record too, but holds nothing the user typed.
+        try folder.writeTranscript(untitled, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":[{"type":"tool_result","content":"ok"}]}}"#])
         try folder.writeIndex(#"""
         {"entries":[
           {"sessionId":"\#(renamedInTranscript)","customTitle":"Index name","firstPrompt":"Index prompt"},

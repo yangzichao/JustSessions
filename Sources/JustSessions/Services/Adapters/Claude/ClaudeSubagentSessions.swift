@@ -17,9 +17,7 @@ struct ClaudeSubagentSession: Sendable, Codable {
             lineCount += 1
             if let record = ConversationMetadata.object(from: line) {
                 workingDirectory = workingDirectory ?? record["cwd"] as? String
-                if firstPrompt == nil, record["type"] as? String == "user", let message = record["message"] as? [String: Any] {
-                    firstPrompt = message["content"] as? String
-                }
+                if firstPrompt == nil { firstPrompt = ClaudeUserPromptText.text(ofRecord: record) }
             }
             return (workingDirectory == nil || firstPrompt == nil) && lineCount < ClaudeTranscriptHead.maximumLineCount
         }
