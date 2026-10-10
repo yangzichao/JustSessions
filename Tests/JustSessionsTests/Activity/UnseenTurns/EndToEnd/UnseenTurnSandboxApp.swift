@@ -45,6 +45,8 @@ final class UnseenTurnSandboxApp {
             ),
             userDefaults: settings.userDefaults,
             sessionNotifier: notifier,
+            // It types into the CLIs with SwiftTerm's `send(txt:)`.
+            terminalEngineStore: try .pinned(to: .swiftTerm),
             startsBackgroundPolling: false
         )
     }
@@ -111,7 +113,7 @@ final class UnseenTurnSandboxApp {
     /// Types a prompt in the session's tab, and waits until its CLI works on it.
     func sendPrompt(_ prompt: String, in title: String) async throws {
         let tab = try tab(of: title)
-        tab.terminalView.send(txt: prompt + "\r")
+        try #require(tab.terminalView as? SelectableTerminalView).send(txt: prompt + "\r")
         try #require(await followCLIs { tab.cliActivity == .working }, "\"\(title)\" never started its turn: \(reportDiagnostics(of: tab))")
     }
 
@@ -130,7 +132,7 @@ final class UnseenTurnSandboxApp {
 
     func quitCLI(in title: String) async throws {
         let tab = try tab(of: title)
-        tab.terminalView.send(txt: "/exit\r")
+        try #require(tab.terminalView as? SelectableTerminalView).send(txt: "/exit\r")
         try #require(await sandbox.waitUntil { tab.hasExited }, "\"\(title)\"'s tab never ended")
         await followCLIsOnce()
     }

@@ -3,13 +3,15 @@ import Foundation
 /// What only SSH hosts need of tmux: reconnecting a tab whose connection ended. A refresh lists the host's tmux
 /// sessions through `RemoteHostStatusProbe`; the rest is shared with this Mac, see `ConversationStore+Tmux`.
 extension ConversationStore {
-    /// Opens a fresh connection for a remote tab whose connection ended, in its place in the tab bar.
+    /// Opens a fresh connection for a remote tab whose connection ended, in its place in the tab bar, drawn by the
+    /// engine the tab opened with.
     func reconnectRemoteTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }),
               terminalSessions[index].host != .thisMac,
               terminalSessions[index].hasExited else { return }
         let ended = terminalSessions[index]
         let replacement = TerminalSession(
+            engine: ended.engine,
             conversation: ended.conversation,
             provider: ended.provider,
             projectPath: ended.projectPath,

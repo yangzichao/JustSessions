@@ -33,6 +33,7 @@ final class TabBarWindowFixture {
     @discardableResult
     func openTab(_ title: String, in projectPath: String) -> TerminalSession {
         let tab = TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: nil,
             projectPath: projectPath,

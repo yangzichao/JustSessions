@@ -22,6 +22,7 @@ extension ConversationStore {
             startCommand: startCommand
         )
         let session = TerminalSession(
+            engine: terminalEngineStore.engine,
             conversation: nil,
             provider: provider,
             projectPath: projectPath,

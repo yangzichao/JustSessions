@@ -79,7 +79,7 @@ Tab recovery is controlled in **Settings → General**; split layouts reopen as 
 
 ## Lightweight by design
 
-- **Native SwiftUI + SwiftTerm.** A Mac app with an AppKit terminal.
+- **Native SwiftUI + SwiftTerm.** A Mac app with an AppKit terminal, or Ghostty's GPU-drawn one as a setting.
 - **No import or new account.** Reads the history your CLIs already create.
 - **No conversation uploads.** JustSessions reads existing CLI history; your CLIs still communicate with their providers.
 - **Free and open source.** MIT licensed; your CLI provider’s charges still apply.
@@ -129,4 +129,4 @@ For in-app help, open **Settings → Help**. Send feedback or report an issue fr
 
 ## License
 
-[MIT](LICENSE). The embedded terminal uses [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm) under its MIT license. Terminals draw Nerd Font icons with Symbols Nerd Font Mono from [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts), which the app includes with its license and the licenses of its icon sets.
+[MIT](LICENSE). The embedded terminal uses [Ghostty](https://github.com/ghostty-org/ghostty) through [libghostty-spm](https://github.com/Lakr233/libghostty-spm), and [SwiftTerm](https://github.com/migueldeicaza/SwiftTerm), each under its MIT license; the app includes the licenses of everything Ghostty's library links, apart from the few its [notice](Branding/ThirdParty/Ghostty/README.md) lists as not collected. Terminals draw Nerd Font icons with Symbols Nerd Font Mono from [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts), which the app includes with its license and the licenses of its icon sets.

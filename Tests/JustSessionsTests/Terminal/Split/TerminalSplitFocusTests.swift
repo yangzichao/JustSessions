@@ -8,8 +8,9 @@ import Testing
 /// back, it would resign first responder and typing would go nowhere until a click.
 @MainActor
 struct TerminalSplitFocusTests {
-    @Test func reorderingTheTabsKeepsTheKeyboardOnTheSelectedTerminal() async throws {
-        let workspace = try SplitWorkspace()
+    @Test(arguments: TerminalEngine.allCases)
+    func reorderingTheTabsKeepsTheKeyboardOnTheSelectedTerminal(_ engine: TerminalEngine) async throws {
+        let workspace = try SplitWorkspace(engine: engine)
         defer { workspace.close() }
         let store = workspace.store
         let first = workspace.open()
@@ -47,11 +48,13 @@ struct TerminalSplitFocusTests {
 private final class SplitWorkspace {
     let store: ConversationStore
     let window: NSWindow
+    private let engine: TerminalEngine
     private let settings: IsolatedUserDefaults
     private let hostingView: NSHostingView<AnyView>
 
-    init() throws {
+    init(engine: TerminalEngine) throws {
         _ = NSApplication.shared
+        self.engine = engine
         settings = try IsolatedUserDefaults()
         store = ConversationStore(adapters: [], userDefaults: settings.userDefaults)
         hostingView = NSHostingView(rootView: AnyView(EmptyView()))
@@ -62,6 +65,7 @@ private final class SplitWorkspace {
 
     func open() -> TerminalSession {
         let tab = TerminalSession(
+            engine: engine,
             conversation: nil,
             provider: nil,
             projectPath: "/tmp/split-focus",

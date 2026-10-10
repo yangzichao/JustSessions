@@ -14,6 +14,7 @@ struct TabReopeningStoreTests {
         store.replaceConversations(on: .thisMac, with: [conversation])
 
         store.openTerminal(TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: .claude,
             projectPath: sandbox.project.path,

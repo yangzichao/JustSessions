@@ -1,0 +1,244 @@
+[
+  {
+    "component": "ghostty",
+    "version": "1.3.2-dev @ 35a81a980bb9fce09a1ea762a68b55f8eb3477ed",
+    "spdx": "MIT",
+    "sourceUrl": "https://github.com/ghostty-org/ghostty/blob/35a81a980bb9fce09a1ea762a68b55f8eb3477ed/LICENSE",
+    "licenseFile": "ghostty.txt",
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:3 (.version = \"1.3.2-dev\"); github.com/Lakr233/libghostty-spm@d139d99a5b10ab45a0a0704d4c1fb1d595710837 Ghostty.ref; objects libghostty_zcu.o, vt.o, zig_macos.o, ext.o (pkg/macos), base64.o/codepoint_width.o/index_of.o (src/simd, SharedDeps.zig:992-995)",
+    "sha256OfLicenseFile": "386211873e5b7a02f663ae4d7adf96285999f91608f8f9f31fecfd0f4095e6f1"
+  },
+  {
+    "component": "zig-compiler-rt",
+    "version": "Zig 0.16.0 (tag 0.16.0, commit 24fdd5b7a4c1c8b5deb5b56756b9dbc8e08c86a8)",
+    "spdx": "MIT",
+    "sourceUrl": "https://codeberg.org/ziglang/zig/raw/tag/0.16.0/LICENSE",
+    "licenseFile": "zig-compiler-rt.txt",
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:6 (.minimum_zig_version = \"0.16.0\"); github.com/Lakr233/libghostty-spm@d139d99a5b10ab45a0a0704d4c1fb1d595710837 .github/workflows/build.yml:94-98 (mlugg/setup-zig version: 0.16.0). Also covers Zig std/ubsan_rt code inside libghostty_zcu.o. lib/compiler_rt contains code ported from musl (MIT) and LLVM compiler-rt release_80 per in-file comments.",
+    "sha256OfLicenseFile": "5c537d6853e005298a285d508cff9ac7192cea23576c840d485b2b586a7ff177"
+  },
+  {
+    "component": "oniguruma",
+    "version": "6.9.9",
+    "spdx": "BSD-2-Clause",
+    "sourceUrl": "https://deps.files.ghostty.org/oniguruma-1220c15e72eadd0d9085a8af134904d9a0f5dfcbed5f606ad60edc60ebeccd9706bb.tar.gz (COPYING)",
+    "licenseFile": "oniguruma.txt",
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed pkg/oniguruma/build.zig.zon:3 (.version = \"6.9.9\"), :9 (url); tarball src/oniguruma.h:37-39 ONIGURUMA_VERSION 6.9.9; sources listed pkg/oniguruma/build.zig:107-142",
+    "sha256OfLicenseFile": "70ba5469ea0bab6e18a32d7009068f996503168d27be57747e08da34337ff26f"
+  },
+  {
+    "component": "freetype",
+    "version": "2.13.2",
+    "spdx": "FTL (dual FTL OR GPL-2.0-or-later; FTL chosen). bdf/pcf drivers: MIT-style (see freetype-bdf-README.txt, freetype-pcf-README.txt)",
+    "sourceUrl": "https://deps.files.ghostty.org/freetype-1220b81f6ecfb3fd222f76cf9106fecfa6554ab07ec7fdc4124b9bb063ae2adf969d.tar.gz (docs/FTL.TXT)",
+    "licenseFile": "freetype.txt",
+    "extraFiles": [
+      "freetype-LICENSE.txt",
+      "freetype-bdf-README.txt",
+      "freetype-pcf-README.txt"
+    ],
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed pkg/freetype/build.zig.zon:3 (.version = \"2.13.2\"), :9 (url); tarball dir freetype-VER-2-13-2, include/freetype/freetype.h:5223-5225; bdf.c/pcf.c compiled per pkg/freetype/build.zig:194,201 (bdf.o, pcf.o present in archive)",
+    "sha256OfLicenseFile": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+    "extraFilesSha256": {
+      "freetype-LICENSE.txt": "2e3bbb7d7c5c396368dd0853a790ec29ce5b8647163dde42a0493fb0d6556b2b",
+      "freetype-bdf-README.txt": "7984455e7e5a9faba3797c8bf095fbe10cc846316b7320aff8c58402e22b82fe",
+      "freetype-pcf-README.txt": "18d9782898d9eac04476e2f744678137b2a889689ed3e923e052fc396a86f86b"
+    }
+  },
+  {
+    "component": "libpng",
+    "version": "1.6.43",
+    "spdx": "libpng-2.0 (file also contains the legacy PNG Reference Library License v1 for 0.5-1.6.35 contributions)",
+    "sourceUrl": "https://deps.files.ghostty.org/libpng-1220aa013f0c83da3fb64ea6d327f9173fa008d10e28bc9349eac3463457723b1c66.tar.gz (LICENSE)",
+    "licenseFile": "libpng.txt",
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed pkg/libpng/build.zig.zon:3 (.version = \"1.6.43\"), :9 (url); tarball png.h:278 PNG_LIBPNG_VER_STRING \"1.6.43\"",
+    "sha256OfLicenseFile": "7317e078e2d3b5d7ba5a6159e650945153262b44b76f6700f8e9edb261c5143e"
+  },
+  {
+    "component": "zlib",
+    "version": "1.3.1",
+    "spdx": "Zlib",
+    "sourceUrl": "https://deps.files.ghostty.org/zlib-1220fed0c74e1019b3ee29edae2051788b080cd96e90d56836eea857b0b966742efb.tar.gz (LICENSE)",
+    "licenseFile": "zlib.txt",
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed pkg/zlib/build.zig.zon:3 (.version = \"1.3.1\"), :9 (url); tarball zlib.h:40 ZLIB_VERSION \"1.3.1\"",
+    "sha256OfLicenseFile": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243"
+  },
+  {
+    "component": "libintl",
+    "version": "GNU gettext 0.24 (gettext-runtime/intl)",
+    "spdx": "LGPL-2.1-or-later (plural.c is Bison output: GPL-3.0-or-later WITH Bison-exception-2.2)",
+    "sourceUrl": "https://deps.files.ghostty.org/gettext-0.24.tar.gz (gettext-runtime/intl/COPYING.LIB)",
+    "licenseFile": "libintl.txt",
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed pkg/libintl/build.zig.zon:3 (.version = \"0.24.0\"), :8 (url gettext-0.24.tar.gz); pkg/libintl/build.zig srcs list; per-file headers of all 30 compiled sources checked: LGPL v2.1 or later, except plural.c",
+    "sha256OfLicenseFile": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95"
+  },
+  {
+    "component": "simdutf",
+    "version": "9.0.0 (vendored amalgamation; NOT the 5.2.8 declared in pkg/simdutf/build.zig.zon)",
+    "spdx": "Apache-2.0 OR MIT",
+    "sourceUrl": "https://raw.githubusercontent.com/simdutf/simdutf/v9.0.0/LICENSE-MIT (+ LICENSE-APACHE)",
+    "licenseFile": "simdutf.txt",
+    "extraFiles": [
+      "simdutf-LICENSE-APACHE.txt"
+    ],
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed pkg/simdutf/vendor/simdutf.h:936 (#define SIMDUTF_VERSION \"9.0.0\"), simdutf.h:1 auto-generated 2026-04-21 (matches v9.0.0 tag commit ca7acbcea967 dated 2026-04-21); pkg/simdutf/build.zig:85 compiles vendor/simdutf.cpp; pkg/simdutf/build.zig.zon:3 says \"5.2.8\" (stale wrapper version)",
+    "sha256OfLicenseFile": "fc8dbc04e03ad4efc08a647ffe7f995b811a95bc04c0e85a56d5277c6593fa5f",
+    "extraFilesSha256": {
+      "simdutf-LICENSE-APACHE.txt": "3d34610fc6b5e1b0bfe4e2f36171c2d62c28ef05cb8d704f5a0073be41a43b3d"
+    }
+  },
+  {
+    "component": "highway",
+    "version": "1.2.0 (commit 66486a10623fa0d72fe91260f96c892e41aceb06; runtime .cc files are Ghostty-modified copies)",
+    "spdx": "Apache-2.0 OR BSD-3-Clause",
+    "sourceUrl": "https://deps.files.ghostty.org/highway-66486a10623fa0d72fe91260f96c892e41aceb06.tar.gz (LICENSE, LICENSE-BSD3)",
+    "licenseFile": "highway.txt",
+    "extraFiles": [
+      "highway-LICENSE-BSD3.txt"
+    ],
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed pkg/highway/build.zig.zon:3 (.version = \"1.2.0\"), :9 (url); tarball hwy/base.h:33-35 HWY 1.2.0; pkg/highway/build.zig:112-114 compiles pkg/highway/src/cpp/{abort.cc,per_target.cc,targets.cpp} (\"Vendored from google/highway ... at commit 66486a10...\" with local modifications); README.md:9 dual-licensed Apache 2 / BSD-3",
+    "sha256OfLicenseFile": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+    "extraFilesSha256": {
+      "highway-LICENSE-BSD3.txt": "d25e82e26acd42ca3ccc9993622631163425b869b9e16284226d534cff6470f2"
+    }
+  },
+  {
+    "component": "wuffs",
+    "version": "0.4.0-alpha.10+3966.20260623 (commit 7411f488fe2e2c205c3d3b3d28638b7356522930)",
+    "spdx": "Apache-2.0 OR MIT",
+    "sourceUrl": "https://deps.files.ghostty.org/wuffs-7411f488fe2e2c205c3d3b3d28638b7356522930.tar.gz (LICENSE)",
+    "licenseFile": "wuffs.txt",
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed pkg/wuffs/build.zig.zon:10 (url); pkg/wuffs/build.zig:94 compiles release/c/wuffs-v0.4.c; wuffs-v0.4.c:36 SPDX Apache-2.0 OR MIT, :82 WUFFS_VERSION_STRING. (pkg zon .version \"0.0.0\" is a placeholder)",
+    "sha256OfLicenseFile": "f8ac2c75e7f629a87565c80d61ff9fe5aa15cdea0bda997d52a4dc13fdbd19cb"
+  },
+  {
+    "component": "stb",
+    "version": "stb_image v2.28 + stb_image_resize v0.97 (vendored in Ghostty src/stb)",
+    "spdx": "MIT OR Unlicense",
+    "sourceUrl": "https://github.com/ghostty-org/ghostty/blob/35a81a980bb9fce09a1ea762a68b55f8eb3477ed/src/stb/stb_image.h#L7948-L7986",
+    "licenseFile": "stb.txt",
+    "evidence": "github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed src/stb/stb.c; src/build/SharedDeps.zig:460-478; stb_image.h:1 \"v2.28\", stb_image_resize.h:1 \"v0.97\". stb.txt is an EXTRACT of stb_image.h lines 7948-7986 (license block, identical to stb_image_resize.h end block); stb has no standalone license file in this tree",
+    "sha256OfLicenseFile": "9407f57d550d1d36974de15c7aad3dbf21e59c4b3312fc762157f05fdea6ff41"
+  },
+  {
+    "component": "libcxx-compat",
+    "version": "libghostty-spm 2.2.2026100901 (commit d139d99)",
+    "spdx": "MIT",
+    "sourceUrl": "https://github.com/Lakr233/libghostty-spm/blob/d139d99a5b10ab45a0a0704d4c1fb1d595710837/LICENSE",
+    "licenseFile": "libcxx-compat.txt",
+    "evidence": "github.com/Lakr233/libghostty-spm@d139d99a5b10ab45a0a0704d4c1fb1d595710837 Script/build-ghostty.sh:183-189 compiles Script/support/libcxx-verbose-abort-compat.c into libcxx-verbose-abort-compat.o and adds it to libghostty.a. Not produced by Patches/ghostty/0009 (that patch only adds -D_LIBCPP_HAS_VENDOR_AVAILABILITY_ANNOTATIONS=1 flags). Source file has no own header; covered by repo LICENSE (MIT, Copyright (c) 2026 @Lakr233)",
+    "sha256OfLicenseFile": "1f4b38df6a142e678a85d84c3a7ec4d1db328a556483241df714156134e81615"
+  },
+  {
+    "component": "libxev",
+    "version": "0.0.0 @ 9ce8e8e6ff89e583258a7f8e7adeeeaeae8611bf",
+    "spdx": "MIT",
+    "sourceUrl": "https://deps.files.ghostty.org/libxev-9ce8e8e6ff89e583258a7f8e7adeeeaeae8611bf.tar.gz",
+    "licenseFile": "libxev.txt",
+    "evidence": "ADDITIONAL (not in original task list) - github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:15; symbols watcher.async.AsyncMachPort(api.Xev(.kqueue,...)), log scope libxev_kqueue in libghostty_zcu.o",
+    "sha256OfLicenseFile": "fcd26bcead569a910dd778cb864e027683498ca414e15db1694a5893eee1b835"
+  },
+  {
+    "component": "vaxis",
+    "version": "0.6.0 @ 1dbbe575dff4586fe51e3217aa5c3fecdcbb6089",
+    "spdx": "MIT",
+    "sourceUrl": "https://deps.files.ghostty.org/vaxis-1dbbe575dff4586fe51e3217aa5c3fecdcbb6089.tar.gz",
+    "licenseFile": "vaxis.txt",
+    "evidence": "ADDITIONAL (not in original task list) - github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:21; symbols l_Vaxis.*, l_vxfw.* in libghostty_zcu.o",
+    "sha256OfLicenseFile": "cca4ffa6a45c0b17d3e9840b4cbe5be1e76ab84fda69850e0cb3f117729eeeea"
+  },
+  {
+    "component": "z2d",
+    "version": "0.12.1 @ 7dbae85c81784dba9988320bf9543ed9a81350c8",
+    "spdx": "MPL-2.0 (portions derived from Cairo MPL-1.1->MPL-2.0 and Pixman MIT; see z2d.txt)",
+    "sourceUrl": "https://deps.files.ghostty.org/z2d-7dbae85c81784dba9988320bf9543ed9a81350c8.tar.gz",
+    "licenseFile": "z2d.txt",
+    "evidence": "ADDITIONAL (not in original task list) - github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:27; symbols l_compositor.RGBA16Vec.*, l_Path.*, l_Context.fill in libghostty_zcu.o",
+    "extraFiles": [
+      "z2d-COPYING-MPL-2.0.txt"
+    ],
+    "sha256OfLicenseFile": "c3c0b845181a67c2f926485299855769afa675bc90b18904c3087ae884cb1873",
+    "extraFilesSha256": {
+      "z2d-COPYING-MPL-2.0.txt": "d8d2562a7cb68ffdfe91fc66af1ed4a8a4e272aa4ab59bea7451ba34b9aba3d4"
+    }
+  },
+  {
+    "component": "zig-objc",
+    "version": "0.0.0 @ c8de82ff80281215ad92900866dab7103a8efa8b",
+    "spdx": "MIT",
+    "sourceUrl": "https://deps.files.ghostty.org/zig_objc-c8de82ff80281215ad92900866dab7103a8efa8b.tar.gz",
+    "licenseFile": "zig-objc.txt",
+    "evidence": "ADDITIONAL (not in original task list) - github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:33; symbols l_block.Block(...objc-imp...) in libghostty_zcu.o",
+    "sha256OfLicenseFile": "fcd26bcead569a910dd778cb864e027683498ca414e15db1694a5893eee1b835"
+  },
+  {
+    "component": "uucode",
+    "version": "0.2.0 @ 9d55524551411b493cca41ca06363625d90aff1e",
+    "spdx": "MIT AND Unicode-3.0 (+ MIT for Bjoern Hoehrmann UTF-8 decoder)",
+    "sourceUrl": "https://github.com/jacobsandlund/uucode/archive/9d55524551411b493cca41ca06363625d90aff1e.tar.gz",
+    "licenseFile": "uucode.txt",
+    "evidence": "ADDITIONAL (not in original task list) - github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:45 (non-lazy); src/build/SharedDeps.zig:66-75; symbol l_benchmark.IsSymbol.stepUucode",
+    "extraFiles": [
+      "uucode-LICENSE_unicode.txt",
+      "uucode-LICENSE_Bjoern_Hoehrmann.txt"
+    ],
+    "sha256OfLicenseFile": "312e901e142be2477b4ca859e9311f9e3f80d33372991759b7921c1893605f33",
+    "extraFilesSha256": {
+      "uucode-LICENSE_unicode.txt": "1eda5a3b026870c737b22e8bcd4954338612c790db688242e003f41a4fa95175",
+      "uucode-LICENSE_Bjoern_Hoehrmann.txt": "de219cece932aad5a817bf763393d8d149d378a15d2ad5320e3331eac07626dd"
+    }
+  },
+  {
+    "component": "zf",
+    "version": "0.11.0 @ c35c421f84895193246db06c40683c1a30e616ef",
+    "spdx": "MIT",
+    "sourceUrl": "https://deps.files.ghostty.org/zf-c35c421f84895193246db06c40683c1a30e616ef.tar.gz",
+    "licenseFile": "zf.txt",
+    "evidence": "ADDITIONAL (not in original task list) - github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:56; src/cli/list_themes.zig:11 imports zf and l_cli.list_themes.Preview.updateFiltered is present; no zf-named symbol found (likely inlined) - LIKELY linked",
+    "sha256OfLicenseFile": "0629000344ad0dc3c6e0e4c1b0c4a5cacf090e17d56e8bc5272705e3d35b7def"
+  },
+  {
+    "component": "jetbrains-mono",
+    "version": "2.304",
+    "spdx": "OFL-1.1",
+    "sourceUrl": "https://deps.files.ghostty.org/JetBrainsMono-2.304.tar.gz (OFL.txt)",
+    "licenseFile": "jetbrains-mono.txt",
+    "evidence": "ADDITIONAL (not in original task list) - github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:108; SharedDeps.zig:620-645 @embedFile; UTF-16 name-table strings \"JetBrains Mono ... 2.304\" found in libghostty_zcu.o",
+    "sha256OfLicenseFile": "30f0c136e3c88e422d0791acd97238870f9054a9729bc34cf2ff0d4ed8cac4ad"
+  },
+  {
+    "component": "nerd-fonts-symbols-only",
+    "version": "3.4.0",
+    "spdx": "MIT (font package) - embedded glyphs carry their own licenses (CC-BY-4.0, OFL-1.1, MIT, Pictogrammers Free License, ...)",
+    "sourceUrl": "https://deps.files.ghostty.org/NerdFontsSymbolsOnly-3.4.0.tar.gz (LICENSE) + https://github.com/ryanoasis/nerd-fonts/tree/v3.4.0 (license-audit.md, src/glyphs/*/LICENSE*)",
+    "licenseFile": "nerd-fonts-symbols.txt",
+    "evidence": "ADDITIONAL (not in original task list) - github.com/ghostty-org/ghostty@35a81a980bb9fce09a1ea762a68b55f8eb3477ed build.zig.zon:113; SharedDeps.zig:648-653 @embedFile SymbolsNerdFont-Regular.ttf; strings \"Symbols Nerd Font 3.4.0\" in libghostty_zcu.o",
+    "extraFiles": [
+      "nerd-fonts-license-audit.md",
+      "nerd-fonts-glyphs/README.md",
+      "nerd-fonts-glyphs/codicons/LICENSE.txt",
+      "nerd-fonts-glyphs/devicons/README.md",
+      "nerd-fonts-glyphs/font-awesome/LICENSE.txt",
+      "nerd-fonts-glyphs/materialdesign/LICENSE",
+      "nerd-fonts-glyphs/octicons/LICENSE",
+      "nerd-fonts-glyphs/pomicons/LICENSE",
+      "nerd-fonts-glyphs/powerline-extra/LICENSE",
+      "nerd-fonts-glyphs/powerline-symbols/LICENSE.txt",
+      "nerd-fonts-glyphs/weather-icons/OFL.txt"
+    ],
+    "sha256OfLicenseFile": "84a7a98c82140fb12c37fe42b93805baa16024cb3e5acc599b7ffe612c55d847",
+    "extraFilesSha256": {
+      "nerd-fonts-license-audit.md": "22c490a48e08adcabab0b06d317fe6c6310a420e081d8ebff7f44d0210096cd1",
+      "nerd-fonts-glyphs/README.md": "8538467a6f1f67b9d7fb7f95da492796ac1f02046121aa4138c07026e85c5fb2",
+      "nerd-fonts-glyphs/codicons/LICENSE.txt": "d6239afa918961b465b07bf7411cbe34ff6685854f58553db7966f4881a0211f",
+      "nerd-fonts-glyphs/devicons/README.md": "4d5547fb89112b934f117d1688872dc29389f1ac1cd7e831fc938561a1023aea",
+      "nerd-fonts-glyphs/font-awesome/LICENSE.txt": "de784a808496d49f5f80dd9d1d6e9a51cff712cfbc339e7c25155631ae3cdb5d",
+      "nerd-fonts-glyphs/materialdesign/LICENSE": "3bae6305bcaa6d10219b999f65c342034c2d40b1c0e8567fa08605e73ccba829",
+      "nerd-fonts-glyphs/octicons/LICENSE": "4f886642f9e8d99eeadd484acdac011c3fde8a338faf52f5ca1408c13b9a9b63",
+      "nerd-fonts-glyphs/pomicons/LICENSE": "cb4797a9745683f287c28833db596e9d68ec43082d59359b3a49c504f0f610ce",
+      "nerd-fonts-glyphs/powerline-extra/LICENSE": "544307a58e6826c24145b2af1c3578b53e2e21ae0e6c67ab4c6abd544304d26a",
+      "nerd-fonts-glyphs/powerline-symbols/LICENSE.txt": "46d5355e4734468135d8e4a30d0916292cc4df2b3ec30aa68c866f82497933be",
+      "nerd-fonts-glyphs/weather-icons/OFL.txt": "69cdedc8a4f57a30d68e4f045af8b9cce0ec3b1a6e7eec1ad41737c894f26790"
+    }
+  }
+]

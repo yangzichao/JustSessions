@@ -51,6 +51,17 @@ if [[ -d "$swiftterm_resources" ]]; then
     ditto "$swiftterm_resources" "$app_directory/Contents/Resources/SwiftTerm_SwiftTerm.bundle"
 fi
 cp -f "$project_directory/.build/checkouts/SwiftTerm/LICENSE" "$app_directory/Contents/Resources/SwiftTerm-LICENSE.txt"
+# Ghostty's terminal reads its shell integration and terminfo from this bundle, and stops the app if it is missing.
+ghostty_resources="$project_directory/.build/release/GhosttyKit_GhosttyTerminal.bundle"
+if [[ ! -d "$ghostty_resources" ]]; then
+    print -u2 "Ghostty's resource bundle was not found at $ghostty_resources"
+    exit 1
+fi
+ditto "$ghostty_resources" "$app_directory/Contents/Resources/GhosttyKit_GhosttyTerminal.bundle"
+cp -f "$project_directory/.build/checkouts/libghostty-spm/LICENSE" "$app_directory/Contents/Resources/libghostty-spm-LICENSE.txt"
+cp -f "$project_directory/.build/checkouts/DisplayLink/LICENSE" "$app_directory/Contents/Resources/DisplayLink-LICENSE.txt"
+# Everything Ghostty's prebuilt library links; see Branding/ThirdParty/Ghostty/README.md.
+ditto "$project_directory/Branding/ThirdParty/Ghostty" "$app_directory/Contents/Resources/Ghostty-Licenses"
 cp -f "$project_directory/Branding/ThirdParty/Octicons/LICENSE" "$app_directory/Contents/Resources/Octicons-LICENSE.txt"
 # The font itself ships in the resource bundle above; keep its license with the other third-party licenses.
 cp -f "$project_directory/Sources/JustSessions/Resources/Fonts/SymbolsNerdFontMono-LICENSE.txt" "$app_directory/Contents/Resources/SymbolsNerdFontMono-LICENSE.txt"

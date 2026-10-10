@@ -2,13 +2,20 @@ import AppKit
 import Testing
 @testable import JustSessions
 
-/// A terminal tells its tab when its colors turn light or dark and no program in it subscribes to hear about it.
+/// A terminal tells its tab when its colors turn light or dark and no program in it subscribes to hear about it. See
+/// `GhosttyTabBackgroundQueryReportTests` for a program that subscribes in a Ghostty tab.
 @MainActor
 struct UnheardLightDarkChangeTests {
-    @Test func passesOnEachLightDarkChangeNoProgramHears() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func passesOnEachLightDarkChangeNoProgramHears(engine: TerminalEngine) throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
-        let (appearanceStore, themeStore, terminalView) = makeTerminal(settings: settings)
+        let appearanceStore = TerminalAppearanceStore(userDefaults: settings.userDefaults)
+        let themeStore = AppThemeStore(userDefaults: settings.userDefaults)
+        appearanceStore.setMode(.light)
+        let terminalView = engine.makeTabTerminalView(
+            frame: NSRect(x: 0, y: 0, width: 600, height: 400), appearanceStore: appearanceStore, themeStore: themeStore
+        )
         var changeCount = 0
         terminalView.onUnheardLightDarkChange = { changeCount += 1 }
 

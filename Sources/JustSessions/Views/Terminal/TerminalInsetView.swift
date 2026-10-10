@@ -2,13 +2,14 @@ import AppKit
 
 /// Holds a tab's terminal in from the window's edges, in the terminal's own background color, so text never touches
 /// the window's edge or the sidebar. The leading inset lines the first column up with the tab bar's labels. SwiftTerm
-/// draws from its view's edge and already keeps the scroller's width free on the trailing side.
+/// draws from its view's edge and already keeps the scroller's width free on the trailing side; for a terminal that
+/// doesn't, the margin keeps that width free; see `TabTerminalView.trailingMarginWidth`.
 final class TerminalInsetView: NSView {
     static let insets = NSEdgeInsets(top: 6, left: 16, bottom: 6, right: 0)
 
-    let terminalView: SelectableTerminalView
+    let terminalView: any TabTerminalView
 
-    init(terminalView: SelectableTerminalView) {
+    init(terminalView: any TabTerminalView) {
         self.terminalView = terminalView
         super.init(frame: terminalView.frame)
         wantsLayer = true
@@ -25,7 +26,7 @@ final class TerminalInsetView: NSView {
         return NSRect(
             x: insets.left,
             y: insets.bottom,
-            width: max(0, bounds.width - insets.left - insets.right),
+            width: max(0, bounds.width - insets.left - insets.right - terminalView.trailingMarginWidth),
             height: max(0, bounds.height - insets.top - insets.bottom)
         )
     }
@@ -33,7 +34,7 @@ final class TerminalInsetView: NSView {
     override var wantsUpdateLayer: Bool { true }
 
     override func updateLayer() {
-        layer?.backgroundColor = terminalView.nativeBackgroundColor.cgColor
+        layer?.backgroundColor = terminalView.marginColor.cgColor
     }
 
     /// A tab moved to another window takes its terminal into that window's inset view.

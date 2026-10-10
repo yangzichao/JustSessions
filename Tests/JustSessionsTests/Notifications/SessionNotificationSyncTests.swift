@@ -158,6 +158,7 @@ struct SessionNotificationSyncTests {
 
     private static func makeTab(for conversation: Conversation) -> TerminalSession {
         TerminalSession(
+            engine: .swiftTerm,
             conversation: conversation,
             provider: conversation.provider,
             projectPath: conversation.projectPath,

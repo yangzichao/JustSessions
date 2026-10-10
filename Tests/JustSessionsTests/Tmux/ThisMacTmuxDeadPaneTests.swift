@@ -33,6 +33,7 @@ struct ThisMacTmuxDeadPaneTests {
 
     private func makeTab(tmuxSessionName: String?, host: SessionHost = .thisMac) -> TerminalSession {
         TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: .claude,
             projectPath: "/tmp",

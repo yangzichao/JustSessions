@@ -54,6 +54,7 @@ struct WaitingToBeShownTabTests {
         let conversation = sandbox.conversation()
         let tmuxSessionName = TmuxSessionName.forConversation(conversation)
         let tab = TerminalSession(
+            engine: .swiftTerm,
             conversation: conversation,
             provider: .claude,
             projectPath: conversation.projectPath,

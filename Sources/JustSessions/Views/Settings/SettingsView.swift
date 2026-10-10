@@ -12,6 +12,7 @@ struct SettingsView: View {
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
+    let terminalEngineStore: TerminalEngineStore
     let notificationSettingsStore: SessionNotificationSettingsStore
     let onCheckForUpdates: () -> Void
 
@@ -48,7 +49,8 @@ struct SettingsView: View {
                     AppearanceSettingsView(
                         appAppearanceStore: appAppearanceStore,
                         appThemeStore: appThemeStore,
-                        terminalAppearanceStore: terminalAppearanceStore
+                        terminalAppearanceStore: terminalAppearanceStore,
+                        terminalEngineStore: terminalEngineStore
                     )
                 case .permissions:
                     PermissionsSettingsView()

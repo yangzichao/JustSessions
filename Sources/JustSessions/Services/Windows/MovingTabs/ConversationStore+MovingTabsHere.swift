@@ -40,11 +40,12 @@ extension ConversationStore {
     }
 
     /// The tab may have closed or ended in its window while the host answered. Resuming here then reattaches to the
-    /// CLI or starts it, as it does for any session.
+    /// CLI or starts it, as it does for any session. The tab here is drawn by the engine the moved tab had, as a
+    /// reconnected SSH tab is, since it is the same tab in another window.
     private func finishMovingTerminal(_ tab: TerminalSession, from otherStore: ConversationStore, for conversation: Conversation) {
         if !tab.hasExited, otherStore.terminalSessions.contains(where: { $0.id == tab.id }) {
             otherStore.closeTerminal(tab.id, endingTmuxSession: false)
         }
-        launch(conversation, action: .resume)
+        launch(conversation, action: .resume, engine: tab.engine)
     }
 }

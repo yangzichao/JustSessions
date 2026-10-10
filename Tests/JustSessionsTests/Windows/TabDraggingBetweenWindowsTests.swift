@@ -5,15 +5,17 @@ import Testing
 
 /// A tab dragged to another window goes there as it is: the same tab, its terminal and CLI still running, with nothing
 /// closed or started again, so even a CLI that does not run in tmux moves. The window it left shows another tab, and
-/// both windows save their tabs for the next launch.
+/// both windows save their tabs for the next launch. See `TabTerminalDraggingBetweenWindowsTests` for the terminal view
+/// in its new window.
 @MainActor
 struct TabDraggingBetweenWindowsTests {
-    @Test func aTabMovesToAnotherWindowAsItIs() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aTabMovesToAnotherWindowAsItIs(engine: TerminalEngine) throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
-        let first = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
-        let moving = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
-        let tools = open(sandbox.second, makeTab(projectPath: "/tmp/tools"))
+        let first = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
+        let moving = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
+        let tools = open(sandbox.second, makeTab(engine: engine, projectPath: "/tmp/tools"))
 
         let tabs = try #require(sandbox.first.takeOutTabsForAnotherWindow([moving.id]))
         sandbox.second.bringInTabsFromAnotherWindow(tabs, at: .asNewGroup(0), selecting: moving.id)
@@ -31,12 +33,13 @@ struct TabDraggingBetweenWindowsTests {
     }
 
     /// As when it closes: its group's next tab shows, and the groups keep their order.
-    @Test func aSelectedTabLeavesItsGroupsNextTabShowing() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aSelectedTabLeavesItsGroupsNextTabShowing(engine: TerminalEngine) throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
-        let moving = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
-        let next = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
-        let tools = open(sandbox.first, makeTab(projectPath: "/tmp/tools"))
+        let moving = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
+        let next = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
+        let tools = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/tools"))
         sandbox.first.selectTerminal(moving.id)
 
         _ = try #require(sandbox.first.takeOutTabsForAnotherWindow([moving.id]))
@@ -45,21 +48,23 @@ struct TabDraggingBetweenWindowsTests {
         #expect(sandbox.first.selectedTerminalID == next.id)
     }
 
-    @Test func aTabThatWasNotSelectedLeavesTheSelectionAsItIs() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aTabThatWasNotSelectedLeavesTheSelectionAsItIs(engine: TerminalEngine) throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
-        let moving = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
-        let selected = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
+        let moving = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
+        let selected = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
 
         _ = try #require(sandbox.first.takeOutTabsForAnotherWindow([moving.id]))
 
         #expect(sandbox.first.selectedTerminalID == selected.id)
     }
 
-    @Test func aWindowsLastTabLeavesItWithNoneSelected() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aWindowsLastTabLeavesItWithNoneSelected(engine: TerminalEngine) throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
-        let moving = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
+        let moving = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
 
         let tabs = try #require(sandbox.first.takeOutTabsForAnotherWindow([moving.id]))
         sandbox.second.bringInTabsFromAnotherWindow(tabs, at: .asNewGroup(0), selecting: moving.id)
@@ -69,12 +74,13 @@ struct TabDraggingBetweenWindowsTests {
         #expect(sandbox.second.terminalSessions.map(\.id) == [moving.id])
     }
 
-    @Test func aSplitMovesWholeAndShowsInTheOtherWindow() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aSplitMovesWholeAndShowsInTheOtherWindow(engine: TerminalEngine) throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
-        let left = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
-        let right = open(sandbox.first, makeTab(projectPath: "/tmp/tools"))
-        let staying = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
+        let left = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
+        let right = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/tools"))
+        let staying = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
         sandbox.first.selectTerminal(left.id)
         sandbox.first.splitSelectedTerminal(with: right.id)
         let split = try #require(sandbox.first.shownSplit)
@@ -91,10 +97,11 @@ struct TabDraggingBetweenWindowsTests {
     }
 
     /// Its CLI ending lists what it saved in the window it is in now.
-    @Test func aMovedTabsCLIEndingRefreshesItsNewWindow() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aMovedTabsCLIEndingRefreshesItsNewWindow(engine: TerminalEngine) throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
-        let moving = open(sandbox.first, makeTab(projectPath: "/tmp/app"))
+        let moving = open(sandbox.first, makeTab(engine: engine, projectPath: "/tmp/app"))
         moving.onProcessFinished = { [weak first = sandbox.first] in first?.refresh(.thisMac) }
 
         let tabs = try #require(sandbox.first.takeOutTabsForAnotherWindow([moving.id]))
@@ -151,8 +158,9 @@ struct TabDraggingBetweenWindowsTests {
     }
 
     /// A plain terminal that runs nothing until its view starts it.
-    private func makeTab(projectPath: String) -> TerminalSession {
+    private func makeTab(engine: TerminalEngine, projectPath: String) -> TerminalSession {
         TerminalSession(
+            engine: engine,
             conversation: nil,
             provider: nil,
             projectPath: projectPath,

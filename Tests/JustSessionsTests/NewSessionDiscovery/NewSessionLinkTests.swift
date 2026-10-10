@@ -44,6 +44,7 @@ struct NewSessionLinkTests {
 
     private func makeNewSession() -> TerminalSession {
         TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: .claude,
             projectPath: "/tmp/new-session-link-project",

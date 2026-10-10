@@ -6,11 +6,12 @@ import Testing
 /// tab bar offers after New session, in the same order and in the app's language.
 @MainActor
 struct TerminalContextMenuItemsTests {
-    @Test func aSessionsTerminalOffersItsTextThenTheTabsItems() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aSessionsTerminalOffersItsTextThenTheTabsItems(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        fixture.openTab(title: "Other")
-        let tab = fixture.openTab(conversation: .fixture())
+        fixture.openTab(engine: engine, title: "Other")
+        let tab = fixture.openTab(engine: engine, conversation: .fixture())
 
         #expect(TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)) == [
             "Copy", "Paste", "Select All", "—",
@@ -21,11 +22,12 @@ struct TerminalContextMenuItemsTests {
         ])
     }
 
-    @Test func aPlainTerminalOffersItsTextThenSplitAndClose() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aPlainTerminalOffersItsTextThenSplitAndClose(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        fixture.openTab(title: "Other")
-        let tab = fixture.openTab(isPlainTerminal: true)
+        fixture.openTab(engine: engine, title: "Other")
+        let tab = fixture.openTab(engine: engine, isPlainTerminal: true)
 
         #expect(TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)) == [
             "Copy", "Paste", "Select All", "—",
@@ -36,10 +38,11 @@ struct TerminalContextMenuItemsTests {
 
     /// As in the tab bar, a new session's tab can't be renamed or shared until it is linked to the session its CLI
     /// writes.
-    @Test func aTabNotYetLinkedToItsSessionCannotBeRenamedOrShared() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aTabNotYetLinkedToItsSessionCannotBeRenamedOrShared(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        let tab = fixture.openTab()
+        let tab = fixture.openTab(engine: engine)
         let menu = fixture.menu(for: tab)
 
         #expect(TerminalContextMenuFixture.titles(of: menu) == [
@@ -51,10 +54,14 @@ struct TerminalContextMenuItemsTests {
         #expect(try !TerminalContextMenuFixture.item("Rename", in: menu).isEnabled)
     }
 
-    @Test func copyNeedsASelectionWhichSelectAllMakes() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func copyNeedsASelectionWhichSelectAllMakes(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        let tab = fixture.openTab()
+        let tab = fixture.openTab(engine: engine)
+        // Ghostty selects only text, which its surface holds once in a window.
+        fixture.showInWindow(tab)
+        feedOutput("Terminal output", to: tab.terminalView)
         let menuBefore = fixture.menu(for: tab)
         #expect(try !TerminalContextMenuFixture.item("Copy", in: menuBefore).isEnabled)
 
@@ -64,14 +71,15 @@ struct TerminalContextMenuItemsTests {
         #expect(try TerminalContextMenuFixture.item("Copy", in: fixture.menu(for: tab)).isEnabled)
     }
 
-    @Test func addTabToNewSplitViewListsEveryOtherTabInNoSplit() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func addTabToNewSplitViewListsEveryOtherTabInNoSplit(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        let onlyTab = fixture.openTab(title: "Only")
+        let onlyTab = fixture.openTab(engine: engine, title: "Only")
         let aloneItem = try TerminalContextMenuFixture.item("Add tab to new split view", in: fixture.menu(for: onlyTab))
         #expect(!aloneItem.isEnabled)
 
-        fixture.openTab(title: "Other")
+        fixture.openTab(engine: engine, title: "Other")
         fixture.store.selectTerminal(onlyTab.id)
         let item = try TerminalContextMenuFixture.item("Add tab to new split view", in: fixture.menu(for: onlyTab))
 
@@ -80,11 +88,12 @@ struct TerminalContextMenuItemsTests {
         #expect(item.submenu.map(TerminalContextMenuFixture.titles(of:)) == ["Other · \(projectName)"])
     }
 
-    @Test func aSplitPanesTerminalArrangesItsSplit() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aSplitPanesTerminalArrangesItsSplit(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        let left = fixture.openTab(title: "Left")
-        let right = fixture.openTab(title: "Right")
+        let left = fixture.openTab(engine: engine, title: "Left")
+        let right = fixture.openTab(engine: engine, title: "Right")
         fixture.store.selectTerminal(left.id)
         fixture.store.splitSelectedTerminal(with: right.id)
 
@@ -96,19 +105,21 @@ struct TerminalContextMenuItemsTests {
     }
 
     /// macOS would otherwise add AutoFill's Contact…, Passwords…, and Credit Card… when it shows the menu.
-    @Test func macOSAddsNoAutoFillItems() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func macOSAddsNoAutoFillItems(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        let tab = fixture.openTab()
+        let tab = fixture.openTab(engine: engine)
 
         #expect(!fixture.menu(for: tab).allowsContextMenuPlugIns)
     }
 
-    @Test func theMenuIsInTheAppLanguage() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func theMenuIsInTheAppLanguage(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        fixture.openTab(title: "Other")
-        let tab = fixture.openTab(conversation: .fixture())
+        fixture.openTab(engine: engine, title: "Other")
+        let tab = fixture.openTab(engine: engine, conversation: .fixture())
 
         #expect(TerminalContextMenuFixture.titles(of: fixture.menu(for: tab, language: "zh-Hans")) == [
             "复制", "粘贴", "全选", "—",

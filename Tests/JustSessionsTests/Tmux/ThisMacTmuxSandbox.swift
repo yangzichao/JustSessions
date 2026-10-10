@@ -114,7 +114,7 @@ struct ThisMacTmuxSandbox {
     /// Keep a failed real-terminal launch actionable on a headless CI runner.
     @MainActor
     func launchDiagnostics(for tab: TerminalSession) -> String {
-        let terminalOutput = String(decoding: tab.terminalView.getTerminal().getBufferAsData(), as: UTF8.self)
+        let terminalOutput = screenText(of: tab.terminalView)
         var descriptorLimit = rlimit()
         getrlimit(RLIMIT_NOFILE, &descriptorLimit)
         let openDescriptorCount = (0..<1024).filter { fcntl(Int32($0), F_GETFD) >= 0 }.count

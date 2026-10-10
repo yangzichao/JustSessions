@@ -25,6 +25,7 @@ extension ConversationStore {
     func makePlainTerminal(in location: ProjectLocation, startsOnceShown: Bool = false) throws -> TerminalSession {
         let (command, projectPath) = try plainTerminalCommand(in: location)
         return TerminalSession(
+            engine: terminalEngineStore.engine,
             conversation: nil,
             provider: nil,
             projectPath: projectPath,

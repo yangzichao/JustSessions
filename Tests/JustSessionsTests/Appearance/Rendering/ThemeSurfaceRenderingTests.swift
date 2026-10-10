@@ -22,7 +22,9 @@ struct ThemeSurfaceRenderingTests {
                 tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore(userDefaults: settings.userDefaults),
                 plainTerminalCloseChoiceSettingsStore: PlainTerminalCloseChoiceSettingsStore(userDefaults: settings.userDefaults),
                 appAppearanceStore: appearanceStore, appThemeStore: themeStore,
-                terminalAppearanceStore: terminalStore, notificationSettingsStore: notificationStore,
+                terminalAppearanceStore: terminalStore,
+                terminalEngineStore: TerminalEngineStore(userDefaults: settings.userDefaults),
+                notificationSettingsStore: notificationStore,
                 onCheckForUpdates: {}
             ))
         }

@@ -2,15 +2,17 @@ import Foundation
 import Testing
 @testable import JustSessions
 
-/// The CLI activity sync marking a Codex tab whose turn finished off screen, and looking at the tab clearing it.
+/// The CLI activity sync marking a Codex tab whose turn finished off screen, and looking at the tab clearing it. The
+/// sync finds the tab's CLI by its process, whichever engine draws the tab.
 @MainActor
 struct UnseenFinishedTurnSyncTests {
-    @Test func aTurnThatFinishesOffScreenStaysMarkedUntilItsTabIsSelected() async throws {
-        let fixture = try Fixture(isApplicationActive: true)
+    @Test(arguments: TerminalEngine.allCases)
+    func aTurnThatFinishesOffScreenStaysMarkedUntilItsTabIsSelected(_ engine: TerminalEngine) async throws {
+        let fixture = try Fixture(isApplicationActive: true, engine: engine)
         defer { fixture.tearDown() }
         let store = fixture.store
         // A second tab opens in front, so the Codex tab is off screen.
-        store.openTerminal(Fixture.makeTab(for: fixture.otherConversation))
+        store.openTerminal(Fixture.makeTab(for: fixture.otherConversation, engine: engine))
         #expect(store.selectedTerminalID != fixture.tab.id)
 
         try await fixture.startTurn()
@@ -64,8 +66,9 @@ struct UnseenFinishedTurnSyncTests {
         #expect(!fixture.tab.hasUnseenFinishedTurn)
     }
 
-    @Test func aTurnThatFinishesInViewIsNeverMarked() async throws {
-        let fixture = try Fixture(isApplicationActive: true)
+    @Test(arguments: TerminalEngine.allCases)
+    func aTurnThatFinishesInViewIsNeverMarked(_ engine: TerminalEngine) async throws {
+        let fixture = try Fixture(isApplicationActive: true, engine: engine)
         defer { fixture.tearDown() }
 
         try await fixture.startTurn()
@@ -88,7 +91,7 @@ struct UnseenFinishedTurnSyncTests {
         let claudeRegistry: ClaudeLiveSessionRegistry
         let cliStartedAt: Date
 
-        init(isApplicationActive: Bool) throws {
+        init(isApplicationActive: Bool, engine: TerminalEngine = .swiftTerm) throws {
             directory = try makeTemporaryDirectory()
             rolloutFile = directory.appendingPathComponent("rollout.jsonl")
             conversation = Conversation.fixture(provider: .codex, projectPath: directory.path, sourceFile: rolloutFile)
@@ -100,7 +103,7 @@ struct UnseenFinishedTurnSyncTests {
                 sessionNotifier: notifier
             )
             store.replaceConversations(on: .thisMac, with: [conversation, otherConversation])
-            tab = Self.makeTab(for: conversation)
+            tab = Self.makeTab(for: conversation, engine: engine)
             tab.startIfNeeded()
             store.openTerminal(tab)
             claudeRegistry = ClaudeLiveSessionRegistry(configurationDirectory: directory.appendingPathComponent("claude"))
@@ -133,8 +136,9 @@ struct UnseenFinishedTurnSyncTests {
             #expect(tab.cliActivity == .idle)
         }
 
-        static func makeTab(for conversation: Conversation) -> TerminalSession {
+        static func makeTab(for conversation: Conversation, engine: TerminalEngine = .swiftTerm) -> TerminalSession {
             TerminalSession(
+                engine: engine,
                 conversation: conversation,
                 provider: conversation.provider,
                 projectPath: conversation.projectPath,

@@ -4,11 +4,13 @@ import Testing
 @testable import JustSessions
 
 /// A CLI in tmux asks for the terminal's background to pick light or dark colors. tmux answers from what it learned
-/// from the tab's terminal, so after a theme change it has to learn the new background.
+/// from the tab's terminal, so after a theme change it has to learn the new background. Ghostty answers the background
+/// query itself, from its configuration; SwiftTerm from its colors.
 @MainActor
 @Suite(.serialized)
 struct TerminalThemeChangeInTmuxTests {
-    @Test func aCLIInTmuxSeesTheNewBackgroundAfterTheThemeChanges() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aCLIInTmuxSeesTheNewBackgroundAfterTheThemeChanges(_ engine: TerminalEngine) async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
         let settings = try IsolatedUserDefaults()
@@ -18,15 +20,23 @@ struct TerminalThemeChangeInTmuxTests {
         appearanceStore.setMode(.light)
         let replyLog = sandbox.root.appendingPathComponent("background-replies.log")
         let probe = try sandbox.writeExecutable(named: "background-probe", script: Self.backgroundProbeScript)
-        let terminalView = SelectableTerminalView(
-            frame: NSRect(x: 0, y: 0, width: 600, height: 400), appearanceStore: appearanceStore, themeStore: themeStore
-        )
-        defer { terminalView.terminate() }
+        _ = NSApplication.shared
+        let frame = NSRect(x: 0, y: 0, width: 600, height: 400)
+        let terminalView = engine.makeTabTerminalView(frame: frame, appearanceStore: appearanceStore, themeStore: themeStore)
+        // A Ghostty terminal reads output only in a window.
+        let window = NSWindow(contentRect: frame, styleMask: [.titled], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentView = terminalView
+        defer {
+            terminalView.terminate()
+            window.close()
+        }
         terminalView.startProcess(
             executable: sandbox.server.executablePath,
             args: ["-L", ThisMacTmuxServer.socketName, "-f", "/dev/null", "new-session", "-A", "-s", "probe",
                    probe.path, replyLog.path],
             environment: sandbox.environment.map { "\($0.key)=\($0.value)" },
+            execName: nil,
             currentDirectory: sandbox.project.path
         )
         let lightBackground = Self.reply(for: AppThemeColors.justSessionsLight.contentSurface)
@@ -40,6 +50,7 @@ struct TerminalThemeChangeInTmuxTests {
 
         let sawDarkBackground = await Self.waitUntil(timeout: .seconds(120)) { Self.lastReply(in: replyLog) == darkBackground }
         #expect(sawDarkBackground, "\(Self.diagnostics(replyLog: replyLog, terminalView: terminalView))")
+        #expect(terminalView.marginColor == NSColor(hexValue: AppThemeColors.justSessionsDark.contentSurface))
     }
 
     /// Waits without blocking the main thread, where the terminal reads tmux's output.
@@ -52,9 +63,9 @@ struct TerminalThemeChangeInTmuxTests {
         return condition()
     }
 
-    private static func diagnostics(replyLog: URL, terminalView: SelectableTerminalView) -> String {
+    private static func diagnostics(replyLog: URL, terminalView: any TabTerminalView) -> String {
         let replies = (try? String(contentsOf: replyLog, encoding: .utf8))?.split(separator: "\n").suffix(5) ?? []
-        let screen = String(decoding: terminalView.getTerminal().getBufferAsData(), as: UTF8.self)
+        let screen = screenText(of: terminalView)
         return "last replies: \(replies); terminal: \(screen.trimmingCharacters(in: .whitespacesAndNewlines))"
     }
 

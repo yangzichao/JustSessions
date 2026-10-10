@@ -49,4 +49,19 @@ struct BundledTmuxRuntimeTests {
         #expect(command.environmentVariables["TERMINFO_DIRS"] == "/App/Tmux/share/terminfo:/custom/terminfo:/usr/share/terminfo")
         #expect(command.arguments.contains("TERMINFO_DIRS=/App/Tmux/share/terminfo:/custom/terminfo:/usr/share/terminfo"))
     }
+
+    /// GhosttyTerminal sets it in the app's own environment; see `GhosttyAppEnvironment`.
+    @Test(arguments: [nil, "/App/Tmux/share/terminfo"])
+    func ghosttysResourcesDirectoryReachesNeitherTheTmuxServerNorItsPanes(terminfoDirectory: String?) {
+        let server = ThisMacTmuxServer(executablePath: "/App/Tmux/bin/tmux", environment: [:], terminfoDirectory: terminfoDirectory)
+        let ghosttyVariable = "GHOSTTY_RESOURCES_DIR=/App/Ghostty"
+        let command = server.command(attachingTo: "justsessions-claude-test", running: NativeCLICommand(
+            executablePath: "/bin/claude", arguments: [], workingDirectory: "/tmp",
+            environment: ["TERM=xterm-256color", ghosttyVariable]
+        ))
+
+        #expect(server.runtimeEnvironment(from: ["GHOSTTY_RESOURCES_DIR": "/App/Ghostty"])["GHOSTTY_RESOURCES_DIR"] == nil)
+        #expect(command.environmentVariables["GHOSTTY_RESOURCES_DIR"] == nil)
+        #expect(!command.arguments.contains(ghosttyVariable))
+    }
 }

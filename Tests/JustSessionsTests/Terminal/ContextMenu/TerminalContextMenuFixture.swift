@@ -11,6 +11,7 @@ final class TerminalContextMenuFixture {
     private let isolatedUserDefaults: IsolatedUserDefaults
     private(set) var renamedConversations: [Conversation] = []
     private(set) var tabsAskedToClose: [UUID] = []
+    private var windows: [NSWindow] = []
 
     init() throws {
         isolatedUserDefaults = try IsolatedUserDefaults()
@@ -19,13 +20,20 @@ final class TerminalContextMenuFixture {
 
     func tearDown() {
         store.closeAllTerminals()
+        for window in windows {
+            window.contentView = nil
+            window.close()
+        }
         isolatedUserDefaults.removeSuite()
     }
 
     /// Opens and selects a tab, as a new tab is.
     @discardableResult
-    func openTab(title: String = "Fix the build", conversation: Conversation? = nil, isPlainTerminal: Bool = false) -> TerminalSession {
+    func openTab(
+        engine: TerminalEngine, title: String = "Fix the build", conversation: Conversation? = nil, isPlainTerminal: Bool = false
+    ) -> TerminalSession {
         let tab = TerminalSession(
+            engine: engine,
             conversation: conversation,
             provider: isPlainTerminal ? nil : .claude,
             projectPath: Self.projectPath,
@@ -35,6 +43,16 @@ final class TerminalContextMenuFixture {
         )
         store.openTerminal(tab)
         return tab
+    }
+
+    /// Puts the tab's terminal in a window that is never shown, as its inset view in a workspace, so a Ghostty terminal
+    /// has the surface that holds its text and selection.
+    func showInWindow(_ tab: TerminalSession) {
+        let insetView = TerminalInsetView(terminalView: tab.terminalView)
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 640, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentView = insetView
+        windows.append(window)
     }
 
     func menu(for tab: TerminalSession, language: String = "en") -> NSMenu {

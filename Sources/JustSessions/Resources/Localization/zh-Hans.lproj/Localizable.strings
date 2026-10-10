@@ -142,6 +142,8 @@
 	<string>外观</string>
 	<key>Applies immediately to all terminals. Some CLI apps use their own colors.</key>
 	<string>立即应用到所有终端。部分 CLI 应用使用自己的配色。</string>
+	<key>Applies to tabs opened after you change it.</key>
+	<string>仅应用于更改后打开的标签页。</string>
 	<key>Archive</key>
 	<string>归档</string>
 	<key>Archive %lld projects</key>
@@ -390,6 +392,8 @@
 	<string>结束此 CLI 会话？</string>
 	<key>Ended</key>
 	<string>已结束</string>
+	<key>Engine</key>
+	<string>引擎</string>
 	<key>Enter only the host, such as `devbox` or `me@devbox`. Options such as a key or a jump host go in `~/.ssh/config`.</key>
 	<string>只输入主机，例如 `devbox` 或 `me@devbox`。密钥、跳板机等选项写在 `~/.ssh/config` 中。</string>
 	<key>Every open tab in one list</key>
@@ -988,6 +992,8 @@
 	<string>终端外观预览</string>
 	<key>Terminal colors</key>
 	<string>终端配色</string>
+	<key>Terminal engine</key>
+	<string>终端引擎</string>
 	<key>Text and accents</key>
 	<string>文字和强调色</string>
 	<key>Text can't stay readable on that color. Choose a darker one.</key>

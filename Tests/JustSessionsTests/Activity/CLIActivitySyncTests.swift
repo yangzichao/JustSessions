@@ -2,17 +2,19 @@ import Foundation
 import Testing
 @testable import JustSessions
 
-/// The sync on its own; `DetachedCLIActivityTmuxTests` runs it against a real tmux server.
+/// The sync on its own; `DetachedCLIActivityTmuxTests` runs it against a real tmux server. It finds a tab's CLI by its
+/// process, whichever engine draws the tab.
 @MainActor
 struct CLIActivitySyncTests {
-    @Test func followsATabsCodexCLIThroughItsTurns() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func followsATabsCodexCLIThroughItsTurns(_ engine: TerminalEngine) async throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let rolloutFile = directory.appendingPathComponent("rollout.jsonl")
         let conversation = Conversation.fixture(provider: .codex, projectPath: directory.path, sourceFile: rolloutFile)
         let store = Self.makeStore(listing: [conversation], searching: directory)
         defer { store.closeAllTerminals() }
-        let tab = Self.startTab(for: conversation, running: StandInCLI.executablePath, StandInCLI.arguments)
+        let tab = Self.startTab(for: conversation, engine: engine, running: StandInCLI.executablePath, StandInCLI.arguments)
         store.openTerminal(tab)
         let cliStartedAt = try #require(RunningProcessInfo.startDate(of: tab.cliProcessID))
         try CodexRolloutLines.write([CodexRolloutLines.sessionMeta], to: rolloutFile)
@@ -63,7 +65,8 @@ struct CLIActivitySyncTests {
         #expect(store.activitySummary(forProjectDirectoryKey: conversation.projectDirectoryKey).runningCount == 0)
     }
 
-    @Test func aTabOverTheSameSessionTakesOverFromTmux() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aTabOverTheSameSessionTakesOverFromTmux(_ engine: TerminalEngine) async throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let rolloutFile = directory.appendingPathComponent("rollout.jsonl")
@@ -76,7 +79,7 @@ struct CLIActivitySyncTests {
         await store.synchronizeCLIActivity(claudeRegistry: Self.emptyClaudeRegistry(in: directory))
         #expect(store.detachedCLIActivities == [conversation.id: .idle])
 
-        store.openTerminal(Self.startTab(for: conversation, running: StandInCLI.executablePath, StandInCLI.arguments))
+        store.openTerminal(Self.startTab(for: conversation, engine: engine, running: StandInCLI.executablePath, StandInCLI.arguments))
         await store.synchronizeCLIActivity(claudeRegistry: Self.emptyClaudeRegistry(in: directory))
         #expect(store.detachedCLIActivities.isEmpty)
         #expect(store.activitySummary(forProjectDirectoryKey: conversation.projectDirectoryKey).summary == "1 idle")
@@ -92,8 +95,14 @@ struct CLIActivitySyncTests {
         return store
     }
 
-    private static func startTab(for conversation: Conversation, running executablePath: String, _ arguments: [String]) -> TerminalSession {
+    private static func startTab(
+        for conversation: Conversation,
+        engine: TerminalEngine,
+        running executablePath: String,
+        _ arguments: [String]
+    ) -> TerminalSession {
         let tab = TerminalSession(
+            engine: engine,
             conversation: conversation,
             provider: conversation.provider,
             projectPath: conversation.projectPath,

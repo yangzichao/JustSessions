@@ -679,6 +679,7 @@ struct TerminalSplitStoreTests {
         isPlainTerminal: Bool = false
     ) -> TerminalSession {
         TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: isPlainTerminal ? nil : .claude,
             projectPath: projectPath,

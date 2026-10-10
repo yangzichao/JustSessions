@@ -60,7 +60,9 @@ struct RemoteTmuxPrefixChoiceTests {
         defer { store.closeAllTerminals() }
         let conversation = Conversation.fixture(provider: .pi, projectPath: "/srv/app", host: .ssh("devbox"))
         store.replaceConversations(on: .ssh("devbox"), with: [conversation])
-        let waitingTab = try #require(try store.makeTerminal(for: conversation, action: .resume, startsOnceShown: true))
+        // Drawn by the engine not chosen now, as after the engine setting changed since the tab reopened.
+        let engine = store.terminalEngineStore.engine.otherEngine
+        let waitingTab = try #require(try store.makeTerminal(for: conversation, action: .resume, startsOnceShown: true, engine: engine))
         store.insertReopenedTerminal(waitingTab, at: 0, selecting: false)
         #expect(hasNoPrefixKeys(waitingTab.command.arguments.last ?? ""))
 
@@ -70,6 +72,7 @@ struct RemoteTmuxPrefixChoiceTests {
         #expect(store.terminalSessions.count == 1)
         #expect(remadeTab.id != waitingTab.id)
         #expect(remadeTab.isWaitingToBeShown)
+        #expect(remadeTab.engine == engine)
         #expect(remadeTab.conversation?.id == conversation.id)
         #expect(usesHostPrefix(remadeTab.command.arguments.last ?? ""))
     }

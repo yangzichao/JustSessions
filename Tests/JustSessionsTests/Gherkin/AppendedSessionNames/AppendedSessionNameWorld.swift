@@ -32,6 +32,7 @@ final class AppendedSessionNameWorld: SessionTabWorld {
         let file = try nameFile(for: conversation)
         if !FileManager.default.fileExists(atPath: file.path) { try Data().write(to: file) }
         let session = TerminalSession(
+            engine: .swiftTerm,
             conversation: conversation,
             provider: app.provider,
             projectPath: app.projectPath,

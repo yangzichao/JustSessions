@@ -41,7 +41,9 @@ extension ConversationStore {
         return shownTerminal.id == selectedTerminalID
     }
 
-    func launch(_ conversation: Conversation, action: ConversationAction) {
+    /// A new tab opens with `engine` rather than the engine chosen now when given, as a tab moving here from another
+    /// window keeps the engine it had there. A session started again in its ended tab keeps that tab's engine.
+    func launch(_ conversation: Conversation, action: ConversationAction, engine: TerminalEngine? = nil) {
         guard !isDeletionPending(for: conversation) else { return }
         guard action != .branch || conversation.provider.supportsBranchFromLauncher else { return }
         if action == .resume, let runningTerminal = runningTerminal(for: conversation) {
@@ -51,8 +53,9 @@ extension ConversationStore {
         // A session runs in one tab across the app's windows, so another window's tab comes forward instead.
         if action == .resume, showRunningTerminalInAnotherWindow(for: conversation) { return }
         do {
-            guard let session = try makeTerminal(for: conversation, action: action) else { return }
-            if action == .resume, let endedTab = endedTerminal(for: conversation) {
+            let endedTab = action == .resume ? endedTerminal(for: conversation) : nil
+            guard let session = try makeTerminal(for: conversation, action: action, engine: engine ?? endedTab?.engine) else { return }
+            if let endedTab {
                 restartEndedTerminal(endedTab, with: session)
             } else {
                 openTerminal(session)
@@ -89,11 +92,13 @@ extension ConversationStore {
         selectTerminal(session.id)
     }
 
-    /// A tab that runs the session's CLI, not opened yet; nil when no adapter reads the session's tool.
+    /// A tab that runs the session's CLI, not opened yet; nil when no adapter reads the session's tool. It opens with
+    /// `engine`, or else the engine chosen now.
     func makeTerminal(
         for conversation: Conversation,
         action: ConversationAction,
-        startsOnceShown: Bool = false
+        startsOnceShown: Bool = false,
+        engine: TerminalEngine? = nil
     ) throws -> TerminalSession? {
         guard let adapter = adapter(for: conversation.provider) else { return nil }
         let (command, tmuxSessionName) = try launchCommand(for: conversation, action: action, adapter: adapter)
@@ -101,6 +106,7 @@ extension ConversationStore {
         // new session's tab does; see new session discovery.
         let isBranch = action == .branch
         let session = TerminalSession(
+            engine: engine ?? terminalEngineStore.engine,
             conversation: isBranch ? nil : conversation,
             provider: conversation.provider,
             projectPath: conversation.projectPath,
@@ -185,6 +191,7 @@ extension ConversationStore {
                 ?? TmuxSessionName.unique(for: provider)
         )
         let session = TerminalSession(
+            engine: terminalEngineStore.engine,
             conversation: nil,
             provider: provider,
             projectPath: standardizedPath,

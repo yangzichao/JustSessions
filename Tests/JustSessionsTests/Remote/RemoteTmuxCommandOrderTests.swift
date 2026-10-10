@@ -12,6 +12,7 @@ struct RemoteTmuxCommandOrderTests {
         let store = ConversationStore(adapters: [], startsBackgroundPolling: false)
         let conversation = Conversation.fixture(host: .ssh("devbox"))
         let tab = TerminalSession(
+            engine: .swiftTerm,
             conversation: conversation,
             provider: conversation.provider,
             projectPath: conversation.projectPath,

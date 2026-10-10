@@ -4,7 +4,7 @@
 
 ## Build from source
 
-Requires macOS 14+ and a Swift 6 toolchain (Xcode Command Line Tools). Run these commands from the repository root.
+Requires macOS 14+ and Swift 6.2 or later (Xcode 26 or its Command Line Tools), which libghostty-spm needs. Run these commands from the repository root.
 
 ```sh
 make check  # Compile the Swift development build
@@ -34,6 +34,14 @@ The terminal comes from [yangzichao/SwiftTerm](https://github.com/yangzichao/Swi
 
 Fork tags are named `v<upstream version>-justsessions.<n>`, and `Package.swift` pins one exactly. To move to a newer SwiftTerm, rebase the commit onto the upstream tag, run `swift test` in the fork, push a new tag, and update `Package.swift` and `Package.resolved`. Drop the fork once upstream SwiftTerm has an equivalent setting.
 
+## libghostty
+
+The Ghostty terminal engine comes from [libghostty-spm](https://github.com/Lakr233/libghostty-spm), which `Package.swift` pins exactly. It provides `libghostty.a` prebuilt from a pinned upstream Ghostty commit with its own patches, as a binary target SwiftPM downloads with the package (about 77 MB), and the `GhosttyTerminal` AppKit view around it. Nothing here builds Ghostty or needs Zig.
+
+`Scripts/build-app.sh` copies `GhosttyKit_GhosttyTerminal.bundle`, Ghostty's shell integration and terminfo, into the app. The view finds it the way any SwiftPM resource bundle is found, and stops the app if it is missing, so `build-app.sh` fails when the build has none, and the launch check in `make verify` fails when the packaged app lacks it. The launch itself opens no tab, so it starts no Ghostty terminal. The library adds about 9 MB to the app's executable, measured on `2.2.2026100901` in an arm64 release build (13.9 MB without it, 22.9 MB with it), and the bundle about 124 KB.
+
+The library statically links Ghostty's dependencies, including FreeType, Oniguruma, libpng, zlib, GNU libintl, and its built-in fonts. Their license texts, versions, and the obligations still open are in `Branding/ThirdParty/Ghostty/`, which the app ships as `Contents/Resources/Ghostty-Licenses`. To move to a newer release, update the pin and `Package.resolved`, then recheck that folder against the new archive's members, as its README describes.
+
 ## Gherkin features
 
 Behavior that reads best as a story is written as Gherkin in `Tests/JustSessionsTests/Gherkin/Features/`, one folder per feature, and run by [CucumberSwift](https://github.com/cucumberswift/CucumberSwift) as part of `make test`. Each feature's steps live beside it under `Tests/JustSessionsTests/Gherkin/` and register in `CucumberStepImplementation.swift`, the one step implementation SwiftPM's single test bundle allows. A step matches by its text in every feature, so steps that read the same in several features, such as what a tab or the sidebar shows, are written once in `Gherkin/Shared/` and reach each tool's world through `CurrentSessionTabWorld`. A step's text cannot hold `|`: CucumberSwift's lexer reads it as the start of a table cell and drops the rest of the line.
@@ -44,6 +52,18 @@ CucumberSwift makes an XCTest case for each step when the run starts, so `swift 
 
 Tests that need the app's own launch, tmux, and CLI activity sync run in `ThisMacTmuxSandbox`: a private tmux server with its own home folder and a `bin` folder of stand-in CLIs, so the app's own server and your sessions are never touched. `Activity/UnseenTurns/EndToEnd/` runs the unseen-turn dot and the Waiting for you filter this way. Its `StandInActivityCLI` scripts report what they do as Claude Code and Codex do, in the live registry and the rollout file, and as Pi and OpenCode do, in the report file their extension writes, only when the app started them with it. A test drives them by typing in their tab's terminal. A tab starts its CLI with only that `bin` folder on `PATH`, so a stand-in sets its own. These tests pass without running where tmux is missing or too old, so run them through `make test`, which provides the bundled tmux.
 
+## Live CLI checks
+
+`LiveCLIEvidence` runs the Claude Code and Codex CLIs installed on this Mac in real tabs, directly and in a sandboxed tmux server, and saves a PNG and the screen text of each terminal. It is opt-in, since it starts the real CLIs; each run gives them a home folder and settings folders of their own, so they show their first-run screen and never read your sessions or settings:
+
+```sh
+JUSTSESSIONS_LIVE_EVIDENCE=1 JUSTSESSIONS_LIVE_EVIDENCE_DIRECTORY="$(mktemp -d)" \
+CLAUDE_CONFIG_DIR="$(mktemp -d)" CODEX_HOME="$(mktemp -d)" \
+JUSTSESSIONS_TEST_TMUX_RUNTIME="$(./Scripts/Tmux/build-runtime.sh)" swift test --filter LiveCLIEvidence
+```
+
+Add `JUSTSESSIONS_LIVE_SSH_HOST=<host>` to also open a tab on an SSH host, such as the [test VM](ssh-testing.md): a login shell, and Claude Code if the host has it, with a settings folder of its own that the test removes afterwards.
+
 ## Performance measurements
 
 Run these opt-in suites separately, with a release build, so their visible test windows do not compete for the main thread:
@@ -51,9 +71,17 @@ Run these opt-in suites separately, with a release build, so their visible test 
 ```sh
 JUSTSESSIONS_PERF=1 swift test -c release --filter SidebarInteractionMeasurements
 JUSTSESSIONS_PERF=1 swift test -c release --filter TerminalVisibilityMeasurements
+JUSTSESSIONS_PERF=1 JUSTSESSIONS_PERF_SAMPLE_DIR=/tmp/engine-profiles swift test -c release --filter 'TerminalEngineMeasurements/(tuiRepaint|bulkStream|hiddenTabsRepaint)'
+for round in 1 2 3; do
+  for memory_case in ghostty swiftTerm swiftTerm10k; do
+    JUSTSESSIONS_PERF=1 JUSTSESSIONS_PERF_MEMORY_CASE=$memory_case swift test -c release --filter TerminalEngineMeasurements/memory
+  done
+done
 ```
 
 The sidebar suite records interaction time and main-thread heartbeat gaps at 300 and 2,000 sessions. The terminal suite replays continuous ANSI output through five or ten SwiftTerm views, comparing the original opacity-only behavior with inactive-output coalescing. It reports process CPU as a percentage of one core, taking the median of three runs; it starts no CLI sessions. These are controlled workloads, not battery-life measurements.
+
+The engine suite runs the same output through a Ghostty tab and a SwiftTerm tab, from a script on each tab's own pseudo-terminal: a TUI-style repaint, a 20 MB log stream, and the repaint with hidden tabs. It reports process and main-thread CPU, the longest main-thread gap, and frames drawn, as the median of three runs that alternate the engines. With `JUSTSESSIONS_PERF_SAMPLE_DIR` set, it also saves a `sample` profile of each engine's repaint there. Its memory test measures one case per process, since a second run in the same process reads too low, so the loop above runs each case three times. See [Performance](performance.md#terminal-engines-ghostty-and-swiftterm) for the method and results.
 
 Discovery metadata is cached under the app's macOS Caches directory in `SessionSummaries`. The snapshots are versioned and disposable; each entry is checked against the source file's size, modification date, and inode before use. A missing, incompatible, or corrupt cache falls back to reading source files.
 

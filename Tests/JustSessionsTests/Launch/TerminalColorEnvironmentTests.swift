@@ -43,4 +43,15 @@ struct TerminalColorEnvironmentTests {
         #expect(command.environment.contains("TERM=xterm-256color"))
         #expect(command.environment.contains("COLORTERM=truecolor"))
     }
+
+    /// GhosttyTerminal sets it in the app's own environment; see `GhosttyAppEnvironment`.
+    @Test func aCLIDoesNotInheritGhosttysResourcesDirectory() {
+        let environment = TerminalColorEnvironment.embeddedTerminalEnvironment(from: [
+            "GHOSTTY_RESOURCES_DIR": "/Applications/JustSessions.app/Contents/Resources/Ghostty",
+            "HOME": "/Users/example",
+        ])
+
+        #expect(environment["GHOSTTY_RESOURCES_DIR"] == nil)
+        #expect(environment["HOME"] == "/Users/example")
+    }
 }

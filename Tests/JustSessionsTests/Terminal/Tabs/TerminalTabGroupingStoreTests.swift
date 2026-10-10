@@ -44,6 +44,7 @@ struct TerminalTabGroupingStoreTests {
 
     private func makeTab(projectPath: String) -> TerminalSession {
         TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: .claude,
             projectPath: projectPath,

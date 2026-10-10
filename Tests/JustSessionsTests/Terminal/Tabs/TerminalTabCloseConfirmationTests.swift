@@ -110,6 +110,7 @@ private final class CloseConfirmationScenario {
 
     func openTab(provider: ConversationProvider?, tmuxSessionName: String?) -> TerminalSession {
         let tab = TerminalSession(
+            engine: .swiftTerm,
             conversation: nil, provider: provider, projectPath: "/tmp", action: nil, displayTitle: "Tab",
             command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [], workingDirectory: "/tmp", environment: []),
             tmuxSessionName: tmuxSessionName

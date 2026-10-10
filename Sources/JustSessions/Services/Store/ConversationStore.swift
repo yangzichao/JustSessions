@@ -130,6 +130,8 @@ final class ConversationStore: ObservableObject {
     let remoteShellStartupCheck: RemoteShellStartupCheck
     /// Where custom titles, project names, pins, sidebar projects, SSH hosts, and start commands are kept.
     let userDefaults: UserDefaults
+    /// The engine new tabs' terminals open with.
+    let terminalEngineStore: TerminalEngineStore
 
     init(
         adapters: [any ConversationAdapter] = [
@@ -142,6 +144,9 @@ final class ConversationStore: ObservableObject {
         remoteDeletion: RemoteConversationDeletion = RemoteConversationDeletion(),
         remoteClaudeSessionIDFlagSupport: RemoteClaudeSessionIDFlagSupport = .shared,
         remoteShellStartupCheck: RemoteShellStartupCheck = RemoteShellStartupCheck(),
+        // Unlike the settings above, the engine comes from the shared store, which reads the standard defaults; a test
+        // that depends on the engine passes its own store.
+        terminalEngineStore: TerminalEngineStore = .shared,
         startsBackgroundPolling: Bool = true
     ) {
         self.adapters = adapters
@@ -150,6 +155,7 @@ final class ConversationStore: ObservableObject {
         self.remoteClaudeSessionIDFlagSupport = remoteClaudeSessionIDFlagSupport
         self.remoteShellStartupCheck = remoteShellStartupCheck
         self.userDefaults = userDefaults
+        self.terminalEngineStore = terminalEngineStore
         self.sessionNotifier = sessionNotifier
         self.windowRegistry = windowRegistry
         self.titleAliases = ConversationTitleAliases.load(from: userDefaults)

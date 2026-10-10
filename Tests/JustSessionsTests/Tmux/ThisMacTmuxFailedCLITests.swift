@@ -30,6 +30,8 @@ struct ThisMacTmuxFailedCLITests {
             store = ConversationStore(
                 adapters: [StaticConversationAdapter(discoveredConversations: [conversation])],
                 commandResolver: sandbox.resolver,
+                // The screen it reads includes what scrolled off, which only SwiftTerm's API gives.
+                terminalEngineStore: try .pinned(to: .swiftTerm),
                 startsBackgroundPolling: false
             )
             _ = NSApplication.shared
@@ -55,7 +57,7 @@ struct ThisMacTmuxFailedCLITests {
         }
 
         func screen(of tab: TerminalSession) -> String {
-            String(decoding: tab.terminalView.getTerminal().getBufferAsData(), as: UTF8.self)
+            screenText(of: tab.terminalView)
         }
 
         func tearDown() {
