@@ -78,6 +78,9 @@ struct WorkspaceTabBar: View {
                 // Tabs narrow or widen smoothly as others open or close; resizing the window moves them directly.
                 .animation(.easeOut(duration: 0.15), value: shownTabCount)
             }
+            // As in Chrome, the bar shows no scroller, which would lie over the tab titles; selecting a tab, from the
+            // sidebar or by shortcut, scrolls it into sight.
+            .scrollIndicators(.never)
             .onGeometryChange(for: CGFloat.self, of: \.size.width) { barWidth = $0 }
             // Past the leading clearance, which the window buttons and sidebar toggle can lie over.
             .windowMoveZone()
