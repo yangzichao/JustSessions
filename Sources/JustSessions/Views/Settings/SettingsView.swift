@@ -8,6 +8,7 @@ struct SettingsView: View {
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
     let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
+    let plainTerminalCloseChoiceSettingsStore: PlainTerminalCloseChoiceSettingsStore
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
@@ -39,6 +40,7 @@ struct SettingsView: View {
                         tabReopeningSettingsStore: tabReopeningSettingsStore,
                         launchAtLoginSettingsStore: launchAtLoginSettingsStore,
                         tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
+                        plainTerminalCloseChoiceSettingsStore: plainTerminalCloseChoiceSettingsStore,
                         notificationSettingsStore: notificationSettingsStore,
                         onCheckForUpdates: onCheckForUpdates
                     )

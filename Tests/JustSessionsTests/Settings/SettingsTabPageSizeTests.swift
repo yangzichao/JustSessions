@@ -17,6 +17,7 @@ struct SettingsTabPageSizeTests {
                 tabReopeningSettingsStore: TabReopeningSettingsStore(userDefaults: settings.userDefaults),
                 launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
                 tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore(userDefaults: settings.userDefaults),
+                plainTerminalCloseChoiceSettingsStore: PlainTerminalCloseChoiceSettingsStore(userDefaults: settings.userDefaults),
                 notificationSettingsStore: SessionNotificationSettingsStore(userDefaults: settings.userDefaults),
                 onCheckForUpdates: {}
             ))),

@@ -280,6 +280,8 @@
 	<string>关闭此终端？</string>
 	<key>Close this view</key>
 	<string>关闭此视图</string>
+	<key>Close without asking</key>
+	<string>直接关闭</string>
 	<key>Closing tabs</key>
 	<string>关闭标签</string>
 	<key>Collapse Group</key>
@@ -450,8 +452,6 @@
 	<string>字号</string>
 	<key>For sessions to survive disconnects or closed tabs, install `tmux` on the host. Reopen a session to reattach.</key>
 	<string>在主机上安装 `tmux`，可让会话在断线或关闭标签后继续运行。再次打开会话即可重新连接。</string>
-	<key>For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.</key>
-	<string>适用于 CLI 可在 tmux 中保持运行的标签。关闭对话框中的“不再询问”也会设置此项。</string>
 	<key>Fork in the native CLI</key>
 	<string>在原生 CLI 中创建分支</string>
 	<key>Full</key>
@@ -1022,6 +1022,8 @@
 	<string>发送太频繁了。请等一分钟再发送。</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
 	<string>Antigravity 会话数据库、关联文件夹和注释将移到 macOS 废纸篓，并从 Antigravity 本地索引中移除。</string>
+	<key>The CLI tab choice is for tabs whose CLI can keep running in tmux. A terminal's shell always ends with its tab. Don't ask again in the close dialog sets these too.</key>
+	<string>CLI 标签的选项适用于 CLI 可在 tmux 中保持运行的标签。终端的 shell 总会随标签一起结束。关闭对话框中的“不再询问”也会设置这些选项。</string>
 	<key>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</key>
 	<string>Claude Code 会话文件及其关联文件夹将移到 macOS 废纸篓，并从 Claude Code 本地索引中移除。</string>
 	<key>The Pi session file and its associated folder will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
@@ -1114,8 +1116,10 @@
 	<string>等待我处理</string>
 	<key>Website ↗</key>
 	<string>网站 ↗</string>
-	<key>When you close a tab</key>
-	<string>关闭标签时</string>
+	<key>When you close a CLI tab</key>
+	<string>关闭 CLI 标签时</string>
+	<key>When you close a terminal</key>
+	<string>关闭终端时</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。</string>
 	<key>Write to the developer from here</key>

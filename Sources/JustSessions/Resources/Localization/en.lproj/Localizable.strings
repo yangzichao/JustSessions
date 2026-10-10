@@ -286,6 +286,8 @@
 	<string>Close this terminal?</string>
 	<key>Close this view</key>
 	<string>Close this view</string>
+	<key>Close without asking</key>
+	<string>Close without asking</string>
 	<key>Closing tabs</key>
 	<string>Closing tabs</string>
 	<key>Collapse Group</key>
@@ -448,8 +450,6 @@
 	<string>Font size</string>
 	<key>For sessions to survive disconnects or closed tabs, install `tmux` on the host. Reopen a session to reattach.</key>
 	<string>For sessions to survive disconnects or closed tabs, install `tmux` on the host. Reopen a session to reattach.</string>
-	<key>For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.</key>
-	<string>For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.</string>
 	<key>Fork in the native CLI</key>
 	<string>Fork in the native CLI</string>
 	<key>Full</key>
@@ -1012,6 +1012,8 @@
 	<string>That's a lot of messages at once. Wait a minute, then send again.</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
 	<string>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</string>
+	<key>The CLI tab choice is for tabs whose CLI can keep running in tmux. A terminal's shell always ends with its tab. Don't ask again in the close dialog sets these too.</key>
+	<string>The CLI tab choice is for tabs whose CLI can keep running in tmux. A terminal's shell always ends with its tab. Don't ask again in the close dialog sets these too.</string>
 	<key>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</key>
 	<string>The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.</string>
 	<key>The Pi session file and its associated folder will be permanently deleted on %@. SSH hosts have no Trash, so this cannot be undone.</key>
@@ -1102,8 +1104,10 @@
 	<string>Waiting for you</string>
 	<key>Website ↗</key>
 	<string>Website ↗</string>
-	<key>When you close a tab</key>
-	<string>When you close a tab</string>
+	<key>When you close a CLI tab</key>
+	<string>When you close a CLI tab</string>
+	<key>When you close a terminal</key>
+	<string>When you close a terminal</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</string>
 	<key>Write to the developer from here</key>

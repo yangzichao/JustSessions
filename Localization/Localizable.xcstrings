@@ -1508,6 +1508,16 @@
         }
       }
     },
+    "Close without asking": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接关闭"
+          }
+        }
+      }
+    },
     "Closing tabs": {
       "localizations": {
         "zh-Hans": {
@@ -2426,16 +2436,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "在主机上安装 `tmux`，可让会话在断线或关闭标签后继续运行。再次打开会话即可重新连接。"
-          }
-        }
-      }
-    },
-    "For tabs whose CLI can keep running in tmux. Don't ask again in the close dialog sets it too.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "适用于 CLI 可在 tmux 中保持运行的标签。关闭对话框中的“不再询问”也会设置此项。"
           }
         }
       }
@@ -5377,6 +5377,16 @@
         }
       }
     },
+    "The CLI tab choice is for tabs whose CLI can keep running in tmux. A terminal's shell always ends with its tab. Don't ask again in the close dialog sets these too.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CLI 标签的选项适用于 CLI 可在 tmux 中保持运行的标签。终端的 shell 总会随标签一起结束。关闭对话框中的“不再询问”也会设置这些选项。"
+          }
+        }
+      }
+    },
     "The Claude Code session file and its associated folder will move to the macOS Trash. This also removes its entry from Claude Code's local index.": {
       "localizations": {
         "zh-Hans": {
@@ -5843,12 +5853,22 @@
         }
       }
     },
-    "When you close a tab": {
+    "When you close a CLI tab": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "关闭标签时"
+            "value": "关闭 CLI 标签时"
+          }
+        }
+      }
+    },
+    "When you close a terminal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭终端时"
           }
         }
       }
