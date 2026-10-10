@@ -3,10 +3,11 @@ import Carbon.HIToolbox
 import Testing
 @testable import JustSessions
 
-/// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
+/// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`. Either engine sends the same bytes.
 @MainActor
 struct ThisMacTmuxShiftReturnTests {
-    @Test func shiftReturnReachesTheCLIInTmuxDistinctFromReturn() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func shiftReturnReachesTheCLIInTmuxDistinctFromReturn(_ engine: TerminalEngine) async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
         let keyLog = sandbox.root.appendingPathComponent("keys")
@@ -14,6 +15,7 @@ struct ThisMacTmuxShiftReturnTests {
         let cli = try sandbox.writeExecutable(named: "claude", script: TmuxKeyboardReaderFixture.script)
         let tmuxSessionName = "justsessions-claude-keys"
         let tab = TerminalSession(
+            engine: engine,
             conversation: nil,
             provider: .claude,
             projectPath: sandbox.project.path,
@@ -35,12 +37,12 @@ struct ThisMacTmuxShiftReturnTests {
         }
 
         tab.startIfNeeded()
-        // A file can appear before tmux's initial screen reaches SwiftTerm. Wait for rendered output too,
+        // A file can appear before tmux's initial screen reaches the terminal. Wait for rendered output too,
         // so key events are sent through an attached, initialized terminal rather than during its handshake.
         try #require(await sandbox.waitUntil {
             FileManager.default.fileExists(atPath: readyMarker.path)
                 && sandbox.tmuxOutput(["list-clients", "-F", "#{session_name}"]) == "\(tmuxSessionName)\n"
-                && String(decoding: tab.terminalView.getTerminal().getBufferAsData(), as: UTF8.self).contains("KEY_READER_READY")
+                && screenText(of: tab.terminalView).contains("KEY_READER_READY")
         }, "\(sandbox.launchDiagnostics(for: tab))")
         // Reproduce a late initialization reply deterministically, rather than relying on CI timing.
         _ = sandbox.tmuxOutput(["send-keys", "-t", "=\(tmuxSessionName):", "-l", "\u{1b}[?65;4;6;18;22c"])
@@ -52,10 +54,12 @@ struct ThisMacTmuxShiftReturnTests {
         #expect(recordedKeys == "\u{1b}[13;2u\r", "Received bytes: \(Array(recordedKeys.utf8))")
     }
 
-    @Test func onlyATabWhoseCLIRunsInTmuxOnThisMacSendsShiftReturnAsCSIu() {
+    @Test(arguments: TerminalEngine.allCases)
+    func onlyATabWhoseCLIRunsInTmuxOnThisMacSendsShiftReturnAsCSIu(_ engine: TerminalEngine) {
         let command = NativeCLICommand(executablePath: "/bin/sh", arguments: [], workingDirectory: "/tmp", environment: [])
         func tab(host: SessionHost, tmuxSessionName: String?) -> TerminalSession {
             TerminalSession(
+                engine: engine,
                 conversation: nil,
                 provider: .claude,
                 projectPath: "/tmp",

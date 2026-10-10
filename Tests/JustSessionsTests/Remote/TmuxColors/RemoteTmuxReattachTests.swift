@@ -6,10 +6,11 @@ import Testing
 /// client again and reports the change once tmux has asked for the new colors.
 @MainActor
 struct RemoteTmuxReattachTests {
-    @Test func aClaudeCodeTabOnAnSSHHostAttachesAgainAndOwesAReport() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aClaudeCodeTabOnAnSSHHostAttachesAgainAndOwesAReport(engine: TerminalEngine) async throws {
         let recorder = RemoteReattachRecorder(exitStatus: 0)
         let store = ConversationStore(adapters: [], startsBackgroundPolling: false)
-        let tab = Self.tab(provider: .claude, host: .ssh("devbox"))
+        let tab = Self.tab(engine: engine, provider: .claude, host: .ssh("devbox"))
         let tmuxSessionName = try #require(tab.tmuxSessionName)
 
         store.reattachRemoteTmuxClient(of: tab, remoteRunner: recorder.runner)
@@ -22,23 +23,25 @@ struct RemoteTmuxReattachTests {
 
     /// Without tmux or its session on the host, no client asks for the colors, and a report owed until a later attach
     /// would arrive unasked.
-    @Test func aFailedReattachOwesNoReport() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aFailedReattachOwesNoReport(engine: TerminalEngine) async throws {
         let recorder = RemoteReattachRecorder(exitStatus: 1)
         let store = ConversationStore(adapters: [], startsBackgroundPolling: false)
-        let tab = Self.tab(provider: .claude, host: .ssh("devbox"))
+        let tab = Self.tab(engine: engine, provider: .claude, host: .ssh("devbox"))
 
         store.reattachRemoteTmuxClient(of: tab, remoteRunner: recorder.runner)
 
         try await expectEventually { recorder.calls.count == 1 && !tab.terminalView.reportsThemeAfterNextBackgroundQuery }
     }
 
-    @Test func otherTabsAreLeftAlone() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func otherTabsAreLeftAlone(engine: TerminalEngine) async throws {
         let recorder = RemoteReattachRecorder(exitStatus: 0)
         let store = ConversationStore(adapters: [], startsBackgroundPolling: false)
         let tabs = [
-            Self.tab(provider: .codex, host: .ssh("devbox")),
-            Self.tab(provider: .claude, host: .thisMac),
-            Self.tab(provider: .claude, host: .ssh("devbox"), startsOnceShown: true),
+            Self.tab(engine: engine, provider: .codex, host: .ssh("devbox")),
+            Self.tab(engine: engine, provider: .claude, host: .thisMac),
+            Self.tab(engine: engine, provider: .claude, host: .ssh("devbox"), startsOnceShown: true),
         ]
 
         for tab in tabs { store.reattachRemoteTmuxClient(of: tab, remoteRunner: recorder.runner) }
@@ -48,11 +51,12 @@ struct RemoteTmuxReattachTests {
         #expect(tabs.allSatisfy { !$0.terminalView.reportsThemeAfterNextBackgroundQuery })
     }
 
-    @Test func onlyAnSSHHostsClaudeCodeTabFollowsLightDarkChanges() {
+    @Test(arguments: TerminalEngine.allCases)
+    func onlyAnSSHHostsClaudeCodeTabFollowsLightDarkChanges(engine: TerminalEngine) {
         let store = ConversationStore(adapters: [], startsBackgroundPolling: false)
-        let remoteClaudeTab = Self.tab(provider: .claude, host: .ssh("devbox"))
-        let remoteCodexTab = Self.tab(provider: .codex, host: .ssh("devbox"))
-        let thisMacClaudeTab = Self.tab(provider: .claude, host: .thisMac)
+        let remoteClaudeTab = Self.tab(engine: engine, provider: .claude, host: .ssh("devbox"))
+        let remoteCodexTab = Self.tab(engine: engine, provider: .codex, host: .ssh("devbox"))
+        let thisMacClaudeTab = Self.tab(engine: engine, provider: .claude, host: .thisMac)
 
         for tab in [remoteClaudeTab, remoteCodexTab, thisMacClaudeTab] { store.followLightDarkChanges(of: tab) }
 
@@ -61,9 +65,12 @@ struct RemoteTmuxReattachTests {
         #expect(thisMacClaudeTab.terminalView.onUnheardLightDarkChange == nil)
     }
 
-    private static func tab(provider: ConversationProvider, host: SessionHost, startsOnceShown: Bool = false) -> TerminalSession {
+    private static func tab(
+        engine: TerminalEngine, provider: ConversationProvider, host: SessionHost, startsOnceShown: Bool = false
+    ) -> TerminalSession {
         let conversation = Conversation.fixture(provider: provider, host: host)
         return TerminalSession(
+            engine: engine,
             conversation: conversation,
             provider: provider,
             projectPath: conversation.projectPath,

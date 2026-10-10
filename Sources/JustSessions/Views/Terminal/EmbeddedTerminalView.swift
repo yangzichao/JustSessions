@@ -1,4 +1,3 @@
-import SwiftTerm
 import SwiftUI
 
 struct EmbeddedTerminalView: NSViewRepresentable {
@@ -36,7 +35,14 @@ struct EmbeddedTerminalView: NSViewRepresentable {
         context.coordinator.wasActive = isActive
     }
 
-    private func focus(_ terminalView: LocalProcessTerminalView, coordinator: Coordinator) {
+    /// The tab's session holds its terminal, and these closures hold the session, so a closed tab's terminal would
+    /// otherwise never be freed: for Ghostty, a GPU surface and its scrollback.
+    static func dismantleNSView(_ insetView: TerminalInsetView, coordinator: Coordinator) {
+        insetView.terminalView.onFocus = nil
+        insetView.terminalView.makeContextMenu = nil
+    }
+
+    private func focus(_ terminalView: any TabTerminalView, coordinator: Coordinator) {
         DispatchQueue.main.async { [weak terminalView, weak coordinator] in
             guard let terminalView, coordinator?.wasActive == true else { return }
             terminalView.window?.makeFirstResponder(terminalView)

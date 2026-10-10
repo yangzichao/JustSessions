@@ -4,8 +4,9 @@ import Testing
 
 @MainActor
 struct TabNavigationTests {
-    @Test func cyclingWrapsAndEntersFromPreviewWithoutReplacingTerminals() throws {
-        let sandbox = try TabNavigationSandbox(tabCount: 3)
+    @Test(arguments: TerminalEngine.allCases)
+    func cyclingWrapsAndEntersFromPreviewWithoutReplacingTerminals(_ engine: TerminalEngine) throws {
+        let sandbox = try TabNavigationSandbox(tabCount: 3, engine: engine)
         defer { sandbox.tearDown() }
         let store = sandbox.store
         let terminalViews = store.terminalSessions.map(\.terminalView)
@@ -105,7 +106,7 @@ private struct TabNavigationSandbox {
     let tabs: [TerminalSession]
     let settings: IsolatedUserDefaults
 
-    init(tabCount: Int, plainTerminalAtIndex: Int? = nil, projectPaths: [String]? = nil) throws {
+    init(tabCount: Int, plainTerminalAtIndex: Int? = nil, projectPaths: [String]? = nil, engine: TerminalEngine = .swiftTerm) throws {
         settings = try IsolatedUserDefaults()
         store = ConversationStore(
             adapters: [],
@@ -115,6 +116,7 @@ private struct TabNavigationSandbox {
         )
         tabs = (0..<tabCount).map { index in
             TerminalSession(
+                engine: engine,
                 conversation: nil, provider: index == plainTerminalAtIndex ? nil : .codex,
                 projectPath: projectPaths?[index] ?? "/tmp",
                 action: index == plainTerminalAtIndex ? nil : .resume,

@@ -37,6 +37,7 @@ struct TabBarVisibilityTests {
 
         func openTab(running executablePath: String, on host: SessionHost = .thisMac) -> TerminalSession {
             let tab = TerminalSession(
+                engine: .swiftTerm,
                 conversation: nil, provider: nil, projectPath: "/tmp", action: nil, displayTitle: "Tab",
                 command: NativeCLICommand(executablePath: executablePath, arguments: [], workingDirectory: "/tmp", environment: []),
                 host: host

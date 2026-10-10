@@ -43,6 +43,7 @@ final class LiveSessionTabWorld: SessionTabWorld {
     func openResumedTab(on label: String) throws {
         let conversation = try app.listedConversation(labeled: label)
         openTab(TerminalSession(
+            engine: .swiftTerm,
             conversation: conversation,
             provider: app.provider,
             projectPath: app.projectPath,
@@ -56,6 +57,7 @@ final class LiveSessionTabWorld: SessionTabWorld {
 
     func openNewSessionTab() {
         openTab(TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: app.provider,
             projectPath: app.projectPath,

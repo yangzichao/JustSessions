@@ -6,7 +6,8 @@ import Testing
 @MainActor
 struct ThisMacTmuxTerminalTitleTests {
     /// A Codex tab reads its thread from this title; see `CodexThreadTitle`.
-    @Test func theTitleACLISetsInTmuxReachesItsTab() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func theTitleACLISetsInTmuxReachesItsTab(_ engine: TerminalEngine) async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
         let threadTitle = "01a10846-4c77-75e2-bec8-ab638..."
@@ -20,6 +21,7 @@ struct ThisMacTmuxTerminalTitleTests {
             """)
         let tmuxSessionName = "justsessions-codex-title"
         let tab = TerminalSession(
+            engine: engine,
             conversation: nil,
             provider: .codex,
             projectPath: sandbox.project.path,

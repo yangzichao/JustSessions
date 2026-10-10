@@ -7,14 +7,15 @@ import Testing
 /// `kill(pid, 0)` still succeeds for a zombie, so it fails only once the process has ended and been reaped.
 @MainActor
 struct ClosedTabProcessTests {
-    @Test func closingAPlainTerminalEndsItsInteractiveShell() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func closingAPlainTerminalEndsItsInteractiveShell(_ engine: TerminalEngine) async throws {
         let folder = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: folder) }
-        let tab = makeTab(running: "/bin/zsh", arguments: ["-f", "-i"], in: folder)
+        let tab = makeTab(engine: engine, running: "/bin/zsh", arguments: ["-f", "-i"], in: folder)
         tab.startIfNeeded()
         let shellProcessID = tab.processID
         try #require(shellProcessID > 0)
-        // Once started up, an interactive shell ignores SIGTERM, the signal SwiftTerm's `terminate()` sends.
+        // Once started up, an interactive shell ignores SIGTERM, the signal the terminal's `terminate()` sends.
         try await expectEventually { ignoresSIGTERM(shellProcessID) }
 
         tab.close()
@@ -22,10 +23,11 @@ struct ClosedTabProcessTests {
         try await expectEventually { kill(shellProcessID, 0) != 0 }
     }
 
-    @Test func closingATabWhoseProcessEndsRightAwayLeavesNoZombie() async throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func closingATabWhoseProcessEndsRightAwayLeavesNoZombie(_ engine: TerminalEngine) async throws {
         let folder = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: folder) }
-        let tab = makeTab(running: "/bin/sleep", arguments: ["60"], in: folder)
+        let tab = makeTab(engine: engine, running: "/bin/sleep", arguments: ["60"], in: folder)
         tab.startIfNeeded()
         let processID = tab.processID
         try #require(processID > 0)
@@ -35,8 +37,9 @@ struct ClosedTabProcessTests {
         try await expectEventually { kill(processID, 0) != 0 }
     }
 
-    private func makeTab(running executablePath: String, arguments: [String], in folder: URL) -> TerminalSession {
+    private func makeTab(engine: TerminalEngine, running executablePath: String, arguments: [String], in folder: URL) -> TerminalSession {
         TerminalSession(
+            engine: engine,
             conversation: nil,
             provider: nil,
             projectPath: folder.path,

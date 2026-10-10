@@ -71,6 +71,7 @@ struct TabMovingStoreTests {
     /// A plain terminal, which the next launch reopens without a session to resume.
     private func makeTab(projectPath: String) -> TerminalSession {
         TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: nil,
             projectPath: projectPath,

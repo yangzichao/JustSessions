@@ -35,6 +35,7 @@ struct TabGroupNewSessionTests {
         @discardableResult
         func openTab(in folder: URL, isPlainTerminal: Bool = false) -> TerminalSession {
             let tab = TerminalSession(
+                engine: .swiftTerm,
                 conversation: nil,
                 provider: isPlainTerminal ? nil : .claude,
                 projectPath: folder.path,
@@ -126,6 +127,7 @@ struct TabGroupNewSessionTests {
         defer { fixture.tearDown() }
         let store = fixture.store
         let remoteTab = TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: .claude,
             projectPath: "/home/me/paper",

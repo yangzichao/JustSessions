@@ -38,6 +38,7 @@ struct SidebarProjectPersistenceTests {
         let projectPath = "/work/new-project"
         store.removeProjectFromSidebar(projectPath)
         let terminal = TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: .codex,
             projectPath: projectPath,

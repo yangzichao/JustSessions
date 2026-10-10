@@ -30,6 +30,83 @@ The accessibility walk was most of each freeze. SwiftUI only does it while an ac
 
 The tree is large because the transcript lays out every loaded entry, up to `TranscriptPagingModel.maximumRetainedPageCount` pages. It uses a plain `VStack` on purpose; see `TranscriptScrollView.transcriptEntries`.
 
+## Terminal engines: Ghostty and SwiftTerm
+
+`TerminalEngineMeasurements` runs the same output through a tab of each engine, on 9 October 2026. A script started with the tab's own `startProcess` writes the output to the tab's pseudo-terminal, so it reaches each terminal as a CLI's does. The test window is ordered front, so both engines draw.
+
+**Method:**
+- **Machine:** Apple M4 Pro, 12 cores (8 performance, 4 efficiency), 24 GB, macOS 26.6.1, the built-in Liquid Retina XDR display.
+- **Build:** commit `9998098`, built by `swift test -c release` with Xcode 27.0 (Swift 6.4, macOS 27.0 SDK), not the release's SDK. SwiftTerm is the 1.15.0 fork, drawing on the CPU; Ghostty is libghostty-spm `2.2.2026100901`.
+- **Runs:** three of each, alternating which engine goes first. Each result is the median, with the lowest and highest in brackets. Each memory run had a process of its own.
+- **Load:** the machine was busy, so absolute CPU figures are noisy; compare the engines. Blender used 60–120% of a core and 13 GB throughout, a running copy of the app 30–80%, and WindowServer 35–48%, with bursts from Spotlight and media analysis. The load average was 5–9.
+- **CPU:** process CPU from `getrusage`, as a percentage of one core. The scripts writing the output are child processes, so they don't count. Main-thread CPU comes from `thread_info`.
+- **Gaps:** `MainThreadPerfHeartbeat` ticks every 20 ms. On this machine its longest gap was 25–30 ms even with the main thread almost idle, so a gap under about 30 ms is no hitch.
+- **Frames:** for SwiftTerm, calls to its view's `draw(_:)`. For Ghostty, each frame its renderer hands to its layer, as the layer's new contents.
+
+The workloads:
+1. **Repaint:** 8 rows rewritten 30 times a second for 5 s, with a spinner, as in `TerminalVisibilityMeasurements`. One tab, shown.
+2. **Bulk:** 20 MB in 175,920 log lines, colored, every fifth in truecolor and about every seventh with CJK text, written by `cat`. One tab, shown. Timed until the terminal has parsed all of it and its screen shows the last line.
+3. **Hidden tabs:** the repaint in 5 or 10 tabs, one shown, the rest hidden through `setWorkspaceActive(false)`.
+4. **Memory:** before any tab, with 10 idle tabs, and after the bulk stream in all 10 tabs. A tab's share is a tenth of the change.
+
+**Repaint, one tab:**
+
+| Measure | Ghostty | SwiftTerm |
+| --- | --- | --- |
+| Process CPU, % of one core | 4.4 (3.9–4.8) | 15.3 (13.4–15.8) |
+| Main-thread CPU, % of one core | 1.2 (1.1–1.2) | 14.8 (12.9–15.3) |
+| Longest main-thread gap | 28.7 ms (28.5–31.8) | 31.6 ms (28.5–41.0) |
+| Frames drawn in 5 s | 151 | 149 (147–149) |
+
+**Bulk stream, one tab:**
+
+| Measure | Ghostty | SwiftTerm |
+| --- | --- | --- |
+| Time until parsed and on screen | 0.21 s (0.20–0.22) | 0.79 s (0.77–0.80) |
+| Process CPU, % of one core | 352 (343–366) | 123 (122–123) |
+| Process CPU time, from the medians | 0.74 s | 0.97 s |
+| Main-thread CPU, % of one core | 65 (61–65) | 98 (98–99) |
+| Longest main-thread gap | 26.5 ms (26.0–27.5) | 31.3 ms (30.0–32.4) |
+| Frames drawn | 379 (291–381) | 35 (34–35) |
+
+Ghostty parsed the stream about four times as fast, across several threads. It handed its layer more frames than a display can show in that time; how many reached the screen is unconfirmed.
+
+**Repaint, one tab shown and the rest hidden:**
+
+| Tabs | Process CPU, Ghostty | Process CPU, SwiftTerm | Main thread, Ghostty | Main thread, SwiftTerm | Longest gap, Ghostty | Longest gap, SwiftTerm |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 4.4% | 15.3% | 1.2% | 14.8% | 28.7 ms | 31.6 ms |
+| 5 | 6.1% (5.4–6.8) | 18.9% (16.6–20.0) | 1.5% | 17.5% | 29.3 ms | 29.8 ms |
+| 10 | 7.1% (6.7–7.3) | 17.2% (16.8–20.5) | 1.8% | 15.3% | 30.0 ms | 27.7 ms |
+
+Each hidden Ghostty tab added about 0.3% of a core, mostly off the main thread. Hidden SwiftTerm tabs added 2–4% in all, more with 5 tabs than with 10, so the load's noise is as large as their cost. Both engines drew 149–151 frames for the shown tab.
+
+**Memory, in MB:** the medians of three runs. The runs differed by at most 2.3 MB per tab, and for SwiftTerm by under 0.5 MB.
+
+| Measure | Ghostty | SwiftTerm, shipped 500 lines | SwiftTerm, 10,000 lines |
+| --- | --- | --- | --- |
+| Footprint before any tab | 59.8 | 59.9 | 60.0 |
+| Footprint with 10 idle tabs | 212.5 | 82.6 | 83.4 |
+| Footprint per idle tab | 15.3 | 2.3 | 2.3 |
+| Footprint after the stream in all 10 tabs | 285.4 | 77.8 | 384.8 |
+| Footprint added per full tab | 7.4 | −0.5 | 30.1 |
+| Resident memory added per full tab | 55.1 | 8.4 | 39.2 |
+| Scrollback kept, rows × columns | 46,341 × 125 | 540 × 115 | 10,040 × 115 |
+
+The footprint is what Activity Monitor's Memory column shows. Read the table with these points in mind:
+- **An idle Ghostty tab** costs about 15 MB, nearly all of it graphics memory: the surfaces it draws into, which hidden tabs keep too. With 10 idle tabs, `vmmap` showed 98 MB of "owned unmapped (graphics)", 30 MB of IOSurface, and 7 MB of IOAccelerator memory.
+- **Ghostty's scrollback isn't in the footprint.** `vmmap` shows its terminal pages as "Memory Tag 240": with 10 full tabs, 477 MB resident but only 4 MB dirty, and the footprint is `vmmap`'s dirty total. Resident memory gives the real cost, about 55 MB per full tab. Whether macOS can reclaim those pages without losing scrollback is unconfirmed.
+- **For SwiftTerm, the footprint is the cost.** Its resident figure also counts memory the allocator freed and kept.
+- **One run per process.** In a process that had already run the same case, the footprint counted 0–22 MB per full SwiftTerm tab with 10,000 lines instead of 30: memory the process freed and then reused wasn't counted again.
+
+**Scrollback differs by engine.** A Ghostty tab keeps far more scrollback than a SwiftTerm tab by default: 46,341 rows here, against SwiftTerm's 500 lines. Full, it holds about 55 MB, against well under 1 MB for SwiftTerm's 500 lines, or 30 MB for 10,000. The app sets no limit for Ghostty, so Ghostty's default `scrollback-limit` applies. Upstream documents it as 10,000,000 bytes, so how Ghostty counts it against these 55 MB is unconfirmed.
+
+**Profile:** one 5-second `sample` of the repaint for each engine.
+- **SwiftTerm:** the main thread was busy in 721 of 3,675 samples, 20%. Parsing the output (`feed`) took 12 of them, and Core Animation's commit, drawing the view, 693. No other thread did measurable work. The drawing went to:
+  - 251 samples in `NSView` drawing, where SwiftTerm's `drawTerminalContents` records each row's text;
+  - 417 in updating the layer's backing store, which replays those commands. 316 of them rasterized glyphs into the 16-bit RGBA backing store this XDR display gets (`RGBAf16_mark_constmask`, `vCGCompositeConstMask_ARGB16F_vec`).
+- **Ghostty:** the main thread was busy in 28 of 3,459 samples, under 1%: committing the layer's new contents, and handing output on. Ghostty's renderer thread took 29 samples, Metal's command queue 21, Ghostty's output parsing 6, and reading the pseudo-terminal 5. All threads together were busy in 94 samples, against SwiftTerm's 726.
+
 ## Work items
 
 | # | Item | Status |
@@ -39,7 +116,7 @@ The tree is large because the transcript lays out every loaded entry, up to `Tra
 | 3 | [Fast `AttributedString` to `String` conversion](#3-fast-attributedstring-to-string-conversion) | Done: #46 |
 | 4 | [One position marker view per transcript entry](#4-one-position-marker-view-per-transcript-entry) | Planned |
 | 5 | [Text selection on very long blocks](#5-text-selection-on-very-long-blocks) | Planned |
-| 6 | [Terminal drawing: SwiftTerm upgrade, then Metal](#6-terminal-drawing-swiftterm-upgrade-then-metal) | Planned |
+| 6 | [Terminal drawing](#6-terminal-drawing) | Done for Ghostty, the engine you can choose in Settings: libghostty PR. Planned for SwiftTerm, the default |
 | 7 | [The search context changes on every transcript update](#7-the-search-context-changes-on-every-transcript-update) | Done: scrolling PR |
 | 8 | [Scrolling re-rendered every transcript entry](#8-scrolling-re-rendered-every-transcript-entry) | Done: scrolling PR |
 | 9 | [SwiftUI's scroll position tracking](#9-swiftuis-scroll-position-tracking) | Done: issue #55 |
@@ -105,11 +182,13 @@ Every selectable block is a `SelectionTextField` in a host view. Of the window's
 
 **Plan:** keep live selection under a size limit, and offer **Copy Text** for longer blocks. Measure first whether one selectable view per entry, instead of one per block, keeps selection usable with fewer views.
 
-### 6. Terminal drawing: SwiftTerm upgrade, then Metal
+### 6. Terminal drawing
 
 **Evidence:** this is the largest steady cost: 43% of the main thread's busy time over the whole recording, and up to a fifth of a core while new output took about 1%. When a change reaches the bottom row, SwiftTerm repaints from the changed rows down to the bottom of the view. TUI status lines and spinners do that constantly. The app uses SwiftTerm 1.15.0, through its [fork](build-and-release.md#swiftterm-fork), with CPU drawing.
 
-**Plan:**
+**Change:** Ghostty, which you can choose under Settings › Appearance › Terminal › Engine, draws with Metal on its own renderer thread, and parses output off the main thread. In the repaint workload, the main thread spent 1.2% of a core on a Ghostty tab, against 14.8% on a SwiftTerm tab; see [Terminal engines](#terminal-engines-ghostty-and-swiftterm).
+
+**Plan for SwiftTerm, the default engine:** a tab that uses SwiftTerm still draws on the CPU, on the main thread.
 1. Upgrade to SwiftTerm 1.20.0 by rebasing the fork onto it. Version 1.16.0 notes improved baseline performance, and 1.20.0 is the last release before breaking changes.
 2. Then try `setUseMetal(true)`. The Metal renderer caches each row and rebuilds only changed rows.
 3. Check visually: selection, insets, transparency, the cursor, and the app's own drawing.
@@ -197,4 +276,5 @@ Or open the trace in Instruments. Keep these points in mind:
   - `MessageSearchReadingMeasurements`: reading generated sessions with images for message search, decoding the images and leaving them undecoded.
   - `SidebarInteractionMeasurements`: sidebar interactions.
   - `TerminalVisibilityMeasurements`: hidden terminals.
+  - `TerminalEngineMeasurements`: Ghostty and SwiftTerm tabs under the same output, and their memory; see [Terminal engines](#terminal-engines-ghostty-and-swiftterm) and [Build and release](build-and-release.md#performance-measurements) for the commands.
   - `TranscriptInteractionMeasurements`: scrolling, hit testing, and opening Find in a 240- and 640-entry transcript, with SwiftUI's accessibility off and on. Run it with `JUSTSESSIONS_PERF=1 swift test -c release --filter TranscriptInteractionMeasurements`.

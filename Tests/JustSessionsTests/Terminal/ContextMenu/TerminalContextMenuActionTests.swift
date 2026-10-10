@@ -5,11 +5,12 @@ import Testing
 /// The items of a terminal's right-click menu do what the same items of its tab's menu in the tab bar do.
 @MainActor
 struct TerminalContextMenuActionTests {
-    @Test func renameAndEndSessionAskTheWindowAsTheTabsMenuDoes() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func renameAndEndSessionAskTheWindowAsTheTabsMenuDoes(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
         let conversation = Conversation.fixture()
-        let tab = fixture.openTab(conversation: conversation)
+        let tab = fixture.openTab(engine: engine, conversation: conversation)
         let menu = fixture.menu(for: tab)
 
         try TerminalContextMenuFixture.choose(TerminalContextMenuFixture.item("Rename", in: menu))
@@ -19,11 +20,12 @@ struct TerminalContextMenuActionTests {
         #expect(fixture.tabsAskedToClose == [tab.id])
     }
 
-    @Test func choosingAnotherTabOpensItInANewSplitWithThisOne() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func choosingAnotherTabOpensItInANewSplitWithThisOne(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        let tab = fixture.openTab(title: "This")
-        let other = fixture.openTab(title: "Other")
+        let tab = fixture.openTab(engine: engine, title: "This")
+        let other = fixture.openTab(engine: engine, title: "Other")
         fixture.store.selectTerminal(tab.id)
         let submenu = try #require(
             TerminalContextMenuFixture.item("Add tab to new split view", in: fixture.menu(for: tab)).submenu
@@ -35,11 +37,12 @@ struct TerminalContextMenuActionTests {
         #expect(fixture.store.selectedTerminalID == tab.id)
     }
 
-    @Test func arrangingTheSplitReversesClosesOrSeparatesItsViews() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func arrangingTheSplitReversesClosesOrSeparatesItsViews(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        let left = fixture.openTab(title: "Left")
-        let right = fixture.openTab(title: "Right")
+        let left = fixture.openTab(engine: engine, title: "Left")
+        let right = fixture.openTab(engine: engine, title: "Right")
         fixture.store.selectTerminal(left.id)
         fixture.store.splitSelectedTerminal(with: right.id)
         let split = try #require(fixture.store.shownSplit)

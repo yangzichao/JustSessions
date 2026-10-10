@@ -6,7 +6,9 @@ import Testing
 /// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct ThisMacTmuxStoreTests {
-    @Test func aResumedSessionKeepsRunningInTmuxAfterItsTabClosesUntilEnded() async throws {
+    /// The CLI's process is found from the tmux server, whichever engine draws the tab.
+    @Test(arguments: TerminalEngine.allCases)
+    func aResumedSessionKeepsRunningInTmuxAfterItsTabClosesUntilEnded(_ engine: TerminalEngine) async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
         try sandbox.writeExecutable(named: "claude", script: "#!/bin/sh\nexec /bin/sleep 60\n")
@@ -21,6 +23,7 @@ struct ThisMacTmuxStoreTests {
         let store = ConversationStore(
             adapters: [StaticConversationAdapter(discoveredConversations: [conversation])],
             commandResolver: sandbox.resolver,
+            terminalEngineStore: try .pinned(to: engine),
             startsBackgroundPolling: false
         )
         defer { store.closeAllTerminals() }
@@ -34,6 +37,7 @@ struct ThisMacTmuxStoreTests {
 
         store.launch(conversation, action: .resume)
         let tab = try #require(store.terminalSessions.last)
+        #expect(tab.engine == engine)
         #expect(tab.tmuxSessionName == tmuxSessionName)
         #expect(tab.command.executablePath == sandbox.server.executablePath)
         tab.startIfNeeded()

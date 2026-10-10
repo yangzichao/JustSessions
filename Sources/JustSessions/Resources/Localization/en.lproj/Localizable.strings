@@ -150,6 +150,8 @@
 	<string>Appearance</string>
 	<key>Applies immediately to all terminals. Some CLI apps use their own colors.</key>
 	<string>Applies immediately to all terminals. Some CLI apps use their own colors.</string>
+	<key>Applies to tabs opened after you change it.</key>
+	<string>Applies to tabs opened after you change it.</string>
 	<key>Archive</key>
 	<string>Archive</string>
 	<key>Archive %lld projects</key>
@@ -388,6 +390,8 @@
 	<string>End this CLI session?</string>
 	<key>Ended</key>
 	<string>Ended</string>
+	<key>Engine</key>
+	<string>Engine</string>
 	<key>Enter only the host, such as `devbox` or `me@devbox`. Options such as a key or a jump host go in `~/.ssh/config`.</key>
 	<string>Enter only the host, such as `devbox` or `me@devbox`. Options such as a key or a jump host go in `~/.ssh/config`.</string>
 	<key>Every open tab in one list</key>
@@ -976,6 +980,8 @@
 	<string>Terminal appearance preview</string>
 	<key>Terminal colors</key>
 	<string>Terminal colors</string>
+	<key>Terminal engine</key>
+	<string>Terminal engine</string>
 	<key>Text and accents</key>
 	<string>Text and accents</string>
 	<key>Text can't stay readable on that color. Choose a darker one.</key>

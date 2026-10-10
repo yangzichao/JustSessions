@@ -5,11 +5,12 @@ import Testing
 /// A right-click on a terminal or its margin selects its tab, as a click does, then shows the terminal's menu.
 @MainActor
 struct TerminalRightClickTests {
-    @Test func aRightClickInASplitPaneSelectsItsTabThenShowsItsMenu() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aRightClickInASplitPaneSelectsItsTabThenShowsItsMenu(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        let left = fixture.openTab(title: "Left")
-        let right = fixture.openTab(title: "Right")
+        let left = fixture.openTab(engine: engine, title: "Left")
+        let right = fixture.openTab(engine: engine, title: "Right")
         fixture.store.selectTerminal(left.id)
         fixture.store.splitSelectedTerminal(with: right.id)
         wireUp(right, in: fixture)
@@ -20,10 +21,11 @@ struct TerminalRightClickTests {
         #expect(TerminalContextMenuFixture.titles(of: menu) == TerminalContextMenuFixture.titles(of: fixture.menu(for: right)))
     }
 
-    @Test func aRightClickInTheMarginShowsTheTerminalsMenu() throws {
+    @Test(arguments: TerminalEngine.allCases)
+    func aRightClickInTheMarginShowsTheTerminalsMenu(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
-        let tab = fixture.openTab(conversation: .fixture())
+        let tab = fixture.openTab(engine: engine, conversation: .fixture())
         wireUp(tab, in: fixture)
         let insetView = TerminalInsetView(terminalView: tab.terminalView)
 

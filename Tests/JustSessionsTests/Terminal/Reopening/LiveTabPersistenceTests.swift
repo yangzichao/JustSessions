@@ -126,6 +126,7 @@ struct LiveTabPersistenceTests {
         let conversation = sandbox.conversation()
         store.replaceConversations(on: .thisMac, with: [conversation])
         let tab = TerminalSession(
+            engine: .swiftTerm,
             conversation: nil, provider: .claude, projectPath: sandbox.project.path,
             action: .new, displayTitle: "New session",
             command: NativeCLICommand(executablePath: "/bin/sh", arguments: [], workingDirectory: sandbox.project.path, environment: [])

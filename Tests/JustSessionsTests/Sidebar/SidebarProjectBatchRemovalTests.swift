@@ -31,6 +31,7 @@ struct SidebarProjectBatchRemovalTests {
             store.setPinned(true, projectPath: projectID)
         }
         let terminal = TerminalSession(
+            engine: .swiftTerm,
             conversation: selectedLocal,
             provider: selectedLocal.provider,
             projectPath: selectedLocal.projectPath,

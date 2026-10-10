@@ -201,6 +201,7 @@ private struct LaunchSandbox {
     @discardableResult
     func openPlainTab(in store: ConversationStore) -> TerminalSession {
         let tab = TerminalSession(
+            engine: .swiftTerm,
             conversation: nil, provider: nil, projectPath: project.path, action: nil, displayTitle: "Terminal",
             command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [], workingDirectory: project.path, environment: [])
         )

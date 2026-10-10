@@ -40,6 +40,7 @@ struct ThisMacAppearingSessionTests {
 
     private func newSessionTab(_ provider: ConversationProvider, project: String, store: ConversationStore) -> TerminalSession {
         TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: provider,
             projectPath: project,

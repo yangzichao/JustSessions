@@ -1,6 +1,5 @@
 import AppKit
 import Combine
-import SwiftTerm
 
 @MainActor
 final class TerminalSession: ObservableObject, Identifiable {
@@ -15,7 +14,9 @@ final class TerminalSession: ObservableObject, Identifiable {
     let action: ConversationAction?
     @Published private(set) var displayTitle: String
     let command: NativeCLICommand
-    let terminalView: SelectableTerminalView
+    /// What draws the tab's terminal, chosen when the tab opens; see `TerminalEngineStore`.
+    let engine: TerminalEngine
+    let terminalView: any TabTerminalView
     /// The session id a new Claude Code tab was started with (`--session-id`), when the CLI accepts one.
     let preassignedSessionID: String?
     /// For a Branch tab, the session it forked. The CLI runs a new session, so this one is never the tab's own.
@@ -58,7 +59,7 @@ final class TerminalSession: ObservableObject, Identifiable {
     private var hasProcessExited = false
     private var isClosed = false
 
-    var processID: Int32 { terminalView.process.shellPid }
+    var processID: Int32 { terminalView.processID }
     /// The CLI's process on this Mac, or 0 while it is unknown: the tab's own process, unless the CLI runs in tmux.
     var cliProcessID: Int32 {
         tmuxSessionName == nil ? processID : tmuxPaneProcessID ?? 0
@@ -86,6 +87,7 @@ final class TerminalSession: ObservableObject, Identifiable {
     var startsNewSession: Bool { action?.startsNewSession ?? false }
 
     init(
+        engine: TerminalEngine,
         conversation: Conversation?,
         provider: ConversationProvider?,
         projectPath: String,
@@ -99,6 +101,7 @@ final class TerminalSession: ObservableObject, Identifiable {
         tmuxSessionName: String? = nil,
         startsOnceShown: Bool = false
     ) {
+        self.engine = engine
         self.conversation = conversation
         self.provider = provider
         self.projectPath = projectPath
@@ -111,11 +114,11 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.preassignedSessionID = preassignedSessionID
         self.branchedFromSessionID = branchedFromSessionID
         self.isWaitingToBeShown = startsOnceShown
-        self.terminalView = SelectableTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
+        self.terminalView = engine.makeTabTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.processObserver = TerminalProcessObserver()
         terminalView.sendsShiftReturnAsCSIu = host == .thisMac && tmuxSessionName != nil
         terminalView.acceptsDroppedFiles = host == .thisMac
-        terminalView.processDelegate = processObserver
+        terminalView.connectProcessObserver(processObserver)
         processObserver.session = self
     }
 
@@ -126,6 +129,7 @@ final class TerminalSession: ObservableObject, Identifiable {
             executable: command.executablePath,
             args: command.arguments,
             environment: command.environment,
+            execName: nil,
             currentDirectory: command.workingDirectory
         )
     }
@@ -186,7 +190,7 @@ final class TerminalSession: ObservableObject, Identifiable {
     }
 
     /// Hangs up on the tab's process with SIGHUP, as closing a terminal window does. An interactive shell ignores the
-    /// SIGTERM of SwiftTerm's `terminate()`, which also leaves the terminal open, so a plain terminal's shell would
+    /// SIGTERM of the terminal's `terminate()`, which also leaves the terminal open, so a plain terminal's shell would
     /// otherwise outlive its tab. A tmux client detaches on SIGHUP and leaves its CLI running, or ends the session of a
     /// failed CLI it still shows.
     func close() {

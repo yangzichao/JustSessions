@@ -50,6 +50,7 @@ struct SessionStatusAcrossWindowsTests {
         #expect(second.detachedCLIActivities == [conversation.id: .idle])
 
         let tab = TerminalSession(
+            engine: .swiftTerm,
             conversation: conversation,
             provider: conversation.provider,
             projectPath: conversation.projectPath,

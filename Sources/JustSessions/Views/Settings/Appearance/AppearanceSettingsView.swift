@@ -6,6 +6,7 @@ struct AppearanceSettingsView: View {
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
+    let terminalEngineStore: TerminalEngineStore
 
     var body: some View {
         // One grid, so the terminal's labels line up with the app's.
@@ -18,7 +19,11 @@ struct AppearanceSettingsView: View {
             GridRow {
                 ThemeDivider().gridCellColumns(2)
             }
-            TerminalAppearanceSection(appearanceStore: terminalAppearanceStore, themeStore: appThemeStore)
+            TerminalAppearanceSection(
+                appearanceStore: terminalAppearanceStore,
+                engineStore: terminalEngineStore,
+                themeStore: appThemeStore
+            )
         }
     }
 }

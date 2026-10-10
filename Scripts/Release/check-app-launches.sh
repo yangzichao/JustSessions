@@ -13,6 +13,18 @@ if [[ ! -d "$app_path" ]]; then
     exit 1
 fi
 executable_name="$(plutil -extract CFBundleExecutable raw "$app_path/Contents/Info.plist")"
+# Ghostty's terminal stops the app when its resource bundle is missing, but only once a tab opens, which this launch
+# never does; so the bundle the app looks for in its own resources is checked here.
+# SwiftPM's native build system lays the bundle out flat; its default swiftbuild system uses Contents/Resources.
+ghostty_bundle="$app_path/Contents/Resources/GhosttyKit_GhosttyTerminal.bundle"
+ghostty_resources_found=false
+for ghostty_resources in "$ghostty_bundle" "$ghostty_bundle/Contents/Resources"; do
+    if [[ -d "$ghostty_resources/Ghostty" && -d "$ghostty_resources/terminfo" ]]; then ghostty_resources_found=true; fi
+done
+if [[ "$ghostty_resources_found" != true ]]; then
+    print -u2 "Ghostty's shell integration and terminfo were not found in $ghostty_bundle"
+    exit 1
+fi
 
 # .build/release is a symlink to the architecture's build directory; the app records the resolved path.
 release_build_directory="${${:-$project_directory/.build/release}:A}"

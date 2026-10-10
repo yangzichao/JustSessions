@@ -803,6 +803,16 @@
         }
       }
     },
+    "Applies to tabs opened after you change it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅应用于更改后打开的标签页。"
+          }
+        }
+      }
+    },
     "Archive": {
       "localizations": {
         "zh-Hans": {
@@ -2126,6 +2136,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "已结束"
+          }
+        }
+      }
+    },
+    "Engine": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "引擎"
           }
         }
       }
@@ -5221,6 +5241,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "终端配色"
+          }
+        }
+      }
+    },
+    "Terminal engine": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "终端引擎"
           }
         }
       }

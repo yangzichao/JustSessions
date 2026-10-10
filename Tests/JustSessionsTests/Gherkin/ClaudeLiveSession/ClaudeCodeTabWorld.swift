@@ -38,6 +38,7 @@ final class ClaudeCodeTabWorld: SessionTabWorld {
         let conversation = try app.listedConversation(labeled: label)
         cliSessionID = conversation.sessionID
         openTab(TerminalSession(
+            engine: .swiftTerm,
             conversation: conversation,
             provider: .claude,
             projectPath: app.projectPath,
@@ -50,6 +51,7 @@ final class ClaudeCodeTabWorld: SessionTabWorld {
 
     func openNewSessionTab() {
         openTab(TerminalSession(
+            engine: .swiftTerm,
             conversation: nil,
             provider: .claude,
             projectPath: app.projectPath,
