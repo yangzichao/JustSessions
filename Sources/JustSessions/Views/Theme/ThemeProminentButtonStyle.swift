@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The app's primary action, using the same ink and foreground as the new-session badge.
+/// The primary action in Settings and on the onboarding tour's cards, filled with the theme's ink.
 struct ThemeProminentButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
