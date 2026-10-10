@@ -1,5 +1,50 @@
 [
   {
+    "version": "1.1.1",
+    "publishedOn": "2026-10-10",
+    "title": {
+      "en": "Tab hover cards and Running filter",
+      "zh-Hans": "标签页悬停卡片与运行中筛选"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Hover over a tab to see its full title, project, CLI, and status; hover a group to list its tabs.",
+            "zh-Hans": "鼠标停在标签页上可查看完整标题、项目、CLI 和状态；停在标签组上可列出其中的标签页。"
+          },
+          {
+            "en": "Filter the sidebar to Running sessions: CLIs running in a JustSessions tab or tmux, including on SSH hosts.",
+            "zh-Hans": "侧栏可筛选“运行中”的会话：CLI 在 JustSessions 的标签页或 tmux 中运行，包括 SSH 主机上的。"
+          }
+        ]
+      },
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Pinned projects and sessions keep the order you set; drag them in the sidebar to reorder.",
+            "zh-Hans": "置顶的项目和会话保持你设定的顺序；可在侧栏中拖动调整。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Fixed Send Feedback never getting past verification; it now opens the feedback form in your browser.",
+            "zh-Hans": "修复了“发送反馈”一直卡在验证步骤的问题；现在会在浏览器中打开反馈表单。"
+          },
+          {
+            "en": "Fixed Claude Code sessions sometimes missing from the sidebar when the first prompt included an image.",
+            "zh-Hans": "修复了首条提示附带图片的 Claude Code 会话有时不在侧栏中显示的问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.1.0",
     "publishedOn": "2026-10-09",
     "title": {
