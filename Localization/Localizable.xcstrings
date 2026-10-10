@@ -449,6 +449,16 @@
         }
       }
     },
+    "Accessibility": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "辅助功能"
+          }
+        }
+      }
+    },
     "Actual Size": {
       "localizations": {
         "zh-Hans": {
@@ -3459,6 +3469,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "可选"
+          }
+        }
+      }
+    },
+    "Optional. Lets CLIs in terminals control apps, such as clicking a menu or typing keys through System Events with osascript. Every CLI in a terminal gets it, so allow it only if you want them to.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可选。允许终端中的 CLI 控制 app，例如用 osascript 通过 System Events 点按菜单或输入按键。终端中的每个 CLI 都会获得这项权限，所以只在你希望它们拥有时才允许。"
           }
         }
       }

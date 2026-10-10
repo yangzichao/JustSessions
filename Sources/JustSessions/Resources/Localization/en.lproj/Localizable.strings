@@ -88,6 +88,8 @@
 	<string>A+</string>
 	<key>About JustSessions</key>
 	<string>About JustSessions</string>
+	<key>Accessibility</key>
+	<string>Accessibility</string>
 	<key>Actual Size</key>
 	<string>Actual Size</string>
 	<key>Add SSH host</key>
@@ -650,6 +652,8 @@
 	<string>Open the source code on GitHub</string>
 	<key>Optional</key>
 	<string>Optional</string>
+	<key>Optional. Lets CLIs in terminals control apps, such as clicking a menu or typing keys through System Events with osascript. Every CLI in a terminal gets it, so allow it only if you want them to.</key>
+	<string>Optional. Lets CLIs in terminals control apps, such as clicking a menu or typing keys through System Events with osascript. Every CLI in a terminal gets it, so allow it only if you want them to.</string>
 	<key>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</key>
 	<string>Optional. Without it, macOS asks about each protected folder, such as Documents or an external drive, the first time a CLI in a terminal opens files there.</string>
 	<key>Organize</key>
