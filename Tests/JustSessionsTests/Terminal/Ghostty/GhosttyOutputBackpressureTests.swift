@@ -12,7 +12,7 @@ struct GhosttyOutputBackpressureTests {
         defer { backpressure.stop() }
         backpressure.outputHandedToMainThread(byteCount: 63 << 10)
         let firstRead = Waiter(backpressure)
-        try await expectEventually(timeout: .seconds(10)) { firstRead.hasReturned }
+        try await expectEventually { firstRead.hasReturned }
 
         backpressure.outputHandedToMainThread(byteCount: 1 << 10)
         let read = Waiter(backpressure)
@@ -24,7 +24,7 @@ struct GhosttyOutputBackpressureTests {
         #expect(!read.hasReturned, "Above the low-water mark")
 
         backpressure.outputPassedToGhostty(byteCount: 8 << 10)
-        try await expectEventually(timeout: .seconds(10)) { read.hasReturned }
+        try await expectEventually { read.hasReturned }
         #expect(backpressure.unparsedByteCount == 16 << 10)
     }
 
@@ -56,7 +56,7 @@ struct GhosttyOutputBackpressureTests {
             window.close()
         }
 
-        try await expectEventually(timeout: .seconds(30)) { read.hasReturned }
+        try await expectEventually { read.hasReturned }
     }
 
     @Test func stoppingEndsTheWait() async throws {
@@ -70,7 +70,7 @@ struct GhosttyOutputBackpressureTests {
 
         backpressure.stop()
 
-        try await expectEventually(timeout: .seconds(10)) { read.hasReturned }
+        try await expectEventually { read.hasReturned }
     }
 }
 

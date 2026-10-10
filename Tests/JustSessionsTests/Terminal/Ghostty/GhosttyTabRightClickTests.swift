@@ -26,7 +26,7 @@ struct GhosttyTabRightClickTests {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
         try await fixture.start(printing: "printf '\\033[?1000hREADY'")
-        try await expectEventually(timeout: .seconds(30)) { fixture.screen.contains("READY") }
+        try await expectEventually { fixture.screen.contains("READY") }
         let appMenu = NSMenu(title: "App")
         fixture.view.makeContextMenu = { appMenu }
         var shownMenus: [NSMenu] = []
@@ -51,13 +51,13 @@ struct GhosttyTabRightClickTests {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
         try await fixture.start(printing: "printf '\\033[?1000hREADY'")
-        try await expectEventually(timeout: .seconds(30)) { fixture.screen.contains("READY") }
+        try await expectEventually { fixture.screen.contains("READY") }
 
         fixture.view.rightMouseDown(with: rightMouseEvent(.rightMouseDown, in: fixture))
         fixture.view.rightMouseUp(with: rightMouseEvent(.rightMouseUp, in: fixture))
 
         // X10 mouse reports: a right press (button 2) and a release.
-        try await expectEventually(timeout: .seconds(30)) { fixture.receivedInput.hasPrefix("\u{1B}[M\"") }
+        try await expectEventually { fixture.receivedInput.hasPrefix("\u{1B}[M\"") }
     }
 
     private func rightMouseEvent(_ type: NSEvent.EventType, in fixture: GhosttyTabFixture) -> NSEvent {

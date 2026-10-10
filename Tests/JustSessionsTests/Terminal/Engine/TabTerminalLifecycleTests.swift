@@ -16,7 +16,7 @@ struct TabTerminalLifecycleTests {
         fixture.tab.startIfNeeded()
 
         #expect(fixture.tab.processID > 0)
-        try await expectEventually(timeout: .seconds(30)) { fixture.screen.contains("OUTPUT_FROM_THE_PROCESS") }
+        try await expectEventually { fixture.screen.contains("OUTPUT_FROM_THE_PROCESS") }
     }
 
     @Test(arguments: TerminalEngine.allCases)
@@ -30,12 +30,12 @@ struct TabTerminalLifecycleTests {
             """)
         defer { fixture.tearDown() }
         fixture.tab.startIfNeeded()
-        try await expectEventually(timeout: .seconds(30)) { fixture.reportedSize != nil && fixture.reportedSize == fixture.terminalSize }
+        try await expectEventually { fixture.reportedSize != nil && fixture.reportedSize == fixture.terminalSize }
         let sizeBefore = try #require(fixture.reportedSize)
 
         fixture.window.setContentSize(NSSize(width: 500, height: 300))
 
-        try await expectEventually(timeout: .seconds(30)) {
+        try await expectEventually {
             fixture.reportedSize != sizeBefore && fixture.reportedSize == fixture.terminalSize
         }
     }
@@ -47,7 +47,7 @@ struct TabTerminalLifecycleTests {
 
         fixture.tab.startIfNeeded()
 
-        try await expectEventually(timeout: .seconds(30)) { fixture.tab.hasExited }
+        try await expectEventually { fixture.tab.hasExited }
         #expect(fixture.tab.exitCode == 3)
     }
 
@@ -58,7 +58,7 @@ struct TabTerminalLifecycleTests {
 
         fixture.tab.startIfNeeded()
 
-        try await expectEventually(timeout: .seconds(30)) { fixture.tab.terminalTitle == "Title from the CLI" }
+        try await expectEventually { fixture.tab.terminalTitle == "Title from the CLI" }
     }
 
     @Test(arguments: TerminalEngine.allCases)
@@ -69,12 +69,12 @@ struct TabTerminalLifecycleTests {
         fixture.tab.startIfNeeded()
         let processID = fixture.tab.processID
         try #require(processID > 0)
-        try await expectEventually(timeout: .seconds(30)) { fixture.screen.contains("READY") }
+        try await expectEventually { fixture.screen.contains("READY") }
 
         fixture.tab.close()
 
         // `kill(pid, 0)` still succeeds for a zombie, so it fails only once the process has ended and been reaped.
-        try await expectEventually(timeout: .seconds(30)) { kill(processID, 0) != 0 }
+        try await expectEventually { kill(processID, 0) != 0 }
     }
 }
 

@@ -42,6 +42,8 @@ The Ghostty terminal engine comes from [libghostty-spm](https://github.com/Lakr2
 
 The library statically links Ghostty's dependencies, including FreeType, Oniguruma, libpng, zlib, GNU libintl, and its built-in fonts. Their license texts, versions, and the obligations still open are in `Branding/ThirdParty/Ghostty/`, which the app ships as `Contents/Resources/Ghostty-Licenses`. To move to a newer release, update the pin and `Package.resolved`, then recheck that folder against the new archive's members, as its README describes.
 
+The release workflow tests on a GitHub virtual machine, where Ghostty drew its background in the configured color but its text and cell colors in others. The rendering tests that check those exact colors skip there (`TestMachine.isVirtual`), so `make verify` on a Mac is what checks them before a release.
+
 ## Gherkin features
 
 Behavior that reads best as a story is written as Gherkin in `Tests/JustSessionsTests/Gherkin/Features/`, one folder per feature, and run by [CucumberSwift](https://github.com/cucumberswift/CucumberSwift) as part of `make test`. Each feature's steps live beside it under `Tests/JustSessionsTests/Gherkin/` and register in `CucumberStepImplementation.swift`, the one step implementation SwiftPM's single test bundle allows. A step matches by its text in every feature, so steps that read the same in several features, such as what a tab or the sidebar shows, are written once in `Gherkin/Shared/` and reach each tool's world through `CurrentSessionTabWorld`. A step's text cannot hold `|`: CucumberSwift's lexer reads it as the start of a table cell and drops the rest of the line.

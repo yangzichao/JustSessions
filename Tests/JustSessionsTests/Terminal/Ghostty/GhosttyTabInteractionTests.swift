@@ -42,13 +42,13 @@ struct GhosttyTabInteractionTests {
         let savedPasteboard = SavedGeneralPasteboard()
         defer { savedPasteboard.restore() }
         try await fixture.start(printing: "echo READY")
-        try await expectEventually(timeout: .seconds(30)) { fixture.screen.contains("READY") }
+        try await expectEventually { fixture.screen.contains("READY") }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString("pasted text 你好", forType: .string)
 
         #expect(NSApp.sendAction(#selector(NSText.paste(_:)), to: fixture.view, from: nil))
 
-        try await expectEventually(timeout: .seconds(30)) { fixture.receivedInput == "pasted text 你好" }
+        try await expectEventually { fixture.receivedInput == "pasted text 你好" }
     }
 
     /// The terminal's right-click menu calls these through `TabTerminalView`; see `TerminalContextMenu`.
@@ -58,7 +58,7 @@ struct GhosttyTabInteractionTests {
         let savedPasteboard = SavedGeneralPasteboard()
         defer { savedPasteboard.restore() }
         try await fixture.start(printing: "echo READY")
-        try await expectEventually(timeout: .seconds(30)) { fixture.screen.contains("READY") }
+        try await expectEventually { fixture.screen.contains("READY") }
         let terminalView: any TabTerminalView = fixture.view
         NSPasteboard.general.clearContents()
         terminalView.selectAll(terminalView)
@@ -72,7 +72,7 @@ struct GhosttyTabInteractionTests {
 
         terminalView.paste(terminalView)
 
-        try await expectEventually(timeout: .seconds(30)) { fixture.receivedInput == "pasted from the menu" }
+        try await expectEventually { fixture.receivedInput == "pasted from the menu" }
     }
 
     /// Ghostty's own rules, which SwiftTerm doesn't follow: without bracketed paste a newline goes as Return, and
@@ -82,12 +82,12 @@ struct GhosttyTabInteractionTests {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
         try await fixture.start(printing: (isBracketed ? "printf '\\033[?2004h'; " : "") + "echo READY")
-        try await expectEventually(timeout: .seconds(30)) { fixture.screen.contains("READY") }
+        try await expectEventually { fixture.screen.contains("READY") }
 
         fixture.view.paste(text: "a1\nb2\u{1B}[31mX")
 
         let expected = isBracketed ? "\u{1B}[200~a1\nb2 [31mX\u{1B}[201~" : "a1\rb2 [31mX"
-        try await expectEventually(timeout: .seconds(30)) { fixture.receivedInput.utf8.count >= expected.utf8.count }
+        try await expectEventually { fixture.receivedInput.utf8.count >= expected.utf8.count }
         #expect(fixture.receivedInput == expected)
     }
 }

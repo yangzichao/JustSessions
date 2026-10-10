@@ -28,11 +28,11 @@ struct TerminalAppearancePreviewEngineTests {
             return terminalEngines(in: hostingView)
         }
 
-        try await expectEventually(timeout: .seconds(30)) { previewEngines() == [.swiftTerm] }
+        try await expectEventually { previewEngines() == [.swiftTerm] }
 
         engineStore.setEngine(.ghostty)
 
-        try await expectEventually(timeout: .seconds(30)) { previewEngines() == [.ghostty] }
+        try await expectEventually { previewEngines() == [.ghostty] }
     }
 
     private func terminalEngines(in view: NSView) -> [TerminalEngine] {

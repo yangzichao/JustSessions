@@ -25,7 +25,7 @@ struct GhosttyTabOutputTests {
         #expect(written < limit + (2 << 20), "The process wrote \(written) bytes")
         #expect(fixture.view.outputBackpressure.unparsedByteCount < limit + (256 << 10))
         fixture.view.setWorkspaceActive(true)
-        try await expectEventually(timeout: .seconds(60)) { fixture.screen.contains("PRODUCER-DONE") }
+        try await expectEventually { fixture.screen.contains("PRODUCER-DONE") }
         #expect(Self.progress(in: fixture) >= total)
     }
 
@@ -39,7 +39,7 @@ struct GhosttyTabOutputTests {
             """)
         Self.blockMainThread(for: 0.5)
 
-        try await expectEventually(timeout: .seconds(60)) { fixture.screen.contains("NUMBERS-DONE") }
+        try await expectEventually { fixture.screen.contains("NUMBERS-DONE") }
 
         let numbers = try #require(fixture.selectAllText())
             .split(whereSeparator: \.isNewline)
@@ -83,7 +83,7 @@ struct GhosttyTabOutputTests {
 
         tab.startIfNeeded()
 
-        try await expectEventually(timeout: .seconds(30)) { tab.hasExited }
+        try await expectEventually { tab.hasExited }
         #expect(screenWhenTheProcessEnded?.contains("LAST-OUTPUT") == true, "\(screenWhenTheProcessEnded ?? "nil")")
     }
 

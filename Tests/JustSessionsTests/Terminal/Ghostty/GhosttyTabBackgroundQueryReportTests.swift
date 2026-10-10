@@ -21,14 +21,14 @@ struct GhosttyTabBackgroundQueryReportTests {
         fixture.view.reportThemeAfterNextBackgroundQuery()
         fixture.signal("owed")
 
-        try await expectEventually(timeout: .seconds(30)) { fixture.receivedInput.utf8.count >= (answer + report).utf8.count }
+        try await expectEventually { fixture.receivedInput.utf8.count >= (answer + report).utf8.count }
         try await Task.sleep(for: .milliseconds(300))
         #expect(fixture.receivedInput == answer + report)
         #expect(!fixture.view.reportsThemeAfterNextBackgroundQuery)
 
         fixture.signal("again")
 
-        try await expectEventually(timeout: .seconds(30)) { fixture.receivedInput.utf8.count >= (answer + report + answer).utf8.count }
+        try await expectEventually { fixture.receivedInput.utf8.count >= (answer + report + answer).utf8.count }
         try await Task.sleep(for: .milliseconds(300))
         #expect(fixture.receivedInput == answer + report + answer)
     }
@@ -43,7 +43,7 @@ struct GhosttyTabBackgroundQueryReportTests {
         fixture.view.cancelThemeReportAfterNextBackgroundQuery()
         fixture.signal("asked")
 
-        try await expectEventually(timeout: .seconds(30)) { !fixture.receivedInput.isEmpty }
+        try await expectEventually { !fixture.receivedInput.isEmpty }
         try await Task.sleep(for: .milliseconds(300))
         #expect(fixture.receivedInput == answer)
     }
@@ -56,11 +56,11 @@ struct GhosttyTabBackgroundQueryReportTests {
         var unheardChangeCount = 0
         fixture.view.onUnheardLightDarkChange = { unheardChangeCount += 1 }
         try await fixture.start(printing: "printf '\\033[?2031hSUBSCRIBED'")
-        try await expectEventually(timeout: .seconds(30)) { fixture.screen.contains("SUBSCRIBED") }
+        try await expectEventually { fixture.screen.contains("SUBSCRIBED") }
 
         fixture.appearanceStore.setMode(.dark)
 
-        try await expectEventually(timeout: .seconds(30)) { !fixture.receivedInput.isEmpty }
+        try await expectEventually { !fixture.receivedInput.isEmpty }
         #expect(fixture.receivedInput == TerminalThemeReporting.report(isDark: true))
         #expect(unheardChangeCount == 0)
     }
