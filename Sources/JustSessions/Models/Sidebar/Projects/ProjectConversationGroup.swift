@@ -3,7 +3,8 @@ import Foundation
 struct ProjectConversationGroup: Identifiable {
     let projectPath: String
     let displayName: String
-    let isPinned: Bool
+    /// The project's place among the pinned projects, which sets its order among them; nil when it is not pinned.
+    let pinnedPlace: Int?
     let conversations: [Conversation]
     /// Newest first; listed below pinned sessions and above the other sessions.
     let pendingNewSessions: [PendingNewSession]
@@ -14,13 +15,13 @@ struct ProjectConversationGroup: Identifiable {
     init(
         projectPath: String,
         displayName: String,
-        isPinned: Bool,
+        pinnedPlace: Int?,
         conversations: [Conversation],
         pendingNewSessions: [PendingNewSession]
     ) {
         self.projectPath = projectPath
         self.displayName = displayName
-        self.isPinned = isPinned
+        self.pinnedPlace = pinnedPlace
         self.conversations = conversations
         self.pendingNewSessions = pendingNewSessions
         latestActivity = max(
@@ -30,6 +31,7 @@ struct ProjectConversationGroup: Identifiable {
     }
 
     var id: String { projectPath }
+    var isPinned: Bool { pinnedPlace != nil }
     var location: ProjectLocation { ProjectLocation(key: projectPath) }
     var host: SessionHost { location.host }
     var folderName: String { ProjectDisplayNames.folderName(forProjectPath: projectPath) }
@@ -52,7 +54,7 @@ struct ProjectConversationGroup: Identifiable {
                 ProjectConversationGroup(
                     projectPath: projectPath,
                     displayName: displayNames.displayName(forProjectPath: projectPath),
-                    isPinned: pinnedItems.isPinned(projectPath: projectPath),
+                    pinnedPlace: pinnedItems.pinnedPlace(ofProjectPath: projectPath),
                     conversations: pinnedItems.pinnedConversationsFirst(
                         (conversationsByProject[projectPath] ?? []).sorted { first, second in
                             if first.updatedAt != second.updatedAt { return first.updatedAt > second.updatedAt }
@@ -68,9 +70,16 @@ struct ProjectConversationGroup: Identifiable {
         return orderedForSidebar(projects)
     }
 
+    /// Pinned projects first, in the order you put them, which activity never changes; then the rest, most recently
+    /// active first.
     static func orderedForSidebar(_ projects: [ProjectConversationGroup]) -> [ProjectConversationGroup] {
         projects.sorted { first, second in
-            if first.isPinned != second.isPinned { return first.isPinned }
+            switch (first.pinnedPlace, second.pinnedPlace) {
+            case let (firstPlace?, secondPlace?): return firstPlace < secondPlace
+            case (.some, nil): return true
+            case (nil, .some): return false
+            case (nil, nil): break
+            }
             if first.latestActivity != second.latestActivity { return first.latestActivity > second.latestActivity }
             return first.projectPath.localizedStandardCompare(second.projectPath) == .orderedAscending
         }

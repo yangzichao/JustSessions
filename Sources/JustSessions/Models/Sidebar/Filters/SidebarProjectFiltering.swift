@@ -24,7 +24,7 @@ enum SidebarProjectFiltering {
             return ProjectConversationGroup(
                 projectPath: project.projectPath,
                 displayName: project.displayName,
-                isPinned: project.isPinned,
+                pinnedPlace: project.pinnedPlace,
                 conversations: conversations,
                 pendingNewSessions: pendingNewSessions
             )
@@ -58,7 +58,7 @@ enum SidebarProjectFiltering {
             return ProjectConversationGroup(
                 projectPath: project.projectPath,
                 displayName: project.displayName,
-                isPinned: project.isPinned,
+                pinnedPlace: project.pinnedPlace,
                 conversations: matchingConversations,
                 pendingNewSessions: matchingPendingNewSessions
             )

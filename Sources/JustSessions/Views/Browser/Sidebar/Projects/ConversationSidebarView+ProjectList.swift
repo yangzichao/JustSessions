@@ -5,6 +5,7 @@ extension ConversationSidebarView {
     var projectList: some View {
         let selectedConversations = selectedConversations
         let onboardingTourProjectID = onboardingTourProjectID
+        let pinDragging = pinDragging
 
         ScrollViewReader { scrollProxy in
             SidebarSelectionScrollView(
@@ -38,6 +39,8 @@ extension ConversationSidebarView {
                                 store: store,
                                 project: project,
                                 parentLabel: parentLabels.label(for: project),
+                                pinDragging: pinDragging,
+                                hostProjectRows: { section.projects.map(SidebarPinDrag.Row.project) },
                                 isExpanded: isExpanded(project),
                                 isOnboardingTourProject: project.id == onboardingTourProjectID,
                                 projectSelection: projectSelection,
@@ -65,6 +68,7 @@ extension ConversationSidebarView {
                         .padding(.horizontal, 8)
                     }
                 }
+                .sidebarRowFramesCoordinateSpace()
                 .padding(.bottom, 12)
             }
             .task(id: projectToReveal) {

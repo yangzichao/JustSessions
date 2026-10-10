@@ -36,6 +36,8 @@ struct SidebarSubagentVisibilityTests {
                 store: store,
                 project: project,
                 parentLabel: nil,
+                pinDragging: SidebarPinDragging(drag: nil, rowFrames: SidebarRowFrames(), onDrag: { _, _, _, _ in }, onDrop: {}, onCancel: {}),
+                hostProjectRows: { [] },
                 isExpanded: true,
                 isOnboardingTourProject: false,
                 projectSelection: ProjectMultiSelection(),

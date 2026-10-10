@@ -19,7 +19,13 @@ struct SidebarProjectRow: View {
     @State private var isHovered = false
 
     private var isSelected: Bool { projectSelection.contains(project.id) }
-    private var rowHeight: CGFloat { parentLabel == nil ? 30 : 40 }
+    private var rowHeight: CGFloat { Self.height(withParentLabel: parentLabel != nil) }
+
+    static let chevronWidth: CGFloat = 27
+
+    static func height(withParentLabel: Bool) -> CGFloat {
+        withParentLabel ? 40 : 30
+    }
 
     var body: some View {
         let activitySummary = store.activitySummary(forProjectDirectoryKey: project.id)
@@ -31,7 +37,7 @@ struct SidebarProjectRow: View {
                     .foregroundStyle(ThemePalette.tertiaryText)
                     .rotationEffect(.degrees(isExpanded ? 90 : 0))
                     .animation(.easeOut(duration: 0.12), value: isExpanded)
-                    .frame(width: 27, height: rowHeight)
+                    .frame(width: Self.chevronWidth, height: rowHeight)
                     .contentShape(Rectangle())
             }
             .buttonStyle(ThemePlainButtonStyle(showsHover: false))
@@ -40,23 +46,7 @@ struct SidebarProjectRow: View {
 
             Button(action: onClick) {
                 HStack(spacing: 7) {
-                    // A pinned project's pin takes the folder's place, rather than joining the status and actions at the end.
-                    Image(systemName: project.isPinned ? "pin.fill" : "folder")
-                        .font(.system(size: 12))
-                        .foregroundStyle(ThemePalette.secondaryText)
-                        .frame(width: 16)
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(project.displayName)
-                            .font(.system(size: 12, weight: .medium))
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                        if let parentLabel {
-                            Text(parentLabel)
-                                .font(.system(size: 10))
-                                .foregroundStyle(ThemePalette.tertiaryText)
-                                .lineLimit(1)
-                        }
-                    }
+                    SidebarProjectLabel(project: project, parentLabel: parentLabel)
                     Spacer(minLength: 4)
                     if let status = activitySummary.mostPressingStatus {
                         SessionStatusIndicator(status: status, description: activitySummary.summary)
