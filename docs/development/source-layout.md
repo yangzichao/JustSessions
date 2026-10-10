@@ -56,6 +56,7 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Cloudflare/Feedback/`: the Worker that stores feedback sent from the Guide and from **Settings → Send feedback** after checking its Cloudflare Turnstile token. See [Feedback](website.md#feedback).
 - `Cloudflare/UpdateFeed/`: the Worker at the app's `SUFeedURL`, which counts update checks per day and app version and redirects to the appcast on GitHub. See [Counting update checks](update-checks.md).
 - `Scripts/Release/`: release checks, such as opening the packaged app without the build machine's resource bundles.
+- `Scripts/Version/`: the version a local build shows, read from `git describe`.
 - `Scripts/Tmux/`: pinned source builds, license collection, and relocated runtime verification for app packaging and CI.
 - `Services/Tmux/`: tmux session names, and keeping a CLI running after its tab closes, on any host.
 - `Services/Tmux/ThisMac/`: this Mac's own tmux server, its version check, finding each tab's CLI process, and keeping a failed CLI's output and exit status in its tab.

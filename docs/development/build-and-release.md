@@ -16,6 +16,8 @@ make dev    # Build the app, quit its running copy, and open it
 
 `make help` lists the commands. `make run` is an alias for `make dev`. `make dmg` packages `dist/JustSessions.dmg`, and `make website` builds and validates the product site. Set `APP_BUNDLE_PATH` or `INSTALLER_PATH` to change the output paths, for example `make build APP_BUNDLE_PATH="dist/JustSessions Preview.app"`. The targets use the existing build scripts and respect their version and signing environment variables.
 
+A local build's version is the commit it was built from, as `Scripts/Version/describe-development-version.sh` prints it from `git describe`: `1.1.0-3-gf45492c` is three commits after v1.1.0, and `-dirty` marks uncommitted changes to tracked files. Settings → General, feedback, and crash reports show it with build number 0. Local builds don't check for updates on their own; **Check for updates** still offers the latest release, and installing it replaces the build. Only the release workflow sets `APP_VERSION`, from the tag, together with `APP_BUILD_NUMBER`.
+
 `build-app.sh` builds a pinned tmux runtime from checksum-verified upstream archives, statically links libevent, ncurses, and utf8proc, and packages the binary, terminal database, and license notices under `Contents/Resources/Tmux`. The first package build downloads sources; subsequent builds reuse the verified runtime when its build fingerprint matches. End users need no separate tmux install. Direct `swift run` development builds still use an installed tmux 3.3+.
 
 ```sh
