@@ -136,7 +136,7 @@
           <li>In <strong>Projects</strong>, clear the filters, then click the affected host's refresh button.</li>
           <li>Confirm the CLI runs in your usual terminal. New session menus offer only installed tools.</li>
           <li>Start one conversation so the CLI creates history. Kiro sessions need a message; archived OpenCode sessions are excluded. Subagents' sessions are hidden until you turn them on in <strong>Settings &gt; General</strong>; then expand the session that started them with the chevron before its icon.</li>
-          <li>For SSH, check passwordless access, <code>rsync</code>, and the remote CLI. Remote history uses the host's standard Claude Code, Codex, Antigravity, Kiro CLI, and Pi folders, and the OpenCode database its login shell points to.</li>
+          <li>For SSH, check passwordless access, <code>rsync</code>, and the remote CLI. Remote history follows folder settings such as <code>CLAUDE_CONFIG_DIR</code> in the host's login shell; Antigravity always uses its standard folder.</li>
         </ul>
       </section>
 
