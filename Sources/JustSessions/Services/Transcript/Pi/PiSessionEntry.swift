@@ -46,10 +46,9 @@ struct PiSessionEntry: Decodable {
                 data = container.lenientlyDecode(String.self, forKey: .data)
             }
 
-            /// The image of an `image` part; nil for other parts and for one without base64.
-            var image: TranscriptImage? {
-                guard type == "image", let data else { return nil }
-                return TranscriptImage(base64Encoded: data)
+            /// The base64 of an `image` part; nil for other parts and for one without base64.
+            var imageBase64: String? {
+                type == "image" ? data : nil
             }
         }
 

@@ -9,6 +9,8 @@ actor TranscriptPageSource {
     /// Reads a subagent's transcript; see `ClaudeTranscriptReader.includesSidechains`.
     let isSubagentTranscript: Bool
     let limits: TranscriptPageLimits
+    /// See `TranscriptBuilder.decodesImages`.
+    let decodesImages: Bool
     private var fileIndex: TranscriptFileIndex?
     private var piRecordIndices: [Int]?
 
@@ -17,13 +19,15 @@ actor TranscriptPageSource {
         provider: ConversationProvider,
         sessionID: String? = nil,
         isSubagentTranscript: Bool = false,
-        limits: TranscriptPageLimits = TranscriptPageLimits()
+        limits: TranscriptPageLimits = TranscriptPageLimits(),
+        decodesImages: Bool = true
     ) {
         self.file = file
         self.provider = provider
         self.sessionID = sessionID
         self.isSubagentTranscript = isSubagentTranscript
         self.limits = limits
+        self.decodesImages = decodesImages
     }
 
     func read(_ request: TranscriptPageRequest, refreshIndex: Bool = false) throws -> TranscriptPage {
@@ -51,7 +55,8 @@ actor TranscriptPageSource {
         let decoder = TranscriptRecordDecoder(
             provider: provider,
             maximumTextLength: limits.maximumTextLength,
-            isSubagentTranscript: isSubagentTranscript
+            isSubagentTranscript: isSubagentTranscript,
+            decodesImages: decodesImages
         )
         return try TranscriptPageReader.read(
             request, recordCount: recordCount, limits: limits,

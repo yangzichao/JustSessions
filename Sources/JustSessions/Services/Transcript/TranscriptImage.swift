@@ -9,6 +9,10 @@ struct TranscriptImage: Sendable, Equatable {
     /// not an image ImageIO can read.
     let pixelSize: CGSize?
 
+    /// Holds the place of an image a reader leaves undecoded, as message search does; see
+    /// `TranscriptBuilder.decodesImages`. It reads as an image whose base64 did not decode.
+    static let undecoded = TranscriptImage(data: Data())
+
     init(data: Data) {
         self.data = data
         pixelSize = Self.pixelSize(of: data)

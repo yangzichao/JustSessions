@@ -31,6 +31,9 @@ struct TranscriptBuilder {
 
     let maximumEntryCount: Int
     let maximumTextLength: Int
+    /// False when a session is read only for its text, as message search reads it. Each image still gets its entry,
+    /// so later entries keep their IDs, but holds `TranscriptImage.undecoded` instead of its decoded bytes.
+    var decodesImages = true
     private var pendingEntries: [PendingEntry] = []
 
     init(maximumEntryCount: Int = 2_000, maximumTextLength: Int = 12_000) {
@@ -62,12 +65,14 @@ struct TranscriptBuilder {
         }
     }
 
-    mutating func appendUserImage(_ image: TranscriptImage, timestamp: Date?) {
-        pendingEntries.append(PendingEntry(content: .userImage(image), timestamp: timestamp))
+    /// Decodes `image` only when `decodesImages` is on.
+    mutating func appendUserImage(_ image: @autoclosure () -> TranscriptImage, timestamp: Date?) {
+        pendingEntries.append(PendingEntry(content: .userImage(decodesImages ? image() : .undecoded), timestamp: timestamp))
     }
 
-    mutating func appendToolResultImage(_ image: TranscriptImage, timestamp: Date?) {
-        pendingEntries.append(PendingEntry(content: .toolResultImage(image), timestamp: timestamp))
+    /// Decodes `image` only when `decodesImages` is on.
+    mutating func appendToolResultImage(_ image: @autoclosure () -> TranscriptImage, timestamp: Date?) {
+        pendingEntries.append(PendingEntry(content: .toolResultImage(decodesImages ? image() : .undecoded), timestamp: timestamp))
     }
 
     /// Marks where the CLI summarized older messages to free up its context window.

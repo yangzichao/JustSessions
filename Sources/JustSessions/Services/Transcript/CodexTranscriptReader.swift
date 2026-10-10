@@ -66,8 +66,8 @@ struct CodexTranscriptReader {
             switch payload["role"] as? String {
             case "user":
                 builder.append(.userMessage, text: userText(from: content), timestamp: timestamp)
-                for image in content.compactMap(Self.image(from:)) {
-                    builder.appendUserImage(image, timestamp: timestamp)
+                for base64 in content.compactMap(Self.imageBase64(from:)) {
+                    builder.appendUserImage(TranscriptImage(base64Encoded: String(base64)), timestamp: timestamp)
                 }
             case "assistant":
                 let text = content
@@ -109,11 +109,11 @@ struct CodexTranscriptReader {
         }.joined(separator: "\n\n")
     }
 
-    /// The image of an `input_image` part, whose `image_url` is a data URL: `data:image/png;base64,…`.
-    private static func image(from part: [String: Any]) -> TranscriptImage? {
+    /// The base64 of an `input_image` part, whose `image_url` is a data URL: `data:image/png;base64,…`.
+    private static func imageBase64(from part: [String: Any]) -> Substring? {
         guard part["type"] as? String == "input_image",
               let url = part["image_url"] as? String, url.hasPrefix("data:"),
               let separator = url.firstIndex(of: ",") else { return nil }
-        return TranscriptImage(base64Encoded: String(url[url.index(after: separator)...]))
+        return url[url.index(after: separator)...]
     }
 }

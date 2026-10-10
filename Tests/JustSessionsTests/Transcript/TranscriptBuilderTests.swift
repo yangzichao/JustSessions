@@ -57,4 +57,30 @@ struct TranscriptBuilderTests {
         ])
         #expect(transcript.entries.map(\.startsTurn) == [true, false, true, false, false, true])
     }
+
+    /// Message search reads only text: each image keeps its entry, and so its place in the turn, without being decoded.
+    @Test func withoutDecodingImagesKeepsTheirEntriesButNeverDecodesThem() {
+        var decodedImageCount = 0
+        func decodedImage() -> TranscriptImage {
+            decodedImageCount += 1
+            return SampleTranscriptImage.image
+        }
+        var builder = TranscriptBuilder()
+        builder.decodesImages = false
+        builder.append(.userMessage, text: "Look", timestamp: nil)
+        builder.appendUserImage(decodedImage(), timestamp: nil)
+        builder.append(.toolCall, text: "screenshot", timestamp: nil)
+        builder.appendToolResultImage(decodedImage(), timestamp: nil)
+
+        let transcript = builder.build()
+
+        #expect(decodedImageCount == 0)
+        #expect(transcript.entries.map(\.content) == [
+            .userMessage("Look"),
+            .userImage(.undecoded),
+            .toolCalls(["screenshot"]),
+            .toolResultImage(.undecoded),
+        ])
+        #expect(transcript.entries.map(\.startsTurn) == [true, false, true, false])
+    }
 }
