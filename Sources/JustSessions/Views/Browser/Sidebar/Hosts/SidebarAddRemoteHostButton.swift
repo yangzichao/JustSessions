@@ -6,7 +6,7 @@ struct SidebarAddRemoteHostButton: View {
 
     var body: some View {
         Button(action: action) {
-            Label("Add SSH host…", systemImage: "plus.circle")
+            Label("Add SSH host…", systemImage: "plus")
                 .lineLimit(1)
                 .frame(height: 30)
                 .contentShape(Rectangle())

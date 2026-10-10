@@ -48,11 +48,16 @@ struct SessionPreviewPane: View {
             } else if store.isScanningThisMac && store.conversations.isEmpty {
                 ContentUnavailableView("Scanning conversations", systemImage: "magnifyingglass")
             } else {
-                ContentUnavailableView(
-                    "No session selected",
-                    systemImage: "text.bubble",
-                    description: Text("Choose a session in the sidebar to read its conversation.")
-                )
+                ContentUnavailableView {
+                    Label {
+                        Text("No session selected")
+                    } icon: {
+                        JustSessionsMark()
+                            .frame(width: 56, height: 48)
+                    }
+                } description: {
+                    Text("Choose a session in the sidebar to read its conversation.")
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
