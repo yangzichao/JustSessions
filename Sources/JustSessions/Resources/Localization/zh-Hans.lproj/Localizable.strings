@@ -336,8 +336,6 @@
 	<string>无法启动会话</string>
 	<key>Couldn't find iTerm2's default profile. A dynamic profile can't be imported.</key>
 	<string>找不到 iTerm2 的默认 Profile。动态 Profile 无法导入。</string>
-	<key>Couldn't reach the feedback server. Check your connection, or email us.</key>
-	<string>无法连接反馈服务器。请检查网络，或改用邮件联系我们。</string>
 	<key>Create folder and add</key>
 	<string>创建文件夹并添加</string>
 	<key>Creating the folder on %@…</key>
@@ -378,12 +376,6 @@
 	<string>完成</string>
 	<key>Edit</key>
 	<string>编辑</string>
-	<key>Email for a reply</key>
-	<string>回复邮箱</string>
-	<key>Email for a reply (optional)</key>
-	<string>回复邮箱（可选）</string>
-	<key>Email us ↗</key>
-	<string>发送邮件 ↗</string>
 	<key>End and close this terminal</key>
 	<string>结束并关闭此终端</string>
 	<key>End on %@</key>
@@ -416,10 +408,8 @@
 	<string>导出对话</string>
 	<key>Feedback</key>
 	<string>反馈</string>
-	<key>Feedback and issues are sent with these versions.</key>
-	<string>反馈和问题报告会附上以上版本信息。</string>
-	<key>Feedback couldn't be sent right now. Try again later, or email us.</key>
-	<string>反馈暂时无法发送。请稍后重试，或改用邮件联系我们。</string>
+	<key>Feedback and issues start with these versions filled in.</key>
+	<string>反馈和问题报告会自动附上以上版本信息。</string>
 	<key>Fields and buttons</key>
 	<string>输入框和按钮</string>
 	<key>Filter project sessions</key>
@@ -564,8 +554,6 @@
 	<string>与应用一致</string>
 	<key>Match app theme</key>
 	<string>与应用主题一致</string>
-	<key>Message</key>
-	<string>反馈内容</string>
 	<key>More actions</key>
 	<string>更多操作</string>
 	<key>More actions for %@</key>
@@ -682,6 +670,8 @@
 	<string>打开终端</string>
 	<key>Open the JustSessions website</key>
 	<string>打开 JustSessions 网站</string>
+	<key>Open the feedback form on the website</key>
+	<string>在网站上打开反馈表单</string>
 	<key>Open the source code on GitHub</key>
 	<string>在 GitHub 上查看源代码</string>
 	<key>Optional</key>
@@ -712,8 +702,6 @@
 	<string>已置顶</string>
 	<key>Plain text (.txt)…</key>
 	<string>纯文本（.txt）…</string>
-	<key>Prefer email or GitHub?</key>
-	<string>想用邮件或 GitHub？</string>
 	<key>Preview</key>
 	<string>预览</string>
 	<key>Previous Tab</key>
@@ -864,18 +852,10 @@
 	<string>选择一个范围</string>
 	<key>Select several sessions or projects</key>
 	<string>选择多个会话或项目</string>
-	<key>Send</key>
-	<string>发送</string>
-	<key>Send Feedback…</key>
-	<string>发送反馈…</string>
-	<key>Send feedback</key>
+	<key>Send Feedback</key>
 	<string>发送反馈</string>
-	<key>Send feedback (⌘↩)</key>
-	<string>发送反馈（⌘↩）</string>
-	<key>Sending…</key>
-	<string>正在发送…</string>
-	<key>Sent with %@. Kept for up to a year; Cloudflare Turnstile checks that a person sent it.</key>
-	<string>随附 %@。反馈最多保留一年；Cloudflare Turnstile 会确认是真人发送。</string>
+	<key>Send feedback ↗</key>
+	<string>发送反馈 ↗</string>
 	<key>Separate Views</key>
 	<string>取消拆分视图</string>
 	<key>Separate views</key>
@@ -902,10 +882,6 @@
 	<string>用户指南中的 shell 启动配置 ↗</string>
 	<key>Shell startup is fine</key>
 	<string>Shell 启动配置正常</string>
-	<key>Shorten the email to 200 characters or fewer.</key>
-	<string>邮箱请控制在 200 个字符以内。</string>
-	<key>Shorten the message to 5,000 characters or fewer.</key>
-	<string>反馈内容请控制在 5,000 个字符以内。</string>
 	<key>Show</key>
 	<string>显示</string>
 	<key>Show %@</key>
@@ -940,8 +916,6 @@
 	<string>减小字号</string>
 	<key>Some colors are missing, such as the text or background color.</key>
 	<string>缺少部分颜色，例如文字或背景颜色。</string>
-	<key>Spam check</key>
-	<string>防垃圾验证</string>
 	<key>Split View Resize Handle (draggable)</key>
 	<string>拆分视图下大小调整手柄（可拖动）</string>
 	<key>Start a native CLI or a plain terminal in a project folder.</key>
@@ -1000,8 +974,6 @@
 	<string>查看引导</string>
 	<key>Take the tour</key>
 	<string>查看引导</string>
-	<key>Tell us what works, what doesn't, and what you'd like next. Only the developer reads it.</key>
-	<string>告诉我们哪些好用、哪些不好用，以及你还想要什么。只有开发者会看到。</string>
 	<key>Terminal</key>
 	<string>终端</string>
 	<key>Terminal appearance preview</key>
@@ -1016,10 +988,6 @@
 	<string>文字在这个颜色上无法清晰可读，请选更浅的颜色。</string>
 	<key>Text size, in the terminals or the conversation shown</key>
 	<string>字号：终端，或当前显示的对话</string>
-	<key>Thanks — your feedback was sent.</key>
-	<string>谢谢，反馈已发送。</string>
-	<key>That's a lot of messages at once. Wait a minute, then send again.</key>
-	<string>发送太频繁了。请等一分钟再发送。</string>
 	<key>The Antigravity session database, associated folder, and annotations will move to the macOS Trash. This also removes its entry from Antigravity's local index.</key>
 	<string>Antigravity 会话数据库、关联文件夹和注释将移到 macOS 废纸篓，并从 Antigravity 本地索引中移除。</string>
 	<key>The CLI tab choice is for tabs whose CLI can keep running in tmux. A terminal's shell always ends with its tab. Don't ask again in the close dialog sets these too.</key>
@@ -1034,8 +1002,6 @@
 	<string>该文件夹会列在侧边栏的 %@ 下，可直接在其中新建会话。</string>
 	<key>The host needs:</key>
 	<string>主机需要：</string>
-	<key>The message is empty or too long.</key>
-	<string>反馈内容为空或过长。</string>
 	<key>The project folder is no longer at %@. Move it back there to resume this session.</key>
 	<string>项目文件夹已不在 %@。把它移回原处即可继续这个会话。</string>
 	<key>The project folder no longer exists</key>
@@ -1050,10 +1016,6 @@
 	<string>shell 及其中仍在运行的进程都会停止。</string>
 	<key>The sidebar lists sessions from %@ by host and project. Search matches project names and paths, session titles and IDs, and message text.</key>
 	<string>侧边栏按主机和项目列出来自 %@ 的会话。搜索可匹配项目名称和路径、会话标题和 ID，以及消息内容。</string>
-	<key>The spam check couldn't load. Check your connection, or email us.</key>
-	<string>防垃圾验证无法加载。请检查网络，或改用邮件联系我们。</string>
-	<key>The spam check didn't pass. Send again once it finishes.</key>
-	<string>防垃圾验证未通过。请等验证完成后再发送。</string>
 	<key>The terminal process will stop. Sessions saved by the CLI will appear in the project list after refresh.</key>
 	<string>终端进程会停止。CLI 已保存的会话将在刷新后出现在项目列表中。</string>
 	<key>The tmux sessions the app starts on a host have no prefix key, so every key reaches the CLI. To use your own tmux prefix there, point at the host's heading, click its **⋯**, and choose **Use this host's tmux prefix**.</key>
@@ -1122,8 +1084,6 @@
 	<string>关闭终端时</string>
 	<key>When you close this tab, choose **Keep running**: the CLI carries on, even after you quit. Click its session to return.</key>
 	<string>关闭这个标签页时选择 **保持运行**：CLI 会继续运行，退出 App 后也不会停。单击它的会话即可回来。</string>
-	<key>Write to the developer from here</key>
-	<string>直接在这里给开发者留言</string>
 	<key>You</key>
 	<string>你</string>
 	<key>Your login shell, with no CLI</key>

@@ -56,15 +56,15 @@ test("website feedback is verified, then stored trimmed without its token or the
   assert.doesNotMatch(harness.writes[0].sql, /ip|agent|token/i);
 });
 
-test("app feedback, which has no Origin, keeps its versions", async () => {
-  const harness = createHarness({ body: appFeedback, origin: null });
+test("feedback from the Guide opened by the app keeps the app's versions", async () => {
+  const harness = createHarness({ body: appFeedback });
   assert.equal((await send(harness)).response.status, 201);
   assert.deepEqual(harness.writes[0].values, ["app", "Search is slow", null, "1.0.13 (32)", "26.0.1"]);
 });
 
-test("other sites, other routes, and other methods are refused before anything is checked", async () => {
+test("other sites, requests without an Origin, other routes, and other methods are refused before anything is checked", async () => {
   for (const [options, status] of [
-    [{ origin: "https://unrelated.example" }, 403], [{ origin: "null" }, 403],
+    [{ origin: "https://unrelated.example" }, 403], [{ origin: "null" }, 403], [{ origin: null }, 403],
     [{ address: "https://feedback.example/stats" }, 404], [{ method: "GET" }, 405],
   ]) {
     const harness = createHarness(options);
@@ -95,7 +95,7 @@ test("bodies that are not small JSON are refused", async () => {
   }
 });
 
-test("feedback that is empty, too long, or not shaped like the website's or app's is refused unverified", async () => {
+test("feedback that is empty, too long, or not shaped like the Guide's form sends is refused unverified", async () => {
   for (const body of [
     { ...websiteFeedback, message: "   " },
     { ...websiteFeedback, message: "x".repeat(5001) },

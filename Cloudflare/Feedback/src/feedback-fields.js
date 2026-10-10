@@ -1,14 +1,14 @@
+import { isVersion } from "../../../website/scripts/feedback/app-versions.js";
 import {
-  feedbackSources, maximumContactLength, maximumMessageLength, maximumTurnstileTokenLength, maximumVersionLength,
+  feedbackSources, maximumContactLength, maximumMessageLength, maximumTurnstileTokenLength,
 } from "../../../website/scripts/feedback/feedback-contract.js";
 
 const allowedFields = new Set(["message", "contact", "source", "appVersion", "macOSVersion", "turnstileToken"]);
-// Such as "1.0.13 (32)", "development build", or "26.0.1".
-const versionPattern = /^[0-9A-Za-z .()-]+$/;
 
 /**
- * The feedback to store, or null when the body is not exactly what the website or app sends: a JSON object with a
- * message, an optional contact, its source, the app and macOS versions only from the app, and a Turnstile token.
+ * The feedback to store, or null when the body is not exactly what the Guide's form sends: a JSON object with a
+ * message, an optional contact, its source, the app and macOS versions only when the app opened the form, and a
+ * Turnstile token.
  */
 export function readFeedbackFields(body) {
   if (typeof body !== "object" || body === null || Array.isArray(body)) return null;
@@ -40,8 +40,4 @@ export function readFeedbackFields(body) {
 
 function trimmedText(value) {
   return typeof value === "string" ? value.trim() : null;
-}
-
-function isVersion(value) {
-  return typeof value === "string" && value.length <= maximumVersionLength && versionPattern.test(value);
 }

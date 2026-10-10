@@ -13,16 +13,16 @@ const responseHeaders = {
 
 export default {
   /**
-   * Stores feedback from the Guide's form or the app after Cloudflare Turnstile confirms a person sent it. Only the
-   * message, the optional contact, its source, and the app's versions are kept; never an IP address or user agent.
+   * Stores feedback from the Guide's form, opened on the website or by the app, after Cloudflare Turnstile confirms a
+   * person sent it. Only the message, the optional contact, its source, and the app's versions are kept; never an IP
+   * address or user agent.
    * @param {Request} request
    * @param {{ FEEDBACK_DATABASE: D1Database, FEEDBACK_RATE_LIMITER: RateLimit, TURNSTILE_SECRET_KEY: string }} env
    */
   async fetch(request, env) {
     if (new URL(request.url).pathname !== "/feedback") return answer(404);
-    // The app sends no Origin; a browser on any other site may not use this endpoint.
-    const origin = request.headers.get("Origin");
-    if (origin !== null && origin !== publishedWebsiteOrigin) return answer(403);
+    // Only the published website sends feedback, so requests from other sites or without an Origin are refused.
+    if (request.headers.get("Origin") !== publishedWebsiteOrigin) return answer(403);
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: {
         ...responseHeaders,
@@ -70,7 +70,7 @@ export default {
   },
 };
 
-/** A JSON `{ "result": … }` the website and app read, or an empty response for requests neither of them makes. */
+/** A JSON `{ "result": … }` the website reads, or an empty response for requests it never makes. */
 function answer(status, result, extraHeaders = {}) {
   if (result === undefined) return new Response(null, { status, headers: { ...responseHeaders, ...extraHeaders } });
   return new Response(JSON.stringify({ result }), {

@@ -15,19 +15,22 @@ struct FeedbackLinksTests {
         #expect(queryValue("body", in: url) == "\n\nJustSessions 0.45.0 (45) · macOS 26.0.1")
     }
 
-    @Test func emailHasTheSubjectAndTheVersions() throws {
-        let url = FeedbackLinks.emailURL(for: environment)
-        #expect(url.scheme == "mailto")
-        #expect(url.absoluteString.hasPrefix("mailto:zichaoyangphys@gmail.com?"))
-        #expect(queryValue("subject", in: url) == "JustSessions feedback")
-        #expect(queryValue("body", in: url) == "\n\nJustSessions 0.45.0 (45) · macOS 26.0.1")
-        // Mail clients read %20 as a space but may show a + as is.
-        #expect(!url.absoluteString.contains("+"))
+    @Test func feedbackFormOpensTheGuidesFormWithTheVersions() throws {
+        let url = FeedbackLinks.formURL(for: environment)
+        #expect(url.absoluteString.hasPrefix("https://yangzichao.github.io/JustSessions/guide.html?"))
+        #expect(url.fragment == "feedback")
+        #expect(queryValue("appVersion", in: url) == "0.45.0 (45)")
+        #expect(queryValue("macOSVersion", in: url) == "26.0.1")
+        // The page's URLSearchParams would read a literal + as a space, so spaces must arrive as %20.
+        #expect(url.absoluteString.contains("0.45.0%20(45)"))
     }
 
     @Test func userGuideSectionLinksPointAtSectionsTheGuideHas() throws {
         let guide = try RepositoryFiles.contents(of: "website/guide.html")
-        for url in [AppLinks.userGuideSSHHostsURL, AppLinks.userGuideSSHShellStartupURL, AppLinks.userGuideTroubleshootingURL] {
+        for url in [
+            AppLinks.userGuideSSHHostsURL, AppLinks.userGuideSSHShellStartupURL, AppLinks.userGuideTroubleshootingURL,
+            AppLinks.userGuideFeedbackURL,
+        ] {
             #expect(url.absoluteString.hasPrefix(AppLinks.userGuideURL.absoluteString + "#"))
             let sectionID = try #require(url.fragment)
             #expect(guide.contains("id=\"\(sectionID)\""))

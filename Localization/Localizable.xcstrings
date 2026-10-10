@@ -1806,16 +1806,6 @@
         }
       }
     },
-    "Couldn't reach the feedback server. Check your connection, or email us.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法连接反馈服务器。请检查网络，或改用邮件联系我们。"
-          }
-        }
-      }
-    },
     "Create folder and add": {
       "localizations": {
         "zh-Hans": {
@@ -2052,36 +2042,6 @@
         }
       }
     },
-    "Email for a reply": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "回复邮箱"
-          }
-        }
-      }
-    },
-    "Email for a reply (optional)": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "回复邮箱（可选）"
-          }
-        }
-      }
-    },
-    "Email us ↗": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "发送邮件 ↗"
-          }
-        }
-      }
-    },
     "End and close this terminal": {
       "localizations": {
         "zh-Hans": {
@@ -2260,22 +2220,12 @@
         }
       }
     },
-    "Feedback and issues are sent with these versions.": {
+    "Feedback and issues start with these versions filled in.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "反馈和问题报告会附上以上版本信息。"
-          }
-        }
-      }
-    },
-    "Feedback couldn't be sent right now. Try again later, or email us.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "反馈暂时无法发送。请稍后重试，或改用邮件联系我们。"
+            "value": "反馈和问题报告会自动附上以上版本信息。"
           }
         }
       }
@@ -2545,12 +2495,6 @@
     },
     "Hide %lld subagent sessions": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "隐藏 %lld 个子代理会话"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -2567,6 +2511,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏 %lld 个子代理会话"
           }
         }
       }
@@ -3023,16 +2973,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "与应用主题一致"
-          }
-        }
-      }
-    },
-    "Message": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "反馈内容"
           }
         }
       }
@@ -3623,6 +3563,16 @@
         }
       }
     },
+    "Open the feedback form on the website": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在网站上打开反馈表单"
+          }
+        }
+      }
+    },
     "Open the source code on GitHub": {
       "localizations": {
         "zh-Hans": {
@@ -3769,16 +3719,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "纯文本（.txt）…"
-          }
-        }
-      }
-    },
-    "Prefer email or GitHub?": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "想用邮件或 GitHub？"
           }
         }
       }
@@ -4557,27 +4497,7 @@
         }
       }
     },
-    "Send": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "发送"
-          }
-        }
-      }
-    },
-    "Send Feedback…": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "发送反馈…"
-          }
-        }
-      }
-    },
-    "Send feedback": {
+    "Send Feedback": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -4587,32 +4507,12 @@
         }
       }
     },
-    "Send feedback (⌘↩)": {
+    "Send feedback ↗": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "发送反馈（⌘↩）"
-          }
-        }
-      }
-    },
-    "Sending…": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在发送…"
-          }
-        }
-      }
-    },
-    "Sent with %@. Kept for up to a year; Cloudflare Turnstile checks that a person sent it.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "随附 %@。反馈最多保留一年；Cloudflare Turnstile 会确认是真人发送。"
+            "value": "发送反馈 ↗"
           }
         }
       }
@@ -4753,26 +4653,6 @@
         }
       }
     },
-    "Shorten the email to 200 characters or fewer.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "邮箱请控制在 200 个字符以内。"
-          }
-        }
-      }
-    },
-    "Shorten the message to 5,000 characters or fewer.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "反馈内容请控制在 5,000 个字符以内。"
-          }
-        }
-      }
-    },
     "Show": {
       "localizations": {
         "zh-Hans": {
@@ -4795,12 +4675,6 @@
     },
     "Show %lld subagent sessions": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "显示 %lld 个子代理会话"
-          }
-        },
         "en": {
           "variations": {
             "plural": {
@@ -4817,6 +4691,12 @@
                 }
               }
             }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示 %lld 个子代理会话"
           }
         }
       }
@@ -4957,16 +4837,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "缺少部分颜色，例如文字或背景颜色。"
-          }
-        }
-      }
-    },
-    "Spam check": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "防垃圾验证"
           }
         }
       }
@@ -5267,16 +5137,6 @@
         }
       }
     },
-    "Tell us what works, what doesn't, and what you'd like next. Only the developer reads it.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "告诉我们哪些好用、哪些不好用，以及你还想要什么。只有开发者会看到。"
-          }
-        }
-      }
-    },
     "Terminal": {
       "localizations": {
         "zh-Hans": {
@@ -5343,26 +5203,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "字号：终端，或当前显示的对话"
-          }
-        }
-      }
-    },
-    "Thanks — your feedback was sent.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "谢谢，反馈已发送。"
-          }
-        }
-      }
-    },
-    "That's a lot of messages at once. Wait a minute, then send again.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "发送太频繁了。请等一分钟再发送。"
           }
         }
       }
@@ -5437,16 +5277,6 @@
         }
       }
     },
-    "The message is empty or too long.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "反馈内容为空或过长。"
-          }
-        }
-      }
-    },
     "The project folder is no longer at %@. Move it back there to resume this session.": {
       "localizations": {
         "zh-Hans": {
@@ -5513,26 +5343,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "侧边栏按主机和项目列出来自 %@ 的会话。搜索可匹配项目名称和路径、会话标题和 ID，以及消息内容。"
-          }
-        }
-      }
-    },
-    "The spam check couldn't load. Check your connection, or email us.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "防垃圾验证无法加载。请检查网络，或改用邮件联系我们。"
-          }
-        }
-      }
-    },
-    "The spam check didn't pass. Send again once it finishes.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "防垃圾验证未通过。请等验证完成后再发送。"
           }
         }
       }
@@ -5883,16 +5693,6 @@
         }
       }
     },
-    "Write to the developer from here": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "直接在这里给开发者留言"
-          }
-        }
-      }
-    },
     "You": {
       "localizations": {
         "zh-Hans": {
@@ -6062,9 +5862,6 @@
           }
         }
       }
-    },
-    "you@example.com": {
-      "shouldTranslate": false
     },
     "·": {
       "shouldTranslate": false

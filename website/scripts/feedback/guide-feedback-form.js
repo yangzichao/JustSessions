@@ -1,5 +1,6 @@
+import { readAppVersions } from "./app-versions.js";
 import { turnstileAction, turnstileSiteKey } from "./feedback-contract.js";
-import { sendWebsiteFeedback } from "./feedback-submission.js";
+import { sendFeedback } from "./feedback-submission.js";
 import { loadTurnstile } from "./turnstile-loader.js";
 
 export const feedbackStatusMessages = {
@@ -15,14 +16,18 @@ export const feedbackStatusMessages = {
 /**
  * Shows the Guide's feedback form, which stays hidden without JavaScript. Cloudflare Turnstile loads only when the
  * visitor first moves into the form, so reading the Guide contacts no one but GitHub. Send waits for its token, and
- * each token is used once.
+ * each token is used once. Opened from the app's Send feedback, the form shows the app's versions and sends them as
+ * feedback from the app.
  */
-export function connectFeedbackForm(form, { browser, load = loadTurnstile, send = sendWebsiteFeedback }) {
+export function connectFeedbackForm(form, { browser, load = loadTurnstile, send = sendFeedback }) {
   const message = form.querySelector('[name="message"]');
   const contact = form.querySelector('[name="contact"]');
   const sendButton = form.querySelector('button[type="submit"]');
   const status = form.querySelector("[data-feedback-status]");
   const verification = form.querySelector("[data-feedback-verification]");
+  const appVersionsLine = form.querySelector("[data-feedback-app-versions]");
+  const appVersions = readAppVersions(browser.location.search);
+  const source = appVersions ? "app" : "website";
   let turnstile = null;
   let widgetID = null;
   let turnstileToken = null;
@@ -45,7 +50,7 @@ export function connectFeedbackForm(form, { browser, load = loadTurnstile, send 
     widgetID = turnstile.render(verification, {
       sitekey: turnstileSiteKey,
       action: turnstileAction,
-      cData: "website",
+      cData: source,
       theme: "light",
       callback: (token) => { turnstileToken = token; updateSendButton(); },
       "expired-callback": () => { turnstileToken = null; updateSendButton(); },
@@ -63,7 +68,9 @@ export function connectFeedbackForm(form, { browser, load = loadTurnstile, send 
     isSending = true;
     updateSendButton();
     showStatus("sending");
-    const result = await send({ fetch: browser.fetch.bind(browser), message: message.value, contact: contact.value, turnstileToken: usedToken });
+    const result = await send({
+      fetch: browser.fetch.bind(browser), message: message.value, contact: contact.value, source, appVersions, turnstileToken: usedToken,
+    });
     isSending = false;
     if (result === "sent") {
       message.value = "";
@@ -73,6 +80,10 @@ export function connectFeedbackForm(form, { browser, load = loadTurnstile, send 
     turnstile.reset(widgetID);
     updateSendButton();
   });
+  if (appVersions) {
+    appVersionsLine.textContent = `Sent with JustSessions ${appVersions.appVersion} on macOS ${appVersions.macOSVersion}.`;
+    appVersionsLine.hidden = false;
+  }
   form.hidden = false;
   updateSendButton();
 }

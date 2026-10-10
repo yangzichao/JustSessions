@@ -1,21 +1,19 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
+import { readAppVersions } from "../../../website/scripts/feedback/app-versions.js";
 import * as contract from "../../../website/scripts/feedback/feedback-contract.js";
 
 const repositoryURL = new URL("../../../", import.meta.url);
 
-test("the app sends feedback within the limits the Worker accepts", () => {
-  const swiftLimits = readFileSync(new URL("Sources/JustSessions/Models/App/Feedback/Submission/FeedbackLimits.swift", repositoryURL), "utf8");
-  const swiftValue = (name) => Number(swiftLimits.match(new RegExp(`static let ${name} = (\\d+)`))?.[1]);
-  assert.equal(swiftValue("maximumMessageLength"), contract.maximumMessageLength);
-  assert.equal(swiftValue("maximumContactLength"), contract.maximumContactLength);
-});
-
-test("the app posts to the Worker and loads Turnstile from the published verification page", () => {
+test("the app opens the Guide's form with the versions the form reads from its address", () => {
   const appLinks = readFileSync(new URL("Sources/JustSessions/Models/App/AppLinks.swift", repositoryURL), "utf8");
-  assert.ok(appLinks.includes(`URL(string: "${contract.feedbackEndpoint}")`), "AppLinks.feedbackEndpointURL differs");
-  assert.ok(appLinks.includes(`"app-feedback-verification.html"`), "AppLinks.feedbackVerificationPageURL differs");
+  const feedbackLinks = readFileSync(new URL("Sources/JustSessions/Models/App/Feedback/FeedbackLinks.swift", repositoryURL), "utf8");
+  assert.ok(appLinks.includes(`userGuideFeedbackURL = userGuideSection("feedback")`), "AppLinks.userGuideFeedbackURL differs");
+  for (const name of ["appVersion", "macOSVersion"]) {
+    assert.ok(feedbackLinks.includes(`URLQueryItem(name: "${name}"`), `FeedbackLinks.formURL does not send ${name}`);
+  }
+  assert.deepEqual(readAppVersions("?appVersion=1.1.0%20(98)&macOSVersion=26.5"), { appVersion: "1.1.0 (98)", macOSVersion: "26.5" });
   assert.equal(new URL(contract.feedbackEndpoint).pathname, "/feedback");
 });
 
