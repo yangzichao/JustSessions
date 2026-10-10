@@ -122,6 +122,7 @@ The footprint is what Activity Monitor's Memory column shows. Read the table wit
 | 9 | [SwiftUI's scroll position tracking](#9-swiftuis-scroll-position-tracking) | Done: issue #55 |
 | 10 | [Message search decoded every image](#10-message-search-decoded-every-image) | Done: issue #59 |
 | 11 | [Codex's compacted records are parsed in full](#11-codexs-compacted-records-are-parsed-in-full) | To investigate |
+| 12 | [Every reader decoded its own images](#12-every-reader-decoded-its-own-images) | Done: issue #62 |
 
 ### 1. Timestamp parsing
 
@@ -255,6 +256,28 @@ The gain is smaller on real sessions. On one contributor's 46 Claude Code and 16
 **Evidence:** a Codex `compacted` record carries the conversation it replaced, images included. The reader only shows a note for it, but `CodexTranscriptReader.mightContainTranscriptItem` lets the line through, so the whole record is JSON-parsed. In the 163 Codex sessions of item 10, these records held 306 MiB of image base64, 16% of all of it, and more than the messages themselves.
 
 **Plan:** measure how much reading time these records take. If it matters, add the note from the line's start, which holds the timestamp and type, without parsing the rest.
+### 12. Every reader decoded its own images
+
+**Evidence:** each `TranscriptImageView` decoded its image in a detached task of its own and kept the result. The reader lays out every loaded entry, so opening a session decodes all the images in its loaded pages at once. Opening the session again, after reading another one, decoded them all again. A second reader of the same session, such as a reading window beside the preview, decoded them a second time and kept a second copy.
+
+**Change:** `TranscriptImageDecoder` decodes each image once for every view that shows it. It knows an image by a SHA-256 digest of its bytes, since each reader reads its own `Data` from the session file. Views asking for an image that is decoding wait for that decode. Decoded images stay in an `NSCache` of at most 128 MiB of pixels, which also empties when memory runs low. A view that goes away stops waiting, and a decode nobody waits for any more doesn't start. The digest names the bytes, so a cached image can't be an older version of the one asked for.
+
+It adds no limit on how many images decode at once. Decoding runs off the main thread, and it lengthened the longest main-thread gap by only about 15 ms over the same transcript without images: 224 to 237 ms, against 208 to 219 ms. A limit would only make the images in sight wait for the others.
+
+`TranscriptImageDecodingMeasurements`, release build, two runs each. The session has 24 screenshots of 2880×1800 in 240 entries:
+
+| Measure | Before | After |
+| --- | --- | --- |
+| One reader: CPU until the process settles | 1.05–1.14 s | 1.04–1.08 s |
+| One reader: memory footprint growth | 413 MB | 401–414 MB |
+| Opened again after closing: CPU | 1.01–1.16 s | 0.36 s |
+| Opened again after closing: memory footprint growth | 378–390 MB | 66–96 MB |
+| Two readers at once: CPU | 2.0–2.2 s | 1.25–1.27 s |
+| Two readers at once: memory footprint growth | 580–655 MB | 422–429 MB |
+| Four readers at once: CPU | 4.3–4.5 s | 2.0 s |
+| Four readers at once: memory footprint growth | 1.27 GB | 515–564 MB |
+
+Laying out the same 240 entries without images takes about 0.23 s of CPU, which each extra reader still pays. Time until settled and the longest main-thread gap barely changed, since layout dominates both. The process kept 220 to 530 MB after its readers closed before the change, and 280 to 434 MB after it. Freed memory isn't returned right away, so that measure can't show the cache's share; the cache holds at most 128 MiB.
 
 ## How to profile
 
@@ -278,3 +301,4 @@ Or open the trace in Instruments. Keep these points in mind:
   - `TerminalVisibilityMeasurements`: hidden terminals.
   - `TerminalEngineMeasurements`: Ghostty and SwiftTerm tabs under the same output, and their memory; see [Terminal engines](#terminal-engines-ghostty-and-swiftterm) and [Build and release](build-and-release.md#performance-measurements) for the commands.
   - `TranscriptInteractionMeasurements`: scrolling, hit testing, and opening Find in a 240- and 640-entry transcript, with SwiftUI's accessibility off and on. Run it with `JUSTSESSIONS_PERF=1 swift test -c release --filter TranscriptInteractionMeasurements`.
+  - `TranscriptImageDecodingMeasurements`: opening one, two, or four readers of a session full of screenshots, then opening it again.

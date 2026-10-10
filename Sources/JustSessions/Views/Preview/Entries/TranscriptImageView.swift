@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// Shows an image across the reading column, no taller than a screen's worth. Its shape is reserved from the
-/// image's header while it decodes off the main thread, so the entries below it do not move.
+/// image's header while it decodes off the main thread, so the entries below it do not move. Every reader showing the
+/// same image shares one decode; see `TranscriptImageDecoder`.
 struct TranscriptImageView: View {
     let image: TranscriptImage
     @State private var decodedImage: CGImage?
@@ -50,11 +51,7 @@ struct TranscriptImageView: View {
     }
 
     private func decode() async {
-        let image = image
-        let maximumPixelSize = Self.maximumPixelSize
-        let decoded = await Task.detached(priority: .userInitiated) {
-            image.decoded(maximumPixelSize: maximumPixelSize)
-        }.value
+        let decoded = await TranscriptImageDecoder.shared.image(for: image, maximumPixelSize: Self.maximumPixelSize)
         guard !Task.isCancelled else { return }
         decodedImage = decoded
         failedToDecode = decoded == nil
