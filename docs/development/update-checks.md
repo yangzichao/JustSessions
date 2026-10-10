@@ -15,7 +15,7 @@ The `justsessions-update-checks` database holds only `utc_day`, `app_version`, a
 Read the numbers with these limits in mind:
 
 - They count installs, not people. Someone with two Macs counts twice.
-- A manual **Check for Updates** also counts, and so do development builds, which use the same feed.
+- A manual **Check for Updates** also counts. Local development builds don't check automatically, and their versions, such as `1.1.0-3-gf45492c`, aren't counted; see [Build from source](build-and-release.md#build-from-source).
 - Installs with automatic checks turned off, or without network access, are not counted.
 - Installs from before the Worker became the feed still fetch GitHub's appcast directly until they update.
 

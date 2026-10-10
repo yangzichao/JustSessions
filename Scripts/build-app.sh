@@ -3,6 +3,19 @@ set -euo pipefail
 
 project_directory="${0:A:h:h}"
 cd "$project_directory"
+# The release workflow sets APP_VERSION from the tag and APP_BUILD_NUMBER from its run. A local build shows the commit
+# it was built from, such as 1.1.0-3-gf45492c, read before this script generates any files. Its build number 0 is
+# older than every release, so Check for updates still offers the latest one, but automatic checks are off by default:
+# a development build is not interrupted by update offers or counted as an install of a release.
+if [[ -n "${APP_VERSION:-}" ]]; then
+    app_version="$APP_VERSION"
+    build_number="${APP_BUILD_NUMBER:?APP_BUILD_NUMBER must be set with APP_VERSION}"
+    checks_for_updates_automatically=true
+else
+    app_version="$("$project_directory/Scripts/Version/describe-development-version.sh")"
+    build_number="${APP_BUILD_NUMBER:-0}"
+    checks_for_updates_automatically=false
+fi
 python3 Scripts/Localization/compile_catalog.py
 # Recreate this generated bundle: incremental SwiftPM builds can retain a removed language directory.
 rm -rf "$project_directory/.build/release/JustSessions_JustSessions.bundle"
@@ -53,9 +66,7 @@ if [[ ! -d "$sparkle_framework" ]]; then
 fi
 ditto "$sparkle_framework" "$app_directory/Contents/Frameworks/Sparkle.framework"
 cp -f "$project_directory/.build/artifacts/Sparkle/Sparkle/LICENSE" "$app_directory/Contents/Resources/Sparkle-LICENSE.txt"
-build_number="${APP_BUILD_NUMBER:-20}"
-app_version="${APP_VERSION:-0.16.0}"
-cat > "$app_directory/Contents/Info.plist" <<'PLIST'
+cat >"$app_directory/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
@@ -67,7 +78,7 @@ cat > "$app_directory/Contents/Info.plist" <<'PLIST'
     <key>CFBundleIconName</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleDevelopmentRegion</key><string>en</string>
-    <key>CFBundleShortVersionString</key><string>0.16.0</string>
+    <key>CFBundleShortVersionString</key><string>VERSION_PLACEHOLDER</string>
     <key>CFBundleVersion</key><string>BUILD_NUMBER_PLACEHOLDER</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>NSHighResolutionCapable</key><true/>
@@ -80,6 +91,7 @@ PLIST
 plutil -insert CFBundleLocalizations -json "$(python3 -c 'import json, sys; print(json.dumps(sys.argv[1:]))' "${localization_identifiers[@]}")" "$app_directory/Contents/Info.plist"
 plutil -replace CFBundleVersion -string "$build_number" "$app_directory/Contents/Info.plist"
 plutil -replace CFBundleShortVersionString -string "$app_version" "$app_directory/Contents/Info.plist"
+plutil -replace SUEnableAutomaticChecks -bool "$checks_for_updates_automatically" "$app_directory/Contents/Info.plist"
 source_revision="$(git rev-parse HEAD)"
 plutil -insert JustSessionsSourceRevision -string "$source_revision" "$app_directory/Contents/Info.plist"
 codesign_identity="${CODE_SIGN_IDENTITY:--}"
