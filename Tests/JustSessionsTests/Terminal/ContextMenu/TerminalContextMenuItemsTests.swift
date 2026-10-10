@@ -95,6 +95,15 @@ struct TerminalContextMenuItemsTests {
         ])
     }
 
+    /// macOS would otherwise add AutoFill's Contact…, Passwords…, and Credit Card… when it shows the menu.
+    @Test func macOSAddsNoAutoFillItems() throws {
+        let fixture = try TerminalContextMenuFixture()
+        defer { fixture.tearDown() }
+        let tab = fixture.openTab()
+
+        #expect(!fixture.menu(for: tab).allowsContextMenuPlugIns)
+    }
+
     @Test func theMenuIsInTheAppLanguage() throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }

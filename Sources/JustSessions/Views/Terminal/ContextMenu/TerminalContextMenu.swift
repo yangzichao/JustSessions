@@ -15,7 +15,11 @@ struct TerminalContextMenu {
     var language: AppInterfaceLanguage? = nil
 
     func makeMenu() -> NSMenu {
-        makeMenu(items: textEditingItems + [.separator()] + tabItems)
+        let menu = makeMenu(items: textEditingItems + [.separator()] + tabItems)
+        // macOS's context menu plug-ins would add AutoFill (Contact…, Passwords…, Credit Card…), as for any view that
+        // takes typing. A terminal has no form to fill.
+        menu.allowsContextMenuPlugIns = false
+        return menu
     }
 
     /// Copy needs a selection. Paste needs text on the clipboard, the only kind SwiftTerm pastes.
