@@ -10,10 +10,10 @@ final class TerminalFindState {
     var query = "" {
         didSet {
             guard query != oldValue, isPresented else { return }
-            matchCount = finder.findText(query)
+            finder.findText(query)
         }
     }
-    /// Nil before a search and for an engine that doesn't count matches.
+    /// What the terminal last counted while the bar showed; nil before it counts and after the bar closes.
     private(set) var matchCount: TerminalFindMatchCount?
     /// The field has the keyboard, so Return, Shift-Return, and Escape belong to the bar, not the terminal's program.
     var isFieldFocused = false
@@ -26,20 +26,25 @@ final class TerminalFindState {
 
     init(finder: any TerminalTextFinding) {
         self.finder = finder
+        // Ghostty's counts come later, so one can arrive after the bar closed.
+        finder.onFindMatchCountChange = { [weak self] matchCount in
+            guard let self, isPresented else { return }
+            self.matchCount = matchCount
+        }
     }
 
     /// Opens the bar, or puts the keyboard back in it, and searches again for the text it kept.
     func show() {
         if !isPresented {
             isPresented = true
-            matchCount = query.isEmpty ? nil : finder.findText(query)
+            if !query.isEmpty { finder.findText(query) }
         }
         focusRevision += 1
     }
 
     func move(_ direction: TerminalFindDirection) {
         guard isPresented, !query.isEmpty else { return }
-        matchCount = finder.findTextAgain(query, direction: direction)
+        finder.findTextAgain(query, direction: direction)
     }
 
     func close() {

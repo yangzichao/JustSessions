@@ -11,8 +11,9 @@ let package = Package(
         // SwiftTerm 1.15.0 plus `minimumContrastRatio` and cells sized by the character W; see
         // docs/development/build-and-release.md#swiftterm-fork.
         .package(url: "https://github.com/yangzichao/SwiftTerm.git", exact: "1.15.0-justsessions.2"),
-        // Ghostty's terminal as a prebuilt library and an AppKit view; see docs/development/build-and-release.md#libghostty.
-        .package(url: "https://github.com/Lakr233/libghostty-spm.git", exact: "2.2.2026100901"),
+        // Ghostty's terminal as a prebuilt library and an AppKit view, plus its search counts; see
+        // docs/development/build-and-release.md#libghostty.
+        .package(url: "https://github.com/yangzichao/libghostty-spm.git", exact: "2.2.2026100901-justsessions.1"),
         .package(url: "https://github.com/cucumberswift/CucumberSwift.git", exact: "6.3.0"),
     ],
     targets: [

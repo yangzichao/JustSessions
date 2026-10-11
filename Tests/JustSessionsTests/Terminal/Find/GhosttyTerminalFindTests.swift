@@ -12,24 +12,51 @@ struct GhosttyTerminalFindTests {
         fixture.screen.split(whereSeparator: \.isNewline).first.map(String.init) ?? ""
     }
 
+    private func count(_ selectedNumber: Int?) -> TerminalFindMatchCount {
+        TerminalFindMatchCount(total: 3, selectedNumber: selectedNumber, exceedsCountLimit: false)
+    }
+
     @Test func movesGoTowardOlderOrNewerOutputFromTheNewestMatch() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
         try await fixture.waitForLayout()
         fixture.view.inMemorySession.receive(TerminalFindFixtureOutput.linesWithThreeNeedles.joined(separator: "\r\n"))
         fixture.view.inMemorySession.waitForPendingOutput()
+        var reportedCounts: [TerminalFindMatchCount?] = []
+        fixture.view.onFindMatchCountChange = { reportedCounts.append($0) }
 
-        #expect(fixture.view.findText("NEEDLE") == nil)
+        fixture.view.findText("NEEDLE")
         try await expectEventually { firstShownLine(fixture).hasSuffix("needle-new") }
+        try await expectEventually { reportedCounts.last == count(1) }
 
-        _ = fixture.view.findTextAgain("needle", direction: .towardOlder)
+        fixture.view.findTextAgain("needle", direction: .towardOlder)
         try await expectEventually { firstShownLine(fixture).hasSuffix("needle-mid") }
-        _ = fixture.view.findTextAgain("needle", direction: .towardOlder)
+        try await expectEventually { reportedCounts.last == count(2) }
+        fixture.view.findTextAgain("needle", direction: .towardOlder)
         try await expectEventually { firstShownLine(fixture).hasSuffix("needle-old") }
-        _ = fixture.view.findTextAgain("needle", direction: .towardOlder)
+        try await expectEventually { reportedCounts.last == count(3) }
+        fixture.view.findTextAgain("needle", direction: .towardOlder)
         try await expectEventually { firstShownLine(fixture).hasSuffix("needle-new") }
-        _ = fixture.view.findTextAgain("needle", direction: .towardNewer)
+        try await expectEventually { reportedCounts.last == count(1) }
+        fixture.view.findTextAgain("needle", direction: .towardNewer)
         try await expectEventually { firstShownLine(fixture).hasSuffix("needle-old") }
+        try await expectEventually { reportedCounts.last == count(3) }
+    }
+
+    @Test func aQueryWithNoMatchCountsNoneAndEndingTheSearchCountsNothing() async throws {
+        let fixture = try GhosttyTabFixture()
+        defer { fixture.tearDown() }
+        try await fixture.waitForLayout()
+        fixture.view.inMemorySession.receive(TerminalFindFixtureOutput.linesWithThreeNeedles.joined(separator: "\r\n"))
+        fixture.view.inMemorySession.waitForPendingOutput()
+        var reportedCounts: [TerminalFindMatchCount?] = []
+        fixture.view.onFindMatchCountChange = { reportedCounts.append($0) }
+
+        fixture.view.findText("haystack")
+        try await expectEventually { reportedCounts.last == TerminalFindMatchCount.none }
+
+        fixture.view.endTextFind()
+        try await expectEventually { reportedCounts.last == .some(nil) }
     }
 
     /// `search:` takes the rest of the binding action as its text, as typed.
@@ -42,7 +69,7 @@ struct GhosttyTerminalFindTests {
         fixture.view.inMemorySession.receive(lines.joined(separator: "\r\n"))
         fixture.view.inMemorySession.waitForPendingOutput()
 
-        _ = fixture.view.findText(#"C:\Users\x41:found"#)
+        fixture.view.findText(#"C:\Users\x41:found"#)
 
         try await expectEventually { firstShownLine(fixture).hasPrefix("line-0050") }
     }

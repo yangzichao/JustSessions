@@ -23,6 +23,10 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
     var onOpenLink: ((String) -> Void)?
     /// The link Ghostty last reported under the pointer, which it does only while ⌘ is held; see `link(under:)`.
     var hoveredLink: String?
+    /// See `TerminalTextFinding.onFindMatchCountChange` and `GhosttyTabTerminalView+Find`.
+    var onFindMatchCountChange: ((TerminalFindMatchCount?) -> Void)?
+    /// What Ghostty last reported of its search.
+    var findProgress = GhosttyFindProgress()
     /// The terminal takes files dropped on it; see `GhosttyTabTerminalView+FileDrop`.
     var acceptsDroppedFiles = false {
         didSet {

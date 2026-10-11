@@ -4,12 +4,14 @@
 /// only what the screen shows.
 @MainActor
 protocol TerminalTextFinding: AnyObject {
+    /// Called with the matches counted each time the count or the selected match changes, and with nil when no search
+    /// runs. SwiftTerm counts as it moves, so it calls this from inside `findText` and `findTextAgain`. Ghostty counts
+    /// on a thread of its own and calls this later, as its count grows and its selection moves.
+    var onFindMatchCountChange: ((TerminalFindMatchCount?) -> Void)? { get set }
     /// Starts a search for `query`, replacing any other, and selects its newest match. An empty query ends the search.
-    /// Returns the matches counted, or nil when the engine doesn't count them, as Ghostty's wrapper doesn't pass its
-    /// counts on.
-    func findText(_ query: String) -> TerminalFindMatchCount?
+    func findText(_ query: String)
     /// Selects the match after the selected one, wrapping around at either end.
-    func findTextAgain(_ query: String, direction: TerminalFindDirection) -> TerminalFindMatchCount?
+    func findTextAgain(_ query: String, direction: TerminalFindDirection)
     /// Ends the search and takes its highlight away.
     func endTextFind()
 }

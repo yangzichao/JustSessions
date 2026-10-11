@@ -20,6 +20,8 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     var makeContextMenu: ((_ linkUnderPointer: String?) -> NSMenu)?
     /// See `TabTerminalView.onOpenLink`.
     var onOpenLink: ((String) -> Void)?
+    /// See `TerminalTextFinding.onFindMatchCountChange`.
+    var onFindMatchCountChange: ((TerminalFindMatchCount?) -> Void)?
     /// The terminal takes files dropped on it; see `SelectableTerminalView+FileDrop`.
     var acceptsDroppedFiles = false {
         didSet {

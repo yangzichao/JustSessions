@@ -39,7 +39,16 @@ Fork tags are named `v<upstream version>-justsessions.<n>`, and `Package.swift` 
 
 ## libghostty
 
-The Ghostty terminal engine comes from [libghostty-spm](https://github.com/Lakr233/libghostty-spm), which `Package.swift` pins exactly. It provides `libghostty.a` prebuilt from a pinned upstream Ghostty commit with its own patches, as a binary target SwiftPM downloads with the package (about 77 MB), and the `GhosttyTerminal` AppKit view around it. Nothing here builds Ghostty or needs Zig.
+The Ghostty terminal engine comes from [libghostty-spm](https://github.com/Lakr233/libghostty-spm), through a fork that `Package.swift` pins exactly. It provides `libghostty.a` prebuilt from a pinned upstream Ghostty commit with its own patches, as a binary target SwiftPM downloads with the package (about 77 MB), and the `GhosttyTerminal` AppKit view around it. Nothing here builds Ghostty or needs Zig.
+
+`Package.swift` pins [yangzichao/libghostty-spm](https://github.com/yangzichao/libghostty-spm), a fork. Its `justsessions-search-counts` branch is upstream `2.2.2026100901` plus one commit. That commit passes Ghostty's search count and selected match on to `TerminalSurfaceSearchDelegate`, which the find bar needs to show "2 of 14" in a Ghostty tab. The upstream wrapper dropped these reports. Upstream review: [Lakr233/libghostty-spm#82](https://github.com/Lakr233/libghostty-spm/pull/82). The commit changes only Swift code. The fork's manifest downloads the same `libghostty.a` archive, with the same URL and checksum, so the library and its licenses are upstream's. Fork tags are named `<upstream version>-justsessions.<n>`, without a `v`, as upstream's tags are. To move to a newer release:
+
+1. Rebase the commit onto the upstream tag.
+2. Run `swift test` in the fork.
+3. Push a new tag.
+4. Update `Package.swift` and `Package.resolved`.
+
+Drop the fork once an upstream release forwards the search reports.
 
 `Scripts/build-app.sh` copies `GhosttyKit_GhosttyTerminal.bundle`, Ghostty's shell integration and terminfo, into the app. Ghostty's package finds it through SwiftPM's generated resource accessor and stops the app when that finds nothing. Only Swift Build, the default from Swift 6.4, makes an accessor that looks in the app's `Contents/Resources`; the native build system, the default on the release runner's older Swift, makes one that looks only beside the `.app` and in the building machine's own build folder, which stopped v1.2.0 on every other Mac as soon as Ghostty was chosen. So `build-app.sh` builds with `--build-system swiftbuild` and takes its paths from `--show-bin-path`, and fails when the build has no bundle. The launch check opens the app with `-checksGhosttyResourcesAtLaunch YES`, which makes the Ghostty controller a terminal makes first and quits if the bundle or its resources can't be found, with the build folder's bundles hidden, so the app must find its own copy. The library adds about 9 MB to the app's executable, measured on `2.2.2026100901` in an arm64 release build (13.9 MB without it, 22.9 MB with it), and the bundle about 124 KB.
 

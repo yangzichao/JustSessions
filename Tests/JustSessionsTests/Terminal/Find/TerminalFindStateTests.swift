@@ -65,6 +65,27 @@ struct TerminalFindStateTests {
         #expect(finder.calls.last == .find("needle"))
     }
 
+    /// Ghostty counts on its own thread and reports later, as its count grows and its selection moves, and its last
+    /// report can come after the bar closed.
+    @Test func showsCountsReportedLaterOnlyWhileTheBarShows() {
+        let finder = RecordingTerminalFinder()
+        finder.reportsWhenCalled = false
+        let findState = TerminalFindState(finder: finder)
+        findState.show()
+        findState.query = "needle"
+        #expect(findState.matchCount == nil)
+
+        let total = TerminalFindMatchCount(total: 3, selectedNumber: nil, exceedsCountLimit: false)
+        finder.onFindMatchCountChange?(total)
+        #expect(findState.matchCount == total)
+        finder.onFindMatchCountChange?(finder.matchCount)
+        #expect(findState.matchCount == finder.matchCount)
+
+        findState.close()
+        finder.onFindMatchCountChange?(total)
+        #expect(findState.matchCount == nil)
+    }
+
     /// ⌘F while the bar shows puts the keyboard back in its field without searching again.
     @Test func showingAgainOnlyFocusesTheField() {
         let finder = RecordingTerminalFinder()
@@ -90,16 +111,19 @@ private final class RecordingTerminalFinder: TerminalTextFinding {
     }
 
     var calls: [Call] = []
+    var onFindMatchCountChange: ((TerminalFindMatchCount?) -> Void)?
     let matchCount = TerminalFindMatchCount(total: 3, selectedNumber: 1, exceedsCountLimit: false)
+    /// Reports `matchCount` from inside each call, as SwiftTerm does; Ghostty reports later.
+    var reportsWhenCalled = true
 
-    func findText(_ query: String) -> TerminalFindMatchCount? {
+    func findText(_ query: String) {
         calls.append(.find(query))
-        return matchCount
+        if reportsWhenCalled { onFindMatchCountChange?(matchCount) }
     }
 
-    func findTextAgain(_ query: String, direction: TerminalFindDirection) -> TerminalFindMatchCount? {
+    func findTextAgain(_ query: String, direction: TerminalFindDirection) {
         calls.append(.findAgain(query, direction))
-        return matchCount
+        if reportsWhenCalled { onFindMatchCountChange?(matchCount) }
     }
 
     func endTextFind() {

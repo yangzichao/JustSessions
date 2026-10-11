@@ -1,6 +1,6 @@
 # Ghostty's terminal and what it links
 
-The Ghostty terminal engine comes from [libghostty-spm](https://github.com/Lakr233/libghostty-spm) `2.2.2026100901`, a prebuilt `libghostty.a` built from Ghostty commit [`35a81a98`](https://github.com/ghostty-org/ghostty/tree/35a81a980bb9fce09a1ea762a68b55f8eb3477ed) with Zig 0.16.0. That archive statically links the components below, and each one's license text is in this folder, unmodified from the pinned upstream source. `manifest.json` records each component's version, source URL, the file's SHA-256, and the evidence for the version. `Scripts/build-app.sh` copies this folder into the app as `Contents/Resources/Ghostty-Licenses`.
+The Ghostty terminal engine comes from [libghostty-spm](https://github.com/Lakr233/libghostty-spm) `2.2.2026100901`, through the app's fork `2.2.2026100901-justsessions.1`, which adds only Swift code and downloads the same archive. The archive is a prebuilt `libghostty.a` built from Ghostty commit [`35a81a98`](https://github.com/ghostty-org/ghostty/tree/35a81a980bb9fce09a1ea762a68b55f8eb3477ed) with Zig 0.16.0. That archive statically links the components below, and each one's license text is in this folder, unmodified from the pinned upstream source. `manifest.json` records each component's version, source URL, the file's SHA-256, and the evidence for the version. `Scripts/build-app.sh` copies this folder into the app as `Contents/Resources/Ghostty-Licenses`.
 
 | Component | Version | License | File |
 | --- | --- | --- | --- |

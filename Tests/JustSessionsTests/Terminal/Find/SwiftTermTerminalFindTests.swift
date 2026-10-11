@@ -22,7 +22,7 @@ struct SwiftTermTerminalFindTests {
         let terminalView = makeTerminalWithThreeMatches()
         #expect(!isShown(row: 199, in: terminalView))
 
-        let count = terminalView.findText("NEEDLE")
+        let count = terminalView.countAfterFinding("NEEDLE")
 
         #expect(count == TerminalFindMatchCount(total: 3, selectedNumber: 1, exceedsCountLimit: false))
         #expect(terminalView.getSelection() == "needle")
@@ -31,32 +31,35 @@ struct SwiftTermTerminalFindTests {
 
     @Test func movesGoTowardOlderOrNewerOutputAndWrap() {
         let terminalView = makeTerminalWithThreeMatches()
-        _ = terminalView.findText("needle")
+        terminalView.findText("needle")
 
-        #expect(terminalView.findTextAgain("needle", direction: .towardOlder)?.selectedNumber == 2)
+        #expect(terminalView.countAfterFindingAgain("needle", .towardOlder)?.selectedNumber == 2)
         #expect(isShown(row: 149, in: terminalView))
-        #expect(terminalView.findTextAgain("needle", direction: .towardOlder)?.selectedNumber == 3)
+        #expect(terminalView.countAfterFindingAgain("needle", .towardOlder)?.selectedNumber == 3)
         #expect(isShown(row: 9, in: terminalView))
-        #expect(terminalView.findTextAgain("needle", direction: .towardOlder)?.selectedNumber == 1)
-        #expect(terminalView.findTextAgain("needle", direction: .towardNewer)?.selectedNumber == 3)
-        #expect(terminalView.findTextAgain("needle", direction: .towardNewer)?.selectedNumber == 2)
+        #expect(terminalView.countAfterFindingAgain("needle", .towardOlder)?.selectedNumber == 1)
+        #expect(terminalView.countAfterFindingAgain("needle", .towardNewer)?.selectedNumber == 3)
+        #expect(terminalView.countAfterFindingAgain("needle", .towardNewer)?.selectedNumber == 2)
         #expect(isShown(row: 149, in: terminalView))
     }
 
     @Test func aQueryWithNoMatchCountsNone() {
         let terminalView = makeTerminalWithThreeMatches()
 
-        #expect(terminalView.findText("haystack") == TerminalFindMatchCount.none)
+        #expect(terminalView.countAfterFinding("haystack") == TerminalFindMatchCount.none)
         #expect(terminalView.getSelection() == nil)
     }
 
     @Test func endingTheSearchTakesTheSelectionAway() {
         let terminalView = makeTerminalWithThreeMatches()
-        _ = terminalView.findText("needle")
+        terminalView.findText("needle")
+        var reportedCounts: [TerminalFindMatchCount?] = []
+        terminalView.onFindMatchCountChange = { reportedCounts.append($0) }
 
         terminalView.endTextFind()
 
         #expect(terminalView.getSelection() == nil)
+        #expect(reportedCounts == [nil])
     }
 
     /// SwiftTerm keeps 500 lines by default; a tab keeps `scrollbackLineCount`.
@@ -65,8 +68,25 @@ struct SwiftTermTerminalFindTests {
         let lines = (1...10_500).map { String(format: "row-%05d", $0) }
         terminalView.feed(text: lines.joined(separator: "\r\n"))
 
-        #expect(terminalView.findText("row-00600")?.total == 1)
-        #expect(terminalView.findText("row-00001")?.total == 0)
+        #expect(terminalView.countAfterFinding("row-00600")?.total == 1)
+        #expect(terminalView.countAfterFinding("row-00001")?.total == 0)
+    }
+}
+
+/// SwiftTerm reports its count before the call returns.
+private extension SelectableTerminalView {
+    func countAfterFinding(_ query: String) -> TerminalFindMatchCount? {
+        var reportedCount: TerminalFindMatchCount?
+        onFindMatchCountChange = { reportedCount = $0 }
+        findText(query)
+        return reportedCount
+    }
+
+    func countAfterFindingAgain(_ query: String, _ direction: TerminalFindDirection) -> TerminalFindMatchCount? {
+        var reportedCount: TerminalFindMatchCount?
+        onFindMatchCountChange = { reportedCount = $0 }
+        findTextAgain(query, direction: direction)
+        return reportedCount
     }
 }
 

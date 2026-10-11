@@ -114,7 +114,8 @@ struct TerminalFindShortcutsTests {
 /// A finder that counts nothing, for tests about keys rather than matches.
 @MainActor
 private final class SilentTerminalFinder: TerminalTextFinding {
-    func findText(_ query: String) -> TerminalFindMatchCount? { nil }
-    func findTextAgain(_ query: String, direction: TerminalFindDirection) -> TerminalFindMatchCount? { nil }
+    var onFindMatchCountChange: ((TerminalFindMatchCount?) -> Void)?
+    func findText(_ query: String) {}
+    func findTextAgain(_ query: String, direction: TerminalFindDirection) {}
     func endTextFind() {}
 }

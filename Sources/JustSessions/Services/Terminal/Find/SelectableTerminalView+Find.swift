@@ -5,24 +5,28 @@ import SwiftTerm
 /// Output clears SwiftTerm's selection, so after new output the next move starts again from the newest match.
 extension SelectableTerminalView: TerminalTextFinding {
     /// SwiftTerm's "previous" searches up from the end, so with nothing selected it finds the newest match.
-    func findText(_ query: String) -> TerminalFindMatchCount? {
+    func findText(_ query: String) {
         clearSearch()
-        guard !query.isEmpty else { return nil }
+        guard !query.isEmpty else {
+            onFindMatchCountChange?(nil)
+            return
+        }
         findPrevious(query)
-        return matchCount(for: query)
+        onFindMatchCountChange?(matchCount(for: query))
     }
 
-    func findTextAgain(_ query: String, direction: TerminalFindDirection) -> TerminalFindMatchCount? {
-        guard !query.isEmpty else { return nil }
+    func findTextAgain(_ query: String, direction: TerminalFindDirection) {
+        guard !query.isEmpty else { return }
         switch direction {
         case .towardOlder: findPrevious(query)
         case .towardNewer: findNext(query)
         }
-        return matchCount(for: query)
+        onFindMatchCountChange?(matchCount(for: query))
     }
 
     func endTextFind() {
         clearSearch()
+        onFindMatchCountChange?(nil)
     }
 
     private func matchCount(for query: String) -> TerminalFindMatchCount {

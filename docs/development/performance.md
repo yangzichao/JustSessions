@@ -107,6 +107,34 @@ The footprint is what Activity Monitor's Memory column shows. Read the table wit
   - 417 in updating the layer's backing store, which replays those commands. 316 of them rasterized glyphs into the 16-bit RGBA backing store this XDR display gets (`RGBAf16_mark_constmask`, `vCGCompositeConstMask_ARGB16F_vec`).
 - **Ghostty:** the main thread was busy in 28 of 3,459 samples, under 1%: committing the layer's new contents, and handing output on. Ghostty's renderer thread took 29 samples, Metal's command queue 21, Ghostty's output parsing 6, and reading the pseudo-terminal 5. All threads together were busy in 94 samples, against SwiftTerm's 726.
 
+**The libghostty-spm fork, 11 October 2026.** The pin moved to the fork that passes on Ghostty's search counts; see [libghostty](build-and-release.md#libghostty). The fork adds cases to the wrapper's action handler that run only during a search, and downloads the same `libghostty.a`. `TerminalEngineMeasurements` ran on the base (`f8d8d61`, upstream `2.2.2026100901`) and on the fork (`09d84fd`), alternating base, fork, base, fork.
+
+**Method:**
+- **Machine:** Apple M4 Max, 14 cores (10 performance, 4 efficiency), 36 GB, macOS 27.0.1.
+- **Build:** release build from `swift test -c release`.
+- **Load:** other builds were running. The load average was 3–10.
+- **Runs:** each figure below is the median of the test's three runs in that round. Memory is one run per round, each in a process of its own.
+
+| Ghostty | Base, round 1 / 2 | Fork, round 1 / 2 |
+| --- | --- | --- |
+| Repaint, 1 tab: process CPU | 5.1% / 5.1% | 5.8% / 5.8% |
+| Repaint, 1 tab: main thread | 1.2% / 1.3% | 1.5% / 1.4% |
+| Repaint, 1 tab: longest main-thread gap | 28.1 / 28.7 ms | 29.9 / 28.5 ms |
+| Repaint, 5 tabs, 1 shown: process CPU | 8.3% / 7.5% | 5.6% / 7.3% |
+| Repaint, 10 tabs, 1 shown: process CPU | 9.3% / 9.9% | 10.0% / 9.2% |
+| Bulk 20 MB: time | 0.20 / 0.20 s | 0.20 / 0.19 s |
+| Bulk 20 MB: process CPU | 345% / 342% | 339% / 353% |
+| Footprint per idle tab | 25.6 / 25.6 MB | 25.6 / 25.2 MB |
+| Footprint added per full tab | 7.1 / 7.1 MB | 7.9 / 8.6 MB |
+| Resident memory added per full tab | 54.1 / 54.1 MB | 49.3 / 55.0 MB |
+
+No difference stands out from the load's noise:
+- **CPU:** with one tab, the fork used 0.7 points more in both rounds. With five tabs it used less.
+- **Memory:** the fork's footprint per full tab was 0.8–1.5 MB higher. That is within the 2.3 MB that separate runs differed by in the memory table above.
+- **Frames:** every repaint drew 149–150 frames.
+
+This Mac's figures differ from the M4 Pro's above, for example 25.6 MB per idle tab against 15.3 MB, so compare the two columns, not the two machines.
+
 ## Work items
 
 | # | Item | Status |
