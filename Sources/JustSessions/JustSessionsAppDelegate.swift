@@ -6,7 +6,13 @@ final class JustSessionsAppDelegate: NSObject, NSApplicationDelegate {
     /// first window already opens in the saved appearance. Clicks on notifications need their handler this early too.
     /// Onboarding reads whether this is a fresh install before anything this launch saves a setting, and the random tip
     /// whether onboarding's tour is due before it starts.
+    ///
+    /// The app's own tab bar holds its tabs, so a window has no macOS tab bar: shown with View → Show Tab Bar, it lay
+    /// under the app's bar and the terminal's first row, invisible, and took every click there, such as on the × of
+    /// Claude Code's diff panel. Turning tabbing off before the first window opens hides a bar shown before and removes
+    /// the menu items.
     func applicationWillFinishLaunching(_ notification: Notification) {
+        NSWindow.allowsAutomaticWindowTabbing = false
         _ = OnboardingTipsStore.shared
         _ = RandomTipsStore.shared
         AppAppearanceStore.shared.applyToApplication()
