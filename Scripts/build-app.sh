@@ -99,6 +99,7 @@ cat >"$app_directory/Contents/Info.plist" <<'PLIST'
     <key>CFBundleVersion</key><string>BUILD_NUMBER_PLACEHOLDER</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>NSHighResolutionCapable</key><true/>
+    <key>NSMicrophoneUsageDescription</key><string>A program running within JustSessions would like to use your microphone.</string>
     <key>SUFeedURL</key><string>https://justsessions-update-feed.noether-lab.workers.dev/appcast.xml</string>
     <key>SUPublicEDKey</key><string>pTbuztMtV4TVr5xOu9ON8B3L2xsJJRf8q5zyMg7SaD8=</string>
     <key>SUEnableAutomaticChecks</key><true/>
@@ -118,6 +119,9 @@ if [[ "$codesign_identity" == "-" ]]; then
 else
     codesign --force --options runtime --timestamp --sign "$codesign_identity" "$app_directory/Contents/Resources/Tmux/bin/tmux"
     codesign --force --deep --options runtime --timestamp --sign "$codesign_identity" "$app_directory"
+    # Without --deep, so the entitlements go to the app alone and not to Sparkle's helpers. macOS asks the app's
+    # permission for what its terminals run, so a CLI's voice input needs the app's audio-input entitlement.
+    codesign --force --options runtime --timestamp --entitlements "$project_directory/Scripts/JustSessions.entitlements" --sign "$codesign_identity" "$app_directory"
 fi
 python3 "$project_directory/Scripts/Tmux/verify-runtime.py" "$app_directory/Contents/Resources/Tmux"
 echo "$app_directory"

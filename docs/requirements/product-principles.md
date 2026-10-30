@@ -17,6 +17,7 @@ These hold everywhere in the app. A feature that breaks one needs an explicit de
 | PRD-07 | The interface is fully localized in English and Simplified Chinese. **Follow System** is the default; switching language updates the interface in place and leaves running terminal tabs alone. | `77bdca4`, `ddc62fc` | `Localization/*`, `make localization-check` |
 | PRD-08 | A local build's version comes from `git describe`, with build number 0 and Sparkle's automatic checks off, so a development build is never offered or counted as a release install. | `33ec74c` | Manual |
 | PRD-09 | The packaged app must find its resource bundles (localizations, Ghostty) in `Contents/Resources`. `make verify` opens the packaged app with the build folder's bundles hidden. | `ddc62fc`, `c71fab6`, `fb0e17a` | `make verify` launch check |
+| PRD-27 | A program in a terminal tab can use the microphone, such as Claude Code's `/voice`. macOS asks for the app's permission, so `Info.plist` has `NSMicrophoneUsageDescription` and the release signature has the `com.apple.security.device.audio-input` entitlement, which the hardened runtime requires. Only the app carries it, not Sparkle's helpers. | Bug report, 29 October 2026 | `AppBundleInfoContractTests`, manual |
 
 ## Cross-cutting UI rules
 
