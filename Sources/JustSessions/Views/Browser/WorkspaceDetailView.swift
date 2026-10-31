@@ -27,7 +27,8 @@ struct WorkspaceDetailView: View {
     let onDelete: (Conversation) -> Void
 
     @Environment(\.titleBarRow) private var titleBarRow
-    /// Each split's left pane share of the panes' width, by split id: even until its resize area is dragged, and kept as
+    /// Each split's first pane share of the panes' width, or height when stacked, by split id: even until its resize area
+    /// is dragged, and kept as
     /// its views are reversed or swapped, as Chrome keeps a split's sizes. A split chooser's is under its id, which the
     /// split takes once a tab is chosen.
     @State private var splitFractions: [UUID: CGFloat] = [:]
@@ -103,6 +104,7 @@ struct WorkspaceDetailView: View {
                         .overlay {
                             if isInSplitView && isShown {
                                 WorkspaceSplitPaneOverlay(
+                                    store: store,
                                     session: session,
                                     isSelected: isActive,
                                     onSelect: { store.selectTerminal(session.id) },
@@ -116,7 +118,7 @@ struct WorkspaceDetailView: View {
                     }
 
                     if let shownSplitChooser {
-                        let frames = TerminalSplitLayout.frames(fraction: splitFraction(ofSplitView: shownSplitChooser.id), size: geometry.size)
+                        let frames = splitFrames(ofSplitView: shownSplitChooser.id, size: geometry.size)
                         let chooserFrame = shownSplitChooser.side == .left ? frames.left : frames.right
                         TerminalSplitChooserPane(
                             store: store,
@@ -130,10 +132,12 @@ struct WorkspaceDetailView: View {
                     }
 
                     if let shownSplitViewID {
-                        let resizeAreaFrame = TerminalSplitLayout.frames(fraction: splitFraction(ofSplitView: shownSplitViewID), size: geometry.size).resizeArea
+                        let orientation = store.orientation(ofSplitView: shownSplitViewID)
+                        let resizeAreaFrame = splitFrames(ofSplitView: shownSplitViewID, size: geometry.size).resizeArea
                         WorkspaceSplitResizeArea(
                             fraction: splitFractionBinding(forSplitView: shownSplitViewID),
-                            totalWidth: geometry.size.width,
+                            totalLength: TerminalSplitLayout.totalLength(of: geometry.size, orientation),
+                            orientation: orientation,
                             onReverse: reverseShownSplitView
                         )
                             .frame(width: resizeAreaFrame.width, height: resizeAreaFrame.height)
@@ -144,11 +148,11 @@ struct WorkspaceDetailView: View {
                         store: store,
                         area: TerminalSplitDropArea(
                             frameInWindow: CGRect(origin: .zero, size: geometry.size),
-                            shownSplitFraction: shownSplitViewID.map(splitFraction(ofSplitView:))
+                            shownSplit: shownSplitViewID.map(shownSplitLayout(ofSplitView:))
                         )
                     )
                 }
-                .reportsTerminalSplitDropArea(in: store, shownSplitFraction: shownSplitViewID.map(splitFraction(ofSplitView:)))
+                .reportsTerminalSplitDropArea(in: store, shownSplit: shownSplitViewID.map(shownSplitLayout(ofSplitView:)))
             }
             .tabBarTerminalPalette(from: .shared, themeStore: .shared)
         }
@@ -191,6 +195,15 @@ struct WorkspaceDetailView: View {
         Binding(get: { splitFraction(ofSplitView: id) }, set: { splitFractions[id] = $0 })
     }
 
+    private func shownSplitLayout(ofSplitView id: UUID) -> TerminalSplitDropArea.ShownSplit {
+        TerminalSplitDropArea.ShownSplit(fraction: splitFraction(ofSplitView: id), orientation: store.orientation(ofSplitView: id))
+    }
+
+    /// The split's, or split chooser's, panes and resize area in an area of `size`, side by side or stacked.
+    private func splitFrames(ofSplitView id: UUID, size: CGSize) -> TerminalSplitLayout.Frames {
+        TerminalSplitLayout.frames(fraction: splitFraction(ofSplitView: id), size: size, orientation: store.orientation(ofSplitView: id))
+    }
+
     /// A double-click on the resize area reverses the shown split's views, or the shown split chooser and its tab.
     private func reverseShownSplitView() {
         if let shownSplit = store.shownSplit {
@@ -212,7 +225,7 @@ struct WorkspaceDetailView: View {
         } else {
             return CGRect(origin: .zero, size: size)
         }
-        let frames = TerminalSplitLayout.frames(fraction: splitFraction(ofSplitView: splitViewID), size: size)
+        let frames = splitFrames(ofSplitView: splitViewID, size: size)
         return side == .left ? frames.left : frames.right
     }
 }

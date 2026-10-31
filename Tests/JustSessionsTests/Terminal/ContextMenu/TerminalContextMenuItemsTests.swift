@@ -18,7 +18,7 @@ struct TerminalContextMenuItemsTests {
             "Copy", "Paste", "Select All", "—",
             "Rename", "—",
             "Copy conversation", "Export conversation", "Copy session ID", "Reveal session file in Finder", "—",
-            "Add tab to new split view", "—",
+            "Split right", "Split down", "—",
             "Close Tab…", "Close and end session", "Close and delete session…",
         ])
     }
@@ -46,7 +46,7 @@ struct TerminalContextMenuItemsTests {
 
         #expect(TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)) == [
             "Copy", "Paste", "Select All", "—",
-            "Add tab to new split view", "—",
+            "Split right", "Split down", "—",
             "Close terminal…",
         ])
     }
@@ -63,7 +63,7 @@ struct TerminalContextMenuItemsTests {
         #expect(TerminalContextMenuFixture.titles(of: menu) == [
             "Copy", "Paste", "Select All", "—",
             "Rename", "—",
-            "Add tab to new split view", "—",
+            "Split right", "Split down", "—",
             "Close Tab…", "Close and end session",
         ])
         #expect(try !TerminalContextMenuFixture.item("Rename", in: menu).isEnabled)
@@ -100,21 +100,23 @@ struct TerminalContextMenuItemsTests {
         #expect(try TerminalContextMenuFixture.item("Copy", in: fixture.menu(for: tab)).isEnabled)
     }
 
+    /// Each lists a new session of the host's CLIs and a terminal, then the window's other tabs in no split.
     @Test(arguments: TerminalEngine.allCases)
-    func addTabToNewSplitViewListsEveryOtherTabInNoSplit(engine: TerminalEngine) throws {
+    func splitRightAndSplitDownListNewTabsThenEveryOtherTabInNoSplit(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
         let onlyTab = fixture.openTab(engine: engine, title: "Only")
-        let aloneItem = try TerminalContextMenuFixture.item("Add tab to new split view", in: fixture.menu(for: onlyTab))
-        #expect(!aloneItem.isEnabled)
+        let aloneItem = try TerminalContextMenuFixture.item("Split right", in: fixture.menu(for: onlyTab))
+        #expect(aloneItem.submenu.map(TerminalContextMenuFixture.titles(of:))?.last == "Terminal")
 
         fixture.openTab(engine: engine, title: "Other")
         fixture.store.selectTerminal(onlyTab.id)
-        let item = try TerminalContextMenuFixture.item("Add tab to new split view", in: fixture.menu(for: onlyTab))
-
         let projectName = fixture.store.projectDisplayName(forProjectPath: TerminalContextMenuFixture.projectPath)
-        #expect(item.isEnabled)
-        #expect(item.submenu.map(TerminalContextMenuFixture.titles(of:)) == ["Other · \(projectName)"])
+        for title in ["Split right", "Split down"] {
+            let item = try TerminalContextMenuFixture.item(title, in: fixture.menu(for: onlyTab))
+            let titles = try #require(item.submenu.map(TerminalContextMenuFixture.titles(of:)))
+            #expect(titles.suffix(3) == ["Terminal", "—", "Other · \(projectName)"])
+        }
     }
 
     @Test(arguments: TerminalEngine.allCases)
@@ -129,7 +131,7 @@ struct TerminalContextMenuItemsTests {
         let item = try TerminalContextMenuFixture.item("Arrange split view", in: fixture.menu(for: right))
 
         #expect(item.submenu.map(TerminalContextMenuFixture.titles(of:)) == [
-            "Separate views", "—", "Close left view", "Close right view", "—", "Reverse views",
+            "Separate views", "—", "Close left view", "Close right view", "—", "Reverse views", "Stack views",
         ])
     }
 
@@ -154,7 +156,7 @@ struct TerminalContextMenuItemsTests {
             "复制", "粘贴", "全选", "—",
             "重命名", "—",
             "复制对话", "导出对话", "复制会话 ID", "在 Finder 中显示会话文件", "—",
-            "向新拆分视图添加标签页", "—",
+            "向右拆分", "向下拆分", "—",
             "关闭标签…", "关闭并结束会话", "关闭并删除会话…",
         ])
     }

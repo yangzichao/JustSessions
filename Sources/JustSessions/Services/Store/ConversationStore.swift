@@ -85,6 +85,7 @@ final class ConversationStore {
         didSet {
             markTerminalsOnScreenSeen()
             forgetClosedTabsInSplitChoosers()
+            forgetOrientationsOfClosedSplitViews()
         }
     }
     /// Splits whose other view is still to be chosen, each beside a tab open here in no split, at most one per tab. Like
@@ -95,6 +96,9 @@ final class ConversationStore {
     /// The shown split chooser has the keyboard rather than the tab beside it, as Chrome's split view page is the
     /// active tab while it shows. Selecting another tab gives the keyboard back to tabs.
     var selectsShownSplitChooser = false
+    /// The splits and split choosers whose views are stacked rather than side by side, by id; see
+    /// `ConversationStore+SplitOrientation`. A chooser's carries over to the split it becomes, which takes its id.
+    var stackedSplitViewIDs: Set<UUID> = []
     /// The open tabs by when they were last selected, the latest first, which is the order a split chooser lists them in.
     private(set) var tabIDsByLastSelected: [UUID] = []
     /// The split chooser whose New Session… is open: the next tab to open takes its place; see `openTerminal`.
@@ -941,13 +945,19 @@ final class ConversationStore {
 
     /// Shows another tab side by side with the selected tab, which stays selected, as Chrome's AddToNewSplit; see
     /// `TerminalTabStrip.addSplit(joining:beside:on:splitID:)` for where the other tab moves. Neither tab may be in a
-    /// split, or beside a split chooser, already. A reopened tab still waiting to be shown starts as it joins.
-    func splitSelectedTerminal(with id: UUID) {
+    /// split, or beside a split chooser, already. A reopened tab still waiting to be shown starts as it joins. The other
+    /// tab joins on `side`, or on the side it came from without one, in a split laid out as `orientation`.
+    func splitSelectedTerminal(
+        with id: UUID,
+        on side: TerminalSplit.Side? = nil,
+        orientation: TerminalSplit.Orientation = .sideBySide
+    ) {
         guard let selectedTerminalID, let joiningTab = terminalSessions.first(where: { $0.id == id }),
               splitChooser(beside: id) == nil, splitChooser(beside: selectedTerminalID) == nil else { return }
         var strip = tabStrip
-        guard strip.addSplit(joining: id, beside: selectedTerminalID) != nil else { return }
+        guard let split = strip.addSplit(joining: id, beside: selectedTerminalID, on: side) else { return }
         defer { persistOpenTabs() }
+        if orientation == .stacked { stackedSplitViewIDs.insert(split.id) }
         apply(strip)
         joiningTab.startNowThatItIsShown()
     }

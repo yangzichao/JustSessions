@@ -36,6 +36,7 @@ struct SingleSessionContextMenu: View {
             }
             .disabled(!store.canLaunch(conversation, action: .branch))
         }
+        SessionSplitMenuItems(store: store, conversation: conversation)
         if store.canEndSession(conversation) {
             Button("End session", systemImage: "stop.circle", role: .destructive) {
                 store.endSession(conversation)

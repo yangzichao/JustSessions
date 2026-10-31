@@ -15,8 +15,8 @@ extension ConversationStore {
     /// full width, the shown tab staying open behind it.
     func showDroppedTab(_ tabID: UUID, at place: TerminalDropPlace) {
         switch place {
-        case .split(let side):
-            showDroppedTabInSplit(tabID, on: side)
+        case .split(let side, let orientation):
+            showDroppedTabInSplit(tabID, on: side, orientation: orientation)
         case .wholeArea:
             guard canShowDroppedTabs([tabID]) else { return }
             selectTerminal(tabID)
@@ -24,18 +24,14 @@ extension ConversationStore {
     }
 
     /// Shows the tab, open here in no split, on `side` of a split view, and selects it: beside the selected tab in a new
-    /// split, or, while the selected tab is in a split or beside a split chooser, in place of the view on `side`, as
-    /// Move tab into split view does.
-    func showDroppedTabInSplit(_ tabID: UUID, on side: TerminalSplit.Side) {
+    /// split laid out as `orientation`, or, while the selected tab is in a split or beside a split chooser, in place of
+    /// the view on `side`, as Move tab into split view does, the split keeping its own layout.
+    func showDroppedTabInSplit(_ tabID: UUID, on side: TerminalSplit.Side, orientation: TerminalSplit.Orientation = .sideBySide) {
         guard canShowDroppedTabs([tabID]) else { return }
         if isSplitViewShown {
             moveIntoShownSplitView(tabID, on: side)
         } else {
-            splitSelectedTerminal(with: tabID)
-            // The tab joins on the side it came from in the tab bar.
-            if let split = split(containing: tabID), sides(of: split)?.side(of: tabID) != side {
-                reverseSplit(split.id)
-            }
+            splitSelectedTerminal(with: tabID, on: side, orientation: orientation)
         }
         selectTerminal(tabID)
     }

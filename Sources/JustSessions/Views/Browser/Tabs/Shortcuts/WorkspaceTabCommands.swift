@@ -10,6 +10,8 @@ struct WorkspaceTabCommands: Commands {
     /// The split view items, as in Chrome's split view button, act on the shown split, so only while one shows.
     private var isSplitShown: Bool { actions?.isEnabled == true && actions?.isSplitShown == true }
 
+    private var isStacked: Bool { isSplitShown && actions?.shownSplitOrientation == .stacked }
+
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
             Button(AppLocalization.string("New Session…", language: languageStore.language)) { actions?.newSession() }
@@ -67,15 +69,23 @@ struct WorkspaceTabCommands: Commands {
 
             Divider()
 
-            Button(AppLocalization.string("Close Left View", language: languageStore.language)) { actions?.closeShownSplitView(.left) }
-                .disabled(!isSplitShown)
-            Button(AppLocalization.string("Close Right View", language: languageStore.language)) { actions?.closeShownSplitView(.right) }
-                .disabled(!isSplitShown)
+            Button(AppLocalization.string(isStacked ? "Close Top View" : "Close Left View", language: languageStore.language)) {
+                actions?.closeShownSplitView(.left)
+            }
+            .disabled(!isSplitShown)
+            Button(AppLocalization.string(isStacked ? "Close Bottom View" : "Close Right View", language: languageStore.language)) {
+                actions?.closeShownSplitView(.right)
+            }
+            .disabled(!isSplitShown)
 
             Divider()
 
             Button(AppLocalization.string("Reverse Views", language: languageStore.language)) { actions?.reverseShownSplit() }
                 .disabled(!isSplitShown)
+            Button(AppLocalization.string(isStacked ? "Place Views Side by Side" : "Stack Views", language: languageStore.language)) {
+                actions?.toggleShownSplitOrientation()
+            }
+            .disabled(!isSplitShown)
         }
     }
 }

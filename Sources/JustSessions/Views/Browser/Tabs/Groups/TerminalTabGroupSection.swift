@@ -170,7 +170,7 @@ struct TerminalTabGroupSection: View {
             isPartnerHovered: hoveredTabID == session.id,
             showsLeadingSeparator: showsLeadingSeparator,
             groupColor: color,
-            menuItems: TerminalTabSplitMenuItems(splitMenu: .arrangeSplit) { action in
+            menuItems: TerminalTabSplitMenuItems(splitMenu: store.splitMenu(forTab: session.id)) { action in
                 store.performSplitAction(action, fromTab: session.id, closeTab: onCloseTab)
             },
             onHoverChange: { isHovering in

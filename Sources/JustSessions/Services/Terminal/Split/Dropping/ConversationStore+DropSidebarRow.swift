@@ -28,15 +28,15 @@ extension ConversationStore {
         switch (row, place) {
         case (.openTab(let tabID), .wholeArea):
             selectTerminal(tabID)
-        case (.openTab(let tabID), .split(let side)):
-            showDroppedTabInSplit(tabID, on: side)
+        case (.openTab(let tabID), .split(let side, let orientation)):
+            showDroppedTabInSplit(tabID, on: side, orientation: orientation)
         case (.session(let conversation), .wholeArea):
             // As a double-click on it does: it resumes, in its own tab if one is open here.
             resume(conversation)
-        case (.session(let conversation), .split(let side)):
+        case (.session(let conversation), .split(let side, let orientation)):
             // Resumed too, so it leaves the archive also when its tab is already open.
             unarchiveResumableSessions([conversation])
-            showDroppedSessionInSplit(conversation, on: side)
+            showDroppedSessionInSplit(conversation, on: side, orientation: orientation)
         }
     }
 
@@ -51,9 +51,13 @@ extension ConversationStore {
     }
 
     /// Shows the session's tab on `side` of a split view, resuming it in a new tab first when none is open.
-    private func showDroppedSessionInSplit(_ conversation: Conversation, on side: TerminalSplit.Side) {
+    private func showDroppedSessionInSplit(
+        _ conversation: Conversation,
+        on side: TerminalSplit.Side,
+        orientation: TerminalSplit.Orientation
+    ) {
         if let tab = openTab(of: conversation) {
-            showDroppedTabInSplit(tab.id, on: side)
+            showDroppedTabInSplit(tab.id, on: side, orientation: orientation)
             return
         }
         guard let shownTabID = selectedTerminalID else { return }
@@ -61,6 +65,6 @@ extension ConversationStore {
         // The new tab opens selected, in no split; the tab shown before comes back for it to join.
         guard let resumedTab = runningTerminal(for: conversation), resumedTab.id != shownTabID else { return }
         selectTerminal(shownTabID)
-        showDroppedTabInSplit(resumedTab.id, on: side)
+        showDroppedTabInSplit(resumedTab.id, on: side, orientation: orientation)
     }
 }

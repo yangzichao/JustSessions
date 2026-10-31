@@ -80,13 +80,34 @@ struct TerminalContextMenuActionTests {
         let other = fixture.openTab(engine: engine, title: "Other")
         fixture.store.selectTerminal(tab.id)
         let submenu = try #require(
-            TerminalContextMenuFixture.item("Add tab to new split view", in: fixture.menu(for: tab)).submenu
+            TerminalContextMenuFixture.item("Split right", in: fixture.menu(for: tab)).submenu
         )
 
-        try TerminalContextMenuFixture.choose(#require(submenu.items.first))
+        try TerminalContextMenuFixture.choose(#require(submenu.items.last))
 
-        #expect(fixture.store.shownSplit?.tabIDs == [tab.id, other.id])
+        let split = try #require(fixture.store.shownSplit)
+        #expect(split.tabIDs == [tab.id, other.id])
+        #expect(fixture.store.sides(of: split) == TerminalSplit.Sides(left: tab.id, right: other.id))
+        #expect(fixture.store.orientation(ofSplitView: split.id) == .sideBySide)
         #expect(fixture.store.selectedTerminalID == tab.id)
+    }
+
+    @Test(arguments: TerminalEngine.allCases)
+    func choosingAnotherTabInSplitDownOpensItBelowThisOne(engine: TerminalEngine) throws {
+        let fixture = try TerminalContextMenuFixture()
+        defer { fixture.tearDown() }
+        let other = fixture.openTab(engine: engine, title: "Other")
+        let tab = fixture.openTab(engine: engine, title: "This")
+        fixture.store.selectTerminal(tab.id)
+        let submenu = try #require(
+            TerminalContextMenuFixture.item("Split down", in: fixture.menu(for: tab)).submenu
+        )
+
+        try TerminalContextMenuFixture.choose(#require(submenu.items.last))
+
+        let split = try #require(fixture.store.shownSplit)
+        #expect(fixture.store.sides(of: split) == TerminalSplit.Sides(left: tab.id, right: other.id))
+        #expect(fixture.store.orientation(ofSplitView: split.id) == .stacked)
     }
 
     @Test(arguments: TerminalEngine.allCases)
@@ -105,6 +126,14 @@ struct TerminalContextMenuActionTests {
 
         try TerminalContextMenuFixture.choose(arrangeItem("Reverse views"))
         #expect(fixture.store.sides(of: split) == TerminalSplit.Sides(left: right.id, right: left.id))
+
+        try TerminalContextMenuFixture.choose(arrangeItem("Stack views"))
+        #expect(fixture.store.orientation(ofSplitView: split.id) == .stacked)
+        #expect(try TerminalContextMenuFixture.titles(of: #require(
+            TerminalContextMenuFixture.item("Arrange split view", in: fixture.menu(for: right)).submenu
+        )).contains("Close top view"))
+        try TerminalContextMenuFixture.choose(arrangeItem("Place views side by side"))
+        #expect(fixture.store.orientation(ofSplitView: split.id) == .sideBySide)
 
         // Closing a view goes through the close request, which asks what to do with its CLI.
         try TerminalContextMenuFixture.choose(arrangeItem("Close left view"))

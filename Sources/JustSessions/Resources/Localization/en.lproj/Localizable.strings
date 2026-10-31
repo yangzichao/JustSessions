@@ -196,8 +196,6 @@
 	<string>Add project on this Mac</string>
 	<key>Add project…</key>
 	<string>Add project…</string>
-	<key>Add tab to new split view</key>
-	<string>Add tab to new split view</string>
 	<key>Add tag %@</key>
 	<string>Add tag %@</string>
 	<key>Adjusted to stay readable</key>
@@ -402,12 +400,16 @@
 	<string>Close</string>
 	<key>Close %@</key>
 	<string>Close %@</string>
+	<key>Close Bottom View</key>
+	<string>Close Bottom View</string>
 	<key>Close Left View</key>
 	<string>Close Left View</string>
 	<key>Close Right View</key>
 	<string>Close Right View</string>
 	<key>Close Tab…</key>
 	<string>Close Tab…</string>
+	<key>Close Top View</key>
+	<string>Close Top View</string>
 	<key>Close Window</key>
 	<string>Close Window</string>
 	<key>Close a tab with **Keep running**, or quit the app, and the CLI carries on in tmux. Click its session to return. A plain terminal ends with its tab.</key>
@@ -424,6 +426,8 @@
 	<string>Close and delete session…</string>
 	<key>Close and end session</key>
 	<string>Close and end session</string>
+	<key>Close bottom view</key>
+	<string>Close bottom view</string>
 	<key>Close find</key>
 	<string>Close find</string>
 	<key>Close find, while its field has the keyboard</key>
@@ -452,6 +456,8 @@
 	<string>Close this terminal?</string>
 	<key>Close this view</key>
 	<string>Close this view</string>
+	<key>Close top view</key>
+	<string>Close top view</string>
 	<key>Close without asking</key>
 	<string>Close without asking</string>
 	<key>Closing tabs</key>
@@ -988,6 +994,8 @@
 	<string>New session in %@</string>
 	<key>New session…</key>
 	<string>New session…</string>
+	<key>New split view below current tab</key>
+	<string>New split view below current tab</string>
 	<key>New split view with current tab</key>
 	<string>New split view with current tab</string>
 	<key>New terminal</key>
@@ -1110,14 +1118,26 @@
 	<string>Open in Finder</string>
 	<key>Open in a separate reading window</key>
 	<string>Open in a separate reading window</string>
+	<key>Open in bottom view</key>
+	<string>Open in bottom view</string>
 	<key>Open in browser</key>
 	<string>Open in browser</string>
 	<key>Open in its default app</key>
 	<string>Open in its default app</string>
+	<key>Open in left view</key>
+	<string>Open in left view</string>
 	<key>Open in new window</key>
 	<string>Open in new window</string>
 	<key>Open in reading window</key>
 	<string>Open in reading window</string>
+	<key>Open in right view</key>
+	<string>Open in right view</string>
+	<key>Open in split below</key>
+	<string>Open in split below</string>
+	<key>Open in split on the right</key>
+	<string>Open in split on the right</string>
+	<key>Open in top view</key>
+	<string>Open in top view</string>
 	<key>Open project in</key>
 	<string>Open project in</string>
 	<key>Open project in Finder</key>
@@ -1160,6 +1180,10 @@
 	<string>Pin your most-used sessions and projects to the top from their right-click menu.</string>
 	<key>Pinned</key>
 	<string>Pinned</string>
+	<key>Place Views Side by Side</key>
+	<string>Place Views Side by Side</string>
+	<key>Place views side by side</key>
+	<string>Place views side by side</string>
 	<key>Plain text (.txt)…</key>
 	<string>Plain text (.txt)…</string>
 	<key>Port on %@</key>
@@ -1488,8 +1512,16 @@
 	<string>Some colors are missing, such as the text or background color.</string>
 	<key>Split View Resize Handle (draggable)</key>
 	<string>Split View Resize Handle (draggable)</string>
+	<key>Split down</key>
+	<string>Split down</string>
+	<key>Split right</key>
+	<string>Split right</string>
 	<key>Split view across projects</key>
 	<string>Split view across projects</string>
+	<key>Stack Views</key>
+	<string>Stack Views</string>
+	<key>Stack views</key>
+	<string>Stack views</string>
 	<key>Start</key>
 	<string>Start</string>
 	<key>Start %@</key>
@@ -1544,10 +1576,14 @@
 	<string>Such as 3000</string>
 	<key>Supports Claude Code, Codex, Antigravity, Pi, OpenCode, and Kiro CLI, on this Mac or an SSH host, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session.</key>
 	<string>Supports Claude Code, Codex, Antigravity, Pi, OpenCode, and Kiro CLI, on this Mac or an SSH host, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session.</string>
+	<key>Swap with bottom view</key>
+	<string>Swap with bottom view</string>
 	<key>Swap with left view</key>
 	<string>Swap with left view</string>
 	<key>Swap with right view</key>
 	<string>Swap with right view</string>
+	<key>Swap with top view</key>
+	<string>Swap with top view</string>
 	<key>Switch tabs with ⌘1 to ⌘9, even while typing in a CLI.</key>
 	<string>Switch tabs with ⌘1 to ⌘9, even while typing in a CLI.</string>
 	<key>Switches between a readable width and the full window width</key>

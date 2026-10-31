@@ -93,7 +93,7 @@ struct ResumingArchivedSessionsTests {
         store.launch(shownInSplit, action: .resume)
         let resumedWholeTab = try #require(store.runningTerminal(for: resumedWhole))
         store.selectTerminal(resumedWholeTab.id)
-        store.showDroppedRow(.session(shownInSplit), at: .split(.right))
+        store.showDroppedRow(.session(shownInSplit), at: .split(.right, .sideBySide))
         #expect(store.shownSplit != nil)
         #expect(!store.archivedSessions.isArchived(conversationID: shownInSplit.id))
     }

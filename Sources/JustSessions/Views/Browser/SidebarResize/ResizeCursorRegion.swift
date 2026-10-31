@@ -1,20 +1,28 @@
 import AppKit
 import SwiftUI
 
-/// Shows the left/right resize cursor over its whole frame through an AppKit cursor rect.
-/// Only used before macOS 15, which has no SwiftUI pointer style; see `columnResizeCursor`.
+/// Shows the left/right resize cursor, or the up/down one between rows, over its whole frame through an AppKit cursor
+/// rect. Only used before macOS 15, which has no SwiftUI pointer style; see `columnResizeCursor`.
 struct ResizeCursorRegion: NSViewRepresentable {
+    var betweenRows = false
+
     func makeNSView(context: Context) -> ResizeCursorRegionView {
         ResizeCursorRegionView()
     }
 
-    func updateNSView(_ nsView: ResizeCursorRegionView, context: Context) {}
+    func updateNSView(_ nsView: ResizeCursorRegionView, context: Context) {
+        nsView.betweenRows = betweenRows
+    }
 }
 
 final class ResizeCursorRegionView: NSView {
+    var betweenRows = false {
+        didSet { if betweenRows != oldValue { window?.invalidateCursorRects(for: self) } }
+    }
+
     override func resetCursorRects() {
         super.resetCursorRects()
-        addCursorRect(bounds, cursor: .resizeLeftRight)
+        addCursorRect(bounds, cursor: betweenRows ? .resizeUpDown : .resizeLeftRight)
     }
 
     override func layout() {

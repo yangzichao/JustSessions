@@ -337,7 +337,7 @@ struct TerminalSplitChooserStoreTests {
         store.openSplitChooser()
         store.selectTerminal(b.id)
 
-        guard case .addTabToNewSplit(let candidates) = store.splitMenu(forTab: b.id) else {
+        guard case .addTabToNewSplit(let candidates, _, _) = store.splitMenu(forTab: b.id) else {
             Issue.record("The selected tab offers tabs for a new split")
             return
         }

@@ -1,9 +1,10 @@
 import CoreGraphics
 
 /// Where a shown split's panes and the resize area between them sit, as in Chrome's split view: the panes are inset
-/// from the split area's edges, with the resize area between them. The fraction is the left pane's share of the width
-/// the two panes share; it is kept where both panes stay wide enough for a terminal, and the split starts even, as in
-/// Chrome. A drag that brings the panes close to even snaps them even, as Chrome's snap point does.
+/// from the split area's edges, with the resize area between them. Side by side, the panes share the area's width; when
+/// stacked, its height, the first pane on top. The fraction is the first pane's share of the length the two panes
+/// share; it is kept where both panes stay large enough for a terminal, and the split starts even, as in Chrome. A drag
+/// that brings the panes close to even snaps them even, as Chrome's snap point does.
 enum TerminalSplitLayout {
     /// Between the split area's edges and its panes, as Chrome's `kSplitViewContentInset`. Chrome has no inset at the
     /// top, where its toolbar sits; with no toolbar here, the same band runs along the top too.
@@ -13,61 +14,96 @@ enum TerminalSplitLayout {
     static let resizeAreaWidth: CGFloat = 10
     /// Neither pane gets narrower than this while the window has room for both, as Chrome's `kMinWebContentsSize`.
     static let minimumPaneWidth: CGFloat = 200
+    /// Neither stacked pane gets shorter than this while the window has room for both: a CLI's input and status rows
+    /// above the pane's mini toolbar.
+    static let minimumPaneHeight: CGFloat = 120
     static let evenFraction: CGFloat = 0.5
-    /// A drag leaving the left pane less than this from half the panes' width snaps it to half, as Chrome's
+    /// A drag leaving the first pane less than this from half the panes' length snaps it to half, as Chrome's
     /// `kSnapDistance` around its one snap point.
     static let snapDistance: CGFloat = 15
 
-    struct PaneWidths: Equatable {
+    struct PaneLengths: Equatable {
         var leading: CGFloat
         var trailing: CGFloat
     }
 
-    /// The left pane, the resize area, and the right pane, in the split area's coordinates.
+    /// The first pane, the resize area, and the second pane, in the split area's coordinates: left and right side by
+    /// side, top and bottom when stacked.
     struct Frames: Equatable {
         var left: CGRect
         var resizeArea: CGRect
         var right: CGRect
     }
 
-    /// The width the two panes share, inside the insets and beside the resize area.
-    static func availableWidth(totalWidth: CGFloat) -> CGFloat {
-        max(totalWidth - 2 * contentInset - resizeAreaWidth, 0)
+    static func minimumPaneLength(_ orientation: TerminalSplit.Orientation) -> CGFloat {
+        orientation == .sideBySide ? minimumPaneWidth : minimumPaneHeight
     }
 
-    /// `fraction` kept where each pane stays at least `minimumPaneWidth`; a window too narrow for two such
-    /// panes splits evenly.
-    static func clampedFraction(_ fraction: CGFloat, totalWidth: CGFloat) -> CGFloat {
-        let availableWidth = availableWidth(totalWidth: totalWidth)
-        guard availableWidth >= minimumPaneWidth * 2 else { return evenFraction }
-        let minimumFraction = minimumPaneWidth / availableWidth
+    /// The split area's width side by side, or its height stacked: the length its panes share.
+    static func totalLength(of size: CGSize, _ orientation: TerminalSplit.Orientation) -> CGFloat {
+        orientation == .sideBySide ? size.width : size.height
+    }
+
+    /// The length the two panes share, inside the insets and beside the resize area.
+    static func availableLength(totalLength: CGFloat) -> CGFloat {
+        max(totalLength - 2 * contentInset - resizeAreaWidth, 0)
+    }
+
+    /// `fraction` kept where each pane stays at least its minimum; an area too small for two such panes splits evenly.
+    static func clampedFraction(
+        _ fraction: CGFloat,
+        totalLength: CGFloat,
+        orientation: TerminalSplit.Orientation = .sideBySide
+    ) -> CGFloat {
+        let availableLength = availableLength(totalLength: totalLength)
+        let minimumLength = minimumPaneLength(orientation)
+        guard availableLength >= minimumLength * 2 else { return evenFraction }
+        let minimumFraction = minimumLength / availableLength
         return min(max(fraction, minimumFraction), 1 - minimumFraction)
     }
 
-    static func paneWidths(fraction: CGFloat, totalWidth: CGFloat) -> PaneWidths {
-        let availableWidth = availableWidth(totalWidth: totalWidth)
-        let leading = (availableWidth * clampedFraction(fraction, totalWidth: totalWidth)).rounded()
-        return PaneWidths(leading: leading, trailing: availableWidth - leading)
+    static func paneLengths(
+        fraction: CGFloat,
+        totalLength: CGFloat,
+        orientation: TerminalSplit.Orientation = .sideBySide
+    ) -> PaneLengths {
+        let availableLength = availableLength(totalLength: totalLength)
+        let leading = (availableLength * clampedFraction(fraction, totalLength: totalLength, orientation: orientation)).rounded()
+        return PaneLengths(leading: leading, trailing: availableLength - leading)
     }
 
-    /// Every part's place in a split area of `size`: the panes run the area's height inside the insets, and the resize
-    /// area runs between them as tall as they are.
-    static func frames(fraction: CGFloat, size: CGSize) -> Frames {
-        let widths = paneWidths(fraction: fraction, totalWidth: size.width)
-        let height = max(size.height - 2 * contentInset, 0)
-        let left = CGRect(x: contentInset, y: contentInset, width: widths.leading, height: height)
-        let resizeArea = CGRect(x: left.maxX, y: contentInset, width: resizeAreaWidth, height: height)
-        let right = CGRect(x: resizeArea.maxX, y: contentInset, width: widths.trailing, height: height)
-        return Frames(left: left, resizeArea: resizeArea, right: right)
+    /// Every part's place in a split area of `size`: side by side, the panes run the area's height inside the insets,
+    /// and the resize area runs between them as tall as they are; stacked, the same turned on its side.
+    static func frames(fraction: CGFloat, size: CGSize, orientation: TerminalSplit.Orientation = .sideBySide) -> Frames {
+        let lengths = paneLengths(fraction: fraction, totalLength: totalLength(of: size, orientation), orientation: orientation)
+        switch orientation {
+        case .sideBySide:
+            let height = max(size.height - 2 * contentInset, 0)
+            let left = CGRect(x: contentInset, y: contentInset, width: lengths.leading, height: height)
+            let resizeArea = CGRect(x: left.maxX, y: contentInset, width: resizeAreaWidth, height: height)
+            let right = CGRect(x: resizeArea.maxX, y: contentInset, width: lengths.trailing, height: height)
+            return Frames(left: left, resizeArea: resizeArea, right: right)
+        case .stacked:
+            let width = max(size.width - 2 * contentInset, 0)
+            let top = CGRect(x: contentInset, y: contentInset, width: width, height: lengths.leading)
+            let resizeArea = CGRect(x: contentInset, y: top.maxY, width: width, height: resizeAreaWidth)
+            let bottom = CGRect(x: contentInset, y: resizeArea.maxY, width: width, height: lengths.trailing)
+            return Frames(left: top, resizeArea: resizeArea, right: bottom)
+        }
     }
 
     /// The fraction after the resize area is dragged `delta` points from where it sat at `startFraction`, even when
-    /// that leaves the left pane within `snapDistance` of half the width, as Chrome's `CalculateRatioWithSnapPoints`.
-    static func fraction(startingAt startFraction: CGFloat, draggedBy delta: CGFloat, totalWidth: CGFloat) -> CGFloat {
-        let availableWidth = availableWidth(totalWidth: totalWidth)
-        guard availableWidth > 0 else { return evenFraction }
-        let leftWidth = startFraction * availableWidth + delta
-        guard abs(leftWidth - evenFraction * availableWidth) >= snapDistance else { return evenFraction }
-        return clampedFraction(leftWidth / availableWidth, totalWidth: totalWidth)
+    /// that leaves the first pane within `snapDistance` of half the length, as Chrome's `CalculateRatioWithSnapPoints`.
+    static func fraction(
+        startingAt startFraction: CGFloat,
+        draggedBy delta: CGFloat,
+        totalLength: CGFloat,
+        orientation: TerminalSplit.Orientation = .sideBySide
+    ) -> CGFloat {
+        let availableLength = availableLength(totalLength: totalLength)
+        guard availableLength > 0 else { return evenFraction }
+        let leadingLength = startFraction * availableLength + delta
+        guard abs(leadingLength - evenFraction * availableLength) >= snapDistance else { return evenFraction }
+        return clampedFraction(leadingLength / availableLength, totalLength: totalLength, orientation: orientation)
     }
 }
