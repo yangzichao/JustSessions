@@ -40,13 +40,14 @@ struct HostFixAgentPromptTests {
         #expect(task.hasPrefix("Fix what JustSessions' host check found on devbox.\n"))
         #expect(task.contains(report.plainText.trimmingCharacters(in: .newlines)))
         #expect(task.contains("exec /usr/bin/env JUSTSESSIONS=1 \"$SHELL\" -lic '<command>'"))
-        // The tab command the app really runs, for the tab the check came from.
-        #expect(task.contains(RemoteCLICommandBuilder.remoteCommand(
-            provider: .codex,
-            projectPath: "/srv/project",
-            arguments: [],
-            tmuxSessionName: "justsessions-codex-<session id>"
-        )))
+        // The parts of the tab command the app really runs, for the tab the check came from.
+        #expect(task.contains(RemoteCLICommandBuilder.remoteCommand(provider: .codex, projectPath: "/srv/project", arguments: [])))
+        #expect(task.contains("`tmux new-session -A -s justsessions-codex-<session id> '<pane command>'`"))
+        for option in RemoteTmuxSessionOptions.setOptionCommands(for: .codex, usingHostPrefix: false) {
+            #expect(task.contains("`\(option)`"))
+        }
+        #expect(task.contains("`tmux list-panes -a -F '#{session_name}: #{pane_start_command}'`"))
+        #expect(!task.contains("exec sh -c"))
         #expect(task.contains("justsessions-claude-new-1a2b3c4d"))
         #expect(task.contains("Before ending a tmux server, list its sessions with the tmux that started it"))
         #expect(task.contains(AppLinks.newGitHubIssueURL.absoluteString))
