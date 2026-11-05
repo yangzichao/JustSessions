@@ -11,14 +11,13 @@ extension ConversationStore {
         defer { persistOpenTabs() }
         let tabsByID = Dictionary(uniqueKeysWithValues: terminalSessions.map { ($0.id, $0) })
         let tabs = unit.tabs.compactMap { tabsByID[$0.id] }
-        let stackedSplitIDs = stackedSplitViewIDs.intersection(unit.splits.map(\.id))
         let leavingIDs = Set(tabIDs)
         let tabToSelect = selectedTerminalID.map(leavingIDs.contains) == true
             ? tabToSelect(afterTakingOut: leavingIDs)
             : selectedTerminalID
         apply(strip)
         selectTerminal(tabToSelect)
-        return TabsBetweenWindows(unit: unit, tabs: tabs, stackedSplitIDs: stackedSplitIDs)
+        return TabsBetweenWindows(unit: unit, tabs: tabs)
     }
 
     /// Puts tabs taken out of another window here at `placement`, showing `tabID`. Their CLIs ending refreshes this
@@ -34,8 +33,6 @@ extension ConversationStore {
         var strip = tabStrip
         strip.bringIn(incoming.unit, at: placement)
         apply(strip, bringingIn: incoming.tabs)
-        // After the splits are here: a layout kept for a split not open here would be forgotten.
-        stackedSplitViewIDs.formUnion(incoming.stackedSplitIDs)
         selectTerminal(tabID)
     }
 

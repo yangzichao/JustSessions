@@ -11,11 +11,14 @@ struct TerminalSplitChooser: Identifiable, Equatable {
     var tabID: UUID
     /// The list's side; the tab shows on the other.
     var side: TerminalSplit.Side
+    /// How the tab and the list share the area; the split the chooser becomes takes it.
+    var orientation: TerminalSplit.Orientation
 
-    init(id: UUID = UUID(), tabID: UUID, side: TerminalSplit.Side = .right) {
+    init(id: UUID = UUID(), tabID: UUID, side: TerminalSplit.Side = .right, orientation: TerminalSplit.Orientation = .sideBySide) {
         self.id = id
         self.tabID = tabID
         self.side = side
+        self.orientation = orientation
     }
 
     /// The side the tab beside the list shows on.

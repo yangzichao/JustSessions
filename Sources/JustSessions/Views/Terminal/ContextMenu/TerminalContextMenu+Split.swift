@@ -46,16 +46,13 @@ extension TerminalContextMenu {
         canStartNewTabs: Bool,
         perform: @escaping (TerminalTabSplitAction) -> Void
     ) -> NSMenuItem {
-        // As the project's New session menu says (`ProjectNewSessionMenu`).
-        let noCLIFoundItems: [NSMenuItem] = providers.isEmpty
-            ? [ActionMenuItem(title: NewSessionProviderAvailability.noCLIFoundMessage(on: host, language: language ?? AppLanguageStore.shared.language), isEnabled: false) {}]
-            : []
-        let newTabItems: [NSMenuItem] = noCLIFoundItems + providers.map { provider -> NSMenuItem in
-            let item = ActionMenuItem(title: provider.rawValue, isEnabled: canStartNewTabs) {
-                perform(.openInNewSplit(.session(provider), orientation))
-            }
-            item.image = provider.menuItemImage()
-            return item
+        let newTabItems: [NSMenuItem] = NewSessionProviderMenuItems.appKitItems(
+            providers: providers,
+            host: host,
+            language: language ?? AppLanguageStore.shared.language,
+            isEnabled: canStartNewTabs
+        ) { provider in
+            perform(.openInNewSplit(.session(provider), orientation))
         } + [
             ActionMenuItem(title: localized("Terminal"), systemImage: "apple.terminal", isEnabled: canStartNewTabs) {
                 perform(.openInNewSplit(.terminal, orientation))

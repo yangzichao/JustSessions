@@ -2,9 +2,9 @@ import Foundation
 
 /// Two open tabs linked side by side, or one above the other, as Chrome links a pair of split tabs: while either is
 /// selected, both terminals show. Which shows on the left, or on top, is not kept here: it is the one that comes first
-/// in the tab bar, as in Chrome, so the panes can never disagree with the tabs. How the two are laid out is kept by the
-/// store, by split id; see `ConversationStore.orientation(ofSplitView:)`. The split outlives the selection, so showing another tab and coming
-/// back to either tab shows the split again.
+/// in the tab bar, as in Chrome, so the panes can never disagree with the tabs. How the two are laid out is the split's
+/// own `orientation`, so it moves with the split, as to another window, and goes when the split does. The split
+/// outlives the selection, so showing another tab and coming back to either tab shows the split again.
 struct TerminalSplit: Identifiable, Equatable {
     /// The split's two tabs by their places in the tab bar: the left pane's tab and the right pane's.
     struct Sides: Equatable {
@@ -49,12 +49,15 @@ struct TerminalSplit: Identifiable, Equatable {
     /// two projects shows in neither project's group but as a unit of its own among the groups, under a key of its
     /// own; see `groupKey(ofSplitAcrossProjects:)` and `TerminalTabStrip`.
     let groupKey: String
+    /// Side by side unless stacked; the tab strip's rules keep it as they reorder, swap or regroup the split's tabs.
+    var orientation: Orientation
 
-    init(id: UUID = UUID(), tabIDs: (UUID, UUID), groupKey: String) {
+    init(id: UUID = UUID(), tabIDs: (UUID, UUID), groupKey: String, orientation: Orientation = .sideBySide) {
         precondition(tabIDs.0 != tabIDs.1, "A split links two different tabs")
         self.id = id
         self.tabIDs = [tabIDs.0, tabIDs.1]
         self.groupKey = groupKey
+        self.orientation = orientation
     }
 
     /// The group key of the split across two projects with this id, which no project key equals: project keys are
@@ -87,12 +90,12 @@ struct TerminalSplit: Identifiable, Equatable {
     /// tab outside it.
     func replacing(_ oldID: UUID, with newID: UUID) -> TerminalSplit {
         guard let partner = partner(of: oldID), partner != newID else { return self }
-        return TerminalSplit(id: id, tabIDs: (partner, newID), groupKey: groupKey)
+        return TerminalSplit(id: id, tabIDs: (partner, newID), groupKey: groupKey, orientation: orientation)
     }
 
     /// The same split, showing in the group `groupKey`.
     func regrouped(into groupKey: String) -> TerminalSplit {
         let tabIDs = Array(tabIDs)
-        return TerminalSplit(id: id, tabIDs: (tabIDs[0], tabIDs[1]), groupKey: groupKey)
+        return TerminalSplit(id: id, tabIDs: (tabIDs[0], tabIDs[1]), groupKey: groupKey, orientation: orientation)
     }
 }

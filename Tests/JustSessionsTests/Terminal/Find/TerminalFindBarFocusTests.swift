@@ -51,12 +51,24 @@ struct TerminalFindBarFocusTests {
 
         var terminalHasTheKeyboard: Bool { window.firstResponder === tab.terminalView }
 
-        /// Waits for the condition as `expectEventually` does, laying the window out before each check.
+        /// Waits for the condition as `expectEventually` does, laying the window out before each check. A failure says
+        /// who had the keyboard and how far the bar got, since the wait has still run out in a full run now and then.
         func expectEventually(_ condition: () -> Bool, sourceLocation: SourceLocation = #_sourceLocation) async throws {
-            try await JustSessionsTests.expectEventually({
+            let clock = ContinuousClock()
+            let deadline = clock.now + .seconds(120)
+            while true {
                 window.contentView!.layoutSubtreeIfNeeded()
-                return condition()
-            }, sourceLocation: sourceLocation)
+                if condition() || clock.now >= deadline { break }
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            #expect(condition(), "\(keyboardState)", sourceLocation: sourceLocation)
+        }
+
+        private var keyboardState: String {
+            let firstResponder = window.firstResponder.map { String(describing: type(of: $0)) } ?? "none"
+            return "first responder: \(firstResponder), bar shown: \(tab.findState.isPresented), "
+                + "field focused: \(tab.findState.isFieldFocused), focus count: \(focusCount), "
+                + "window visible: \(window.isVisible), occluded: \(!window.occlusionState.contains(.visible))"
         }
 
         func tearDown() {

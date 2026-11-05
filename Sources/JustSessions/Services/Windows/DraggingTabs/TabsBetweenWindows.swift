@@ -6,6 +6,4 @@ struct TabsBetweenWindows {
     let unit: DetachedTabStripUnit
     /// The unit's tabs, in its order.
     let tabs: [TerminalSession]
-    /// The unit's splits whose views are stacked, which stay stacked in the other window (SPL-18).
-    var stackedSplitIDs: Set<UUID> = []
 }
