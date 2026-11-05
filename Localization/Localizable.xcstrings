@@ -66,6 +66,16 @@
         }
       }
     },
+    "%@ - Bottom view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ - 下方视图"
+          }
+        }
+      }
+    },
     "%@ - Left view": {
       "localizations": {
         "zh-Hans": {
@@ -82,6 +92,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ - 右侧视图"
+          }
+        }
+      }
+    },
+    "%@ - Top view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ - 上方视图"
           }
         }
       }
@@ -1834,6 +1854,16 @@
         }
       }
     },
+    "Bottom view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下方视图"
+          }
+        }
+      }
+    },
     "Branch": {
       "localizations": {
         "zh-Hans": {
@@ -2198,6 +2228,16 @@
         }
       }
     },
+    "Choose a tab - Bottom view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择标签页 - 下方视图"
+          }
+        }
+      }
+    },
     "Choose a tab - Left view": {
       "localizations": {
         "zh-Hans": {
@@ -2214,6 +2254,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "选择标签页 - 右侧视图"
+          }
+        }
+      }
+    },
+    "Choose a tab - Top view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择标签页 - 上方视图"
           }
         }
       }
@@ -9385,6 +9435,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "工具"
+          }
+        }
+      }
+    },
+    "Top view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上方视图"
           }
         }
       }

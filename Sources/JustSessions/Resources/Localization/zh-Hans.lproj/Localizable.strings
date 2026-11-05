@@ -12,10 +12,14 @@
 	<string>%@（未安装）</string>
 	<key>%@ (not supported)</key>
 	<string>%@（不支持）</string>
+	<key>%@ - Bottom view</key>
+	<string>%@ - 下方视图</string>
 	<key>%@ - Left view</key>
 	<string>%@ - 左侧视图</string>
 	<key>%@ - Right view</key>
 	<string>%@ - 右侧视图</string>
+	<key>%@ - Top view</key>
+	<string>%@ - 上方视图</string>
 	<key>%@ Click to check %@.</key>
 	<string>%@ 点按以检查 %@。</string>
 	<key>%@ Click to see what the check found.</key>
@@ -320,6 +324,8 @@
 	<string>书签</string>
 	<key>Bookmarks (⌘D, ⌘', ⇧⌘')</key>
 	<string>书签（⌘D、⌘'、⇧⌘'）</string>
+	<key>Bottom view</key>
+	<string>下方视图</string>
 	<key>Branch</key>
 	<string>分支</string>
 	<key>Branch %lld sessions</key>
@@ -388,10 +394,14 @@
 	<string>在侧栏中选择一个会话，阅读其对话内容。</string>
 	<key>Choose a tab</key>
 	<string>选择标签页</string>
+	<key>Choose a tab - Bottom view</key>
+	<string>选择标签页 - 下方视图</string>
 	<key>Choose a tab - Left view</key>
 	<string>选择标签页 - 左侧视图</string>
 	<key>Choose a tab - Right view</key>
 	<string>选择标签页 - 右侧视图</string>
+	<key>Choose a tab - Top view</key>
+	<string>选择标签页 - 上方视图</string>
 	<key>Choose a tab to add to split view</key>
 	<string>选择要添加到拆分视图的标签页</string>
 	<key>Choose a tab to show beside this one</key>
@@ -1774,6 +1784,8 @@
 	<string>提示</string>
 	<key>Tool</key>
 	<string>工具</string>
+	<key>Top view</key>
+	<string>上方视图</string>
 	<key>Trust %@?</key>
 	<string>信任 %@？</string>
 	<key>Trust and connect</key>

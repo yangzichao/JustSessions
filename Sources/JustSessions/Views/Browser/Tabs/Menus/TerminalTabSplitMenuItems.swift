@@ -8,6 +8,8 @@ struct TerminalTabSplitMenuItems: View {
     let splitMenu: TerminalTabSplitMenu?
     let onSplitAction: (TerminalTabSplitAction) -> Void
 
+    @Environment(\.locale) private var locale
+
     var body: some View {
         switch splitMenu {
         case .newSplitWithSelectedTab:
@@ -18,9 +20,9 @@ struct TerminalTabSplitMenuItems: View {
                 onSplitAction(.newSplitWithSelectedTab(.stacked))
             }
             Divider()
-        case .addTabToNewSplit(let candidates, let providers, let canStartNewTabs):
-            newSplitMenu(.sideBySide, candidates: candidates, providers: providers, canStartNewTabs: canStartNewTabs)
-            newSplitMenu(.stacked, candidates: candidates, providers: providers, canStartNewTabs: canStartNewTabs)
+        case .addTabToNewSplit(let candidates, let providers, let host, let canStartNewTabs):
+            newSplitMenu(.sideBySide, candidates: candidates, providers: providers, host: host, canStartNewTabs: canStartNewTabs)
+            newSplitMenu(.stacked, candidates: candidates, providers: providers, host: host, canStartNewTabs: canStartNewTabs)
             Divider()
         case .moveIntoShownSplit(let orientation):
             Menu {
@@ -68,10 +70,15 @@ struct TerminalTabSplitMenuItems: View {
         _ orientation: TerminalSplit.Orientation,
         candidates: [TerminalTabSplitCandidate],
         providers: [ConversationProvider],
+        host: SessionHost,
         canStartNewTabs: Bool
     ) -> some View {
         Menu {
             Group {
+                // As the project's New session menu says (`ProjectNewSessionMenu`).
+                if providers.isEmpty {
+                    Text(NewSessionProviderAvailability.noCLIFoundMessage(on: host, language: AppInterfaceLanguage(identifier: locale.identifier)))
+                }
                 ForEach(providers) { provider in
                     Button {
                         onSplitAction(.openInNewSplit(.session(provider), orientation))

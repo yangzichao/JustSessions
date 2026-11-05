@@ -172,6 +172,10 @@ struct WorkspaceDetailView: View {
             // Forget the pane widths of splits and split choosers that are gone.
             splitFractions = splitFractions.filter { splitViewIDs.contains($0.key) }
         }
+        .onChange(of: store.stackedSplitViewIDs) { oldStackedIDs, newStackedIDs in
+            // A split laid out the other way starts even, as the highlight of a pane dragged there shows (SPL-18).
+            for splitViewID in oldStackedIDs.symmetricDifference(newStackedIDs) { splitFractions[splitViewID] = nil }
+        }
     }
 
     /// ⌘F in the selected tab: its conversation's Find in a reading window, or the tab's find bar; see

@@ -8,6 +8,8 @@ struct SidebarOpenTabRow<MenuItems: View>: View {
     let projectDisplayName: String
     /// The tab's side of its split, or nil for a tab in no split.
     var splitSide: TerminalSplit.Side? = nil
+    /// How the tab's split, or split chooser, lays out its views: left or right, or top or bottom.
+    var splitOrientation: TerminalSplit.Orientation = .sideBySide
     let isSelected: Bool
     let onSelect: () -> Void
     /// The tab's menu in the tab bar, or, while the row is one of several selected, the menu for them all.
@@ -26,7 +28,7 @@ struct SidebarOpenTabRow<MenuItems: View>: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                 if let splitSide {
-                    Image(systemName: splitSide == .left ? "rectangle.lefthalf.inset.filled" : "rectangle.righthalf.inset.filled")
+                    Image(systemName: splitSideSystemImage(splitSide))
                         .font(ThemeFont.glyph(.control))
                         .foregroundStyle(ThemePalette.secondaryText)
                         .accessibilityHidden(true)
@@ -49,10 +51,21 @@ struct SidebarOpenTabRow<MenuItems: View>: View {
 
     /// Which view of its split the tab is, as the tab bar's tabs say; nothing for a tab in no split.
     private var splitAccessibilityValue: Text {
-        switch splitSide {
-        case .left: Text("Left view")
-        case .right: Text("Right view")
-        case nil: Text(verbatim: "")
+        switch (splitSide, splitOrientation) {
+        case (.left, .sideBySide): Text("Left view")
+        case (.right, .sideBySide): Text("Right view")
+        case (.left, .stacked): Text("Top view")
+        case (.right, .stacked): Text("Bottom view")
+        case (nil, _): Text(verbatim: "")
+        }
+    }
+
+    private func splitSideSystemImage(_ side: TerminalSplit.Side) -> String {
+        switch (side, splitOrientation) {
+        case (.left, .sideBySide): "rectangle.lefthalf.inset.filled"
+        case (.right, .sideBySide): "rectangle.righthalf.inset.filled"
+        case (.left, .stacked): "rectangle.tophalf.inset.filled"
+        case (.right, .stacked): "rectangle.bottomhalf.inset.filled"
         }
     }
 

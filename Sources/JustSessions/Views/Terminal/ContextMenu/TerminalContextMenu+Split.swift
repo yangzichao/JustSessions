@@ -7,9 +7,9 @@ extension TerminalContextMenu {
             store.performSplitAction(action, fromTab: tab.id, closeTab: onCloseTab)
         }
         switch store.splitMenu(forTab: tab.id) {
-        case .addTabToNewSplit(let candidates, let providers, let canStartNewTabs):
+        case .addTabToNewSplit(let candidates, let providers, let host, let canStartNewTabs):
             let newSplitItems = [TerminalSplit.Orientation.sideBySide, .stacked].map { orientation in
-                newSplitItem(orientation, candidates: candidates, providers: providers, canStartNewTabs: canStartNewTabs, perform: perform)
+                newSplitItem(orientation, candidates: candidates, providers: providers, host: host, canStartNewTabs: canStartNewTabs, perform: perform)
             }
             return newSplitItems + [.separator()]
         case .arrangeSplit(let orientation):
@@ -42,10 +42,15 @@ extension TerminalContextMenu {
         _ orientation: TerminalSplit.Orientation,
         candidates: [TerminalTabSplitCandidate],
         providers: [ConversationProvider],
+        host: SessionHost,
         canStartNewTabs: Bool,
         perform: @escaping (TerminalTabSplitAction) -> Void
     ) -> NSMenuItem {
-        let newTabItems: [NSMenuItem] = providers.map { provider in
+        // As the project's New session menu says (`ProjectNewSessionMenu`).
+        let noCLIFoundItems: [NSMenuItem] = providers.isEmpty
+            ? [ActionMenuItem(title: NewSessionProviderAvailability.noCLIFoundMessage(on: host, language: language ?? AppLanguageStore.shared.language), isEnabled: false) {}]
+            : []
+        let newTabItems: [NSMenuItem] = noCLIFoundItems + providers.map { provider in
             ActionMenuItem(title: provider.rawValue, isEnabled: canStartNewTabs) {
                 perform(.openInNewSplit(.session(provider), orientation))
             }

@@ -70,8 +70,9 @@ extension ConversationStore {
         var strip = tabStrip
         guard strip.addSplit(joining: tabID, beside: chooser.tabID, on: chooser.side, splitID: chooser.id) != nil else { return }
         defer { persistOpenTabs() }
-        terminalSplitChoosers.removeAll { $0.id == chooserID }
+        // The split first, so the chooser's layout, kept by the id they share, has a split to stay with.
         apply(strip)
+        terminalSplitChoosers.removeAll { $0.id == chooserID }
         selectTerminal(tabID)
         chosenTab.startNowThatItIsShown()
     }

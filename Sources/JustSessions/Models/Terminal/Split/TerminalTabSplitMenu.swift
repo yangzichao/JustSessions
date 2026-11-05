@@ -11,6 +11,8 @@ enum TerminalTabSplitMenu {
     case addTabToNewSplit(
         candidates: [TerminalTabSplitCandidate],
         newSessionProviders: [ConversationProvider],
+        /// Where the new sessions start, which says where no CLI was found when there are none.
+        host: SessionHost,
         canStartNewTabs: Bool
     )
     /// A tab in no split, while the selected tab is in a split laid out this way: it can take the place of either of

@@ -45,15 +45,14 @@ extension ConversationStore {
 
     /// Opens a tab with `openTab`, such as a new session in the selected tab's project, and shows it on `side` of a new
     /// split with the tab selected before, laid out as `orientation`. While that tab is in a split already, or no tab
-    /// was selected, the new tab opens on its own, as it would otherwise.
+    /// was selected, the new tab opens on its own, as it would otherwise. The new tab stays selected throughout, so it
+    /// never leaves the screen, which would refresh its host before its CLI saved anything (SPL-10).
     func openTabInNewSplit(on side: TerminalSplit.Side, orientation: TerminalSplit.Orientation, _ openTab: () -> Void) {
         let shownTabID = selectedTerminalID
         openTab()
         guard let shownTabID, let newTabID = selectedTerminalID, newTabID != shownTabID,
               !isInSplitOrChooser(shownTabID), !isInSplitOrChooser(newTabID) else { return }
-        selectTerminal(shownTabID)
-        splitSelectedTerminal(with: newTabID, on: side, orientation: orientation)
-        selectTerminal(newTabID)
+        splitTerminal(shownTabID, with: newTabID, on: side, orientation: orientation)
     }
 
     /// Splits and choosers that are gone take their layout with them.

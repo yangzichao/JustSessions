@@ -21,6 +21,7 @@ extension ConversationStore {
         return .addTabToNewSplit(
             candidates: candidates,
             newSessionProviders: newSessionProviders(on: location.host),
+            host: location.host,
             canStartNewTabs: location.canStartSessions
         )
     }

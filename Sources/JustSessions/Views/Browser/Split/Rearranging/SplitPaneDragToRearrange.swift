@@ -9,6 +9,10 @@ import SwiftUI
 @MainActor
 final class SplitPaneDragToRearrange {
     static let shared = SplitPaneDragToRearrange()
+    /// How far the pointer moves from where it pressed the toolbar before the drag places the pane anywhere. The
+    /// toolbar sits in a pane's bottom corner, already over an edge's third, so a click whose pointer slips a few points,
+    /// on the toolbar's × too, must not lay the split out again.
+    static let distanceBeforePlacing: CGFloat = 24
 
     private struct Drag {
         let tabID: UUID
@@ -21,10 +25,12 @@ final class SplitPaneDragToRearrange {
 
     private init() {}
 
-    /// Follows the pointer, highlighting where the tab, which the highlight names `title`, would sit.
-    func follow(_ tabID: UUID, titled title: String, in store: ConversationStore) {
+    /// Follows the pointer, `translation` from where it pressed, highlighting where the tab, which the highlight names
+    /// `title`, would sit; nowhere until it has moved `distanceBeforePlacing`.
+    func follow(_ tabID: UUID, titled title: String, translation: CGSize, in store: ConversationStore) {
         guard store.shownSplit?.contains(tabID) == true else { return cancel() }
-        let place = placeOnTerminals(at: NSEvent.mouseLocation, in: store)
+        let hasMovedFarEnough = hypot(translation.width, translation.height) >= Self.distanceBeforePlacing
+        let place = hasMovedFarEnough ? placeOnTerminals(at: NSEvent.mouseLocation, in: store) : nil
         drag = Drag(tabID: tabID, store: store, place: place)
         splitDropTargets.show(place.map { TerminalSplitDropTargets.Target(storeID: ObjectIdentifier(store), place: $0, title: title) })
     }
@@ -74,7 +80,9 @@ private struct SplitPaneDragToRearrangeGesture: ViewModifier {
             .simultaneousGesture(
                 DragGesture(minimumDistance: 4, coordinateSpace: .global)
                     .updating($isDragging) { _, isDragging, _ in isDragging = true }
-                    .onChanged { _ in SplitPaneDragToRearrange.shared.follow(tabID, titled: title, in: store) }
+                    .onChanged { value in
+                        SplitPaneDragToRearrange.shared.follow(tabID, titled: title, translation: value.translation, in: store)
+                    }
             )
             .onChange(of: isDragging) { _, isDragging in
                 if !isDragging { SplitPaneDragToRearrange.shared.drop() }

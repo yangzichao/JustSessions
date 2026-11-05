@@ -135,6 +135,22 @@ struct TerminalSplitOrientationStoreTests {
         expectSplitRules(store)
     }
 
+    /// Split right or Split down with a new session: its tab never leaves the screen on its way into the split, which
+    /// would refresh its host, an SSH listing on a remote one, before its CLI saved anything (SPL-10).
+    @Test func aNewSessionOpenedIntoANewSplitRefreshesNoHost() throws {
+        let (store, cleanUp) = try makeStore()
+        defer { cleanUp() }
+        let first = open(store, makeTab())
+        store.selectTerminal(first.id)
+        let newSessionTab = makeTab(action: .new)
+
+        store.openTabInNewSplit(on: .right, orientation: .sideBySide) { store.openTerminal(newSessionTab) }
+
+        #expect(store.sides(of: try #require(store.shownSplit)) == TerminalSplit.Sides(left: first.id, right: newSessionTab.id))
+        #expect(store.selectedTerminalID == newSessionTab.id)
+        #expect(store.hostRefreshStatuses[.thisMac] == nil)
+    }
+
     @Test func aNewTabOpensOnItsOwnWhileTheSelectedTabIsInASplit() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -158,7 +174,7 @@ struct TerminalSplitOrientationStoreTests {
         let third = open(store, makeTab())
         store.selectTerminal(first.id)
 
-        guard case .addTabToNewSplit(let candidates, _, _) = store.splitMenu(forTab: first.id) else {
+        guard case .addTabToNewSplit(let candidates, _, _, _) = store.splitMenu(forTab: first.id) else {
             Issue.record("The selected tab in no split offers new splits")
             return
         }
@@ -213,6 +229,21 @@ struct TerminalSplitOrientationStoreTests {
         #expect(store.orientation(ofSplitView: split.id) == .stacked)
     }
 
+    @Test func aClosedSplitChooserForgetsItsLayout() throws {
+        let (store, cleanUp) = try makeStore()
+        defer { cleanUp() }
+        let first = open(store, makeTab())
+        _ = open(store, makeTab())
+        store.selectTerminal(first.id)
+        store.openSplitChooser()
+        let chooser = try #require(store.shownSplitChooser)
+        store.setOrientation(.stacked, ofSplitView: chooser.id)
+
+        store.closeSplitChooser(chooser.id)
+
+        #expect(store.stackedSplitViewIDs.isEmpty)
+    }
+
     // MARK: - Helpers
 
     private func makeStore() throws -> (ConversationStore, () -> Void) {
@@ -229,13 +260,13 @@ struct TerminalSplitOrientationStoreTests {
         return tab
     }
 
-    private func makeTab(projectPath: String = "/tmp/app") -> TerminalSession {
+    private func makeTab(projectPath: String = "/tmp/app", action: ConversationAction = .resume) -> TerminalSession {
         TerminalSession(
             engine: .swiftTerm,
             conversation: nil,
             provider: .claude,
             projectPath: projectPath,
-            action: .resume,
+            action: action,
             displayTitle: "Tab in \(projectPath)",
             command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [], workingDirectory: projectPath, environment: [])
         )

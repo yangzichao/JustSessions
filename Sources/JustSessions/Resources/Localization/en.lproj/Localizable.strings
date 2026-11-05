@@ -16,10 +16,14 @@
 	<string>%@ (not installed)</string>
 	<key>%@ (not supported)</key>
 	<string>%@ (not supported)</string>
+	<key>%@ - Bottom view</key>
+	<string>%@ - Bottom view</string>
 	<key>%@ - Left view</key>
 	<string>%@ - Left view</string>
 	<key>%@ - Right view</key>
 	<string>%@ - Right view</string>
+	<key>%@ - Top view</key>
+	<string>%@ - Top view</string>
 	<key>%@ Click to check %@.</key>
 	<string>%@ Click to check %@.</string>
 	<key>%@ Click to see what the check found.</key>
@@ -300,6 +304,8 @@
 	<string>Bookmarks</string>
 	<key>Bookmarks (⌘D, ⌘', ⇧⌘')</key>
 	<string>Bookmarks (⌘D, ⌘', ⇧⌘')</string>
+	<key>Bottom view</key>
+	<string>Bottom view</string>
 	<key>Branch</key>
 	<string>Branch</string>
 	<key>Browse and resume sessions on another machine.</key>
@@ -364,10 +370,14 @@
 	<string>Choose a session in the sidebar to read its conversation.</string>
 	<key>Choose a tab</key>
 	<string>Choose a tab</string>
+	<key>Choose a tab - Bottom view</key>
+	<string>Choose a tab - Bottom view</string>
 	<key>Choose a tab - Left view</key>
 	<string>Choose a tab - Left view</string>
 	<key>Choose a tab - Right view</key>
 	<string>Choose a tab - Right view</string>
+	<key>Choose a tab - Top view</key>
+	<string>Choose a tab - Top view</string>
 	<key>Choose a tab to add to split view</key>
 	<string>Choose a tab to add to split view</string>
 	<key>Choose a tab to show beside this one</key>
@@ -1716,6 +1726,8 @@
 	<string>Tips</string>
 	<key>Tool</key>
 	<string>Tool</string>
+	<key>Top view</key>
+	<string>Top view</string>
 	<key>Trust %@?</key>
 	<string>Trust %@?</string>
 	<key>Trust and connect</key>

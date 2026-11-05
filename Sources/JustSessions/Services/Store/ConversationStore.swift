@@ -91,7 +91,10 @@ final class ConversationStore {
     /// Splits whose other view is still to be chosen, each beside a tab open here in no split, at most one per tab. Like
     /// a split, one outlives the selection and shows while its tab is selected; see `ConversationStore+SplitChooser`.
     var terminalSplitChoosers: [TerminalSplitChooser] = [] {
-        didSet { if shownSplitChooser == nil { selectsShownSplitChooser = false } }
+        didSet {
+            if shownSplitChooser == nil { selectsShownSplitChooser = false }
+            forgetOrientationsOfClosedSplitViews()
+        }
     }
     /// The shown split chooser has the keyboard rather than the tab beside it, as Chrome's split view page is the
     /// active tab while it shows. Selecting another tab gives the keyboard back to tabs.
@@ -952,10 +955,21 @@ final class ConversationStore {
         on side: TerminalSplit.Side? = nil,
         orientation: TerminalSplit.Orientation = .sideBySide
     ) {
-        guard let selectedTerminalID, let joiningTab = terminalSessions.first(where: { $0.id == id }),
-              splitChooser(beside: id) == nil, splitChooser(beside: selectedTerminalID) == nil else { return }
+        guard let selectedTerminalID else { return }
+        splitTerminal(selectedTerminalID, with: id, on: side, orientation: orientation)
+    }
+
+    /// As `splitSelectedTerminal`, beside `tabID` rather than the selected tab; the selection stays as it is.
+    func splitTerminal(
+        _ tabID: UUID,
+        with id: UUID,
+        on side: TerminalSplit.Side?,
+        orientation: TerminalSplit.Orientation
+    ) {
+        guard let joiningTab = terminalSessions.first(where: { $0.id == id }),
+              splitChooser(beside: id) == nil, splitChooser(beside: tabID) == nil else { return }
         var strip = tabStrip
-        guard let split = strip.addSplit(joining: id, beside: selectedTerminalID, on: side) else { return }
+        guard let split = strip.addSplit(joining: id, beside: tabID, on: side) else { return }
         defer { persistOpenTabs() }
         if orientation == .stacked { stackedSplitViewIDs.insert(split.id) }
         apply(strip)
