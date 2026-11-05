@@ -55,6 +55,21 @@ struct AppBundleInfoContractTests {
         #expect(workerSource.contains("\"https://github.com/yangzichao/JustSessions/releases/latest/download/appcast.xml\""))
     }
 
+    /// A CLI's voice input, such as Claude Code's `/voice`, records under the app's permission. Without the usage
+    /// description macOS never asks and gives silence; the hardened runtime also needs the audio-input entitlement.
+    @Test func programsInTheTerminalCanAskForTheMicrophone() throws {
+        let usageDescription = try #require(try Self.infoPlistTemplate()["NSMicrophoneUsageDescription"] as? String)
+        let entitlements = try #require(try PropertyListSerialization.propertyList(
+            from: Data(try RepositoryFiles.contents(of: "Scripts/JustSessions.entitlements").utf8),
+            format: nil
+        ) as? [String: Any])
+
+        #expect(!usageDescription.isEmpty)
+        #expect(entitlements["com.apple.security.device.audio-input"] as? Bool == true)
+        #expect(try RepositoryFiles.contents(of: "Scripts/build-app.sh")
+            .contains("--entitlements \"$project_directory/Scripts/JustSessions.entitlements\""))
+    }
+
     /// `plutil -replace` fills in the version at build time; each key it replaces is in the template.
     @Test func everyKeyTheScriptFillsInIsInTheTemplate() throws {
         let script = try RepositoryFiles.contents(of: "Scripts/build-app.sh")
