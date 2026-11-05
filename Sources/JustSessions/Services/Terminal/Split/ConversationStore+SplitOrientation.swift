@@ -1,11 +1,20 @@
 import Foundation
 
 /// How each split, or split chooser, lays out its two views: side by side, as in Chrome, unless stacked, one above the
-/// other. Kept by the split's id rather than in the split, as its panes' widths are, so the tab strip's rules, which
-/// know only the tabs' order, never change it. Splits are not saved across quits, and neither is this.
+/// other. Each keeps its own `orientation`, which a chooser hands to the split it becomes. Splits are not saved across
+/// quits, and neither is this.
 extension ConversationStore {
+    /// The split's, or split chooser's, layout; side by side for an id neither has.
     func orientation(ofSplitView id: UUID) -> TerminalSplit.Orientation {
-        stackedSplitViewIDs.contains(id) ? .stacked : .sideBySide
+        terminalSplits.first { $0.id == id }?.orientation
+            ?? terminalSplitChoosers.first { $0.id == id }?.orientation
+            ?? .sideBySide
+    }
+
+    /// The splits and split choosers laid out one above the other, by id, so a view can tell when one changes layout.
+    var stackedSplitViewIDs: Set<UUID> {
+        Set(terminalSplits.filter { $0.orientation == .stacked }.map(\.id)
+            + terminalSplitChoosers.filter { $0.orientation == .stacked }.map(\.id))
     }
 
     /// The id of the split the tab is in, or of the split chooser beside it; nil for a tab in neither.
@@ -26,10 +35,12 @@ extension ConversationStore {
     /// Lays the split's, or split chooser's, views out as `orientation`. Each keeps its tab and its side: the left view
     /// is the top one when stacked.
     func setOrientation(_ orientation: TerminalSplit.Orientation, ofSplitView id: UUID) {
-        guard terminalSplits.contains(where: { $0.id == id }) || terminalSplitChoosers.contains(where: { $0.id == id }) else { return }
-        switch orientation {
-        case .stacked: stackedSplitViewIDs.insert(id)
-        case .sideBySide: stackedSplitViewIDs.remove(id)
+        if terminalSplits.contains(where: { $0.id == id }) {
+            var strip = tabStrip
+            strip.setOrientation(orientation, ofSplit: id)
+            apply(strip)
+        } else if let index = terminalSplitChoosers.firstIndex(where: { $0.id == id }) {
+            if terminalSplitChoosers[index].orientation != orientation { terminalSplitChoosers[index].orientation = orientation }
         }
     }
 
@@ -70,19 +81,9 @@ extension ConversationStore {
         guard let joiningTab = terminalSessions.first(where: { $0.id == id }),
               splitChooser(beside: id) == nil, splitChooser(beside: tabID) == nil else { return }
         var strip = tabStrip
-        guard let split = strip.addSplit(joining: id, beside: tabID, on: side) else { return }
+        guard strip.addSplit(joining: id, beside: tabID, on: side, orientation: orientation) != nil else { return }
         defer { persistOpenTabs() }
         apply(strip)
-        // Once the split is open: a layout kept for an id no split or chooser has is forgotten.
-        if orientation == .stacked { stackedSplitViewIDs.insert(split.id) }
         joiningTab.startNowThatItIsShown()
-    }
-
-    /// Splits and choosers that are gone take their layout with them.
-    func forgetOrientationsOfClosedSplitViews() {
-        guard !stackedSplitViewIDs.isEmpty else { return }
-        let openIDs = Set(terminalSplits.map(\.id) + terminalSplitChoosers.map(\.id))
-        let kept = stackedSplitViewIDs.intersection(openIDs)
-        if kept != stackedSplitViewIDs { stackedSplitViewIDs = kept }
     }
 }

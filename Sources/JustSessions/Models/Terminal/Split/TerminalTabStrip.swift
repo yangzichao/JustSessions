@@ -73,7 +73,8 @@ struct TerminalTabStrip: Equatable {
         joining joiningID: UUID,
         beside pivotID: UUID,
         on joiningSide: TerminalSplit.Side? = nil,
-        splitID: UUID = UUID()
+        splitID: UUID = UUID(),
+        orientation: TerminalSplit.Orientation = .sideBySide
     ) -> TerminalSplit? {
         guard joiningID != pivotID,
               let joiningIndex = index(of: joiningID),
@@ -84,7 +85,7 @@ struct TerminalTabStrip: Equatable {
         let groupKey = tabs[joiningIndex].projectKey == pivotProjectKey
             ? pivotProjectKey
             : TerminalSplit.groupKey(ofSplitAcrossProjects: splitID)
-        let split = TerminalSplit(id: splitID, tabIDs: (pivotID, joiningID), groupKey: groupKey)
+        let split = TerminalSplit(id: splitID, tabIDs: (pivotID, joiningID), groupKey: groupKey, orientation: orientation)
         let joiningTab = tabs.remove(at: joiningIndex)
         let pivotIndexAfterRemoval = joiningIndex < pivotIndex ? pivotIndex - 1 : pivotIndex
         let side = joiningSide ?? (joiningIndex < pivotIndex ? .left : .right)
@@ -92,6 +93,12 @@ struct TerminalTabStrip: Equatable {
         splits.append(split)
         if split.spansProjects { move(split, afterGroupOf: pivotProjectKey) }
         return split
+    }
+
+    /// Lays the split's two views out as `orientation`; the tabs keep their places.
+    mutating func setOrientation(_ orientation: TerminalSplit.Orientation, ofSplit splitID: UUID) {
+        guard let splitIndex = splits.firstIndex(where: { $0.id == splitID }) else { return }
+        splits[splitIndex].orientation = orientation
     }
 
     /// The split's two tabs trade places in the tab bar, so its panes trade sides, as Chrome's ReverseTabsInSplit.

@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ProjectNewSessionMenu: View {
-    @Environment(\.locale) private var locale
     let location: ProjectLocation
     let projectDisplayName: String
     /// The tools installed on the project's host.
@@ -13,20 +12,7 @@ struct ProjectNewSessionMenu: View {
 
     var body: some View {
         Menu {
-            if providers.isEmpty {
-                Text(NewSessionProviderAvailability.noCLIFoundMessage(on: location.host, language: AppInterfaceLanguage(identifier: locale.identifier)))
-            }
-            ForEach(providers) { provider in
-                Button {
-                    onStart(provider)
-                } label: {
-                    Label {
-                        Text(provider.rawValue)
-                    } icon: {
-                        provider.iconImage()
-                    }
-                }
-            }
+            NewSessionProviderMenuItems(providers: providers, host: location.host, onStart: onStart)
             if let onOpenTerminal {
                 Divider()
                 Button("Terminal", systemImage: "apple.terminal", action: onOpenTerminal)

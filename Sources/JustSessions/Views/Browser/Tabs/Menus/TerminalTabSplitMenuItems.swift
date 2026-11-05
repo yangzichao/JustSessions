@@ -8,8 +8,6 @@ struct TerminalTabSplitMenuItems: View {
     let splitMenu: TerminalTabSplitMenu?
     let onSplitAction: (TerminalTabSplitAction) -> Void
 
-    @Environment(\.locale) private var locale
-
     var body: some View {
         switch splitMenu {
         case .newSplitWithSelectedTab:
@@ -75,20 +73,8 @@ struct TerminalTabSplitMenuItems: View {
     ) -> some View {
         Menu {
             Group {
-                // As the project's New session menu says (`ProjectNewSessionMenu`).
-                if providers.isEmpty {
-                    Text(NewSessionProviderAvailability.noCLIFoundMessage(on: host, language: AppInterfaceLanguage(identifier: locale.identifier)))
-                }
-                ForEach(providers) { provider in
-                    Button {
-                        onSplitAction(.openInNewSplit(.session(provider), orientation))
-                    } label: {
-                        Label {
-                            Text(provider.rawValue)
-                        } icon: {
-                            provider.iconImage()
-                        }
-                    }
+                NewSessionProviderMenuItems(providers: providers, host: host) { provider in
+                    onSplitAction(.openInNewSplit(.session(provider), orientation))
                 }
                 Button("Terminal", systemImage: "apple.terminal") {
                     onSplitAction(.openInNewSplit(.terminal, orientation))

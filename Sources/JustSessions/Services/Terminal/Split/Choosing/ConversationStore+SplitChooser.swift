@@ -68,10 +68,15 @@ extension ConversationStore {
               tabID != chooser.tabID,
               !isInSplitOrChooser(tabID) else { return }
         var strip = tabStrip
-        guard strip.addSplit(joining: tabID, beside: chooser.tabID, on: chooser.side, splitID: chooser.id) != nil else { return }
+        guard strip.addSplit(
+            joining: tabID,
+            beside: chooser.tabID,
+            on: chooser.side,
+            splitID: chooser.id,
+            orientation: chooser.orientation
+        ) != nil else { return }
         defer { persistOpenTabs() }
-        // Applying the split closes the chooser, its tab now in a split, once the split is there, so the chooser's
-        // layout, kept by the id they share, stays with it.
+        // Applying the split closes the chooser, its tab now in a split.
         apply(strip)
         selectTerminal(tabID)
         chosenTab.startNowThatItIsShown()
