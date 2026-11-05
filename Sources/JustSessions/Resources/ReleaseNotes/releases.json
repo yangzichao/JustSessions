@@ -1,5 +1,32 @@
 [
   {
+    "version": "1.2.22",
+    "publishedOn": "2026-11-04",
+    "title": {
+      "en": "Voice input in terminal tabs",
+      "zh-Hans": "终端标签页中的语音输入"
+    },
+    "sections": [
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Fixed voice input such as Claude Code's /voice in terminal tabs; macOS now asks for microphone access.",
+            "zh-Hans": "修复了终端标签页中 Claude Code 的 /voice 等语音输入；macOS 会先请求麦克风权限。"
+          },
+          {
+            "en": "Fixed clicks on a terminal's first row doing nothing after View → Show Tab Bar was turned on.",
+            "zh-Hans": "修复了开启「显示标签页栏」后，终端第一行点按无反应的问题。"
+          },
+          {
+            "en": "Fixed Fix with agent… on SSH hosts refusing to start because the prompt was too long.",
+            "zh-Hans": "修复了 SSH 主机上「让代理修复…」因提示词太长而无法启动的问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.2.21",
     "publishedOn": "2026-10-25",
     "title": {
