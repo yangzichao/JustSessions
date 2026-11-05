@@ -1,5 +1,32 @@
 [
   {
+    "version": "1.3.0",
+    "publishedOn": "2026-11-05",
+    "title": {
+      "en": "Stacked split views",
+      "zh-Hans": "上下拆分视图"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Stack a split's views one above the other by dragging a tab to the top or bottom edge.",
+            "zh-Hans": "将标签页拖到终端顶部或底部边缘，拆分视图即可上下堆叠。"
+          },
+          {
+            "en": "Split right and Split down in a tab's menu open a new session, a terminal, or another tab beside it.",
+            "zh-Hans": "标签页菜单中的「向右拆分」和「向下拆分」可在旁边打开新会话、终端或其他标签页。"
+          },
+          {
+            "en": "Drag a split view by its toolbar to another edge to move it, or to the middle to separate it.",
+            "zh-Hans": "拖动拆分视图的工具栏到其他边缘可移动它，拖到中间则取消拆分。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.2.22",
     "publishedOn": "2026-11-04",
     "title": {
