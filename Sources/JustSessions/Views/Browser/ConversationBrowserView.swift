@@ -324,6 +324,7 @@ private struct WorkspaceTabActionsValue: ViewModifier {
                 tabCount: store.terminalSessions.count,
                 hasSelectedTab: store.selectedTerminal != nil,
                 isSplitShown: store.isSplitViewShown,
+                shownSplitOrientation: store.shownSplitOrientation ?? .sideBySide,
                 canOpenSplitChooser: store.canOpenSplitChooser,
                 canReopenClosedTab: store.canReopenClosedTab,
                 isEnabled: isEnabled,
@@ -343,7 +344,10 @@ private struct WorkspaceTabActionsValue: ViewModifier {
                 separateShownSplit: { performOnShownSplitView(.separateViews) },
                 // The same close request as ⌘W, for the view on that side.
                 closeShownSplitView: { performOnShownSplitView(.closeView($0)) },
-                reverseShownSplit: { performOnShownSplitView(.reverseViews) }
+                reverseShownSplit: { performOnShownSplitView(.reverseViews) },
+                toggleShownSplitOrientation: {
+                    performOnShownSplitView(.setOrientation((store.shownSplitOrientation ?? .sideBySide).toggled))
+                }
             ))
             .background(WorkspaceTabCycleShortcuts(
                 isEnabled: isEnabled && !store.terminalSessions.isEmpty,

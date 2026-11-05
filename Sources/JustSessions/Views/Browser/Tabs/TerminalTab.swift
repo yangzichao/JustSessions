@@ -19,6 +19,8 @@ struct TerminalTab: View {
     let isActive: Bool
     /// The tab's side of its split, or nil for a tab in no split.
     let splitSide: TerminalSplit.Side?
+    /// How the tab's split lays out its views, which names its side for VoiceOver: left or right, or top or bottom.
+    let splitOrientation: TerminalSplit.Orientation
     /// A tab of a split across projects draws a shape of its own rather than joining its split's other tab.
     var drawsOwnShape = false
     /// The pointer is over the other tab of this tab's split, which lights this one too.
@@ -97,10 +99,12 @@ struct TerminalTab: View {
 
     /// A split's tab's title says which view it is, as Chrome's split tabs do; nil keeps the title's own label.
     private var splitAccessibilityLabel: Text? {
-        switch splitSide {
-        case .left: Text("\(session.displayTitle) - Left view")
-        case .right: Text("\(session.displayTitle) - Right view")
-        case nil: nil
+        switch (splitSide, splitOrientation) {
+        case (.left, .sideBySide): Text("\(session.displayTitle) - Left view")
+        case (.right, .sideBySide): Text("\(session.displayTitle) - Right view")
+        case (.left, .stacked): Text("\(session.displayTitle) - Top view")
+        case (.right, .stacked): Text("\(session.displayTitle) - Bottom view")
+        case (nil, _): nil
         }
     }
 

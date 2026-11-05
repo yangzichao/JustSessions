@@ -89,7 +89,7 @@ struct TerminalSplitDropStoreTests {
         #expect(ids(store) == [first.id, second.id])
         #expect(store.terminalSplits.isEmpty)
 
-        store.showDroppedTab(second.id, at: .split(.left))
+        store.showDroppedTab(second.id, at: .split(.left, .sideBySide))
         let split = try #require(store.shownSplit)
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: second.id, right: first.id))
         #expect(store.selectedTerminalID == second.id)

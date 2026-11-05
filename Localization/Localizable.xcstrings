@@ -66,6 +66,16 @@
         }
       }
     },
+    "%@ - Bottom view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ - 下方视图"
+          }
+        }
+      }
+    },
     "%@ - Left view": {
       "localizations": {
         "zh-Hans": {
@@ -82,6 +92,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ - 右侧视图"
+          }
+        }
+      }
+    },
+    "%@ - Top view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ - 上方视图"
           }
         }
       }
@@ -1213,16 +1233,6 @@
         }
       }
     },
-    "Add tab to new split view": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "向新拆分视图添加标签页"
-          }
-        }
-      }
-    },
     "Add tag %@": {
       "localizations": {
         "zh-Hans": {
@@ -1844,6 +1854,16 @@
         }
       }
     },
+    "Bottom view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下方视图"
+          }
+        }
+      }
+    },
     "Branch": {
       "localizations": {
         "zh-Hans": {
@@ -2208,6 +2228,16 @@
         }
       }
     },
+    "Choose a tab - Bottom view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择标签页 - 下方视图"
+          }
+        }
+      }
+    },
     "Choose a tab - Left view": {
       "localizations": {
         "zh-Hans": {
@@ -2224,6 +2254,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "选择标签页 - 右侧视图"
+          }
+        }
+      }
+    },
+    "Choose a tab - Top view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择标签页 - 上方视图"
           }
         }
       }
@@ -2444,6 +2484,16 @@
         }
       }
     },
+    "Close Bottom View": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭下方视图"
+          }
+        }
+      }
+    },
     "Close Left View": {
       "localizations": {
         "zh-Hans": {
@@ -2470,6 +2520,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭标签…"
+          }
+        }
+      }
+    },
+    "Close Top View": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭上方视图"
           }
         }
       }
@@ -2578,6 +2638,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭并结束会话"
+          }
+        }
+      }
+    },
+    "Close bottom view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭下方视图"
           }
         }
       }
@@ -2718,6 +2788,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "关闭此视图"
+          }
+        }
+      }
+    },
+    "Close top view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭上方视图"
           }
         }
       }
@@ -5565,6 +5645,16 @@
         }
       }
     },
+    "New split view below current tab": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在当前标签页下方创建新的拆分视图"
+          }
+        }
+      }
+    },
     "New split view with current tab": {
       "localizations": {
         "zh-Hans": {
@@ -6191,6 +6281,16 @@
         }
       }
     },
+    "Open in bottom view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在下方视图中打开"
+          }
+        }
+      }
+    },
     "Open in browser": {
       "localizations": {
         "zh-Hans": {
@@ -6211,6 +6311,16 @@
         }
       }
     },
+    "Open in left view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在左侧视图中打开"
+          }
+        }
+      }
+    },
     "Open in new window": {
       "localizations": {
         "zh-Hans": {
@@ -6227,6 +6337,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "在阅读窗口中打开"
+          }
+        }
+      }
+    },
+    "Open in right view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在右侧视图中打开"
+          }
+        }
+      }
+    },
+    "Open in split below": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在下方拆分视图中打开"
+          }
+        }
+      }
+    },
+    "Open in split on the right": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在右侧拆分视图中打开"
+          }
+        }
+      }
+    },
+    "Open in top view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在上方视图中打开"
           }
         }
       }
@@ -6437,6 +6587,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "已置顶"
+          }
+        }
+      }
+    },
+    "Place Views Side by Side": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "并排显示视图"
+          }
+        }
+      }
+    },
+    "Place views side by side": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "并排显示视图"
           }
         }
       }
@@ -8185,12 +8355,52 @@
         }
       }
     },
+    "Split down": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向下拆分"
+          }
+        }
+      }
+    },
+    "Split right": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向右拆分"
+          }
+        }
+      }
+    },
     "Split view across projects": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "跨项目的拆分视图"
+          }
+        }
+      }
+    },
+    "Stack Views": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上下堆叠视图"
+          }
+        }
+      }
+    },
+    "Stack views": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上下堆叠视图"
           }
         }
       }
@@ -8497,6 +8707,16 @@
         }
       }
     },
+    "Swap with bottom view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与下方视图交换"
+          }
+        }
+      }
+    },
     "Swap with left view": {
       "localizations": {
         "zh-Hans": {
@@ -8513,6 +8733,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "与右侧视图交换"
+          }
+        }
+      }
+    },
+    "Swap with top view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与上方视图交换"
           }
         }
       }
@@ -9205,6 +9435,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "工具"
+          }
+        }
+      }
+    },
+    "Top view": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上方视图"
           }
         }
       }

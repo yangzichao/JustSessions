@@ -96,6 +96,25 @@ struct TabDraggingBetweenWindowsTests {
         expectSplitRules(sandbox.second)
     }
 
+    /// A stacked split stays stacked in the window it moves to (SPL-18); the window it left forgets its layout.
+    @Test func aStackedSplitStaysStackedInTheOtherWindow() throws {
+        let sandbox = try TwoWindowSandbox()
+        defer { sandbox.tearDown() }
+        let top = open(sandbox.first, makeTab(engine: .swiftTerm, projectPath: "/tmp/app"))
+        let bottom = open(sandbox.first, makeTab(engine: .swiftTerm, projectPath: "/tmp/app"))
+        sandbox.first.selectTerminal(top.id)
+        sandbox.first.splitSelectedTerminal(with: bottom.id, on: .right, orientation: .stacked)
+        let split = try #require(sandbox.first.shownSplit)
+
+        let tabs = try #require(sandbox.first.takeOutTabsForAnotherWindow([top.id, bottom.id]))
+        sandbox.second.bringInTabsFromAnotherWindow(tabs, at: .asNewGroup(0), selecting: top.id)
+
+        #expect(sandbox.second.shownSplit == split)
+        #expect(sandbox.second.orientation(ofSplitView: split.id) == .stacked)
+        #expect(sandbox.second.sides(of: split) == TerminalSplit.Sides(left: top.id, right: bottom.id))
+        #expect(sandbox.first.stackedSplitViewIDs.isEmpty)
+    }
+
     /// A group dragged by its label moves with all its tabs and their split, and the window it left shows another tab.
     @Test(arguments: TerminalEngine.allCases)
     func aWholeGroupMovesToAnotherWindowWithItsSplit(engine: TerminalEngine) throws {

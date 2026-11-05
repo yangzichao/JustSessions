@@ -1,8 +1,9 @@
 import Foundation
 
-/// Two open tabs linked side by side, as Chrome links a pair of split tabs: while either is selected, both terminals
-/// show. Which shows on the left is not kept here: it is the one that comes first in the tab bar, as in Chrome, so
-/// the panes can never disagree with the tabs. The split outlives the selection, so showing another tab and coming
+/// Two open tabs linked side by side, or one above the other, as Chrome links a pair of split tabs: while either is
+/// selected, both terminals show. Which shows on the left, or on top, is not kept here: it is the one that comes first
+/// in the tab bar, as in Chrome, so the panes can never disagree with the tabs. How the two are laid out is kept by the
+/// store, by split id; see `ConversationStore.orientation(ofSplitView:)`. The split outlives the selection, so showing another tab and coming
 /// back to either tab shows the split again.
 struct TerminalSplit: Identifiable, Equatable {
     /// The split's two tabs by their places in the tab bar: the left pane's tab and the right pane's.
@@ -24,8 +25,19 @@ struct TerminalSplit: Identifiable, Equatable {
         }
     }
 
+    /// A split's first and second views: left and right side by side, or top and bottom when stacked.
     enum Side {
         case left, right
+    }
+
+    /// How a split's two views share the terminals: side by side, as in Chrome, or one above the other, as a terminal
+    /// app stacks a pane below another. A split stays two views either way; see DNR-15.
+    enum Orientation: Equatable {
+        case sideBySide, stacked
+
+        var toggled: Orientation {
+            self == .sideBySide ? .stacked : .sideBySide
+        }
     }
 
     private static let groupKeyPrefixOfSplitsAcrossProjects = "split-view:"

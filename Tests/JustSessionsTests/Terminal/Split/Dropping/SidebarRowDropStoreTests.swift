@@ -16,13 +16,32 @@ struct SidebarRowDropStoreTests {
         let shown = open(store, makePlainTab(in: sandbox))
         let row = SidebarDraggedRow.session(conversation)
 
-        #expect(store.dropPlace(for: row, at: .split(.left)) == .split(.left))
-        store.showDroppedRow(row, at: .split(.left))
+        #expect(store.dropPlace(for: row, at: .split(.left, .sideBySide)) == .split(.left, .sideBySide))
+        store.showDroppedRow(row, at: .split(.left, .sideBySide))
 
         let resumed = try #require(store.runningTerminal(for: conversation))
         let split = try #require(store.shownSplit)
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: resumed.id, right: shown.id))
         #expect(store.terminalSessions.count == 2)
+        #expect(store.selectedTerminalID == resumed.id)
+        expectSplitRules(store)
+    }
+
+    /// As its row's Open in split below does.
+    @Test func aSessionWithNoTabResumesBelowTheSelectedTab() throws {
+        let sandbox = try TerminalEngineLaunchSandbox(engine: .swiftTerm)
+        defer { sandbox.tearDown() }
+        let conversation = sandbox.conversation()
+        let store = sandbox.makeStore(listing: [conversation])
+        let shown = open(store, makePlainTab(in: sandbox))
+        let row = SidebarDraggedRow.session(conversation)
+
+        store.showDroppedRow(row, at: .split(.right, .stacked))
+
+        let resumed = try #require(store.runningTerminal(for: conversation))
+        let split = try #require(store.shownSplit)
+        #expect(store.sides(of: split) == TerminalSplit.Sides(left: shown.id, right: resumed.id))
+        #expect(store.orientation(ofSplitView: split.id) == .stacked)
         #expect(store.selectedTerminalID == resumed.id)
         expectSplitRules(store)
     }
@@ -38,7 +57,7 @@ struct SidebarRowDropStoreTests {
         store.splitSelectedTerminal(with: right.id)
         let split = try #require(store.shownSplit)
 
-        store.showDroppedRow(.session(conversation), at: .split(.right))
+        store.showDroppedRow(.session(conversation), at: .split(.right, .sideBySide))
 
         let resumed = try #require(store.runningTerminal(for: conversation))
         let swapped = try #require(store.shownSplit)
@@ -57,12 +76,12 @@ struct SidebarRowDropStoreTests {
         let row = SidebarDraggedRow.session(conversation)
 
         // No tabs open at all, then a tab open but the preview shown.
-        #expect(store.dropPlace(for: row, at: .split(.right)) == .wholeArea)
+        #expect(store.dropPlace(for: row, at: .split(.right, .sideBySide)) == .wholeArea)
         let other = open(store, makePlainTab(in: sandbox))
         store.selectTerminal(nil)
-        #expect(store.dropPlace(for: row, at: .split(.right)) == .wholeArea)
+        #expect(store.dropPlace(for: row, at: .split(.right, .sideBySide)) == .wholeArea)
 
-        store.showDroppedRow(row, at: .split(.right))
+        store.showDroppedRow(row, at: .split(.right, .sideBySide))
 
         let resumed = try #require(store.runningTerminal(for: conversation))
         #expect(store.selectedTerminalID == resumed.id)
@@ -96,7 +115,7 @@ struct SidebarRowDropStoreTests {
         let sessionTab = try #require(store.runningTerminal(for: conversation))
         let shown = open(store, makePlainTab(in: sandbox))
 
-        store.showDroppedRow(.session(conversation), at: .split(.right))
+        store.showDroppedRow(.session(conversation), at: .split(.right, .sideBySide))
 
         let split = try #require(store.shownSplit)
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: shown.id, right: sessionTab.id))
@@ -118,12 +137,12 @@ struct SidebarRowDropStoreTests {
         store.launch(here, action: .resume)
 
         // Its tab is the selected one; another window's tab runs it; a subagent's session is only read.
-        #expect(store.dropPlace(for: .session(here), at: .split(.left)) == nil)
-        #expect(store.dropPlace(for: .session(elsewhere), at: .split(.left)) == nil)
-        #expect(store.dropPlace(for: .session(subagent), at: .split(.left)) == nil)
+        #expect(store.dropPlace(for: .session(here), at: .split(.left, .sideBySide)) == nil)
+        #expect(store.dropPlace(for: .session(elsewhere), at: .split(.left, .sideBySide)) == nil)
+        #expect(store.dropPlace(for: .session(subagent), at: .split(.left, .sideBySide)) == nil)
 
         let tabsBefore = store.terminalSessions.map(\.id)
-        store.showDroppedRow(.session(elsewhere), at: .split(.left))
+        store.showDroppedRow(.session(elsewhere), at: .split(.left, .sideBySide))
         #expect(store.terminalSessions.map(\.id) == tabsBefore)
         #expect(store.terminalSplits.isEmpty)
     }
@@ -135,17 +154,17 @@ struct SidebarRowDropStoreTests {
         let first = open(store, makePlainTab(in: sandbox))
         let second = open(store, makePlainTab(in: sandbox))
 
-        #expect(store.dropPlace(for: .openTab(second.id), at: .split(.left)) == nil)
-        #expect(store.dropPlace(for: .openTab(first.id), at: .split(.left)) == .split(.left))
-        #expect(store.dropPlace(for: .openTab(UUID()), at: .split(.left)) == nil)
+        #expect(store.dropPlace(for: .openTab(second.id), at: .split(.left, .sideBySide)) == nil)
+        #expect(store.dropPlace(for: .openTab(first.id), at: .split(.left, .sideBySide)) == .split(.left, .sideBySide))
+        #expect(store.dropPlace(for: .openTab(UUID()), at: .split(.left, .sideBySide)) == nil)
 
         store.selectTerminal(nil)
-        #expect(store.dropPlace(for: .openTab(first.id), at: .split(.left)) == .wholeArea)
-        store.showDroppedRow(.openTab(first.id), at: .split(.left))
+        #expect(store.dropPlace(for: .openTab(first.id), at: .split(.left, .sideBySide)) == .wholeArea)
+        store.showDroppedRow(.openTab(first.id), at: .split(.left, .sideBySide))
         #expect(store.selectedTerminalID == first.id)
         #expect(store.terminalSplits.isEmpty)
 
-        store.showDroppedRow(.openTab(second.id), at: .split(.right))
+        store.showDroppedRow(.openTab(second.id), at: .split(.right, .sideBySide))
         let split = try #require(store.shownSplit)
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: first.id, right: second.id))
         #expect(store.selectedTerminalID == second.id)

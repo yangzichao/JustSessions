@@ -22,7 +22,7 @@ Things the project tried or had, then removed or rejected. Bringing one back nee
 | DNR-12 | Subagent rows shown by default. | Hidden until turned on in Settings → General. | `23c4377` |
 | DNR-13 | System secondary and tertiary text styles in Views, and translucent selected-row fills. | They fell below 4.5:1 on theme surfaces and P3 displays. A contract test enforces the first. | `16246c3` |
 | DNR-14 | Removing a project for good. | Projects are archived and can be restored. | `d8e8b4a` |
-| DNR-15 | Splits with more than two panes, or split up and down. | Split view follows Chrome's two-tab model (SPL-01–13); a pane grid would replace that model, not extend it. | Project decision, 11 October 2026 |
+| DNR-15 | Splits with more than two panes, or a grid of panes. | Split view follows Chrome's two-tab model (SPL-01–13); a pane grid would replace that model, not extend it. *Changed 31 October 2026: a split's two views can stack, one above the other (SPL-18). It stays one pair of tabs, ordered by the tab bar, with one resize area, so the model is unchanged; a terminal often wants a full-width pane below another, which Chrome's pages don't (PRD-25).* | Project decision, 11 October 2026; feature request, 31 October 2026 |
 
 ## Code and build
 

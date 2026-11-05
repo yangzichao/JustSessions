@@ -47,6 +47,7 @@ struct TerminalSplitAcrossProjectsSection: View {
                     isSelected: store.selectedTerminalID == session.id,
                     isActive: store.shownSplit?.id == split.id,
                     splitSide: sides?.side(of: session.id),
+                    splitOrientation: store.orientation(ofSplitView: split.id),
                     drawsOwnShape: true,
                     isSplitPartnerHovered: hoveredTabID.map { split.partner(of: session.id) == $0 } ?? false,
                     showsLeadingSeparator: false,
