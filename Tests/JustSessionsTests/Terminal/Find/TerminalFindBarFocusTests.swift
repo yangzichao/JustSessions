@@ -5,9 +5,8 @@ import Testing
 
 /// Who has the keyboard as a tab's find bar opens and closes, with the tab's view in a window as the app shows it.
 /// A selected tab's terminal takes the keyboard a moment after it appears, so tests wait for that before opening the
-/// bar, as a person would. Each wait lays the window out on every check, as `SplitWorkspace.settleLayout()` does, so
-/// SwiftUI applies its focus changes even when a full run keeps the main queue too busy to get to them: polling alone
-/// timed out at 120 seconds on a loaded Mac, at a different step each time.
+/// bar, as a person would. The field never takes the keyboard while the Mac's screen is locked, so a full run then
+/// fails here; see `keyboardState` for what a failure reports.
 @MainActor
 @Suite(.serialized)
 struct TerminalFindBarFocusTests {
@@ -51,14 +50,13 @@ struct TerminalFindBarFocusTests {
 
         var terminalHasTheKeyboard: Bool { window.firstResponder === tab.terminalView }
 
-        /// Waits for the condition as `expectEventually` does, laying the window out before each check. A failure says
-        /// who had the keyboard and how far the bar got, since the wait has still run out in a full run now and then.
+        /// Waits for the condition as `expectEventually` does. A failure says who had the keyboard and how far the bar
+        /// got. Laying the window out on every check did not stop the wait running out, and v1.3.0's release run then
+        /// saw the field take the keyboard and lose it, which no release run had before, so the window lays itself out.
         func expectEventually(_ condition: () -> Bool, sourceLocation: SourceLocation = #_sourceLocation) async throws {
             let clock = ContinuousClock()
             let deadline = clock.now + .seconds(120)
-            while true {
-                window.contentView!.layoutSubtreeIfNeeded()
-                if condition() || clock.now >= deadline { break }
+            while !condition(), clock.now < deadline {
                 try await Task.sleep(for: .milliseconds(10))
             }
             #expect(condition(), "\(keyboardState)", sourceLocation: sourceLocation)

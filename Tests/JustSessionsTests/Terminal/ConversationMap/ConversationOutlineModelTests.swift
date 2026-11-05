@@ -137,20 +137,28 @@ struct ConversationOutlineModelTests {
     }
 
     /// A relink while a read runs: the old session's read unwinds after the new session's watch started, and must not
-    /// put off the new session's first read.
+    /// put off the new session's first read. Had it spaced reads, the new one would wait `readCostMultiple` times as
+    /// long as the old one ran, at least four times its half second, from when it unwound, which is after the cancel. The
+    /// new outline must show before then, a limit that grows with the machine's load as the old read's time does; a
+    /// fixed second ran out on v1.3.0's release run.
     @Test func aReadUnwindingAfterARelinkDoesNotDelayTheNewSession() async throws {
         let large = try TranscriptPagingFixture(count: 200_000)
         let small = try TranscriptPagingFixture(count: 10)
         defer { large.remove(); small.remove() }
         let model = Self.model()
+        let clock = ContinuousClock()
         let first = OutlineWatch(model, large.conversation)
         try await expectEventually { model.readCount == 1 }
+        let firstReadSeenRunning = clock.now
         try await Task.sleep(for: .milliseconds(500))
         try #require(model.outline == nil, "the first read must still be running when the tab relinks")
+        let cancelled = clock.now
         first.cancel()
         let second = OutlineWatch(model, small.conversation)
         defer { second.cancel() }
-        try await expectEventually(timeout: .seconds(1)) { model.outline?.blocks.count == 10 }
+        try await expectEventually { model.outline?.blocks.count == 10 }
+        let spacingTheOldReadWouldHaveCaused = (cancelled - firstReadSeenRunning) * ConversationOutlineModel.readCostMultiple
+        #expect(clock.now - cancelled < spacingTheOldReadWouldHaveCaused)
     }
 
     /// A relink while a read runs, before the old session's watch is cancelled: the new session's reader reads at once,
