@@ -28,7 +28,7 @@ struct SidebarOpenTabRow<MenuItems: View>: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                 if let splitSide {
-                    Image(systemName: splitSideSystemImage(splitSide))
+                    Image(systemName: splitOrientation.swapWithViewSystemImage(splitSide))
                         .font(ThemeFont.glyph(.control))
                         .foregroundStyle(ThemePalette.secondaryText)
                         .accessibilityHidden(true)
@@ -57,15 +57,6 @@ struct SidebarOpenTabRow<MenuItems: View>: View {
         case (.left, .stacked): Text("Top view")
         case (.right, .stacked): Text("Bottom view")
         case (nil, _): Text(verbatim: "")
-        }
-    }
-
-    private func splitSideSystemImage(_ side: TerminalSplit.Side) -> String {
-        switch (side, splitOrientation) {
-        case (.left, .sideBySide): "rectangle.lefthalf.inset.filled"
-        case (.right, .sideBySide): "rectangle.righthalf.inset.filled"
-        case (.left, .stacked): "rectangle.tophalf.inset.filled"
-        case (.right, .stacked): "rectangle.bottomhalf.inset.filled"
         }
     }
 

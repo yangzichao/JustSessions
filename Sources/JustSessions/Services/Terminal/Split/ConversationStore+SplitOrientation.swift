@@ -8,6 +8,11 @@ extension ConversationStore {
         stackedSplitViewIDs.contains(id) ? .stacked : .sideBySide
     }
 
+    /// The id of the split the tab is in, or of the split chooser beside it; nil for a tab in neither.
+    func splitViewID(containing tabID: UUID) -> UUID? {
+        split(containing: tabID)?.id ?? splitChooser(beside: tabID)?.id
+    }
+
     /// The shown split's, or split chooser's, id.
     var shownSplitViewID: UUID? {
         shownSplit?.id ?? shownSplitChooser?.id
@@ -53,6 +58,24 @@ extension ConversationStore {
         guard let shownTabID, let newTabID = selectedTerminalID, newTabID != shownTabID,
               !isInSplitOrChooser(shownTabID), !isInSplitOrChooser(newTabID) else { return }
         splitTerminal(shownTabID, with: newTabID, on: side, orientation: orientation)
+    }
+
+    /// As `splitSelectedTerminal`, beside `tabID` rather than the selected tab; the selection stays as it is.
+    func splitTerminal(
+        _ tabID: UUID,
+        with id: UUID,
+        on side: TerminalSplit.Side?,
+        orientation: TerminalSplit.Orientation
+    ) {
+        guard let joiningTab = terminalSessions.first(where: { $0.id == id }),
+              splitChooser(beside: id) == nil, splitChooser(beside: tabID) == nil else { return }
+        var strip = tabStrip
+        guard let split = strip.addSplit(joining: id, beside: tabID, on: side) else { return }
+        defer { persistOpenTabs() }
+        apply(strip)
+        // Once the split is open: a layout kept for an id no split or chooser has is forgotten.
+        if orientation == .stacked { stackedSplitViewIDs.insert(split.id) }
+        joiningTab.startNowThatItIsShown()
     }
 
     /// Splits and choosers that are gone take their layout with them.

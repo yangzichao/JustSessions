@@ -183,6 +183,8 @@ struct TerminalSplitOrientationStoreTests {
         store.performSplitAction(.addToNewSplit(third.id, .stacked), fromTab: first.id) { _ in }
         let split = try #require(store.shownSplit)
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: first.id, right: third.id))
+        // An open tab joins beside the selected tab, which stays selected, as in Chrome (SPL-20).
+        #expect(store.selectedTerminalID == first.id)
         guard case .arrangeSplit(.stacked) = store.splitMenu(forTab: first.id) else {
             Issue.record("A stacked split's tab arranges it stacked")
             return

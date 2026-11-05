@@ -50,10 +50,12 @@ extension TerminalContextMenu {
         let noCLIFoundItems: [NSMenuItem] = providers.isEmpty
             ? [ActionMenuItem(title: NewSessionProviderAvailability.noCLIFoundMessage(on: host, language: language ?? AppLanguageStore.shared.language), isEnabled: false) {}]
             : []
-        let newTabItems: [NSMenuItem] = noCLIFoundItems + providers.map { provider in
-            ActionMenuItem(title: provider.rawValue, isEnabled: canStartNewTabs) {
+        let newTabItems: [NSMenuItem] = noCLIFoundItems + providers.map { provider -> NSMenuItem in
+            let item = ActionMenuItem(title: provider.rawValue, isEnabled: canStartNewTabs) {
                 perform(.openInNewSplit(.session(provider), orientation))
             }
+            item.image = provider.menuItemImage()
+            return item
         } + [
             ActionMenuItem(title: localized("Terminal"), systemImage: "apple.terminal", isEnabled: canStartNewTabs) {
                 perform(.openInNewSplit(.terminal, orientation))

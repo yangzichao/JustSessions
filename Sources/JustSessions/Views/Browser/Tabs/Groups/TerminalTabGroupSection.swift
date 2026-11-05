@@ -112,6 +112,7 @@ struct TerminalTabGroupSection: View {
                     session,
                     width: halfWidth,
                     splitSide: chooser.tabSide,
+                    splitOrientation: store.orientation(ofSplitView: chooser.id),
                     isPartnerHovered: hoveredSplitChooserTabID == session.id,
                     showsLeadingSeparator: chooser.side == .right && showsLeadingSeparator
                 )
@@ -123,6 +124,7 @@ struct TerminalTabGroupSection: View {
                 session,
                 width: width(ofTab: session.id),
                 splitSide: split.flatMap { store.sides(of: $0)?.side(of: session.id) },
+                splitOrientation: split.map { store.orientation(ofSplitView: $0.id) } ?? .sideBySide,
                 isPartnerHovered: hoveredTabID.map { split?.partner(of: session.id) == $0 } ?? false,
                 showsLeadingSeparator: showsLeadingSeparator
             )
@@ -133,6 +135,7 @@ struct TerminalTabGroupSection: View {
         _ session: TerminalSession,
         width: CGFloat,
         splitSide: TerminalSplit.Side?,
+        splitOrientation: TerminalSplit.Orientation,
         isPartnerHovered: Bool,
         showsLeadingSeparator: Bool
     ) -> some View {
@@ -144,7 +147,7 @@ struct TerminalTabGroupSection: View {
             isSelected: store.selectedTerminalID == session.id && !(store.selectsShownSplitChooser && store.splitChooser(beside: session.id) != nil),
             isActive: isActive(session.id),
             splitSide: splitSide,
-            splitOrientation: store.split(containing: session.id).map { store.orientation(ofSplitView: $0.id) } ?? .sideBySide,
+            splitOrientation: splitOrientation,
             isSplitPartnerHovered: isPartnerHovered,
             showsLeadingSeparator: showsLeadingSeparator,
             groupColor: color,
