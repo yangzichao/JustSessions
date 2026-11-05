@@ -1,0 +1,2 @@
+/* The prompt macOS shows the first time a program in a terminal tab asks for the microphone (PRD-27). */
+"NSMicrophoneUsageDescription" = "JustSessions 中运行的程序想要使用你的麦克风。";

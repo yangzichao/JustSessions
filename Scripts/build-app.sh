@@ -52,6 +52,10 @@ for localization_directory in "${localization_directories[@]}"; do
     ditto "$localization_directory" "$app_directory/Contents/Resources/${localization_directory:t}"
     localization_identifiers+=("${${localization_directory:t}%.lproj}")
 done
+# Translations of Info.plist's strings, such as the microphone prompt; the String Catalog only makes Localizable.strings.
+for info_plist_translation in "$project_directory"/Localization/InfoPlist/*.lproj/InfoPlist.strings(N); do
+    ditto "$info_plist_translation" "$app_directory/Contents/Resources/${info_plist_translation:h:t}/InfoPlist.strings"
+done
 swiftterm_resources="$build_directory/SwiftTerm_SwiftTerm.bundle"
 if [[ -d "$swiftterm_resources" ]]; then
     ditto "$swiftterm_resources" "$app_directory/Contents/Resources/SwiftTerm_SwiftTerm.bundle"

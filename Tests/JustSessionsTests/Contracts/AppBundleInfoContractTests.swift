@@ -70,6 +70,23 @@ struct AppBundleInfoContractTests {
             .contains("--entitlements \"$project_directory/Scripts/JustSessions.entitlements\""))
     }
 
+    /// The interface is in English and Simplified Chinese (PRD-07), so macOS's microphone prompt is too. The
+    /// template holds the English; `build-app.sh` copies `Localization/InfoPlist` into the app's `zh-Hans.lproj`,
+    /// where macOS reads it.
+    @Test func theMicrophonePromptIsInSimplifiedChinese() throws {
+        let translations = try #require(try PropertyListSerialization.propertyList(
+            from: Data(try RepositoryFiles.contents(
+                of: "Localization/InfoPlist/zh-Hans.lproj/InfoPlist.strings"
+            ).utf8),
+            format: nil
+        ) as? [String: String])
+
+        let translation = try #require(translations["NSMicrophoneUsageDescription"])
+        #expect(translation.contains("JustSessions"))
+        #expect(translation.contains("麦克风"))
+        #expect(try RepositoryFiles.contents(of: "Scripts/build-app.sh").contains("Localization/InfoPlist/*.lproj/InfoPlist.strings"))
+    }
+
     /// `plutil -replace` fills in the version at build time; each key it replaces is in the template.
     @Test func everyKeyTheScriptFillsInIsInTheTemplate() throws {
         let script = try RepositoryFiles.contents(of: "Scripts/build-app.sh")

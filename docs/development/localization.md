@@ -1,6 +1,6 @@
 # Interface localization
 
-`Localization/Localizable.xcstrings` is the translation source. Edit it with Xcode's String Catalog editor or as JSON. The English source strings are extracted by the Swift compiler; keys, interpolations, and plural variations use Apple's localization formats. Never edit the generated `.strings` or `.stringsdict` files in `Sources/JustSessions/Resources/Localization/`.
+`Localization/Localizable.xcstrings` is the translation source. Edit it with Xcode's String Catalog editor or as JSON. The English source strings are extracted by the Swift compiler; keys, interpolations, and plural variations use Apple's localization formats. Never edit the generated `.strings` or `.stringsdict` files in `Sources/JustSessions/Resources/Localization/`. Translations of `Info.plist` strings, such as the microphone prompt, are hand-written in `Localization/InfoPlist/<language>.lproj/InfoPlist.strings`; `Scripts/build-app.sh` copies them into the app.
 
 ## Add a language
 
