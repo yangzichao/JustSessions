@@ -27,7 +27,7 @@ struct TerminalSplitChooserPane: View {
         ZStack(alignment: .topTrailing) {
             Group {
                 if candidates.isEmpty {
-                    TerminalSplitChooserEmptyState(onNewSession: onNewSession)
+                    TerminalSplitChooserEmptyState(orientation: store.orientation(ofSplitView: chooser.id), onNewSession: onNewSession)
                 } else {
                     tabList(candidates, highlightedTabID: hasKeyboard ? highlightedTabID : nil)
                         .padding(.top, WorkspaceSplitPaneMetrics.miniToolbarHeight + Self.listMargin)

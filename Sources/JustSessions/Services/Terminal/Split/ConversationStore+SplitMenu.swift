@@ -34,6 +34,7 @@ extension ConversationStore {
             // Side by side, it joins on the side it came from, as in Chrome; stacked, below.
             splitSelectedTerminal(with: tabID, on: orientation == .stacked ? .right : nil, orientation: orientation)
         case .addToNewSplit(let otherTabID, let orientation):
+            // The selected tab stays selected, as Chrome's AddToNewSplit keeps it (SPL-20).
             splitSelectedTerminal(with: otherTabID, on: .right, orientation: orientation)
         case .openInNewSplit(let newTab, let orientation):
             openNewTabInNewSplit(newTab, besideTab: tabID, orientation: orientation)
@@ -58,7 +59,7 @@ extension ConversationStore {
                 reverseSplitChooser(chooser.id)
             }
         case .setOrientation(let orientation):
-            if let splitViewID = split(containing: tabID)?.id ?? splitChooser(beside: tabID)?.id {
+            if let splitViewID = splitViewID(containing: tabID) {
                 setOrientation(orientation, ofSplitView: splitViewID)
             }
         }

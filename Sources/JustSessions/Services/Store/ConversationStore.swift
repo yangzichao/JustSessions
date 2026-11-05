@@ -959,23 +959,6 @@ final class ConversationStore {
         splitTerminal(selectedTerminalID, with: id, on: side, orientation: orientation)
     }
 
-    /// As `splitSelectedTerminal`, beside `tabID` rather than the selected tab; the selection stays as it is.
-    func splitTerminal(
-        _ tabID: UUID,
-        with id: UUID,
-        on side: TerminalSplit.Side?,
-        orientation: TerminalSplit.Orientation
-    ) {
-        guard let joiningTab = terminalSessions.first(where: { $0.id == id }),
-              splitChooser(beside: id) == nil, splitChooser(beside: tabID) == nil else { return }
-        var strip = tabStrip
-        guard let split = strip.addSplit(joining: id, beside: tabID, on: side) else { return }
-        defer { persistOpenTabs() }
-        if orientation == .stacked { stackedSplitViewIDs.insert(split.id) }
-        apply(strip)
-        joiningTab.startNowThatItIsShown()
-    }
-
     /// The split's tabs trade places in the tab bar, so its panes trade sides. The selection stays.
     func reverseSplit(_ splitID: UUID) {
         var strip = tabStrip

@@ -53,7 +53,7 @@ enum TerminalSplitLayout {
     static func clampedFraction(
         _ fraction: CGFloat,
         totalLength: CGFloat,
-        orientation: TerminalSplit.Orientation = .sideBySide
+        orientation: TerminalSplit.Orientation
     ) -> CGFloat {
         let availableLength = availableLength(totalLength: totalLength)
         let minimumLength = minimumPaneLength(orientation)
@@ -65,7 +65,7 @@ enum TerminalSplitLayout {
     static func paneLengths(
         fraction: CGFloat,
         totalLength: CGFloat,
-        orientation: TerminalSplit.Orientation = .sideBySide
+        orientation: TerminalSplit.Orientation
     ) -> PaneLengths {
         let availableLength = availableLength(totalLength: totalLength)
         let leading = (availableLength * clampedFraction(fraction, totalLength: totalLength, orientation: orientation)).rounded()
@@ -74,7 +74,7 @@ enum TerminalSplitLayout {
 
     /// Every part's place in a split area of `size`: side by side, the panes run the area's height inside the insets,
     /// and the resize area runs between them as tall as they are; stacked, the same turned on its side.
-    static func frames(fraction: CGFloat, size: CGSize, orientation: TerminalSplit.Orientation = .sideBySide) -> Frames {
+    static func frames(fraction: CGFloat, size: CGSize, orientation: TerminalSplit.Orientation) -> Frames {
         let lengths = paneLengths(fraction: fraction, totalLength: totalLength(of: size, orientation), orientation: orientation)
         switch orientation {
         case .sideBySide:
@@ -98,7 +98,7 @@ enum TerminalSplitLayout {
         startingAt startFraction: CGFloat,
         draggedBy delta: CGFloat,
         totalLength: CGFloat,
-        orientation: TerminalSplit.Orientation = .sideBySide
+        orientation: TerminalSplit.Orientation
     ) -> CGFloat {
         let availableLength = availableLength(totalLength: totalLength)
         guard availableLength > 0 else { return evenFraction }
