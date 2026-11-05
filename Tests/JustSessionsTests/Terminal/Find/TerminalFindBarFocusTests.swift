@@ -5,7 +5,9 @@ import Testing
 
 /// Who has the keyboard as a tab's find bar opens and closes, with the tab's view in a window as the app shows it.
 /// A selected tab's terminal takes the keyboard a moment after it appears, so tests wait for that before opening the
-/// bar, as a person would.
+/// bar, as a person would. Each wait lays the window out on every check, as `SplitWorkspace.settleLayout()` does, so
+/// SwiftUI applies its focus changes even when a full run keeps the main queue too busy to get to them: polling alone
+/// timed out at 120 seconds on a loaded Mac, at a different step each time.
 @MainActor
 @Suite(.serialized)
 struct TerminalFindBarFocusTests {
@@ -49,6 +51,14 @@ struct TerminalFindBarFocusTests {
 
         var terminalHasTheKeyboard: Bool { window.firstResponder === tab.terminalView }
 
+        /// Waits for the condition as `expectEventually` does, laying the window out before each check.
+        func expectEventually(_ condition: () -> Bool, sourceLocation: SourceLocation = #_sourceLocation) async throws {
+            try await JustSessionsTests.expectEventually({
+                window.contentView!.layoutSubtreeIfNeeded()
+                return condition()
+            }, sourceLocation: sourceLocation)
+        }
+
         func tearDown() {
             tab.close()
             window.close()
@@ -58,15 +68,15 @@ struct TerminalFindBarFocusTests {
     @Test func showingTheBarGivesItsFieldTheKeyboardAndClosingGivesItBack() async throws {
         let fixture = Fixture()
         defer { fixture.tearDown() }
-        try await expectEventually { fixture.terminalHasTheKeyboard }
+        try await fixture.expectEventually { fixture.terminalHasTheKeyboard }
 
         fixture.tab.findState.show()
 
-        try await expectEventually { fixture.findFieldHasTheKeyboard && fixture.tab.findState.isFieldFocused }
+        try await fixture.expectEventually { fixture.findFieldHasTheKeyboard && fixture.tab.findState.isFieldFocused }
 
         fixture.tab.findState.close()
 
-        try await expectEventually { fixture.terminalHasTheKeyboard }
+        try await fixture.expectEventually { fixture.terminalHasTheKeyboard }
         #expect(!fixture.tab.findState.isFieldFocused)
     }
 
@@ -74,15 +84,15 @@ struct TerminalFindBarFocusTests {
     @Test func showingTheOpenBarAgainTakesTheKeyboardBack() async throws {
         let fixture = Fixture()
         defer { fixture.tearDown() }
-        try await expectEventually { fixture.terminalHasTheKeyboard }
+        try await fixture.expectEventually { fixture.terminalHasTheKeyboard }
         fixture.tab.findState.show()
-        try await expectEventually { fixture.findFieldHasTheKeyboard }
+        try await fixture.expectEventually { fixture.findFieldHasTheKeyboard }
         fixture.window.makeFirstResponder(fixture.tab.terminalView)
-        try await expectEventually { !fixture.tab.findState.isFieldFocused }
+        try await fixture.expectEventually { !fixture.tab.findState.isFieldFocused }
 
         fixture.tab.findState.show()
 
-        try await expectEventually { fixture.findFieldHasTheKeyboard && fixture.tab.findState.isFieldFocused }
+        try await fixture.expectEventually { fixture.findFieldHasTheKeyboard && fixture.tab.findState.isFieldFocused }
     }
 
     /// In a split, the field of the pane that is not selected selects its tab when it takes the keyboard.
@@ -92,7 +102,7 @@ struct TerminalFindBarFocusTests {
 
         fixture.tab.findState.show()
 
-        try await expectEventually { fixture.findFieldHasTheKeyboard }
-        try await expectEventually { fixture.focusCount == 1 }
+        try await fixture.expectEventually { fixture.findFieldHasTheKeyboard }
+        try await fixture.expectEventually { fixture.focusCount == 1 }
     }
 }
