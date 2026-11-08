@@ -6,11 +6,13 @@ extension ConversationStore {
     /// After a refresh reached the host: checks its CLI, unless that has an answer, so the next new session there
     /// can use the flag.
     func checkClaudeSessionIDFlagIfUnanswered(on host: String) {
-        guard remoteHostList.hosts.contains(host) else { return }
+        guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), !isDisconnected(host) else { return }
         let startCommand = customStartCommand(for: .claude, on: .ssh(host))
         guard installedProvidersByHost[.ssh(host)]?.contains(.claude) == true
             || CLIStartCommandLine.customCommand(startCommand) != nil else { return }
-        remoteClaudeSessionIDFlagSupport.checkInBackgroundIfUnanswered(host: host, startCommand: startCommand)
+        if let task = remoteClaudeSessionIDFlagSupport.checkInBackgroundIfUnanswered(host: host, startCommand: startCommand) {
+            remoteHostWork.keepAuxiliary(task, on: host)
+        }
     }
 
     /// Links waiting tabs on the host to the sessions they started with, once the host lists them. Runs before

@@ -23,6 +23,13 @@ actor ConversationOutlineReader {
     private var outline = ConversationOutline(blocks: [])
     private var readStamp: ConversationOutlineChangeStamp?
     private var hasRead = false
+    private var outlineLineage: UUID?
+    private var openCodePrefix: OpenCodeConversationOutline.Prefix?
+
+    private struct ReadOutline {
+        let outline: ConversationOutline
+        let lineage: UUID?
+    }
 
     init(_ conversation: Conversation) {
         self.conversation = conversation
@@ -37,10 +44,14 @@ actor ConversationOutlineReader {
     /// The outline after reading what changed; nil when no block changed since the last outline returned.
     func update() async throws -> ConversationOutline? {
         let stamp = ConversationOutlineChangeStamp(of: conversation)   // before reading: anything appended meanwhile shows next check
-        let updated: ConversationOutline
+        let updated: ReadOutline
         do {
             do {
-                if let extended = try await extended() { updated = extended } else { updated = try await readInFull() }
+                if conversation.provider == .opencode {
+                    let read = try OpenCodeConversationOutline.read(conversation, extending: outline, prefix: openCodePrefix)
+                    updated = ReadOutline(outline: read.outline, lineage: nil)
+                    openCodePrefix = read.prefix
+                } else if let extended = try await extended() { updated = extended } else { updated = try await readInFull() }
             } catch TranscriptPagingError.sourceChanged {
                 updated = try await readInFull()   // shrank while its index was scanned (TranscriptFileIndex.swift:55)
             }
@@ -50,42 +61,49 @@ actor ConversationOutlineReader {
             readStamp = stamp; hasRead = true   // tried again once the file changes again
             throw error
         }
-        let isNew = !hasRead || updated.blocks != outline.blocks
-        outline = updated; readStamp = stamp; hasRead = true
-        return isNew ? updated : nil
+        let isNew = !hasRead || updated.outline.blocks != outline.blocks
+        outline = updated.outline; outlineLineage = updated.lineage; readStamp = stamp; hasRead = true
+        return isNew ? updated.outline : nil
     }
 
     /// Everything from the resume record on, read again: a reply growing in its record, a run still adding calls,
     /// what was appended. Nil, for a read in full, without an outline or when the record read again no longer starts
     /// with its block: a Pi branch left with /tree (the record left the branch, so .around lands past it), a truncated
     /// file (.around lands before it), or a rewritten one.
-    private func extended() async throws -> ConversationOutline? {
+    private func extended() async throws -> ReadOutline? {
+        // Database rows are mutable, including earlier messages. A final anchor cannot prove their prefix unchanged.
+        guard conversation.provider != .opencode, conversation.provider != .antigravity else { return nil }
         guard let resume = ConversationOutlineBuilder.resumePoint(in: outline.blocks) else { return nil }
         let anchor = outline.blocks[resume.keptCount]
         var page = try await source.read(.around(TranscriptPageIdentity.entryID(record: resume.record, part: 0)),
                                          refreshIndex: true, limits: limits, preparesMarkdown: false)
-        guard let first = page.entries.first(where: ConversationOutlineBuilder.makesBlock),
+        let lineage = page.sourceLineage
+        guard lineage == outlineLineage,
+              let first = page.entries.first(where: ConversationOutlineBuilder.makesBlock),
               ConversationOutlineBuilder.startsLike(anchor, first) else { return nil }
         var builder = ConversationOutlineBuilder(keeping: outline.blocks[..<resume.keptCount])
         builder.append(page.entries)
         while page.hasLater {
             try Task.checkCancellation()
             page = try await source.read(.after(page.records.upperBound), limits: limits, preparesMarkdown: false)
+            guard page.sourceLineage == lineage else { throw TranscriptPagingError.sourceChanged }
             builder.append(page.entries)
         }
-        return ConversationOutline(blocks: builder.blocks)
+        return ReadOutline(outline: ConversationOutline(blocks: builder.blocks), lineage: lineage)
     }
 
-    private func readInFull() async throws -> ConversationOutline {
+    private func readInFull() async throws -> ReadOutline {
         var builder = ConversationOutlineBuilder()
         var page = try await source.read(.first, refreshIndex: true, limits: limits, preparesMarkdown: false)
+        let lineage = page.sourceLineage
         builder.append(page.entries)
         while page.hasLater {
             try Task.checkCancellation()
             page = try await source.read(.after(page.records.upperBound), limits: limits, preparesMarkdown: false)
+            guard page.sourceLineage == lineage else { throw TranscriptPagingError.sourceChanged }
             builder.append(page.entries)
         }
-        return ConversationOutline(blocks: builder.blocks)
+        return ReadOutline(outline: ConversationOutline(blocks: builder.blocks), lineage: lineage)
     }
 
     /// ⌘D in the tab (TRM-74): the newest of your messages or the CLI's replies in the file now. The reader's last page

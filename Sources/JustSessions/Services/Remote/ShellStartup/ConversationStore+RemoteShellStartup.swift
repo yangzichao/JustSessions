@@ -43,25 +43,29 @@ extension ConversationStore {
     }
 
     private func checkRemoteShellStartup(on host: String) {
-        guard remoteHostList.hosts.contains(host), RemoteHostShellStartups.shared.beginCheck(on: host) else { return }
+        guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), !isDisconnected(host),
+              RemoteHostShellStartups.shared.beginCheck(on: host) else { return }
         hostsCheckingShellStartup.insert(host)
         let check = remoteShellStartupCheck
-        Task.detached(priority: .utility) {
+        let generation = hostLifecycleGeneration(on: .ssh(host))
+        let task: Task<Void, Never> = Task.detached(priority: .utility) { [weak self] in
             let result = check.check(host: host)
-            await self.finishRemoteShellStartupCheck(result, on: host)
+            RemoteHostShellStartups.shared.endCheck(on: host)
+            await self?.finishRemoteShellStartupCheck(result, on: host, generation: generation)
         }
+        remoteHostWork.keepAuxiliary(task, on: host)
     }
 
-    private func finishRemoteShellStartupCheck(_ result: RemoteShellStartupCheckResult?, on host: String) {
-        RemoteHostShellStartups.shared.endCheck(on: host)
+    private func finishRemoteShellStartupCheck(_ result: RemoteShellStartupCheckResult?, on host: String, generation: UInt64) {
+        guard hostLifecycleGeneration(on: .ssh(host)) == generation else { return }
         hostsCheckingShellStartup.remove(host)
-        guard let result else { return }
+        guard let result, isCurrentHostLifecycle(generation, on: .ssh(host)) else { return }
         applyRemoteShellStartupCheckResult(result, on: host)
     }
 
     /// Keeps a check's result, from this check or from Check this host…, and remakes what the host's new startup changes.
     func applyRemoteShellStartupCheckResult(_ result: RemoteShellStartupCheckResult, on host: String) {
-        guard remoteHostList.hosts.contains(host) else { return }
+        guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), !isDisconnected(host) else { return }
         let previousStartup = RemoteHostShellStartups.shared.startup(on: host)
         saveRemoteShellStartupCheck(result, on: host)
         RemoteHostShellStartups.shared.setStartup(result.shellStartup, on: host)

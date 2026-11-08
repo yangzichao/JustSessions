@@ -30,11 +30,15 @@ final class SessionMessageIndexer: ObservableObject {
     private var activeUpdateID: UUID?
     private var updateTask: Task<Void, Never>?
     private var unloadTask: Task<Void, Never>?
+    private var retryTask: Task<Void, Never>?
+    private var consecutiveFailures = 0
+    var waitBeforeRetry: @Sendable (Duration) async throws -> Void = { try await Task.sleep(for: $0) }
 
     static let concurrentReadCount = 3
     var unloadDelay: Duration = .seconds(60)
     /// Progress and new matches show at most this often while sessions are read.
     var publishInterval: Duration = .milliseconds(250)
+    var retryDelay: Duration = .seconds(1)
 
     init(
         index: SessionMessageIndex = SessionMessageIndex(),
@@ -55,10 +59,12 @@ final class SessionMessageIndexer: ObservableObject {
     func endUse(by user: UUID) {
         guard users.remove(user) != nil else { return }
         conversationsByUser[user] = nil
-        desiredGeneration &+= 1
-        let generation = desiredGeneration
-
         guard !users.isEmpty else {
+            desiredGeneration &+= 1
+            let generation = desiredGeneration
+            retryTask?.cancel()
+            retryTask = nil
+            consecutiveFailures = 0
             desiredConversations = []
             activeUpdateID = nil
             updateTask?.cancel()
@@ -93,6 +99,8 @@ final class SessionMessageIndexer: ObservableObject {
     /// pruning another user's sessions, and an update already reading for another user is allowed to finish.
     func update(with conversations: [Conversation], for user: UUID) async {
         guard users.contains(user) else { return }
+        // Query edits and progress publications usually carry the same list. Failed reads have their own timer.
+        guard conversationsByUser[user] != conversations else { return }
         conversationsByUser[user] = conversations
         await applyDesiredConversations()
     }
@@ -100,10 +108,14 @@ final class SessionMessageIndexer: ObservableObject {
     private func applyDesiredConversations() async {
         let conversations = unionOfUsersConversations()
         guard conversations != desiredConversations else { return }
+        retryTask?.cancel()
+        retryTask = nil
+        consecutiveFailures = 0
         desiredConversations = conversations
         desiredGeneration &+= 1
         let generation = desiredGeneration
         let sessions = await index.sessionsToRead(among: conversations, generation: generation)
+        guard generation == desiredGeneration, !users.isEmpty else { return }
         guard updateTask == nil else { return }
         startUpdate(sessions, conversations: conversations, generation: generation)
     }
@@ -132,22 +144,26 @@ final class SessionMessageIndexer: ObservableObject {
         let index = index
         let reader = reader
         updateTask = Task { [weak self] in
+            var hadFailures = false
             if !sessions.isEmpty {
-                await self?.read(sessions, generation: generation, into: index, reader: reader)
+                hadFailures = await self?.read(sessions, generation: generation, into: index, reader: reader) ?? false
             }
-            await self?.finishUpdate(id: id, conversations: conversations, generation: generation)
+            await self?.finishUpdate(id: id, conversations: conversations, generation: generation, hadFailures: hadFailures)
         }
     }
 
-    private func finishUpdate(id: UUID, conversations: [Conversation], generation: Int) async {
+    private func finishUpdate(id: UUID, conversations: [Conversation], generation: Int, hadFailures: Bool) async {
         guard activeUpdateID == id else { return }
         activeUpdateID = nil
         updateTask = nil
         guard !users.isEmpty else { return }
 
         guard generation == desiredGeneration, conversations == desiredConversations else {
-            let sessions = await index.sessionsToRead(among: desiredConversations, generation: desiredGeneration)
-            startUpdate(sessions, conversations: desiredConversations, generation: desiredGeneration)
+            let nextGeneration = desiredGeneration
+            let nextConversations = desiredConversations
+            let sessions = await index.sessionsToRead(among: nextConversations, generation: nextGeneration)
+            guard nextGeneration == desiredGeneration, !users.isEmpty, updateTask == nil else { return }
+            startUpdate(sessions, conversations: nextConversations, generation: nextGeneration)
             return
         }
 
@@ -156,6 +172,25 @@ final class SessionMessageIndexer: ObservableObject {
         await index.removeSavedText(
             ofSessionsOtherThan: Set(conversations.map(\.id)), generation: generation
         )
+        guard generation == desiredGeneration, !users.isEmpty else { return }
+        if hadFailures { scheduleRetry(generation: generation) } else { consecutiveFailures = 0 }
+    }
+
+    /// A permanently unreadable file backs off to one attempt every 30 seconds, and closing search cancels the wait.
+    private func scheduleRetry(generation: Int) {
+        retryTask?.cancel()
+        let delay = min(retryDelay * (1 << min(consecutiveFailures, 5)), .seconds(30))
+        consecutiveFailures += 1
+        retryTask = Task { [weak self, waitBeforeRetry] in
+            do { try await waitBeforeRetry(delay) } catch { return }
+            guard !Task.isCancelled, let self, !self.users.isEmpty,
+                  generation == self.desiredGeneration else { return }
+            self.retryTask = nil
+            let conversations = self.desiredConversations
+            let sessions = await self.index.sessionsToRead(among: conversations, generation: generation)
+            guard !Task.isCancelled, generation == self.desiredGeneration, self.updateTask == nil else { return }
+            self.startUpdate(sessions, conversations: conversations, generation: generation)
+        }
     }
 
     private func read(
@@ -163,8 +198,9 @@ final class SessionMessageIndexer: ObservableObject {
         generation: Int,
         into index: SessionMessageIndex,
         reader: @escaping Reader
-    ) async {
+    ) async -> Bool {
         let cache = index.cache
+        var hadFailures = false
         var lastPublished = ContinuousClock.now
         progress = Progress(readCount: 0, totalCount: sessions.count)
         await withTaskGroup(of: (String, SessionMessageTextFingerprint, SearchableSessionText?).self) { group in
@@ -181,6 +217,8 @@ final class SessionMessageIndexer: ObservableObject {
             for await (conversationID, fingerprint, text) in group {
                 if let text {
                     await index.add(text, fingerprint: fingerprint, for: conversationID, generation: generation)
+                } else {
+                    hadFailures = true
                 }
                 readCount += 1
                 if generation == desiredGeneration, ContinuousClock.now - lastPublished >= publishInterval {
@@ -191,5 +229,6 @@ final class SessionMessageIndexer: ObservableObject {
                 if !Task.isCancelled { readNext() }
             }
         }
+        return hadFailures && !Task.isCancelled
     }
 }

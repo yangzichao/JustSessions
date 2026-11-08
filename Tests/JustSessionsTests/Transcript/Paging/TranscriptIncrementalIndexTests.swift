@@ -3,6 +3,36 @@ import Testing
 @testable import JustSessions
 
 struct TranscriptIncrementalIndexTests {
+    @Test func aMiddleRewriteAndAppendCannotReuseTheOldRecordBoundaries() throws {
+        let fixture = try TranscriptPagingFixture(count: 100)
+        defer { fixture.remove() }
+        let original = try Data(contentsOf: fixture.file)
+        let before = try TranscriptFileIndex.read(fixture.file)
+        let text = String(decoding: original, as: UTF8.self)
+            .replacingOccurrences(of: "Message 50,", with: "Message xx50,")
+            .replacingOccurrences(of: "Message 51,", with: "Messa 51,")
+        let rewritten = Data(text.utf8)
+        #expect(rewritten.count == original.count)
+        #expect(rewritten.prefix(256) == original.prefix(256))
+        #expect(rewritten.suffix(256) == original.suffix(256))
+        let handle = try FileHandle(forWritingTo: fixture.file)
+        try handle.write(contentsOf: rewritten)
+        try handle.seekToEnd()
+        try handle.write(contentsOf: Data("{\"extra\":true}\n".utf8))
+        try handle.close()
+        let updated = try TranscriptFileIndex.read(fixture.file, updating: before)
+        let fresh = try TranscriptFileIndex.read(fixture.file)
+        #expect(updated.fingerprint.identifiesSameFile(as: before.fingerprint))
+        #expect(updated.lineStarts == fresh.lineStarts)
+        #expect(updated.contentLineage != before.contentLineage)
+        let reader = try FileHandle(forReadingFrom: fixture.file)
+        defer { try? reader.close() }
+        for record in [50, 51] {
+            let data = try #require(try updated.readRecord(at: record, from: reader, maximumByteCount: 1 << 20))
+            #expect((try JSONSerialization.jsonObject(with: data)) is [String: Any])
+        }
+    }
+
     @Test(arguments: ["", "first\n", "first\npartial", "你好\r\n\n"])
     func appendsOnlyNewBytesAndPreservesPartialRecords(initial: String) throws {
         let directory = try makeTemporaryDirectory()
@@ -12,6 +42,7 @@ struct TranscriptIncrementalIndexTests {
         let original = try TranscriptFileIndex.read(file, chunkSize: 3)
         let unchanged = try TranscriptFileIndex.read(file, updating: original)
         #expect(unchanged.scannedByteCount == 0)
+        #expect(unchanged.validatedByteCount == 0)
         let appended = Data(" completed\nsecond\nlast".utf8)
         let handle = try FileHandle(forWritingTo: file)
         try handle.seekToEnd()
@@ -21,6 +52,8 @@ struct TranscriptIncrementalIndexTests {
         let rebuilt = try TranscriptFileIndex.read(file)
         #expect(updated.lineStarts == rebuilt.lineStarts)
         #expect(updated.scannedByteCount == appended.count)
+        #expect(updated.contentLineage == original.contentLineage)
+        #expect(updated.validatedByteCount == original.byteCount)
     }
 
     @Test func linesAppendedDuringTheScanAreIndexedByTheNextRefresh() throws {

@@ -59,6 +59,66 @@ struct BoundedProcessRunnerTests {
         #expect(clock.now - startedAt < .seconds(120))
     }
 
+    @Test func aTimedOutWrapperCannotLeaveAChildWritingAfterTheResult() throws {
+        let folder = try makeTemporaryDirectory()
+        defer { Self.cleanUpDelayedChild(in: folder) }
+        let marker = folder.appendingPathComponent("late-write")
+        let result = BoundedProcessRunner.result(
+            ofExecutable: "/bin/sh",
+            arguments: ["-c", Self.delayedChildScript],
+            workingDirectory: folder,
+            timeout: 0.15
+        )
+        #expect(result == nil)
+        try Data().write(to: folder.appendingPathComponent("release"))
+        Thread.sleep(forTimeInterval: 0.8)
+        #expect(!FileManager.default.fileExists(atPath: marker.path))
+    }
+
+    @Test func cancelingAnOptedInTaskStopsItsWrapperAndChildren() async throws {
+        let folder = try makeTemporaryDirectory()
+        defer { Self.cleanUpDelayedChild(in: folder) }
+        let started = folder.appendingPathComponent("started")
+        let marker = folder.appendingPathComponent("late-write")
+        let task = Task.detached {
+            BoundedProcessRunner.result(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", Self.delayedChildScript],
+                workingDirectory: folder,
+                timeout: 30,
+                cancelsWithTask: true
+            )
+        }
+        defer { task.cancel() }
+        let deadline = ContinuousClock.now + .seconds(10)
+        while !FileManager.default.fileExists(atPath: started.path), ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        try #require(FileManager.default.fileExists(atPath: started.path))
+        task.cancel()
+        #expect(await task.value == nil)
+        try Data().write(to: folder.appendingPathComponent("release"))
+        try await Task.sleep(for: .milliseconds(800))
+        #expect(!FileManager.default.fileExists(atPath: marker.path))
+    }
+
+    // The side effect is released only AFTER the helper reports timeout/cancellation, so a busy test machine
+    // cannot let the child write before the test gets a chance to cancel it.
+    private static let delayedChildScript = """
+        (while [ ! -e release ]; do sleep 0.01; done; touch late-write) &
+        echo $! > child-id
+        touch started
+        wait
+        """
+
+    private static func cleanUpDelayedChild(in folder: URL) {
+        if let text = try? String(contentsOf: folder.appendingPathComponent("child-id"), encoding: .utf8),
+           let childID = pid_t(text.trimmingCharacters(in: .whitespacesAndNewlines)) {
+            kill(childID, SIGKILL)
+        }
+        try? FileManager.default.removeItem(at: folder)
+    }
+
     /// A pipe would stay open while the child it leaves behind runs; output in a file does not wait for it.
     @Test func aChildLeftRunningDoesNotHoldUpTheResult() throws {
         let clock = ContinuousClock()

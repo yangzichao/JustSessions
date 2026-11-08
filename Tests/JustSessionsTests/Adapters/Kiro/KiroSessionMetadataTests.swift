@@ -3,6 +3,26 @@ import Testing
 @testable import JustSessions
 
 struct KiroSessionMetadataTests {
+    @Test(arguments: [false, true])
+    func metadataSplitAroundSessionStateIsReadCompletely(large: Bool) throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let file = root.appendingPathComponent("session.json")
+        let padding = String(repeating: "x", count: large ? Self.largePadding : 10)
+        try #"{"session_id":"a","session_state":{"padding":"\#(padding)"},"cwd":"/project","parent_session_id":"parent","title":"Title"}"#
+            .write(to: file, atomically: true, encoding: .utf8)
+        let metadata = try #require(KiroSessionMetadata(file: file))
+        #expect(metadata.projectPath == "/project")
+        #expect(metadata.parentSessionID == "parent")
+        #expect(metadata.title == "Title")
+
+        try #"{"session_id":"a","cwd":"/project","session_state":{"padding":"\#(padding)"},"parent_session_id":"parent"}"#
+            .write(to: file, atomically: true, encoding: .utf8)
+        #expect(KiroSessionMetadata(file: file)?.parentSessionID == "parent")
+    }
+
+    private static let largePadding = KiroSessionMetadata.maximumHeadByteCount * 2
+
     @Test func membersBeforeSessionStateAreReadOnTheirOwn() throws {
         let head = Data(#"{"session_id":"a","cwd":"/x","title":"has \"session_state\" in it", "session_state" : {"unfinished": ["#.utf8)
         let object = try #require(KiroSessionMetadata.objectBeforeSessionState(in: head))

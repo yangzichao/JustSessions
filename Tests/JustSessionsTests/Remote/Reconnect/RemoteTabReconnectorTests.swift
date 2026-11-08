@@ -6,6 +6,38 @@ import Testing
 /// session again, and left ended when the host doesn't, since its CLI ended there too.
 @MainActor
 struct RemoteTabReconnectorTests {
+    @Test func closingTheLastDroppedTabBeforeItsFirstTryStartsNoProbe() throws {
+        let setup = try DroppedTabSetup()
+        defer { setup.tearDown() }
+        setup.drop(setup.tab)
+        setup.sandbox.first.closeTerminal(setup.tab.id)
+
+        setup.clock.advance(by: 2)
+        setup.reconnector.askDueHosts()
+        setup.reconnector.tryAgain()
+        setup.clock.advance(by: 60)
+        setup.reconnector.askDueHosts()
+
+        #expect(setup.host.askCount.value == 0)
+        #expect(setup.sandbox.first.terminalSessions.isEmpty)
+    }
+
+    @Test func closingTheLastDroppedTabAfterAFailureStopsRetries() async throws {
+        let setup = try DroppedTabSetup()
+        defer { setup.tearDown() }
+        setup.drop(setup.tab)
+        setup.clock.advance(by: 2)
+        setup.reconnector.askDueHosts()
+        try await setup.waitForAnswer(number: 1)
+        setup.sandbox.first.closeTerminal(setup.tab.id)
+
+        setup.clock.advance(by: 5)
+        setup.reconnector.askDueHosts()
+
+        #expect(setup.host.askCount.value == 1)
+        #expect(!setup.reconnector.isAsking("devbox"))
+    }
+
     @Test func aDroppedTabIsReconnectedInItsPlaceOnceTheHostListsItsTmuxSession() async throws {
         let setup = try DroppedTabSetup()
         defer { setup.tearDown() }

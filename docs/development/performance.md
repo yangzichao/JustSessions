@@ -223,6 +223,7 @@ No difference stands out from the load's noise:
 | 33 | [The sidebar looked up an SSH host's project paths on this Mac's disk](#33-the-sidebar-looked-up-an-ssh-hosts-project-paths-on-this-macs-disk) | Done: this change |
 | 34 | [Bookmark letters beside messages](#34-bookmark-letters-beside-messages) | Done: this change |
 | 35 | [The conversation map beside CLI tabs](#35-the-conversation-map-beside-cli-tabs) | Done: this change; every measured limit met after a second pass, 3 not measured |
+| 36 | [November audit fixes for many tabs and sessions](#36-november-audit-fixes-for-many-tabs-and-sessions) | Implemented and verified, 8 November 2026 |
 
 ### 1. Timestamp parsing
 
@@ -632,7 +633,7 @@ These scenarios expand projects with a search, which lists every match, so they 
 **Change:** a Codex session read again after a change saves its text with a resume state: the file's device and inode, how many bytes the text came from, a SHA-256 of those bytes, and the final page's first record, its byte offset, and how many entries came before it. When the file has only grown, `CodexSessionTextResumer` reads from the final page's start to the end into memory once, hashes the bytes before it in 1 MiB chunks, checks the saved digest, and parses only the final page onwards with the same `TranscriptPageReader` and `TranscriptRecordDecoder.pageEntries` as a full read. Every byte is read once, so the digest and the parsed records describe the same bytes while the CLI writes. Any other change, such as an amended earlier record, a same-size rewrite, truncation, or a replaced file, or more than 64 MiB from the final page's start, reads the session in full.
 
 - **Pages:** Codex search pages are now 256 entries, 4,096 records, and 8 MiB, so the final page is small. Full and resumed reads use the same limits, so tool calls merge into the same entries either way. Other providers keep 5,000 entries, 50,000 records, and 64 MiB: the smaller pages made reading a 10,000-message OpenCode session 312–317 → 340–355 ms (`OpenCodeTranscriptPagingMeasurements`).
-- **When state is kept:** a session's first read keeps none, so indexing many sessions costs no hashing. The state is kept only if the file is unchanged, modification time included, from before the read to after the hash. Sessions on an SSH host keep none and are read in full as before: rsync replaces a mirrored session's file with a new one at every copy, so it could never resume and the hash would be wasted.
+- **When state is kept (historical; superseded by item 36):** a session's first read kept none, so indexing many sessions cost no hashing. The state is kept only if the file is unchanged, modification time included, from before the read to after the hash. Sessions on an SSH host keep none and are read in full as before: rsync replaces a mirrored session's file with a new one at every copy, so it could never resume and the hash would be wasted.
 - **Cache:** the cache file starts with a small header, so a stale, other-version, or other-session file is turned down without decoding its text. The format went to version 2, so every session is read once more after the update. The resume state also records the page limits its text was read with, and text read with other limits is read again in full, since where pages end decides which tool calls merge.
 
 `IncrementalMessageSearchMeasurements` (`JUSTSESSIONS_PERF=1 swift test -c release --filter IncrementalMessageSearchMeasurements`) runs the baseline and the new path in the same build, alternating, on two copies of each log. The baseline is `main` before the change: a full read on every change, in 5,000-entry pages, saved in the first cache format. Each operation runs three times per process. The table shows the median of three processes' medians, wall time in ms, baseline → resumable. CPU time was within 2% of wall time.
@@ -1060,6 +1061,64 @@ The first round, before the second pass, missed three limits in all three runs: 
 - **Run several suites with `--no-parallel`:** without it they disturb each other, as above. In those runs the map-on echo p50 was about 8 ms above map-off in all three (10.6, 9.4, 10.0 against 2.0 ms); whether the map or the suite running beside it caused that wasn't isolated.
 - **Absolute numbers are this Mac's:** the reader's sit below item 34's on the same Mac (see its rerun note); the comparison is between the columns.
 
+### 36. November audit fixes for many tabs and sessions
+
+The [November audit](performance-and-bug-audit-2026-11-07.md) found three repeatable main-thread costs and correctness defects in cache identity, transcript reuse, and work that outlived a window or host connection. Fixes were developed from `cd63e90b` (v1.3.1); the fix pull request's Local verification section records the final tested commit SHA and logs. Measurements below are from 8 November 2026 on an Apple M4 Pro with 24 GiB RAM, macOS 26.7.2, Swift 6.4.2, Xcode 27.2 build 27B52, release configuration. They are local synthetic measurements, not a profile of the user's reported interaction stall.
+
+Appended session names now read and parse on a utility-priority actor, then apply results only if the tab still has the same live session and source. Recovery order is a linear projection of tabs and splits; it preserves the previous ordering without repeatedly rebuilding the split model. Equal per-window search inputs skip constructing and sorting the shared corpus, while failed reads have a separate bounded retry schedule.
+
+The shared search, tab recovery, and file-backed reader fixes also apply to Claude and Codex; background name reading supports Claude, Codex, and Pi, while the name-read timings below use Pi fixtures only.
+
+`TerminalScalingMeasurements` compares the old and new production paths on identical generated fixtures, seven rounds per size, alternating which name-reading path runs first. Name measurements isolate reading/extraction: they exclude store snapshots and applying actual title changes to the sidebar. Recovery measurements compare each projected result with the legacy mutation result.
+
+| Operation | Previous path, median | New path, median |
+| --- | --- | --- |
+| Recovery, 50 tabs / 25 cross-project splits | 1.0 ms | Below 0.05 ms |
+| Recovery, 100 tabs / 50 splits | 5.8 ms | Below 0.05 ms |
+| Recovery, 250 tabs / 125 splits | 70.1 ms | 0.1 ms |
+| Appended names, 20 Pi files / 264,080 new bytes each, main-thread CPU | 15.11 ms | 0.018 ms |
+| Appended names, 50 Pi files, main-thread CPU | 37.84 ms | 0.047 ms |
+| Appended names, 100 Pi files, main-thread CPU | 78.16 ms | 0.097 ms |
+| Appended names, 100 Pi files, longest main-thread gap | 78.2 ms | 22.3 ms |
+
+`SharedWorkspaceReadMeasurements.unchangedSearchInputs` uses distinct equal arrays of full `Conversation` values, after initial indexing completes. One hundred repetitions compare the old union/sort bookkeeping with the new update path on the same fixtures. At 1,000 sessions CPU p50/p95 was 2.3/2.4 ms before and below 0.05/below 0.05 ms after; at 10,000 it was 21.2/22.9 ms before and 0.1/0.1 ms after. The old-path seam omits the empty removed-host filter and measures bookkeeping only. The audit's earlier reduced-model timing is not a comparable before measurement for these full fixtures.
+
+**Correctness costs.** Changed JSONL files validate every byte of the retained prefix using SHA-256 before extending record offsets or an outline. Initial indexing hashes its existing read chunks; unchanged metadata still avoids source reads. Replacements with an equal prefix can retain offsets. This replaces sampled-edge validation, which missed edits in the middle. A changed full search read reuses the index's digest instead of hashing a second time. Hashing does add CPU and source reads to append checks; the historical 0.2 ms Codex map append figure in item 35 is superseded.
+
+OpenCode validates the visible columns of its retained outline prefix with one ordered SQL cursor. Prefix validation, tail decoding, and the next proof share one SQLite read transaction, so an earlier edit cannot leave old blocks attached to a new tail. This skips repeated JSON/Markdown decoding for unchanged prefix records but still visits their projected columns. Antigravity changes rebuild the map. The final OpenCode append is 44.5 ms at 10,000 messages, versus 232.2 ms for the initial correctness-only full rebuild. This intentionally supersedes item 35's 15 ms append target: checking earlier mutable rows costs more than trusting the final anchor, but prevents stale outlines. The check remains off the main thread and subject to the existing map polling limits. Ordinary page reads remain 2.3 ms for the latest page and 13.2 ms for that page plus five earlier pages at 10,000 messages (`OpenCodeTranscriptPagingMeasurements`).
+
+Final `ConversationOutlineMeasurements` medians (five reads per operation; change checks average 10,000 calls):
+
+| Operation | 27 MiB Codex | 100 MiB Codex | 95 MiB Pi | OpenCode, 10,000 messages |
+| --- | --- | --- | --- | --- |
+| Cold outline | 297.7 ms | 169.3 ms | 666.0 ms | 280.8 ms |
+| One-record append | 10.8 ms | 39.8 ms | 107.2 ms | 44.5 ms |
+| Atomic replacement with unchanged prefix plus append | 12.1 ms | 42.2 ms | 109.2 ms | Not exercised |
+| Change check | 2.2 µs | 2.1 µs | 2.0 µs | 3.1 µs |
+| Latest message, cold / warm | 22.0 / 3.9 ms | 67.0 / 1.0 ms | 125.8 / 0.7 ms | 1.7 / 1.6 ms |
+
+The replacement scenario models rsync copying an unchanged prefix plus a new record. It does not time an earlier-content rewrite, which incurs a failed proof followed by a rebuild. Those rewrites have deterministic correctness regressions, but no map timing in this suite.
+
+`IncrementalMessageSearchMeasurements` passed for 10, 100, and 500 MiB synthetic Codex logs and the realistic 27 MiB log. In that fixture the resumable path took 34.1 ms for a steady append versus 290.6 ms for full extraction, and 343.9 versus 2,929.7 ms for ten appends. These compare the existing issue-56 algorithms in the changed build, not pre-audit against post-audit app versions. Amendment rebuilds were 309.0 versus 296.5 ms; prefer wall/CPU evidence here because the source-byte counter does not include a failed resume proof before the fallback read. Unchanged cache hits read no source bytes.
+
+Kiro metadata's prefix shortcut now requires every used metadata key to be present (an explicit null counts). Otherwise full parsing preserves fields that follow `session_state`. A standalone release-optimized comparison of the actual old/new readers, eleven cached-file reads per case, measured 0.018 / 0.018 ms for a 10 MiB file with complete prefix metadata, but 0.053 / 14.683 ms when optional metadata was absent. At 1 MiB the latter was 0.029 / 1.902 ms. This is an explicit correctness tradeoff, not a metadata-speed improvement.
+
+**Interaction checks.** `TerminalFairnessMeasurements` passed. With one visible and five hidden tabs each producing 25,000 lines/s, quiet-tab echo p50 was 1.9 ms both without maps and with two growing-session maps; longest main-thread gaps were 27.0 and 25.2 ms. At unbounded output the same six flooders still caused 43.1 ms echo p50 and 141.9 ms draw p95. This work does not resolve every saturation workload. `CLIActivitySyncMeasurements` remained 0.1 ms CPU p50/p90 at 10,365 listed sessions and 100 tmux sessions; `RemoteToolStepMeasurements` recorded 2.9 ms median / 3.2 ms longest unchanged step at 10,000 sessions. Four shared discovery consumers still used one adapter scan and three subprocess probes instead of four scans and twelve probes.
+
+**Reproduction and coverage.** The first release run passed 12 tests in seven suites with:
+
+```sh
+env JUSTSESSIONS_PERF=1 swift test -c release --no-parallel --filter 'TerminalScalingMeasurements|TerminalFairnessMeasurements|ConversationOutlineMeasurements|IncrementalMessageSearchMeasurements|SharedWorkspaceReadMeasurements|CLIActivitySyncMeasurements|RemoteToolStepMeasurements'
+```
+
+A source manifest identified that run's snapshot before the OpenCode refinement. The Kiro comparison used a separate disposable harness, with the method and results described above; it is not a repository measurement suite. The final rerun passed seven tests in three suites with:
+
+```sh
+env JUSTSESSIONS_PERF=1 swift test -c release --no-parallel --filter 'ConversationOutlineMeasurements|SharedWorkspaceReadMeasurements|OpenCodeTranscriptPagingMeasurements'
+```
+
+Production source stayed unchanged after the final performance run; three test fixture files were corrected for the full parallel suite. Source manifests recorded both performance snapshots and the final integration-check state. Final `make verify` passed: 2,932 Swift tests in 620 suites, 151 Gherkin/XCTest cases, website/Worker tests and build, localization, release packaging, bundled tmux, and the eight-second launch check. The launch-check process uses an empty SSH host list to avoid migrating developer caches. Run `make verify` from the repository root to repeat those checks. The fix pull request's Local verification section records the final tested commit SHA, source snapshots, and logs. See the audit for live Linux SSH fixture evidence, migration behavior, and untested macOS SSH/manual interaction scenarios.
+
 ## How to profile
 
 Attach to a running copy, so you keep your windows and sessions. Record in chunks, so you can analyze finished chunks while still using the app:
@@ -1089,4 +1148,5 @@ Or open the trace in Instruments. Keep these points in mind:
   - `OpenCodeTranscriptPagingMeasurements`: paging through OpenCode sessions of 1,000 and 10,000 messages, and reading them for message search.
   - `TranscriptImageDecodingMeasurements`: opening one, two, or four readers of a session full of screenshots, then opening it again.
   - `ConversationOutlineMeasurements`: reading a tab's conversation-map outline cold, after a one-record append, and after its file is replaced by a copy, its change check, ⌘D's newest message, and its size, for 27 and 100 MiB Codex logs, a 95 MiB Pi file, and a 10,000-message OpenCode session; and drawing a 10,000-block map (PERF-89, PERF-90).
+  - `TerminalScalingMeasurements`: recovery ordering for 25–250 tabs and appended Pi name reads for 20–100 sessions.
   - `TabBarDragMeasurements`: one pointer move while a tab, or a group by its label, is dragged along a bar of 18 tabs in 3 groups.

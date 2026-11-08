@@ -12,6 +12,66 @@ struct SharedWorkspaceReadMeasurements {
     static let sessionCount = 8
     static let repetitionCount = 3
 
+    /// Query/progress reruns carry unchanged lists; use a distinct array to include element equality in the cost.
+    @Test(arguments: [1_000, 10_000])
+    func unchangedSearchInputs(sessionCount: Int) async throws {
+        guard SidebarInteractionMeasurements.isEnabled else { return }
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let conversations = (0..<sessionCount).map { number in
+            Conversation.fixture(provider: .codex, sessionID: "unchanged-\(number)",
+                                 updatedAt: Date(timeIntervalSince1970: Double(number)),
+                                 sourceFile: directory.appendingPathComponent("\(number).jsonl"))
+        }
+        let index = SessionMessageIndex(cache: SessionMessageTextCache(directory: directory.appendingPathComponent("Cache")))
+        let indexer = SessionMessageIndexer(index: index) { _, _, _ in
+            SearchableSessionText(SessionMessageText(entries: []))
+        }
+        let user = UUID()
+        defer { indexer.endUse(by: user) }
+        indexer.beginUse(by: user)
+        await indexer.update(with: conversations, for: user)
+        try await expectEventually(timeout: .seconds(120)) { indexer.revision > 0 && indexer.progress == nil }
+        let equalCopy = conversations.map { $0 }
+        var times: [Duration] = []
+        var baselineTimes: [Duration] = []
+        var baselineInputs = [user: conversations]
+        let baselineDesired = Self.previousSearchUnion(baselineInputs)
+        for _ in 0..<100 {
+            let baselineStart = Self.processCPUTime()
+            baselineInputs[user] = equalCopy
+            let unchanged = Self.previousSearchUnion(baselineInputs) == baselineDesired
+            baselineTimes.append(Self.processCPUTime() - baselineStart)
+            #expect(unchanged)
+            let start = Self.processCPUTime()
+            await indexer.update(with: equalCopy, for: user)
+            times.append(Self.processCPUTime() - start)
+        }
+        times.sort()
+        baselineTimes.sort()
+        let scenario = "unchanged search inputs, \(sessionCount) sessions"
+        perfReport(scenario, "CPU p50", times[50])
+        perfReport(scenario, "CPU p95", times[95])
+        perfReport(scenario, "previous union/sort CPU p50", baselineTimes[50])
+        perfReport(scenario, "previous union/sort CPU p95", baselineTimes[95])
+        #expect(await index.sessionCount() == sessionCount)
+    }
+
+    /// The pre-fix unchanged-input bookkeeping, on exactly the same Conversation values as the current path.
+    private static func previousSearchUnion(_ inputs: [UUID: [Conversation]]) -> [Conversation] {
+        var byID: [String: Conversation] = [:]
+        for conversations in inputs.values {
+            for conversation in conversations {
+                if let found = byID[conversation.id], found.updatedAt > conversation.updatedAt { continue }
+                byID[conversation.id] = conversation
+            }
+        }
+        return byID.values.sorted {
+            if $0.updatedAt != $1.updatedAt { return $0.updatedAt > $1.updatedAt }
+            return $0.id < $1.id
+        }
+    }
+
     @Test func simultaneousSearchIndexing() async throws {
         guard SidebarInteractionMeasurements.isEnabled else { return }
         for windowCount in [1, 2, 4] {

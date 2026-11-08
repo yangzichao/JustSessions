@@ -10,6 +10,7 @@ extension ConversationStore {
     /// Freeze the recovery snapshot before tearing down the terminal views on normal app termination.
     func prepareTabsForTermination() {
         cancelThisMacRefresh()
+        cancelRemoteHostRefreshes()
         persistOpenTabs()
         isTearingDownWorkspace = true
         closeAllTerminals()
@@ -20,10 +21,12 @@ extension ConversationStore {
     func closeWorkspace() {
         guard !isTearingDownWorkspace else { return }
         cancelThisMacRefresh()
+        cancelRemoteHostRefreshes()
         persistOpenTabs()
         isTearingDownWorkspace = true
         closeAllTerminals()
         windowRegistry.remove(self)
+        resumeQueuedHostWorkInAllWindows()
         openTabPersistence?.closeWindow(tabPersistenceWindowID, in: userDefaults)
         openTabPersistence = nil
     }

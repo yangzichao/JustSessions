@@ -59,7 +59,10 @@ struct TwoWindowSandbox {
     /// on any SSH host do.
     func listSSHSession() -> Conversation {
         let conversation = Conversation.fixture(projectPath: "/srv/project", host: .ssh("devbox"))
-        for store in [first, second] { store.replaceConversations(on: .ssh("devbox"), with: [conversation]) }
+        for store in [first, second] {
+            _ = store.remoteHostList.add("devbox")
+            store.replaceConversations(on: .ssh("devbox"), with: [conversation])
+        }
         return conversation
     }
 

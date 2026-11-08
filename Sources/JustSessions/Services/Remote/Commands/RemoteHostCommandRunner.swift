@@ -10,9 +10,11 @@ struct RemoteHostCommandRunner: Sendable {
     init(
         connectionSharingOptions: [String] = [],
         reachability: SSHHostReachability = .shared,
+        cancelsWithTask: Bool = false,
         run: (@Sendable (_ host: String, _ command: String, _ timeout: TimeInterval) -> (exitStatus: Int32, output: String)?)? = nil
     ) {
         self.run = run ?? { host, command, timeout in
+            if cancelsWithTask, Task.isCancelled { return nil }
             if let failureOutput = reachability.recentFailureOutput(on: host) {
                 return (Self.connectionFailureExitStatus, failureOutput)
             }
@@ -27,7 +29,8 @@ struct RemoteHostCommandRunner: Sendable {
                 ),
                 environment: SSHProcessEnvironment.standard,
                 includesStandardError: true,
-                timeout: timeout
+                timeout: timeout,
+                cancelsWithTask: cancelsWithTask
             )
             if let result { reachability.noteResult(exitStatus: result.exitStatus, output: result.output, on: host) }
             return result

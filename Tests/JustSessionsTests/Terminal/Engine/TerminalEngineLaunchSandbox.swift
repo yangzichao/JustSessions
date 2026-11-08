@@ -48,6 +48,7 @@ final class TerminalEngineLaunchSandbox {
             startsBackgroundPolling: false
         )
         for host in Set(conversations.map(\.host)) {
+            if let destination = host.sshDestination { _ = store.remoteHostList.add(destination) }
             store.replaceConversations(on: host, with: conversations.filter { $0.host == host })
         }
         stores.append(store)

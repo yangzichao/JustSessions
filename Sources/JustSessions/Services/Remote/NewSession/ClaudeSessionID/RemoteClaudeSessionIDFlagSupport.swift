@@ -14,7 +14,7 @@ final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
     private var answersByCheck: [String: Bool] = [:]
     private var checksRunning: Set<String> = []
 
-    init(runner: RemoteHostCommandRunner = RemoteHostCommandRunner(), helpTimeout: TimeInterval = 30) {
+    init(runner: RemoteHostCommandRunner = RemoteHostCommandRunner(cancelsWithTask: true), helpTimeout: TimeInterval = 30) {
         self.runner = runner
         self.helpTimeout = helpTimeout
     }
@@ -26,13 +26,14 @@ final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
         return UUID().uuidString.lowercased()
     }
 
-    func checkInBackgroundIfUnanswered(host: String, startCommand: String?) {
+    @discardableResult
+    func checkInBackgroundIfUnanswered(host: String, startCommand: String?) -> Task<Void, Never>? {
         let key = Self.key(host: host, startCommand: startCommand)
         let startsCheck = lock.withLock {
             answersByCheck[key] == nil && checksRunning.insert(key).inserted
         }
-        guard startsCheck else { return }
-        Task.detached(priority: .utility) { [self] in check(host: host, startCommand: startCommand) }
+        guard startsCheck else { return nil }
+        return Task.detached(priority: .utility) { [self] in _ = check(host: host, startCommand: startCommand) }
     }
 
     /// Runs the CLI's `--help` on the host and records whether it lists the flag. Returns nil when it could not
@@ -44,7 +45,7 @@ final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
         let key = Self.key(host: host, startCommand: startCommand)
         lock.withLock {
             checksRunning.remove(key)
-            if let answer { answersByCheck[key] = answer }
+            if let answer, !Task.isCancelled { answersByCheck[key] = answer }
         }
         return answer
     }

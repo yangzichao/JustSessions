@@ -114,25 +114,33 @@ enum CodexSessionTextResumer {
         )
     }
 
-    /// The resume state after a full read whose index is `indexFingerprint`, hashing the bytes the index covers. Nil
+    /// The resume state after a full read whose index is `indexFingerprint`, reusing its digest when provided. Nil
     /// when the file changed in any way since it was indexed, as the text may then come from other bytes than these;
     /// the next change reads it in full again.
     static func state(
-        of file: URL, indexedAs indexFingerprint: TranscriptFileFingerprint, finalPageRecord: Int, finalPageByteOffset: UInt64,
+        of file: URL, indexedAs indexFingerprint: TranscriptFileFingerprint, indexedDigest: Data? = nil,
+        finalPageRecord: Int, finalPageByteOffset: UInt64,
         committedEntryCount: Int, limits: TranscriptPageLimits
     ) throws -> SessionMessageTextResumeState? {
         guard let handle = try? FileHandle(forReadingFrom: file) else { return nil }
         defer { try? handle.close() }
-        var hasher = SHA256()
-        do {
-            try hash(handle.fileDescriptor, upTo: indexFingerprint.byteCount, into: &hasher)
-        } catch TranscriptPagingError.sourceChanged {
-            return nil
+        let digest: Data
+        if let indexedDigest {
+            guard indexedDigest.count == SHA256.byteCount else { return nil }
+            digest = indexedDigest
+        } else {
+            var hasher = SHA256()
+            do {
+                try hash(handle.fileDescriptor, upTo: indexFingerprint.byteCount, into: &hasher)
+            } catch TranscriptPagingError.sourceChanged {
+                return nil
+            }
+            digest = Data(hasher.finalize())
         }
         guard (try? TranscriptFileFingerprint(handle: handle)) == indexFingerprint else { return nil }
         return SessionMessageTextResumeState(
             device: indexFingerprint.device, inode: indexFingerprint.inode, byteCount: indexFingerprint.byteCount,
-            digest: Data(hasher.finalize()), finalPageRecord: finalPageRecord, finalPageByteOffset: finalPageByteOffset,
+            digest: digest, finalPageRecord: finalPageRecord, finalPageByteOffset: finalPageByteOffset,
             committedEntryCount: committedEntryCount, pageLimits: SessionMessageTextResumeState.pageLimits(of: limits)
         )
     }

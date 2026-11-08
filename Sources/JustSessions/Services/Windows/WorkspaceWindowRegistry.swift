@@ -8,6 +8,8 @@ final class WorkspaceWindowRegistry {
     /// The app's windows. A store made on its own, as in tests, gets a registry of its own and sees no other window.
     static let shared = WorkspaceWindowRegistry()
 
+    let hostSessionWork = HostSessionWorkCoordinator()
+
     private struct Workspace {
         weak var store: ConversationStore?
         weak var window: NSWindow?
@@ -16,15 +18,41 @@ final class WorkspaceWindowRegistry {
     }
 
     private var workspaces: [Workspace] = []
+    private struct DeletionOwner {
+        weak var store: ConversationStore?
+    }
+    /// Closing a window does not interrupt a native deletion. Keep its pending work visible to other windows
+    /// until that batch ends, without keeping a closed workspace in the window or refresh election lists.
+    private var deletionOwners: [DeletionOwner] = []
     /// Opens a workspace window through SwiftUI's `openWindow`, which each workspace window hands over as it appears;
     /// see `handsOverWindowOpening()`.
     var openWorkspaceWindow: (() -> Void)?
     /// Waiting for the windows `openWindow(handingOverTo:)` opened, in order.
     private var windowHandOvers: [(ConversationStore, NSWindow) -> Void] = []
+    /// Cleanup of a failed tmux pane is shared across windows before that session can be started again.
+    let terminalRestarts = TerminalRestartCoordinator()
 
     /// Every open window's store, oldest first.
     var stores: [ConversationStore] {
         workspaces.compactMap(\.store)
+    }
+
+    var storesWithSessionWork: [ConversationStore] {
+        var result = stores
+        for owner in deletionOwners {
+            if let store = owner.store, !result.contains(where: { $0 === store }) { result.append(store) }
+        }
+        return result
+    }
+
+    func deletionStarted(in store: ConversationStore) {
+        deletionOwners.removeAll { $0.store == nil }
+        guard !deletionOwners.contains(where: { $0.store === store }) else { return }
+        deletionOwners.append(DeletionOwner(store: store))
+    }
+
+    func deletionFinished(in store: ConversationStore) {
+        deletionOwners.removeAll { $0.store == nil || $0.store === store }
     }
 
     func add(_ store: ConversationStore) {

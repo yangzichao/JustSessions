@@ -1,8 +1,26 @@
+import Darwin
 import Foundation
 import Testing
 @testable import JustSessions
 
 struct CodexAdapterTests {
+    @Test func transcriptNamedPipesLinksAndDirectoriesAreSkipped() throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let sessions = root.appendingPathComponent("sessions")
+        try FileManager.default.createDirectory(at: sessions, withIntermediateDirectories: true)
+        let pipe = sessions.appendingPathComponent("rollout-pipe.jsonl")
+        try #require(mkfifo(pipe.path, 0o600) == 0)
+        let target = root.appendingPathComponent("real.jsonl")
+        try #"{"type":"session_meta","payload":{"id":"\#(UUID().uuidString)","cwd":"/project"}}"#
+            .appending("\n").write(to: target, atomically: true, encoding: .utf8)
+        try FileManager.default.createSymbolicLink(at: sessions.appendingPathComponent("rollout-link.jsonl"), withDestinationURL: target)
+        try FileManager.default.createDirectory(at: sessions.appendingPathComponent("rollout-directory.jsonl"), withIntermediateDirectories: true)
+        #expect(try CodexAdapter(codexDirectory: root).discover().isEmpty)
+        // The reader itself also rejects a pipe, covering replacement after the adapter's regular-file check.
+        #expect(CodexRolloutHead(file: pipe) == nil)
+    }
+
     @Test func discoversTitleAndNativeCommands() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }

@@ -5,6 +5,24 @@ import Testing
 struct SessionMessageTextCacheTests {
     private let text = SessionMessageText(entries: [.init(id: 4, segments: ["Saved text"])])
 
+    @Test func replacingASameSizeFileWithTheSameDatesInvalidatesItsSavedText() throws {
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let conversation = try conversation(in: directory, contents: "old message\n")
+        let date = Date(timeIntervalSince1970: 1_700_000_000)
+        try FileManager.default.setAttributes([.modificationDate: date], ofItemAtPath: conversation.sourceFile.path)
+        let before = SessionMessageTextFingerprint(conversation)
+        let cache = SessionMessageTextCache(directory: directory.appendingPathComponent("Cache"))
+        cache.save(text, for: conversation.id, fingerprint: before)
+        try Data("new message\n".utf8).write(to: conversation.sourceFile, options: .atomic)
+        try FileManager.default.setAttributes([.modificationDate: date], ofItemAtPath: conversation.sourceFile.path)
+        let after = SessionMessageTextFingerprint(conversation)
+        #expect(after.byteCount == before.byteCount)
+        #expect(after.modifiedAt == before.modifiedAt)
+        #expect(after.inode != before.inode)
+        #expect(cache.text(for: conversation.id, fingerprint: after) == nil)
+    }
+
     private func conversation(in directory: URL, provider: ConversationProvider = .codex, contents: String = "one line\n") throws -> Conversation {
         let file = directory.appendingPathComponent("\(UUID().uuidString).jsonl")
         try contents.write(to: file, atomically: true, encoding: .utf8)
