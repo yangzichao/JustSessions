@@ -1,5 +1,24 @@
 [
   {
+    "version": "1.3.1",
+    "publishedOn": "2026-11-08",
+    "title": {
+      "en": "Hide a CLI's sessions",
+      "zh-Hans": "隐藏 CLI 的会话"
+    },
+    "sections": [
+      {
+        "kind": "new",
+        "items": [
+          {
+            "en": "Hide a CLI's sessions by unticking it under Show sessions from in Settings; New session stops offering it.",
+            "zh-Hans": "在「设置」的「显示这些 CLI 的会话」中取消勾选某个 CLI，即可隐藏它的会话，新建会话也不再提供它。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.3.0",
     "publishedOn": "2026-11-05",
     "title": {
