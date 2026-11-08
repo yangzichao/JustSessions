@@ -40,6 +40,9 @@ struct TerminalFindBarFocusTests {
                 onOpenLink: { _ in }
             ))
             window.makeKeyAndOrderFront(nil)
+            // The test process never becomes the active app, so without this the window opens behind whatever app
+            // is in front and is occluded.
+            window.orderFrontRegardless()
         }
 
         var findFieldHasTheKeyboard: Bool {
