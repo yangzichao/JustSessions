@@ -1,9 +1,12 @@
 import Foundation
 
-/// Names of the tmux sessions tabs run their CLI in, on this Mac and on SSH hosts. A session's own tab uses a name
-/// derived from its session id, so resuming it again reattaches instead of starting a second CLI on the same session.
+/// Names of the tmux sessions tabs run their CLI or shell in, on this Mac and on SSH hosts. A session's own tab uses a
+/// name derived from its session id, so resuming it again reattaches instead of starting a second CLI on the same
+/// session. A plain terminal's name is its tab's own, kept with the tab across launches.
 enum TmuxSessionName {
     static let prefix = "justsessions-"
+    /// No CLI's executable is named `terminal`, so these names never name a session.
+    static let plainTerminalPrefix = "\(prefix)terminal-"
 
     static func forConversation(_ conversation: Conversation) -> String {
         forSession(provider: conversation.provider, sessionID: conversation.sessionID)
@@ -15,8 +18,20 @@ enum TmuxSessionName {
 
     /// A new session or a branch has no session id of its own yet.
     static func unique(for provider: ConversationProvider) -> String {
-        let suffix = UUID().uuidString.prefix(8).lowercased()
-        return "\(prefix)\(provider.executableName)-new-\(suffix)"
+        "\(prefix)\(provider.executableName)-new-\(randomSuffix())"
+    }
+
+    /// A new plain terminal's, which its tab keeps; see `ReopenableTerminalTab.tmuxSessionName`.
+    static func forNewPlainTerminal() -> String {
+        "\(plainTerminalPrefix)\(randomSuffix())"
+    }
+
+    static func isPlainTerminal(named name: String) -> Bool {
+        name.hasPrefix(plainTerminalPrefix)
+    }
+
+    private static func randomSuffix() -> String {
+        UUID().uuidString.prefix(8).lowercased()
     }
 
     /// The session whose own name this is; nil for a new session's temporary name and for other names.

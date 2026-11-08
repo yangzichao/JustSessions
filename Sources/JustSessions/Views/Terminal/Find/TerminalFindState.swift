@@ -10,10 +10,11 @@ final class TerminalFindState {
     var query = "" {
         didSet {
             guard query != oldValue, isPresented else { return }
-            matchCount = finder.findText(query)
+            showCount(finder.findText(query))
         }
     }
-    /// Nil before a search and for an engine that doesn't count matches.
+    /// Nil before a search and for an engine that doesn't count matches. A finder that counts later keeps the last count
+    /// until the next one arrives.
     private(set) var matchCount: TerminalFindMatchCount?
     /// The field has the keyboard, so Return, Shift-Return, and Escape belong to the bar, not the terminal's program.
     var isFieldFocused = false
@@ -23,23 +24,30 @@ final class TerminalFindState {
     private(set) var closeRevision = 0
 
     @ObservationIgnored private let finder: any TerminalTextFinding
+    @ObservationIgnored private let countsLater: Bool
 
     init(finder: any TerminalTextFinding) {
         self.finder = finder
+        let laterFinder = finder as? any TerminalTextFindingCountingLater
+        countsLater = laterFinder != nil
+        laterFinder?.onMatchCount = { [weak self] count in
+            guard let self, self.isPresented else { return }
+            self.matchCount = count
+        }
     }
 
     /// Opens the bar, or puts the keyboard back in it, and searches again for the text it kept.
     func show() {
         if !isPresented {
             isPresented = true
-            matchCount = query.isEmpty ? nil : finder.findText(query)
+            if !query.isEmpty { showCount(finder.findText(query)) }
         }
         focusRevision += 1
     }
 
     func move(_ direction: TerminalFindDirection) {
         guard isPresented, !query.isEmpty else { return }
-        matchCount = finder.findTextAgain(query, direction: direction)
+        showCount(finder.findTextAgain(query, direction: direction))
     }
 
     func close() {
@@ -49,5 +57,10 @@ final class TerminalFindState {
         matchCount = nil
         finder.endTextFind()
         closeRevision += 1
+    }
+
+    private func showCount(_ count: TerminalFindMatchCount?) {
+        guard !countsLater else { return }
+        matchCount = count
     }
 }

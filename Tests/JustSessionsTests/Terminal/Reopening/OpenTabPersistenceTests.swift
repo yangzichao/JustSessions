@@ -52,6 +52,25 @@ struct OpenTabPersistenceTests {
         #expect(persistence.take(from: settings.userDefaults).isEmpty)
     }
 
+    /// A plain terminal that ran without tmux saves no tmux session, and reopens with a new shell.
+    @Test func savesEachPlainTerminalsTmuxSession() throws {
+        let settings = try IsolatedUserDefaults()
+        defer { settings.removeSuite() }
+        let tabs = [
+            ReopenableTerminalTab(
+                conversationID: nil,
+                projectDirectoryKey: "ssh://devbox/srv/app",
+                wasSelected: true,
+                tmuxSessionName: "justsessions-terminal-a1b2c3d4"
+            ),
+            ReopenableTerminalTab(conversationID: nil, projectDirectoryKey: "/Users/me/paper", wasSelected: false),
+        ]
+
+        TerminalTabsToReopen(tabs: tabs).save(to: settings.userDefaults)
+
+        #expect(TerminalTabsToReopen.load(from: settings.userDefaults).tabs == tabs)
+    }
+
     @Test func unreadableSavedTabsReopenNothing() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

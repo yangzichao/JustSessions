@@ -1,7 +1,9 @@
 import Foundation
 
 /// A plain terminal: your login shell in a project folder, on the project's host. It runs no CLI and is no session,
-/// so the app never lists it, links it to a session, or watches what it does. It runs outside tmux and ends with its tab.
+/// so the app never lists it, links it to a session, or watches what it does. Where the host has tmux, the shell runs
+/// in a tmux session of the tab's own, so it outlives a quit, an update, or a dropped connection, and the tab attaches
+/// to it again; closing the tab ends it (see `ConversationStore+PlainTerminalTmux`). Without tmux it ends with its tab.
 extension ConversationStore {
     func openPlainTerminal(in location: ProjectLocation) {
         connectIfDisconnected(location.host)
@@ -29,11 +31,21 @@ extension ConversationStore {
         openTerminal(try makePlainTerminal(in: location))
     }
 
-    /// A plain terminal tab in the folder, not opened yet.
-    func makePlainTerminal(in location: ProjectLocation, startsOnceShown: Bool = false) throws -> TerminalSession {
-        let (command, projectPath) = try plainTerminalCommand(in: location)
+    /// A plain terminal tab in the folder, not opened yet. `tmuxSessionName` is the tmux session a reopened tab's shell
+    /// ran in, which it attaches to while that shell still runs; a new tab gets a name of its own. It opens with
+    /// `engine`, or else the engine chosen now.
+    func makePlainTerminal(
+        in location: ProjectLocation,
+        tmuxSessionName: String? = nil,
+        startsOnceShown: Bool = false,
+        engine: TerminalEngine? = nil
+    ) throws -> TerminalSession {
+        let (command, projectPath, runningTmuxSessionName) = try plainTerminalCommand(
+            in: location,
+            tmuxSessionName: tmuxSessionName ?? TmuxSessionName.forNewPlainTerminal()
+        )
         return TerminalSession(
-            engine: terminalEngineStore.engine,
+            engine: engine ?? terminalEngineStore.engine,
             conversation: nil,
             provider: nil,
             projectPath: projectPath,
@@ -41,19 +53,37 @@ extension ConversationStore {
             displayTitle: "Terminal · \(projectDisplayName(forProjectPath: location.key))",
             command: command,
             host: location.host,
-            startsOnceShown: startsOnceShown
+            tmuxSessionName: runningTmuxSessionName,
+            startsOnceShown: startsOnceShown,
+            tmuxHistory: runningTmuxSessionName.flatMap { plainTerminalTmuxHistory(sessionName: $0, on: location.host) }
         )
     }
 
-    /// Also returns the folder as the tab records it.
-    private func plainTerminalCommand(in location: ProjectLocation) throws -> (command: NativeCLICommand, projectPath: String) {
+    /// Also returns the folder as the tab records it, and the tmux session's name when the shell runs in tmux. An SSH
+    /// tab names one even on a host without tmux, where its shell runs directly, as a CLI tab does.
+    private func plainTerminalCommand(
+        in location: ProjectLocation,
+        tmuxSessionName: String
+    ) throws -> (command: NativeCLICommand, projectPath: String, tmuxSessionName: String?) {
         switch location.host {
         case .thisMac:
             let expandedPath = (location.path as NSString).expandingTildeInPath
             let standardizedPath = URL(fileURLWithPath: expandedPath).standardizedFileURL.path
-            return (try commandResolver.resolvePlainTerminal(projectPath: standardizedPath), standardizedPath)
+            let shell = try commandResolver.resolvePlainTerminal(projectPath: standardizedPath)
+            let (command, runningTmuxSessionName) = thisMacTabCommand(
+                running: shell,
+                tmuxSessionName: tmuxSessionName,
+                historyLimit: PlainTerminalTmuxHistoryLimit.lineCount
+            )
+            return (command, standardizedPath, runningTmuxSessionName)
         case .ssh(let destination):
-            return (RemoteCLICommandBuilder().plainTerminalCommand(host: destination, projectPath: location.path), location.path)
+            let command = RemoteCLICommandBuilder().plainTerminalCommand(
+                host: destination,
+                projectPath: location.path,
+                tmuxSessionName: tmuxSessionName,
+                usesHostTmuxPrefix: usesTmuxPrefix(on: location.host)
+            )
+            return (command, location.path, tmuxSessionName)
         }
     }
 }

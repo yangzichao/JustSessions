@@ -1,10 +1,10 @@
 import Foundation
 
 /// Like a browser reopening its tabs: the tabs open when the app quit open again at launch, in the same order, with the
-/// same one selected. A session tab whose CLI still runs in tmux on this Mac reattaches right away. Any other tab, such
+/// same one selected. A tab whose CLI or shell still runs in tmux on this Mac reattaches right away. Any other tab, such
 /// as one whose CLI ended with a restart of the Mac, starts once you select it: a session tab resumes its session with
-/// the CLI, and a plain terminal opens a new shell in its folder. A New session or Branch tab whose session was never
-/// known has nothing to reopen.
+/// the CLI, and a plain terminal attaches to its shell still running in tmux on its SSH host, or opens a new shell in
+/// its folder. A New session or Branch tab whose session was never known has nothing to reopen.
 extension ConversationStore {
     /// Every open tab with something to reopen, then the tabs from the last quit that have not reopened yet. Splits
     /// are not saved across quits, so the open tabs are saved in the order they would take with every split
@@ -36,12 +36,14 @@ extension ConversationStore {
         beginReopening(isEnabled ? tabs : [])
     }
 
-    /// Plain terminals reopen right away. Session tabs wait for their host to list its sessions; a host no longer in
-    /// the host list never will, so its tabs are left out, as are a disconnected host's, which would connect to it.
+    /// SSH hosts' plain terminals reopen right away, and attach to their shells once you select them. The other tabs
+    /// wait for their host to list its sessions, which on this Mac also tells which tmux it runs and which shells run
+    /// there; a host no longer in the host list never will, so its tabs are left out, as are a disconnected host's,
+    /// which would connect to it.
     func beginReopening(_ tabs: [ReopenableTerminalTab]) {
         let listedHosts = Set(hosts)
         pendingTabReopening = PendingTabReopening(tabs: tabs.filter { listedHosts.contains($0.host) && !isDisconnected($0.host) })
-        reopenWaitingTabs { $0.isPlainTerminal }
+        reopenWaitingTabs { $0.isPlainTerminal && $0.host != .thisMac }
     }
 
     /// Once the host lists its sessions, its waiting tabs reopen, except those whose session is gone.
@@ -86,7 +88,13 @@ extension ConversationStore {
     /// is gone.
     private func makeReopenedTerminal(for tab: ReopenableTerminalTab) -> TerminalSession? {
         guard let conversationID = tab.conversationID else {
-            return try? makePlainTerminal(in: ProjectLocation(key: tab.projectDirectoryKey), startsOnceShown: true)
+            let reattachesNow = tab.host == .thisMac
+                && tab.tmuxSessionName.map { tmuxSessionNamesByHost[.thisMac]?.contains($0) == true } == true
+            return try? makePlainTerminal(
+                in: ProjectLocation(key: tab.projectDirectoryKey),
+                tmuxSessionName: tab.tmuxSessionName,
+                startsOnceShown: !reattachesNow
+            )
         }
         guard let conversation = conversation(withID: conversationID),
               canLaunch(conversation, action: .resume),

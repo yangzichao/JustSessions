@@ -1,13 +1,17 @@
 import Foundation
 
 /// A tab open when the app quit, as much of it as reopens it at the next launch: the session it ran, or for a plain
-/// terminal its folder.
+/// terminal its folder and the tmux session its shell runs in.
 struct ReopenableTerminalTab: Codable, Equatable, Sendable {
     /// The session the tab ran, by `Conversation.id`; nil for a plain terminal.
     let conversationID: String?
     /// The tab's project, by `ProjectLocation.key`, which also names its host.
     let projectDirectoryKey: String
     let wasSelected: Bool
+    /// A plain terminal's tmux session, which reopening attaches to while its shell still runs, as after a quit, or
+    /// starts a new shell under. Nil for a session's tab, whose tmux session is named after the session, and for a
+    /// plain terminal that ran without tmux.
+    var tmuxSessionName: String? = nil
 
     var isPlainTerminal: Bool { conversationID == nil }
     var host: SessionHost { ProjectLocation(key: projectDirectoryKey).host }
@@ -21,7 +25,8 @@ extension ReopenableTerminalTab {
         self.init(
             conversationID: tab.conversation?.id,
             projectDirectoryKey: tab.projectDirectoryKey,
-            wasSelected: tab.id == selectedTerminalID
+            wasSelected: tab.id == selectedTerminalID,
+            tmuxSessionName: tab.isPlainTerminal ? tab.tmuxSessionName : nil
         )
     }
 }

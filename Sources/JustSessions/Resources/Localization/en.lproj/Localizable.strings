@@ -494,8 +494,8 @@
 	<string>Complete your split view</string>
 	<key>Connect</key>
 	<string>Connect</string>
-	<key>Connect again; a CLI still running in tmux on the host is reattached</key>
-	<string>Connect again; a CLI still running in tmux on the host is reattached</string>
+	<key>Connect again; a CLI or shell still running in tmux on the host is reattached</key>
+	<string>Connect again; a CLI or shell still running in tmux on the host is reattached</string>
 	<key>Connect and refresh sessions on %@</key>
 	<string>Connect and refresh sessions on %@</string>
 	<key>Connecting to %@…</key>

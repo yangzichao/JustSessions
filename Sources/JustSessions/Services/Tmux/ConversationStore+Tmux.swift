@@ -56,7 +56,7 @@ extension ConversationStore {
     }
 
     /// Closes the tab. With `endingTmuxSession`, the tmux session its CLI runs in stops too; without it, the CLI
-    /// keeps running and resuming reattaches.
+    /// keeps running and resuming reattaches. A plain terminal's shell stops either way, as closing it ends it.
     func closeTerminal(_ id: UUID, endingTmuxSession: Bool) {
         guard let session = terminalSessions.first(where: { $0.id == id }) else { return }
         let host = session.host
@@ -64,7 +64,7 @@ extension ConversationStore {
         let paneProcessID = session.tmuxPaneProcessID
         let canKeepCLIRunning = session.canKeepCLIRunningAfterClose
         closeTerminal(id)
-        guard let tmuxName else { return }
+        guard let tmuxName, !session.isPlainTerminal else { return }
         if endingTmuxSession {
             endTmuxSession(named: tmuxName, on: host)
         } else if canKeepCLIRunning {

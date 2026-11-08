@@ -40,19 +40,30 @@ struct TabReopeningStoreTests {
         let remote = sandbox.conversation(title: "Remote", host: .ssh("devbox"))
         let last = sandbox.conversation(title: "Last")
 
+        let remoteFolder = ProjectLocation(host: .ssh("devbox"), path: "/srv/app")
+
         store.beginReopening([
             .session(first),
             .session(remote),
+            .plainTerminal(in: remoteFolder, tmuxSessionName: "justsessions-terminal-a1b2c3d4"),
             .plainTerminal(in: sandbox.projectLocation),
             .session(last, wasSelected: true),
         ])
-        // A plain terminal needs no listing.
-        #expect(store.terminalSessions.map(\.displayTitle) == ["Terminal · project"])
+        // An SSH host's plain terminal needs no listing; this Mac's waits for it to tell whether its shell still runs.
+        #expect(store.terminalSessions.map(\.projectDirectoryKey) == [remoteFolder.key])
+        #expect(store.terminalSessions.first?.tmuxSessionName == "justsessions-terminal-a1b2c3d4")
 
         store.replaceConversations(on: .ssh("devbox"), with: [remote])
         store.replaceConversations(on: .thisMac, with: [first, last])
 
-        #expect(store.terminalSessions.map(\.displayTitle) == ["First", "Remote", "Terminal · project", "Last"])
+        #expect(store.terminalSessions.map(\.projectDirectoryKey) == [
+            first.projectDirectoryKey,
+            remote.projectDirectoryKey,
+            remoteFolder.key,
+            sandbox.projectLocation.key,
+            last.projectDirectoryKey,
+        ])
+        #expect(store.terminalSessions.map(\.isPlainTerminal) == [false, false, true, true, false])
         let selectedTab = try #require(store.selectedTerminal)
         #expect(selectedTab.conversation?.id == last.id)
         #expect(!selectedTab.isWaitingToBeShown)
@@ -146,9 +157,28 @@ struct TabReopeningStoreTests {
         TerminalTabsToReopen(tabs: [.plainTerminal(in: sandbox.projectLocation)]).save(to: sandbox.userDefaults)
 
         store.reopenTabsFromLastQuit(from: OpenTabPersistence(), isEnabled: true)
+        store.replaceConversations(on: .thisMac, with: [])
 
         let tab = try #require(store.terminalSessions.first)
         #expect(tab.isPlainTerminal)
         #expect(tab.isWaitingToBeShown)
+    }
+
+    @Test func aPlainTerminalWhoseShellStillRunsInTmuxOnThisMacReattachesRightAway() throws {
+        let sandbox = try TabReopeningSandbox()
+        defer { sandbox.tearDown() }
+        let store = sandbox.makeStore()
+        defer { store.closeAllTerminals() }
+        let running = "justsessions-terminal-a1b2c3d4"
+        store.setTmuxSessionNames([running], on: .thisMac)
+
+        store.beginReopening([
+            .plainTerminal(in: sandbox.projectLocation, tmuxSessionName: running),
+            .plainTerminal(in: sandbox.projectLocation, tmuxSessionName: "justsessions-terminal-e5f6a7b8"),
+        ])
+        #expect(store.terminalSessions.isEmpty)
+        store.replaceConversations(on: .thisMac, with: [])
+
+        #expect(store.terminalSessions.map(\.isWaitingToBeShown) == [false, true])
     }
 }

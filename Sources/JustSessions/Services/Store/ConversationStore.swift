@@ -1045,7 +1045,8 @@ final class ConversationStore {
     }
 
     /// Closing a tab of a split unlinks it, and the other tab goes back to its project's tabs; closing the selected
-    /// one leaves the other in front, full width. Closing any other selected tab shows a neighbor in its group.
+    /// one leaves the other in front, full width. Closing any other selected tab shows a neighbor in its group. A plain
+    /// terminal's shell ends with its tab, in tmux too.
     func closeTerminal(_ id: UUID) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }) else { return }
         defer { persistOpenTabs() }
@@ -1059,6 +1060,7 @@ final class ConversationStore {
         strip.removeTab(id)
         rememberClosedTab(closedTab, at: index)
         closedTab.close()
+        endPlainTerminalTmuxSession(of: closedTab)
         apply(strip)
         if selectedTerminalID == id { selectedTerminalID = tabToSelect }
         if closedTab.startsNewSession { refresh(closedTab.host) }

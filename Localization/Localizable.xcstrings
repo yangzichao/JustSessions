@@ -2932,12 +2932,12 @@
         }
       }
     },
-    "Connect again; a CLI still running in tmux on the host is reattached": {
+    "Connect again; a CLI or shell still running in tmux on the host is reattached": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "重新连接；仍在主机 tmux 中运行的 CLI 会重新接入"
+            "value": "重新连接；仍在主机 tmux 中运行的 CLI 或 shell 会重新接入"
           }
         }
       }

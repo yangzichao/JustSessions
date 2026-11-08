@@ -33,6 +33,28 @@ struct RemoteTabReconnectorTests {
         #expect(setup.host.askCount.value == 1)
     }
 
+    /// A plain terminal's shell runs on in tmux on the host, as a CLI does.
+    @Test func aDroppedPlainTerminalIsReconnectedToItsShell() async throws {
+        let setup = try DroppedTabSetup()
+        defer { setup.tearDown() }
+        let store = setup.sandbox.first
+        let plainTerminal = try store.makePlainTerminal(in: ProjectLocation(host: .ssh("devbox"), path: "/srv/app"))
+        store.openTerminal(plainTerminal)
+        let tmuxSessionName = try #require(plainTerminal.tmuxSessionName)
+        setup.host.answer.update { $0 = [tmuxSessionName] }
+
+        setup.drop(plainTerminal)
+        #expect(plainTerminal.isWaitingToReconnect)
+        setup.clock.advance(by: 2)
+        setup.reconnector.askDueHosts()
+
+        try await expectEventually { !store.terminalSessions.contains { $0.id == plainTerminal.id } }
+        let replacement = try #require(store.terminalSessions.first { $0.isPlainTerminal })
+        #expect(!replacement.hasExited)
+        #expect(replacement.tmuxSessionName == tmuxSessionName)
+        #expect(store.selectedTerminalID == replacement.id)
+    }
+
     /// Its CLI ended on the host, so reconnecting would start it again; nothing does that on its own.
     @Test func aDroppedTabWhoseTmuxSessionIsGoneStaysEnded() async throws {
         let setup = try DroppedTabSetup()
@@ -96,24 +118,18 @@ struct RemoteTabReconnectorTests {
         try await expectEventually { store.terminalSessions.first?.id != setup.tab.id }
     }
 
-    /// A CLI that exited, a tmux client that detached, and a plain terminal end `ssh` with another status or run
-    /// outside tmux.
+    /// A CLI or shell that exited, or a tmux client that detached, ends `ssh` with another status.
     @Test func onlyATabWhoseConnectionDroppedIsReconnected() throws {
         let setup = try DroppedTabSetup()
         defer { setup.tearDown() }
         setup.host.answer.update { $0 = [setup.tmuxSessionName] }
-        let store = setup.sandbox.first
-        store.openPlainTerminal(in: ProjectLocation(host: .ssh("devbox"), path: "/srv/project"))
-        let plainTerminal = try #require(store.terminalSessions.last)
 
         setup.end(setup.tab, exitCode: 0)
-        setup.drop(plainTerminal)
         setup.reconnector.tryAgain()
         setup.clock.advance(by: 2)
         setup.reconnector.askDueHosts()
 
         #expect(!setup.tab.isWaitingToReconnect)
-        #expect(!plainTerminal.isWaitingToReconnect)
         #expect(setup.host.askCount.value == 0)
     }
 

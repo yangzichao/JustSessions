@@ -35,6 +35,24 @@ struct ThisMacTmuxServerTests {
         #expect(command.environment == ["COLORTERM=truecolor", "PATH=/usr/bin:/bin", "TERM=xterm-256color"])
     }
 
+    /// A plain terminal's pane keeps as many lines as the tab's terminal would. tmux gives a pane the limit in force as
+    /// it starts, so the server's is raised for the new session only, and set on it for tmux 3.7 on, which applies a
+    /// session's limit to its pane again as it changes.
+    @Test func aPlainTerminalsSessionKeepsMoreHistoryAndOtherSessionsKeepTmuxsDefault() throws {
+        let shell = NativeCLICommand(executablePath: "/bin/zsh", arguments: ["-l"], workingDirectory: "/Users/me/paper", environment: [])
+
+        let arguments = server.command(attachingTo: "justsessions-terminal-a1b2c3d4", running: shell, historyLimit: 10_000).arguments
+
+        let sessionStart = try #require(arguments.firstIndex(of: "new-session"))
+        #expect(Array(arguments[(sessionStart - 5)..<sessionStart]) == ["set-option", "-gq", "history-limit", "10000", ";"])
+        #expect(Array(arguments.suffix(15)) == [
+            "--", "/bin/zsh", "-l",
+            ";", "set-option", "-q", "-t", "=justsessions-terminal-a1b2c3d4:", "history-limit", "10000",
+            ";", "set-option", "-gq", "history-limit", "2000",
+        ])
+        #expect(!server.command(attachingTo: "justsessions-claude-abc", running: shell).arguments.contains("history-limit"))
+    }
+
     @Test func aCLIWithoutArgumentsRunsThroughEnvRatherThanTheShell() {
         let cli = NativeCLICommand(executablePath: "/Users/me/my tools/codex", arguments: [], workingDirectory: "/tmp", environment: [])
 

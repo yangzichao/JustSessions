@@ -41,6 +41,8 @@ protocol TabTerminalView: NSView, TerminalTextFinding {
     var trailingMarginWidth: CGFloat { get }
     /// For a tab whose CLI runs in tmux, on this Mac or an SSH host; see `SelectableTerminalView.cliRunsInTmux`.
     var cliRunsInTmux: Bool { get set }
+    /// The terminal shows the alternate screen, which keeps no scrollback, as a tmux client's terminal does.
+    var isOnAlternateScreen: Bool { get }
     /// The terminal takes files dropped on it. Every tab turns it on.
     var acceptsDroppedFiles: Bool { get set }
     /// Takes the files dropped on a tab whose CLI runs on an SSH host, which copies them there before typing the host's
@@ -70,6 +72,7 @@ extension SelectableTerminalView: TabTerminalView {
     /// None: SwiftTerm keeps its scroller's width free inside its own view.
     var trailingMarginWidth: CGFloat { 0 }
     var processID: Int32 { process.shellPid }
+    var isOnAlternateScreen: Bool { terminal.isCurrentBufferAlternate }
 
     func connectProcessObserver(_ observer: TerminalProcessObserver) {
         processDelegate = observer
