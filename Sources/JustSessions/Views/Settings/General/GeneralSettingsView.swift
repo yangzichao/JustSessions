@@ -1,10 +1,12 @@
 import SwiftUI
 
 /// The General tab of Settings: interface language, what the app does at startup, what closing a tab and ⌘-clicking a
-/// file link in one do, whether the sidebar lists subagents, and when it notifies you; then the installed versions,
-/// software updates, and feedback.
+/// file link in one do, whether the sidebar lists subagents and which CLIs' sessions it lists, and when it notifies
+/// you; then the installed versions, software updates, and feedback.
 struct GeneralSettingsView: View {
     let hosts: [SessionHost]
+    /// The window's store, which keeps the CLIs whose sessions are hidden.
+    let conversationStore: ConversationStore
     @ObservedObject var languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
@@ -50,7 +52,7 @@ struct GeneralSettingsView: View {
 
             ThemeDivider()
 
-            SidebarSettingsSection()
+            SidebarSettingsSection(store: conversationStore)
 
             ThemeDivider()
 

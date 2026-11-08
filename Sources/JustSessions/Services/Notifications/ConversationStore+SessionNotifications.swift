@@ -48,7 +48,9 @@ extension ConversationStore {
                 projectName: projectDisplayName(forProjectPath: tab.projectDirectoryKey)
             )
         }
-        guard let conversationID = event.source.conversationID, let conversation = conversation(withID: conversationID) else {
+        // A hidden CLI's session notifies only from an open tab, which still shows it.
+        guard let conversationID = event.source.conversationID, let conversation = conversation(withID: conversationID),
+              !hiddenConversationProviders.hides(conversation.provider) else {
             return nil
         }
         return SessionNotification(

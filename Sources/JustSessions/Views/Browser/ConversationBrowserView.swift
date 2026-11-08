@@ -132,11 +132,16 @@ struct ConversationBrowserView: View {
             search: messageSearch,
             typedQuery: searchText,
             conversations: store.sidebarConversations,
-            conversationsRevision: store.conversationsRevision
+            conversationsRevision: store.conversationsRevision,
+            hiddenProviders: store.hiddenConversationProviders
         ))
         // A reveal opens the reader only for the session it was made for, and only once.
         .onChange(of: sessionSelection.onlySelectedConversationID) { _, conversationID in
             if conversationID != transcriptMatchReveal?.conversationID { transcriptMatchReveal = nil }
+        }
+        // A tool filter on a CLI just hidden in Settings would list nothing.
+        .onChange(of: store.hiddenConversationProviders) { _, hiddenProviders in
+            if let provider = providerFilter.provider, hiddenProviders.hides(provider) { providerFilter = .all }
         }
         .modifier(WorkspaceNavigationControls(
             store: store,
@@ -187,7 +192,7 @@ struct ConversationBrowserView: View {
             HostCheckSheet(store: store, presentedState: state)
         }
         .dismissesOnClickOutside(item: hostCheckBinding)
-        .showsAppWideSheets($appWideSheet, hosts: store.hosts, onCheckForUpdates: { updateManager.checkForUpdates() })
+        .showsAppWideSheets($appWideSheet, store: store, onCheckForUpdates: { updateManager.checkForUpdates() })
         .modifier(WorkspaceTabActionsValue(
             store: store,
             isEnabled: workspaceTabCommandsEnabled,

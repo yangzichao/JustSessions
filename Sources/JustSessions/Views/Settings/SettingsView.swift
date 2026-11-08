@@ -6,6 +6,8 @@ struct SettingsView: View {
     @Binding var selectedTab: SettingsTab
     /// This Mac and the window's SSH hosts, for settings each host has its own of.
     let hosts: [SessionHost]
+    /// The window's store, for settings it keeps, such as the CLIs whose sessions are hidden.
+    let conversationStore: ConversationStore
     let languageStore: AppLanguageStore
     let tabReopeningSettingsStore: TabReopeningSettingsStore
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
@@ -38,6 +40,7 @@ struct SettingsView: View {
                 case .general:
                     GeneralSettingsView(
                         hosts: hosts,
+                        conversationStore: conversationStore,
                         languageStore: languageStore,
                         tabReopeningSettingsStore: tabReopeningSettingsStore,
                         launchAtLoginSettingsStore: launchAtLoginSettingsStore,

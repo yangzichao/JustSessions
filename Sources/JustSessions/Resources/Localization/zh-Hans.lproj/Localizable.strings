@@ -236,6 +236,8 @@
 	<string>在这台 Mac 上恢复 %@ 会话时也会用它。JustSessions 会在它后面加上自己的参数。</string>
 	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
 	<string>已归档的项目会从侧栏中隐藏。其文件夹和会话仍保留在磁盘上，恢复后会重新列出。在其文件夹中新建会话也会恢复该项目。</string>
+	<key>An unticked CLI's sessions leave the sidebar, search, and the filter menu, and New session stops offering it. Its open tabs stay, and its session files are kept.</key>
+	<string>取消勾选的 CLI，它的会话不再出现在侧栏、搜索和筛选菜单中，新建会话时也不再提供它。它已打开的标签页会保留，会话文件也不会删除。</string>
 	<key>Another program on this Mac uses port %@. Choose another port on this Mac.</key>
 	<string>此 Mac 上的另一个程序正在使用端口 %@。请为此 Mac 选择其他端口。</string>
 	<key>Answer</key>
@@ -836,6 +838,8 @@
 	<string>知道了</string>
 	<key>Help</key>
 	<string>帮助</string>
+	<key>Hidden CLIs</key>
+	<string>隐藏的 CLI</string>
 	<key>Hide %lld subagent sessions</key>
 	<string>隐藏 %lld 个子代理会话</string>
 	<key>Hide Conversation Map</key>
@@ -1528,6 +1532,8 @@
 	<string>查看说明</string>
 	<key>Show in Other Window</key>
 	<string>在另一个窗口中显示</string>
+	<key>Show sessions from</key>
+	<string>显示这些 CLI 的会话</string>
 	<key>Show sidebar</key>
 	<string>显示侧栏</string>
 	<key>Show sidebar (⌘B)</key>

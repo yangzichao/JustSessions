@@ -43,8 +43,10 @@ final class AppWideSheetState: ObservableObject {
 
 struct AppWideSheetHostingStandIn: View {
     @ObservedObject var state: AppWideSheetState
+    /// Only shows Settings, which reads it; nothing here changes a setting it keeps.
+    @State private var store = ConversationStore(adapters: [], startsBackgroundPolling: false)
 
     var body: some View {
-        Color.clear.showsAppWideSheets($state.sheet, hosts: [.thisMac], onCheckForUpdates: {})
+        Color.clear.showsAppWideSheets($state.sheet, store: store, onCheckForUpdates: {})
     }
 }

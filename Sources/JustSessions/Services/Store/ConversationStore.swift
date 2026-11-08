@@ -44,6 +44,8 @@ final class ConversationStore {
     private(set) var archivedSessions: ArchivedSessions
     private(set) var messageBookmarks: MessageBookmarks
     private(set) var sessionsDeletedWhenTabCloses: SessionsDeletedWhenTabCloses
+    /// CLIs whose sessions the sidebar leaves out and New session doesn't offer; see `HiddenConversationProviders`.
+    private(set) var hiddenConversationProviders: HiddenConversationProviders
     var sidebarProjectList: SidebarProjectList
     private var terminalSessionsStorage: [TerminalSession] = [] {
         didSet {
@@ -263,6 +265,7 @@ final class ConversationStore {
         self.archivedSessions = ArchivedSessions.load(from: userDefaults)
         self.messageBookmarks = MessageBookmarks.load(from: userDefaults)
         self.sessionsDeletedWhenTabCloses = SessionsDeletedWhenTabCloses.load(from: userDefaults)
+        self.hiddenConversationProviders = HiddenConversationProviders.load(from: userDefaults)
         self.sidebarProjectList = SidebarProjectList.load(from: userDefaults)
         self.remoteHostList = RemoteHostList.load(from: userDefaults)
         self.remoteHostsUsingTmuxPrefix = RemoteHostsUsingTmuxPrefix.load(from: userDefaults)
@@ -406,6 +409,11 @@ final class ConversationStore {
         changeSavedCustomization(\.archivedSessions) { $0.setArchived(isArchived, conversationIDs: conversations.map(\.id)) }
     }
 
+    /// Hiding a CLI only changes what the app lists and offers; its sessions' files and its open tabs are kept.
+    func setHidden(_ isHidden: Bool, provider: ConversationProvider) {
+        changeSavedCustomization(\.hiddenConversationProviders) { $0.setHidden(isHidden, provider: provider) }
+    }
+
     /// Whether closing the sessions' tab deletes them; see `SessionsDeletedWhenTabCloses`.
     func setDeletedWhenTabCloses(_ isDeleted: Bool, conversationIDs: [String]) {
         changeSavedCustomization(\.sessionsDeletedWhenTabCloses) {
@@ -479,7 +487,8 @@ final class ConversationStore {
         return saved
     }
 
-    /// Changes a name, pin, archiving, bookmark, or deletion when a tab closes, which every workspace window shares.
+    /// Changes a name, pin, archiving, bookmark, deletion when a tab closes, or hidden CLI, which every workspace
+    /// window shares.
     /// The change starts from what is saved, not from this window's copy: another window may have changed it since
     /// this one loaded it, and saving this window's copy lost that change. Every window then shows the result.
     private func changeSavedCustomization<Customization: SavedCustomization>(

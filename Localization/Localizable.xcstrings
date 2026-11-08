@@ -1369,6 +1369,16 @@
         }
       }
     },
+    "An unticked CLI's sessions leave the sidebar, search, and the filter menu, and New session stops offering it. Its open tabs stay, and its session files are kept.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消勾选的 CLI，它的会话不再出现在侧栏、搜索和筛选菜单中，新建会话时也不再提供它。它已打开的标签页会保留，会话文件也不会删除。"
+          }
+        }
+      }
+    },
     "Another program on this Mac uses port %@. Choose another port on this Mac.": {
       "localizations": {
         "zh-Hans": {
@@ -4587,6 +4597,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "帮助"
+          }
+        }
+      }
+    },
+    "Hidden CLIs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏的 CLI"
           }
         }
       }
@@ -8131,6 +8151,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "在另一个窗口中显示"
+          }
+        }
+      }
+    },
+    "Show sessions from": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示这些 CLI 的会话"
           }
         }
       }

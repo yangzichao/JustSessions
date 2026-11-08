@@ -53,9 +53,11 @@ extension ConversationStore {
         )
     }
 
-    /// Nil unless the session's CLI, which runs in tmux with no tab open, waits on you.
+    /// Nil unless the session's CLI, which runs in tmux with no tab open, waits on you. A hidden CLI's session is
+    /// listed only from an open tab.
     private func notificationBellEntry(forDetachedConversationID conversationID: String) -> NotificationBellEntry? {
-        guard let conversation = conversation(withID: conversationID), let reason = WaitingForYou.reason(
+        guard let conversation = conversation(withID: conversationID),
+              !hiddenConversationProviders.hides(conversation.provider), let reason = WaitingForYou.reason(
             activity: detachedCLIActivities[conversationID],
             hasUnseenFinishedTurn: hasUnseenFinishedTurn(detachedConversationID: conversationID)
         ) else { return nil }

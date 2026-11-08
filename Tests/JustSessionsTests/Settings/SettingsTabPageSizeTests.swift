@@ -15,6 +15,7 @@ struct SettingsTabPageSizeTests {
         let tabs: [(name: String, content: AnyView)] = [
             ("General", AnyView(GeneralSettingsView(
                 hosts: [.thisMac, .ssh("devbox")],
+                conversationStore: ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false),
                 languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
                 tabReopeningSettingsStore: TabReopeningSettingsStore(userDefaults: settings.userDefaults),
                 launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),
