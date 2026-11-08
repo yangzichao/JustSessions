@@ -224,6 +224,8 @@
 	<string>Also resumes %@ sessions on this Mac. JustSessions adds its own arguments after it.</string>
 	<key>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</key>
 	<string>An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it.</string>
+	<key>An unticked CLI's sessions leave the sidebar, search, and the filter menu, and New session stops offering it. Its open tabs stay, and its session files are kept.</key>
+	<string>An unticked CLI's sessions leave the sidebar, search, and the filter menu, and New session stops offering it. Its open tabs stay, and its session files are kept.</string>
 	<key>Another program on this Mac uses port %@. Choose another port on this Mac.</key>
 	<string>Another program on this Mac uses port %@. Choose another port on this Mac.</string>
 	<key>Answer</key>
@@ -796,6 +798,8 @@
 	<string>Got it</string>
 	<key>Help</key>
 	<string>Help</string>
+	<key>Hidden CLIs</key>
+	<string>Hidden CLIs</string>
 	<key>Hide Conversation Map</key>
 	<string>Hide Conversation Map</string>
 	<key>Hide Sidebar</key>
@@ -1478,6 +1482,8 @@
 	<string>Show explanation</string>
 	<key>Show in Other Window</key>
 	<string>Show in Other Window</string>
+	<key>Show sessions from</key>
+	<string>Show sessions from</string>
 	<key>Show sidebar</key>
 	<string>Show sidebar</string>
 	<key>Show sidebar (⌘B)</key>

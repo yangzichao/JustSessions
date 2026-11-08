@@ -23,7 +23,7 @@
 | --- | --- | --- | --- |
 | DSC-20 | CLIs are found when the app is opened from Finder or the Dock: the login shell's `PATH` is read once in the background, with common install folders (nvm, bun, volta, pnpm, `~/.toolbox/bin`, `~/.opencode/bin`) as a fallback. Spawned CLIs get that combined `PATH`, so npm-installed CLIs find `node`. | `022aad5`, `112a6aa`, `81e53c6` | `CLILookupTests`, `LoginShellEnvironmentTests` |
 | DSC-21 | Spawned CLIs never inherit `NO_COLOR` or similar variables, and see `TERM=xterm-256color` and `COLORTERM=truecolor`. Nor do they, or a plain terminal, inherit the variables of a Claude Code session the app was opened from, as by `make dev` in a Claude Code terminal (`ClaudeCodeSessionEnvironment`): with `CLAUDE_CODE_CHILD_SESSION` a Claude Code tab saved no transcript ("Transcript saving is off"), so its session was never listed and its tab never linked. Settings such as `CLAUDE_CONFIG_DIR` and `ANTHROPIC_*` stay. | `3f2b21b`, bug report, 23 October 2026 | `TerminalColorEnvironmentTests` |
-| DSC-22 | New session menus offer only CLIs installed on that machine; until a machine's first check finishes, every CLI that runs there is offered. The sidebar's CLI filter lists CLIs that are installed or have sessions. | `12abb26` | `InstalledCLIsTests` |
+| DSC-22 | New session menus offer only CLIs installed on that machine; until a machine's first check finishes, every CLI that runs there is offered. A CLI hidden in Settings (SBF-25) is never offered. The sidebar's CLI filter lists CLIs that are installed or have sessions, except hidden ones. | `12abb26` | `InstalledCLIsTests` |
 
 ## Starting and resuming
 

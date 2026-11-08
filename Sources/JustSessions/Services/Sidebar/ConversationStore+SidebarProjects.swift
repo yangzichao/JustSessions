@@ -49,7 +49,8 @@ extension ConversationStore {
             sidebarProjectList: sidebarProjectList,
             pendingNewSessions: pendingNewSessions,
             projectDisplayNames: projectDisplayNames,
-            pinnedItems: pinnedItems
+            pinnedItems: pinnedItems,
+            hiddenProviders: hiddenConversationProviders
         )
         if let cachedSidebarProjection, cachedSidebarProjection.inputs == inputs { return cachedSidebarProjection }
         let projection = SidebarProjection(inputs: inputs, conversations: conversations)

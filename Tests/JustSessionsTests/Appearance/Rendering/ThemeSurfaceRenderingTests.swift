@@ -13,10 +13,12 @@ struct ThemeSurfaceRenderingTests {
         let terminalStore = TerminalAppearanceStore(userDefaults: settings.userDefaults)
         let notificationStore = SessionNotificationSettingsStore(userDefaults: settings.userDefaults)
         let tabReopeningStore = TabReopeningSettingsStore(userDefaults: settings.userDefaults)
+        let conversationStore = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
         func settingsView(selectedTab: SettingsTab) -> AnyView {
             AnyView(SettingsView(
                 selectedTab: .constant(selectedTab),
                 hosts: [.thisMac],
+                conversationStore: conversationStore,
                 languageStore: AppLanguageStore(userDefaults: settings.userDefaults),
                 tabReopeningSettingsStore: tabReopeningStore,
                 launchAtLoginSettingsStore: LaunchAtLoginSettingsStore(),

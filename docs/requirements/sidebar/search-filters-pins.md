@@ -16,11 +16,12 @@
 
 | ID | Requirement | Origin | Related tests |
 | --- | --- | --- | --- |
-| SBF-20 | The Projects filter menu offers **Last 7 days**, one CLI (listing only CLIs installed or with sessions), **Running**, **Waiting for you**, and **Show archived** (SBF-24). The two status filters are exclusive. Filters never hide open tabs. | `cb9c604`, `12abb26`, `8ddfcf5`, `66e5e05` | `ConversationProviderFilterTests`, `RunningSessionsFilterTests`, `WaitingForYouTests` |
+| SBF-20 | The Projects filter menu offers **Last 7 days**, one CLI (listing only CLIs installed or with sessions, and not hidden, SBF-25), **Running**, **Waiting for you**, and **Show archived** (SBF-24). The two status filters are exclusive. Filters never hide open tabs. | `cb9c604`, `12abb26`, `8ddfcf5`, `66e5e05` | `ConversationProviderFilterTests`, `RunningSessionsFilterTests`, `WaitingForYouTests` |
 | SBF-21 | **Running** lists sessions whose CLI runs in a tab of any window or in tmux after its tab closed, on this Mac or on an SSH host as of its last refresh. | `66e5e05` | `RunningSessionsFilterTests` |
 | SBF-22 | **Waiting for you** lists sessions stopped for your answer or done with a turn you haven't seen, including new sessions' tabs. Empty projects hide while a status filter is on. | `8ddfcf5` | `WaitingForYouTests` |
 | SBF-23 | The recent filter moves an aging session out within a minute. | `4878267` | `FilteredSidebarProjectionTests` |
 | SBF-24 | Archived sessions (DEL-33) are left out of the Projects list, its search, and the menu's other counts, under **Running** and **Waiting for you** too, even while their CLI runs; their tabs stay. **Show archived · N** is off in each new window; turning it on lists them with the others, each with an archive box after its title, and Clear filters turns it off. | `4e97aec` | `ArchivedSessionsTests`, `SidebarProjectFilteringTests` |
+| SBF-25 | Unticking a CLI under **Show sessions from** in Settings → General treats it as not installed, in every window and on every host: its sessions leave the Projects list, its search and counts, and the filter menu, and New session stops offering it (DSC-22). A project whose only sessions are that CLI's leaves too; one with no sessions stays. A window filtered to that CLI goes back to all tools. Its open tabs stay, with their notifications and bell rows; one running in tmux with no tab neither notifies nor shows in the bell. Nothing is deleted, and the CLI's sessions are still scanned, so ticking it again lists them at once; All Bookmarks still lists their bookmarks. | Feature request, 7 November 2026 | `HiddenConversationProvidersTests` |
 
 ## Pins and names
 

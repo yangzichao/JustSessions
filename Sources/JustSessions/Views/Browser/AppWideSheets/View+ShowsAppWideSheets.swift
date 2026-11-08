@@ -1,11 +1,11 @@
 import SwiftUI
 
 extension View {
-    /// Shows Settings while `sheet` holds a selected page. Help opens its Help tab in the same sheet. `hosts` are the
-    /// window's hosts, whose settings Settings lists.
+    /// Shows Settings while `sheet` holds a selected page. Help opens its Help tab in the same sheet. `store` is the
+    /// window's, whose hosts' settings Settings lists.
     func showsAppWideSheets(
         _ sheet: Binding<AppWideSheet?>,
-        hosts: [SessionHost],
+        store: ConversationStore,
         onCheckForUpdates: @escaping () -> Void
     ) -> some View {
         environment(\.showAppWideSheet, ShowAppWideSheetAction { sheet.wrappedValue = $0 })
@@ -16,7 +16,7 @@ extension View {
                         get: { sheet.wrappedValue?.selectedSettingsTab ?? .general },
                         set: { sheet.wrappedValue = AppWideSheet(selectedSettingsTab: $0) }
                     ),
-                    hosts: hosts,
+                    store: store,
                     onCheckForUpdates: onCheckForUpdates
                 )
             }
