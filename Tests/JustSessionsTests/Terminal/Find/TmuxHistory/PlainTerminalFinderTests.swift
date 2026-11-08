@@ -71,6 +71,24 @@ struct PlainTerminalFinderTests {
         #expect(terminal.calls.last == .findAgain("needle", .towardNewer))
     }
 
+    /// As in tmux 3.4, which counts nothing: the search goes on in tmux, with no count.
+    @Test func aSearchTmuxFoundButDidntCountStaysInTmux() async throws {
+        let terminal = TerminalFinderStandIn()
+        let tmux = ScriptedTmuxHistory(countOutputs: Array(repeating: ScriptedTmuxHistory.countLine(nil, foundAny: true), count: 2))
+        let finder = PlainTerminalFinder(terminalFinder: terminal, tmuxHistory: tmux.history) { true }
+        var reports: [TerminalFindMatchCount?] = []
+        finder.onMatchCount = { reports.append($0) }
+
+        _ = finder.findText("needle")
+        try await expectEventually { reports.count == 1 }
+        _ = finder.findTextAgain("needle", direction: .towardOlder)
+
+        try await expectEventually { reports.count == 2 }
+        #expect(reports == [nil, nil])
+        #expect(tmux.commands.count == 2)
+        #expect(terminal.calls.isEmpty)
+    }
+
     @Test func anEmptyQueryEndsTheSearchAndClearsTheCount() {
         let terminal = TerminalFinderStandIn()
         let finder = PlainTerminalFinder(terminalFinder: terminal, tmuxHistory: ScriptedTmuxHistory(countOutputs: []).history) { false }

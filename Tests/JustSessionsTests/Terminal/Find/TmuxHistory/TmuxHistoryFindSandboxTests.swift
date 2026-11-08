@@ -11,11 +11,11 @@ struct TmuxHistoryFindSandboxTests {
         guard let session = try await FindSandboxSession.start(modeKeys: modeKeys) else { return }
         defer { session.sandbox.tearDown() }
         let finder = TmuxHistoryFinder(history: .onThisMac(sessionName: session.name, server: session.sandbox.server))
-        var reports: [TerminalFindMatchCount?] = []
-        finder.onStepFinished = { reports.append($0) }
+        var outcomes: [TmuxHistorySearchOutcome] = []
+        finder.onStepFinished = { outcomes.append($0) }
         func expectSelected(_ number: Int, onLine line: String, sourceLocation: SourceLocation = #_sourceLocation) {
             #expect(
-                reports.last == TerminalFindMatchCount(total: 3, selectedNumber: number, exceedsCountLimit: false),
+                outcomes.last == .searched(TerminalFindMatchCount(total: 3, selectedNumber: number, exceedsCountLimit: false)),
                 sourceLocation: sourceLocation
             )
             // In tmux 3.6a, unlike 3.7c, the top line also has copy mode's position on its right.
@@ -23,7 +23,7 @@ struct TmuxHistoryFindSandboxTests {
         }
 
         _ = finder.findText("NEEDLE")
-        try await expectEventually { reports.count == 1 }
+        try await expectEventually { outcomes.count == 1 }
         expectSelected(1, onLine: "Needle 3")
         let steps: [(TerminalFindDirection, Int, String)] = [
             (.towardOlder, 2, "needle 2"),
@@ -33,9 +33,9 @@ struct TmuxHistoryFindSandboxTests {
             (.towardNewer, 2, "needle 2"),
         ]
         for (direction, number, line) in steps {
-            let reportCount = reports.count
+            let reportCount = outcomes.count
             _ = finder.findTextAgain("NEEDLE", direction: direction)
-            try await expectEventually { reports.count == reportCount + 1 }
+            try await expectEventually { outcomes.count == reportCount + 1 }
             expectSelected(number, onLine: line)
         }
 
@@ -49,16 +49,16 @@ struct TmuxHistoryFindSandboxTests {
         guard let session = try await FindSandboxSession.start(modeKeys: "emacs") else { return }
         defer { session.sandbox.tearDown() }
         let finder = TmuxHistoryFinder(history: .onThisMac(sessionName: session.name, server: session.sandbox.server))
-        var reports: [TerminalFindMatchCount?] = []
-        finder.onStepFinished = { reports.append($0) }
+        var outcomes: [TmuxHistorySearchOutcome] = []
+        finder.onStepFinished = { outcomes.append($0) }
 
         _ = finder.findText("École")
-        try await expectEventually { reports.count == 1 }
-        #expect(reports.last == TerminalFindMatchCount(total: 1, selectedNumber: 1, exceedsCountLimit: false))
+        try await expectEventually { outcomes.count == 1 }
+        #expect(outcomes.last == .searched(TerminalFindMatchCount(total: 1, selectedNumber: 1, exceedsCountLimit: false)))
 
         _ = finder.findText("absent")
-        try await expectEventually { reports.count == 2 }
-        #expect(reports.last == TerminalFindMatchCount.none)
+        try await expectEventually { outcomes.count == 2 }
+        #expect(outcomes.last == .searched(TerminalFindMatchCount.none))
     }
 }
 

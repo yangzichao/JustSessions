@@ -76,11 +76,28 @@ struct TmuxHistorySearchCommandsTests {
         #expect(partial.isPartial)
     }
 
+    /// tmux 3.4 counts nothing, and says whether the search found any.
+    @Test func readsWhetherTheSearchFoundAnyWithOrWithoutACount() throws {
+        let foundUncounted = try #require(TmuxHistorySearchCommands.printedCount(inOutput: "justsessions-find-count   1\n"))
+        #expect(foundUncounted.total == nil)
+        #expect(!foundUncounted.isPartial)
+        #expect(foundUncounted.foundAny == true)
+
+        let foundNone = try #require(TmuxHistorySearchCommands.printedCount(inOutput: "justsessions-find-count   0\n"))
+        #expect(foundNone.total == nil)
+        #expect(foundNone.foundAny == false)
+
+        let counted = try #require(TmuxHistorySearchCommands.printedCount(inOutput: "justsessions-find-count 2 0 1\n"))
+        #expect(counted.total == 2)
+        #expect(counted.foundAny == true)
+    }
+
     @Test func anEmptyCountHasNoTotal() throws {
         let printed = try #require(TmuxHistorySearchCommands.printedCount(inOutput: "justsessions-find-count  \n"))
 
         #expect(printed.total == nil)
         #expect(!printed.isPartial)
+        #expect(printed.foundAny == nil)
     }
 
     @Test func outputWithoutTheCountsLineIsNoCount() {

@@ -23,7 +23,7 @@ final class PlainTerminalFinder: TerminalTextFindingCountingLater {
         self.terminalFinder = terminalFinder
         tmuxFinder = TmuxHistoryFinder(history: tmuxHistory)
         self.terminalIsOnAlternateScreen = terminalIsOnAlternateScreen
-        tmuxFinder.onStepFinished = { [weak self] count in self?.tmuxStepFinished(count) }
+        tmuxFinder.onStepFinished = { [weak self] outcome in self?.tmuxStepFinished(outcome) }
     }
 
     func findText(_ query: String) -> TerminalFindMatchCount? {
@@ -63,15 +63,16 @@ final class PlainTerminalFinder: TerminalTextFindingCountingLater {
         searchesInTmux = nil
     }
 
-    private func tmuxStepFinished(_ count: TerminalFindMatchCount?) {
+    private func tmuxStepFinished(_ outcome: TmuxHistorySearchOutcome) {
         guard searchesInTmux == true else { return }
-        guard count == nil else {
+        switch outcome {
+        case .searched(let count):
             report(count)
-            return
+        case .couldNotSearch:
+            tmuxFinder.endTextFind()
+            searchesInTmux = false
+            report(terminalFinder.findText(query))
         }
-        tmuxFinder.endTextFind()
-        searchesInTmux = false
-        report(terminalFinder.findText(query))
     }
 
     /// The terminal searches even with no one to tell, as `onMatchCount?(…)` would skip its argument.

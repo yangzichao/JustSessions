@@ -15,11 +15,13 @@ import Foundation
 /// tmux counts every match only for the first search of a copy mode or a search for other text; a search for the same
 /// text again counts only the screen's and keeps the count it had. Any copy mode command but a search drops the count,
 /// so no other command comes between a search's steps, and a new search leaves copy mode and enters it again first.
+/// tmux 3.4 counts nothing, and only says whether the search found any; 3.6a and 3.7c count.
 enum TmuxHistorySearchCommands {
-    /// Prints the matches tmux counted, and 1 when it stopped counting before the last, after a word that tells the
-    /// line from what an SSH host's startup files print.
+    /// Prints the matches tmux counted, 1 when it stopped counting before the last, and 1 when the search found any or
+    /// 0 when it found none, after a word that tells the line from what an SSH host's startup files print. A tmux that
+    /// doesn't count prints nothing for the first two.
     static let countMarker = "justsessions-find-count"
-    static let countFormat = "\(countMarker) #{search_count} #{search_count_partial}"
+    static let countFormat = "\(countMarker) #{search_count} #{search_count_partial} #{search_present}"
 
     /// Starts a search for the newest match, from the end of the last line, whether or not a search runs already.
     static func startingSearch(for query: String, inSession sessionName: String) -> [String] {
@@ -49,12 +51,15 @@ enum TmuxHistorySearchCommands {
     }
 
     /// Nil for output without the count's line, as when tmux could not run the search. The total is nil when tmux kept
-    /// no count, as after a key you pressed in copy mode took the search's highlight away.
-    static func printedCount(inOutput output: String) -> (total: Int?, isPartial: Bool)? {
+    /// no count, as after a key you pressed in copy mode took the search's highlight away, and when it counts nothing.
+    /// `foundAny` is nil when tmux doesn't say.
+    static func printedCount(inOutput output: String) -> (total: Int?, isPartial: Bool, foundAny: Bool?)? {
         guard let line = output.split(whereSeparator: \.isNewline).last(where: { $0.hasPrefix(countMarker) }) else { return nil }
-        let fields = line.dropFirst(countMarker.count).split(separator: " ")
-        guard let total = fields.first.flatMap({ Int($0) }) else { return (nil, false) }
-        return (total, fields.count > 1 && fields[1] == "1")
+        // An empty field is a field: tmux 3.4 prints `<marker>   1`.
+        let fields = line.dropFirst(countMarker.count + 1).split(separator: " ", omittingEmptySubsequences: false)
+        func field(_ index: Int) -> Substring? { fields.indices.contains(index) ? fields[index] : nil }
+        let foundAny: Bool? = switch field(2) { case "1": true; case "0": false; default: nil }
+        return (field(0).flatMap { Int($0) }, field(1) == "1", foundAny)
     }
 
     /// `=name:` is exactly that session's pane; a bare `=name` is no pane, and a plain name could match another

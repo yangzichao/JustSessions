@@ -33,9 +33,11 @@ final class ScriptedTmuxHistory: @unchecked Sendable {
         firstCommandRelease.signal()
     }
 
-    /// A count line as tmux prints it, with nothing for a count it didn't keep.
-    static func countLine(_ total: Int?, partial: Bool = false) -> String {
-        "\(TmuxHistorySearchCommands.countMarker) \(total.map(String.init) ?? "") \(total == nil ? "" : partial ? "1" : "0")\n"
+    /// A count line as tmux prints it, with nothing for a count it didn't keep. `foundAny` is whether the search found
+    /// any, by default whether it counted any.
+    static func countLine(_ total: Int?, partial: Bool = false, foundAny: Bool? = nil) -> String {
+        let found = (foundAny ?? total.map { $0 > 0 }).map { $0 ? "1" : "0" } ?? ""
+        return "\(TmuxHistorySearchCommands.countMarker) \(total.map(String.init) ?? "") \(total == nil ? "" : partial ? "1" : "0") \(found)\n"
     }
 
     private func answer(_ arguments: [String]) -> String? {

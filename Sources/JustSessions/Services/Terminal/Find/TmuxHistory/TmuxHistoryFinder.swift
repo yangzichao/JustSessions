@@ -8,8 +8,8 @@ import os
 /// for the searches it replaced; moves run in order.
 @MainActor
 final class TmuxHistoryFinder: TerminalTextFinding {
-    /// What each step of the current search found, in order. Nil when tmux couldn't search, as on an SSH host without it.
-    var onStepFinished: ((TerminalFindMatchCount?) -> Void)?
+    /// What each step of the current search found, in order.
+    var onStepFinished: ((TmuxHistorySearchOutcome) -> Void)?
 
     private let history: TmuxHistory
     private let commandQueue = DispatchQueue(label: "JustSessions.tmux-history-find", qos: .userInitiated)
@@ -77,16 +77,26 @@ final class TmuxHistoryFinder: TerminalTextFinding {
             guard !isEnding else { return }
             DispatchQueue.main.async { [weak self] in
                 guard let self, self.generation == generation else { return }
-                self.onStepFinished?(self.matchCount(inOutput: output, after: step))
+                self.onStepFinished?(self.outcome(inOutput: output, after: step))
             }
         }
     }
 
-    private func matchCount(inOutput output: String?, after step: Step) -> TerminalFindMatchCount? {
-        guard let output, let printed = TmuxHistorySearchCommands.printedCount(inOutput: output) else { return nil }
-        // A new search counts every match; without a count it found none (`TmuxHistorySearchCommands`). After a move
-        // without one, the count before it stands.
-        guard let total = printed.total ?? (Self.isStart(step) ? 0 : lastTotal) else { return nil }
+    private func outcome(inOutput output: String?, after step: Step) -> TmuxHistorySearchOutcome {
+        guard let output, let printed = TmuxHistorySearchCommands.printedCount(inOutput: output) else { return .couldNotSearch }
+        // Without a count, a search that found none has none, and after a move the count before it stands. One that
+        // found some in a tmux that counts nothing shows no count (`TmuxHistorySearchCommands`).
+        let total: Int
+        if let counted = printed.total {
+            total = counted
+        } else if printed.foundAny == false {
+            total = 0
+        } else if !Self.isStart(step), let lastTotal {
+            total = lastTotal
+        } else {
+            selectedNumber = nil
+            return .searched(nil)
+        }
         if total == 0 || printed.isPartial {
             selectedNumber = nil
         } else if case .move(let direction) = step {
@@ -95,7 +105,7 @@ final class TmuxHistoryFinder: TerminalTextFinding {
             selectedNumber = 1
         }
         lastTotal = total
-        return TerminalFindMatchCount(total: total, selectedNumber: selectedNumber, exceedsCountLimit: printed.isPartial)
+        return .searched(TerminalFindMatchCount(total: total, selectedNumber: selectedNumber, exceedsCountLimit: printed.isPartial))
     }
 
     private static func isStart(_ step: Step) -> Bool {
