@@ -57,6 +57,8 @@ For people who prefer the command line. JustSessions adds a native Mac workspace
 
 Add a `~/.ssh/config` alias or `user@hostname` with `rsync` and the CLI installed. A host that asks for a password or a code logs in with **Connect…**. **Disconnect** in a host's **⋯** leaves it alone, sessions still listed, until you choose **Connect**. A host that needs you to sign in again every so often can run a **Sign-in command…** that asks for its PIN or code in a dialog. Session history is cached on your Mac. [SSH setup](docs/guides/session-management.md#ssh-hosts).
 
+**Upgrading to 1.4:** some SSH hosts need a fresh connection before their cached history appears again. Remote history is not deleted. [Upgrade details](docs/guides/session-storage.md#upgrading-to-14).
+
 ## Close a tab. Keep the work.
 
 - Close the tab → choose [**Keep running**](docs/images/tmux-close-choice.jpg).

@@ -135,7 +135,8 @@ private final class PausedRemoteFolders: @unchecked Sendable {
     var isWaiting: Bool { lock.withLock { waiting } }
     func read() -> RemoteToolFolders {
         lock.withLock { waiting = true }
-        _ = ready.wait(timeout: .now() + 10)
+        // Only the test releases this pause; parallel UI tests can delay its main-actor turn beyond a timeout.
+        ready.wait()
         return .standard
     }
     func release() { ready.signal() }

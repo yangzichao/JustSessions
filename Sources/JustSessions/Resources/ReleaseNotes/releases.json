@@ -1,5 +1,32 @@
 [
   {
+    "version": "1.4.0",
+    "publishedOn": "2026-11-09",
+    "title": {
+      "en": "SSH history and session search",
+      "zh-Hans": "SSH 历史记录与会话搜索"
+    },
+    "sections": [
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Reconnect SSH hosts if cached history is missing after upgrading; remote history is not deleted.",
+            "zh-Hans": "升级后，缓存历史未显示的 SSH 主机需重新连接；远程历史不会被删除。"
+          },
+          {
+            "en": "Speed up repeated search updates when the session list is unchanged.",
+            "zh-Hans": "会话列表未变时，后续搜索更新更快。"
+          },
+          {
+            "en": "Small bug fixes.",
+            "zh-Hans": "修复了一些小问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.3.1",
     "publishedOn": "2026-11-08",
     "title": {
