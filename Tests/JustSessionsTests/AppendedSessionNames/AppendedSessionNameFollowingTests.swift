@@ -3,6 +3,7 @@ import Testing
 @testable import JustSessions
 
 @MainActor
+@Suite(.serialized, .oneHeldThreadAtATime)
 struct AppendedSessionNameFollowingTests {
     @Test func aBusyFilesReadLeavesTheMainActorFreeAndAppliesItsName() async throws {
         let fixture = try Fixture()
@@ -13,11 +14,16 @@ struct AppendedSessionNameFollowingTests {
         try fixture.appendName()
         gate.arm()
         let following = Task { await fixture.store.followAppendedSessionNames(readers: readers, codexDirectory: fixture.folder) }
-        defer { gate.release() }
-        // This runs on the main actor while the file reader is still blocked.
-        try await expectEventually { gate.hasStarted }
-        let readOnMainThread = gate.readOnMainThread
-        #expect(!readOnMainThread)
+        do {
+            // This runs on the main actor while the file reader is still blocked.
+            try await expectEventually { gate.hasStarted }
+            let readOnMainThread = gate.readOnMainThread
+            #expect(!readOnMainThread)
+        } catch {
+            gate.release()
+            await following.value
+            throw error
+        }
         gate.release()
         await following.value
         #expect(fixture.tab.displayTitle == "background-name")
@@ -37,14 +43,19 @@ struct AppendedSessionNameFollowingTests {
         try fixture.appendName()
         gate.arm()
         let following = Task { await fixture.store.followAppendedSessionNames(readers: readers, codexDirectory: fixture.folder) }
-        defer { gate.release() }
-        try await expectEventually { gate.hasStarted }
-        switch change {
-        case .closed: fixture.store.closeTerminal(fixture.tab.id)
-        case .ended: fixture.tab.processFinished(exitCode: 0)
-        case .relinked:
-            let other = Conversation.fixture(provider: .pi, title: "Other", sourceFile: fixture.folder.appendingPathComponent("other.jsonl"))
-            fixture.tab.synchronize(conversation: other, displayTitle: "Other")
+        do {
+            try await expectEventually { gate.hasStarted }
+            switch change {
+            case .closed: fixture.store.closeTerminal(fixture.tab.id)
+            case .ended: fixture.tab.processFinished(exitCode: 0)
+            case .relinked:
+                let other = Conversation.fixture(provider: .pi, title: "Other", sourceFile: fixture.folder.appendingPathComponent("other.jsonl"))
+                fixture.tab.synchronize(conversation: other, displayTitle: "Other")
+            }
+        } catch {
+            gate.release()
+            await following.value
+            throw error
         }
         gate.release()
         await following.value
@@ -110,7 +121,8 @@ private final class NameReadGate: @unchecked Sendable {
             onMainThread = Thread.isMainThread
             return true
         }
-        if shouldWait { _ = semaphore.wait(timeout: .now() + 10) }
+        // Only the test releases this read; a busy main actor can take longer than a wall-clock timeout.
+        if shouldWait { semaphore.wait() }
         return reader.newLines()
     }
 }

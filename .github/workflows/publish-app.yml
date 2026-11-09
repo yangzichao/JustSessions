@@ -53,9 +53,10 @@ jobs:
           fi
           printf 'APP_VERSION=%s\n' "${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
 
-      # The shipped tmux is built from source, never restored from a cache.
+      # The shipped tmux is built from source, never restored from a cache. Terminal tests stop taking input and
+      # redrawing while the Mac's display sleeps, so keep it awake for them, as docs/development/build-and-release.md asks.
       - name: Test with bundled tmux
-        run: make test
+        run: caffeinate -d -i -u make test
 
       - name: Check localization
         run: make localization-check
