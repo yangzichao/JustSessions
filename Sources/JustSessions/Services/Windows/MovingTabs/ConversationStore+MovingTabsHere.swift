@@ -7,7 +7,8 @@ extension ConversationStore {
     /// Whether the session's tab in another window can move here: it has not started its CLI yet, or its CLI runs in
     /// the tmux session named after the session, which resuming here attaches to.
     func canMoveTerminalHere(for conversation: Conversation) -> Bool {
-        guard runningTerminal(for: conversation) == nil, canLaunch(conversation, action: .resume),
+        guard isCurrentHostLifecycle(hostLifecycleGeneration(on: conversation.host), on: conversation.host),
+              runningTerminal(for: conversation) == nil, canLaunch(conversation, action: .resume),
               let (_, tab) = otherWindowRunningTerminal(for: conversation) else { return false }
         return tab.isWaitingToBeShown
             || (tab.canKeepCLIRunningAfterClose && tab.tmuxSessionName == TmuxSessionName.forConversation(conversation))
@@ -23,18 +24,24 @@ extension ConversationStore {
             finishMovingTerminal(tab, from: otherStore, for: conversation)
             return
         }
+        let destinationLifecycle = hostLifecycleGeneration(on: conversation.host)
+        let sourceLifecycle = otherStore.hostLifecycleGeneration(on: conversation.host)
         // After that window's own tmux commands for the host, such as the rename that gave the session this name.
-        otherStore.tmuxCommandQueues.run(on: tab.host) { [weak self] in
+        otherStore.tmuxCommandQueues.run(on: tab.host) { [weak self, weak otherStore] in
             let runsInTmux = remoteRunner.run(destination, RemoteTmuxCommands.hasSessionCommand(tmuxSessionName, on: destination), 30)?.exitStatus == 0
-            Task { @MainActor [weak self] in
-                guard let self else { return }
+            Task { @MainActor [weak self, weak otherStore] in
+                guard let self, let otherStore,
+                      self.isCurrentHostLifecycle(destinationLifecycle, on: conversation.host),
+                      otherStore.isCurrentHostLifecycle(sourceLifecycle, on: conversation.host),
+                      tab.conversation?.id == conversation.id, tab.tmuxSessionName == tmuxSessionName,
+                      let current = self.conversation(withID: conversation.id), self.canLaunch(current, action: .resume) else { return }
                 guard runsInTmux else {
                     self.showError(
                         "The tab stays in the other window. JustSessions couldn't confirm that tmux on \(tab.host.nameInSentence) runs its CLI, and without tmux, closing the tab would end the CLI."
                     )
                     return
                 }
-                self.finishMovingTerminal(tab, from: otherStore, for: conversation)
+                self.finishMovingTerminal(tab, from: otherStore, for: current)
             }
         }
     }

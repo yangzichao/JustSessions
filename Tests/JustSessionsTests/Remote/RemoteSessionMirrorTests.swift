@@ -53,7 +53,9 @@ struct RemoteSessionMirrorTests {
     }
 
     @Test func hostNamesBecomeSafeFolderNames() {
-        #expect(RemoteSessionMirror.directoryName(forHost: "me@devbox.example.com") == "me@devbox.example.com")
-        #expect(RemoteSessionMirror.directoryName(forHost: "a:b") == "a_b")
+        let hosts = ["me@devbox.example.com", "a:b", "a_b", "dev+gpu", "dev_gpu", "DEVBOX", "devbox"]
+        let names = hosts.map(RemoteSessionMirror.directoryName(forHost:))
+        #expect(Set(names).count == hosts.count)
+        #expect(names.allSatisfy { $0.hasPrefix("host-v2-") && $0.count == 72 && !$0.contains("/") })
     }
 }

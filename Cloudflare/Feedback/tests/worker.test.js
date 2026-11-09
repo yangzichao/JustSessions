@@ -164,6 +164,16 @@ test("a failed database write reports the service unavailable", async () => {
   assert.equal(result, "unavailable");
 });
 
+test("malformed successful Siteverify responses report unavailable and store nothing", async () => {
+  for (const outcome of [null, [], "ok", 1, true, {}, { success: "true" }]) {
+    const harness = createHarness({ siteverify: async () => Response.json(outcome) });
+    const { response, result } = await send(harness);
+    assert.equal(response.status, 503);
+    assert.equal(result, "unavailable");
+    assert.equal(harness.writes.length, 0);
+  }
+});
+
 test("scheduled retention deletes feedback older than a year and propagates failures", async () => {
   let completed = false;
   const database = { prepare(sql) {

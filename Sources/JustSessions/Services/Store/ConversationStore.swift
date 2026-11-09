@@ -204,7 +204,10 @@ final class ConversationStore {
     /// joined during the one before.
     private var finishedDeletionRounds: SessionDeletionReport?
     private var deletionTask: Task<Void, Never>?
+    @ObservationIgnored private var deletionCancellation = SessionDeletionCancellation()
     @ObservationIgnored private var thisMacRefreshTask: Task<Void, Never>?
+    @ObservationIgnored private var thisMacRefreshGeneration = UUID()
+    @ObservationIgnored let remoteHostWork = RemoteHostWork()
     /// Deleted sessions leave the list, and the progress bar moves, at most this often while a deletion runs, and
     /// once more when it ends. Tests set it to zero to follow each session.
     var deletionListUpdateInterval: Duration = .milliseconds(500)
@@ -295,9 +298,11 @@ final class ConversationStore {
     }
 
     func cancelThisMacRefresh() {
+        thisMacRefreshGeneration = UUID()
         thisMacRefreshTask?.cancel()
         thisMacRefreshTask = nil
         isRefreshQueued = false
+        hostRefreshStatuses.removeValue(forKey: .thisMac)
     }
 
     /// This window's scan of this Mac, or another window's, which a refresh asked for here would join (see
@@ -317,11 +322,14 @@ final class ConversationStore {
         }
         hostRefreshStatuses[.thisMac] = .refreshing
         lastRefreshStartedAt = .now
-        thisMacRefreshTask = Task { [weak self, readService] in
+        let generation = UUID()
+        thisMacRefreshGeneration = generation
+        let hostWork = windowRegistry.hostSessionWork
+        thisMacRefreshTask = Task { [weak self, readService, hostWork] in
             do {
-                let result = try await readService.discoverThisMac()
+                let result = try await readService.discoverThisMac(coordinatingWith: hostWork)
                 try Task.checkCancellation()
-                guard let self else { return }
+                guard let self, self.thisMacRefreshGeneration == generation else { return }
                 self.thisMacRefreshTask = nil
                 self.tmuxSessionNamesByHost[.thisMac] = Set(result.tmuxPaneProcessIDs.keys)
                 self.thisMacTmuxPaneProcessIDs = result.tmuxPaneProcessIDs
@@ -342,13 +350,17 @@ final class ConversationStore {
                 } else {
                     Task { await self.discoverNewSessions(mayRefresh: false) }
                 }
-                self.startQueuedDeletion()
+                self.resumeQueuedHostWorkInAllWindows()
             } catch is CancellationError {
-                self?.thisMacRefreshTask = nil
+                guard let self, self.thisMacRefreshGeneration == generation else { return }
+                self.thisMacRefreshTask = nil
+                self.hostRefreshStatuses.removeValue(forKey: .thisMac)
+                self.resumeQueuedHostWorkInAllWindows()
             } catch {
-                guard let self else { return }
+                guard let self, self.thisMacRefreshGeneration == generation else { return }
                 self.thisMacRefreshTask = nil
                 self.hostRefreshStatuses[.thisMac] = .failed(error.localizedDescription)
+                self.resumeQueuedHostWorkInAllWindows()
             }
         }
     }
@@ -528,20 +540,37 @@ final class ConversationStore {
     }
 
     func isDeleting(on host: SessionHost) -> Bool {
-        hostsWithRunningDeletion.contains(host)
+        storesSharingHostWork.contains { $0.hostsWithRunningDeletion.contains(host) }
     }
 
     /// Returns true when a deletion runs on `host`; its refresh then starts once the deletion ends: it may read a
     /// session before it is deleted and list it again.
     func deferRefreshWhileDeleting(on host: SessionHost) -> Bool {
-        guard hostsWithRunningDeletion.contains(host) else { return false }
+        guard isDeleting(on: host) else { return false }
         hostsToRefreshAfterDeletion.insert(host)
         return true
     }
 
     /// Being deleted, or waiting to be.
     func isDeletionPending(for conversation: Conversation) -> Bool {
-        pendingDeletionConversationIDs.contains(conversation.id) || queuedDeletionConversationIDs.contains(conversation.id)
+        storesSharingHostWork.contains {
+            $0.pendingDeletionConversationIDs.contains(conversation.id) || $0.queuedDeletionConversationIDs.contains(conversation.id)
+        }
+    }
+
+    var storesSharingHostWork: [ConversationStore] {
+        [self] + windowRegistry.storesWithSessionWork.filter { $0 !== self }
+    }
+
+    /// A refresh or deletion in any window may have released work another window queued for the same host.
+    func resumeQueuedHostWorkInAllWindows() {
+        let stores = storesSharingHostWork.filter { !$0.isTearingDownWorkspace }
+        for store in stores { store.startQueuedDeletion() }
+        for store in stores {
+            let ready = store.hostsToRefreshAfterDeletion.filter { !store.isDeleting(on: $0) }
+            store.hostsToRefreshAfterDeletion.subtract(ready)
+            for host in store.hosts where ready.contains(host) { store.refresh(host) }
+        }
     }
 
     func deletionPlan(for projectPath: String) -> SessionDeletionPlan {
@@ -615,6 +644,14 @@ final class ConversationStore {
         deletionTask.cancel()
     }
 
+    /// A later Disconnect or Remove wins over deletions queued by an earlier action. An already-running native
+    /// deletion finishes its current session; the worker skips this host's remaining sessions and keeps other hosts.
+    func discardQueuedDeletions(on host: SessionHost) {
+        let ids = Set(conversations.filter { $0.host == host }.map(\.id))
+        queuedDeletionConversationIDs.subtract(ids)
+        deletionCancellation.cancel(on: host)
+    }
+
     /// Starts deleting the sessions, or adds them to the running deletion. Sessions on a host being refreshed wait
     /// for the refresh to end, as it may have read a session before it was deleted and would list it again; those
     /// asked for while a deletion stops wait for it to end.
@@ -622,15 +659,24 @@ final class ConversationStore {
         guard !deletableConversations.isEmpty else { return }
         // Deleting on a disconnected host connects it; its sessions then wait for the refresh that starts.
         for host in Set(deletableConversations.map(\.host)) { connectIfDisconnected(host) }
-        let isHostRefreshing = deletableConversations.contains { hostRefreshStatuses[$0.host] == .refreshing }
-        if isHostRefreshing || deletionProgress.isStopping {
+        let hosts = Set(deletableConversations.map(\.host))
+        let isHostRefreshing = storesSharingHostWork.contains { store in
+            hosts.contains { store.hostRefreshStatuses[$0] == .refreshing }
+        }
+        let anotherWindowDeletes = storesSharingHostWork.contains {
+            $0 !== self && !$0.hostsWithRunningDeletion.isDisjoint(with: hosts)
+        }
+        let cancelledHostInRunningBatch = isDeletingSessions && hosts.contains { deletionCancellation.isCancelled(on: $0) }
+        if isHostRefreshing || anotherWindowDeletes || deletionProgress.isStopping || cancelledHostInRunningBatch {
             queuedDeletionConversationIDs.formUnion(deletableConversations.map(\.id))
         } else if isDeletingSessions {
             joinRunningDeletion(deletableConversations)
         } else {
+            deletionCancellation = SessionDeletionCancellation()
             pendingDeletionConversationIDs = Set(deletableConversations.map(\.id))
             hostsWithRunningDeletion = Set(deletableConversations.map(\.host))
             deletionProgress.start(totalCount: deletableConversations.count)
+            windowRegistry.deletionStarted(in: self)
             deleteRoundInBackground(deletableConversations)
         }
     }
@@ -656,68 +702,82 @@ final class ConversationStore {
         let listUpdateInterval = deletionListUpdateInterval
         let completedCountBeforeRound = deletionProgress.completedCount
         let unresponsiveHostsBeforeRound = finishedDeletionRounds?.unresponsiveHosts ?? [:]
+        let hostWork = windowRegistry.hostSessionWork
+        let cancellation = deletionCancellation
         deletionTask = Task.detached(priority: .userInitiated) {
-            let claudeIndexBatch = ClaudeDeletionIndexBatch()
-            let clock = ContinuousClock()
-            var lastListUpdate = clock.now
-            var deletedSinceListUpdate: [Conversation] = []
-            var deletedCount = 0
-            var attemptedCount = 0
-            var wasCanceled = false
-            var failures: [ConversationDeletionFailure] = []
-            var unresponsiveHosts = unresponsiveHostsBeforeRound
-            for conversation in deletableConversations {
-                // Cancel takes effect between sessions, so no session is left half deleted.
-                if Task.isCancelled {
-                    wasCanceled = true
-                    break
-                }
-                attemptedCount += 1
-                if let unresponsiveHost = conversation.host.sshDestination.flatMap({ unresponsiveHosts[$0] }) {
-                    failures.append(ConversationDeletionFailure(
-                        conversation: conversation,
-                        reason: RemoteConversationDeletionError.notAttempted(unresponsiveHost).localizedDescription,
-                        unresponsiveHost: unresponsiveHost
-                    ))
-                } else if let adapter = adapters.first(where: { $0.provider == conversation.provider }) {
-                    do {
-                        try Self.deleteFromDisk(conversation, adapter: adapter, remoteDeletion: remoteDeletion, claudeIndexBatch: claudeIndexBatch)
-                        deletedSinceListUpdate.append(conversation)
-                    } catch ConversationDeletionError.missingSource {
-                        // Already gone, as after an earlier deletion whose result was lost: it counts as deleted.
-                        deletedSinceListUpdate.append(conversation)
-                    } catch {
-                        let unresponsiveHost = (error as? RemoteConversationDeletionError)?.unresponsiveHost
-                        if let unresponsiveHost { unresponsiveHosts[unresponsiveHost.host] = unresponsiveHost }
-                        let isFileGone = !FileManager.default.fileExists(atPath: conversation.sourceFile.path)
-                        failures.append(ConversationDeletionFailure(
-                            conversation: conversation,
-                            reason: error.localizedDescription,
-                            unresponsiveHost: unresponsiveHost,
-                            isStillListed: !isFileGone
-                        ))
-                        if isFileGone { deletedSinceListUpdate.append(conversation) }
+            do {
+                try await hostWork.withAccess(to: Set(deletableConversations.map(\.host))) {
+                    let claudeIndexBatch = ClaudeDeletionIndexBatch()
+                    let clock = ContinuousClock()
+                    var lastListUpdate = clock.now
+                    var deletedSinceListUpdate: [Conversation] = []
+                    var deletedCount = 0
+                    var attemptedCount = 0
+                    var wasCanceled = false
+                    var failures: [ConversationDeletionFailure] = []
+                    var unresponsiveHosts = unresponsiveHostsBeforeRound
+                    for conversation in deletableConversations {
+                        // Cancel takes effect between sessions, so no session is left half deleted.
+                        if Task.isCancelled {
+                            wasCanceled = true
+                            break
+                        }
+                        if cancellation.isCancelled(on: conversation.host) {
+                            wasCanceled = true
+                            continue
+                        }
+                        attemptedCount += 1
+                        if let unresponsiveHost = conversation.host.sshDestination.flatMap({ unresponsiveHosts[$0] }) {
+                            failures.append(ConversationDeletionFailure(
+                                conversation: conversation,
+                                reason: RemoteConversationDeletionError.notAttempted(unresponsiveHost).localizedDescription,
+                                unresponsiveHost: unresponsiveHost
+                            ))
+                        } else if let adapter = adapters.first(where: { $0.provider == conversation.provider }) {
+                            do {
+                                try Self.deleteFromDisk(conversation, adapter: adapter, remoteDeletion: remoteDeletion, claudeIndexBatch: claudeIndexBatch)
+                                deletedSinceListUpdate.append(conversation)
+                            } catch ConversationDeletionError.missingSource {
+                                // Already gone, as after an earlier deletion whose result was lost: it counts as deleted.
+                                deletedSinceListUpdate.append(conversation)
+                            } catch {
+                                let unresponsiveHost = (error as? RemoteConversationDeletionError)?.unresponsiveHost
+                                if let unresponsiveHost { unresponsiveHosts[unresponsiveHost.host] = unresponsiveHost }
+                                let isFileGone = !FileManager.default.fileExists(atPath: conversation.sourceFile.path)
+                                failures.append(ConversationDeletionFailure(
+                                    conversation: conversation,
+                                    reason: error.localizedDescription,
+                                    unresponsiveHost: unresponsiveHost,
+                                    isStillListed: !isFileGone
+                                ))
+                                if isFileGone { deletedSinceListUpdate.append(conversation) }
+                            }
+                        }
+                        if clock.now - lastListUpdate >= listUpdateInterval || claudeIndexBatch.pendingCount >= ClaudeDeletionIndexBatch.maximumSessionCount {
+                            failures += claudeIndexBatch.flush()
+                            let deleted = deletedSinceListUpdate
+                            let completedCount = completedCountBeforeRound + attemptedCount
+                            deletedCount += deleted.count
+                            deletedSinceListUpdate = []
+                            lastListUpdate = clock.now
+                            await self.applyDeletionProgress(removing: deleted, completedCount: completedCount)
+                        }
                     }
-                }
-                if clock.now - lastListUpdate >= listUpdateInterval || claudeIndexBatch.pendingCount >= ClaudeDeletionIndexBatch.maximumSessionCount {
                     failures += claudeIndexBatch.flush()
                     let deleted = deletedSinceListUpdate
-                    let completedCount = completedCountBeforeRound + attemptedCount
-                    deletedCount += deleted.count
-                    deletedSinceListUpdate = []
-                    lastListUpdate = clock.now
-                    await self.applyDeletionProgress(removing: deleted, completedCount: completedCount)
+                    let report = SessionDeletionReport(
+                        requestedCount: deletableConversations.count,
+                        deletedCount: deletedCount + deleted.count,
+                        failures: failures,
+                        wasCanceled: wasCanceled
+                    )
+                    await self.finishDeletionRound(removing: deleted, report: report)
                 }
+            } catch {
+                await self.finishDeletionRound(removing: [], report: SessionDeletionReport(
+                    requestedCount: deletableConversations.count, deletedCount: 0, failures: [], wasCanceled: true
+                ))
             }
-            failures += claudeIndexBatch.flush()
-            let deleted = deletedSinceListUpdate
-            let report = SessionDeletionReport(
-                requestedCount: deletableConversations.count,
-                deletedCount: deletedCount + deleted.count,
-                failures: failures,
-                wasCanceled: wasCanceled
-            )
-            await self.finishDeletionRound(removing: deleted, report: report)
         }
     }
 
@@ -752,7 +812,9 @@ final class ConversationStore {
             finishDeletion(removing: deleted, report: report)
             return
         }
-        guard !report.wasCanceled, !deletionProgress.isStopping else {
+        // A disconnected host may have been skipped while other hosts can still proceed. Only the progress bar's
+        // Cancel stops the entire batch, including joined sessions.
+        guard !deletionProgress.isStopping else {
             report = report.followed(by: SessionDeletionReport(
                 requestedCount: joinedSessions.count, deletedCount: 0, failures: [], wasCanceled: true
             ))
@@ -777,15 +839,13 @@ final class ConversationStore {
         if let reportAlert { show(reportAlert) }
 
         hostsWithRunningDeletion = []
-        let hostsToRefresh = hostsToRefreshAfterDeletion
-        hostsToRefreshAfterDeletion = []
-        for host in hosts where hostsToRefresh.contains(host) { refresh(host) }
-        startQueuedDeletion()
+        windowRegistry.deletionFinished(in: self)
+        resumeQueuedHostWorkInAllWindows()
     }
 
     /// Takes the deleted sessions off the list in one change, and forgets their custom titles, pins, archiving,
     /// deletion when their tab closes, and bookmarks, with the bookmarks of the subagents' sessions deleted with them.
-    private func removeDeletedConversations(_ deleted: [Conversation]) {
+    private func removeDeletedConversations(_ deleted: [Conversation], sharingWithOtherWindows: Bool = true) {
         guard !deleted.isEmpty else { return }
         let deletedIDs = Set(deleted.map(\.id))
         // Some CLIs delete a session's subagents' sessions with it; Antigravity's stay as conversations of their own.
@@ -806,6 +866,11 @@ final class ConversationStore {
         changeSavedCustomization(\.messageBookmarks) { $0.removeAll(forConversationIDs: deletedIDs.union(deletedSubagentIDs)) }
         changeSavedCustomization(\.sessionsDeletedWhenTabCloses) {
             $0.setDeletedWhenTabCloses(false, conversationIDs: deletedIDs)
+        }
+        if sharingWithOtherWindows {
+            for store in windowRegistry.stores where store !== self {
+                store.removeDeletedConversations(deleted, sharingWithOtherWindows: false)
+            }
         }
     }
 
@@ -944,10 +1009,8 @@ final class ConversationStore {
     /// The tabs in the order they would take with every split separated. Splits are not saved across quits, so
     /// this is the order the tabs reopen in, with no tab inside another project's group.
     var terminalSessionsWithSplitsSeparated: [TerminalSession] {
-        var strip = tabStrip
-        strip.separateAllSplits()
         let tabsByID = Dictionary(uniqueKeysWithValues: terminalSessions.map { ($0.id, $0) })
-        return strip.tabIDs.compactMap { tabsByID[$0] }
+        return tabStrip.tabsWithSplitsSeparated.compactMap { tabsByID[$0.id] }
     }
 
     /// Shows another tab side by side with the selected tab, which stays selected, as Chrome's AddToNewSplit; see

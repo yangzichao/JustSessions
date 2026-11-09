@@ -12,6 +12,12 @@ enum OpenCodeTranscriptPageSource {
         try OpenCodeDatabase.execute("BEGIN", in: database)
         defer { try? OpenCodeDatabase.execute("ROLLBACK", in: database) }
         let index = try OpenCodeTranscriptIndex.read(sessionID: sessionID, in: database)
+        return try read(index, in: database, request: request, limits: limits)
+    }
+
+    /// The caller keeps one read transaction open for the index and every page, as the conversation map does.
+    static func read(_ index: OpenCodeTranscriptIndex, in database: OpaquePointer,
+                     request: TranscriptPageRequest, limits: TranscriptPageLimits) throws -> TranscriptPage {
         let messages = try OpenCodeTranscriptMessageReader(in: database)
         defer { messages.close() }
         let partsStatement = try OpenCodeDatabase.prepare(OpenCodeTranscriptParts.query, in: database)

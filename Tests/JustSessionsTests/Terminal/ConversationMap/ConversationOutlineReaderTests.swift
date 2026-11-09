@@ -5,6 +5,53 @@ import Testing
 /// A tab's outline as its file changes (TAB-10, PERF-89): extended from the last block's record when the file grew, read
 /// in full when it was cut, rewritten, or left its Pi branch; and ⌘D's newest message (TRM-74).
 struct ConversationOutlineReaderTests {
+    @Test func anEarlierAntigravityStepRewriteRebuildsTheOutline() async throws {
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let fixture = try AntigravitySessionFixture(configurationDirectory: directory)
+        try fixture.appendPrompt("Unchanged final prompt", index: 1)
+        let reader = ConversationOutlineReader(fixture.conversation)
+        _ = try await reader.update()
+        try AntigravitySessionFixture.execute(["DELETE FROM steps WHERE idx = 0"], at: fixture.databaseFile)
+        try fixture.appendPrompt("Rewritten first prompt", index: 0)
+        let updated = try #require(try await reader.update())
+        #expect(updated.blocks.first?.snippet == "Rewritten first prompt")
+        #expect(updated == (try await Self.fullRead(fixture.conversation)))
+    }
+
+    @Test(arguments: [false, true])
+    func anEarlierRewriteIsDetectedEvenAfterReadingTheLatestMessage(atomic: Bool) async throws {
+        let fixture = try TranscriptPagingFixture(count: 600)
+        defer { fixture.remove() }
+        let reader = ConversationOutlineReader(fixture.conversation)
+        _ = try await reader.update()
+        let original = String(decoding: try Data(contentsOf: fixture.file), as: UTF8.self)
+        let replacement = Data(original.replacingOccurrences(of: "Message 0,", with: "Rewritten first message 0,").utf8)
+        try replacement.write(to: fixture.file, options: atomic ? .atomic : [])
+        // ⌘D shares the source but must not consume the outline's rewrite detection.
+        #expect(try await reader.latestMessage()?.id == TranscriptPageIdentity.entryID(record: 599, part: 0))
+        let updated = try #require(try await reader.update())
+        #expect(updated.blocks.first?.snippet.hasPrefix("Rewritten first message 0") == true)
+        #expect(updated == (try await Self.fullRead(fixture.conversation)))
+    }
+
+    @Test func anEarlierOpenCodePartRewriteRebuildsTheOutline() async throws {
+        let fixture = try OpenCodeTranscriptReaderFixture()
+        defer { fixture.remove() }
+        let database = fixture.database
+        try database.addSession("ses_earlier_rewrite")
+        try database.addUserPrompt("msg_a", session: "ses_earlier_rewrite", createdAt: 1, text: "Original first")
+        try database.addAssistantReply("msg_b", session: "ses_earlier_rewrite", createdAt: 2, text: "Unchanged last")
+        let conversation = Conversation.fixture(provider: .opencode, sessionID: "ses_earlier_rewrite", sourceFile: database.file)
+        let reader = ConversationOutlineReader(conversation)
+        _ = try await reader.update()
+        try database.execute("UPDATE part SET data = ? WHERE message_id = ?", [#"{"type":"text","text":"Rewritten first"}"#, "msg_a"])
+        _ = try await reader.latestMessage()
+        let updated = try #require(try await reader.update())
+        #expect(updated.blocks.first?.snippet == "Rewritten first")
+        #expect(updated == (try await Self.fullRead(conversation)))
+    }
+
     @Test func anAppendExtendsAsAFullReadWould() async throws {
         let fixture = try TranscriptPagingFixture(count: 600)
         defer { fixture.remove() }

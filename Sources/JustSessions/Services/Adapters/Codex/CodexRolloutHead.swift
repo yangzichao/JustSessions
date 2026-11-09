@@ -18,7 +18,7 @@ struct CodexRolloutHead: Sendable, Codable {
 
     /// Nil when the file does not open with a valid `session_meta` line, such as one Codex has not finished writing.
     init?(file: URL) {
-        guard let root = ConversationMetadata.firstLine(of: file),
+        guard let root = ConversationMetadata.firstLine(of: file, requiresRegularFile: true),
               root["type"] as? String == "session_meta",
               let payload = root["payload"] as? [String: Any],
               let sessionID = payload["id"] as? String,

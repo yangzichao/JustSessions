@@ -46,8 +46,11 @@ extension ConversationStore {
     /// window, as after Connect… logs in, and refreshes on its own again from then on.
     func connectHost(_ host: String) {
         guard isDisconnected(host) else { return }
-        let stores = storesOfEveryWindow
-        for store in stores { store.disconnectedRemoteHosts.setDisconnected(false, for: host) }
+        let stores = storesSharingHostWork
+        for store in stores {
+            store.disconnectedRemoteHosts.setDisconnected(false, for: host)
+            store.invalidateRemoteHostWork(on: host)
+        }
         disconnectedRemoteHosts.save(to: userDefaults)
         SSHHostReachability.shared.forget(host)
         for store in stores { store.refreshRemoteHost(host) }
@@ -73,9 +76,13 @@ extension ConversationStore {
         closingTabs: (ConversationStore, [UUID]) -> Void
     ) {
         guard remoteHostList.hosts.contains(host), !isDisconnected(host) else { return }
-        let stores = storesOfEveryWindow
+        let stores = storesSharingHostWork
         // Marked first, so the refresh a closing tab may start is refused.
         for store in stores { store.disconnectedRemoteHosts.setDisconnected(true, for: host) }
+        for store in stores {
+            store.discardQueuedDeletions(on: .ssh(host))
+            store.invalidateRemoteHostWork(on: host)
+        }
         disconnectedRemoteHosts.save(to: userDefaults)
         for store in stores {
             let tabs = store.terminalSessions.filter { $0.host == .ssh(host) }

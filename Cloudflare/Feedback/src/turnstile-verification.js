@@ -31,6 +31,11 @@ export async function verifyTurnstileToken({ token, source, secret, remoteIP, fe
     return "unavailable";
   }
 
+  if (outcome === null || typeof outcome !== "object" || Array.isArray(outcome)
+      || typeof outcome.success !== "boolean") {
+    console.error("Turnstile siteverify returned an invalid response");
+    return "unavailable";
+  }
   const errorCodes = Array.isArray(outcome["error-codes"]) ? outcome["error-codes"] : [];
   if (errorCodes.some((code) => secretErrorCodes.has(code))) {
     console.error(`Turnstile rejected the Worker's secret: ${errorCodes.join(", ")}`);

@@ -7,6 +7,57 @@ import Testing
 struct SessionMessageIndexerTests {
     private let user = UUID()
 
+    @Test func aFailedReadRetriesWithoutChangingTheQueryOrListedSessions() async throws {
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let session = try codexSession(["Recovered after a transient failure"], in: directory)
+        let reads = AsyncCounter()
+        let retry = MessageSearchRetryGate()
+        let index = SessionMessageIndex(cache: SessionMessageTextCache(directory: directory.appendingPathComponent("Cache")))
+        let indexer = SessionMessageIndexer(index: index) { conversation, fingerprint, cache in
+            await reads.increment()
+            if await reads.value == 1 { return nil }
+            return await SessionMessageIndex.searchableText(of: conversation, fingerprint: fingerprint, cache: cache)
+        }
+        indexer.waitBeforeRetry = { await retry.wait($0) }
+        defer { indexer.endUse(by: user) }
+        indexer.beginUse(by: user)
+        await indexer.update(with: [session], for: user)
+        try await expectEventually { retry.waitCount == 1 }
+        #expect(await index.sessionCount() == 0)
+        let revision = indexer.revision
+        // Progress and query reruns cannot bypass the pending backoff or create a retry loop.
+        for _ in 0..<100 { await indexer.update(with: [session], for: user) }
+        #expect(await reads.value == 1)
+        retry.release()
+        try await waitForUpdate(of: indexer, after: revision)
+        #expect(await reads.value == 2)
+        #expect(try await matches("recovered", in: indexer).keys.contains(session.id))
+    }
+
+    @Test func closingTheLastSearchCancelsItsPendingRetry() async throws {
+        let directory = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let session = try codexSession(["Unreadable"], in: directory)
+        let reads = AsyncCounter()
+        let retry = MessageSearchRetryGate()
+        let index = SessionMessageIndex(cache: SessionMessageTextCache(directory: directory.appendingPathComponent("Cache")))
+        let indexer = SessionMessageIndexer(index: index) { _, _, _ in
+            await reads.increment()
+            return nil
+        }
+        indexer.waitBeforeRetry = { await retry.wait($0) }
+        indexer.beginUse(by: user)
+        await indexer.update(with: [session], for: user)
+        try await expectEventually { retry.waitCount == 1 }
+        indexer.endUse(by: user)
+        retry.release()
+        try await expectEventually { retry.finished }
+        #expect(retry.wasCancelled)
+        #expect(await reads.value == 1)
+        #expect(await index.sessionCount() == 0)
+    }
+
     private func codexSession(_ messages: [String], in directory: URL, sessionID: String = UUID().uuidString.lowercased(),
                               updatedAt: Date = .now) throws -> Conversation {
         let file = directory.appendingPathComponent("\(sessionID).jsonl")
@@ -345,4 +396,24 @@ private actor PausedFirstMessageReader {
 private actor AsyncCounter {
     private(set) var value = 0
     func increment() { value += 1 }
+}
+
+@MainActor
+private final class MessageSearchRetryGate {
+    private(set) var waitCount = 0
+    private(set) var finished = false
+    private(set) var wasCancelled = false
+    private var continuation: CheckedContinuation<Void, Never>?
+
+    func wait(_ delay: Duration) async {
+        waitCount += 1
+        await withCheckedContinuation { continuation = $0 }
+        wasCancelled = Task.isCancelled
+        finished = true
+    }
+
+    func release() {
+        continuation?.resume()
+        continuation = nil
+    }
 }

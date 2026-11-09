@@ -31,8 +31,8 @@ final class WorkspaceReadService: ObservableObject {
 
     /// Joins a scan already in flight. Each caller is a waiter; when the final waiter cancels, that producer is
     /// evicted so a later window starts fresh.
-    func discoverThisMac() async throws -> ThisMacDiscovery {
-        try await discovery.discover(adapters: adapters, commandResolver: commandResolver)
+    func discoverThisMac(coordinatingWith hostWork: HostSessionWorkCoordinator? = nil) async throws -> ThisMacDiscovery {
+        try await discovery.discover(adapters: adapters, commandResolver: commandResolver, hostWork: hostWork)
     }
 
     /// How many windows wait on the scan in flight. A window's refresh joins from a task of its own, so this tells a
@@ -67,7 +67,8 @@ private actor ThisMacDiscoveryCoordinator {
 
     var waiterCount: Int { inFlight?.waiters.count ?? 0 }
 
-    func discover(adapters: [any ConversationAdapter], commandResolver: NativeCLICommandResolver) async throws -> Discovery {
+    func discover(adapters: [any ConversationAdapter], commandResolver: NativeCLICommandResolver,
+                  hostWork: HostSessionWorkCoordinator?) async throws -> Discovery {
         let waiterID = UUID()
         let cancellation = DiscoveryWaiterCancellation()
         return try await withTaskCancellationHandler {
@@ -78,7 +79,8 @@ private actor ThisMacDiscoveryCoordinator {
                     continuation: continuation,
                     cancellation: cancellation,
                     adapters: adapters,
-                    commandResolver: commandResolver
+                    commandResolver: commandResolver,
+                    hostWork: hostWork
                 )
             }
         } onCancel: {
@@ -93,7 +95,8 @@ private actor ThisMacDiscoveryCoordinator {
         continuation: Continuation,
         cancellation: DiscoveryWaiterCancellation,
         adapters: [any ConversationAdapter],
-        commandResolver: NativeCLICommandResolver
+        commandResolver: NativeCLICommandResolver,
+        hostWork: HostSessionWorkCoordinator?
     ) {
         removeCancelledWaiters()
         guard !cancellation.isCancelled else {
@@ -108,7 +111,14 @@ private actor ThisMacDiscoveryCoordinator {
 
         let generation = commandResolver.beginThisMacTmuxProbeGeneration()
         let task = Task.detached(priority: .userInitiated) {
-            await Self.scan(adapters: adapters, commandResolver: commandResolver)
+            if let hostWork {
+                do {
+                    return try await hostWork.withAccess(to: [.thisMac]) {
+                        await Self.scan(adapters: adapters, commandResolver: commandResolver)
+                    }
+                } catch { return Self.cancelledResult() }
+            }
+            return await Self.scan(adapters: adapters, commandResolver: commandResolver)
         }
         inFlight = InFlight(
             generation: generation,

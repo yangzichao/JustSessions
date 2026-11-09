@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 /// Only byte offsets are retained, never JSON objects or message text. A 100,000-line log needs about 0.8 MiB.
@@ -5,29 +6,55 @@ struct TranscriptFileIndex: Sendable {
     let lineStarts: [UInt64]
     let byteCount: UInt64
     let fingerprint: TranscriptFileFingerprint
-    /// Work performed by this update, excluding the bounded append validation reads.
+    /// Bytes scanned for newlines, excluding the prefix hash used to validate an append.
     let scannedByteCount: UInt64
-    private let prefix: Data
-    private let suffix: Data
+    let validatedByteCount: UInt64
+    /// Stays the same only while every byte of the preceding index is preserved. Pages carry it across actor awaits.
+    let contentLineage: UUID
+    /// SHA-256 from the same chunks as the offsets; search can reuse it after verifying the file is still unchanged.
+    let digest: Data
+    private let lastByte: UInt8?
 
     static func read(_ file: URL, chunkSize: Int = 1 << 20, updating previous: Self? = nil) throws -> Self {
-        precondition(chunkSize > 0)
         let handle = try FileHandle(forReadingFrom: file)
         defer { try? handle.close() }
+        return try read(handle, chunkSize: chunkSize, updating: previous)
+    }
+
+    /// Index and page bytes come from the same descriptor, even if a mirror replaces the pathname meanwhile.
+    static func read(_ handle: FileHandle, chunkSize: Int = 1 << 20, updating previous: Self? = nil) throws -> Self {
+        precondition(chunkSize > 0)
         let fingerprint = try TranscriptFileFingerprint(handle: handle)
         let byteCount = fingerprint.byteCount
         if let previous, fingerprint == previous.fingerprint {
             return Self(lineStarts: previous.lineStarts, byteCount: byteCount, fingerprint: fingerprint,
-                        scannedByteCount: 0, prefix: previous.prefix, suffix: previous.suffix)
+                        scannedByteCount: 0, validatedByteCount: 0, contentLineage: previous.contentLineage,
+                        digest: previous.digest, lastByte: previous.lastByte)
         }
-        let appending = try previous.map {
-            try fingerprint.identifiesSameFile(as: $0.fingerprint) && byteCount > $0.byteCount
-                && matchesPreviousEdges($0, in: handle)
-        } ?? false
+        var hasher = SHA256()
+        var validatedByteCount: UInt64 = 0
+        var appending = false
+        if let previous, byteCount >= previous.byteCount {
+            try handle.seek(toOffset: 0)
+            while validatedByteCount < previous.byteCount {
+                try Task.checkCancellation()
+                let count = try autoreleasepool {
+                    let chunk = try handle.read(upToCount: Int(min(UInt64(chunkSize), previous.byteCount - validatedByteCount))) ?? Data()
+                    guard !chunk.isEmpty else { throw TranscriptPagingError.sourceChanged }
+                    hasher.update(data: chunk)
+                    return chunk.count
+                }
+                validatedByteCount += UInt64(count)
+            }
+            let prefixHasher = hasher
+            appending = Data(prefixHasher.finalize()) == previous.digest
+        }
+        if !appending { hasher = SHA256() }
         var lineStarts = appending ? previous!.lineStarts : (byteCount == 0 ? [] : [0])
         var offset: UInt64 = appending ? previous!.byteCount : 0
+        var lastByte = appending ? previous!.lastByte : nil
         let scanStart = offset
-        if appending, previous!.byteCount == 0 || previous!.suffix.last == UInt8(ascii: "\n") {
+        if appending, offset < byteCount, previous!.byteCount == 0 || previous!.lastByte == UInt8(ascii: "\n") {
             lineStarts.append(offset)
         }
         try handle.seek(toOffset: offset)
@@ -37,6 +64,8 @@ struct TranscriptFileIndex: Sendable {
             let readByteCount = try autoreleasepool {
                 let chunk = try handle.read(upToCount: Int(min(UInt64(chunkSize), byteCount - offset))) ?? Data()
                 guard !chunk.isEmpty else { throw TranscriptPagingError.sourceChanged }
+                hasher.update(data: chunk)
+                lastByte = chunk.last
                 chunk.withUnsafeBytes { bytes in
                     for index in bytes.indices where bytes[index] == UInt8(ascii: "\n") {
                         let nextStart = offset + UInt64(index) + 1
@@ -47,26 +76,12 @@ struct TranscriptFileIndex: Sendable {
             }
             offset += UInt64(readByteCount)
         }
-        let edgeLength = min(byteCount, 256)
-        let prefix = try edge(in: handle, offset: 0, count: edgeLength)
-        let suffix = try edge(in: handle, offset: byteCount - edgeLength, count: edgeLength)
         // A running CLI appends while the scan runs. The offsets still describe the first `byteCount` bytes, and keeping
         // the fingerprint from before the scan makes the next refresh extend them. Only a shrinking file fails the read.
         guard try TranscriptFileFingerprint(handle: handle).byteCount >= byteCount else { throw TranscriptPagingError.sourceChanged }
         return Self(lineStarts: lineStarts, byteCount: byteCount, fingerprint: fingerprint,
-                    scannedByteCount: byteCount - scanStart, prefix: prefix, suffix: suffix)
-    }
-
-    /// Detect truncation/rewrite followed by growth at the boundaries, including completion of a partial final line.
-    private static func matchesPreviousEdges(_ previous: Self, in handle: FileHandle) throws -> Bool {
-        let prefix = try edge(in: handle, offset: 0, count: UInt64(previous.prefix.count))
-        let suffix = try edge(in: handle, offset: previous.byteCount - UInt64(previous.suffix.count), count: UInt64(previous.suffix.count))
-        return prefix == previous.prefix && suffix == previous.suffix
-    }
-
-    private static func edge(in handle: FileHandle, offset: UInt64, count: UInt64) throws -> Data {
-        try handle.seek(toOffset: offset)
-        return try handle.read(upToCount: Int(count)) ?? Data()
+                    scannedByteCount: byteCount - scanStart, validatedByteCount: validatedByteCount,
+                    contentLineage: appending ? previous!.contentLineage : UUID(), digest: Data(hasher.finalize()), lastByte: lastByte)
     }
 
     func byteRange(at record: Int) -> Range<UInt64> {

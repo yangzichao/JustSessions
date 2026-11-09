@@ -3,6 +3,42 @@ import Testing
 @testable import JustSessions
 
 struct TranscriptPageSourceTests {
+    @Test func leavingAPiBranchBetweenPagesInvalidatesTheOldPageWindow() async throws {
+        let fixture = try TranscriptPagingFixture(count: 0)
+        defer { fixture.remove() }
+        try SampleTranscriptLines.fileContents(SampleTranscriptLines.pi).write(to: fixture.file)
+        var limits = TranscriptPageLimits()
+        limits.targetEntryCount = 1
+        let source = TranscriptPageSource(file: fixture.file, provider: .pi, limits: limits)
+        let first = try await source.read(.first)
+        let branch = #"{"type":"message","id":"b1","parentId":"a2","timestamp":"2026-09-24T10:00:09.000Z","message":{"role":"user","content":"Try another way","timestamp":1758708009000}}"#
+        try fixture.append(SampleTranscriptLines.fileContents([branch]))
+        await #expect(throws: TranscriptPagingError.sourceChanged) {
+            try await source.read(.after(first.records.upperBound))
+        }
+        let latest = try await source.read(.latest, refreshIndex: true)
+        #expect(latest.sourceLineage != first.sourceLineage)
+        #expect(latest.entries.last?.content == .userMessage("Try another way"))
+    }
+
+    @Test func replacingAFileBetweenPagesRequestsARefreshInsteadOfSkippingMessages() async throws {
+        let fixture = try TranscriptPagingFixture(count: 200)
+        defer { fixture.remove() }
+        let source = TranscriptPageSource(file: fixture.file, provider: .codex)
+        let first = try await source.read(.first)
+        let text = String(decoding: try Data(contentsOf: fixture.file), as: UTF8.self)
+            .replacingOccurrences(of: "Message 0,", with: "A much longer rewritten first message 0,")
+        try Data(text.utf8).write(to: fixture.file, options: .atomic)
+        await #expect(throws: TranscriptPagingError.sourceChanged) {
+            try await source.read(.after(first.records.upperBound))
+        }
+        let next = try await source.read(.after(first.records.upperBound), refreshIndex: true)
+        #expect(next.entries.count == 80)
+        #expect(next.entries.first?.id == TranscriptPageIdentity.entryID(record: 80, part: 0))
+        #expect(next.sourceLineage != first.sourceLineage)
+        #expect(try next.preparingMarkdown().sourceLineage == next.sourceLineage)
+    }
+
     @Test func pagesCoverEveryMessageExactlyOnceInBothDirections() async throws {
         let fixture = try TranscriptPagingFixture(count: 503)
         defer { fixture.remove() }

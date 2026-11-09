@@ -24,20 +24,37 @@ extension ConversationStore {
         discovery: RemoteSessionDiscovery
     ) {
         guard canListRemoteHostCopy(host) else { return }
-        Task.detached(priority: .userInitiated) {
-            guard let hostConversations = try? discovery.readMirror(host: host) else { return }
-            await self.applyRemoteHostCopy(host, hostConversations: hostConversations, refreshedAt: refreshedAt, status: status)
+        if case .refreshed(let current)? = hostRefreshStatuses[.ssh(host)], refreshedAt < current { return }
+        startReadingRemoteHostCopy(host, refreshedAt: refreshedAt, status: status, discovery: discovery)
+    }
+
+    private func startReadingRemoteHostCopy(
+        _ host: String, refreshedAt: Date, status: RemoteHostStatus?, discovery: RemoteSessionDiscovery
+    ) {
+        guard canListRemoteHostCopy(host), let token = remoteHostWork.beginRead(on: host, copiedAt: refreshedAt) else { return }
+        let coordinator = windowRegistry.hostSessionWork
+        Task.detached(priority: .userInitiated) { [weak self] in
+            try? await coordinator.withAccess(to: [.ssh(host)]) { [weak self] in
+                guard await self?.canReadRemoteHostCopy(host, token: token) == true else { return }
+                let hostConversations = try discovery.readMirror(host: host)
+                await self?.applyRemoteHostCopy(host, hostConversations: hostConversations, refreshedAt: refreshedAt, status: status, token: token)
+            }
         }
+    }
+
+    private func canReadRemoteHostCopy(_ host: String, token: RemoteHostWork.Token) -> Bool {
+        canListRemoteHostCopy(host) && remoteHostWork.isCurrentRead(token, on: host)
     }
 
     private func applyRemoteHostCopy(
         _ host: String,
         hostConversations: [Conversation],
         refreshedAt: Date,
-        status: RemoteHostStatus?
+        status: RemoteHostStatus?,
+        token: RemoteHostWork.Token
     ) {
         // This window may have started a refresh or a deletion of its own while the copy was read.
-        guard canListRemoteHostCopy(host) else { return }
+        guard canListRemoteHostCopy(host), remoteHostWork.isCurrentRead(token, on: host) else { return }
         applyRemoteHostConversations(hostConversations, host: host)
         if let status {
             setTmuxSessionNames(status.tmuxSessionNames, on: .ssh(host))
@@ -51,7 +68,7 @@ extension ConversationStore {
     }
 
     private func canListRemoteHostCopy(_ host: String) -> Bool {
-        remoteHostList.hosts.contains(host)
+        !isTearingDownWorkspace && remoteHostList.hosts.contains(host) && !isDisconnected(host)
             && hostRefreshStatuses[.ssh(host)] != .refreshing
             && !isDeleting(on: .ssh(host))
     }
