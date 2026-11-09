@@ -75,7 +75,7 @@ struct BoundedProcessRunnerTests {
         #expect(!FileManager.default.fileExists(atPath: marker.path))
     }
 
-    @Test func cancelingAnOptedInTaskStopsItsWrapperAndChildren() async throws {
+    @Test(.oneHeldThreadAtATime) func cancelingAnOptedInTaskStopsItsWrapperAndChildren() async throws {
         let folder = try makeTemporaryDirectory()
         defer { Self.cleanUpDelayedChild(in: folder) }
         let started = folder.appendingPathComponent("started")
@@ -91,10 +91,16 @@ struct BoundedProcessRunnerTests {
         }
         defer { task.cancel() }
         let deadline = ContinuousClock.now + .seconds(10)
-        while !FileManager.default.fileExists(atPath: started.path), ContinuousClock.now < deadline {
-            try await Task.sleep(for: .milliseconds(10))
+        do {
+            while !FileManager.default.fileExists(atPath: started.path), ContinuousClock.now < deadline {
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            try #require(FileManager.default.fileExists(atPath: started.path))
+        } catch {
+            task.cancel()
+            _ = await task.value
+            throw error
         }
-        try #require(FileManager.default.fileExists(atPath: started.path))
         task.cancel()
         #expect(await task.value == nil)
         try Data().write(to: folder.appendingPathComponent("release"))

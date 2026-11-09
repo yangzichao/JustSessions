@@ -75,6 +75,6 @@ OpenCode SSH hosts also need `python3`. The host's login shell decides where its
 
 Antigravity SSH hosts also need `python3`. SQLite backup snapshots include committed WAL updates; only conversation databases and their summary index are copied, excluding credentials, settings, brain artifacts, and annotations. Temporary snapshots are removed after transfer. Antigravity deletion over SSH additionally needs `lsof` to reject sessions open in another process. It validates the host database's session ID and workspace, stages its database and companions before committing the index change, and then permanently removes them. A failure before commit restores the files and rolls back the index.
 
-### Upgrading to 1.4
+### Upgrading to 1.3.2
 
-Version 1.4 separates each SSH destination's cached history. Existing copies migrate only when their host can be identified safely; other old copies stay on disk but are not listed. If a host's cached history is missing after upgrading, reconnect and let its refresh finish. For a disconnected host, choose **Connect** from its **⋯** menu; otherwise click its refresh button. Until then, that history may be unavailable offline. This changes only the local cache and does not delete session history on the host.
+Version 1.3.2 separates each SSH destination's cached history. Existing copies migrate only when their host can be identified safely; other old copies stay on disk but are not listed. If a host's cached history is missing after upgrading, reconnect and let its refresh finish. For a disconnected host, choose **Connect** from its **⋯** menu; otherwise click its refresh button. Until then, that history may be unavailable offline. This changes only the local cache and does not delete session history on the host.

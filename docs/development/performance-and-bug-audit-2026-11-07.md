@@ -362,3 +362,11 @@ swift test --no-parallel --filter 'BoundedProcessRunnerTests|TranscriptIncrement
 ```
 
 The original audit verification, failed reproduction outputs, and final fix verification are separate evidence sets. See the fix pull request's Local verification section for the recorded commit and logs; the historical temporary test names above are not current test selectors.
+
+### Release-runner follow-up, 9 November 2026
+
+The first `v1.4.0` release run failed before signing or publication ([run 42687072461](https://github.com/yangzichao/JustSessions/actions/runs/42687072461)), despite passing local verification. It reported 62 issues, mostly terminal and UI timeouts, on the smaller macOS runner. Two new tests could occupy shared Swift concurrency threads while their own tasks needed a free thread to release them: the appended-name reader fixture and the opted-in process-cancellation test. Both now use the existing `.oneHeldThreadAtATime` trait; the name suite also serializes its cases. Error cleanup releases or cancels the worker and awaits completion before disposing of its files.
+
+The name fixture's ten-second automatic release could let a name apply before the test reached its close/relink action. It now waits for explicit release. The remote-refresh fixture received the same correction while preparing 1.4.0. These fixes preserve the intended ordering without changing production lifecycle guards or weakening assertions.
+
+CI also exposed a pre-existing scroll-restoration fixture that expired after 60 seconds before its assertion resumed at about 113 seconds. The explicit-handover fixture now keeps restoration pending until the test releases it; separate seek and bookmark tests retain the production settling interval and automatic-completion checks. The widespread timeout pattern is consistent with worker starvation, but the log alone does not prove that every reported failure had that cause. The corrected candidate is 1.3.2; the failed 1.4.0 tag remains unchanged and unpublished. Release verification and CI results are recorded separately in the release pull request.
