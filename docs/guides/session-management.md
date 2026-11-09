@@ -143,7 +143,7 @@ The host runs Linux or macOS and needs `rsync` plus the CLI you want to run inst
 
 ### Leave a host alone
 
-- Choose **Disconnect** from a host's **⋯** or right-click menu when JustSessions should stop reaching it, such as a host that is off, behind a VPN you left, or on a metered connection. From then on the app runs nothing on the host on its own: no refresh, check, sign-in check, or activity lookup, and no reconnecting of tabs. The host's sessions stay listed from the last copy, as this Mac's are from its disk, with none marked running, and its heading says **Disconnected**.
+- Choose **Disconnect** from a host's **⋯** or right-click menu when JustSessions should stop reaching it, such as a host that is off, behind a VPN you left, or on a metered connection. From then on the app runs nothing on the host on its own: no refresh, check, sign-in check, or activity lookup, and no reconnecting of tabs. The host's sessions stay listed from the last copy, as this Mac's are from its disk, with none marked running, and its heading says **Disconnected**. See the [1.4 cache upgrade note](session-storage.md#upgrading-to-14) if older cached history is missing.
 - Disconnecting closes the host's open tabs in every window. When one runs a CLI in tmux, it asks **Keep running** or **End sessions**, as closing several tabs does. The login made with **Connect…** and the host's port forwards end too.
 - The host stays disconnected until you say otherwise, also after you quit and reopen JustSessions. Choose **Connect** from the same menu, click the heading's refresh button, or just use the host, such as resuming or starting a session there: it refreshes at once, and on its own from then on.
 
