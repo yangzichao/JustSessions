@@ -1,5 +1,28 @@
 [
   {
+    "version": "1.3.3",
+    "publishedOn": "2026-11-10",
+    "title": {
+      "en": "SSH connect and large sessions",
+      "zh-Hans": "SSH 连接与大型会话"
+    },
+    "sections": [
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "With several windows open, connecting an SSH host copies its history once; other windows update sooner.",
+            "zh-Hans": "打开多个窗口时，连接 SSH 主机只复制一次历史记录，其他窗口更快更新。"
+          },
+          {
+            "en": "The conversation map and Codex message search use less CPU while a large session grows.",
+            "zh-Hans": "大型会话持续增长时，对话地图和 Codex 消息搜索占用的 CPU 更少。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.3.2",
     "publishedOn": "2026-11-09",
     "title": {
