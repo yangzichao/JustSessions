@@ -8,7 +8,7 @@ Before changing behavior, UI, or a hot path, read the matching files in [feature
 
 Contributors develop and run JustSessions on macOS. Use a disposable local Ubuntu 24.04 VM in Multipass as the standard Linux SSH test target; follow [SSH development testing](docs/development/ssh-testing.md) for setup and the manual checklist. Use the `justsessions-test` SSH alias so instructions are consistent across contributors and coding agents.
 
-For SSH behavior changes, run the relevant checklist with disposable sessions and record the host OS, CLI versions, and results. Also test a separate macOS account or Mac when changing remote shell commands, paths, or platform-dependent tools. Simulated tests and `make verify` do not establish live SSH coverage; explicitly report any untested host or provider. SSH to your everyday Mac account accesses real session files, so use the isolated target for deletion tests.
+For SSH behavior changes, run the relevant checklist with disposable sessions and record the host OS, CLI versions, and results. Also test a macOS target when changing remote shell commands, paths, or platform-dependent tools. To test SSH to a Mac, install [Tart](https://tart.run) and use a disposable macOS VM with the `justsessions-test-macos` alias, as [macOS target coverage](docs/development/ssh-testing.md#macos-target-coverage) describes; a separate macOS account or another Mac also works. Simulated tests and `make verify` do not establish live SSH coverage; explicitly report any untested host or provider. SSH to your everyday Mac account accesses real session files, so use the isolated target for deletion tests.
 
 ## Checks before you push
 
