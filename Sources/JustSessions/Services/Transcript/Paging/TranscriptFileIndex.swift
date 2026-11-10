@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 
 /// Only byte offsets are retained, never JSON objects or message text. A 100,000-line log needs about 0.8 MiB.
@@ -11,7 +10,7 @@ struct TranscriptFileIndex: Sendable {
     let validatedByteCount: UInt64
     /// Stays the same only while every byte of the preceding index is preserved. Pages carry it across actor awaits.
     let contentLineage: UUID
-    /// SHA-256 from the same chunks as the offsets; search can reuse it after verifying the file is still unchanged.
+    /// CRC-32 from the same chunks as the offsets; search can reuse it after verifying the file is still unchanged.
     let digest: Data
     private let lastByte: UInt8?
 
@@ -31,7 +30,7 @@ struct TranscriptFileIndex: Sendable {
                         scannedByteCount: 0, validatedByteCount: 0, contentLineage: previous.contentLineage,
                         digest: previous.digest, lastByte: previous.lastByte)
         }
-        var hasher = SHA256()
+        var hasher = CRC32Checksum()
         var validatedByteCount: UInt64 = 0
         var appending = false
         if let previous, byteCount >= previous.byteCount {
@@ -47,9 +46,9 @@ struct TranscriptFileIndex: Sendable {
                 validatedByteCount += UInt64(count)
             }
             let prefixHasher = hasher
-            appending = Data(prefixHasher.finalize()) == previous.digest
+            appending = prefixHasher.finalize() == previous.digest
         }
-        if !appending { hasher = SHA256() }
+        if !appending { hasher = CRC32Checksum() }
         var lineStarts = appending ? previous!.lineStarts : (byteCount == 0 ? [] : [0])
         var offset: UInt64 = appending ? previous!.byteCount : 0
         var lastByte = appending ? previous!.lastByte : nil
@@ -81,7 +80,7 @@ struct TranscriptFileIndex: Sendable {
         guard try TranscriptFileFingerprint(handle: handle).byteCount >= byteCount else { throw TranscriptPagingError.sourceChanged }
         return Self(lineStarts: lineStarts, byteCount: byteCount, fingerprint: fingerprint,
                     scannedByteCount: byteCount - scanStart, validatedByteCount: validatedByteCount,
-                    contentLineage: appending ? previous!.contentLineage : UUID(), digest: Data(hasher.finalize()), lastByte: lastByte)
+                    contentLineage: appending ? previous!.contentLineage : UUID(), digest: hasher.finalize(), lastByte: lastByte)
     }
 
     func byteRange(at record: Int) -> Range<UInt64> {

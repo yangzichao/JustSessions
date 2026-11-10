@@ -70,7 +70,7 @@ struct SessionMessageTextCacheTests {
         #expect(cache.text(for: conversation.id, fingerprint: fingerprint) == nil)
     }
 
-    private func resumeState(committedEntryCount: Int = 1, digestByteCount: Int = 32) -> SessionMessageTextResumeState {
+    private func resumeState(committedEntryCount: Int = 1, digestByteCount: Int = 4) -> SessionMessageTextResumeState {
         SessionMessageTextResumeState(
             device: 1, inode: 2, byteCount: 9, digest: Data(count: digestByteCount), finalPageRecord: 1, finalPageByteOffset: 9,
             committedEntryCount: committedEntryCount,
@@ -103,7 +103,7 @@ struct SessionMessageTextCacheTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let cache = SessionMessageTextCache(directory: directory.appendingPathComponent("Cache"))
-        for state in [resumeState(committedEntryCount: 2), resumeState(digestByteCount: 4)] {
+        for state in [resumeState(committedEntryCount: 2), resumeState(digestByteCount: 32)] {
             let conversation = try conversation(in: directory)
             cache.save(text, resumeState: state, for: conversation.id, fingerprint: SessionMessageTextFingerprint(conversation))
 
