@@ -4,7 +4,7 @@
 
 Contributors develop and run JustSessions on macOS. Our standard Linux SSH test target is a disposable Ubuntu 24.04 VM running locally in Multipass. It needs no cloud account or second computer, gives each contributor an independent test environment, and exercises Linux tools and paths through real SSH. The app and its build tools stay on the Mac.
 
-Use a separate macOS account or another Mac as well when changing remote shell commands, paths, or platform-dependent tools. A Linux result does not verify macOS behavior, and a local VM does not establish behavior across an unreliable internet connection. SSH to your everyday Mac account exposes the same session files the app reads locally; use disposable accounts and sessions for deletion tests.
+Use a macOS target as well when changing remote shell commands, paths, or platform-dependent tools: a disposable macOS VM in Tart, a separate macOS account, or another Mac; see [macOS target coverage](#macos-target-coverage). A Linux result does not verify macOS behavior, and a local VM does not establish behavior across an unreliable internet connection. SSH to your everyday Mac account exposes the same session files the app reads locally; use disposable accounts and sessions for deletion tests.
 
 ## Create the Linux target
 
@@ -212,7 +212,69 @@ kill PID
 
 ## macOS target coverage
 
-Create a dedicated standard macOS test account with disposable projects and CLI history. Enable **System Settings → General → Sharing → Remote Login** for that account, following [Apple's Remote Login guide](https://support.apple.com/guide/mac-help/allow-a-remote-computer-to-access-your-mac-mchlp1066/mac). For a target on the development Mac, connect to `test-account@127.0.0.1`.
+The standard macOS SSH target is a disposable macOS VM in [Tart](https://tart.run), with the alias `justsessions-test-macos`. Like the Multipass VM, it keeps deletion tests away from your own session files and can be thrown away. It covers macOS paths, zsh as the login shell, macOS's `/bin/sh`, openrsync as `/usr/bin/rsync`, and BSD command-line tools.
+
+Tart needs an Apple silicon Mac. A VM can run a macOS release no newer than the host's. The `macos-tahoe-base` image (macOS 26) takes about 33 GB of disk, plus Tart's copy of the download. Tart's license, FSL-1.1-ALv2, permits internal use.
+
+### Create the macOS VM
+
+Install Tart from its signed and notarized GitHub release. On 9 November 2026, `brew install cirruslabs/cli/tart` failed under Homebrew 7.0 with "Calling `depends_on :macos` with `depends_on macos:` is disabled"; use the formula again once it installs. Put the `tart` link in a folder on your `PATH`:
+
+```sh
+cd "$(mktemp -d)"
+gh release download --repo cirruslabs/tart --pattern 'tart.tar.gz' --pattern 'tart_*_checksums.txt'
+shasum -a 256 -c tart_*_checksums.txt
+tar -xzf tart.tar.gz
+codesign --verify --deep --strict tart.app && spctl -a -vv tart.app
+mkdir -p "$HOME/Applications" && mv tart.app "$HOME/Applications/"
+ln -s "$HOME/Applications/tart.app/Contents/MacOS/tart" "$HOME/.local/bin/tart"
+```
+
+`spctl` should report a notarized Developer ID from Cirrus Labs. Create the VM from Cirrus Labs' `base` image, which has SSH enabled for the user `admin`, Homebrew, Node 24, Python 3, and the Tart guest agent. The download took about 70 minutes at 6 MB/s. Then start it without a window and wait for its address:
+
+```sh
+tart clone ghcr.io/cirruslabs/macos-tahoe-base:latest justsessions-ssh-test-macos
+tart run --no-graphics justsessions-ssh-test-macos &
+tart ip --wait 180 justsessions-ssh-test-macos
+```
+
+`tart run` keeps running while the VM does; run it from a terminal you leave open, or in the background as above.
+
+### Configure its SSH alias
+
+`tart exec` runs a command in the VM through the guest agent, without SSH. Use it to authorize the same test key as the Linux VM and to print the VM's host-key fingerprint:
+
+```sh
+PUB="$(cat "$HOME/.ssh/justsessions-test.pub")"
+tart exec justsessions-ssh-test-macos /bin/sh -c "mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '$PUB' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub"
+```
+
+Add an alias beside `justsessions-test` in `~/.ssh/config`, replacing `VM_IP_ADDRESS` with the address `tart ip` printed:
+
+```sshconfig
+Host justsessions-test-macos
+    HostName VM_IP_ADDRESS
+    User admin
+    IdentityFile ~/.ssh/justsessions-test
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+    UseKeychain yes
+    HostKeyAlias justsessions-test-macos
+```
+
+Connect once interactively and accept the host key only when its fingerprint matches the one above. Then check batch mode and install tmux, which macOS does not include:
+
+```sh
+ssh -o HostKeyAlgorithms=ssh-ed25519 justsessions-test-macos true
+ssh -o BatchMode=yes justsessions-test-macos 'command -v rsync python3 lsof && exec "$SHELL" -lic "command -v brew node"'
+ssh -o BatchMode=yes justsessions-test-macos 'HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew install tmux && /opt/homebrew/bin/tmux -V'
+```
+
+Install the CLI being tested in the VM, as for the Linux target, and check it through `exec "$SHELL" -lic`. Check `tart ip justsessions-ssh-test-macos` again after restarting the VM; if its address changed, update `HostName`. Stop it with `tart stop justsessions-ssh-test-macos`. To discard it, remove the host from JustSessions, run `tart delete justsessions-ssh-test-macos`, and remove the alias and its `known_hosts` entry. The `OCI` entries in `tart list` are Tart's cache of the download; `tart prune --help` describes removing them.
+
+### A separate macOS account or Mac
+
+Instead of the VM, create a dedicated standard macOS test account with disposable projects and CLI history. Enable **System Settings → General → Sharing → Remote Login** for that account, following [Apple's Remote Login guide](https://support.apple.com/guide/mac-help/allow-a-remote-computer-to-access-your-mac-mchlp1066/mac). For a target on the development Mac, connect to `test-account@127.0.0.1`.
 
 Authorize your test public key in that account's `~/.ssh/authorized_keys`, with permissions `700` for `.ssh` and `600` for `authorized_keys`. Give it a separate SSH alias such as `justsessions-test-macos`, with `User` set to the test account and the same local `IdentityFile`, `AddKeysToAgent`, and `UseKeychain` settings. Verify a batch-mode SSH connection before adding it to JustSessions. Install the selected CLI and remote dependencies for that account, check their availability in its login shell, and repeat the relevant checklist. This covers macOS paths, its default shell, and differences between BSD and GNU command-line tools.
 
