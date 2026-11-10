@@ -9,6 +9,8 @@ final class WorkspaceWindowRegistry {
     static let shared = WorkspaceWindowRegistry()
 
     let hostSessionWork = HostSessionWorkCoordinator()
+    /// So windows refreshing an SSH host at once copy it once.
+    let latestRemoteHostCopies = LatestRemoteHostCopies()
 
     private struct Workspace {
         weak var store: ConversationStore?

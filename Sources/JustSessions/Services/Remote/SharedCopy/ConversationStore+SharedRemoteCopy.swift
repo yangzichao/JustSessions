@@ -56,15 +56,50 @@ extension ConversationStore {
         // This window may have started a refresh or a deletion of its own while the copy was read.
         guard canListRemoteHostCopy(host), remoteHostWork.isCurrentRead(token, on: host) else { return }
         applyRemoteHostConversations(hostConversations, host: host)
-        if let status {
-            setTmuxSessionNames(status.tmuxSessionNames, on: .ssh(host))
-            setTmuxServerProblem(status.tmuxServerProblem, on: host)
-            if let installedProviders = status.installedProviders {
-                setInstalledProviders(installedProviders, on: .ssh(host))
-            }
-        }
+        showRemoteHostStatusOfAnotherWindowsCopy(status, on: host)
         hostRefreshStatuses[.ssh(host)] = .refreshed(refreshedAt)
         noteLoginState(on: host, refreshProblem: nil)
+    }
+
+    /// This window's refresh, once another window's copy that started after it was asked for has ended: lists that copy,
+    /// read off the main actor from the same folder, or shows its failure; see `LatestRemoteHostCopies`. The window that
+    /// made the copy has shared it with the windows not refreshing, and checks what the host's status calls for.
+    nonisolated func takeAnotherWindowsCopy(
+        _ outcome: LatestRemoteHostCopies.Outcome, host: String, token: RemoteHostWork.Token, discovery: RemoteSessionDiscovery
+    ) async throws {
+        switch outcome {
+        case .copied(let refreshedAt, let status):
+            let hostConversations = try discovery.readMirror(host: host)
+            try Task.checkCancellation()
+            await finishRefreshWithAnotherWindowsCopy(
+                host, token: token, hostConversations: hostConversations, refreshedAt: refreshedAt, status: status
+            )
+        case .failed(let error):
+            await failRemoteHostRefresh(host, token: token, error: error, checksShellStartup: false)
+        }
+    }
+
+    private func finishRefreshWithAnotherWindowsCopy(
+        _ host: String,
+        token: RemoteHostWork.Token,
+        hostConversations: [Conversation],
+        refreshedAt: Date,
+        status: RemoteHostStatus?
+    ) {
+        guard isCurrentRemoteHostRefresh(token, on: host) else { return }
+        applyRemoteHostConversations(hostConversations, host: host)
+        showRemoteHostStatusOfAnotherWindowsCopy(status, on: host)
+        setRemoteHostRefreshStatus(.refreshed(refreshedAt), host: host)
+        noteLoginState(on: host, refreshProblem: nil)
+    }
+
+    private func showRemoteHostStatusOfAnotherWindowsCopy(_ status: RemoteHostStatus?, on host: String) {
+        guard let status else { return }
+        setTmuxSessionNames(status.tmuxSessionNames, on: .ssh(host))
+        setTmuxServerProblem(status.tmuxServerProblem, on: host)
+        if let installedProviders = status.installedProviders {
+            setInstalledProviders(installedProviders, on: .ssh(host))
+        }
     }
 
     private func canListRemoteHostCopy(_ host: String) -> Bool {

@@ -702,6 +702,19 @@ With an accessibility client (`/tmp/perf-switch.sh`, which presses the tabs thro
 
 **Limits:** the VM runs on the same Mac, so the timing has no real network latency and little data. A distant host or one with a large history takes longer per copy; none was timed.
 
+**Several windows refreshing at once (10 November 2026):** Connect, and Connect… logging in or closing, refresh a host in every window at once. Each window's refresh waited for the one before it and then copied the host again, so with two windows the second listed the host a whole copy later. Now a refresh asked for before another window's copy started waits for that copy and lists it, or shows its failure (`LatestRemoteHostCopies`). A refresh asked for after a copy started copies again once it ends, as the host may have changed since.
+
+Measured with two windows' stores sharing one window registry, in a temporary test against real `ssh` that wasn't committed: one warm copy, then Disconnect and Connect five times, counting the status probes to count copies. `main` at `7725423a` and this change ran alternately, twice each, on an Apple M4 Max with macOS 27.0.1:
+
+| Host | Build | Copies per Connect | First window listed | Second window listed |
+| --- | --- | --- | --- | --- |
+| macOS test VM (`justsessions-test-macos`: macOS 26.6.2 in Tart, almost no history) | `main` | 2 | 516–541 ms | 1,026–1,082 ms |
+| | This change | 1 | 514–522 ms | 517–526 ms |
+| Linux test VM (`justsessions-test`: about 10 MB of history) | `main` | 2 | 1,631–2,737 ms | 3,082–4,959 ms |
+| | This change | 1 | 1,936–2,286 ms | 2,333–2,614 ms |
+
+On the Linux VM the second window lists 0.3 to 0.4 s after the first, reading the copy from disk. One refresh alone of that VM took 1.8 to 2.6 s, against 0.8 to 1.2 s on 13 October with about 1 MB of history; most of its history is now Pi's (7.3 MB) and OpenCode's (2.0 MB). Both VMs run on the same Mac, so there is no real network latency.
+
 ### 27. Typing in a Rename dialog
 
 **Evidence:** typing in a session's Rename dialog lagged. The name being typed was `ContentView`'s own state, so every keystroke ran `ContentView`'s body. That builds `ConversationBrowserView` with closures SwiftUI can't compare, so the whole browser and sidebar redrew, as tab switches did before item 25.
