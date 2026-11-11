@@ -45,8 +45,10 @@ struct SSHAskpassRelayTests {
         let folder = makeShortSocketFolder()
         try FileManager.default.createDirectory(atPath: folder, withIntermediateDirectories: false)
         defer { try? FileManager.default.removeItem(atPath: folder) }
+        let isAsked = LockedValue(false)
         let wasWithdrawn = LockedValue(false)
         let server = try #require(SSHAskpassServer(socketPath: folder + "/askpass") { _ in
+            isAsked.update { $0 = true }
             try? await Task.sleep(for: .seconds(600)) // Ended only by a cancel, however busy the test run.
             wasWithdrawn.update { $0 = Task.isCancelled }
             return SSHAskpassReply(answer: nil)
@@ -57,7 +59,8 @@ struct SSHAskpassRelayTests {
         try helper.write(try #require(SSHAskpassMessageLine.encoded(
             SSHAskpassRequest(prompt: "Confirm user presence for key ED25519-SK", hint: "none")
         )))
-        try await Task.sleep(for: .milliseconds(100))
+        // A helper that goes before its question is read asks nothing, so it waits for the question first.
+        try await expectEventually { isAsked.value }
         helper.close()
 
         try await expectEventually { wasWithdrawn.value }
@@ -84,10 +87,11 @@ struct SSHAskpassRelayTests {
     }
 
     /// Runs the helper's blocking exchange off Swift's shared threads, which the server needs to ask its question. On a
-    /// runner with few cores, blocking those threads leaves the question waiting forever.
+    /// runner with few cores, blocking those threads leaves the question waiting forever. A queue of its own, as a
+    /// global queue's work waits while busy tasks fill every core.
     private static func answer(_ request: SSHAskpassRequest, socketPath: String) async -> String? {
         await withCheckedContinuation { continuation in
-            DispatchQueue.global().async {
+            DispatchQueue(label: "SSHAskpassRelayTests.helper").async {
                 continuation.resume(returning: SSHAskpassRelay.answer(to: request, socketPath: socketPath))
             }
         }
