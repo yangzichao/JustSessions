@@ -1,5 +1,28 @@
 [
   {
+    "version": "1.3.4",
+    "publishedOn": "2026-11-11",
+    "title": {
+      "en": "SSH login with Connect…",
+      "zh-Hans": "使用“连接…”登录 SSH"
+    },
+    "sections": [
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Fixed the app quitting when ssh ended a Connect… question before the app showed it.",
+            "zh-Hans": "修复了“连接…”的提问尚未显示就被 ssh 结束时，应用会退出的问题。"
+          },
+          {
+            "en": "Small bug fixes.",
+            "zh-Hans": "修复了一些小问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.3.3",
     "publishedOn": "2026-11-10",
     "title": {
