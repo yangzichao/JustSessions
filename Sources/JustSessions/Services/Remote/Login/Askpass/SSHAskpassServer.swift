@@ -72,7 +72,9 @@ final class SSHAskpassServer: @unchecked Sendable {
     private func acceptConnection(on listeningDescriptor: Int32) {
         let descriptor = accept(listeningDescriptor, nil, nil)
         guard descriptor >= 0 else { return }
-        DispatchQueue.global(qos: .userInitiated).async { [self] in serve(descriptor) }
+        // A queue of its own gets a thread even while busy Swift tasks fill every core, where a global queue's work
+        // waits until they finish, and with it the question. Each connection has one, as reading its question blocks.
+        DispatchQueue(label: "SSHAskpassServer.connection", qos: .userInitiated).async { [self] in serve(descriptor) }
     }
 
     private func serve(_ descriptor: Int32) {
@@ -102,15 +104,17 @@ final class SSHAskpassServer: @unchecked Sendable {
         }
     }
 
-    /// Blocking, with a time limit for the question; false for a connection from another user.
-    private static func prepare(_ descriptor: Int32) -> Bool {
+    /// Blocking, with a time limit for the question; false for a connection from another user, or one whose helper has
+    /// already gone. macOS refuses `SO_NOSIGPIPE` on a socket closed at both ends, and a reply sent there without it
+    /// would end the app with `SIGPIPE`.
+    static func prepare(_ descriptor: Int32) -> Bool {
         var userID: uid_t = 0
         var groupID: gid_t = 0
         guard getpeereid(descriptor, &userID, &groupID) == 0, userID == getuid() else { return false }
         let flags = fcntl(descriptor, F_GETFL)
         guard flags >= 0, fcntl(descriptor, F_SETFL, flags & ~O_NONBLOCK) == 0 else { return false }
         var isOn: Int32 = 1
-        setsockopt(descriptor, SOL_SOCKET, SO_NOSIGPIPE, &isOn, socklen_t(MemoryLayout<Int32>.size))
+        guard setsockopt(descriptor, SOL_SOCKET, SO_NOSIGPIPE, &isOn, socklen_t(MemoryLayout<Int32>.size)) == 0 else { return false }
         var timeout = timeval(tv_sec: Int(requestTimeout), tv_usec: 0)
         setsockopt(descriptor, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
         return true

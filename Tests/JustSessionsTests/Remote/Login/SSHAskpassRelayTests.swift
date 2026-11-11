@@ -84,10 +84,11 @@ struct SSHAskpassRelayTests {
     }
 
     /// Runs the helper's blocking exchange off Swift's shared threads, which the server needs to ask its question. On a
-    /// runner with few cores, blocking those threads leaves the question waiting forever.
+    /// runner with few cores, blocking those threads leaves the question waiting forever. A queue of its own, as a
+    /// global queue's work waits while busy tasks fill every core.
     private static func answer(_ request: SSHAskpassRequest, socketPath: String) async -> String? {
         await withCheckedContinuation { continuation in
-            DispatchQueue.global().async {
+            DispatchQueue(label: "SSHAskpassRelayTests.helper").async {
                 continuation.resume(returning: SSHAskpassRelay.answer(to: request, socketPath: socketPath))
             }
         }
