@@ -21,7 +21,10 @@ final class SSHAskpassServer: @unchecked Sendable {
         guard let descriptor = Self.listeningSocket(at: socketPath) else { return nil }
         self.socketPath = socketPath
         self.ask = ask
-        acceptSource = DispatchSource.makeReadSource(fileDescriptor: descriptor, queue: .global(qos: .userInitiated))
+        // The server's own queues get a thread even while busy Swift tasks fill every core. Work on a global queue
+        // waits until they finish, and the question with it.
+        let acceptQueue = DispatchQueue(label: "SSHAskpassServer.accept", qos: .userInitiated)
+        acceptSource = DispatchSource.makeReadSource(fileDescriptor: descriptor, queue: acceptQueue)
         acceptSource.setEventHandler { [weak self] in self?.acceptConnection(on: descriptor) }
         acceptSource.setCancelHandler { Darwin.close(descriptor) }
         acceptSource.resume()
@@ -55,6 +58,7 @@ final class SSHAskpassServer: @unchecked Sendable {
         unlink(path)
         let descriptor = socket(AF_UNIX, SOCK_STREAM, 0)
         guard descriptor >= 0 else { return nil }
+        CloseOnExecDescriptor.mark(descriptor)
         let bound = withUnsafePointer(to: &address) {
             $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
                 bind(descriptor, $0, socklen_t(MemoryLayout<sockaddr_un>.size))
@@ -72,12 +76,13 @@ final class SSHAskpassServer: @unchecked Sendable {
     private func acceptConnection(on listeningDescriptor: Int32) {
         let descriptor = accept(listeningDescriptor, nil, nil)
         guard descriptor >= 0 else { return }
-        // A queue of its own gets a thread even while busy Swift tasks fill every core, where a global queue's work
-        // waits until they finish, and with it the question. Each connection has one, as reading its question blocks.
-        DispatchQueue(label: "SSHAskpassServer.connection", qos: .userInitiated).async { [self] in serve(descriptor) }
+        CloseOnExecDescriptor.mark(descriptor)
+        // Each connection has a queue of its own, as reading its question blocks.
+        let connectionQueue = DispatchQueue(label: "SSHAskpassServer.connection", qos: .userInitiated)
+        connectionQueue.async { [self] in serve(descriptor, on: connectionQueue) }
     }
 
-    private func serve(_ descriptor: Int32) {
+    private func serve(_ descriptor: Int32, on connectionQueue: DispatchQueue) {
         guard Self.prepare(descriptor), let request = Self.readRequest(from: descriptor) else {
             Darwin.close(descriptor)
             return
@@ -85,7 +90,7 @@ final class SSHAskpassServer: @unchecked Sendable {
         let id = UUID()
         // The connection is closed only after the reply, so no write can reach a descriptor reused meanwhile; the
         // watch for the helper going away reads a copy of it.
-        let hangUpWatch = HangUpWatch(copying: descriptor)
+        let hangUpWatch = HangUpWatch(copying: descriptor, queue: connectionQueue)
         let task = Task { [ask] in
             let reply = await ask(request)
             if let message = SSHAskpassMessageLine.encoded(reply) { Self.send(message, to: descriptor) }
@@ -147,10 +152,10 @@ final class SSHAskpassServer: @unchecked Sendable {
         private let lock = NSLock()
         private var isStopped = false
 
-        init?(copying descriptor: Int32) {
-            let copy = dup(descriptor)
+        init?(copying descriptor: Int32, queue: DispatchQueue) {
+            let copy = CloseOnExecDescriptor.duplicate(descriptor)
             guard copy >= 0 else { return nil }
-            source = DispatchSource.makeReadSource(fileDescriptor: copy, queue: .global(qos: .utility))
+            source = DispatchSource.makeReadSource(fileDescriptor: copy, queue: queue)
             source.setCancelHandler { Darwin.close(copy) }
         }
 
