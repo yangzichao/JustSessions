@@ -1,9 +1,15 @@
 /* Keep the CLI positioning compact so the demo video stays in the first screen. */
 .hero { padding-top: 28px; text-align: center; }
-.hero h1 { margin: 0 0 10px; font-size: clamp(30px, 3.2vw, 44px); font-weight: 750; line-height: 1.1; letter-spacing: -.03em; }
+/* The demo's halftone and stacked panels reach past the page width; never let them scroll the page sideways. */
+main { overflow-x: clip; }
+.hero h1 { margin: 0 0 10px; font-size: clamp(30px, 3.2vw, 44px); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; }
 .hero-description { margin: 0 0 26px; font-size: clamp(18px, 1.6vw, 22px); font-weight: 600; line-height: 1.4; }
-/* Keep the positioning phrase together when the title wraps. */
-.hero-title-line { display: inline-block; }
+/* Keep the positioning phrase together when the title wraps, under a comic marker stroke. */
+.hero-title-line {
+  display: inline-block;
+  padding-inline: .12em;
+  background: linear-gradient(transparent 56%, rgb(255 138 31 / 38%) 56%, rgb(255 138 31 / 38%) 92%, transparent 92%);
+}
 
 @media (max-width: 650px) {
   .hero { padding-top: 20px; }

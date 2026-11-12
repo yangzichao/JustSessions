@@ -1,4 +1,8 @@
 :root {
+  /* Comic accents from the app icon: ink outlines, hard offset shadows, and halftone dots. */
+  --comic-outline: 2.5px solid var(--ink);
+  --comic-shadow: 4px 4px 0 var(--ink);
+  --comic-halftone: radial-gradient(circle, rgb(21 23 28 / 22%) 1.6px, transparent 2.1px) 0 0 / 11px 11px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--ink);
   background: var(--paper);
@@ -37,17 +41,19 @@ code { font-size: .92em; }
   gap: 10px;
   min-height: 50px;
   padding: 14px 22px;
-  border: 1px solid var(--ink);
-  border-radius: 9px;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
   background: var(--ink);
-  box-shadow: 0 3px 8px var(--shadow);
+  /* A hard comic shadow in Claude orange, the first dot of the mark. */
+  box-shadow: 3px 3px 0 var(--provider-claude);
   color: var(--ink-foreground);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.35;
-  transition: background-color .18s, box-shadow .18s;
+  transition: background-color .18s, box-shadow .12s, transform .12s;
 }
-.button:hover { background: var(--button-hover); box-shadow: 0 4px 12px var(--shadow); }
+.button:hover { background: var(--button-hover); box-shadow: 4px 4px 0 var(--provider-claude); transform: translate(-1px, -1px); }
+.button:active { box-shadow: 1px 1px 0 var(--provider-claude); transform: translate(2px, 2px); }
 .text-link { display: inline-flex; align-items: center; gap: 8px; padding-block: 10px; font-size: 15px; font-weight: 600; color: var(--ink); }
 .text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
 .wordmark { display: inline-flex; align-items: center; gap: 11px; font-size: 21px; font-weight: 650; letter-spacing: -.025em; }
@@ -58,4 +64,5 @@ code { font-size: .92em; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
+  .button:hover, .button:active { transform: none; }
 }

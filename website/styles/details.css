@@ -1,15 +1,38 @@
-.questions { padding-block: 40px 48px; }
-.question-list { border-top: 1px solid var(--line); }
-details { border-bottom: 1px solid var(--line); }
-summary { position: relative; padding: 18px 34px 18px 0; font-size: 19px; font-weight: 600; line-height: 1.35; cursor: pointer; list-style: none; }
+/* The FAQ answers are comic panels: ink outlines and hard shadows, two per row on wide screens. */
+.questions { padding-block: 48px 48px; }
+.question-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 18px 22px; }
+details { border: var(--comic-outline); border-radius: 14px; background: var(--surface); box-shadow: var(--comic-shadow); }
+summary { position: relative; padding: 18px 56px 18px 22px; font-size: 19px; font-weight: 650; line-height: 1.35; cursor: pointer; list-style: none; }
 summary::-webkit-details-marker { display: none; }
-summary::after { content: "+"; position: absolute; top: 18px; right: 4px; font-size: inherit; font-weight: 400; }
-details[open] summary::after { content: "−"; }
-details p { margin-bottom: 18px; padding-right: 34px; font-size: 17px; line-height: 1.6; }
-details a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+summary::after {
+  content: "+";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+}
+details[open] summary::after { content: "−"; background: var(--provider-claude); }
+details[open] summary { padding-bottom: 10px; }
+details[open] summary::after { top: 18px; margin-top: 0; }
+details p { margin: 0; padding: 0 22px 20px; font-size: 17px; line-height: 1.6; }
+details a { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--provider-claude); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+summary:focus-visible { outline-offset: -4px; border-radius: 12px; }
+
+@media (max-width: 850px) {
+  .question-list { grid-template-columns: minmax(0, 1fr); }
+}
 
 @media (max-width: 650px) {
-  .questions { padding-block: 32px; }
-  summary { font-size: 17px; }
-  details p { font-size: 16px; }
+  .questions { padding-block: 36px; }
+  summary { padding: 16px 52px 16px 18px; font-size: 17px; }
+  details p { padding-inline: 18px; font-size: 16px; }
 }
