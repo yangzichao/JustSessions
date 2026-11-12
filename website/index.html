@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="./styles/hero.css">
   <link rel="stylesheet" href="./styles/providers.css">
   <link rel="stylesheet" href="./styles/demo-video.css">
+  <link rel="stylesheet" href="./styles/demo-chapter-tabs.css">
   <script type="module" src="./scripts/demo-video/demo-video.js"></script>
   <script type="module" src="./scripts/traffic/traffic-monitor.js"></script>
   <link rel="stylesheet" href="./styles/details.css">
@@ -82,24 +83,54 @@
       <h1 id="hero-title">Nothing extra. <span class="hero-title-line">Just sessions.</span></h1>
       <p class="hero-description">Multiple agents, all your sessions in one place. Your familiar command line, with native tabs.</p>
       <div class="demo-video" data-demo-video>
-        <div class="demo-video-stage">
-          <video src="./assets/justsessions-demo.mp4" poster="./assets/justsessions-demo.jpg" width="1920" height="1080" controls playsinline preload="metadata" data-demo-video-player aria-label="JustSessions demo with narration and captions: sessions grouped by project, resuming a conversation in its CLI, Codex, OpenCode, and Pi, search, tabs and split view, dragging a tab into a new window, and an SSH session that keeps running after its tab closes."></video>
-          <button class="demo-video-play" type="button" aria-label="Play the 53-second demo with sound" hidden data-demo-video-play>
-            <span class="demo-video-play-label">
-              <svg class="demo-video-play-icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M5 3.2v11.6c0 .6.6.9 1.1.6l9.2-5.8c.5-.3.5-.9 0-1.2L6.1 2.6C5.6 2.3 5 2.6 5 3.2Z"/></svg>
-              Watch the demo
-              <span class="demo-video-length">0:53</span>
-            </span>
-          </button>
+        <span class="demo-video-halftone" aria-hidden="true"></span>
+        <div class="demo-window">
+          <div class="demo-tab-strip">
+            <span class="demo-window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            <ol class="demo-chapters" aria-label="Demo chapters" hidden data-demo-chapters>
+              <li><button class="demo-chapter" type="button" aria-label="Play from Sessions" data-demo-chapter data-start="3" data-end="9.5">
+                <svg class="demo-chapter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+                <span class="demo-chapter-label">Sessions</span>
+                <span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span>
+              </button></li>
+              <li><button class="demo-chapter" type="button" aria-label="Play from Agents" data-demo-chapter data-start="9.5" data-end="15.8">
+                <svg class="demo-chapter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="5.5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="18.5" cy="12" r="2.2"/></svg>
+                <span class="demo-chapter-label">Agents</span>
+                <span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span>
+              </button></li>
+              <li><button class="demo-chapter" type="button" aria-label="Play from Search" data-demo-chapter data-start="15.8" data-end="22.29">
+                <svg class="demo-chapter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></svg>
+                <span class="demo-chapter-label">Search</span>
+                <span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span>
+              </button></li>
+              <li><button class="demo-chapter" type="button" aria-label="Play from Tabs &amp; split" data-demo-chapter data-start="22.29" data-end="28.05">
+                <svg class="demo-chapter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M12 5v14"/></svg>
+                <span class="demo-chapter-label">Tabs &amp; split</span>
+                <span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span>
+              </button></li>
+              <li><button class="demo-chapter" type="button" aria-label="Play from New window" data-demo-chapter data-start="28.05" data-end="32.88">
+                <svg class="demo-chapter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="3.5" width="12.5" height="11" rx="2"/><path d="M16 17.5v1a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2h1"/></svg>
+                <span class="demo-chapter-label">New window</span>
+                <span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span>
+              </button></li>
+              <li><button class="demo-chapter" type="button" aria-label="Play from SSH" data-demo-chapter data-start="32.88" data-end="47.23">
+                <svg class="demo-chapter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="m7.5 10 2.5 2.5L7.5 15m5 0h4"/></svg>
+                <span class="demo-chapter-label">SSH</span>
+                <span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span>
+              </button></li>
+            </ol>
+          </div>
+          <div class="demo-video-stage">
+            <video src="./assets/justsessions-demo.mp4" poster="./assets/justsessions-demo.jpg" width="1920" height="1080" controls playsinline preload="metadata" data-demo-video-player aria-label="JustSessions demo with narration and captions: sessions grouped by project, resuming a conversation in its CLI, Codex, OpenCode, and Pi, search, tabs and split view, dragging a tab into a new window, and an SSH session that keeps running after its tab closes."></video>
+            <button class="demo-video-play" type="button" aria-label="Play the 53-second demo with sound" hidden data-demo-video-play>
+              <span class="demo-video-play-label">
+                <svg class="demo-video-play-icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M5 3.2v11.6c0 .6.6.9 1.1.6l9.2-5.8c.5-.3.5-.9 0-1.2L6.1 2.6C5.6 2.3 5 2.6 5 3.2Z"/></svg>
+                Watch the demo
+                <span class="demo-video-length">0:53</span>
+              </span>
+            </button>
+          </div>
         </div>
-        <ol class="demo-chapters" aria-label="Demo chapters" hidden data-demo-chapters>
-          <li><button class="demo-chapter" type="button" aria-label="Play from Sessions" data-demo-chapter data-start="3" data-end="9.5">Sessions<span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span></button></li>
-          <li><button class="demo-chapter" type="button" aria-label="Play from Agents" data-demo-chapter data-start="9.5" data-end="15.8">Agents<span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span></button></li>
-          <li><button class="demo-chapter" type="button" aria-label="Play from Search" data-demo-chapter data-start="15.8" data-end="22.29">Search<span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span></button></li>
-          <li><button class="demo-chapter" type="button" aria-label="Play from Tabs &amp; split" data-demo-chapter data-start="22.29" data-end="28.05">Tabs &amp; split<span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span></button></li>
-          <li><button class="demo-chapter" type="button" aria-label="Play from New window" data-demo-chapter data-start="28.05" data-end="32.88">New window<span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span></button></li>
-          <li><button class="demo-chapter" type="button" aria-label="Play from SSH" data-demo-chapter data-start="32.88" data-end="47.23">SSH<span class="demo-chapter-track" aria-hidden="true"><span class="demo-chapter-fill" data-demo-chapter-fill></span></span></button></li>
-        </ol>
       </div>
     </section>
     <section class="agents page-width" aria-labelledby="agents-title">
