@@ -120,6 +120,7 @@ struct TmuxHistoryFinderTests {
             countOutputs: [ScriptedTmuxHistory.countLine(9), ScriptedTmuxHistory.countLine(2)],
             holdsFirstCommand: true
         )
+        defer { tmux.releaseFirstCommand() }
         let finder = TmuxHistoryFinder(history: tmux.history)
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
