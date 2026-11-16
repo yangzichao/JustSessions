@@ -920,12 +920,12 @@
         }
       }
     },
-    "A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.": {
+    "A CLI or a plain terminal's shell still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart, and other plain terminals open a new shell in their folder. With this off, quitting ends plain terminals' shells.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "仍在 tmux 中运行的 CLI 会重新连接。其他会话在选中标签时继续，包括 Mac 重启后的会话。普通终端会在原文件夹打开新 shell。"
+            "value": "仍在 tmux 中运行的 CLI 和普通终端的 shell 会重新连接。其他会话在选中标签时继续，包括 Mac 重启后的会话；其他普通终端会在原文件夹打开新 shell。关闭此项时，退出应用会结束普通终端的 shell。"
           }
         }
       }

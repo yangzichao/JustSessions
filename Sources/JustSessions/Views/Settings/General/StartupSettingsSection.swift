@@ -18,7 +18,7 @@ struct StartupSettingsSection: View {
                 ))
                 HelpPopoverButton(
                     title: "Reopening tabs",
-                    explanation: "A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder."
+                    explanation: "A CLI or a plain terminal's shell still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart, and other plain terminals open a new shell in their folder. With this off, quitting ends plain terminals' shells."
                 )
                 .accessibilityIdentifier("settings.help.reopeningTabs")
             }

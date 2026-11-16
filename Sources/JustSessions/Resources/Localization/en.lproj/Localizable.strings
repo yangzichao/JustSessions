@@ -136,8 +136,8 @@
 	<string>1 subagent session stays on disk.</string>
 	<key>1 tool call</key>
 	<string>1 tool call</string>
-	<key>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</key>
-	<string>A CLI still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart. Plain terminals open a new shell in their folder.</string>
+	<key>A CLI or a plain terminal's shell still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart, and other plain terminals open a new shell in their folder. With this off, quitting ends plain terminals' shells.</key>
+	<string>A CLI or a plain terminal's shell still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart, and other plain terminals open a new shell in their folder. With this off, quitting ends plain terminals' shells.</string>
 	<key>A blue dot means a CLI finished a turn you haven't seen yet.</key>
 	<string>A blue dot means a CLI finished a turn you haven't seen yet.</string>
 	<key>A name to know it by</key>
