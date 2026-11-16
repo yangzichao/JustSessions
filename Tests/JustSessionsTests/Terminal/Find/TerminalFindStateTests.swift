@@ -79,6 +79,38 @@ struct TerminalFindStateTests {
         #expect(finder.calls.count == callCount)
         #expect(findState.focusRevision == focusRevision + 1)
     }
+
+    /// As tmux's, for a plain terminal: the bar shows each count as it arrives, and none once it closed.
+    @Test func aFinderThatCountsLaterShowsEachCountAsItArrives() {
+        let finder = LaterCountingTerminalFinder()
+        let findState = TerminalFindState(finder: finder)
+        let count = TerminalFindMatchCount(total: 4, selectedNumber: 1, exceedsCountLimit: false)
+        finder.onMatchCount?(count)
+        #expect(findState.matchCount == nil)
+
+        findState.show()
+        findState.query = "needle"
+        #expect(findState.matchCount == nil)
+        finder.onMatchCount?(count)
+        #expect(findState.matchCount == count)
+
+        findState.move(.towardOlder)
+        #expect(findState.matchCount == count)
+
+        findState.close()
+        finder.onMatchCount?(count)
+        #expect(findState.matchCount == nil)
+    }
+}
+
+@MainActor
+private final class LaterCountingTerminalFinder: TerminalTextFindingCountingLater {
+    var onMatchCount: ((TerminalFindMatchCount?) -> Void)?
+
+    /// What a finder that counts later returns is not its count, so the bar must not show it.
+    func findText(_ query: String) -> TerminalFindMatchCount? { TerminalFindMatchCount.none }
+    func findTextAgain(_ query: String, direction: TerminalFindDirection) -> TerminalFindMatchCount? { TerminalFindMatchCount.none }
+    func endTextFind() {}
 }
 
 @MainActor

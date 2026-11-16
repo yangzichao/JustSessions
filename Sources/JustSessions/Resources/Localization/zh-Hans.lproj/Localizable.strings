@@ -524,8 +524,8 @@
 	<string>完成拆分视图</string>
 	<key>Connect</key>
 	<string>连接</string>
-	<key>Connect again; a CLI still running in tmux on the host is reattached</key>
-	<string>重新连接；仍在主机 tmux 中运行的 CLI 会重新接入</string>
+	<key>Connect again; a CLI or shell still running in tmux on the host is reattached</key>
+	<string>重新连接；仍在主机 tmux 中运行的 CLI 或 shell 会重新接入</string>
 	<key>Connect and refresh sessions on %@</key>
 	<string>连接并刷新 %@ 的会话</string>
 	<key>Connecting to %@…</key>

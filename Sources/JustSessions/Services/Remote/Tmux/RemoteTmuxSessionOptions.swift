@@ -26,7 +26,18 @@ enum RemoteTmuxSessionOptions {
     static func setOptionCommands(for provider: ConversationProvider, usingHostPrefix: Bool) -> [String] {
         let titleFormat = provider == .claude ? RemoteClaudeSessionTitle.titleFormat
             : RemoteCLIActivityTitle.providers.contains(provider) ? RemoteCLIActivityTitle.titleFormat : "#T"
-        return [
+        return setOptionCommands(titleFormat: titleFormat, usingHostPrefix: usingHostPrefix)
+    }
+
+    /// A plain terminal's shell tells nothing but its own title. Its scrollback is the pane's history, which keeps as
+    /// many lines as the tab's terminal does where tmux allows it; see `PlainTerminalTmuxHistoryLimit`.
+    static func setOptionCommandsForPlainTerminal(usingHostPrefix: Bool) -> [String] {
+        setOptionCommands(titleFormat: "#T", usingHostPrefix: usingHostPrefix)
+            + [PlainTerminalTmuxHistoryLimit.remoteSessionOptionCommand]
+    }
+
+    private static func setOptionCommands(titleFormat: String, usingHostPrefix: Bool) -> [String] {
+        [
             "set-option status off", "set-option set-titles on", "set-option set-titles-string '\(titleFormat)'",
             "set-option mouse on", "set-option -wq allow-passthrough on", "set-option -s escape-time 10",
             "set-option -sq extended-keys on", "set-option -sq extended-keys-format csi-u",

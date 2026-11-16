@@ -13,3 +13,10 @@ protocol TerminalTextFinding: AnyObject {
     /// Ends the search and takes its highlight away.
     func endTextFind()
 }
+
+/// A finder whose counts come after `findText` and `findTextAgain` return, as tmux's do; see `PlainTerminalFinder`. The
+/// find bar ignores what those return and shows each count as it arrives.
+@MainActor
+protocol TerminalTextFindingCountingLater: TerminalTextFinding {
+    var onMatchCount: ((TerminalFindMatchCount?) -> Void)? { get set }
+}

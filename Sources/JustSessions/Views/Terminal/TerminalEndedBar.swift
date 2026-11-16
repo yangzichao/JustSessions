@@ -52,7 +52,7 @@ struct TerminalEndedBar: View {
                     .buttonStyle(QuietBorderedButtonStyle())
                     .controlSize(.small)
                     .fixedSize()
-                    .help("Connect again; a CLI still running in tmux on the host is reattached")
+                    .help("Connect again; a CLI or shell still running in tmux on the host is reattached")
             }
         }
         .padding(.horizontal, 16)

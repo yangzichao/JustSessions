@@ -5,12 +5,17 @@ import Testing
 /// A plain terminal is a tab, not a session: nothing waits for it to save one, watches it, or counts it as running.
 @MainActor
 struct PlainTerminalTabTests {
+    /// The store finds no tmux, so the shell runs directly in the tab; `ThisMacPlainTerminalTmuxTests` covers tmux.
     @Test func opensASelectedTabThatIsNoSession() throws {
         let projectDirectory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: projectDirectory) }
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
-        let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
+        let store = ConversationStore(
+            adapters: [],
+            commandResolver: NativeCLICommandResolver(searchDirectories: [], bundledTmuxDirectory: nil),
+            userDefaults: isolatedUserDefaults.userDefaults
+        )
         defer { store.closeAllTerminals() }
         let location = ProjectLocation(host: .thisMac, path: projectDirectory.path)
 

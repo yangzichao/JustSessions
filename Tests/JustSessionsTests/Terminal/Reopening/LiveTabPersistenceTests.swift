@@ -87,6 +87,7 @@ struct LiveTabPersistenceTests {
         let reopenedWindow = sandbox.makeStore()
         defer { reopenedWindow.closeAllTerminals() }
         reopenedWindow.reopenTabsFromLastQuit(from: persistence, isEnabled: true)
+        reopenedWindow.replaceConversations(on: .thisMac, with: [])
         #expect(reopenedWindow.terminalSessions.count == 1)
         #expect(reopenedWindow.selectedTerminal != nil)
         #expect(savedTabs(in: sandbox) == snapshot)

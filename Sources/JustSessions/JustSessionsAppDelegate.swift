@@ -33,8 +33,10 @@ final class JustSessionsAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Port forwards and logins made with Connect… end with the app; nothing it typed for them is kept.
+    /// Port forwards and logins made with Connect… end with the app; nothing it typed for them is kept. The windows
+    /// save their tabs first, and end what nothing will reattach to, through those logins.
     func applicationWillTerminate(_ notification: Notification) {
+        for store in WorkspaceWindowRegistry.shared.stores { store.prepareTabsForTermination() }
         SSHPortForwards.shared.endAll()
         SSHLoginConnections.shared.disconnectAll()
     }

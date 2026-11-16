@@ -53,7 +53,16 @@ extension ReopenableTerminalTab {
         )
     }
 
-    static func plainTerminal(in location: ProjectLocation, wasSelected: Bool = false) -> ReopenableTerminalTab {
-        ReopenableTerminalTab(conversationID: nil, projectDirectoryKey: location.key, wasSelected: wasSelected)
+    static func plainTerminal(
+        in location: ProjectLocation,
+        wasSelected: Bool = false,
+        tmuxSessionName: String? = nil
+    ) -> ReopenableTerminalTab {
+        ReopenableTerminalTab(
+            conversationID: nil,
+            projectDirectoryKey: location.key,
+            wasSelected: wasSelected,
+            tmuxSessionName: tmuxSessionName
+        )
     }
 }

@@ -53,8 +53,9 @@ struct ThisMacTmuxServer: Sendable {
     var terminfoDirectory: String? = nil
 
     /// The tab's command: a tmux client attached to `sessionName`, which first starts `command` in that session
-    /// unless it already runs. The session starts in the client's folder, the command's own.
-    func command(attachingTo sessionName: String, running command: NativeCLICommand) -> NativeCLICommand {
+    /// unless it already runs. The session starts in the client's folder, the command's own. With `historyLimit`, the
+    /// session's pane keeps that many lines rather than tmux's default; see `PlainTerminalTmuxHistoryLimit`.
+    func command(attachingTo sessionName: String, running command: NativeCLICommand, historyLimit: Int? = nil) -> NativeCLICommand {
         // The tab's terminal draws RGB colors and OSC 8 hyperlinks; without `hyperlinks` tmux drops a CLI's links.
         let serverArguments = ["-L", Self.socketName, "-f", "/dev/null", "-u", "-T", "RGB,hyperlinks"]
         let optionArguments = Self.globalOptions.flatMap { ["set-option", "-gq", $0.name, $0.value, ";"] }
@@ -71,10 +72,18 @@ struct ThisMacTmuxServer: Sendable {
             ? ["/usr/bin/env", command.executablePath]
             : [command.executablePath] + command.arguments
         let sessionArguments = ["-s", sessionName] + sessionEnvironment + ["--"] + program
+        // The target is the session's pane: `set-option` takes a pane, and a bare `=name` is none.
+        let (historyLimitBefore, historyLimitAfter) = historyLimit.map {
+            (
+                ["set-option", "-gq", "history-limit", "\($0)", ";"],
+                [";", "set-option", "-q", "-t", "=\(sessionName):", "history-limit", "\($0)",
+                 ";", "set-option", "-gq", "history-limit", "\(PlainTerminalTmuxHistoryLimit.tmuxDefaultLineCount)"]
+            )
+        } ?? ([], [])
         return NativeCLICommand(
             executablePath: executablePath,
-            arguments: serverArguments + optionArguments + ["new-session", "-A"]
-                + sessionArguments.map(Self.escapingCommandSeparator),
+            arguments: serverArguments + optionArguments + historyLimitBefore + ["new-session", "-A"]
+                + sessionArguments.map(Self.escapingCommandSeparator) + historyLimitAfter,
             workingDirectory: command.workingDirectory,
             // tmux refuses to start a session from inside another one.
             environment: NativeCLICommand.environmentEntries(clientEnvironment.filter { $0.key != "TMUX" && $0.key != "TMUX_PANE" })
@@ -107,6 +116,12 @@ struct ThisMacTmuxServer: Sendable {
 
     func killSession(named name: String) {
         _ = output(of: ["kill-session", "-t", "=\(name)"])
+    }
+
+    /// Runs tmux commands on this server, such as a plain terminal's search of its history (`TmuxHistoryFinder`), and
+    /// returns what they print, or nil when they failed. It waits for tmux, so it is for background work.
+    func run(_ arguments: [String]) -> String? {
+        output(of: arguments)
     }
 
     /// Whether this tmux is new enough for the sessions; see `ThisMacTmuxVersionCheck`. The first call for an

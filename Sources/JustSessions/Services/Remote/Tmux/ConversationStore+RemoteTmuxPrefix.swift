@@ -26,15 +26,26 @@ extension ConversationStore {
 
     /// A tab reopened from the last quit holds the command it was made with, which uses the host's old settings when it
     /// attaches, such as its tmux prefix choice or its shell startup; it gets one made with the new settings, in its
-    /// place in the tab bar, drawn by the same engine.
+    /// place in the tab bar, drawn by the same engine. A plain terminal keeps its tmux session's name.
     func remakeTabsWaitingToBeShown(on host: SessionHost) {
         for index in terminalSessions.indices {
             let tab = terminalSessions[index]
             guard tab.host == host, tab.isWaitingToBeShown, tab.tmuxSessionName != nil,
-                  let conversation = tab.conversation,
-                  let replacement = try? makeTerminal(for: conversation, action: .resume, startsOnceShown: true, engine: tab.engine)
-            else { continue }
+                  let replacement = remadeTabWaitingToBeShown(tab) else { continue }
             replaceTerminal(at: index, with: replacement)
         }
+    }
+
+    private func remadeTabWaitingToBeShown(_ tab: TerminalSession) -> TerminalSession? {
+        if let conversation = tab.conversation {
+            return try? makeTerminal(for: conversation, action: .resume, startsOnceShown: true, engine: tab.engine)
+        }
+        guard tab.isPlainTerminal else { return nil }
+        return try? makePlainTerminal(
+            in: ProjectLocation(host: tab.host, path: tab.projectPath),
+            tmuxSessionName: tab.tmuxSessionName,
+            startsOnceShown: true,
+            engine: tab.engine
+        )
     }
 }

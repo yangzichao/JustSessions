@@ -121,12 +121,12 @@ final class TerminalSession: ObservableObject, Identifiable {
     }
     /// A New session or Branch tab, whose session id the app learns once the CLI writes it.
     var startsNewSession: Bool { action?.startsNewSession ?? false }
-    /// A CLI tab on an SSH host whose `ssh` ended with its connection error, as when the Mac slept, so its CLI may
-    /// still run in tmux there. A plain terminal runs outside tmux, and a CLI that ended or a client that detached
-    /// ends `ssh` with another status. One that ended so right after starting most likely couldn't connect, as when
-    /// the host refused the login, and Check host is the way on.
+    /// A tab on an SSH host whose `ssh` ended with its connection error, as when the Mac slept, so its CLI or shell may
+    /// still run in tmux there. A CLI or shell that ended, or a client that detached, ends `ssh` with another status.
+    /// One that ended so right after starting most likely couldn't connect, as when the host refused the login, and
+    /// Check host is the way on.
     var hasDroppedConnectionToTmux: Bool {
-        host != .thisMac && provider != nil && tmuxSessionName != nil && hasExited
+        host != .thisMac && tmuxSessionName != nil && hasExited
             && exitCode == RemoteHostCommandRunner.connectionFailureExitStatus && !connectionEndedOnPurpose
             && !endedWithErrorSoonAfterStarting
     }
@@ -144,7 +144,8 @@ final class TerminalSession: ObservableObject, Identifiable {
         host: SessionHost = .thisMac,
         sessionIDsKnownAtLaunch: Set<String> = [],
         tmuxSessionName: String? = nil,
-        startsOnceShown: Bool = false
+        startsOnceShown: Bool = false,
+        tmuxHistory: TmuxHistory? = nil
     ) {
         self.engine = engine
         self.conversation = conversation
@@ -162,13 +163,18 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.isWaitingToBeShown = startsOnceShown
         let terminalView = engine.makeTabTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.terminalView = terminalView
-        self.findState = TerminalFindState(finder: terminalView)
+        // A plain terminal's shell history is in tmux's, while it runs there; see `PlainTerminalFinder`.
+        self.findState = TerminalFindState(finder: tmuxHistory.map { tmuxHistory in
+            PlainTerminalFinder(terminalFinder: terminalView, tmuxHistory: tmuxHistory) { terminalView.isOnAlternateScreen }
+        } ?? terminalView)
         self.conversationOutline = ConversationOutlineModel()
         self.bookmarkNotices = TerminalBookmarkNoticeState()
         self.processObserver = TerminalProcessObserver()
         self.linkOpener = TerminalLinkOpener(host: host, workingDirectory: projectPath)
         self.sshFileDrop = host.sshDestination.map { TerminalSSHFileDrop(host: $0) }
-        terminalView.cliRunsInTmux = tmuxSessionName != nil
+        // A plain terminal's shell gets the keys as it would outside tmux: tmux passes a program that doesn't ask for
+        // extended keys their plain bytes, and the tab sends those.
+        terminalView.cliRunsInTmux = tmuxSessionName != nil && provider != nil
         terminalView.promptSelection.layout = provider.flatMap(CLIPromptLayout.init(provider:))
         terminalView.acceptsDroppedFiles = true
         if let sshFileDrop {

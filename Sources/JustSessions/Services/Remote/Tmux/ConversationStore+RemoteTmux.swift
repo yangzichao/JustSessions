@@ -22,7 +22,10 @@ extension ConversationStore {
             branchedFromSessionID: ended.branchedFromSessionID,
             host: ended.host,
             sessionIDsKnownAtLaunch: ended.sessionIDsKnownAtLaunch,
-            tmuxSessionName: ended.tmuxSessionName
+            tmuxSessionName: ended.tmuxSessionName,
+            tmuxHistory: ended.isPlainTerminal
+                ? ended.tmuxSessionName.flatMap { plainTerminalTmuxHistory(sessionName: $0, on: ended.host) }
+                : nil
         )
         replacement.onProcessFinished = ended.onProcessFinished
         replaceTerminal(at: index, with: replacement)
