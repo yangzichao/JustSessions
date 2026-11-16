@@ -101,12 +101,14 @@ final class RemoteTabReconnector {
             hosts.insert(host)
         }
         for host in hosts { schedule.startTrying(host, now: now) }
+        pruneHostsWithoutCandidates()
         scheduleWakeUp()
     }
 
     /// Asks each host that is due, unless it is being asked already or needs Connect…, which counts as a failure. A
     /// host that was removed or disconnected from is given up.
     func askDueHosts() {
+        pruneHostsWithoutCandidates()
         let now = currentDate()
         for host in schedule.hostsBeingTried where schedule.isDue(host, now: now) && !hostsBeingAsked.contains(host) {
             guard let oldestStore = registry.stores.first, oldestStore.remoteHostList.hosts.contains(host),
@@ -119,18 +121,24 @@ final class RemoteTabReconnector {
                 continue
             }
             hostsBeingAsked.insert(host)
+            let generation = oldestStore.hostLifecycleGeneration(on: .ssh(host))
             let listTmuxSessions = listTmuxSessions
-            Task { [weak self] in
+            Task { [weak self, weak oldestStore] in
                 let tmuxSessionNames = await Task.detached(priority: .utility) { listTmuxSessions(host) }.value
-                self?.handleAnswer(tmuxSessionNames, from: host)
+                self?.handleAnswer(tmuxSessionNames, from: host, sourceStore: oldestStore, generation: generation)
             }
         }
         scheduleWakeUp()
     }
 
-    private func handleAnswer(_ tmuxSessionNames: Set<String>?, from host: String) {
+    private func handleAnswer(
+        _ tmuxSessionNames: Set<String>?, from host: String, sourceStore: ConversationStore?, generation: UInt64
+    ) {
         hostsBeingAsked.remove(host)
         defer { scheduleWakeUp() }
+        guard hasReconnectCandidate(on: host) else { stopTrying(host); return }
+        guard let sourceStore, registry.stores.contains(where: { $0 === sourceStore }),
+              sourceStore.isCurrentHostLifecycle(generation, on: .ssh(host)) else { return }
         guard let tmuxSessionNames else {
             noteFailure(on: host)
             return
@@ -154,7 +162,19 @@ final class RemoteTabReconnector {
     }
 
     private func noteFailure(on host: String) {
+        guard hasReconnectCandidate(on: host) else { stopTrying(host); return }
         if !schedule.noteFailure(on: host, now: currentDate()) { stopTrying(host) }
+    }
+
+    private func hasReconnectCandidate(on host: String) -> Bool {
+        registry.stores.contains { store in
+            store.remoteHostList.hosts.contains(host) && !store.isDisconnected(host) && !store.isTearingDownWorkspace
+                && store.terminalSessions.contains { $0.host == .ssh(host) && $0.isWaitingToReconnect && $0.hasDroppedConnectionToTmux }
+        }
+    }
+
+    private func pruneHostsWithoutCandidates() {
+        for host in schedule.hostsBeingTried where !hasReconnectCandidate(on: host) { stopTrying(host) }
     }
 
     private func stopTrying(_ host: String) {

@@ -26,7 +26,7 @@ struct RemoteSessionMirror: Sendable {
             self.toolFoldersLookup = { host, options in
                 try RemoteToolFoldersLookup.folders(
                     on: host,
-                    runner: RemoteHostCommandRunner(connectionSharingOptions: options)
+                    runner: RemoteHostCommandRunner(connectionSharingOptions: options, cancelsWithTask: true)
                 )
             }
         } else {
@@ -82,7 +82,7 @@ struct RemoteSessionMirror: Sendable {
         let destination = mirrorDirectory(host: host, provider: provider)
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
         if provider == .antigravity {
-            try AntigravityRemoteSessionMirror(runner: RemoteHostCommandRunner(connectionSharingOptions: connectionSharingOptions))
+            try AntigravityRemoteSessionMirror(runner: RemoteHostCommandRunner(connectionSharingOptions: connectionSharingOptions, cancelsWithTask: true))
                 .synchronize(
                     host: host,
                     sourceHomeOverride: sourceHomeOverride,
@@ -92,7 +92,7 @@ struct RemoteSessionMirror: Sendable {
             return
         }
         if provider == .opencode {
-            try OpenCodeRemoteSessionMirror(runner: RemoteHostCommandRunner(connectionSharingOptions: connectionSharingOptions))
+            try OpenCodeRemoteSessionMirror(runner: RemoteHostCommandRunner(connectionSharingOptions: connectionSharingOptions, cancelsWithTask: true))
                 .synchronize(
                     host: host,
                     sourceHomeOverride: sourceHomeOverride,
@@ -175,7 +175,8 @@ struct RemoteSessionMirror: Sendable {
             arguments: ["--archive", "--delete", "-e", remoteShell] + extraArguments + filters + [source, destination],
             environment: SSHProcessEnvironment.standard,
             includesStandardError: true,
-            timeout: 600
+            timeout: 600,
+            cancelsWithTask: true
         )
     }
 
@@ -234,7 +235,7 @@ struct RemoteSessionMirror: Sendable {
             ["/conversation_summaries.db", "/conversation_summaries.db-wal", "/conversation_summaries.db-shm",
              "/conversations/", "/conversations/*.db", "/conversations/*.db-wal", "/conversations/*.db-shm"]
         case .pi:
-            ["/*/", "/*/*.jsonl"]
+            ["/*.jsonl", "/*/", "/*/*.jsonl"]
         case .opencode:
             ["/opencode.db"]
         }
@@ -264,11 +265,4 @@ struct RemoteSessionMirror: Sendable {
         }
     }
 
-    /// One path component inside `cacheRoot`. A name of dots alone, or no name, would stand for `cacheRoot`
-    /// or its parent, so removing that host's mirror would remove every mirror, or more.
-    static func directoryName(forHost host: String) -> String {
-        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: ".-_@"))
-        let name = String(host.unicodeScalars.map { allowed.contains($0) ? Character($0) : "_" })
-        return name.allSatisfy { $0 == "." } ? "_" + name : name
-    }
 }

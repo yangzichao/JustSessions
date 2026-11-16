@@ -24,6 +24,8 @@ struct TranscriptPage: Sendable {
     /// Who the last entry before the page is from, as `TranscriptPageAssembler.speaker(of:)` tells; nil when there is
     /// none or it is a note. Labels the page's first entry as it is labeled with every earlier page loaded.
     let precedingSpeaker: Int?
+    /// File-backed pages from different lineages cannot be combined: earlier bytes were rewritten.
+    var sourceLineage: UUID? = nil
 
     var hasEarlier: Bool { records.lowerBound > 0 }
     var hasLater: Bool { records.upperBound < totalRecordCount }

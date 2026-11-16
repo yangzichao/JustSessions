@@ -10,24 +10,26 @@ extension ConversationStore {
         codexDirectory: URL = CodexAdapter.defaultCodexDirectory
     ) {
         let readers = AppendedSessionNameReaders()
-        runPeriodically(every: interval) { $0.followAppendedSessionNames(readers: readers, codexDirectory: codexDirectory) }
+        runPeriodically(every: interval) { await $0.followAppendedSessionNames(readers: readers, codexDirectory: codexDirectory) }
     }
 
-    func followAppendedSessionNames(readers: AppendedSessionNameReaders, codexDirectory: URL) {
-        var tabsByFile: [URL: [(tab: TerminalSession, conversation: Conversation)]] = [:]
-        for tab in terminalSessions where tab.host == .thisMac && tab.isRunning {
+    func followAppendedSessionNames(readers: AppendedSessionNameReaders, codexDirectory: URL) async {
+        guard !isTearingDownWorkspace else { return }
+        let lookups = terminalSessions.compactMap { tab -> AppendedSessionNameReaders.Lookup? in
+            guard tab.host == .thisMac, tab.isRunning else { return nil }
             guard let conversation = tab.conversation,
-                  let file = AppendedSessionNameSource.file(for: conversation, codexDirectory: codexDirectory) else { continue }
-            tabsByFile[file, default: []].append((tab, conversation))
+                  let file = AppendedSessionNameSource.file(for: conversation, codexDirectory: codexDirectory) else { return nil }
+            return AppendedSessionNameReaders.Lookup(tabID: tab.id, conversation: conversation, file: file)
         }
-        readers.keepOnly(Set(tabsByFile.keys))
-        for (file, tabs) in tabsByFile {
-            let lines = readers.newLines(in: file)
-            guard !lines.isEmpty else { continue }
-            for (tab, conversation) in tabs {
-                guard let name = AppendedSessionNameSource.latestName(for: conversation, amongLines: lines) else { continue }
-                applyChosenName(name, toSessionID: conversation.sessionID, provider: conversation.provider, shownIn: tab)
-            }
+        let names = await Task.detached(priority: .utility) { await readers.names(for: lookups) }.value
+        guard !isTearingDownWorkspace else { return }
+        let tabsByID = Dictionary(uniqueKeysWithValues: terminalSessions.map { ($0.id, $0) })
+        for name in names {
+            let lookup = name.lookup
+            guard let tab = tabsByID[lookup.tabID], tab.isRunning,
+                  let conversation = tab.conversation, conversation.id == lookup.conversation.id,
+                  AppendedSessionNameSource.file(for: conversation, codexDirectory: codexDirectory) == lookup.file else { continue }
+            applyChosenName(name.value, toSessionID: conversation.sessionID, provider: conversation.provider, shownIn: tab)
         }
     }
 }

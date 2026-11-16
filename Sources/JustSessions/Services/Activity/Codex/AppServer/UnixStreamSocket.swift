@@ -26,6 +26,8 @@ final class UnixStreamSocket {
 
         descriptor = socket(AF_UNIX, SOCK_STREAM, 0)
         guard descriptor >= 0 else { throw SocketError.failed(errno: errno) }
+        // A tab started while it is open would otherwise keep the connection open after this closes it.
+        CloseOnExecDescriptor.mark(descriptor)
         var socketTimeout = timeval(
             tv_sec: Int(timeout.components.seconds),
             tv_usec: Int32(timeout.components.attoseconds / 1_000_000_000_000)

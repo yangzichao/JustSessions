@@ -7,7 +7,8 @@ import Foundation
 struct SessionMessageTextCache: Sendable {
     /// Goes up when what is saved changes, such as which entries are kept, so text saved before is read again. 2: smaller
     /// Codex pages, which merge fewer tool calls into one entry, and a header with where a Codex read can resume.
-    static let formatVersion = 2
+    /// 3: file identity distinguishes timestamp-preserving replacements from unchanged transcripts.
+    static let formatVersion = 3
     /// How long the text of a session no longer listed is kept. A session can be missing from the list only for now,
     /// such as one on an SSH host not refreshed yet since launch, so its text is not deleted right away.
     static let unlistedRetention: TimeInterval = 30 * 24 * 60 * 60

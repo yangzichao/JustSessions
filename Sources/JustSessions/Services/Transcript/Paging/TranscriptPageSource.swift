@@ -14,6 +14,7 @@ actor TranscriptPageSource {
     /// The index pages are read from; message search takes the byte offset of its final page from it.
     private(set) var fileIndex: TranscriptFileIndex?
     private var piRecordIndices: [Int]?
+    private var pageLineage: UUID?
 
     init(
         file: URL,
@@ -51,17 +52,30 @@ actor TranscriptPageSource {
             guard let sessionID else { throw OpenCodeDatabaseError.unreadable }
             return try OpenCodeTranscriptPageSource.read(file, sessionID: sessionID, request: request, limits: limits)
         }
-        if fileIndex == nil || refreshIndex {
-            let updatedIndex = try TranscriptFileIndex.read(file, updating: fileIndex)
-            if updatedIndex.fingerprint != fileIndex?.fingerprint { piRecordIndices = nil }
-            fileIndex = updatedIndex
-        }
-        let index = fileIndex!
         let handle = try FileHandle(forReadingFrom: file)
         defer { try? handle.close() }
+        let fingerprint = try TranscriptFileFingerprint(handle: handle)
+        let previousPiRecords = piRecordIndices
+        if fileIndex == nil || refreshIndex || fileIndex?.fingerprint != fingerprint {
+            let previousLineage = fileIndex?.contentLineage
+            let updatedIndex = try TranscriptFileIndex.read(handle, updating: fileIndex)
+            if updatedIndex.fingerprint != fileIndex?.fingerprint { piRecordIndices = nil }
+            fileIndex = updatedIndex
+            if previousLineage != updatedIndex.contentLineage { pageLineage = updatedIndex.contentLineage }
+            if !refreshIndex, let previousLineage, previousLineage != updatedIndex.contentLineage {
+                throw TranscriptPagingError.sourceChanged
+            }
+        }
+        let index = fileIndex!
         if provider == .pi, piRecordIndices == nil {
             // The source's own limits, never a call's: the cached branch must not depend on who asked first.
-            piRecordIndices = try TranscriptPiPageIndex.records(in: index, handle: handle, limits: self.limits)
+            let records = try TranscriptPiPageIndex.records(in: index, handle: handle, limits: self.limits)
+            piRecordIndices = records
+            // A Pi branch change appends bytes but replaces the logical conversation before its end.
+            if let previousPiRecords, !previousPiRecords.elementsEqual(records.prefix(previousPiRecords.count)) {
+                pageLineage = UUID()
+                if !refreshIndex { throw TranscriptPagingError.sourceChanged }
+            }
         }
         let recordIndices = piRecordIndices
         let recordCount = recordIndices?.count ?? index.lineStarts.count
@@ -71,7 +85,7 @@ actor TranscriptPageSource {
             isSubagentTranscript: isSubagentTranscript,
             decodesImages: decodesImages
         )
-        return try TranscriptPageReader.read(
+        var page = try TranscriptPageReader.read(
             request, recordCount: recordCount, limits: limits,
             sourceID: { recordIndices?[$0] ?? $0 },
             decode: { position in
@@ -85,5 +99,7 @@ actor TranscriptPageSource {
                 }
             }
         )
+        page.sourceLineage = pageLineage
+        return page
     }
 }

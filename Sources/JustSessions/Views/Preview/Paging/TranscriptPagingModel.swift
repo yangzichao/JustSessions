@@ -79,16 +79,38 @@ final class TranscriptPagingModel {
         errorMessage = nil
         loadTask = Task { [weak self] in
             do {
-                let page = try await source.read(request, refreshIndex: refreshIndex)
+                var replacedSource = false
+                let page: TranscriptPage
+                do {
+                    let loaded = try await source.read(request, refreshIndex: refreshIndex)
+                    if case .before = request, let previous = self?.pages.first, previous.sourceLineage != loaded.sourceLineage {
+                        throw TranscriptPagingError.sourceChanged
+                    }
+                    if case .after = request, let previous = self?.pages.last, previous.sourceLineage != loaded.sourceLineage {
+                        throw TranscriptPagingError.sourceChanged
+                    }
+                    page = loaded
+                } catch TranscriptPagingError.sourceChanged {
+                    try Task.checkCancellation()
+                    // The old window's record ranges belong to another file generation. Rebuild around the reader.
+                    let current = currentPosition?() ?? position
+                    let retry: TranscriptPageRequest
+                    switch request {
+                    case .before, .after: retry = current.entryIndex.map(TranscriptPageRequest.around) ?? .latest
+                    default: retry = request
+                    }
+                    page = try await source.read(retry, refreshIndex: true)
+                    replacedSource = true
+                }
                 try Task.checkCancellation()
                 guard let self, self.requestRevision == requestRevision else { return }
                 // A reader may keep scrolling while the next page is decoded. Preserve where they are now.
                 let position = currentPosition?() ?? position
-                switch request {
-                case .before:
+                switch (request, replacedSource) {
+                case (.before, false):
                     self.pages.insert(page, at: 0)
                     self.pages = Array(self.pages.prefix(keepingPages))
-                case .after:
+                case (.after, false):
                     self.pages.append(page)
                     self.pages = Array(self.pages.suffix(keepingPages))
                 default: self.pages = [page]

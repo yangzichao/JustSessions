@@ -22,7 +22,7 @@ final class AppendedSessionNameWorld: SessionTabWorld {
     }
 
     func followTheCLIOnce() async {
-        app.store.followAppendedSessionNames(readers: readers, codexDirectory: codexDirectory)
+        await app.store.followAppendedSessionNames(readers: readers, codexDirectory: codexDirectory)
     }
 
     /// The tab opens on a listed session whose file exists, and the app takes its first look at that file.

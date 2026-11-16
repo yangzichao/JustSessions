@@ -40,6 +40,7 @@ enum LocalPortAvailability {
         guard SSHPortForward.validPorts.contains(port) else { return false }
         let descriptor = socket(AF_INET, SOCK_STREAM, 0)
         guard descriptor >= 0 else { return false }
+        CloseOnExecDescriptor.mark(descriptor)
         defer { close(descriptor) }
         var reuse: Int32 = 1
         setsockopt(descriptor, SOL_SOCKET, SO_REUSEADDR, &reuse, socklen_t(MemoryLayout<Int32>.size))

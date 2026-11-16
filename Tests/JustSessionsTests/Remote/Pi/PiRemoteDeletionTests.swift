@@ -9,6 +9,29 @@ import Testing
 struct PiRemoteDeletionTests {
     typealias HostShell = RemotePiFixture.HostShell
 
+    @Test(arguments: HostShell.installed)
+    func deletesASessionDirectlyInTheSessionsRootAndItsCompanion(shell: HostShell) throws {
+        let fixture = try RemotePiFixture(shell: shell)
+        defer { fixture.remove() }
+        let id = UUID().uuidString.lowercased()
+        let file = try PiSessionFolderFixture(sessionsDirectory: fixture.sessionsDirectory)
+            .writeSession(id: id, projectPath: "/srv/project", inProjectFolder: false)
+        let companion = file.deletingPathExtension()
+        try FileManager.default.createDirectory(at: companion.appendingPathComponent("forks"), withIntermediateDirectories: true)
+        try "child".write(to: companion.appendingPathComponent("forks/output"), atomically: true, encoding: .utf8)
+        let mirrored = fixture.mirror.mirrorDirectory(host: "devbox", provider: .pi).appendingPathComponent(file.lastPathComponent)
+        try FileManager.default.copyItem(at: file, to: mirrored)
+        let conversation = Conversation.fixture(provider: .pi, sessionID: id, projectPath: "/srv/project", sourceFile: mirrored, host: .ssh("devbox"))
+        #expect(try RemotePiConversationDeletion.hostFileNames(of: conversation, piMirrorDirectory: mirrored.deletingLastPathComponent()).projectFolderName == nil)
+
+        try fixture.deletion().delete(conversation)
+
+        #expect(!FileManager.default.fileExists(atPath: file.path))
+        #expect(!FileManager.default.fileExists(atPath: companion.path))
+        #expect(!FileManager.default.fileExists(atPath: mirrored.path))
+        #expect(FileManager.default.fileExists(atPath: fixture.hostSessionFile.path))
+    }
+
     /// The script runs as `sh -c …`, so that inner `sh` must be dash too for dash to check it: dash rejects the
     /// bash-only `[[`, which macOS's `/bin/sh` accepts. Skipped without `/bin/dash`, which shows that the other tests
     /// ran only under `/bin/sh`.
@@ -202,14 +225,12 @@ struct PiRemoteDeletionTests {
         #expect(!command.dropLast(arguments.count).contains(fixture.conversation.sessionID))
     }
 
-    @Test func aSourceOutsideAProjectFolderOfThePiMirrorNeverStartsARemoteCommand() throws {
+    @Test func aSourceOutsideTheRootOrAProjectFolderOfThePiMirrorNeverStartsARemoteCommand() throws {
         let fixture = try RemotePiFixture()
         defer { fixture.remove() }
         let sessionID = fixture.conversation.sessionID
         let mirrorProjectFolder = fixture.conversation.sourceFile.deletingLastPathComponent()
-        let mirrorDirectory = mirrorProjectFolder.deletingLastPathComponent()
         let sourceFiles = [
-            mirrorDirectory.appendingPathComponent("2026-09-30T10-00-00-000Z_\(sessionID).jsonl"),
             mirrorProjectFolder.appendingPathComponent("2026-09-30T10-00-00-000Z_\(sessionID)/forks/2026-09-30T10-00-00-000Z_\(sessionID).jsonl"),
             fixture.mirror.mirrorDirectory(host: "devbox", provider: .kiro)
                 .appendingPathComponent("\(RemotePiFixture.projectFolderName)/2026-09-30T10-00-00-000Z_\(sessionID).jsonl"),
@@ -249,7 +270,6 @@ struct PiRemoteDeletionTests {
         let cases: [(project: String, file: String, expectedOutput: String)] = [
             ("..", fileName, "Refusing an unexpected session path."),
             ("a/b", fileName, "Refusing an unexpected session path."),
-            ("", fileName, "Refusing an unexpected session path."),
             (RemotePiFixture.projectFolderName, "..", "Refusing an unexpected session path."),
             (RemotePiFixture.projectFolderName, "x/" + fileName, "Refusing an unexpected session path."),
             (RemotePiFixture.projectFolderName, otherIDFileName, "The file name does not match the session."),

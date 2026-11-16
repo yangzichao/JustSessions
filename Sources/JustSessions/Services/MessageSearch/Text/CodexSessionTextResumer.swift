@@ -1,4 +1,3 @@
-import CryptoKit
 import Darwin
 import Foundation
 
@@ -10,7 +9,7 @@ struct SessionMessageTextResumeState: Sendable, Codable, Equatable {
     let inode: UInt64
     /// How many bytes of the file the text came from.
     let byteCount: UInt64
-    /// SHA-256 of the first `byteCount` bytes.
+    /// CRC-32 of the first `byteCount` bytes. A digest of another length, as SHA-256 states saved before, never resumes.
     let digest: Data
     /// The final page's first record, read again on resume.
     let finalPageRecord: Int
@@ -29,7 +28,7 @@ struct SessionMessageTextResumeState: Sendable, Codable, Equatable {
 
     /// Whether this state could have been saved with `text`; a saved file that fails this is read in full again.
     func isConsistent(with text: SessionMessageText) -> Bool {
-        guard digest.count == SHA256.byteCount, finalPageRecord >= 0, finalPageByteOffset <= byteCount,
+        guard digest.count == CRC32Checksum.byteCount, finalPageRecord >= 0, finalPageByteOffset <= byteCount,
               (0...text.entries.count).contains(committedEntryCount) else { return false }
         let committedLast = text.entries[..<committedEntryCount].last.map { TranscriptPageIdentity.record(for: $0.id) }
         let finalPageFirst = text.entries[committedEntryCount...].first.map { TranscriptPageIdentity.record(for: $0.id) }
@@ -64,11 +63,11 @@ enum CodexSessionTextResumer {
 
         let descriptor = handle.fileDescriptor
         let tail = try bytes(of: descriptor, from: resumeOffset, count: Int(byteCount - resumeOffset))
-        var hasher = SHA256()
+        var hasher = CRC32Checksum()
         try hash(descriptor, upTo: resumeOffset, into: &hasher)
         var savedBytesHasher = hasher
         tail.withUnsafeBytes { savedBytesHasher.update(bufferPointer: UnsafeRawBufferPointer(rebasing: $0[..<Int(state.byteCount - resumeOffset)])) }
-        guard Data(savedBytesHasher.finalize()) == state.digest else { return nil }
+        guard savedBytesHasher.finalize() == state.digest else { return nil }
         tail.withUnsafeBytes { hasher.update(bufferPointer: $0) }
 
         let recordStarts = recordStarts(in: tail)
@@ -103,7 +102,7 @@ enum CodexSessionTextResumer {
         // A running CLI appends while the read runs; only a file that shrank fails it, as `TranscriptFileIndex` does.
         guard try TranscriptFileFingerprint(handle: handle).byteCount >= byteCount else { throw TranscriptPagingError.sourceChanged }
         let resumeState = SessionMessageTextResumeState(
-            device: fingerprint.device, inode: fingerprint.inode, byteCount: byteCount, digest: Data(hasher.finalize()),
+            device: fingerprint.device, inode: fingerprint.inode, byteCount: byteCount, digest: hasher.finalize(),
             finalPageRecord: finalPageRecord,
             finalPageByteOffset: resumeOffset + UInt64(recordStarts[finalPageRecord - firstRecord]),
             committedEntryCount: committedEntryCount, pageLimits: state.pageLimits
@@ -114,25 +113,33 @@ enum CodexSessionTextResumer {
         )
     }
 
-    /// The resume state after a full read whose index is `indexFingerprint`, hashing the bytes the index covers. Nil
+    /// The resume state after a full read whose index is `indexFingerprint`, reusing its digest when provided. Nil
     /// when the file changed in any way since it was indexed, as the text may then come from other bytes than these;
     /// the next change reads it in full again.
     static func state(
-        of file: URL, indexedAs indexFingerprint: TranscriptFileFingerprint, finalPageRecord: Int, finalPageByteOffset: UInt64,
+        of file: URL, indexedAs indexFingerprint: TranscriptFileFingerprint, indexedDigest: Data? = nil,
+        finalPageRecord: Int, finalPageByteOffset: UInt64,
         committedEntryCount: Int, limits: TranscriptPageLimits
     ) throws -> SessionMessageTextResumeState? {
         guard let handle = try? FileHandle(forReadingFrom: file) else { return nil }
         defer { try? handle.close() }
-        var hasher = SHA256()
-        do {
-            try hash(handle.fileDescriptor, upTo: indexFingerprint.byteCount, into: &hasher)
-        } catch TranscriptPagingError.sourceChanged {
-            return nil
+        let digest: Data
+        if let indexedDigest {
+            guard indexedDigest.count == CRC32Checksum.byteCount else { return nil }
+            digest = indexedDigest
+        } else {
+            var hasher = CRC32Checksum()
+            do {
+                try hash(handle.fileDescriptor, upTo: indexFingerprint.byteCount, into: &hasher)
+            } catch TranscriptPagingError.sourceChanged {
+                return nil
+            }
+            digest = hasher.finalize()
         }
         guard (try? TranscriptFileFingerprint(handle: handle)) == indexFingerprint else { return nil }
         return SessionMessageTextResumeState(
             device: indexFingerprint.device, inode: indexFingerprint.inode, byteCount: indexFingerprint.byteCount,
-            digest: Data(hasher.finalize()), finalPageRecord: finalPageRecord, finalPageByteOffset: finalPageByteOffset,
+            digest: digest, finalPageRecord: finalPageRecord, finalPageByteOffset: finalPageByteOffset,
             committedEntryCount: committedEntryCount, pageLimits: SessionMessageTextResumeState.pageLimits(of: limits)
         )
     }
@@ -161,7 +168,7 @@ enum CodexSessionTextResumer {
     }
 
     /// Hashes the first `byteCount` bytes in chunks through one buffer.
-    private static func hash(_ descriptor: Int32, upTo byteCount: UInt64, into hasher: inout SHA256) throws {
+    private static func hash(_ descriptor: Int32, upTo byteCount: UInt64, into hasher: inout CRC32Checksum) throws {
         let buffer = UnsafeMutableRawBufferPointer.allocate(byteCount: hashChunkByteCount, alignment: 1)
         defer { buffer.deallocate() }
         var offset: UInt64 = 0

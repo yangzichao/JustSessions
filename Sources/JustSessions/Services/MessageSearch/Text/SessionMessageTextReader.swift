@@ -44,8 +44,8 @@ enum SessionMessageTextReader {
         return try await readInFull(conversation, keepsResumeState: true, limits: limits)
     }
 
-    /// Reads the session from its first page to its last; a Codex read that `keepsResumeState` also hashes the bytes
-    /// read, for where the next read can resume.
+    /// Reads the session from its first page to its last; a Codex read that `keepsResumeState` reuses the index's digest
+    /// after a final fingerprint check, for where the next read can resume.
     static func readInFull(
         _ conversation: Conversation, keepsResumeState: Bool, limits: TranscriptPageLimits
     ) async throws -> SessionMessageTextRead {
@@ -58,8 +58,11 @@ enum SessionMessageTextReader {
         var decodedRecordCount = 0
         var decodedByteCount: UInt64 = 0
         var request = TranscriptPageRequest.first
+        var sourceLineage: UUID?
         while true {
             let page = try await source.read(request)
+            if request == .first { sourceLineage = page.sourceLineage }
+            guard page.sourceLineage == sourceLineage else { throw TranscriptPagingError.sourceChanged }
             committedEntryCount = entries.count
             entries += searchedEntries(in: page)
             decodedRecordCount += page.records.count
@@ -76,13 +79,13 @@ enum SessionMessageTextReader {
                 }
                 let finalPageRecord = page.records.lowerBound
                 let state = try CodexSessionTextResumer.state(
-                    of: conversation.sourceFile, indexedAs: index.fingerprint, finalPageRecord: finalPageRecord,
+                    of: conversation.sourceFile, indexedAs: index.fingerprint, indexedDigest: index.digest, finalPageRecord: finalPageRecord,
                     finalPageByteOffset: finalPageRecord < index.lineStarts.count ? index.lineStarts[finalPageRecord] : index.byteCount,
                     committedEntryCount: committedEntryCount, limits: limits
                 )
                 return SessionMessageTextRead(
                     text: text, resumeState: state, resumed: false, decodedRecordCount: decodedRecordCount,
-                    sourceByteCount: sourceByteCount + index.byteCount
+                    sourceByteCount: sourceByteCount
                 )
             }
             request = .after(page.records.upperBound)

@@ -39,8 +39,8 @@ struct TranscriptScrollRestorationTests {
             controller = TranscriptScrollPositionController(
                 conversationID: "conversation", positionStore: TranscriptReadingPositionStore(), initialPosition: .bottom
             )
-            // A restoration stays pending while a test acts, however busy the machine.
-            controller.settlingDuration = 60
+            // These tests exercise pending restoration and explicit handover, not elapsed-time settling.
+            controller.settlingDuration = .infinity
             let scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 400, height: 300))
             scrollView.documentView = FlippedView(frame: NSRect(x: 0, y: 0, width: 400, height: 5_000))
             window = NSWindow(contentRect: scrollView.frame, styleMask: [.borderless], backing: .buffered, defer: false)

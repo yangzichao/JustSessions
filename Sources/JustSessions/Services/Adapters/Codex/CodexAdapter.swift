@@ -43,6 +43,7 @@ struct CodexAdapter: ConversationAdapter {
         var conversations: [Conversation] = []
         for case let file as URL in enumerator where file.pathExtension == "jsonl" && file.lastPathComponent.hasPrefix("rollout-") {
             try cancellation.checkCancellation()
+            guard (try? file.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true else { continue }
             rolloutFiles.append(file)
             guard let head = Self.rolloutHeads.summary(of: file, read: CodexRolloutHead.init(file:)) else { continue }
             let indexEntry = index.entry(forSessionID: head.sessionID)

@@ -12,7 +12,8 @@ enum BoundedProcessRunner {
         environment: [String: String]? = nil,
         workingDirectory: URL? = nil,
         includesStandardError: Bool = false,
-        timeout: TimeInterval
+        timeout: TimeInterval,
+        cancelsWithTask: Bool = false
     ) -> String? {
         result(
             ofExecutable: executablePath,
@@ -20,7 +21,8 @@ enum BoundedProcessRunner {
             environment: environment,
             workingDirectory: workingDirectory,
             includesStandardError: includesStandardError,
-            timeout: timeout
+            timeout: timeout,
+            cancelsWithTask: cancelsWithTask
         )?.output
     }
 
@@ -31,7 +33,8 @@ enum BoundedProcessRunner {
         environment: [String: String]? = nil,
         workingDirectory: URL? = nil,
         includesStandardError: Bool = false,
-        timeout: TimeInterval
+        timeout: TimeInterval,
+        cancelsWithTask: Bool = false
     ) -> (exitStatus: Int32, output: String)? {
         guard let outcome = outcome(
             ofExecutable: executablePath,
@@ -39,7 +42,8 @@ enum BoundedProcessRunner {
             environment: environment,
             workingDirectory: workingDirectory,
             includesStandardError: includesStandardError,
-            timeout: timeout
+            timeout: timeout,
+            cancelsWithTask: cancelsWithTask
         ), let exitStatus = outcome.exitStatus else { return nil }
         return (exitStatus, outcome.output)
     }
@@ -52,8 +56,10 @@ enum BoundedProcessRunner {
         environment: [String: String]? = nil,
         workingDirectory: URL? = nil,
         includesStandardError: Bool = false,
-        timeout: TimeInterval
+        timeout: TimeInterval,
+        cancelsWithTask: Bool = false
     ) -> (exitStatus: Int32?, output: String)? {
+        guard !cancelsWithTask || !Task.isCancelled else { return nil }
         let outputFile = FileManager.default.temporaryDirectory
             .appendingPathComponent("justsessions-process-output-\(UUID().uuidString)")
         guard FileManager.default.createFile(atPath: outputFile.path, contents: nil),
@@ -74,10 +80,35 @@ enum BoundedProcessRunner {
         let finished = DispatchSemaphore(value: 0)
         process.terminationHandler = { _ in finished.signal() }
         do { try process.run() } catch { return nil }
-        let timedOut = finished.wait(timeout: .now() + timeout) == .timedOut
-        if timedOut { kill(process.processIdentifier, SIGKILL) }
+        let processID = process.processIdentifier
+        let ownsProcessGroup = getpgid(processID) == processID
+        let stopped = !waitForExit(finished, timeout: timeout, cancelsWithTask: cancelsWithTask)
+        if stopped {
+            // Foundation starts a Process in its own process group. Verify ownership before addressing the group:
+            // a timed-out shell wrapper can otherwise leave children still deleting files after we report failure.
+            if ownsProcessGroup {
+                kill(-processID, SIGKILL)
+            } else if process.isRunning {
+                kill(processID, SIGKILL)
+            }
+            // Reap the direct child before returning or releasing a host's mutation reservation. Successful helpers
+            // can deliberately leave a daemon running; only the timeout/cancellation path stops the group.
+            _ = finished.wait(timeout: .now() + 5)
+        }
 
         guard let data = try? Data(contentsOf: outputFile) else { return nil }
-        return (timedOut ? nil : process.terminationStatus, String(decoding: data, as: UTF8.self))
+        return (stopped ? nil : process.terminationStatus, String(decoding: data, as: UTF8.self))
+    }
+
+    private static func waitForExit(_ finished: DispatchSemaphore, timeout: TimeInterval, cancelsWithTask: Bool) -> Bool {
+        let deadline = DispatchTime.now() + timeout
+        guard cancelsWithTask else { return finished.wait(timeout: deadline) == .success }
+        while !Task.isCancelled {
+            let nextCheck = DispatchTime.now() + .milliseconds(50)
+            let waitUntil = nextCheck.uptimeNanoseconds < deadline.uptimeNanoseconds ? nextCheck : deadline
+            if finished.wait(timeout: waitUntil) == .success { return true }
+            if DispatchTime.now().uptimeNanoseconds >= deadline.uptimeNanoseconds { return false }
+        }
+        return false
     }
 }

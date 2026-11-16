@@ -30,14 +30,18 @@ struct KiroSessionMetadata: Equatable {
         guard let handle = try? FileHandle(forReadingFrom: file) else { return nil }
         defer { try? handle.close() }
         guard let head = try? handle.read(upToCount: Self.maximumHeadByteCount) else { return nil }
-        if let object = Self.objectBeforeSessionState(in: head), object["session_id"] != nil {
-            self.init(object: object)
-        } else if head.count < Self.maximumHeadByteCount {
+        if head.count < Self.maximumHeadByteCount {
             // That was the whole file.
             guard let object = ConversationMetadata.object(from: head) else { return nil }
             self.init(object: object)
+        } else if let object = Self.objectBeforeSessionState(in: head),
+                  ["session_id", "cwd", "title", "updated_at", "session_created_reason", "parent_session_id"]
+                    .allSatisfy({ object[$0] != nil }) {
+            // Only a complete metadata prefix proves no field we use was omitted. A missing optional field may
+            // occur after session_state in a reordered file; explicit JSON null still counts as present here.
+            self.init(object: object)
         } else {
-            // The fields come after `session_state`, or the start holds no `session_state`: read it all.
+            // The metadata can straddle session_state; finding only its id is not enough to accept a partial object.
             guard let rest = try? handle.readToEnd(), let object = ConversationMetadata.object(from: head + rest) else { return nil }
             self.init(object: object)
         }

@@ -43,6 +43,8 @@ Choose the version before writing the notes, from what users get since the previ
 
 When patch and minor both seem to fit, ask whether the release title names something users couldn't do at all before. If it does, make it a minor release. The highest level any change reaches decides, and a minor or major release resets the numbers after it to 0. Record the level and the change that decided it in the release PR.
 
+**1.3.2 exception:** Ship this release's [SSH cache migration](../requirements/remote/ssh-hosts.md) (SSH-106) as a patch, as the owner chose. It changes only rebuildable local copies while preserving original session data and compatibility of saved settings, bookmarks, and tabs. Some legacy caches require reconnecting to repopulate history; the notes must state that conditional action first. The other changes are fixes. This release-specific exception does not relax the minor or major rules for new capabilities, durable data, supported features, or other required user actions.
+
 Before this standard, every release after 1.2.0 was a patch. By it, 1.2.18 (bookmarks and the conversation map) and 1.2.20 (Kiro CLI V3 sessions) would have been minor releases. Published versions keep their numbers.
 
 ## Pre-tag check

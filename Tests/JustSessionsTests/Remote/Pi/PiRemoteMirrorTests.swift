@@ -56,9 +56,31 @@ struct PiRemoteMirrorTests {
     }
 
     @Test func copiesOnlyFoldersAndTheSessionFilesDirectlyInThem() {
-        #expect(RemoteSessionMirror.includedPatterns(for: .pi) == ["/*/", "/*/*.jsonl"])
+        #expect(RemoteSessionMirror.includedPatterns(for: .pi) == ["/*.jsonl", "/*/", "/*/*.jsonl"])
         #expect(RemoteSessionMirror.remoteFolder(for: .pi) == ".pi/agent/sessions")
-        #expect(RemoteSessionMirror.rsyncArguments(for: .pi, source: "devbox:.pi/agent/sessions/", destination: "/cache/pi/", remoteShell: "ssh").suffix(5)
-            == ["--include=/*/", "--include=/*/*.jsonl", "--exclude=*", "devbox:.pi/agent/sessions/", "/cache/pi/"])
+        #expect(RemoteSessionMirror.rsyncArguments(for: .pi, source: "devbox:.pi/agent/sessions/", destination: "/cache/pi/", remoteShell: "ssh").suffix(6)
+            == ["--include=/*.jsonl", "--include=/*/", "--include=/*/*.jsonl", "--exclude=*", "devbox:.pi/agent/sessions/", "/cache/pi/"])
+    }
+
+    @Test func aCustomSessionsRootCopiesItsDirectSessionsWithoutCompanionContents() throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let home = root.appendingPathComponent("home")
+        let sessions = home.appendingPathComponent("custom sessions")
+        let id = UUID().uuidString.lowercased()
+        let fixture = PiSessionFolderFixture(sessionsDirectory: sessions)
+        let file = try fixture.writeSession(id: id, projectPath: "/srv/project", lines: [PiSessionFolderFixture.userMessage("Root session")], inProjectFolder: false)
+        let nested = file.deletingPathExtension().appendingPathComponent("forks/kept-on-host.jsonl")
+        try FileManager.default.createDirectory(at: nested.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try "private extension output".write(to: nested, atomically: true, encoding: .utf8)
+        let folders = RemoteToolFolders(claude: ".claude", codex: ".codex", kiro: ".kiro/sessions/cli", pi: "custom sessions")
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: home.path, toolFoldersLookup: { _ in folders })
+
+        let found = try RemoteSessionDiscovery(mirror: mirror).discover(host: "devbox")
+
+        #expect(found.map(\.sessionID) == [id])
+        #expect(found.first?.sourceFile.deletingLastPathComponent().resolvingSymlinksInPath()
+            == mirror.mirrorDirectory(host: "devbox", provider: .pi).resolvingSymlinksInPath())
+        #expect(!FileManager.default.fileExists(atPath: mirror.mirrorDirectory(host: "devbox", provider: .pi).appendingPathComponent(file.deletingPathExtension().lastPathComponent + "/forks").path))
     }
 }

@@ -57,6 +57,7 @@ extension ConversationStore {
             selectTerminal(runningTerminal.id)
             return
         }
+        if action == .resume, deferResumeWhileCleaningUp(conversation, engine: engine, appendedArguments: appendedArguments) { return }
         // A session runs in one tab across the app's windows, so another window's tab comes forward instead.
         if action == .resume, showRunningTerminalInAnotherWindow(for: conversation) { return }
         connectIfDisconnected(conversation.host)
@@ -83,6 +84,29 @@ extension ConversationStore {
         terminalSessions.first { $0.conversation?.id == conversation.id && $0.hasExited }
     }
 
+    /// Repeated Resume selects the tab already being restarted. If that tab closed before a later Resume request,
+    /// the request waits until cleanup finishes, also when it came from another window. A repeat made before Close
+    /// doesn't leave a delayed request that would reopen a tab the user then closed.
+    private func deferResumeWhileCleaningUp(_ conversation: Conversation, engine: TerminalEngine?, appendedArguments: [String]) -> Bool {
+        let restarts = windowRegistry.terminalRestarts
+        guard let ownerTabID = restarts.tabBeingCleanedUp(for: conversation.id) else { return false }
+        for store in [self] + otherWindowStores {
+            if let tab = store.terminalSessions.first(where: { $0.id == ownerTabID }) {
+                store.selectTerminal(tab.id)
+                if store !== self { windowRegistry.bringForward(store) }
+                return true
+            }
+        }
+        let lifecycle = hostLifecycleGeneration(on: conversation.host)
+        let requestedTabID = endedTerminal(for: conversation)?.id
+        return restarts.deferResume(for: conversation.id) { [weak self] in
+            guard let self, self.isCurrentHostLifecycle(lifecycle, on: conversation.host),
+                  let current = self.conversation(withID: conversation.id), self.canLaunch(current, action: .resume) else { return }
+            if let requestedTabID, !self.terminalSessions.contains(where: { $0.id == requestedTabID && $0.conversation?.id == conversation.id }) { return }
+            self.launch(current, action: .resume, engine: engine, appendedArguments: appendedArguments)
+        }
+    }
+
     /// Resuming a session whose tab ended starts it again in that tab, keeping its place, its split, and the
     /// selection, rather than opening a second tab of the session beside it. A tab still showing a failed CLI's tmux
     /// session first lets that session go, since the new CLI's client would otherwise attach to its dead pane.
@@ -92,15 +116,24 @@ extension ConversationStore {
             replaceEndedTerminal(endedTab, with: session)
             return
         }
+        let restarts = windowRegistry.terminalRestarts
+        let conversationID = session.conversation?.id ?? endedTab.conversation?.id
+        guard let conversationID, restarts.beginCleanup(for: conversationID, tabID: endedTab.id) else { return }
         endedTab.close()
         tmuxCommandQueues.run(on: .thisMac) { [weak self] in
             tmuxServer.killSession(named: keptSessionName)
-            Task { @MainActor [weak self] in self?.replaceEndedTerminal(endedTab, with: session) }
+            Task { @MainActor [weak self] in
+                restarts.finishCleanup(for: conversationID) {
+                    guard let self, !self.isTearingDownWorkspace else { return }
+                    self.replaceEndedTerminal(endedTab, with: session)
+                }
+            }
         }
     }
 
     private func replaceEndedTerminal(_ endedTab: TerminalSession, with session: TerminalSession) {
-        guard let index = terminalSessions.firstIndex(where: { $0.id == endedTab.id }) else { return }
+        guard let index = terminalSessions.firstIndex(where: { $0.id == endedTab.id }),
+              terminalSessions[index].conversation?.id == session.conversation?.id else { return }
         replaceTerminal(at: index, with: session)
         selectTerminal(session.id)
     }

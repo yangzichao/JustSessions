@@ -19,6 +19,7 @@
 | [Source layout](development/source-layout.md) | Feature folders and responsibilities. |
 | [Feature requirements](requirements/README.md) | Behavior, UI, and performance the project chose on purpose, with origins and tests; check it to avoid regressions. |
 | [Performance](development/performance.md) | Profiling baseline, known hotspots, the status of each optimization, and how to profile. |
+| [November 2026 performance and bug audit](development/performance-and-bug-audit-2026-11-07.md) | Findings, fix status, measured scaling problems, and verification evidence. |
 | [Counting update checks](development/update-checks.md) | The Cloudflare Worker that counts daily update checks, what it stores, and how to read the numbers. |
 | [UI style](development/ui-style.md) | Theme colors, type scale, corner radii, button and sheet rules, and the contract tests that enforce them. |
 | [Interface localization](development/localization.md) | String Catalog, language discovery, adding translations, and automated checks. |

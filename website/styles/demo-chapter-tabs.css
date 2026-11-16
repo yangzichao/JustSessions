@@ -1,0 +1,133 @@
+/* The demo's chapters are the window's tabs, shaped like the app's tabs (WorkspaceTabShape.swift), as in Chrome: the
+   playing chapter is the selected tab, filled with the video's background, with rounded top corners and feet that curve
+   out into the video below, so tab and video read as one surface. Other tabs show a faint fill under the pointer and a
+   short line between them. Each tab's bar fills as its chapter plays. */
+.demo-tab-strip {
+  --tab-height: 38px;
+  --tab-corner: 10px;
+  --tab-foot: 9px;
+  --tab-selected: #14161c;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  min-height: calc(var(--tab-height) + 8px);
+  padding: 8px 8px 0 16px;
+  border-bottom: 0;
+}
+
+/* The mark's three dots stand in for the window controls. */
+.demo-window-dots { display: flex; flex: none; gap: 7px; align-self: center; padding-right: 2px; }
+.demo-window-dots span { width: 13px; height: 13px; border: 2px solid var(--ink); border-radius: 50%; background: var(--provider-claude); }
+.demo-window-dots span:nth-child(2) { background: var(--provider-codex); }
+.demo-window-dots span:nth-child(3) { background: var(--provider-antigravity); }
+
+.demo-chapters { display: flex; flex: 1; min-width: 0; margin: 0; padding: 0 var(--tab-foot); list-style: none; }
+.demo-chapters[hidden] { display: none; }
+.demo-chapters li { position: relative; flex: 1 1 0; min-width: 0; transition: flex-grow .2s; }
+/* The short line between two tabs, hidden next to the selected tab and the one under the pointer. */
+.demo-chapters li + li::before {
+  content: "";
+  position: absolute;
+  top: calc(50% - 8px);
+  left: -.5px;
+  width: 1px;
+  height: 16px;
+  background: rgb(21 23 28 / 18%);
+}
+.demo-chapters li:has(> .demo-chapter:is([aria-current], :hover))::before,
+.demo-chapters li:has(> .demo-chapter:is([aria-current], :hover)) + li::before { opacity: 0; }
+
+.demo-chapter {
+  position: relative;
+  /* Keeps the hover fill above the strip, behind the label. */
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: var(--tab-height);
+  padding: 0 8px 4px;
+  border: 0;
+  border-radius: var(--tab-corner) var(--tab-corner) 0 0;
+  background: none;
+  color: var(--secondary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .15s;
+}
+.demo-chapter-icon { flex: none; }
+.demo-chapter-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+/* The hover fill is inset from the tab's edges, like WorkspaceTabHoverShape. */
+.demo-chapter:not([aria-current]):hover::before {
+  content: "";
+  position: absolute;
+  inset: 2px 2px 6px;
+  z-index: -1;
+  border-radius: 8px;
+  background: rgb(21 23 28 / 7%);
+}
+.demo-chapter:hover { color: var(--ink); }
+
+.demo-chapter[aria-current] { background: var(--tab-selected); color: var(--ink-foreground); }
+/* The feet: a quarter circle cut from a square on each side of the selected tab's bottom. */
+.demo-chapter[aria-current]::before, .demo-chapter[aria-current]::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: var(--tab-foot);
+  height: var(--tab-foot);
+}
+.demo-chapter[aria-current]::before {
+  left: calc(-1 * var(--tab-foot));
+  background: radial-gradient(circle at 0 0, transparent calc(var(--tab-foot) - .5px), var(--tab-selected) var(--tab-foot));
+}
+.demo-chapter[aria-current]::after {
+  right: calc(-1 * var(--tab-foot));
+  background: radial-gradient(circle at 100% 0, transparent calc(var(--tab-foot) - .5px), var(--tab-selected) var(--tab-foot));
+}
+.demo-chapter:focus-visible { outline: 3px solid var(--provider-codex); outline-offset: -3px; }
+
+/* The chapter's progress runs along the tab's bottom edge. */
+.demo-chapter-track {
+  position: absolute;
+  right: 14px;
+  bottom: 5px;
+  left: 14px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgb(21 23 28 / 10%);
+}
+.demo-chapter-fill { display: block; height: 100%; background: var(--ink); transform: scaleX(0); transform-origin: left; }
+.demo-chapter[aria-current] .demo-chapter-track { background: rgb(255 255 255 / 18%); }
+.demo-chapter[aria-current] .demo-chapter-fill { background: var(--provider-claude); }
+
+/* Narrow windows keep one strip: tabs show only their icons, and the playing tab widens to show its name. These follow
+   the window's own width, which also shrinks with the browser window's height. */
+@container demo-video (max-width: 880px) {
+  .demo-tab-strip { --tab-height: 36px; gap: 4px; padding-inline: 8px; }
+  .demo-chapter { padding-inline: 5px; font-size: 13px; }
+  .demo-chapter-label { display: none; }
+  .demo-chapter[aria-current] .demo-chapter-label { display: block; }
+  .demo-chapters li:has(> [aria-current]) { flex-grow: 4; }
+  .demo-chapter-track { right: 8px; left: 8px; }
+}
+
+@container demo-video (max-width: 560px) {
+  .demo-window-dots { display: none; }
+}
+
+/* The smallest phones give the playing tab's name the room its icon took. */
+@container demo-video (max-width: 320px) {
+  .demo-chapter[aria-current] .demo-chapter-icon { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-chapters li { transition: none; }
+}

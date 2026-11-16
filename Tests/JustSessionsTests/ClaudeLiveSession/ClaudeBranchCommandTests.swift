@@ -28,7 +28,7 @@ struct ClaudeBranchCommandTests {
         let readers = AppendedSessionNameReaders()
         func followTheCLI() async throws {
             store.synchronizeClaudeLiveNames(registry: registry)
-            store.followAppendedSessionNames(readers: readers, codexDirectory: transcripts.root)
+            await store.followAppendedSessionNames(readers: readers, codexDirectory: transcripts.root)
             try await expectEventually { !store.isScanningThisMac }
         }
         func title(of sessionID: String) -> String? {

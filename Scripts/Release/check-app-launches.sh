@@ -50,7 +50,9 @@ done
 # offer to report a crash would mark the developer's own crashes as offered.
 # The argument domain needs a plist boolean: a bare NO reads as a string, which the setting ignores.
 # The launch opens no tab, so the app is asked to look up Ghostty's resources as a Ghostty terminal does.
+# An empty argument-domain host list also keeps this check from refreshing or migrating the developer's SSH copies.
 "$app_path/Contents/MacOS/$executable_name" -reopensTabsAtLaunch '<false/>' -offersCrashReportsAtLaunch '<false/>' \
+    -remoteHosts '<array/>' \
     -checksGhosttyResourcesAtLaunch YES \
     >"$launch_log" 2>&1 &
 app_process_id=$!

@@ -43,11 +43,15 @@ extension ConversationStore {
     }
 
     /// Connect, in a disconnected host's menu, and what using the host does first: the host is refreshed in every
-    /// window, as after Connect… logs in, and refreshes on its own again from then on.
+    /// window, as after Connect… logs in, and refreshes on its own again from then on. One window copies it, and the
+    /// others list that copy; see `LatestRemoteHostCopies`.
     func connectHost(_ host: String) {
         guard isDisconnected(host) else { return }
-        let stores = storesOfEveryWindow
-        for store in stores { store.disconnectedRemoteHosts.setDisconnected(false, for: host) }
+        let stores = storesSharingHostWork
+        for store in stores {
+            store.disconnectedRemoteHosts.setDisconnected(false, for: host)
+            store.invalidateRemoteHostWork(on: host)
+        }
         disconnectedRemoteHosts.save(to: userDefaults)
         SSHHostReachability.shared.forget(host)
         for store in stores { store.refreshRemoteHost(host) }
@@ -73,9 +77,13 @@ extension ConversationStore {
         closingTabs: (ConversationStore, [UUID]) -> Void
     ) {
         guard remoteHostList.hosts.contains(host), !isDisconnected(host) else { return }
-        let stores = storesOfEveryWindow
+        let stores = storesSharingHostWork
         // Marked first, so the refresh a closing tab may start is refused.
         for store in stores { store.disconnectedRemoteHosts.setDisconnected(true, for: host) }
+        for store in stores {
+            store.discardQueuedDeletions(on: .ssh(host))
+            store.invalidateRemoteHostWork(on: host)
+        }
         disconnectedRemoteHosts.save(to: userDefaults)
         for store in stores {
             let tabs = store.terminalSessions.filter { $0.host == .ssh(host) }

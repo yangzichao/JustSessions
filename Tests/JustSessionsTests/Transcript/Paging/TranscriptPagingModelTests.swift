@@ -1,8 +1,31 @@
+import Foundation
 import Testing
 @testable import JustSessions
 
 @MainActor
 struct TranscriptPagingModelTests {
+    @Test func replacingAFileDuringPaginationRebuildsTheWindowAroundTheReadingPosition() async throws {
+        let fixture = try TranscriptPagingFixture(count: 200)
+        defer { fixture.remove() }
+        let model = TranscriptPagingModel()
+        model.refresh(fixture.conversation, position: .entry(index: 0, offset: -6))
+        try await expectEventually { !model.isLoading }
+        let position = TranscriptReadingPosition.entry(index: TranscriptPageIdentity.entryID(record: 60, part: 0), offset: 17)
+        let text = String(decoding: try Data(contentsOf: fixture.file), as: UTF8.self)
+            .replacingOccurrences(of: "Message ", with: "Rewritten longer message ")
+        try Data(text.utf8).write(to: fixture.file, options: .atomic)
+        model.later(preserving: position)
+        try await expectEventually { !model.isLoading }
+        #expect(model.errorMessage == nil)
+        #expect(model.pages.count == 1)
+        #expect(model.restorationPosition == position)
+        #expect(model.transcript?.entries.first?.id == position.entryIndex)
+        #expect(model.transcript?.entries.allSatisfy {
+            if case .assistantMessage(let text) = $0.content { return text.hasPrefix("Rewritten longer message") }
+            return false
+        } == true)
+    }
+
     @Test func loadingPreservesThePositionReachedWhileThePageWasBeingRead() async throws {
         let fixture = try TranscriptPagingFixture()
         defer { fixture.remove() }
