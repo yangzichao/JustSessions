@@ -3,7 +3,9 @@ import Dispatch
 
 /// A tmux session's history whose tmux answers each search step with the next of `countOutputs`, and each other
 /// command with nothing. It records every command it was given; `holdsFirstCommand` keeps the first one waiting until
-/// `releaseFirstCommand()`, as a slow SSH host would.
+/// `releaseFirstCommand()`, as a slow SSH host would. It waits with no timer: the release runner's main actor can stall
+/// for over 30 seconds, and a hold that ran out then answered before the test had typed the searches that replace it.
+/// A test that holds releases in a `defer`, so a failing one doesn't leave the command's thread waiting.
 final class ScriptedTmuxHistory: @unchecked Sendable {
     let sessionName = "justsessions-terminal-a1b2c3d4"
     private let countOutputs: LockedValue<[String?]>
@@ -47,7 +49,7 @@ final class ScriptedTmuxHistory: @unchecked Sendable {
             $0.append(arguments)
         }
         if isFirstCommand && holdsFirstCommand {
-            _ = firstCommandRelease.wait(timeout: .now() + 30)
+            firstCommandRelease.wait()
         }
         guard arguments.contains("display-message") else { return "" }
         var output: String?
