@@ -1206,6 +1206,10 @@
 	<string>在网站上打开反馈表单</string>
 	<key>Open the source code on GitHub</key>
 	<string>在 GitHub 上查看源代码</string>
+	<key>Option key</key>
+	<string>Option 键</string>
+	<key>Option with a key sends Esc and that key, which shells and CLIs read as Alt shortcuts. Turn it off to type the characters your keyboard layout keeps behind Option, such as brackets, braces, or the pipe. Open tabs follow the change.</key>
+	<string>Option 加按键会发送 Esc 和该按键，Shell 和 CLI 会将其识别为 Alt 快捷键。关闭后可输入键盘布局中需按住 Option 才能输入的字符，例如方括号、花括号或竖线。已打开的标签页也会随之更改。</string>
 	<key>Optional</key>
 	<string>可选</string>
 	<key>Optional. Lets CLIs in terminals control apps, such as clicking a menu or typing keys through System Events with osascript. Every CLI in a terminal gets it, so allow it only if you want them to.</key>
@@ -1818,6 +1822,8 @@
 	<string>取消置顶项目</string>
 	<key>Unpin session</key>
 	<string>取消置顶会话</string>
+	<key>Use Option as Meta</key>
+	<string>将 Option 用作 Meta 键</string>
 	<key>Use a readable width</key>
 	<string>使用适合阅读的宽度</string>
 	<key>Use default</key>

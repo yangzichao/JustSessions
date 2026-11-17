@@ -35,6 +35,29 @@ struct GhosttyKeyBindingTests {
         }
     }
 
+    /// Option with a key sends Esc and the key while Option is Meta. Turned off, a terminal already open sends what the
+    /// keyboard layout types for the key instead, and Option-Left still moves a word back.
+    @Test func optionIsMetaUntilTurnedOffInAnOpenTerminal() async throws {
+        let stores = try IsolatedAppearanceStores()
+        defer { stores.remove() }
+        let terminal = GhosttyTestTerminal(controller: stores.controller(), appearance: .aqua)
+        terminal.window.makeFirstResponder(terminal.view)
+        let escape = UInt8(0x1B)
+        let optionB = USKey(description: "Option-B", keyCode: 11, characters: "b", modifierFlags: .option)
+
+        #expect(try await terminal.bytesSent(pressing: optionB) == [escape, UInt8(ascii: "b")])
+
+        stores.optionKey.setOptionIsMeta(false)
+
+        let typed = try await terminal.bytesSent(pressing: optionB)
+        #expect(!typed.isEmpty && !typed.contains(escape), "\(typed)")
+        #expect(try await terminal.bytesSent(pressing: .optionLeft) == [escape, UInt8(ascii: "b")])
+
+        stores.optionKey.setOptionIsMeta(true)
+
+        #expect(try await terminal.bytesSent(pressing: optionB) == [escape, UInt8(ascii: "b")])
+    }
+
     /// The app's menus' shortcuts: Ghostty, whose own shortcuts would close the terminal on Command-W and open a tab on
     /// Command-T, leaves each to the menu. Command-Z is a line editing key the terminal takes; see `TerminalEditingKey`.
     @Test func theAppsMenuShortcutsReachTheMenu() throws {

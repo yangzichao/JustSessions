@@ -12,16 +12,18 @@ struct GhosttyAppearanceConfiguration {
     let theme: TerminalTheme
 
     /// `ghosttyFindsFontFamily` stands in for Ghostty's font lookup, `GhosttyFontConfiguration.fontDiscoveryFinds`, in
-    /// tests. The cells are sized for a screen of `backingScaleFactor`.
+    /// tests. The cells are sized for a screen of `backingScaleFactor`. `optionIsMeta` is `TerminalOptionKeyStore`'s.
     init(
         preferences: TerminalAppearancePreferences,
         appTheme: ResolvedAppTheme,
+        optionIsMeta: Bool = TerminalOptionKeyStore.defaultOptionIsMeta,
         backingScaleFactor: CGFloat = GhosttyFontConfiguration.screensBackingScaleFactor,
         ghosttyFindsFontFamily: (String) -> Bool = GhosttyFontConfiguration.fontDiscoveryFinds(family:)
     ) {
         let preferences = preferences.validated
         terminalConfiguration = Self.terminalConfiguration(
-            for: preferences, backingScaleFactor: backingScaleFactor, ghosttyFindsFontFamily: ghosttyFindsFontFamily
+            for: preferences, optionIsMeta: optionIsMeta, backingScaleFactor: backingScaleFactor,
+            ghosttyFindsFontFamily: ghosttyFindsFontFamily
         )
         let variants = preferences.colorVariants(appTheme: appTheme)
         theme = TerminalTheme(
@@ -35,6 +37,7 @@ struct GhosttyAppearanceConfiguration {
     /// one Ghostty knows.
     private static func terminalConfiguration(
         for preferences: TerminalAppearancePreferences,
+        optionIsMeta: Bool,
         backingScaleFactor: CGFloat,
         ghosttyFindsFontFamily: (String) -> Bool
     ) -> TerminalConfiguration {
@@ -53,8 +56,9 @@ struct GhosttyAppearanceConfiguration {
             // SwiftTerm's caret is a blinking block.
             builder.withCursorStyle(.block)
             builder.withCursorStyleBlink(true)
-            // SwiftTerm sends Option as Meta (its `optionAsMetaKey` is true) whatever the keyboard layout.
-            builder.withCustom("macos-option-as-alt", "true")
+            // As SwiftTerm's `optionAsMetaKey`: Option is Meta whatever the keyboard layout, or types the layout's
+            // characters. Option-Left and Option-Right keep their bindings below either way.
+            builder.withCustom("macos-option-as-alt", optionIsMeta ? "true" : "false")
             // SwiftTerm pastes without asking and lets programs read and write the clipboard with OSC 52.
             builder.withCustom("clipboard-paste-protection", "false")
             builder.withCustom("clipboard-read", "allow")

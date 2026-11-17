@@ -29,6 +29,7 @@ struct ThemeSurfaceRenderingTests {
                 appAppearanceStore: appearanceStore, appThemeStore: themeStore,
                 terminalAppearanceStore: terminalStore,
                 terminalEngineStore: TerminalEngineStore(userDefaults: settings.userDefaults),
+                terminalOptionKeyStore: TerminalOptionKeyStore(userDefaults: settings.userDefaults),
                 notificationSettingsStore: notificationStore,
                 onCheckForUpdates: {}
             ))

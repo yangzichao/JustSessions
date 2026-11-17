@@ -38,6 +38,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     private var appearancePreferences = TerminalAppearancePreferences()
     private var theme = ResolvedAppTheme(.justSessions)
     private var appearanceSubscription: AnyCancellable?
+    private var optionKeySubscription: AnyCancellable?
     /// The colors the terminal last took on, so a theme report goes out only when they change.
     private var appliedPalette: TerminalPalette?
     private var themeReporting = TerminalThemeReporting()
@@ -99,16 +100,23 @@ final class SelectableTerminalView: LocalProcessTerminalView {
         self.init(frame: frame, appearanceStore: .shared, themeStore: .shared)
     }
 
-    init(frame: CGRect, appearanceStore: TerminalAppearanceStore, themeStore: AppThemeStore) {
+    init(
+        frame: CGRect,
+        appearanceStore: TerminalAppearanceStore,
+        themeStore: AppThemeStore,
+        optionKeyStore: TerminalOptionKeyStore = .shared
+    ) {
         super.init(frame: frame)
         getTerminal().changeScrollback(Self.scrollbackLineCount)
         observeAppearance(in: appearanceStore, themeStore: themeStore)
+        observeOptionKey(in: optionKeyStore)
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         getTerminal().changeScrollback(Self.scrollbackLineCount)
         observeAppearance(in: .shared, themeStore: .shared)
+        observeOptionKey(in: .shared)
     }
 
     /// The lines kept above the screen, which scrolling and find reach, in place of SwiftTerm's 500. Full, they hold
@@ -180,6 +188,13 @@ final class SelectableTerminalView: LocalProcessTerminalView {
             self.theme = theme
             appearance = TerminalAppearanceStyling.nativeAppearance(for: preferences, theme: theme)
             applyAppearance()
+        }
+    }
+
+    /// Option is Meta, or types the keyboard layout's characters, as the store says now and whenever it changes.
+    private func observeOptionKey(in store: TerminalOptionKeyStore) {
+        optionKeySubscription = store.$optionIsMeta.sink { [weak self] optionIsMeta in
+            self?.optionAsMetaKey = optionIsMeta
         }
     }
 
