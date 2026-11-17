@@ -21,10 +21,10 @@ struct ClaudeAdapter: ConversationAdapter {
     }
 
     /// Shared by every Claude Code adapter, this Mac's and each SSH host's mirror, which keep their files apart.
-    private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-heads"))
+    private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-heads-2"))
     /// Named for the version of the tail it keeps: tails kept before `relocated` lines were read would leave a session
     /// moved with `/cd` under the folder it started in.
-    private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-tails-3"))
+    private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-tails-4"))
     private static let subagentSessions = SessionFileSummaryCache<ClaudeSubagentSession>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-subagents-2"))
 
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
@@ -95,6 +95,8 @@ struct ClaudeAdapter: ConversationAdapter {
             tail.latestCustomTitle
                 ?? indexEntry?.customTitle
                 ?? head.customTitle
+                ?? tail.latestAITitle
+                ?? head.aiTitle
                 ?? indexEntry?.firstPrompt
                 ?? head.firstPrompt,
             fallback: ConversationMetadata.untitledConversationTitle

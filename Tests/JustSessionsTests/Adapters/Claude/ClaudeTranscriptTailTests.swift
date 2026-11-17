@@ -30,11 +30,24 @@ struct ClaudeTranscriptTailTests {
         #expect(tail.latestTimestamp == ConversationMetadata.date("2026-09-24T11:00:00Z"))
     }
 
+    @Test func readsTheLastGeneratedTitle() {
+        let tail = ClaudeTranscriptTail(lines: jsonLines([
+            #"{"type":"ai-title","aiTitle":"Early guess","sessionId":"s"}"#,
+            #"{"type":"user","timestamp":"2026-09-24T11:00:00Z","message":{"content":"Keep going"}}"#,
+            #"{"type":"ai-title","aiTitle":"Build fixes","sessionId":"s"}"#,
+            #"{"type":"custom-title","customTitle":"Named"}"#,
+        ]))
+
+        #expect(tail.latestAITitle == "Build fixes")
+        #expect(tail.latestCustomTitle == "Named")
+    }
+
     @Test func aTranscriptWithNeitherSaysNothing() {
         let tail = ClaudeTranscriptTail(lines: jsonLines([#"{"type":"user","message":{"content":"Hi"}}"#]))
 
         #expect(tail.latestTimestamp == nil)
         #expect(tail.latestCustomTitle == nil)
+        #expect(tail.latestAITitle == nil)
         #expect(tail.relocatedWorkingDirectory == nil)
         #expect(tail.latestModel == nil)
     }

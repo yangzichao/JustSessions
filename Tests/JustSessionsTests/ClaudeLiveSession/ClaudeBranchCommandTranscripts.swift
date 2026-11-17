@@ -10,7 +10,9 @@ struct ClaudeBranchCommandTranscripts {
     static let parentID = "4f80d7f2-88b3-4d73-8423-34f5faa8e081"
     static let branchID = "1fe21c86-d52a-4ee8-895f-155bf341fbb6"
     static let processID: Int32 = 5823
-    static let parentTitle = "Reply with the single word OK."
+    static let parentPrompt = "Reply with the single word OK."
+    /// The title Claude Code generated for the session branched from, which names it: it has no name of its own.
+    static let parentTitle = "Single word OK reply"
     static let branchTitle = "Reply with the single word OK. (Branch)"
 
     /// What the registry says about the CLI at each step, as one line of JSON.
@@ -48,7 +50,7 @@ struct ClaudeBranchCommandTranscripts {
         try append(to: Self.parentID, [
             #"{"type":"permission-mode","permissionMode":"auto","sessionId":"\#(Self.parentID)"}"#,
             Self.prompt(sessionID: Self.parentID, forked: false),
-            #"{"type":"ai-title","aiTitle":"Single word OK reply","sessionId":"\#(Self.parentID)"}"#,
+            #"{"type":"ai-title","aiTitle":"\#(Self.parentTitle)","sessionId":"\#(Self.parentID)"}"#,
             Self.reply(sessionID: Self.parentID, forked: false),
             #"{"type":"last-prompt","leafUuid":"77841e5c-1174-4c06-9485-052950c03f48","sessionId":"\#(Self.parentID)"}"#,
         ])
@@ -123,7 +125,7 @@ struct ClaudeBranchCommandTranscripts {
 
     private static func prompt(sessionID: String, forked: Bool) -> String {
         let uuid = "a26341e3-5e47-49e8-bd48-511852da9c22"
-        return #"{"parentUuid":null,"isSidechain":false,"type":"user","message":{"role":"user","content":"\#(parentTitle)"},"uuid":"\#(uuid)","timestamp":"2026-10-21T19:45:31.357Z","cwd":"/Users/me/project","sessionId":"\#(sessionID)","version":"2.1.306"\#(forkedFrom(uuid, forked))}"#
+        return #"{"parentUuid":null,"isSidechain":false,"type":"user","message":{"role":"user","content":"\#(parentPrompt)"},"uuid":"\#(uuid)","timestamp":"2026-10-21T19:45:31.357Z","cwd":"/Users/me/project","sessionId":"\#(sessionID)","version":"2.1.306"\#(forkedFrom(uuid, forked))}"#
     }
 
     /// A copied reply keeps the snake_case `session_id` of the session it came from.

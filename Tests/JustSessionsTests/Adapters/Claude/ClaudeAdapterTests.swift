@@ -182,6 +182,29 @@ struct ClaudeAdapterTests {
         #expect(try folder.discoveredConversationsBySessionID()[sessionID]?.projectPath == "/Users/me/app")
     }
 
+    /// Claude Code titles a session itself, in `ai-title` lines. That title comes after a name the user gave and
+    /// before the first prompt, and a session that opens with a slash command is titled by its first real prompt.
+    @Test func aGeneratedTitleComesAfterANameAndBeforeAPrompt() throws {
+        let folder = try ClaudeProjectFolderFixture()
+        defer { folder.remove() }
+        let generated = UUID().uuidString
+        let renamed = UUID().uuidString
+        let commandFirst = UUID().uuidString
+        let prompt = #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Transcript prompt"}}"#
+        let command = #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<command-name>/model</command-name>"}}"#
+        let aiTitle = #"{"type":"ai-title","aiTitle":"Generated title"}"#
+        try folder.writeTranscript(generated, lines: [command, prompt, #"{"type":"ai-title","aiTitle":"Early guess"}"#, aiTitle])
+        try folder.writeTranscript(renamed, lines: [prompt, #"{"type":"custom-title","customTitle":"Transcript name"}"#, aiTitle])
+        try folder.writeTranscript(commandFirst, lines: [command, prompt])
+
+        let titles = try folder.discoveredConversationsBySessionID().mapValues(\.suggestedTitle)
+        #expect(titles == [
+            generated: "Generated title",
+            renamed: "Transcript name",
+            commandFirst: "Transcript prompt",
+        ])
+    }
+
     @Test func theTitleIsTheLatestCustomTitleThenTheIndexsNameThenAPrompt() throws {
         let folder = try ClaudeProjectFolderFixture()
         defer { folder.remove() }

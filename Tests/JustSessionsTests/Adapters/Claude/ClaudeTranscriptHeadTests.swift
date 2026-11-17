@@ -55,12 +55,47 @@ struct ClaudeTranscriptHeadTests {
         #expect(head.isSidechain)
     }
 
-    @Test func linesPastTheLineLimitAreNotRead() {
-        let filler = Array(repeating: #"{"type":"assistant"}"#, count: ClaudeTranscriptHead.maximumLineCount - 1)
+    /// A session that opens with slash commands has its first prompt after the line limit. Reading goes on for the
+    /// prompt alone, and stops once it is found.
+    @Test func pastTheLineLimitOnlyTheFirstPromptIsLookedFor() {
+        let filler = Array(repeating: #"{"type":"assistant"}"#, count: ClaudeTranscriptHead.maximumLineCount + 10)
         let prompt = #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#
+        let head = ClaudeTranscriptHead(lines: jsonLines(filler + [
+            #"{"type":"ai-title","aiTitle":"Past the limit"}"#,
+            #"{"type":"custom-title","customTitle":"Past the limit"}"#,
+            prompt,
+            #"{"type":"user","cwd":"/Users/me/app","isSidechain":true,"message":{"content":"After the prompt"}}"#,
+        ]))
 
-        #expect(ClaudeTranscriptHead(lines: jsonLines(filler + [prompt])).firstPrompt == "Fix the build")
-        #expect(ClaudeTranscriptHead(lines: jsonLines(filler + [#"{"type":"assistant"}"#, prompt])).firstPrompt == nil)
+        #expect(head.firstPrompt == "Fix the build")
+        #expect(head.workingDirectory == "/Users/me/app")
+        #expect(head.aiTitle == nil)
+        #expect(head.customTitle == nil)
+        #expect(!head.isSidechain)
+    }
+
+    /// What Claude Code writes for the user is not a prompt: the note before a slash command, the command, and its
+    /// output are `user` lines too.
+    @Test func slashCommandsAndTheirOutputAreNotTheFirstPrompt() {
+        let head = ClaudeTranscriptHead(lines: jsonLines([
+            #"{"type":"user","isMeta":true,"cwd":"/Users/me/app","message":{"content":"Run without asking, then report."}}"#,
+            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<command-name>/model</command-name>\n<command-args></command-args>"}}"#,
+            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<local-command-stdout>Set model to Opus</local-command-stdout>"}}"#,
+            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#,
+        ]))
+
+        #expect(head.firstPrompt == "Fix the build")
+    }
+
+    @Test func readsTheLastGeneratedTitleInItsLines() {
+        let head = ClaudeTranscriptHead(lines: jsonLines([
+            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#,
+            #"{"type":"ai-title","aiTitle":"Early guess","sessionId":"s"}"#,
+            #"{"type":"ai-title","aiTitle":"Build fixes","sessionId":"s"}"#,
+        ]))
+
+        #expect(head.aiTitle == "Build fixes")
+        #expect(head.customTitle == nil)
     }
 
     @Test func linesThatAreNotJSONObjectsAreSkipped() {
