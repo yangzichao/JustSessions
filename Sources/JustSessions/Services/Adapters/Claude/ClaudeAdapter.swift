@@ -97,7 +97,8 @@ struct ClaudeAdapter: ConversationAdapter {
                 ?? head.customTitle
                 ?? tail.latestAITitle
                 ?? head.aiTitle
-                ?? indexEntry?.firstPrompt
+                // The index can record a slash command's markup as the first prompt; the head skips it.
+                ?? indexEntry?.firstPrompt.flatMap { ConversationMetadata.holdsTitle($0) ? $0 : nil }
                 ?? head.firstPrompt,
             fallback: ConversationMetadata.untitledConversationTitle
         )
