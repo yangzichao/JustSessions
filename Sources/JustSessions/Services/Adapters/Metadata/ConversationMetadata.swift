@@ -52,6 +52,11 @@ enum ConversationMetadata {
         return String(firstLine.prefix(maximumTitleLength))
     }
 
+    /// Whether `cleanTitle` would take a title from `text`: it has a line with text that is not injected markup.
+    static func holdsTitle(_ text: String) -> Bool {
+        firstNonBlankLine(of: text).map { !$0.hasPrefix("<") } ?? false
+    }
+
     /// Stops at the first line with text, since a prompt can run to hundreds of kilobytes of pasted text.
     private static func firstNonBlankLine(of text: String) -> String? {
         let scalars = text.unicodeScalars
