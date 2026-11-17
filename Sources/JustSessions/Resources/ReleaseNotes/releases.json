@@ -1,5 +1,33 @@
 [
   {
+    "version": "1.4.1",
+    "publishedOn": "2026-11-17",
+    "title": {
+      "en": "Claude Code session titles",
+      "zh-Hans": "Claude Code 会话标题"
+    },
+    "sections": [
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Claude Code sessions you haven't renamed show the title Claude Code generated, as /resume does.",
+            "zh-Hans": "未重命名的 Claude Code 会话显示 Claude Code 生成的标题，与 /resume 一致。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Fixed Claude Code sessions that start with a slash command, such as /model, showing as Untitled conversation.",
+            "zh-Hans": "修复了以 /model 等斜杠命令开头的 Claude Code 会话没有标题的问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.4.0",
     "publishedOn": "2026-11-16",
     "title": {
