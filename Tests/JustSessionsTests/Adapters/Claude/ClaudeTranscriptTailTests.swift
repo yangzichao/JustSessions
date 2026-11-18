@@ -49,6 +49,7 @@ struct ClaudeTranscriptTailTests {
         #expect(tail.latestCustomTitle == nil)
         #expect(tail.latestAITitle == nil)
         #expect(tail.relocatedWorkingDirectory == nil)
+        #expect(tail.movedProjectDirectory == nil)
         #expect(tail.latestModel == nil)
     }
 
@@ -76,6 +77,67 @@ struct ClaudeTranscriptTailTests {
         #expect(tail.latestTimestamp == ConversationMetadata.date("2026-10-13T10:01:00Z"))
         #expect(tail.latestCustomTitle == "Moved session")
         #expect(tail.relocatedWorkingDirectory == "/Users/me/other")
+    }
+
+    /// Entering a worktree writes a `relocated` line with the worktree's folder and a `worktree-state` line that names
+    /// the folder the session entered it from. Claude Code's `/resume` lists the session in that folder.
+    @Test func aSessionInAWorktreeBelongsToTheRepositoryItEnteredItFrom() {
+        let tail = ClaudeTranscriptTail(lines: jsonLines([
+            #"{"type":"relocated","sessionId":"s1","relocatedCwd":"/Users/me/app/.claude/worktrees/fix"}"#,
+            #"{"type":"worktree-state","worktreeSession":{"originalCwd":"/Users/me/app","worktreePath":"/Users/me/app/.claude/worktrees/fix","worktreeName":"fix"},"sessionId":"s1"}"#,
+            #"{"type":"user","cwd":"/Users/me/app/.claude/worktrees/fix","timestamp":"2026-10-15T10:00:00Z","message":{"content":"Keep going"}}"#,
+        ]))
+
+        #expect(tail.worktreeDirectory == "/Users/me/app/.claude/worktrees/fix")
+        #expect(tail.movedProjectDirectory == "/Users/me/app")
+    }
+
+    /// Leaving a worktree writes a `worktree-state` line with no `worktreeSession`, and a `relocated` line with the
+    /// folder the session went back to.
+    @Test func aSessionThatLeftItsWorktreeIsInTheFolderItWentBackTo() {
+        let tail = ClaudeTranscriptTail(lines: jsonLines([
+            #"{"type":"relocated","sessionId":"s1","relocatedCwd":"/Users/me/app/.claude/worktrees/fix"}"#,
+            #"{"type":"worktree-state","worktreeSession":{"originalCwd":"/Users/me/app","worktreePath":"/Users/me/app/.claude/worktrees/fix"},"sessionId":"s1"}"#,
+            #"{"type":"relocated","sessionId":"s1","relocatedCwd":"/Users/me/other"}"#,
+            #"{"type":"worktree-state","worktreeSession":null,"sessionId":"s1"}"#,
+        ]))
+
+        #expect(tail.movedProjectDirectory == "/Users/me/other")
+    }
+
+    /// Resuming a session whose worktree was removed writes a `worktree-state` line with no `worktreeSession` and no
+    /// `relocated` line: the last one still names the worktree, and the session runs in the repository.
+    @Test func aSessionResumedAfterItsWorktreeWasRemovedStaysWithTheRepository() {
+        let tail = ClaudeTranscriptTail(lines: jsonLines([
+            #"{"type":"relocated","sessionId":"s1","relocatedCwd":"/Users/me/app/.claude/worktrees/fix"}"#,
+            #"{"type":"worktree-state","worktreeSession":{"originalCwd":"/Users/me/app","worktreePath":"/Users/me/app/.claude/worktrees/fix"},"sessionId":"s1"}"#,
+            #"{"type":"assistant","timestamp":"2026-10-15T10:01:00Z","message":{"content":"Done"}}"#,
+            #"{"type":"worktree-state","worktreeSession":null,"sessionId":"s1"}"#,
+        ]))
+
+        #expect(tail.movedProjectDirectory == "/Users/me/app")
+    }
+
+    @Test func aSessionMovedWithCdOutOfItsWorktreeIsInTheFolderItMovedTo() {
+        let tail = ClaudeTranscriptTail(lines: jsonLines([
+            #"{"type":"relocated","sessionId":"s1","relocatedCwd":"/Users/me/app/.claude/worktrees/fix"}"#,
+            #"{"type":"worktree-state","worktreeSession":{"originalCwd":"/Users/me/app","worktreePath":"/Users/me/app/.claude/worktrees/fix"},"sessionId":"s1"}"#,
+            #"{"type":"relocated","sessionId":"s1","relocatedCwd":"/Users/me/other"}"#,
+        ]))
+
+        #expect(tail.movedProjectDirectory == "/Users/me/other")
+    }
+
+    @Test func aWorktreeStateLineOlderThanTheTimestampTitleAndModelIsStillRead() {
+        let tail = ClaudeTranscriptTail(lines: jsonLines([
+            #"{"type":"worktree-state","worktreeSession":{"originalCwd":"/Users/me/app","worktreePath":"/Users/me/app/.claude/worktrees/fix"},"sessionId":"s1"}"#,
+            #"{"type":"relocated","sessionId":"s1","relocatedCwd":"/Users/me/app/.claude/worktrees/fix"}"#,
+            #"{"type":"custom-title","customTitle":"Worktree session"}"#,
+            #"{"type":"assistant","timestamp":"2026-10-15T10:01:00Z","message":{"model":"claude-opus-4-7","content":"Done"}}"#,
+        ]))
+
+        #expect(tail.latestCustomTitle == "Worktree session")
+        #expect(tail.movedProjectDirectory == "/Users/me/app")
     }
 
     @Test func onlyTheEndOfALongTranscriptIsRead() throws {
