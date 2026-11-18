@@ -212,19 +212,24 @@ struct ClaudeAdapterTests {
         let renamedInIndex = UUID().uuidString
         let promptInIndex = UUID().uuidString
         let promptInTranscript = UUID().uuidString
+        let commandInIndex = UUID().uuidString
         let untitled = UUID().uuidString
         let prompt = #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Transcript prompt"}}"#
         try folder.writeTranscript(renamedInTranscript, lines: [prompt, #"{"type":"custom-title","customTitle":"Transcript name"}"#])
         try folder.writeTranscript(renamedInIndex, lines: [prompt])
         try folder.writeTranscript(promptInIndex, lines: [prompt])
         try folder.writeTranscript(promptInTranscript, lines: [prompt])
+        try folder.writeTranscript(commandInIndex, lines: [
+            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<command-name>/model</command-name>"}}"#, prompt,
+        ])
         // A tool result is a user record too, but holds nothing the user typed.
         try folder.writeTranscript(untitled, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":[{"type":"tool_result","content":"ok"}]}}"#])
         try folder.writeIndex(#"""
         {"entries":[
           {"sessionId":"\#(renamedInTranscript)","customTitle":"Index name","firstPrompt":"Index prompt"},
           {"sessionId":"\#(renamedInIndex)","customTitle":"Index name","firstPrompt":"Index prompt"},
-          {"sessionId":"\#(promptInIndex)","firstPrompt":"Index prompt"}
+          {"sessionId":"\#(promptInIndex)","firstPrompt":"Index prompt"},
+          {"sessionId":"\#(commandInIndex)","firstPrompt":"<command-name>/model</command-name>"}
         ]}
         """#)
 
@@ -234,6 +239,7 @@ struct ClaudeAdapterTests {
             renamedInIndex: "Index name",
             promptInIndex: "Index prompt",
             promptInTranscript: "Transcript prompt",
+            commandInIndex: "Transcript prompt",
             untitled: ConversationMetadata.untitledConversationTitle,
         ])
     }
