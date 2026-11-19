@@ -2,6 +2,7 @@
 dist/
 .DS_Store
 *.xcuserstate
+*.profraw
 __pycache__/
 .playwright-mcp/
 .wrangler/

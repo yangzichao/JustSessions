@@ -6,7 +6,7 @@
 APP_BUNDLE_PATH ?= dist/JustSessions.app
 INSTALLER_PATH ?= dist/JustSessions.dmg
 
-.PHONY: build dev run check test verify release-notes-check release-check dmg website website-check website-traffic-test website-traffic-deploy website-traffic feedback-test feedback-deploy feedback localization localization-check update-feed-test update-feed-deploy update-checks help
+.PHONY: build dev run check test verify tracked-files-check release-notes-check release-check dmg website website-check website-traffic-test website-traffic-deploy website-traffic feedback-test feedback-deploy feedback localization localization-check update-feed-test update-feed-deploy update-checks help
 
 build:
 	./Scripts/build-app.sh "$(APP_BUNDLE_PATH)"
@@ -22,8 +22,12 @@ test:
 	JUSTSESSIONS_TEST_TMUX_RUNTIME="$$runtime_directory" swift test
 
 # Website deployment checks do not replace local app verification before delivering or tagging.
-verify: release-notes-check website-check update-feed-test test localization-check build
+verify: tracked-files-check release-notes-check website-check update-feed-test test localization-check build
 	./Scripts/Release/check-app-launches.sh "$(APP_BUNDLE_PATH)"
+
+tracked-files-check:
+	python3 Scripts/TrackedFiles/check_tracked_files.py
+	python3 -m unittest discover -s Scripts/TrackedFiles/tests
 
 release-notes-check:
 	python3 Scripts/ReleaseNotes/check_release_notes.py $(if $(RELEASE_TAG),--tag "$(RELEASE_TAG)")
@@ -86,6 +90,7 @@ help:
 		'make check     Compile the Swift development build' \
 		'make test      Build bundled tmux and run the Swift tests' \
 		'make verify    Check the website, tests, localization, and packaged app launch' \
+		'make tracked-files-check  Fail if git tracks agent skills or machine-local files' \
 		'make release-notes-check RELEASE_TAG=vX.Y.Z  Check and preview candidate release notes' \
 		'make release-check RELEASE_TAG=vX.Y.Z        Check candidate notes and run make verify before tagging' \
 		'make dmg       Build the app and dist/JustSessions.dmg' \
