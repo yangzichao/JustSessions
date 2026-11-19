@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PiPreviewedEntryTests {
@@ -41,7 +42,9 @@ struct PiPreviewedEntryTests {
     /// Only a tool result's images are shown, so one without an image part is not worth decoding.
     @Test func aToolResultMightBeShownOnlyWhenItsLineMentionsAnImagePart() {
         let textOnly = Data(#"{"type":"message","message":{"role":"toolResult","content":[{"type":"text","text":"ok"}]}}"#.utf8)
-        let withImage = Data(#"{"type":"message","message":{"role":"toolResult","content":[{"type":"text","text":"Screenshot:"},{"type":"image","data":"AAAA","mimeType":"image/png"}]}}"#.utf8)
+        let withImage = Data(
+            #"{"type":"message","message":{"role":"toolResult","content":[{"type":"text","text":"Screenshot:"},{"type":"image","data":"AAAA","mimeType":"image/png"}]}}"#
+                .utf8)
 
         #expect(PiPreviewedEntry.toolResult.mightBeShown(in: textOnly) == false)
         #expect(PiPreviewedEntry.toolResult.mightBeShown(in: withImage))

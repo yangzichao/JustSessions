@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Tabs that go because their session is deleted, they move to another window, or their host disconnects were not

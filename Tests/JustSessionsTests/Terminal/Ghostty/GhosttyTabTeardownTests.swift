@@ -4,6 +4,7 @@ import Foundation
 import GhosttyTerminal
 import ObjectiveC
 import Testing
+
 @testable import JustSessions
 
 /// A Ghostty tab that goes away while the reading of its process's output waits for Ghostty to catch up.

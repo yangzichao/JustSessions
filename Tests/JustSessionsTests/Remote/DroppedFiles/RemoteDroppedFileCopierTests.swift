@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Copying one dropped file to a host, with a local shell standing in for `ssh` and the host.
@@ -47,8 +48,9 @@ struct RemoteDroppedFileCopierTests {
         let launch = RemoteDroppedFileCopier().processLaunch("devbox", "HOST_COMMAND", ["-o", "ControlPath=/tmp/shared"])
 
         #expect(launch.executablePath == "/usr/bin/ssh")
-        #expect(launch.arguments == ["-T"] + RemoteHostCommandRunner.nonInteractiveSSHOptions
-            + ["-o", "ControlPath=/tmp/shared", "devbox", "HOST_COMMAND"])
+        #expect(
+            launch.arguments == ["-T"] + RemoteHostCommandRunner.nonInteractiveSSHOptions
+                + ["-o", "ControlPath=/tmp/shared", "devbox", "HOST_COMMAND"])
     }
 
     @Test func aConnectionThatFailsSaysWhy() throws {
@@ -126,7 +128,8 @@ struct RemoteDroppedFileCopierTests {
         let copier = RemoteDroppedFileCopier.replacingSSH(with: "exec sleep 600")
         let cancellation = RemoteDroppedFileCopyCancellation()
 
-        let (outcome, copyDuration) = await withCheckedContinuation { (continuation: CheckedContinuation<(Result<String, any Error>, Duration), Never>) in
+        let (outcome, copyDuration) = await withCheckedContinuation {
+            (continuation: CheckedContinuation<(Result<String, any Error>, Duration), Never>) in
             DispatchQueue.global().async {
                 let started = ContinuousClock.now
                 DispatchQueue.global().asyncAfter(deadline: .now() + 0.3) { cancellation.cancel() }

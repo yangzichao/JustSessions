@@ -17,16 +17,17 @@ extension View {
         onCancelled: @escaping () -> Void,
         @ViewBuilder ghost: () -> Ghost
     ) -> some View {
-        modifier(SidebarPinDragGesture(
-            isDragged: isDragged,
-            ghostOffset: ghostOffset,
-            landingLineOffset: landingLineOffset,
-            landingLineLeadingInset: landingLineLeadingInset,
-            onChanged: onChanged,
-            onEnded: onEnded,
-            onCancelled: onCancelled,
-            ghost: ghost()
-        ))
+        modifier(
+            SidebarPinDragGesture(
+                isDragged: isDragged,
+                ghostOffset: ghostOffset,
+                landingLineOffset: landingLineOffset,
+                landingLineLeadingInset: landingLineLeadingInset,
+                onChanged: onChanged,
+                onEnded: onEnded,
+                onCancelled: onCancelled,
+                ghost: ghost()
+            ))
     }
 }
 

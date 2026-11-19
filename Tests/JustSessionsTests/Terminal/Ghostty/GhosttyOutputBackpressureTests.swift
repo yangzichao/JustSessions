@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import GhosttyTerminal
 import Testing
+
 @testable import JustSessions
 
 @MainActor

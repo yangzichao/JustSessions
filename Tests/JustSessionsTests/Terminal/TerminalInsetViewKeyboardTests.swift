@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A selected tab's terminal takes the keyboard even when SwiftUI adds its view to the window only after the tab was

@@ -8,7 +8,8 @@ struct TerminalTabsToReopen: Codable, Equatable {
 
     static func load(from userDefaults: UserDefaults) -> Self {
         guard let data = userDefaults.data(forKey: userDefaultsKey),
-              let saved = try? JSONDecoder().decode(Self.self, from: data) else { return Self() }
+            let saved = try? JSONDecoder().decode(Self.self, from: data)
+        else { return Self() }
         return saved
     }
 

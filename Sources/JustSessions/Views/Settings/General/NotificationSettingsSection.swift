@@ -13,18 +13,23 @@ struct NotificationSettingsSection: View {
                     .font(ThemeFont.heading)
                 HelpPopoverButton(
                     title: "Notifications",
-                    explanation: "Supports Claude Code, Codex, Antigravity, Pi, OpenCode, and Kiro CLI, on this Mac or an SSH host, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session."
+                    explanation:
+                        "Supports Claude Code, Codex, Antigravity, Pi, OpenCode, and Kiro CLI, on this Mac or an SSH host, including sessions running in tmux without an open tab. Sessions you are viewing do not notify you. Click a notification to open its session."
                 )
                 .accessibilityIdentifier("settings.help.notifications")
             }
-            Toggle("Needs my input, such as a permission prompt", isOn: Binding(
-                get: { settingsStore.preferences.notifiesWhenInputNeeded },
-                set: { settingsStore.setNotifiesWhenInputNeeded($0) }
-            ))
-            Toggle("Finishes its turn", isOn: Binding(
-                get: { settingsStore.preferences.notifiesWhenTurnFinishes },
-                set: { settingsStore.setNotifiesWhenTurnFinishes($0) }
-            ))
+            Toggle(
+                "Needs my input, such as a permission prompt",
+                isOn: Binding(
+                    get: { settingsStore.preferences.notifiesWhenInputNeeded },
+                    set: { settingsStore.setNotifiesWhenInputNeeded($0) }
+                ))
+            Toggle(
+                "Finishes its turn",
+                isOn: Binding(
+                    get: { settingsStore.preferences.notifiesWhenTurnFinishes },
+                    set: { settingsStore.setNotifiesWhenTurnFinishes($0) }
+                ))
             if isTurnedOffInSystemSettings {
                 Text("Notifications for JustSessions are turned off in System Settings > Notifications.")
                     .font(ThemeFont.caption)

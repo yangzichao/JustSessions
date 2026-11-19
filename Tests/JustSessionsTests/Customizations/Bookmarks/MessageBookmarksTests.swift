@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct MessageBookmarksTests {
@@ -142,14 +143,18 @@ struct MessageBookmarksTests {
         let moved = TranscriptPageIdentity.entryID(record: 1, part: 1)
         bookmarks.update(a, entryID: moved, snippet: "Short and longer", conversationID: conversationID)
 
-        #expect(bookmarks.bookmarks(forConversationID: conversationID)
-            == [MessageBookmark(letter: "a", entryID: moved, kind: .assistant, snippet: "Short and longer"),
-                MessageBookmark(letter: "b", entryID: id(5), kind: .assistant, snippet: "Other")])
+        #expect(
+            bookmarks.bookmarks(forConversationID: conversationID)
+                == [
+                    MessageBookmark(letter: "a", entryID: moved, kind: .assistant, snippet: "Short and longer"),
+                    MessageBookmark(letter: "b", entryID: id(5), kind: .assistant, snippet: "Other"),
+                ])
 
         let movedA = bookmarks.bookmarks(forConversationID: conversationID)[0]
         bookmarks.update(movedA, entryID: id(5), snippet: "Other", conversationID: conversationID)
 
-        #expect(bookmarks.bookmarks(forConversationID: conversationID)
-            == [MessageBookmark(letter: "b", entryID: id(5), kind: .assistant, snippet: "Other")])
+        #expect(
+            bookmarks.bookmarks(forConversationID: conversationID)
+                == [MessageBookmark(letter: "b", entryID: id(5), kind: .assistant, snippet: "Other")])
     }
 }

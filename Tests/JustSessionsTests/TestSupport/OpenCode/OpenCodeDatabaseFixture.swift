@@ -10,7 +10,8 @@ struct OpenCodeDatabaseFixture {
     init(file: URL, createsTables: Bool = true) throws {
         self.file = file
         guard createsTables else { return }
-        try execute("""
+        try execute(
+            """
             CREATE TABLE session (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, parent_id TEXT, slug TEXT NOT NULL,
                 directory TEXT NOT NULL, title TEXT NOT NULL, version TEXT NOT NULL, revert TEXT,
                 time_created INTEGER NOT NULL, time_updated INTEGER NOT NULL, time_archived INTEGER);
@@ -83,8 +84,12 @@ struct OpenCodeDatabaseFixture {
         try run("BEGIN", in: database)
         for (index, text) in texts.enumerated() {
             let messageID = String(format: "msg_%06d", index)
-            try run("INSERT INTO message VALUES (?, ?, ?, ?, ?)", [messageID, session, Int64(index), Int64(index), try Self.json(["role": "user"])], in: database)
-            try run("INSERT INTO part VALUES (?, ?, ?, 1, 1, ?)", ["prt_\(messageID)", messageID, session, try Self.json(["type": "text", "text": text])], in: database)
+            try run(
+                "INSERT INTO message VALUES (?, ?, ?, ?, ?)",
+                [messageID, session, Int64(index), Int64(index), try Self.json(["role": "user"])], in: database)
+            try run(
+                "INSERT INTO part VALUES (?, ?, ?, 1, 1, ?)",
+                ["prt_\(messageID)", messageID, session, try Self.json(["type": "text", "text": text])], in: database)
         }
         try run("COMMIT", in: database)
     }
@@ -99,8 +104,9 @@ struct OpenCodeDatabaseFixture {
         defer { sqlite3_close(database) }
         try run("BEGIN", in: database)
         for message in messages {
-            try run("INSERT INTO message VALUES (?, ?, ?, ?, ?)",
-                    [message.id, message.session, message.createdAt, message.createdAt, message.data], in: database)
+            try run(
+                "INSERT INTO message VALUES (?, ?, ?, ?, ?)",
+                [message.id, message.session, message.createdAt, message.createdAt, message.data], in: database)
         }
         for part in parts {
             try run("INSERT INTO part VALUES (?, ?, ?, 1, 1, ?)", [part.id, part.message, part.session, part.data], in: database)
@@ -145,9 +151,11 @@ struct OpenCodeDatabaseFixture {
     }
 
     private func failure(_ database: OpaquePointer, _ sql: String) -> NSError {
-        NSError(domain: "OpenCodeDatabaseFixture", code: 2, userInfo: [
-            NSLocalizedDescriptionKey: "\(String(cString: sqlite3_errmsg(database))): \(sql)",
-        ])
+        NSError(
+            domain: "OpenCodeDatabaseFixture", code: 2,
+            userInfo: [
+                NSLocalizedDescriptionKey: "\(String(cString: sqlite3_errmsg(database))): \(sql)"
+            ])
     }
 
     private static func json(_ object: [String: Any]) throws -> String {

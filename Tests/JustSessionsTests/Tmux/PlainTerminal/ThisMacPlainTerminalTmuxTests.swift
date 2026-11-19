@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A plain terminal's shell on this Mac runs in a tmux session of its tab's own: it outlives a quit, and ends with its
@@ -19,8 +20,9 @@ struct ThisMacPlainTerminalTmuxTests {
         #expect(TmuxSessionName.isPlainTerminal(named: tmuxSessionName))
         #expect(fixture.paneValue("#{history_limit}", of: tmuxSessionName) == "\(PlainTerminalTmuxHistoryLimit.lineCount)")
         // A CLI's session started later keeps tmux's default.
-        #expect(fixture.sandbox.tmuxOutput(["show-options", "-gv", "history-limit"])
-            == "\(PlainTerminalTmuxHistoryLimit.tmuxDefaultLineCount)\n")
+        #expect(
+            fixture.sandbox.tmuxOutput(["show-options", "-gv", "history-limit"])
+                == "\(PlainTerminalTmuxHistoryLimit.tmuxDefaultLineCount)\n")
         #expect(tab.closingNeed == .plainTerminal)
         #expect(!tab.canKeepCLIRunningAfterClose)
 

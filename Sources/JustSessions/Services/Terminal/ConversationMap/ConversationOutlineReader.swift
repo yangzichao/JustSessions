@@ -8,10 +8,11 @@ actor ConversationOutlineReader {
     /// since each page reopens the database (TranscriptPageSource.swift:47-53; SessionMessageTextReader.swift:13-17).
     /// Tool calls are left unmerged: the builder merges them itself, recording each run's last record.
     static func pageLimits(for provider: ConversationProvider) -> TranscriptPageLimits {
-        var limits = switch provider {
-        case .opencode, .antigravity: SessionMessageTextReader.wholeSessionLimits
-        default: TranscriptPageLimits(targetEntryCount: 1_000, maximumRecordCount: 8_192, targetByteCount: 8 << 20)
-        }
+        var limits =
+            switch provider {
+            case .opencode, .antigravity: SessionMessageTextReader.wholeSessionLimits
+            default: TranscriptPageLimits(targetEntryCount: 1_000, maximumRecordCount: 8_192, targetByteCount: 8 << 20)
+            }
         limits.maximumMergedToolCallCount = 0
         return limits
     }
@@ -34,16 +35,17 @@ actor ConversationOutlineReader {
     init(_ conversation: Conversation) {
         self.conversation = conversation
         limits = Self.pageLimits(for: conversation.provider)
-        source = TranscriptPageSource(file: conversation.sourceFile, provider: conversation.provider,
-                                      sessionID: conversation.sessionID, isSubagentTranscript: conversation.isSubagent,
-                                      decodesImages: false)
+        source = TranscriptPageSource(
+            file: conversation.sourceFile, provider: conversation.provider,
+            sessionID: conversation.sessionID, isSubagentTranscript: conversation.isSubagent,
+            decodesImages: false)
     }
 
     func hasChanged() -> Bool { !hasRead || ConversationOutlineChangeStamp(of: conversation) != readStamp }
 
     /// The outline after reading what changed; nil when no block changed since the last outline returned.
     func update() async throws -> ConversationOutline? {
-        let stamp = ConversationOutlineChangeStamp(of: conversation)   // before reading: anything appended meanwhile shows next check
+        let stamp = ConversationOutlineChangeStamp(of: conversation)  // before reading: anything appended meanwhile shows next check
         let updated: ReadOutline
         do {
             do {
@@ -51,18 +53,26 @@ actor ConversationOutlineReader {
                     let read = try OpenCodeConversationOutline.read(conversation, extending: outline, prefix: openCodePrefix)
                     updated = ReadOutline(outline: read.outline, lineage: nil)
                     openCodePrefix = read.prefix
-                } else if let extended = try await extended() { updated = extended } else { updated = try await readInFull() }
+                } else if let extended = try await extended() {
+                    updated = extended
+                } else {
+                    updated = try await readInFull()
+                }
             } catch TranscriptPagingError.sourceChanged {
-                updated = try await readInFull()   // shrank while its index was scanned (TranscriptFileIndex.swift:55)
+                updated = try await readInFull()  // shrank while its index was scanned (TranscriptFileIndex.swift:55)
             }
         } catch is CancellationError {
-            throw CancellationError()   // nothing recorded: the next watch reads again
+            throw CancellationError()  // nothing recorded: the next watch reads again
         } catch {
-            readStamp = stamp; hasRead = true   // tried again once the file changes again
+            readStamp = stamp
+            hasRead = true  // tried again once the file changes again
             throw error
         }
         let isNew = !hasRead || updated.outline.blocks != outline.blocks
-        outline = updated.outline; outlineLineage = updated.lineage; readStamp = stamp; hasRead = true
+        outline = updated.outline
+        outlineLineage = updated.lineage
+        readStamp = stamp
+        hasRead = true
         return isNew ? updated.outline : nil
     }
 
@@ -75,12 +85,14 @@ actor ConversationOutlineReader {
         guard conversation.provider != .opencode, conversation.provider != .antigravity else { return nil }
         guard let resume = ConversationOutlineBuilder.resumePoint(in: outline.blocks) else { return nil }
         let anchor = outline.blocks[resume.keptCount]
-        var page = try await source.read(.around(TranscriptPageIdentity.entryID(record: resume.record, part: 0)),
-                                         refreshIndex: true, limits: limits, preparesMarkdown: false)
+        var page = try await source.read(
+            .around(TranscriptPageIdentity.entryID(record: resume.record, part: 0)),
+            refreshIndex: true, limits: limits, preparesMarkdown: false)
         let lineage = page.sourceLineage
         guard lineage == outlineLineage,
-              let first = page.entries.first(where: ConversationOutlineBuilder.makesBlock),
-              ConversationOutlineBuilder.startsLike(anchor, first) else { return nil }
+            let first = page.entries.first(where: ConversationOutlineBuilder.makesBlock),
+            ConversationOutlineBuilder.startsLike(anchor, first)
+        else { return nil }
         var builder = ConversationOutlineBuilder(keeping: outline.blocks[..<resume.keptCount])
         builder.append(page.entries)
         while page.hasLater {

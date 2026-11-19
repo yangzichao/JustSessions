@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteToolFoldersTests {
@@ -18,9 +19,10 @@ struct RemoteToolFoldersTests {
 
     @Test func aScriptFindsARelativeFolderInTheHome() throws {
         let script = "printf '%s|%s' " + Self.custom.shellPath(for: .pi) + " " + Self.custom.shellPath(for: .claude)
-        let result = try #require(BoundedProcessRunner.result(
-            ofExecutable: "/bin/sh", arguments: ["-c", script], environment: ["HOME": "/home/me"], timeout: 10
-        ))
+        let result = try #require(
+            BoundedProcessRunner.result(
+                ofExecutable: "/bin/sh", arguments: ["-c", script], environment: ["HOME": "/home/me"], timeout: 10
+            ))
 
         #expect(result.output == "/home/me/.pi/agent/sessions|/data/my claude")
     }
@@ -47,16 +49,20 @@ struct RemoteToolFoldersTests {
         let claudeFolder = root.appendingPathComponent("claude config")
         let projectFolder = claudeFolder.appendingPathComponent("projects/-home-me-paper")
         try FileManager.default.createDirectory(at: projectFolder, withIntermediateDirectories: true)
-        try FileManager.default.createDirectory(at: remoteHome.appendingPathComponent(".claude/projects/-home-me-paper"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: remoteHome.appendingPathComponent(".claude/projects/-home-me-paper"), withIntermediateDirectories: true)
         let sessionID = UUID().uuidString.lowercased()
         let transcript = #"{"type":"user","cwd":"/home/me/paper","message":{"content":"Draft intro"}}"# + "\n"
         try transcript.write(to: projectFolder.appendingPathComponent("\(sessionID).jsonl"), atomically: true, encoding: .utf8)
         // The standard folder holds another session, which isn't the host's.
-        try transcript.write(to: remoteHome.appendingPathComponent(".claude/projects/-home-me-paper/\(UUID().uuidString.lowercased()).jsonl"), atomically: true, encoding: .utf8)
+        try transcript.write(
+            to: remoteHome.appendingPathComponent(".claude/projects/-home-me-paper/\(UUID().uuidString.lowercased()).jsonl"),
+            atomically: true, encoding: .utf8)
         var folders = RemoteToolFolders.standard
         folders.claude = claudeFolder.path
         let mirror = RemoteSessionMirror(
-            cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path, toolFoldersLookup: { [folders] _ in folders }
+            cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path,
+            toolFoldersLookup: { [folders] _ in folders }
         )
 
         let conversations = try RemoteSessionDiscovery(mirror: mirror).discover(host: "devbox")

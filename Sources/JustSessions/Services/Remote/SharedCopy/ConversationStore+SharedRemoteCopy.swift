@@ -37,7 +37,8 @@ extension ConversationStore {
             try? await coordinator.withAccess(to: [.ssh(host)]) { [weak self] in
                 guard await self?.canReadRemoteHostCopy(host, token: token) == true else { return }
                 let hostConversations = try discovery.readMirror(host: host)
-                await self?.applyRemoteHostCopy(host, hostConversations: hostConversations, refreshedAt: refreshedAt, status: status, token: token)
+                await self?.applyRemoteHostCopy(
+                    host, hostConversations: hostConversations, refreshedAt: refreshedAt, status: status, token: token)
             }
         }
     }

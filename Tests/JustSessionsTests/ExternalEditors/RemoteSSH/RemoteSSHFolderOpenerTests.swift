@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteSSHFolderOpenerTests {
@@ -14,8 +15,9 @@ struct RemoteSSHFolderOpenerTests {
 
         try await RemoteSSHFolderOpener.open(path: "/srv/my app", on: "devbox", withCommandLineToolAt: tool)
 
-        #expect(try String(contentsOf: argumentsFile, encoding: .utf8)
-            == "--folder-uri\nvscode-remote://ssh-remote+devbox/srv/my%20app\n")
+        #expect(
+            try String(contentsOf: argumentsFile, encoding: .utf8)
+                == "--folder-uri\nvscode-remote://ssh-remote+devbox/srv/my%20app\n")
     }
 
     @Test func reportsWhatAFailingToolPrinted() async throws {

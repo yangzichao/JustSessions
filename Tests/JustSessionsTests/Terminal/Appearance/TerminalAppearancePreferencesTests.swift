@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -73,8 +74,9 @@ struct TerminalAppearancePreferencesTests {
         let key = TerminalAppearancePreferences.userDefaultsKey
 
         settings.userDefaults.set(Data(#"{"mode":"sepia","fontFamily":"menlo","fontSize":18}"#.utf8), forKey: key)
-        #expect(TerminalAppearanceStore(userDefaults: settings.userDefaults).preferences
-            == TerminalAppearancePreferences(mode: .matchApp, fontFamily: .named("Menlo"), fontSize: 18))
+        #expect(
+            TerminalAppearanceStore(userDefaults: settings.userDefaults).preferences
+                == TerminalAppearancePreferences(mode: .matchApp, fontFamily: .named("Menlo"), fontSize: 18))
 
         settings.userDefaults.set(Data(#"{"mode":"dark","fontSize":"large"}"#.utf8), forKey: key)
         #expect(TerminalAppearancePreferences.load(from: settings.userDefaults) == TerminalAppearancePreferences(mode: .dark))

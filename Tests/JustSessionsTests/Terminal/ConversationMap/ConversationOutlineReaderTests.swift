@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A tab's outline as its file changes (TAB-10, PERF-89): extended from the last block's record when the file grew, read
@@ -146,8 +147,12 @@ struct ConversationOutlineReaderTests {
         #expect(sameLength == (try await Self.fullRead(fixture.conversation)))
 
         // Every record rewritten, one longer: the record read again no longer starts as its block did.
-        try Data(original.replacingOccurrences(of: "Message ", with: "Edited ").replacingOccurrences(of: "Edited 599", with: "Edited 599, longer").utf8)
-            .write(to: fixture.file)
+        try Data(
+            original.replacingOccurrences(of: "Message ", with: "Edited ").replacingOccurrences(
+                of: "Edited 599", with: "Edited 599, longer"
+            ).utf8
+        )
+        .write(to: fixture.file)
         let rewritten = try #require(try await reader.update())
         #expect(rewritten.blocks.first?.snippet.hasPrefix("Edited 0") == true)
         #expect(rewritten == (try await Self.fullRead(fixture.conversation)))
@@ -178,7 +183,8 @@ struct ConversationOutlineReaderTests {
         let reader = ConversationOutlineReader(conversation)
         let before = try #require(try await reader.update())
         #expect(before.blocks.last?.snippet == "Thanks")
-        let branch = #"{"type":"message","id":"b1","parentId":"a2","timestamp":"2026-09-24T10:00:09.000Z","message":{"role":"user","content":"Try another way","timestamp":1758708009000}}"#
+        let branch =
+            #"{"type":"message","id":"b1","parentId":"a2","timestamp":"2026-09-24T10:00:09.000Z","message":{"role":"user","content":"Try another way","timestamp":1758708009000}}"#
         try fixture.append(SampleTranscriptLines.fileContents([branch]))
         let after = try #require(try await reader.update())
         #expect(after.blocks.last?.snippet == "Try another way")
@@ -206,9 +212,11 @@ struct ConversationOutlineReaderTests {
         try database.addSession("ses_map")
         try database.addUserPrompt("msg_a", session: "ses_map", createdAt: 1, text: "First")
         try database.addMessage("msg_b", session: "ses_map", createdAt: 2, data: ["role": "assistant"])
-        try database.addPart("prt_b1", message: "msg_b", session: "ses_map", data: [
-            "type": "tool", "tool": "bash", "state": ["status": "completed", "input": ["command": "swift test"]],
-        ])
+        try database.addPart(
+            "prt_b1", message: "msg_b", session: "ses_map",
+            data: [
+                "type": "tool", "tool": "bash", "state": ["status": "completed", "input": ["command": "swift test"]],
+            ])
         try database.addPart("prt_b2", message: "msg_b", session: "ses_map", data: ["type": "text", "text": "Reply"])
         try database.addUserPrompt("msg_c", session: "ses_map", createdAt: 3, text: "Thanks")
         let conversation = Conversation.fixture(provider: .opencode, sessionID: "ses_map", sourceFile: database.file)

@@ -1,6 +1,7 @@
 import AppKit
 import GhosttyTerminal
 import Testing
+
 @testable import JustSessions
 
 /// The grid a terminal lays its text out at, for a test that clicks a given cell.

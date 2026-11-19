@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// What ⌘F searches in a tab: the conversation of a tab linked to a session, the terminal otherwise.

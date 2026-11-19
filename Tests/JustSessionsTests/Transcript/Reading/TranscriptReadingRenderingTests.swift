@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -22,7 +23,8 @@ struct TranscriptReadingRenderingTests {
             .background(ThemePalette.contentSurface)
             .defaultAppStorage(settings.userDefaults)
             for scheme in [ColorScheme.light, .dark] {
-                let fixture = ThemeSurfaceRenderingFixture(content: AnyView(content), size: CGSize(width: width, height: 920), colorScheme: scheme)
+                let fixture = ThemeSurfaceRenderingFixture(
+                    content: AnyView(content), size: CGSize(width: width, height: 920), colorScheme: scheme)
                 defer { fixture.close() }
                 let bitmap = try await fixture.capture(named: "reading-preview-\(Int(width))-\(scheme)")
                 #expect(bitmap.pixelsWide > 0 && bitmap.pixelsHigh > 0)
@@ -39,13 +41,14 @@ struct TranscriptReadingRenderingTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier())
-        let conversation = Conversation(provider: .claude, sessionID: "reading-window-fixture", projectPath: directory.path,
-                                        suggestedTitle: "Read before you resume", updatedAt: .now, sourceFile: sourceFile)
+        let conversation = Conversation(
+            provider: .claude, sessionID: "reading-window-fixture", projectPath: directory.path,
+            suggestedTitle: "Read before you resume", updatedAt: .now, sourceFile: sourceFile)
         let content = SessionReadingView(
             store: store, conversation: conversation, readingPositionStore: TranscriptReadingPositionStore(),
             requests: SessionReadingRequests()
         )
-            .defaultAppStorage(settings.userDefaults)
+        .defaultAppStorage(settings.userDefaults)
         let fixture = ThemeSurfaceRenderingFixture(content: AnyView(content), size: CGSize(width: 760, height: 900), colorScheme: .light)
         defer { fixture.close() }
         let bitmap = try await fixture.capture(named: "independent-session-reader")
@@ -59,15 +62,18 @@ struct TranscriptReadingRenderingTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let conversation = TranscriptScrollViewFixture.conversation("A screenshot from a tool")
-        let transcript = TranscriptContent(entries: [
-            .init(id: 0, content: .userMessage("What is in this?"), timestamp: nil, startsTurn: true),
-            .init(id: 1, content: .userImage(SampleTranscriptImage.image), timestamp: nil, startsTurn: false),
-            .init(id: 2, content: .toolCalls(["screenshot"]), timestamp: nil, startsTurn: true),
-            .init(id: 3, content: .toolResultImage(TranscriptImage(base64Encoded: "AAAA")), timestamp: nil, startsTurn: false),
-        ], omittedEntryCount: 0)
-        let content = TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: TranscriptReadingPositionStore())
-            .background(ThemePalette.contentSurface)
-            .defaultAppStorage(settings.userDefaults)
+        let transcript = TranscriptContent(
+            entries: [
+                .init(id: 0, content: .userMessage("What is in this?"), timestamp: nil, startsTurn: true),
+                .init(id: 1, content: .userImage(SampleTranscriptImage.image), timestamp: nil, startsTurn: false),
+                .init(id: 2, content: .toolCalls(["screenshot"]), timestamp: nil, startsTurn: true),
+                .init(id: 3, content: .toolResultImage(TranscriptImage(base64Encoded: "AAAA")), timestamp: nil, startsTurn: false),
+            ], omittedEntryCount: 0)
+        let content = TranscriptScrollView(
+            conversation: conversation, transcript: transcript, positionStore: TranscriptReadingPositionStore()
+        )
+        .background(ThemePalette.contentSurface)
+        .defaultAppStorage(settings.userDefaults)
         let fixture = ThemeSurfaceRenderingFixture(content: AnyView(content), size: CGSize(width: 820, height: 920), colorScheme: .light)
         defer { fixture.close() }
 
@@ -88,11 +94,12 @@ struct TranscriptReadingRenderingTests {
     }
 
     private var sampleTranscript: TranscriptContent {
-        TranscriptContent(entries: [
-            .init(id: 0, content: .userMessage("帮我整理这次会话的改动，先阅读，再决定是否继续。"), timestamp: nil, startsTurn: true),
-            .init(id: 1, content: .toolCalls(["Read Sources/Preview.swift", "swift build"]), timestamp: nil, startsTurn: true),
-            .init(id: 2, content: .assistantMessage(markdown), timestamp: nil, startsTurn: false),
-        ], omittedEntryCount: 0)
+        TranscriptContent(
+            entries: [
+                .init(id: 0, content: .userMessage("帮我整理这次会话的改动，先阅读，再决定是否继续。"), timestamp: nil, startsTurn: true),
+                .init(id: 1, content: .toolCalls(["Read Sources/Preview.swift", "swift build"]), timestamp: nil, startsTurn: true),
+                .init(id: 2, content: .assistantMessage(markdown), timestamp: nil, startsTurn: false),
+            ], omittedEntryCount: 0)
     }
 
     private var markdown: String {

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Hosts list their sessions at different times; each reopened tab still lands in its saved place.
@@ -25,7 +26,8 @@ struct PendingTabReopeningTests {
 
     @Test func aTabGoesBeforeTheFirstReopenedTabSavedAfterIt() {
         var pending = PendingTabReopening(tabs: tabs(4))
-        let second = UUID(), fourth = UUID()
+        let second = UUID()
+        let fourth = UUID()
         pending.recordReopenedTab(id: second, savedPosition: 1)
         pending.recordReopenedTab(id: fourth, savedPosition: 3)
 
@@ -35,7 +37,8 @@ struct PendingTabReopeningTests {
 
     @Test func aTabSavedAfterEveryReopenedTabGoesRightAfterTheLastOfThem() {
         var pending = PendingTabReopening(tabs: tabs(3))
-        let first = UUID(), openedSinceLaunch = UUID()
+        let first = UUID()
+        let openedSinceLaunch = UUID()
         pending.recordReopenedTab(id: first, savedPosition: 0)
 
         #expect(pending.insertionIndex(forSavedPosition: 2, amongOpenTabIDs: [first, openedSinceLaunch]) == 1)

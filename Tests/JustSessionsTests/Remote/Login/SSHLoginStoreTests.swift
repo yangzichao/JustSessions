@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A host that asks for a password or a code offers Connect… on its heading, and a login opened from any window

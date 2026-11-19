@@ -9,19 +9,22 @@ struct GhosttyFontVerticalMetrics {
     let lineHeight: Double
 
     init(font: CTFont) {
-        let unitsPerEm = Self.table(font, "head").flatMap { $0.uint16(at: 18) }
+        let unitsPerEm =
+            Self.table(font, "head").flatMap { $0.uint16(at: 18) }
             ?? Self.table(font, "bhed").flatMap { $0.uint16(at: 18) }
             ?? Int(CTFontGetUnitsPerEm(font))
         let pixelsPerUnit = Double(CTFontGetSize(font)) / Double(max(unitsPerEm, 1))
         guard let hhea = Self.table(font, "hhea"), hhea.count >= 36,
-              let hheaAscent = hhea.int16(at: 4), let hheaDescent = hhea.int16(at: 6), let hheaLineGap = hhea.int16(at: 8) else {
+            let hheaAscent = hhea.int16(at: 4), let hheaDescent = hhea.int16(at: 6), let hheaLineGap = hhea.int16(at: 8)
+        else {
             lineHeight = Double(CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font))
             return
         }
         let unitsHeight: Int
         if let os2 = Self.table(font, "OS/2"), os2.count >= 78,
-           let fsSelection = os2.uint16(at: 62), let typoAscent = os2.int16(at: 68), let typoDescent = os2.int16(at: 70),
-           let typoLineGap = os2.int16(at: 72), let winAscent = os2.uint16(at: 74), let winDescent = os2.uint16(at: 76) {
+            let fsSelection = os2.uint16(at: 62), let typoAscent = os2.int16(at: 68), let typoDescent = os2.int16(at: 70),
+            let typoLineGap = os2.int16(at: 72), let winAscent = os2.uint16(at: 74), let winDescent = os2.uint16(at: 76)
+        {
             let usesTypoMetrics = fsSelection & (1 << 7) != 0
             if usesTypoMetrics {
                 unitsHeight = typoAscent - typoDescent + typoLineGap
@@ -45,14 +48,14 @@ struct GhosttyFontVerticalMetrics {
 }
 
 /// Big-endian reads, as OpenType tables store their numbers.
-private extension Data {
-    func uint16(at offset: Int) -> Int? {
+extension Data {
+    fileprivate func uint16(at offset: Int) -> Int? {
         guard offset + 2 <= count else { return nil }
         let start = startIndex + offset
         return Int(self[start]) << 8 | Int(self[start + 1])
     }
 
-    func int16(at offset: Int) -> Int? {
+    fileprivate func int16(at offset: Int) -> Int? {
         uint16(at: offset).map { Int(Int16(bitPattern: UInt16($0))) }
     }
 }

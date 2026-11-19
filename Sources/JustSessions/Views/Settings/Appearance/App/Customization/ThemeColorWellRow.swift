@@ -16,13 +16,16 @@ struct ThemeColorWellRow: View {
         GridRow {
             Text(color.localizedTitle)
             HStack(spacing: 6) {
-                ColorPicker(color.localizedTitle, selection: Binding(
-                    get: { Color(nsColor: NSColor(hexValue: value)) },
-                    set: { newColor in
-                        guard let hexValue = NSColor(newColor).sRGBHexValue else { return }
-                        onChange(hexValue)
-                    }
-                ), supportsOpacity: false)
+                ColorPicker(
+                    color.localizedTitle,
+                    selection: Binding(
+                        get: { Color(nsColor: NSColor(hexValue: value)) },
+                        set: { newColor in
+                            guard let hexValue = NSColor(newColor).sRGBHexValue else { return }
+                            onChange(hexValue)
+                        }
+                    ), supportsOpacity: false
+                )
                 .labelsHidden()
                 Button {
                     onChange(nil)

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A window shows a session whose tab is in another window by that tab: its row and project follow the tab's CLI,

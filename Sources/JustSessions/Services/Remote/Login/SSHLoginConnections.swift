@@ -67,7 +67,8 @@ final class SSHLoginConnections: @unchecked Sendable {
     func forgetEndedLogin(of host: String) {
         let directory: URL? = lock.withLock {
             guard let directory = directoriesByHost[host],
-                  !FileManager.default.fileExists(atPath: Self.controlPath(in: directory)) else { return nil }
+                !FileManager.default.fileExists(atPath: Self.controlPath(in: directory))
+            else { return nil }
             directoriesByHost.removeValue(forKey: host)
             return directory
         }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CodexRolloutTurnTrackerTests {
@@ -59,7 +60,8 @@ struct CodexRolloutTurnTrackerTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let file = directory.appendingPathComponent("rollout.jsonl")
         let firstStep = Int(try #require(CodexRolloutTurnTracker.firstLookByteCounts.first))
-        let messagesAfterTheStart = Array(repeating: CodexRolloutLines.agentMessage, count: firstStep / CodexRolloutLines.agentMessage.utf8.count + 10)
+        let messagesAfterTheStart = Array(
+            repeating: CodexRolloutLines.agentMessage, count: firstStep / CodexRolloutLines.agentMessage.utf8.count + 10)
         try CodexRolloutLines.write([CodexRolloutLines.turnStarted(at: Self.startedAt)] + messagesAfterTheStart, to: file)
 
         #expect(CodexRolloutTurnTracker().turnState(ofRolloutFile: file) == .inTurn(startedAt: Self.startedAt))

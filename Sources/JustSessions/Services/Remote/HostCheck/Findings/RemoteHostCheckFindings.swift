@@ -6,15 +6,16 @@ enum RemoteHostCheckFindings {
     static func findings(in output: RemoteHostCheckOutput, context: RemoteHostCheckContext) -> [HostCheckFinding] {
         var findings = [rsyncFinding(in: output, host: context.host)]
         guard output.reachedLoginShell else {
-            findings.append(HostCheckFinding(
-                id: "login-shell",
-                status: .problem,
-                title: AppLocalization.string("Login shell"),
-                summary: AppLocalization.string(
-                    "The check's commands didn't run in \(context.host)'s login shell, so nothing else could be checked. The app's commands start the same way, so sessions there can't start either."
-                ),
-                commandToRunYourself: RemoteHostCheckCommands.shellStartup(context.host, startup: context.shellStartup)
-            ))
+            findings.append(
+                HostCheckFinding(
+                    id: "login-shell",
+                    status: .problem,
+                    title: AppLocalization.string("Login shell"),
+                    summary: AppLocalization.string(
+                        "The check's commands didn't run in \(context.host)'s login shell, so nothing else could be checked. The app's commands start the same way, so sessions there can't start either."
+                    ),
+                    commandToRunYourself: RemoteHostCheckCommands.shellStartup(context.host, startup: context.shellStartup)
+                ))
             return findings
         }
         findings.insert(systemFinding(in: output), at: 0)

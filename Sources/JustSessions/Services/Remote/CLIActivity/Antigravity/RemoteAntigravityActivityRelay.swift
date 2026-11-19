@@ -30,7 +30,8 @@ enum RemoteAntigravityActivityRelay {
     }
 
     /// Starts the relay in the background and returns at once, so the CLI starts as before.
-    static let launchCommand = "sh -c "
+    static let launchCommand =
+        "sh -c "
         + ShellQuoting.quoted(#"command -v python3 >/dev/null 2>&1 || exit 0; python3 -c "$1" </dev/null >/dev/null 2>&1 &"#)
         + " sh " + ShellQuoting.quoted(script)
 

@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The working spinner draws its arc in the live status color of each appearance, from a Core Animation layer: the

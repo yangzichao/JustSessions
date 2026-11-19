@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The sign-ins of a store's own, with each host's command run as a local `sh` script and its check answered by the

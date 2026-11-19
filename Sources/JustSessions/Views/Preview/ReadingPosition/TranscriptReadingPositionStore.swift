@@ -7,7 +7,8 @@ enum TranscriptReadingPosition: Equatable {
 
     func resolved(in transcript: TranscriptContent) -> TranscriptReadingPosition {
         guard case .entry(let index, let offset) = self,
-              let firstIndex = transcript.positionIDs.first, let lastIndex = transcript.positionIDs.last else { return self }
+            let firstIndex = transcript.positionIDs.first, let lastIndex = transcript.positionIDs.last
+        else { return self }
         if transcript.usesEntryIDsForPositions {
             let resolvedIndex = transcript.positionIDs.first(where: { $0 >= index }) ?? lastIndex
             return .entry(index: resolvedIndex, offset: resolvedIndex == index ? offset : 0)

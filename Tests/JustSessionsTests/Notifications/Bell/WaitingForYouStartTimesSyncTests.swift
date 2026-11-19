@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The activity sync times each wait for the bell, and publishes only when a wait starts or ends, so a window does
@@ -31,7 +32,8 @@ struct WaitingForYouStartTimesSyncTests {
         let registry = ClaudeLiveSessionRegistry(configurationDirectory: directory.appendingPathComponent("claude"))
         try FileManager.default.createDirectory(at: registry.sessionsDirectory, withIntermediateDirectories: true)
         try #"{"sessionId":"\#(conversation.sessionID)","status":"waiting","waitingFor":"input needed"}"#
-            .write(to: registry.sessionsDirectory.appendingPathComponent("\(cli.processIdentifier).json"), atomically: true, encoding: .utf8)
+            .write(
+                to: registry.sessionsDirectory.appendingPathComponent("\(cli.processIdentifier).json"), atomically: true, encoding: .utf8)
         let publications = StoreChangeCounter(store) { _ = $0.waitingForYouStartTimes }
         defer { publications.cancel() }
 

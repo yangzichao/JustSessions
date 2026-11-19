@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Subagents' sessions stay out of the sidebar until Settings → General turns them on, even under a session that was
@@ -36,7 +37,8 @@ struct SidebarSubagentVisibilityTests {
                 store: store,
                 project: project,
                 parentLabel: nil,
-                pinDragging: SidebarPinDragging(drag: nil, rowFrames: SidebarRowFrames(), onDrag: { _, _, _, _ in }, onDrop: {}, onCancel: {}),
+                pinDragging: SidebarPinDragging(
+                    drag: nil, rowFrames: SidebarRowFrames(), onDrag: { _, _, _, _ in }, onDrop: {}, onCancel: {}),
                 hostProjectRows: { [] },
                 isExpanded: true,
                 sessionLimit: nil,

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs the remote tab's command against a real tmux on this Mac, with a private tmux server and home folder,
@@ -7,8 +8,10 @@ import Testing
 @Suite(.oneTmuxSandboxAtATime)
 struct RemoteTmuxKeepAliveTests {
     @Test func cliKeepsRunningAfterDisconnectAndReopeningReattaches() throws {
-        guard let tmuxPath = ["/opt/homebrew/bin/tmux", "/usr/local/bin/tmux", "/usr/bin/tmux"]
-            .first(where: FileManager.default.isExecutableFile(atPath:)) else { return }
+        guard
+            let tmuxPath = ["/opt/homebrew/bin/tmux", "/usr/local/bin/tmux", "/usr/bin/tmux"]
+                .first(where: FileManager.default.isExecutableFile(atPath:))
+        else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: URL(fileURLWithPath: tmuxPath).deletingLastPathComponent().path)
         defer { sandbox.tearDown() }
         let tmuxName = TmuxSessionName.unique(for: .claude)
@@ -44,7 +47,8 @@ struct RemoteTmuxKeepAliveTests {
         firstClient.terminate()
         firstClient.waitUntilExit()
         #expect(sandbox.hasTmuxSession(tmuxName))
-        #expect(RemoteHostStatusProbe.status(inOutput: sandbox.run(RemoteHostStatusProbe.command(on: "devbox"))).tmuxSessionNames == [tmuxName])
+        #expect(
+            RemoteHostStatusProbe.status(inOutput: sandbox.run(RemoteHostStatusProbe.command(on: "devbox"))).tmuxSessionNames == [tmuxName])
 
         // Opening it again attaches instead of starting the CLI a second time. The server waits after Esc as tmux
         // before 3.5 does, until the attach sets it to 10 ms.

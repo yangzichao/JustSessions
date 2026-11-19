@@ -19,10 +19,13 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Picker("Interface language", selection: Binding(
-                get: { languageStore.language },
-                set: { languageStore.setLanguage($0) }
-            )) {
+            Picker(
+                "Interface language",
+                selection: Binding(
+                    get: { languageStore.language },
+                    set: { languageStore.setLanguage($0) }
+                )
+            ) {
                 ForEach(languageStore.choices) { language in
                     if language == .followSystem {
                         Text("Follow System").tag(language)

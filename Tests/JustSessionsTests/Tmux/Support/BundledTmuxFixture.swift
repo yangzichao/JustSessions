@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 struct BundledTmuxFixture {
@@ -21,7 +22,8 @@ struct BundledTmuxFixture {
 
     @discardableResult
     func writeTmux(in directory: URL, version: String, hasRunningSessions: Bool = false) throws -> URL {
-        try writeExecutableScript("""
+        try writeExecutableScript(
+            """
             #!/bin/sh
             if [ "$1" = '-V' ]; then echo 'tmux \(version)'; exit 0; fi
             if [ "$3" = 'list-sessions' ]; then

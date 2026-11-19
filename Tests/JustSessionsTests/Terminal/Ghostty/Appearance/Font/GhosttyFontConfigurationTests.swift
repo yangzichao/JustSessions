@@ -2,6 +2,7 @@ import AppKit
 import CoreText
 import GhosttyTerminal
 import Testing
+
 @testable import JustSessions
 
 /// The font keys that make Ghostty draw text as SwiftTerm does. `GhosttyTextMatchesSwiftTermTests` compares the drawn
@@ -78,8 +79,9 @@ struct GhosttyFontConfigurationTests {
     @Test func cellsAreAdjustedByTheDifferenceFromSwiftTerms() {
         let lines = Self.lines(of: TerminalAppearancePreferences(), backingScaleFactor: 2)
 
-        #expect(TerminalCellPixelSize.swiftTerm(font: TerminalFontFamily.system.font(size: 13), backingScaleFactor: 2)
-            == TerminalCellPixelSize(width: 16, height: 32))
+        #expect(
+            TerminalCellPixelSize.swiftTerm(font: TerminalFontFamily.system.font(size: 13), backingScaleFactor: 2)
+                == TerminalCellPixelSize(width: 16, height: 32))
         #expect(!lines.contains { $0.hasPrefix("adjust-cell-width") })
         #expect(lines.contains("adjust-cell-height = 1"))
     }

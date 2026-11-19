@@ -17,7 +17,8 @@ struct AntigravityCLILogTail: Sendable {
         if fileSize < readByteCount { self = AntigravityCLILogTail() }
         while readByteCount < fileSize {
             guard (try? handle.seek(toOffset: readByteCount)) != nil,
-                  let chunk = try? handle.read(upToCount: Self.chunkByteCount), !chunk.isEmpty else { return }
+                let chunk = try? handle.read(upToCount: Self.chunkByteCount), !chunk.isEmpty
+            else { return }
             guard let lastNewline = chunk.lastIndex(of: UInt8(ascii: "\n")) else {
                 // The last line is still being written, unless a single line fills a whole chunk.
                 if chunk.count < Self.chunkByteCount { return }

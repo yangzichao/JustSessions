@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The store's alert as the main window shows it, in a window on screen: clicking its buttons, and a new alert
@@ -153,10 +154,11 @@ private final class StoreAlertScenario {
             defer: false
         )
         window.isReleasedWhenClosed = false
-        window.contentView = NSHostingView(rootView: StoreAlertHost(
-            store: store,
-            deletionRequest: confirming ? .conversation(session) : nil
-        ))
+        window.contentView = NSHostingView(
+            rootView: StoreAlertHost(
+                store: store,
+                deletionRequest: confirming ? .conversation(session) : nil
+            ))
         window.center()
         window.orderFrontRegardless()
     }
@@ -199,11 +201,13 @@ private final class StoreAlertScenario {
 
     /// Clicks the window's content beside its sheet, which AppKit alone would only answer with a beep.
     func clickBesideTheSheet() throws {
-        NSApp.sendEvent(try #require(NSEvent.mouseEvent(
-            with: .leftMouseDown, location: CGPoint(x: 20, y: 20), modifierFlags: [],
-            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
-            context: nil, eventNumber: 0, clickCount: 1, pressure: 1
-        )))
+        NSApp.sendEvent(
+            try #require(
+                NSEvent.mouseEvent(
+                    with: .leftMouseDown, location: CGPoint(x: 20, y: 20), modifierFlags: [],
+                    timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
+                    context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+                )))
     }
 
     /// Lets any closing finish, then expects neither an alert on screen nor one in the store.

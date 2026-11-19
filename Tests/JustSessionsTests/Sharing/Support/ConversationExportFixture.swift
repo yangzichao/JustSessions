@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 enum ConversationExportFixture {
@@ -26,11 +27,17 @@ enum ConversationExportFixture {
             case .claude:
                 records.append(["type": "user", "message": ["content": text]])
             case .codex:
-                records.append(["type": "response_item", "payload": ["type": "message", "role": "user", "content": [["type": "input_text", "text": text]]]])
+                records.append([
+                    "type": "response_item",
+                    "payload": ["type": "message", "role": "user", "content": [["type": "input_text", "text": text]]],
+                ])
             case .kiro:
                 records.append(["kind": "Prompt", "data": ["content": [["kind": "text", "data": text]]]])
             case .pi:
-                records.append(["type": "message", "id": "entry-\(index)", "parentId": index == 0 ? NSNull() : "entry-\(index - 1)", "message": ["role": "user", "content": text]])
+                records.append([
+                    "type": "message", "id": "entry-\(index)", "parentId": index == 0 ? NSNull() : "entry-\(index - 1)",
+                    "message": ["role": "user", "content": text],
+                ])
             case .antigravity, .opencode:
                 preconditionFailure("Antigravity and OpenCode sessions are databases, made above")
             }

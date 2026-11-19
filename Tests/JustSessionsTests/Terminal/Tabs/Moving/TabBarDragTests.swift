@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+
 @testable import JustSessions
 
 /// Where a dragged tab or group lands as the pointer moves: past a neighbor once it covers half of it, never past

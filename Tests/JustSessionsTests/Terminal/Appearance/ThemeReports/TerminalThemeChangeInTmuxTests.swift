@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A CLI in tmux asks for the terminal's background to pick light or dark colors. tmux answers from what it learned
@@ -33,8 +34,10 @@ struct TerminalThemeChangeInTmuxTests {
         }
         terminalView.startProcess(
             executable: sandbox.server.executablePath,
-            args: ["-L", ThisMacTmuxServer.socketName, "-f", "/dev/null", "new-session", "-A", "-s", "probe",
-                   probe.path, replyLog.path],
+            args: [
+                "-L", ThisMacTmuxServer.socketName, "-f", "/dev/null", "new-session", "-A", "-s", "probe",
+                probe.path, replyLog.path,
+            ],
             environment: sandbox.environment.map { "\($0.key)=\($0.value)" },
             execName: nil,
             currentDirectory: sandbox.project.path
@@ -71,31 +74,31 @@ struct TerminalThemeChangeInTmuxTests {
 
     /// Asks for the background every 200 ms and writes each reply on a line of its own.
     private static let backgroundProbeScript = #"""
-    #!/usr/bin/perl
-    use strict;
-    use warnings;
-    use IO::Select;
-    use Time::HiRes qw(time sleep);
-    my $log_path = shift;
-    system("/bin/stty raw -echo");
-    my $input = IO::Select->new(\*STDIN);
-    while (1) {
-        syswrite(STDOUT, "\e]11;?\e\\");
-        my $reply = "";
-        my $deadline = time + 1;
-        while (time < $deadline && $reply !~ /(\e\\|\a)$/) {
-            next unless $input->can_read(0.05);
-            my $chunk;
-            last unless sysread(STDIN, $chunk, 256);
-            $reply .= $chunk;
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+        use IO::Select;
+        use Time::HiRes qw(time sleep);
+        my $log_path = shift;
+        system("/bin/stty raw -echo");
+        my $input = IO::Select->new(\*STDIN);
+        while (1) {
+            syswrite(STDOUT, "\e]11;?\e\\");
+            my $reply = "";
+            my $deadline = time + 1;
+            while (time < $deadline && $reply !~ /(\e\\|\a)$/) {
+                next unless $input->can_read(0.05);
+                my $chunk;
+                last unless sysread(STDIN, $chunk, 256);
+                $reply .= $chunk;
+            }
+            $reply =~ s/\e/ESC/g;
+            open(my $log, ">>", $log_path) or die;
+            print $log "$reply\n";
+            close $log;
+            sleep 0.2;
         }
-        $reply =~ s/\e/ESC/g;
-        open(my $log, ">>", $log_path) or die;
-        print $log "$reply\n";
-        close $log;
-        sleep 0.2;
-    }
-    """#
+        """#
 
     private static func lastReply(in log: URL) -> String? {
         (try? String(contentsOf: log, encoding: .utf8))?.split(separator: "\n").last.map(String.init)

@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// Close all tabs in group… asks once for every tab, and only what a single tab's close would ask.
@@ -23,15 +24,18 @@ struct SeveralTabsClosingQuestionTests {
         #expect(question([.canKeepCLIRunning, .plainTerminal]) == .keepOrEndCLIs(alsoStopsOthers: true))
         #expect(question([.canKeepCLIRunning, .cliStopsWithTab]) == .keepOrEndCLIs(alsoStopsOthers: true))
         // A plain terminal you chose to close without asking still stops, so the question still says so.
-        #expect(question([.canKeepCLIRunning, .plainTerminal], plainTerminalCloseChoice: .closeWithoutAsking)
-            == .keepOrEndCLIs(alsoStopsOthers: true))
+        #expect(
+            question([.canKeepCLIRunning, .plainTerminal], plainTerminalCloseChoice: .closeWithoutAsking)
+                == .keepOrEndCLIs(alsoStopsOthers: true))
     }
 
     @Test func aSavedChoiceClosesTmuxCLIsWithoutAsking() {
-        #expect(question([.canKeepCLIRunning, .canKeepCLIRunning], tabCloseChoice: .keepRunning)
-            == .closeWithoutAsking)
-        #expect(question([.canKeepCLIRunning, .plainTerminal], tabCloseChoice: .endSession, plainTerminalCloseChoice: .closeWithoutAsking)
-            == .closeWithoutAsking)
+        #expect(
+            question([.canKeepCLIRunning, .canKeepCLIRunning], tabCloseChoice: .keepRunning)
+                == .closeWithoutAsking)
+        #expect(
+            question([.canKeepCLIRunning, .plainTerminal], tabCloseChoice: .endSession, plainTerminalCloseChoice: .closeWithoutAsking)
+                == .closeWithoutAsking)
     }
 
     /// Tabs on hosts that each saved a choice close without asking, each as its host's choice says.
@@ -48,13 +52,15 @@ struct SeveralTabsClosingQuestionTests {
         let askingHostTabs: [(need: TabClosingNeed, tabCloseChoice: TabCloseChoice)] = [
             (.canKeepCLIRunning, .keepRunning), (.canKeepCLIRunning, .askEachTime),
         ]
-        #expect(SeveralTabsClosingQuestion(tabs: askingHostTabs, plainTerminalCloseChoice: .askEachTime)
-            == .keepOrEndCLIs(alsoStopsOthers: false))
+        #expect(
+            SeveralTabsClosingQuestion(tabs: askingHostTabs, plainTerminalCloseChoice: .askEachTime)
+                == .keepOrEndCLIs(alsoStopsOthers: false))
         let startedNothingOnAskingHost: [(need: TabClosingNeed, tabCloseChoice: TabCloseChoice)] = [
             (.canKeepCLIRunning, .keepRunning), (.nothingStarted, .askEachTime),
         ]
-        #expect(SeveralTabsClosingQuestion(tabs: startedNothingOnAskingHost, plainTerminalCloseChoice: .askEachTime)
-            == .closeWithoutAsking)
+        #expect(
+            SeveralTabsClosingQuestion(tabs: startedNothingOnAskingHost, plainTerminalCloseChoice: .askEachTime)
+                == .closeWithoutAsking)
     }
 
     /// The saved choice answers for the CLIs in tmux, but a tab whose CLI or shell stops still asks first.
@@ -66,8 +72,9 @@ struct SeveralTabsClosingQuestionTests {
     @Test func tabsWhoseCLIsOrShellsStopAskWhetherToStopThem() {
         #expect(question([.plainTerminal, .cliStopsWithTab]) == .stopEverything)
         #expect(question([.cliStopsWithTab], plainTerminalCloseChoice: .closeWithoutAsking) == .stopEverything)
-        #expect(question([.plainTerminal, .plainTerminal], plainTerminalCloseChoice: .closeWithoutAsking)
-            == .closeWithoutAsking)
+        #expect(
+            question([.plainTerminal, .plainTerminal], plainTerminalCloseChoice: .closeWithoutAsking)
+                == .closeWithoutAsking)
     }
 
     @Test func tabsThatStopNothingCloseWithoutAsking() {
@@ -75,15 +82,21 @@ struct SeveralTabsClosingQuestionTests {
     }
 
     @Test func eachTabsNeedFollowsTheOrderASingleTabsCloseChecks() {
-        #expect(TabClosingNeed(isWaitingToBeShown: true, closingStopsNothing: true, canKeepCLIRunningAfterClose: true, isPlainTerminal: true)
-            == .nothingStarted)
-        #expect(TabClosingNeed(isWaitingToBeShown: false, closingStopsNothing: true, canKeepCLIRunningAfterClose: false, isPlainTerminal: true)
-            == .alreadyEnded)
-        #expect(TabClosingNeed(isWaitingToBeShown: false, closingStopsNothing: false, canKeepCLIRunningAfterClose: true, isPlainTerminal: true)
-            == .canKeepCLIRunning)
-        #expect(TabClosingNeed(isWaitingToBeShown: false, closingStopsNothing: false, canKeepCLIRunningAfterClose: false, isPlainTerminal: true)
-            == .plainTerminal)
-        #expect(TabClosingNeed(isWaitingToBeShown: false, closingStopsNothing: false, canKeepCLIRunningAfterClose: false, isPlainTerminal: false)
-            == .cliStopsWithTab)
+        #expect(
+            TabClosingNeed(isWaitingToBeShown: true, closingStopsNothing: true, canKeepCLIRunningAfterClose: true, isPlainTerminal: true)
+                == .nothingStarted)
+        #expect(
+            TabClosingNeed(isWaitingToBeShown: false, closingStopsNothing: true, canKeepCLIRunningAfterClose: false, isPlainTerminal: true)
+                == .alreadyEnded)
+        #expect(
+            TabClosingNeed(isWaitingToBeShown: false, closingStopsNothing: false, canKeepCLIRunningAfterClose: true, isPlainTerminal: true)
+                == .canKeepCLIRunning)
+        #expect(
+            TabClosingNeed(isWaitingToBeShown: false, closingStopsNothing: false, canKeepCLIRunningAfterClose: false, isPlainTerminal: true)
+                == .plainTerminal)
+        #expect(
+            TabClosingNeed(
+                isWaitingToBeShown: false, closingStopsNothing: false, canKeepCLIRunningAfterClose: false, isPlainTerminal: false)
+                == .cliStopsWithTab)
     }
 }

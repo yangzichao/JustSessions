@@ -48,10 +48,10 @@ extension AppThemeSeeds {
     }
 }
 
-private extension TerminalColorScheme {
+extension TerminalColorScheme {
     /// The scheme with its selection kept where it still stands out from a new background, and otherwise the
     /// background blended toward the text, as imported colors without a selection color get.
-    func withSelection(standingOutFrom background: UInt32) -> TerminalColorScheme {
+    fileprivate func withSelection(standingOutFrom background: UInt32) -> TerminalColorScheme {
         let contrast = ThemeColorContrast.ratio(selectionBackground, background)
         guard contrast < AppThemeSeeds.minimumSelectionContrast else { return self }
         return TerminalColorScheme(

@@ -17,7 +17,8 @@ extension ConversationStore {
                 if session.unlistedClaudeSession != nil { stopWaitingForUnlistedSession(of: session) }
                 continue
             }
-            let record = session.host == .thisMac
+            let record =
+                session.host == .thisMac
                 ? registry.record(forProcessID: session.cliProcessID)
                 : session.terminalTitle.flatMap(RemoteClaudeSessionTitle.record(inTerminalTitle:))
             guard let record else { continue }

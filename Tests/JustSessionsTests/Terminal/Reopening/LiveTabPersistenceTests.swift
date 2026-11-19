@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -54,7 +55,10 @@ struct LiveTabPersistenceTests {
         let persistence = OpenTabPersistence()
         let firstWindow = sandbox.makeStore()
         let secondWindow = sandbox.makeStore()
-        defer { firstWindow.closeAllTerminals(); secondWindow.closeAllTerminals() }
+        defer {
+            firstWindow.closeAllTerminals()
+            secondWindow.closeAllTerminals()
+        }
         firstWindow.reopenTabsFromLastQuit(from: persistence, isEnabled: true)
         firstWindow.openPlainTerminal(in: sandbox.projectLocation)
         secondWindow.reopenTabsFromLastQuit(from: persistence, isEnabled: true)

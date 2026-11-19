@@ -32,21 +32,25 @@ enum OpenCodeSQLiteReader {
         sqlite3_busy_timeout(database, 1_000)
 
         var statement: OpaquePointer?
-        guard sqlite3_prepare_v2(database, sessionsQuery, -1, &statement, nil) == SQLITE_OK
-            || sqlite3_prepare_v2(database, sessionsQueryWithoutArchiving, -1, &statement, nil) == SQLITE_OK else { return [] }
+        guard
+            sqlite3_prepare_v2(database, sessionsQuery, -1, &statement, nil) == SQLITE_OK
+                || sqlite3_prepare_v2(database, sessionsQueryWithoutArchiving, -1, &statement, nil) == SQLITE_OK
+        else { return [] }
         defer { sqlite3_finalize(statement) }
 
         var sessions: [Session] = []
         while sqlite3_step(statement) == SQLITE_ROW {
             guard let sessionID = textColumn(statement, at: 0),
-                  let projectPath = textColumn(statement, at: 1) else { continue }
-            sessions.append(Session(
-                sessionID: sessionID,
-                projectPath: projectPath,
-                title: textColumn(statement, at: 2),
-                updatedAt: Date(timeIntervalSince1970: Double(sqlite3_column_int64(statement, 3)) / 1_000),
-                parentSessionID: textColumn(statement, at: 4)
-            ))
+                let projectPath = textColumn(statement, at: 1)
+            else { continue }
+            sessions.append(
+                Session(
+                    sessionID: sessionID,
+                    projectPath: projectPath,
+                    title: textColumn(statement, at: 2),
+                    updatedAt: Date(timeIntervalSince1970: Double(sqlite3_column_int64(statement, 3)) / 1_000),
+                    parentSessionID: textColumn(statement, at: 4)
+                ))
         }
         return sessions
     }

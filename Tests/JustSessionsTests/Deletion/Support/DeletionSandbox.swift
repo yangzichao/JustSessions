@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Session files in a temporary folder, listed by stores whose settings are the sandbox's own.
@@ -36,7 +37,8 @@ struct DeletionSandbox {
     /// A Claude Code session on the SSH host `host`, whose mirrored copy exists in the sandbox, so a session that
     /// fails to delete stays listed as it does in the app.
     func savedConversation(onHost host: String, title: String = "Remote session", updatedAt: Date = .now) throws -> Conversation {
-        let mirrorProjectFolder = directory
+        let mirrorProjectFolder =
+            directory
             .appendingPathComponent("mirror-\(host)")
             .appendingPathComponent("-home-me-project")
         try FileManager.default.createDirectory(at: mirrorProjectFolder, withIntermediateDirectories: true)
@@ -65,9 +67,10 @@ struct DeletionSandbox {
         )
     ) -> ConversationStore {
         let store = ConversationStore(
-            adapters: adapters ?? ConversationProvider.allCases.map {
-                FileBackedConversationAdapter(provider: $0, conversations: conversations)
-            },
+            adapters: adapters
+                ?? ConversationProvider.allCases.map {
+                    FileBackedConversationAdapter(provider: $0, conversations: conversations)
+                },
             userDefaults: userDefaults,
             sessionNotifier: RecordingSessionNotifier(),
             remoteDeletion: remoteDeletion,

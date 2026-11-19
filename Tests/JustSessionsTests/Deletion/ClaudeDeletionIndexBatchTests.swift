@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ClaudeDeletionIndexBatchTests {
@@ -17,8 +18,9 @@ struct ClaudeDeletionIndexBatchTests {
         let index = project.appendingPathComponent("sessions-index.json")
         try JSONSerialization.data(withJSONObject: ["entries": sessions.map { ["sessionId": $0.sessionID] }]).write(to: index)
         let batch = ClaudeDeletionIndexBatch()
-        let deletion = ClaudeConversationDeletion(configurationDirectory: directory,
-                                                  moveToTrash: { try FileManager.default.removeItem(at: $0) }, indexBatch: batch)
+        let deletion = ClaudeConversationDeletion(
+            configurationDirectory: directory,
+            moveToTrash: { try FileManager.default.removeItem(at: $0) }, indexBatch: batch)
         for session in sessions.prefix(2) { try deletion.delete(session) }
         #expect(batch.pendingCount == 2)
         // The deletion worker performs this flush when Cancel stops it between sessions.

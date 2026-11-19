@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The panes sit inside the split area's insets, around the resize area; each pane keeps a workable minimum while the
@@ -45,7 +46,8 @@ struct TerminalSplitLayoutTests {
     @Test func draggingTheResizeAreaMovesTheFractionByTheTravelledShare() {
         let total: CGFloat = 1026
         let availableLength = TerminalSplitLayout.availableLength(totalLength: total)
-        let dragged = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: availableLength / 10, totalLength: total, orientation: .sideBySide)
+        let dragged = TerminalSplitLayout.fraction(
+            startingAt: 0.5, draggedBy: availableLength / 10, totalLength: total, orientation: .sideBySide)
         #expect(abs(dragged - 0.6) < 0.0001)
     }
 

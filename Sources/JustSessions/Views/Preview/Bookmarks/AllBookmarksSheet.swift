@@ -14,8 +14,9 @@ struct AllBookmarksSheet: View {
     @FocusState private var isSearchFocused: Bool
 
     private var list: AllBookmarksList {
-        AllBookmarksList(bookmarks: store.messageBookmarks, query: MessageBookmarkQuery(searchText), requiredTags: requiredTags,
-                         conversation: store.conversation(withID:), title: store.title(for:))
+        AllBookmarksList(
+            bookmarks: store.messageBookmarks, query: MessageBookmarkQuery(searchText), requiredTags: requiredTags,
+            conversation: store.conversation(withID:), title: store.title(for:))
     }
 
     var body: some View {
@@ -31,14 +32,17 @@ struct AllBookmarksSheet: View {
                     .focused($isSearchFocused)
                     .accessibilityIdentifier("all-bookmarks.search")
                 AllBookmarksTagFilter(tags: store.messageBookmarks.allTags, selected: $requiredTags)
-                AllBookmarksRows(list: list, store: store, language: AppInterfaceLanguage(identifier: locale.identifier),
-                                 onOpen: open, onEdit: { editor.open($1, in: $0) })
+                AllBookmarksRows(
+                    list: list, store: store, language: AppInterfaceLanguage(identifier: locale.identifier),
+                    onOpen: open, onEdit: { editor.open($1, in: $0) })
                 if list.unlistedBookmarkCount > 0 {
-                    Text(list.unlistedBookmarkCount == 1
-                         ? "1 bookmark belongs to a session no host lists now."
-                         : "\(list.unlistedBookmarkCount) bookmarks belong to sessions no host lists now.")
-                        .font(ThemeFont.callout)
-                        .foregroundStyle(ThemePalette.secondaryText)
+                    Text(
+                        list.unlistedBookmarkCount == 1
+                            ? "1 bookmark belongs to a session no host lists now."
+                            : "\(list.unlistedBookmarkCount) bookmarks belong to sessions no host lists now."
+                    )
+                    .font(ThemeFont.callout)
+                    .foregroundStyle(ThemePalette.secondaryText)
                 }
             }
         } footer: {
@@ -77,8 +81,9 @@ private struct AllBookmarksTagFilter: View {
                             .foregroundStyle(isSelected ? ThemePalette.inkForeground : ThemePalette.secondaryText)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(isSelected ? AnyShapeStyle(ThemePalette.ink) : AnyShapeStyle(ThemePalette.trackFill),
-                                        in: RoundedRectangle(.small))
+                            .background(
+                                isSelected ? AnyShapeStyle(ThemePalette.ink) : AnyShapeStyle(ThemePalette.trackFill),
+                                in: RoundedRectangle(.small))
                     }
                     .buttonStyle(ThemePlainButtonStyle(cornerRadius: .small))
                     .accessibilityLabel(Text(verbatim: "#" + tag))
@@ -101,12 +106,14 @@ private struct AllBookmarksRows: View {
 
     var body: some View {
         if list.sections.isEmpty {
-            Text(store.messageBookmarks.bookmarksByConversationID.isEmpty
-                 ? "No bookmarks yet. Press ⌘D to bookmark a message."
-                 : "No bookmarks match.")
-                .font(ThemeFont.callout)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .frame(maxWidth: .infinity, minHeight: 120)
+            Text(
+                store.messageBookmarks.bookmarksByConversationID.isEmpty
+                    ? "No bookmarks yet. Press ⌘D to bookmark a message."
+                    : "No bookmarks match."
+            )
+            .font(ThemeFont.callout)
+            .foregroundStyle(ThemePalette.secondaryText)
+            .frame(maxWidth: .infinity, minHeight: 120)
         } else {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 12) {
@@ -114,10 +121,11 @@ private struct AllBookmarksRows: View {
                         VStack(alignment: .leading, spacing: 2) {
                             sessionHeader(section.conversation)
                             ForEach(section.bookmarks, id: \.letter) { bookmark in
-                                AllBookmarksRow(bookmark: bookmark, speaker: speaker(of: bookmark, in: section.conversation),
-                                                onOpen: { onOpen(bookmark, section.conversation) },
-                                                onEdit: { onEdit(section.conversation, bookmark) },
-                                                onRemove: { store.removeMessageBookmark(bookmark, in: section.conversation) })
+                                AllBookmarksRow(
+                                    bookmark: bookmark, speaker: speaker(of: bookmark, in: section.conversation),
+                                    onOpen: { onOpen(bookmark, section.conversation) },
+                                    onEdit: { onEdit(section.conversation, bookmark) },
+                                    onRemove: { store.removeMessageBookmark(bookmark, in: section.conversation) })
                             }
                         }
                     }
@@ -133,9 +141,12 @@ private struct AllBookmarksRows: View {
             Text(verbatim: store.title(for: conversation))
                 .font(ThemeFont.callout.weight(.semibold))
                 .foregroundStyle(ThemePalette.ink)
-            Text(verbatim: "\(conversation.provider.rawValue) · \(store.projectDisplayName(forProjectPath: conversation.projectDirectoryKey))")
-                .font(ThemeFont.detail)
-                .foregroundStyle(ThemePalette.secondaryText)
+            Text(
+                verbatim:
+                    "\(conversation.provider.rawValue) · \(store.projectDisplayName(forProjectPath: conversation.projectDirectoryKey))"
+            )
+            .font(ThemeFont.detail)
+            .foregroundStyle(ThemePalette.secondaryText)
         }
         .lineLimit(1)
         .accessibilityAddTraits(.isHeader)

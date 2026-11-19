@@ -43,10 +43,13 @@ struct WorkspaceSplitPaneOutlineShape: Shape {
         let notchRadius = cornerRadius
         var path = Path()
         path.move(to: CGPoint(x: bounds.minX, y: bounds.minY + radius))
-        path.addArc(tangent1End: CGPoint(x: bounds.minX, y: bounds.minY), tangent2End: CGPoint(x: bounds.maxX, y: bounds.minY), radius: radius)
-        path.addArc(tangent1End: CGPoint(x: bounds.maxX, y: bounds.minY), tangent2End: CGPoint(x: bounds.maxX, y: bounds.maxY), radius: radius)
+        path.addArc(
+            tangent1End: CGPoint(x: bounds.minX, y: bounds.minY), tangent2End: CGPoint(x: bounds.maxX, y: bounds.minY), radius: radius)
+        path.addArc(
+            tangent1End: CGPoint(x: bounds.maxX, y: bounds.minY), tangent2End: CGPoint(x: bounds.maxX, y: bounds.maxY), radius: radius)
         if toolbarSize.width <= 0 || toolbarSize.height <= 0 {
-            path.addArc(tangent1End: CGPoint(x: bounds.maxX, y: bounds.maxY), tangent2End: CGPoint(x: bounds.minX, y: bounds.maxY), radius: radius)
+            path.addArc(
+                tangent1End: CGPoint(x: bounds.maxX, y: bounds.maxY), tangent2End: CGPoint(x: bounds.minX, y: bounds.maxY), radius: radius)
         } else {
             let toolbarTop = bounds.maxY - toolbarSize.height
             let toolbarLeading = bounds.maxX - toolbarSize.width
@@ -70,7 +73,8 @@ struct WorkspaceSplitPaneOutlineShape: Shape {
                 radius: notchRadius
             )
         }
-        path.addArc(tangent1End: CGPoint(x: bounds.minX, y: bounds.maxY), tangent2End: CGPoint(x: bounds.minX, y: bounds.minY), radius: radius)
+        path.addArc(
+            tangent1End: CGPoint(x: bounds.minX, y: bounds.maxY), tangent2End: CGPoint(x: bounds.minX, y: bounds.minY), radius: radius)
         path.closeSubpath()
         return path
     }
@@ -113,12 +117,13 @@ extension TerminalPalette {
     /// A split pane's outline, by Chrome's color mixer: darker around the selected tab's pane than around the other,
     /// in Chrome's greys for a light or a dark background.
     func splitPaneOutlineColor(isSelected: Bool) -> Color {
-        let hexValue: UInt32 = switch (isSelected, isDark) {
-        case (true, false): 0x80868B
-        case (true, true): 0x9AA0A6
-        case (false, false): 0xDADCE0
-        case (false, true): 0x5F6368
-        }
+        let hexValue: UInt32 =
+            switch (isSelected, isDark) {
+            case (true, false): 0x80868B
+            case (true, true): 0x9AA0A6
+            case (false, false): 0xDADCE0
+            case (false, true): 0x5F6368
+            }
         return Color(nsColor: NSColor(hexValue: hexValue))
     }
 }

@@ -11,8 +11,6 @@ enum CustomizableThemeColor: String, CaseIterable, Identifiable, Sendable {
 
     var id: String { rawValue }
 
-    var isSurface: Bool { self != .ink }
-
     /// The color the variant was made from.
     func value(in seeds: AppThemeSeeds) -> UInt32 {
         switch self {

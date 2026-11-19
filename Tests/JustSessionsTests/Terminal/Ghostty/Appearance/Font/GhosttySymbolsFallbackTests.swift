@@ -2,6 +2,7 @@ import AppKit
 import CoreText
 import GhosttyTerminal
 import Testing
+
 @testable import JustSessions
 
 /// Ghostty draws the Nerd Font icons the terminal font lacks with the bundled symbols font, as SwiftTerm does, rather
@@ -31,11 +32,15 @@ struct GhosttySymbolsFallbackTests {
 
         #expect(families.filter { $0 != Self.symbolsFamily } == familiesWithoutSymbols)
         for icon in Self.icons {
-            #expect(Self.familyGhosttyDraws(icon, families: families, codepointMaps: codepointMaps) == Self.symbolsFamily, "U+\(Self.hex(icon))")
+            #expect(
+                Self.familyGhosttyDraws(icon, families: families, codepointMaps: codepointMaps) == Self.symbolsFamily, "U+\(Self.hex(icon))"
+            )
         }
         for character in Self.symbolsOutsideThePrivateUseAreas {
             let familyBefore = Self.firstFamily(drawing: character, in: familiesWithoutSymbols) ?? Self.symbolsFamily
-            #expect(Self.familyGhosttyDraws(character, families: families, codepointMaps: codepointMaps) == familyBefore, "U+\(Self.hex(character))")
+            #expect(
+                Self.familyGhosttyDraws(character, families: families, codepointMaps: codepointMaps) == familyBefore,
+                "U+\(Self.hex(character))")
         }
     }
 
@@ -58,10 +63,12 @@ struct GhosttySymbolsFallbackTests {
         let configuration = GhosttyAppearanceConfiguration(
             preferences: TerminalAppearancePreferences(fontFamily: fontFamily), appTheme: ResolvedAppTheme(.justSessions)
         )
-        let symbolsOnlyLines = Self.withOnlyTheSymbolsFontAsFallback(GhosttyAppearanceConfigurationTests.lines(of: configuration.terminalConfiguration))
+        let symbolsOnlyLines = Self.withOnlyTheSymbolsFontAsFallback(
+            GhosttyAppearanceConfigurationTests.lines(of: configuration.terminalConfiguration))
 
         let drawn = try await Self.drawnPixels(of: output, configuration: configuration.terminalConfiguration, theme: configuration.theme)
-        let drawnWithOnlySymbols = try await Self.drawnPixels(of: output, configuration: Self.configuration(symbolsOnlyLines), theme: configuration.theme)
+        let drawnWithOnlySymbols = try await Self.drawnPixels(
+            of: output, configuration: Self.configuration(symbolsOnlyLines), theme: configuration.theme)
         #expect(drawn == drawnWithOnlySymbols)
     }
 
@@ -120,7 +127,8 @@ struct GhosttySymbolsFallbackTests {
 
     /// The pixels of a light terminal showing `output` on one line.
     private static func drawnPixels(of output: String, configuration: TerminalConfiguration, theme: TerminalTheme) async throws -> Data {
-        let controller = TerminalController(configSource: .generated("# JustSessions test"), theme: theme, terminalConfiguration: configuration)
+        let controller = TerminalController(
+            configSource: .generated("# JustSessions test"), theme: theme, terminalConfiguration: configuration)
         let terminal = GhosttyTestTerminal(controller: controller, appearance: .aqua, frame: NSRect(x: 0, y: 0, width: 360, height: 60))
         #expect(controller.lastConfigurationIssue == nil)
         terminal.show(output)

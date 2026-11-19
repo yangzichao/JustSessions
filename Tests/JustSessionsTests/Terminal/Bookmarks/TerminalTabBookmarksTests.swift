@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// ⌘D, ⌘', and ⇧⌘' in a tab (TRM-74): ⌘D bookmarks the newest message in the session's file, ⌘' and ⇧⌘' hand the jump to
@@ -208,8 +209,10 @@ struct TerminalTabBookmarksTests {
     @Test func anEmptySessionSaysSo() async throws {
         let files = try TranscriptPagingFixture(count: 0)
         defer { files.remove() }
-        try SampleTranscriptLines.fileContents([SampleTranscriptLines.codex[0]] + Array(repeating: SampleTranscriptLines.codex[2], count: 5))
-            .write(to: files.file)
+        try SampleTranscriptLines.fileContents(
+            [SampleTranscriptLines.codex[0]] + Array(repeating: SampleTranscriptLines.codex[2], count: 5)
+        )
+        .write(to: files.file)
         let harness = try Harness(conversation: files.conversation)
         defer { harness.close() }
 
@@ -313,8 +316,9 @@ struct TerminalTabBookmarksTests {
         defer { harness.close() }
         // Listed, as a session open in a tab is, so the window's reader keeps bookmarks.
         harness.store.replaceConversations(on: .thisMac, with: [files.conversation])
-        let window = harness.readingWindows.open(files.conversation, store: harness.store,
-                                                 initialPosition: .entry(index: id(500), offset: -6))
+        let window = harness.readingWindows.open(
+            files.conversation, store: harness.store,
+            initialPosition: .entry(index: id(500), offset: -6))
         defer { window.close() }
         let controller = try #require(window.windowController as? SessionReadingWindowController)
         try await expectEventually { Self.showsAtTop(id(500), in: window) }
@@ -336,7 +340,8 @@ struct TerminalTabBookmarksTests {
         guard let contentView = window.contentView else { return false }
         contentView.layoutSubtreeIfNeeded()
         guard let controller = geometryView(in: contentView)?.controller, !controller.isRestoring,
-              let scrollView = controller.scrollView, let frame = controller.entryFrameInClipView(at: entryID) else { return false }
+            let scrollView = controller.scrollView, let frame = controller.entryFrameInClipView(at: entryID)
+        else { return false }
         return abs(frame.minY - TranscriptScrollPositionController.readableBounds(of: scrollView.contentView).minY - 6) < 1
     }
 

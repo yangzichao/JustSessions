@@ -1,12 +1,13 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ClaudeSessionIDFlagSupportTests {
     private static let helpWithFlag = """
-      -r, --resume [value]    Resume a conversation by session ID
-      --session-id <uuid>     Use a specific session ID for the conversation (must be a valid UUID)
-    """
+          -r, --resume [value]    Resume a conversation by session ID
+          --session-id <uuid>     Use a specific session ID for the conversation (must be a valid UUID)
+        """
 
     @Test func helpTextMustListTheFlagItself() {
         #expect(ClaudeSessionIDFlagSupport.helpTextListsFlag(Self.helpWithFlag))

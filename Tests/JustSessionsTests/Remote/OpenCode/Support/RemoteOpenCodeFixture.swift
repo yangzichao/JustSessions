@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// A folder that stands in for an SSH host's home, with an OpenCode database in its standard place, a fake login
@@ -23,7 +24,8 @@ struct RemoteOpenCodeFixture {
         try writeExecutableScript("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: binaryDirectory.appendingPathComponent("login-shell"))
         hostDatabase = try OpenCodeDatabaseFixture(file: dataDirectory.appendingPathComponent("opencode.db"))
         try hostDatabase.addSession(OpenCodeDeletionFixture.selectedSessionID, directory: Self.projectPath, title: "Delete me")
-        try hostDatabase.addSession(OpenCodeDeletionFixture.subagentSessionID, directory: Self.projectPath, parentID: OpenCodeDeletionFixture.selectedSessionID)
+        try hostDatabase.addSession(
+            OpenCodeDeletionFixture.subagentSessionID, directory: Self.projectPath, parentID: OpenCodeDeletionFixture.selectedSessionID)
         try hostDatabase.addSession(OpenCodeDeletionFixture.retainedSessionID, directory: Self.projectPath, title: "Keep me")
         try hostDatabase.addUserPrompt("msg_selected", session: OpenCodeDeletionFixture.selectedSessionID, createdAt: 1, text: "Delete me")
         try hostDatabase.addUserPrompt("msg_subagent", session: OpenCodeDeletionFixture.subagentSessionID, createdAt: 1, text: "Subtask")
@@ -40,13 +42,18 @@ struct RemoteOpenCodeFixture {
     }
 
     func mirroredConversation(_ sessionID: String = OpenCodeDeletionFixture.selectedSessionID) throws -> Conversation {
-        guard let conversation = try discovery.discover(host: "devbox").first(where: { $0.provider == .opencode && $0.sessionID == sessionID }) else {
+        guard
+            let conversation = try discovery.discover(host: "devbox").first(where: { $0.provider == .opencode && $0.sessionID == sessionID }
+            )
+        else {
             throw NSError(domain: "RemoteOpenCodeFixture", code: 1)
         }
         return conversation
     }
 
-    func deletion(running script: String = OpenCodeDeletionFixture.deletingScript, environment: [String: String] = [:]) throws -> RemoteConversationDeletion {
+    func deletion(running script: String = OpenCodeDeletionFixture.deletingScript, environment: [String: String] = [:]) throws
+        -> RemoteConversationDeletion
+    {
         try writeExecutableScript(script, to: binaryDirectory.appendingPathComponent("opencode"))
         return RemoteConversationDeletion(runner: runner(environment: environment), mirror: RemoteSessionMirror(cacheRoot: cacheRoot))
     }

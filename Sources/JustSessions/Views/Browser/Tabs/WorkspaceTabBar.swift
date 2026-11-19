@@ -45,7 +45,8 @@ struct WorkspaceTabBar: View {
         let dragDisplays = TabDragBetweenWindows.shared.dragDisplays(in: store)
         let groupDragsInBar = [groupDrag, dragDisplays.amongGroups]
         let shownGroupDrag = groupDragsInBar.first { $0.placement?.itemIDs == groupKeys }
-        let shownTabs = groups
+        let shownTabs =
+            groups
             .filter { !collapsedProjectKeys.contains($0.projectDirectoryKey) }
             .flatMap(\.tabs)
         // A split's two tabs, always in one group, take one tab's place.
@@ -72,7 +73,9 @@ struct WorkspaceTabBar: View {
                 HStack(spacing: WorkspaceTabMetrics.groupSpacing) {
                     ForEach(groups) { group in
                         Group {
-                            if let split = store.terminalSplits.first(where: { $0.spansProjects && $0.groupKey == group.projectDirectoryKey }) {
+                            if let split = store.terminalSplits.first(where: {
+                                $0.spansProjects && $0.groupKey == group.projectDirectoryKey
+                            }) {
                                 TerminalSplitAcrossProjectsSection(
                                     store: store,
                                     split: split,
@@ -213,12 +216,13 @@ struct WorkspaceTabBar: View {
     private func selectTabInSight(insteadOfTabsIn projectKey: String) {
         let tabProjectKeys = store.tabGroupKeys
         guard let selectedIndex = store.terminalSessions.firstIndex(where: { $0.id == store.selectedTerminalID }),
-              tabProjectKeys[selectedIndex] == projectKey,
-              let indexToSelect = TerminalTabOrder.indexToSelect(
-                  afterCollapsingGroupOfTabAt: selectedIndex,
-                  collapsedProjectKeys: collapsedProjectKeys,
-                  amongTabProjectKeys: tabProjectKeys
-              ) else { return }
+            tabProjectKeys[selectedIndex] == projectKey,
+            let indexToSelect = TerminalTabOrder.indexToSelect(
+                afterCollapsingGroupOfTabAt: selectedIndex,
+                collapsedProjectKeys: collapsedProjectKeys,
+                amongTabProjectKeys: tabProjectKeys
+            )
+        else { return }
         store.selectTerminal(store.terminalSessions[indexToSelect].id)
     }
 }

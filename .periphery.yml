@@ -1,0 +1,9 @@
+# make dead-code-check: Periphery reads the index of a separate native build in .build/periphery.
+retain_swift_ui_previews: true
+retain_codable_properties: true
+retain_equatable_properties: true
+retain_hashable_properties: true
+retain_objc_accessible: true
+relative_results: true
+strict: true
+disable_update_check: true

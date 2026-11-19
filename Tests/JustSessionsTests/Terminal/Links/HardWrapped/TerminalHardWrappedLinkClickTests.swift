@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A ⌘-click or right-click on a link a CLI broke over rows gets all of it, whichever engine draws the terminal:

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A session runs in at most one tab across the app's windows: opening it where another window has its tab shows that

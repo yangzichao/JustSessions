@@ -39,7 +39,8 @@ final class RemoteDetachedActivityReader {
     init(
         listPanes: @escaping @Sendable (String) -> RemoteTmuxPanes? = { host in
             guard let result = RemoteHostCommandRunner().run(host, RemoteTmuxPanes.command(on: host), 10),
-                  result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus else { return nil }
+                result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus
+            else { return nil }
             return RemoteTmuxPanes.panes(inOutput: result.output)
         },
         currentDate: @escaping () -> Date = Date.init
@@ -54,7 +55,8 @@ final class RemoteDetachedActivityReader {
     /// The host's last listing, unless it is too old to tell anything.
     func listing(of host: String) -> Listing? {
         guard let listing = listings[host],
-              currentDate().timeIntervalSince(listing.answeredAt) < Self.longestUseOfAListing else { return nil }
+            currentDate().timeIntervalSince(listing.answeredAt) < Self.longestUseOfAListing
+        else { return nil }
         return listing
     }
 

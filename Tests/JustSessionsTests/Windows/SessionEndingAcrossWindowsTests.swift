@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// End session, from a session's row, stops its CLI wherever it runs: in a tab of either window, or in tmux with no

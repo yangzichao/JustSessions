@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// An image pasted on a tab on an SSH host is saved on this Mac, copied there as a dropped file is, and its host path
@@ -72,9 +73,11 @@ struct TerminalSSHImagePasteTests {
     @Test func aFailedCopyRemovesTheSavedImageAndSaysWhy() async throws {
         let folder = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: folder) }
-        let fileDrop = try makeFileDrop(in: folder, copier: .replacingSSH(
-            with: "cat > /dev/null; echo 'ssh: connect to host devbox port 22: Connection refused' >&2; exit 255"
-        ))
+        let fileDrop = try makeFileDrop(
+            in: folder,
+            copier: .replacingSSH(
+                with: "cat > /dev/null; echo 'ssh: connect to host devbox port 22: Connection refused' >&2; exit 255"
+            ))
 
         fileDrop.take(try image(makePNGData()))
 

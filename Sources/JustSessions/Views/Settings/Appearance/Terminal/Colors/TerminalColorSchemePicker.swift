@@ -9,10 +9,13 @@ struct TerminalColorSchemePicker: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
-                Picker("Colors", selection: Binding(
-                    get: { appearanceStore.preferences.colorChoice },
-                    set: { appearanceStore.setColorChoice($0) }
-                )) {
+                Picker(
+                    "Colors",
+                    selection: Binding(
+                        get: { appearanceStore.preferences.colorChoice },
+                        set: { appearanceStore.setColorChoice($0) }
+                    )
+                ) {
                     Text("Match app theme").tag(TerminalColorChoice.matchAppTheme)
                     Divider()
                     ForEach(TerminalColorPreset.allCases) { preset in

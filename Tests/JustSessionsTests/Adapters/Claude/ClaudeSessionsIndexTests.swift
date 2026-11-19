@@ -1,20 +1,23 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ClaudeSessionsIndexTests {
     @Test func entriesAreFoundBySessionID() throws {
-        let index = ClaudeSessionsIndex(jsonData: Data(#"""
-        {
-          "originalPath": "/Users/me/code/app",
-          "entries": [
-            {"sessionId": "a", "projectPath": "/Users/me/code/app/Sources", "customTitle": "Renamed",
-             "firstPrompt": "Fix the build", "modified": "2026-09-24T10:00:00Z", "isSidechain": false},
-            {"sessionId": "b", "isSidechain": true},
-            {"projectPath": "/Users/me/code/no-session-id"}
-          ]
-        }
-        """#.utf8))
+        let index = ClaudeSessionsIndex(
+            jsonData: Data(
+                #"""
+                {
+                  "originalPath": "/Users/me/code/app",
+                  "entries": [
+                    {"sessionId": "a", "projectPath": "/Users/me/code/app/Sources", "customTitle": "Renamed",
+                     "firstPrompt": "Fix the build", "modified": "2026-09-24T10:00:00Z", "isSidechain": false},
+                    {"sessionId": "b", "isSidechain": true},
+                    {"projectPath": "/Users/me/code/no-session-id"}
+                  ]
+                }
+                """#.utf8))
 
         let entry = try #require(index.entry(forSessionID: "a"))
         #expect(entry.projectPath == "/Users/me/code/app/Sources")
@@ -28,9 +31,10 @@ struct ClaudeSessionsIndexTests {
     }
 
     @Test func aLaterEntryForTheSameSessionWins() {
-        let index = ClaudeSessionsIndex(jsonData: Data(
-            #"{"entries": [{"sessionId": "a", "firstPrompt": "Old"}, {"sessionId": "a", "firstPrompt": "New"}]}"#.utf8
-        ))
+        let index = ClaudeSessionsIndex(
+            jsonData: Data(
+                #"{"entries": [{"sessionId": "a", "firstPrompt": "Old"}, {"sessionId": "a", "firstPrompt": "New"}]}"#.utf8
+            ))
 
         #expect(index.entry(forSessionID: "a")?.firstPrompt == "New")
     }

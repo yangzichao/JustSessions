@@ -1,6 +1,7 @@
 import Foundation
 import SQLite3
 import Testing
+
 @testable import JustSessions
 
 struct AntigravityConversationDeletionTests {
@@ -17,14 +18,18 @@ struct AntigravityConversationDeletionTests {
         let annotations = root.appendingPathComponent("annotations/\(fixture.sessionID).pbtxt")
         try FileManager.default.createDirectory(at: annotations.deletingLastPathComponent(), withIntermediateDirectories: true)
         try Data("annotation".utf8).write(to: annotations)
-        try AntigravitySessionFixture.execute(["INSERT INTO conversation_summaries VALUES ('\(fixture.sessionID)', 'IDE', '', '[]', '2026-10-01', 'antigravity')"], at: root.appendingPathComponent("conversation_summaries.db"))
+        try AntigravitySessionFixture.execute(
+            ["INSERT INTO conversation_summaries VALUES ('\(fixture.sessionID)', 'IDE', '', '[]', '2026-10-01', 'antigravity')"],
+            at: root.appendingPathComponent("conversation_summaries.db"))
         let trash = root.appendingPathComponent("trash")
         try FileManager.default.createDirectory(at: trash, withIntermediateDirectories: true)
-        let deletion = AntigravityConversationDeletion(configurationDirectory: root, moveToTrash: { file in
-            let destination = trash.appendingPathComponent(file.lastPathComponent)
-            try FileManager.default.moveItem(at: file, to: destination)
-            return destination
-        }, isInUse: { _ in false })
+        let deletion = AntigravityConversationDeletion(
+            configurationDirectory: root,
+            moveToTrash: { file in
+                let destination = trash.appendingPathComponent(file.lastPathComponent)
+                try FileManager.default.moveItem(at: file, to: destination)
+                return destination
+            }, isInUse: { _ in false })
 
         try deletion.delete(fixture.conversation)
 
@@ -33,7 +38,10 @@ struct AntigravityConversationDeletionTests {
         #expect(FileManager.default.fileExists(atPath: trash.appendingPathComponent(fixture.sessionID + "/notes.md").path))
         #expect(FileManager.default.fileExists(atPath: trash.appendingPathComponent(annotations.lastPathComponent).path))
         #expect(FileManager.default.fileExists(atPath: other.databaseFile.path))
-        #expect(AntigravitySQLiteReader.summaries(at: root.appendingPathComponent("conversation_summaries.db")).keys.sorted() == [other.sessionID])
+        #expect(
+            AntigravitySQLiteReader.summaries(at: root.appendingPathComponent("conversation_summaries.db")).keys.sorted() == [
+                other.sessionID
+            ])
         #expect(try rowCount(in: root.appendingPathComponent("conversation_summaries.db")) == 2)
     }
 
@@ -45,11 +53,13 @@ struct AntigravityConversationDeletionTests {
         let brain = root.appendingPathComponent("brain/\(fixture.sessionID)")
         try FileManager.default.createDirectory(at: brain, withIntermediateDirectories: true)
         let staged = root.appendingPathComponent("trashed.db")
-        let deletion = AntigravityConversationDeletion(configurationDirectory: root, moveToTrash: { file in
-            guard file.pathExtension == "db" else { throw AntigravityDatabaseError.unreadable }
-            try FileManager.default.moveItem(at: file, to: staged)
-            return staged
-        }, isInUse: { _ in false })
+        let deletion = AntigravityConversationDeletion(
+            configurationDirectory: root,
+            moveToTrash: { file in
+                guard file.pathExtension == "db" else { throw AntigravityDatabaseError.unreadable }
+                try FileManager.default.moveItem(at: file, to: staged)
+                return staged
+            }, isInUse: { _ in false })
 
         #expect(throws: AntigravityDatabaseError.self) { try deletion.delete(fixture.conversation) }
         #expect(FileManager.default.fileExists(atPath: fixture.databaseFile.path))
@@ -62,7 +72,8 @@ struct AntigravityConversationDeletionTests {
         defer { try? FileManager.default.removeItem(at: root) }
         let fixture = try AntigravitySessionFixture(configurationDirectory: root)
         let deletion = AntigravityConversationDeletion(configurationDirectory: root, isInUse: { _ in false })
-        let wrongProject = Conversation.fixture(provider: .antigravity, sessionID: fixture.sessionID, projectPath: "/another/project", sourceFile: fixture.databaseFile)
+        let wrongProject = Conversation.fixture(
+            provider: .antigravity, sessionID: fixture.sessionID, projectPath: "/another/project", sourceFile: fixture.databaseFile)
         #expect(throws: ConversationDeletionError.invalidSource) { try deletion.delete(wrongProject) }
         #expect(throws: ConversationDeletionError.invalidSource) { try deletion.delete(fixture.conversation.onHost(.ssh("devbox"))) }
         let brain = root.appendingPathComponent("brain")

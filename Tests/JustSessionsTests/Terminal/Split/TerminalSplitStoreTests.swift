@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Splitting links two tabs side by side as Chrome's split view does: any number of splits, each outliving the
@@ -667,10 +668,13 @@ struct TerminalSplitStoreTests {
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
-        return (store, {
-            store.closeAllTerminals()
-            isolatedUserDefaults.removeSuite()
-        })
+        return (
+            store,
+            {
+                store.closeAllTerminals()
+                isolatedUserDefaults.removeSuite()
+            }
+        )
     }
 
     private func open(_ store: ConversationStore, _ tab: TerminalSession) -> TerminalSession {

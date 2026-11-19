@@ -95,7 +95,8 @@ enum GhosttyFontConfiguration {
         backingScaleFactor: CGFloat
     ) {
         let swiftTermCell = TerminalCellPixelSize.swiftTerm(font: swiftTermFont, backingScaleFactor: backingScaleFactor)
-        let ghosttyCell = TerminalCellPixelSize.ghostty(family: family, pointSize: swiftTermFont.pointSize, backingScaleFactor: backingScaleFactor)
+        let ghosttyCell = TerminalCellPixelSize.ghostty(
+            family: family, pointSize: swiftTermFont.pointSize, backingScaleFactor: backingScaleFactor)
         if swiftTermCell.width != ghosttyCell.width {
             builder.withCustom("adjust-cell-width", String(swiftTermCell.width - ghosttyCell.width))
         }

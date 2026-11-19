@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct KiroRemoteDeletionTests {
@@ -13,19 +14,29 @@ struct KiroRemoteDeletionTests {
             messageLines: KiroTranscriptSamples.lines
         )
         let reportFile = fixture.root.appendingPathComponent("report.txt")
-        let runner = try fixture.runner(running: KiroHomeFixture.successfulDeletionScript + "\n"
-            + "printf '%s\\n' \"$@\" \"$KIRO_HOME\" \"$PWD\" > \(ShellQuoting.quoted(reportFile.path))\n")
+        let runner = try fixture.runner(
+            running: KiroHomeFixture.successfulDeletionScript + "\n"
+                + "printf '%s\\n' \"$@\" \"$KIRO_HOME\" \"$PWD\" > \(ShellQuoting.quoted(reportFile.path))\n")
 
         try RemoteConversationDeletion(runner: runner).delete(fixture.conversation)
 
         let report = try String(contentsOf: reportFile, encoding: .utf8).split(separator: "\n").map(String.init)
-        #expect(Array(report.prefix(4)) == ["chat", "--delete-session", fixture.conversation.sessionID, fixture.remoteHome.appendingPathComponent(".kiro").path])
+        #expect(
+            Array(report.prefix(4)) == [
+                "chat", "--delete-session", fixture.conversation.sessionID, fixture.remoteHome.appendingPathComponent(".kiro").path,
+            ])
         let reportedProjectPath = URL(fileURLWithPath: try #require(report.last)).resolvingSymlinksInPath().path
         #expect(reportedProjectPath == fixture.projectDirectory.resolvingSymlinksInPath().path, "CLI report: \(report)")
         for fileExtension in ["json", "jsonl"] {
-            #expect(!FileManager.default.fileExists(atPath: fixture.sessionsDirectory.appendingPathComponent("\(fixture.conversation.sessionID).\(fileExtension)").path))
-            #expect(!FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.deletingPathExtension().appendingPathExtension(fileExtension).path))
-            #expect(FileManager.default.fileExists(atPath: fixture.sessionsDirectory.appendingPathComponent("\(retainedSessionID).\(fileExtension)").path))
+            #expect(
+                !FileManager.default.fileExists(
+                    atPath: fixture.sessionsDirectory.appendingPathComponent("\(fixture.conversation.sessionID).\(fileExtension)").path))
+            #expect(
+                !FileManager.default.fileExists(
+                    atPath: fixture.conversation.sourceFile.deletingPathExtension().appendingPathExtension(fileExtension).path))
+            #expect(
+                FileManager.default.fileExists(
+                    atPath: fixture.sessionsDirectory.appendingPathComponent("\(retainedSessionID).\(fileExtension)").path))
         }
     }
 
@@ -38,7 +49,9 @@ struct KiroRemoteDeletionTests {
         #expect(throws: RemoteConversationDeletionError.self) { try deletion.delete(fixture.conversation) }
 
         #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
-        #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.deletingPathExtension().appendingPathExtension("json").path))
+        #expect(
+            FileManager.default.fileExists(
+                atPath: fixture.conversation.sourceFile.deletingPathExtension().appendingPathExtension("json").path))
     }
 
     @Test func missingHistoryOnTheHostCountsAsDeletedAndDropsTheMirror() throws {
@@ -49,7 +62,9 @@ struct KiroRemoteDeletionTests {
         try RemoteConversationDeletion(runner: fixture.runner()).delete(fixture.conversation)
 
         #expect(!FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
-        #expect(!FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.deletingPathExtension().appendingPathExtension("json").path))
+        #expect(
+            !FileManager.default.fileExists(
+                atPath: fixture.conversation.sourceFile.deletingPathExtension().appendingPathExtension("json").path))
     }
 
     @Test func aNativeExitCodeDoesNotMasqueradeAsMissingHistory() throws {
@@ -61,7 +76,7 @@ struct KiroRemoteDeletionTests {
             try deletion.delete(fixture.conversation)
             Issue.record("Kiro's failed deletion should be reported")
         } catch let error as RemoteConversationDeletionError {
-            guard case let .failed(host, details) = error else {
+            guard case .failed(let host, let details) = error else {
                 Issue.record("Native exit code 3 is a CLI failure, not missing remote history: \(error)")
                 return
             }
@@ -91,7 +106,6 @@ struct KiroRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
     }
 
-
     /// As on this Mac: a session a running CLI holds isn't handed to Kiro, which would say it deleted it.
     @Test func aSessionARunningCLIHoldsOnTheHostIsNotHandedToKiro() throws {
         let fixture = try RemoteKiroFixture()
@@ -99,13 +113,14 @@ struct KiroRemoteDeletionTests {
         let sessionFile = fixture.sessionsDirectory.appendingPathComponent("\(fixture.conversation.sessionID).jsonl")
         try KiroSessionLockTests.writeLock(processID: getpid(), startedAt: .now, to: KiroSessionLock.file(forSessionFile: sessionFile))
         let ranFile = fixture.root.appendingPathComponent("ran")
-        let deletion = RemoteConversationDeletion(runner: try fixture.runner(running: "#!/bin/sh\ntouch \(ShellQuoting.quoted(ranFile.path))\n"))
+        let deletion = RemoteConversationDeletion(
+            runner: try fixture.runner(running: "#!/bin/sh\ntouch \(ShellQuoting.quoted(ranFile.path))\n"))
 
         do {
             try deletion.delete(fixture.conversation)
             Issue.record("A session a running CLI holds should not be deleted")
         } catch let error as RemoteConversationDeletionError {
-            guard case let .failed(_, details) = error else {
+            guard case .failed(_, let details) = error else {
                 Issue.record("\(error)")
                 return
             }
@@ -121,8 +136,9 @@ struct KiroRemoteDeletionTests {
         let fixture = try RemoteKiroFixture()
         defer { fixture.remove() }
         let sessionFile = fixture.sessionsDirectory.appendingPathComponent("\(fixture.conversation.sessionID).jsonl")
-        try KiroSessionLockTests.writeLock(processID: try KiroSessionLockTests.endedProcessID(), startedAt: .now,
-                                           to: KiroSessionLock.file(forSessionFile: sessionFile))
+        try KiroSessionLockTests.writeLock(
+            processID: try KiroSessionLockTests.endedProcessID(), startedAt: .now,
+            to: KiroSessionLock.file(forSessionFile: sessionFile))
         let history = fixture.sessionsDirectory.appendingPathComponent("\(fixture.conversation.sessionID).history")
         try "Fix the login bug\n".write(to: history, atomically: true, encoding: .utf8)
 

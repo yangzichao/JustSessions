@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// Find in a SwiftTerm tab; see `GhosttyTerminalFindTests` for Ghostty's.

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A check the app runs on its own keeps its report as the host's last check, which the host's heading warns of and
@@ -9,7 +10,8 @@ import Testing
 struct BackgroundHostCheckStoreTests {
     @Test func keepsTheReportWithoutRunningTheShellStartupTraceAgain() async throws {
         let tracedStartups = TracedStartupCounter()
-        let (store, settings, host) = try makeStore(tmuxServerOutput: "protocol version mismatch (client 8, server 7)", tracedStartups: tracedStartups)
+        let (store, settings, host) = try makeStore(
+            tmuxServerOutput: "protocol version mismatch (client 8, server 7)", tracedStartups: tracedStartups)
         defer { cleanUp(settings, host) }
 
         let check = try #require(store.checkHostInBackground(host))
@@ -39,9 +41,11 @@ struct BackgroundHostCheckStoreTests {
 
         store.hostCheck = nil
         store.setTmuxServerProblem("protocol version mismatch (client 8, server 7)", on: host)
-        #expect(store.hostCheckProblemMessage(on: host) == AppLocalization.string(
-            "tmux on \(host) can't reach the tmux server running there, so its sessions can't be opened: protocol version mismatch (client 8, server 7)"
-        ))
+        #expect(
+            store.hostCheckProblemMessage(on: host)
+                == AppLocalization.string(
+                    "tmux on \(host) can't reach the tmux server running there, so its sessions can't be opened: protocol version mismatch (client 8, server 7)"
+                ))
         // The kept report doesn't know of it, so the warning checks the host again.
         store.showHostCheck(host)
         #expect(store.hostCheck?.isChecking == true)
@@ -72,15 +76,18 @@ struct BackgroundHostCheckStoreTests {
             .save(to: settings.userDefaults)
         let remoteHostCheck = RemoteHostCheck(
             runner: RemoteHostCommandRunner { _, _, _ in
-                (0, hostCheckScriptOutput([
-                    "shell": "/bin/bash",
-                    "rsync-path": "/usr/bin/rsync",
-                    "rsync-version": "rsync  version 3.2.7  protocol version 31",
-                    "tmux-path": "/usr/bin/tmux",
-                    "tmux-version": "tmux 3.4",
-                    "tmux-server": tmuxServerOutput,
-                    "tmux-server-exit": "1",
-                ]))
+                (
+                    0,
+                    hostCheckScriptOutput([
+                        "shell": "/bin/bash",
+                        "rsync-path": "/usr/bin/rsync",
+                        "rsync-version": "rsync  version 3.2.7  protocol version 31",
+                        "tmux-path": "/usr/bin/tmux",
+                        "tmux-version": "tmux 3.4",
+                        "tmux-server": tmuxServerOutput,
+                        "tmux-server-exit": "1",
+                    ])
+                )
             },
             connectionCheck: RemoteHostConnectionCheck(runner: RemoteHostCommandRunner { _, _, _ in (0, "%OS% :OS\n") }),
             shellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in

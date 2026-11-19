@@ -10,7 +10,8 @@ struct CodexTranscriptReader {
         var builder = TranscriptBuilder(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength)
         try JSONLinesReader.forEachLine(in: file) { line in
             guard Self.mightContainTranscriptItem(line),
-                  let record = ConversationMetadata.object(from: line) else { return }
+                let record = ConversationMetadata.object(from: line)
+            else { return }
             append(record, to: &builder)
         }
         return builder.build()
@@ -25,9 +26,9 @@ struct CodexTranscriptReader {
         // A quote right after a comma cannot be inside a string, and with no `{` or `[` before it, this `type` is
         // the record's own rather than one inside the payload.
         guard head.hasPrefix("{\"timestamp\":"),
-              let recordTypeMarker = head.range(of: ",\"type\":\""),
-              !head[..<recordTypeMarker.lowerBound].dropFirst().contains(where: { $0 == "{" || $0 == "[" }),
-              let recordType = plainStringValue(startingAt: recordTypeMarker.upperBound, in: head)
+            let recordTypeMarker = head.range(of: ",\"type\":\""),
+            !head[..<recordTypeMarker.lowerBound].dropFirst().contains(where: { $0 == "{" || $0 == "[" }),
+            let recordType = plainStringValue(startingAt: recordTypeMarker.upperBound, in: head)
         else { return true }
         if recordType.value == "compacted" { return true }
         guard recordType.value == "response_item" else { return false }
@@ -35,10 +36,10 @@ struct CodexTranscriptReader {
         let payloadTypeMarker = ",\"payload\":{\"type\":\""
         let afterRecordType = head[recordType.end...]
         guard afterRecordType.hasPrefix(payloadTypeMarker),
-              let payloadType = plainStringValue(
-                  startingAt: afterRecordType.dropFirst(payloadTypeMarker.count).startIndex,
-                  in: head
-              )
+            let payloadType = plainStringValue(
+                startingAt: afterRecordType.dropFirst(payloadTypeMarker.count).startIndex,
+                in: head
+            )
         else { return true }
         return transcriptPayloadTypes.contains(payloadType.value)
     }
@@ -47,7 +48,8 @@ struct CodexTranscriptReader {
     /// or holds an escape, which could spell a type differently, so the line is parsed instead.
     private static func plainStringValue(startingAt start: String.Index, in text: String) -> (value: String, end: String.Index)? {
         guard let closingQuote = text[start...].firstIndex(of: "\""),
-              !text[start..<closingQuote].contains("\\") else { return nil }
+            !text[start..<closingQuote].contains("\\")
+        else { return nil }
         return (String(text[start..<closingQuote]), text.index(after: closingQuote))
     }
 
@@ -58,7 +60,8 @@ struct CodexTranscriptReader {
             return
         }
         guard record["type"] as? String == "response_item",
-              let payload = record["payload"] as? [String: Any] else { return }
+            let payload = record["payload"] as? [String: Any]
+        else { return }
 
         switch payload["type"] as? String {
         case "message":
@@ -70,15 +73,17 @@ struct CodexTranscriptReader {
                     builder.appendUserImage(TranscriptImage(base64Encoded: String(base64)), timestamp: timestamp)
                 }
             case "assistant":
-                let text = content
+                let text =
+                    content
                     .compactMap { $0["type"] as? String == "output_text" ? $0["text"] as? String : nil }
                     .joined(separator: "\n\n")
                 builder.append(.assistantMessage, text: text, timestamp: timestamp)
             default:
-                return // Developer messages are instructions, not conversation.
+                return  // Developer messages are instructions, not conversation.
             }
         case "function_call":
-            let arguments = (payload["arguments"] as? String)
+            let arguments =
+                (payload["arguments"] as? String)
                 .flatMap { ConversationMetadata.object(from: Data($0.utf8)) } ?? [:]
             builder.append(
                 .toolCall,
@@ -112,8 +117,9 @@ struct CodexTranscriptReader {
     /// The base64 of an `input_image` part, whose `image_url` is a data URL: `data:image/png;base64,…`.
     private static func imageBase64(from part: [String: Any]) -> Substring? {
         guard part["type"] as? String == "input_image",
-              let url = part["image_url"] as? String, url.hasPrefix("data:"),
-              let separator = url.firstIndex(of: ",") else { return nil }
+            let url = part["image_url"] as? String, url.hasPrefix("data:"),
+            let separator = url.firstIndex(of: ",")
+        else { return nil }
         return url[url.index(after: separator)...]
     }
 }

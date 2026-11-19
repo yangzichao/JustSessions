@@ -77,12 +77,14 @@ struct TerminalTabStrip: Equatable {
         orientation: TerminalSplit.Orientation = .sideBySide
     ) -> TerminalSplit? {
         guard joiningID != pivotID,
-              let joiningIndex = index(of: joiningID),
-              let pivotIndex = index(of: pivotID),
-              split(containing: joiningID) == nil,
-              split(containing: pivotID) == nil else { return nil }
+            let joiningIndex = index(of: joiningID),
+            let pivotIndex = index(of: pivotID),
+            split(containing: joiningID) == nil,
+            split(containing: pivotID) == nil
+        else { return nil }
         let pivotProjectKey = tabs[pivotIndex].projectKey
-        let groupKey = tabs[joiningIndex].projectKey == pivotProjectKey
+        let groupKey =
+            tabs[joiningIndex].projectKey == pivotProjectKey
             ? pivotProjectKey
             : TerminalSplit.groupKey(ofSplitAcrossProjects: splitID)
         let split = TerminalSplit(id: splitID, tabIDs: (pivotID, joiningID), groupKey: groupKey, orientation: orientation)
@@ -104,9 +106,10 @@ struct TerminalTabStrip: Equatable {
     /// The split's two tabs trade places in the tab bar, so its panes trade sides, as Chrome's ReverseTabsInSplit.
     mutating func reverseSplit(_ splitID: UUID) {
         guard let split = splits.first(where: { $0.id == splitID }),
-              let sides = sides(of: split),
-              let leftIndex = index(of: sides.left),
-              let rightIndex = index(of: sides.right) else { return }
+            let sides = sides(of: split),
+            let leftIndex = index(of: sides.left),
+            let rightIndex = index(of: sides.right)
+        else { return }
         tabs.swapAt(leftIndex, rightIndex)
     }
 
@@ -138,12 +141,13 @@ struct TerminalTabStrip: Equatable {
     @discardableResult
     mutating func swap(_ incomingID: UUID, intoSplit splitID: UUID, replacing outgoingID: UUID) -> Bool {
         guard incomingID != outgoingID,
-              let splitIndex = splits.firstIndex(where: { $0.id == splitID }),
-              let stayingID = splits[splitIndex].partner(of: outgoingID),
-              split(containing: incomingID) == nil,
-              let incomingIndex = index(of: incomingID),
-              let outgoingIndex = index(of: outgoingID),
-              let stayingIndex = index(of: stayingID) else { return false }
+            let splitIndex = splits.firstIndex(where: { $0.id == splitID }),
+            let stayingID = splits[splitIndex].partner(of: outgoingID),
+            split(containing: incomingID) == nil,
+            let incomingIndex = index(of: incomingID),
+            let outgoingIndex = index(of: outgoingID),
+            let stayingIndex = index(of: stayingID)
+        else { return false }
         let incomingProjectKey = tabs[incomingIndex].projectKey
         let stayingProjectKey = tabs[stayingIndex].projectKey
         tabs.swapAt(incomingIndex, outgoingIndex)
@@ -202,11 +206,13 @@ struct TerminalTabStrip: Equatable {
     /// project of the tab that stayed; see `move(_:afterGroupOf:)`.
     private mutating func regroup(_ splitID: UUID, besideGroupOf projectKey: String) {
         guard let splitIndex = splits.firstIndex(where: { $0.id == splitID }),
-              let sides = sides(of: splits[splitIndex]),
-              let left = tabs.first(where: { $0.id == sides.left }),
-              let right = tabs.first(where: { $0.id == sides.right }) else { return }
+            let sides = sides(of: splits[splitIndex]),
+            let left = tabs.first(where: { $0.id == sides.left }),
+            let right = tabs.first(where: { $0.id == sides.right })
+        else { return }
         let split = splits[splitIndex]
-        let groupKey = left.projectKey == right.projectKey
+        let groupKey =
+            left.projectKey == right.projectKey
             ? left.projectKey
             : TerminalSplit.groupKey(ofSplitAcrossProjects: split.id)
         guard groupKey != split.groupKey else { return }

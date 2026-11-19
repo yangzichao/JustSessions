@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A right-click on a link hands the menu the same link a ⌘-click there would open, whichever engine draws the
@@ -85,7 +86,7 @@ struct TerminalLinkRightClickTests {
         }
         defer { terminal.view.makeContextMenu = nil }
         guard let rightClick = try? TerminalClick.rightClick(terminal.view, column: column),
-              terminal.view.menu(for: rightClick) != nil
+            terminal.view.menu(for: rightClick) != nil
         else { return nil }
         return handedLinks.last
     }

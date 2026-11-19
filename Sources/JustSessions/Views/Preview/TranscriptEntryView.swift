@@ -52,16 +52,17 @@ struct TranscriptEntryView: View {
     }
 
     private var speakerLabel: some View {
-        let isUser = switch entry.content {
-        case .userMessage, .userImage: true
-        default: false
-        }
+        let isUser =
+            switch entry.content {
+            case .userMessage, .userImage: true
+            default: false
+            }
         return HStack(spacing: 6) {
             Group {
                 if isUser { Text("You") } else { Text(verbatim: assistantName) }
             }
-                .font(ThemeFont.callout.weight(.semibold))
-                .foregroundStyle(isUser ? ThemePalette.secondaryText : assistantNameColor)
+            .font(ThemeFont.callout.weight(.semibold))
+            .foregroundStyle(isUser ? ThemePalette.secondaryText : assistantNameColor)
             if let timestamp = entry.timestamp {
                 Text(timestamp, format: .dateTime.month(.abbreviated).day().hour().minute())
                     .font(ThemeFont.detail)

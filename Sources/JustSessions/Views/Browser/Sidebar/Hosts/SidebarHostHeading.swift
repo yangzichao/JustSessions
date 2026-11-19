@@ -38,14 +38,13 @@ struct SidebarHostHeading: View {
                 .foregroundStyle(ThemePalette.tertiaryText)
                 .frame(width: InterfaceScale.points(14))
             Group {
-                if host == .thisMac { Text("This Mac") }
-                else { Text(verbatim: host.displayName) }
+                if host == .thisMac { Text("This Mac") } else { Text(verbatim: host.displayName) }
             }
             .textCase(.uppercase)
-                .tracking(0.8)
-                .foregroundStyle(ThemePalette.secondaryText)
-                .lineLimit(1)
-                .truncationMode(.middle)
+            .tracking(0.8)
+            .foregroundStyle(ThemePalette.secondaryText)
+            .lineLimit(1)
+            .truncationMode(.middle)
             if !isDisconnected { warningsAndButtons }
             Spacer(minLength: 6)
             refreshStatusOrMoreActions
@@ -86,8 +85,10 @@ struct SidebarHostHeading: View {
     @ViewBuilder
     private var warningsAndButtons: some View {
         Group {
-            if let sshHostActions, sshHostActions.login == .loggingIn
-                || sshHostActions.login == .notLoggedIn(needsLogIn: true) {
+            if let sshHostActions,
+                sshHostActions.login == .loggingIn
+                    || sshHostActions.login == .notLoggedIn(needsLogIn: true)
+            {
                 SidebarHostConnectButton(
                     host: host,
                     isLoggingIn: sshHostActions.login == .loggingIn,
@@ -110,7 +111,8 @@ struct SidebarHostHeading: View {
             if let shellStartupCheck = sshHostActions?.shellStartupCheck, shellStartupCheck.outcome == .blocked {
                 SidebarHostShellStartupWarning(host: host, stoppedAt: shellStartupCheck.stoppedAt)
             } else if let sshHostActions, failureMessage == nil, let hostCheckProblem = sshHostActions.hostCheckProblem,
-                      sshHostActions.login != .loggingIn, sshHostActions.login != .notLoggedIn(needsLogIn: true) {
+                sshHostActions.login != .loggingIn, sshHostActions.login != .notLoggedIn(needsLogIn: true)
+            {
                 SidebarHostCheckProblemWarning(
                     host: host,
                     problemMessage: hostCheckProblem,
@@ -158,9 +160,10 @@ struct SidebarHostHeading: View {
                     .monospacedDigit()
                     .foregroundStyle(ThemePalette.tertiaryText)
                     .fixedSize()
-                    .accessibilityLabel(Text(
-                        "Copying \(copyStep.provider.rawValue) sessions (\(copyStep.number) of \(copyStep.count))…"
-                    ))
+                    .accessibilityLabel(
+                        Text(
+                            "Copying \(copyStep.provider.rawValue) sessions (\(copyStep.number) of \(copyStep.count))…"
+                        ))
             }
         case .failed?:
             EmptyView()
@@ -197,7 +200,8 @@ struct SidebarHostHeading: View {
     }
 
     private var helpText: String {
-        let summary = host == .thisMac
+        let summary =
+            host == .thisMac
             ? "Sessions on this Mac"
             : "Sessions on \(host.displayName), copied over SSH"
         if isDisconnected {

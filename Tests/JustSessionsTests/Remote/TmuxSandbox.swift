@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// A temporary remote home: a login shell that runs its `-c` command, a `claude` that records how it was
@@ -141,4 +142,5 @@ struct TmuxSandbox {
     func tearDown() {
         _ = run("tmux kill-server 2>/dev/null; true")
         try? FileManager.default.removeItem(at: root)
-    }}
+    }
+}

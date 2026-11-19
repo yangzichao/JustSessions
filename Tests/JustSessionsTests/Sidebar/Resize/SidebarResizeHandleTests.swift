@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The sidebar's resize handle lies over the detail's leading edge, not in a strip of its own beside it.
@@ -11,10 +12,12 @@ struct SidebarResizeHandleTests {
     private let windowSize = CGSize(width: 1000, height: 600)
 
     @Test func detailShowsThroughTheHandle() async throws {
-        let fixture = try ResizableSidebarLayoutFixture(size: windowSize, detail: VStack(spacing: 0) {
-            Color.blue.frame(height: 40)
-            Color.green
-        })
+        let fixture = try ResizableSidebarLayoutFixture(
+            size: windowSize,
+            detail: VStack(spacing: 0) {
+                Color.blue.frame(height: 40)
+                Color.green
+            })
         defer { fixture.close() }
         let bitmap = try await fixture.capture()
         let renderingScale = CGFloat(bitmap.pixelsWide) / windowSize.width
@@ -55,10 +58,15 @@ private final class ResizableSidebarLayoutFixture {
     init(size: CGSize, detail: some View) throws {
         _ = NSApplication.shared
         settings = try IsolatedUserDefaults()
-        hostingView = NSHostingView(rootView: AnyView(
-            ResizableSidebarLayout(isSidebarHidden: false) { Color.red } detail: { detail }
+        hostingView = NSHostingView(
+            rootView: AnyView(
+                ResizableSidebarLayout(isSidebarHidden: false) {
+                    Color.red
+                } detail: {
+                    detail
+                }
                 .defaultAppStorage(settings.userDefaults)
-        ))
+            ))
         window = NSWindow(
             contentRect: CGRect(origin: .zero, size: size), styleMask: [.borderless], backing: .buffered, defer: false
         )

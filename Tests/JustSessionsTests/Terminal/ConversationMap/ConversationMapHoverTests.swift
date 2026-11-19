@@ -2,6 +2,7 @@ import AppKit
 import Observation
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The map's hover card (TAB-10) over a map in a window: it follows the outline under a still pointer and goes when
@@ -41,11 +42,13 @@ struct ConversationMapHoverTests {
             settings = try IsolatedUserDefaults()
             let store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
             link = Link(conversation)
-            window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: ConversationMapMetrics.columnWidth, height: 400),
-                              styleMask: [.titled], backing: .buffered, defer: false)
+            window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: ConversationMapMetrics.columnWidth, height: 400),
+                styleMask: [.titled], backing: .buffered, defer: false)
             window.isReleasedWhenClosed = false
-            window.contentView = NSHostingView(rootView: Host(link: link, model: model, store: store, hover: hover)
-                .environment(\.ignoresWindowOcclusion, true))
+            window.contentView = NSHostingView(
+                rootView: Host(link: link, model: model, store: store, hover: hover)
+                    .environment(\.ignoresWindowOcclusion, true))
             window.makeKeyAndOrderFront(nil)
         }
 
@@ -54,10 +57,12 @@ struct ConversationMapHoverTests {
             let outline = try #require(model.outline)
             let index = outline.blocks.count - 1
             let y = ConversationMapMetrics.verticalInset + CGFloat(outline.rowStarts[index]) * ConversationMapMetrics.naturalRowPitch + 1
-            hover.show(ConversationMapHover.Card(blockIndex: index, revision: outline.revision, speaker: "Codex", timestamp: nil,
-                                                 snippet: outline.blocks[index].snippet, letter: nil, top: 0, bandMinY: y - 1,
-                                                 bandHeight: 1, trailingInset: 0),
-                       at: CGPoint(x: 10, y: y))
+            hover.show(
+                ConversationMapHover.Card(
+                    blockIndex: index, revision: outline.revision, speaker: "Codex", timestamp: nil,
+                    snippet: outline.blocks[index].snippet, letter: nil, top: 0, bandMinY: y - 1,
+                    bandHeight: 1, trailingInset: 0),
+                at: CGPoint(x: 10, y: y))
         }
 
         func tearDown() {
@@ -88,7 +93,10 @@ struct ConversationMapHoverTests {
     @Test func aRelinkTakesTheCardAway() async throws {
         let files = try TranscriptPagingFixture(count: 5)
         let empty = try TranscriptPagingFixture(count: 0)
-        defer { files.remove(); empty.remove() }
+        defer {
+            files.remove()
+            empty.remove()
+        }
         let fixture = try Fixture(conversation: files.conversation)
         defer { fixture.tearDown() }
         try await expectEventually { fixture.model.outline?.blocks.count == 5 }

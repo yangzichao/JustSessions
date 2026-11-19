@@ -1,11 +1,13 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
 struct TranscriptSearchContextTests {
     private static func controller() -> TranscriptScrollPositionController {
-        TranscriptScrollPositionController(conversationID: "search-context", positionStore: TranscriptReadingPositionStore(), initialPosition: .bottom)
+        TranscriptScrollPositionController(
+            conversationID: "search-context", positionStore: TranscriptReadingPositionStore(), initialPosition: .bottom)
     }
 
     /// The transcript sets a new context each time its view updates, as it does while you scroll. Only a context that
@@ -23,7 +25,9 @@ struct TranscriptSearchContextTests {
         var otherController = context
         otherController.positionController = Self.controller()
 
-        #expect(context == TranscriptSearchContext(query: "needle", selectedMatch: match, navigationRevision: 4, positionController: controller))
+        #expect(
+            context == TranscriptSearchContext(query: "needle", selectedMatch: match, navigationRevision: 4, positionController: controller)
+        )
         #expect(context != otherQuery)
         #expect(context != noSelection)
         #expect(context != nextRevision)

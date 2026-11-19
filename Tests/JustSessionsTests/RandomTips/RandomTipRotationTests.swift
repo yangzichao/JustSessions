@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct RandomTipRotationTests {
@@ -19,10 +20,12 @@ struct RandomTipRotationTests {
         var rotation = RandomTipRotation(shownTips: shownTips)
         var offeredCount: Int?
 
-        let nextTip = rotation.nextTip(after: nil, randomIndex: { count in
-            offeredCount = count
-            return count - 1
-        })
+        let nextTip = rotation.nextTip(
+            after: nil,
+            randomIndex: { count in
+                offeredCount = count
+                return count - 1
+            })
 
         #expect(offeredCount == 2)
         #expect(nextTip == RandomTip.allCases.last)
@@ -34,10 +37,12 @@ struct RandomTipRotationTests {
         var rotation = RandomTipRotation(shownTips: Set(RandomTip.allCases))
         var offeredCount: Int?
 
-        let nextTip = rotation.nextTip(after: currentTip, randomIndex: { count in
-            offeredCount = count
-            return 0
-        })
+        let nextTip = rotation.nextTip(
+            after: currentTip,
+            randomIndex: { count in
+                offeredCount = count
+                return 0
+            })
 
         #expect(offeredCount == RandomTip.allCases.count - 1)
         #expect(nextTip != currentTip)
@@ -49,10 +54,12 @@ struct RandomTipRotationTests {
         var rotation = RandomTipRotation(shownTips: Set(RandomTip.allCases.dropFirst().dropLast()))
 
         // Only the first tip and the one showing are unshown; the one showing is never offered.
-        let nextTip = rotation.nextTip(after: currentTip, randomIndex: { count in
-            #expect(count == 1)
-            return 0
-        })
+        let nextTip = rotation.nextTip(
+            after: currentTip,
+            randomIndex: { count in
+                #expect(count == 1)
+                return 0
+            })
 
         #expect(nextTip == RandomTip.allCases.first)
     }

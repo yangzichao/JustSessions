@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The hover card waits for the pointer to rest before the first card, then follows it from tab to tab at once, as in

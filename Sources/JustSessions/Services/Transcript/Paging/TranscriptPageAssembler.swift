@@ -7,14 +7,16 @@ enum TranscriptPageAssembler {
             for (part, entry) in parts.enumerated() {
                 let identifier = TranscriptPageIdentity.entryID(record: record, part: part)
                 if case .toolCalls(let summaries) = entry.content, let previous = entries.last,
-                   case .toolCalls(let earlierSummaries) = previous.content,
-                   earlierSummaries.count + summaries.count <= maximumMergedToolCallCount {
+                    case .toolCalls(let earlierSummaries) = previous.content,
+                    earlierSummaries.count + summaries.count <= maximumMergedToolCallCount
+                {
                     entries[entries.count - 1] = TranscriptEntry(
                         id: previous.id, content: .toolCalls(earlierSummaries + summaries),
                         timestamp: previous.timestamp, startsTurn: previous.startsTurn
                     )
                 } else {
-                    entries.append(TranscriptEntry(id: identifier, content: entry.content, timestamp: entry.timestamp, startsTurn: entry.startsTurn))
+                    entries.append(
+                        TranscriptEntry(id: identifier, content: entry.content, timestamp: entry.timestamp, startsTurn: entry.startsTurn))
                 }
             }
         }
@@ -38,8 +40,9 @@ enum TranscriptPageAssembler {
         let entries = pages.flatMap(\.entries).map { entry in
             let speaker = speaker(of: entry)
             defer { previousSpeaker = speaker }
-            return TranscriptEntry(id: entry.id, content: entry.content, timestamp: entry.timestamp,
-                                   startsTurn: speaker != nil && speaker != previousSpeaker, markdown: entry.markdown)
+            return TranscriptEntry(
+                id: entry.id, content: entry.content, timestamp: entry.timestamp,
+                startsTurn: speaker != nil && speaker != previousSpeaker, markdown: entry.markdown)
         }
         return TranscriptContent(entries: entries, omittedEntryCount: 0, usesEntryIDsForPositions: true)
     }

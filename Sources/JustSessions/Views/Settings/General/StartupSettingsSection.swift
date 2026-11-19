@@ -12,13 +12,16 @@ struct StartupSettingsSection: View {
                 .font(ThemeFont.heading)
             LaunchAtLoginToggle(settingsStore: launchAtLoginSettingsStore)
             HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Toggle("Reopen the tabs that were open when JustSessions quit", isOn: Binding(
-                    get: { tabReopeningSettingsStore.reopensTabsAtLaunch },
-                    set: { tabReopeningSettingsStore.setReopensTabsAtLaunch($0) }
-                ))
+                Toggle(
+                    "Reopen the tabs that were open when JustSessions quit",
+                    isOn: Binding(
+                        get: { tabReopeningSettingsStore.reopensTabsAtLaunch },
+                        set: { tabReopeningSettingsStore.setReopensTabsAtLaunch($0) }
+                    ))
                 HelpPopoverButton(
                     title: "Reopening tabs",
-                    explanation: "A CLI or a plain terminal's shell still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart, and other plain terminals open a new shell in their folder. With this off, quitting ends plain terminals' shells."
+                    explanation:
+                        "A CLI or a plain terminal's shell still running in tmux reattaches. Other sessions resume when you select their tab, including after a Mac restart, and other plain terminals open a new shell in their folder. With this off, quitting ends plain terminals' shells."
                 )
                 .accessibilityIdentifier("settings.help.reopeningTabs")
             }

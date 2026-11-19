@@ -92,13 +92,15 @@ struct TerminalSplitAcrossProjectsSection: View {
 
     /// Moves the split among the groups as the pointer moves along the bar, until the drag goes on between windows.
     private func drag(grabbing tabID: UUID, by translation: CGFloat, from startLocation: CGPoint) {
-        guard tabDragBetweenWindows.followDragInTabBar(
-            of: tabs.map(\.id),
-            grabbing: tabID,
-            inGroup: split.groupKey,
-            of: store,
-            from: startLocation
-        ) else { return }
+        guard
+            tabDragBetweenWindows.followDragInTabBar(
+                of: tabs.map(\.id),
+                grabbing: tabID,
+                inGroup: split.groupKey,
+                of: store,
+                from: startLocation
+            )
+        else { return }
         onDragChanged(translation)
     }
 

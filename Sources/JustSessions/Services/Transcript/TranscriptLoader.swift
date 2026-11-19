@@ -14,11 +14,20 @@ enum TranscriptLoader {
                 maximumTextLength: maximumTextLength,
                 includesSidechains: conversation.isSubagent
             ).read(conversation.sourceFile)
-        case .codex: try CodexTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile)
-        case .kiro: try KiroTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile)
-        case .antigravity: try AntigravityTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile)
-        case .pi: try PiTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile)
-        case .opencode: try OpenCodeTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile, sessionID: conversation.sessionID)
+        case .codex:
+            try CodexTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(
+                conversation.sourceFile)
+        case .kiro:
+            try KiroTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(
+                conversation.sourceFile)
+        case .antigravity:
+            try AntigravityTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(
+                conversation.sourceFile)
+        case .pi:
+            try PiTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(conversation.sourceFile)
+        case .opencode:
+            try OpenCodeTranscriptReader(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength).read(
+                conversation.sourceFile, sessionID: conversation.sessionID)
         }
     }
 }

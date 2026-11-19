@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// tmux before 3.6 hears of a light/dark change only from a client that attaches again and asks for the colors; the

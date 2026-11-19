@@ -61,9 +61,9 @@ enum RemoteHostInput: Equatable {
     private static func reading(destination: String) -> RemoteHostInput {
         if destination.lowercased().hasPrefix("ssh://") {
             guard let components = URLComponents(string: destination),
-                  let hostName = components.host, !hostName.isEmpty,
-                  components.path.isEmpty || components.path == "/",
-                  components.password == nil, components.query == nil, components.fragment == nil
+                let hostName = components.host, !hostName.isEmpty,
+                components.path.isEmpty || components.path == "/",
+                components.password == nil, components.query == nil, components.fragment == nil
             else { return .notADestination }
             if let port = components.port, port != 22 {
                 return .needsPortInConfig(user: components.user, hostName: hostName, port: port)

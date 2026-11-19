@@ -34,21 +34,24 @@ struct CrashReportFinder: Sendable {
 
     /// The most recent crash of this app written after `date`, if any.
     func newestReport(writtenAfter date: Date) -> FoundCrashReport? {
-        let files = (try? FileManager.default.contentsOfDirectory(
-            at: reportsDirectory,
-            includingPropertiesForKeys: [.contentModificationDateKey],
-            options: .skipsHiddenFiles
-        )) ?? []
+        let files =
+            (try? FileManager.default.contentsOfDirectory(
+                at: reportsDirectory,
+                includingPropertiesForKeys: [.contentModificationDateKey],
+                options: .skipsHiddenFiles
+            )) ?? []
         let newFiles: [(file: URL, writtenAt: Date)] = files.compactMap { file in
             guard file.pathExtension == "ips", file.lastPathComponent.hasPrefix("\(executableName)-"),
-                  let writtenAt = try? file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate,
-                  writtenAt > date else { return nil }
+                let writtenAt = try? file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate,
+                writtenAt > date
+            else { return nil }
             return (file, writtenAt)
         }
         for (file, writtenAt) in newFiles.sorted(by: { $0.writtenAt > $1.writtenAt }).prefix(Self.maximumReportsRead) {
             guard let text = try? String(contentsOf: file, encoding: .utf8),
-                  let summary = CrashReportSummary(reportText: text),
-                  summary.bundleIdentifier == bundleIdentifier else { continue }
+                let summary = CrashReportSummary(reportText: text),
+                summary.bundleIdentifier == bundleIdentifier
+            else { continue }
             return FoundCrashReport(file: file, writtenAt: writtenAt, summary: summary)
         }
         return nil

@@ -19,18 +19,18 @@ struct CodexConversationDeletion {
         let sourceFile = conversation.sourceFile.standardizedFileURL
         let sessionsDirectory = codexDirectory.appendingPathComponent("sessions").standardizedFileURL
         guard conversation.provider == .codex,
-              ConversationMetadata.isValidSessionID(conversation.sessionID),
-              sourceFile.pathExtension == "jsonl",
-              sourceFile.lastPathComponent.hasPrefix("rollout-"),
-              sourceFile.resolvingSymlinksInPath().path.hasPrefix(sessionsDirectory.resolvingSymlinksInPath().path + "/")
+            ConversationMetadata.isValidSessionID(conversation.sessionID),
+            sourceFile.pathExtension == "jsonl",
+            sourceFile.lastPathComponent.hasPrefix("rollout-"),
+            sourceFile.resolvingSymlinksInPath().path.hasPrefix(sessionsDirectory.resolvingSymlinksInPath().path + "/")
         else { throw ConversationDeletionError.invalidSource }
         guard fileManager.fileExists(atPath: sourceFile.path) else {
             throw ConversationDeletionError.missingSource
         }
         guard
-              let metadata = ConversationMetadata.firstLine(of: sourceFile),
-              let payload = metadata["payload"] as? [String: Any],
-              payload["id"] as? String == conversation.sessionID
+            let metadata = ConversationMetadata.firstLine(of: sourceFile),
+            let payload = metadata["payload"] as? [String: Any],
+            payload["id"] as? String == conversation.sessionID
         else { throw ConversationDeletionError.invalidSource }
 
         let resolver = NativeCLICommandResolver()
@@ -40,14 +40,16 @@ struct CodexConversationDeletion {
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = resolver.pathEnvironmentValue
         environment["CODEX_HOME"] = codexDirectory.path
-        guard let result = BoundedProcessRunner.result(
-            ofExecutable: executablePath,
-            arguments: ["delete", "--force", conversation.sessionID],
-            environment: environment,
-            workingDirectory: codexDirectory,
-            includesStandardError: true,
-            timeout: timeout
-        ) else { throw ConversationDeletionError.codexDidNotFinish }
+        guard
+            let result = BoundedProcessRunner.result(
+                ofExecutable: executablePath,
+                arguments: ["delete", "--force", conversation.sessionID],
+                environment: environment,
+                workingDirectory: codexDirectory,
+                includesStandardError: true,
+                timeout: timeout
+            )
+        else { throw ConversationDeletionError.codexDidNotFinish }
         let details = result.output.trimmingCharacters(in: .whitespacesAndNewlines)
         guard result.exitStatus == 0 else {
             throw ConversationDeletionError.codexFailed(details.isEmpty ? "Exit code \(result.exitStatus)" : String(details.prefix(500)))

@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// Where a bookmark jump went, which next, previous, and ⌘D go on from until the reader scrolls away from it.
@@ -9,21 +10,25 @@ struct TranscriptSeekTargetTests {
     private func id(_ record: Int) -> Int { TranscriptPageIdentity.entryID(record: record, part: 0) }
 
     private func unhostedController() -> TranscriptScrollPositionController {
-        TranscriptScrollPositionController(conversationID: "conversation", positionStore: TranscriptReadingPositionStore(),
-                                           initialPosition: .bottom)
+        TranscriptScrollPositionController(
+            conversationID: "conversation", positionStore: TranscriptReadingPositionStore(),
+            initialPosition: .bottom)
     }
 
     private var messages: [TranscriptEntry.Content] {
         (0..<60).map { index in
-            .assistantMessage((0..<(12 + index % 5)).map { "Message \(index), line \($0): keep this reading position." }.joined(separator: "\n"))
+            .assistantMessage(
+                (0..<(12 + index % 5)).map { "Message \(index), line \($0): keep this reading position." }.joined(separator: "\n"))
         }
     }
 
     /// Shows the transcript and jumps to record 20, then waits until the jump has put it 6 points below the top.
     private func showAfterSeekingToRecord20(in fixture: TranscriptScrollViewFixture) async throws
-        -> (NSScrollView, TranscriptScrollPositionController) {
-        let scrollView = try await fixture.show(TranscriptScrollViewFixture.conversation("seek"),
-                                                transcript: TranscriptScrollViewFixture.pagedTranscript(messages))
+        -> (NSScrollView, TranscriptScrollPositionController)
+    {
+        let scrollView = try await fixture.show(
+            TranscriptScrollViewFixture.conversation("seek"),
+            transcript: TranscriptScrollViewFixture.pagedTranscript(messages))
         let controller = try #require(fixture.positionController)
         controller.seek(toEntryAt: id(20))
         try await fixture.waitUntil {

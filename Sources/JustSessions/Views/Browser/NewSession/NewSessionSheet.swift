@@ -117,9 +117,10 @@ struct NewSessionSheet: View {
                 Picker("Host", selection: hostSelection) {
                     ForEach(hosts) { host in
                         Label {
-                            if host == .thisMac { Text("This Mac") }
-                            else { Text(verbatim: host.displayName) }
-                        } icon: { Image(systemName: host.symbolName) }
+                            if host == .thisMac { Text("This Mac") } else { Text(verbatim: host.displayName) }
+                        } icon: {
+                            Image(systemName: host.symbolName)
+                        }
                         .tag(host)
                     }
                 }
@@ -130,7 +131,8 @@ struct NewSessionSheet: View {
             NewSessionKindPicker(
                 selection: kindSelection,
                 providers: providersOnSelectedHost,
-                noCLIFoundMessage: NewSessionProviderAvailability.noCLIFoundMessage(on: selectedHost, language: AppInterfaceLanguage(identifier: locale.identifier))
+                noCLIFoundMessage: NewSessionProviderAvailability.noCLIFoundMessage(
+                    on: selectedHost, language: AppInterfaceLanguage(identifier: locale.identifier))
             )
 
             if case .cli(let provider) = startingKind {
@@ -162,11 +164,13 @@ struct NewSessionSheet: View {
         } footer: {
             if isStarting && selectedHost != .thisMac {
                 ProgressView().controlSize(.small)
-                Text(isCreatingMissingFolder
-                    ? "Creating the folder on \(selectedHost.displayName)…"
-                    : "Checking the folder on \(selectedHost.displayName)…")
-                    .font(ThemeFont.callout)
-                    .foregroundStyle(ThemePalette.secondaryText)
+                Text(
+                    isCreatingMissingFolder
+                        ? "Creating the folder on \(selectedHost.displayName)…"
+                        : "Checking the folder on \(selectedHost.displayName)…"
+                )
+                .font(ThemeFont.callout)
+                .foregroundStyle(ThemePalette.secondaryText)
             }
             Spacer()
             Button("Cancel") { dismiss() }
@@ -176,11 +180,13 @@ struct NewSessionSheet: View {
                 .keyboardShortcut(.defaultAction)
                 .disabled(trimmedProjectPath.isEmpty || isStarting || isEditingShownStartCommand)
         }
-        .alert(startingKind == .plainTerminal ? "Could not open terminal" : "Could not start session", isPresented: Binding(isPresenting: $errorMessage)) {
+        .alert(
+            startingKind == .plainTerminal ? "Could not open terminal" : "Could not start session",
+            isPresented: Binding(isPresenting: $errorMessage)
+        ) {
             Button("OK") { errorMessage = nil }
         } message: {
-            if let errorMessage { Text(verbatim: errorMessage) }
-            else { Text("Unknown error") }
+            if let errorMessage { Text(verbatim: errorMessage) } else { Text("Unknown error") }
         }
         // The alert covers this sheet, so a click on the sheet around it closes only the alert.
         .dismissesOnClickOutside(item: $errorMessage)

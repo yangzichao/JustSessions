@@ -33,7 +33,8 @@ enum ConversationMetadata {
         }
         defer { try? handle.close() }
         guard let data = try? handle.read(upToCount: maxBytes),
-              let newline = data.firstIndex(of: UInt8(ascii: "\n")) else { return nil }
+            let newline = data.firstIndex(of: UInt8(ascii: "\n"))
+        else { return nil }
         return object(from: Data(data[..<newline]))
     }
 

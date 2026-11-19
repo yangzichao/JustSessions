@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Clicking a session in the sidebar shows its running CLI when there is one, and otherwise leaves it to the preview.

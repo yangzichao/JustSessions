@@ -44,11 +44,12 @@ final class WindowMoveZoneView: NSView {
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
         for trackingArea in trackingAreas { removeTrackingArea(trackingArea) }
-        addTrackingArea(NSTrackingArea(
-            rect: .zero,
-            options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect, .enabledDuringMouseDrag],
-            owner: self
-        ))
+        addTrackingArea(
+            NSTrackingArea(
+                rect: .zero,
+                options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect, .enabledDuringMouseDrag],
+                owner: self
+            ))
     }
 
     override func mouseEntered(with event: NSEvent) {

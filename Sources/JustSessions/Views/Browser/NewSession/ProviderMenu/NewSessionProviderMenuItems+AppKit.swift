@@ -10,7 +10,9 @@ extension NewSessionProviderMenuItems {
         onStart: @escaping (ConversationProvider) -> Void
     ) -> [NSMenuItem] {
         guard !providers.isEmpty else {
-            return [ActionMenuItem(title: NewSessionProviderAvailability.noCLIFoundMessage(on: host, language: language), isEnabled: false) {}]
+            return [
+                ActionMenuItem(title: NewSessionProviderAvailability.noCLIFoundMessage(on: host, language: language), isEnabled: false) {}
+            ]
         }
         return providers.map { provider in
             let item = ActionMenuItem(title: provider.rawValue, isEnabled: isEnabled) { onStart(provider) }

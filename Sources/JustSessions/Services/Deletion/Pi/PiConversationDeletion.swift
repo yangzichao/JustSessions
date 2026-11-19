@@ -14,9 +14,10 @@ struct PiConversationDeletion {
     ) {
         self.sessionsDirectory = sessionsDirectory
         self.fileManager = fileManager
-        self.moveToTrash = moveToTrash ?? { url in
-            try fileManager.trashItem(at: url, resultingItemURL: nil)
-        }
+        self.moveToTrash =
+            moveToTrash ?? { url in
+                try fileManager.trashItem(at: url, resultingItemURL: nil)
+            }
     }
 
     /// Only a file Pi would list is deleted: one directly in the sessions folder or in one of its project folders,
@@ -29,17 +30,17 @@ struct PiConversationDeletion {
         let sessionsPath = sessionsDirectory.standardizedFileURL.resolvingSymlinksInPath().path
         let containingFolder = sourceFile.deletingLastPathComponent().resolvingSymlinksInPath()
         guard conversation.provider == .pi,
-              conversation.provider.isValidSessionID(conversation.sessionID),
-              sourceFile.lastPathComponent.hasSuffix("_\(conversation.sessionID).jsonl"),
-              containingFolder.path == sessionsPath || containingFolder.deletingLastPathComponent().path == sessionsPath
+            conversation.provider.isValidSessionID(conversation.sessionID),
+            sourceFile.lastPathComponent.hasSuffix("_\(conversation.sessionID).jsonl"),
+            containingFolder.path == sessionsPath || containingFolder.deletingLastPathComponent().path == sessionsPath
         else { throw ConversationDeletionError.invalidSource }
         guard fileManager.fileExists(atPath: sourceFile.path) else {
             throw ConversationDeletionError.missingSource
         }
         guard itemType(at: sourceFile) == .typeRegular,
-              let header = PiSessionFileHeader(firstLineOf: sourceFile),
-              header.type == "session",
-              header.id == conversation.sessionID
+            let header = PiSessionFileHeader(firstLineOf: sourceFile),
+            header.type == "session",
+            header.id == conversation.sessionID
         else { throw ConversationDeletionError.sourceMismatch }
 
         let companionDirectory = sourceFile.deletingPathExtension()

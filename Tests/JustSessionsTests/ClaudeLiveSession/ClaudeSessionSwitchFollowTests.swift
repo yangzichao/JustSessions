@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A Claude Code tab on this Mac whose CLI moved to a session no refresh has listed keeps asking for scans until one
@@ -114,8 +115,9 @@ struct ClaudeSessionSwitchFollowTests {
         fixture.synchronize()
         try #require(tab.displayTitle == "after-branch")
 
-        let press = try #require(TerminalTabBookmarks(store: fixture.store, readingWindows: SessionReadingWindowManager())
-            .toggleLatestMessage(in: tab))
+        let press = try #require(
+            TerminalTabBookmarks(store: fixture.store, readingWindows: SessionReadingWindowManager())
+                .toggleLatestMessage(in: tab))
         await press.value
 
         #expect(tab.conversation?.id == parent.id)
@@ -135,9 +137,11 @@ struct ClaudeSessionSwitchFollowTests {
         defer { fixture.remove() }
         let (tab, parent) = try await fixture.openTabOnTheSessionToBranch()
         // `/rename kept-name` before `/clear`.
-        try fixture.transcripts.append(to: parent.sessionID, [
-            #"{"type":"custom-title","customTitle":"kept-name","sessionId":"\#(parent.sessionID)"}"#,
-        ])
+        try fixture.transcripts.append(
+            to: parent.sessionID,
+            [
+                #"{"type":"custom-title","customTitle":"kept-name","sessionId":"\#(parent.sessionID)"}"#
+            ])
         try fixture.transcripts.writeRecord(Self.record(sessionID: parent.sessionID, name: "kept-name"))
         fixture.synchronize()
         #expect(tab.displayTitle == "kept-name")
@@ -150,10 +154,12 @@ struct ClaudeSessionSwitchFollowTests {
         #expect(tab.conversation?.id == parent.id)
         #expect(tab.displayTitle == "kept-name")
 
-        try fixture.transcripts.append(to: clearedID, [
-            #"{"type":"custom-title","customTitle":"kept-name","sessionId":"\#(clearedID)"}"#,
-            #"{"parentUuid":null,"type":"user","message":{"role":"user","content":"After clear"},"uuid":"\#(UUID().uuidString.lowercased())","timestamp":"2026-10-21T20:00:00.000Z","cwd":"/Users/me/project","sessionId":"\#(clearedID)","version":"2.1.306"}"#,
-        ])
+        try fixture.transcripts.append(
+            to: clearedID,
+            [
+                #"{"type":"custom-title","customTitle":"kept-name","sessionId":"\#(clearedID)"}"#,
+                #"{"parentUuid":null,"type":"user","message":{"role":"user","content":"After clear"},"uuid":"\#(UUID().uuidString.lowercased())","timestamp":"2026-10-21T20:00:00.000Z","cwd":"/Users/me/project","sessionId":"\#(clearedID)","version":"2.1.306"}"#,
+            ])
         fixture.clock.advance(by: ConversationStore.refreshIntervalWhileWaitingForAppearingSession - 1)
         fixture.synchronize()
         #expect(!fixture.store.isScanningThisMac && fixture.scans.scanCount == 2, "No sooner than a new session's tab")

@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// A 3 by 2 pixel red PNG, small enough to keep inline in session lines, with sides that differ so a swapped

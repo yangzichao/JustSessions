@@ -21,38 +21,45 @@ struct ClaudeAdapter: ConversationAdapter {
     }
 
     /// Shared by every Claude Code adapter, this Mac's and each SSH host's mirror, which keep their files apart.
-    private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-heads-2"))
+    private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>(
+        persistenceFile: SessionSummaryCacheLocation.file(named: "claude-heads-2"))
     /// Named for the version of the tail it keeps: tails kept before `relocated` and `worktree-state` lines were read
     /// would leave a session moved with `/cd` under the folder it started in, and one in a worktree under the
     /// worktree's folder.
-    private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-tails-5"))
-    private static let subagentSessions = SessionFileSummaryCache<ClaudeSubagentSession>(persistenceFile: SessionSummaryCacheLocation.file(named: "claude-subagents-2"))
+    private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>(
+        persistenceFile: SessionSummaryCacheLocation.file(named: "claude-tails-5"))
+    private static let subagentSessions = SessionFileSummaryCache<ClaudeSubagentSession>(
+        persistenceFile: SessionSummaryCacheLocation.file(named: "claude-subagents-2"))
 
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         try cancellation.checkCancellation()
         let projectsDirectory = configurationDirectory.appendingPathComponent("projects")
-        guard let projectDirectories = try? FileManager.default.contentsOfDirectory(
-            at: projectsDirectory,
-            includingPropertiesForKeys: [.isDirectoryKey],
-            options: [.skipsHiddenFiles]
-        ) else { return [] }
+        guard
+            let projectDirectories = try? FileManager.default.contentsOfDirectory(
+                at: projectsDirectory,
+                includingPropertiesForKeys: [.isDirectoryKey],
+                options: [.skipsHiddenFiles]
+            )
+        else { return [] }
 
         var transcriptFiles: [URL] = []
         var subagentFiles: [URL] = []
         let conversations = projectDirectories.flatMap { projectDirectory -> [Conversation] in
             guard !cancellation.isCancelled else { return [] }
             let index = ClaudeSessionsIndex(projectDirectory: projectDirectory)
-            let files = (try? FileManager.default.contentsOfDirectory(
-                at: projectDirectory,
-                includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey],
-                options: [.skipsHiddenFiles]
-            )) ?? []
+            let files =
+                (try? FileManager.default.contentsOfDirectory(
+                    at: projectDirectory,
+                    includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey],
+                    options: [.skipsHiddenFiles]
+                )) ?? []
             transcriptFiles += files
             return files.compactMap {
                 cancellation.isCancelled ? nil : conversation(in: $0, index: index)
             }.flatMap { conversation -> [Conversation] in
                 guard !cancellation.isCancelled else { return [] }
-                let sessionSubagentFiles = ClaudeSubagentSessions.files(ofSessionID: conversation.sessionID, inProjectDirectory: projectDirectory)
+                let sessionSubagentFiles = ClaudeSubagentSessions.files(
+                    ofSessionID: conversation.sessionID, inProjectDirectory: projectDirectory)
                 subagentFiles += sessionSubagentFiles
                 return [conversation] + sessionSubagentFiles.compactMap { subagentConversation(in: $0, startedBy: conversation) }
             }
@@ -85,12 +92,13 @@ struct ClaudeAdapter: ConversationAdapter {
         let indexEntry = index.entry(forSessionID: sessionID)
         if indexEntry?.isSidechain == true { return nil }
         guard let head = Self.transcriptHeads.summary(of: file, read: ClaudeTranscriptHead.init(file:)),
-              !head.isSidechain,
-              let tail = Self.transcriptTails.summary(of: file, read: ClaudeTranscriptTail.init(file:)),
-              let projectPath = tail.movedProjectDirectory
+            !head.isSidechain,
+            let tail = Self.transcriptTails.summary(of: file, read: ClaudeTranscriptTail.init(file:)),
+            let projectPath = tail.movedProjectDirectory
                 ?? indexEntry?.projectPath
                 ?? head.workingDirectory
-                ?? index.originalProjectPath else {
+                ?? index.originalProjectPath
+        else {
             return nil
         }
         let title = ConversationMetadata.cleanTitle(
@@ -104,7 +112,8 @@ struct ClaudeAdapter: ConversationAdapter {
                 ?? head.firstPrompt,
             fallback: ConversationMetadata.untitledConversationTitle
         )
-        let updatedAt = [indexEntry?.modifiedAt, tail.latestTimestamp].compactMap { $0 }.max()
+        let updatedAt =
+            [indexEntry?.modifiedAt, tail.latestTimestamp].compactMap { $0 }.max()
             ?? ConversationMetadata.fileModificationDate(file)
         return Conversation(
             provider: provider,
@@ -119,7 +128,8 @@ struct ClaudeAdapter: ConversationAdapter {
 
     private func subagentConversation(in file: URL, startedBy parent: Conversation) -> Conversation? {
         guard let agentID = ClaudeSubagentSessions.agentID(of: file),
-              let session = Self.subagentSessions.summary(of: file, read: ClaudeSubagentSession.init(file:)) else { return nil }
+            let session = Self.subagentSessions.summary(of: file, read: ClaudeSubagentSession.init(file:))
+        else { return nil }
         return Conversation(
             provider: provider,
             sessionID: agentID,

@@ -19,6 +19,7 @@ struct AddRemoteHostSheet: View {
     @State private var failedConnection: FailedConnection?
     /// Where the typed host connects, read by `ssh -G` shortly after typing stops.
     @State private var sameMachineCheck: (host: String, result: SSHHostSameMachineCheck)?
+    // periphery:ignore - read through its $ binding, which Periphery does not see.
     @State private var showsSetupRequirements = false
 
     private struct FailedConnection {
@@ -48,7 +49,8 @@ struct AddRemoteHostSheet: View {
     /// The host as it will be stored, or nil when it is invalid or already listed, under its name or another.
     private var hostToAdd: String? {
         guard let host = input.validDestination, !isListed,
-              sameMachineCheckOfInput?.listedHostWithSameIdentity == nil else { return nil }
+            sameMachineCheckOfInput?.listedHostWithSameIdentity == nil
+        else { return nil }
         return host
     }
 
@@ -102,7 +104,8 @@ struct AddRemoteHostSheet: View {
             // Connect… stands in for Try again: once nothing needs asking, it logs in without a question. After a
             // failed login, trying again is logging in again.
             if let failedConnection = failedConnectionToHostToAdd,
-               failedConnection.problem.isFixedByLoggingIn || failedConnection.afterLoggingIn {
+                failedConnection.problem.isFixedByLoggingIn || failedConnection.afterLoggingIn
+            {
                 Button("Connect…") { logInAndAdd(failedConnection.host) }
                     .buttonStyle(ThemeProminentButtonStyle())
                     .keyboardShortcut(.defaultAction)

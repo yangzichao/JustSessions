@@ -71,8 +71,7 @@ struct TerminalEndedBar: View {
         if isWaitingToReconnect {
             Text("Connection lost. Reconnecting…")
         } else if let exitCode {
-            if endedWithErrorSoonAfterStarting { Text("Exited (\(exitCode)) right after starting") }
-            else { Text("Exited (\(exitCode))") }
+            if endedWithErrorSoonAfterStarting { Text("Exited (\(exitCode)) right after starting") } else { Text("Exited (\(exitCode))") }
         } else {
             Text("Ended")
         }

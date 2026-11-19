@@ -18,7 +18,8 @@ struct RemoteConversationDeletion: Sendable {
 
     func delete(_ conversation: Conversation) throws {
         guard let host = conversation.host.sshDestination,
-              conversation.provider.isValidSessionID(conversation.sessionID) else {
+            conversation.provider.isValidSessionID(conversation.sessionID)
+        else {
             throw ConversationDeletionError.invalidSource
         }
         // The folders the host's sessions were copied from.
@@ -42,12 +43,13 @@ struct RemoteConversationDeletion: Sendable {
             let sessionFolder = conversation.sourceFile.deletingLastPathComponent()
             let workspaceFolderName = sessionFolder.deletingLastPathComponent().lastPathComponent
             guard KiroV3Session.isMessagesFile(conversation.sourceFile),
-                  sessionFolder.lastPathComponent == conversation.sessionID,
-                  Self.isSafeFolderName(workspaceFolderName),
-                  let metadata = KiroV3SessionMetadata(file: sessionFolder.appendingPathComponent(KiroV3Session.metadataFileName)),
-                  metadata.sessionID == conversation.sessionID,
-                  metadata.projectPath == conversation.projectPath,
-                  conversation.projectPath.hasPrefix("/") else { throw ConversationDeletionError.invalidSource }
+                sessionFolder.lastPathComponent == conversation.sessionID,
+                Self.isSafeFolderName(workspaceFolderName),
+                let metadata = KiroV3SessionMetadata(file: sessionFolder.appendingPathComponent(KiroV3Session.metadataFileName)),
+                metadata.sessionID == conversation.sessionID,
+                metadata.projectPath == conversation.projectPath,
+                conversation.projectPath.hasPrefix("/")
+            else { throw ConversationDeletionError.invalidSource }
             command = RemoteKiroConversationDeletion.v3Command(
                 sessionID: conversation.sessionID,
                 workspaceFolderName: workspaceFolderName,
@@ -58,10 +60,11 @@ struct RemoteConversationDeletion: Sendable {
         case .kiro:
             let metadataFile = conversation.sourceFile.deletingPathExtension().appendingPathExtension("json")
             guard conversation.sourceFile.lastPathComponent == "\(conversation.sessionID).jsonl",
-                  let metadata = KiroSessionMetadata(file: metadataFile),
-                  metadata.sessionID == conversation.sessionID,
-                  metadata.projectPath == conversation.projectPath,
-                  conversation.projectPath.hasPrefix("/") else { throw ConversationDeletionError.invalidSource }
+                let metadata = KiroSessionMetadata(file: metadataFile),
+                metadata.sessionID == conversation.sessionID,
+                metadata.projectPath == conversation.projectPath,
+                conversation.projectPath.hasPrefix("/")
+            else { throw ConversationDeletionError.invalidSource }
             command = RemoteKiroConversationDeletion.command(
                 sessionID: conversation.sessionID,
                 projectPath: conversation.projectPath,

@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// What a Kiro CLI does, as its turn markers say; see `KiroTurnMarkers`. The markers are as Kiro CLI 2.31.1 keeps them
@@ -45,7 +46,12 @@ struct KiroTurnMarkersTests {
         cli.executableURL = URL(fileURLWithPath: "/bin/sh")
         cli.arguments = ["-c", "sleep 600 & wait"]
         try cli.run()
-        defer { if cli.isRunning { kill(-cli.processIdentifier, SIGTERM); cli.terminate() } }
+        defer {
+            if cli.isRunning {
+                kill(-cli.processIdentifier, SIGTERM)
+                cli.terminate()
+            }
+        }
         let tui = try #require(Self.waitForChild(of: cli.processIdentifier))
         defer { kill(tui, SIGTERM) }
         let reader = CLIActivityReader(

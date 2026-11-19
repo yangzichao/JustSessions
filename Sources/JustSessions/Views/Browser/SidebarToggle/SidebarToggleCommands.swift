@@ -8,8 +8,11 @@ struct SidebarToggleCommands: Commands {
 
     var body: some Commands {
         CommandGroup(before: .sidebar) {
-            Button(AppLocalization.string(isSidebarHidden == true ? "Show Sidebar" : "Hide Sidebar",
-                                          language: languageStore.language)) {
+            Button(
+                AppLocalization.string(
+                    isSidebarHidden == true ? "Show Sidebar" : "Hide Sidebar",
+                    language: languageStore.language)
+            ) {
                 isSidebarHidden?.toggle()
             }
             .keyboardShortcut("b", modifiers: .command)

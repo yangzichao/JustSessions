@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A split keeps its own layout through the tab strip's rules, which rebuild it as they swap or regroup its tabs

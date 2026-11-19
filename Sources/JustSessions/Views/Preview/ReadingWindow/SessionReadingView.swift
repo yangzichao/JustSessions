@@ -41,7 +41,7 @@ struct SessionReadingView: View {
                 // A session deleted while its window stays open has had its bookmarks forgotten; none are saved again.
                 store: store.conversation(withID: conversation.id) == nil ? nil : store
             )
-                .id(conversation.id)
+            .id(conversation.id)
         }
         .frame(minWidth: 400, minHeight: 300)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

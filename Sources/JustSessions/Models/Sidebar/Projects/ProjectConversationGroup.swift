@@ -75,7 +75,7 @@ struct ProjectConversationGroup: Identifiable {
     static func orderedForSidebar(_ projects: [ProjectConversationGroup]) -> [ProjectConversationGroup] {
         projects.sorted { first, second in
             switch (first.pinnedPlace, second.pinnedPlace) {
-            case let (firstPlace?, secondPlace?): return firstPlace < secondPlace
+            case (let firstPlace?, let secondPlace?): return firstPlace < secondPlace
             case (.some, nil): return true
             case (nil, .some): return false
             case (nil, nil): break

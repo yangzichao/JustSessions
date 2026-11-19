@@ -29,14 +29,16 @@ struct WindowVisibilityReader: NSViewRepresentable {
             super.viewDidMoveToWindow()
             // Selector observers go with the view, as WorkingSpinner's do.
             let center = NotificationCenter.default
-            for name in [NSWindow.didChangeOcclusionStateNotification, NSWindow.didMiniaturizeNotification, NSWindow.didDeminiaturizeNotification] {
+            for name in [
+                NSWindow.didChangeOcclusionStateNotification, NSWindow.didMiniaturizeNotification, NSWindow.didDeminiaturizeNotification,
+            ] {
                 center.removeObserver(self, name: name, object: nil)
                 if let window { center.addObserver(self, selector: #selector(windowChanged), name: name, object: window) }
             }
             report()
         }
 
-        @objc private func windowChanged(_ notification: Notification) {
+        @objc private func windowChanged(_: Notification) {
             report()
         }
 

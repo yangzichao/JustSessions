@@ -12,9 +12,10 @@ struct LiveSessionReporting: Sendable {
     /// Only the packaged app reports, so tests and `swift run` leave the app's own folder alone.
     static var thisApp: LiveSessionReporting? {
         guard Bundle.main.bundleURL.pathExtension == "app" else { return nil }
-        return LiveSessionReporting(directory: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent(AppIdentity.currentBundleIdentifier)
-            .appendingPathComponent("LiveSessionReporting", isDirectory: true))
+        return LiveSessionReporting(
+            directory: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent(AppIdentity.currentBundleIdentifier)
+                .appendingPathComponent("LiveSessionReporting", isDirectory: true))
     }
 
     var reportsDirectory: URL {
@@ -36,8 +37,9 @@ struct LiveSessionReporting: Sendable {
             let pluginFile = directory.appendingPathComponent("opencode/\(OpenCodeLiveSessionPlugin.fileName)")
             let tuiConfigurationFile = directory.appendingPathComponent("opencode/tui.json")
             guard Self.write(OpenCodeLiveSessionPlugin.source, to: pluginFile),
-                  let tuiConfiguration = OpenCodeLiveSessionPlugin.tuiConfiguration(loading: pluginFile),
-                  Self.write(tuiConfiguration, to: tuiConfigurationFile) else { return nil }
+                let tuiConfiguration = OpenCodeLiveSessionPlugin.tuiConfiguration(loading: pluginFile),
+                Self.write(tuiConfiguration, to: tuiConfigurationFile)
+            else { return nil }
             return LiveSessionReporterLaunch(
                 arguments: [],
                 environment: reportsVariable.merging([OpenCodeLiveSessionPlugin.tuiConfigurationVariable: tuiConfigurationFile.path]) { $1 }
@@ -50,7 +52,8 @@ struct LiveSessionReporting: Sendable {
     /// What the CLI with this process id last reported; nil when it reported nothing.
     func report(forProcessID processID: Int32) -> LiveSessionReport? {
         guard processID > 0,
-              let data = try? Data(contentsOf: reportsDirectory.appendingPathComponent("\(processID).json")) else { return nil }
+            let data = try? Data(contentsOf: reportsDirectory.appendingPathComponent("\(processID).json"))
+        else { return nil }
         return LiveSessionReport(jsonData: data, processID: processID)
     }
 
@@ -61,7 +64,8 @@ struct LiveSessionReporting: Sendable {
             let fileNames = (try? FileManager.default.contentsOfDirectory(atPath: reportsDirectory.path)) ?? []
             for fileName in fileNames {
                 guard let processID = Int32(fileName.replacingOccurrences(of: ".json", with: "")),
-                      !RunningProcessInfo.isRunning(processID) else { continue }
+                    !RunningProcessInfo.isRunning(processID)
+                else { continue }
                 try? FileManager.default.removeItem(at: reportsDirectory.appendingPathComponent(fileName))
             }
         }

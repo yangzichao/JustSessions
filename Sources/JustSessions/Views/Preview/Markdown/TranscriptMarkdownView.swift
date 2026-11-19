@@ -28,7 +28,8 @@ struct TranscriptMarkdownView: View {
     /// Plain messages need only one text view, keeping their lazy scroll measurements inexpensive and stable.
     private var singleParagraph: AttributedString? {
         guard blocks.count == 1, blocks[0].listDepth == 0, blocks[0].quoteDepth == 0,
-              case .text(let text, nil) = blocks[0].content else { return nil }
+            case .text(let text, nil) = blocks[0].content
+        else { return nil }
         return text
     }
 

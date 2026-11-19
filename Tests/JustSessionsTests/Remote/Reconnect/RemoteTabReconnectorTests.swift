@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A tab whose connection dropped, as when the Mac slept, is reconnected in its place once its host lists its tmux

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A program in a Ghostty tab hears whether the terminal is light or dark once, from the tab, as in a SwiftTerm tab.

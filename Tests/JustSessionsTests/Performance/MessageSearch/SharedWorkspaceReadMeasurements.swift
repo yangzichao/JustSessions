@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Service-level proxy for 1, 2, and 4 simultaneously searching workspace windows. "isolated" models the former
@@ -19,9 +20,10 @@ struct SharedWorkspaceReadMeasurements {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let conversations = (0..<sessionCount).map { number in
-            Conversation.fixture(provider: .codex, sessionID: "unchanged-\(number)",
-                                 updatedAt: Date(timeIntervalSince1970: Double(number)),
-                                 sourceFile: directory.appendingPathComponent("\(number).jsonl"))
+            Conversation.fixture(
+                provider: .codex, sessionID: "unchanged-\(number)",
+                updatedAt: Date(timeIntervalSince1970: Double(number)),
+                sourceFile: directory.appendingPathComponent("\(number).jsonl"))
         }
         let index = SessionMessageIndex(cache: SessionMessageTextCache(directory: directory.appendingPathComponent("Cache")))
         let indexer = SessionMessageIndexer(index: index) { _, _, _ in
@@ -99,7 +101,8 @@ struct SharedWorkspaceReadMeasurements {
             let id = "measurement-\(number)"
             let file = directory.appendingPathComponent("\(id).jsonl")
             let payload = String(repeating: "searchable-\(number)-", count: 2_000)
-            let line = #"{"timestamp":"2026-10-02T12:00:00.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"\#(payload)"}]}}"#
+            let line =
+                #"{"timestamp":"2026-10-02T12:00:00.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"\#(payload)"}]}}"#
             try SampleTranscriptLines.fileContents([line]).write(to: file)
             return Conversation.fixture(provider: .codex, sessionID: id, sourceFile: file)
         }
@@ -204,7 +207,8 @@ struct SharedWorkspaceReadMeasurements {
     private static func processCPUTime() -> Duration {
         var usage = rusage()
         getrusage(RUSAGE_SELF, &usage)
-        let microseconds = Int64(usage.ru_utime.tv_sec + usage.ru_stime.tv_sec) * 1_000_000
+        let microseconds =
+            Int64(usage.ru_utime.tv_sec + usage.ru_stime.tv_sec) * 1_000_000
             + Int64(usage.ru_utime.tv_usec + usage.ru_stime.tv_usec)
         return .microseconds(microseconds)
     }
@@ -227,7 +231,8 @@ private final class DiscoveryMeasurementAdapter: ConversationAdapter, @unchecked
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         lock.withLock { count += 1 }
         while !cancellation.isCancelled,
-              gate.wait(timeout: .now() + .milliseconds(10)) == .timedOut {}
+            gate.wait(timeout: .now() + .milliseconds(10)) == .timedOut
+        {}
         try cancellation.checkCancellation()
         return []
     }

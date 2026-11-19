@@ -16,7 +16,8 @@ struct ArchivedProjectsSheet: View {
         ) {
             HelpPopoverButton(
                 title: "Archived projects",
-                explanation: "An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it."
+                explanation:
+                    "An archived project is hidden from the sidebar. Its folder and sessions stay on disk, and restoring it lists them again. Starting a new session in its folder also restores it."
             )
             .accessibilityIdentifier("archivedProjects.help")
         } content: {

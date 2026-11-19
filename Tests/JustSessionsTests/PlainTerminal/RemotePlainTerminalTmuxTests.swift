@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// An SSH plain terminal's command against a real tmux on this Mac, with a private tmux server and home folder for the
@@ -14,11 +15,13 @@ struct RemotePlainTerminalTmuxTests {
         defer { sandbox.tearDown() }
         // Given a command, it runs it, as `$SHELL -lc` does; given only `-l`, it stays open as your shell would, after
         // noting where it started and with which environment.
-        try sandbox.addProgram(named: "login-shell", script: """
-            if [ "$#" = 1 ]; then pwd -P >> "$HOME/shell-starts.log"; env > "$HOME/shell.environment"; exec sleep 600; fi
-            shift
-            exec /bin/sh -c "$1"
-            """)
+        try sandbox.addProgram(
+            named: "login-shell",
+            script: """
+                if [ "$#" = 1 ]; then pwd -P >> "$HOME/shell-starts.log"; env > "$HOME/shell.environment"; exec sleep 600; fi
+                shift
+                exec /bin/sh -c "$1"
+                """)
         let tmuxSessionName = TmuxSessionName.forNewPlainTerminal()
         let tabCommand = RemoteCLICommandBuilder.remotePlainTerminalCommand(
             projectPath: sandbox.project.path,
@@ -38,8 +41,9 @@ struct RemotePlainTerminalTmuxTests {
         // Startup files see a shell of yours, not a command of the app's (SSH-24).
         let shellEnvironment = try String(contentsOf: sandbox.root.appendingPathComponent("shell.environment"), encoding: .utf8)
         #expect(!shellEnvironment.contains("\(RemoteShellStartup.environmentVariable)="))
-        #expect(sandbox.run("tmux show-options -v -t \(ShellQuoting.quoted("=" + tmuxSessionName + ":")) history-limit")
-            == "\(PlainTerminalTmuxHistoryLimit.lineCount)\n")
+        #expect(
+            sandbox.run("tmux show-options -v -t \(ShellQuoting.quoted("=" + tmuxSessionName + ":")) history-limit")
+                == "\(PlainTerminalTmuxHistoryLimit.lineCount)\n")
         // The host's own sessions keep its limit.
         #expect(sandbox.run("tmux show-options -gv history-limit") == "\(PlainTerminalTmuxHistoryLimit.tmuxDefaultLineCount)\n")
 

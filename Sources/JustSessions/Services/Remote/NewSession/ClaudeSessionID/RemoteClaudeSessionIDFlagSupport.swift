@@ -56,12 +56,13 @@ final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
         host: String,
         cliLocation: RemoteCLILocation? = nil
     ) -> String {
-        let invocation = CLIStartCommandLine.customCommand(startCommand).map {
-            CLIStartCommandLine.remoteInvocation(startCommand: $0, arguments: ["--help"])
-        } ?? RemoteCLIInvocation.oneOffInvocation(
-            executableName: ConversationProvider.claude.executableName,
-            location: cliLocation ?? RemoteHostCLILocations.shared.location(of: .claude, on: host)
-        ) + " --help"
+        let invocation =
+            CLIStartCommandLine.customCommand(startCommand).map {
+                CLIStartCommandLine.remoteInvocation(startCommand: $0, arguments: ["--help"])
+            } ?? RemoteCLIInvocation.oneOffInvocation(
+                executableName: ConversationProvider.claude.executableName,
+                location: cliLocation ?? RemoteHostCLILocations.shared.location(of: .claude, on: host)
+            ) + " --help"
         return RemoteCLICommandBuilder.loginShellCommand(invocation, on: host)
     }
 

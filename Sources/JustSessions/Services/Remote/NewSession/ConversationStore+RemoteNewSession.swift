@@ -16,10 +16,12 @@ extension ConversationStore {
     ) {
         connectIfDisconnected(.ssh(host))
         let startCommand = customStartCommand(for: provider, on: .ssh(host))
-        let preassignedSessionID = provider == .claude
+        let preassignedSessionID =
+            provider == .claude
             ? remoteClaudeSessionIDFlagSupport.preassignedSessionID(host: host, startCommand: startCommand)
             : nil
-        let tmuxSessionName = runsInTmux
+        let tmuxSessionName =
+            runsInTmux
             ? preassignedSessionID.map { TmuxSessionName.forSession(provider: provider, sessionID: $0) }
                 ?? TmuxSessionName.unique(for: provider)
             : nil
@@ -62,10 +64,11 @@ extension ConversationStore {
     }
 
     private func hostsWithRemoteNewSessionsToFollow() -> Set<String> {
-        Set(terminalSessions.compactMap { session -> String? in
-            guard let host = session.host.sshDestination, session.startsNewSession, !session.hasExited else { return nil }
-            let needsTitle = session.conversation?.suggestedTitle == ConversationMetadata.untitledConversationTitle
-            return session.isNewSessionAwaitingConversation || needsTitle ? host : nil
-        })
+        Set(
+            terminalSessions.compactMap { session -> String? in
+                guard let host = session.host.sshDestination, session.startsNewSession, !session.hasExited else { return nil }
+                let needsTitle = session.conversation?.suggestedTitle == ConversationMetadata.untitledConversationTitle
+                return session.isNewSessionAwaitingConversation || needsTitle ? host : nil
+            })
     }
 }

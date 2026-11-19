@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The store opens each new tab with the engine chosen in Settings at that moment.

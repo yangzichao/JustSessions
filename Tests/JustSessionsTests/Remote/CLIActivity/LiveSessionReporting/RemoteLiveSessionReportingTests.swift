@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A Pi or OpenCode tab's tmux session on an SSH host writes the app's extension to the host and starts the CLI with
@@ -36,8 +37,9 @@ struct RemoteLiveSessionReportingTests {
         #expect(launch.arguments == ["--session", "abc"])
         #expect(launch.activityOption == RemoteCLIActivityTitle.optionName)
         #expect(launch.tuiConfiguration == folder.appendingPathComponent("tui.json").path)
-        #expect(try String(contentsOf: folder.appendingPathComponent("tui.json"), encoding: .utf8)
-            == #"{"plugin":["./justsessions-live-session.js"]}"# + "\n")
+        #expect(
+            try String(contentsOf: folder.appendingPathComponent("tui.json"), encoding: .utf8)
+                == #"{"plugin":["./justsessions-live-session.js"]}"# + "\n")
         let pluginFile = folder.appendingPathComponent(OpenCodeLiveSessionPlugin.fileName)
         #expect(try String(contentsOf: pluginFile, encoding: .utf8) == OpenCodeLiveSessionPlugin.source)
     }
@@ -62,7 +64,8 @@ struct RemoteLiveSessionReportingTests {
 
     @Test func piTellsTheTabWhatItDoes() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory,
-              let node = ExtensionHostStandIns.installedNodePath else { return }
+            let node = ExtensionHostStandIns.installedNodePath
+        else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
         defer { sandbox.tearDown() }
         try Self.addStandIn(named: "pi", running: ExtensionHostStandIns.pi, with: node, to: sandbox)
@@ -87,7 +90,8 @@ struct RemoteLiveSessionReportingTests {
 
     @Test func openCodeTellsTheTabWhatTheSessionOnScreenDoes() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory,
-              let node = ExtensionHostStandIns.installedNodePath else { return }
+            let node = ExtensionHostStandIns.installedNodePath
+        else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
         defer { sandbox.tearDown() }
         try Self.addStandIn(named: "opencode", running: ExtensionHostStandIns.openCode, with: node, to: sandbox)
@@ -108,10 +112,11 @@ struct RemoteLiveSessionReportingTests {
 
         // Its home screen shows no session, and the tab's title is the CLI's own again.
         try Self.setSteps(steps.map(\.0) + [#"{"session":null,"status":"idle","permissions":0}"#], in: sandbox)
-        #expect(sandbox.waitUntil {
-            let title = TerminalTitlesSent.titles(inOutputFile: output).last ?? ""
-            return !title.isEmpty && !title.hasPrefix(RemoteCLIActivityTitle.titlePrefix)
-        })
+        #expect(
+            sandbox.waitUntil {
+                let title = TerminalTitlesSent.titles(inOutputFile: output).last ?? ""
+                return !title.isEmpty && !title.hasPrefix(RemoteCLIActivityTitle.titlePrefix)
+            })
     }
 
     /// Records its arguments, and the two variables a tab's login shell may set for the extension, then waits.
@@ -132,7 +137,8 @@ struct RemoteLiveSessionReportingTests {
     private static func waitForLaunch(in sandbox: TmuxSandbox) -> Launch? {
         let file = sandbox.root.appendingPathComponent("launch")
         guard sandbox.waitUntil({ FileManager.default.fileExists(atPath: file.path) }),
-              let text = try? String(contentsOf: file, encoding: .utf8) else { return nil }
+            let text = try? String(contentsOf: file, encoding: .utf8)
+        else { return nil }
         let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init).dropLast()
         guard lines.count >= 2 else { return nil }
         return Launch(

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -29,7 +30,10 @@ struct OnboardingTipsStoreTests {
         var askedWhetherFresh = false
         let relaunchedTipsStore = OnboardingTipsStore(
             userDefaults: isolatedUserDefaults.userDefaults,
-            isFreshInstall: { askedWhetherFresh = true; return true }()
+            isFreshInstall: {
+                askedWhetherFresh = true
+                return true
+            }()
         )
         #expect(relaunchedTipsStore.tipsToShow.isEmpty)
         #expect(!askedWhetherFresh)

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Moving a session's tab to another window opens a tab for it there, which is the same tab to you, so it keeps the
@@ -89,7 +90,8 @@ struct TerminalEngineTabMovingTests {
         first.launch(conversation, action: .resume)
         let tab = try #require(first.runningTerminal(for: conversation))
         tab.startIfNeeded()
-        try #require(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
         try #require(await sandbox.waitForPaneProcess(in: first, for: tab))
         let cliProcessID = try #require(tab.tmuxPaneProcessID)
         engineStore.setEngine(engine.otherEngine)

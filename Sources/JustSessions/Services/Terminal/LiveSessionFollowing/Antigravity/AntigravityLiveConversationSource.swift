@@ -26,11 +26,12 @@ final class AntigravityLiveConversationSource: LiveSessionSource, @unchecked Sen
         logFileOfProcess: (@Sendable (Int32) -> URL?)? = nil
     ) {
         self.configurationDirectory = configurationDirectory
-        self.logFileOfProcess = logFileOfProcess ?? { processID in
-            ProcessOpenFileReader().openFilePaths(ofProcessIDs: [processID])[processID]?
-                .first { AntigravityCLILog.isCLILog(atPath: $0, configurationDirectory: configurationDirectory) }
-                .map { URL(fileURLWithPath: $0) }
-        }
+        self.logFileOfProcess =
+            logFileOfProcess ?? { processID in
+                ProcessOpenFileReader().openFilePaths(ofProcessIDs: [processID])[processID]?
+                    .first { AntigravityCLILog.isCLILog(atPath: $0, configurationDirectory: configurationDirectory) }
+                    .map { URL(fileURLWithPath: $0) }
+            }
     }
 
     func currentSession(ofCLIProcessID processID: Int32) -> LiveCLISession? {
@@ -56,7 +57,8 @@ final class AntigravityLiveConversationSource: LiveSessionSource, @unchecked Sen
     private func cliLog(ofProcessID processID: Int32) -> CLILog {
         let processStartDate = RunningProcessInfo.startDate(of: processID)
         if let cliLog = lock.withLock({ cliLogs[processID] }), cliLog.processStartDate == processStartDate,
-           cliLog.file != nil || Date.now.timeIntervalSince(cliLog.lookedUpAt) < Self.logLookupRetryInterval {
+            cliLog.file != nil || Date.now.timeIntervalSince(cliLog.lookedUpAt) < Self.logLookupRetryInterval
+        {
             return cliLog
         }
         let file = logFileOfProcess(processID)

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A bookmark's label and tags (RDR-51), and finding bookmarks by them (SBF-05, RDR-52).
@@ -26,7 +27,10 @@ struct MessageBookmarkDetailsTests {
         defer { isolatedUserDefaults.removeSuite() }
         var bookmarks = MessageBookmarks()
         guard case .added(let added) = bookmarks.toggle(entryID: id(1), kind: .assistant, snippet: "Plan", conversationID: conversationID)
-        else { Issue.record("not added"); return }
+        else {
+            Issue.record("not added")
+            return
+        }
 
         bookmarks.setDetails(of: added, label: "Migration plan", tags: ["db", "todo"], conversationID: conversationID)
         bookmarks.save(to: isolatedUserDefaults.userDefaults)
@@ -54,10 +58,12 @@ struct MessageBookmarkDetailsTests {
     @Test func typedTagsSplitOnCommasAndSpacesWithoutHashesOrRepeats() {
         #expect(MessageBookmarkDetails.tags(fromTyped: "#db, todo  #DB，Todo bug") == ["db", "todo", "bug"])
         #expect(MessageBookmarkDetails.tags(fromTyped: " , # ,") == [])
-        #expect(MessageBookmarkDetails.tags(fromTyped: String(repeating: "t", count: 40)).first?.count
-            == MessageBookmarkDetails.maximumTagLength)
-        #expect(MessageBookmarkDetails.tags(fromTyped: (1...20).map { "t\($0)" }.joined(separator: " ")).count
-            == MessageBookmarkDetails.maximumTagCount)
+        #expect(
+            MessageBookmarkDetails.tags(fromTyped: String(repeating: "t", count: 40)).first?.count
+                == MessageBookmarkDetails.maximumTagLength)
+        #expect(
+            MessageBookmarkDetails.tags(fromTyped: (1...20).map { "t\($0)" }.joined(separator: " ")).count
+                == MessageBookmarkDetails.maximumTagCount)
         #expect(MessageBookmarkDetails.typedText(of: ["db", "todo"]) == "#db #todo")
     }
 
@@ -67,15 +73,16 @@ struct MessageBookmarkDetailsTests {
         #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "") == used)
         #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "#DB ") == ["todo", "deploy", "Today"])
         #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "#db #to") == ["todo", "Today"])
-        #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "#todo").isEmpty)   // "today" doesn't start with it
-        #expect(MessageBookmarkTagTyping.suggestions(from: (1...20).map { "t\($0)" }, typed: "").count
-            == MessageBookmarkTagTyping.maximumSuggestionCount)
+        #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "#todo").isEmpty)  // "today" doesn't start with it
+        #expect(
+            MessageBookmarkTagTyping.suggestions(from: (1...20).map { "t\($0)" }, typed: "").count
+                == MessageBookmarkTagTyping.maximumSuggestionCount)
     }
 
     @Test func choosingASuggestionReplacesTheTagBeingTypedOrFollowsTheOthers() {
         #expect(MessageBookmarkTagTyping.adding("todo", to: "") == "#todo ")
         #expect(MessageBookmarkTagTyping.adding("todo", to: "#db ") == "#db #todo ")
-        #expect(MessageBookmarkTagTyping.adding("todo", to: "#db") == "#todo ")   // "db" is being typed
+        #expect(MessageBookmarkTagTyping.adding("todo", to: "#db") == "#todo ")  // "db" is being typed
         #expect(MessageBookmarkTagTyping.adding("todo", to: "#db #to") == "#db #todo ")
         #expect(MessageBookmarkTagTyping.adding("todo", to: "#db, to") == "#db, #todo ")
         #expect(MessageBookmarkTagTyping.adding("todo", to: "#db #") == "#db #todo ")
@@ -112,11 +119,13 @@ struct MessageBookmarkDetailsTests {
     @Test func aMovedBookmarkKeepsItsLabelAndTags() {
         var bookmarks = MessageBookmarks()
         _ = bookmarks.toggle(entryID: id(1), kind: .assistant, snippet: "Reply", conversationID: conversationID)
-        let bookmark = bookmarks.setDetails(of: bookmarks.bookmarks(forConversationID: conversationID)[0],
-                                            label: "Answer", tags: ["keep"], conversationID: conversationID)!
+        let bookmark = bookmarks.setDetails(
+            of: bookmarks.bookmarks(forConversationID: conversationID)[0],
+            label: "Answer", tags: ["keep"], conversationID: conversationID)!
 
-        bookmarks.update(bookmark, entryID: TranscriptPageIdentity.entryID(record: 1, part: 2), snippet: "Reply, longer",
-                         conversationID: conversationID)
+        bookmarks.update(
+            bookmark, entryID: TranscriptPageIdentity.entryID(record: 1, part: 2), snippet: "Reply, longer",
+            conversationID: conversationID)
 
         let moved = bookmarks.bookmarks(forConversationID: conversationID)[0]
         #expect(moved.label == "Answer")
@@ -141,7 +150,8 @@ struct MessageBookmarkDetailsTests {
     @Test func allTagsListsTheMostUsedFirstOnceEach() {
         var bookmarks = MessageBookmarks()
         func add(_ record: Int, in conversationID: String, tags: [String]) {
-            guard case .added(let bookmark) = bookmarks.toggle(entryID: id(record), kind: .user, snippet: "", conversationID: conversationID)
+            guard
+                case .added(let bookmark) = bookmarks.toggle(entryID: id(record), kind: .user, snippet: "", conversationID: conversationID)
             else { return }
             bookmarks.setDetails(of: bookmark, label: nil, tags: tags, conversationID: conversationID)
         }
@@ -153,8 +163,9 @@ struct MessageBookmarkDetailsTests {
     }
 
     @Test func aQueryFindsLabelsAndTagsIgnoringCaseAndAccents() throws {
-        let labelled = MessageBookmark(letter: "a", entryID: id(1), kind: .user, snippet: "Run the migration",
-                                       label: "Café rollout", tags: ["deploy", "db"])
+        let labelled = MessageBookmark(
+            letter: "a", entryID: id(1), kind: .user, snippet: "Run the migration",
+            label: "Café rollout", tags: ["deploy", "db"])
         let plain = MessageBookmark(letter: "b", entryID: id(2), kind: .assistant, snippet: "Deploy steps")
 
         let text = try #require(MessageBookmarkQuery("CAFE"))
@@ -168,7 +179,7 @@ struct MessageBookmarkDetailsTests {
 
         let tagPrefix = try #require(MessageBookmarkQuery(" #De "))
         #expect(tagPrefix.matches(labelled, includingSnippet: false))
-        #expect(!tagPrefix.matches(plain, includingSnippet: true))   // a tag search never reads the message
+        #expect(!tagPrefix.matches(plain, includingSnippet: true))  // a tag search never reads the message
         #expect(try #require(MessageBookmarkQuery("#b")).matches(labelled, includingSnippet: false) == false)
 
         #expect(MessageBookmarkQuery("  ") == nil)
@@ -178,8 +189,11 @@ struct MessageBookmarkDetailsTests {
     @Test func matchesListOnlySessionsWithFoundBookmarks() {
         var bookmarks = MessageBookmarks()
         guard case .added(let first) = bookmarks.toggle(entryID: id(1), kind: .user, snippet: "", conversationID: "one"),
-              case .added = bookmarks.toggle(entryID: id(1), kind: .user, snippet: "", conversationID: "two")
-        else { Issue.record("not added"); return }
+            case .added = bookmarks.toggle(entryID: id(1), kind: .user, snippet: "", conversationID: "two")
+        else {
+            Issue.record("not added")
+            return
+        }
         bookmarks.setDetails(of: first, label: "Release", tags: [], conversationID: "one")
 
         let matches = bookmarks.matches(for: MessageBookmarkQuery("release")!, includingSnippets: false)

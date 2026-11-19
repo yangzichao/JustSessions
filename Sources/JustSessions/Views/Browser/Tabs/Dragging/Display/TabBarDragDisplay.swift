@@ -15,11 +15,12 @@ final class TabBarDragDisplay<ItemID: Hashable> {
     /// Shows the drag, or none for nil, changing only what differs.
     func show(_ nextDrag: TabBarDrag<ItemID>?) {
         if drag != nextDrag { drag = nextDrag }
-        let placesItemsAlike = switch (placement, nextDrag) {
-        case (nil, nil): true
-        case let (placement?, nextDrag?): placement.placesItemsAlike(nextDrag)
-        default: false
-        }
+        let placesItemsAlike =
+            switch (placement, nextDrag) {
+            case (nil, nil): true
+            case (let placement?, let nextDrag?): placement.placesItemsAlike(nextDrag)
+            default: false
+            }
         if !placesItemsAlike { placement = nextDrag }
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Measures one activity sync with thousands of sessions listed, most on an SSH host, and dozens running in tmux with
@@ -26,7 +27,8 @@ struct CLIActivitySyncMeasurements {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         RemoteHostList(hosts: ["devbox"]).save(to: settings.userDefaults)
-        let store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(), startsBackgroundPolling: false)
+        let store = ConversationStore(
+            adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(), startsBackgroundPolling: false)
         let thisMacConversations = Self.conversations(Self.thisMacSessionCount, on: .thisMac)
         let hostConversations = Self.conversations(counts.listed - Self.thisMacSessionCount, on: .ssh("devbox"))
         store.replaceConversations(on: .thisMac, with: thisMacConversations)

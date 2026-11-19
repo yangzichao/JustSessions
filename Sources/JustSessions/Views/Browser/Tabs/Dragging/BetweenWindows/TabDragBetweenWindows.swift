@@ -199,10 +199,12 @@ final class TabDragBetweenWindows {
         guard let window = store.windowRegistry.window(of: store), let groupSpan = layout.groupSpans[groupKey] else { return true }
         let firstTabsOfGroup = store.tabStrip.movingUnits(inGroup: groupKey).first ?? tabIDs
         // A collapsed group shows only its label; its tabs would start right past it.
-        let groupTabsLeadingEdge = firstTabsOfGroup.compactMap { layout.tabSpansInGroups[$0]?.minX }.min()
+        let groupTabsLeadingEdge =
+            firstTabsOfGroup.compactMap { layout.tabSpansInGroups[$0]?.minX }.min()
             ?? (isWholeGroup ? groupSpan.width : 0)
         // A whole group is grabbed by its label, before its tabs.
-        let tabsLeadingEdge = isWholeGroup
+        let tabsLeadingEdge =
+            isWholeGroup
             ? groupSpan.minX + groupTabsLeadingEdge
             : layout.span(ofTabs: tabIDs, inGroup: groupKey)?.minX
         guard let tabsLeadingEdge else { return true }
@@ -241,7 +243,8 @@ final class TabDragBetweenWindows {
     /// terminals take a tab that can show there, or else a window opens to carry the tabs.
     private func followDragInStartingBar() -> Bool {
         guard let drag, let window = drag.registry.window(of: drag.startingStore),
-              !TabBarBand(windowFrame: window.frame).holdsTab(at: drag.pointer) else { return true }
+            !TabBarBand(windowFrame: window.frame).holdsTab(at: drag.pointer)
+        else { return true }
         let startingWorkspace = Workspace(store: drag.startingStore, window: window)
         if let place = terminalDropPlace(in: startingWorkspace, at: drag.pointer) {
             showTerminalDrop(at: place, in: startingWorkspace)
@@ -271,7 +274,8 @@ final class TabDragBetweenWindows {
 
     private func carrierOpened(_ carrier: Workspace) {
         guard var drag, case .waitingForCarrier = drag.stage,
-              let tabs = drag.startingStore.takeOutTabsForAnotherWindow(drag.tabIDs) else {
+            let tabs = drag.startingStore.takeOutTabsForAnotherWindow(drag.tabIDs)
+        else {
             // The drag ended without it.
             carrier.window.close()
             return
@@ -296,7 +300,8 @@ final class TabDragBetweenWindows {
             followCarriedTabs(to: pointer)
         case .inTabBar(let store):
             guard let window = drag.registry.window(of: store),
-                  TabBarBand(windowFrame: window.frame).holdsTab(at: pointer) else {
+                TabBarBand(windowFrame: window.frame).holdsTab(at: pointer)
+            else {
                 moveTabsOutOfTabBar(of: store, to: pointer)
                 return
             }
@@ -483,11 +488,12 @@ final class TabDragBetweenWindows {
         self.drag?.stage = .overTerminals(workspace.store, place)
         drag.carrier?.window.alphaValue = 0
         if isNewTarget { workspace.window.orderFront(nil) }
-        splitDropTargets.show(TerminalSplitDropTargets.Target(
-            storeID: ObjectIdentifier(workspace.store),
-            place: place,
-            title: drag.grabbedTabTitle
-        ))
+        splitDropTargets.show(
+            TerminalSplitDropTargets.Target(
+                storeID: ObjectIdentifier(workspace.store),
+                place: place,
+                title: drag.grabbedTabTitle
+            ))
     }
 
     /// Shows the dragged tab at `place` on the store's window's terminals, selected, the window in front. A tab in a
@@ -501,13 +507,15 @@ final class TabDragBetweenWindows {
         }
         if let carrier = drag.carrier, carrier.store !== store {
             guard let pivotTabID = store.selectedTerminalID,
-                  let tabs = carrier.store.takeOutTabsForAnotherWindow(drag.tabIDs) else {
+                let tabs = carrier.store.takeOutTabsForAnotherWindow(drag.tabIDs)
+            else {
                 leaveTabsOffTerminals()
                 return
             }
             let strip = store.tabStrip
             let groupKey = tabs.unit.groupKey
-            let placement: TabStripPlacement = strip.groupKeysInOrder.contains(groupKey)
+            let placement: TabStripPlacement =
+                strip.groupKeysInOrder.contains(groupKey)
                 ? .amongGroupTabs(strip.movingUnits(inGroup: groupKey).count)
                 : .asNewGroup(strip.groupKeysInOrder.count)
             store.bringInTabsFromAnotherWindow(tabs, at: placement, selecting: pivotTabID)
@@ -533,18 +541,20 @@ final class TabDragBetweenWindows {
     private func moveCarrier(to pointer: CGPoint) {
         guard let drag, let carrier = drag.carrier else { return }
         let tabsLeadingEdge = tabsSpan(in: carrier.store)?.minX ?? drag.estimatedCarrierTabsLeadingEdge
-        carrier.window.setFrameOrigin(drag.grab.carrierWindowOrigin(
-            pointer: pointer,
-            tabsLeadingEdge: tabsLeadingEdge,
-            windowHeight: carrier.window.frame.height
-        ))
+        carrier.window.setFrameOrigin(
+            drag.grab.carrierWindowOrigin(
+                pointer: pointer,
+                tabsLeadingEdge: tabsLeadingEdge,
+                windowHeight: carrier.window.frame.height
+            ))
     }
 
     /// Draws the tabs in the tab bar holding them under the pointer, once it has laid them out: among their group's
     /// tabs, together as one, or as their own group among the groups when they are the group's only ones.
     private func showDrag(in holder: Workspace, at pointer: CGPoint) {
         guard let drag, let tabsSpan = tabsSpan(in: holder.store),
-              let groupKey = holder.store.terminalSessions.first(where: { $0.id == drag.grabbedTabID }).map(holder.store.tabGroupKey(of:)) else { return }
+            let groupKey = holder.store.terminalSessions.first(where: { $0.id == drag.grabbedTabID }).map(holder.store.tabGroupKey(of:))
+        else { return }
         let layout = layouts.layout(of: holder.store)
         let strip = holder.store.tabStrip
         let displays = dragDisplays(in: holder.store)
@@ -583,8 +593,9 @@ final class TabDragBetweenWindows {
     /// How far the dragged tabs start past their group's leading edge in the store's tab bar, once it has laid them out.
     private func tabsDistanceFromGroupLeadingEdge(in store: ConversationStore) -> CGFloat? {
         guard let drag, let grabbedTab = store.terminalSessions.first(where: { $0.id == drag.grabbedTabID }),
-              let tabsSpan = tabsSpan(in: store),
-              let groupSpan = layouts.layout(of: store).groupSpans[store.tabGroupKey(of: grabbedTab)] else { return nil }
+            let tabsSpan = tabsSpan(in: store),
+            let groupSpan = layouts.layout(of: store).groupSpans[store.tabGroupKey(of: grabbedTab)]
+        else { return nil }
         return tabsSpan.minX - groupSpan.minX
     }
 
@@ -626,7 +637,7 @@ final class TabDragBetweenWindows {
         withAnimation(TabBarDragMetrics.slideAnimation) {
             switch shownDrag {
             case .amongGroupTabs(let groupKey, _, let tabDrag)
-                where tabDrag.itemIDs == strip.movingUnits(inGroup: groupKey, keepingTogether: drag.tabIDs):
+            where tabDrag.itemIDs == strip.movingUnits(inGroup: groupKey, keepingTogether: drag.tabIDs):
                 store.moveTabs(drag.tabIDs, toPlaceInGroup: tabDrag.targetIndex)
             case .amongGroups(_, let groupDrag) where groupDrag.itemIDs == strip.groupKeysInOrder:
                 store.moveTabGroup(groupDrag.draggedID, toPlace: groupDrag.targetIndex)

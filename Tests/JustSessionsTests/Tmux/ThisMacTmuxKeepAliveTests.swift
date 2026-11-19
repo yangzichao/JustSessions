@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
@@ -10,16 +11,18 @@ struct ThisMacTmuxKeepAliveTests {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
         let log = sandbox.root.appendingPathComponent("cli.log")
-        let cli = try sandbox.writeExecutable(named: "claude", script: """
-            #!/bin/sh
-            {
-              echo "pid=$$"
-              echo "directory=$(pwd -P)"
-              for argument in "$@"; do echo "argument=$argument"; done
-              echo "COLORTERM=$COLORTERM"
-            } >> "$CLI_LOG"
-            exec /bin/sleep 600
-            """)
+        let cli = try sandbox.writeExecutable(
+            named: "claude",
+            script: """
+                #!/bin/sh
+                {
+                  echo "pid=$$"
+                  echo "directory=$(pwd -P)"
+                  for argument in "$@"; do echo "argument=$argument"; done
+                  echo "COLORTERM=$COLORTERM"
+                } >> "$CLI_LOG"
+                exec /bin/sleep 600
+                """)
         let name = "justsessions-claude-keepalive"
         let command = sandbox.server.command(
             attachingTo: name,
@@ -33,7 +36,8 @@ struct ThisMacTmuxKeepAliveTests {
         #expect(sandbox.server.paneProcessIDsBySessionName() == [name: cliProcessID])
         let logLines = try String(contentsOf: log, encoding: .utf8).split(separator: "\n").map(String.init)
         let loggedDirectory = try #require(logLines.first { $0.hasPrefix("directory=") }?.dropFirst("directory=".count))
-        #expect(URL(fileURLWithPath: String(loggedDirectory)).resolvingSymlinksInPath().path == sandbox.project.resolvingSymlinksInPath().path)
+        #expect(
+            URL(fileURLWithPath: String(loggedDirectory)).resolvingSymlinksInPath().path == sandbox.project.resolvingSymlinksInPath().path)
         #expect(logLines.filter { $0.hasPrefix("argument=") } == ["argument=--resume", "argument=abc", "argument=say;"])
         #expect(logLines.contains("COLORTERM=truecolor"))
         // A pane target needs the colon to name the session exactly.

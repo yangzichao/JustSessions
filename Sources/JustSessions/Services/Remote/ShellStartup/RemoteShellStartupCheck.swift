@@ -21,28 +21,29 @@ struct RemoteShellStartupCheck: Sendable {
         run: (@Sendable (_ host: String, _ command: String, _ timeout: TimeInterval) -> (exitStatus: Int32?, output: String)?)? = nil,
         timeout: TimeInterval = 20
     ) {
-        self.run = run ?? { host, command, timeout in
-            if let failureOutput = reachability.recentFailureOutput(on: host) {
-                return (RemoteHostCommandRunner.connectionFailureExitStatus, failureOutput)
+        self.run =
+            run ?? { host, command, timeout in
+                if let failureOutput = reachability.recentFailureOutput(on: host) {
+                    return (RemoteHostCommandRunner.connectionFailureExitStatus, failureOutput)
+                }
+                let result = BoundedProcessRunner.outcome(
+                    ofExecutable: "/usr/bin/ssh",
+                    arguments: Self.sshArguments(
+                        host: host,
+                        command: command,
+                        connectionSharingOptions: SSHLoginConnections.shared.connectionOptions(for: host)
+                    ),
+                    // A tab's terminal settings, which startup files may look at, such as TERM.
+                    environment: TerminalColorEnvironment.embeddedTerminalEnvironment(from: SSHProcessEnvironment.standard),
+                    includesStandardError: true,
+                    timeout: timeout,
+                    cancelsWithTask: true
+                )
+                if let result, let exitStatus = result.exitStatus {
+                    reachability.noteResult(exitStatus: exitStatus, output: result.output, on: host)
+                }
+                return result
             }
-            let result = BoundedProcessRunner.outcome(
-                ofExecutable: "/usr/bin/ssh",
-                arguments: Self.sshArguments(
-                    host: host,
-                    command: command,
-                    connectionSharingOptions: SSHLoginConnections.shared.connectionOptions(for: host)
-                ),
-                // A tab's terminal settings, which startup files may look at, such as TERM.
-                environment: TerminalColorEnvironment.embeddedTerminalEnvironment(from: SSHProcessEnvironment.standard),
-                includesStandardError: true,
-                timeout: timeout,
-                cancelsWithTask: true
-            )
-            if let result, let exitStatus = result.exitStatus {
-                reachability.noteResult(exitStatus: exitStatus, output: result.output, on: host)
-            }
-            return result
-        }
         self.timeout = timeout
     }
 
@@ -69,8 +70,8 @@ struct RemoteShellStartupCheck: Sendable {
     private func conclusiveRun(_ host: String, _ command: String) -> (exitStatus: Int32?, output: String)? {
         guard !Task.isCancelled else { return nil }
         guard let result = run(host, command, timeout),
-              result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus,
-              result.exitStatus != nil || !result.output.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus,
+            result.exitStatus != nil || !result.output.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         else { return nil }
         return result
     }

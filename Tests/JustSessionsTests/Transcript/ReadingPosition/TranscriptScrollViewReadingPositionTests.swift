@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -92,7 +93,8 @@ struct TranscriptScrollViewReadingPositionTests {
         let savedPosition = fixture.visiblePosition(in: scrollView)
         _ = try await fixture.show(TranscriptScrollViewFixture.conversation("other"), transcript: TranscriptScrollViewFixture.transcript())
 
-        let restoredScrollView = try await fixture.show(conversation, transcript: TranscriptScrollViewFixture.transcript(count: 115, omittedEntryCount: 10))
+        let restoredScrollView = try await fixture.show(
+            conversation, transcript: TranscriptScrollViewFixture.transcript(count: 115, omittedEntryCount: 10))
 
         #expect(fixture.visiblePosition(in: restoredScrollView) == savedPosition)
     }

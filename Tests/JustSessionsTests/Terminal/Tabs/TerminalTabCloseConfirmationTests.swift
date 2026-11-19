@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Return answers the dialog that asks before a tab closes, and Escape cancels it. The dialog is shown on a window on
@@ -102,7 +103,8 @@ private final class CloseConfirmationScenario {
         store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
         tabCloseChoiceSettingsStore = TabCloseChoiceSettingsStore(userDefaults: settings.userDefaults)
         plainTerminalCloseChoiceSettingsStore = PlainTerminalCloseChoiceSettingsStore(userDefaults: settings.userDefaults)
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled, .closable], backing: .buffered, defer: false)
+        window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
         window.center()
@@ -126,12 +128,13 @@ private final class CloseConfirmationScenario {
 
     /// Asks to close `tab`, as its close button does, and returns the dialog once it is on screen.
     func confirmClosing(_ tab: TerminalSession) async throws -> NSWindow {
-        hostingView.rootView = AnyView(CloseConfirmationHost(
-            store: store,
-            tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
-            plainTerminalCloseChoiceSettingsStore: plainTerminalCloseChoiceSettingsStore,
-            closingSessionID: tab.id
-        ))
+        hostingView.rootView = AnyView(
+            CloseConfirmationHost(
+                store: store,
+                tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
+                plainTerminalCloseChoiceSettingsStore: plainTerminalCloseChoiceSettingsStore,
+                closingSessionID: tab.id
+            ))
         let clock = ContinuousClock()
         let deadline = clock.now + .seconds(Self.timeoutSeconds)
         while clock.now < deadline {
@@ -175,11 +178,12 @@ private final class CloseConfirmationScenario {
     }
 
     private func press(_ characters: String, keyCode: UInt16, in sheet: NSWindow) throws {
-        let event = try #require(NSEvent.keyEvent(
-            with: .keyDown, location: .zero, modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
-            windowNumber: sheet.windowNumber, context: nil, characters: characters, charactersIgnoringModifiers: characters,
-            isARepeat: false, keyCode: keyCode
-        ))
+        let event = try #require(
+            NSEvent.keyEvent(
+                with: .keyDown, location: .zero, modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: sheet.windowNumber, context: nil, characters: characters, charactersIgnoringModifiers: characters,
+                isARepeat: false, keyCode: keyCode
+            ))
         #expect(sheet.performKeyEquivalent(with: event), "No button answers \(characters.debugDescription)")
     }
 
@@ -211,11 +215,12 @@ private struct CloseConfirmationHost: View {
     var body: some View {
         Color.clear
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .modifier(TerminalTabCloseConfirmation(
-                store: store,
-                closingSessionID: $closingSessionID,
-                tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
-                plainTerminalCloseChoiceSettingsStore: plainTerminalCloseChoiceSettingsStore
-            ))
+            .modifier(
+                TerminalTabCloseConfirmation(
+                    store: store,
+                    closingSessionID: $closingSessionID,
+                    tabCloseChoiceSettingsStore: tabCloseChoiceSettingsStore,
+                    plainTerminalCloseChoiceSettingsStore: plainTerminalCloseChoiceSettingsStore
+                ))
     }
 }

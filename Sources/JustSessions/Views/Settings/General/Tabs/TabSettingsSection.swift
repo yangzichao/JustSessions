@@ -19,7 +19,8 @@ struct TabSettingsSection: View {
                 Text("When you close a CLI tab")
                 HelpPopoverButton(
                     title: "Closing tabs",
-                    explanation: "Each host has its own choice for tabs whose CLI can keep running in tmux there. A terminal's shell always ends with its tab. Don't ask again in the close dialog sets these too."
+                    explanation:
+                        "Each host has its own choice for tabs whose CLI can keep running in tmux there. A terminal's shell always ends with its tab. Don't ask again in the close dialog sets these too."
                 )
                 .accessibilityIdentifier("settings.help.closingTabs")
             }
@@ -29,10 +30,13 @@ struct TabSettingsSection: View {
                 }
             }
             .padding(.leading, 16)
-            Picker("When you close a terminal", selection: Binding(
-                get: { plainTerminalCloseChoiceSettingsStore.choice },
-                set: { plainTerminalCloseChoiceSettingsStore.setChoice($0) }
-            )) {
+            Picker(
+                "When you close a terminal",
+                selection: Binding(
+                    get: { plainTerminalCloseChoiceSettingsStore.choice },
+                    set: { plainTerminalCloseChoiceSettingsStore.setChoice($0) }
+                )
+            ) {
                 Text("Ask each time").tag(PlainTerminalCloseChoice.askEachTime)
                 Text("Close without asking").tag(PlainTerminalCloseChoice.closeWithoutAsking)
             }

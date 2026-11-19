@@ -13,7 +13,8 @@ struct PiSessionFolderFixture {
         fileSessionID: String? = nil,
         inProjectFolder: Bool = true
     ) throws -> URL {
-        let folder = inProjectFolder
+        let folder =
+            inProjectFolder
             ? sessionsDirectory.appendingPathComponent("--" + projectPath.dropFirst().replacingOccurrences(of: "/", with: "-") + "--")
             : sessionsDirectory
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
@@ -37,7 +38,8 @@ struct PiSessionFolderFixture {
         let file = sessionFile.deletingPathExtension().appendingPathComponent(relativePath)
         try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
         let parentSession = parentFile.map { #","parentSession":"\#($0.path)""# } ?? ""
-        let header = #"{"type":"session","version":3,"id":"\#(sessionID)","timestamp":"2026-09-30T10:05:00.000Z","cwd":"\#(projectPath)"\#(parentSession)}"#
+        let header =
+            #"{"type":"session","version":3,"id":"\#(sessionID)","timestamp":"2026-09-30T10:05:00.000Z","cwd":"\#(projectPath)"\#(parentSession)}"#
         try ([header] + lines).map { $0 + "\n" }.joined().write(to: file, atomically: true, encoding: .utf8)
         return file
     }

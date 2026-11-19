@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The store keeps the sidebar's projects between store changes; each change they come from must still show.

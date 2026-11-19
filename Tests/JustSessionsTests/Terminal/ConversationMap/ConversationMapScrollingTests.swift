@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+
 @testable import JustSessions
 
 /// A conversation too long to show at a third of full size scrolls (TAB-10): it starts at, and follows, its newest
@@ -10,22 +11,26 @@ struct ConversationMapScrollingTests {
     private static let height: CGFloat = 700
 
     private static func outline(blocks count: Int) -> ConversationOutline {
-        ConversationOutline(blocks: (0..<count).map { record in
-            ConversationOutline.Block(entryID: TranscriptPageIdentity.entryID(record: record, part: 0), lastRecord: record,
-                                      kind: record.isMultiple(of: 2) ? .user : .assistant, timestamp: nil,
-                                      snippet: "Block \(record)", lineWidths: [40, 30], toolCallCount: 0)
-        })
+        ConversationOutline(
+            blocks: (0..<count).map { record in
+                ConversationOutline.Block(
+                    entryID: TranscriptPageIdentity.entryID(record: record, part: 0), lastRecord: record,
+                    kind: record.isMultiple(of: 2) ? .user : .assistant, timestamp: nil,
+                    snippet: "Block \(record)", lineWidths: [40, 30], toolCallCount: 0)
+            })
     }
 
     private static func layout(_ outline: ConversationOutline, offsetFromTop: CGFloat? = nil) -> ConversationMapLayout {
-        ConversationMapLayout(rowCount: outline.rowCount, height: height, naturalPitch: 3, verticalInset: 6, minimumPitch: 1,
-                              offsetFromTop: offsetFromTop)
+        ConversationMapLayout(
+            rowCount: outline.rowCount, height: height, naturalPitch: 3, verticalInset: 6, minimumPitch: 1,
+            offsetFromTop: offsetFromTop)
     }
 
     /// On a reply: the odd records are the CLI's.
     private static func bookmark(_ letter: String, at record: Int, label: String? = nil) -> MessageBookmark {
-        var bookmark = MessageBookmark(letter: letter, entryID: TranscriptPageIdentity.entryID(record: record, part: 0),
-                                       kind: .assistant, snippet: "")
+        var bookmark = MessageBookmark(
+            letter: letter, entryID: TranscriptPageIdentity.entryID(record: record, part: 0),
+            kind: .assistant, snippet: "")
         bookmark.label = label
         return bookmark
     }
@@ -136,21 +141,23 @@ struct ConversationMapScrollingTests {
 @MainActor
 struct ConversationMapChipTitlesTests {
     private static func bookmark(_ letter: String, label: String?) -> MessageBookmark {
-        var bookmark = MessageBookmark(letter: letter, entryID: TranscriptPageIdentity.entryID(record: 0, part: 0),
-                                       kind: .assistant, snippet: "")
+        var bookmark = MessageBookmark(
+            letter: letter, entryID: TranscriptPageIdentity.entryID(record: 0, part: 0),
+            kind: .assistant, snippet: "")
         bookmark.label = label
         return bookmark
     }
 
     @Test func shortLabelsShowWholeLongOnesAreCutAndOthersKeepTheirLetter() throws {
         let maximum = ConversationMapMetrics.labelChipMaximumWidth(at: 1)
-        let titles = ConversationMapChipTitles.titles(for: [
-            Self.bookmark("a", label: "Fix login"),
-            Self.bookmark("b", label: "The migration that dropped the sessions table on staging"),
-            Self.bookmark("c", label: nil),
-            Self.bookmark("d", label: "  \n "),
-            Self.bookmark("e", label: "Two\nlines"),
-        ], side: 14, factor: 1)
+        let titles = ConversationMapChipTitles.titles(
+            for: [
+                Self.bookmark("a", label: "Fix login"),
+                Self.bookmark("b", label: "The migration that dropped the sessions table on staging"),
+                Self.bookmark("c", label: nil),
+                Self.bookmark("d", label: "  \n "),
+                Self.bookmark("e", label: "Two\nlines"),
+            ], side: 14, factor: 1)
 
         let short = try #require(titles["a"])
         let long = try #require(titles["b"])

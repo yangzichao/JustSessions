@@ -1,14 +1,17 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Every command the app runs in an SSH host's login shell starts it as the host needs, with `JUSTSESSIONS=1`.
 struct RemoteShellStartupTests {
     @Test func eachStartupStartsTheLoginShellWithTheAppsVariable() {
-        #expect(RemoteShellStartup.interactive.command(running: "tmux -V")
-            == #"exec /usr/bin/env JUSTSESSIONS=1 "$SHELL" -lic 'tmux -V'"#)
-        #expect(RemoteShellStartup.loginOnly.command(running: "tmux -V")
-            == #"exec /usr/bin/env JUSTSESSIONS=1 "$SHELL" -lc 'tmux -V'"#)
+        #expect(
+            RemoteShellStartup.interactive.command(running: "tmux -V")
+                == #"exec /usr/bin/env JUSTSESSIONS=1 "$SHELL" -lic 'tmux -V'"#)
+        #expect(
+            RemoteShellStartup.loginOnly.command(running: "tmux -V")
+                == #"exec /usr/bin/env JUSTSESSIONS=1 "$SHELL" -lc 'tmux -V'"#)
     }
 
     @Test func aLoginOnlyHostsTabStartsEveryShellWithoutTheInteractiveStartup() throws {

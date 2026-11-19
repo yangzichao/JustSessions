@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct LoginShellEnvironmentTests {
@@ -13,15 +14,16 @@ struct LoginShellEnvironmentTests {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         // Stands in for zsh: exports what an rc file would, then runs the `-c` command ($4).
-        let fakeShell = try writeExecutableScript("""
-        #!/bin/sh
-        PATH="/from/rc/file:/usr/bin"
-        SSH_AUTH_SOCK="/Users/me/Library/Group Containers/agent.sock"
-        MULTILINE_VALUE="first
-        second=line"
-        export PATH SSH_AUTH_SOCK MULTILINE_VALUE
-        eval "$4"
-        """, to: root.appendingPathComponent("fake-shell"))
+        let fakeShell = try writeExecutableScript(
+            """
+            #!/bin/sh
+            PATH="/from/rc/file:/usr/bin"
+            SSH_AUTH_SOCK="/Users/me/Library/Group Containers/agent.sock"
+            MULTILINE_VALUE="first
+            second=line"
+            export PATH SSH_AUTH_SOCK MULTILINE_VALUE
+            eval "$4"
+            """, to: root.appendingPathComponent("fake-shell"))
 
         let variables = LoginShellEnvironment.readVariables(shellPath: fakeShell.path, timeout: 5)
 
@@ -34,11 +36,12 @@ struct LoginShellEnvironmentTests {
     @Test func hungLoginShellTimesOutWithNothing() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
-        let hungShell = try writeExecutableScript("""
-        #!/bin/sh
-        trap '' TERM
-        exec sleep 600
-        """, to: root.appendingPathComponent("hung-shell"))
+        let hungShell = try writeExecutableScript(
+            """
+            #!/bin/sh
+            trap '' TERM
+            exec sleep 600
+            """, to: root.appendingPathComponent("hung-shell"))
 
         let startedAt = Date()
         let variables = LoginShellEnvironment.readVariables(shellPath: hungShell.path, timeout: 0.5)

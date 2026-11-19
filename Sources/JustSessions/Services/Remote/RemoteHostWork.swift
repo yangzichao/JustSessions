@@ -33,7 +33,10 @@ final class RemoteHostWork {
     }
 
     func keep(_ task: Task<Void, Never>, on host: String, token: Token) {
-        guard isCurrent(token, on: host) else { task.cancel(); return }
+        guard isCurrent(token, on: host) else {
+            task.cancel()
+            return
+        }
         tasks[host] = task
     }
 

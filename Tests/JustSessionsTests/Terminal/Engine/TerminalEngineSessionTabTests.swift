@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Every kind of session tab opens with the engine chosen in Settings at that moment, drawn by that engine's own
@@ -141,7 +142,8 @@ struct TerminalEngineSessionTabTests {
         #expect(tab.engine == engine)
         #expect(engine.draws(tab.terminalView))
         _ = NSApplication.shared
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = tab.terminalView
         defer {
@@ -150,6 +152,8 @@ struct TerminalEngineSessionTabTests {
         }
         tab.startIfNeeded()
         #expect(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
-        #expect(await sandbox.waitUntil { screenText(of: tab.terminalView).contains("RESUMED_IN_TMUX") }, "\(sandbox.launchDiagnostics(for: tab))")
+        #expect(
+            await sandbox.waitUntil { screenText(of: tab.terminalView).contains("RESUMED_IN_TMUX") },
+            "\(sandbox.launchDiagnostics(for: tab))")
     }
 }

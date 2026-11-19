@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A refresh lists each tool's sessions on an SSH host as soon as that tool is copied, keeps the host's other tools'

@@ -14,7 +14,8 @@ struct MessageBookmarks: Equatable {
 
     static func load(from userDefaults: UserDefaults) -> MessageBookmarks {
         guard let data = userDefaults.data(forKey: userDefaultsKey),
-              let saved = try? JSONDecoder().decode([String: [MessageBookmark]].self, from: data) else { return MessageBookmarks() }
+            let saved = try? JSONDecoder().decode([String: [MessageBookmark]].self, from: data)
+        else { return MessageBookmarks() }
         return MessageBookmarks(bookmarksByConversationID: saved)
     }
 
@@ -50,7 +51,7 @@ struct MessageBookmarks: Equatable {
         }
         switch toggle(entryID: entryID, kind: kind, snippet: snippet, conversationID: conversationID) {
         case .added(let added): return .added(added)
-        case .removed, .allLettersInUse: return .allLettersInUse   // .removed is not reached: the message had none
+        case .removed, .allLettersInUse: return .allLettersInUse  // .removed is not reached: the message had none
         }
     }
 
@@ -92,7 +93,8 @@ struct MessageBookmarks: Equatable {
 
     /// Only the bookmark with this letter on this message, never one that took the letter since.
     mutating func remove(_ bookmark: MessageBookmark, conversationID: String) {
-        set(bookmarks(forConversationID: conversationID).filter { $0.letter != bookmark.letter || $0.entryID != bookmark.entryID },
+        set(
+            bookmarks(forConversationID: conversationID).filter { $0.letter != bookmark.letter || $0.entryID != bookmark.entryID },
             forConversationID: conversationID)
     }
 
@@ -120,10 +122,14 @@ struct MessageBookmarks: Equatable {
 
     /// Sorted by entry ID; only letters a–z; one bookmark per letter and per message; nil, dropping the key, when empty.
     private static func normalized(_ bookmarks: [MessageBookmark]) -> [MessageBookmark]? {
-        var usedLetters = Set<String>(), markedEntryIDs = Set<Int>(), kept: [MessageBookmark] = []
+        var usedLetters = Set<String>()
+        var markedEntryIDs = Set<Int>()
+        var kept: [MessageBookmark] = []
         for bookmark in bookmarks.sorted(by: { ($0.entryID, $0.letter) < ($1.entryID, $1.letter) })
         where letters.contains(bookmark.letter) && !usedLetters.contains(bookmark.letter) && !markedEntryIDs.contains(bookmark.entryID) {
-            usedLetters.insert(bookmark.letter); markedEntryIDs.insert(bookmark.entryID); kept.append(bookmark)
+            usedLetters.insert(bookmark.letter)
+            markedEntryIDs.insert(bookmark.entryID)
+            kept.append(bookmark)
         }
         return kept.isEmpty ? nil : kept
     }

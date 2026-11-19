@@ -2,6 +2,7 @@ import AppKit
 import Darwin
 import Foundation
 import GhosttyTerminal
+
 @testable import JustSessions
 
 /// A Ghostty tab's terminal in a window that is never shown, running a process that records every byte the terminal

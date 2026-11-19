@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Disconnect leaves an SSH host alone: it closes the host's tabs in every window, forgets what ran there, and keeps
@@ -159,9 +160,10 @@ struct RemoteHostDisconnectTests {
     private static func discoveryThatFailsWithoutSSH() throws -> RemoteSessionDiscovery {
         let notAFolder = FileManager.default.temporaryDirectory.appendingPathComponent("not-a-folder-\(UUID().uuidString.prefix(8))")
         try "".write(to: notAFolder, atomically: true, encoding: .utf8)
-        return RemoteSessionDiscovery(mirror: RemoteSessionMirror(
-            cacheRoot: notAFolder,
-            sourceHomeOverride: FileManager.default.temporaryDirectory.path
-        ))
+        return RemoteSessionDiscovery(
+            mirror: RemoteSessionMirror(
+                cacheRoot: notAFolder,
+                sourceHomeOverride: FileManager.default.temporaryDirectory.path
+            ))
     }
 }

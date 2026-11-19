@@ -32,7 +32,9 @@ struct TranscriptTextBlock: View {
     }
 
     private var selectedMatchRange: NSRange? {
-        guard let match = searchContext.selectedMatch, match.entryIndex == entryIndex, match.segmentIndex == segmentIndex else { return nil }
+        guard let match = searchContext.selectedMatch, match.entryIndex == entryIndex, match.segmentIndex == segmentIndex else {
+            return nil
+        }
         return match.range
     }
 }

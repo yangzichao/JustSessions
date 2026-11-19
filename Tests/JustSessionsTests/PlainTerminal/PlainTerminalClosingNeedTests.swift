@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// Closing a plain terminal ends its shell, so it asks first wherever a shell may still run, even in a tab that waits to

@@ -22,14 +22,17 @@ struct SessionMessageTextResumeState: Sendable, Codable, Equatable {
     let pageLimits: [Int]
 
     static func pageLimits(of limits: TranscriptPageLimits) -> [Int] {
-        [limits.targetEntryCount, limits.maximumRecordCount, limits.targetByteCount, limits.maximumRecordByteCount,
-         limits.maximumTextLength]
+        [
+            limits.targetEntryCount, limits.maximumRecordCount, limits.targetByteCount, limits.maximumRecordByteCount,
+            limits.maximumTextLength,
+        ]
     }
 
     /// Whether this state could have been saved with `text`; a saved file that fails this is read in full again.
     func isConsistent(with text: SessionMessageText) -> Bool {
         guard digest.count == CRC32Checksum.byteCount, finalPageRecord >= 0, finalPageByteOffset <= byteCount,
-              (0...text.entries.count).contains(committedEntryCount) else { return false }
+            (0...text.entries.count).contains(committedEntryCount)
+        else { return false }
         let committedLast = text.entries[..<committedEntryCount].last.map { TranscriptPageIdentity.record(for: $0.id) }
         let finalPageFirst = text.entries[committedEntryCount...].first.map { TranscriptPageIdentity.record(for: $0.id) }
         return (committedLast ?? -1) < finalPageRecord && (finalPageFirst ?? finalPageRecord) >= finalPageRecord
@@ -58,15 +61,18 @@ enum CodexSessionTextResumer {
         let byteCount = fingerprint.byteCount
         let resumeOffset = state.finalPageByteOffset
         guard state.pageLimits == SessionMessageTextResumeState.pageLimits(of: limits),
-              fingerprint.device == state.device, fingerprint.inode == state.inode, byteCount > state.byteCount,
-              resumeOffset <= state.byteCount, byteCount - resumeOffset <= maximumResumedByteCount else { return nil }
+            fingerprint.device == state.device, fingerprint.inode == state.inode, byteCount > state.byteCount,
+            resumeOffset <= state.byteCount, byteCount - resumeOffset <= maximumResumedByteCount
+        else { return nil }
 
         let descriptor = handle.fileDescriptor
         let tail = try bytes(of: descriptor, from: resumeOffset, count: Int(byteCount - resumeOffset))
         var hasher = CRC32Checksum()
         try hash(descriptor, upTo: resumeOffset, into: &hasher)
         var savedBytesHasher = hasher
-        tail.withUnsafeBytes { savedBytesHasher.update(bufferPointer: UnsafeRawBufferPointer(rebasing: $0[..<Int(state.byteCount - resumeOffset)])) }
+        tail.withUnsafeBytes {
+            savedBytesHasher.update(bufferPointer: UnsafeRawBufferPointer(rebasing: $0[..<Int(state.byteCount - resumeOffset)]))
+        }
         guard savedBytesHasher.finalize() == state.digest else { return nil }
         tail.withUnsafeBytes { hasher.update(bufferPointer: $0) }
 

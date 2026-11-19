@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// ⌥← and ⌥→ alone reach the program as Esc b and Esc f, a word back and forward in a shell, from either engine,

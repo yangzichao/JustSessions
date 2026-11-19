@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct LiveSessionReportingTests {
@@ -26,10 +27,11 @@ struct LiveSessionReportingTests {
         let tuiConfigurationFile = directory.appendingPathComponent("opencode/tui.json")
         let pluginFile = directory.appendingPathComponent("opencode/\(OpenCodeLiveSessionPlugin.fileName)")
         #expect(launch.arguments.isEmpty)
-        #expect(launch.environment == [
-            LiveSessionReporting.reportsDirectoryVariable: reporting.reportsDirectory.path,
-            OpenCodeLiveSessionPlugin.tuiConfigurationVariable: tuiConfigurationFile.path,
-        ])
+        #expect(
+            launch.environment == [
+                LiveSessionReporting.reportsDirectoryVariable: reporting.reportsDirectory.path,
+                OpenCodeLiveSessionPlugin.tuiConfigurationVariable: tuiConfigurationFile.path,
+            ])
         let tuiConfiguration = try JSONSerialization.jsonObject(with: Data(contentsOf: tuiConfigurationFile)) as? [String: [String]]
         #expect(tuiConfiguration == ["plugin": [pluginFile.path]])
         #expect(try String(contentsOf: pluginFile, encoding: .utf8) == OpenCodeLiveSessionPlugin.source)
@@ -51,7 +53,8 @@ struct LiveSessionReportingTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let reporting = LiveSessionReporting(directory: directory)
         try FileManager.default.createDirectory(at: reporting.reportsDirectory, withIntermediateDirectories: true)
-        let sessionFile = "/Users/me/.pi/agent/sessions/--Users-me-app--/2026-10-04T23-00-26-198Z_01a10925-abd5-7606-8b40-1c56e397895e.jsonl"
+        let sessionFile =
+            "/Users/me/.pi/agent/sessions/--Users-me-app--/2026-10-04T23-00-26-198Z_01a10925-abd5-7606-8b40-1c56e397895e.jsonl"
         try #"{"pid":4242,"sessionId":"01a10925-abd5-7606-8b40-1c56e397895e","sessionFile":"\#(sessionFile)"}"#
             .write(to: reporting.reportsDirectory.appendingPathComponent("4242.json"), atomically: true, encoding: .utf8)
         try #"{"pid":1,"sessionId":"01a10925-abd5-7606-8b40-1c56e397895e"}"#
@@ -81,15 +84,16 @@ struct LiveSessionReportingTests {
             #"{"pid":7,"sessionId":null,"activity":"idle"}"#,
         ].map { try #require(LiveSessionReport(jsonData: Data($0.utf8), processID: 7)).activity }
 
-        #expect(activities == [
-            .working,
-            .needsInput(reason: "permission"),
-            .needsInput(reason: nil),
-            .needsInput(reason: "Dangerous command: rm -rf build Allow?"),
-            .idle,
-            nil,
-            nil,
-            nil,
-        ])
+        #expect(
+            activities == [
+                .working,
+                .needsInput(reason: "permission"),
+                .needsInput(reason: nil),
+                .needsInput(reason: "Dangerous command: rm -rf build Allow?"),
+                .idle,
+                nil,
+                nil,
+                nil,
+            ])
     }
 }

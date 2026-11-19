@@ -18,8 +18,9 @@ enum CoreTextFallbackFamilies {
         var families: [String] = []
         for descriptor in cascade {
             guard let family = CTFontDescriptorCopyAttribute(descriptor, kCTFontFamilyNameAttribute) as? String,
-                  family != primaryFamily, !families.contains(family),
-                  GhosttyFontConfiguration.fontDiscoveryFinds(family: family) else { continue }
+                family != primaryFamily, !families.contains(family),
+                GhosttyFontConfiguration.fontDiscoveryFinds(family: family)
+            else { continue }
             families.append(family)
         }
         familiesByKey[key] = families

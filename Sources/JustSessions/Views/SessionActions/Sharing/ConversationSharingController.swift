@@ -26,7 +26,8 @@ final class ConversationSharingController: ObservableObject {
     func export(_ selections: [ConversationExportSelection], format: ConversationExportFormat) {
         perform(selections, failureTitle: "Could not export conversation") { document, window in
             let panel = NSSavePanel()
-            panel.title = selections.count == 1
+            panel.title =
+                selections.count == 1
                 ? AppLocalization.string("Export conversation") : AppLocalization.string("Export conversations")
             panel.prompt = AppLocalization.string("Export")
             panel.allowedContentTypes = [UTType(filenameExtension: format.fileExtension) ?? .plainText]

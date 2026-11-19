@@ -67,7 +67,8 @@ struct PinnedItems: Equatable {
 
     /// Moves pinned conversations to the front in their pinned order; the rest keep their incoming order.
     func pinnedConversationsFirst(_ conversations: [Conversation]) -> [Conversation] {
-        let pinned = conversations
+        let pinned =
+            conversations
             .compactMap { conversation in pinnedConversations.place(of: conversation.id).map { (conversation, $0) } }
             .sorted { $0.1 < $1.1 }
             .map(\.0)

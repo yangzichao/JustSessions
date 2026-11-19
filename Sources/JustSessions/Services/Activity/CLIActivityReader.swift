@@ -19,15 +19,20 @@ struct CLIActivityReader: Sendable {
     func activities(for probes: [CLIActivityProbe]) -> [CLIActivity?] {
         // Read at most once, and only when a Claude Code install turns out to be a wrapper script.
         var processTree: ProcessTree?
-        let codexThreadsWaitingOnYou = codexWaitReader?.threadsWaitingOnYou(among: Set(probes.compactMap { probe in
-            probe.provider == .codex ? probe.sessionID : nil
-        })) ?? []
+        let codexThreadsWaitingOnYou =
+            codexWaitReader?.threadsWaitingOnYou(
+                among: Set(
+                    probes.compactMap { probe in
+                        probe.provider == .codex ? probe.sessionID : nil
+                    })) ?? []
         let activities = probes.map { probe in
             activity(for: probe, codexThreadsWaitingOnYou: codexThreadsWaitingOnYou, processTree: &processTree)
         }
-        codexTurnTracker.stopFollowingFiles(otherThan: Set(probes.compactMap { probe in
-            probe.provider == .codex ? probe.sessionFile?.path : nil
-        }))
+        codexTurnTracker.stopFollowingFiles(
+            otherThan: Set(
+                probes.compactMap { probe in
+                    probe.provider == .codex ? probe.sessionFile?.path : nil
+                }))
         return activities
     }
 

@@ -26,7 +26,8 @@ struct ForwardPortSheet: View {
     var body: some View {
         ThemeSheetLayout(
             title: Text("Forward a port"),
-            intro: Text("Reach a port on \(host) at localhost on this Mac. Only this Mac can use it, and it stops when JustSessions quits."),
+            intro: Text(
+                "Reach a port on \(host) at localhost on this Mac. Only this Mac can use it, and it stops when JustSessions quits."),
             width: ThemeSheetMetrics.compactWidth
         ) {
             VStack(alignment: .leading, spacing: 14) {

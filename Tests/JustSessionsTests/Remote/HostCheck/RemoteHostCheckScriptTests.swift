@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The check's command, run here through `sh` with a stand-in login shell and stand-in programs on its PATH, as
@@ -158,4 +159,3 @@ struct RemoteHostCheckScriptTests {
         #expect(output.text("cli-codex-version-exit") == nil)
     }
 }
-

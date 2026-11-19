@@ -55,7 +55,8 @@ enum CLISearchDirectories {
     static func nvmDirectories(homeDirectory: String, fileManager: FileManager) -> [String] {
         let versionsDirectory = nvmVersionsDirectory(homeDirectory: homeDirectory)
         let versions = (try? fileManager.contentsOfDirectory(atPath: versionsDirectory)) ?? []
-        return versions
+        return
+            versions
             .sorted(by: isNewerNodeVersion)
             .map { "\(versionsDirectory)/\($0)/bin" }
     }

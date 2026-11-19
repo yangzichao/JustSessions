@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct SidebarEmptyHostMessageTests {
@@ -39,7 +40,9 @@ struct SidebarEmptyHostMessageTests {
     }
 
     @Test func withNothingWaitingItNamesTheCLIsThatTellOrSaysAnSSHHostCannot() {
-        #expect(message(nil, statusFilter: .waitingForYou).text == "No Claude Code, Codex, Antigravity, Pi, or OpenCode session is waiting for you")
+        #expect(
+            message(nil, statusFilter: .waitingForYou).text
+                == "No Claude Code, Codex, Antigravity, Pi, or OpenCode session is waiting for you")
         #expect(message(nil, on: .ssh("devbox"), statusFilter: .waitingForYou).text == "SSH hosts don't tell when a session waits for you")
         #expect(message(nil, isSearching: true, statusFilter: .waitingForYou).text == "No matching projects or sessions")
     }
@@ -47,8 +50,9 @@ struct SidebarEmptyHostMessageTests {
     /// Nothing is known of a disconnected host beyond its last copy, whatever the filters.
     @Test func aDisconnectedHostSaysToConnectUnlessItIsCopyingOrSearched() {
         #expect(message(nil, on: .ssh("devbox"), isDisconnected: true).text == "Disconnected. Connect to copy its sessions.")
-        #expect(message(.refreshed(.now), on: .ssh("devbox"), statusFilter: .running, isDisconnected: true).text
-            == "Disconnected. Connect to copy its sessions.")
+        #expect(
+            message(.refreshed(.now), on: .ssh("devbox"), statusFilter: .running, isDisconnected: true).text
+                == "Disconnected. Connect to copy its sessions.")
         #expect(message(nil, on: .ssh("devbox"), isSearching: true, isDisconnected: true).text == "No matching projects or sessions")
         #expect(message(.refreshing, on: .ssh("devbox"), isDisconnected: true).text == "Copying sessions…")
     }

@@ -16,8 +16,10 @@ struct KiroConversationDeletion {
     /// process below it that may still be ending (`KiroSessionLock`).
     let lockReleaseTimeout: TimeInterval
 
-    init(sessionsDirectory: URL, v3SessionsDirectory: URL? = nil, executableURL: URL? = nil, fileManager: FileManager = .default,
-         timeout: TimeInterval = 60, lockReleaseTimeout: TimeInterval = 2) {
+    init(
+        sessionsDirectory: URL, v3SessionsDirectory: URL? = nil, executableURL: URL? = nil, fileManager: FileManager = .default,
+        timeout: TimeInterval = 60, lockReleaseTimeout: TimeInterval = 2
+    ) {
         self.sessionsDirectory = sessionsDirectory
         self.v3SessionsDirectory = v3SessionsDirectory
         self.executableURL = executableURL
@@ -35,24 +37,24 @@ struct KiroConversationDeletion {
         let metadataFile = sourceFile.deletingPathExtension().appendingPathExtension("json")
         let resolvedSessionsPath = sessionsDirectory.resolvingSymlinksInPath().path
         guard conversation.provider == .kiro,
-              conversation.host == .thisMac,
-              sessionsDirectory.lastPathComponent == "cli",
-              sessionsDirectory.deletingLastPathComponent().lastPathComponent == "sessions",
-              ConversationProvider.kiro.isValidSessionID(conversation.sessionID),
-              sourceFile.lastPathComponent == "\(conversation.sessionID).jsonl",
-              sourceFile.deletingLastPathComponent().resolvingSymlinksInPath().path == resolvedSessionsPath,
-              sourceFile.resolvingSymlinksInPath().deletingLastPathComponent().path == resolvedSessionsPath,
-              metadataFile.resolvingSymlinksInPath().deletingLastPathComponent().path == resolvedSessionsPath
+            conversation.host == .thisMac,
+            sessionsDirectory.lastPathComponent == "cli",
+            sessionsDirectory.deletingLastPathComponent().lastPathComponent == "sessions",
+            ConversationProvider.kiro.isValidSessionID(conversation.sessionID),
+            sourceFile.lastPathComponent == "\(conversation.sessionID).jsonl",
+            sourceFile.deletingLastPathComponent().resolvingSymlinksInPath().path == resolvedSessionsPath,
+            sourceFile.resolvingSymlinksInPath().deletingLastPathComponent().path == resolvedSessionsPath,
+            metadataFile.resolvingSymlinksInPath().deletingLastPathComponent().path == resolvedSessionsPath
         else { throw ConversationDeletionError.invalidSource }
         guard fileManager.fileExists(atPath: sourceFile.path), fileManager.fileExists(atPath: metadataFile.path) else {
             throw ConversationDeletionError.missingSource
         }
         guard (try? sourceFile.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
-              (try? metadataFile.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
-              let metadata = KiroSessionMetadata(file: metadataFile),
-              metadata.sessionID == conversation.sessionID,
-              metadata.projectPath.hasPrefix("/"),
-              metadata.projectPath == conversation.projectPath
+            (try? metadataFile.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
+            let metadata = KiroSessionMetadata(file: metadataFile),
+            metadata.sessionID == conversation.sessionID,
+            metadata.projectPath.hasPrefix("/"),
+            metadata.projectPath == conversation.projectPath
         else { throw ConversationDeletionError.invalidSource }
         try waitForLockRelease(of: sourceFile)
 
@@ -69,25 +71,26 @@ struct KiroConversationDeletion {
         let sessionFolder = sourceFile.deletingLastPathComponent()
         let metadataFile = sessionFolder.appendingPathComponent(KiroV3Session.metadataFileName)
         guard conversation.provider == .kiro,
-              conversation.host == .thisMac,
-              let v3SessionsDirectory,
-              sessionsDirectory.lastPathComponent == "cli",
-              v3SessionsDirectory.standardizedFileURL == KiroV3Session.sessionsRoot(besideClassicDirectory: sessionsDirectory)
+            conversation.host == .thisMac,
+            let v3SessionsDirectory,
+            sessionsDirectory.lastPathComponent == "cli",
+            v3SessionsDirectory.standardizedFileURL
+                == KiroV3Session.sessionsRoot(besideClassicDirectory: sessionsDirectory)
                 .standardizedFileURL,
-              sourceFile.lastPathComponent == KiroV3Session.messagesFileName,
-              sessionFolder.lastPathComponent == conversation.sessionID,
-              sessionFolder.resolvingSymlinksInPath().deletingLastPathComponent().deletingLastPathComponent().path
+            sourceFile.lastPathComponent == KiroV3Session.messagesFileName,
+            sessionFolder.lastPathComponent == conversation.sessionID,
+            sessionFolder.resolvingSymlinksInPath().deletingLastPathComponent().deletingLastPathComponent().path
                 == v3SessionsDirectory.resolvingSymlinksInPath().path,
-              sessionFolder.deletingLastPathComponent().lastPathComponent != sessionsDirectory.lastPathComponent
+            sessionFolder.deletingLastPathComponent().lastPathComponent != sessionsDirectory.lastPathComponent
         else { throw ConversationDeletionError.invalidSource }
         guard fileManager.fileExists(atPath: sourceFile.path), fileManager.fileExists(atPath: metadataFile.path) else {
             throw ConversationDeletionError.missingSource
         }
         guard (try? sourceFile.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
-              let metadata = KiroV3SessionMetadata(file: metadataFile),
-              metadata.sessionID == conversation.sessionID,
-              metadata.projectPath == conversation.projectPath,
-              metadata.projectPath.hasPrefix("/")
+            let metadata = KiroV3SessionMetadata(file: metadataFile),
+            metadata.sessionID == conversation.sessionID,
+            metadata.projectPath == conversation.projectPath,
+            metadata.projectPath.hasPrefix("/")
         else { throw ConversationDeletionError.invalidSource }
         try waitForLockRelease(of: sourceFile)
         try runDeletion(of: conversation)
@@ -110,8 +113,10 @@ struct KiroConversationDeletion {
     private func removeLeftovers(of conversation: Conversation, named fileExtensions: [String]) {
         for fileExtension in fileExtensions {
             let file = sessionsDirectory.appendingPathComponent("\(conversation.sessionID).\(fileExtension)")
-            guard (try? file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey]))
-                .map({ $0.isRegularFile == true && $0.isSymbolicLink != true }) == true else { continue }
+            guard
+                (try? file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey]))
+                    .map({ $0.isRegularFile == true && $0.isSymbolicLink != true }) == true
+            else { continue }
             try? fileManager.removeItem(at: file)
         }
     }
@@ -128,16 +133,19 @@ struct KiroConversationDeletion {
         environment["PATH"] = resolver.pathEnvironmentValue
         environment["KIRO_HOME"] = kiroDirectory.path
         var isProjectDirectory: ObjCBool = false
-        let projectExists = fileManager.fileExists(atPath: conversation.projectPath, isDirectory: &isProjectDirectory)
+        let projectExists =
+            fileManager.fileExists(atPath: conversation.projectPath, isDirectory: &isProjectDirectory)
             && isProjectDirectory.boolValue
-        guard let result = BoundedProcessRunner.result(
-            ofExecutable: executablePath,
-            arguments: ["chat", "--delete-session", conversation.sessionID],
-            environment: environment,
-            workingDirectory: projectExists ? URL(fileURLWithPath: conversation.projectPath) : kiroDirectory,
-            includesStandardError: true,
-            timeout: timeout
-        ) else { throw KiroConversationDeletionError.didNotFinish }
+        guard
+            let result = BoundedProcessRunner.result(
+                ofExecutable: executablePath,
+                arguments: ["chat", "--delete-session", conversation.sessionID],
+                environment: environment,
+                workingDirectory: projectExists ? URL(fileURLWithPath: conversation.projectPath) : kiroDirectory,
+                includesStandardError: true,
+                timeout: timeout
+            )
+        else { throw KiroConversationDeletionError.didNotFinish }
         let details = result.output.trimmingCharacters(in: .whitespacesAndNewlines)
         guard result.exitStatus == 0 else {
             throw KiroConversationDeletionError.failed(details.isEmpty ? "Exit code \(result.exitStatus)" : String(details.prefix(500)))

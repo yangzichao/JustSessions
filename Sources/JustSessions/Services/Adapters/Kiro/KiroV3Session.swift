@@ -47,7 +47,8 @@ struct KiroV3SessionMetadata: Equatable {
 
     init?(object: [String: Any]) {
         guard let sessionID = object["id"] as? String,
-              let projectPath = (object["workspacePaths"] as? [Any])?.first as? String else { return nil }
+            let projectPath = (object["workspacePaths"] as? [Any])?.first as? String
+        else { return nil }
         self.sessionID = sessionID
         self.projectPath = projectPath
         title = (object["title"] as? String).flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
@@ -59,7 +60,8 @@ struct KiroV3SessionMetadata: Equatable {
     /// Nil for a file that is missing, not a session's, or too large to be one.
     init?(file: URL) {
         guard let size = (try? file.resourceValues(forKeys: [.fileSizeKey]))?.fileSize, size <= Self.maximumByteCount,
-              let data = try? Data(contentsOf: file), let object = ConversationMetadata.object(from: data) else { return nil }
+            let data = try? Data(contentsOf: file), let object = ConversationMetadata.object(from: data)
+        else { return nil }
         self.init(object: object)
     }
 

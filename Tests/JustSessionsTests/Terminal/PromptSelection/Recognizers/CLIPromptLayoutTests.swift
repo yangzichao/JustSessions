@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// ⌘A finds each CLI's prompt on its screen and reads back the text typed in it; see `CLIPromptLayout`. The screens

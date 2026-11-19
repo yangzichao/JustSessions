@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PiTranscriptReaderTests {
@@ -9,14 +10,18 @@ struct PiTranscriptReaderTests {
             Self.message("s1", parent: "m0", #"{"role":"system","content":"You are Pi","sections":{"preamble":"hidden"},"timestamp":1}"#),
             Self.entry("thinking_level_change", "k1", parent: "s1", #""thinkingLevel":"high""#),
             Self.user("u1", parent: "k1", "Fix the build"),
-            Self.message("a1", parent: "u1", #"{"role":"assistant","content":["#
-                + #"{"type":"thinking","thinking":"hidden plan"},{"type":"text","text":"Looking at it."},"#
-                + #"{"type":"toolCall","id":"t1","name":"bash","arguments":{"command":"swift build\nextra line","timeout":60}}"#
-                + #"],"stopReason":"toolUse","timestamp":2}"#),
+            Self.message(
+                "a1", parent: "u1",
+                #"{"role":"assistant","content":["#
+                    + #"{"type":"thinking","thinking":"hidden plan"},{"type":"text","text":"Looking at it."},"#
+                    + #"{"type":"toolCall","id":"t1","name":"bash","arguments":{"command":"swift build\nextra line","timeout":60}}"#
+                    + #"],"stopReason":"toolUse","timestamp":2}"#),
             Self.toolResult("r1", parent: "a1", toolCallID: "t1"),
-            Self.message("a2", parent: "r1", #"{"role":"assistant","content":["#
-                + #"{"type":"toolCall","id":"t2","name":"read","arguments":{"path":"/tmp/Package.swift"}},"#
-                + #"{"type":"toolCall","id":"t3","arguments":{}}],"stopReason":"toolUse","timestamp":3}"#),
+            Self.message(
+                "a2", parent: "r1",
+                #"{"role":"assistant","content":["#
+                    + #"{"type":"toolCall","id":"t2","name":"read","arguments":{"path":"/tmp/Package.swift"}},"#
+                    + #"{"type":"toolCall","id":"t3","arguments":{}}],"stopReason":"toolUse","timestamp":3}"#),
             Self.toolResult("r2", parent: "a2", toolCallID: "t2"),
             Self.toolResult("r3", parent: "r2", toolCallID: "t3"),
             Self.assistant("a3", parent: "r3", "Fixed."),
@@ -25,12 +30,13 @@ struct PiTranscriptReaderTests {
             Self.entry("custom", "c1", parent: "n1", #""customType":"my-extension","data":{"count":1}"#),
         ])
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Fix the build"),
-            .assistantMessage("Looking at it."),
-            .toolCalls(["bash · swift build", "read · /tmp/Package.swift", "tool"]),
-            .assistantMessage("Fixed."),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Fix the build"),
+                .assistantMessage("Looking at it."),
+                .toolCalls(["bash · swift build", "read · /tmp/Package.swift", "tool"]),
+                .assistantMessage("Fixed."),
+            ])
         #expect(transcript.entries.map(\.startsTurn) == [true, true, false, false])
         #expect(transcript.entries.first?.timestamp == ISO8601TimestampParser.shared.date(from: Self.timestamp))
     }
@@ -45,12 +51,13 @@ struct PiTranscriptReaderTests {
             Self.assistant("a3", parent: "u3", "Approach B is done."),
         ])
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Start"),
-            .assistantMessage("Started."),
-            .userMessage("Try approach B"),
-            .assistantMessage("Approach B is done."),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Start"),
+                .assistantMessage("Started."),
+                .userMessage("Try approach B"),
+                .assistantMessage("Approach B is done."),
+            ])
     }
 
     @Test func marksCompactionsAndBranchSummariesWhereTheyHappened() throws {
@@ -66,38 +73,52 @@ struct PiTranscriptReaderTests {
             Self.user("u4", parent: "c1", "Next"),
         ])
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Start"),
-            .assistantMessage("Started."),
-            .note(PiTranscriptReader.branchSummaryNoteText),
-            .userMessage("Another idea"),
-            .assistantMessage("Done."),
-            .note(TranscriptBuilder.compactionNoteText),
-            .userMessage("Next"),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Start"),
+                .assistantMessage("Started."),
+                .note(PiTranscriptReader.branchSummaryNoteText),
+                .userMessage("Another idea"),
+                .assistantMessage("Done."),
+                .note(TranscriptBuilder.compactionNoteText),
+                .userMessage("Next"),
+            ])
     }
 
     @Test func showsWhatTheUserTypedWhetherContentIsTextOrParts() throws {
-        let skillBlock = #"<skill name=\"review\" location=\"/skills/review/SKILL.md\">\nReferences are relative to /skills/review.\n\nHidden instructions\n</skill>\n\nthe login page"#
+        let skillBlock =
+            #"<skill name=\"review\" location=\"/skills/review/SKILL.md\">\nReferences are relative to /skills/review.\n\nHidden instructions\n</skill>\n\nthe login page"#
         let transcript = try read([
             Self.user("u1", parent: nil, "Plain text"),
-            Self.message("u2", parent: "u1", #"{"role":"user","content":[{"type":"text","text":"Look at this"},"#
-                + #"{"type":"image","data":"\#(SampleTranscriptImage.base64)","mimeType":"image/png"},{"type":"text","text":"and this"}],"timestamp":1}"#),
+            Self.message(
+                "u2", parent: "u1",
+                #"{"role":"user","content":[{"type":"text","text":"Look at this"},"#
+                    + #"{"type":"image","data":"\#(SampleTranscriptImage.base64)","mimeType":"image/png"},{"type":"text","text":"and this"}],"timestamp":1}"#
+            ),
             Self.user("u3", parent: "u2", skillBlock),
-            Self.message("x1", parent: "u3", #"{"role":"bashExecution","command":"git status","output":"hidden","exitCode":0,"cancelled":false,"truncated":false,"timestamp":1}"#),
-            Self.message("x2", parent: "x1", #"{"role":"bashExecution","command":"ls","output":"hidden","exitCode":0,"cancelled":false,"truncated":false,"excludeFromContext":true,"timestamp":1}"#),
-            Self.entry("custom_message", "m1", parent: "x2", #""customType":"intercom_message","content":"Hidden extension message","display":true"#),
+            Self.message(
+                "x1", parent: "u3",
+                #"{"role":"bashExecution","command":"git status","output":"hidden","exitCode":0,"cancelled":false,"truncated":false,"timestamp":1}"#
+            ),
+            Self.message(
+                "x2", parent: "x1",
+                #"{"role":"bashExecution","command":"ls","output":"hidden","exitCode":0,"cancelled":false,"truncated":false,"excludeFromContext":true,"timestamp":1}"#
+            ),
+            Self.entry(
+                "custom_message", "m1", parent: "x2",
+                #""customType":"intercom_message","content":"Hidden extension message","display":true"#),
             Self.entry("custom_message", "m2", parent: "m1", #""customType":"subagent-notify","content":"Hidden","display":false"#),
         ])
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Plain text"),
-            .userMessage("Look at this\n\nand this"),
-            .userImage(SampleTranscriptImage.image),
-            .userMessage("/skill:review the login page"),
-            .userMessage("!git status"),
-            .userMessage("!!ls"),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Plain text"),
+                .userMessage("Look at this\n\nand this"),
+                .userImage(SampleTranscriptImage.image),
+                .userMessage("/skill:review the login page"),
+                .userMessage("!git status"),
+                .userMessage("!!ls"),
+            ])
         #expect(transcript.entries.map(\.startsTurn) == [true, false, false, false, false, false])
     }
 
@@ -105,30 +126,43 @@ struct PiTranscriptReaderTests {
     @Test func showsAToolResultsImagesAfterTheToolCallThatProducedThem() throws {
         let transcript = try read([
             Self.user("u1", parent: nil, "Render the scene"),
-            Self.message("a1", parent: "u1", #"{"role":"assistant","content":[{"type":"toolCall","id":"t1","name":"screenshot","arguments":{}}],"stopReason":"toolUse","timestamp":2}"#),
-            Self.message("r1", parent: "a1", #"{"role":"toolResult","toolCallId":"t1","toolName":"screenshot","content":["#
-                + #"{"type":"text","text":"hidden caption"},{"type":"image","data":"\#(SampleTranscriptImage.base64)","mimeType":"image/png"},"#
-                + #"{"type":"image","mimeType":"image/png"}],"isError":false,"timestamp":3}"#),
-            Self.message("a2", parent: "r1", #"{"role":"assistant","content":[{"type":"toolCall","id":"t2","name":"bash","arguments":{"command":"ls"}}],"stopReason":"toolUse","timestamp":4}"#),
+            Self.message(
+                "a1", parent: "u1",
+                #"{"role":"assistant","content":[{"type":"toolCall","id":"t1","name":"screenshot","arguments":{}}],"stopReason":"toolUse","timestamp":2}"#
+            ),
+            Self.message(
+                "r1", parent: "a1",
+                #"{"role":"toolResult","toolCallId":"t1","toolName":"screenshot","content":["#
+                    + #"{"type":"text","text":"hidden caption"},{"type":"image","data":"\#(SampleTranscriptImage.base64)","mimeType":"image/png"},"#
+                    + #"{"type":"image","mimeType":"image/png"}],"isError":false,"timestamp":3}"#),
+            Self.message(
+                "a2", parent: "r1",
+                #"{"role":"assistant","content":[{"type":"toolCall","id":"t2","name":"bash","arguments":{"command":"ls"}}],"stopReason":"toolUse","timestamp":4}"#
+            ),
             Self.toolResult("r2", parent: "a2", toolCallID: "t2"),
             Self.assistant("a3", parent: "r2", "Rendered."),
         ])
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Render the scene"),
-            .toolCalls(["screenshot"]),
-            .toolResultImage(SampleTranscriptImage.image),
-            .toolCalls(["bash · ls"]),
-            .assistantMessage("Rendered."),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Render the scene"),
+                .toolCalls(["screenshot"]),
+                .toolResultImage(SampleTranscriptImage.image),
+                .toolCalls(["bash · ls"]),
+                .assistantMessage("Rendered."),
+            ])
         #expect(transcript.entries.map(\.startsTurn) == [true, true, false, false, false])
     }
 
     @Test func showsAFailedReplysErrorAsANote() throws {
         let transcript = try read([
             Self.user("u1", parent: nil, "Hello"),
-            Self.message("a1", parent: "u1", #"{"role":"assistant","content":[],"stopReason":"error","errorMessage":"429 rate limited","timestamp":1}"#),
-            Self.message("a2", parent: "a1", #"{"role":"assistant","content":[],"stopReason":"aborted","errorMessage":"Request was aborted","timestamp":1}"#),
+            Self.message(
+                "a1", parent: "u1",
+                #"{"role":"assistant","content":[],"stopReason":"error","errorMessage":"429 rate limited","timestamp":1}"#),
+            Self.message(
+                "a2", parent: "a1",
+                #"{"role":"assistant","content":[],"stopReason":"aborted","errorMessage":"Request was aborted","timestamp":1}"#),
         ])
 
         #expect(transcript.entries.map(\.content) == [.userMessage("Hello"), .note("429 rate limited")])
@@ -140,20 +174,23 @@ struct PiTranscriptReaderTests {
         let transcript = try read([
             #"{"type":"message","id":"u1","parentId":null,"timestamp":17,"message":{"role":"user","content":"Untimed"}}"#,
             Self.message("x1", parent: "u1", #"{"role":"bashExecution","command":"ls","excludeFromContext":"yes","timestamp":1}"#),
-            Self.message("a1", parent: "x1", #"{"role":"assistant","content":["#
-                + #"{"type":"text","text":5},{"type":"text","text":"Still here."},"#
-                + #"{"type":"toolCall","name":7,"arguments":"ls -la"},"#
-                + #"{"type":"toolCall","name":"bash","arguments":{"timeout":60,"command":["git","status"],"env":null}}"#
-                + #"],"stopReason":"error","errorMessage":{"code":500},"timestamp":2}"#),
+            Self.message(
+                "a1", parent: "x1",
+                #"{"role":"assistant","content":["#
+                    + #"{"type":"text","text":5},{"type":"text","text":"Still here."},"#
+                    + #"{"type":"toolCall","name":7,"arguments":"ls -la"},"#
+                    + #"{"type":"toolCall","name":"bash","arguments":{"timeout":60,"command":["git","status"],"env":null}}"#
+                    + #"],"stopReason":"error","errorMessage":{"code":500},"timestamp":2}"#),
             Self.message("a2", parent: "a1", #"{"role":"assistant","content":"Plain text is not an assistant's content","timestamp":3}"#),
         ])
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Untimed"),
-            .userMessage("!ls"),
-            .assistantMessage("Still here."),
-            .toolCalls(["tool", "bash · git status"]),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Untimed"),
+                .userMessage("!ls"),
+                .assistantMessage("Still here."),
+                .toolCalls(["tool", "bash · git status"]),
+            ])
         #expect(transcript.entries.first?.timestamp == nil)
     }
 
@@ -161,25 +198,29 @@ struct PiTranscriptReaderTests {
     @Test func aShellCommandsExcludeFromContextReadsZeroAndOneAsABoolean() throws {
         let values = ["true", "1", "1.0", "0", "2", "false"]
         let lines = values.enumerated().map { offset, value in
-            Self.message("x\(offset)", parent: offset == 0 ? nil : "x\(offset - 1)",
-                         #"{"role":"bashExecution","command":"c\#(offset)","excludeFromContext":\#(value),"timestamp":1}"#)
+            Self.message(
+                "x\(offset)", parent: offset == 0 ? nil : "x\(offset - 1)",
+                #"{"role":"bashExecution","command":"c\#(offset)","excludeFromContext":\#(value),"timestamp":1}"#)
         }
 
         let transcript = try read(lines)
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("!!c0"),
-            .userMessage("!!c1"),
-            .userMessage("!!c2"),
-            .userMessage("!c3"),
-            .userMessage("!c4"),
-            .userMessage("!c5"),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("!!c0"),
+                .userMessage("!!c1"),
+                .userMessage("!!c2"),
+                .userMessage("!c3"),
+                .userMessage("!c4"),
+                .userMessage("!c5"),
+            ])
     }
 
     @Test func linesInAnotherKeyOrderAreParsedAndLinked() throws {
-        let reorderedUser = #"{"message":{"content":"Reordered","role":"user"},"parentId":"a1","id":"u2","timestamp":"2026-09-30T10:00:00.000Z","type":"message"}"#
-        let escapedID = #"{"type":"message","id":"a\u0032","parentId":"u2","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Escaped id"}]}}"#
+        let reorderedUser =
+            #"{"message":{"content":"Reordered","role":"user"},"parentId":"a1","id":"u2","timestamp":"2026-09-30T10:00:00.000Z","type":"message"}"#
+        let escapedID =
+            #"{"type":"message","id":"a\u0032","parentId":"u2","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Escaped id"}]}}"#
         let transcript = try read([
             Self.user("u1", parent: nil, "Start"),
             Self.assistant("a1", parent: "u1", "Started."),
@@ -188,13 +229,14 @@ struct PiTranscriptReaderTests {
             Self.assistant("a3", parent: "a2", "Linked through the escaped id."),
         ])
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Start"),
-            .assistantMessage("Started."),
-            .userMessage("Reordered"),
-            .assistantMessage("Escaped id"),
-            .assistantMessage("Linked through the escaped id."),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Start"),
+                .assistantMessage("Started."),
+                .userMessage("Reordered"),
+                .assistantMessage("Escaped id"),
+                .assistantMessage("Linked through the escaped id."),
+            ])
     }
 
     @Test func skipsMalformedLinesAndALastLineStillBeingWritten() throws {
@@ -218,11 +260,12 @@ struct PiTranscriptReaderTests {
             in: directory
         )
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Start"),
-            .assistantMessage("Started."),
-            .userMessage("Next"),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Start"),
+                .assistantMessage("Started."),
+                .userMessage("Next"),
+            ])
     }
 
     @Test func aMissingOrLoopingParentEndsTheConversation() throws {
@@ -269,13 +312,14 @@ struct PiTranscriptReaderTests {
 
         let transcript = try TranscriptFileReader.pi.read(SampleTranscriptLines.fileContents(lines), in: directory)
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("First"),
-            .assistantMessage("Reply"),
-            .toolCalls(["bash · ls"]),
-            .note(TranscriptBuilder.compactionNoteText),
-            .userMessage("Second"),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("First"),
+                .assistantMessage("Reply"),
+                .toolCalls(["bash · ls"]),
+                .note(TranscriptBuilder.compactionNoteText),
+                .userMessage("Second"),
+            ])
     }
 
     @Test func loaderRoutesPiSessionsToThisReader() async throws {
@@ -295,7 +339,8 @@ struct PiTranscriptReaderTests {
     // MARK: - Session lines in Pi's own key order
 
     private static let timestamp = "2026-09-30T10:00:00.000Z"
-    private static let header = #"{"type":"session","version":3,"id":"019a0000-0000-7000-8000-000000000000","timestamp":"2026-09-30T10:00:00.000Z","cwd":"/tmp"}"#
+    private static let header =
+        #"{"type":"session","version":3,"id":"019a0000-0000-7000-8000-000000000000","timestamp":"2026-09-30T10:00:00.000Z","cwd":"/tmp"}"#
 
     /// Writes the lines after a session header and reads them as the preview does.
     private func read(_ lines: [String]) throws -> TranscriptContent {
@@ -323,11 +368,14 @@ struct PiTranscriptReaderTests {
     }
 
     private static func assistant(_ id: String, parent: String?, _ text: String) -> String {
-        message(id, parent: parent, #"{"role":"assistant","content":[{"type":"text","text":"\#(text)"}],"stopReason":"stop","timestamp":2}"#)
+        message(
+            id, parent: parent, #"{"role":"assistant","content":[{"type":"text","text":"\#(text)"}],"stopReason":"stop","timestamp":2}"#)
     }
 
     private static func toolResult(_ id: String, parent: String?, toolCallID: String) -> String {
-        message(id, parent: parent, #"{"role":"toolResult","toolCallId":"\#(toolCallID)","toolName":"bash","#
-            + #""content":[{"type":"text","text":"hidden output"}],"isError":false,"timestamp":3}"#)
+        message(
+            id, parent: parent,
+            #"{"role":"toolResult","toolCallId":"\#(toolCallID)","toolName":"bash","#
+                + #""content":[{"type":"text","text":"hidden output"}],"isError":false,"timestamp":3}"#)
     }
 }

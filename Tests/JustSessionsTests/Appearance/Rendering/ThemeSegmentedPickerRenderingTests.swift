@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -13,10 +14,13 @@ struct ThemeSegmentedPickerRenderingTests {
         let themeStore = AppThemeStore(userDefaults: settings.userDefaults)
         let size = CGSize(width: 240, height: 40)
         let pickerFrame = CGRect(x: 20, y: 0, width: 200, height: size.height)
-        let picker = ThemeSegmentedPicker("Engine", selection: .constant(TerminalEngine.swiftTerm), segments: [
-            ThemeSegment(value: TerminalEngine.swiftTerm, title: Text(verbatim: "SwiftTerm")),
-            ThemeSegment(value: TerminalEngine.ghostty, title: Text(verbatim: "Ghostty")),
-        ])
+        let picker = ThemeSegmentedPicker(
+            "Engine", selection: .constant(TerminalEngine.swiftTerm),
+            segments: [
+                ThemeSegment(value: TerminalEngine.swiftTerm, title: Text(verbatim: "SwiftTerm")),
+                ThemeSegment(value: TerminalEngine.ghostty, title: Text(verbatim: "Ghostty")),
+            ]
+        )
         .frame(width: pickerFrame.width)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ThemePalette.contentSurface)
@@ -31,9 +35,10 @@ struct ThemeSegmentedPickerRenderingTests {
                 let bitmap = try await fixture.capture(named: "segmented-\(theme.rawValue)-\(colorScheme)")
                 let renderingScale = Double(bitmap.pixelsWide) / size.width
                 func color(atPoint x: CGFloat) throws -> UInt32 {
-                    let pixel = try #require(bitmap.colorAt(
-                        x: Int(x * renderingScale), y: Int(size.height / 2 * renderingScale)
-                    ))
+                    let pixel = try #require(
+                        bitmap.colorAt(
+                            x: Int(x * renderingScale), y: Int(size.height / 2 * renderingScale)
+                        ))
                     return hexValue(of: pixel)
                 }
                 // Just inside each end of the control, clear of its rounded corners and centered titles.

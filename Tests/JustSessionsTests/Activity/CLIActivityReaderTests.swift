@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CLIActivityReaderTests {
@@ -44,7 +45,8 @@ struct CLIActivityReaderTests {
         let inTurnFile = directory.appendingPathComponent("in-turn.jsonl")
         try CodexRolloutLines.write([CodexRolloutLines.turnStarted(at: cliStartedAt + 1)], to: inTurnFile)
         let finishedFile = directory.appendingPathComponent("finished.jsonl")
-        try CodexRolloutLines.write([CodexRolloutLines.turnStarted(at: cliStartedAt + 1), CodexRolloutLines.turnCompleted()], to: finishedFile)
+        try CodexRolloutLines.write(
+            [CodexRolloutLines.turnStarted(at: cliStartedAt + 1), CodexRolloutLines.turnCompleted()], to: finishedFile)
         server.setStatus(FakeCodexAppServer.waitingOnApproval, ofThread: "waiting")
         server.setStatus(FakeCodexAppServer.working, ofThread: "working")
         server.setStatus(FakeCodexAppServer.waitingOnApproval, ofThread: "ended")
@@ -133,10 +135,11 @@ struct CLIActivityReaderTests {
             CLIActivityProbe(provider: .kiro, processID: cliProcessID, sessionFile: nil),
         ])
 
-        #expect(activities == [
-            .working, nil, .working, .idle, nil, .needsInput(reason: "Allow rm?"), .idle, nil,
-            nil, .needsInput(reason: nil), .idle, nil,
-        ])
+        #expect(
+            activities == [
+                .working, nil, .working, .idle, nil, .needsInput(reason: "Allow rm?"), .idle, nil,
+                nil, .needsInput(reason: nil), .idle, nil,
+            ])
     }
 
     @Test func piAndOpenCodeTellNothingWithoutTheAppsExtension() throws {

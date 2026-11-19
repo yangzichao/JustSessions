@@ -10,7 +10,8 @@ enum TabGroupColorAssignment {
         var takenColorIndices: Set<Int> = []
         return projectKeys.map { projectKey in
             let preferredColorIndex = preferredColorIndex(forProjectKey: projectKey, paletteSize: paletteSize)
-            let colorIndex = (0..<paletteSize)
+            let colorIndex =
+                (0..<paletteSize)
                 .map { (preferredColorIndex + $0) % paletteSize }
                 .first { !takenColorIndices.contains($0) } ?? preferredColorIndex
             takenColorIndices.insert(colorIndex)

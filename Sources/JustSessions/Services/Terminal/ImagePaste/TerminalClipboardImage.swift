@@ -26,7 +26,8 @@ struct TerminalClipboardImage: Equatable {
             data = jpeg
             fileExtension = "jpg"
         } else if let tiff = pasteboard.data(forType: .tiff),
-                  let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) {
+            let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:])
+        {
             data = png
             fileExtension = "png"
         } else {

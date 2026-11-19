@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Stands in for an Antigravity, Pi, or OpenCode CLI: it writes what the app's `LiveSessionSource` for the tool reads,
@@ -30,9 +31,10 @@ struct ScenarioAntigravityCLI: ScenarioCLI {
         let handle = try FileHandle(forWritingTo: logFile)
         defer { try? handle.close() }
         try handle.seekToEnd()
-        try handle.write(contentsOf: Data(
-            "I1004 15:55:37.839493    1237 server.go:1272] Starting conversation update stream for \(sessionID)\n".utf8
-        ))
+        try handle.write(
+            contentsOf: Data(
+                "I1004 15:55:37.839493    1237 server.go:1272] Starting conversation update stream for \(sessionID)\n".utf8
+            ))
     }
 
     func saves(session sessionID: String, projectPath: String) throws {

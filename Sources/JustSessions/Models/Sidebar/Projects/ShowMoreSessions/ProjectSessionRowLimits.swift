@@ -29,7 +29,8 @@ struct ProjectSessionRowLimits: Equatable {
     }
 
     mutating func showMore(inProject projectID: String, hiddenSessionCount: Int) {
-        sessionLimitByProjectID[projectID] = sessionLimit(inProject: projectID)
+        sessionLimitByProjectID[projectID] =
+            sessionLimit(inProject: projectID)
             + Self.sessionsShownByShowMore(hiddenSessionCount: hiddenSessionCount)
     }
 

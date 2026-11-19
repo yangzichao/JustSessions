@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Commands and copies over SSH without a terminal notice a host that stops answering, as after the Mac sleeps, and
@@ -13,8 +14,9 @@ struct NonInteractiveSSHOptionsTests {
 
     @Test func remoteCommandsUseTheSharedOptionsWithoutATerminal() {
         #expect(RemoteHostCommandRunner.nonInteractiveSSHOptions == Self.expectedOptions)
-        #expect(RemoteHostCommandRunner.sshArguments(host: "devbox", command: "true", connectionSharingOptions: Self.sharingOptions)
-            == ["-T"] + Self.expectedOptions + Self.sharingOptions + ["devbox", "true"])
+        #expect(
+            RemoteHostCommandRunner.sshArguments(host: "devbox", command: "true", connectionSharingOptions: Self.sharingOptions)
+                == ["-T"] + Self.expectedOptions + Self.sharingOptions + ["devbox", "true"])
     }
 
     @Test func rsyncConnectsWithTheSharedOptionsWithoutATerminal() throws {
@@ -24,15 +26,17 @@ struct NonInteractiveSSHOptionsTests {
         )
         let remoteShellIndex = try #require(arguments.firstIndex(of: "-e")) + 1
 
-        #expect(arguments[remoteShellIndex] == "ssh -T -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=10"
-            + " -o ServerAliveCountMax=3 -o RemoteCommand=none -o ClearAllForwardings=yes"
-            + " -o ControlMaster=auto -o ControlPath=/tmp/justsessions-ssh-501/refresh-id/master -o ControlPersist=60")
+        #expect(
+            arguments[remoteShellIndex] == "ssh -T -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=10"
+                + " -o ServerAliveCountMax=3 -o RemoteCommand=none -o ClearAllForwardings=yes"
+                + " -o ControlMaster=auto -o ControlPath=/tmp/justsessions-ssh-501/refresh-id/master -o ControlPersist=60")
     }
 
     /// It runs the host's shell in a terminal, as a tab does.
     @Test func theShellStartupCheckKeepsItsTerminal() {
-        #expect(RemoteShellStartupCheck.sshArguments(host: "devbox", command: "true", connectionSharingOptions: Self.sharingOptions)
-            == ["-tt"] + Self.expectedOptions + Self.sharingOptions + ["devbox", "true"])
+        #expect(
+            RemoteShellStartupCheck.sshArguments(host: "devbox", command: "true", connectionSharingOptions: Self.sharingOptions)
+                == ["-tt"] + Self.expectedOptions + Self.sharingOptions + ["devbox", "true"])
     }
 
     /// Each tab keeps a connection of its own, so ending one never ends the others' CLIs.
@@ -79,10 +83,12 @@ struct NonInteractiveSSHOptionsTests {
         connections.add(current, for: "devbox")
         let throughNewLogin = builder.withCurrentLogin(withoutLogin, host: "devbox")
 
-        #expect(withoutLogin.arguments == RemoteCLICommandBuilder(
-            inheritedEnvironment: [:],
-            loginConnections: SSHLoginConnections(close: { _, _ in })
-        ).sshCommand(host: "devbox", remoteCommand: "true").arguments)
+        #expect(
+            withoutLogin.arguments
+                == RemoteCLICommandBuilder(
+                    inheritedEnvironment: [:],
+                    loginConnections: SSHLoginConnections(close: { _, _ in })
+                ).sshCommand(host: "devbox", remoteCommand: "true").arguments)
         #expect(throughNewLogin.arguments == builder.sshCommand(host: "devbox", remoteCommand: "true").arguments)
         #expect(throughNewLogin.arguments.contains("ControlPath=\(SSHLoginConnections.controlPath(in: current))"))
     }

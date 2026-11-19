@@ -39,7 +39,8 @@ struct RemoteSignInSettings: Equatable {
     static func load(from userDefaults: UserDefaults) -> RemoteSignInSettings {
         var settings = RemoteSignInSettings()
         if let data = userDefaults.data(forKey: commandsKey),
-           let commands = try? JSONDecoder().decode([String: RemoteSignInCommand].self, from: data) {
+            let commands = try? JSONDecoder().decode([String: RemoteSignInCommand].self, from: data)
+        {
             settings.commandsByHost = commands
         }
         settings.signedInAtByHost = userDefaults.dictionary(forKey: signedInKey) as? [String: Date] ?? [:]

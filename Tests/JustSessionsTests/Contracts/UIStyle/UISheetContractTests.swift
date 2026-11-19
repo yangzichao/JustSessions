@@ -8,7 +8,8 @@ struct UISheetContractTests {
         let sheetFiles = try ViewSourceLines().files.filter { file in
             file.path.hasSuffix("Sheet.swift") && file.lines.contains { $0.contains(": View {") }
         }
-        let offendingFiles = sheetFiles
+        let offendingFiles =
+            sheetFiles
             .filter { !$0.path.hasSuffix("Settings/SettingsSheet.swift") }
             .filter { file in !file.lines.contains { $0.contains("ThemeSheetLayout(") } }
             .map(\.path)

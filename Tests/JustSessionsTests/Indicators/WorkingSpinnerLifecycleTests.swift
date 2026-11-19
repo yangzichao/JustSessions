@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The spinner's rotation runs only while the arc can be seen, and comes back once it can be again: a spinner the
@@ -104,7 +105,9 @@ struct WorkingSpinnerLifecycleTests {
         // A window that can miniaturize is one with a title bar, shown first, as a user's window has been: AppKit
         // posts `didDeminiaturize` for a window restored to the screen, not for one that was never on it.
         let hostingView = NSHostingView(rootView: WorkingSpinnerArc(turns: true).frame(width: 10, height: 10).padding(7))
-        let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 200, height: 100), styleMask: [.titled, .miniaturizable], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: CGRect(x: 0, y: 0, width: 200, height: 100), styleMask: [.titled, .miniaturizable], backing: .buffered,
+            defer: false)
         window.isReleasedWhenClosed = false
         defer { window.close() }
         window.contentView = hostingView
@@ -137,7 +140,8 @@ struct WorkingSpinnerLifecycleTests {
         _ = NSApplication.shared
         let visibility = Visibility()
         let hostingView = NSHostingView(rootView: SpinnerUnderTest(visibility: visibility))
-        let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 24, height: 24), styleMask: [.borderless], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: CGRect(x: 0, y: 0, width: 24, height: 24), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
         window.orderFrontRegardless()

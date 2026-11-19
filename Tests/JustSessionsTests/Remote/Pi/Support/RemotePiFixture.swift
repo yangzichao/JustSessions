@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// A temporary folder standing in for an SSH host's home, with one Pi session in `~/.pi/agent/sessions` and its copy
@@ -61,7 +62,8 @@ struct RemotePiFixture {
         try FileManager.default.createDirectory(at: mirrorProjectFolder, withIntermediateDirectories: true)
         let mirrorFile = mirrorProjectFolder.appendingPathComponent(hostSessionFile.lastPathComponent)
         try FileManager.default.copyItem(at: hostSessionFile, to: mirrorFile)
-        conversation = .fixture(provider: .pi, sessionID: sessionID, projectPath: "/home/me/paper", sourceFile: mirrorFile, host: .ssh("devbox"))
+        conversation = .fixture(
+            provider: .pi, sessionID: sessionID, projectPath: "/home/me/paper", sourceFile: mirrorFile, host: .ssh("devbox"))
     }
 
     /// The folder beside the session file on the host, where Pi extensions keep subagent runs and forks.

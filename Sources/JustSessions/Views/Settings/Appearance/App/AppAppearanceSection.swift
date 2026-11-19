@@ -28,10 +28,12 @@ struct AppAppearanceSection: View {
         GridRow {
             Text("Interface size")
             HStack(spacing: 12) {
-                Slider(value: Binding(
-                    get: { interfaceSizeStore.scale },
-                    set: { interfaceSizeStore.setScale($0) }
-                ), in: InterfaceSizeStore.scaleRange, step: InterfaceSizeStore.scaleStep)
+                Slider(
+                    value: Binding(
+                        get: { interfaceSizeStore.scale },
+                        set: { interfaceSizeStore.setScale($0) }
+                    ), in: InterfaceSizeStore.scaleRange, step: InterfaceSizeStore.scaleStep
+                )
                 .accessibilityLabel("Interface size")
                 Text(interfaceSizeStore.scale, format: .percent.precision(.fractionLength(0)))
                     .monospacedDigit()

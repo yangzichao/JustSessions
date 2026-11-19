@@ -9,7 +9,8 @@ enum CodexThreadStatus {
     /// In a turn that waits for your approval of a command or edit, or for your answer to a question.
     static func isWaitingOnYou(_ status: Any?) -> Bool {
         guard let status = status as? [String: Any], status["type"] as? String == "active",
-              let flags = status["activeFlags"] as? [String] else { return false }
+            let flags = status["activeFlags"] as? [String]
+        else { return false }
         return flags.contains(where: waitingOnYouFlags.contains)
     }
 }

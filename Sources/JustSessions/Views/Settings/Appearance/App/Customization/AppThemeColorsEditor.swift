@@ -25,13 +25,17 @@ struct AppThemeColorsEditor: View {
         DisclosureGroup(isExpanded: $isExpanded) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 12) {
-                    ThemeSegmentedPicker("Version", selection: Binding(
-                        get: { editsDarkVersion },
-                        set: { editedVersionIsDark = $0 }
-                    ), segments: [
-                        ThemeSegment(value: false, title: Text("Light")),
-                        ThemeSegment(value: true, title: Text("Dark")),
-                    ])
+                    ThemeSegmentedPicker(
+                        "Version",
+                        selection: Binding(
+                            get: { editsDarkVersion },
+                            set: { editedVersionIsDark = $0 }
+                        ),
+                        segments: [
+                            ThemeSegment(value: false, title: Text("Light")),
+                            ThemeSegment(value: true, title: Text("Dark")),
+                        ]
+                    )
                     .fixedSize()
                     Spacer(minLength: 0)
                     Button("Reset") {
@@ -53,7 +57,8 @@ struct AppThemeColorsEditor: View {
                 }
                 HelpPopoverButton(
                     title: "Customize colors",
-                    explanation: "Changes the chosen theme's colors, in its light or dark version. Your changes stay with the theme when you choose another one. Text is made readable on your colors, so the text color can come out darker or lighter than you chose. Terminals that match the app theme take its background."
+                    explanation:
+                        "Changes the chosen theme's colors, in its light or dark version. Your changes stay with the theme when you choose another one. Text is made readable on your colors, so the text color can come out darker or lighter than you chose. Terminals that match the app theme take its background."
                 )
                 .accessibilityIdentifier("settings.help.customizeThemeColors")
             }

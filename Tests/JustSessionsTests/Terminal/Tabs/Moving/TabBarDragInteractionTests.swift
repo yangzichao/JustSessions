@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Mouse events on the tab bar itself: a drag moves a tab within its group, a split's two tabs together, or a whole

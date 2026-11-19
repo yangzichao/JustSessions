@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Measures reading a long transcript with the real reader hosted in a visible 1000×800 window, as
@@ -30,7 +31,7 @@ struct TranscriptInteractionMeasurements {
             for (name, value) in try await harness.measureOpeningFind() { perfReport(label, name, value) }
             for (name, value) in try await harness.measurePositionLookup() { perfReport(label, name, value) }
         }
-        #expect(entryCount > 0) // Record-only: the numbers above are the result.
+        #expect(entryCount > 0)  // Record-only: the numbers above are the result.
     }
 
     /// Reading as the app's readers do, with the bookmark commands on: a store and a paging model, so each scroll update
@@ -49,7 +50,7 @@ struct TranscriptInteractionMeasurements {
             for (name, value) in try await harness.measureHitTesting() { perfReport(label, name, value) }
             for (name, value) in try await harness.measurePointerMoves() { perfReport(label, name, value) }
         }
-        #expect(entryCount > 0) // Record-only: the numbers above are the result.
+        #expect(entryCount > 0)  // Record-only: the numbers above are the result.
     }
 
     /// The same reading with a letter beside 26 messages, so the markers' cost shows beside the plain reader's. Labelled,
@@ -68,7 +69,7 @@ struct TranscriptInteractionMeasurements {
             for (name, value) in try await harness.measureScrolling() { perfReport(label, name, value) }
             for (name, value) in try await harness.measureHitTesting() { perfReport(label, name, value) }
         }
-        #expect(entryCount > 0) // Record-only: the numbers above are the result.
+        #expect(entryCount > 0)  // Record-only: the numbers above are the result.
     }
 }
 
@@ -92,9 +93,10 @@ final class TranscriptPerfHarness {
         if bookmarkCount > 0 {
             let messages = transcript.entries.compactMap { entry in MessageBookmark.Kind(entry.content).map { (entry, kind: $0) } }
             let bookmarks = zip(MessageBookmarks.letters, messages.prefix(bookmarkCount)).map { letter, message in
-                MessageBookmark(letter: letter, entryID: message.0.id, kind: message.kind,
-                                snippet: MessageBookmarkNavigation.snippet(of: message.0) ?? "",
-                                label: labelled ? "Label \(letter)" : nil, tags: labelled ? ["perf", "tag-\(letter)"] : [])
+                MessageBookmark(
+                    letter: letter, entryID: message.0.id, kind: message.kind,
+                    snippet: MessageBookmarkNavigation.snippet(of: message.0) ?? "",
+                    label: labelled ? "Label \(letter)" : nil, tags: labelled ? ["perf", "tag-\(letter)"] : [])
             }
             MessageBookmarks(bookmarksByConversationID: [conversation.id: bookmarks]).save(to: settings.userDefaults)
             store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
@@ -102,14 +104,15 @@ final class TranscriptPerfHarness {
         if bookmarkCommands, store == nil {
             store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
         }
-        hostingView = NSHostingView(rootView: AnyView(
-            TranscriptScrollView(
-                conversation: conversation, transcript: transcript,
-                positionStore: TranscriptReadingPositionStore(), searchState: searchState,
-                paging: bookmarkCommands ? TranscriptPagingModel() : nil, store: store
-            )
-            .defaultAppStorage(settings.userDefaults)
-        ))
+        hostingView = NSHostingView(
+            rootView: AnyView(
+                TranscriptScrollView(
+                    conversation: conversation, transcript: transcript,
+                    positionStore: TranscriptReadingPositionStore(), searchState: searchState,
+                    paging: bookmarkCommands ? TranscriptPagingModel() : nil, store: store
+                )
+                .defaultAppStorage(settings.userDefaults)
+            ))
         window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 1000, height: 800),
             styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false
@@ -198,7 +201,8 @@ final class TranscriptPerfHarness {
     func measurePositionLookup(iterations: Int = 1_000) async throws -> [(String, String)] {
         try await resetViewport(to: .middle)
         guard let scrollView = transcriptScrollView,
-              let lookup = PositionLookup(in: hostingView, scrollView: scrollView) else { return [] }
+            let lookup = PositionLookup(in: hostingView, scrollView: scrollView)
+        else { return [] }
         var checksum = 0
         let total = ContinuousClock().measure {
             for _ in 0..<iterations { checksum &+= lookup.firstVisibleEntryIndex() ?? 0 }
@@ -295,28 +299,40 @@ final class TranscriptPerfHarness {
 
     /// Reading entries as a session has them: prompts, replies with prose, lists, and code, and runs of tool calls.
     static func transcript(count: Int) -> TranscriptContent {
-        TranscriptContent(entries: (0..<count).map { index in
-            let content: TranscriptEntry.Content = switch index % 4 {
-            case 0: .userMessage("Question \(index): why does the sidebar redraw when a session in another project changes?")
-            case 1: .assistantMessage("""
-                The sidebar redraws because **every row** reads the store, entry \(index). Three changes help:
+        TranscriptContent(
+            entries: (0..<count).map { index in
+                let content: TranscriptEntry.Content =
+                    switch index % 4 {
+                    case 0: .userMessage("Question \(index): why does the sidebar redraw when a session in another project changes?")
+                    case 1:
+                        .assistantMessage(
+                            """
+                            The sidebar redraws because **every row** reads the store, entry \(index). Three changes help:
 
-                - Read only the `session` a row shows.
-                - Keep the project list *lazy*.
-                - Batch updates from the [poller](https://example.com).
+                            - Read only the `session` a row shows.
+                            - Keep the project list *lazy*.
+                            - Batch updates from the [poller](https://example.com).
 
-                ```swift
-                let rows = projects.flatMap(\\.sessions).filter { $0.isVisible }
-                print(rows.count)
-                ```
-                """)
-            case 2: .toolCalls(["Read Sources/JustSessions/Views/Browser/Sidebar/SidebarSessionRow.swift", "Bash swift build", "Edit SidebarSessionRow.swift"])
-            default: .assistantMessage(String(repeating: "This paragraph explains the change in detail, entry \(index), so it wraps over several lines. ", count: 4))
-            }
-            var entry = TranscriptEntry(id: index, content: content, timestamp: nil, startsTurn: index % 4 == 0)
-            if case .assistantMessage(let text) = content { entry.markdown = PreparedTranscriptMarkdown(text: text) }
-            return entry
-        }, omittedEntryCount: 0)
+                            ```swift
+                            let rows = projects.flatMap(\\.sessions).filter { $0.isVisible }
+                            print(rows.count)
+                            ```
+                            """)
+                    case 2:
+                        .toolCalls([
+                            "Read Sources/JustSessions/Views/Browser/Sidebar/SidebarSessionRow.swift", "Bash swift build",
+                            "Edit SidebarSessionRow.swift",
+                        ])
+                    default:
+                        .assistantMessage(
+                            String(
+                                repeating: "This paragraph explains the change in detail, entry \(index), so it wraps over several lines. ",
+                                count: 4))
+                    }
+                var entry = TranscriptEntry(id: index, content: content, timestamp: nil, startsTurn: index % 4 == 0)
+                if case .assistantMessage(let text) = content { entry.markdown = PreparedTranscriptMarkdown(text: text) }
+                return entry
+            }, omittedEntryCount: 0)
     }
 
     /// The app-wide setting an assistive app turns on. The attribute accessors exist only in the deprecated informal
@@ -327,8 +343,9 @@ final class TranscriptPerfHarness {
                 .takeUnretainedValue() as? NSNumber
         }
         set {
-            NSApp.perform(NSSelectorFromString("accessibilitySetValue:forAttribute:"), with: newValue ?? NSNumber(value: false),
-                          with: "AXEnhancedUserInterface" as NSString)
+            NSApp.perform(
+                NSSelectorFromString("accessibilitySetValue:forAttribute:"), with: newValue ?? NSNumber(value: false),
+                with: "AXEnhancedUserInterface" as NSString)
         }
     }
 
@@ -363,13 +380,16 @@ private enum PositionLookup {
             return
         }
 
-        guard let geometryView = views.first(where: {
-            String(describing: type(of: $0)).hasSuffix("TranscriptEntryGeometryView")
-        }), let controller = Self.child(named: "controller", in: geometryView),
-              let storedGeometries = Self.child(named: "entryGeometries", in: controller) else { return nil }
+        guard
+            let geometryView = views.first(where: {
+                String(describing: type(of: $0)).hasSuffix("TranscriptEntryGeometryView")
+            }), let controller = Self.child(named: "controller", in: geometryView),
+            let storedGeometries = Self.child(named: "entryGeometries", in: controller)
+        else { return nil }
         let geometries = Mirror(reflecting: storedGeometries).children.compactMap { child -> Geometry? in
             guard let entryIndex = Self.child(named: "entryIndex", in: child.value) as? Int,
-                  let frame = Self.child(named: "frame", in: child.value) as? CGRect else { return nil }
+                let frame = Self.child(named: "frame", in: child.value) as? CGRect
+            else { return nil }
             return Geometry(entryIndex: entryIndex, frame: frame)
         }
         guard !geometries.isEmpty else { return nil }

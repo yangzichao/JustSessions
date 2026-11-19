@@ -1,6 +1,7 @@
 import AppKit
 import SwiftTerm
 import Testing
+
 @testable import JustSessions
 
 /// Claude Code draws most of its colored text in colors 16–255 of the 256-color palette. These render a terminal to

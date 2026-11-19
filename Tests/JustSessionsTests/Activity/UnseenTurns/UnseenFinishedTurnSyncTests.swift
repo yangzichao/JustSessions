@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The CLI activity sync marking a Codex tab whose turn finished off screen, and looking at the tab clearing it. The
@@ -125,7 +126,8 @@ struct UnseenFinishedTurnSyncTests {
         }
 
         func startTurn() async throws {
-            try CodexRolloutLines.write([CodexRolloutLines.sessionMeta, CodexRolloutLines.turnStarted(at: cliStartedAt + 1)], to: rolloutFile)
+            try CodexRolloutLines.write(
+                [CodexRolloutLines.sessionMeta, CodexRolloutLines.turnStarted(at: cliStartedAt + 1)], to: rolloutFile)
             await synchronize()
             #expect(tab.cliActivity == .working)
         }

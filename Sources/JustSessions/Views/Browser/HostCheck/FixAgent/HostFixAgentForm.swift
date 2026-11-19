@@ -16,10 +16,13 @@ struct HostFixAgentForm: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             labeledRow("Run on") {
-                ThemeSegmentedPicker("Run on", selection: $draft.machine, segments: [
-                    ThemeSegment(value: HostFixAgentMachine.checkedHost, title: Text(verbatim: host)),
-                    ThemeSegment(value: HostFixAgentMachine.thisMac, title: Text("This Mac")),
-                ])
+                ThemeSegmentedPicker(
+                    "Run on", selection: $draft.machine,
+                    segments: [
+                        ThemeSegment(value: HostFixAgentMachine.checkedHost, title: Text(verbatim: host)),
+                        ThemeSegment(value: HostFixAgentMachine.thisMac, title: Text("This Mac")),
+                    ]
+                )
                 .fixedSize()
                 Text(machineExplanation)
                     .font(ThemeFont.callout)
@@ -33,9 +36,12 @@ struct HostFixAgentForm: View {
                         .font(ThemeFont.callout)
                         .foregroundStyle(ThemePalette.secondaryText)
                 } else {
-                    ThemeSegmentedPicker("Tool", selection: $draft.provider, segments: machineProviders.map { provider in
-                        ThemeSegment(value: Optional(provider), title: Text(provider.rawValue))
-                    })
+                    ThemeSegmentedPicker(
+                        "Tool", selection: $draft.provider,
+                        segments: machineProviders.map { provider in
+                            ThemeSegment(value: Optional(provider), title: Text(provider.rawValue))
+                        }
+                    )
                     .fixedSize()
                 }
             }

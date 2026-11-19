@@ -51,9 +51,10 @@ enum TerminalLinkTarget: Equatable {
         for candidate in candidates {
             let url = URL(fileURLWithPath: candidate.path)
             if let kind = localItemKind(url) {
-                self = .localItem(TerminalLinkLocalItem(
-                    url: url, kind: kind, lineNumber: candidate.lineNumber, columnNumber: candidate.columnNumber
-                ))
+                self = .localItem(
+                    TerminalLinkLocalItem(
+                        url: url, kind: kind, lineNumber: candidate.lineNumber, columnNumber: candidate.columnNumber
+                    ))
                 return
             }
         }

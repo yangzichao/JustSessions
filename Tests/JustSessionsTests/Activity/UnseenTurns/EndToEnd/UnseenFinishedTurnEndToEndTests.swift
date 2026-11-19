@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A session whose CLI finished its turn while you were not looking keeps a dot until you look, and Waiting for you

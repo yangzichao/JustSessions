@@ -1,6 +1,5 @@
 import CucumberSwift
 import XCTest
-@testable import JustSessions
 
 /// The Claude Code steps of `Features/ClaudeLiveSession/RenameInClaudeCodeTab.feature`; the rest are `SessionTabSteps`.
 @MainActor

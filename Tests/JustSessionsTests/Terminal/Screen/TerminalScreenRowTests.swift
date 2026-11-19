@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// A screen row's text measured in cells; see `TerminalScreenRow`.

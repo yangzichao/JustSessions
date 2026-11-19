@@ -31,7 +31,8 @@ extension ConversationStore {
         for index in terminalSessions.indices {
             let tab = terminalSessions[index]
             guard tab.host == host, tab.isWaitingToBeShown, tab.tmuxSessionName != nil,
-                  let replacement = remadeTabWaitingToBeShown(tab) else { continue }
+                let replacement = remadeTabWaitingToBeShown(tab)
+            else { continue }
             replaceTerminal(at: index, with: replacement)
         }
     }

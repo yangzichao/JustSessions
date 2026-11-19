@@ -14,10 +14,9 @@ enum WebSocketOpcode: UInt8, Sendable {
 enum WebSocketClientFrame {
     /// The request that turns the connection into a WebSocket. `key` is 16 random bytes in base64.
     static func upgradeRequest(key: String) -> Data {
-        Data((
-            "GET / HTTP/1.1\r\nHost: localhost\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n"
-                + "Sec-WebSocket-Key: \(key)\r\nSec-WebSocket-Version: 13\r\n\r\n"
-        ).utf8)
+        Data(
+            ("GET / HTTP/1.1\r\nHost: localhost\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n"
+                + "Sec-WebSocket-Key: \(key)\r\nSec-WebSocket-Version: 13\r\n\r\n").utf8)
     }
 
     static func randomUpgradeKey() -> String {

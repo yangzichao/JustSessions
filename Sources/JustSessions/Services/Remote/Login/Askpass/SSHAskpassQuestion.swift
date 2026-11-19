@@ -38,11 +38,12 @@ struct SSHAskpassQuestion: Identifiable, Equatable, Sendable {
         asker = .ssh
         prompt = request.prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         self.context = context
-        kind = switch request.hint {
-        case "confirm": .confirmation
-        case "none": .notice
-        default: Self.asksToTrustHostKey(request.prompt) ? .unknownHostKey : .secret
-        }
+        kind =
+            switch request.hint {
+            case "confirm": .confirmation
+            case "none": .notice
+            default: Self.asksToTrustHostKey(request.prompt) ? .unknownHostKey : .secret
+            }
         isAskedAgain = kind == .secret && prompt == previousPrompt
     }
 

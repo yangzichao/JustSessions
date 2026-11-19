@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// Sparkle's Install and Relaunch sends a normal quit request. AppKit rejects that request before consulting the

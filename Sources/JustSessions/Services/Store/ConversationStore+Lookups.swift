@@ -15,10 +15,12 @@ extension ConversationStore {
     /// the sessions above it as its own subagent is listed once, as the sidebar lists it once.
     func descendantSubagents(of conversation: Conversation) -> [Conversation] {
         var counted: Set<String> = [conversation.id]
-        var pending = [conversation], found: [Conversation] = []
+        var pending = [conversation]
+        var found: [Conversation] = []
         while let next = pending.popLast() {
             for subagent in subagents(of: next) where counted.insert(subagent.id).inserted {
-                pending.append(subagent); found.append(subagent)
+                pending.append(subagent)
+                found.append(subagent)
             }
         }
         return found

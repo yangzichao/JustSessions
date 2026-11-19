@@ -2,6 +2,7 @@ import AppKit
 import Combine
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -154,19 +155,19 @@ struct AppThemeCustomizationTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let saved = """
-        {
-          "version": 2,
-          "solarized": {"dark": {"contentSurface": 1052688}},
-          "gitHub": {
-            "light": {
-              "accentColor": 255, "sidebarSurface": 16448250, "raisedSurface": "white",
-              "userMessageSurface": -1, "ink": 1.5, "contentSurface": 33554431
-            },
-            "dark": {"contentSurface": 16777215}
-          },
-          "gruvbox": {"dark": {"contentSurface": 1118481}, "light": [1, 2]}
-        }
-        """
+            {
+              "version": 2,
+              "solarized": {"dark": {"contentSurface": 1052688}},
+              "gitHub": {
+                "light": {
+                  "accentColor": 255, "sidebarSurface": 16448250, "raisedSurface": "white",
+                  "userMessageSurface": -1, "ink": 1.5, "contentSurface": 33554431
+                },
+                "dark": {"contentSurface": 16777215}
+              },
+              "gruvbox": {"dark": {"contentSurface": 1118481}, "light": [1, 2]}
+            }
+            """
         settings.userDefaults.set(Data(saved.utf8), forKey: AppThemeCustomization.userDefaultsKey)
 
         let customizations = AppThemeCustomization.loadAll(from: settings.userDefaults)
@@ -217,7 +218,8 @@ struct AppThemeCustomizationTests {
 
     /// Every text color reads at 4.5 on every surface it sits on, and on the ink.
     private nonisolated func keepsTextReadable(_ colors: AppThemeColors) -> Bool {
-        let textColors = [colors.ink, colors.secondaryText, colors.tertiaryText, colors.warningText, colors.errorText]
+        let textColors =
+            [colors.ink, colors.secondaryText, colors.tertiaryText, colors.warningText, colors.errorText]
             + colors.providerTextHexColors.values
         let textIsReadable = textColors.allSatisfy { textColor in
             colors.textSurfaces.allSatisfy { ThemeColorContrast.ratio(textColor, $0) >= 4.5 }

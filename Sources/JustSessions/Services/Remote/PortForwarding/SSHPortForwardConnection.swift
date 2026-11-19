@@ -47,8 +47,9 @@ final class SSHPortForwardConnection: @unchecked Sendable {
         onEndOnItsOwn: @escaping @Sendable (SSHPortForwardConnection) -> Void
     ) -> StartOutcome {
         guard let directory = SSHSocketDirectory.makePortForwardDirectory(at: socketRoot),
-              let output = SSHLoginOutput(file: directory.appendingPathComponent("ssh-output")),
-              let outputHandle = output.makeWritingHandle() else {
+            let output = SSHLoginOutput(file: directory.appendingPathComponent("ssh-output")),
+            let outputHandle = output.makeWritingHandle()
+        else {
             return .failed(.other(sshMessage: "The app could not make a private folder for the connection in /tmp."))
         }
         defer { try? outputHandle.close() }

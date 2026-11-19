@@ -20,10 +20,13 @@ struct AllBookmarksList: Equatable {
     ///   - requiredTags: a bookmark must have every one, ignoring case and accents.
     ///   - conversation: the listed session with an ID, or nil.
     ///   - title: the session's title as the sidebar shows it.
-    init(bookmarks: MessageBookmarks, query: MessageBookmarkQuery?, requiredTags: Set<String>,
-         conversation: (String) -> Conversation?, title: (Conversation) -> String) {
+    init(
+        bookmarks: MessageBookmarks, query: MessageBookmarkQuery?, requiredTags: Set<String>,
+        conversation: (String) -> Conversation?, title: (Conversation) -> String
+    ) {
         let requiredKeys = Set(requiredTags.map(MessageBookmarkDetails.searchKey))
-        var sections: [Section] = [], unlisted = 0
+        var sections: [Section] = []
+        var unlisted = 0
         for (conversationID, sessionBookmarks) in bookmarks.bookmarksByConversationID {
             guard let listed = conversation(conversationID) else {
                 unlisted += sessionBookmarks.count

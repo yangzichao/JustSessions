@@ -50,22 +50,27 @@ struct SSHLogin: Sendable {
     /// away on its own, as a notice does once `ssh` is done with it.
     func logIn(to host: String, ask: @escaping @Sendable (SSHAskpassQuestion) async -> String?) async -> SSHLoginOutcome {
         guard let directory = SSHSocketDirectory.makeLoginDirectory(at: socketRoot),
-              let output = SSHLoginOutput(file: directory.appendingPathComponent("ssh-output")) else {
+            let output = SSHLoginOutput(file: directory.appendingPathComponent("ssh-output"))
+        else {
             return .failed(.other(sshMessage: "The app could not make a private folder for the connection in /tmp."))
         }
         let controlPath = SSHLoginConnections.controlPath(in: directory)
         let run = LoginRun()
-        guard let server = SSHAskpassServer(socketPath: directory.appendingPathComponent("askpass").path, ask: { request in
-            let question = SSHAskpassQuestion(
-                host: host,
-                request: request,
-                context: output.newText(),
-                previousPrompt: run.notePrompt(request.prompt.trimmingCharacters(in: .whitespacesAndNewlines))
-            )
-            let answer = await ask(question)
-            if answer == nil, !Task.isCancelled { run.cancel() }
-            return SSHAskpassReply(answer: answer)
-        }) else {
+        guard
+            let server = SSHAskpassServer(
+                socketPath: directory.appendingPathComponent("askpass").path,
+                ask: { request in
+                    let question = SSHAskpassQuestion(
+                        host: host,
+                        request: request,
+                        context: output.newText(),
+                        previousPrompt: run.notePrompt(request.prompt.trimmingCharacters(in: .whitespacesAndNewlines))
+                    )
+                    let answer = await ask(question)
+                    if answer == nil, !Task.isCancelled { run.cancel() }
+                    return SSHAskpassReply(answer: answer)
+                })
+        else {
             try? FileManager.default.removeItem(at: directory)
             return .failed(.other(sshMessage: "The app could not listen for the login's questions."))
         }
@@ -92,8 +97,10 @@ struct SSHLogin: Sendable {
             outcome = .loggedIn
         } else {
             // Logged in, but the master did not stay, as when the host refuses sessions to share the connection.
-            outcome = .failed(.other(sshMessage: SSHConnectionProblem.tellingLine(inOutput: printed)
-                ?? "The connection closed after logging in."))
+            outcome = .failed(
+                .other(
+                    sshMessage: SSHConnectionProblem.tellingLine(inOutput: printed)
+                        ?? "The connection closed after logging in."))
         }
         if outcome == .loggedIn {
             connections.add(directory, for: host)

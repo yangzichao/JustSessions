@@ -11,12 +11,14 @@ struct ClaudeSessionFileLocator: Sendable {
 
     func transcriptFile(forSessionID sessionID: String) -> URL? {
         guard ConversationMetadata.isValidSessionID(sessionID),
-              let projectDirectories = try? FileManager.default.contentsOfDirectory(
-                  at: projectsDirectory,
-                  includingPropertiesForKeys: nil,
-                  options: [.skipsHiddenFiles]
-              ) else { return nil }
-        return projectDirectories
+            let projectDirectories = try? FileManager.default.contentsOfDirectory(
+                at: projectsDirectory,
+                includingPropertiesForKeys: nil,
+                options: [.skipsHiddenFiles]
+            )
+        else { return nil }
+        return
+            projectDirectories
             .map { $0.appendingPathComponent("\(sessionID).jsonl") }
             .first { FileManager.default.fileExists(atPath: $0.path) }
     }

@@ -28,11 +28,11 @@ struct RuledPromptRecognizer: Sendable {
     func prompt(on screen: TerminalScreen) -> CLIPrompt? {
         let caretRow = screen.cursor.row
         guard let topRule = screen.rows[..<caretRow].lastIndex(where: { isRule($0, on: screen) }),
-              let bottomRule = screen.rows[(caretRow + 1)...].firstIndex(where: { isRule($0, on: screen) })
+            let bottomRule = screen.rows[(caretRow + 1)...].firstIndex(where: { isRule($0, on: screen) })
         else { return nil }
         let rows = (topRule + 1)..<bottomRule
         guard startsWithMarker(screen.rows[rows.lowerBound]),
-              rows.dropFirst().allSatisfy({ screen.rows[$0].isBlank(beforeColumn: textStartColumn) })
+            rows.dropFirst().allSatisfy({ screen.rows[$0].isBlank(beforeColumn: textStartColumn) })
         else { return nil }
         return CLIPrompt(
             lines: rows.map { CLIPromptLine(row: $0, of: screen, startColumn: textStartColumn) },

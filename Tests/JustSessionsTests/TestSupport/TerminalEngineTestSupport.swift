@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+
 @testable import JustSessions
 
 extension TerminalEngineStore {

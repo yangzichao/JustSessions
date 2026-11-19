@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// What Claude Code 2.1.306 wrote for `/branch` typed in a running CLI, then `/rename after-branch`, trimmed to the
@@ -47,13 +48,15 @@ struct ClaudeBranchCommandTranscripts {
             at: configurationDirectory.appendingPathComponent("sessions"),
             withIntermediateDirectories: true
         )
-        try append(to: Self.parentID, [
-            #"{"type":"permission-mode","permissionMode":"auto","sessionId":"\#(Self.parentID)"}"#,
-            Self.prompt(sessionID: Self.parentID, forked: false),
-            #"{"type":"ai-title","aiTitle":"\#(Self.parentTitle)","sessionId":"\#(Self.parentID)"}"#,
-            Self.reply(sessionID: Self.parentID, forked: false),
-            #"{"type":"last-prompt","leafUuid":"77841e5c-1174-4c06-9485-052950c03f48","sessionId":"\#(Self.parentID)"}"#,
-        ])
+        try append(
+            to: Self.parentID,
+            [
+                #"{"type":"permission-mode","permissionMode":"auto","sessionId":"\#(Self.parentID)"}"#,
+                Self.prompt(sessionID: Self.parentID, forked: false),
+                #"{"type":"ai-title","aiTitle":"\#(Self.parentTitle)","sessionId":"\#(Self.parentID)"}"#,
+                Self.reply(sessionID: Self.parentID, forked: false),
+                #"{"type":"last-prompt","leafUuid":"77841e5c-1174-4c06-9485-052950c03f48","sessionId":"\#(Self.parentID)"}"#,
+            ])
         try writeRecord(.beforeBranch)
     }
 
@@ -67,23 +70,27 @@ struct ClaudeBranchCommandTranscripts {
 
     /// `/branch`: the branch's file is written in full before the registry names it.
     func branch() throws {
-        try append(to: Self.branchID, [
-            Self.prompt(sessionID: Self.branchID, forked: true),
-            Self.reply(sessionID: Self.branchID, forked: true),
-            #"{"type":"atis-latch","sessionId":"\#(Self.branchID)"}"#,
-            Self.customTitleLine(Self.branchTitle),
-            #"{"type":"agent-name","agentName":"\#(Self.branchTitle)","sessionId":"\#(Self.branchID)"}"#,
-        ])
+        try append(
+            to: Self.branchID,
+            [
+                Self.prompt(sessionID: Self.branchID, forked: true),
+                Self.reply(sessionID: Self.branchID, forked: true),
+                #"{"type":"atis-latch","sessionId":"\#(Self.branchID)"}"#,
+                Self.customTitleLine(Self.branchTitle),
+                #"{"type":"agent-name","agentName":"\#(Self.branchTitle)","sessionId":"\#(Self.branchID)"}"#,
+            ])
         try append(to: Self.parentID, [#"{"type":"cost-state","sessionId":"\#(Self.parentID)"}"#])
         try writeRecord(.branched)
     }
 
     /// `/rename after-branch` in the branch.
     func rename() throws {
-        try append(to: Self.branchID, [
-            Self.customTitleLine("after-branch"),
-            #"{"type":"agent-name","agentName":"after-branch","sessionId":"\#(Self.branchID)"}"#,
-        ])
+        try append(
+            to: Self.branchID,
+            [
+                Self.customTitleLine("after-branch"),
+                #"{"type":"agent-name","agentName":"after-branch","sessionId":"\#(Self.branchID)"}"#,
+            ])
         try writeRecord(.renamed)
     }
 
@@ -125,13 +132,15 @@ struct ClaudeBranchCommandTranscripts {
 
     private static func prompt(sessionID: String, forked: Bool) -> String {
         let uuid = "a26341e3-5e47-49e8-bd48-511852da9c22"
-        return #"{"parentUuid":null,"isSidechain":false,"type":"user","message":{"role":"user","content":"\#(parentPrompt)"},"uuid":"\#(uuid)","timestamp":"2026-10-21T19:45:31.357Z","cwd":"/Users/me/project","sessionId":"\#(sessionID)","version":"2.1.306"\#(forkedFrom(uuid, forked))}"#
+        return
+            #"{"parentUuid":null,"isSidechain":false,"type":"user","message":{"role":"user","content":"\#(parentPrompt)"},"uuid":"\#(uuid)","timestamp":"2026-10-21T19:45:31.357Z","cwd":"/Users/me/project","sessionId":"\#(sessionID)","version":"2.1.306"\#(forkedFrom(uuid, forked))}"#
     }
 
     /// A copied reply keeps the snake_case `session_id` of the session it came from.
     private static func reply(sessionID: String, forked: Bool) -> String {
         let uuid = "77841e5c-1174-4c06-9485-052950c03f48"
-        return #"{"parentUuid":"a26341e3-5e47-49e8-bd48-511852da9c22","isSidechain":false,"message":{"model":"claude-opus-5-5","type":"message","role":"assistant","content":[{"type":"text","text":"OK"}]},"type":"assistant","uuid":"\#(uuid)","timestamp":"2026-10-21T19:45:33.854Z","session_id":"\#(parentID)","cwd":"/Users/me/project","sessionId":"\#(sessionID)","version":"2.1.306"\#(forkedFrom(uuid, forked))}"#
+        return
+            #"{"parentUuid":"a26341e3-5e47-49e8-bd48-511852da9c22","isSidechain":false,"message":{"model":"claude-opus-5-5","type":"message","role":"assistant","content":[{"type":"text","text":"OK"}]},"type":"assistant","uuid":"\#(uuid)","timestamp":"2026-10-21T19:45:33.854Z","session_id":"\#(parentID)","cwd":"/Users/me/project","sessionId":"\#(sessionID)","version":"2.1.306"\#(forkedFrom(uuid, forked))}"#
     }
 
     private static func forkedFrom(_ uuid: String, _ forked: Bool) -> String {

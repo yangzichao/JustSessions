@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Measures how long one move of the pointer takes while a tab, or a group by its label, is dragged along a tab bar of

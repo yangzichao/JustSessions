@@ -1,6 +1,7 @@
 import AppKit
 import Carbon.HIToolbox
 import Testing
+
 @testable import JustSessions
 
 /// What each key does while a CLI's prompt is selected, as in a text field with all its text selected.

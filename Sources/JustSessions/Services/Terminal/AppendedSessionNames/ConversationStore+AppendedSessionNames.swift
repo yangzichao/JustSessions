@@ -18,7 +18,8 @@ extension ConversationStore {
         let lookups = terminalSessions.compactMap { tab -> AppendedSessionNameReaders.Lookup? in
             guard tab.host == .thisMac, tab.isRunning else { return nil }
             guard let conversation = tab.conversation,
-                  let file = AppendedSessionNameSource.file(for: conversation, codexDirectory: codexDirectory) else { return nil }
+                let file = AppendedSessionNameSource.file(for: conversation, codexDirectory: codexDirectory)
+            else { return nil }
             return AppendedSessionNameReaders.Lookup(tabID: tab.id, conversation: conversation, file: file)
         }
         let names = await Task.detached(priority: .utility) { await readers.names(for: lookups) }.value
@@ -27,8 +28,9 @@ extension ConversationStore {
         for name in names {
             let lookup = name.lookup
             guard let tab = tabsByID[lookup.tabID], tab.isRunning,
-                  let conversation = tab.conversation, conversation.id == lookup.conversation.id,
-                  AppendedSessionNameSource.file(for: conversation, codexDirectory: codexDirectory) == lookup.file else { continue }
+                let conversation = tab.conversation, conversation.id == lookup.conversation.id,
+                AppendedSessionNameSource.file(for: conversation, codexDirectory: codexDirectory) == lookup.file
+            else { continue }
             applyChosenName(name.value, toSessionID: conversation.sessionID, provider: conversation.provider, shownIn: tab)
         }
     }

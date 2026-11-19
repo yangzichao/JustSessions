@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteFolderResolverTests {
@@ -40,12 +41,14 @@ struct RemoteFolderResolverTests {
         }
         #expect(!FileManager.default.fileExists(atPath: newApp.path))
 
-        #expect(try resolver.resolvedPath(of: "~/code/new app", host: "devbox", creatingMissingFolder: true)
-            == physicalPath(of: newApp))
+        #expect(
+            try resolver.resolvedPath(of: "~/code/new app", host: "devbox", creatingMissingFolder: true)
+                == physicalPath(of: newApp))
         var isDirectory: ObjCBool = false
         #expect(FileManager.default.fileExists(atPath: newApp.path, isDirectory: &isDirectory) && isDirectory.boolValue)
-        #expect(try resolver.resolvedPath(of: "~/code/new app", host: "devbox", creatingMissingFolder: true)
-            == physicalPath(of: newApp))
+        #expect(
+            try resolver.resolvedPath(of: "~/code/new app", host: "devbox", creatingMissingFolder: true)
+                == physicalPath(of: newApp))
 
         #expect(throws: RemoteFolderResolutionError.couldNotCreateFolder(host: "devbox", folder: "~/notes.txt/app")) {
             try resolver.resolvedPath(of: "~/notes.txt/app", host: "devbox", creatingMissingFolder: true)

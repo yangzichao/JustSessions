@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Which host `HostBackgroundChecker` checks, one at a time; the checks themselves are faked.
@@ -10,10 +11,12 @@ struct HostBackgroundCheckerTests {
         defer { settings.removeSuite() }
         let gate = AsyncGate()
         var checkedHosts: [String] = []
-        let checker = HostBackgroundChecker(appVersion: { "1.2.11" }, checkHost: { _, host in
-            checkedHosts.append(host)
-            return Task { await gate.wait() }
-        })
+        let checker = HostBackgroundChecker(
+            appVersion: { "1.2.11" },
+            checkHost: { _, host in
+                checkedHosts.append(host)
+                return Task { await gate.wait() }
+            })
 
         checker.checkDueHost(in: [store])
         checker.checkDueHost(in: [store])
@@ -37,10 +40,12 @@ struct HostBackgroundCheckerTests {
         store.sshHostsNeedingLogIn = ["needs-login"]
         store.disconnectedRemoteHosts.setDisconnected(true, for: "disconnected")
         var checkedHosts: [String] = []
-        let checker = HostBackgroundChecker(appVersion: { "1.2.11" }, checkHost: { _, host in
-            checkedHosts.append(host)
-            return Task {}
-        })
+        let checker = HostBackgroundChecker(
+            appVersion: { "1.2.11" },
+            checkHost: { _, host in
+                checkedHosts.append(host)
+                return Task {}
+            })
 
         checker.checkDueHost(in: [store])
 
@@ -60,10 +65,12 @@ struct HostBackgroundCheckerTests {
         )
         store.keptHostChecks = keptChecks
         var checkedHosts: [String] = []
-        let checker = HostBackgroundChecker(appVersion: { "1.2.11" }, checkHost: { _, host in
-            checkedHosts.append(host)
-            return Task {}
-        })
+        let checker = HostBackgroundChecker(
+            appVersion: { "1.2.11" },
+            checkHost: { _, host in
+                checkedHosts.append(host)
+                return Task {}
+            })
 
         checker.checkDueHost(in: [store])
         #expect(checkedHosts.isEmpty)
@@ -77,9 +84,12 @@ struct HostBackgroundCheckerTests {
     private func makeStore(hosts: [String], shellStartupHosts: [String]? = nil) throws -> (ConversationStore, IsolatedUserDefaults) {
         let settings = try IsolatedUserDefaults()
         RemoteHostList(hosts: hosts).save(to: settings.userDefaults)
-        RemoteShellStartupChecks(resultsByHost: Dictionary(uniqueKeysWithValues: (shellStartupHosts ?? hosts).map {
-            ($0, RemoteShellStartupCheckResult(outcome: .interactiveStartupWorks, stoppedAt: nil))
-        })).save(to: settings.userDefaults)
+        RemoteShellStartupChecks(
+            resultsByHost: Dictionary(
+                uniqueKeysWithValues: (shellStartupHosts ?? hosts).map {
+                    ($0, RemoteShellStartupCheckResult(outcome: .interactiveStartupWorks, stoppedAt: nil))
+                })
+        ).save(to: settings.userDefaults)
         let store = ConversationStore(
             adapters: [PiAdapter(sessionsDirectory: URL(fileURLWithPath: "/unused"))],
             userDefaults: settings.userDefaults,

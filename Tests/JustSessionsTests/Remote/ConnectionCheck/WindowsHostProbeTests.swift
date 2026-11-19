@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A Windows host prints its `OS` variable; a POSIX shell prints the command's words.
@@ -11,15 +12,17 @@ struct WindowsHostProbeTests {
     }
 
     /// The shells a Linux or macOS host logs in with, csh's error included.
-    @Test(arguments: ["/bin/sh", "/bin/bash", "/bin/zsh", "/bin/dash", "/bin/ksh", "/bin/csh"].filter(FileManager.default.isExecutableFile))
+    @Test(
+        arguments: ["/bin/sh", "/bin/bash", "/bin/zsh", "/bin/dash", "/bin/ksh", "/bin/csh"].filter(FileManager.default.isExecutableFile))
     func posixShellsDoNot(shellPath: String) throws {
-        let result = try #require(BoundedProcessRunner.result(
-            ofExecutable: shellPath,
-            arguments: ["-c", WindowsHostProbe.command],
-            environment: ["PATH": "/usr/bin:/bin"],
-            includesStandardError: true,
-            timeout: 10
-        ))
+        let result = try #require(
+            BoundedProcessRunner.result(
+                ofExecutable: shellPath,
+                arguments: ["-c", WindowsHostProbe.command],
+                environment: ["PATH": "/usr/bin:/bin"],
+                includesStandardError: true,
+                timeout: 10
+            ))
 
         #expect(!result.output.isEmpty)
         #expect(!WindowsHostProbe.isWindows(output: result.output), "\(result.output)")

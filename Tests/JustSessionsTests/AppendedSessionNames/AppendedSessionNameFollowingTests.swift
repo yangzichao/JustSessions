@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -49,7 +50,8 @@ struct AppendedSessionNameFollowingTests {
             case .closed: fixture.store.closeTerminal(fixture.tab.id)
             case .ended: fixture.tab.processFinished(exitCode: 0)
             case .relinked:
-                let other = Conversation.fixture(provider: .pi, title: "Other", sourceFile: fixture.folder.appendingPathComponent("other.jsonl"))
+                let other = Conversation.fixture(
+                    provider: .pi, title: "Other", sourceFile: fixture.folder.appendingPathComponent("other.jsonl"))
                 fixture.tab.synchronize(conversation: other, displayTitle: "Other")
             }
         } catch {
@@ -79,10 +81,12 @@ struct AppendedSessionNameFollowingTests {
             conversation = .fixture(provider: .pi, projectPath: folder.path, sourceFile: file)
             store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
             store.replaceConversations(on: .thisMac, with: [conversation])
-            tab = TerminalSession(engine: .swiftTerm, conversation: conversation, provider: .pi, projectPath: folder.path,
-                                  action: .resume, displayTitle: "Session",
-                                  command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [],
-                                                            workingDirectory: folder.path, environment: []))
+            tab = TerminalSession(
+                engine: .swiftTerm, conversation: conversation, provider: .pi, projectPath: folder.path,
+                action: .resume, displayTitle: "Session",
+                command: NativeCLICommand(
+                    executablePath: "/usr/bin/true", arguments: [],
+                    workingDirectory: folder.path, environment: []))
             store.openTerminal(tab)
         }
 

@@ -22,12 +22,12 @@ struct TerminalTabBookmarks {
     @discardableResult
     func toggleLatestMessage(in tab: TerminalSession) -> Task<Void, Never>? {
         actOnLatestMessage(in: tab) { entry, conversation in
-            let name = conversation.provider.rawValue   // as TranscriptBookmarkMenu labels replies
+            let name = conversation.provider.rawValue  // as TranscriptBookmarkMenu labels replies
             switch store.toggleMessageBookmark(on: entry, in: conversation) {
             case .added(let bookmark): tab.bookmarkNotices.show(.added(bookmark, assistantName: name))
             case .removed(let bookmark): tab.bookmarkNotices.show(.removed(bookmark, assistantName: name))
             case .allLettersInUse: tab.bookmarkNotices.show(.allLettersInUse)
-            case nil: tab.bookmarkNotices.show(.noMessagesYet)   // not reached: only messages are returned
+            case nil: tab.bookmarkNotices.show(.noMessagesYet)  // not reached: only messages are returned
             }
         }
     }
@@ -41,15 +41,17 @@ struct TerminalTabBookmarks {
                 tab.bookmarkNotices.dismiss()
                 tab.bookmarkNotices.editor.open(bookmark, in: conversation)
             case .allLettersInUse: tab.bookmarkNotices.show(.allLettersInUse)
-            case nil: tab.bookmarkNotices.show(.noMessagesYet)   // not reached: only messages are returned
+            case nil: tab.bookmarkNotices.show(.noMessagesYet)  // not reached: only messages are returned
             }
         }
     }
 
     /// Reads the newest of your messages or the CLI's replies off the main thread, after every press before it, and acts on
     /// it in the conversation it read; a notice says it is finding one after a while, or why there is none.
-    private func actOnLatestMessage(in tab: TerminalSession,
-                                    _ act: @escaping @MainActor (TranscriptEntry, Conversation) -> Void) -> Task<Void, Never>? {
+    private func actOnLatestMessage(
+        in tab: TerminalSession,
+        _ act: @escaping @MainActor (TranscriptEntry, Conversation) -> Void
+    ) -> Task<Void, Never>? {
         guard let conversation = linkedConversation(of: tab) else { return nil }
         return tab.bookmarkNotices.enqueue {
             // Cannot fire after the result: nothing yields between showing it and the deferred cancel.
@@ -68,7 +70,10 @@ struct TerminalTabBookmarks {
                 tab.bookmarkNotices.show(.couldNotRead)
                 return
             }
-            guard let entry else { tab.bookmarkNotices.show(.noMessagesYet); return }
+            guard let entry else {
+                tab.bookmarkNotices.show(.noMessagesYet)
+                return
+            }
             act(entry, conversation)
         }
     }

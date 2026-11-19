@@ -69,9 +69,10 @@ struct HostCheckProgressView: View {
         case .logIn: "Logging in to \(host)"
         case .shellStartup: "Checking its shell startup"
         case .cliLookup: "Looking up each CLI"
-        case .hostCommand: checksTabFolder
-            ? "Asking about tmux, rsync, each CLI's version, and the tab's folder"
-            : "Asking about tmux, rsync, and each CLI's version"
+        case .hostCommand:
+            checksTabFolder
+                ? "Asking about tmux, rsync, each CLI's version, and the tab's folder"
+                : "Asking about tmux, rsync, and each CLI's version"
         }
     }
 }

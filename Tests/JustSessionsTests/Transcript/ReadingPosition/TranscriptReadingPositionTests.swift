@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -24,8 +25,9 @@ struct TranscriptReadingPositionTests {
     }
 
     private func makeTranscript(omittedEntryCount: Int) -> TranscriptContent {
-        TranscriptContent(entries: (0..<50).map { index in
-            TranscriptEntry(id: index, content: .assistantMessage("Message \(index)"), timestamp: nil, startsTurn: true)
-        }, omittedEntryCount: omittedEntryCount)
+        TranscriptContent(
+            entries: (0..<50).map { index in
+                TranscriptEntry(id: index, content: .assistantMessage("Message \(index)"), timestamp: nil, startsTurn: true)
+            }, omittedEntryCount: omittedEntryCount)
     }
 }

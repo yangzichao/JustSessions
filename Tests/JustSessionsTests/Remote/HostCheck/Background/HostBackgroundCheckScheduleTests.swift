@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct HostBackgroundCheckScheduleTests {
@@ -22,8 +23,9 @@ struct HostBackgroundCheckScheduleTests {
 
     @Test func aRefreshAfterTheCheckThatDisagreesAboutTheTmuxServerAsksForACheck() {
         let passedCheck = check(minutesAgo: 30)
-        #expect(reason(keptCheck: passedCheck, refreshMinutesAgo: 1, tmuxServerProblem: "protocol version mismatch")
-            == .tmuxServerUnreachable)
+        #expect(
+            reason(keptCheck: passedCheck, refreshMinutesAgo: 1, tmuxServerProblem: "protocol version mismatch")
+                == .tmuxServerUnreachable)
         // The refresh came before the check, so the check knows better.
         #expect(reason(keptCheck: passedCheck, refreshMinutesAgo: 31, tmuxServerProblem: "protocol version mismatch") == nil)
 

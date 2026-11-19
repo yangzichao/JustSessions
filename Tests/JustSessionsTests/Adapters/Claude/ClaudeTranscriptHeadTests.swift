@@ -1,15 +1,17 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ClaudeTranscriptHeadTests {
     @Test func readsTheFirstWorkingDirectoryTheFirstPromptAndACustomTitle() {
-        let head = ClaudeTranscriptHead(lines: jsonLines([
-            #"{"type":"summary","summary":"Earlier work"}"#,
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":[{"type":"tool_result","content":"ok"}]}}"#,
-            #"{"type":"user","cwd":"/Users/me/app/Sources","message":{"content":"Fix the build"}}"#,
-            #"{"type":"custom-title","customTitle":"Build fixes"}"#,
-        ]))
+        let head = ClaudeTranscriptHead(
+            lines: jsonLines([
+                #"{"type":"summary","summary":"Earlier work"}"#,
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":[{"type":"tool_result","content":"ok"}]}}"#,
+                #"{"type":"user","cwd":"/Users/me/app/Sources","message":{"content":"Fix the build"}}"#,
+                #"{"type":"custom-title","customTitle":"Build fixes"}"#,
+            ]))
 
         #expect(head.workingDirectory == "/Users/me/app")
         #expect(head.firstPrompt == "Fix the build")
@@ -19,10 +21,11 @@ struct ClaudeTranscriptHeadTests {
 
     /// A prompt sent with a screenshot has its text and the image as parts, and the text is what was typed.
     @Test func aPromptSentWithImagesIsItsTextPart() {
-        let head = ClaudeTranscriptHead(lines: jsonLines([
-            #"{"type":"user","message":{"content":[{"type":"image","source":{"data":"iVBORw0"}},{"type":"text","text":"[Image #1] What is this?"}]}}"#,
-            #"{"type":"user","message":{"content":"Fix the build"}}"#,
-        ]))
+        let head = ClaudeTranscriptHead(
+            lines: jsonLines([
+                #"{"type":"user","message":{"content":[{"type":"image","source":{"data":"iVBORw0"}},{"type":"text","text":"[Image #1] What is this?"}]}}"#,
+                #"{"type":"user","message":{"content":"Fix the build"}}"#,
+            ]))
 
         #expect(head.firstPrompt == "[Image #1] What is this?")
     }
@@ -47,10 +50,11 @@ struct ClaudeTranscriptHeadTests {
     }
 
     @Test func anySidechainLineMarksTheSession() {
-        let head = ClaudeTranscriptHead(lines: jsonLines([
-            #"{"type":"user","isSidechain":false,"message":{"content":"Look into it"}}"#,
-            #"{"type":"assistant","isSidechain":true}"#,
-        ]))
+        let head = ClaudeTranscriptHead(
+            lines: jsonLines([
+                #"{"type":"user","isSidechain":false,"message":{"content":"Look into it"}}"#,
+                #"{"type":"assistant","isSidechain":true}"#,
+            ]))
 
         #expect(head.isSidechain)
     }
@@ -60,12 +64,14 @@ struct ClaudeTranscriptHeadTests {
     @Test func pastTheLineLimitOnlyTheFirstPromptIsLookedFor() {
         let filler = Array(repeating: #"{"type":"assistant"}"#, count: ClaudeTranscriptHead.maximumLineCount + 10)
         let prompt = #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#
-        let head = ClaudeTranscriptHead(lines: jsonLines(filler + [
-            #"{"type":"ai-title","aiTitle":"Past the limit"}"#,
-            #"{"type":"custom-title","customTitle":"Past the limit"}"#,
-            prompt,
-            #"{"type":"user","cwd":"/Users/me/app","isSidechain":true,"message":{"content":"After the prompt"}}"#,
-        ]))
+        let head = ClaudeTranscriptHead(
+            lines: jsonLines(
+                filler + [
+                    #"{"type":"ai-title","aiTitle":"Past the limit"}"#,
+                    #"{"type":"custom-title","customTitle":"Past the limit"}"#,
+                    prompt,
+                    #"{"type":"user","cwd":"/Users/me/app","isSidechain":true,"message":{"content":"After the prompt"}}"#,
+                ]))
 
         #expect(head.firstPrompt == "Fix the build")
         #expect(head.workingDirectory == "/Users/me/app")
@@ -77,33 +83,36 @@ struct ClaudeTranscriptHeadTests {
     /// What Claude Code writes for the user is not a prompt: the note before a slash command, the command, and its
     /// output are `user` lines too.
     @Test func slashCommandsAndTheirOutputAreNotTheFirstPrompt() {
-        let head = ClaudeTranscriptHead(lines: jsonLines([
-            #"{"type":"user","isMeta":true,"cwd":"/Users/me/app","message":{"content":"Run without asking, then report."}}"#,
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<command-name>/model</command-name>\n<command-args></command-args>"}}"#,
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<local-command-stdout>Set model to Opus</local-command-stdout>"}}"#,
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#,
-        ]))
+        let head = ClaudeTranscriptHead(
+            lines: jsonLines([
+                #"{"type":"user","isMeta":true,"cwd":"/Users/me/app","message":{"content":"Run without asking, then report."}}"#,
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<command-name>/model</command-name>\n<command-args></command-args>"}}"#,
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<local-command-stdout>Set model to Opus</local-command-stdout>"}}"#,
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#,
+            ]))
 
         #expect(head.firstPrompt == "Fix the build")
     }
 
     @Test func readsTheLastGeneratedTitleInItsLines() {
-        let head = ClaudeTranscriptHead(lines: jsonLines([
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#,
-            #"{"type":"ai-title","aiTitle":"Early guess","sessionId":"s"}"#,
-            #"{"type":"ai-title","aiTitle":"Build fixes","sessionId":"s"}"#,
-        ]))
+        let head = ClaudeTranscriptHead(
+            lines: jsonLines([
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#,
+                #"{"type":"ai-title","aiTitle":"Early guess","sessionId":"s"}"#,
+                #"{"type":"ai-title","aiTitle":"Build fixes","sessionId":"s"}"#,
+            ]))
 
         #expect(head.aiTitle == "Build fixes")
         #expect(head.customTitle == nil)
     }
 
     @Test func linesThatAreNotJSONObjectsAreSkipped() {
-        let head = ClaudeTranscriptHead(lines: jsonLines([
-            "not json",
-            "[1, 2]",
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#,
-        ]))
+        let head = ClaudeTranscriptHead(
+            lines: jsonLines([
+                "not json",
+                "[1, 2]",
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#,
+            ]))
 
         #expect(head.workingDirectory == "/Users/me/app")
         #expect(head.firstPrompt == "Fix the build")

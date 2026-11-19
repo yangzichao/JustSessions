@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PiSessionNameScanTests {
@@ -55,7 +56,8 @@ struct PiSessionNameScanTests {
         try writeLines([PiSessionFolderFixture.sessionName("Old file"), PiSessionFolderFixture.userMessage("Hi")], to: file)
         let previous = try #require(PiSessionNameScan.scan(file, continuing: nil))
 
-        try writeLines([PiSessionFolderFixture.userMessage("Replaced"), PiSessionFolderFixture.userMessage("and longer than before")], to: file)
+        try writeLines(
+            [PiSessionFolderFixture.userMessage("Replaced"), PiSessionFolderFixture.userMessage("and longer than before")], to: file)
         #expect(PiSessionNameScan.scan(file, continuing: previous)?.latestName == nil)
 
         try writeLines([PiSessionFolderFixture.sessionName("New")], to: file)
@@ -85,13 +87,14 @@ struct PiSessionNameScanTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let file = directory.appendingPathComponent("session.jsonl")
         let longOutput = PiSessionFolderFixture.userMessage(String(repeating: "y", count: PiSessionNameScan.maximumNameLineByteCount * 2))
-        try writeLines([
-            PiSessionFolderFixture.sessionName("First"),
-            longOutput,
-            PiSessionFolderFixture.sessionName("After the long line"),
-            longOutput,
-            PiSessionFolderFixture.userMessage("Last"),
-        ], to: file)
+        try writeLines(
+            [
+                PiSessionFolderFixture.sessionName("First"),
+                longOutput,
+                PiSessionFolderFixture.sessionName("After the long line"),
+                longOutput,
+                PiSessionFolderFixture.userMessage("Last"),
+            ], to: file)
 
         let scan = PiSessionNameScan.scan(file, continuing: nil, chunkSize: chunkSize)
 
@@ -103,12 +106,13 @@ struct PiSessionNameScanTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let file = directory.appendingPathComponent("session.jsonl")
-        try writeLines([
-            PiSessionFolderFixture.sessionName("Real name"),
-            #"{"type":"custom","data":{"kind":"session_info","name":"Not a name"}}"#,
-            PiSessionFolderFixture.userMessage(#"Print \"type\":\"session_info\" lines"#),
-            PiSessionFolderFixture.sessionName("   "),
-        ], to: file)
+        try writeLines(
+            [
+                PiSessionFolderFixture.sessionName("Real name"),
+                #"{"type":"custom","data":{"kind":"session_info","name":"Not a name"}}"#,
+                PiSessionFolderFixture.userMessage(#"Print \"type\":\"session_info\" lines"#),
+                PiSessionFolderFixture.sessionName("   "),
+            ], to: file)
 
         #expect(PiSessionNameScan.scan(file, continuing: nil)?.latestName == "Real name")
     }

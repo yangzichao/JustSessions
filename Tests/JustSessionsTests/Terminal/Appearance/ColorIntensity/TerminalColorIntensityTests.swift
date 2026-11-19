@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// **Color intensity** scales each ANSI color's OKLab chroma and keeps its lightness and hue, so colored text stays as

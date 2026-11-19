@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct PiSessionTitleTests {
@@ -15,7 +16,8 @@ struct PiSessionTitleTests {
     @Test func firstUserPromptReadsStringAndPartContent() {
         let stringContent = #"{"type":"message","message":{"role":"user","content":"  Plain prompt  "}}"#
         let assistantFirst = #"{"type":"message","message":{"role":"assistant","content":[{"type":"text","text":"Hello"}]}}"#
-        let imageThenText = #"{"type":"message","message":{"role":"user","content":[{"type":"image","data":"…"},{"type":"text","text":"Describe it"}]}}"#
+        let imageThenText =
+            #"{"type":"message","message":{"role":"user","content":[{"type":"image","data":"…"},{"type":"text","text":"Describe it"}]}}"#
 
         #expect(PiSessionTitle.firstUserPrompt(amongLines: jsonLines([assistantFirst, stringContent])) == "Plain prompt")
         #expect(PiSessionTitle.firstUserPrompt(amongLines: jsonLines([imageThenText])) == "Describe it")

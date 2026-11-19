@@ -6,13 +6,15 @@ enum HostCheckThisMacSummary {
     /// followed by its TLS library's.
     static func current() -> String {
         let environment = FeedbackEnvironment.current.summary
-        guard let output = BoundedProcessRunner.output(
-            ofExecutable: "/usr/bin/ssh",
-            arguments: ["-V"],
-            includesStandardError: true,
-            timeout: 5
-        ), let sshVersion = output.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !sshVersion.isEmpty else { return environment }
+        guard
+            let output = BoundedProcessRunner.output(
+                ofExecutable: "/usr/bin/ssh",
+                arguments: ["-V"],
+                includesStandardError: true,
+                timeout: 5
+            ), let sshVersion = output.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines),
+            !sshVersion.isEmpty
+        else { return environment }
         return "\(environment) · \(sshVersion)"
     }
 }

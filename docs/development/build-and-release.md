@@ -7,12 +7,26 @@
 Requires macOS 14+ and Swift 6.2 or later (Xcode 26 or its Command Line Tools), which libghostty-spm needs. Run these commands from the repository root.
 
 ```sh
-make check  # Compile the Swift development build
+make format # Format Swift files in place with swift format
+make check  # Lint, then compile the Swift development build
+make dead-code-check # Fail on unused Swift (Periphery)
 make test   # Run tests against the bundled tmux runtime
 make verify # Check the website, tests, localization, and packaged app launch
 make        # Package dist/JustSessions.app, including tmux
 make dev    # Build the app, quit its running copy, and open it
 ```
+
+### Formatting and lint
+
+Swift code is formatted by `swift format`, which ships with the Swift toolchain, using the rules in `.swift-format` (4-space indentation, 140 columns). `make lint` runs `swift format lint --strict` over `Package.swift`, `Sources`, `Tests`, and the Swift under `Scripts`. `make check`, `make`, `make dev`, and `make verify` run it first and stop on any finding. Run `make format` to fix layout; it cannot fix a few rules, such as a `forEach` that should be a `for` loop, so change those by hand. Silence a rule for one declaration only when the code needs it, with `// swift-format-ignore: RuleName` and a comment saying why.
+
+The repository was formatted with the `swift format` in Swift 6.4. Other toolchain versions can lay out a few lines differently; use Swift 6.4 or later when `make lint` disagrees with `make format`. The release workflow calls `Scripts/build-app.sh` directly and does not lint, so its older Swift cannot block a release.
+
+### Dead code
+
+`make dead-code-check` runs [Periphery](https://github.com/peripheryapp/periphery) (`brew install periphery`; checked with 3.8.0) and fails on unused declarations, parameters, imports, and properties that are only ever assigned. `make verify` runs it. Periphery reads an index store, which Swift Build does not write, so `Scripts/check-dead-code.sh` builds the package and its tests with the native build system into `.build/periphery`; the first run takes about a minute. Options are in `.periphery.yml`: it keeps `Codable`, `Equatable`, and `Hashable` properties, SwiftUI previews, and declarations Objective-C can reach.
+
+Delete what it finds. Mark code it cannot see as used with `// periphery:ignore - <reason>` on the line above, or `// periphery:ignore:parameters <name>` for a parameter. It misses an `@State` read only through its `$` binding, an `@NSApplicationDelegateAdaptor`, a property kept only to hold an observer alive, and a protocol requirement SwiftUI calls by name. For a parameter that only a selector or signature needs, name it `_` instead.
 
 `make help` lists the commands. `make run` is an alias for `make dev`. `make dmg` packages `dist/JustSessions.dmg`, and `make website` builds and validates the product site. Set `APP_BUNDLE_PATH` or `INSTALLER_PATH` to change the output paths, for example `make build APP_BUNDLE_PATH="dist/JustSessions Preview.app"`. The targets use the existing build scripts and respect their version and signing environment variables.
 

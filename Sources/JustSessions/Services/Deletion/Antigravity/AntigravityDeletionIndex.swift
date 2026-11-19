@@ -11,9 +11,12 @@ enum AntigravityDeletionIndex {
         try AntigravityDatabase.execute("BEGIN IMMEDIATE", in: database)
         do {
             var statement: OpaquePointer?
-            guard sqlite3_prepare_v2(database,
-                "DELETE FROM conversation_summaries WHERE conversation_id = ? AND app_data_dir = 'antigravity-cli'",
-                -1, &statement, nil) == SQLITE_OK, let statement else { throw AntigravityDatabaseError.unreadable }
+            guard
+                sqlite3_prepare_v2(
+                    database,
+                    "DELETE FROM conversation_summaries WHERE conversation_id = ? AND app_data_dir = 'antigravity-cli'",
+                    -1, &statement, nil) == SQLITE_OK, let statement
+            else { throw AntigravityDatabaseError.unreadable }
             let result = sessionID.withCString { text -> Int32 in
                 sqlite3_bind_text(statement, 1, text, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
                 return sqlite3_step(statement)

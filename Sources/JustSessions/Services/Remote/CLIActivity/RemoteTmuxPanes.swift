@@ -24,7 +24,8 @@ struct RemoteTmuxPanes: Equatable, Sendable {
     /// Lists the panes of the host's tmux server. A host without tmux, or without a running server, lists none. `sh`
     /// runs it, as the login shell may be fish; the login shell finds `tmux` as the tab's does.
     static func command(on host: String) -> String {
-        let script = "command -v tmux >/dev/null 2>&1 || exit 0; tmux list-panes -a -F \(ShellQuoting.quoted(format)) 2>&1; echo \(endMarker)"
+        let script =
+            "command -v tmux >/dev/null 2>&1 || exit 0; tmux list-panes -a -F \(ShellQuoting.quoted(format)) 2>&1; echo \(endMarker)"
         return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
     }
 
@@ -33,7 +34,8 @@ struct RemoteTmuxPanes: Equatable, Sendable {
     static func panes(inOutput output: String) -> RemoteTmuxPanes? {
         let lines = output.split(whereSeparator: \.isNewline).map(String.init)
         guard lines.contains(endMarker),
-              RemoteHostTmuxFinding.unreachableServerMessage(in: output) == nil else { return nil }
+            RemoteHostTmuxFinding.unreachableServerMessage(in: output) == nil
+        else { return nil }
         var panes: [String: Pane] = [:]
         for line in lines {
             let fields = line.components(separatedBy: separator)

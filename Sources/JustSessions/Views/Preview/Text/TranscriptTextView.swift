@@ -19,6 +19,7 @@ final class TranscriptTextView: NSTextView {
     private(set) var copyRole: TranscriptTextCopyRole = .paragraph
     private var content: TranscriptTextContent?
     /// The text system's root object: AppKit leaves keeping it to whoever assembled the text system.
+    // periphery:ignore - held to keep the text system alive.
     private var assembledTextStorage: NSTextStorage?
     private var measuredSizes: [CGFloat: CGSize] = [:]
     /// The width of the text laid out at the text container's current width.
@@ -151,7 +152,8 @@ final class TranscriptTextView: NSTextView {
 
     private func scheduleReveal() {
         guard selectedSearchRange != nil, bounds.height > 0,
-              revealedRevision != navigationRevision, scheduledRevision != navigationRevision else { return }
+            revealedRevision != navigationRevision, scheduledRevision != navigationRevision
+        else { return }
         let revision = navigationRevision
         revealAttempts = 0
         scheduledRevision = revision

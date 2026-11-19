@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -16,7 +17,8 @@ struct LaunchCrashReportOfferTests {
     }
 
     private func finder(in directory: URL) -> CrashReportFinder {
-        CrashReportFinder(reportsDirectory: directory, executableName: "JustSessions", bundleIdentifier: CrashReportSamples.bundleIdentifier)
+        CrashReportFinder(
+            reportsDirectory: directory, executableName: "JustSessions", bundleIdentifier: CrashReportSamples.bundleIdentifier)
     }
 
     @Test func theFirstLookGoesBackAWeekAndEachLaterOneToThePreviousLook() throws {

@@ -21,11 +21,15 @@ enum PromptSelectionTestKey {
     }
 
     static func leftArrow(modifiers: NSEvent.ModifierFlags = [], windowNumber: Int = 0) -> NSEvent {
-        key(kVK_LeftArrow, functionKey(NSLeftArrowFunctionKey), modifiers: modifiers.union([.function, .numericPad]), windowNumber: windowNumber)
+        key(
+            kVK_LeftArrow, functionKey(NSLeftArrowFunctionKey), modifiers: modifiers.union([.function, .numericPad]),
+            windowNumber: windowNumber)
     }
 
     static func rightArrow(modifiers: NSEvent.ModifierFlags = [], windowNumber: Int = 0) -> NSEvent {
-        key(kVK_RightArrow, functionKey(NSRightArrowFunctionKey), modifiers: modifiers.union([.function, .numericPad]), windowNumber: windowNumber)
+        key(
+            kVK_RightArrow, functionKey(NSRightArrowFunctionKey), modifiers: modifiers.union([.function, .numericPad]),
+            windowNumber: windowNumber)
     }
 
     static func upArrow(windowNumber: Int = 0) -> NSEvent {

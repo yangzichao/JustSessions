@@ -22,8 +22,9 @@ struct TranscriptEntriesStack: View, Equatable {
                     .overlay(alignment: .topLeading) {
                         // Only your messages and the CLI's replies can be bookmarked; other rows get no marker view at all.
                         if MessageBookmark.Kind(positionedEntry.entry.content) != nil {
-                            TranscriptBookmarkMarker(entryID: entryIndex,
-                                                     topPadding: TranscriptEntryView.topPadding(startsTurn: positionedEntry.entry.startsTurn))
+                            TranscriptBookmarkMarker(
+                                entryID: entryIndex,
+                                topPadding: TranscriptEntryView.topPadding(startsTurn: positionedEntry.entry.startsTurn))
                         }
                     }
                     .environment(\.transcriptSearchEntryIndex, entryIndex)

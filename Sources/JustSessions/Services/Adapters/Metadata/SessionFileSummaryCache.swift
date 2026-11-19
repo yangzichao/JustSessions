@@ -11,10 +11,11 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         /// Uses the values a directory listing already fetched for `file`, when it fetched them.
         init?(file: URL) {
             guard let values = try? file.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey]),
-                  let modificationDate = values.contentModificationDate,
-                  let size = values.fileSize,
-                  let attributes = try? FileManager.default.attributesOfItem(atPath: file.path),
-                  let fileNumber = attributes[.systemFileNumber] as? NSNumber else { return nil }
+                let modificationDate = values.contentModificationDate,
+                let size = values.fileSize,
+                let attributes = try? FileManager.default.attributesOfItem(atPath: file.path),
+                let fileNumber = attributes[.systemFileNumber] as? NSNumber
+            else { return nil }
             self.modificationDate = modificationDate
             self.size = size
             self.fileNumber = fileNumber.uint64Value
@@ -48,10 +49,11 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         guard !hasLoadedSnapshot else { return }
         hasLoadedSnapshot = true
         guard let persistenceFile,
-              let size = try? persistenceFile.resourceValues(forKeys: [.fileSizeKey]).fileSize,
-              size <= 64 << 20,
-              let data = try? Data(contentsOf: persistenceFile),
-              let snapshot = try? JSONDecoder().decode(Snapshot.self, from: data), snapshot.version == 1 else { return }
+            let size = try? persistenceFile.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+            size <= 64 << 20,
+            let data = try? Data(contentsOf: persistenceFile),
+            let snapshot = try? JSONDecoder().decode(Snapshot.self, from: data), snapshot.version == 1
+        else { return }
         entriesByPath = snapshot.entries
     }
 
@@ -66,7 +68,10 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         // Taken before reading: a write landing during the read then shows as a change at the next refresh.
         guard let fingerprint = Fingerprint(file: file) else { return read(file, nil) }
         let path = file.path
-        let entry = lock.withLock { loadSnapshotIfNeeded(); return entriesByPath[path] }
+        let entry = lock.withLock {
+            loadSnapshotIfNeeded()
+            return entriesByPath[path]
+        }
         if let entry, entry.fingerprint == fingerprint { return entry.summary }
         let summary = read(file, entry?.summary)
         lock.withLock {
@@ -97,18 +102,22 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         let temporaryPrefix = FileManager.default.temporaryDirectory.resolvingSymlinksInPath().path + "/"
         let temporaryURLPrefix = FileManager.default.temporaryDirectory.path + "/"
         let persistentEntries = entriesByPath.filter { path, _ in
-            persistsTemporaryFiles || (!path.hasPrefix(temporaryPrefix) && !path.hasPrefix(temporaryURLPrefix)
-                && !path.hasPrefix("/tmp/") && !path.hasPrefix("/private/tmp/"))
+            persistsTemporaryFiles
+                || (!path.hasPrefix(temporaryPrefix) && !path.hasPrefix(temporaryURLPrefix)
+                    && !path.hasPrefix("/tmp/") && !path.hasPrefix("/private/tmp/"))
         }
         guard let data = try? JSONEncoder().encode(Snapshot(version: 1, entries: persistentEntries)), data.count <= 64 << 20 else { return }
         do {
-            try FileManager.default.createDirectory(at: persistenceFile.deletingLastPathComponent(), withIntermediateDirectories: true,
-                                                    attributes: [.posixPermissions: 0o700])
+            try FileManager.default.createDirectory(
+                at: persistenceFile.deletingLastPathComponent(), withIntermediateDirectories: true,
+                attributes: [.posixPermissions: 0o700])
             // No data protection class: on macOS 26.5 a file written with `.completeFileProtectionUnlessOpen` could not
             // be read again ("Operation not permitted"), so no launch reused the cache. The owner-only permissions keep it private.
             try data.write(to: persistenceFile, options: .atomic)
             try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: persistenceFile.path)
             needsSaving = false
-        } catch { /* Rebuild from the source files when a cache cannot be saved. */ }
+        } catch {
+            // Rebuild from the source files when a cache cannot be saved.
+        }
     }
 }

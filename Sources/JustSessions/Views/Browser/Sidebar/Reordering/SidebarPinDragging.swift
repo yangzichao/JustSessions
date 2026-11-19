@@ -27,7 +27,8 @@ struct SidebarPinDragging {
     /// How far below the dragged row's top the landing line lies; nil for any other row, or while nothing would land.
     func landingLineOffset(fromTopOf rowID: String) -> CGFloat? {
         guard let drag, drag.draggedRowID == rowID, let edgeY = drag.landingEdgeY,
-              let draggedFrame = drag.rowFrames[rowID] else { return nil }
+            let draggedFrame = drag.rowFrames[rowID]
+        else { return nil }
         return edgeY - draggedFrame.minY
     }
 }

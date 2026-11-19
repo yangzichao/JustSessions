@@ -17,6 +17,7 @@ enum LocalFileLinkSafety {
     }
 
     /// Terminal declares its two types; `.command` and `.tool` scripts are `com.apple.terminal.shell-script`.
-    private static let typesThatRun: [UTType] = [.executable, .application]
+    private static let typesThatRun: [UTType] =
+        [.executable, .application]
         + ["com.apple.terminal.shell-script", "com.apple.terminal.settings"].compactMap { UTType($0) }
 }

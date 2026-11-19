@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs the deletion script in a local shell whose `$HOME` is a temporary folder standing in for the host's home,
@@ -21,8 +22,11 @@ struct PiRemoteDeletionTests {
         try "child".write(to: companion.appendingPathComponent("forks/output"), atomically: true, encoding: .utf8)
         let mirrored = fixture.mirror.mirrorDirectory(host: "devbox", provider: .pi).appendingPathComponent(file.lastPathComponent)
         try FileManager.default.copyItem(at: file, to: mirrored)
-        let conversation = Conversation.fixture(provider: .pi, sessionID: id, projectPath: "/srv/project", sourceFile: mirrored, host: .ssh("devbox"))
-        #expect(try RemotePiConversationDeletion.hostFileNames(of: conversation, piMirrorDirectory: mirrored.deletingLastPathComponent()).projectFolderName == nil)
+        let conversation = Conversation.fixture(
+            provider: .pi, sessionID: id, projectPath: "/srv/project", sourceFile: mirrored, host: .ssh("devbox"))
+        #expect(
+            try RemotePiConversationDeletion.hostFileNames(of: conversation, piMirrorDirectory: mirrored.deletingLastPathComponent())
+                .projectFolderName == nil)
 
         try fixture.deletion().delete(conversation)
 
@@ -132,12 +136,18 @@ struct PiRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.hostSessionFile.path))
     }
 
-    @Test(arguments: HostShell.installed, [
-        (firstLine: #"{"type":"session","version":3,"id":"019a0000-0000-7000-8000-0000000000aa","cwd":"/home/me/paper"}"#,
-         expectedFailure: "The file belongs to another session. Refresh before deleting."),
-        (firstLine: #"{"type":"message","id":"a1","parentId":null}"#,
-         expectedFailure: "The file is not a Pi session. Refresh before deleting."),
-    ])
+    @Test(
+        arguments: HostShell.installed,
+        [
+            (
+                firstLine: #"{"type":"session","version":3,"id":"019a0000-0000-7000-8000-0000000000aa","cwd":"/home/me/paper"}"#,
+                expectedFailure: "The file belongs to another session. Refresh before deleting."
+            ),
+            (
+                firstLine: #"{"type":"message","id":"a1","parentId":null}"#,
+                expectedFailure: "The file is not a Pi session. Refresh before deleting."
+            ),
+        ])
     func aFileWhoseFirstLineIsNotThisSessionsHeaderIsRefused(
         shell: HostShell,
         headerCase: (firstLine: String, expectedFailure: String)
@@ -186,10 +196,11 @@ struct PiRemoteDeletionTests {
         defer { fixture.remove() }
         let recorder = RemoteCommandRecorder()
         let deletion = RemoteConversationDeletion(
-            runner: recorder.runner(answering: (
-                RemoteHostCommandRunner.connectionFailureExitStatus,
-                "ssh: connect to host devbox port 22: Connection refused\n"
-            )),
+            runner: recorder.runner(
+                answering: (
+                    RemoteHostCommandRunner.connectionFailureExitStatus,
+                    "ssh: connect to host devbox port 22: Connection refused\n"
+                )),
             mirror: fixture.mirror
         )
 
@@ -214,12 +225,14 @@ struct PiRemoteDeletionTests {
         try RemoteConversationDeletion(runner: recorder.runner(answering: (0, "")), mirror: fixture.mirror).delete(fixture.conversation)
 
         let command = try #require(recorder.commands.first?.command)
-        let arguments = " sh " + [
-            RemotePiFixture.projectFolderName,
-            fixture.hostSessionFile.lastPathComponent,
-            fixture.conversation.sessionID,
-            RemoteToolFolders.standard.pi,
-        ].map(ShellQuoting.quoted).joined(separator: " ")
+        let arguments =
+            " sh "
+            + [
+                RemotePiFixture.projectFolderName,
+                fixture.hostSessionFile.lastPathComponent,
+                fixture.conversation.sessionID,
+                RemoteToolFolders.standard.pi,
+            ].map(ShellQuoting.quoted).joined(separator: " ")
         #expect(command.hasPrefix("sh -c '"))
         #expect(command.hasSuffix(arguments))
         #expect(!command.dropLast(arguments.count).contains(fixture.conversation.sessionID))
@@ -231,7 +244,8 @@ struct PiRemoteDeletionTests {
         let sessionID = fixture.conversation.sessionID
         let mirrorProjectFolder = fixture.conversation.sourceFile.deletingLastPathComponent()
         let sourceFiles = [
-            mirrorProjectFolder.appendingPathComponent("2026-09-30T10-00-00-000Z_\(sessionID)/forks/2026-09-30T10-00-00-000Z_\(sessionID).jsonl"),
+            mirrorProjectFolder.appendingPathComponent(
+                "2026-09-30T10-00-00-000Z_\(sessionID)/forks/2026-09-30T10-00-00-000Z_\(sessionID).jsonl"),
             fixture.mirror.mirrorDirectory(host: "devbox", provider: .kiro)
                 .appendingPathComponent("\(RemotePiFixture.projectFolderName)/2026-09-30T10-00-00-000Z_\(sessionID).jsonl"),
             fixture.mirror.mirrorDirectory(host: "otherbox", provider: .pi)
@@ -266,7 +280,8 @@ struct PiRemoteDeletionTests {
         let decoys = [agentFolder.appendingPathComponent(fileName), nestedFolder.appendingPathComponent(fileName)]
         for decoy in decoys { try FileManager.default.copyItem(at: fixture.hostSessionFile, to: decoy) }
         let otherIDFileName = "2026-09-30T10-00-00-000Z_019a0000-0000-7000-8000-0000000000bb.jsonl"
-        try FileManager.default.copyItem(at: fixture.hostSessionFile, to: fixture.hostProjectFolder.sessionsDirectory.appendingPathComponent(otherIDFileName))
+        try FileManager.default.copyItem(
+            at: fixture.hostSessionFile, to: fixture.hostProjectFolder.sessionsDirectory.appendingPathComponent(otherIDFileName))
         let cases: [(project: String, file: String, expectedOutput: String)] = [
             ("..", fileName, "Refusing an unexpected session path."),
             ("a/b", fileName, "Refusing an unexpected session path."),
@@ -276,17 +291,20 @@ struct PiRemoteDeletionTests {
         ]
 
         for scriptCase in cases {
-            let result = fixture.runOnHost(RemotePiConversationDeletion.command(
-                sessionsFolder: RemoteToolFolders.standard.pi,
-                projectFolderName: scriptCase.project,
-                fileName: scriptCase.file,
-                sessionID: id
-            ))
+            let result = fixture.runOnHost(
+                RemotePiConversationDeletion.command(
+                    sessionsFolder: RemoteToolFolders.standard.pi,
+                    projectFolderName: scriptCase.project,
+                    fileName: scriptCase.file,
+                    sessionID: id
+                ))
             #expect(result?.exitStatus == 1, "\(scriptCase)")
             #expect(result?.output.trimmingCharacters(in: .whitespacesAndNewlines) == scriptCase.expectedOutput, "\(scriptCase)")
         }
 
-        for remaining in decoys + [fixture.hostSessionFile, fixture.hostProjectFolder.sessionsDirectory.appendingPathComponent(otherIDFileName)] {
+        for remaining in decoys + [
+            fixture.hostSessionFile, fixture.hostProjectFolder.sessionsDirectory.appendingPathComponent(otherIDFileName),
+        ] {
             #expect(FileManager.default.fileExists(atPath: remaining.path), "\(remaining.lastPathComponent)")
         }
     }
@@ -296,12 +314,13 @@ struct PiRemoteDeletionTests {
         let fixture = try RemotePiFixture(shell: shell)
         defer { fixture.remove() }
 
-        let result = fixture.runOnHost(RemotePiConversationDeletion.command(
-            sessionsFolder: RemoteToolFolders.standard.pi,
-            projectFolderName: "--home-me-gone--",
-            fileName: fixture.hostSessionFile.lastPathComponent,
-            sessionID: fixture.conversation.sessionID
-        ))
+        let result = fixture.runOnHost(
+            RemotePiConversationDeletion.command(
+                sessionsFolder: RemoteToolFolders.standard.pi,
+                projectFolderName: "--home-me-gone--",
+                fileName: fixture.hostSessionFile.lastPathComponent,
+                sessionID: fixture.conversation.sessionID
+            ))
 
         #expect(result?.exitStatus == RemoteConversationDeletion.missingTranscriptExitStatus)
         #expect(FileManager.default.fileExists(atPath: fixture.hostSessionFile.path))

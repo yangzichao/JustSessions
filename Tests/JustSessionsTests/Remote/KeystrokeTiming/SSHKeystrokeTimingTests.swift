@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// SSH tabs send each keystroke as it is typed, not in OpenSSH's 20 ms batches, where this Mac's `ssh` takes the

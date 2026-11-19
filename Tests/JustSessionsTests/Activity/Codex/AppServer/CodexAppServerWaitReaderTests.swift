@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CodexAppServerWaitReaderTests {
@@ -15,7 +16,8 @@ struct CodexAppServerWaitReaderTests {
         }
 
         func reader(retryDelay: Duration = .zero) -> CodexAppServerWaitReader {
-            CodexAppServerWaitReader(codexDirectory: codexDirectory, clientVersion: "test", timeout: .milliseconds(300), retryDelay: retryDelay)
+            CodexAppServerWaitReader(
+                codexDirectory: codexDirectory, clientVersion: "test", timeout: .milliseconds(300), retryDelay: retryDelay)
         }
 
         func remove() {

@@ -44,7 +44,8 @@ enum JoinedWordLink {
         while end > start {
             let last = word[end - 1]
             let url = word[start..<end]
-            let closesUnopenedBracket = (last == ")" && url.count { $0 == "(" } < url.count { $0 == ")" })
+            let closesUnopenedBracket =
+                (last == ")" && url.count { $0 == "(" } < url.count { $0 == ")" })
                 || (last == "]" && url.count { $0 == "[" } < url.count { $0 == "]" })
             guard last == "." || last == "," || closesUnopenedBracket else { break }
             end -= 1

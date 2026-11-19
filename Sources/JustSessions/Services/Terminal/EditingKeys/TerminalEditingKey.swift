@@ -14,7 +14,7 @@ enum TerminalEditingKey: CaseIterable {
     /// for Edit → Undo; the arrows and Delete are the same keys on every layout.
     init?(_ event: NSEvent) {
         guard event.type == .keyDown,
-              event.modifierFlags.intersection([.shift, .control, .option, .command]) == .command
+            event.modifierFlags.intersection([.shift, .control, .option, .command]) == .command
         else { return nil }
         switch Int(event.keyCode) {
         case kVK_LeftArrow: self = .moveToLineStart

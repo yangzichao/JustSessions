@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+
 @testable import JustSessions
 
 /// The app one scenario runs: a store whose one adapter lists the sessions the scenario gives it, with files in a
@@ -84,14 +85,15 @@ final class ScenarioApp {
     func addSessionWithoutListing(labeled label: String, sessionID: String? = nil) -> String {
         let sessionID = sessionID ?? sessionIDsByLabel[label] ?? makeSessionID()
         sessionIDsByLabel[label] = sessionID
-        adapter.add(Conversation(
-            provider: provider,
-            sessionID: sessionID,
-            projectPath: projectPath,
-            suggestedTitle: label,
-            updatedAt: .now,
-            sourceFile: temporaryDirectory.appendingPathComponent("\(sessionID).jsonl")
-        ))
+        adapter.add(
+            Conversation(
+                provider: provider,
+                sessionID: sessionID,
+                projectPath: projectPath,
+                suggestedTitle: label,
+                updatedAt: .now,
+                sourceFile: temporaryDirectory.appendingPathComponent("\(sessionID).jsonl")
+            ))
         return sessionID
     }
 

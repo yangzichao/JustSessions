@@ -64,17 +64,20 @@ extension ConversationStore {
     /// it is selected. A reopened tab still waiting to be shown starts as it joins.
     func chooseTab(_ tabID: UUID, inSplitChooser chooserID: UUID) {
         guard let chooser = terminalSplitChoosers.first(where: { $0.id == chooserID }),
-              let chosenTab = terminalSessions.first(where: { $0.id == tabID }),
-              tabID != chooser.tabID,
-              !isInSplitOrChooser(tabID) else { return }
+            let chosenTab = terminalSessions.first(where: { $0.id == tabID }),
+            tabID != chooser.tabID,
+            !isInSplitOrChooser(tabID)
+        else { return }
         var strip = tabStrip
-        guard strip.addSplit(
-            joining: tabID,
-            beside: chooser.tabID,
-            on: chooser.side,
-            splitID: chooser.id,
-            orientation: chooser.orientation
-        ) != nil else { return }
+        guard
+            strip.addSplit(
+                joining: tabID,
+                beside: chooser.tabID,
+                on: chooser.side,
+                splitID: chooser.id,
+                orientation: chooser.orientation
+            ) != nil
+        else { return }
         defer { persistOpenTabs() }
         // Applying the split closes the chooser, its tab now in a split.
         apply(strip)
@@ -114,9 +117,10 @@ extension ConversationStore {
     /// within its project's group, where Chrome trades the two tabs' places.
     private func moveBesideShownSplitChooser(_ tabID: UUID) {
         guard let chooser = shownSplitChooser,
-              let chooserIndex = terminalSplitChoosers.firstIndex(where: { $0.id == chooser.id }),
-              terminalSessions.contains(where: { $0.id == tabID }),
-              !isInSplitOrChooser(tabID) else { return }
+            let chooserIndex = terminalSplitChoosers.firstIndex(where: { $0.id == chooser.id }),
+            terminalSessions.contains(where: { $0.id == tabID }),
+            !isInSplitOrChooser(tabID)
+        else { return }
         let chooserWasSelected = selectsShownSplitChooser
         terminalSplitChoosers[chooserIndex].tabID = tabID
         selectTerminal(tabID)

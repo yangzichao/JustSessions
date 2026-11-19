@@ -1,6 +1,7 @@
 import AppKit
 import Carbon.HIToolbox
 import Testing
+
 @testable import JustSessions
 
 /// Find's keys in a window showing a tab. Escape and Return reach the terminal's program unless the find field has the
@@ -17,7 +18,8 @@ struct TerminalFindShortcutsTests {
 
         init() {
             _ = NSApplication.shared
-            window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 300, height: 200), styleMask: [.titled], backing: .buffered, defer: false)
+            window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 300, height: 200), styleMask: [.titled], backing: .buffered, defer: false)
             window.isReleasedWhenClosed = false
             window.contentView?.addSubview(shortcutView)
             window.contentView?.addSubview(fieldEditor)

@@ -35,7 +35,8 @@ extension CLIPrompt {
     /// The prompt in `lines`, unless the caret sits at the start of a single line showing the CLI's placeholder.
     init?(lines: [CLIPromptLine], wrapWidth: Int, caret: TerminalCellPosition, isPlaceholder: (String) -> Bool) {
         if lines.count == 1, let line = lines.first, caret == TerminalCellPosition(column: line.startColumn, row: line.row),
-           isPlaceholder(line.text) {
+            isPlaceholder(line.text)
+        {
             return nil
         }
         self.init(lines: lines, wrapWidth: wrapWidth, caretRow: caret.row)

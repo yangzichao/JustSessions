@@ -17,7 +17,7 @@ enum OpenCodePromptRecognizer {
         let rows = screen.rows
         let caretRow = screen.cursor.row
         guard let bottomRow = rows[(caretRow + 1)...].firstIndex(where: { $0.firstTextCharacter == "╹" }),
-              let borderIndex = rows[bottomRow].firstTextIndex
+            let borderIndex = rows[bottomRow].firstTextIndex
         else { return nil }
         let borderColumn = rows[bottomRow].startColumn(ofCharacterAt: borderIndex)
         let topRow = rows[..<bottomRow].lastIndex { $0.character(atColumn: borderColumn) != "┃" }.map { $0 + 1 } ?? 0

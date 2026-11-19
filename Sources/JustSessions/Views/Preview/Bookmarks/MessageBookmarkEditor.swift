@@ -64,8 +64,10 @@ struct MessageBookmarkEditorSheet: View {
     }
 
     /// The bookmark as saved now, by its letter and message, as `MessageBookmarks.remove` finds it.
-    private static func savedBookmark(_ bookmark: MessageBookmark, in conversation: Conversation,
-                                      store: ConversationStore) -> MessageBookmark? {
+    private static func savedBookmark(
+        _ bookmark: MessageBookmark, in conversation: Conversation,
+        store: ConversationStore
+    ) -> MessageBookmark? {
         store.messageBookmarks.bookmarks(forConversationID: conversation.id)
             .first { $0.letter == bookmark.letter && $0.entryID == bookmark.entryID }
     }
@@ -140,8 +142,9 @@ struct MessageBookmarkEditorSheet: View {
 
     private func save() {
         guard let saved else { return }
-        store.setMessageBookmarkDetails(of: saved, label: label, tags: MessageBookmarkDetails.tags(fromTyped: typedTags),
-                                        in: request.conversation)
+        store.setMessageBookmarkDetails(
+            of: saved, label: label, tags: MessageBookmarkDetails.tags(fromTyped: typedTags),
+            in: request.conversation)
         dismiss()
     }
 }
@@ -155,10 +158,14 @@ private struct MessageBookmarkTagSuggestions: View {
         if !suggestions.isEmpty {
             MessageBookmarkFlowLayout(spacing: 4) {
                 ForEach(suggestions, id: \.self) { tag in
-                    Button { onChoose(tag) } label: { MessageBookmarkTagChip(tag: tag) }
-                        .buttonStyle(ThemePlainButtonStyle(cornerRadius: .small))
-                        .help("Add #\(tag)")
-                        .accessibilityLabel(Text("Add tag \(tag)"))
+                    Button {
+                        onChoose(tag)
+                    } label: {
+                        MessageBookmarkTagChip(tag: tag)
+                    }
+                    .buttonStyle(ThemePlainButtonStyle(cornerRadius: .small))
+                    .help("Add #\(tag)")
+                    .accessibilityLabel(Text("Add tag \(tag)"))
                 }
             }
         }

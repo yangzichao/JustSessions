@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -30,7 +31,8 @@ struct OpenCodeStoreDeletionTests {
         #expect(store.errorMessage == nil)
         let expectedSessionIDs = deletionKind == "project" ? [] : [OpenCodeDeletionFixture.retainedSessionID]
         #expect(store.conversations.map(\.sessionID) == expectedSessionIDs)
-        #expect(!ConversationTitleAliases.load(from: isolatedUserDefaults.userDefaults).customTitlesByConversationID.keys.contains(selected.id))
+        #expect(
+            !ConversationTitleAliases.load(from: isolatedUserDefaults.userDefaults).customTitlesByConversationID.keys.contains(selected.id))
         #expect(!PinnedItems.load(from: isolatedUserDefaults.userDefaults).isPinned(conversationID: selected.id))
         #expect(store.sidebarProjectGroups.contains { $0.id == selected.projectDirectoryKey })
     }
@@ -51,6 +53,8 @@ struct OpenCodeStoreDeletionTests {
 
         #expect(store.errorMessage == OpenCodeConversationDeletionError.failed("database is locked").localizedDescription)
         #expect(store.conversations.contains { $0.id == selected.id })
-        #expect(ConversationTitleAliases.load(from: isolatedUserDefaults.userDefaults).customTitlesByConversationID[selected.id] == "Custom title")
+        #expect(
+            ConversationTitleAliases.load(from: isolatedUserDefaults.userDefaults).customTitlesByConversationID[selected.id]
+                == "Custom title")
     }
 }

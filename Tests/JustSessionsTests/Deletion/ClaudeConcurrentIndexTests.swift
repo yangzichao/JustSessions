@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ClaudeConcurrentIndexTests {
@@ -11,8 +12,7 @@ struct ClaudeConcurrentIndexTests {
         try JSONSerialization.data(withJSONObject: ["entries": entries]).write(to: index)
         let failures = IndexWriteFailures()
         DispatchQueue.concurrentPerform(iterations: 8) { number in
-            do { try ClaudeConversationIndex.remove(sessionIDs: ["session-\(number)"], in: directory) }
-            catch { failures.record(error) }
+            do { try ClaudeConversationIndex.remove(sessionIDs: ["session-\(number)"], in: directory) } catch { failures.record(error) }
         }
         #expect(failures.messages.isEmpty)
         let object = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: index)) as? [String: Any])

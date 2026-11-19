@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct NativeCLICommandResolverTests {
@@ -50,14 +51,15 @@ struct NativeCLICommandResolverTests {
             // Codex names its thread in the terminal title only when asked; see `CodexThreadTitle`.
             #expect(command.arguments == (provider == .codex ? CodexThreadTitle.launchArguments : []))
             #expect(command.workingDirectory == projectDirectory.path)
-            let expectedExecutable = switch provider {
-            case .claude: "claude"
-            case .codex: "codex"
-            case .antigravity: "agy"
-            case .kiro: "kiro-cli"
-            case .opencode: "opencode"
-            case .pi: "pi"
-            }
+            let expectedExecutable =
+                switch provider {
+                case .claude: "claude"
+                case .codex: "codex"
+                case .antigravity: "agy"
+                case .kiro: "kiro-cli"
+                case .opencode: "opencode"
+                case .pi: "pi"
+                }
             #expect(command.executablePath == binaryDirectory.appendingPathComponent(expectedExecutable).path)
         }
     }
@@ -85,7 +87,8 @@ struct NativeCLICommandResolverTests {
         let newOpenCode = try resolver.resolveNewSession(provider: .opencode, projectPath: projectDirectory.path)
         #expect(newOpenCode.arguments.isEmpty)
         #expect(newOpenCode.environment.contains(reportsVariable))
-        #expect(newOpenCode.environment.contains("OPENCODE_TUI_CONFIG=\(reporting.directory.appendingPathComponent("opencode/tui.json").path)"))
+        #expect(
+            newOpenCode.environment.contains("OPENCODE_TUI_CONFIG=\(reporting.directory.appendingPathComponent("opencode/tui.json").path)"))
 
         let newClaude = try resolver.resolveNewSession(provider: .claude, projectPath: projectDirectory.path)
         #expect(newClaude.arguments.isEmpty)

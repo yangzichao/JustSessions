@@ -99,7 +99,8 @@ struct ConversationSidebarView: View {
     /// The session of the tab shown, whose row is highlighted through the tab; none while a filter leaves its row out.
     private var listedConversationIDShownThroughTab: String? {
         guard let conversationID = store.selectedTerminal?.conversation?.id,
-              listedConversationIDs.contains(conversationID) else { return nil }
+            listedConversationIDs.contains(conversationID)
+        else { return nil }
         return conversationID
     }
 
@@ -172,7 +173,8 @@ struct ConversationSidebarView: View {
                     onRemoveAndDeleteSessions: requestRemovalOfSelectedProjectsAndTheirSessions
                 )
             } else if contentMode == .projects && sessionSelection.hasMultipleSelected
-                && !selectedConversations.allSatisfy(store.isDeletionPending(for:)) {
+                && !selectedConversations.allSatisfy(store.isDeletionPending(for:))
+            {
                 // Hidden while every selected session is already being deleted, as after deleting the selection.
                 ThemeDivider()
                 SidebarSelectionActionBar(

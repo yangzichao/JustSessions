@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// The New session items an AppKit menu lists, such as a terminal's Split right and Split down: as the SwiftUI menus

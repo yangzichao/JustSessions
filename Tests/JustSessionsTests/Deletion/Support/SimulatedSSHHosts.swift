@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Stands in for the SSH hosts a deletion reaches, without `ssh`: counts the deletions tried on each host and
@@ -15,8 +16,6 @@ final class SimulatedSSHHosts: @unchecked Sendable {
     /// What `ssh` prints when its keepalive gets no answer, as after the Mac slept.
     static let connectionLost: (exitStatus: Int32, output: String) =
         (RemoteHostCommandRunner.connectionFailureExitStatus, "Timeout, server devbox not responding.\r\n")
-    static let loginRefused: (exitStatus: Int32, output: String) =
-        (RemoteHostCommandRunner.connectionFailureExitStatus, "me@devbox: Permission denied (publickey,password).\n")
     /// The deletion script's answer when the session is already gone from the host.
     static let alreadyGone: (exitStatus: Int32, output: String) = (RemoteConversationDeletion.missingTranscriptExitStatus, "")
     static let deleted: (exitStatus: Int32, output: String) = (0, "")
@@ -45,13 +44,14 @@ final class SimulatedSSHHosts: @unchecked Sendable {
     }
 
     var deletion: RemoteConversationDeletion {
-        RemoteConversationDeletion(runner: RemoteHostCommandRunner { host, _, _ in
-            let (attempt, totalAttempts) = self.lock.withLock {
-                self.attemptsByHost[host, default: 0] += 1
-                return (self.attemptsByHost[host] ?? 0, self.attemptsByHost.values.reduce(0, +))
-            }
-            if totalAttempts == self.heldAttempt { self.heldAttemptRelease.wait() }
-            return self.answer(host, attempt)
-        })
+        RemoteConversationDeletion(
+            runner: RemoteHostCommandRunner { host, _, _ in
+                let (attempt, totalAttempts) = self.lock.withLock {
+                    self.attemptsByHost[host, default: 0] += 1
+                    return (self.attemptsByHost[host] ?? 0, self.attemptsByHost.values.reduce(0, +))
+                }
+                if totalAttempts == self.heldAttempt { self.heldAttemptRelease.wait() }
+                return self.answer(host, attempt)
+            })
     }
 }

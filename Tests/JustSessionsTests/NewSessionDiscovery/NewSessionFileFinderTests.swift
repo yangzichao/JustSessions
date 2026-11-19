@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct NewSessionFileFinderTests {
@@ -43,8 +44,9 @@ struct NewSessionFileFinderTests {
         let sessionFiles = finder(claudeConfigurationDirectory: root).sessionFiles(for: [tab], processTree: processTree)
 
         #expect(sessionFiles[tab.terminalID]?.sessionID == sessionID)
-        #expect(finder(claudeConfigurationDirectory: root)
-            .sessionFiles(for: [tab], processTree: ProcessTree(parentProcessIDs: [:])).isEmpty)
+        #expect(
+            finder(claudeConfigurationDirectory: root)
+                .sessionFiles(for: [tab], processTree: ProcessTree(parentProcessIDs: [:])).isEmpty)
     }
 
     @Test func findsTheRolloutThatTheChildOfAWrapperScriptHoldsOpen() async throws {

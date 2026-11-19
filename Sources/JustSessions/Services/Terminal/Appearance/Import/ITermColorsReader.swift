@@ -42,14 +42,16 @@ enum ITermColorsReader {
     /// Converts a color to sRGB the way iTerm2 reads it: sRGB and P3 as named, anything else as calibrated RGB.
     static func hexColor(from value: Any?) -> UInt32? {
         guard let dictionary = value as? [String: Any],
-              let red = (dictionary["Red Component"] as? NSNumber)?.doubleValue,
-              let green = (dictionary["Green Component"] as? NSNumber)?.doubleValue,
-              let blue = (dictionary["Blue Component"] as? NSNumber)?.doubleValue else { return nil }
-        let colorSpace: NSColorSpace = switch dictionary["Color Space"] as? String {
-        case "sRGB": .sRGB
-        case "P3": .displayP3
-        default: .genericRGB
-        }
+            let red = (dictionary["Red Component"] as? NSNumber)?.doubleValue,
+            let green = (dictionary["Green Component"] as? NSNumber)?.doubleValue,
+            let blue = (dictionary["Blue Component"] as? NSNumber)?.doubleValue
+        else { return nil }
+        let colorSpace: NSColorSpace =
+            switch dictionary["Color Space"] as? String {
+            case "sRGB": .sRGB
+            case "P3": .displayP3
+            default: .genericRGB
+            }
         let components = [red, green, blue, 1].map { CGFloat($0) }
         return NSColor(colorSpace: colorSpace, components: components, count: 4).sRGBHexValue
     }

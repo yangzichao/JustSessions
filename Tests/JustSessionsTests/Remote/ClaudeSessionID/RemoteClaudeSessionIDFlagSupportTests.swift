@@ -1,22 +1,26 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteClaudeSessionIDFlagSupportTests {
     static let helpWithFlag = """
-    bash: cannot set terminal process group (1234): Inappropriate ioctl for device
-      -r, --resume [value]    Resume a conversation by session ID
-      --session-id <uuid>     Use a specific session ID for the conversation (must be a valid UUID)
-    """
+        bash: cannot set terminal process group (1234): Inappropriate ioctl for device
+          -r, --resume [value]    Resume a conversation by session ID
+          --session-id <uuid>     Use a specific session ID for the conversation (must be a valid UUID)
+        """
     private static let helpWithoutFlag = "  -r, --resume [value]    Resume a conversation by session ID"
 
     @Test func runsTheHostsCLIOrTheStartCommandInItsLoginShell() {
-        #expect(RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: nil, host: "devbox")
-            == RemoteCLICommandBuilder.loginShellCommand("claude --help", on: "devbox"))
-        #expect(RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: "  ", host: "devbox")
-            == RemoteCLICommandBuilder.loginShellCommand("claude --help", on: "devbox"))
-        #expect(RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: "~/bin/claude --model opus", host: "devbox")
-            == RemoteCLICommandBuilder.loginShellCommand("env ~/bin/claude --model opus '--help'", on: "devbox"))
+        #expect(
+            RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: nil, host: "devbox")
+                == RemoteCLICommandBuilder.loginShellCommand("claude --help", on: "devbox"))
+        #expect(
+            RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: "  ", host: "devbox")
+                == RemoteCLICommandBuilder.loginShellCommand("claude --help", on: "devbox"))
+        #expect(
+            RemoteClaudeSessionIDFlagSupport.helpCommand(startCommand: "~/bin/claude --model opus", host: "devbox")
+                == RemoteCLICommandBuilder.loginShellCommand("env ~/bin/claude --model opus '--help'", on: "devbox"))
     }
 
     @Test func preassignsALowercaseSessionIDOnceTheHostsHelpListsTheFlag() throws {
@@ -73,9 +77,10 @@ struct RemoteClaudeSessionIDFlagSupportTests {
 
     /// A start command of your own can run another CLI, so it gets an answer of its own.
     @Test func aStartCommandHasAnAnswerOfItsOwn() {
-        let support = RemoteClaudeSessionIDFlagSupport(runner: RemoteHostCommandRunner { _, command, _ in
-            (0, command.contains("new-claude") ? Self.helpWithFlag : Self.helpWithoutFlag)
-        })
+        let support = RemoteClaudeSessionIDFlagSupport(
+            runner: RemoteHostCommandRunner { _, command, _ in
+                (0, command.contains("new-claude") ? Self.helpWithFlag : Self.helpWithoutFlag)
+            })
 
         #expect(support.check(host: "devbox", startCommand: nil) == false)
         #expect(support.check(host: "devbox", startCommand: "~/bin/new-claude") == true)

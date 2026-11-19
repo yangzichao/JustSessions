@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -45,7 +46,8 @@ struct TabCloseChoiceSettingsStoreTests {
         defer { settings.removeSuite() }
 
         settings.userDefaults.set("closeQuietly", forKey: TabCloseChoicesByHost.thisMacUserDefaultsKey)
-        settings.userDefaults.set(["devbox": "closeQuietly", "buildbox": "keepRunning"], forKey: TabCloseChoicesByHost.sshHostsUserDefaultsKey)
+        settings.userDefaults.set(
+            ["devbox": "closeQuietly", "buildbox": "keepRunning"], forKey: TabCloseChoicesByHost.sshHostsUserDefaultsKey)
 
         let store = TabCloseChoiceSettingsStore(userDefaults: settings.userDefaults)
         #expect(store.choice(for: .thisMac) == .askEachTime)

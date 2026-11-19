@@ -29,8 +29,9 @@ struct AppendedJSONLinesReader {
 
         let startOffset = max(readOffset, endOffset - min(endOffset, Self.maximumCatchUpByteCount))
         guard (try? handle.seek(toOffset: startOffset)) != nil,
-              let appendedBytes = try? handle.readToEnd(),
-              let lastNewline = appendedBytes.lastIndex(of: Self.newline) else { return [] }
+            let appendedBytes = try? handle.readToEnd(),
+            let lastNewline = appendedBytes.lastIndex(of: Self.newline)
+        else { return [] }
         let completeLines = appendedBytes[...lastNewline]
         self.readOffset = startOffset + UInt64(completeLines.count)
         let lines = completeLines.split(separator: Self.newline).map { Data($0) }

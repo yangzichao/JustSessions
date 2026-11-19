@@ -73,7 +73,8 @@ struct PiSessionEntry: Decodable {
             content = container.lenientlyDecode(Content.self, forKey: .content)
             command = container.lenientlyDecode(String.self, forKey: .command)
             // Like a JSON dictionary's `as? Bool`, which also reads the numbers 0 and 1 as false and true.
-            excludeFromContext = container.lenientlyDecode(Bool.self, forKey: .excludeFromContext)
+            excludeFromContext =
+                container.lenientlyDecode(Bool.self, forKey: .excludeFromContext)
                 ?? container.lenientlyDecode(Double.self, forKey: .excludeFromContext).flatMap { number in
                     number == 1 ? true : number == 0 ? false : nil
                 }

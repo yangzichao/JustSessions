@@ -76,6 +76,8 @@ Application paths below are relative to `Sources/JustSessions/`. Tests live in `
 - `Cloudflare/Feedback/`: the Worker that stores feedback sent from the Guide's form, which **Settings → Send feedback** opens in the browser, after checking its Cloudflare Turnstile token. See [Feedback](website.md#feedback).
 - `Cloudflare/UpdateFeed/`: the Worker at the app's `SUFeedURL`, which counts update checks per day and app version and redirects to the appcast on GitHub. See [Counting update checks](update-checks.md).
 - `Scripts/Release/`: release checks, such as opening the packaged app without the build machine's resource bundles.
+- `Scripts/check-dead-code.sh`: the `make verify` check for unused Swift, with Periphery.
+- `Scripts/TrackedFiles/`: the `make verify` check that fails when git tracks coding agent state or skills, or machine-local output.
 - `Scripts/Version/`: the version a local build shows, read from `git describe`.
 - `Scripts/Tmux/`: pinned source builds, license collection, and relocated runtime verification for app packaging and CI.
 - `Scripts/DemoVideo/`: the homepage demo video: the isolated demo app and its sample sessions, the scripted takes and their recorder, and the edit. See [Demo video](demo-video.md).

@@ -41,9 +41,12 @@ struct SettingsSheet: View {
         }
         .background(ThemePalette.contentSurface)
         .background(SettingsSheetTerminationPolicy())
-        .environment(\.showAppWideSheet, ShowAppWideSheetAction { requestedSheet in
-            selectedTab = requestedSheet.selectedSettingsTab
-        })
+        .environment(
+            \.showAppWideSheet,
+            ShowAppWideSheetAction { requestedSheet in
+                selectedTab = requestedSheet.selectedSettingsTab
+            }
+        )
         .appLanguage(from: .shared)
     }
 }

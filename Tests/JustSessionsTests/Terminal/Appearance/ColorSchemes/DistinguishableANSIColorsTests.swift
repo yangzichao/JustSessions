@@ -1,18 +1,22 @@
 import Testing
+
 @testable import JustSessions
 
 /// A fill in any ANSI color can be seen, such as Claude Code's selection when it is held to 16 colors.
 struct DistinguishableANSIColorsTests {
     @Test func everyPresetsANSIColorsStandApartFromItsBackground() {
         for preset in TerminalColorPreset.allCases {
-            let palettes: [TerminalPalette] = switch preset.variants {
-            case .single(let palette): [palette]
-            case .lightAndDark(let light, let dark): [light, dark]
-            }
+            let palettes: [TerminalPalette] =
+                switch preset.variants {
+                case .single(let palette): [palette]
+                case .lightAndDark(let light, let dark): [light, dark]
+                }
             for palette in palettes {
                 for (index, color) in palette.distinguishableANSIHexColors.enumerated() {
                     let ratio = ThemeColorContrast.ratio(color, palette.background)
-                    #expect(ratio >= TerminalPalette.minimumANSIFillRatio, "\(preset) on \(String(palette.background, radix: 16)) ANSI \(index): \(ratio)")
+                    #expect(
+                        ratio >= TerminalPalette.minimumANSIFillRatio,
+                        "\(preset) on \(String(palette.background, radix: 16)) ANSI \(index): \(ratio)")
                 }
             }
         }
@@ -56,6 +60,7 @@ struct DistinguishableANSIColorsTests {
                 ansiHexColors: [0x101010] + Array(repeating: 0xCC6666, count: 15)
             )
         )
-        #expect(ThemeColorContrast.ratio(palette.distinguishableANSIHexColors[0], palette.background) >= TerminalPalette.minimumANSIFillRatio)
+        #expect(
+            ThemeColorContrast.ratio(palette.distinguishableANSIHexColors[0], palette.background) >= TerminalPalette.minimumANSIFillRatio)
     }
 }

@@ -9,10 +9,18 @@ enum TranscriptPageReader {
         let backwards: Bool
         var position: Int
         switch request {
-        case .first: backwards = false; position = 0
-        case .latest: backwards = true; position = recordCount - 1
-        case .before(let boundary): backwards = true; position = min(boundary, recordCount) - 1
-        case .after(let boundary): backwards = false; position = max(0, boundary)
+        case .first:
+            backwards = false
+            position = 0
+        case .latest:
+            backwards = true
+            position = recordCount - 1
+        case .before(let boundary):
+            backwards = true
+            position = min(boundary, recordCount) - 1
+        case .after(let boundary):
+            backwards = false
+            position = max(0, boundary)
         case .around(let entryID):
             // Binary search also works for sparse Pi branches and SQLite step IDs.
             let sourceRecord = TranscriptPageIdentity.record(for: entryID)
@@ -41,14 +49,20 @@ enum TranscriptPageReader {
             lowerBound = min(lowerBound, position)
             upperBound = max(upperBound, position + 1)
             position += backwards ? -1 : 1
-            if entryCount > 0 && (entryCount >= limits.targetEntryCount
-                || scannedRecordCount >= limits.maximumRecordCount || byteCount >= limits.targetByteCount) { break }
+            if entryCount > 0
+                && (entryCount >= limits.targetEntryCount
+                    || scannedRecordCount >= limits.maximumRecordCount || byteCount >= limits.targetByteCount)
+            {
+                break
+            }
             // Hidden records do not need to remain in memory while looking for the next visible message.
             if entries.isEmpty { records.removeLast() }
         }
-        return TranscriptPage(entries: TranscriptPageAssembler.entries(in: records, maximumMergedToolCallCount: limits.maximumMergedToolCallCount), records: lowerBound..<upperBound,
-                              totalRecordCount: recordCount, decodedByteCount: byteCount,
-                              precedingSpeaker: try speaker(before: lowerBound, limit: limits.maximumRecordCount, decode: decode))
+        return TranscriptPage(
+            entries: TranscriptPageAssembler.entries(in: records, maximumMergedToolCallCount: limits.maximumMergedToolCallCount),
+            records: lowerBound..<upperBound,
+            totalRecordCount: recordCount, decodedByteCount: byteCount,
+            precedingSpeaker: try speaker(before: lowerBound, limit: limits.maximumRecordCount, decode: decode))
     }
 
     /// The speaker of the last entry before `position`, looking back at most `limit` records past hidden ones.

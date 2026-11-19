@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// An image pasted on a tab, from either menu's Paste to what the tab's CLI receives; ⌘V chooses the Edit menu's. Each

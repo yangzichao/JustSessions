@@ -12,10 +12,12 @@ struct LiveSessionReport: Sendable, Equatable {
     /// Nil unless the report is one the process with this id wrote.
     init?(jsonData: Data, processID: Int32) {
         guard let object = ConversationMetadata.object(from: jsonData),
-              (object["pid"] as? NSNumber)?.int32Value == processID else { return nil }
+            (object["pid"] as? NSNumber)?.int32Value == processID
+        else { return nil }
         sessionID = object["sessionId"] as? String
         sessionFile = (object["sessionFile"] as? String).flatMap { $0.hasPrefix("/") ? URL(fileURLWithPath: $0) : nil }
-        activity = sessionID == nil
+        activity =
+            sessionID == nil
             ? nil
             : Self.activity(named: object["activity"] as? String, waitingFor: object["waitingFor"] as? String)
     }

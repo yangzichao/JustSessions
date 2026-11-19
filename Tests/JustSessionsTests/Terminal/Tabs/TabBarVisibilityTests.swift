@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The tab bar stays in sight whatever shows below it. The window's content runs up under its hidden title bar, whose
@@ -51,7 +52,8 @@ struct TabBarVisibilityTests {
             hostingView.rootView = AnyView(
                 WorkspaceDetailView(
                     store: store, sessionSelection: selection, isSidebarHidden: false,
-                    onRename: { _ in }, onNewSession: {}, onNewSessionInSplitChooser: { _ in }, onCloseTerminal: { _ in }, onCloseTabGroup: { _, _ in },
+                    onRename: { _ in }, onNewSession: {}, onNewSessionInSplitChooser: { _ in }, onCloseTerminal: { _ in },
+                    onCloseTabGroup: { _, _ in },
                     onDelete: { _ in }
                 )
                 .defaultAppStorage(settings.userDefaults)

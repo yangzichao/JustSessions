@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The app as it runs on this Mac, in a tmux sandbox: the real Claude Code, Codex, Pi, OpenCode, and Antigravity
@@ -109,7 +110,8 @@ final class UnseenTurnSandboxApp {
         #expect(store.selectedTerminalID == tab.id)
         tab.startIfNeeded()
         try #require(await sandbox.waitForPaneProcess(in: store, for: tab), "\(sandbox.launchDiagnostics(for: tab))")
-        try #require(await followCLIs { tab.cliActivity != nil }, "The activity sync never heard from \"\(title)\": \(reportDiagnostics(of: tab))")
+        try #require(
+            await followCLIs { tab.cliActivity != nil }, "The activity sync never heard from \"\(title)\": \(reportDiagnostics(of: tab))")
         return tab
     }
 

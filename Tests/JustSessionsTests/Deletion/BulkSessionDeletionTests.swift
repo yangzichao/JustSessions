@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Deleting many sessions at once: SSH hosts that cannot be reached, Cancel, and how often the list changes.
@@ -20,11 +21,12 @@ struct BulkSessionDeletionTests {
         #expect(hosts.attempts(on: "devbox") == 1)
         #expect(store.conversations.count == 150)
         #expect(store.alert?.title == "150 sessions weren't deleted")
-        #expect(store.errorMessage == """
-            None of the 150 sessions were deleted. devbox couldn't be found. Check the host name and your network or VPN.
+        #expect(
+            store.errorMessage == """
+                None of the 150 sessions were deleted. devbox couldn't be found. Check the host name and your network or VPN.
 
-            Choose Try Again once devbox is reachable.
-            """)
+                Choose Try Again once devbox is reachable.
+                """)
         #expect(store.alert?.retryConversationIDs == Set(sessions.map(\.id)))
         #expect(store.deletionPlan(for: sessions).deletableConversations.count == 150)
         #expect(!store.deferRefreshWhileDeleting(on: .ssh("devbox")))
@@ -57,12 +59,13 @@ struct BulkSessionDeletionTests {
         #expect(hosts.attempts(on: "buildbox") == 6)
         #expect(Set(store.conversations.map(\.id)) == Set(onDevbox.dropFirst(3).map(\.id)))
         #expect(!onThisMac.contains { sandbox.fileExists(for: $0) })
-        #expect(store.errorMessage == """
-            Deleted 15 of 18 sessions. The connection to devbox was lost, for example because the Mac slept or the \
-            network changed. The other 3 are still listed.
+        #expect(
+            store.errorMessage == """
+                Deleted 15 of 18 sessions. The connection to devbox was lost, for example because the Mac slept or the \
+                network changed. The other 3 are still listed.
 
-            Choose Try Again once devbox is reachable.
-            """)
+                Choose Try Again once devbox is reachable.
+                """)
     }
 
     /// A host that answers too slowly may still be reachable, so the message says it did not respond in time.
@@ -80,12 +83,13 @@ struct BulkSessionDeletionTests {
 
         #expect(hosts.attempts(on: "devbox") == 1)
         #expect(store.conversations.count == 3)
-        #expect(store.errorMessage == """
-            None of the 3 sessions were deleted. Deleting on devbox didn't start or didn't finish within a minute. \
-            Refresh to see whether the session being deleted is gone.
+        #expect(
+            store.errorMessage == """
+                None of the 3 sessions were deleted. Deleting on devbox didn't start or didn't finish within a minute. \
+                Refresh to see whether the session being deleted is gone.
 
-            Choose Try Again to retry them.
-            """)
+                Choose Try Again to retry them.
+                """)
         #expect(store.alert?.offersTryAgain == true)
     }
 
@@ -180,11 +184,12 @@ struct BulkSessionDeletionTests {
         #expect(hosts.totalAttempts == 1)
         #expect(store.conversations.map(\.id) == [refused.id] + onDevbox.dropFirst().map(\.id))
         #expect(store.alert?.title == "1 session wasn't deleted")
-        #expect(store.errorMessage == """
-            Deleted 1 of 4 sessions before you canceled. The other 3 are still listed.
+        #expect(
+            store.errorMessage == """
+                Deleted 1 of 4 sessions before you canceled. The other 3 are still listed.
 
-            Claude Code · Keep me: Permission denied.
-            """)
+                Claude Code · Keep me: Permission denied.
+                """)
         #expect(store.alert?.offersTryAgain == false)
     }
 

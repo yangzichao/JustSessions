@@ -5,7 +5,8 @@ import SQLite3
 /// session; OpenCode only adds messages at the end, so the numbers stay put while the session grows. A page reads the
 /// data of only its own messages, so a page of a long session costs about as much as one of a short session.
 enum OpenCodeTranscriptPageSource {
-    static func read(_ file: URL, sessionID: String, request: TranscriptPageRequest, limits: TranscriptPageLimits) throws -> TranscriptPage {
+    static func read(_ file: URL, sessionID: String, request: TranscriptPageRequest, limits: TranscriptPageLimits) throws -> TranscriptPage
+    {
         let database = try OpenCodeDatabase.open(file)
         defer { sqlite3_close(database) }
         // The message list and the parts read for this page come from the same snapshot.
@@ -16,8 +17,10 @@ enum OpenCodeTranscriptPageSource {
     }
 
     /// The caller keeps one read transaction open for the index and every page, as the conversation map does.
-    static func read(_ index: OpenCodeTranscriptIndex, in database: OpaquePointer,
-                     request: TranscriptPageRequest, limits: TranscriptPageLimits) throws -> TranscriptPage {
+    static func read(
+        _ index: OpenCodeTranscriptIndex, in database: OpaquePointer,
+        request: TranscriptPageRequest, limits: TranscriptPageLimits
+    ) throws -> TranscriptPage {
         let messages = try OpenCodeTranscriptMessageReader(in: database)
         defer { messages.close() }
         let partsStatement = try OpenCodeDatabase.prepare(OpenCodeTranscriptParts.query, in: database)

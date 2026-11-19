@@ -13,8 +13,9 @@ extension ConversationStore {
         discovery: RemoteSessionDiscovery? = nil
     ) -> Task<Void, Never>? {
         guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), !isDisconnected(host),
-              !deferRefreshWhileDeleting(on: .ssh(host)),
-              hostRefreshStatuses[.ssh(host)] != .refreshing else { return nil }
+            !deferRefreshWhileDeleting(on: .ssh(host)),
+            hostRefreshStatuses[.ssh(host)] != .refreshing
+        else { return nil }
         let discovery = discovery ?? remoteSessionDiscovery
         let token = remoteHostWork.beginRefresh(on: host, previousStatus: hostRefreshStatuses[.ssh(host)])
         let requestNumber = windowRegistry.latestRemoteHostCopies.noteRefreshAsked()
@@ -100,8 +101,11 @@ extension ConversationStore {
         _ conversations: [Conversation], host: String, token: RemoteHostWork.Token, step: RemoteSessionCopyStep? = nil
     ) {
         guard isCurrentRemoteHostRefresh(token, on: host) else { return }
-        if let step { applyRemoteHostConversations(conversations, of: step, host: host) }
-        else { applyRemoteHostConversations(conversations, host: host) }
+        if let step {
+            applyRemoteHostConversations(conversations, of: step, host: host)
+        } else {
+            applyRemoteHostConversations(conversations, host: host)
+        }
     }
 
     private func finishRemoteHostRefresh(
@@ -156,7 +160,8 @@ extension ConversationStore {
     /// `ConversationStore+RemoteHostDisconnect`. Its refresh status stays as it was, since nothing was refreshed.
     func listRemoteHostFromMirror(_ host: String) {
         guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), hostRefreshStatuses[.ssh(host)] != .refreshing,
-              let token = remoteHostWork.beginRead(on: host) else { return }
+            let token = remoteHostWork.beginRead(on: host)
+        else { return }
         let discovery = remoteSessionDiscovery
         let coordinator = windowRegistry.hostSessionWork
         let configuredHosts = Array(Set(storesOfEveryWindow.flatMap { $0.remoteHostList.hosts }))

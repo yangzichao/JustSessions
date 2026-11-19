@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Names, pins, archiving, and bookmarks belong to the app, so every workspace window shows each change, and a change in one
@@ -148,7 +149,8 @@ struct SharedCustomizationsTests {
     }
 
     private func message(record: Int) -> TranscriptEntry {
-        TranscriptEntry(id: TranscriptPageIdentity.entryID(record: record, part: 0), content: .userMessage("Message \(record)"),
-                        timestamp: nil, startsTurn: true)
+        TranscriptEntry(
+            id: TranscriptPageIdentity.entryID(record: record, part: 0), content: .userMessage("Message \(record)"),
+            timestamp: nil, startsTurn: true)
     }
 }

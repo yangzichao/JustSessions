@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Dragging tabs in the tab bar keeps the order's rules: a tab moves only among its group's tabs, a split's two tabs

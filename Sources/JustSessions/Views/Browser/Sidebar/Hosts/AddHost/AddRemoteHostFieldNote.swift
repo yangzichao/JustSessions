@@ -15,7 +15,10 @@ struct AddRemoteHostFieldNote: View {
         } else {
             switch input {
             case .notADestination:
-                warning(Text("Enter only the host, such as `devbox` or `me@devbox`. Options such as a key or a jump host go in `~/.ssh/config`."))
+                warning(
+                    Text(
+                        "Enter only the host, such as `devbox` or `me@devbox`. Options such as a key or a jump host go in `~/.ssh/config`.")
+                )
             case .needsPortInConfig(let user, let hostName, let port):
                 portInConfig(user: user, hostName: hostName, port: port)
             case .destination(let host) where isListed:

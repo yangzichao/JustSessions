@@ -1,12 +1,14 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CodexRolloutModelTests {
     private static func turnContext(model: String?, effort: String? = "medium", padding: Int = 0) -> String {
         let model = model.map { #""model":"\#($0)","# } ?? ""
         let effort = effort.map { #""effort":"\#($0)","# } ?? ""
-        return #"{"timestamp":"2026-10-13T10:00:00Z","type":"turn_context","payload":{\#(model)\#(effort)"cwd":"/Users/me/app","developer_instructions":"\#(String(repeating: "x", count: padding))"}}"#
+        return
+            #"{"timestamp":"2026-10-13T10:00:00Z","type":"turn_context","payload":{\#(model)\#(effort)"cwd":"/Users/me/app","developer_instructions":"\#(String(repeating: "x", count: padding))"}}"#
     }
 
     private static func output(_ byteCount: Int) -> String {

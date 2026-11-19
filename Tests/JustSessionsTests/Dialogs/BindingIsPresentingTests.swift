@@ -1,5 +1,6 @@
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Alerts and dialogs show while their value is set, and closing one clears the value.

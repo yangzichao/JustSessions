@@ -4,8 +4,9 @@ extension TranscriptScrollPositionController {
     /// Reveal both axes: code and tables can have their own horizontal scroll view inside the conversation.
     func revealSearchMatch(in textView: NSTextView, range: NSRange, entryIndex: Int) -> Bool {
         guard let scrollView, let entryFrame = entryFrameInClipView(at: entryIndex), entryFrame.height > 0,
-              textView.window != nil, let textContainer = textView.textContainer,
-              let layoutManager = textView.layoutManager else { return false }
+            textView.window != nil, let textContainer = textView.textContainer,
+            let layoutManager = textView.layoutManager
+        else { return false }
         layoutManager.ensureLayout(for: textContainer)
         let glyphRange = layoutManager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
         var matchRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)

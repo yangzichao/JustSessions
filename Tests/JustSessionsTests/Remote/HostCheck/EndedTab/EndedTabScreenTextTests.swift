@@ -1,11 +1,13 @@
 import Testing
+
 @testable import JustSessions
 
 struct EndedTabScreenTextTests {
     @Test func keepsTheRowsWithTextWithoutTrailingSpaces() {
         let rows = ["", "protocol version mismatch (client 8, server 7)   ", "", "Connection to devbox closed.  ", "", ""]
-        #expect(EndedTabScreenText.text(ofRows: rows)
-            == "protocol version mismatch (client 8, server 7)\n\nConnection to devbox closed.")
+        #expect(
+            EndedTabScreenText.text(ofRows: rows)
+                == "protocol version mismatch (client 8, server 7)\n\nConnection to devbox closed.")
     }
 
     @Test func aBlankScreenShowsNothing() {

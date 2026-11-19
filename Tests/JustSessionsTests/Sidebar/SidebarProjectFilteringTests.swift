@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct SidebarProjectFilteringTests {
@@ -70,10 +71,12 @@ struct SidebarProjectFilteringTests {
         let ended = Conversation.fixture(provider: .claude, projectPath: "/work/app")
         let runningOnDevbox = Conversation.fixture(provider: .codex, projectPath: "/work/site", host: .ssh("devbox"))
         let runningNewSession = PendingNewSession(
-            terminalID: UUID(), provider: .codex, projectDirectoryKey: runningOnDevbox.projectDirectoryKey, title: "New session", startedAt: .now
+            terminalID: UUID(), provider: .codex, projectDirectoryKey: runningOnDevbox.projectDirectoryKey, title: "New session",
+            startedAt: .now
         )
         let endedNewSession = PendingNewSession(
-            terminalID: UUID(), provider: .codex, projectDirectoryKey: runningOnDevbox.projectDirectoryKey, title: "New session", startedAt: .now
+            terminalID: UUID(), provider: .codex, projectDirectoryKey: runningOnDevbox.projectDirectoryKey, title: "New session",
+            startedAt: .now
         )
         let projects = ProjectConversationGroup.grouped(
             [running, ended, runningOnDevbox],

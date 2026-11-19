@@ -127,12 +127,13 @@ struct RemoteCLICommandBuilder {
                         + provider.argumentsAfterCustomStartCommand(arguments).map(ShellQuoting.quoted)
                 )
                 return "cd \(ShellQuoting.quoted(projectPath)) && exec \(invocation)"
-            } ?? RemoteCLIInvocation.startCommand(
-                executableName: provider.executableName,
-                location: cliLocation,
-                projectPath: projectPath,
-                quotedArguments: quotedLeadingArguments + arguments.map(ShellQuoting.quoted)
-            )
+            }
+                ?? RemoteCLIInvocation.startCommand(
+                    executableName: provider.executableName,
+                    location: cliLocation,
+                    projectPath: projectPath,
+                    quotedArguments: quotedLeadingArguments + arguments.map(ShellQuoting.quoted)
+                )
         }
         let directCommand = cliStartCommand(after: titleArguments)
         func inLoginShell(_ command: String, environment: [String] = []) -> String {
@@ -141,25 +142,26 @@ struct RemoteCLICommandBuilder {
         guard let tmuxSessionName else { return inLoginShell(directCommand) }
         // `-A` attaches when the session already runs, and the options after it are set again on every attach; see
         // `RemoteTmuxSessionOptions`.
-        let paneCommand = switch provider {
-        case .claude:
-            inLoginShell("\(RemoteClaudeActivityRelay.launchCommand); \(directCommand)")
-        case .kiro:
-            inLoginShell("\(RemoteKiroActivityRelay.launchCommand); \(directCommand)")
-        case .antigravity:
-            inLoginShell("\(RemoteAntigravityActivityRelay.launchCommand); \(directCommand)")
-        case .pi, .opencode:
-            RemoteLiveSessionReporting.command(
-                for: provider,
-                reporting: inLoginShell(
-                    cliStartCommand(after: titleArguments + RemoteLiveSessionReporting.quotedArguments(for: provider)),
-                    environment: RemoteLiveSessionReporting.environment(for: provider)
-                ),
-                otherwise: inLoginShell(directCommand)
-            )
-        case .codex:
-            inLoginShell(directCommand)
-        }
+        let paneCommand =
+            switch provider {
+            case .claude:
+                inLoginShell("\(RemoteClaudeActivityRelay.launchCommand); \(directCommand)")
+            case .kiro:
+                inLoginShell("\(RemoteKiroActivityRelay.launchCommand); \(directCommand)")
+            case .antigravity:
+                inLoginShell("\(RemoteAntigravityActivityRelay.launchCommand); \(directCommand)")
+            case .pi, .opencode:
+                RemoteLiveSessionReporting.command(
+                    for: provider,
+                    reporting: inLoginShell(
+                        cliStartCommand(after: titleArguments + RemoteLiveSessionReporting.quotedArguments(for: provider)),
+                        environment: RemoteLiveSessionReporting.environment(for: provider)
+                    ),
+                    otherwise: inLoginShell(directCommand)
+                )
+            case .codex:
+                inLoginShell(directCommand)
+            }
         let tmuxCommand = RemoteTmuxAttachScript.command(
             sessionName: tmuxSessionName,
             paneCommand: paneCommand,

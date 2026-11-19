@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct AntigravityCLILogTailTests {
@@ -48,7 +49,8 @@ struct AntigravityCLILogTailTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let logFile = directory.appendingPathComponent("cli-20261004_155442.log")
-        try (String(repeating: "I1004 15:54:42.450497      69 server.go:1612] Padding\n", count: 20)
+        try
+            (String(repeating: "I1004 15:54:42.450497      69 server.go:1612] Padding\n", count: 20)
             + AntigravityCLILogTests.streamLine(for: AntigravityCLILogTests.firstConversationID))
             .write(to: logFile, atomically: true, encoding: .utf8)
         var tail = AntigravityCLILogTail()

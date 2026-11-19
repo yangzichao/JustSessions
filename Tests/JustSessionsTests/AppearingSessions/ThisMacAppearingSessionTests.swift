@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Kiro CLI, OpenCode, and Pi say nothing about the session a new tab starts, so on this Mac its tab takes the first

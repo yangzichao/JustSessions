@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A session started with Delete the session when its tab closes goes when its tab closes, without asking again.

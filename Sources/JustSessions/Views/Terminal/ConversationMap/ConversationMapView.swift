@@ -57,40 +57,51 @@ struct ConversationMapView: View {
         }
     }
 
-    private func drawing(_ outline: ConversationOutline, bookmarks: [MessageBookmark], colors: ConversationMapColors,
-                         conversation: Conversation) -> some View {
+    private func drawing(
+        _ outline: ConversationOutline, bookmarks: [MessageBookmark], colors: ConversationMapColors,
+        conversation: Conversation
+    ) -> some View {
         GeometryReader { geometry in
             let chipSide = ConversationMapMetrics.chipSide
             let factor = InterfaceScale.factor
-            let layout = ConversationMapLayout(rowCount: outline.rowCount, height: geometry.size.height,
-                                               naturalPitch: ConversationMapMetrics.naturalRowPitch,
-                                               verticalInset: ConversationMapMetrics.verticalInset,
-                                               minimumPitch: ConversationMapMetrics.minimumRowPitch,
-                                               offsetFromTop: offsetFromTop)
-            let chips = layout.chips(for: bookmarks, in: outline, side: chipSide, height: geometry.size.height,
-                                     titles: ConversationMapChipTitles.titles(for: bookmarks, side: chipSide, factor: factor))
+            let layout = ConversationMapLayout(
+                rowCount: outline.rowCount, height: geometry.size.height,
+                naturalPitch: ConversationMapMetrics.naturalRowPitch,
+                verticalInset: ConversationMapMetrics.verticalInset,
+                minimumPitch: ConversationMapMetrics.minimumRowPitch,
+                offsetFromTop: offsetFromTop)
+            let chips = layout.chips(
+                for: bookmarks, in: outline, side: chipSide, height: geometry.size.height,
+                titles: ConversationMapChipTitles.titles(for: bookmarks, side: chipSide, factor: factor))
             ZStack(alignment: .topLeading) {
                 ConversationMapScrollReader(isScrollable: layout.isScrollable) { distance in
                     // From the state, not this layout, so scroll events between two redraws all count.
-                    let current = ConversationMapLayout(rowCount: outline.rowCount, height: geometry.size.height,
-                                                        naturalPitch: ConversationMapMetrics.naturalRowPitch,
-                                                        verticalInset: ConversationMapMetrics.verticalInset,
-                                                        minimumPitch: ConversationMapMetrics.minimumRowPitch,
-                                                        offsetFromTop: offsetFromTop)
+                    let current = ConversationMapLayout(
+                        rowCount: outline.rowCount, height: geometry.size.height,
+                        naturalPitch: ConversationMapMetrics.naturalRowPitch,
+                        verticalInset: ConversationMapMetrics.verticalInset,
+                        minimumPitch: ConversationMapMetrics.minimumRowPitch,
+                        offsetFromTop: offsetFromTop)
                     offsetFromTop = current.offsetFromTop(afterScrollingBy: distance)
                 }
                 .accessibilityHidden(true)
                 ConversationMapHoverBand(hover: hover, color: colors.hoverBand)
-                ConversationMapCanvas(outline: outline, layout: layout, chips: chips, colors: colors,
-                                      pixel: 1 / max(1, displayScale), chipSide: chipSide, letterFont: ThemeFont.caption.weight(.semibold),
-                                      scrollThumbWidth: ConversationMapMetrics.scrollThumbWidth(at: factor),
-                                      scrollThumbMinimumLength: ConversationMapMetrics.scrollThumbMinimumLength(at: factor))
-                    .equatable()
+                ConversationMapCanvas(
+                    outline: outline, layout: layout, chips: chips, colors: colors,
+                    pixel: 1 / max(1, displayScale), chipSide: chipSide, letterFont: ThemeFont.caption.weight(.semibold),
+                    scrollThumbWidth: ConversationMapMetrics.scrollThumbWidth(at: factor),
+                    scrollThumbMinimumLength: ConversationMapMetrics.scrollThumbMinimumLength(at: factor)
+                )
+                .equatable()
                 if let editor {
-                    ConversationMapChipMenus(chips: chips, bookmarks: bookmarks, width: geometry.size.width, side: chipSide,
-                                             onOpen: { hover.hide(); open(.bookmark($0), conversation) },
-                                             onEdit: { editor.open($0, in: conversation) },
-                                             onRemove: { store.removeMessageBookmark($0, in: conversation) })
+                    ConversationMapChipMenus(
+                        chips: chips, bookmarks: bookmarks, width: geometry.size.width, side: chipSide,
+                        onOpen: {
+                            hover.hide()
+                            open(.bookmark($0), conversation)
+                        },
+                        onEdit: { editor.open($0, in: conversation) },
+                        onRemove: { store.removeMessageBookmark($0, in: conversation) })
                 }
             }
             .contentShape(Rectangle())
@@ -117,18 +128,24 @@ struct ConversationMapView: View {
             .onDisappear { hover.hide() }
             .onTapGesture(count: 1, coordinateSpace: .local) { point in
                 hover.hide()
-                if let bookmark = layout.bookmark(at: point, chips: chips, bookmarks: bookmarks, width: geometry.size.width, side: chipSide) {
+                if let bookmark = layout.bookmark(at: point, chips: chips, bookmarks: bookmarks, width: geometry.size.width, side: chipSide)
+                {
                     open(.bookmark(bookmark), conversation)
                 } else if let index = outline.blockIndex(atRow: layout.row(atY: point.y)),
-                          let entryID = outline.targetEntryID(forBlockAt: index) {
+                    let entryID = outline.targetEntryID(forBlockAt: index)
+                {
                     open(.entry(entryID), conversation)
                 }
             }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Conversation map"))
-        .accessibilityValue(Text(verbatim: ConversationMapAccessibility.value(messageCount: outline.messageCount,
-                                                                              bookmarkCount: bookmarks.count, language: language)))
+        .accessibilityValue(
+            Text(
+                verbatim: ConversationMapAccessibility.value(
+                    messageCount: outline.messageCount,
+                    bookmarkCount: bookmarks.count, language: language))
+        )
         .accessibilityAction(named: Text("Open in reading window")) { open(nil, conversation) }
         .accessibilityActions {
             ForEach(bookmarks, id: \.letter) { bookmark in
@@ -143,46 +160,56 @@ struct ConversationMapView: View {
 
     /// Opens the session's reading window, or moves the one open, without selecting anything (RDR-45, RDR-50).
     private func open(_ navigation: SessionReadingNavigation?, _ conversation: Conversation) {
-        SessionReadingWindowManager.shared.open(store.conversation(withID: conversation.id) ?? conversation, store: store, navigation: navigation)
+        SessionReadingWindowManager.shared.open(
+            store.conversation(withID: conversation.id) ?? conversation, store: store, navigation: navigation)
     }
 
     /// The card for the block under the pointer, or under the chip there. Rebuilt only when that block or the outline changes.
-    private func showCard(at point: CGPoint, outline: ConversationOutline, layout: ConversationMapLayout,
-                          chips: [ConversationMapLayout.Chip], bookmarks: [MessageBookmark], size: CGSize) {
-        let chipBookmark = layout.bookmark(at: point, chips: chips, bookmarks: bookmarks, width: size.width,
-                                           side: ConversationMapMetrics.chipSide)
+    private func showCard(
+        at point: CGPoint, outline: ConversationOutline, layout: ConversationMapLayout,
+        chips: [ConversationMapLayout.Chip], bookmarks: [MessageBookmark], size: CGSize
+    ) {
+        let chipBookmark = layout.bookmark(
+            at: point, chips: chips, bookmarks: bookmarks, width: size.width,
+            side: ConversationMapMetrics.chipSide)
         guard let index = chipBookmark.flatMap(outline.blockIndex(for:)) ?? outline.blockIndex(atRow: layout.row(atY: point.y)) else {
             hover.hide()
             return
         }
         let bookmark = bookmarks.first { outline.blockIndex(for: $0) == index }
-        guard index != hover.card?.blockIndex || outline.revision != hover.card?.revision
+        guard
+            index != hover.card?.blockIndex || outline.revision != hover.card?.revision
                 || bookmark?.letter != hover.card?.letter || bookmark?.label != hover.card?.label || bookmark?.tags != hover.card?.tags
         else { return }
         let block = outline.blocks[index]
-        let speaker = switch block.kind {
-        case .user, .image: AppLocalization.string("You", language: language)
-        case .assistant: provider.rawValue
-        case .toolRun: block.toolCallCount == 1
-            ? AppLocalization.string("1 tool call", language: language)
-            : AppLocalization.string("\(block.toolCallCount) tool calls", language: language)
-        }
+        let speaker =
+            switch block.kind {
+            case .user, .image: AppLocalization.string("You", language: language)
+            case .assistant: provider.rawValue
+            case .toolRun:
+                block.toolCallCount == 1
+                    ? AppLocalization.string("1 tool call", language: language)
+                    : AppLocalization.string("\(block.toolCallCount) tool calls", language: language)
+            }
         let rowY = layout.y(ofRow: outline.rowStarts[index])
-        hover.show(ConversationMapHover.Card(
-            blockIndex: index,
-            revision: outline.revision,
-            speaker: speaker,
-            timestamp: block.timestamp,
-            snippet: block.kind == .image ? AppLocalization.string("Image", language: language) : block.snippet,
-            letter: bookmark?.letter,
-            label: bookmark?.label,
-            tags: bookmark?.tags ?? [],
-            // Room for the card's height: more with a label or tags.
-            top: min(max(0, rowY - 8), max(0, size.height - InterfaceScale.points(bookmark?.label != nil || bookmark?.tags.isEmpty == false ? 170 : 110))),
-            bandMinY: rowY,
-            bandHeight: max(1 / max(1, displayScale), CGFloat(max(1, block.lineWidths.count)) * layout.pitch),
-            trailingInset: ConversationMapMetrics.columnWidth + 6
-        ), at: point)
+        hover.show(
+            ConversationMapHover.Card(
+                blockIndex: index,
+                revision: outline.revision,
+                speaker: speaker,
+                timestamp: block.timestamp,
+                snippet: block.kind == .image ? AppLocalization.string("Image", language: language) : block.snippet,
+                letter: bookmark?.letter,
+                label: bookmark?.label,
+                tags: bookmark?.tags ?? [],
+                // Room for the card's height: more with a label or tags.
+                top: min(
+                    max(0, rowY - 8),
+                    max(0, size.height - InterfaceScale.points(bookmark?.label != nil || bookmark?.tags.isEmpty == false ? 170 : 110))),
+                bandMinY: rowY,
+                bandHeight: max(1 / max(1, displayScale), CGFloat(max(1, block.lineWidths.count)) * layout.pitch),
+                trailingInset: ConversationMapMetrics.columnWidth + 6
+            ), at: point)
     }
 }
 
@@ -220,8 +247,10 @@ struct ConversationMapCanvas: View, Equatable {
             // One path and one fill per ink.
             var paths: [ConversationMapLayout.Ink: Path] = [:]
             for bar in layout.bars(for: outline, pixel: pixel) {
-                paths[bar.ink, default: Path()].addRect(CGRect(x: barsMinX, y: bar.minY,
-                                                               width: max(pixel, bar.widthFraction * barsWidth), height: bar.height))
+                paths[bar.ink, default: Path()].addRect(
+                    CGRect(
+                        x: barsMinX, y: bar.minY,
+                        width: max(pixel, bar.widthFraction * barsWidth), height: bar.height))
             }
             for ink in ConversationMapLayout.Ink.allCases {
                 if let path = paths[ink] { context.fill(path, with: .color(Color(hexValue: colors.hex(for: ink)))) }
@@ -231,13 +260,15 @@ struct ConversationMapCanvas: View, Equatable {
                 let minX = ConversationMapLayout.chipMinX(of: chip, width: size.width)
                 // The tick, while its message's first row is in view.
                 if chip.rowY >= 0, chip.rowY <= size.height {
-                    context.fill(Path(CGRect(x: barsMinX, y: chip.rowY, width: max(0, minX - barsMinX), height: pixel)),
-                                 with: .color(chipColor))
+                    context.fill(
+                        Path(CGRect(x: barsMinX, y: chip.rowY, width: max(0, minX - barsMinX), height: pixel)),
+                        with: .color(chipColor))
                 }
                 let rect = CGRect(x: minX, y: chip.chipY, width: chip.title.width, height: chipSide)
                 context.fill(RoundedRectangle(.small).path(in: rect), with: .color(chipColor))
-                context.draw(Text(verbatim: chip.title.text).font(letterFont).foregroundStyle(Color(hexValue: colors.chipText)),
-                             at: CGPoint(x: rect.midX, y: rect.midY))
+                context.draw(
+                    Text(verbatim: chip.title.text).font(letterFont).foregroundStyle(Color(hexValue: colors.chipText)),
+                    at: CGPoint(x: rect.midX, y: rect.midY))
             }
         }
         .accessibilityHidden(true)
@@ -268,7 +299,7 @@ struct ConversationMapChipMenus: View {
                         Button("Remove bookmark \(bookmark.letter)") { onRemove(bookmark) }
                     }
                     .offset(x: ConversationMapLayout.chipMinX(of: chip, width: width), y: chip.chipY)
-                    .accessibilityHidden(true)   // the map's own element has these actions
+                    .accessibilityHidden(true)  // the map's own element has these actions
             }
         }
     }
@@ -294,10 +325,14 @@ struct ConversationMapEmptyState: View {
 enum ConversationMapAccessibility {
     /// "N messages, M bookmarks", for VoiceOver.
     @MainActor static func value(messageCount: Int, bookmarkCount: Int, language: AppInterfaceLanguage?) -> String {
-        let messages = messageCount == 1 ? AppLocalization.string("1 message", language: language)
-                                         : AppLocalization.string("\(messageCount) messages", language: language)
-        let bookmarks = bookmarkCount == 1 ? AppLocalization.string("1 bookmark", language: language)
-                                           : AppLocalization.string("\(bookmarkCount) bookmarks", language: language)
+        let messages =
+            messageCount == 1
+            ? AppLocalization.string("1 message", language: language)
+            : AppLocalization.string("\(messageCount) messages", language: language)
+        let bookmarks =
+            bookmarkCount == 1
+            ? AppLocalization.string("1 bookmark", language: language)
+            : AppLocalization.string("\(bookmarkCount) bookmarks", language: language)
         return AppLocalization.string("\(messages), \(bookmarks)", language: language)
     }
 }

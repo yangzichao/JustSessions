@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// One window restores the snapshot, and live updates merge every window without appending duplicates.

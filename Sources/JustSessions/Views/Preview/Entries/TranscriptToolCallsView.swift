@@ -16,7 +16,7 @@ struct TranscriptToolCallsView: View {
                         source: AttributedString(summary), segmentIndex: segmentIndex,
                         style: TranscriptTextStyle(fontSize: 12, isMonospaced: true, lineSpacing: 0, tone: .secondary), copyRole: .line
                     )
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
             .padding(.top, 8)

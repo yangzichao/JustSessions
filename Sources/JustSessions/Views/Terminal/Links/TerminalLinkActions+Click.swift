@@ -19,7 +19,8 @@ extension TerminalLinkActions {
             popUpMenu(ActionMenu.make(items: menuItems(for: target)), tab.terminalView)
         case .editor(let name):
             if FileLinkEditorScope.includes(item.url),
-               let editor = editorStore.editors(opening: .thisMac).first(where: { $0.name == name }) {
+                let editor = editorStore.editors(opening: .thisMac).first(where: { $0.name == name })
+            {
                 open(item, in: editor)
             } else {
                 opener.open(target)

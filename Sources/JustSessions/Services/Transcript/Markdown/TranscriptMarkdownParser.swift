@@ -19,24 +19,30 @@ enum TranscriptMarkdownParser {
             let listItems = components.filter { if case .listItem = $0.kind { true } else { false } }
             var listMarker: String?
             if let item = listItems.first, seenListItems.insert(item.identity).inserted,
-               case .listItem(let ordinal) = item.kind {
+                case .listItem(let ordinal) = item.kind
+            {
                 // The closest list, rather than an outer ordered list, controls the marker.
                 let nearestList = components.first { component in
-                    switch component.kind { case .orderedList, .unorderedList: true; default: false }
+                    switch component.kind {
+                    case .orderedList, .unorderedList: true
+                    default: false
+                    }
                 }
                 let orderedMarker = nearestList.map { if case .orderedList = $0.kind { true } else { false } } ?? false
                 listMarker = orderedMarker ? "\(ordinal)." : "•"
             }
-            let content: TranscriptMarkdownBlock.Content = switch leaf.kind {
-            case .header(let level): .text(text, headingLevel: level)
-            case .codeBlock(let language): .code(text.plainText, language: language)
-            case .thematicBreak: .divider
-            default: .text(text, headingLevel: nil)
-            }
-            blocks.append(TranscriptMarkdownBlock(
-                id: leaf.identity, content: content, listDepth: listItems.count, listMarker: listMarker,
-                quoteDepth: components.filter { if case .blockQuote = $0.kind { true } else { false } }.count
-            ))
+            let content: TranscriptMarkdownBlock.Content =
+                switch leaf.kind {
+                case .header(let level): .text(text, headingLevel: level)
+                case .codeBlock(let language): .code(text.plainText, language: language)
+                case .thematicBreak: .divider
+                default: .text(text, headingLevel: nil)
+                }
+            blocks.append(
+                TranscriptMarkdownBlock(
+                    id: leaf.identity, content: content, listDepth: listItems.count, listMarker: listMarker,
+                    quoteDepth: components.filter { if case .blockQuote = $0.kind { true } else { false } }.count
+                ))
         }
         return blocks.isEmpty && !source.isEmpty ? [plainTextBlock(source)] : blocks
     }
@@ -60,9 +66,14 @@ enum TranscriptMarkdownParser {
         _ text: AttributedString, components: [PresentationIntent.IntentType], tableID: Int,
         to blocks: inout [TranscriptMarkdownBlock]
     ) {
-        guard let row = components.first(where: { component in
-            switch component.kind { case .tableHeaderRow, .tableRow: true; default: false }
-        }) else { return }
+        guard
+            let row = components.first(where: { component in
+                switch component.kind {
+                case .tableHeaderRow, .tableRow: true
+                default: false
+                }
+            })
+        else { return }
         let isHeader = if case .tableHeaderRow = row.kind { true } else { false }
         var table: TranscriptMarkdownTable
         if let last = blocks.last, last.id == tableID, case .table(let existingTable) = last.content {
@@ -80,6 +91,7 @@ enum TranscriptMarkdownParser {
     }
 
     private static func plainTextBlock(_ text: String) -> TranscriptMarkdownBlock {
-        TranscriptMarkdownBlock(id: 0, content: .text(AttributedString(text), headingLevel: nil), listDepth: 0, listMarker: nil, quoteDepth: 0)
+        TranscriptMarkdownBlock(
+            id: 0, content: .text(AttributedString(text), headingLevel: nil), listDepth: 0, listMarker: nil, quoteDepth: 0)
     }
 }

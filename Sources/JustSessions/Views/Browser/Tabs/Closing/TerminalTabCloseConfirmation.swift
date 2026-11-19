@@ -43,7 +43,9 @@ struct TerminalTabCloseConfirmation: ViewModifier {
                 Button("Cancel", role: .cancel) { closingSessionID = nil }
             } message: {
                 if let closingTabTmuxHost {
-                    Text("Keep running leaves the CLI running in tmux on \(closingTabTmuxHost.nameInSentence); click the session to reattach. End session stops it.")
+                    Text(
+                        "Keep running leaves the CLI running in tmux on \(closingTabTmuxHost.nameInSentence); click the session to reattach. End session stops it."
+                    )
                 }
             }
             .alert("Close this terminal?", isPresented: presentation(of: .closePlainTerminal)) {

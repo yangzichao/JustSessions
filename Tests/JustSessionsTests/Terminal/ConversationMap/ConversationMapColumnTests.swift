@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The conversation map's column beside a tab's terminal (TAB-09, PERF-89), with the tab's view in a window as the app
@@ -31,22 +32,24 @@ struct ConversationMapColumnTests {
                 displayTitle: "Conversation map",
                 command: NativeCLICommand(executablePath: "/bin/cat", arguments: [], workingDirectory: "/tmp", environment: [])
             )
-            window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: Self.windowWidth, height: 400), styleMask: [.titled, .miniaturizable],
-                              backing: .buffered, defer: false)
+            window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: Self.windowWidth, height: 400), styleMask: [.titled, .miniaturizable],
+                backing: .buffered, defer: false)
             window.isReleasedWhenClosed = false
-            window.contentView = NSHostingView(rootView: TerminalWorkspaceView(
-                session: tab,
-                isShown: isShown,
-                isActive: true,
-                onReconnect: nil,
-                onCheckHost: nil,
-                onFocus: {},
-                makeContextMenu: { _ in NSMenu() },
-                onOpenLink: { _ in },
-                store: store
-            )
-            .defaultAppStorage(settings.userDefaults)
-            .environment(\.ignoresWindowOcclusion, true))
+            window.contentView = NSHostingView(
+                rootView: TerminalWorkspaceView(
+                    session: tab,
+                    isShown: isShown,
+                    isActive: true,
+                    onReconnect: nil,
+                    onCheckHost: nil,
+                    onFocus: {},
+                    makeContextMenu: { _ in NSMenu() },
+                    onOpenLink: { _ in },
+                    store: store
+                )
+                .defaultAppStorage(settings.userDefaults)
+                .environment(\.ignoresWindowOcclusion, true))
             window.makeKeyAndOrderFront(nil)
             window.contentView?.layoutSubtreeIfNeeded()
         }
@@ -153,7 +156,8 @@ struct ConversationMapColumnTests {
         fixture.window.miniaturize(nil)
         try await expectEventually { fixture.window.isMiniaturized }
         try files.append(ConversationOutlineModelTests.record(5))
-        try await Task.sleep(for: ConversationOutlineModel.checkInterval(on: .thisMac) + ConversationOutlineModel.minimumReadInterval + .milliseconds(500))
+        try await Task.sleep(
+            for: ConversationOutlineModel.checkInterval(on: .thisMac) + ConversationOutlineModel.minimumReadInterval + .milliseconds(500))
         #expect(fixture.tab.conversationOutline.readCount == 1)
 
         fixture.window.deminiaturize(nil)
@@ -176,7 +180,9 @@ struct ConversationMapColumnTests {
 
     /// PERF-89: the map never becomes an input of the terminal's own views, so drawing it can't redraw or resize them.
     @Test func theTerminalViewsTakeNoMapInput() throws {
-        for path in ["Sources/JustSessions/Views/Terminal/EmbeddedTerminalView.swift", "Sources/JustSessions/Views/Terminal/TerminalInsetView.swift"] {
+        for path in [
+            "Sources/JustSessions/Views/Terminal/EmbeddedTerminalView.swift", "Sources/JustSessions/Views/Terminal/TerminalInsetView.swift",
+        ] {
             let source = try RepositoryFiles.contents(of: path)
             for name in ["Outline", "ConversationMap", "showsConversationMap"] {
                 #expect(!source.contains(name), "\(path) mentions \(name)")

@@ -14,8 +14,10 @@ struct AppWideSheetCommands: Commands {
         }
 
         CommandGroup(replacing: .help) {
-            Button(AppLocalization.string("JustSessions Help", language: languageStore.language),
-                   systemImage: "questionmark.circle") { show(.help) }
+            Button(
+                AppLocalization.string("JustSessions Help", language: languageStore.language),
+                systemImage: "questionmark.circle"
+            ) { show(.help) }
             Button(AppLocalization.string("Take the Tour", language: languageStore.language)) { startOnboardingTour?() }
                 .disabled(startOnboardingTour == nil)
             Button(AppLocalization.string("Release notes", language: languageStore.language)) { show(.releaseNotes) }

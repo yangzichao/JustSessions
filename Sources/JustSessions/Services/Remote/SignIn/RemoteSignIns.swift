@@ -103,7 +103,8 @@ final class RemoteSignIns {
     /// You came to the app: a due host whose dialog hasn't opened since it came due opens it now.
     func appCameForward() {
         guard signingIn == nil,
-              let host = states.keys.sorted().first(where: { states[$0] == .due && !opened.contains($0) }) else { return }
+            let host = states.keys.sorted().first(where: { states[$0] == .due && !opened.contains($0) })
+        else { return }
         openDialog(on: host)
     }
 
@@ -142,7 +143,8 @@ final class RemoteSignIns {
             return
         }
         guard !needsLogIn, !hostsBeingChecked.contains(host),
-              RemoteSignInSchedule.isCheckDue(lastCheckedAt: lastCheckedAt[host], now: now) else { return }
+            RemoteSignInSchedule.isCheckDue(lastCheckedAt: lastCheckedAt[host], now: now)
+        else { return }
         hostsBeingChecked.insert(host)
         lastCheckedAt[host] = now
         let runCheck = runCheck

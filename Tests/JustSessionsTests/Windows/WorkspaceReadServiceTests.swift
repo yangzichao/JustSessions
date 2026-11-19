@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @Suite(.serialized, .oneHeldThreadAtATime)
@@ -95,7 +96,8 @@ private final class FirstDiscoveryBlocksAdapter: ConversationAdapter, @unchecked
         defer { lock.withLock { activeCount -= 1 } }
         if call == 1 {
             while !cancellation.isCancelled,
-                  firstGate.wait(timeout: .now() + .milliseconds(10)) == .timedOut {}
+                firstGate.wait(timeout: .now() + .milliseconds(10)) == .timedOut
+            {}
             try cancellation.checkCancellation()
         }
         return conversations

@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+
 @testable import JustSessions
 
 /// A private tmux server for tests: its socket sits in a temporary folder of its own, next to a project folder and a
@@ -14,14 +15,19 @@ struct ThisMacTmuxSandbox {
     let server: ThisMacTmuxServer
 
     static func make(tmuxPathOverride: String? = nil) throws -> ThisMacTmuxSandbox? {
-        let bundledRuntime = tmuxPathOverride == nil
+        let bundledRuntime =
+            tmuxPathOverride == nil
             ? ProcessInfo.processInfo.environment["JUSTSESSIONS_TEST_TMUX_RUNTIME"].map { URL(fileURLWithPath: $0) } : nil
-        let candidatePaths = tmuxPathOverride.map { [$0] } ?? bundledRuntime.map { [$0.appendingPathComponent("bin/tmux").path] }
+        let candidatePaths =
+            tmuxPathOverride.map { [$0] } ?? bundledRuntime.map { [$0.appendingPathComponent("bin/tmux").path] }
             ?? ["/opt/homebrew/bin/tmux", "/usr/local/bin/tmux", "/usr/bin/tmux"]
-        guard let tmuxPath = candidatePaths
-            .first(where: FileManager.default.isExecutableFile(atPath:)),
+        guard
+            let tmuxPath =
+                candidatePaths
+                .first(where: FileManager.default.isExecutableFile(atPath:)),
             let versionOutput = BoundedProcessRunner.output(ofExecutable: tmuxPath, arguments: ["-V"], timeout: 5),
-            ThisMacTmuxVersionCheck.isSupported(versionOutput: versionOutput) else { return nil }
+            ThisMacTmuxVersionCheck.isSupported(versionOutput: versionOutput)
+        else { return nil }
         return try ThisMacTmuxSandbox(installedTmuxPath: tmuxPath, bundledRuntime: bundledRuntime)
     }
 

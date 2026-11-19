@@ -33,7 +33,8 @@ extension RemoteCLICommandBuilder {
     ) -> String {
         let directCommand = "cd \(ShellQuoting.quoted(projectPath)) && exec \"$SHELL\" -l"
         guard let tmuxSessionName else { return directCommand }
-        let paneCommand = "cd \(ShellQuoting.quoted(projectPath)) && exec /usr/bin/env -u \(RemoteShellStartup.environmentVariable) \"$SHELL\" -l"
+        let paneCommand =
+            "cd \(ShellQuoting.quoted(projectPath)) && exec /usr/bin/env -u \(RemoteShellStartup.environmentVariable) \"$SHELL\" -l"
         let tmuxCommand = RemoteTmuxAttachScript.command(
             sessionName: tmuxSessionName,
             paneCommand: paneCommand,

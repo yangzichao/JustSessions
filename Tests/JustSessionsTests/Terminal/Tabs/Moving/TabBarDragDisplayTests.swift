@@ -1,5 +1,6 @@
 import Observation
 import Testing
+
 @testable import JustSessions
 
 /// A drag along the tab bar is drawn so that a move of the pointer re-runs only the shifts of the tabs or groups: the
@@ -62,8 +63,16 @@ struct TabBarDragDisplayTests {
     /// The display's properties that views reading them would see change through `change`.
     private func observedChanges(of display: TabBarDragDisplay<String>, through change: () -> Void) -> Set<Property> {
         let changes = ObservedChanges()
-        withObservationTracking { _ = display.drag } onChange: { changes.insert(.drag) }
-        withObservationTracking { _ = display.placement } onChange: { changes.insert(.placement) }
+        withObservationTracking {
+            _ = display.drag
+        } onChange: {
+            changes.insert(.drag)
+        }
+        withObservationTracking {
+            _ = display.placement
+        } onChange: {
+            changes.insert(.placement)
+        }
         change()
         return changes.properties
     }

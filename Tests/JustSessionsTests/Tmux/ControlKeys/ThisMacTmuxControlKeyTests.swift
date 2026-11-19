@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// Keys with Control reach a CLI in this Mac's tmux as the keys they are, with either engine. A CLI that asks for
@@ -14,7 +15,8 @@ struct ThisMacTmuxControlKeyTests {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
         let presses = ControlKeyPress.all.filter { $0.bytesForLegacyCLI != "\u{1b}" }
-        let expectedBytes = presses
+        let expectedBytes =
+            presses
             .map { cliAsksForModifyOtherKeys ? $0.bytesForCLIAskingForModifyOtherKeys : $0.bytesForLegacyCLI }
             .joined()
         let keyLog = sandbox.root.appendingPathComponent("keys")
@@ -34,7 +36,8 @@ struct ThisMacTmuxControlKeyTests {
             tmuxSessionName: tmuxSessionName
         )
         _ = NSApplication.shared
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = tab.terminalView
         window.makeFirstResponder(tab.terminalView)
@@ -44,11 +47,12 @@ struct ThisMacTmuxControlKeyTests {
         }
 
         tab.startIfNeeded()
-        try #require(await sandbox.waitUntil {
-            FileManager.default.fileExists(atPath: readyMarker.path)
-                && sandbox.tmuxOutput(["list-clients", "-F", "#{session_name}"]) == "\(tmuxSessionName)\n"
-                && screenText(of: tab.terminalView).contains("KEY_READER_READY")
-        }, "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil {
+                FileManager.default.fileExists(atPath: readyMarker.path)
+                    && sandbox.tmuxOutput(["list-clients", "-F", "#{session_name}"]) == "\(tmuxSessionName)\n"
+                    && screenText(of: tab.terminalView).contains("KEY_READER_READY")
+            }, "\(sandbox.launchDiagnostics(for: tab))")
         for press in presses {
             press.press(in: tab.terminalView, windowNumber: window.windowNumber)
         }

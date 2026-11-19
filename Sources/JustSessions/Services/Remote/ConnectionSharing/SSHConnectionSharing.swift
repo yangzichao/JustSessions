@@ -24,11 +24,13 @@ struct SSHConnectionSharing: Sendable {
         if !loginOptions.isEmpty { return SSHConnectionSharing(throughLoginWithOptions: loginOptions) }
         guard let directory = SSHSocketDirectory.makeRefreshDirectory(at: socketRoot) else { return nil }
         let controlPath = directory.appendingPathComponent("master").path
-        guard let configuration = SSHHostConfiguration.resolveWithConnectionSharingFallback(
-            host: host,
-            controlPath: controlPath
-        ), configuration.controlMaster == "auto", configuration.controlPath == controlPath,
-           configuration.controlPersist == String(crashFallbackSeconds) else {
+        guard
+            let configuration = SSHHostConfiguration.resolveWithConnectionSharingFallback(
+                host: host,
+                controlPath: controlPath
+            ), configuration.controlMaster == "auto", configuration.controlPath == controlPath,
+            configuration.controlPersist == String(crashFallbackSeconds)
+        else {
             try? FileManager.default.removeItem(at: directory)
             return nil
         }

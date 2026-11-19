@@ -7,10 +7,15 @@ struct ContentView: View {
     /// the store's own observation.
     @StateObject private var storeHolder: StoreHolder
     private var store: ConversationStore { storeHolder.store }
+    // periphery:ignore - the filters are read through their $ bindings, which Periphery does not see.
     @State private var searchText = ""
+    // periphery:ignore
     @State private var recencyFilter: SessionRecencyFilter = .all
+    // periphery:ignore
     @State private var providerFilter: ConversationProviderFilter = .all
+    // periphery:ignore
     @State private var statusFilter: SessionStatusFilter = .all
+    // periphery:ignore
     @State private var archiveFilter: SessionArchiveFilter = .hideArchived
     @State private var renamingConversation: Conversation?
     @State private var renamingProject: ProjectConversationGroup?
@@ -57,12 +62,14 @@ struct ContentView: View {
         }
         .background(WorkspaceWindowRegistration(store: store))
         .onDisappear { store.closeWorkspace() }
-        .modifier(RenameDialogs(
-            store: store,
-            conversation: $renamingConversation,
-            project: $renamingProject,
-            openCount: renameDialogOpenCount
-        ))
+        .modifier(
+            RenameDialogs(
+                store: store,
+                conversation: $renamingConversation,
+                project: $renamingProject,
+                openCount: renameDialogOpenCount
+            )
+        )
         .sessionDeletionDialog(for: $deletionRequest, store: store)
         .storeAlert(store)
     }

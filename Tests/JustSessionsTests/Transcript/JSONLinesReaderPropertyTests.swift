@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct JSONLinesReaderPropertyTests {
@@ -41,7 +42,10 @@ struct JSONLinesReaderPropertyTests {
             let expected = JSONLinesReader.leadingLines(in: file, maximumByteCount: limit)
 
             var lines: [Data] = []
-            JSONLinesReader.forEachLeadingLine(in: file, maximumByteCount: limit, chunkSize: chunkSize) { lines.append($0); return true }
+            JSONLinesReader.forEachLeadingLine(in: file, maximumByteCount: limit, chunkSize: chunkSize) {
+                lines.append($0)
+                return true
+            }
             var firstTwo: [Data] = []
             JSONLinesReader.forEachLeadingLine(in: file, maximumByteCount: limit, chunkSize: chunkSize) {
                 firstTwo.append($0)

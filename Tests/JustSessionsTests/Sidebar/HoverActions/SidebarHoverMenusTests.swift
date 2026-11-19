@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The ⋯ and + menus a sidebar row shows under the pointer are in the view tree only while it is there. Each is an
@@ -20,7 +21,9 @@ struct SidebarHoverMenusTests {
         let popUpButtons = hostedViews.filter { $0 is NSPopUpButton }
 
         #expect(hostedViews.count > 50, "the browser is hosted (\(hostedViews.count) views)")
-        #expect(popUpButtons.count <= 1, "\(popUpButtons.count) pop-up buttons at rest; a row's menus belong in the tree only under the pointer")
+        #expect(
+            popUpButtons.count <= 1, "\(popUpButtons.count) pop-up buttons at rest; a row's menus belong in the tree only under the pointer"
+        )
     }
 
     /// Each row type that trades its count for menus hosts no pop-up button at rest. The host heading keeps its menus
@@ -30,12 +33,13 @@ struct SidebarHoverMenusTests {
         defer { cleanUp() }
         let conversation = Conversation.fixture(sessionID: "hover-menus")
         // Forced to rest, so where the pointer happens to be cannot mount a menu mid-test.
-        let window = try await host(VStack(spacing: 2) {
-            projectRow(store: store, conversation: conversation, hovered: false)
-            sessionRow(store: store, conversation: conversation, hovered: false)
-            subagentRow(store: store, conversation: conversation, hovered: false)
-            openTabsHeading(store: store, hovered: false)
-        })
+        let window = try await host(
+            VStack(spacing: 2) {
+                projectRow(store: store, conversation: conversation, hovered: false)
+                sessionRow(store: store, conversation: conversation, hovered: false)
+                subagentRow(store: store, conversation: conversation, hovered: false)
+                openTabsHeading(store: store, hovered: false)
+            })
         defer { window.close() }
 
         var views: [NSView] = []
@@ -73,16 +77,21 @@ struct SidebarHoverMenusTests {
     @Test func thePlaceholderTakesTheMenusRoom() throws {
         _ = NSApplication.shared
         let store = ConversationStore(adapters: [], startsBackgroundPolling: false)
-        let menus = NSHostingView(rootView: ProjectHoverActions(
-            store: store,
-            location: ProjectLocation(host: .thisMac, path: "/tmp/app"),
-            projectDisplayName: "app",
-            onNewSession: { _ in }
-        ) { EmptyView() })
+        let menus = NSHostingView(
+            rootView: ProjectHoverActions(
+                store: store,
+                location: ProjectLocation(host: .thisMac, path: "/tmp/app"),
+                projectDisplayName: "app",
+                onNewSession: { _ in }
+            ) { EmptyView() })
         let placeholder = NSHostingView(rootView: ProjectHoverActions<EmptyView>.placeholder)
 
-        #expect(abs(placeholder.fittingSize.width - menus.fittingSize.width) <= 2, "placeholder \(placeholder.fittingSize) vs menus \(menus.fittingSize)")
-        #expect(abs(placeholder.fittingSize.height - menus.fittingSize.height) <= 2, "placeholder \(placeholder.fittingSize) vs menus \(menus.fittingSize)")
+        #expect(
+            abs(placeholder.fittingSize.width - menus.fittingSize.width) <= 2,
+            "placeholder \(placeholder.fittingSize) vs menus \(menus.fittingSize)")
+        #expect(
+            abs(placeholder.fittingSize.height - menus.fittingSize.height) <= 2,
+            "placeholder \(placeholder.fittingSize) vs menus \(menus.fittingSize)")
     }
 
     // MARK: - Rows under test
@@ -164,7 +173,8 @@ struct SidebarHoverMenusTests {
     private func host(_ content: some View) async throws -> NSWindow {
         _ = NSApplication.shared
         let hostingView = NSHostingView(rootView: AnyView(content.padding(8)))
-        let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.borderless], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: CGRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
         window.orderFrontRegardless()
@@ -178,9 +188,12 @@ struct SidebarHoverMenusTests {
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
-        return (store, {
-            store.closeAllTerminals()
-            isolatedUserDefaults.removeSuite()
-        })
+        return (
+            store,
+            {
+                store.closeAllTerminals()
+                isolatedUserDefaults.removeSuite()
+            }
+        )
     }
 }

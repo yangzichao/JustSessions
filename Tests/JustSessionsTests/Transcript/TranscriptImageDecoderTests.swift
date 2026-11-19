@@ -1,6 +1,7 @@
 import CoreGraphics
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Readers showing the same image share one decode and its result, a view that goes away stops waiting without
@@ -51,7 +52,10 @@ struct TranscriptImageDecoderTests {
         try await expectEventually { counter.count == 1 }
         leaving.cancel()
         // If the view kept waiting, releasing the decode after a while makes the test fail instead of hang.
-        let releaseAnyway = Task { try await Task.sleep(for: .seconds(5)); counter.release() }
+        let releaseAnyway = Task {
+            try await Task.sleep(for: .seconds(5))
+            counter.release()
+        }
         let leftWith = await leaving.value
         releaseAnyway.cancel()
         counter.release()

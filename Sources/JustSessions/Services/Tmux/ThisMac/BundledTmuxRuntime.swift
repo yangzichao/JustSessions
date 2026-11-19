@@ -13,7 +13,8 @@ struct BundledTmuxRuntime: Sendable {
         let executable = directory.appendingPathComponent("bin/tmux")
         let terminfo = directory.appendingPathComponent("share/terminfo", isDirectory: true)
         guard fileManager.isExecutableFile(atPath: executable.path),
-              fileManager.fileExists(atPath: terminfo.path) else { return nil }
+            fileManager.fileExists(atPath: terminfo.path)
+        else { return nil }
         return ThisMacTmuxServer(executablePath: executable.path, environment: environment, terminfoDirectory: terminfo.path)
     }
 }

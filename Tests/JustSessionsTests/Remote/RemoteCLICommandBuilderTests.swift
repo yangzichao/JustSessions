@@ -1,16 +1,21 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteCLICommandBuilderTests {
     @Test func buildsAnSSHCommandWithATerminal() {
         let command = RemoteCLICommandBuilder(inheritedEnvironment: ["NO_COLOR": "1", "SSH_AUTH_SOCK": "/tmp/agent"])
-            .command(host: "devbox", provider: .codex, projectPath: "/home/me/api", arguments: ["resume", "abc"], usesHostTmuxPrefix: false)
+            .command(
+                host: "devbox", provider: .codex, projectPath: "/home/me/api", arguments: ["resume", "abc"], usesHostTmuxPrefix: false)
 
         #expect(command.executablePath == "/usr/bin/ssh")
         #expect(command.arguments.first == "-t")
         #expect(command.arguments.dropLast().last == "devbox")
-        #expect(command.arguments.last == #"exec /usr/bin/env JUSTSESSIONS=1 COLORTERM=truecolor "$SHELL" -lic 'cd '\''/home/me/api'\'' && command -v codex 2>/dev/null | grep -q "^/" && builtin functions codex 2>/dev/null | grep -c . | grep -qx 0 && exec codex '\''-c'\'' '\''tui.terminal_title=["activity","run-state","thread-id"]'\'' '\''resume'\'' '\''abc'\''; cd '\''/home/me/api'\'' 2>/dev/null && codex '\''-c'\'' '\''tui.terminal_title=["activity","run-state","thread-id"]'\'' '\''resume'\'' '\''abc'\'''"#)
+        #expect(
+            command.arguments.last
+                == #"exec /usr/bin/env JUSTSESSIONS=1 COLORTERM=truecolor "$SHELL" -lic 'cd '\''/home/me/api'\'' && command -v codex 2>/dev/null | grep -q "^/" && builtin functions codex 2>/dev/null | grep -c . | grep -qx 0 && exec codex '\''-c'\'' '\''tui.terminal_title=["activity","run-state","thread-id"]'\'' '\''resume'\'' '\''abc'\''; cd '\''/home/me/api'\'' 2>/dev/null && codex '\''-c'\'' '\''tui.terminal_title=["activity","run-state","thread-id"]'\'' '\''resume'\'' '\''abc'\'''"#
+        )
         #expect(command.environment.contains("SSH_AUTH_SOCK=/tmp/agent"))
         #expect(command.environment.contains("TERM=xterm-256color"))
         #expect(!command.environment.contains { $0.hasPrefix("NO_COLOR=") })
@@ -34,12 +39,13 @@ struct RemoteCLICommandBuilderTests {
             projectPath: project.path,
             arguments: ["--resume", "id with space"]
         )
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", remoteCommand],
-            environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": bin.path + ":/usr/bin:/bin"],
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", remoteCommand],
+                environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": bin.path + ":/usr/bin:/bin"],
+                timeout: 10
+            ))
 
         // `pwd -P` keeps the `/private` prefix of the temporary folder, which Foundation paths drop.
         let lines = output.split(separator: "\n").map(String.init)
@@ -63,18 +69,21 @@ struct RemoteCLICommandBuilderTests {
             let remoteCommand = RemoteCLICommandBuilder.remoteCommand(
                 provider: provider, projectPath: root.path, arguments: ["resume", "abc"], startCommand: startCommand
             )
-            let output = try #require(BoundedProcessRunner.output(
-                ofExecutable: "/bin/sh",
-                arguments: ["-c", remoteCommand],
-                environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": bin.path + ":/usr/bin:/bin"],
-                timeout: 10
-            ))
+            let output = try #require(
+                BoundedProcessRunner.output(
+                    ofExecutable: "/bin/sh",
+                    arguments: ["-c", remoteCommand],
+                    environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": bin.path + ":/usr/bin:/bin"],
+                    timeout: 10
+                ))
             return output.split(separator: "\n").map(String.init)
         }
 
         let codexArguments = try receivedArguments(.codex, startCommand: startCommand)
         #expect(codexArguments == (startCommand == nil ? [] : ["--full-auto"]) + CodexThreadTitle.launchArguments + ["resume", "abc"])
-        #expect(try receivedArguments(.claude, startCommand: startCommand.map { _ in "claude --verbose" }) == (startCommand == nil ? [] : ["--verbose"]) + ["resume", "abc"])
+        #expect(
+            try receivedArguments(.claude, startCommand: startCommand.map { _ in "claude --verbose" })
+                == (startCommand == nil ? [] : ["--verbose"]) + ["resume", "abc"])
     }
 
     /// Claude Code says what it does only in its registry on the host, so its tmux session starts a relay that puts
@@ -119,12 +128,13 @@ struct RemoteCLICommandBuilderTests {
         try writeExecutableScript("#!/bin/sh\nprintf '%s\\n' \"$COLORTERM\"\n", to: bin.appendingPathComponent("claude"))
 
         let remoteCommand = RemoteCLICommandBuilder.remoteCommand(provider: .claude, projectPath: root.path, arguments: [])
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", remoteCommand],
-            environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": bin.path + ":/usr/bin:/bin"],
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", remoteCommand],
+                environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": bin.path + ":/usr/bin:/bin"],
+                timeout: 10
+            ))
 
         #expect(output.trimmingCharacters(in: .whitespacesAndNewlines) == "truecolor")
     }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The tab order as Chrome's split view changes it: a tab joining a split moves beside the selected tab on the side it

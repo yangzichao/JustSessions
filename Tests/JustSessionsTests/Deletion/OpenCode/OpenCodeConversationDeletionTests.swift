@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct OpenCodeConversationDeletionTests {
@@ -21,7 +22,10 @@ struct OpenCodeConversationDeletionTests {
     }
 
     @Test(arguments: [
-        (#"printf '\033[91m\033[1mError: \033[0mdatabase is locked\n' >&2"# + "\nexit 1", OpenCodeConversationDeletionError.failed("Error: database is locked")),
+        (
+            #"printf '\033[91m\033[1mError: \033[0mdatabase is locked\n' >&2"# + "\nexit 1",
+            OpenCodeConversationDeletionError.failed("Error: database is locked")
+        ),
         ("exit 7", .failed("Exit code 7")),
         ("printf '%0600d' 0 >&2\nexit 1", .failed(String(repeating: "0", count: 500))),
         ("exit 0", .sessionStillPresent),
@@ -33,11 +37,12 @@ struct OpenCodeConversationDeletionTests {
 
         #expect(throws: expectedError) { try adapter.delete(try fixture.selectedConversation()) }
 
-        #expect(Set(try adapter.discover().map(\.sessionID)) == [
-            OpenCodeDeletionFixture.selectedSessionID,
-            OpenCodeDeletionFixture.subagentSessionID,
-            OpenCodeDeletionFixture.retainedSessionID,
-        ])
+        #expect(
+            Set(try adapter.discover().map(\.sessionID)) == [
+                OpenCodeDeletionFixture.selectedSessionID,
+                OpenCodeDeletionFixture.subagentSessionID,
+                OpenCodeDeletionFixture.retainedSessionID,
+            ])
     }
 
     @Test func aHangingCLIIsStoppedAndTheSessionRemains() throws {
@@ -64,7 +69,9 @@ struct OpenCodeConversationDeletionTests {
         let adapter = try fixture.adapter()
         let selected = try fixture.selectedConversation()
         let otherDatabase = fixture.root.appendingPathComponent("other.db")
-        func copy(sessionID: String? = nil, projectPath: String? = nil, sourceFile: URL? = nil, host: SessionHost = .thisMac) -> Conversation {
+        func copy(sessionID: String? = nil, projectPath: String? = nil, sourceFile: URL? = nil, host: SessionHost = .thisMac)
+            -> Conversation
+        {
             .fixture(
                 provider: .opencode,
                 sessionID: sessionID ?? selected.sessionID,

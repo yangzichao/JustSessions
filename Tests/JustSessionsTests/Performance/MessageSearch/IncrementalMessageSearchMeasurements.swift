@@ -1,10 +1,11 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @_silgen_name("proc_reset_footprint_interval")
-private func proc_reset_footprint_interval(_ pid: pid_t) -> Int32
+private func resetProcessFootprintInterval(_: pid_t) -> Int32
 
 /// Measures message search's text for a growing Codex session (issue #56): the baseline, which reads the session in
 /// full on every change in 5,000-entry pages and saves the first cache format, against resuming from the saved final
@@ -30,7 +31,10 @@ struct IncrementalMessageSearchMeasurements {
     func codexSearchText(fixture: String) async throws {
         guard SidebarInteractionMeasurements.isEnabled else { return }
         if let picked = ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF_FIXTURES"],
-           !picked.split(separator: ",").contains(Substring(fixture)) { return }
+            !picked.split(separator: ",").contains(Substring(fixture))
+        {
+            return
+        }
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let sessions = try Path.allCases.map { path in
@@ -121,7 +125,8 @@ struct IncrementalMessageSearchMeasurements {
     private func check(_ sessions: [MeasuredSession], scenario: String) async throws {
         for session in sessions {
             let clean = try await SessionMessageTextReader.read(
-                session.conversation, limits: session.path == .baseline ? Self.baselineLimits : SessionMessageTextReader.codexWholeSessionLimits
+                session.conversation,
+                limits: session.path == .baseline ? Self.baselineLimits : SessionMessageTextReader.codexWholeSessionLimits
             )
             let saved = try #require(session.lastText)
             #expect(saved.text == clean, "\(scenario), \(session.path.rawValue)")
@@ -143,7 +148,8 @@ struct IncrementalMessageSearchMeasurements {
             perfReport(scenario, "\(label): CPU", median(\.cpu))
             perfReport(scenario, "\(label): source bytes read", median(\.sourceBytes))
             perfReport(scenario, "\(label): records decoded", median(\.decodedRecords))
-            perfReport(scenario, "\(label): peak footprint growth", String(format: "%.1f MiB", Double(median(\.peakFootprintBytes)) / 1_048_576))
+            perfReport(
+                scenario, "\(label): peak footprint growth", String(format: "%.1f MiB", Double(median(\.peakFootprintBytes)) / 1_048_576))
             perfReport(scenario, "\(label): cache bytes written", median(\.cacheBytesWritten))
             perfReport(scenario, "\(label): resumed", "\(runs.filter(\.resumed).count) of \(runs.count)")
         }
@@ -163,8 +169,10 @@ struct IncrementalMessageSearchMeasurements {
         var cacheBytesWritten: Int
         var resumed: Bool
 
-        init(wall: Duration, cpu: Duration, sourceBytes: UInt64, decodedRecords: Int, peakFootprintBytes: UInt64,
-             cacheBytesWritten: Int, resumed: Bool) {
+        init(
+            wall: Duration, cpu: Duration, sourceBytes: UInt64, decodedRecords: Int, peakFootprintBytes: UInt64,
+            cacheBytesWritten: Int, resumed: Bool
+        ) {
             self.wall = wall
             self.cpu = cpu
             self.sourceBytes = sourceBytes
@@ -205,7 +213,7 @@ struct IncrementalMessageSearchMeasurements {
 
         /// Gets the session's search text as this path does, timed.
         func measure() async throws -> Sample {
-            _ = proc_reset_footprint_interval(getpid())
+            _ = resetProcessFootprintInterval(getpid())
             let startFootprint = Self.footprint().current
             let cpuStart = Self.processCPUTime()
             let wallStart = ContinuousClock.now
@@ -280,7 +288,8 @@ struct IncrementalMessageSearchMeasurements {
         private static func processCPUTime() -> Duration {
             var usage = rusage()
             getrusage(RUSAGE_SELF, &usage)
-            let microseconds = Int64(usage.ru_utime.tv_sec + usage.ru_stime.tv_sec) * 1_000_000
+            let microseconds =
+                Int64(usage.ru_utime.tv_sec + usage.ru_stime.tv_sec) * 1_000_000
                 + Int64(usage.ru_utime.tv_usec + usage.ru_stime.tv_usec)
             return .microseconds(microseconds)
         }
@@ -305,8 +314,9 @@ struct IncrementalMessageSearchMeasurements {
 
         static func text(at file: URL, for conversationID: String, fingerprint: SessionMessageTextFingerprint) -> SessionMessageText? {
             guard let data = try? Data(contentsOf: file),
-                  let saved = try? JSONDecoder().decode(SavedText.self, from: data),
-                  saved.version == 1, saved.conversationID == conversationID, saved.fingerprint == fingerprint else { return nil }
+                let saved = try? JSONDecoder().decode(SavedText.self, from: data),
+                saved.version == 1, saved.conversationID == conversationID, saved.fingerprint == fingerprint
+            else { return nil }
             return saved.text
         }
 
@@ -327,7 +337,8 @@ struct IncrementalMessageSearchMeasurements {
             let first = message("Marker A: First **Café** 中文 🧪") + "\n"
             try handle.write(contentsOf: Data(first.utf8))
             let hidden = event(padding: 3_800) + "\n"
-            let group = Data((message("Searchable checkpoint with **bold words**, naïve") + "\n" + String(repeating: hidden, count: 128)).utf8)
+            let group = Data(
+                (message("Searchable checkpoint with **bold words**, naïve") + "\n" + String(repeating: hidden, count: 128)).utf8)
             let target = UInt64(sizeMiB) << 20
             var written = UInt64(first.utf8.count)
             while written < target {
@@ -375,9 +386,11 @@ struct IncrementalMessageSearchMeasurements {
         static func turn(_ number: Int) -> [String] {
             var lines: [String] = []
             if number.isMultiple(of: 4) { lines.append(user("Turn \(number): please fix the naïve parser, 中文 too")) }
-            lines.append(SyntheticFixture.message(
-                "Turn \(number): I'll update the parser. Here is the plan with **bold words**:\\n\\n- read the file\\n- change `parse()`\\n\\n" + filler(700)
-            ))
+            lines.append(
+                SyntheticFixture.message(
+                    "Turn \(number): I'll update the parser. Here is the plan with **bold words**:\\n\\n- read the file\\n- change `parse()`\\n\\n"
+                        + filler(700)
+                ))
             for call in 0..<3 {
                 lines.append(toolCall("*** Begin Patch\\n*** Update File: Sources/File\(number)-\(call).swift\\n" + filler(1_050)))
                 lines.append(hidden(recordType: "response_item", payloadType: "custom_tool_call_output", padding: 5_000))

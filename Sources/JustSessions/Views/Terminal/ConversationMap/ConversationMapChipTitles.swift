@@ -16,8 +16,10 @@ enum ConversationMapChipTitles {
     private static let cacheLimit = 512
     private static var cache: [Key: ConversationMapLayout.ChipTitle] = [:]
 
-    static func titles(for bookmarks: [MessageBookmark], side: CGFloat,
-                       factor: CGFloat = InterfaceScale.factor) -> [String: ConversationMapLayout.ChipTitle] {
+    static func titles(
+        for bookmarks: [MessageBookmark], side: CGFloat,
+        factor: CGFloat = InterfaceScale.factor
+    ) -> [String: ConversationMapLayout.ChipTitle] {
         var titles: [String: ConversationMapLayout.ChipTitle] = [:]
         for bookmark in bookmarks {
             guard let label = bookmark.label.map(Self.oneLine), !label.isEmpty else { continue }
@@ -27,8 +29,9 @@ enum ConversationMapChipTitles {
     }
 
     static func title(for label: String, side: CGFloat, factor: CGFloat) -> ConversationMapLayout.ChipTitle {
-        let key = Key(label: label, fontSize: ConversationMapMetrics.chipFontSize(at: factor),
-                      maximumWidth: ConversationMapMetrics.labelChipMaximumWidth(at: factor))
+        let key = Key(
+            label: label, fontSize: ConversationMapMetrics.chipFontSize(at: factor),
+            maximumWidth: ConversationMapMetrics.labelChipMaximumWidth(at: factor))
         if let title = cache[key] { return title }
         if cache.count >= cacheLimit { cache.removeAll(keepingCapacity: true) }
         let title = measure(key, padding: ConversationMapMetrics.chipPadding(at: factor), side: side)

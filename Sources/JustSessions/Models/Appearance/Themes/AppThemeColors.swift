@@ -40,10 +40,11 @@ struct AppThemeColors: Equatable, Sendable {
         sidebarSurface: UInt32, contentSurface: UInt32, raisedSurface: UInt32, userMessageSurface: UInt32,
         ink: UInt32, inkForeground: UInt32, line: UInt32, terminal: TerminalColorScheme
     ) {
-        self.init(seeds: AppThemeSeeds(
-            sidebarSurface: sidebarSurface, contentSurface: contentSurface, raisedSurface: raisedSurface,
-            userMessageSurface: userMessageSurface, ink: ink, inkForeground: inkForeground, line: line, terminal: terminal
-        ))
+        self.init(
+            seeds: AppThemeSeeds(
+                sidebarSurface: sidebarSurface, contentSurface: contentSurface, raisedSurface: raisedSurface,
+                userMessageSurface: userMessageSurface, ink: ink, inkForeground: inkForeground, line: line, terminal: terminal
+            ))
     }
 
     init(seeds: AppThemeSeeds) {
@@ -80,14 +81,16 @@ struct AppThemeColors: Equatable, Sendable {
         let tertiaryText = readable(ThemeColorContrast.blend(readableInk, with: contentSurface, fraction: 0.55))
         self.secondaryText = secondaryText
         // Where both had to be made readable, tertiary can come out a shade stronger; it is never stronger than secondary.
-        let tertiaryIsFainter = ThemeColorContrast.ratio(tertiaryText, contentSurface)
+        let tertiaryIsFainter =
+            ThemeColorContrast.ratio(tertiaryText, contentSurface)
             <= ThemeColorContrast.ratio(secondaryText, contentSurface)
         self.tertiaryText = tertiaryIsFainter ? tertiaryText : secondaryText
         warningText = readable(StatusHexColors.warning.value(isDark: isDark))
         errorText = readable(StatusHexColors.error.value(isDark: isDark))
-        providerTextHexColors = Dictionary(uniqueKeysWithValues: ConversationProvider.allCases.map { provider in
-            (provider, readable(provider.tintHexColor.value(isDark: isDark)))
-        })
+        providerTextHexColors = Dictionary(
+            uniqueKeysWithValues: ConversationProvider.allCases.map { provider in
+                (provider, readable(provider.tintHexColor.value(isDark: isDark)))
+            })
         tabGroupHexColors = Self.tabGroupColors(
             ansiColors: seeds.terminal.ansiHexColors, labelSurfaces: [contentSurface, sidebarSurface]
         )

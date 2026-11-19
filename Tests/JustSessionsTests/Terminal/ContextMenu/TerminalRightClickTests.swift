@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A right-click on a terminal or its margin selects its tab, as a click does, then shows the terminal's menu.
@@ -41,9 +42,10 @@ struct TerminalRightClickTests {
     }
 
     private func rightClick() throws -> NSEvent {
-        try #require(NSEvent.mouseEvent(
-            with: .rightMouseDown, location: .zero, modifierFlags: [], timestamp: 0, windowNumber: 0, context: nil,
-            eventNumber: 0, clickCount: 1, pressure: 1
-        ))
+        try #require(
+            NSEvent.mouseEvent(
+                with: .rightMouseDown, location: .zero, modifierFlags: [], timestamp: 0, windowNumber: 0, context: nil,
+                eventNumber: 0, clickCount: 1, pressure: 1
+            ))
     }
 }

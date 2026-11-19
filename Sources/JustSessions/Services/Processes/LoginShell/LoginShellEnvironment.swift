@@ -51,8 +51,9 @@ enum LoginShellEnvironment {
     static func parseVariables(_ output: Data) -> [String: String] {
         output.split(separator: 0).reduce(into: [String: String]()) { variables, entry in
             guard let text = String(data: Data(entry), encoding: .utf8),
-                  let separator = text.firstIndex(of: "="),
-                  separator != text.startIndex else { return }
+                let separator = text.firstIndex(of: "="),
+                separator != text.startIndex
+            else { return }
             variables[String(text[..<separator])] = String(text[text.index(after: separator)...])
         }
     }
@@ -72,7 +73,8 @@ enum LoginShellEnvironment {
             if FileManager.default.isExecutableFile(atPath: shellPath) { return shellPath }
         }
         if let shellPath = ProcessInfo.processInfo.environment["SHELL"],
-           FileManager.default.isExecutableFile(atPath: shellPath) {
+            FileManager.default.isExecutableFile(atPath: shellPath)
+        {
             return shellPath
         }
         return "/bin/zsh"

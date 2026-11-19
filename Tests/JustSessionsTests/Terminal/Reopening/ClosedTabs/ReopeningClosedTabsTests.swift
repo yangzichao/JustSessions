@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Reopen Closed Tab (⇧⌘T): the latest tab closed in the window comes back at its place, selected, as in Chrome.

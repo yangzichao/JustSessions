@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PersistentSessionSummaryCacheTests {
@@ -13,7 +14,11 @@ struct PersistentSessionSummaryCacheTests {
         #expect(first.summary(of: file) { _ in "old" } == "old")
         first.forgetFiles(in: directory, except: [file])
         let second = SessionFileSummaryCache<String>(persistenceFile: snapshot, persistsTemporaryFiles: true)
-        #expect(second.summary(of: URL(fileURLWithPath: file.path)) { _ in Issue.record("Unchanged files should not be parsed again"); return nil } == "old")
+        #expect(
+            second.summary(of: URL(fileURLWithPath: file.path)) { _ in
+                Issue.record("Unchanged files should not be parsed again")
+                return nil
+            } == "old")
         let date = try #require(FileManager.default.attributesOfItem(atPath: file.path)[.modificationDate] as? Date)
         try Data("new".utf8).write(to: file, options: .atomic)
         try FileManager.default.setAttributes([.modificationDate: date], ofItemAtPath: file.path)

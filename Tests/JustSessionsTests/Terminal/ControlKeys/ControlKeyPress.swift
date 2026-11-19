@@ -4,6 +4,7 @@ import Carbon.HIToolbox
 /// A key pressed with Control, as macOS delivers it on a US keyboard or with Pinyin, which types full-width punctuation,
 /// and the bytes a program should receive for it.
 struct ControlKeyPress {
+    // periphery:ignore - names the key in parameterized test results.
     let name: String
     let keyCode: Int
     let withShift: Bool

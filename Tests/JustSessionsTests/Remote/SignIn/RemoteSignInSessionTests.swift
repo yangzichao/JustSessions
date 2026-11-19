@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The session runs a local `sh` script in place of `ssh`: it reads its answers from a pipe, as the command on the
@@ -119,17 +120,21 @@ struct RemoteSignInSessionTests {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let asked = directory.appendingPathComponent("asked")
-        let asker = Asker(["PIN:": "1234"], onAsked: { question in
-            if question.prompt == "Contacting the server" { FileManager.default.createFile(atPath: asked.path, contents: nil) }
-        })
+        let asker = Asker(
+            ["PIN:": "1234"],
+            onAsked: { question in
+                if question.prompt == "Contacting the server" { FileManager.default.createFile(atPath: asked.path, contents: nil) }
+            })
 
-        let outcome = await session(running: """
-            echo 'Contacting the server'
-            while [ ! -f '\(asked.path)' ]; do sleep 0.05; done
-            printf 'PIN: '
-            read pin
-            [ "$pin" = 1234 ]
-            """).run(ask: asker.ask)
+        let outcome = await session(
+            running: """
+                echo 'Contacting the server'
+                while [ ! -f '\(asked.path)' ]; do sleep 0.05; done
+                printf 'PIN: '
+                read pin
+                [ "$pin" = 1234 ]
+                """
+        ).run(ask: asker.ask)
 
         #expect(outcome == .signedIn)
         #expect(asker.asked.map(\.prompt) == ["Contacting the server", "PIN:"])

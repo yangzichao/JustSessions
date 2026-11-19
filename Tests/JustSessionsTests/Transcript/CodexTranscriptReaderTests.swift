@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CodexTranscriptReaderTests {
@@ -7,15 +8,21 @@ struct CodexTranscriptReaderTests {
         let file = try TranscriptTestFiles.write([
             ["timestamp": "2026-09-24T10:00:00.000Z", "type": "session_meta", "payload": ["id": "abc", "cwd": "/tmp"]],
             codexItem(["type": "message", "role": "developer", "content": [["type": "input_text", "text": "hidden"]]]),
-            codexItem(["type": "message", "role": "user", "content": [
-                ["type": "input_text", "text": "# AGENTS.md instructions"],
-                ["type": "input_text", "text": "<environment_context>hidden</environment_context>"],
-            ]]),
-            codexItem(["type": "message", "role": "user", "content": [
-                ["type": "input_text", "text": "Add a test"],
-                ["type": "input_image", "image_url": "data:image/png;base64,\(SampleTranscriptImage.base64)"],
-                ["type": "input_image", "image_url": "https://example.com/not-inline.png"],
-            ]]),
+            codexItem([
+                "type": "message", "role": "user",
+                "content": [
+                    ["type": "input_text", "text": "# AGENTS.md instructions"],
+                    ["type": "input_text", "text": "<environment_context>hidden</environment_context>"],
+                ],
+            ]),
+            codexItem([
+                "type": "message", "role": "user",
+                "content": [
+                    ["type": "input_text", "text": "Add a test"],
+                    ["type": "input_image", "image_url": "data:image/png;base64,\(SampleTranscriptImage.base64)"],
+                    ["type": "input_image", "image_url": "https://example.com/not-inline.png"],
+                ],
+            ]),
             codexItem(["type": "reasoning", "summary": []]),
             codexItem(["type": "function_call", "name": "shell", "arguments": #"{"command":["bash","-lc","swift test"]}"#]),
             codexItem(["type": "function_call_output", "output": "hidden"]),
@@ -28,22 +35,31 @@ struct CodexTranscriptReaderTests {
 
         let transcript = try CodexTranscriptReader().read(file)
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Add a test"),
-            .userImage(SampleTranscriptImage.image),
-            .toolCalls(["shell · bash -lc swift test", "exec · const x = 1"]),
-            .assistantMessage("Done."),
-            .note("Earlier messages were compacted"),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Add a test"),
+                .userImage(SampleTranscriptImage.image),
+                .toolCalls(["shell · bash -lc swift test", "exec · const x = 1"]),
+                .assistantMessage("Done."),
+                .note("Earlier messages were compacted"),
+            ])
     }
 
     @Test func lineCheckSkipsEventsAndToolOutputsWithoutParsing() {
         func line(_ text: String) -> Data { Data(text.utf8) }
 
-        #expect(!CodexTranscriptReader.mightContainTranscriptItem(line(#"{"timestamp":"t","ordinal":1,"type":"event_msg","payload":{"type":"item_completed"}}"#)))
-        #expect(!CodexTranscriptReader.mightContainTranscriptItem(line(#"{"timestamp":"t","type":"response_item","payload":{"type":"function_call_output"}}"#)))
-        #expect(CodexTranscriptReader.mightContainTranscriptItem(line(#"{"timestamp":"t","type":"response_item","payload":{"type":"function_call","name":"shell"}}"#)))
-        #expect(CodexTranscriptReader.mightContainTranscriptItem(line(#"{"timestamp":"t","type":"response_item","payload":{"type":"message"}}"#)))
+        #expect(
+            !CodexTranscriptReader.mightContainTranscriptItem(
+                line(#"{"timestamp":"t","ordinal":1,"type":"event_msg","payload":{"type":"item_completed"}}"#)))
+        #expect(
+            !CodexTranscriptReader.mightContainTranscriptItem(
+                line(#"{"timestamp":"t","type":"response_item","payload":{"type":"function_call_output"}}"#)))
+        #expect(
+            CodexTranscriptReader.mightContainTranscriptItem(
+                line(#"{"timestamp":"t","type":"response_item","payload":{"type":"function_call","name":"shell"}}"#)))
+        #expect(
+            CodexTranscriptReader.mightContainTranscriptItem(
+                line(#"{"timestamp":"t","type":"response_item","payload":{"type":"message"}}"#)))
         // Lines in an unexpected shape are parsed rather than skipped.
         #expect(CodexTranscriptReader.mightContainTranscriptItem(line(#"{"type":"event_msg","timestamp":"t"}"#)))
     }

@@ -39,15 +39,16 @@ enum RemoteToolFoldersLookup {
         let printedVariables = variableNames.map { name in
             "printf '\(linePrefix)\(name)=%s\\n\' \"$(absolute \"${\(name):-}\")\""
         }
-        return ([
-            #"absolute() { case $1 in /*) printf '%s' "$1" ;; '~') printf '%s' "$HOME" ;; '~/'*) printf '%s' "$HOME/${1#'~/'}" ;; esac; }"#,
-            "printf '\(linePrefix)HOME=%s\\n' \"$HOME\"",
-        ] + printedVariables + [
-            #"agent=$(absolute "${PI_CODING_AGENT_DIR:-}"); [ -n "$agent" ] || agent="$HOME/.pi/agent""#,
-            "echo \(piSettingsStart)",
-            #"cat "$agent/settings.json" 2>/dev/null"#,
-            "echo; echo \(piSettingsEnd)",
-        ]).joined(separator: "\n")
+        return
+            ([
+                #"absolute() { case $1 in /*) printf '%s' "$1" ;; '~') printf '%s' "$HOME" ;; '~/'*) printf '%s' "$HOME/${1#'~/'}" ;; esac; }"#,
+                "printf '\(linePrefix)HOME=%s\\n' \"$HOME\"",
+            ] + printedVariables + [
+                #"agent=$(absolute "${PI_CODING_AGENT_DIR:-}"); [ -n "$agent" ] || agent="$HOME/.pi/agent""#,
+                "echo \(piSettingsStart)",
+                #"cat "$agent/settings.json" 2>/dev/null"#,
+                "echo; echo \(piSettingsEnd)",
+            ]).joined(separator: "\n")
     }
 
     /// Lines a shell profile prints come before the lookup's, and are skipped.
@@ -77,7 +78,8 @@ enum RemoteToolFoldersLookup {
 
     private static func piSettingsText(in lines: [String]) -> String? {
         guard let start = lines.lastIndex(of: piSettingsStart),
-              let end = lines[start...].firstIndex(of: piSettingsEnd) else { return nil }
+            let end = lines[start...].firstIndex(of: piSettingsEnd)
+        else { return nil }
         let text = lines[(start + 1)..<end].joined(separator: "\n")
         return text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : text
     }

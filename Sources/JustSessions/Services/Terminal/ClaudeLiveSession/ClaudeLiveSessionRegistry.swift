@@ -10,7 +10,8 @@ struct ClaudeLiveSessionRegistry: Sendable {
 
     func record(forProcessID processID: Int32) -> ClaudeLiveSessionRecord? {
         guard processID > 0,
-              let data = try? Data(contentsOf: sessionsDirectory.appendingPathComponent("\(processID).json")) else {
+            let data = try? Data(contentsOf: sessionsDirectory.appendingPathComponent("\(processID).json"))
+        else {
             return nil
         }
         return ClaudeLiveSessionRecord(jsonData: data)

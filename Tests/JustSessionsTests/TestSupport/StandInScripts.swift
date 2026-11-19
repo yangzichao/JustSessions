@@ -50,7 +50,8 @@ final class StandInScripts: @unchecked Sendable {
         let names = (try? FileManager.default.contentsOfDirectory(atPath: temporaryDirectory.path)) ?? []
         for name in names where name.hasPrefix(folderPrefix) {
             guard let processID = pid_t(name.dropFirst(folderPrefix.count)), processID != getpid(),
-                  kill(processID, 0) != 0, errno == ESRCH else { continue }
+                kill(processID, 0) != 0, errno == ESRCH
+            else { continue }
             try? FileManager.default.removeItem(at: temporaryDirectory.appendingPathComponent(name))
         }
     }

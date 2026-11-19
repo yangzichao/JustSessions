@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// A tab dragged to another window takes its terminal view along, into that window's inset view: the terminal keeps
@@ -102,7 +103,8 @@ private final class WorkspaceWindow {
         settings = try IsolatedUserDefaults()
         store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
         hostingView = NSHostingView(rootView: AnyView(EmptyView()))
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1000, height: 600), styleMask: [.borderless], backing: .buffered, defer: false)
+        window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 1000, height: 600), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
     }
@@ -129,17 +131,18 @@ private final class WorkspaceWindow {
     }
 
     func show() async throws {
-        hostingView.rootView = AnyView(WorkspaceDetailView(
-            store: store,
-            sessionSelection: SessionMultiSelection(),
-            isSidebarHidden: false,
-            onRename: { _ in },
-            onNewSession: {},
-            onNewSessionInSplitChooser: { _ in },
-            onCloseTerminal: { _ in },
-            onCloseTabGroup: { _, _ in },
-            onDelete: { _ in }
-        ))
+        hostingView.rootView = AnyView(
+            WorkspaceDetailView(
+                store: store,
+                sessionSelection: SessionMultiSelection(),
+                isSidebarHidden: false,
+                onRename: { _ in },
+                onNewSession: {},
+                onNewSessionInSplitChooser: { _ in },
+                onCloseTerminal: { _ in },
+                onCloseTabGroup: { _, _ in },
+                onDelete: { _ in }
+            ))
         try await settleLayout()
     }
 

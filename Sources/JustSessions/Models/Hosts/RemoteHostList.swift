@@ -23,9 +23,10 @@ struct RemoteHostList: Equatable {
     static func normalizedHost(_ proposedHost: String) -> String? {
         let host = proposedHost.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !host.isEmpty, !host.hasPrefix("-"),
-              host.rangeOfCharacter(from: .whitespacesAndNewlines) == nil,
-              !host.contains("/"),
-              !host.allSatisfy({ $0 == "." }) else { return nil }
+            host.rangeOfCharacter(from: .whitespacesAndNewlines) == nil,
+            !host.contains("/"),
+            !host.allSatisfy({ $0 == "." })
+        else { return nil }
         return host
     }
 

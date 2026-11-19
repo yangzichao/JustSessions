@@ -41,7 +41,8 @@ final class SSHHostReachability: @unchecked Sendable {
     /// After a background command to the host ended: remembers that `ssh` couldn't reach it, and forgets that once
     /// any command gets through, even one the host refuses to log in.
     func noteResult(exitStatus: Int32, output: String, on host: String) {
-        let couldNotReach = exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus
+        let couldNotReach =
+            exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus
             && SSHConnectionProblem(sshOutput: output).meansHostIsOutOfReach
         lock.withLock {
             if couldNotReach {

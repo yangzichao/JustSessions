@@ -2,11 +2,10 @@
 dist/
 .DS_Store
 *.xcuserstate
+*.profraw
 __pycache__/
 .playwright-mcp/
 .wrangler/
 .dev.vars
-# Coding agents' local state stays out of git; the project's skills are shared.
-!/.claude/
-/.claude/*
-!/.claude/skills/
+# Coding agents' local state and skills stay out of git.
+/.claude/

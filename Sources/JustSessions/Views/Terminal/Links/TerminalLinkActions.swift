@@ -41,9 +41,10 @@ struct TerminalLinkActions {
             }
             if let openInEditorItem = openInEditorItem(for: item) { items.append(openInEditorItem) }
             if item.kind == .file {
-                items.append(ActionMenuItem(title: localized("Reveal in Finder"), systemImage: "folder") {
-                    opener.revealInFinder(item.url)
-                })
+                items.append(
+                    ActionMenuItem(title: localized("Reveal in Finder"), systemImage: "folder") {
+                        opener.revealInFinder(item.url)
+                    })
             }
             items.append(copyPathItem(item.url.path))
             return items
@@ -62,10 +63,11 @@ struct TerminalLinkActions {
             do {
                 try await opener.openInEditor(item, editor)
             } catch {
-                store.showError(AppLocalization.string(
-                    "Could not open \(itemName) in \(editor.name): \(error.localizedDescription)",
-                    language: language
-                ))
+                store.showError(
+                    AppLocalization.string(
+                        "Could not open \(itemName) in \(editor.name): \(error.localizedDescription)",
+                        language: language
+                    ))
             }
         }
     }

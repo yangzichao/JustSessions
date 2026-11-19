@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Closing a tab ends what it ran, as closing a terminal window does, and leaves nothing in the process table.

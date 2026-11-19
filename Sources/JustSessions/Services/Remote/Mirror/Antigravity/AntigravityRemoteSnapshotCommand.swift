@@ -16,7 +16,9 @@ enum AntigravityRemoteSnapshotCommand {
         let path = String(line.dropFirst(outputHeading.count))
         guard path.hasPrefix(pathPrefix) else { return nil }
         let suffix = path.dropFirst(pathPrefix.count)
-        guard !suffix.isEmpty, suffix.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_" || $0 == "-") }) else { return nil }
+        guard !suffix.isEmpty, suffix.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_" || $0 == "-") }) else {
+            return nil
+        }
         return path
     }
 

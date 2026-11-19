@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct SessionMessageSnippetTests {
@@ -8,7 +9,9 @@ struct SessionMessageSnippetTests {
     }
 
     @Test func aShortMessageShowsWhole() throws {
-        #expect(try snippet("Fix the build", around: "the") == SessionMessageSnippet(leadingText: "Fix ", matchedText: "the", trailingText: " build"))
+        #expect(
+            try snippet("Fix the build", around: "the")
+                == SessionMessageSnippet(leadingText: "Fix ", matchedText: "the", trailingText: " build"))
     }
 
     @Test func aLongMessageIsCutAroundTheMatchWithEllipses() throws {
@@ -29,7 +32,8 @@ struct SessionMessageSnippetTests {
     }
 
     @Test func textAfterTheMatchEndsBeforeAnyWhitespaceWhereItIsCut() throws {
-        let cut = try snippet("key" + String(repeating: "a", count: SessionMessageSnippet.trailingCharacterCount - 1) + "  \n tail", around: "key")
+        let cut = try snippet(
+            "key" + String(repeating: "a", count: SessionMessageSnippet.trailingCharacterCount - 1) + "  \n tail", around: "key")
 
         #expect(cut.trailingText == String(repeating: "a", count: SessionMessageSnippet.trailingCharacterCount - 1) + "…")
     }

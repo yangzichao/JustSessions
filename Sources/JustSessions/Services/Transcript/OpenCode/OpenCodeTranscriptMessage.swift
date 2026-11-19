@@ -20,14 +20,6 @@ struct OpenCodeTranscriptMessage: Sendable, Equatable {
     /// Why the reply failed, as OpenCode shows it. Nil when it succeeded or was interrupted by the user.
     let errorText: String?
 
-    init(id: String, role: Role, timestamp: Date, isCompactionSummary: Bool = false, errorText: String? = nil) {
-        self.id = id
-        self.role = role
-        self.timestamp = timestamp
-        self.isCompactionSummary = isCompactionSummary
-        self.errorText = errorText
-    }
-
     /// Nil for a message whose data is not a user or assistant message.
     init?(id: String, createdAtMilliseconds: Int64, data: Data?) {
         guard let data, let object = ConversationMetadata.object(from: data) else { return nil }

@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Settings and Help from the app menu show as a sheet on the frontmost workspace window. Windows are on screen, which

@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A new reading window's size (RDR-53): the last one's, or at first 1000 points wide and nearly as tall as the screen;
@@ -51,17 +52,22 @@ struct SessionReadingWindowSizeTests {
         let settings = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], startsBackgroundPolling: false)
         let conversation = TranscriptScrollViewFixture.conversation("reading-window-size")
-        let first = SessionReadingWindowController(conversation: conversation, store: store, initialPosition: nil,
-                                                   userDefaults: settings.userDefaults) {}
+        let first = SessionReadingWindowController(
+            conversation: conversation, store: store, initialPosition: nil,
+            userDefaults: settings.userDefaults
+        ) {}
         first.readingWindow.setFrame(NSRect(x: 100, y: 100, width: 1111, height: 666), display: false)
 
         first.windowWillClose(Notification(name: NSWindow.willCloseNotification))
 
         #expect(SessionReadingWindowController.savedSize(in: settings.userDefaults) == CGSize(width: 1111, height: 666))
-        let second = SessionReadingWindowController(conversation: conversation, store: store, initialPosition: nil,
-                                                    userDefaults: settings.userDefaults) {}
-        #expect(second.readingWindow.frame.size == CGSize(width: 1111, height: 666)
-            || NSScreen.main.map { $0.visibleFrame.width < 1151 || $0.visibleFrame.height < 706 } == true)
+        let second = SessionReadingWindowController(
+            conversation: conversation, store: store, initialPosition: nil,
+            userDefaults: settings.userDefaults
+        ) {}
+        #expect(
+            second.readingWindow.frame.size == CGSize(width: 1111, height: 666)
+                || NSScreen.main.map { $0.visibleFrame.width < 1151 || $0.visibleFrame.height < 706 } == true)
         settings.userDefaults.set("{10, 10}", forKey: SessionReadingWindowController.savedSizeKey)
         #expect(SessionReadingWindowController.savedSize(in: settings.userDefaults) == nil)
         first.close()

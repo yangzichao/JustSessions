@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -17,12 +18,14 @@ struct AntigravityRemoteLaunchTests {
         let tab = try #require(store.terminalSessions.last)
         #expect(tab.host == .ssh("devbox"))
         #expect(tab.conversation?.id == conversation.id)
-        #expect(tab.command.arguments.last == RemoteCLICommandBuilder.remoteCommand(
-            provider: .antigravity,
-            projectPath: conversation.projectPath,
-            arguments: ["--conversation", conversation.sessionID],
-            tmuxSessionName: tab.tmuxSessionName
-        ))
+        #expect(
+            tab.command.arguments.last
+                == RemoteCLICommandBuilder.remoteCommand(
+                    provider: .antigravity,
+                    projectPath: conversation.projectPath,
+                    arguments: ["--conversation", conversation.sessionID],
+                    tmuxSessionName: tab.tmuxSessionName
+                ))
         store.closeAllTerminals()
     }
 

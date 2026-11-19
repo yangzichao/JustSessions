@@ -10,7 +10,8 @@ struct AntigravityTranscriptReader {
         defer { sqlite3_close(database) }
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(database, "SELECT step_type, step_payload FROM steps ORDER BY idx", -1, &statement, nil) == SQLITE_OK,
-              let statement else { throw AntigravityDatabaseError.unreadable }
+            let statement
+        else { throw AntigravityDatabaseError.unreadable }
         defer { sqlite3_finalize(statement) }
         var builder = TranscriptBuilder(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength)
         var result = sqlite3_step(statement)
@@ -27,20 +28,22 @@ struct AntigravityTranscriptReader {
 
     func append(stepType: Int32, payload: Data, to builder: inout TranscriptBuilder) {
         let status = AntigravityProtobuf.integer(in: payload, field: 4)
-        guard status != 4, status != 5 else { return } // Invalid or cleared by rewind/compaction.
+        guard status != 4, status != 5 else { return }  // Invalid or cleared by rewind/compaction.
         let timestamp = AntigravityTranscriptTimestamp.date(in: payload)
         switch stepType {
         case 14:
             let metadata = AntigravityProtobuf.bytes(in: payload, at: [5])
             let source = metadata.flatMap { AntigravityProtobuf.integer(in: $0, field: 3) }
-            guard source == nil || source == 4 else { return } // USER_EXPLICIT; omit injected context.
+            guard source == nil || source == 4 else { return }  // USER_EXPLICIT; omit injected context.
             if let text = AntigravityProtobuf.text(in: payload, at: [19, 2])
-                ?? AntigravityProtobuf.text(in: payload, at: [19, 1]) {
+                ?? AntigravityProtobuf.text(in: payload, at: [19, 1])
+            {
                 builder.append(.userMessage, text: text, timestamp: timestamp)
             }
         case 15:
             if let response = AntigravityProtobuf.bytes(in: payload, at: [20]) {
-                let text = AntigravityProtobuf.text(in: response, at: [8])
+                let text =
+                    AntigravityProtobuf.text(in: response, at: [8])
                     ?? AntigravityProtobuf.text(in: response, at: [1]) ?? ""
                 builder.append(.assistantMessage, text: text, timestamp: timestamp)
                 for toolCall in AntigravityProtobuf.repeatedBytes(in: response, field: 7) {
@@ -50,7 +53,7 @@ struct AntigravityTranscriptReader {
                     builder.append(.toolCall, text: ToolCallSummary.summary(toolName: name, arguments: arguments), timestamp: timestamp)
                 }
             }
-        default: break // Tool results, thinking and internal bookkeeping remain hidden.
+        default: break  // Tool results, thinking and internal bookkeeping remain hidden.
         }
     }
 }

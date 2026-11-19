@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// How a window's store runs Check this host… and shows its report; see `ConversationStore+HostCheck`. Each test has a
@@ -97,10 +98,11 @@ struct HostCheckStoreTests {
                 if !command.contains(RemoteHostStatusProbe.installFoldersHeading) { scriptGate?.waitUntilOpen() }
                 return (0, hostCheckScriptOutput(["shell": "/bin/bash"]))
             },
-            connectionCheck: RemoteHostConnectionCheck(runner: RemoteHostCommandRunner { _, _, _ in
-                gate.waitUntilOpen()
-                return (0, "%OS% :OS\n")
-            }),
+            connectionCheck: RemoteHostConnectionCheck(
+                runner: RemoteHostCommandRunner { _, _, _ in
+                    gate.waitUntilOpen()
+                    return (0, "%OS% :OS\n")
+                }),
             shellStartupCheck: RemoteShellStartupCheck(run: { _, command, _ in
                 command == RemoteShellStartupCheck.tracedInteractiveCommand
                     ? (0, shellStartupOutput)

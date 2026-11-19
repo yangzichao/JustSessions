@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// New Claude Code tabs on an SSH host whose `claude` takes `--session-id`.
@@ -62,9 +63,10 @@ struct RemoteClaudeNewSessionLinkingTests {
     /// A tab waiting for any new session, as one started before the host's answer came, never takes a session that
     /// another tab started with.
     @Test func aTabWaitingForAnyNewSessionLeavesOtherTabsSessionsAlone() throws {
-        let support = RemoteClaudeSessionIDFlagSupport(runner: RemoteCommandRecorder().runner(
-            answering: (0, RemoteClaudeSessionIDFlagSupportTests.helpWithFlag)
-        ))
+        let support = RemoteClaudeSessionIDFlagSupport(
+            runner: RemoteCommandRecorder().runner(
+                answering: (0, RemoteClaudeSessionIDFlagSupportTests.helpWithFlag)
+            ))
         let (store, settings) = try makeStore(support: support)
         defer { tearDown(store, settings) }
         let waitingForAny = try openNewClaudeTab(in: store)
@@ -111,9 +113,10 @@ struct RemoteClaudeNewSessionLinkingTests {
     // MARK: Helpers
 
     private func makeStore(hostTakesSessionIDs: Bool) throws -> (ConversationStore, IsolatedUserDefaults) {
-        let support = RemoteClaudeSessionIDFlagSupport(runner: RemoteCommandRecorder().runner(
-            answering: (0, RemoteClaudeSessionIDFlagSupportTests.helpWithFlag)
-        ))
+        let support = RemoteClaudeSessionIDFlagSupport(
+            runner: RemoteCommandRecorder().runner(
+                answering: (0, RemoteClaudeSessionIDFlagSupportTests.helpWithFlag)
+            ))
         if hostTakesSessionIDs { #expect(support.check(host: Self.host, startCommand: nil) == true) }
         return try makeStore(support: support)
     }

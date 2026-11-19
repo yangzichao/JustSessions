@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// The reading toolbar's buttons move the reader or reflow it. Both tests press buttons through
@@ -32,11 +33,12 @@ struct TranscriptReadingToolbarPositionTests {
         defer { fixture.close() }
         let conversation = TranscriptScrollViewFixture.conversation("text-size-change")
         let longLine = String(repeating: "A long line that wraps in the readable column. ", count: 4)
-        let transcript = TranscriptContent(entries: (0..<60).map { index in
-            let lineCount = index == 40 ? 60 : 6
-            let text = (0..<lineCount).map { "Message \(index), line \($0): \(longLine)" }.joined(separator: "\n")
-            return TranscriptEntry(id: index, content: .assistantMessage(text), timestamp: nil, startsTurn: true)
-        }, omittedEntryCount: 0)
+        let transcript = TranscriptContent(
+            entries: (0..<60).map { index in
+                let lineCount = index == 40 ? 60 : 6
+                let text = (0..<lineCount).map { "Message \(index), line \($0): \(longLine)" }.joined(separator: "\n")
+                return TranscriptEntry(id: index, content: .assistantMessage(text), timestamp: nil, startsTurn: true)
+            }, omittedEntryCount: 0)
         fixture.positionStore.record(.entry(index: 40, offset: 0), for: conversation.id)
         let scrollView = try await fixture.show(conversation, transcript: transcript)
         // Restoring the saved position takes several layout passes, and a scroll cancels a restoration still under way,

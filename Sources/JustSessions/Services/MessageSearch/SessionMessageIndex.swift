@@ -87,7 +87,8 @@ actor SessionMessageIndex {
             return SearchableSessionText(text)
         case .changed(let saved):
             guard let read = try? await SessionMessageTextReader.readChanged(conversation, resuming: saved),
-                  !Task.isCancelled else { return nil }
+                !Task.isCancelled
+            else { return nil }
             cache.save(read.text, resumeState: read.resumeState, for: conversation.id, fingerprint: fingerprint)
             return SearchableSessionText(read.text)
         case .missing:

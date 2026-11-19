@@ -19,7 +19,8 @@ enum RemoteSSHFolderURI {
             user = String(destination[..<at])
             hostName = String(destination[destination.index(after: at)...])
         }
-        let needsEncoding = user != nil
+        let needsEncoding =
+            user != nil
             || hostName.lowercased() != hostName
             || hostName.contains(where: { "/\\+".contains($0) })
         guard needsEncoding else { return hostName }

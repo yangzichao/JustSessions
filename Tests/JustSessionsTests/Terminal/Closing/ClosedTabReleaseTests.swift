@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// A closed tab's terminal is freed once the workspace that showed it goes, as when its window closes, rather than
@@ -48,7 +49,8 @@ private final class ShownWorkspace {
         settings = try IsolatedUserDefaults()
         store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
         hostingView = NSHostingView(rootView: AnyView(EmptyView()))
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1100, height: 700), styleMask: [.borderless], backing: .buffered, defer: false)
+        window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 1100, height: 700), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
     }
@@ -68,17 +70,18 @@ private final class ShownWorkspace {
     }
 
     func show() async throws {
-        hostingView.rootView = AnyView(WorkspaceDetailView(
-            store: store,
-            sessionSelection: SessionMultiSelection(),
-            isSidebarHidden: false,
-            onRename: { _ in },
-            onNewSession: {},
-            onNewSessionInSplitChooser: { _ in },
-            onCloseTerminal: { _ in },
-            onCloseTabGroup: { _, _ in },
-            onDelete: { _ in }
-        ))
+        hostingView.rootView = AnyView(
+            WorkspaceDetailView(
+                store: store,
+                sessionSelection: SessionMultiSelection(),
+                isSidebarHidden: false,
+                onRename: { _ in },
+                onNewSession: {},
+                onNewSessionInSplitChooser: { _ in },
+                onCloseTerminal: { _ in },
+                onCloseTabGroup: { _, _ in },
+                onDelete: { _ in }
+            ))
         try await settleLayout()
     }
 

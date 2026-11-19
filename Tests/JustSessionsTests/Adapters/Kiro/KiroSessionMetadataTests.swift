@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct KiroSessionMetadataTests {
@@ -59,8 +60,10 @@ struct KiroSessionMetadataTests {
 
     /// Kiro CLI writes the parent before `session_state`, as its own session record orders its fields.
     @Test func theParentSessionIsReadAndAnEmptyOneIsNone() throws {
-        let child = Data(#"{"session_id":"a","cwd":"/x","parent_session_id":"p","session_created_reason":"subagent","session_state":{}}"#.utf8)
-        let main = Data(#"{"session_id":"b","cwd":"/x","parent_session_id":"","session_created_reason":"subagent","session_state":{}}"#.utf8)
+        let child = Data(
+            #"{"session_id":"a","cwd":"/x","parent_session_id":"p","session_created_reason":"subagent","session_state":{}}"#.utf8)
+        let main = Data(
+            #"{"session_id":"b","cwd":"/x","parent_session_id":"","session_created_reason":"subagent","session_state":{}}"#.utf8)
 
         #expect(KiroSessionMetadata(object: try #require(KiroSessionMetadata.objectBeforeSessionState(in: child)))?.parentSessionID == "p")
         #expect(KiroSessionMetadata(object: try #require(KiroSessionMetadata.objectBeforeSessionState(in: main)))?.parentSessionID == nil)

@@ -1,4 +1,5 @@
 import AppKit
+
 @testable import JustSessions
 
 /// A small PNG whose pixels aren't all the same.

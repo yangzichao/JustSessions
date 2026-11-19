@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Lists those of `conversations` whose files exist and deletes one by removing its file, as the real adapters

@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Reads generated sessions page by page, as `SessionMessageTextReader` reads one for message search, once decoding
@@ -28,7 +29,7 @@ struct MessageSearchReadingMeasurements {
             let images = imageBase64.map { "\(Self.messageCount) images of \($0.count >> 10) KiB base64" } ?? "no images"
             let label = "search read, \(provider.rawValue), \(images)"
             for decodesImages in [true, false] {
-                _ = try await read(file, provider: provider, decodesImages: decodesImages) // Warms the file cache.
+                _ = try await read(file, provider: provider, decodesImages: decodesImages)  // Warms the file cache.
                 var wallTimes: [Duration] = []
                 var cpuTimes: [Duration] = []
                 var largestPageImageBytes = 0
@@ -71,7 +72,8 @@ struct MessageSearchReadingMeasurements {
     private static func processCPUTime() -> Duration {
         var usage = rusage()
         getrusage(RUSAGE_SELF, &usage)
-        let microseconds = Int64(usage.ru_utime.tv_sec + usage.ru_stime.tv_sec) * 1_000_000
+        let microseconds =
+            Int64(usage.ru_utime.tv_sec + usage.ru_stime.tv_sec) * 1_000_000
             + Int64(usage.ru_utime.tv_usec + usage.ru_stime.tv_usec)
         return .microseconds(microseconds)
     }

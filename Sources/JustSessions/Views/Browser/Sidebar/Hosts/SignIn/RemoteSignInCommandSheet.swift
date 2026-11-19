@@ -24,7 +24,9 @@ struct RemoteSignInCommandSheet: View {
     var body: some View {
         ThemeSheetLayout(
             title: Text("Sign-in command"),
-            intro: Text("Signs in again on \(host) when a sign-in there expires. When the command asks for a PIN or a code, JustSessions asks you in a dialog."),
+            intro: Text(
+                "Signs in again on \(host) when a sign-in there expires. When the command asks for a PIN or a code, JustSessions asks you in a dialog."
+            ),
             width: ThemeSheetMetrics.compactWidth
         ) {
             VStack(alignment: .leading, spacing: 14) {
@@ -88,11 +90,13 @@ struct RemoteSignInCommandSheet: View {
     }
 
     private func save() {
-        guard let signInCommand = RemoteSignInCommand(
-            command: command,
-            checkCommand: checkCommand,
-            intervalHours: intervalHours
-        ) else { return }
+        guard
+            let signInCommand = RemoteSignInCommand(
+                command: command,
+                checkCommand: checkCommand,
+                intervalHours: intervalHours
+            )
+        else { return }
         dismiss()
         // After the sheet has gone, so the sign-in's own dialog can open in its place.
         Task { @MainActor in

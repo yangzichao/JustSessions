@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A private tmux server and a CLI that fails once, then stays running. Delayed commands reproduce a second Resume
@@ -12,8 +13,12 @@ struct FailedCLIRestartOwnershipTests {
         let fixture = try Fixture()
         defer { fixture.close() }
         let failed = try await fixture.startFailedCLI()
-        let beforeCleanup = RestartQueueGate(), afterCleanup = RestartQueueGate()
-        defer { beforeCleanup.release(); afterCleanup.release() }
+        let beforeCleanup = RestartQueueGate()
+        let afterCleanup = RestartQueueGate()
+        defer {
+            beforeCleanup.release()
+            afterCleanup.release()
+        }
         fixture.store.tmuxCommandQueues.run(on: .thisMac) { beforeCleanup.block() }
         try await expectEventually { beforeCleanup.hasStarted }
         fixture.store.launch(fixture.conversation, action: .resume)
@@ -58,8 +63,9 @@ struct FailedCLIRestartOwnershipTests {
         let older = TerminalSession(
             engine: .swiftTerm, conversation: fixture.conversation, provider: .claude,
             projectPath: fixture.sandbox.project.path, action: .resume, displayTitle: "Earlier ended tab",
-            command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [],
-                                      workingDirectory: fixture.sandbox.project.path, environment: [])
+            command: NativeCLICommand(
+                executablePath: "/usr/bin/true", arguments: [],
+                workingDirectory: fixture.sandbox.project.path, environment: [])
         )
         older.processFinished(exitCode: 0)
         other.openTerminal(older)
@@ -116,8 +122,9 @@ struct FailedCLIRestartOwnershipTests {
         let older = TerminalSession(
             engine: .swiftTerm, conversation: fixture.conversation, provider: .claude,
             projectPath: fixture.sandbox.project.path, action: .resume, displayTitle: "Earlier ended tab",
-            command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [],
-                                      workingDirectory: fixture.sandbox.project.path, environment: [])
+            command: NativeCLICommand(
+                executablePath: "/usr/bin/true", arguments: [],
+                workingDirectory: fixture.sandbox.project.path, environment: [])
         )
         older.processFinished(exitCode: 0)
         other.openTerminal(older)
@@ -152,13 +159,15 @@ struct FailedCLIRestartOwnershipTests {
         init() throws {
             sandbox = try #require(try ThisMacTmuxSandbox.make())
             settings = try IsolatedUserDefaults()
-            try sandbox.writeExecutable(named: "claude", script: """
-                #!/bin/sh
-                if [ -e "$HOME/failed-once" ]; then echo CLI_RUNNING; exec /bin/sleep 600; fi
-                /usr/bin/touch "$HOME/failed-once"
-                echo INITIAL_FAILURE
-                exit 2
-                """)
+            try sandbox.writeExecutable(
+                named: "claude",
+                script: """
+                    #!/bin/sh
+                    if [ -e "$HOME/failed-once" ]; then echo CLI_RUNNING; exec /bin/sleep 600; fi
+                    /usr/bin/touch "$HOME/failed-once"
+                    echo INITIAL_FAILURE
+                    exit 2
+                    """)
             conversation = .fixture(projectPath: sandbox.project.path, sourceFile: sandbox.root.appendingPathComponent("session.jsonl"))
             store = ConversationStore(
                 adapters: [StaticConversationAdapter(discoveredConversations: [conversation])],
@@ -166,7 +175,8 @@ struct FailedCLIRestartOwnershipTests {
                 windowRegistry: registry, terminalEngineStore: try .pinned(to: .swiftTerm), startsBackgroundPolling: false
             )
             _ = NSApplication.shared
-            window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
+            window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
             window.isReleasedWhenClosed = false
         }
 
@@ -220,6 +230,9 @@ private final class RestartQueueGate: @unchecked Sendable {
     private let semaphore = DispatchSemaphore(value: 0)
     private var started = false
     var hasStarted: Bool { lock.withLock { started } }
-    func block() { lock.withLock { started = true }; _ = semaphore.wait(timeout: .now() + 30) }
+    func block() {
+        lock.withLock { started = true }
+        _ = semaphore.wait(timeout: .now() + 30)
+    }
     func release() { semaphore.signal() }
 }

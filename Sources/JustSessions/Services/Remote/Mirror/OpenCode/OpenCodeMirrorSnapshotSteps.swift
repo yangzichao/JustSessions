@@ -8,15 +8,19 @@ enum OpenCodeMirrorSnapshotSteps {
     /// Each step is a list of statements tried in order until one succeeds: a database from before OpenCode recorded
     /// archiving still lists, and a host whose SQLite lacks JSON functions copies messages and parts whole.
     static let steps: [[String]] = [
-        ["""
+        [
+            """
             CREATE TABLE session (id TEXT PRIMARY KEY, parent_id TEXT, directory TEXT, title TEXT, time_created INTEGER,
                 time_updated INTEGER, time_archived INTEGER, revert TEXT)
-            """],
+            """
+        ],
         ["CREATE TABLE message (id TEXT PRIMARY KEY, session_id TEXT, time_created INTEGER, time_updated INTEGER, data TEXT)"],
-        ["""
+        [
+            """
             CREATE TABLE part (id TEXT PRIMARY KEY, message_id TEXT, session_id TEXT, time_created INTEGER,
                 time_updated INTEGER, data TEXT)
-            """],
+            """
+        ],
         [
             """
             INSERT INTO session SELECT id, parent_id, directory, title, time_created, time_updated, time_archived, revert

@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The Forward a port sheet offers the ports a host listens on that a forward to `localhost` reaches. The samples are
@@ -70,50 +71,67 @@ struct RemoteListeningPortsTests {
     }
 
     @Test func ssListsEveryPortLocalhostReachesWithItsProgram() {
-        #expect(RemoteListeningPorts.listing(inOutput: Self.output([("ss", Self.linuxSS)])) == .listed([
-            Self.port(18765, "python3"), Self.port(18766, "python3"), Self.port(18767, "python3"), Self.port(18768, "python3"),
-        ]))
+        #expect(
+            RemoteListeningPorts.listing(inOutput: Self.output([("ss", Self.linuxSS)]))
+                == .listed([
+                    Self.port(18765, "python3"), Self.port(18766, "python3"), Self.port(18767, "python3"), Self.port(18768, "python3"),
+                ]))
     }
 
     @Test func procListsEveryPortAndLsofNamesTheUsersOwn() {
-        #expect(RemoteListeningPorts.listing(inOutput: Self.output([("proc", Self.linuxProc)])) == .listed([
-            Self.port(18765), Self.port(18766), Self.port(18767), Self.port(18768),
-        ]))
+        #expect(
+            RemoteListeningPorts.listing(inOutput: Self.output([("proc", Self.linuxProc)]))
+                == .listed([
+                    Self.port(18765), Self.port(18766), Self.port(18767), Self.port(18768),
+                ]))
         // lsof names the user's own programs, and adds a port /proc missed.
         let lsofOfSSHDAndOneServer = Self.linuxLsof.split(separator: "\n").prefix(4).joined(separator: "\n")
-        #expect(RemoteListeningPorts.listing(inOutput: Self.output([
-            ("proc", Self.linuxProc), ("lsof", lsofOfSSHDAndOneServer),
-        ])) == .listed([
-            Self.port(2222, "sshd"), Self.port(18765, "python3"), Self.port(18766), Self.port(18767), Self.port(18768),
-        ]))
+        #expect(
+            RemoteListeningPorts.listing(
+                inOutput: Self.output([
+                    ("proc", Self.linuxProc), ("lsof", lsofOfSSHDAndOneServer),
+                ]))
+                == .listed([
+                    Self.port(2222, "sshd"), Self.port(18765, "python3"), Self.port(18766), Self.port(18767), Self.port(18768),
+                ]))
     }
 
     @Test func macOSNetstatListsThePortsAndLsofNamesThem() {
-        #expect(RemoteListeningPorts.listing(inOutput: Self.output([("netstat", Self.macOSNetstat)])) == .listed([
-            Self.port(18765), Self.port(18766), Self.port(18767), Self.port(18768),
-        ]))
-        #expect(RemoteListeningPorts.listing(inOutput: Self.output([
-            ("netstat", Self.macOSNetstat), ("lsof", Self.macOSLsof),
-        ])) == .listed([
-            Self.port(18765, "Python"), Self.port(18766, "Python"), Self.port(18767, "Python"), Self.port(18768, "Python"),
-        ]))
+        #expect(
+            RemoteListeningPorts.listing(inOutput: Self.output([("netstat", Self.macOSNetstat)]))
+                == .listed([
+                    Self.port(18765), Self.port(18766), Self.port(18767), Self.port(18768),
+                ]))
+        #expect(
+            RemoteListeningPorts.listing(
+                inOutput: Self.output([
+                    ("netstat", Self.macOSNetstat), ("lsof", Self.macOSLsof),
+                ]))
+                == .listed([
+                    Self.port(18765, "Python"), Self.port(18766, "Python"), Self.port(18767, "Python"), Self.port(18768, "Python"),
+                ]))
     }
 
     @Test func lsofAloneListsTheUsersOwnPorts() {
-        #expect(RemoteListeningPorts.listing(inOutput: Self.output([("lsof", Self.linuxLsof)])) == .listed([
-            Self.port(2222, "sshd"), Self.port(18765, "python3"), Self.port(18766, "python3"), Self.port(18767, "python3"),
-        ]))
+        #expect(
+            RemoteListeningPorts.listing(inOutput: Self.output([("lsof", Self.linuxLsof)]))
+                == .listed([
+                    Self.port(2222, "sshd"), Self.port(18765, "python3"), Self.port(18766, "python3"), Self.port(18767, "python3"),
+                ]))
         let spacedName = "Code\\x20Helper 812 me 30u IPv4 0x1 0t0 TCP 127.0.0.1:9229 (LISTEN)"
-        #expect(RemoteListeningPorts.listing(inOutput: Self.output([("lsof", spacedName)])) == .listed([
-            Self.port(9229, "Code Helper"),
-        ]))
+        #expect(
+            RemoteListeningPorts.listing(inOutput: Self.output([("lsof", spacedName)]))
+                == .listed([
+                    Self.port(9229, "Code Helper")
+                ]))
     }
 
     @Test func aHostWithNoToolOrACutOffAnswerSaysSo() {
         #expect(RemoteListeningPorts.listing(inOutput: Self.output([])) == .noTool)
         #expect(RemoteListeningPorts.listing(inOutput: Self.output([("ss", Self.linuxSS)], finished: false)) == nil)
-        #expect(RemoteListeningPorts.listing(inOutput: Self.output([("ss", "State Recv-Q Send-Q Local Address:Port")]))
-            == .listed([]))
+        #expect(
+            RemoteListeningPorts.listing(inOutput: Self.output([("ss", "State Recv-Q Send-Q Local Address:Port")]))
+                == .listed([]))
     }
 
     @Test func onlyAddressesLocalhostReachesCount() {

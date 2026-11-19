@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// The titles a tab's terminal was sent, as `TmuxSandbox.startClient(_:recordingOutputTo:)` records them.

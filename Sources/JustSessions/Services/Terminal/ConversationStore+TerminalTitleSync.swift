@@ -7,7 +7,8 @@ extension ConversationStore {
     func synchronizeTerminalTitles() {
         for session in terminalSessions {
             if let conversation = session.conversation,
-               let current = conversationIndex.conversation(withID: conversation.id) {
+                let current = conversationIndex.conversation(withID: conversation.id)
+            {
                 session.synchronize(
                     conversation: current,
                     displayTitle: titleWhileWaitingForUnlistedSession(of: session) ?? title(for: current)

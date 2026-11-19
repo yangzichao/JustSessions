@@ -8,8 +8,9 @@ extension ConversationStore {
     @discardableResult
     func reconnectRemoteTerminal(_ id: UUID) -> UUID? {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }),
-              terminalSessions[index].host != .thisMac,
-              terminalSessions[index].hasExited else { return nil }
+            terminalSessions[index].host != .thisMac,
+            terminalSessions[index].hasExited
+        else { return nil }
         let ended = terminalSessions[index]
         let replacement = TerminalSession(
             engine: ended.engine,
@@ -38,9 +39,10 @@ extension ConversationStore {
     private func reconnectCommand(for ended: TerminalSession) -> NativeCLICommand {
         guard let host = ended.host.sshDestination else { return ended.command }
         guard let conversation = ended.conversation,
-              let tmuxName = ended.tmuxSessionName,
-              tmuxName == TmuxSessionName.forConversation(conversation),
-              let adapter = adapter(for: conversation.provider) else {
+            let tmuxName = ended.tmuxSessionName,
+            tmuxName == TmuxSessionName.forConversation(conversation),
+            let adapter = adapter(for: conversation.provider)
+        else {
             return RemoteCLICommandBuilder().withCurrentLogin(ended.command, host: host)
         }
         return RemoteCLICommandBuilder().command(

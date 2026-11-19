@@ -37,8 +37,9 @@ struct SessionMultiSelection: Equatable {
 
     mutating func selectRange(to conversationID: String, in orderedConversationIDs: [String]) {
         guard let anchorConversationID,
-              let anchorIndex = orderedConversationIDs.firstIndex(of: anchorConversationID),
-              let targetIndex = orderedConversationIDs.firstIndex(of: conversationID) else {
+            let anchorIndex = orderedConversationIDs.firstIndex(of: anchorConversationID),
+            let targetIndex = orderedConversationIDs.firstIndex(of: conversationID)
+        else {
             selectOnly(conversationID)
             return
         }

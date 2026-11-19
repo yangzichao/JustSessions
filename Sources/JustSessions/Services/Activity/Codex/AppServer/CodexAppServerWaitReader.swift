@@ -41,7 +41,8 @@ final class CodexAppServerWaitReader: @unchecked Sendable {
             }
             if let nextTryAfter, ContinuousClock.now < nextTryAfter { return [] }
             do {
-                let connection = try self.connection
+                let connection =
+                    try self.connection
                     ?? CodexAppServerConnection(socketPath: socketPath, timeout: timeout, clientVersion: clientVersion)
                 self.connection = connection
                 // A thread the server has not loaded cannot wait on you, so it is not read.

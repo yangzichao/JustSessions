@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// tmux tells a tab its failed CLI's status through the tab's title; see `ThisMacTmuxDeadPane`.

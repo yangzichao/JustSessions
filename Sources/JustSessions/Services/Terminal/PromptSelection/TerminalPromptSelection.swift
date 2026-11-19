@@ -23,6 +23,7 @@ final class TerminalPromptSelection {
 
     private weak var terminal: (any PromptSelectableTerminal)?
     private var overlay: TerminalPromptSelectionOverlay?
+    // periphery:ignore - held so the monitor lasts as long as the selection.
     private var eventMonitor: PromptSelectionEventMonitor?
     private var screenCheck: Task<Void, Never>?
 
@@ -34,7 +35,7 @@ final class TerminalPromptSelection {
     /// text, ⌘A selects all of the terminal instead, as it does again while the prompt is selected.
     func selectPrompt() -> Bool {
         guard let layout, let terminal, !terminal.hasMarkedText(), !terminal.selectionActive,
-              let screen = terminal.screenForPromptSelection(), let prompt = layout.prompt(on: screen)
+            let screen = terminal.screenForPromptSelection(), let prompt = layout.prompt(on: screen)
         else { return false }
         show(prompt)
         eventMonitor = PromptSelectionEventMonitor(
@@ -135,8 +136,8 @@ final class TerminalPromptSelection {
 
     func checkPromptOnScreen() {
         guard let selectedPrompt, let layout, let terminal,
-              let screen = terminal.screenForPromptSelection(), let prompt = layout.prompt(on: screen),
-              prompt.text == selectedPrompt.text
+            let screen = terminal.screenForPromptSelection(), let prompt = layout.prompt(on: screen),
+            prompt.text == selectedPrompt.text
         else {
             cancel()
             return

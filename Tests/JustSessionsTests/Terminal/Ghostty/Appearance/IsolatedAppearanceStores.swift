@@ -1,4 +1,5 @@
 import GhosttyTerminal
+
 @testable import JustSessions
 
 /// Appearance, theme, and Option key stores on their own settings, and the Ghostty controller that follows them.

@@ -21,9 +21,10 @@ enum AppLocalization {
     ) -> String {
         let locale = locale(language: language, bundle: bundle, preferredLanguages: preferredLanguages)
         // SwiftPM lowercases .lproj names; do not assume filesystem spelling matches a canonical BCP-47 tag.
-        let resourceIdentifier = bundle.localizations.first {
-            AppInterfaceLanguage.canonicalIdentifier($0) == locale.identifier
-        } ?? locale.identifier
+        let resourceIdentifier =
+            bundle.localizations.first {
+                AppInterfaceLanguage.canonicalIdentifier($0) == locale.identifier
+            } ?? locale.identifier
         let localizedBundle = bundle.url(forResource: resourceIdentifier, withExtension: "lproj").flatMap(Bundle.init(url:)) ?? bundle
         return String(localized: value, bundle: localizedBundle, locale: locale)
     }
@@ -49,13 +50,16 @@ enum AppLocalization {
     private static func locale(
         language: AppInterfaceLanguage?, bundle: Bundle, preferredLanguages: [String]
     ) -> Locale {
-        let requestedLanguage = language ?? UserDefaults.standard.string(forKey: AppInterfaceLanguage.userDefaultsKey)
+        let requestedLanguage =
+            language ?? UserDefaults.standard.string(forKey: AppInterfaceLanguage.userDefaultsKey)
             .map { AppInterfaceLanguage(identifier: $0) } ?? .followSystem
-        let selectedLanguage = AppInterfaceLanguage.choices(availableLocalizations: bundle.localizations).contains(requestedLanguage)
+        let selectedLanguage =
+            AppInterfaceLanguage.choices(availableLocalizations: bundle.localizations).contains(requestedLanguage)
             ? requestedLanguage : .followSystem
-        return Locale(identifier: selectedLanguage.localizationIdentifier(
-            availableLocalizations: bundle.localizations, preferredLanguages: preferredLanguages,
-            developmentLocalization: bundle.developmentLocalization ?? "en"
-        ))
+        return Locale(
+            identifier: selectedLanguage.localizationIdentifier(
+                availableLocalizations: bundle.localizations, preferredLanguages: preferredLanguages,
+                developmentLocalization: bundle.developmentLocalization ?? "en"
+            ))
     }
 }

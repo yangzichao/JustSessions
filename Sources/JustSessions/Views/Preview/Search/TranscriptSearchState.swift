@@ -30,13 +30,6 @@ final class TranscriptSearchState {
         selectedMatchIndex.flatMap { matches.indices.contains($0) ? matches[$0] : nil }
     }
 
-    var resultLabel: String {
-        if isSearching { return "Searching…" }
-        if query.isEmpty { return "" }
-        guard let selectedMatchIndex else { return "No matches" }
-        return "\(selectedMatchIndex + 1) of \(matches.count)"
-    }
-
     func show() {
         isPresented = true
         focusesFieldOnOpen = true

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct TerminalLinkTargetTests {
@@ -41,18 +42,24 @@ struct TerminalLinkTargetTests {
     }
 
     @Test func aFolderIsAFolder() {
-        #expect(target("Sources", host: .thisMac) == .localItem(TerminalLinkLocalItem(
-            url: URL(fileURLWithPath: "/Users/me/paper/Sources"), kind: .folder
-        )))
+        #expect(
+            target("Sources", host: .thisMac)
+                == .localItem(
+                    TerminalLinkLocalItem(
+                        url: URL(fileURLWithPath: "/Users/me/paper/Sources"), kind: .folder
+                    )))
     }
 
     @Test func theLineAndColumnAfterThePathAreKeptApart() {
-        #expect(target("Sources/App/main.swift:42", host: .thisMac)
-            == file("/Users/me/paper/Sources/App/main.swift", lineNumber: 42))
-        #expect(target("Sources/App/main.swift:42:7", host: .thisMac)
-            == file("/Users/me/paper/Sources/App/main.swift", lineNumber: 42, columnNumber: 7))
-        #expect(target("/Users/me/paper/Sources/App/main.swift:3", host: .thisMac)
-            == file("/Users/me/paper/Sources/App/main.swift", lineNumber: 3))
+        #expect(
+            target("Sources/App/main.swift:42", host: .thisMac)
+                == file("/Users/me/paper/Sources/App/main.swift", lineNumber: 42))
+        #expect(
+            target("Sources/App/main.swift:42:7", host: .thisMac)
+                == file("/Users/me/paper/Sources/App/main.swift", lineNumber: 42, columnNumber: 7))
+        #expect(
+            target("/Users/me/paper/Sources/App/main.swift:3", host: .thisMac)
+                == file("/Users/me/paper/Sources/App/main.swift", lineNumber: 3))
     }
 
     /// `README.md:3` reads as a URL whose scheme is `README.md`.
@@ -111,8 +118,9 @@ struct TerminalLinkTargetTests {
     }
 
     private func file(_ path: String, lineNumber: Int? = nil, columnNumber: Int? = nil) -> TerminalLinkTarget {
-        .localItem(TerminalLinkLocalItem(
-            url: URL(fileURLWithPath: path), kind: .file, lineNumber: lineNumber, columnNumber: columnNumber
-        ))
+        .localItem(
+            TerminalLinkLocalItem(
+                url: URL(fileURLWithPath: path), kind: .file, lineNumber: lineNumber, columnNumber: columnNumber
+            ))
     }
 }

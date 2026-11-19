@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The check's real commands, run by real bash and zsh in a terminal, as `ssh -t` gives them one, against a temporary
@@ -43,8 +44,9 @@ struct RemoteShellStartupCheckEndToEndTests {
             ".bash_profile": ". ~/.bashrc\n",
             ".bashrc": "if [[ $- == *i* ]] && [ -z \"$JUSTSESSIONS\" ]; then exec /bin/sh -i; fi\n",
         ])
-        #expect(home.check(shell: "/bin/bash", readsBashrcForSSHCommands: true)
-            == RemoteShellStartupCheckResult(outcome: .interactiveStartupWorks, stoppedAt: nil))
+        #expect(
+            home.check(shell: "/bin/bash", readsBashrcForSSHCommands: true)
+                == RemoteShellStartupCheckResult(outcome: .interactiveStartupWorks, stoppedAt: nil))
     }
 
     /// The shell `sshd` starts for a command reads `~/.bashrc` before the app's command can set `JUSTSESSIONS`, so a
@@ -54,8 +56,9 @@ struct RemoteShellStartupCheckEndToEndTests {
             ".bash_profile": ". ~/.bashrc\n",
             ".bashrc": "if [ -z \"$JUSTSESSIONS\" ] && [ -t 1 ]; then exec /bin/sh -i; fi\n",
         ])
-        #expect(home.check(shell: "/bin/bash", readsBashrcForSSHCommands: true)
-            == RemoteShellStartupCheckResult(outcome: .blocked, stoppedAt: nil))
+        #expect(
+            home.check(shell: "/bin/bash", readsBashrcForSSHCommands: true)
+                == RemoteShellStartupCheckResult(outcome: .blocked, stoppedAt: nil))
     }
 }
 
@@ -80,15 +83,16 @@ private final class TemporaryHome {
         var environment = ["HOME": url.path, "SHELL": shell, "TERM": "xterm-256color", "PATH": "/usr/bin:/bin:/usr/sbin:/sbin"]
         if readsBashrcForSSHCommands { environment["BASH_ENV"] = url.appendingPathComponent(".bashrc").path }
         let shellEnvironment = environment
-        let check = RemoteShellStartupCheck(run: { _, command, timeout in
-            BoundedProcessRunner.outcome(
-                ofExecutable: "/usr/bin/script",
-                arguments: ["-q", "/dev/null", shell, "-c", command],
-                environment: shellEnvironment,
-                includesStandardError: true,
-                timeout: timeout
-            )
-        }, timeout: 15)
+        let check = RemoteShellStartupCheck(
+            run: { _, command, timeout in
+                BoundedProcessRunner.outcome(
+                    ofExecutable: "/usr/bin/script",
+                    arguments: ["-q", "/dev/null", shell, "-c", command],
+                    environment: shellEnvironment,
+                    includesStandardError: true,
+                    timeout: timeout
+                )
+            }, timeout: 15)
         return check.check(host: "devbox")
     }
 }

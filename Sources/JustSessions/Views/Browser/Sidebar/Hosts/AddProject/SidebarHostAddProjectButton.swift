@@ -12,8 +12,9 @@ struct SidebarHostAddProjectButton: View {
         if archivedProjectCount > 0 {
             Menu {
                 Button("Add project…", systemImage: "plus", action: onAddProject)
-                Button("Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox",
-                       action: onShowArchivedProjects)
+                Button(
+                    "Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox",
+                    action: onShowArchivedProjects)
             } label: {
                 plusSymbol
             }
@@ -29,14 +30,6 @@ struct SidebarHostAddProjectButton: View {
                 .help(addProjectHelpText)
                 .accessibilityLabel(addProjectAccessibilityLabel)
         }
-    }
-
-    /// The room the button takes, for a heading to lay out while the pointer is elsewhere.
-    static var placeholder: some View {
-        Image(systemName: "plus")
-            .font(ThemeFont.glyph(.control, weight: .bold))
-            .frame(width: InterfaceScale.points(16), height: InterfaceScale.points(16))
-            .hidden()
     }
 
     private var plusSymbol: some View {

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct HostFixAgentPromptTests {
@@ -15,7 +16,7 @@ struct HostFixAgentPromptTests {
                 summary: "Started by another tmux version.",
                 hostOutput: "protocol version mismatch (client 8, server 7)",
                 commandToRunYourself: "ssh devbox 'tmux ls'"
-            ),
+            )
         ],
         endedTabScreen: "[exited]"
     )
@@ -69,17 +70,20 @@ struct HostFixAgentPromptTests {
             guideText: { $0 == .terminalPersistence ? nil : "### \($0.heading)\n\nWhat to do." }
         )
 
-        #expect(message.hasPrefix("JustSessions started you on devbox, in /home/me, straight in the user's login shell rather than in tmux"))
+        #expect(
+            message.hasPrefix("JustSessions started you on devbox, in /home/me, straight in the user's login shell rather than in tmux"))
         #expect(message.contains("\n\nThe task.\n\n## JustSessions' guides\n"))
         #expect(message.contains("https://github.com/yangzichao/JustSessions/tree/v1.2.11/docs/guides"))
-        #expect(message.hasSuffix("""
-            ### session-management.md: When something fails on an SSH host
+        #expect(
+            message.hasSuffix(
+                """
+                ### session-management.md: When something fails on an SSH host
 
-            Source: https://github.com/yangzichao/JustSessions/blob/v1.2.11/docs/guides/session-management.md#when-something-fails-on-an-ssh-host
+                Source: https://github.com/yangzichao/JustSessions/blob/v1.2.11/docs/guides/session-management.md#when-something-fails-on-an-ssh-host
 
-            What to do.
+                What to do.
 
-            """))
+                """))
         // A section the app can't read is left out.
         #expect(!message.contains("Terminal persistence"))
     }
@@ -93,11 +97,12 @@ struct HostFixAgentPromptTests {
             guideSections: [],
             appVersion: "1.2.11-3-gabc1234"
         )
-        #expect(message == """
-            JustSessions started you on the user's Mac, in /Users/me, outside tmux. devbox is another machine: reach it with `ssh devbox`, as the check's "Run it yourself" commands do. JustSessions' own tmux on this Mac (`-L justsessions`) is not what the check is about.
+        #expect(
+            message == """
+                JustSessions started you on the user's Mac, in /Users/me, outside tmux. devbox is another machine: reach it with `ssh devbox`, as the check's "Run it yourself" commands do. JustSessions' own tmux on this Mac (`-L justsessions`) is not what the check is about.
 
-            The task.
+                The task.
 
-            """)
+                """)
     }
 }

@@ -36,9 +36,10 @@ enum CodexRolloutModel {
     /// The model named by the `turn_context` line holding the byte at `offset`.
     private static func model(inLineAt offset: UInt64, of handle: FileHandle, size: UInt64) -> SessionModel? {
         guard let line = line(around: offset, of: handle, size: size),
-              let record = ConversationMetadata.object(from: line),
-              record["type"] as? String == "turn_context",
-              let payload = record["payload"] as? [String: Any] else { return nil }
+            let record = ConversationMetadata.object(from: line),
+            record["type"] as? String == "turn_context",
+            let payload = record["payload"] as? [String: Any]
+        else { return nil }
         return SessionModel(id: payload["model"] as? String, effort: payload["effort"] as? String)
     }
 

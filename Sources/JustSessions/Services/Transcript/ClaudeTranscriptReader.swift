@@ -20,9 +20,10 @@ struct ClaudeTranscriptReader {
     func append(_ record: [String: Any], to builder: inout TranscriptBuilder) {
         let recordType = record["type"] as? String
         guard recordType == "user" || recordType == "assistant",
-              includesSidechains || record["isSidechain"] as? Bool != true,
-              record["isMeta"] as? Bool != true,
-              let message = record["message"] as? [String: Any] else { return }
+            includesSidechains || record["isSidechain"] as? Bool != true,
+            record["isMeta"] as? Bool != true,
+            let message = record["message"] as? [String: Any]
+        else { return }
         let timestamp = ConversationMetadata.date(record["timestamp"])
 
         if record["isCompactSummary"] as? Bool == true {
@@ -59,7 +60,8 @@ struct ClaudeTranscriptReader {
     private func userText(from content: Any?) -> String {
         if let text = content as? String { return visibleUserText(text) ?? "" }
         let parts = content as? [[String: Any]] ?? []
-        return parts
+        return
+            parts
             .compactMap { part in part["type"] as? String == "text" ? visibleUserText(part["text"] as? String ?? "") : nil }
             .joined(separator: "\n\n")
     }
@@ -67,7 +69,8 @@ struct ClaudeTranscriptReader {
     /// The base64 of an `image` part, which Claude Code stores as `{"source":{"type":"base64","data":…}}`.
     private static func imageBase64(from part: [String: Any]) -> String? {
         guard part["type"] as? String == "image",
-              let source = part["source"] as? [String: Any] else { return nil }
+            let source = part["source"] as? [String: Any]
+        else { return nil }
         return source["data"] as? String
     }
 
@@ -87,7 +90,8 @@ struct ClaudeTranscriptReader {
 
     private func taggedValue(_ tag: String, in text: String) -> String? {
         guard let start = text.range(of: "<\(tag)>"),
-              let end = text.range(of: "</\(tag)>", range: start.upperBound..<text.endIndex) else { return nil }
+            let end = text.range(of: "</\(tag)>", range: start.upperBound..<text.endIndex)
+        else { return nil }
         let value = text[start.upperBound..<end.lowerBound].trimmingCharacters(in: .whitespacesAndNewlines)
         return value.isEmpty ? nil : value
     }
@@ -106,7 +110,7 @@ struct ClaudeTranscriptReader {
                 )
                 return (.toolCall, summary)
             default:
-                return nil // Thinking blocks are left out of the preview.
+                return nil  // Thinking blocks are left out of the preview.
             }
         }
     }

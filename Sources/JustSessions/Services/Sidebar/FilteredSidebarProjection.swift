@@ -46,7 +46,8 @@ struct FilteredSidebarProjection {
         archivedSessionCount = toolConversations.filter { inputs.archived.isArchived(conversationID: $0.id) }.count
         let countedConversations = toolConversations.filter { inputs.archiveFilter.includes($0, archived: inputs.archived) }
         allSessionCount = countedConversations.count
-        recentSessionCount = countedConversations
+        recentSessionCount =
+            countedConversations
             .filter { SessionRecencyFilter.recent.includes($0, now: inputs.recencyNow) }
             .count
         runningSessionCount = countedConversations.filter { inputs.running.conversationIDs.contains($0.id) }.count

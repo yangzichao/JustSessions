@@ -15,7 +15,8 @@ extension NSEvent {
     /// Where the mouse event being handled happened, in screen coordinates, or the cursor's location outside one.
     @MainActor static var currentPointerLocation: CGPoint {
         guard let event = NSApp.currentEvent,
-              [.leftMouseDown, .leftMouseDragged, .leftMouseUp].contains(event.type) else { return mouseLocation }
+            [.leftMouseDown, .leftMouseDragged, .leftMouseUp].contains(event.type)
+        else { return mouseLocation }
         return event.screenLocation
     }
 }

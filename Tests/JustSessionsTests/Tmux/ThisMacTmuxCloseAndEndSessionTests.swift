@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Close and end session, from a tab's menu, closes the tab and ends the tmux session its CLI runs in without asking,
@@ -33,7 +34,8 @@ struct ThisMacTmuxCloseAndEndSessionTests {
         store.launch(conversation, action: .resume)
         let tab = try #require(store.terminalSessions.last)
         tab.startIfNeeded()
-        try #require(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
         try #require(await sandbox.waitForPaneProcess(in: store, for: tab))
         let cliProcessID = try #require(tab.tmuxPaneProcessID)
         try #require(cliProcessID > 0)
@@ -60,7 +62,8 @@ struct ThisMacTmuxCloseAndEndSessionTests {
         let tab = try #require(store.terminalSessions.last)
         let tmuxSessionName = try #require(tab.tmuxSessionName)
         tab.startIfNeeded()
-        try #require(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
         #expect(tab.conversation == nil)
 
         store.closeTerminalEndingSession(tab.id)

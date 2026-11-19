@@ -37,20 +37,24 @@ extension ConversationStore {
         let detachedRemoteSessions = detachedRemoteTmuxSessions(conversationIDsWithRunningTab: conversationIDsWithRunningTab)
         noteRemoteSessionsDetached(detachedRemoteSessions)
         askHosts(of: detachedRemoteSessions)
-        guard !probedTabs.isEmpty || !detachedSessions.isEmpty || !detachedRemoteSessions.isEmpty
-                || !detachedCLIActivities.isEmpty else {
+        guard
+            !probedTabs.isEmpty || !detachedSessions.isEmpty || !detachedRemoteSessions.isEmpty
+                || !detachedCLIActivities.isEmpty
+        else {
             followAttention(after: [])
             return
         }
 
-        let probes = probedTabs.map(\.probe) + detachedSessions.map {
-            CLIActivityProbe(
-                provider: $0.conversation.provider,
-                processID: $0.paneProcessID ?? 0,
-                sessionFile: $0.conversation.sourceFile,
-                sessionID: $0.conversation.sessionID
-            )
-        }
+        let probes =
+            probedTabs.map(\.probe)
+            + detachedSessions.map {
+                CLIActivityProbe(
+                    provider: $0.conversation.provider,
+                    processID: $0.paneProcessID ?? 0,
+                    sessionFile: $0.conversation.sourceFile,
+                    sessionID: $0.conversation.sessionID
+                )
+            }
         let paneProcessIDs = detachedSessions.map(\.paneProcessID)
         let reader = CLIActivityReader(
             claudeRegistry: claudeRegistry,
@@ -81,10 +85,11 @@ extension ConversationStore {
                 continue
             }
             let activity = activities[probedTabs.count + index]
-            observations.append(SessionActivityObservation(
-                source: .detachedTmux(conversationID: detachedSession.conversation.id),
-                activity: activity
-            ))
+            observations.append(
+                SessionActivityObservation(
+                    source: .detachedTmux(conversationID: detachedSession.conversation.id),
+                    activity: activity
+                ))
             if let activity { detachedActivities[detachedSession.conversation.id] = activity }
         }
         for detachedSession in detachedRemoteSessions {
@@ -92,16 +97,18 @@ extension ConversationStore {
             let listing = remoteDetachedActivityReader.listing(of: key.host)
             // A listing asked for after the session was known to run with no tab, which leaves it out: its CLI ended.
             if let listing, listing.panes.panesBySessionName[key.tmuxSessionName] == nil,
-               let since = remoteDetachedSince[key], listing.askedAt > since {
+                let since = remoteDetachedSince[key], listing.askedAt > since
+            {
                 tmuxSessionNamesByHost[.ssh(key.host)]?.remove(key.tmuxSessionName)
                 remoteDetachedSince[key] = nil
                 continue
             }
             let activity = listing?.panes.activity(of: detachedSession.conversation.provider, inSession: key.tmuxSessionName)
-            observations.append(SessionActivityObservation(
-                source: .detachedTmux(conversationID: detachedSession.conversation.id),
-                activity: activity
-            ))
+            observations.append(
+                SessionActivityObservation(
+                    source: .detachedTmux(conversationID: detachedSession.conversation.id),
+                    activity: activity
+                ))
             if let activity { detachedActivities[detachedSession.conversation.id] = activity }
         }
         if detachedCLIActivities != detachedActivities { detachedCLIActivities = detachedActivities }
@@ -143,7 +150,8 @@ extension ConversationStore {
             guard let host = sessionHost.sshDestination else { continue }
             for name in runningNames.sorted() {
                 guard let conversation = listedSession(inTmuxSessionNamed: name, on: sessionHost),
-                      !conversationIDsWithRunningTab.contains(conversation.id) else { continue }
+                    !conversationIDsWithRunningTab.contains(conversation.id)
+                else { continue }
                 let key = RemoteTmuxSessionKey(host: host, tmuxSessionName: name)
                 sessions.append(DetachedRemoteTmuxSession(conversation: conversation, key: key))
             }
@@ -174,7 +182,8 @@ extension ConversationStore {
         guard let runningNames = tmuxSessionNamesByHost[.thisMac], !runningNames.isEmpty else { return [] }
         return runningNames.sorted().compactMap { name in
             guard let conversation = listedSession(inTmuxSessionNamed: name, on: .thisMac),
-                  !conversationIDsWithRunningTab.contains(conversation.id) else { return nil }
+                !conversationIDsWithRunningTab.contains(conversation.id)
+            else { return nil }
             return DetachedTmuxSession(
                 conversation: conversation,
                 tmuxSessionName: name,

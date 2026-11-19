@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -40,7 +41,8 @@ struct TranscriptAutomaticPagingTests {
         fixture.positionStore.record(anchor, for: files.conversation.id)
         let searchState = TranscriptSearchState()
         searchState.show()
-        let scrollView = try await fixture.show(files.conversation, transcript: try #require(model.transcript), paging: model, searchState: searchState)
+        let scrollView = try await fixture.show(
+            files.conversation, transcript: try #require(model.transcript), paging: model, searchState: searchState)
         #expect(model.pages.count == 1)
         searchState.close()
         try await expectEventually { model.pages.last!.records.upperBound > lastBoundary }

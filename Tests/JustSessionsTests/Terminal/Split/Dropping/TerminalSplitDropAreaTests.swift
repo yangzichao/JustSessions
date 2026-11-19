@@ -1,6 +1,7 @@
 import CoreGraphics
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A tab dragged over the terminals takes the place under the pointer: with no split shown, the half of a new, even
@@ -100,10 +101,12 @@ struct TerminalSplitDropAreaTests {
         let area = TerminalSplitDropArea(frameInWindow: terminalFrame, shownSplit: .init(fraction: 0.3, orientation: .sideBySide))
         let windowFrame = CGRect(x: 0, y: 0, width: 1226, height: 640)
 
-        #expect(area.place(atScreenPoint: CGPoint(x: 713, y: 640 - 600), windowFrame: windowFrame, ignoringShownSplit: true)
-            == .split(.right, .stacked))
-        #expect(area.place(atScreenPoint: CGPoint(x: 713, y: 640 - 340), windowFrame: windowFrame, ignoringShownSplit: true)
-            == .wholeArea)
+        #expect(
+            area.place(atScreenPoint: CGPoint(x: 713, y: 640 - 600), windowFrame: windowFrame, ignoringShownSplit: true)
+                == .split(.right, .stacked))
+        #expect(
+            area.place(atScreenPoint: CGPoint(x: 713, y: 640 - 340), windowFrame: windowFrame, ignoringShownSplit: true)
+                == .wholeArea)
         // The shown split's fraction is kept for its own layout, and a new layout starts even.
         #expect(area.frame(of: .split(.left, .sideBySide)) == CGRect(x: 8, y: 8, width: 300, height: 584))
         #expect(area.frame(of: .split(.left, .stacked)) == CGRect(x: 8, y: 8, width: 1010, height: 287))

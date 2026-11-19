@@ -24,20 +24,30 @@ extension SessionDeletionConfirmationText {
         let hosts = Set(locations.map(\.host))
         let deletionSentence: String
         if hosts == [.thisMac] {
-            deletionSentence = AppLocalization.string("Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.", language: language)
+            deletionSentence = AppLocalization.string(
+                "Claude Code, Antigravity, and Pi sessions move to the Trash; Codex, Kiro CLI, and OpenCode sessions are permanently deleted.",
+                language: language)
         } else if hosts.contains(.thisMac) {
-            deletionSentence = AppLocalization.string("Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.", language: language)
+            deletionSentence = AppLocalization.string(
+                "Claude Code, Antigravity, and Pi sessions on this Mac move to the Trash. Codex, Kiro CLI, and OpenCode sessions and all sessions on SSH hosts are permanently deleted.",
+                language: language)
         } else {
-            deletionSentence = AppLocalization.string("SSH hosts have no Trash, so every session is permanently deleted.", language: language)
+            deletionSentence = AppLocalization.string(
+                "SSH hosts have no Trash, so every session is permanently deleted.", language: language)
         }
-        let sentences: [String?] = [
-            AppLocalization.string("This affects all tools in \(locations.count) projects, including sessions hidden by the current filter.", language: language),
-            cliEndingSentence(for: plan, language: language),
-            AppLocalization.string("The projects will be archived; skipped sessions stay on disk and come back when they are restored.", language: language),
-            deletionSentence,
-        ] + subagentSentences(for: plan, language: language) + [
-            skippedSessionsSentence(for: plan, language: language),
-        ]
+        let sentences: [String?] =
+            [
+                AppLocalization.string(
+                    "This affects all tools in \(locations.count) projects, including sessions hidden by the current filter.",
+                    language: language),
+                cliEndingSentence(for: plan, language: language),
+                AppLocalization.string(
+                    "The projects will be archived; skipped sessions stay on disk and come back when they are restored.", language: language
+                ),
+                deletionSentence,
+            ] + subagentSentences(for: plan, language: language) + [
+                skippedSessionsSentence(for: plan, language: language)
+            ]
         return sentences.compactMap { $0 }.joined(separator: " ")
     }
 }

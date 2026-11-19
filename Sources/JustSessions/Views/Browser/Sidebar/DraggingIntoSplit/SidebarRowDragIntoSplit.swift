@@ -51,7 +51,8 @@ final class SidebarRowDragIntoSplit {
     /// off them, or while another window is in front there.
     private func placeOnTerminals(at pointer: CGPoint, in store: ConversationStore) -> TerminalDropPlace? {
         guard let window = store.windowRegistry.window(of: store),
-              NSWindow.windowNumber(at: pointer, belowWindowWithWindowNumber: 0) == window.windowNumber else { return nil }
+            NSWindow.windowNumber(at: pointer, belowWindowWithWindowNumber: 0) == window.windowNumber
+        else { return nil }
         return splitDropTargets.place(at: pointer, in: store, windowFrame: window.frame)
     }
 }

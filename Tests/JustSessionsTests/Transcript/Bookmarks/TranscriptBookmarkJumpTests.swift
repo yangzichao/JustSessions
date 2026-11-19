@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// ⌘D, ⌘', and ⇧⌘' in a hosted reader, through the commands the Bookmarks menu finds for the key window.
@@ -60,18 +61,21 @@ struct TranscriptBookmarkJumpTests {
         if let position { fixture.positionStore.record(position, for: conversation.id) }
         let bookmarkState = TranscriptBookmarkState()
         let searchState = TranscriptSearchState()
-        let scrollView = try await fixture.show(conversation, transcript: try #require(paging.transcript), paging: paging,
-                                                searchState: searchState, store: store, bookmarkState: bookmarkState)
+        let scrollView = try await fixture.show(
+            conversation, transcript: try #require(paging.transcript), paging: paging,
+            searchState: searchState, store: store, bookmarkState: bookmarkState)
         let controller = try #require(fixture.positionController)
         try await fixture.waitUntil { !paging.isLoading && !controller.isRestoring }
-        return Reader(files: files, fixture: fixture, paging: paging, store: store, bookmarkState: bookmarkState,
-                      searchState: searchState, scrollView: scrollView, controller: controller)
+        return Reader(
+            files: files, fixture: fixture, paging: paging, store: store, bookmarkState: bookmarkState,
+            searchState: searchState, scrollView: scrollView, controller: controller)
     }
 
     /// For a reader that loads its own pages (`showReader`), whose model the test can't reach.
     private func showsAtTop(_ entryID: Int, in fixture: TranscriptScrollViewFixture) -> Bool {
         guard let scrollView = fixture.readerScrollView, let controller = fixture.positionController, !controller.isRestoring,
-              let frame = controller.entryFrameInClipView(at: entryID) else { return false }
+            let frame = controller.entryFrameInClipView(at: entryID)
+        else { return false }
         return abs(frame.minY - TranscriptScrollPositionController.readableBounds(of: scrollView.contentView).minY - 6) < 1
     }
 
@@ -153,7 +157,8 @@ struct TranscriptBookmarkJumpTests {
         let clipView = reader.scrollView.contentView
         try await reader.fixture.scroll(reader.scrollView, to: (clipView.documentRect.height - clipView.bounds.height) / 2)
         try await reader.fixture.waitUntil { !reader.paging.isLoading && !reader.controller.isRestoring }
-        let top = try #require(reader.controller.visibleEntryIDs(minimumVisibleHeight: MessageBookmarkNavigation.minimumVisibleHeight).first)
+        let top = try #require(
+            reader.controller.visibleEntryIDs(minimumVisibleHeight: MessageBookmarkNavigation.minimumVisibleHeight).first)
 
         try reader.commands.toggleBookmark()
 
@@ -305,9 +310,10 @@ struct TranscriptBookmarkJumpTests {
 
         try await fixture.waitUntil { fixture.readerScrollView.flatMap(fixture.visiblePosition(in:)) == .bottom }
         #expect(fixture.readerScrollView.flatMap(fixture.visiblePosition(in:)) == .bottom)
-        #expect(try await fixture.hasAccessibilityElement(
-            labeled: "Bookmark a's message is no longer in this conversation. This is where it was."
-        ))
+        #expect(
+            try await fixture.hasAccessibilityElement(
+                labeled: "Bookmark a's message is no longer in this conversation. This is where it was."
+            ))
         #expect(store.messageBookmarks.bookmarks(forConversationID: files.conversation.id) == [gone])
     }
 
@@ -319,7 +325,8 @@ struct TranscriptBookmarkJumpTests {
         defer { files.remove() }
         let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
-        MessageBookmarks(bookmarksByConversationID: [files.conversation.id: [bookmark("a", at: 50)]]).save(to: fixture.settings.userDefaults)
+        MessageBookmarks(bookmarksByConversationID: [files.conversation.id: [bookmark("a", at: 50)]]).save(
+            to: fixture.settings.userDefaults)
         let store = ConversationStore(adapters: [], userDefaults: fixture.settings.userDefaults, startsBackgroundPolling: false)
         fixture.showReader(files.conversation, store: store)
         try await fixture.waitUntil { fixture.readerScrollView.flatMap(fixture.visiblePosition(in:)) == .bottom }
@@ -338,9 +345,10 @@ struct TranscriptBookmarkJumpTests {
         #expect(showsAtTop(id(50), in: fixture))
         #expect(fixture.positionController?.seekTarget == id(50))
         #expect(fixture.textFieldValues.isEmpty)
-        #expect(try await !fixture.hasAccessibilityElement(
-            labeled: "Bookmark a's message is no longer in this conversation. This is where it was."
-        ))
+        #expect(
+            try await !fixture.hasAccessibilityElement(
+                labeled: "Bookmark a's message is no longer in this conversation. This is where it was."
+            ))
     }
 
     @Test func aJumpMadeWhileAMatchRevealLoadsLandsWithFindClosed() async throws {
@@ -357,7 +365,8 @@ struct TranscriptBookmarkJumpTests {
         defer { files.remove() }
         let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
-        MessageBookmarks(bookmarksByConversationID: [files.conversation.id: [bookmark("a", at: 50)]]).save(to: fixture.settings.userDefaults)
+        MessageBookmarks(bookmarksByConversationID: [files.conversation.id: [bookmark("a", at: 50)]]).save(
+            to: fixture.settings.userDefaults)
         let store = ConversationStore(adapters: [], userDefaults: fixture.settings.userDefaults, startsBackgroundPolling: false)
         fixture.showReader(files.conversation, store: store)
         try await fixture.waitUntil { fixture.readerScrollView.flatMap(fixture.visiblePosition(in:)) == .bottom }
@@ -383,7 +392,8 @@ struct TranscriptBookmarkJumpTests {
             try await reader.fixture.scroll(reader.scrollView, to: (clipView.documentRect.height - clipView.bounds.height) * fraction)
             try await reader.fixture.waitUntil {
                 !reader.paging.isLoading && !reader.controller.isRestoring
-                    && target.shown?.entryID == reader.controller.visibleEntryIDs(minimumVisibleHeight: MessageBookmarkNavigation.minimumVisibleHeight).first
+                    && target.shown?.entryID
+                        == reader.controller.visibleEntryIDs(minimumVisibleHeight: MessageBookmarkNavigation.minimumVisibleHeight).first
             }
             let shown = try #require(target.shown)
             #expect(shown.frame == reader.controller.entryFrameInStack(at: shown.entryID))

@@ -13,7 +13,8 @@ extension ConversationStore {
     /// session is in one.
     func launch(_ conversations: [Conversation], action: ConversationAction) {
         let launchable = conversations.filter { canLaunch($0, action: action) }
-        let launchableHere = action == .resume
+        let launchableHere =
+            action == .resume
             ? launchable.filter { runningTerminalInAnotherWindow(for: $0) == nil }
             : launchable
         for conversation in launchableHere.isEmpty ? Array(launchable.suffix(1)) : launchableHere {
@@ -34,7 +35,8 @@ extension ConversationStore {
         if runningTerminal(for: conversation) == nil {
             // Clicking a session whose tab is in another window shows its preview here, which says where the tab is.
             guard isRunningInTmux(conversation), canLaunch(conversation, action: .resume),
-                  runningTerminalInAnotherWindow(for: conversation) == nil else { return false }
+                runningTerminalInAnotherWindow(for: conversation) == nil
+            else { return false }
         }
         launch(conversation, action: .resume)
         guard let shownTerminal = runningTerminal(for: conversation) else { return false }
@@ -63,12 +65,14 @@ extension ConversationStore {
         connectIfDisconnected(conversation.host)
         do {
             let endedTab = action == .resume ? endedTerminal(for: conversation) : nil
-            guard let session = try makeTerminal(
-                for: conversation,
-                action: action,
-                engine: engine ?? endedTab?.engine,
-                appendedArguments: appendedArguments
-            ) else { return }
+            guard
+                let session = try makeTerminal(
+                    for: conversation,
+                    action: action,
+                    engine: engine ?? endedTab?.engine,
+                    appendedArguments: appendedArguments
+                )
+            else { return }
             if let endedTab {
                 restartEndedTerminal(endedTab, with: session)
             } else {
@@ -101,8 +105,13 @@ extension ConversationStore {
         let requestedTabID = endedTerminal(for: conversation)?.id
         return restarts.deferResume(for: conversation.id) { [weak self] in
             guard let self, self.isCurrentHostLifecycle(lifecycle, on: conversation.host),
-                  let current = self.conversation(withID: conversation.id), self.canLaunch(current, action: .resume) else { return }
-            if let requestedTabID, !self.terminalSessions.contains(where: { $0.id == requestedTabID && $0.conversation?.id == conversation.id }) { return }
+                let current = self.conversation(withID: conversation.id), self.canLaunch(current, action: .resume)
+            else { return }
+            if let requestedTabID,
+                !self.terminalSessions.contains(where: { $0.id == requestedTabID && $0.conversation?.id == conversation.id })
+            {
+                return
+            }
             self.launch(current, action: .resume, engine: engine, appendedArguments: appendedArguments)
         }
     }
@@ -112,7 +121,8 @@ extension ConversationStore {
     /// session first lets that session go, since the new CLI's client would otherwise attach to its dead pane.
     private func restartEndedTerminal(_ endedTab: TerminalSession, with session: TerminalSession) {
         guard let keptSessionName = endedTab.tmuxSessionKeptForEndedCLI,
-              let tmuxServer = commandResolver.thisMacTmuxServer() else {
+            let tmuxServer = commandResolver.thisMacTmuxServer()
+        else {
             replaceEndedTerminal(endedTab, with: session)
             return
         }
@@ -133,7 +143,8 @@ extension ConversationStore {
 
     private func replaceEndedTerminal(_ endedTab: TerminalSession, with session: TerminalSession) {
         guard let index = terminalSessions.firstIndex(where: { $0.id == endedTab.id }),
-              terminalSessions[index].conversation?.id == session.conversation?.id else { return }
+            terminalSessions[index].conversation?.id == session.conversation?.id
+        else { return }
         replaceTerminal(at: index, with: session)
         selectTerminal(session.id)
     }
@@ -264,7 +275,8 @@ extension ConversationStore {
         )
         // Before tmux wraps the command: the flag check runs the CLI, or the start command set for it. The first
         // message goes after it, so the check's answer holds for every new session.
-        let preassignment = provider == .claude
+        let preassignment =
+            provider == .claude
             ? ClaudeSessionIDFlagSupport.shared.preassigningSessionID(to: command)
             : nil
         let promptArguments = initialPrompt.map(provider.initialPromptArguments) ?? []
@@ -274,7 +286,8 @@ extension ConversationStore {
                 : provider.argumentsAfterCustomStartCommand(promptArguments)
         )
         // A session whose id is known up front gets its own tmux name right away.
-        let tabCommand = runsInTmux
+        let tabCommand =
+            runsInTmux
             ? thisMacTabCommand(
                 running: cliCommand,
                 tmuxSessionName: preassignment.map { TmuxSessionName.forSession(provider: provider, sessionID: $0.sessionID) }

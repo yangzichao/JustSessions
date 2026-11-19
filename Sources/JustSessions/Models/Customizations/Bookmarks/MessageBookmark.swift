@@ -66,12 +66,16 @@ extension MessageBookmark {
 }
 
 enum MessageBookmarkToggle: Equatable {
-    case added(MessageBookmark), removed(MessageBookmark), allLettersInUse
+    case added(MessageBookmark)
+    case removed(MessageBookmark)
+    case allLettersInUse
 }
 
 /// What "bookmark this message, keeping a bookmark it has" found or did (⇧⌘D).
 enum MessageBookmarkEnsuring: Equatable {
-    case existing(MessageBookmark), added(MessageBookmark), allLettersInUse
+    case existing(MessageBookmark)
+    case added(MessageBookmark)
+    case allLettersInUse
 
     var bookmark: MessageBookmark? {
         switch self {
@@ -102,12 +106,14 @@ enum MessageBookmarkDetails {
     /// Without `#`, cut to `maximumTagLength`, each once whatever its case (the first spelling stays), at most
     /// `maximumTagCount`.
     static func tags(from candidates: [String]) -> [String] {
-        var seen = Set<String>(), kept: [String] = []
+        var seen = Set<String>()
+        var kept: [String] = []
         for candidate in candidates {
-            let tag = String(candidate.trimmingCharacters(in: .whitespacesAndNewlines)
-                .drop { $0 == "#" }
-                .split(whereSeparator: \.isWhitespace).joined(separator: "-")
-                .prefix(maximumTagLength))
+            let tag = String(
+                candidate.trimmingCharacters(in: .whitespacesAndNewlines)
+                    .drop { $0 == "#" }
+                    .split(whereSeparator: \.isWhitespace).joined(separator: "-")
+                    .prefix(maximumTagLength))
             guard !tag.isEmpty, seen.insert(searchKey(tag)).inserted else { continue }
             kept.append(tag)
             if kept.count == maximumTagCount { break }
@@ -135,10 +141,11 @@ enum MessageBookmarkTagTyping {
         // The tag being typed counts as typed, so a tag it already spells out isn't offered again.
         let typedKeys = Set(MessageBookmarkDetails.tags(fromTyped: typed).map(MessageBookmarkDetails.searchKey))
         let partial = partialTag(in: typed).map(MessageBookmarkDetails.searchKey)
-        return Array(allTags.filter { tag in
-            let key = MessageBookmarkDetails.searchKey(tag)
-            return !typedKeys.contains(key) && (partial.map { key.hasPrefix($0) } ?? true)
-        }.prefix(maximumSuggestionCount))
+        return Array(
+            allTags.filter { tag in
+                let key = MessageBookmarkDetails.searchKey(tag)
+                return !typedKeys.contains(key) && (partial.map { key.hasPrefix($0) } ?? true)
+            }.prefix(maximumSuggestionCount))
     }
 
     /// The tag being typed: the last word, without `#`, while no space or comma follows it.

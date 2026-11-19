@@ -39,7 +39,12 @@ struct TerminalWorkspaceView: View {
                     endedWithErrorSoonAfterStarting: session.endedWithErrorSoonAfterStarting,
                     hostProblem: hostProblem(),
                     onCheckHost: onCheckHost,
-                    onReconnect: onReconnect.map { reconnect in { onFocus(); reconnect() } }
+                    onReconnect: onReconnect.map { reconnect in
+                        {
+                            onFocus()
+                            reconnect()
+                        }
+                    }
                 )
                 ThemeDivider()
             }
@@ -52,24 +57,26 @@ struct TerminalWorkspaceView: View {
                     makeContextMenu: makeContextMenu,
                     onOpenLink: onOpenLink
                 )
-                    .id(session.id)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .overlay(alignment: .topTrailing) {
-                        VStack(alignment: .trailing, spacing: 0) {
-                            if session.findState.isPresented {
-                                // The notice's margin, so the two line up when both show.
-                                TerminalFindBar(findState: session.findState)
-                                    .padding([.top, .horizontal], TerminalSSHFileDropNotice.marginFromTerminalEdges)
-                            }
-                            TerminalBookmarkNoticeCard(state: session.bookmarkNotices)
-                            if let sshFileDrop = session.sshFileDrop { TerminalSSHFileDropNotice(fileDrop: sshFileDrop) }
+                .id(session.id)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(alignment: .topTrailing) {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        if session.findState.isPresented {
+                            // The notice's margin, so the two line up when both show.
+                            TerminalFindBar(findState: session.findState)
+                                .padding([.top, .horizontal], TerminalSSHFileDropNotice.marginFromTerminalEdges)
                         }
+                        TerminalBookmarkNoticeCard(state: session.bookmarkNotices)
+                        if let sshFileDrop = session.sshFileDrop { TerminalSSHFileDropNotice(fileDrop: sshFileDrop) }
                     }
+                }
                 // Every CLI tab, linked or not, so linking never resizes its terminal; the column sizes itself from the toggle.
                 if let provider = session.provider, let store {
-                    ConversationMapColumn(model: session.conversationOutline, conversation: session.conversation, provider: provider,
-                                          isShown: isShown, store: store, hover: mapHover, editor: session.bookmarkNotices.editor)
-                        .equatable()
+                    ConversationMapColumn(
+                        model: session.conversationOutline, conversation: session.conversation, provider: provider,
+                        isShown: isShown, store: store, hover: mapHover, editor: session.bookmarkNotices.editor
+                    )
+                    .equatable()
                 }
             }
             // Over the terminal beside the map, as the find bar floats over it; reads the hover in its own body.

@@ -63,9 +63,11 @@ struct TranscriptBookmarkMarker: View {
 
     /// "Bookmark a", then its label and tags, which VoiceOver can't hover for.
     static func accessibilityLabel(of bookmark: MessageBookmark) -> String {
-        [AppLocalization.string("Bookmark \(bookmark.letter)"), bookmark.label,
-         bookmark.tags.isEmpty ? nil : MessageBookmarkDetails.typedText(of: bookmark.tags)]
-            .compactMap { $0 }.joined(separator: ", ")
+        [
+            AppLocalization.string("Bookmark \(bookmark.letter)"), bookmark.label,
+            bookmark.tags.isEmpty ? nil : MessageBookmarkDetails.typedText(of: bookmark.tags),
+        ]
+        .compactMap { $0 }.joined(separator: ", ")
     }
 }
 
@@ -122,8 +124,9 @@ struct TranscriptBookmarkHoverCard: View {
                     .fixedSize(horizontal: false, vertical: true)
                 }
                 .fixedSize()
-                .offset(x: min(card.point.x + 14, max(0, geometry.size.width - Self.width - 24)),
-                        y: max(0, card.point.y - 10))
+                .offset(
+                    x: min(card.point.x + 14, max(0, geometry.size.width - Self.width - 24)),
+                    y: max(0, card.point.y - 10))
             }
         }
         .allowsHitTesting(false)
@@ -140,4 +143,3 @@ extension View {
             .overlay(alignment: .topLeading) { TranscriptBookmarkHoverCard(hover: hover) }
     }
 }
-

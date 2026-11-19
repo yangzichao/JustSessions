@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A tab, or a whole group dragged by its label, dragged to another window leaves its tab bar as closed tabs do, though
@@ -214,9 +215,10 @@ struct TerminalTabStripBetweenWindowsTests {
         #expect(names(target) == ["a1", "a2", "a3", "a4", "c1"])
         #expect(target.splits == [split])
         #expect(target.sides(of: split) == TerminalSplit.Sides(left: id("a1"), right: id("a2")))
-        #expect(target.movingUnits(inGroup: "/a", keepingTogether: unit.tabs.map(\.id)) == [
-            [id("a1"), id("a2"), id("a3")], [id("a4")],
-        ])
+        #expect(
+            target.movingUnits(inGroup: "/a", keepingTogether: unit.tabs.map(\.id)) == [
+                [id("a1"), id("a2"), id("a3")], [id("a4")],
+            ])
         expectSplitRules(target)
     }
 

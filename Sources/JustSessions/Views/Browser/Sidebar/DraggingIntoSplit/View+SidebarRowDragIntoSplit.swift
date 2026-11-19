@@ -13,13 +13,14 @@ extension View {
         fadesWhileDragged: Bool = false,
         onDropped: @escaping () -> Void
     ) -> some View {
-        modifier(SidebarRowDragIntoSplitGesture(
-            row: row,
-            title: title,
-            store: store,
-            fadesWhileDragged: fadesWhileDragged,
-            onDropped: onDropped
-        ))
+        modifier(
+            SidebarRowDragIntoSplitGesture(
+                row: row,
+                title: title,
+                store: store,
+                fadesWhileDragged: fadesWhileDragged,
+                onDropped: onDropped
+            ))
     }
 }
 

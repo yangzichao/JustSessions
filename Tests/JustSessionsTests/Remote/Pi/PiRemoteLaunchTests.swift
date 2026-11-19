@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -18,12 +19,14 @@ struct PiRemoteLaunchTests {
         #expect(tab.host == .ssh("devbox"))
         #expect(tab.command.executablePath == "/usr/bin/ssh")
         #expect(tab.conversation?.id == conversation.id)
-        #expect(tab.command.arguments.last == RemoteCLICommandBuilder.remoteCommand(
-            provider: .pi,
-            projectPath: conversation.projectPath,
-            arguments: ["--session", conversation.sessionID],
-            tmuxSessionName: tab.tmuxSessionName
-        ))
+        #expect(
+            tab.command.arguments.last
+                == RemoteCLICommandBuilder.remoteCommand(
+                    provider: .pi,
+                    projectPath: conversation.projectPath,
+                    arguments: ["--session", conversation.sessionID],
+                    tmuxSessionName: tab.tmuxSessionName
+                ))
         store.closeAllTerminals()
     }
 
@@ -42,12 +45,14 @@ struct PiRemoteLaunchTests {
         #expect(tab.host == .ssh("devbox"))
         #expect(tab.conversation == nil)
         #expect(tab.pendingNewSession?.projectDirectoryKey == "ssh://devbox/srv/app")
-        #expect(tab.command.arguments.last == RemoteCLICommandBuilder.remoteCommand(
-            provider: .pi,
-            projectPath: forked.projectPath,
-            arguments: ["--fork", forked.sessionID],
-            tmuxSessionName: tab.tmuxSessionName
-        ))
+        #expect(
+            tab.command.arguments.last
+                == RemoteCLICommandBuilder.remoteCommand(
+                    provider: .pi,
+                    projectPath: forked.projectPath,
+                    arguments: ["--fork", forked.sessionID],
+                    tmuxSessionName: tab.tmuxSessionName
+                ))
         let fork = Conversation.fixture(provider: .pi, projectPath: forked.projectPath, host: .ssh("devbox"))
         store.replaceConversations(on: .ssh("devbox"), with: [forked, fork])
         store.linkWaitingTabsByAppearance(on: .ssh("devbox"))

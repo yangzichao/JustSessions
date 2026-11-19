@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -6,13 +7,17 @@ struct SidebarStoreObservationTests {
     @Test func identicalRefreshAndTabSelectionDoNotPublishButChangedTitlesDo() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
-        let store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(), startsBackgroundPolling: false)
+        let store = ConversationStore(
+            adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(), startsBackgroundPolling: false)
         let first = Conversation.fixture()
         let other = Conversation.fixture()
         store.replaceConversations(on: .thisMac, with: [first, other])
         let publications = StoreChangeCounter(store) { _ = $0.conversations }
         let selections = StoreChangeCounter(store) { _ = $0.selectedTerminalID }
-        defer { publications.cancel(); selections.cancel() }
+        defer {
+            publications.cancel()
+            selections.cancel()
+        }
         store.selectTerminal(nil)
         #expect(selections.count == 0)
         store.replaceConversations(on: .thisMac, with: [first, other])
@@ -26,7 +31,8 @@ struct SidebarStoreObservationTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         RemoteHostList(hosts: ["devbox"]).save(to: settings.userDefaults)
-        let store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(), startsBackgroundPolling: false)
+        let store = ConversationStore(
+            adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(), startsBackgroundPolling: false)
         let connections = SSHLoginConnections()
         store.setTmuxSessionNames(["justsessions-claude-a"], on: .ssh("devbox"))
         store.noteLoginState(on: "devbox", refreshProblem: .hostKeyNotTrusted, connections: connections)
@@ -52,11 +58,13 @@ struct SidebarStoreObservationTests {
     @Test func aBookmarkChangePublishesOnlyBookmarks() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
-        let store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(), startsBackgroundPolling: false)
+        let store = ConversationStore(
+            adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(), startsBackgroundPolling: false)
         let conversation = Conversation.fixture()
         store.replaceConversations(on: .thisMac, with: [conversation])
-        let entry = TranscriptEntry(id: TranscriptPageIdentity.entryID(record: 1, part: 0), content: .userMessage("Hello"),
-                                    timestamp: nil, startsTurn: true)
+        let entry = TranscriptEntry(
+            id: TranscriptPageIdentity.entryID(record: 1, part: 0), content: .userMessage("Hello"),
+            timestamp: nil, startsTurn: true)
         let sidebar = StoreChangeCounter(store) {
             _ = $0.conversations
             _ = $0.titleAliases
@@ -64,7 +72,10 @@ struct SidebarStoreObservationTests {
             _ = $0.archivedSessions
         }
         let bookmarks = StoreChangeCounter(store) { _ = $0.messageBookmarks }
-        defer { sidebar.cancel(); bookmarks.cancel() }
+        defer {
+            sidebar.cancel()
+            bookmarks.cancel()
+        }
         // The counter counts once per turn, so the change that saves nothing comes first.
         store.removeMessageBookmark(MessageBookmark(letter: "a", entryID: entry.id, kind: .user, snippet: "Hello"), in: conversation)
         #expect(bookmarks.count == 0)

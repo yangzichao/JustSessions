@@ -32,7 +32,9 @@ struct HostCheckSheet: View {
                 ? Text(
                     "Runs on \(state.host) what JustSessions runs there. When a command below fails the same way in your own Terminal, the problem is on \(state.host)."
                 )
-                : Text("Starts a CLI whose first message is this report, so it can find out why and fix it with you. It's told to ask you before it ends sessions or changes the host's setup."),
+                : Text(
+                    "Starts a CLI whose first message is this report, so it can find out why and fix it with you. It's told to ask you before it ends sessions or changes the host's setup."
+                ),
             width: ThemeSheetMetrics.wideWidth
         ) {
             Group {
@@ -113,8 +115,9 @@ struct HostCheckSheet: View {
         Button(startButtonTitle(draft.provider), action: startFixAgent)
             .buttonStyle(ProviderProminentButtonStyle(tint: (draft.provider.map(NewSessionKind.cli) ?? .plainTerminal).emphasisTintColor))
             .keyboardShortcut(.defaultAction)
-            .disabled(draft.provider == nil || isStartingFixAgent
-                || draft.task.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .disabled(
+                draft.provider == nil || isStartingFixAgent
+                    || draft.task.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
     }
 
     private func startButtonTitle(_ provider: ConversationProvider?) -> LocalizedStringKey {

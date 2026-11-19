@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ITermColorsImportTests {
@@ -26,7 +27,8 @@ struct ITermColorsImportTests {
         defaultProfile.merge(colors(background: 0xFAFAFA, foreground: 0x222222, keySuffix: " (Light)")) { $1 }
         defaultProfile.merge(colors(background: 0x101010, foreground: 0xEEEEEE, keySuffix: " (Dark)")) { $1 }
 
-        let variants = try ITermProfileColorsImporter.importDefaultProfile(defaultProfileGuid: "default", profiles: [defaultProfile]).variants
+        let variants = try ITermProfileColorsImporter.importDefaultProfile(defaultProfileGuid: "default", profiles: [defaultProfile])
+            .variants
 
         #expect(variants.hasLightAndDarkVersions)
         #expect(variants.palette(usesDarkColors: false).background == 0xFAFAFA)

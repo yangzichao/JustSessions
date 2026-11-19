@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @Suite(.serialized, .oneHeldThreadAtATime)
@@ -60,8 +61,10 @@ struct CrossWindowDeletionTests {
     @Test func aClosedWindowsDeletionStaysPendingAndDisconnectStopsItsRemainingSessions() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
-        let conversations = try [sandbox.savedConversation(onHost: "devbox"),
-                                 sandbox.savedConversation(onHost: "devbox", updatedAt: .now - 60)]
+        let conversations = try [
+            sandbox.savedConversation(onHost: "devbox"),
+            sandbox.savedConversation(onHost: "devbox", updatedAt: .now - 60),
+        ]
         let registry = WorkspaceWindowRegistry()
         let deletion = PausedRemoteDeletion()
         defer { deletion.release() }
@@ -76,8 +79,12 @@ struct CrossWindowDeletionTests {
             store.replaceConversations(on: .ssh("devbox"), with: conversations)
             return store
         }
-        let first = makeStore(), second = makeStore()
-        defer { first.closeWorkspace(); second.closeWorkspace() }
+        let first = makeStore()
+        let second = makeStore()
+        defer {
+            first.closeWorkspace()
+            second.closeWorkspace()
+        }
         first.deleteConversations(conversations)
         try await expectEventually { deletion.calls == 1 }
         first.closeWorkspace()
@@ -104,7 +111,10 @@ private final class PausedRemoteDeletion: @unchecked Sendable {
     private var count = 0
     var calls: Int { lock.withLock { count } }
     func run() -> (exitStatus: Int32, output: String) {
-        let call = lock.withLock { count += 1; return count }
+        let call = lock.withLock {
+            count += 1
+            return count
+        }
         if call == 1 { _ = gate.wait(timeout: .now() + 30) }
         return (0, "")
     }
@@ -128,8 +138,9 @@ private struct CrossWindowDeletionFixture {
         let adapter = adapter
         let sandbox = sandbox
         let makeStore = {
-            ConversationStore(adapters: [adapter], commandResolver: resolver, userDefaults: sandbox.userDefaults,
-                              windowRegistry: registry, startsBackgroundPolling: false)
+            ConversationStore(
+                adapters: [adapter], commandResolver: resolver, userDefaults: sandbox.userDefaults,
+                windowRegistry: registry, startsBackgroundPolling: false)
         }
         first = makeStore()
         second = makeStore()
@@ -185,7 +196,10 @@ private final class CoordinatedDeletionAdapter: ConversationAdapter, @unchecked 
         lock.withLock {
             active += 1
             overlap = overlap || active > 1
-            if deleting { deletions += 1; return deletions }
+            if deleting {
+                deletions += 1
+                return deletions
+            }
             discoveries += 1
             return discoveries
         }

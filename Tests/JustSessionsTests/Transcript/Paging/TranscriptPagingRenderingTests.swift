@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -19,12 +20,15 @@ struct TranscriptPagingRenderingTests {
             for scheme in [ColorScheme.light, .dark] {
                 let positions = TranscriptReadingPositionStore()
                 positions.record(model.restorationPosition, for: files.conversation.id)
-                let content = TranscriptScrollView(conversation: files.conversation, transcript: transcript,
-                                                   positionStore: positions, paging: model)
-                    .background(ThemePalette.contentSurface)
-                    .appTheme(from: themeStore)
-                    .defaultAppStorage(settings.userDefaults)
-                let fixture = ThemeSurfaceRenderingFixture(content: AnyView(content), size: CGSize(width: width, height: 600), colorScheme: scheme)
+                let content = TranscriptScrollView(
+                    conversation: files.conversation, transcript: transcript,
+                    positionStore: positions, paging: model
+                )
+                .background(ThemePalette.contentSurface)
+                .appTheme(from: themeStore)
+                .defaultAppStorage(settings.userDefaults)
+                let fixture = ThemeSurfaceRenderingFixture(
+                    content: AnyView(content), size: CGSize(width: width, height: 600), colorScheme: scheme)
                 defer { fixture.close() }
                 for theme in AppTheme.allCases {
                     themeStore.setTheme(theme)

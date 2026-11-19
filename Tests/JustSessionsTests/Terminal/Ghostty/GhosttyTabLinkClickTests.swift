@@ -1,6 +1,7 @@
 import AppKit
 import Carbon.HIToolbox
 import Testing
+
 @testable import JustSessions
 
 /// While a program takes the mouse, a Ghostty tab hands Ghostty a ⌘-click with Shift added, so it finds the link as a

@@ -24,7 +24,8 @@ extension ConversationStore {
         let hostCantStartAgent = report.findings.contains {
             $0.status == .problem && ["connection", "login-shell", "shell-startup"].contains($0.id)
         }
-        let machine: HostFixAgentMachine = hostCantStartAgent || hostFixAgentProviders(on: .checkedHost, report: report).isEmpty
+        let machine: HostFixAgentMachine =
+            hostCantStartAgent || hostFixAgentProviders(on: .checkedHost, report: report).isEmpty
             ? .thisMac
             : .checkedHost
         return HostFixAgentDraft(
@@ -45,7 +46,8 @@ extension ConversationStore {
     /// check came from a tab and found its folder, or else the home folder.
     func hostFixAgentFolder(on machine: HostFixAgentMachine, for state: HostCheckSheetState, report: HostCheckReport) -> String {
         guard machine == .checkedHost, let session = state.session,
-              report.findings.contains(where: { $0.id == "folder" && $0.status == .passed }) else { return "~" }
+            report.findings.contains(where: { $0.id == "folder" && $0.status == .passed })
+        else { return "~" }
         return session.projectPath
     }
 

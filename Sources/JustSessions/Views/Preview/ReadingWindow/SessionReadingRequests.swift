@@ -51,11 +51,13 @@ final class SessionReadingRequests {
     /// and none is resolved before the reader knows where it is (RDR-49, RDR-50).
     func requestAdjacentBookmark(forward: Bool, in bookmarks: [MessageBookmark], from recorded: TranscriptReadingPosition?) {
         let anchor = pendingNavigation?.entryID ?? recorded?.entryIndex
-        if let next = forward ? MessageBookmarkNavigation.bookmark(after: anchor, in: bookmarks)
-                              : MessageBookmarkNavigation.bookmark(before: anchor, in: bookmarks) {
+        if let next = forward
+            ? MessageBookmarkNavigation.bookmark(after: anchor, in: bookmarks)
+            : MessageBookmarkNavigation.bookmark(before: anchor, in: bookmarks)
+        {
             request(.bookmark(next))
         } else {
-            request(.adjacentBookmark(forward: forward))   // no bookmarks: the reader says so
+            request(.adjacentBookmark(forward: forward))  // no bookmarks: the reader says so
         }
     }
 

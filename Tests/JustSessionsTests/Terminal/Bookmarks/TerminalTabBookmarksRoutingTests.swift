@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// Which reader ⌘D, ⌘', and ⇧⌘' reach in a workspace window (TRM-74, RDR-49): the selected tab, nothing while a split

@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+
 @testable import JustSessions
 
 /// Counts changes to the store's observed properties, as `objectWillChange` events counted them before the store was

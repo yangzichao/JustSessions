@@ -2,6 +2,7 @@ import AppKit
 import Carbon.HIToolbox
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// `ThisMacTmuxShiftReturnTests` and `ThisMacTmuxControlKeyTests` on a real SSH host: a tab opened with the app's own
@@ -15,7 +16,9 @@ import Testing
 /// The reader's folder on the host and its tmux session are removed afterwards.
 @MainActor
 struct LiveSSHTmuxShiftReturnTests {
-    @Test(.enabled(if: LiveSSHTmuxHost.host != nil, "Set JUSTSESSIONS_LIVE_SSH_HOST to an SSH host with tmux"), arguments: TerminalEngine.allCases)
+    @Test(
+        .enabled(if: LiveSSHTmuxHost.host != nil, "Set JUSTSESSIONS_LIVE_SSH_HOST to an SSH host with tmux"),
+        arguments: TerminalEngine.allCases)
     func shiftReturnReachesACLIInTheHostsTmuxDistinctFromReturn(_ engine: TerminalEngine) async throws {
         try await expectKeysToReachTheReader(engine: engine, name: "shift-return", expectedBytes: "\u{1b}[13;2u\r") { tab, windowNumber in
             tab.terminalView.keyDown(with: Self.returnKeyEvent(modifiers: .shift, windowNumber: windowNumber))
@@ -26,11 +29,13 @@ struct LiveSSHTmuxShiftReturnTests {
     /// Ctrl-[ is left out, as in `ThisMacTmuxControlKeyTests`: tmux would join its lone Esc with the next key. The keys
     /// the tab sends as their legacy bytes, such as Ctrl-_, Ctrl-], and Ctrl-A, reach the CLI as CSI u from tmux 3.5 on,
     /// which encodes them again for a CLI that asks for modifyOtherKeys 2; tmux 3.4 passes them on as sent.
-    @Test(.enabled(if: LiveSSHTmuxHost.host != nil, "Set JUSTSESSIONS_LIVE_SSH_HOST to an SSH host with tmux"), arguments: TerminalEngine.allCases)
+    @Test(
+        .enabled(if: LiveSSHTmuxHost.host != nil, "Set JUSTSESSIONS_LIVE_SSH_HOST to an SSH host with tmux"),
+        arguments: TerminalEngine.allCases)
     func controlKeysReachACLIInTheHostsTmuxAsTheKeysTheyAre(_ engine: TerminalEngine) async throws {
         let host = try #require(LiveSSHTmuxHost.host)
         let tmuxVersion = try LiveSSHTmuxHost.ssh(host, "tmux -V").trimmingCharacters(in: .whitespacesAndNewlines)
-        let tmuxEncodesLegacyBytesAgain = Self.tmuxVersionIsAtLeast3_5(tmuxVersion)
+        let tmuxEncodesLegacyBytesAgain = Self.tmuxVersionIsAtLeastThreePointFive(tmuxVersion)
         let presses = ControlKeyPress.all.filter { $0.bytesForLegacyCLI != "\u{1b}" }
         let expectedBytes = presses.map { press in
             tmuxEncodesLegacyBytesAgain ? press.bytesForCLIAskingForModifyOtherKeys : Self.bytesTheTabSends(for: press)
@@ -49,7 +54,8 @@ struct LiveSSHTmuxShiftReturnTests {
         try LiveSSHTmuxHost.ssh(host, "mkdir -p \(folder) && cat > \(folder)/reader.py", input: TmuxKeyboardReaderFixture.script)
         defer { _ = try? LiveSSHTmuxHost.ssh(host, "tmux kill-session -t =\(tmuxSessionName) 2>/dev/null; rm -rf \(folder)") }
 
-        let startCommand = "KEY_LOG=\(folder)/keys READY_MARKER=\(folder)/ready KEY_BYTE_COUNT=\(expectedBytes.utf8.count) "
+        let startCommand =
+            "KEY_LOG=\(folder)/keys READY_MARKER=\(folder)/ready KEY_BYTE_COUNT=\(expectedBytes.utf8.count) "
             + "ASKS_FOR_EXTENDED_KEYS=1 python3 \(folder)/reader.py"
         let tab = TerminalSession(
             engine: engine,
@@ -71,7 +77,8 @@ struct LiveSSHTmuxShiftReturnTests {
             tmuxSessionName: tmuxSessionName
         )
         _ = NSApplication.shared
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = tab.terminalView
         window.makeFirstResponder(tab.terminalView)
@@ -81,7 +88,9 @@ struct LiveSSHTmuxShiftReturnTests {
         }
 
         tab.startIfNeeded()
-        try #require(await LiveSSHTmuxHost.waitUntil { screenText(of: tab.terminalView).contains("KEY_READER_READY") }, "\(screenText(of: tab.terminalView))")
+        try #require(
+            await LiveSSHTmuxHost.waitUntil { screenText(of: tab.terminalView).contains("KEY_READER_READY") },
+            "\(screenText(of: tab.terminalView))")
         press(tab, window.windowNumber)
 
         var receivedBytes = ""
@@ -102,7 +111,7 @@ struct LiveSSHTmuxShiftReturnTests {
     }
 
     /// `tmux -V` prints `tmux 3.4`, `tmux 3.5a`, or `tmux next-3.6`.
-    private static func tmuxVersionIsAtLeast3_5(_ version: String) -> Bool {
+    private static func tmuxVersionIsAtLeastThreePointFive(_ version: String) -> Bool {
         let digits = version.drop { !$0.isNumber }.prefix { $0.isNumber || $0 == "." }
         let parts = digits.split(separator: ".").compactMap { Int($0) }
         guard parts.count >= 2 else { return false }

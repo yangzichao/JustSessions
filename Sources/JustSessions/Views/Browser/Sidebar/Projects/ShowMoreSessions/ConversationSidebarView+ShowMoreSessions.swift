@@ -36,17 +36,19 @@ extension ConversationSidebarView {
     /// The session the window shows, by a click, Back, a notification, or its selected tab, when its row is hidden in
     /// an expanded project. For a subagent's session, the session listed under the project it hangs off.
     var hiddenShownSession: HiddenShownSession? {
-        guard let shownConversationID = sessionSelection.onlySelectedConversationID
+        guard
+            let shownConversationID = sessionSelection.onlySelectedConversationID
                 ?? store.selectedTerminal?.conversation?.id,
-              let conversation = topLevelConversation(of: shownConversationID),
-              let project = projects.first(where: { $0.id == conversation.projectDirectoryKey }),
-              isExpanded(project),
-              let place = ListedProjectSessionRows.hiddenPlace(
-                  of: conversation.id,
-                  in: project.conversations,
-                  pinnedItems: store.pinnedItems,
-                  sessionLimit: sessionLimit(for: project)
-              ) else { return nil }
+            let conversation = topLevelConversation(of: shownConversationID),
+            let project = projects.first(where: { $0.id == conversation.projectDirectoryKey }),
+            isExpanded(project),
+            let place = ListedProjectSessionRows.hiddenPlace(
+                of: conversation.id,
+                in: project.conversations,
+                pinnedItems: store.pinnedItems,
+                sessionLimit: sessionLimit(for: project)
+            )
+        else { return nil }
         return HiddenShownSession(projectID: project.id, place: place)
     }
 

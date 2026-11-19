@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -17,12 +18,14 @@ struct KiroRemoteLaunchTests {
         let tab = try #require(store.terminalSessions.last)
         #expect(tab.host == .ssh("devbox"))
         #expect(tab.conversation?.id == conversation.id)
-        #expect(tab.command.arguments.last == RemoteCLICommandBuilder.remoteCommand(
-            provider: .kiro,
-            projectPath: conversation.projectPath,
-            arguments: ["chat", "--resume-id", conversation.sessionID],
-            tmuxSessionName: tab.tmuxSessionName
-        ))
+        #expect(
+            tab.command.arguments.last
+                == RemoteCLICommandBuilder.remoteCommand(
+                    provider: .kiro,
+                    projectPath: conversation.projectPath,
+                    arguments: ["chat", "--resume-id", conversation.sessionID],
+                    tmuxSessionName: tab.tmuxSessionName
+                ))
         store.closeAllTerminals()
     }
 

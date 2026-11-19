@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Files dropped on a tab on an SSH host are copied there, then their host paths typed; a local shell stands in for
@@ -58,10 +59,11 @@ struct TerminalSSHFileDropTests {
         #expect(fileDrop.take([file]))
 
         try await expectEventually { !typedPaths.isEmpty }
-        #expect(shownStatuses.contains { status in
-            guard case .copying(let fileName, let fileNumber, let fileCount, _) = status else { return false }
-            return fileName == "shot.png" && fileNumber == 1 && fileCount == 1
-        })
+        #expect(
+            shownStatuses.contains { status in
+                guard case .copying(let fileName, let fileNumber, let fileCount, _) = status else { return false }
+                return fileName == "shot.png" && fileNumber == 1 && fileCount == 1
+            })
         #expect(fileDrop.status == nil)
     }
 
@@ -83,9 +85,10 @@ struct TerminalSSHFileDropTests {
         let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }
         let file = try makeDroppedFile(named: "shot.png", byteCount: 10, in: home)
-        let fileDrop = makeFileDrop(copier: .replacingSSH(
-            with: "cat > /dev/null; echo 'ssh: connect to host devbox port 22: Connection refused' >&2; exit 255"
-        ))
+        let fileDrop = makeFileDrop(
+            copier: .replacingSSH(
+                with: "cat > /dev/null; echo 'ssh: connect to host devbox port 22: Connection refused' >&2; exit 255"
+            ))
         var typedPaths: [[String]] = []
         fileDrop.typePaths = { typedPaths.append($0) }
 

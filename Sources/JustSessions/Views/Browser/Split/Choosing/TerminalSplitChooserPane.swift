@@ -66,7 +66,9 @@ struct TerminalSplitChooserPane: View {
 
     private var closeButton: some View {
         let buttonSize = WorkspaceSplitPaneMetrics.miniToolbarButtonSize
-        return Button { store.closeSplitChooser(chooser.id) } label: {
+        return Button {
+            store.closeSplitChooser(chooser.id)
+        } label: {
             Image(systemName: "xmark")
                 .font(ThemeFont.glyph(.control, weight: .bold))
                 .frame(width: buttonSize, height: buttonSize)
@@ -126,7 +128,8 @@ struct TerminalSplitChooserPane: View {
 
     private func moveHighlight(by offset: Int, among candidates: [TerminalSession]) -> KeyPress.Result {
         guard let currentID = highlightedTabID(among: candidates),
-              let currentIndex = candidates.firstIndex(where: { $0.id == currentID }) else { return .ignored }
+            let currentIndex = candidates.firstIndex(where: { $0.id == currentID })
+        else { return .ignored }
         let nextIndex = min(max(currentIndex + offset, 0), candidates.count - 1)
         highlightedTabID = candidates[nextIndex].id
         return .handled

@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A right-click on a link starts the terminal's menu with what to do with it; see `TerminalLinkActions`. Both
@@ -64,8 +65,10 @@ struct TerminalContextMenuLinkTests {
         let tab = fixture.openTab(engine: .swiftTerm, projectPath: project.folder.path)
         let actions = LinkActionRecorder(tab)
         let editors = try #require(
-            TerminalContextMenuFixture.item("Open in", in: fixture.menu(for: tab, linkUnderPointer: "plan.md:12:3", editorStore: Self.editorStore))
-                .submenu
+            TerminalContextMenuFixture.item(
+                "Open in", in: fixture.menu(for: tab, linkUnderPointer: "plan.md:12:3", editorStore: Self.editorStore)
+            )
+            .submenu
         )
 
         #expect(titles(editors) == ["Visual Studio Code", "Zed"])
@@ -73,9 +76,12 @@ struct TerminalContextMenuLinkTests {
 
         try await expectEventually { !actions.editorOpenings.isEmpty }
         #expect(actions.editorOpenings.map(\.editorName) == ["Zed"])
-        #expect(actions.editorOpenings.map(\.item) == [TerminalLinkLocalItem(
-            url: project.folder.appendingPathComponent("plan.md"), kind: .file, lineNumber: 12, columnNumber: 3
-        )])
+        #expect(
+            actions.editorOpenings.map(\.item) == [
+                TerminalLinkLocalItem(
+                    url: project.folder.appendingPathComponent("plan.md"), kind: .file, lineNumber: 12, columnNumber: 3
+                )
+            ])
     }
 
     @Test func anEditorThatFailsToOpenTheFileSaysSo() async throws {
@@ -86,8 +92,10 @@ struct TerminalContextMenuLinkTests {
         let tab = fixture.openTab(engine: .swiftTerm, projectPath: project.folder.path)
         tab.linkOpener.openInEditor = { _, _ in throw ExternalEditorCommandLineToolError.failed("No window to open it in") }
         let editors = try #require(
-            TerminalContextMenuFixture.item("Open in", in: fixture.menu(for: tab, linkUnderPointer: "plan.md", editorStore: Self.editorStore))
-                .submenu
+            TerminalContextMenuFixture.item(
+                "Open in", in: fixture.menu(for: tab, linkUnderPointer: "plan.md", editorStore: Self.editorStore)
+            )
+            .submenu
         )
 
         try TerminalContextMenuFixture.choose(TerminalContextMenuFixture.item("Zed", in: editors))
@@ -104,8 +112,9 @@ struct TerminalContextMenuLinkTests {
         defer { project.remove() }
         let tab = fixture.openTab(engine: .swiftTerm, projectPath: project.folder.path)
 
-        #expect(titles(fixture.menu(for: tab, linkUnderPointer: "install.command", editorStore: Self.editorStore))
-            == ["Open in", "Reveal in Finder", "Copy Path", "—"] + Self.textAndTabItems)
+        #expect(
+            titles(fixture.menu(for: tab, linkUnderPointer: "install.command", editorStore: Self.editorStore))
+                == ["Open in", "Reveal in Finder", "Copy Path", "—"] + Self.textAndTabItems)
     }
 
     @Test func aFolderOpensInTheFinderOrAnEditor() throws {
@@ -130,8 +139,9 @@ struct TerminalContextMenuLinkTests {
         defer { project.remove() }
         let tab = fixture.openTab(engine: .swiftTerm, projectPath: project.folder.path)
 
-        #expect(titles(fixture.menu(for: tab, linkUnderPointer: "plan.md"))
-            == ["Open", "Reveal in Finder", "Copy Path", "—"] + Self.textAndTabItems)
+        #expect(
+            titles(fixture.menu(for: tab, linkUnderPointer: "plan.md"))
+                == ["Open", "Reveal in Finder", "Copy Path", "—"] + Self.textAndTabItems)
     }
 
     /// The file is on the host, so only its path can be copied.

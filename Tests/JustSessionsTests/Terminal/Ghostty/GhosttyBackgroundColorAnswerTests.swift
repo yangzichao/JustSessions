@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// Where Ghostty's answer to a background query ends in what it sends the tab's process, so an owed theme report can
@@ -9,7 +10,9 @@ struct GhosttyBackgroundColorAnswerTests {
         let answer = "\u{1B}]11;rgb:1a1a/1b1b/2626" + terminator
 
         #expect(endIndex(in: answer) == answer.utf8.count)
-        #expect(endIndex(in: "\u{1B}]10;rgb:0000/0000/0000\u{07}" + answer + "typed") == ("\u{1B}]10;rgb:0000/0000/0000\u{07}" + answer).utf8.count)
+        #expect(
+            endIndex(in: "\u{1B}]10;rgb:0000/0000/0000\u{07}" + answer + "typed")
+                == ("\u{1B}]10;rgb:0000/0000/0000\u{07}" + answer).utf8.count)
     }
 
     @Test func otherRepliesAndUnendedAnswersAreNoAnswer() {

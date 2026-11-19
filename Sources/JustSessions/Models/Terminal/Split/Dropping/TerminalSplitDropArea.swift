@@ -36,7 +36,8 @@ struct TerminalSplitDropArea: Equatable {
         guard let shownSplit else { return edgePlace(at: point) }
         guard frameInWindow.contains(point) else { return nil }
         let boundary = paneFrames.resizeArea
-        let isBeforeBoundary = shownSplit.orientation == .sideBySide
+        let isBeforeBoundary =
+            shownSplit.orientation == .sideBySide
             ? point.x < frameInWindow.minX + boundary.midX
             : point.y < frameInWindow.minY + boundary.midY
         return .split(isBeforeBoundary ? .left : .right, shownSplit.orientation)

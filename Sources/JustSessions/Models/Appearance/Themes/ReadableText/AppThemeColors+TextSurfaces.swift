@@ -7,10 +7,11 @@ extension AppThemeColors {
     /// space. On a P3 display Claude's orange came out lighter than this blend, and Tokyo Night's text on it fell below
     /// 4.5.
     static func selectedRowSurfaces(sidebarSurface: UInt32, ink: UInt32, isDark: Bool) -> [ConversationProvider?: UInt32] {
-        Dictionary(uniqueKeysWithValues: selectedRowProviders.map { provider in
-            let hue = provider?.tintHexColor.value(isDark: isDark) ?? ink
-            return (provider, ThemeColorContrast.blend(sidebarSurface, with: hue, fraction: ThemeFillOpacity.selectedRow))
-        })
+        Dictionary(
+            uniqueKeysWithValues: selectedRowProviders.map { provider in
+                let hue = provider?.tintHexColor.value(isDark: isDark) ?? ink
+                return (provider, ThemeColorContrast.blend(sidebarSurface, with: hue, fraction: ThemeFillOpacity.selectedRow))
+            })
     }
 
     /// Every background the app sets text on: the four surfaces, a row or table header under a faint fill, and the

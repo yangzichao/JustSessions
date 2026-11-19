@@ -1,11 +1,13 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
 struct TranscriptSearchStateRevealTests {
     private func match(record: Int, part: Int = 0) -> TranscriptSearchMatch {
-        TranscriptSearchMatch(entryIndex: TranscriptPageIdentity.entryID(record: record, part: part), segmentIndex: 0, range: NSRange(location: 0, length: 5))
+        TranscriptSearchMatch(
+            entryIndex: TranscriptPageIdentity.entryID(record: record, part: part), segmentIndex: 0, range: NSRange(location: 0, length: 5))
     }
 
     @Test func selectsTheMatchInTheRevealedEntry() {

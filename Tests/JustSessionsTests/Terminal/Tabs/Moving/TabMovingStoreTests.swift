@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Dropping a dragged tab or group reorders the store's tabs, keeps the selection and the shown split, and saves the
@@ -57,10 +58,13 @@ struct TabMovingStoreTests {
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
-        return (store, {
-            store.closeAllTerminals()
-            isolatedUserDefaults.removeSuite()
-        })
+        return (
+            store,
+            {
+                store.closeAllTerminals()
+                isolatedUserDefaults.removeSuite()
+            }
+        )
     }
 
     private func open(_ store: ConversationStore, _ tab: TerminalSession) -> TerminalSession {

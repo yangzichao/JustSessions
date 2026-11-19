@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
@@ -44,7 +45,8 @@ struct TabMovingAcrossWindowsTmuxTests {
         first.launch(conversation, action: .resume)
         let tab = try #require(first.runningTerminal(for: conversation))
         tab.startIfNeeded()
-        try #require(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
         try #require(await sandbox.waitForPaneProcess(in: first, for: tab))
         let cliProcessID = try #require(tab.tmuxPaneProcessID)
 
@@ -56,10 +58,11 @@ struct TabMovingAcrossWindowsTmuxTests {
         #expect(second.selectedTerminalID == movedTab.id)
         movedTab.startIfNeeded()
         // The first window's client has gone, and the moved tab's is the only one attached.
-        #expect(await sandbox.waitUntil {
-            sandbox.tmuxOutput(["list-clients", "-F", "#{client_pid}"]).trimmingCharacters(in: .whitespacesAndNewlines)
-                == "\(movedTab.processID)"
-        }, "\(sandbox.launchDiagnostics(for: movedTab))")
+        #expect(
+            await sandbox.waitUntil {
+                sandbox.tmuxOutput(["list-clients", "-F", "#{client_pid}"]).trimmingCharacters(in: .whitespacesAndNewlines)
+                    == "\(movedTab.processID)"
+            }, "\(sandbox.launchDiagnostics(for: movedTab))")
         #expect(await sandbox.waitForPaneProcess(in: second, for: movedTab))
         #expect(movedTab.tmuxPaneProcessID == cliProcessID)
         #expect(sandbox.server.paneProcessIDsBySessionName() == [tmuxSessionName: cliProcessID])

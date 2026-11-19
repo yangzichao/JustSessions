@@ -2,7 +2,8 @@ import Observation
 
 /// What a bookmark command in a tab did, or why it did nothing (TRM-74). The terminal shows no letters, so each press says.
 enum TerminalBookmarkNotice: Equatable {
-    case added(MessageBookmark, assistantName: String), removed(MessageBookmark, assistantName: String)
+    case added(MessageBookmark, assistantName: String)
+    case removed(MessageBookmark, assistantName: String)
     case plainTerminal, notLinkedYet, noMessagesYet, allLettersInUse, noBookmarks, couldNotRead, findingLatestMessage
 
     /// "Finding…" stays until the press's result replaces it.
@@ -14,14 +15,19 @@ enum TerminalBookmarkNotice: Equatable {
         }
         switch self {
         case .added(let bookmark, let name):
-            return AppLocalization.string("Bookmark \(bookmark.letter) added · \(speaker(bookmark, name)): \(bookmark.menuSnippet)", language: language)
+            return AppLocalization.string(
+                "Bookmark \(bookmark.letter) added · \(speaker(bookmark, name)): \(bookmark.menuSnippet)", language: language)
         case .removed(let bookmark, let name):
-            return AppLocalization.string("Bookmark \(bookmark.letter) removed · \(speaker(bookmark, name)): \(bookmark.menuTitle)", language: language)
+            return AppLocalization.string(
+                "Bookmark \(bookmark.letter) removed · \(speaker(bookmark, name)): \(bookmark.menuTitle)", language: language)
         case .plainTerminal: return AppLocalization.string("A plain terminal has no conversation to bookmark.", language: language)
-        case .notLinkedYet: return AppLocalization.string("This tab isn't linked to its session yet. Bookmarks work once it is.", language: language)
+        case .notLinkedYet:
+            return AppLocalization.string("This tab isn't linked to its session yet. Bookmarks work once it is.", language: language)
         case .noMessagesYet: return AppLocalization.string("No messages in this session yet.", language: language)
-        case .allLettersInUse: return AppLocalization.string("All 26 letters are in use. Remove a bookmark to add another.", language: language)
-        case .noBookmarks: return AppLocalization.string("No bookmarks in this session. Press ⌘D to bookmark its latest message.", language: language)
+        case .allLettersInUse:
+            return AppLocalization.string("All 26 letters are in use. Remove a bookmark to add another.", language: language)
+        case .noBookmarks:
+            return AppLocalization.string("No bookmarks in this session. Press ⌘D to bookmark its latest message.", language: language)
         case .couldNotRead: return AppLocalization.string("Could not read this session", language: language)
         case .findingLatestMessage: return AppLocalization.string("Finding the latest message…", language: language)
         }

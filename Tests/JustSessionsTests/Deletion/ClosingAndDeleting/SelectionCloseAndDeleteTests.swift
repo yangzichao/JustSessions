@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Deleting a multi-selection closes and ends the selected sessions that run, as Close and delete does for one, then

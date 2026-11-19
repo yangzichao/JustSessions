@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Guards against a mistyped color leaving text unreadable. The limits are WCAG contrast ratios.

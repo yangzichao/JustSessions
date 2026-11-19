@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A terminal tells its tab when its colors turn light or dark and no program in it subscribes to hear about it. See

@@ -23,8 +23,8 @@ struct FeedbackEnvironment: Equatable, Sendable {
         let shortVersion = shortVersion.flatMap { $0.isEmpty ? nil : $0 }
         let buildNumber = buildNumber.flatMap { $0.isEmpty ? nil : $0 }
         return switch (shortVersion, buildNumber) {
-        case let (shortVersion?, buildNumber?) where buildNumber != shortVersion: "\(shortVersion) (\(buildNumber))"
-        case let (shortVersion?, _): shortVersion
+        case (let shortVersion?, let buildNumber?) where buildNumber != shortVersion: "\(shortVersion) (\(buildNumber))"
+        case (let shortVersion?, _): shortVersion
         case (nil, _): "development build"
         }
     }

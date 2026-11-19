@@ -15,16 +15,18 @@ struct OpenCodeConversationDeletion {
 
     func delete(_ conversation: Conversation) throws {
         guard conversation.provider == .opencode,
-              conversation.host == .thisMac,
-              ConversationProvider.opencode.isValidSessionID(conversation.sessionID),
-              conversation.sourceFile.standardizedFileURL.path == databaseFile.standardizedFileURL.path
+            conversation.host == .thisMac,
+            ConversationProvider.opencode.isValidSessionID(conversation.sessionID),
+            conversation.sourceFile.standardizedFileURL.path == databaseFile.standardizedFileURL.path
         else { throw ConversationDeletionError.invalidSource }
         guard try OpenCodeDatabase.containsSession(conversation.sessionID, in: databaseFile) else {
             throw ConversationDeletionError.missingSource
         }
-        guard try OpenCodeDatabase.containsTopLevelSession(
-            conversation.sessionID, projectPath: conversation.projectPath, in: databaseFile
-        ) else { throw ConversationDeletionError.sourceMismatch }
+        guard
+            try OpenCodeDatabase.containsTopLevelSession(
+                conversation.sessionID, projectPath: conversation.projectPath, in: databaseFile
+            )
+        else { throw ConversationDeletionError.sourceMismatch }
 
         let resolver = NativeCLICommandResolver()
         guard let executablePath = executableURL?.path ?? resolver.executablePath(named: "opencode") else {
@@ -34,14 +36,16 @@ struct OpenCodeConversationDeletion {
         environment["PATH"] = resolver.pathEnvironmentValue
         environment["OPENCODE_DB"] = databaseFile.path
         // Its data folder, not the project, so a project's own OpenCode configuration plays no part.
-        guard let result = BoundedProcessRunner.result(
-            ofExecutable: executablePath,
-            arguments: ["session", "delete", conversation.sessionID],
-            environment: environment,
-            workingDirectory: databaseFile.deletingLastPathComponent(),
-            includesStandardError: true,
-            timeout: timeout
-        ) else { throw OpenCodeConversationDeletionError.didNotFinish }
+        guard
+            let result = BoundedProcessRunner.result(
+                ofExecutable: executablePath,
+                arguments: ["session", "delete", conversation.sessionID],
+                environment: environment,
+                workingDirectory: databaseFile.deletingLastPathComponent(),
+                includesStandardError: true,
+                timeout: timeout
+            )
+        else { throw OpenCodeConversationDeletionError.didNotFinish }
         guard result.exitStatus == 0 else {
             let details = TerminalEscapeSequences.removed(from: result.output).trimmingCharacters(in: .whitespacesAndNewlines)
             throw OpenCodeConversationDeletionError.failed(details.isEmpty ? "Exit code \(result.exitStatus)" : String(details.prefix(500)))

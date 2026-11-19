@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A remote Kiro CLI tab's relay, which reads the host's turn markers and puts what the CLI does in the tab's title;
@@ -70,8 +71,10 @@ struct RemoteKiroActivityRelayTests {
         defer { client.terminate() }
         #expect(sandbox.waitUntil { Self.relayedActivity(of: tmuxName, in: sandbox) == "idle:" })
         let target = ShellQuoting.quoted("=" + tmuxName + ":")
-        let panePID = try #require(Int32(sandbox.run("tmux display-message -p -t \(target) '#{pane_pid}'")
-            .trimmingCharacters(in: .newlines)))
+        let panePID = try #require(
+            Int32(
+                sandbox.run("tmux display-message -p -t \(target) '#{pane_pid}'")
+                    .trimmingCharacters(in: .newlines)))
         #expect(Self.relayCount(inProcessGroup: panePID) == 1)
 
         _ = sandbox.run(#"touch "$HOME/kiro-exit""#)
@@ -110,15 +113,17 @@ struct RemoteKiroActivityRelayTests {
 
     /// Relays started in one pane; see `RemoteClaudeActivityRelayTests.relayCount(inProcessGroup:)`.
     private static func relayCount(inProcessGroup processGroupID: Int32) -> Int {
-        let processes = BoundedProcessRunner.output(
-            ofExecutable: "/bin/ps",
-            arguments: ["-ax", "-ww", "-o", "pgid=,command="],
-            environment: [:],
-            timeout: 10
-        ) ?? ""
+        let processes =
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/ps",
+                arguments: ["-ax", "-ww", "-o", "pgid=,command="],
+                environment: [:],
+                timeout: 10
+            ) ?? ""
         return processes.split(separator: "\n").filter { line in
             let fields = line.split(separator: " ", maxSplits: 1)
-            return fields.count == 2 && Int32(fields[0]) == processGroupID && fields[1].trimmingCharacters(in: .whitespaces).hasPrefix("sh -c (")
+            return fields.count == 2 && Int32(fields[0]) == processGroupID
+                && fields[1].trimmingCharacters(in: .whitespaces).hasPrefix("sh -c (")
         }.count
     }
 

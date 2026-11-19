@@ -150,7 +150,7 @@ final class TerminalSSHFileDrop: ObservableObject {
         guard let copy, copy.id == copyID else { return }
         copy.updateProgress(of: fileID, copiedByteCount: copiedByteCount)
         guard Date().timeIntervalSince(copy.startedAt) >= Self.quietCopyDuration,
-              let fileName = copy.currentFile?.url.lastPathComponent
+            let fileName = copy.currentFile?.url.lastPathComponent
         else { return }
         status = .copying(
             fileName: fileName,

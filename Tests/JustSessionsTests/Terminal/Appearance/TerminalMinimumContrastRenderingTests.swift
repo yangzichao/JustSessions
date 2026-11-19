@@ -1,6 +1,7 @@
 import AppKit
 import SwiftTerm
 import Testing
+
 @testable import JustSessions
 
 /// A CLI picks its colors for a light or a dark background and keeps them after the theme changes. These render a

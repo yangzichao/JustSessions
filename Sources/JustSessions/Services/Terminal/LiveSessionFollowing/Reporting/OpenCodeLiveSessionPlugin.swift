@@ -16,10 +16,12 @@ enum OpenCodeLiveSessionPlugin {
     static let tuiConfigurationVariable = "OPENCODE_TUI_CONFIG"
 
     static func tuiConfiguration(loading pluginFile: URL) -> String? {
-        guard let data = try? JSONSerialization.data(
-            withJSONObject: ["plugin": [pluginFile.path]],
-            options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
-        ) else { return nil }
+        guard
+            let data = try? JSONSerialization.data(
+                withJSONObject: ["plugin": [pluginFile.path]],
+                options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+            )
+        else { return nil }
         return String(decoding: data, as: UTF8.self) + "\n"
     }
 

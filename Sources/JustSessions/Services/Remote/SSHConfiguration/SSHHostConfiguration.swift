@@ -32,19 +32,20 @@ struct SSHHostConfiguration: Equatable, Sendable {
               ControlPersist \(SSHConnectionSharing.crashFallbackSeconds)
 
             """
-        do { try contents.write(to: probe, atomically: true, encoding: .utf8) }
-        catch { return nil }
+        do { try contents.write(to: probe, atomically: true, encoding: .utf8) } catch { return nil }
         defer { try? FileManager.default.removeItem(at: probe) }
         return resolve(host: host, arguments: ["-F", probe.path])
     }
 
     private static func resolve(host: String, arguments: [String]) -> SSHHostConfiguration? {
-        guard let result = BoundedProcessRunner.result(
-            ofExecutable: "/usr/bin/ssh",
-            arguments: arguments + ["-G", "--", host],
-            environment: SSHProcessEnvironment.standard,
-            timeout: 10
-        ), result.exitStatus == 0 else { return nil }
+        guard
+            let result = BoundedProcessRunner.result(
+                ofExecutable: "/usr/bin/ssh",
+                arguments: arguments + ["-G", "--", host],
+                environment: SSHProcessEnvironment.standard,
+                timeout: 10
+            ), result.exitStatus == 0
+        else { return nil }
         return SSHHostConfiguration(sshDashGOutput: result.output)
     }
 

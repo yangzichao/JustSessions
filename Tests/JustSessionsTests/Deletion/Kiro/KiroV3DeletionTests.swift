@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Deleting a Kiro CLI V3 session runs `kiro-cli chat --delete-session <sess_ id>`, which removes its folder (Kiro CLI
@@ -21,8 +22,9 @@ struct KiroV3DeletionTests {
         }
 
         func adapter(running script: String) throws -> KiroAdapter {
-            KiroAdapter(sessionsDirectory: classicDirectory, v3SessionsDirectory: sessionsRoot,
-                        deletionExecutableURL: try writeExecutableScript(script, to: root.appendingPathComponent("kiro-cli")))
+            KiroAdapter(
+                sessionsDirectory: classicDirectory, v3SessionsDirectory: sessionsRoot,
+                deletionExecutableURL: try writeExecutableScript(script, to: root.appendingPathComponent("kiro-cli")))
         }
 
         func remove() { try? FileManager.default.removeItem(at: root) }
@@ -42,16 +44,18 @@ struct KiroV3DeletionTests {
         let selected = try fixture.writeSession(projectPath: home.projectDirectory.path)
         let kept = try fixture.writeSession(projectPath: home.projectDirectory.path)
         let reportFile = home.root.appendingPathComponent("report.txt")
-        let adapter = try home.adapter(running: Self.successfulDeletionScript + "\n"
-            + "printf '%s\\n' \"$@\" \"$KIRO_HOME\" \"$PWD\" > \(ShellQuoting.quoted(reportFile.path))\n")
+        let adapter = try home.adapter(
+            running: Self.successfulDeletionScript + "\n"
+                + "printf '%s\\n' \"$@\" \"$KIRO_HOME\" \"$PWD\" > \(ShellQuoting.quoted(reportFile.path))\n")
         let conversation = try #require(adapter.discover().first { $0.sessionID == selected.sessionID })
 
         try adapter.delete(conversation)
 
         let report = try String(contentsOf: reportFile, encoding: .utf8).split(separator: "\n").map(String.init)
         #expect(Array(report.prefix(4)) == ["chat", "--delete-session", selected.sessionID, home.kiroDirectory.path])
-        #expect(URL(fileURLWithPath: try #require(report.last)).resolvingSymlinksInPath().path
-            == home.projectDirectory.resolvingSymlinksInPath().path)
+        #expect(
+            URL(fileURLWithPath: try #require(report.last)).resolvingSymlinksInPath().path
+                == home.projectDirectory.resolvingSymlinksInPath().path)
         #expect(!FileManager.default.fileExists(atPath: selected.folder.path))
         #expect(try adapter.discover().map(\.sessionID) == [kept.sessionID])
     }
@@ -78,14 +82,18 @@ struct KiroV3DeletionTests {
         let adapter = try home.adapter(running: "#!/bin/sh\ntouch \(ShellQuoting.quoted(reportFile.path))\n")
         let listed = try #require(adapter.discover().first)
         let candidates = [
-            Conversation.fixture(provider: .kiro, sessionID: listed.sessionID, projectPath: "/Users/me/elsewhere", sourceFile: listed.sourceFile),
-            Conversation.fixture(provider: .kiro, sessionID: "sess_" + UUID().uuidString.lowercased(),
-                                 projectPath: listed.projectPath, sourceFile: listed.sourceFile),
-            Conversation.fixture(provider: .kiro, sessionID: listed.sessionID, projectPath: listed.projectPath,
-                                 sourceFile: home.classicDirectory.appendingPathComponent(listed.sessionID)
-                                    .appendingPathComponent(KiroV3Session.messagesFileName)),
-            Conversation.fixture(provider: .kiro, sessionID: listed.sessionID, projectPath: listed.projectPath,
-                                 sourceFile: home.root.appendingPathComponent("a/\(listed.sessionID)/messages.jsonl")),
+            Conversation.fixture(
+                provider: .kiro, sessionID: listed.sessionID, projectPath: "/Users/me/elsewhere", sourceFile: listed.sourceFile),
+            Conversation.fixture(
+                provider: .kiro, sessionID: "sess_" + UUID().uuidString.lowercased(),
+                projectPath: listed.projectPath, sourceFile: listed.sourceFile),
+            Conversation.fixture(
+                provider: .kiro, sessionID: listed.sessionID, projectPath: listed.projectPath,
+                sourceFile: home.classicDirectory.appendingPathComponent(listed.sessionID)
+                    .appendingPathComponent(KiroV3Session.messagesFileName)),
+            Conversation.fixture(
+                provider: .kiro, sessionID: listed.sessionID, projectPath: listed.projectPath,
+                sourceFile: home.root.appendingPathComponent("a/\(listed.sessionID)/messages.jsonl")),
         ]
 
         for candidate in candidates {
@@ -95,14 +103,14 @@ struct KiroV3DeletionTests {
         #expect(FileManager.default.fileExists(atPath: written.messagesFile.path))
     }
 
-
     /// Kiro CLI 2.34.0 deletes a V3 session a running CLI holds, whose next turn writes its folder again.
     @Test func aSessionARunningCLIHoldsIsNotHandedToKiro() throws {
         let home = try Home()
         defer { home.remove() }
         let selected = try KiroV3SessionFixture(sessionsRoot: home.sessionsRoot).writeSession(projectPath: home.projectDirectory.path)
-        try KiroSessionLockTests.writeLock(processID: getpid(), startedAt: .now, fractionalDigits: 3,
-                                           to: selected.folder.appendingPathComponent(".lock"))
+        try KiroSessionLockTests.writeLock(
+            processID: getpid(), startedAt: .now, fractionalDigits: 3,
+            to: selected.folder.appendingPathComponent(".lock"))
         let adapter = try home.adapter(running: Self.successfulDeletionScript)
         let conversation = try #require(adapter.discover().first)
 

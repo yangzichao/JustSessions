@@ -101,7 +101,10 @@ final class TranscriptScrollPositionController {
                 .store(in: &observations)
             NotificationCenter.default.publisher(for: NSScrollView.willStartLiveScrollNotification, object: scrollView)
                 .sink { [weak self] _ in
-                    MainActor.assumeIsolated { self?.pendingRestoration = nil; self?.seekTargetStorage = nil }
+                    MainActor.assumeIsolated {
+                        self?.pendingRestoration = nil
+                        self?.seekTargetStorage = nil
+                    }
                 }
                 .store(in: &observations)
             monitorScrollWheel()
@@ -117,7 +120,8 @@ final class TranscriptScrollPositionController {
 
     func geometryDidLayout() {
         guard restoresDuringLayout, let index = pendingRestoration?.entryIndex,
-              entryFrameInClipView(at: index) != nil else { return }
+            entryFrameInClipView(at: index) != nil
+        else { return }
         restoresDuringLayout = false
         restorePositionIfNeeded()
     }
@@ -160,7 +164,8 @@ final class TranscriptScrollPositionController {
     /// binary search of the rows; nil while the pointer is outside the reader or over the toolbar above its text.
     func entryIDAtPointer() -> Int? {
         guard let pointerLocation, let scrollView, let geometryView, geometryView.enclosingScrollView === scrollView,
-              scrollView.window != nil, !entryGeometries.isEmpty else { return nil }
+            scrollView.window != nil, !entryGeometries.isEmpty
+        else { return nil }
         let clipView = scrollView.contentView
         let point = clipView.convert(pointerLocation, from: nil)
         let readable = Self.readableBounds(of: clipView)
@@ -186,7 +191,8 @@ final class TranscriptScrollPositionController {
         scrollWheelMonitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
             MainActor.assumeIsolated {
                 guard let self, let scrollView = self.scrollView, event.window === scrollView.window,
-                      scrollView.bounds.contains(scrollView.convert(event.locationInWindow, from: nil)) else { return }
+                    scrollView.bounds.contains(scrollView.convert(event.locationInWindow, from: nil))
+                else { return }
                 self.handOverToScrolling()
             }
             return event
@@ -242,7 +248,8 @@ final class TranscriptScrollPositionController {
 
     private func restorePositionIfNeeded() {
         guard let pendingRestoration, let scrollView, let documentView = scrollView.documentView,
-              scrollView.contentView.bounds.height > 0, documentView.bounds.height > 0 else { return }
+            scrollView.contentView.bounds.height > 0, documentView.bounds.height > 0
+        else { return }
         let clipView = scrollView.contentView
         var proposedBounds = clipView.bounds
         var restoredEntryFrame: NSRect?
@@ -255,7 +262,8 @@ final class TranscriptScrollPositionController {
             // The offset is from the reader's top, below the toolbar (`readableBounds(of:)`).
             proposedBounds.origin.y = entryFrame.minY + min(offset, max(0, entryFrame.height - 1)) - clipView.contentInsets.top
         }
-        let geometry = RestorationGeometry(documentRect: clipView.documentRect, viewportBounds: clipView.bounds, entryFrame: restoredEntryFrame)
+        let geometry = RestorationGeometry(
+            documentRect: clipView.documentRect, viewportBounds: clipView.bounds, entryFrame: restoredEntryFrame)
         let currentTime = ProcessInfo.processInfo.systemUptime
         if geometry != restorationGeometry {
             restorationGeometry = geometry
@@ -284,7 +292,8 @@ final class TranscriptScrollPositionController {
 
     func currentReadingPosition() -> TranscriptReadingPosition? {
         guard pendingRestoration == nil, !isStopped, let scrollView, let geometryView,
-              geometryView.enclosingScrollView === scrollView else { return nil }
+            geometryView.enclosingScrollView === scrollView
+        else { return nil }
         let clipView = scrollView.contentView
         if tracksTranscriptBottom, clipView.documentRect.maxY - clipView.bounds.maxY <= 2 { return .bottom }
         let visibleBounds = Self.readableBounds(of: clipView)
@@ -320,7 +329,8 @@ final class TranscriptScrollPositionController {
     /// good: once its page left, it would no longer be laid out and would hold again.
     private func forgetSeekTargetOutOfView() {
         guard let index = seekTargetStorage, pendingRestoration == nil, let frame = entryFrameInClipView(at: index),
-              let clipView = scrollView?.contentView, !frame.intersects(Self.readableBounds(of: clipView)) else { return }
+            let clipView = scrollView?.contentView, !frame.intersects(Self.readableBounds(of: clipView))
+        else { return }
         seekTargetStorage = nil
     }
 
@@ -364,7 +374,8 @@ final class TranscriptScrollPositionController {
 
     func entryFrameInClipView(at index: Int) -> CGRect? {
         guard let geometryIndex = geometryIndexByEntry[index], entryGeometries.indices.contains(geometryIndex),
-              let scrollView, let geometryView, geometryView.enclosingScrollView === scrollView else { return nil }
+            let scrollView, let geometryView, geometryView.enclosingScrollView === scrollView
+        else { return nil }
         return geometryView.convert(entryGeometries[geometryIndex].frame, to: scrollView.contentView)
     }
 
@@ -398,8 +409,9 @@ private final class TranscriptPointerTracking {
 
     init(controller: TranscriptScrollPositionController, view: NSView) {
         owner = TranscriptPointerTrackingOwner(controller: controller)
-        area = NSTrackingArea(rect: .zero, options: [.mouseMoved, .mouseEnteredAndExited, .activeInActiveApp, .inVisibleRect],
-                              owner: owner, userInfo: nil)
+        area = NSTrackingArea(
+            rect: .zero, options: [.mouseMoved, .mouseEnteredAndExited, .activeInActiveApp, .inVisibleRect],
+            owner: owner, userInfo: nil)
         self.view = view
         view.addTrackingArea(area)
     }

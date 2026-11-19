@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -25,9 +26,11 @@ struct TranscriptMatchRevealTests {
         defer { fixture.close() }
         let entryID = TranscriptPageIdentity.entryID(record: 300, part: 0)
 
-        fixture.showReader(files.conversation, matchReveal: TranscriptMatchReveal(
-            conversationID: files.conversation.id, entryID: entryID, query: "Message 300,"
-        ))
+        fixture.showReader(
+            files.conversation,
+            matchReveal: TranscriptMatchReveal(
+                conversationID: files.conversation.id, entryID: entryID, query: "Message 300,"
+            ))
 
         try await waitForTheMatch(entryID, query: "Message 300,", in: fixture)
         #expect(shownEntry(in: fixture) == entryID)
@@ -44,13 +47,16 @@ struct TranscriptMatchRevealTests {
         let entryID = TranscriptPageIdentity.entryID(record: 300, part: 0)
         func showsAtTop() -> Bool {
             guard let scrollView = fixture.readerScrollView, let controller = fixture.positionController, !controller.isRestoring,
-                  let frame = controller.entryFrameInClipView(at: entryID) else { return false }
+                let frame = controller.entryFrameInClipView(at: entryID)
+            else { return false }
             return abs(frame.minY - TranscriptScrollPositionController.readableBounds(of: scrollView.contentView).minY - 6) < 1
         }
 
-        fixture.showReader(files.conversation, matchReveal: TranscriptMatchReveal(
-            conversationID: files.conversation.id, entryID: entryID, query: ""
-        ))
+        fixture.showReader(
+            files.conversation,
+            matchReveal: TranscriptMatchReveal(
+                conversationID: files.conversation.id, entryID: entryID, query: ""
+            ))
 
         try await fixture.waitUntil { showsAtTop() }
         #expect(showsAtTop())
@@ -68,9 +74,11 @@ struct TranscriptMatchRevealTests {
         try await fixture.waitUntil { fixture.readerScrollView.flatMap(fixture.visiblePosition(in:)) == .bottom }
         let entryID = TranscriptPageIdentity.entryID(record: 120, part: 0)
 
-        fixture.showReader(conversation, matchReveal: TranscriptMatchReveal(
-            conversationID: conversation.id, entryID: entryID, query: "Message 120,"
-        ))
+        fixture.showReader(
+            conversation,
+            matchReveal: TranscriptMatchReveal(
+                conversationID: conversation.id, entryID: entryID, query: "Message 120,"
+            ))
 
         try await waitForTheMatch(entryID, query: "Message 120,", in: fixture)
         #expect(shownEntry(in: fixture) == entryID)

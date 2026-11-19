@@ -48,8 +48,10 @@ struct ConversationMapScrollReader: NSViewRepresentable {
         /// Whether the map takes the event; a sideways scroll, or one elsewhere, goes on.
         private func takes(_ event: NSEvent) -> Bool {
             guard isScrollable, let window, event.window === window, !isHiddenOrHasHiddenAncestor,
-                  bounds.contains(convert(event.locationInWindow, from: nil)), event.scrollingDeltaY != 0 else { return false }
-            let distance = event.hasPreciseScrollingDeltas
+                bounds.contains(convert(event.locationInWindow, from: nil)), event.scrollingDeltaY != 0
+            else { return false }
+            let distance =
+                event.hasPreciseScrollingDeltas
                 ? event.scrollingDeltaY
                 : event.scrollingDeltaY * ConversationMapMetrics.wheelLineHeight
             // Content follows the fingers, as in a scroll view: a positive delta shows earlier rows.

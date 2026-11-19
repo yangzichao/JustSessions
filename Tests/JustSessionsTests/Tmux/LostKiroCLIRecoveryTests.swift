@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A Kiro CLI a tab left running in tmux under its temporary name, as every Kiro tab closed before Kiro CLI 2.16's
@@ -23,12 +24,14 @@ struct LostKiroCLIRecoveryTests {
         // Kiro's chat process, below the tab's `kiro-cli`: holds the lock while it runs and removes it once the CLI ends,
         // within 0.2 seconds of `kill-session` for Kiro CLI 2.34.0's V2 and V3. It watches its parent rather than
         // trapping the hangup, which a process the test runner starts may ignore.
-        let chat = try sandbox.writeExecutable(named: "kiro-cli-chat", script: """
-            #!/bin/sh
-            printf '{"pid":%s,"started_at":"%s"}' "$$" "$(/bin/date -u +%Y-%m-%dT%H:%M:%S.000Z)" > \(lock)
-            while /bin/kill -0 "$PPID" 2>/dev/null; do /bin/sleep 0.1; done
-            /bin/rm -f \(lock)
-            """)
+        let chat = try sandbox.writeExecutable(
+            named: "kiro-cli-chat",
+            script: """
+                #!/bin/sh
+                printf '{"pid":%s,"started_at":"%s"}' "$$" "$(/bin/date -u +%Y-%m-%dT%H:%M:%S.000Z)" > \(lock)
+                while /bin/kill -0 "$PPID" 2>/dev/null; do /bin/sleep 0.1; done
+                /bin/rm -f \(lock)
+                """)
         _ = try sandbox.writeExecutable(named: "kiro-cli", script: "#!/bin/sh\n\(ShellQuoting.quoted(chat.path))\n")
         let adapter = KiroAdapter(
             sessionsDirectory: sessionsDirectory,
@@ -43,8 +46,9 @@ struct LostKiroCLIRecoveryTests {
         tab.startIfNeeded()
         let temporaryName = try #require(tab.tmuxSessionName)
         #expect(temporaryName.hasPrefix(LostKiroCLIs.temporaryNamePrefix))
-        try #require(await sandbox.waitUntil { KiroSessionLock.heldLock(forSessionFile: sessionFile) != nil },
-                     "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil { KiroSessionLock.heldLock(forSessionFile: sessionFile) != nil },
+            "\(sandbox.launchDiagnostics(for: tab))")
         let chatProcessID = try #require(KiroSessionLock(file: lockFile)?.processID)
         defer { kill(chatProcessID, SIGKILL) }
         // While the tab shows it, its CLI isn't anyone's to take.

@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+
 @testable import JustSessions
 
 /// One scenario's app and the one tab whose CLI the scenario drives. Each tool's steps keep their own world; the steps

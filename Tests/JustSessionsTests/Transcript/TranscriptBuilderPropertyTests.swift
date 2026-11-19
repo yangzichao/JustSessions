@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// Random sequences of appends. Whatever the sequence, the built transcript keeps the rules the preview relies on.
@@ -8,7 +9,9 @@ struct TranscriptBuilderPropertyTests {
         case compaction
     }
 
-    private static let texts = ["", "  ", "\n", "hello", "  padded  ", "line one\nline two", String(repeating: "long ", count: 10), "é 🚀 中"]
+    private static let texts = [
+        "", "  ", "\n", "hello", "  padded  ", "line one\nline two", String(repeating: "long ", count: 10), "é 🚀 中",
+    ]
     private static let maximumTextLength = 20
 
     @Test(arguments: [(UInt64(1), 50), (2, 5), (3, 1), (4, 10_000), (5, 3), (6, 120)])
@@ -41,8 +44,10 @@ struct TranscriptBuilderPropertyTests {
         let appendedToolCallCount = steps.filter {
             if case .append(.toolCall, let text) = $0 { !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } else { false }
         }.count
-        let shownToolCallCount = fullTranscript.entries.map { if case .toolCalls(let summaries) = $0.content { summaries.count } else { 0 } }
-            .reduce(0, +)
+        let shownToolCallCount = fullTranscript.entries.map {
+            if case .toolCalls(let summaries) = $0.content { summaries.count } else { 0 }
+        }
+        .reduce(0, +)
         #expect(shownToolCallCount == appendedToolCallCount)
     }
 

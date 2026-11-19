@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 extension RemoteDroppedFileCopier {

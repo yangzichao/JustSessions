@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -13,9 +14,10 @@ struct ExternalEditorStoreTests {
         let editorStore = ExternalEditorStore { installedApplications[$0] }
 
         #expect(editorStore.installedEditors.map(\.name) == ["IntelliJ IDEA", "Visual Studio Code", "Zed"])
-        #expect(editorStore.installedEditors.map(\.applicationURL.lastPathComponent) == [
-            "IntelliJ IDEA Ultimate.app", "Visual Studio Code.app", "Zed.app",
-        ])
+        #expect(
+            editorStore.installedEditors.map(\.applicationURL.lastPathComponent) == [
+                "IntelliJ IDEA Ultimate.app", "Visual Studio Code.app", "Zed.app",
+            ])
     }
 
     @Test func prefersTheNewestBundleIdentifierAndListsEachAppOnce() {

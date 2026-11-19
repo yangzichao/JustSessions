@@ -2,6 +2,7 @@ import AppKit
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A tab's process runs the same way whichever engine draws its terminal: on a pseudo-terminal of the app's, as the
@@ -22,12 +23,14 @@ struct TabTerminalLifecycleTests {
     @Test(arguments: TerminalEngine.allCases)
     func resizingTheTerminalResizesTheProcesssPseudoTerminal(_ engine: TerminalEngine) async throws {
         // Reports its terminal's size as `SIZE:<rows> <columns>;` at the start and on each SIGWINCH.
-        let fixture = try TabTerminalFixture(engine: engine, script: """
-            report() { printf 'SIZE:%s;\\n' "$(stty size)"; }
-            trap report WINCH
-            report
-            while :; do sleep 0.1; done
-            """)
+        let fixture = try TabTerminalFixture(
+            engine: engine,
+            script: """
+                report() { printf 'SIZE:%s;\\n' "$(stty size)"; }
+                trap report WINCH
+                report
+                while :; do sleep 0.1; done
+                """)
         defer { fixture.tearDown() }
         fixture.tab.startIfNeeded()
         try await expectEventually { fixture.reportedSize != nil && fixture.reportedSize == fixture.terminalSize }
@@ -131,8 +134,9 @@ private final class TabTerminalFixture {
     /// The last size the process reported, as `stty size` prints it: rows, then columns.
     var reportedSize: TerminalGridSize? {
         guard let report = screen.components(separatedBy: "SIZE:").last(where: { $0.contains(";") }),
-              let numbers = report.split(separator: ";").first?.split(separator: " "),
-              numbers.count == 2, let rows = Int(numbers[0]), let columns = Int(numbers[1]) else { return nil }
+            let numbers = report.split(separator: ";").first?.split(separator: " "),
+            numbers.count == 2, let rows = Int(numbers[0]), let columns = Int(numbers[1])
+        else { return nil }
         return TerminalGridSize(rows: rows, columns: columns)
     }
 

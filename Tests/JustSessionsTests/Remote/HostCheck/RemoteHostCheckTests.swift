@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The check's steps, with `ssh` stood in for: the login, the shell startup, then the script.
@@ -10,11 +11,16 @@ struct RemoteHostCheckTests {
         let recorder = RemoteCommandRecorder()
         let check = RemoteHostCheck(
             runner: recorder.runner(answering: (0, "")),
-            connectionCheck: RemoteHostConnectionCheck(runner: recorder.runner(answering: (
-                RemoteHostCommandRunner.connectionFailureExitStatus,
-                "me@devbox: Permission denied (publickey)."
-            ))),
-            shellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in Issue.record("Checked the shell startup"); return nil })
+            connectionCheck: RemoteHostConnectionCheck(
+                runner: recorder.runner(
+                    answering: (
+                        RemoteHostCommandRunner.connectionFailureExitStatus,
+                        "me@devbox: Permission denied (publickey)."
+                    ))),
+            shellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in
+                Issue.record("Checked the shell startup")
+                return nil
+            })
         )
 
         var steps: [HostCheckStep] = []
@@ -109,7 +115,10 @@ struct RemoteHostCheckTests {
         let check = RemoteHostCheck(
             runner: recorder.runner(answering: (0, hostCheckScriptOutput(["shell": "/bin/bash", "done": ""]))),
             connectionCheck: RemoteHostConnectionCheck(runner: recorder.runner(answering: (0, "%OS% :OS\n"))),
-            shellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in Issue.record("Checked the shell startup"); return nil })
+            shellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in
+                Issue.record("Checked the shell startup")
+                return nil
+            })
         )
 
         _ = check.check(
@@ -177,4 +186,3 @@ struct RemoteHostCheckTests {
         #expect(claude.summary.contains(installedClaude))
     }
 }
-

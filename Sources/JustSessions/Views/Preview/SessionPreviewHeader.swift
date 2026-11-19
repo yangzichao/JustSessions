@@ -33,7 +33,8 @@ struct SessionPreviewHeader: View {
                 MissingProjectFolderNote(projectPath: conversation.projectPath)
             }
             if store.runningTerminal(for: conversation) == nil,
-               let otherWindowTab = store.runningTerminalInAnotherWindow(for: conversation) {
+                let otherWindowTab = store.runningTerminalInAnotherWindow(for: conversation)
+            {
                 SessionInAnotherWindowNote(
                     tab: otherWindowTab,
                     onShow: { store.showRunningTerminalInAnotherWindow(for: conversation) },

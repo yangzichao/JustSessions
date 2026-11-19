@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteConversationDeletionTests {
@@ -10,7 +11,8 @@ struct RemoteConversationDeletionTests {
         let projectFolder = root.appendingPathComponent("home/.claude/projects/-home-me-bob's paper")
         let sessionID = UUID().uuidString.lowercased()
         let keptID = UUID().uuidString.lowercased()
-        try FileManager.default.createDirectory(at: projectFolder.appendingPathComponent("\(sessionID)/subagents"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: projectFolder.appendingPathComponent("\(sessionID)/subagents"), withIntermediateDirectories: true)
         try "{}".write(to: projectFolder.appendingPathComponent("\(sessionID).jsonl"), atomically: true, encoding: .utf8)
         try "{}".write(to: projectFolder.appendingPathComponent("\(keptID).jsonl"), atomically: true, encoding: .utf8)
         let index: [String: Any] = ["entries": [["sessionId": sessionID], ["sessionId": keptID]], "originalPath": "/home/me"]
@@ -29,9 +31,10 @@ struct RemoteConversationDeletionTests {
         #expect(!fileManager.fileExists(atPath: projectFolder.appendingPathComponent(sessionID).path))
         #expect(fileManager.fileExists(atPath: projectFolder.appendingPathComponent("\(keptID).jsonl").path))
         #expect(!fileManager.fileExists(atPath: mirrorFile.path))
-        let updatedIndex = try JSONSerialization.jsonObject(
-            with: Data(contentsOf: projectFolder.appendingPathComponent("sessions-index.json"))
-        ) as? [String: Any]
+        let updatedIndex =
+            try JSONSerialization.jsonObject(
+                with: Data(contentsOf: projectFolder.appendingPathComponent("sessions-index.json"))
+            ) as? [String: Any]
         let remainingIDs = (updatedIndex?["entries"] as? [[String: Any]])?.compactMap { $0["sessionId"] as? String }
         #expect(remainingIDs == [keptID])
         #expect(updatedIndex?["originalPath"] as? String == "/home/me")
@@ -45,10 +48,14 @@ struct RemoteConversationDeletionTests {
         let recorder = RemoteCommandRecorder()
         let deletion = RemoteConversationDeletion(runner: recorder.runner(answering: (0, "")))
 
-        try deletion.delete(remoteConversation(.codex, sessionID: sessionID, sourceFile: URL(fileURLWithPath: "/tmp/rollout-\(sessionID).jsonl")))
+        try deletion.delete(
+            remoteConversation(.codex, sessionID: sessionID, sourceFile: URL(fileURLWithPath: "/tmp/rollout-\(sessionID).jsonl")))
 
         #expect(recorder.commands.map(\.host) == ["devbox"])
-        #expect(recorder.commands.map(\.command) == [RemoteCLICommandBuilder.loginShellCommand("codex delete --force '\(sessionID)'", on: "devbox")])
+        #expect(
+            recorder.commands.map(\.command) == [
+                RemoteCLICommandBuilder.loginShellCommand("codex delete --force '\(sessionID)'", on: "devbox")
+            ])
     }
 
     @Test func unreachableHostIsReportedAsAConnectionProblem() {

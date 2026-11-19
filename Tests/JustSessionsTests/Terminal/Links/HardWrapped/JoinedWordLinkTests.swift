@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// The URL or path in a word joined from rows; see `JoinedWordLink`.
@@ -8,8 +9,9 @@ struct JoinedWordLinkTests {
     }
 
     @Test func aURLKeepsTheBracketItOpenedButNotTheCommaAfterIt() {
-        #expect(link(in: "https://en.wikipedia.org/wiki/Swift_(language),", holding: 5)
-            == "https://en.wikipedia.org/wiki/Swift_(language)")
+        #expect(
+            link(in: "https://en.wikipedia.org/wiki/Swift_(language),", holding: 5)
+                == "https://en.wikipedia.org/wiki/Swift_(language)")
     }
 
     @Test func aPathKeepsItsLineNumberButNotTheColonAfterIt() {

@@ -28,7 +28,8 @@ struct SessionModel: Sendable, Codable, Equatable, Hashable {
         var name = id
         if name.hasPrefix("claude-"), name.count > "claude-".count { name.removeFirst("claude-".count) }
         if let dash = name.lastIndex(of: "-"), name[name.index(after: dash)...].count == 8,
-           name[name.index(after: dash)...].allSatisfy(\.isNumber), dash > name.startIndex {
+            name[name.index(after: dash)...].allSatisfy(\.isNumber), dash > name.startIndex
+        {
             name = String(name[..<dash])
         }
         return name

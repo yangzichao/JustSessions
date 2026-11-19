@@ -50,8 +50,10 @@ struct ConversationMapLayout: Equatable {
 
     /// Fit to height: the natural pitch while every row fits, never stretched; squeezed otherwise, down to
     /// `minimumPitch`, past which the rows scroll. `offsetFromTop` nil shows the newest rows, at the bottom.
-    init(rowCount: Int, height: CGFloat, naturalPitch: CGFloat, verticalInset: CGFloat, minimumPitch: CGFloat = 0,
-         offsetFromTop: CGFloat? = nil) {
+    init(
+        rowCount: Int, height: CGFloat, naturalPitch: CGFloat, verticalInset: CGFloat, minimumPitch: CGFloat = 0,
+        offsetFromTop: CGFloat? = nil
+    ) {
         self.rowCount = rowCount
         self.height = max(0, height)
         let available = max(0, height - 2 * verticalInset)
@@ -151,8 +153,10 @@ struct ConversationMapLayout: Equatable {
     /// all apart (26 at a large interface size in a short window) they overlap evenly instead, each below the one before,
     /// so every chip's top still shows. A bookmark without a block (gone, or newer than the last read) has none. A chip
     /// shows `titles[letter]`, or else its letter in a square of `side`.
-    func chips(for bookmarks: [MessageBookmark], in outline: ConversationOutline, side: CGFloat, height: CGFloat,
-               titles: [String: ChipTitle] = [:]) -> [Chip] {
+    func chips(
+        for bookmarks: [MessageBookmark], in outline: ConversationOutline, side: CGFloat, height: CGFloat,
+        titles: [String: ChipTitle] = [:]
+    ) -> [Chip] {
         var chips = bookmarks.compactMap { bookmark -> Chip? in
             guard let index = outline.blockIndex(for: bookmark) else { return nil }
             let rowY = y(ofRow: outline.rowStarts[index])
@@ -179,9 +183,11 @@ struct ConversationMapLayout: Equatable {
     /// The bookmark whose chip is under `point`: within its width from the trailing edge and its height. Where chips
     /// overlap, the lower one, drawn last.
     func bookmark(at point: CGPoint, chips: [Chip], bookmarks: [MessageBookmark], width: CGFloat, side: CGFloat) -> MessageBookmark? {
-        guard let chip = chips.last(where: {
-            point.y >= $0.chipY && point.y <= $0.chipY + side && point.x >= Self.chipMinX(of: $0, width: width)
-        }) else { return nil }
+        guard
+            let chip = chips.last(where: {
+                point.y >= $0.chipY && point.y <= $0.chipY + side && point.x >= Self.chipMinX(of: $0, width: width)
+            })
+        else { return nil }
         return bookmarks.first { $0.letter == chip.letter }
     }
 

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Once one window has copied an SSH host, the other windows list that copy instead of copying the host again.
@@ -40,8 +41,9 @@ struct SharedRemoteCopyTests {
         let (discovery, _) = try Self.copyWithOneClaudeSession(in: sandbox)
         sandbox.second.disconnectHost("devbox", endingTmuxSessions: false, connections: SSHLoginConnections(close: { _, _ in }))
 
-        sandbox.first.shareRemoteHostCopy("devbox", refreshedAt: .now,
-                                         status: RemoteHostStatus(tmuxSessionNames: ["justsessions-claude-stale"], cliLocations: [:]), discovery: discovery)
+        sandbox.first.shareRemoteHostCopy(
+            "devbox", refreshedAt: .now,
+            status: RemoteHostStatus(tmuxSessionNames: ["justsessions-claude-stale"], cliLocations: [:]), discovery: discovery)
         try await Task.sleep(for: .milliseconds(50))
 
         #expect(sandbox.second.conversations.filter { $0.host == .ssh("devbox") }.isEmpty)

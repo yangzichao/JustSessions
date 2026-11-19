@@ -68,7 +68,8 @@ final class OnboardingTourPopoverAnchorView: NSView {
     /// At least half the view shows, so the arrow points at what the card is about rather than past a list's edge.
     private var isInSight: Bool {
         guard let window, window.isVisible, window.attachedSheet == nil, !isHiddenOrHasHiddenAncestor,
-              !bounds.isEmpty else { return false }
+            !bounds.isEmpty
+        else { return false }
         guard let clipView = enclosingScrollView?.contentView else { return true }
         // Measured against the scroll view's clip view: `visibleRect` reaches past the bounds of views that don't
         // clip to them, as SwiftUI's hosts don't.
@@ -119,16 +120,17 @@ final class OnboardingTourPopoverAnchorView: NSView {
         ]
         if let clipView = enclosingScrollView?.contentView {
             clipView.postsBoundsChangedNotifications = true
-            observers.append(center.addObserver(forName: NSView.boundsDidChangeNotification, object: clipView, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.schedulePopoverUpdate() }
-            })
+            observers.append(
+                center.addObserver(forName: NSView.boundsDidChangeNotification, object: clipView, queue: .main) { [weak self] _ in
+                    MainActor.assumeIsolated { self?.schedulePopoverUpdate() }
+                })
         }
     }
 }
 
-private extension Edge {
+extension Edge {
     /// The popover's side of a view that is not flipped, as this one is not.
-    var popoverRectEdge: NSRectEdge {
+    fileprivate var popoverRectEdge: NSRectEdge {
         switch self {
         case .top: .maxY
         case .bottom: .minY

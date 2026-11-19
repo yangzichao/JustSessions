@@ -19,7 +19,7 @@ extension Array where Element == NotificationBellEntry {
     func sortedNewestFirst() -> [NotificationBellEntry] {
         sorted { first, second in
             switch (first.waitingSince, second.waitingSince) {
-            case let (firstStart?, secondStart?) where firstStart != secondStart:
+            case (let firstStart?, let secondStart?) where firstStart != secondStart:
                 return firstStart > secondStart
             case (.some, nil):
                 return true

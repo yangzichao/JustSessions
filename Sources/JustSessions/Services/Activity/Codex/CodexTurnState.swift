@@ -19,8 +19,9 @@ enum CodexTurnState: Equatable, Sendable {
     /// The state a turn event leaves the session in; nil for any other line.
     init?(turnEventLine line: Data) {
         guard let object = ConversationMetadata.object(from: line),
-              object["type"] as? String == "event_msg",
-              let payload = object["payload"] as? [String: Any] else { return nil }
+            object["type"] as? String == "event_msg",
+            let payload = object["payload"] as? [String: Any]
+        else { return nil }
         switch payload["type"] as? String {
         case "task_started": self = .inTurn(startedAt: ConversationMetadata.date(object["timestamp"]))
         case "task_complete", "turn_aborted": self = .betweenTurns
@@ -33,9 +34,12 @@ enum CodexTurnState: Equatable, Sendable {
         var searchEnd = text.endIndex
         while searchEnd > text.startIndex {
             let searchRange = text.startIndex..<searchEnd
-            guard let markerRange = turnEventMarkers
-                .compactMap({ text.range(of: $0, options: .backwards, in: searchRange) })
-                .max(by: { $0.lowerBound < $1.lowerBound }) else { return nil }
+            guard
+                let markerRange =
+                    turnEventMarkers
+                    .compactMap({ text.range(of: $0, options: .backwards, in: searchRange) })
+                    .max(by: { $0.lowerBound < $1.lowerBound })
+            else { return nil }
             let lineStart = text[..<markerRange.lowerBound].lastIndex(of: newline).map { $0 + 1 } ?? text.startIndex
             let lineEnd = text[markerRange.upperBound...].firstIndex(of: newline) ?? text.endIndex
             if let state = CodexTurnState(turnEventLine: Data(text[lineStart..<lineEnd])) { return state }

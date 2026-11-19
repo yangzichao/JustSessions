@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs the real `/usr/bin/ssh -G`, which reads the config and exits without connecting.
@@ -51,23 +52,23 @@ struct SSHHostConfigurationTests {
         defer { try? FileManager.default.removeItem(at: root) }
         let configFile = root.appendingPathComponent("config")
         try """
-            Host allowed
-              HostName 192.0.2.20
-              User deploy
-              Port 2202
-              ProxyJump gateway
-              StrictHostKeyChecking yes
-            Host disabled
-              ControlMaster no
-            Host own-path
-              ControlMaster auto
-              ControlPath ~/.ssh/own-%C
-            Host no-path
-              ControlPath none
-            Host no-persist
-              ControlPersist no
+        Host allowed
+          HostName 192.0.2.20
+          User deploy
+          Port 2202
+          ProxyJump gateway
+          StrictHostKeyChecking yes
+        Host disabled
+          ControlMaster no
+        Host own-path
+          ControlMaster auto
+          ControlPath ~/.ssh/own-%C
+        Host no-path
+          ControlPath none
+        Host no-persist
+          ControlPersist no
 
-            """.write(to: configFile, atomically: true, encoding: .utf8)
+        """.write(to: configFile, atomically: true, encoding: .utf8)
         let fallbackPath = "/tmp/justsessions-test/master"
         func resolve(_ host: String) -> SSHHostConfiguration? {
             SSHHostConfiguration.resolveWithConnectionSharingFallback(
@@ -99,25 +100,26 @@ struct SSHHostConfigurationTests {
         defer { try? FileManager.default.removeItem(at: root) }
         let userConfig = root.appendingPathComponent("user-config")
         try """
-            Host another-host
-              HostName 192.0.2.30
+        Host another-host
+          HostName 192.0.2.30
 
-            """.write(to: userConfig, atomically: true, encoding: .utf8)
+        """.write(to: userConfig, atomically: true, encoding: .utf8)
         let systemConfig = root.appendingPathComponent("system-config")
         try """
-            Host devbox
-              ControlMaster no
-              ControlPath none
-              ControlPersist no
+        Host devbox
+          ControlMaster no
+          ControlPath none
+          ControlPersist no
 
-            """.write(to: systemConfig, atomically: true, encoding: .utf8)
+        """.write(to: systemConfig, atomically: true, encoding: .utf8)
 
-        let configuration = try #require(SSHHostConfiguration.resolveWithConnectionSharingFallback(
-            host: "devbox",
-            controlPath: "/tmp/justsessions-test/master",
-            userConfigFile: userConfig.path,
-            systemConfigFile: systemConfig.path
-        ))
+        let configuration = try #require(
+            SSHHostConfiguration.resolveWithConnectionSharingFallback(
+                host: "devbox",
+                controlPath: "/tmp/justsessions-test/master",
+                userConfigFile: userConfig.path,
+                systemConfigFile: systemConfig.path
+            ))
 
         #expect(configuration.controlMaster == "false")
         #expect(configuration.controlPath == nil)

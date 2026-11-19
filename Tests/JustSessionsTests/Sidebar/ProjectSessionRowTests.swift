@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ProjectSessionRowTests {
@@ -21,12 +22,13 @@ struct ProjectSessionRowTests {
             conversations: group.conversations, pendingNewSessions: group.pendingNewSessions, pinnedItems: pinnedItems
         )
 
-        #expect(rows.map(\.id) == [
-            "conversation:\(pinnedOlder.id)",
-            "pending:\(newSession.id.uuidString)",
-            "conversation:\(unpinnedNewest.id)",
-            "conversation:\(unpinnedOlder.id)",
-        ])
+        #expect(
+            rows.map(\.id) == [
+                "conversation:\(pinnedOlder.id)",
+                "pending:\(newSession.id.uuidString)",
+                "conversation:\(unpinnedNewest.id)",
+                "conversation:\(unpinnedOlder.id)",
+            ])
     }
 
     @Test func withoutPinsNewSessionsComeFirst() {

@@ -9,26 +9,34 @@ extension TerminalContextMenu {
         switch store.splitMenu(forTab: tab.id) {
         case .addTabToNewSplit(let candidates, let providers, let host, let canStartNewTabs):
             let newSplitItems = [TerminalSplit.Orientation.sideBySide, .stacked].map { orientation in
-                newSplitItem(orientation, candidates: candidates, providers: providers, host: host, canStartNewTabs: canStartNewTabs, perform: perform)
+                newSplitItem(
+                    orientation, candidates: candidates, providers: providers, host: host, canStartNewTabs: canStartNewTabs,
+                    perform: perform)
             }
             return newSplitItems + [.separator()]
         case .arrangeSplit(let orientation):
-            let item = submenuItem(title: localized("Arrange split view"), systemImage: orientation.systemImage, items: [
-                ActionMenuItem(title: localized("Separate views"), systemImage: "arrow.up.left.and.arrow.down.right") {
-                    perform(.separateViews)
-                },
-                .separator(),
-                ActionMenuItem(title: localized(orientation.closeViewTitle(.left)), systemImage: "xmark") { perform(.closeView(.left)) },
-                ActionMenuItem(title: localized(orientation.closeViewTitle(.right)), systemImage: "xmark") { perform(.closeView(.right)) },
-                .separator(),
-                ActionMenuItem(
-                    title: localized("Reverse views"),
-                    systemImage: orientation == .sideBySide ? "arrow.left.arrow.right" : "arrow.up.arrow.down"
-                ) { perform(.reverseViews) },
-                ActionMenuItem(title: localized(orientation.toggleTitle), systemImage: orientation.toggled.systemImage) {
-                    perform(.setOrientation(orientation.toggled))
-                },
-            ])
+            let item = submenuItem(
+                title: localized("Arrange split view"), systemImage: orientation.systemImage,
+                items: [
+                    ActionMenuItem(title: localized("Separate views"), systemImage: "arrow.up.left.and.arrow.down.right") {
+                        perform(.separateViews)
+                    },
+                    .separator(),
+                    ActionMenuItem(title: localized(orientation.closeViewTitle(.left)), systemImage: "xmark") {
+                        perform(.closeView(.left))
+                    },
+                    ActionMenuItem(title: localized(orientation.closeViewTitle(.right)), systemImage: "xmark") {
+                        perform(.closeView(.right))
+                    },
+                    .separator(),
+                    ActionMenuItem(
+                        title: localized("Reverse views"),
+                        systemImage: orientation == .sideBySide ? "arrow.left.arrow.right" : "arrow.up.arrow.down"
+                    ) { perform(.reverseViews) },
+                    ActionMenuItem(title: localized(orientation.toggleTitle), systemImage: orientation.toggled.systemImage) {
+                        perform(.setOrientation(orientation.toggled))
+                    },
+                ])
             return [item, .separator()]
         case .newSplitWithSelectedTab, .moveIntoShownSplit, nil:
             // A terminal on screen is the selected tab's or in its split, so the entries for tabs off screen never
@@ -46,18 +54,19 @@ extension TerminalContextMenu {
         canStartNewTabs: Bool,
         perform: @escaping (TerminalTabSplitAction) -> Void
     ) -> NSMenuItem {
-        let newTabItems: [NSMenuItem] = NewSessionProviderMenuItems.appKitItems(
-            providers: providers,
-            host: host,
-            language: language ?? AppLanguageStore.shared.language,
-            isEnabled: canStartNewTabs
-        ) { provider in
-            perform(.openInNewSplit(.session(provider), orientation))
-        } + [
-            ActionMenuItem(title: localized("Terminal"), systemImage: "apple.terminal", isEnabled: canStartNewTabs) {
-                perform(.openInNewSplit(.terminal, orientation))
-            },
-        ]
+        let newTabItems: [NSMenuItem] =
+            NewSessionProviderMenuItems.appKitItems(
+                providers: providers,
+                host: host,
+                language: language ?? AppLanguageStore.shared.language,
+                isEnabled: canStartNewTabs
+            ) { provider in
+                perform(.openInNewSplit(.session(provider), orientation))
+            } + [
+                ActionMenuItem(title: localized("Terminal"), systemImage: "apple.terminal", isEnabled: canStartNewTabs) {
+                    perform(.openInNewSplit(.terminal, orientation))
+                }
+            ]
         let tabItems: [NSMenuItem] = candidates.map { candidate in
             ActionMenuItem(title: candidate.menuTitle) { perform(.addToNewSplit(candidate.id, orientation)) }
         }

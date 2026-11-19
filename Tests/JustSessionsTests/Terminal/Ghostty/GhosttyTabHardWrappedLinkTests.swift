@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A ⌘-click on a link a CLI broke over rows opens all of it in a Ghostty tab whose process draws the screen; see
@@ -21,7 +22,8 @@ struct GhosttyTabHardWrappedLinkTests {
         let grid = TerminalTestGrid(try #require(fixture.view.gridMetrics), scale: fixture.window.backingScaleFactor)
         let url = Self.longURL(for: grid)
         let firstRowPart = url.prefix(grid.columns - 4)
-        let screen = "\u{1B}[?1049h\u{1B}[2J\u{1B}[1;1HSee \(firstRowPart)"
+        let screen =
+            "\u{1B}[?1049h\u{1B}[2J\u{1B}[1;1HSee \(firstRowPart)"
             + "\u{1B}[2;3H\(url.dropFirst(firstRowPart.count)) for it\u{1B}[4;1HREADY"
         try screen.write(to: fixture.folder.appendingPathComponent("screen"), atomically: true, encoding: .utf8)
         fixture.signal("screen-written")
@@ -48,10 +50,13 @@ struct GhosttyTabHardWrappedLinkTests {
         fixture.view.onOpenLink = { openedLinks.append($0) }
         fixture.view.startProcess(
             executable: "/bin/sh",
-            args: ["-c", """
+            args: [
+                "-c",
+                """
                 while [ ! -e lines-written ]; do sleep 0.02; done
                 exec "$0" -S "$1" -f /dev/null new-session 'cat lines; sleep 600' \\; set -g mouse on \\; set -g status off
-                """, tmux, socket],
+                """, tmux, socket,
+            ],
             environment: ["HOME=\(fixture.folder.path)", "PATH=/usr/bin:/bin", "TERM=xterm-256color", "LANG=en_US.UTF-8"],
             execName: nil,
             currentDirectory: fixture.folder.path

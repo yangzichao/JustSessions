@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Session files as the CLIs write them, one JSON object per line, for tests that damage or interleave them.
@@ -39,15 +40,16 @@ enum SampleTranscriptLines {
     ]
 
     /// Lines no reader shows anything for: not JSON, not an object, or an object of an unexpected shape.
-    static let unusable: [Data] = [
-        "not json", "{", "}", "[1,2,3]", "null", "\"just a string\"", "{\"type\":",
-        #"{"timestamp":"2026-09-24T10:00:00.000Z","type":"response_item","payload":{"type":"message""#,
-        #"{"type":"user","message":"not an object"}"#,
-        #"{"type":"assistant","message":{"content":42}}"#,
-        #"{"timestamp":"2026-09-24T10:00:00.000Z","type":"response_item","payload":{"type":"message","role":"user","content":"not an array"}}"#,
-        #"{"timestamp":"2026-09-24T10:00:00.000Z","type":"response_item","payload":"not an object"}"#,
-        "\r",
-    ].map { Data($0.utf8) } + [Data([0xFF, 0xFE, 0x00, 0x7B]), Data([0xC3])]
+    static let unusable: [Data] =
+        [
+            "not json", "{", "}", "[1,2,3]", "null", "\"just a string\"", "{\"type\":",
+            #"{"timestamp":"2026-09-24T10:00:00.000Z","type":"response_item","payload":{"type":"message""#,
+            #"{"type":"user","message":"not an object"}"#,
+            #"{"type":"assistant","message":{"content":42}}"#,
+            #"{"timestamp":"2026-09-24T10:00:00.000Z","type":"response_item","payload":{"type":"message","role":"user","content":"not an array"}}"#,
+            #"{"timestamp":"2026-09-24T10:00:00.000Z","type":"response_item","payload":"not an object"}"#,
+            "\r",
+        ].map { Data($0.utf8) } + [Data([0xFF, 0xFE, 0x00, 0x7B]), Data([0xC3])]
 
     static func fileContents(_ lines: [Data]) -> Data {
         Data(lines.joined(separator: [0x0A])) + [0x0A]

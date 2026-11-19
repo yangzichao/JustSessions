@@ -35,7 +35,8 @@ struct ClaudeSubagentSession: Sendable, Codable {
         }
         self.model = model
         let metadataFile = file.deletingPathExtension().appendingPathExtension("meta.json")
-        let description = (try? Data(contentsOf: metadataFile))
+        let description =
+            (try? Data(contentsOf: metadataFile))
             .flatMap(ConversationMetadata.object(from:))?["description"] as? String
         self.workingDirectory = workingDirectory
         title = ConversationMetadata.cleanTitle(
@@ -53,11 +54,13 @@ enum ClaudeSubagentSessions {
     /// The subagent transcripts in the folder of the session with `sessionID`, in any order.
     static func files(ofSessionID sessionID: String, inProjectDirectory projectDirectory: URL) -> [URL] {
         let folder = projectDirectory.appendingPathComponent(sessionID).appendingPathComponent("subagents")
-        guard let enumerator = FileManager.default.enumerator(
-            at: folder,
-            includingPropertiesForKeys: [.isRegularFileKey, .contentModificationDateKey, .fileSizeKey],
-            options: [.skipsHiddenFiles]
-        ) else { return [] }
+        guard
+            let enumerator = FileManager.default.enumerator(
+                at: folder,
+                includingPropertiesForKeys: [.isRegularFileKey, .contentModificationDateKey, .fileSizeKey],
+                options: [.skipsHiddenFiles]
+            )
+        else { return [] }
         return enumerator.compactMap { $0 as? URL }.filter { file in
             file.pathExtension == "jsonl" && agentID(of: file) != nil
                 && (try? file.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true

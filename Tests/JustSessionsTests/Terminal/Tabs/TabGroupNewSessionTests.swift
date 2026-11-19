@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A tab group's right-click menu, on its label in the tab bar or its heading in Open tabs, starts a new session or a

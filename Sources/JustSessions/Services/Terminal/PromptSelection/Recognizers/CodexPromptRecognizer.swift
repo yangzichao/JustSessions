@@ -18,8 +18,8 @@ enum CodexPromptRecognizer {
         let rows = screen.rows
         let caretRow = screen.cursor.row
         guard let firstRow = rows[...caretRow].lastIndex(where: isFirstRow),
-              let lastRow = lastPromptRow(in: rows), lastRow >= caretRow,
-              rows[(firstRow + 1)..<(lastRow + 1)].allSatisfy({ $0.isBlank(beforeColumn: textStartColumn) })
+            let lastRow = lastPromptRow(in: rows), lastRow >= caretRow,
+            rows[(firstRow + 1)..<(lastRow + 1)].allSatisfy({ $0.isBlank(beforeColumn: textStartColumn) })
         else { return nil }
         return CLIPrompt(
             lines: (firstRow...lastRow).map { CLIPromptLine(row: $0, of: screen, startColumn: textStartColumn) },
@@ -36,8 +36,8 @@ enum CodexPromptRecognizer {
     /// The row above the empty row that sits above the footer, the last rows with text.
     private static func lastPromptRow(in rows: [TerminalScreenRow]) -> Int? {
         guard let lastRowWithText = rows.lastIndex(where: { $0.firstTextIndex != nil }),
-              let separator = rows[...lastRowWithText].lastIndex(where: { $0.firstTextIndex == nil }),
-              separator > 0
+            let separator = rows[...lastRowWithText].lastIndex(where: { $0.firstTextIndex == nil }),
+            separator > 0
         else { return nil }
         return separator - 1
     }

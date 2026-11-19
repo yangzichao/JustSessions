@@ -17,7 +17,8 @@ enum CodexTitleActivity {
     /// Nil for a title with no run state, as from Codex before 0.124 or before it first titles its terminal.
     static func activity(inTerminalTitle title: String) -> CLIActivity? {
         guard let firstItem = title.components(separatedBy: " | ").first?.trimmingCharacters(in: .whitespaces),
-              !firstItem.isEmpty else { return nil }
+            !firstItem.isEmpty
+        else { return nil }
         if firstItem.hasSuffix(actionRequired) { return .needsInput(reason: nil) }
         // The spinner frame and `●`, when shown, come before the run state.
         guard let runState = firstItem.split(whereSeparator: \.isWhitespace).last else { return nil }

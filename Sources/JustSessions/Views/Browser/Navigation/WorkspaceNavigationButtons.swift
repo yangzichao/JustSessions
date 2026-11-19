@@ -49,7 +49,9 @@ struct WorkspaceNavigationButtons: View {
         .accessibilityLabel(actionName)
         .contextMenu {
             ForEach(destinations.prefix(Self.menuDestinationLimit)) { destination in
-                Button { navigation.go(destination) } label: {
+                Button {
+                    navigation.go(destination)
+                } label: {
                     Label(destination.title, systemImage: Self.symbolName(of: destination.location))
                 }
             }

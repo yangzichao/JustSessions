@@ -15,21 +15,24 @@ struct AntigravityAdapter: ConversationAdapter {
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         try cancellation.checkCancellation()
         let conversationsDirectory = configurationDirectory.appendingPathComponent("conversations")
-        guard let files = try? FileManager.default.contentsOfDirectory(
-            at: conversationsDirectory,
-            includingPropertiesForKeys: [.contentModificationDateKey],
-            options: [.skipsHiddenFiles]
-        ) else { return [] }
+        guard
+            let files = try? FileManager.default.contentsOfDirectory(
+                at: conversationsDirectory,
+                includingPropertiesForKeys: [.contentModificationDateKey],
+                options: [.skipsHiddenFiles]
+            )
+        else { return [] }
 
         let summaries = AntigravitySQLiteReader.summaries(
             at: configurationDirectory.appendingPathComponent("conversation_summaries.db")
         )
         let conversations = files.compactMap { file -> Conversation? in
             guard !cancellation.isCancelled,
-                  file.pathExtension == "db",
-                  ConversationMetadata.isValidSessionID(file.deletingPathExtension().lastPathComponent),
-                  let localSession = AntigravitySQLiteReader.localSession(at: file),
-                  localSession.sessionID == file.deletingPathExtension().lastPathComponent else { return nil }
+                file.pathExtension == "db",
+                ConversationMetadata.isValidSessionID(file.deletingPathExtension().lastPathComponent),
+                let localSession = AntigravitySQLiteReader.localSession(at: file),
+                localSession.sessionID == file.deletingPathExtension().lastPathComponent
+            else { return nil }
 
             let summary = summaries[localSession.sessionID]
             let title = ConversationMetadata.cleanTitle(

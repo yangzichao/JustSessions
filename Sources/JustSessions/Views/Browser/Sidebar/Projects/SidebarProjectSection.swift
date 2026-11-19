@@ -51,7 +51,8 @@ struct SidebarProjectSection: View {
     /// new sessions, then the rest up to `sessionLimit`, then "Show N more" while some are left.
     var body: some View {
         let pendingNewSessionTerminals = isExpanded ? self.pendingNewSessionTerminals : [:]
-        let listedRows = isExpanded
+        let listedRows =
+            isExpanded
             ? ListedProjectSessionRows(
                 conversations: project.conversations,
                 pendingNewSessions: project.pendingNewSessions.filter { pendingNewSessionTerminals[$0.id] != nil },

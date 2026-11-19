@@ -35,11 +35,13 @@ struct KiroSessionLock: Equatable, Sendable {
     /// Nil for a missing, unreadable, or oversized file, or one without a process id.
     init?(file: URL) {
         guard (try? file.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
-              let handle = try? FileHandle(forReadingFrom: file) else { return nil }
+            let handle = try? FileHandle(forReadingFrom: file)
+        else { return nil }
         defer { try? handle.close() }
         guard let data = try? handle.read(upToCount: Self.maximumByteCount + 1), data.count <= Self.maximumByteCount,
-              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let processID = (object["pid"] as? NSNumber)?.int32Value, processID > 1 else { return nil }
+            let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let processID = (object["pid"] as? NSNumber)?.int32Value, processID > 1
+        else { return nil }
         self.init(processID: processID, startedAt: (object["started_at"] as? String).flatMap(Self.date(from:)))
     }
 

@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+
 @testable import JustSessions
 
 /// Where the conversation map draws (TAB-10): at its natural pitch from the top while a conversation fits, squeezed to
@@ -7,10 +8,13 @@ import Testing
 /// Scrolling past the minimum pitch is in `ConversationMapScrollingTests`.
 @MainActor
 struct ConversationMapLayoutTests {
-    private static func block(_ record: Int, _ kind: ConversationOutline.Block.Kind, widths: [UInt8] = [40], part: Int = 0,
-                              toolCalls: Int = 0) -> ConversationOutline.Block {
-        ConversationOutline.Block(entryID: TranscriptPageIdentity.entryID(record: record, part: part), lastRecord: record, kind: kind,
-                                  timestamp: nil, snippet: "Block \(record)", lineWidths: widths, toolCallCount: toolCalls)
+    private static func block(
+        _ record: Int, _ kind: ConversationOutline.Block.Kind, widths: [UInt8] = [40], part: Int = 0,
+        toolCalls: Int = 0
+    ) -> ConversationOutline.Block {
+        ConversationOutline.Block(
+            entryID: TranscriptPageIdentity.entryID(record: record, part: part), lastRecord: record, kind: kind,
+            timestamp: nil, snippet: "Block \(record)", lineWidths: widths, toolCallCount: toolCalls)
     }
 
     private static func layout(_ outline: ConversationOutline, height: CGFloat) -> ConversationMapLayout {
@@ -61,7 +65,9 @@ struct ConversationMapLayoutTests {
     }
 
     @Test func aPointMapsToTheBlockUnderIt() throws {
-        let outline = ConversationOutline(blocks: [Self.block(0, .user, widths: [10, 10]), Self.block(1, .assistant, widths: [10, 10, 10])])
+        let outline = ConversationOutline(blocks: [
+            Self.block(0, .user, widths: [10, 10]), Self.block(1, .assistant, widths: [10, 10, 10]),
+        ])
         let layout = Self.layout(outline, height: 700)
         func block(atY y: CGFloat) -> Int? { outline.blockIndex(atRow: layout.row(atY: y)) }
 
@@ -88,7 +94,8 @@ struct ConversationMapLayoutTests {
 
     @Test(arguments: [false, true])
     func chipsNeverOverlapAndStayInside(atTheEnd: Bool) {
-        let side: CGFloat = 14, height: CGFloat = 700
+        let side: CGFloat = 14
+        let height: CGFloat = 700
         let outline = ConversationOutline(blocks: (0..<300).map { Self.block($0, .assistant) })
         let records = atTheEnd ? Array(274..<300) : Array(0..<26)
         let letters = "abcdefghijklmnopqrstuvwxyz".map(String.init)
@@ -107,7 +114,9 @@ struct ConversationMapLayoutTests {
     /// sit apart: they overlap evenly, all inside, and a click on the top of each, the part that shows, finds its bookmark.
     @Test(arguments: [false, true])
     func chipsInAShortColumnOverlapButStayInside(atTheEnd: Bool) {
-        let side: CGFloat = 21, height: CGFloat = 400, width: CGFloat = 105
+        let side: CGFloat = 21
+        let height: CGFloat = 400
+        let width: CGFloat = 105
         let outline = ConversationOutline(blocks: (0..<300).map { Self.block($0, .assistant) })
         let records = atTheEnd ? Array(274..<300) : Array(0..<26)
         let letters = "abcdefghijklmnopqrstuvwxyz".map(String.init)
@@ -120,7 +129,8 @@ struct ConversationMapLayoutTests {
         #expect(chips.allSatisfy { $0.chipY >= 0 && $0.chipY <= height - side })
         for (upper, lower) in zip(chips, chips.dropFirst()) { #expect(lower.chipY > upper.chipY) }
         for chip in chips {
-            let found = layout.bookmark(at: CGPoint(x: width - 4, y: chip.chipY + 1), chips: chips, bookmarks: bookmarks, width: width, side: side)
+            let found = layout.bookmark(
+                at: CGPoint(x: width - 4, y: chip.chipY + 1), chips: chips, bookmarks: bookmarks, width: width, side: side)
             #expect(found?.letter == chip.letter)
         }
     }
@@ -150,7 +160,8 @@ struct ConversationMapLayoutTests {
         let chips = layout.chips(for: bookmarks, in: outline, side: 14, height: 700)
         let chip = try #require(chips.first)
 
-        #expect(layout.bookmark(at: CGPoint(x: 65, y: chip.chipY + 7), chips: chips, bookmarks: bookmarks, width: 70, side: 14) == bookmarks[0])
+        #expect(
+            layout.bookmark(at: CGPoint(x: 65, y: chip.chipY + 7), chips: chips, bookmarks: bookmarks, width: 70, side: 14) == bookmarks[0])
         #expect(layout.bookmark(at: CGPoint(x: 20, y: chip.chipY + 7), chips: chips, bookmarks: bookmarks, width: 70, side: 14) == nil)
         #expect(layout.bookmark(at: CGPoint(x: 65, y: chip.chipY + 40), chips: chips, bookmarks: bookmarks, width: 70, side: 14) == nil)
     }

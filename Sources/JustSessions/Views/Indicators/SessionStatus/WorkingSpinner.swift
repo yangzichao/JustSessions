@@ -112,13 +112,15 @@ final class WorkingSpinnerArcView: NSView {
         center.removeObserver(self, name: NSWindow.didMiniaturizeNotification, object: nil)
         center.removeObserver(self, name: NSWindow.didDeminiaturizeNotification, object: nil)
         if let window {
-            center.addObserver(self, selector: #selector(windowMiniaturizationChanged), name: NSWindow.didMiniaturizeNotification, object: window)
-            center.addObserver(self, selector: #selector(windowMiniaturizationChanged), name: NSWindow.didDeminiaturizeNotification, object: window)
+            center.addObserver(
+                self, selector: #selector(windowMiniaturizationChanged), name: NSWindow.didMiniaturizeNotification, object: window)
+            center.addObserver(
+                self, selector: #selector(windowMiniaturizationChanged), name: NSWindow.didDeminiaturizeNotification, object: window)
         }
         updateRotation()
     }
 
-    @objc private func windowMiniaturizationChanged(_ notification: Notification) {
+    @objc private func windowMiniaturizationChanged(_: Notification) {
         updateRotation()
     }
 

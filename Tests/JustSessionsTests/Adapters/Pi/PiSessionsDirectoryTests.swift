@@ -1,12 +1,14 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PiSessionsDirectoryTests {
     @Test func defaultsToTheSessionsFolderInPisAgentFolder() {
         #expect(PiSessionsDirectory.standard(environment: [:], homeDirectory: "/Users/me").path == "/Users/me/.pi/agent/sessions")
-        #expect(PiSessionsDirectory.standard(environment: ["PI_CODING_AGENT_DIR": "~/agents/pi"], homeDirectory: "/Users/me").path
-            == "/Users/me/agents/pi/sessions")
+        #expect(
+            PiSessionsDirectory.standard(environment: ["PI_CODING_AGENT_DIR": "~/agents/pi"], homeDirectory: "/Users/me").path
+                == "/Users/me/agents/pi/sessions")
     }
 
     @Test func environmentOverridesTheSettingsFileWhichOverridesTheDefault() throws {
@@ -52,7 +54,9 @@ struct PiSessionsDirectoryTests {
                 at: directory.appendingPathComponent("2026-10-01T00-00-00-000Z_019a0000-0000-7000-8000-0000000000a1.jsonl"),
                 withDestinationURL: elsewhere
             )
-            #expect(mkfifo(directory.appendingPathComponent("2026-10-01T00-00-00-000Z_019a0000-0000-7000-8000-0000000000b1.jsonl").path, 0o600) == 0)
+            #expect(
+                mkfifo(directory.appendingPathComponent("2026-10-01T00-00-00-000Z_019a0000-0000-7000-8000-0000000000b1.jsonl").path, 0o600)
+                    == 0)
         }
 
         let listed = PiSessionsDirectory.sessionFiles(in: sessionsDirectory).map(\.lastPathComponent).sorted()

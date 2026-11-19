@@ -90,8 +90,9 @@ final class TranscriptBookmarkTargetMarksView: NSView {
         let slotX = TranscriptBookmarkTargetMarks.gutterWidth - style.side - TranscriptBookmarkMarker.gapToText
         let top = shown.frame.minY + shown.topPadding
         let frame = CGRect(x: slotX, y: top, width: style.side, height: max(style.side, shown.frame.maxY - 4 - top))
-        let content = TranscriptBookmarkTargetMarkView.Content(style: style, entryID: shown.entryID,
-                                                               letter: style.letters.letter(forEntryID: shown.entryID))
+        let content = TranscriptBookmarkTargetMarkView.Content(
+            style: style, entryID: shown.entryID,
+            letter: style.letters.letter(forEntryID: shown.entryID))
         if mark.frame != frame { mark.frame = frame }
         if mark.content != content {
             mark.content = content
@@ -129,8 +130,10 @@ final class TranscriptBookmarkTargetMarkView: NSView {
 
     static let ringWidth: CGFloat = 1.5
     static let lineWidth: CGFloat = 2
-    static let clickEvents: Set<NSEvent.EventType> = [.leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp,
-                                                      .otherMouseDown, .otherMouseUp]
+    static let clickEvents: Set<NSEvent.EventType> = [
+        .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp,
+        .otherMouseDown, .otherMouseUp,
+    ]
     var content: Content?
     private var isShowingMenu = false
 
@@ -176,9 +179,10 @@ final class TranscriptBookmarkTargetMarkView: NSView {
         var items = commands.contextMenuItems(content.entryID)
         // None has an action when all 26 letters are in use, and editing would only say so again.
         if !content.hasLetter, items.contains(where: { $0.action != nil }) {
-            items.append(ActionMenuItem(title: AppLocalization.string("Edit bookmark…"), systemImage: "pencil") {
-                commands.editBookmarkOnEntry(content.entryID)
-            })
+            items.append(
+                ActionMenuItem(title: AppLocalization.string("Edit bookmark…"), systemImage: "pencil") {
+                    commands.editBookmarkOnEntry(content.entryID)
+                })
         }
         guard !items.isEmpty else { return nil }
         let menu = NSMenu()
@@ -204,11 +208,13 @@ final class TranscriptBookmarkTargetMarkView: NSView {
     override func accessibilityCustomActions() -> [NSAccessibilityCustomAction]? {
         guard let content, isShown else { return nil }
         let name = content.letter.map { AppLocalization.string("Edit bookmark \($0)…") } ?? AppLocalization.string("Edit bookmark…")
-        return [NSAccessibilityCustomAction(name: name) { [weak self] in
-            guard let self else { return false }
-            TranscriptBookmarkTargetRegistry.shared.target(for: self)?.editBookmarkOnEntry(content.entryID)
-            return true
-        }]
+        return [
+            NSAccessibilityCustomAction(name: name) { [weak self] in
+                guard let self else { return false }
+                TranscriptBookmarkTargetRegistry.shared.target(for: self)?.editBookmarkOnEntry(content.entryID)
+                return true
+            }
+        ]
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -216,15 +222,18 @@ final class TranscriptBookmarkTargetMarkView: NSView {
         let side = content.style.side
         content.style.color.set()
         let slot = CGRect(x: 0, y: 0, width: side, height: side)
-        let ring = NSBezierPath(roundedRect: slot.insetBy(dx: Self.ringWidth / 2, dy: Self.ringWidth / 2),
-                                xRadius: ThemeCornerRadius.small.rawValue, yRadius: ThemeCornerRadius.small.rawValue)
+        let ring = NSBezierPath(
+            roundedRect: slot.insetBy(dx: Self.ringWidth / 2, dy: Self.ringWidth / 2),
+            xRadius: ThemeCornerRadius.small.rawValue, yRadius: ThemeCornerRadius.small.rawValue)
         ring.lineWidth = Self.ringWidth
         ring.stroke()
         if !content.hasLetter { Self.bookmarkOutline(in: slot.insetBy(dx: side * 0.3, dy: side * 0.22)).stroke() }
         let lineTop = side + 3
         if bounds.height - lineTop > 4 {
-            NSBezierPath(roundedRect: CGRect(x: side / 2 - Self.lineWidth / 2, y: lineTop, width: Self.lineWidth, height: bounds.height - lineTop),
-                         xRadius: Self.lineWidth / 2, yRadius: Self.lineWidth / 2).fill()
+            NSBezierPath(
+                roundedRect: CGRect(x: side / 2 - Self.lineWidth / 2, y: lineTop, width: Self.lineWidth, height: bounds.height - lineTop),
+                xRadius: Self.lineWidth / 2, yRadius: Self.lineWidth / 2
+            ).fill()
         }
     }
 

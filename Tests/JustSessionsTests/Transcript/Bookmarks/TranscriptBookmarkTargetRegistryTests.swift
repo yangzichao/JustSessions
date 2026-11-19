@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// The Bookmarks menu and a message's right-click menu act on the reader the key window shows, and on nothing else.
@@ -36,7 +37,8 @@ struct TranscriptBookmarkTargetRegistryTests {
     }
 
     @Test func aTextViewFindsItsOwnWindowsReader() throws {
-        var readerToggleCount = 0, otherToggleCount = 0
+        var readerToggleCount = 0
+        var otherToggleCount = 0
         let readerWindow = window(showing: target(onToggle: { readerToggleCount += 1 }))
         let otherWindow = window(showing: target(onToggle: { otherToggleCount += 1 }))
         let textView = NSView()
@@ -76,7 +78,9 @@ struct TranscriptBookmarkTargetRegistryTests {
     }
 
     @discardableResult
-    private func addReporter(to window: NSWindow, target: TranscriptBookmarkCommandTarget?, isActive: Bool) -> TranscriptBookmarkTargetReportingView {
+    private func addReporter(to window: NSWindow, target: TranscriptBookmarkCommandTarget?, isActive: Bool)
+        -> TranscriptBookmarkTargetReportingView
+    {
         let reporter = TranscriptBookmarkTargetReportingView()
         reporter.registry = registry
         reporter.target = target

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Kiro CLI V3 sessions on an SSH host: copied beside V2's, with only their metadata and log, and deleted there.
@@ -41,9 +42,11 @@ struct KiroV3RemoteTests {
         #expect(v3.host == .ssh("devbox"))
         #expect(v3.suggestedTitle == "Fix the build")
         let copiedFolder = v3.sourceFile.deletingLastPathComponent()
-        #expect(Set(try FileManager.default.contentsOfDirectory(atPath: copiedFolder.path))
-            == [KiroV3Session.metadataFileName, KiroV3Session.messagesFileName])
-        #expect(!FileManager.default.fileExists(atPath: host.mirror.kiroV3MirrorDirectory(host: "devbox").appendingPathComponent("cli").path))
+        #expect(
+            Set(try FileManager.default.contentsOfDirectory(atPath: copiedFolder.path))
+                == [KiroV3Session.metadataFileName, KiroV3Session.messagesFileName])
+        #expect(
+            !FileManager.default.fileExists(atPath: host.mirror.kiroV3MirrorDirectory(host: "devbox").appendingPathComponent("cli").path))
         let transcript = try KiroTranscriptReader().read(v3.sourceFile)
         #expect(transcript.entries.first?.content == .userMessage("Fix the build"))
     }
@@ -66,18 +69,25 @@ struct KiroV3RemoteTests {
         let fixture = KiroV3SessionFixture(sessionsRoot: host.sessionsRoot)
         let selected = try fixture.writeSession(projectPath: host.projectDirectory.path)
         let kept = try fixture.writeSession(projectPath: host.projectDirectory.path)
-        let conversation = try #require(try RemoteSessionDiscovery(mirror: host.mirror).discover(host: "devbox")
-            .first { $0.sessionID == selected.sessionID })
+        let conversation = try #require(
+            try RemoteSessionDiscovery(mirror: host.mirror).discover(host: "devbox")
+                .first { $0.sessionID == selected.sessionID })
         let reportFile = host.root.appendingPathComponent("report.txt")
-        let runner = try Self.runner(host: host, script: KiroV3DeletionTests.successfulDeletionScript + "\n"
-            + "printf '%s\\n' \"$@\" \"$KIRO_HOME\" \"$PWD\" > \(ShellQuoting.quoted(reportFile.path))\n")
+        let runner = try Self.runner(
+            host: host,
+            script: KiroV3DeletionTests.successfulDeletionScript + "\n"
+                + "printf '%s\\n' \"$@\" \"$KIRO_HOME\" \"$PWD\" > \(ShellQuoting.quoted(reportFile.path))\n")
 
         try RemoteConversationDeletion(runner: runner, mirror: host.mirror).delete(conversation)
 
         let report = try String(contentsOf: reportFile, encoding: .utf8).split(separator: "\n").map(String.init)
-        #expect(Array(report.prefix(4)) == ["chat", "--delete-session", selected.sessionID, host.remoteHome.appendingPathComponent(".kiro").path])
-        #expect(URL(fileURLWithPath: try #require(report.last)).resolvingSymlinksInPath().path
-            == host.projectDirectory.resolvingSymlinksInPath().path)
+        #expect(
+            Array(report.prefix(4)) == [
+                "chat", "--delete-session", selected.sessionID, host.remoteHome.appendingPathComponent(".kiro").path,
+            ])
+        #expect(
+            URL(fileURLWithPath: try #require(report.last)).resolvingSymlinksInPath().path
+                == host.projectDirectory.resolvingSymlinksInPath().path)
         #expect(!FileManager.default.fileExists(atPath: selected.folder.path))
         #expect(FileManager.default.fileExists(atPath: kept.folder.path))
         #expect(!FileManager.default.fileExists(atPath: conversation.sourceFile.deletingLastPathComponent().path))
@@ -87,8 +97,9 @@ struct KiroV3RemoteTests {
         let host = try Host()
         defer { host.remove() }
         let selected = try KiroV3SessionFixture(sessionsRoot: host.sessionsRoot).writeSession(projectPath: host.projectDirectory.path)
-        let conversation = try #require(try RemoteSessionDiscovery(mirror: host.mirror).discover(host: "devbox")
-            .first { $0.sessionID == selected.sessionID })
+        let conversation = try #require(
+            try RemoteSessionDiscovery(mirror: host.mirror).discover(host: "devbox")
+                .first { $0.sessionID == selected.sessionID })
 
         let deletion = RemoteConversationDeletion(runner: try Self.runner(host: host, script: "#!/bin/sh\nexit 0\n"), mirror: host.mirror)
         #expect(throws: RemoteConversationDeletionError.self) { try deletion.delete(conversation) }
@@ -103,14 +114,16 @@ struct KiroV3RemoteTests {
         let fixture = KiroV3SessionFixture(sessionsRoot: host.sessionsRoot)
         let held = try fixture.writeSession(projectPath: host.projectDirectory.path)
         let ended = try fixture.writeSession(projectPath: host.projectDirectory.path)
-        try KiroSessionLockTests.writeLock(processID: getpid(), startedAt: .now, fractionalDigits: 3,
-                                           to: held.folder.appendingPathComponent(".lock"))
+        try KiroSessionLockTests.writeLock(
+            processID: getpid(), startedAt: .now, fractionalDigits: 3,
+            to: held.folder.appendingPathComponent(".lock"))
         let history = host.sessionsRoot.appendingPathComponent("cli/\(ended.sessionID).history")
         try FileManager.default.createDirectory(at: history.deletingLastPathComponent(), withIntermediateDirectories: true)
         try "Reply with exactly LOCK.\n".write(to: history, atomically: true, encoding: .utf8)
         let conversations = try RemoteSessionDiscovery(mirror: host.mirror).discover(host: "devbox")
-        let deletion = RemoteConversationDeletion(runner: try Self.runner(host: host, script: KiroV3DeletionTests.successfulDeletionScript),
-                                                  mirror: host.mirror)
+        let deletion = RemoteConversationDeletion(
+            runner: try Self.runner(host: host, script: KiroV3DeletionTests.successfulDeletionScript),
+            mirror: host.mirror)
 
         let heldConversation = try #require(conversations.first { $0.sessionID == held.sessionID })
         let endedConversation = try #require(conversations.first { $0.sessionID == ended.sessionID })
@@ -135,8 +148,9 @@ struct KiroV3RemoteTests {
             "PATH": binaryDirectory.path + ":/usr/bin:/bin",
         ]
         return RemoteHostCommandRunner { _, command, _ in
-            BoundedProcessRunner.result(ofExecutable: "/bin/sh", arguments: ["-c", command], environment: environment,
-                                        includesStandardError: true, timeout: 10)
+            BoundedProcessRunner.result(
+                ofExecutable: "/bin/sh", arguments: ["-c", command], environment: environment,
+                includesStandardError: true, timeout: 10)
         }
     }
 }

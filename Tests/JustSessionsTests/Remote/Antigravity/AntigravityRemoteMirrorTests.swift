@@ -1,6 +1,7 @@
 import Foundation
 import SQLite3
 import Testing
+
 @testable import JustSessions
 
 struct AntigravityRemoteMirrorTests {
@@ -40,7 +41,10 @@ struct AntigravityRemoteMirrorTests {
         #expect(result.exitStatus == 0)
         let path = try #require(AntigravityRemoteSnapshotCommand.snapshotPath(in: result.output))
         defer { try? FileManager.default.removeItem(atPath: path) }
-        #expect(try AntigravityAdapter(configurationDirectory: URL(fileURLWithPath: path)).discover().map(\.sessionID) == [fixture.session.sessionID])
+        #expect(
+            try AntigravityAdapter(configurationDirectory: URL(fileURLWithPath: path)).discover().map(\.sessionID) == [
+                fixture.session.sessionID
+            ])
         #expect(AntigravityRemoteSnapshotCommand.snapshotPath(in: "JUSTSESSIONS_AGY_SNAPSHOT=/tmp/justsessions-agy-../../home") == nil)
         #expect(AntigravityRemoteSnapshotCommand.snapshotPath(in: "JUSTSESSIONS_AGY_SNAPSHOT=/tmp/justsessions-agy-foo;rm -rf x") == nil)
     }

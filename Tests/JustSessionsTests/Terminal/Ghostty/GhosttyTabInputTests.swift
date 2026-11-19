@@ -2,6 +2,7 @@ import AppKit
 import Carbon.HIToolbox
 import CoreGraphics
 import Testing
+
 @testable import JustSessions
 
 /// What a Ghostty tab sends its process for keys, scrolling, and dropped files, compared with a SwiftTerm tab.
@@ -83,11 +84,12 @@ struct GhosttyTabInputTests {
     @Test func pageKeysScrollTheMainScreenAndGoToAProgramOnTheAlternateScreen() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
-        try await fixture.start(printing: """
-            i=1; while [ $i -le 200 ]; do printf 'line-%03d\\r\\n' $i; i=$((i+1)); done
-            wait_for alternate; printf '\\033[?1049hALTERNATE'
-            wait_for main; printf '\\033[?1049lMAIN-AGAIN'
-            """)
+        try await fixture.start(
+            printing: """
+                i=1; while [ $i -le 200 ]; do printf 'line-%03d\\r\\n' $i; i=$((i+1)); done
+                wait_for alternate; printf '\\033[?1049hALTERNATE'
+                wait_for main; printf '\\033[?1049lMAIN-AGAIN'
+                """)
         try await expectEventually { fixture.screen.contains("line-200") }
         let window = fixture.window
 
@@ -127,11 +129,12 @@ struct GhosttyTabInputTests {
     @Test func underTheKittyKeyboardProtocolPageKeysGoToTheProgramOnEitherScreen() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
-        try await fixture.start(printing: """
-            i=1; while [ $i -le 200 ]; do printf 'line-%03d\\r\\n' $i; i=$((i+1)); done; printf '\\033[>1uKITTY-MAIN'
-            wait_for alternate; printf '\\033[?1049h\\033[>1uKITTY-ALTERNATE'
-            wait_for main; printf '\\033[<u\\033[?1049l\\033[<uMAIN-AGAIN'
-            """)
+        try await fixture.start(
+            printing: """
+                i=1; while [ $i -le 200 ]; do printf 'line-%03d\\r\\n' $i; i=$((i+1)); done; printf '\\033[>1uKITTY-MAIN'
+                wait_for alternate; printf '\\033[?1049h\\033[>1uKITTY-ALTERNATE'
+                wait_for main; printf '\\033[<u\\033[?1049l\\033[<uMAIN-AGAIN'
+                """)
         try await expectEventually { fixture.screen.contains("KITTY-MAIN") }
         let window = fixture.window
         let keys = "\u{1B}[5~\u{1B}[5;2~\u{1B}[6~\u{1B}[6;2~"
@@ -160,9 +163,10 @@ struct GhosttyTabInputTests {
     @Test func pageKeysWithControlOptionOrCommandGoToGhostty() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
-        try await fixture.start(printing: """
-            i=1; while [ $i -le 200 ]; do printf 'line-%03d\\r\\n' $i; i=$((i+1)); done; printf 'MAIN-SCREEN'
-            """)
+        try await fixture.start(
+            printing: """
+                i=1; while [ $i -le 200 ]; do printf 'line-%03d\\r\\n' $i; i=$((i+1)); done; printf 'MAIN-SCREEN'
+                """)
         try await expectEventually { fixture.screen.contains("MAIN-SCREEN") }
         let window = fixture.window
 

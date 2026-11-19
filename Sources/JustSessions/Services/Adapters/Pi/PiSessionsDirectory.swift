@@ -8,11 +8,12 @@ enum PiSessionsDirectory {
         environment: [String: String] = ProcessInfo.processInfo.environment,
         homeDirectory: String = NSHomeDirectory()
     ) -> URL {
-        URL(fileURLWithPath: standardPath(
-            environment: environment,
-            homeDirectory: homeDirectory,
-            settingsData: { try? Data(contentsOf: $0) }
-        ))
+        URL(
+            fileURLWithPath: standardPath(
+                environment: environment,
+                homeDirectory: homeDirectory,
+                settingsData: { try? Data(contentsOf: $0) }
+            ))
     }
 
     /// The folder's path, which is relative when a setting gives a relative one. `settingsData` reads the agent
@@ -40,19 +41,22 @@ enum PiSessionsDirectory {
     /// and pipes as they are, and reading one would show a file from elsewhere on this Mac or wait forever.
     static func sessionFiles(in sessionsDirectory: URL) -> [URL] {
         let fileManager = FileManager.default
-        guard let entries = try? fileManager.contentsOfDirectory(
-            at: sessionsDirectory,
-            includingPropertiesForKeys: [.isDirectoryKey, .isRegularFileKey, .contentModificationDateKey],
-            options: [.skipsHiddenFiles]
-        ) else { return [] }
+        guard
+            let entries = try? fileManager.contentsOfDirectory(
+                at: sessionsDirectory,
+                includingPropertiesForKeys: [.isDirectoryKey, .isRegularFileKey, .contentModificationDateKey],
+                options: [.skipsHiddenFiles]
+            )
+        else { return [] }
         return entries.flatMap { entry -> [URL] in
             if entry.pathExtension == "jsonl" { return isRegularFile(entry) ? [entry] : [] }
             guard (try? entry.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true else { return [] }
-            let projectFiles = (try? fileManager.contentsOfDirectory(
-                at: entry,
-                includingPropertiesForKeys: [.isRegularFileKey, .contentModificationDateKey],
-                options: [.skipsHiddenFiles]
-            )) ?? []
+            let projectFiles =
+                (try? fileManager.contentsOfDirectory(
+                    at: entry,
+                    includingPropertiesForKeys: [.isRegularFileKey, .contentModificationDateKey],
+                    options: [.skipsHiddenFiles]
+                )) ?? []
             return projectFiles.filter { $0.pathExtension == "jsonl" && isRegularFile($0) }
         }
     }
@@ -64,9 +68,10 @@ enum PiSessionsDirectory {
 
     private static func settingsSessionDirectory(in agentDirectory: URL, settingsData: (URL) -> Data?) -> String? {
         guard let data = settingsData(agentDirectory.appendingPathComponent("settings.json")),
-              let settings = ConversationMetadata.object(from: data),
-              let sessionDirectory = settings["sessionDir"] as? String,
-              !sessionDirectory.isEmpty else { return nil }
+            let settings = ConversationMetadata.object(from: data),
+            let sessionDirectory = settings["sessionDir"] as? String,
+            !sessionDirectory.isEmpty
+        else { return nil }
         return sessionDirectory
     }
 

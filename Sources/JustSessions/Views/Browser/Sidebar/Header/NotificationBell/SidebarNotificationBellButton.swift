@@ -11,7 +11,9 @@ struct SidebarNotificationBellButton: View {
 
     var body: some View {
         let entries = store.notificationBellEntries
-        Button { isShowingList.toggle() } label: {
+        Button {
+            isShowingList.toggle()
+        } label: {
             Image(systemName: "bell")
                 .frame(width: InterfaceScale.points(24), height: InterfaceScale.points(24))
                 .overlay(alignment: .topTrailing) {

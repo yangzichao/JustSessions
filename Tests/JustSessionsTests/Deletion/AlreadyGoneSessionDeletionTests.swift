@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A session already gone, for example deleted just before a dropped connection hid the result, counts as deleted.

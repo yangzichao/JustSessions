@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct OnboardingTipDueTests {
@@ -30,7 +31,8 @@ struct OnboardingTipDueTests {
 
     @Test func sessionMenuAndSearchWaitForAnotherSessionAfterTheReadingTip() {
         let tipsToShow = everyTipButTheTour.subtracting([.readingSession])
-        let sameSession = OnboardingWindowContext(readSessionID: "claude:1", canResumeReadSession: true, sessionReadAtReadingTip: "claude:1")
+        let sameSession = OnboardingWindowContext(
+            readSessionID: "claude:1", canResumeReadSession: true, sessionReadAtReadingTip: "claude:1")
         #expect(dueStops(in: sameSession, among: tipsToShow).isEmpty)
 
         var anotherSession = sameSession

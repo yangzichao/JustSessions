@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// A labelled bookmark's label above its message in the reader (RDR-51): on the speaker's line where the message starts

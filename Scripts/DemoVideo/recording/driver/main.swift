@@ -37,15 +37,18 @@ func attribute(_ element: AXUIElement, _ name: String) -> AnyObject? {
 func frame(of element: AXUIElement) -> CGRect? {
     guard let positionValue = attribute(element, kAXPositionAttribute), let sizeValue = attribute(element, kAXSizeAttribute)
     else { return nil }
-    var position = CGPoint.zero, size = CGSize.zero
+    var position = CGPoint.zero
+    var size = CGSize.zero
     AXValueGetValue(positionValue as! AXValue, .cgPoint, &position)
     AXValueGetValue(sizeValue as! AXValue, .cgSize, &size)
     return CGRect(origin: position, size: size)
 }
 
 func describe(_ element: AXUIElement) -> String {
-    let fields = [kAXRoleAttribute, kAXSubroleAttribute, kAXTitleAttribute, kAXDescriptionAttribute,
-                  kAXIdentifierAttribute, kAXValueAttribute, kAXHelpAttribute]
+    let fields = [
+        kAXRoleAttribute, kAXSubroleAttribute, kAXTitleAttribute, kAXDescriptionAttribute,
+        kAXIdentifierAttribute, kAXValueAttribute, kAXHelpAttribute,
+    ]
     var parts: [String] = []
     for field in fields {
         if let value = attribute(element, field) as? String, !value.isEmpty {
@@ -131,8 +134,9 @@ func glide(to target: CGPoint, duration: Double, dragging: Bool = false) {
     for step in 1...steps {
         let t = easeInOut(Double(step) / Double(steps))
         let arc = sin(Double(step) / Double(steps) * .pi) * bend
-        let point = CGPoint(x: start.x + (target.x - start.x) * t + normal.x * arc,
-                            y: start.y + (target.y - start.y) * t + normal.y * arc)
+        let point = CGPoint(
+            x: start.x + (target.x - start.x) * t + normal.x * arc,
+            y: start.y + (target.y - start.y) * t + normal.y * arc)
         post(dragging ? .leftMouseDragged : .mouseMoved, at: point)
         usleep(useconds_t(duration / Double(steps) * 1_000_000))
     }
@@ -213,7 +217,8 @@ func target(of step: [String: Any]) -> CGPoint {
             root = windowIndex < windowList.count ? windowList[windowIndex] : nil
         }
         if let root, let element = find(text, role: step["role"] as? String, in: root), let rect = frame(of: element),
-           rect.width > 0, rect.minX.isFinite {
+            rect.width > 0, rect.minX.isFinite
+        {
             found = (element, rect)
         } else {
             usleep(150_000)
@@ -221,8 +226,9 @@ func target(of step: [String: Any]) -> CGPoint {
     } while found == nil && Date() < deadline
     guard let (_, rect) = found else {
         let windowList = windows()
-        fail("element not found: \(text) (pid \(demoProcessIdentifier()), \(windowList.count) windows: "
-             + windowList.map(describe).joined(separator: "; ") + ")")
+        fail(
+            "element not found: \(text) (pid \(demoProcessIdentifier()), \(windowList.count) windows: "
+                + windowList.map(describe).joined(separator: "; ") + ")")
     }
     var point = CGPoint(x: rect.midX, y: rect.midY)
     if step["anchor"] as? String == "left" { point.x = rect.minX + 12 }
@@ -239,7 +245,7 @@ func log(_ message: String) {
 
 func run(script path: String) {
     guard let data = FileManager.default.contents(atPath: path),
-          let steps = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]]
+        let steps = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]]
     else { fail("cannot read script \(path)") }
     for step in steps {
         let action = step["do"] as? String ?? ""
@@ -293,7 +299,8 @@ case "dump":
 case "setframe":
     let values = arguments[3...6].map { Double($0)! }
     let window = windows()[Int(arguments[2])!]
-    var position = CGPoint(x: values[0], y: values[1]), size = CGSize(width: values[2], height: values[3])
+    var position = CGPoint(x: values[0], y: values[1])
+    var size = CGSize(width: values[2], height: values[3])
     AXUIElementSetAttributeValue(window, kAXSizeAttribute as CFString, AXValueCreate(.cgSize, &size)!)
     AXUIElementSetAttributeValue(window, kAXPositionAttribute as CFString, AXValueCreate(.cgPoint, &position)!)
     AXUIElementSetAttributeValue(window, kAXSizeAttribute as CFString, AXValueCreate(.cgSize, &size)!)
@@ -302,8 +309,10 @@ case "activate":
     demoApplication().activate()
 case "windowids":
     let windowList = CGWindowListCopyWindowInfo(.optionAll, kCGNullWindowID) as? [[String: Any]] ?? []
-    for info in windowList where (info[kCGWindowOwnerPID as String] as? pid_t) == demoProcessIdentifier()
-        && (info[kCGWindowLayer as String] as? Int) == 0 {
+    for info in windowList
+    where (info[kCGWindowOwnerPID as String] as? pid_t) == demoProcessIdentifier()
+        && (info[kCGWindowLayer as String] as? Int) == 0
+    {
         print(info[kCGWindowNumber as String]!, info[kCGWindowBounds as String]!)
     }
 case "press":
@@ -321,7 +330,10 @@ case "showmenu":
     var queue = [application]
     while !queue.isEmpty {
         let candidate = queue.removeFirst()
-        if attribute(candidate, kAXRoleAttribute) as? String == "AXMenu" { dump(candidate, depth: 0, maximumDepth: 3); break }
+        if attribute(candidate, kAXRoleAttribute) as? String == "AXMenu" {
+            dump(candidate, depth: 0, maximumDepth: 3)
+            break
+        }
         if attribute(candidate, kAXRoleAttribute) as? String != "AXMenuBar" { queue.append(contentsOf: children(of: candidate)) }
     }
 case "locate":

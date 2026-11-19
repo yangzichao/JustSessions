@@ -14,7 +14,8 @@ struct PermissionsSettingsView: View {
                     .font(ThemeFont.heading)
                 HelpPopoverButton(
                     title: "Permissions",
-                    explanation: "macOS asks for these on behalf of JustSessions, also when a CLI in one of its terminals needs one. Checking here never shows a prompt."
+                    explanation:
+                        "macOS asks for these on behalf of JustSessions, also when a CLI in one of its terminals needs one. Checking here never shows a prompt."
                 )
                 .accessibilityIdentifier("settings.help.permissions")
             }

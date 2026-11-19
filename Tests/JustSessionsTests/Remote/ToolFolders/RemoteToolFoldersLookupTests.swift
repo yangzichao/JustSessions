@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs the lookup's script in a local shell whose environment stands in for the host's login shell.
@@ -11,39 +12,48 @@ struct RemoteToolFoldersLookupTests {
         let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }
         try FileManager.default.createDirectory(at: home.appendingPathComponent("pi-agent"), withIntermediateDirectories: true)
-        try #"{"sessionDir": "~/pi-sessions"}"#.write(to: home.appendingPathComponent("pi-agent/settings.json"), atomically: true, encoding: .utf8)
+        try #"{"sessionDir": "~/pi-sessions"}"#.write(
+            to: home.appendingPathComponent("pi-agent/settings.json"), atomically: true, encoding: .utf8)
 
-        let folders = try Self.folders(shell: shell, home: home.path, variables: [
-            "CLAUDE_CONFIG_DIR": "/data/claude",
-            "CODEX_HOME": "~/codex home",
-            "KIRO_HOME": "relative/kiro",
-            "PI_CODING_AGENT_DIR": "~/pi-agent",
-        ])
+        let folders = try Self.folders(
+            shell: shell, home: home.path,
+            variables: [
+                "CLAUDE_CONFIG_DIR": "/data/claude",
+                "CODEX_HOME": "~/codex home",
+                "KIRO_HOME": "relative/kiro",
+                "PI_CODING_AGENT_DIR": "~/pi-agent",
+            ])
 
-        #expect(folders == RemoteToolFolders(
-            claude: "/data/claude",
-            codex: home.path + "/codex home",
-            kiro: home.path + "/.kiro/sessions/cli",
-            pi: home.path + "/pi-sessions"
-        ))
+        #expect(
+            folders
+                == RemoteToolFolders(
+                    claude: "/data/claude",
+                    codex: home.path + "/codex home",
+                    kiro: home.path + "/.kiro/sessions/cli",
+                    pi: home.path + "/pi-sessions"
+                ))
     }
 
     @Test(arguments: HostShell.installed)
     func aHostThatSetsNothingKeepsTheStandardFoldersInItsHome(shell: HostShell) throws {
         let folders = try Self.folders(shell: shell, home: "/home/me", variables: [:])
 
-        #expect(folders == RemoteToolFolders(
-            claude: "/home/me/.claude",
-            codex: "/home/me/.codex",
-            kiro: "/home/me/.kiro/sessions/cli",
-            pi: "/home/me/.pi/agent/sessions"
-        ))
+        #expect(
+            folders
+                == RemoteToolFolders(
+                    claude: "/home/me/.claude",
+                    codex: "/home/me/.codex",
+                    kiro: "/home/me/.kiro/sessions/cli",
+                    pi: "/home/me/.pi/agent/sessions"
+                ))
     }
 
     @Test func piSessionFolderVariableComesFirst() throws {
-        let folders = try Self.folders(shell: .sh, home: "/home/me", variables: [
-            "PI_CODING_AGENT_SESSION_DIR": "/srv/pi", "PI_CODING_AGENT_DIR": "/opt/pi", "KIRO_HOME": "/opt/kiro",
-        ])
+        let folders = try Self.folders(
+            shell: .sh, home: "/home/me",
+            variables: [
+                "PI_CODING_AGENT_SESSION_DIR": "/srv/pi", "PI_CODING_AGENT_DIR": "/opt/pi", "KIRO_HOME": "/opt/kiro",
+            ])
 
         #expect(folders.pi == "/srv/pi")
         #expect(folders.kiro == "/opt/kiro/sessions/cli")
@@ -83,11 +93,16 @@ struct RemoteToolFoldersLookupTests {
     /// Windows' `cmd.exe` runs none of the lookup, and prints `Windows_NT` for the probe.
     @Test func aWindowsHostIsToldApart() {
         let recorder = RemoteCommandRecorder()
-        let runner = Self.runner(recorder: recorder, lookupOutput: (1, """
-            'exec' is not recognized as an internal or external command,\r
-            operable program or batch file.\r
+        let runner = Self.runner(
+            recorder: recorder,
+            lookupOutput: (
+                1,
+                """
+                'exec' is not recognized as an internal or external command,\r
+                operable program or batch file.\r
 
-            """), probeOutput: (0, "Windows_NT $env:OS\r\n"))
+                """
+            ), probeOutput: (0, "Windows_NT $env:OS\r\n"))
 
         #expect(throws: RemoteSessionMirrorError.sshFailed(host: "devbox", problem: .windowsHost)) {
             try RemoteToolFoldersLookup.folders(on: "devbox", runner: runner)
@@ -97,8 +112,9 @@ struct RemoteToolFoldersLookupTests {
 
     /// A POSIX host whose shell startup fails before the lookup runs is not Windows.
     @Test func aShellThatRanNothingOnAnotherHostKeepsTheStandardFolders() throws {
-        let runner = Self.runner(recorder: RemoteCommandRecorder(), lookupOutput: (1, "bash: /etc/profile: Permission denied\n"),
-                                 probeOutput: (0, "%OS% :OS\n"))
+        let runner = Self.runner(
+            recorder: RemoteCommandRecorder(), lookupOutput: (1, "bash: /etc/profile: Permission denied\n"),
+            probeOutput: (0, "%OS% :OS\n"))
 
         #expect(try RemoteToolFoldersLookup.folders(on: "devbox", runner: runner) == .standard)
     }
@@ -119,8 +135,9 @@ struct RemoteToolFoldersLookupTests {
     }
 
     @Test func runsThroughTheHostsLoginShell() {
-        #expect(RemoteToolFoldersLookup.command(on: "devbox")
-            == RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(RemoteToolFoldersLookup.script))", on: "devbox"))
+        #expect(
+            RemoteToolFoldersLookup.command(on: "devbox")
+                == RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(RemoteToolFoldersLookup.script))", on: "devbox"))
     }
 
     /// Answers the lookup and the Windows probe.
@@ -133,13 +150,14 @@ struct RemoteToolFoldersLookupTests {
     }
 
     private static func folders(shell: HostShell, home: String, variables: [String: String]) throws -> RemoteToolFolders {
-        let result = try #require(BoundedProcessRunner.result(
-            ofExecutable: shell.path,
-            arguments: ["-c", RemoteToolFoldersLookup.script],
-            environment: variables.merging(["HOME": home, "PATH": "/usr/bin:/bin"]) { $1 },
-            includesStandardError: true,
-            timeout: 10
-        ))
+        let result = try #require(
+            BoundedProcessRunner.result(
+                ofExecutable: shell.path,
+                arguments: ["-c", RemoteToolFoldersLookup.script],
+                environment: variables.merging(["HOME": home, "PATH": "/usr/bin:/bin"]) { $1 },
+                includesStandardError: true,
+                timeout: 10
+            ))
         #expect(result.exitStatus == 0, "\(result.output)")
         return RemoteToolFoldersLookup.folders(inOutput: result.output)
     }
