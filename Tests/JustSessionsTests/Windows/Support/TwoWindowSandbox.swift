@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Two workspace windows' stores sharing one window registry, both listing the same Claude Code sessions of one

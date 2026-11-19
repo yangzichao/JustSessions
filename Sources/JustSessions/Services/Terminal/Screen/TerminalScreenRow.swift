@@ -51,7 +51,7 @@ struct TerminalScreenRow {
     /// and the cells that text takes.
     func text(fromColumn column: Int) -> (text: String, cellCount: Int) {
         guard let firstIndex = characters.indices.first(where: { startColumns[$0] >= column }),
-              let lastTextIndex, lastTextIndex >= firstIndex
+            let lastTextIndex, lastTextIndex >= firstIndex
         else { return ("", 0) }
         let cellCount = startColumns[lastTextIndex] + cellCounts[lastTextIndex] - startColumns[firstIndex]
         return (String(characters[firstIndex...lastTextIndex]), cellCount)

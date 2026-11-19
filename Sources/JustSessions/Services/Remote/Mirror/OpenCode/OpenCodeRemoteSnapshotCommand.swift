@@ -8,11 +8,12 @@ enum OpenCodeRemoteSnapshotCommand {
     static let noDatabaseExitStatus: Int32 = 3
 
     static func create(on host: String) -> String {
-        let script = OpenCodeRemoteDatabaseLocation.shellAssignment + """
+        let script =
+            OpenCodeRemoteDatabaseLocation.shellAssignment + """
 
-            [ -f "$db" ] || exit \(noDatabaseExitStatus)
-            exec python3 -c \(ShellQuoting.quoted(pythonScript)) "$db"
-            """
+                [ -f "$db" ] || exit \(noDatabaseExitStatus)
+                exec python3 -c \(ShellQuoting.quoted(pythonScript)) "$db"
+                """
         return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
     }
 
@@ -21,7 +22,9 @@ enum OpenCodeRemoteSnapshotCommand {
         let path = String(line.dropFirst(outputHeading.count))
         guard path.hasPrefix(pathPrefix) else { return nil }
         let suffix = path.dropFirst(pathPrefix.count)
-        guard !suffix.isEmpty, suffix.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_" || $0 == "-") }) else { return nil }
+        guard !suffix.isEmpty, suffix.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_" || $0 == "-") }) else {
+            return nil
+        }
         return path
     }
 

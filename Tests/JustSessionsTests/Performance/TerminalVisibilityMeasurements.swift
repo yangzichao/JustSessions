@@ -2,6 +2,7 @@ import AppKit
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Controlled replay through the actual SwiftTerm input path; no paid CLI sessions or user terminals are started.
@@ -18,7 +19,9 @@ struct TerminalVisibilityMeasurements {
                 percentages.append(try await measure(terminalCount: terminalCount, optimized: optimized))
             }
             let mode = optimized ? "coalesced hidden output" : "original opacity-only behavior"
-            print("TerminalPerf | N=\(terminalCount) | \(mode) | CPU percent of one core median=\(String(format: "%.2f", percentages.sorted()[1])) | runs=\(percentages)")
+            print(
+                "TerminalPerf | N=\(terminalCount) | \(mode) | CPU percent of one core median=\(String(format: "%.2f", percentages.sorted()[1])) | runs=\(percentages)"
+            )
         }
     }
 
@@ -39,7 +42,10 @@ struct TerminalVisibilityMeasurements {
         }
         window.orderFrontRegardless()
         defer {
-            for view in views { view.setWorkspaceActive(true); view.removeFromSuperview() }
+            for view in views {
+                view.setWorkspaceActive(true)
+                view.removeFromSuperview()
+            }
             window.contentView = nil
             window.close()
         }
@@ -64,7 +70,9 @@ struct TerminalVisibilityMeasurements {
         let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
         let percentage = (processCPUSeconds() - cpuStart) / seconds * 100
         heartbeat.stop()
-        print("TerminalPerf | N=\(terminalCount) optimized=\(optimized) | frames=\(frameNumber) | longest main-thread gap=\(perfMilliseconds(heartbeat.longestGap))")
+        print(
+            "TerminalPerf | N=\(terminalCount) optimized=\(optimized) | frames=\(frameNumber) | longest main-thread gap=\(perfMilliseconds(heartbeat.longestGap))"
+        )
         return percentage
     }
 

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A CLI unticked under **Show sessions from** in Settings → General is treated as not installed: its sessions leave

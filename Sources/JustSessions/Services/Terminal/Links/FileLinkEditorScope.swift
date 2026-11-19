@@ -9,7 +9,7 @@ enum FileLinkEditorScope {
     /// for an MPEG-2 video but which in a CLI's output is TypeScript.
     static func includes(_ fileURL: URL) -> Bool {
         guard let values = try? fileURL.resourceValues(forKeys: [.contentTypeKey, .isPackageKey]),
-              values.isPackage != true
+            values.isPackage != true
         else { return false }
         if fileURL.pathExtension.lowercased() == "ts" { return true }
         guard let contentType = values.contentType else { return false }

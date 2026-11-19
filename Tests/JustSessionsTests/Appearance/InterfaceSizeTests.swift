@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Settings → Appearance → Interface size: what it saves, and that the app's type and the sizes that hold it follow it.
@@ -53,7 +54,8 @@ struct InterfaceSizeTests {
         defer { settings.removeSuite() }
         let store = InterfaceSizeStore(userDefaults: settings.userDefaults)
         let label = NSHostingView(rootView: ScaledLabel(store: store))
-        let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 400, height: 200), styleMask: [.borderless], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: CGRect(x: 0, y: 0, width: 400, height: 200), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = label
         defer { window.close() }

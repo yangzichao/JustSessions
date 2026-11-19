@@ -38,7 +38,8 @@ enum StartCommandShape: Equatable {
         let program = programWord.text
         let isPathFromRootOrHome = program.hasPrefix("/") || program.hasPrefix("~/")
         let isNameOnPath = !program.contains("/") && !program.hasPrefix("~") && !program.hasPrefix("-")
-        self = !programWord.hasExpansion && (isPathFromRootOrHome || isNameOnPath)
+        self =
+            !programWord.hasExpansion && (isPathFromRootOrHome || isNameOnPath)
             ? .program(program)
             : .programKnownOnlyWhenItRuns
     }

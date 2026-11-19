@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A tab dragged to another window goes there as it is: the same tab, its terminal and CLI still running, with nothing

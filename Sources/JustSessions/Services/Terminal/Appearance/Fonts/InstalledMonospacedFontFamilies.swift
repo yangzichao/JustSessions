@@ -25,7 +25,8 @@ struct InstalledMonospacedFontFamilies: Equatable {
 
     private static func isMonospaced(_ descriptor: CTFontDescriptor) -> Bool {
         guard let traits = CTFontDescriptorCopyAttribute(descriptor, kCTFontTraitsAttribute) as? [CFString: Any],
-              let symbolicTraits = traits[kCTFontSymbolicTrait] as? UInt32 else { return false }
+            let symbolicTraits = traits[kCTFontSymbolicTrait] as? UInt32
+        else { return false }
         return CTFontSymbolicTraits(rawValue: symbolicTraits).contains(.traitMonoSpace)
     }
 

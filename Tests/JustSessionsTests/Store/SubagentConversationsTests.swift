@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A subagent's session stays out of the listed sessions, is found under the session that started it, and is only
@@ -55,7 +56,8 @@ struct SubagentConversationsTests {
         }
         let nested = Conversation.fixture(provider: .claude, projectPath: "/work/app", parentSessionID: claudeSubagents[0].sessionID)
         let antigravity = Conversation.fixture(provider: .antigravity, projectPath: "/work/app")
-        let antigravitySubagent = Conversation.fixture(provider: .antigravity, projectPath: "/work/app", parentSessionID: antigravity.sessionID)
+        let antigravitySubagent = Conversation.fixture(
+            provider: .antigravity, projectPath: "/work/app", parentSessionID: antigravity.sessionID)
         let alone = Conversation.fixture(provider: .codex, projectPath: "/work/app")
         store.replaceConversations(on: .thisMac, with: [claude, nested, antigravity, antigravitySubagent, alone] + claudeSubagents)
 

@@ -14,7 +14,8 @@ struct AntigravityRemoteSessionMirror {
             let snapshot = FileManager.default.temporaryDirectory.appendingPathComponent("justsessions-agy-" + UUID().uuidString)
             do {
                 try AntigravitySQLiteSnapshot.copySessionStore(
-                    at: URL(fileURLWithPath: sourceHomeOverride).appendingPathComponent(RemoteSessionMirror.remoteFolder(for: .antigravity)), to: snapshot
+                    at: URL(fileURLWithPath: sourceHomeOverride).appendingPathComponent(
+                        RemoteSessionMirror.remoteFolder(for: .antigravity)), to: snapshot
                 )
             } catch {
                 try? FileManager.default.removeItem(at: snapshot)
@@ -33,21 +34,27 @@ struct AntigravityRemoteSessionMirror {
                 throw RemoteSessionMirrorError.sshFailed(host: host, problem: SSHConnectionProblem(sshOutput: result.output))
             }
             guard result.exitStatus == 0, let path = AntigravityRemoteSnapshotCommand.snapshotPath(in: result.output) else {
-                throw RemoteSessionMirrorError.rsyncFailed(host: host, output: "Could not snapshot Antigravity sessions. The SSH host needs python3 and readable session databases.")
+                throw RemoteSessionMirrorError.rsyncFailed(
+                    host: host,
+                    output: "Could not snapshot Antigravity sessions. The SSH host needs python3 and readable session databases.")
             }
             snapshotPath = path
         }
         defer {
-            if sourceHomeOverride != nil { try? FileManager.default.removeItem(atPath: snapshotPath) }
-            else { _ = runner.run(host, "rm -rf -- " + ShellQuoting.quoted(snapshotPath), 30) }
+            if sourceHomeOverride != nil {
+                try? FileManager.default.removeItem(atPath: snapshotPath)
+            } else {
+                _ = runner.run(host, "rm -rf -- " + ShellQuoting.quoted(snapshotPath), 30)
+            }
         }
         let source = sourceHomeOverride != nil ? snapshotPath + "/" : host + ":" + snapshotPath + "/"
-        guard let result = RemoteSessionMirror.runRsync(
-            for: .antigravity,
-            source: source,
-            destination: destination.path + "/",
-            connectionSharingOptions: sourceHomeOverride == nil ? connectionSharingOptions : []
-        )
+        guard
+            let result = RemoteSessionMirror.runRsync(
+                for: .antigravity,
+                source: source,
+                destination: destination.path + "/",
+                connectionSharingOptions: sourceHomeOverride == nil ? connectionSharingOptions : []
+            )
         else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
         guard result.exitStatus == 0 else {
             if result.exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus {

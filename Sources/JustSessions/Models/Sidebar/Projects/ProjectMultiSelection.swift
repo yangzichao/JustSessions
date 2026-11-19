@@ -24,8 +24,9 @@ struct ProjectMultiSelection: Equatable {
 
     mutating func selectRange(to projectID: String, in orderedProjectIDs: [String]) {
         guard let anchorProjectID,
-              let anchorIndex = orderedProjectIDs.firstIndex(of: anchorProjectID),
-              let targetIndex = orderedProjectIDs.firstIndex(of: projectID) else {
+            let anchorIndex = orderedProjectIDs.firstIndex(of: anchorProjectID),
+            let targetIndex = orderedProjectIDs.firstIndex(of: projectID)
+        else {
             selectOnly(projectID)
             return
         }

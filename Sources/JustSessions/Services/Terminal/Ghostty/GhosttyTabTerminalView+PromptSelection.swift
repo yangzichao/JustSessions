@@ -17,8 +17,8 @@ extension GhosttyTabTerminalView: PromptSelectableTerminal {
     /// before its terminal takes the new size, so until the two agree, the text isn't laid out at that grid yet.
     func screenForPromptSelection() -> TerminalScreen? {
         guard let gridMetrics, gridMetrics.cellWidthPixels > 0, gridMetrics.cellHeightPixels > 0,
-              viewport?.columns == gridMetrics.columns, viewport?.rows == gridMetrics.rows,
-              let cursor = cursorCell(in: gridMetrics), let screenText = inMemorySession.readViewportText()
+            viewport?.columns == gridMetrics.columns, viewport?.rows == gridMetrics.rows,
+            let cursor = cursorCell(in: gridMetrics), let screenText = inMemorySession.readViewportText()
         else { return nil }
         return TerminalScreen(lines: screenText.components(separatedBy: "\n"), columnCount: Int(gridMetrics.columns), cursor: cursor)
     }

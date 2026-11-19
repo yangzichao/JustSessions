@@ -17,8 +17,9 @@ struct PiSessionFileHeader: Decodable {
         guard let handle = try? FileHandle(forReadingFrom: file) else { return nil }
         defer { try? handle.close() }
         guard let data = try? handle.read(upToCount: Self.maximumLineLength),
-              let newline = data.firstIndex(of: UInt8(ascii: "\n")),
-              let header = try? JSONDecoder().decode(Self.self, from: data[..<newline]) else { return nil }
+            let newline = data.firstIndex(of: UInt8(ascii: "\n")),
+            let header = try? JSONDecoder().decode(Self.self, from: data[..<newline])
+        else { return nil }
         self = header
     }
 }

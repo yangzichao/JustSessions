@@ -15,18 +15,22 @@ extension ConversationStore {
     /// Check host on an SSH tab whose command ended, as when its session failed to resume.
     func checkHost(ofTerminal id: UUID) {
         guard let tab = terminalSessions.first(where: { $0.id == id }), let host = tab.host.sshDestination else { return }
-        checkHost(host, session: HostCheckSession(
-            provider: tab.provider,
-            projectPath: tab.projectPath,
-            endedTabScreen: tab.shownTextForHostCheck
-        ))
+        checkHost(
+            host,
+            session: HostCheckSession(
+                provider: tab.provider,
+                projectPath: tab.projectPath,
+                endedTabScreen: tab.shownTextForHostCheck
+            ))
     }
 
     /// From the warning on an SSH host's heading: the report of the host's last check, which the warning is about, or
     /// a new check when there is none, as when only the last refresh's tmux noticed a problem.
     func showHostCheck(_ host: String) {
-        guard let keptCheck = keptHostChecks.check(for: host), tmuxServerProblemsByHost[host] == nil
-            || keptCheck.report.findings.contains(where: { $0.id == "tmux" && $0.status == .problem }) else {
+        guard let keptCheck = keptHostChecks.check(for: host),
+            tmuxServerProblemsByHost[host] == nil
+                || keptCheck.report.findings.contains(where: { $0.id == "tmux" && $0.status == .problem })
+        else {
             checkHost(host)
             return
         }

@@ -111,12 +111,13 @@ struct TranscriptView: View {
         guard let readingRequests, let store else { return nil }
         let conversationID = conversation.id
         return TranscriptBookmarkCommandTarget(
-            toggleBookmark: {},   // no message shows to bookmark
+            toggleBookmark: {},  // no message shows to bookmark
             goToAdjacentBookmark: { forward in
                 let bookmarks = store.messageBookmarks.bookmarks(forConversationID: conversationID)
                 if !bookmarks.isEmpty {
-                    readingRequests.requestAdjacentBookmark(forward: forward, in: bookmarks,
-                                                            from: readingPositionStore.position(for: conversationID))
+                    readingRequests.requestAdjacentBookmark(
+                        forward: forward, in: bookmarks,
+                        from: readingPositionStore.position(for: conversationID))
                 }
             },
             contextMenuItems: { _ in [] })
@@ -125,9 +126,10 @@ struct TranscriptView: View {
     @ViewBuilder
     private var content: some View {
         if let transcript = paging.transcript, !transcript.entries.isEmpty {
-            TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: readingPositionStore,
-                                 isActive: isActive, searchState: searchState, paging: paging, onOpenInNewWindow: onOpenInNewWindow,
-                                 store: store, bookmarkState: bookmarkState, readingRequests: readingRequests)
+            TranscriptScrollView(
+                conversation: conversation, transcript: transcript, positionStore: readingPositionStore,
+                isActive: isActive, searchState: searchState, paging: paging, onOpenInNewWindow: onOpenInNewWindow,
+                store: store, bookmarkState: bookmarkState, readingRequests: readingRequests)
         } else if let message = paging.errorMessage {
             VStack {
                 ContentUnavailableView("Could not read this session", systemImage: "exclamationmark.triangle", description: Text(message))
@@ -147,13 +149,14 @@ struct TranscriptView: View {
             shownMatchRevealID = matchReveal.id
             loadingMatchReveal = matchReveal
             loadingJumpCountAtMatchReveal = bookmarkState.loadingJumpCount
-            bookmarkState.cancelLoadingJump()   // the newer request wins
+            bookmarkState.cancelLoadingJump()  // the newer request wins
             readingPositionStore.record(.entry(index: matchReveal.entryID, offset: -6), for: conversation.id)
         }
         dropMatchRevealABookmarkJumpReplaced()
         // Until the reveal's or the jump's pages arrive, the pages shown before still record where they are, such as the
         // bottom. A refresh in the meantime, as when the session's file changes, must not load those instead.
-        let position = loadingMatchReveal.map { TranscriptReadingPosition.entry(index: $0.entryID, offset: -6) }
+        let position =
+            loadingMatchReveal.map { TranscriptReadingPosition.entry(index: $0.entryID, offset: -6) }
             ?? bookmarkState.loadingJump.map { TranscriptReadingPosition.entry(index: $0.entryID, offset: -6) }
             ?? bookmarkState.loadingEntryJump.map { TranscriptReadingPosition.entry(index: $0, offset: -6) }
             ?? readingPositionStore.position(for: conversation.id)
@@ -164,7 +167,8 @@ struct TranscriptView: View {
     /// view takes it once pages show. While a page loads it just waits.
     private func readAgainForNavigation() {
         guard isActive, !paging.isLoading, paging.transcript?.entries.isEmpty != false,
-              let navigation = readingRequests?.pendingNavigation else { return }
+            let navigation = readingRequests?.pendingNavigation
+        else { return }
         if let entryID = navigation.entryID { readingPositionStore.record(.entry(index: entryID, offset: -6), for: conversation.id) }
         refresh()
     }

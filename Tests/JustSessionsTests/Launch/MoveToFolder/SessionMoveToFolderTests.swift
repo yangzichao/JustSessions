@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Move to resumes a Claude Code session with `/cd <folder>` as its first message, so Claude Code moves it.
@@ -84,6 +85,6 @@ struct SessionMoveToFolderTests {
     }
 }
 
-private extension Array {
-    var only: Element? { count == 1 ? first : nil }
+extension Array {
+    fileprivate var only: Element? { count == 1 ? first : nil }
 }

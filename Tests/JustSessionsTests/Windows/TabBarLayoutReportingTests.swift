@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// A tab that moves to another section of the tab bar, as a split across projects becomes a split of one project's
@@ -45,7 +46,7 @@ struct TabBarLayoutReportingTests {
             store: store, leadingClearance: 0, onRenameConversation: { _ in }, onNewSession: {},
             onCloseTerminal: { _ in }, onDeleteConversation: { _ in }, onCloseTabGroup: { _, _ in }
         )
-            .frame(width: Self.barWidth)
+        .frame(width: Self.barWidth)
         return ThemeSurfaceRenderingFixture(
             content: AnyView(bar),
             size: CGSize(width: Self.barWidth, height: WorkspaceTabMetrics.topInset + WorkspaceTabMetrics.height),
@@ -56,10 +57,13 @@ struct TabBarLayoutReportingTests {
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
-        return (store, {
-            store.closeAllTerminals()
-            isolatedUserDefaults.removeSuite()
-        })
+        return (
+            store,
+            {
+                store.closeAllTerminals()
+                isolatedUserDefaults.removeSuite()
+            }
+        )
     }
 
     private func open(_ store: ConversationStore, _ tab: TerminalSession) -> TerminalSession {

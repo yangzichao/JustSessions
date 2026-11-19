@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The parts of `RemoteTmuxAttachScript` a real tmux on this Mac can't show: which tmux versions get the options that
@@ -16,13 +17,15 @@ struct RemoteTmuxAttachScriptTests {
         let sandbox = try TmuxSandbox(tmuxDirectory: nil)
         defer { sandbox.tearDown() }
         // Answers `-V`, records what a new session is started with, and finds no session.
-        try sandbox.addProgram(named: "tmux", script: """
-            case $1 in
-            -V) echo '\(version)' ;;
-            new-session) printf '%s\\n' "$@" > "$HOME/new-session.arguments" ;;
-            *) exit 1 ;;
-            esac
-            """)
+        try sandbox.addProgram(
+            named: "tmux",
+            script: """
+                case $1 in
+                -V) echo '\(version)' ;;
+                new-session) printf '%s\\n' "$@" > "$HOME/new-session.arguments" ;;
+                *) exit 1 ;;
+                esac
+                """)
         let command = RemoteTmuxAttachScript.command(
             sessionName: "justsessions-claude-new-1a2b3c4d",
             paneCommand: "exec claude",
@@ -41,38 +44,42 @@ struct RemoteTmuxAttachScriptTests {
     @Test func aTmuxThatCantReachItsServerEndsTheTabWithItsStatus() throws {
         let sandbox = try TmuxSandbox(tmuxDirectory: nil)
         defer { sandbox.tearDown() }
-        try sandbox.addProgram(named: "tmux", script: """
-            case $1 in
-            -V) echo 'tmux 3.4' ;;
-            *) echo 'protocol version mismatch (client 8, server 7)' >&2; exit 1 ;;
-            esac
-            """)
+        try sandbox.addProgram(
+            named: "tmux",
+            script: """
+                case $1 in
+                -V) echo 'tmux 3.4' ;;
+                *) echo 'protocol version mismatch (client 8, server 7)' >&2; exit 1 ;;
+                esac
+                """)
         let command = RemoteTmuxAttachScript.command(
             sessionName: "justsessions-claude-new-1a2b3c4d",
             paneCommand: "exec claude",
             sessionOptions: ["set-option status off"]
         )
 
-        let result = try #require(BoundedProcessRunner.result(
-            ofExecutable: "/bin/sh", arguments: ["-c", command + " 2>&1"], environment: sandbox.environment, timeout: 10
-        ))
+        let result = try #require(
+            BoundedProcessRunner.result(
+                ofExecutable: "/bin/sh", arguments: ["-c", command + " 2>&1"], environment: sandbox.environment, timeout: 10
+            ))
 
         #expect(result.exitStatus == 1)
         #expect(result.output.contains("protocol version mismatch (client 8, server 7)"))
     }
 
     @Test func capturedOutputLosesTrailingBlanksAndTmuxsDeadPaneLine() {
-        let captured = [
-            "Starting   ",
-            "",
-            "Pane is dead (as a CLI may say)",
-            "env: node: No such file or directory\t",
-            "",
-            "",
-            "Pane is dead (status 127, Tue Oct 13 12:37:11 2026)",
-            "",
-            "",
-        ].joined(separator: "\n") + "\n"
+        let captured =
+            [
+                "Starting   ",
+                "",
+                "Pane is dead (as a CLI may say)",
+                "env: node: No such file or directory\t",
+                "",
+                "",
+                "Pane is dead (status 127, Tue Oct 13 12:37:11 2026)",
+                "",
+                "",
+            ].joined(separator: "\n") + "\n"
 
         let output = BoundedProcessRunner.output(
             ofExecutable: "/bin/sh",
@@ -86,7 +93,9 @@ struct RemoteTmuxAttachScriptTests {
     @Test func aCLIThatPrintedNothingLeavesNothing() {
         let output = BoundedProcessRunner.output(
             ofExecutable: "/bin/sh",
-            arguments: ["-c", "printf '\\n\\nPane is dead (status 1)\\n\\n' | awk \"$1\"", "sh", RemoteTmuxAttachScript.capturedOutputFilter],
+            arguments: [
+                "-c", "printf '\\n\\nPane is dead (status 1)\\n\\n' | awk \"$1\"", "sh", RemoteTmuxAttachScript.capturedOutputFilter,
+            ],
             timeout: 10
         )
 

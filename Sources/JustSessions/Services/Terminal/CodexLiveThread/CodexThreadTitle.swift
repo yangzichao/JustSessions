@@ -20,11 +20,13 @@ enum CodexThreadTitle {
         let lastItem = title.components(separatedBy: " | ").last ?? title
         let trimmedTitle = String(lastItem.split(whereSeparator: \.isWhitespace).first ?? "").lowercased()
         if ConversationProvider.codex.isValidSessionID(trimmedTitle) { return trimmedTitle }
-        guard let prefix = ["...", "…"].lazy.compactMap({ ellipsis in
-            trimmedTitle.hasSuffix(ellipsis) ? String(trimmedTitle.dropLast(ellipsis.count)) : nil
-        }).first,
+        guard
+            let prefix = ["...", "…"].lazy.compactMap({ ellipsis in
+                trimmedTitle.hasSuffix(ellipsis) ? String(trimmedTitle.dropLast(ellipsis.count)) : nil
+            }).first,
             (minimumThreadIDPrefixLength..<threadIDShape.count).contains(prefix.count),
-            zip(prefix, threadIDShape).allSatisfy(matchesThreadIDShape) else { return nil }
+            zip(prefix, threadIDShape).allSatisfy(matchesThreadIDShape)
+        else { return nil }
         return prefix
     }
 

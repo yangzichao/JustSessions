@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// When the store checks an SSH host's shell startup, and what it does with the result; see
@@ -111,11 +112,12 @@ struct RemoteShellStartupStoreTests {
         defer { cleanUp(settings, host) }
         let cacheRoot = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: cacheRoot) }
-        let windows = RemoteSessionDiscovery(mirror: RemoteSessionMirror(
-            cacheRoot: cacheRoot,
-            sourceHomeOverride: cacheRoot.path,
-            toolFoldersLookup: { host in throw RemoteSessionMirrorError.sshFailed(host: host, problem: .windowsHost) }
-        ))
+        let windows = RemoteSessionDiscovery(
+            mirror: RemoteSessionMirror(
+                cacheRoot: cacheRoot,
+                sourceHomeOverride: cacheRoot.path,
+                toolFoldersLookup: { host in throw RemoteSessionMirrorError.sshFailed(host: host, problem: .windowsHost) }
+            ))
 
         store.refreshRemoteHost(host, discovery: windows)
         try await expectEventually { store.hostRefreshStatuses[.ssh(host)] != .refreshing }
@@ -129,10 +131,11 @@ struct RemoteShellStartupStoreTests {
     private static func discoveryThatFailsWithoutSSH() throws -> RemoteSessionDiscovery {
         let notAFolder = FileManager.default.temporaryDirectory.appendingPathComponent("not-a-folder-\(UUID().uuidString.prefix(8))")
         try "".write(to: notAFolder, atomically: true, encoding: .utf8)
-        return RemoteSessionDiscovery(mirror: RemoteSessionMirror(
-            cacheRoot: notAFolder,
-            sourceHomeOverride: FileManager.default.temporaryDirectory.path
-        ))
+        return RemoteSessionDiscovery(
+            mirror: RemoteSessionMirror(
+                cacheRoot: notAFolder,
+                sourceHomeOverride: FileManager.default.temporaryDirectory.path
+            ))
     }
 
     private func makeStore(

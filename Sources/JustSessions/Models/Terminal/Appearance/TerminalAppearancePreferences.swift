@@ -17,7 +17,8 @@ struct TerminalAppearancePreferences: Codable, Equatable {
     var validated: Self {
         var preferences = self
         if colorChoice == .imported && importedColors == nil { preferences.colorChoice = .matchAppTheme }
-        preferences.fontSize = fontSize.isFinite
+        preferences.fontSize =
+            fontSize.isFinite
             ? min(max(fontSize, Self.fontSizeRange.lowerBound), Self.fontSizeRange.upperBound)
             : Self.defaultFontSize
         let intensityRange = TerminalColorIntensity.percentRange
@@ -27,17 +28,19 @@ struct TerminalAppearancePreferences: Codable, Equatable {
 
     /// The chosen colors, in one version or in light and dark, with their ANSI colors at the chosen intensity.
     func colorVariants(appTheme: ResolvedAppTheme) -> TerminalPaletteVariants {
-        let chosenVariants = switch colorChoice {
-        case .matchAppTheme: TerminalPaletteVariants(appTheme: appTheme)
-        case .preset(let preset): preset.variants
-        case .imported: importedColors?.variants ?? TerminalPaletteVariants(appTheme: appTheme)
-        }
+        let chosenVariants =
+            switch colorChoice {
+            case .matchAppTheme: TerminalPaletteVariants(appTheme: appTheme)
+            case .preset(let preset): preset.variants
+            case .imported: importedColors?.variants ?? TerminalPaletteVariants(appTheme: appTheme)
+            }
         return chosenVariants.withANSIColorIntensity(percent: colorIntensityPercent)
     }
 
     static func load(from userDefaults: UserDefaults) -> Self {
         guard let data = userDefaults.data(forKey: userDefaultsKey),
-              let preferences = try? JSONDecoder().decode(Self.self, from: data) else { return Self() }
+            let preferences = try? JSONDecoder().decode(Self.self, from: data)
+        else { return Self() }
         return preferences.validated
     }
 

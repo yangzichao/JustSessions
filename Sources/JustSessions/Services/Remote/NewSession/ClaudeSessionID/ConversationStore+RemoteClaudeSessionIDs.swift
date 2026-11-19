@@ -8,8 +8,10 @@ extension ConversationStore {
     func checkClaudeSessionIDFlagIfUnanswered(on host: String) {
         guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), !isDisconnected(host) else { return }
         let startCommand = customStartCommand(for: .claude, on: .ssh(host))
-        guard installedProvidersByHost[.ssh(host)]?.contains(.claude) == true
-            || CLIStartCommandLine.customCommand(startCommand) != nil else { return }
+        guard
+            installedProvidersByHost[.ssh(host)]?.contains(.claude) == true
+                || CLIStartCommandLine.customCommand(startCommand) != nil
+        else { return }
         if let task = remoteClaudeSessionIDFlagSupport.checkInBackgroundIfUnanswered(host: host, startCommand: startCommand) {
             remoteHostWork.keepAuxiliary(task, on: host)
         }

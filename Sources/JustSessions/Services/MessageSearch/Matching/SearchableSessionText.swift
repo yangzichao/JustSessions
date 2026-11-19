@@ -42,7 +42,8 @@ struct SearchableSessionText: Sendable {
                 guard let haystackStart = haystack.baseAddress, let needleStart = needle.baseAddress else { return nil }
                 var searchStart = 0
                 while searchStart < haystack.count,
-                      let found = memmem(haystackStart + searchStart, haystack.count - searchStart, needleStart, needle.count) {
+                    let found = memmem(haystackStart + searchStart, haystack.count - searchStart, needleStart, needle.count)
+                {
                     let segmentNumber = segmentNumber(containing: haystackStart.distance(to: UnsafeRawPointer(found)))
                     let position = segmentPositions[segmentNumber]
                     let entry = text.entries[position.entry]

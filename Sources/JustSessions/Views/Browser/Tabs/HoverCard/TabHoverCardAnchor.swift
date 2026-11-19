@@ -14,7 +14,9 @@ private struct TabHoverCardAnchorReporting: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+            .onGeometryChange(for: CGRect.self) {
+                $0.frame(in: .global)
+            } action: { frame in
                 hoverCards?.report(frame, of: target)
             }
             .onDisappear { hoverCards?.report(nil, of: target) }

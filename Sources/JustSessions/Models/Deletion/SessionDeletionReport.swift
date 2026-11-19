@@ -71,9 +71,11 @@ struct SessionDeletionReport: Sendable {
     /// each cause is a paragraph: each host given up on once, then a few other failures one by one, or more
     /// grouped by reason, the most common first.
     func messageAfterDeletingSeveralSessions(titleOf: (Conversation) -> String) -> String {
-        let hostCauses = Self.groupedByCount(failures.compactMap { failure in
-            failure.unresponsiveHost.map { ($0.host, failure) }
-        }).map { host, hostFailures in
+        let hostCauses = Self.groupedByCount(
+            failures.compactMap { failure in
+                failure.unresponsiveHost.map { ($0.host, failure) }
+            }
+        ).map { host, hostFailures in
             // The first failure on the host is the one that was tried; the rest were skipped because of it.
             let unresponsiveHost = hostFailures.first?.unresponsiveHost
             let explanation = Self.sentence(unresponsiveHost?.explanation ?? "")
@@ -99,7 +101,8 @@ struct SessionDeletionReport: Sendable {
                 sessionCount: 1
             )
         }
-        let otherCauses = otherFailures.count <= Self.maximumSessionsListedOneByOne
+        let otherCauses =
+            otherFailures.count <= Self.maximumSessionsListedOneByOne
             ? otherFailures.map(oneSessionCause)
             : Self.groupedByCount(otherFailures.map { ($0.reason, $0) }).map { reason, reasonFailures in
                 reasonFailures.count == 1
@@ -115,7 +118,8 @@ struct SessionDeletionReport: Sendable {
 
         var paragraphs: [String]
         if causes.count == 1, let onlyCause = causes.first, let explanation = onlyCause.explanation,
-           onlyCause.notDeletedCount == requestedCount - deletedCount {
+            onlyCause.notDeletedCount == requestedCount - deletedCount
+        {
             paragraphs = [summary(telling: explanation)]
         } else {
             let summary = summary(telling: nil)
@@ -152,7 +156,8 @@ struct SessionDeletionReport: Sendable {
         for host in retriableFailures.compactMap(\.unresponsiveHost) where !hosts.contains(where: { $0.host == host.host }) {
             hosts.append(host)
         }
-        let hostNames = hosts.count <= 2
+        let hostNames =
+            hosts.count <= 2
             ? Self.listed(hosts.map { Self.shortened($0.host, to: 60) })
             : "\(hosts.count) hosts"
         guard retriableFailures.count < notDeletedCount else {

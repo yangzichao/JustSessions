@@ -11,7 +11,8 @@ extension ConversationStore {
         let lostPaneProcessIDs = lostKiroPaneProcessIDs()
         guard !lostPaneProcessIDs.isEmpty, let tmuxServer = commandResolver.thisMacTmuxServer() else { return }
         let runningNames = tmuxSessionNamesByHost[.thisMac] ?? []
-        let candidates = conversations
+        let candidates =
+            conversations
             .filter { $0.host == .thisMac && $0.provider == .kiro && !runningNames.contains(TmuxSessionName.forConversation($0)) }
             .map { (sessionID: $0.sessionID, sourceFile: $0.sourceFile) }
         guard !candidates.isEmpty else { return }
@@ -45,7 +46,8 @@ extension ConversationStore {
         for (temporaryName, sessionID) in sessionIDsByTmuxName {
             let sessionName = TmuxSessionName.forSession(provider: .kiro, sessionID: sessionID)
             guard let paneProcessID = lostPaneProcessIDs[temporaryName],
-                  tmuxSessionNamesByHost[.thisMac]?.contains(sessionName) != true else { continue }
+                tmuxSessionNamesByHost[.thisMac]?.contains(sessionName) != true
+            else { continue }
             tmuxCommandQueues.run(on: .thisMac) { tmuxServer.renameSession(from: temporaryName, to: sessionName) }
             tmuxSessionNamesByHost[.thisMac, default: []].remove(temporaryName)
             tmuxSessionNamesByHost[.thisMac, default: []].insert(sessionName)

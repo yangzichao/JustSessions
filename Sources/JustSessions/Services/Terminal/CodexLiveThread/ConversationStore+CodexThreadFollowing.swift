@@ -15,7 +15,8 @@ extension ConversationStore {
         var unlistedThreads: [(tab: TerminalSession, threadIDPrefix: String)] = []
         for session in terminalSessions where session.provider == .codex && session.host == .thisMac && !session.hasExited {
             guard let threadIDPrefix = session.terminalTitle.flatMap(CodexThreadTitle.threadIDPrefix(inTerminalTitle:)),
-                  session.conversation?.sessionID.hasPrefix(threadIDPrefix) != true else { continue }
+                session.conversation?.sessionID.hasPrefix(threadIDPrefix) != true
+            else { continue }
             if let thread = listedCodexThread(on: session.host, threadIDPrefix: threadIDPrefix) {
                 link(session, to: thread)
             } else {

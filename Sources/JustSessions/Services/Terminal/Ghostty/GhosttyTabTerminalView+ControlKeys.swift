@@ -7,7 +7,7 @@ import AppKit
 extension GhosttyTabTerminalView {
     func sendControlKeyToTmux(_ event: NSEvent) -> Bool {
         guard cliRunsInTmux, window?.firstResponder === self, !hasMarkedText(),
-              !outputModeScanner.hasKittyKeyboardFlags, let controlKey = TerminalControlKey(event)
+            !outputModeScanner.hasKittyKeyboardFlags, let controlKey = TerminalControlKey(event)
         else { return false }
         sendAsTyped(controlKey.bytesForTmux)
         return true

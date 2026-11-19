@@ -1,4 +1,5 @@
 import AppKit
+
 @testable import JustSessions
 
 /// A tab's terminal in a window that is never shown, which records the links it hands over.

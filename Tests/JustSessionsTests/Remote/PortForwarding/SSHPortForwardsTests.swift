@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Port forwarding on demand: a host's forwards share one connection the app opens for them, or the host's Connect…
@@ -151,22 +152,25 @@ struct SSHPortForwardsTests {
     @Test func eachForwardIsAddedByAnSSHThatReadsNoConfigAndListensOnlyOnThisMac() {
         let forward = SSHPortForward(host: "me@devbox", localPort: 8080, remotePort: 3000)
 
-        #expect(SSHPortForwardCommands.requestArguments(.forward, forward, controlPath: "/tmp/s/master") == [
-            "-F", "/dev/null", "-o", "BatchMode=yes", "-S", "/tmp/s/master",
-            "-O", "forward", "-L", "127.0.0.1:8080:localhost:3000", "--", "me@devbox",
-        ])
+        #expect(
+            SSHPortForwardCommands.requestArguments(.forward, forward, controlPath: "/tmp/s/master") == [
+                "-F", "/dev/null", "-o", "BatchMode=yes", "-S", "/tmp/s/master",
+                "-O", "forward", "-L", "127.0.0.1:8080:localhost:3000", "--", "me@devbox",
+            ])
         #expect(SSHPortForwardCommands.requestArguments(.cancel, forward, controlPath: "/tmp/s/master")[7] == "cancel")
-        #expect(SSHPortForwardCommands.probeArguments(forward, controlPath: "/tmp/s/master") == [
-            "-F", "/dev/null", "-o", "BatchMode=yes", "-S", "/tmp/s/master",
-            "-W", "localhost:3000", "--", "me@devbox",
-        ])
+        #expect(
+            SSHPortForwardCommands.probeArguments(forward, controlPath: "/tmp/s/master") == [
+                "-F", "/dev/null", "-o", "BatchMode=yes", "-S", "/tmp/s/master",
+                "-W", "localhost:3000", "--", "me@devbox",
+            ])
         #expect(forward.address == "localhost:8080")
         #expect(forward.browserURL == URL(string: "http://localhost:8080"))
     }
 
     @Test func onlyARefusalOtherThanNothingListeningFailsTheProbe() {
-        #expect(SSHPortForwards.refusal(in: "channel 2: open failed: administratively prohibited: open failed")
-            == "channel 2: open failed: administratively prohibited: open failed")
+        #expect(
+            SSHPortForwards.refusal(in: "channel 2: open failed: administratively prohibited: open failed")
+                == "channel 2: open failed: administratively prohibited: open failed")
         #expect(SSHPortForwards.refusal(in: "channel 2: open failed: connect failed: Connection refused") == nil)
         #expect(SSHPortForwards.refusal(in: "Stdio forwarding request failed: Session open refused by peer") == nil)
     }
@@ -184,17 +188,19 @@ struct SSHPortForwardsTests {
         let controlPath = URL(fileURLWithPath: fixture.socketRoot).appendingPathComponent(folder)
             .appendingPathComponent("master").path
         #expect(fixture.connectionFolders.count == 1)
-        #expect(fixture.requests == [
-            "connect",
-            "forward 127.0.0.1:3000:localhost:3000 \(controlPath)",
-            "probe localhost:3000",
-            "forward 127.0.0.1:8080:localhost:5173 \(controlPath)",
-            "probe localhost:5173",
-        ])
-        #expect(fixture.forwards.entries(on: "devbox").map(\.forward) == [
-            SSHPortForward(host: "devbox", localPort: 3000, remotePort: 3000),
-            SSHPortForward(host: "devbox", localPort: 8080, remotePort: 5173),
-        ])
+        #expect(
+            fixture.requests == [
+                "connect",
+                "forward 127.0.0.1:3000:localhost:3000 \(controlPath)",
+                "probe localhost:3000",
+                "forward 127.0.0.1:8080:localhost:5173 \(controlPath)",
+                "probe localhost:5173",
+            ])
+        #expect(
+            fixture.forwards.entries(on: "devbox").map(\.forward) == [
+                SSHPortForward(host: "devbox", localPort: 3000, remotePort: 3000),
+                SSHPortForward(host: "devbox", localPort: 8080, remotePort: 5173),
+            ])
         #expect(fixture.states() == [.active, .active])
     }
 
@@ -263,10 +269,12 @@ struct SSHPortForwardsTests {
 
         let failure = await fixture.forwards.forward(remotePort: 3000, localPort: 3000, on: "devbox")
 
-        #expect(failure == .refusedByHost(
-            host: "devbox",
-            sshMessage: "channel 2: open failed: administratively prohibited: open failed"
-        ))
+        #expect(
+            failure
+                == .refusedByHost(
+                    host: "devbox",
+                    sshMessage: "channel 2: open failed: administratively prohibited: open failed"
+                ))
         #expect(fixture.requests.contains { $0.hasPrefix("cancel 127.0.0.1:3000:localhost:3000 ") })
         #expect(fixture.forwards.entries.isEmpty)
     }
@@ -441,9 +449,11 @@ struct SSHPortForwardsTests {
         }
         let closed = LockedValue<[String]>([])
 
-        SSHPortForwardConnection.closeConnectionsOfEndedApps(socketRoot: root, close: { _, controlPath in
-            closed.update { $0.append(controlPath) }
-        })
+        SSHPortForwardConnection.closeConnectionsOfEndedApps(
+            socketRoot: root,
+            close: { _, controlPath in
+                closed.update { $0.append(controlPath) }
+            })
 
         #expect(closed.value == [SSHLoginConnections.controlPath(in: crashed)])
         #expect(!FileManager.default.fileExists(atPath: crashed.path))

@@ -23,7 +23,9 @@ struct SessionManagementMenuItems: View {
             SessionMoveToFolderMenu(store: store, conversation: conversation)
             Divider()
         }
-        ConversationSharingMenuItems(selections: [ConversationExportSelection(conversation: conversation, title: store.title(for: conversation))])
+        ConversationSharingMenuItems(selections: [
+            ConversationExportSelection(conversation: conversation, title: store.title(for: conversation))
+        ])
         Button("Copy session ID", systemImage: "doc.on.doc") {
             SessionLocationActions.copySessionID(conversation)
         }
@@ -36,8 +38,10 @@ struct SessionManagementMenuItems: View {
             Divider()
             // The deletion dialog closes the session's tab and ends its CLI first; see `closeAndDelete`.
             let endsCLIFirst = store.cliEndingBeforeDeletion(of: conversation) != nil
-            Button(endsCLIFirst ? "Close and delete session…" : "Delete session…", systemImage: "trash", role: .destructive, action: onDelete)
-                .disabled(store.isDeletionPending(for: conversation))
+            Button(
+                endsCLIFirst ? "Close and delete session…" : "Delete session…", systemImage: "trash", role: .destructive, action: onDelete
+            )
+            .disabled(store.isDeletionPending(for: conversation))
         }
     }
 }

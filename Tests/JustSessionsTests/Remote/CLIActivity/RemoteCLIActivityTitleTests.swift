@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// What a Claude Code, Pi, or OpenCode on an SSH host does, as the tab's tmux session puts it in the tab's title; see

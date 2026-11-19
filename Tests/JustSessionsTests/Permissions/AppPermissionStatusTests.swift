@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import UserNotifications
+
 @testable import JustSessions
 
 struct AppPermissionStatusTests {
@@ -24,12 +25,15 @@ struct AppPermissionStatusTests {
     }
 
     @Test func eachPermissionOpensItsSystemSettingsPage() {
-        #expect(AppPermission.fullDiskAccess.systemSettingsURL?.absoluteString
-            == "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
-        #expect(AppPermission.notifications.systemSettingsURL?.absoluteString
-            .hasPrefix("x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=") == true)
-        #expect(AppPermission.accessibility.systemSettingsURL?.absoluteString
-            == "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
+        #expect(
+            AppPermission.fullDiskAccess.systemSettingsURL?.absoluteString
+                == "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+        #expect(
+            AppPermission.notifications.systemSettingsURL?.absoluteString
+                .hasPrefix("x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=") == true)
+        #expect(
+            AppPermission.accessibility.systemSettingsURL?.absoluteString
+                == "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
         #expect(AppPermission.localNetwork.systemSettingsURL != nil)
     }
 }

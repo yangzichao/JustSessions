@@ -45,8 +45,9 @@ struct TranscriptSearchKeyboardShortcuts: NSViewRepresentable {
                 return nil
             }
             guard searchState.isPresented else { return event }
-            if (event.keyCode == 36 || event.keyCode == 76), modifiers.isEmpty || modifiers == .shift,
-               searchState.isFieldFocused, let fieldEditor = window.firstResponder as? NSTextView, !fieldEditor.hasMarkedText() {
+            if event.keyCode == 36 || event.keyCode == 76, modifiers.isEmpty || modifiers == .shift,
+                searchState.isFieldFocused, let fieldEditor = window.firstResponder as? NSTextView, !fieldEditor.hasMarkedText()
+            {
                 searchState.move(forward: !modifiers.contains(.shift))
                 return nil
             }

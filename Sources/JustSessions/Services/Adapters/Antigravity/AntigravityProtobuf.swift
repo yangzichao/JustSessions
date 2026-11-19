@@ -51,7 +51,8 @@ enum AntigravityProtobuf {
                 guard advance(8, position: &position, count: bytes.count) else { return nil }
             case 2:
                 guard let length = readVarint(bytes, position: &position),
-                      length <= UInt64(bytes.count - position) else { return nil }
+                    length <= UInt64(bytes.count - position)
+                else { return nil }
                 let end = position + Int(length)
                 fields.append(Field(number: fieldNumber, data: Data(bytes[position..<end])))
                 position = end

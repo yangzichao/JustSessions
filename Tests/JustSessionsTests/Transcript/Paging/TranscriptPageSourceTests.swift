@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct TranscriptPageSourceTests {
@@ -11,7 +12,8 @@ struct TranscriptPageSourceTests {
         limits.targetEntryCount = 1
         let source = TranscriptPageSource(file: fixture.file, provider: .pi, limits: limits)
         let first = try await source.read(.first)
-        let branch = #"{"type":"message","id":"b1","parentId":"a2","timestamp":"2026-09-24T10:00:09.000Z","message":{"role":"user","content":"Try another way","timestamp":1758708009000}}"#
+        let branch =
+            #"{"type":"message","id":"b1","parentId":"a2","timestamp":"2026-09-24T10:00:09.000Z","message":{"role":"user","content":"Try another way","timestamp":1758708009000}}"#
         try fixture.append(SampleTranscriptLines.fileContents([branch]))
         await #expect(throws: TranscriptPagingError.sourceChanged) {
             try await source.read(.after(first.records.upperBound))
@@ -99,7 +101,8 @@ struct TranscriptPageSourceTests {
     @Test func skipsOversizedToolOutputsWithoutAllocatingTheirJSON() async throws {
         let fixture = try TranscriptPagingFixture(count: 1)
         defer { fixture.remove() }
-        let output = #"{"timestamp":"2026-10-02T12:00:00.000Z","type":"response_item","payload":{"type":"function_call_output","output":""#
+        let output =
+            #"{"timestamp":"2026-10-02T12:00:00.000Z","type":"response_item","payload":{"type":"function_call_output","output":""#
             + String(repeating: "x", count: 200_000) + "\"}}\n"
         let handle = try FileHandle(forWritingTo: fixture.file)
         try handle.seekToEnd()

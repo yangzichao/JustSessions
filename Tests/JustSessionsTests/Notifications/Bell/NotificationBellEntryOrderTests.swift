@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct NotificationBellEntryOrderTests {
@@ -29,7 +30,10 @@ struct NotificationBellEntryOrderTests {
     }
 
     @Test func waitsThatStartedTogetherKeepTitleOrder() {
-        let entries = [Self.entry("Session 10", waitingFor: 5), Self.entry("Session 9", waitingFor: 5), Self.entry("Apple", waitingFor: nil), Self.entry("Banana", waitingFor: nil)]
+        let entries = [
+            Self.entry("Session 10", waitingFor: 5), Self.entry("Session 9", waitingFor: 5), Self.entry("Apple", waitingFor: nil),
+            Self.entry("Banana", waitingFor: nil),
+        ]
 
         #expect(entries.sortedNewestFirst().map(\.sessionTitle) == ["Session 9", "Session 10", "Apple", "Banana"])
     }

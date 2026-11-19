@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// Right-clicking the Dock icon offers New Window, in the app's language, which opens a workspace window.

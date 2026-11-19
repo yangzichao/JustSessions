@@ -55,7 +55,7 @@ struct TerminalFindShortcuts: NSViewRepresentable {
                 return nil
             }
             guard findState.isFieldFocused, let fieldEditor = window.firstResponder as? NSTextView,
-                  !fieldEditor.hasMarkedText()
+                !fieldEditor.hasMarkedText()
             else { return event }
             if event.keyCode == 36 || event.keyCode == 76, modifiers.isEmpty || modifiers == .shift {
                 findState.move(modifiers.contains(.shift) ? .towardNewer : .towardOlder)

@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// How a Ghostty tab hands its process's output to Ghostty: no faster than Ghostty parses it, in order, all of it
@@ -38,9 +39,10 @@ struct GhosttyTabOutputTests {
         let fixture = try GhosttyTabFixture(outputHighWaterByteCount: 4 << 10, outputLowWaterByteCount: 1 << 10)
         defer { fixture.tearDown() }
         let count = 3000
-        try await fixture.start(printing: """
-            i=1; while [ $i -le \(count) ]; do printf '%d\\r\\n' $i; i=$((i+1)); done; printf 'NUMBERS-DONE'
-            """)
+        try await fixture.start(
+            printing: """
+                i=1; while [ $i -le \(count) ]; do printf '%d\\r\\n' $i; i=$((i+1)); done; printf 'NUMBERS-DONE'
+                """)
         Self.blockMainThread(for: 0.5)
 
         try await expectEventually { fixture.screen.contains("NUMBERS-DONE") }
@@ -71,7 +73,8 @@ struct GhosttyTabOutputTests {
             )
         )
         let view = try #require(tab.terminalView as? GhosttyTabTerminalView)
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 600, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = view
         defer {

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct HostCheckReportTests {
@@ -26,15 +27,16 @@ struct HostCheckReportTests {
         #expect(lines[0] == "JustSessions host check: devbox")
         #expect(lines[2] == "This Mac: JustSessions 1.2.10 · macOS 26.0.1 · OpenSSH_10.3p1")
         // The warning comes first, though it was checked last.
-        #expect(Array(lines[4...]) == [
-            "[Warning] OpenCode: Found at /usr/bin/opencode, but it failed when asked for its version.",
-            "    devbox printed:",
-            "      env: node: No such file or directory",
-            "      second line",
-            "    Run it yourself: ssh devbox 'command -v opencode'",
-            "[OK] rsync: Copies devbox's sessions to this Mac.",
-            "",
-        ])
+        #expect(
+            Array(lines[4...]) == [
+                "[Warning] OpenCode: Found at /usr/bin/opencode, but it failed when asked for its version.",
+                "    devbox printed:",
+                "      env: node: No such file or directory",
+                "      second line",
+                "    Run it yourself: ssh devbox 'command -v opencode'",
+                "[OK] rsync: Copies devbox's sessions to this Mac.",
+                "",
+            ])
         #expect(report.problemCount == 0)
         #expect(report.warningCount == 1)
     }
@@ -50,14 +52,15 @@ struct HostCheckReportTests {
 
         let lines = report.plainText.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
 
-        #expect(Array(lines.suffix(6)) == [
-            "",
-            "What the tab showed when it ended:",
-            "    protocol version mismatch (client 8, server 7)",
-            "    ",
-            "    Connection to devbox closed.",
-            "",
-        ])
+        #expect(
+            Array(lines.suffix(6)) == [
+                "",
+                "What the tab showed when it ended:",
+                "    protocol version mismatch (client 8, server 7)",
+                "    ",
+                "    Connection to devbox closed.",
+                "",
+            ])
         // Nothing failed, but the tab's output is something to explain.
         #expect(report.hasSomethingToFix)
     }

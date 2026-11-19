@@ -26,7 +26,7 @@ final class TerminalPromptSelectionOverlay: NSView {
     override func draw(_ dirtyRect: NSRect) {
         guard let style else { return }
         style.backgroundColor.setFill()
-        lineFrames.forEach { $0.fill() }
+        for lineFrame in lineFrames { lineFrame.fill() }
         let attributes: [NSAttributedString.Key: Any] = [.font: style.font, .foregroundColor: style.foregroundColor]
         for glyph in glyphs {
             NSAttributedString(string: String(glyph.character), attributes: attributes).draw(at: glyph.frame.origin)

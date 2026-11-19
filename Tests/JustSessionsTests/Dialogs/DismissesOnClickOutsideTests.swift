@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// A SwiftUI sheet in a window on screen, which SwiftUI needs before it attaches the sheet.
@@ -22,11 +23,12 @@ struct DismissesOnClickOutsideTests {
 
         presentation.isPresented = true
         try await expectEventually { window.attachedSheet != nil }
-        let click = try #require(NSEvent.mouseEvent(
-            with: .leftMouseDown, location: CGPoint(x: 40, y: 40), modifierFlags: [],
-            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
-            context: nil, eventNumber: 0, clickCount: 1, pressure: 1
-        ))
+        let click = try #require(
+            NSEvent.mouseEvent(
+                with: .leftMouseDown, location: CGPoint(x: 40, y: 40), modifierFlags: [],
+                timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
+                context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+            ))
         NSApp.sendEvent(click)
 
         #expect(!presentation.isPresented)

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// How a tab's outline follows its session while the map shows (PERF-89): a read only after a change, spaced by the
@@ -62,7 +63,10 @@ struct ConversationOutlineModelTests {
     @Test func relinkingStartsAFreshOutline() async throws {
         let first = try TranscriptPagingFixture(count: 10)
         let second = try TranscriptPagingFixture(count: 0)
-        defer { first.remove(); second.remove() }
+        defer {
+            first.remove()
+            second.remove()
+        }
         try SampleTranscriptLines.fileContents(SampleTranscriptLines.codex).write(to: second.file)
         let model = Self.model()
         let watchFirst = OutlineWatch(model, first.conversation)
@@ -82,7 +86,10 @@ struct ConversationOutlineModelTests {
         let firstWatch = OutlineWatch(model, fixture.conversation)
         try await expectEventually { model.readCount == 1 }
         let secondWatch = OutlineWatch(model, fixture.conversation)
-        defer { firstWatch.cancel(); secondWatch.cancel() }
+        defer {
+            firstWatch.cancel()
+            secondWatch.cancel()
+        }
         try await expectEventually { firstWatch.hasEnded }
         #expect(!secondWatch.hasEnded)
         try fixture.append(Self.record(10))
@@ -144,7 +151,10 @@ struct ConversationOutlineModelTests {
     @Test func aReadUnwindingAfterARelinkDoesNotDelayTheNewSession() async throws {
         let large = try TranscriptPagingFixture(count: 200_000)
         let small = try TranscriptPagingFixture(count: 10)
-        defer { large.remove(); small.remove() }
+        defer {
+            large.remove()
+            small.remove()
+        }
         let model = Self.model()
         let clock = ContinuousClock()
         let first = OutlineWatch(model, large.conversation)
@@ -168,14 +178,20 @@ struct ConversationOutlineModelTests {
     @Test func aRelinkReadsTheNewSessionWhileTheOldReadRuns() async throws {
         let large = try TranscriptPagingFixture(count: 200_000)
         let small = try TranscriptPagingFixture(count: 10)
-        defer { large.remove(); small.remove() }
+        defer {
+            large.remove()
+            small.remove()
+        }
         let model = Self.model()
         let first = OutlineWatch(model, large.conversation)
         try await expectEventually { model.readCount == 1 }
         try await Task.sleep(for: .milliseconds(100))
         try #require(model.outline == nil, "the first read must still be running when the tab relinks")
         let second = OutlineWatch(model, small.conversation)
-        defer { first.cancel(); second.cancel() }
+        defer {
+            first.cancel()
+            second.cancel()
+        }
         try await expectEventually { model.outline?.blocks.count == 10 || first.hasEnded }
         try #require(!first.hasEnded, "the first read must still be running when the new session's outline shows")
         #expect(model.outline?.blocks.count == 10)
@@ -186,14 +202,20 @@ struct ConversationOutlineModelTests {
     @Test func aDiscardedReadDoesNotDelayTheNewSession() async throws {
         let large = try TranscriptPagingFixture(count: 30_000)
         let small = try TranscriptPagingFixture(count: 10)
-        defer { large.remove(); small.remove() }
+        defer {
+            large.remove()
+            small.remove()
+        }
         let model = Self.model()
         let first = OutlineWatch(model, large.conversation)
         try await expectEventually { model.readCount == 1 }
         try await Task.sleep(for: .milliseconds(100))
         try #require(model.outline == nil, "the first read must still be running when the new session's watch starts")
         let second = OutlineWatch(model, small.conversation)
-        defer { first.cancel(); second.cancel() }
+        defer {
+            first.cancel()
+            second.cancel()
+        }
         try await expectEventually { first.hasEnded }
         try await expectEventually(timeout: .seconds(1)) { model.outline?.blocks.count == 10 }
     }
@@ -203,7 +225,10 @@ struct ConversationOutlineModelTests {
     @Test func aBookmarkForTheSessionLeftLeavesTheMapFollowing() async throws {
         let left = try TranscriptPagingFixture(count: 10)
         let shown = try TranscriptPagingFixture(count: 5)
-        defer { left.remove(); shown.remove() }
+        defer {
+            left.remove()
+            shown.remove()
+        }
         let model = Self.model()
         let watch = OutlineWatch(model, shown.conversation)
         defer { watch.cancel() }

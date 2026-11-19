@@ -10,7 +10,7 @@ extension SelectableTerminalView {
         // the pixel grid, at the window's scale.
         let scale = window?.backingScaleFactor ?? 1
         guard bounds.contains(point), let cellPixels = cellSizeInPixels(source: terminal), cellPixels.width > 0,
-              cellPixels.height > 0
+            cellPixels.height > 0
         else { return nil }
         let column = Int(point.x * scale) / cellPixels.width
         let row = Int((bounds.height - point.y) * scale) / cellPixels.height

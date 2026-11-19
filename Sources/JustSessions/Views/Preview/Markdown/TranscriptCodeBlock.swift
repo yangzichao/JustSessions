@@ -32,8 +32,8 @@ struct TranscriptCodeBlock: View {
                     source: AttributedString(text), segmentIndex: segmentIndex,
                     style: TranscriptTextStyle(fontSize: fontSize - 1, isMonospaced: true, lineSpacing: 3)
                 )
-                    .fixedSize(horizontal: true, vertical: true)
-                    .padding(12)
+                .fixedSize(horizontal: true, vertical: true)
+                .padding(12)
             }
         }
         .background(ThemePalette.raisedSurface, in: RoundedRectangle(.panel))

@@ -50,10 +50,11 @@ struct TranscriptPagingViewport {
         }
         let ends = Array(starts.dropFirst()) + [documentMaxY]
         let clearance = prefetchDistance + height
-        let clearPageCount = switch direction {
-        case .earlier: starts.reversed().prefix { $0 >= visible.maxY + clearance }.count
-        case .later: ends.prefix { $0 <= visible.minY - clearance }.count
-        }
+        let clearPageCount =
+            switch direction {
+            case .earlier: starts.reversed().prefix { $0 >= visible.maxY + clearance }.count
+            case .later: ends.prefix { $0 <= visible.minY - clearance }.count
+            }
         let loadedCount = starts.count + 1
         let usualLeavingCount = max(0, loadedCount - TranscriptPagingModel.maximumPageCount)
         return min(TranscriptPagingModel.maximumRetainedPageCount, loadedCount - min(usualLeavingCount, clearPageCount))

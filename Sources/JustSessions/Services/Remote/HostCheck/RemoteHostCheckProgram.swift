@@ -26,7 +26,8 @@ struct RemoteHostCheckProgram: Equatable, Sendable {
                 return RemoteHostCheckProgram(provider: provider, program: provider.executableName, asksVersion: true)
             }
             guard case .program(let program) = StartCommandShape(startCommand),
-                  RemoteHostCheckScript.doubleQuoted(program) != nil else { return nil }
+                RemoteHostCheckScript.doubleQuoted(program) != nil
+            else { return nil }
             return RemoteHostCheckProgram(provider: provider, program: program, asksVersion: false)
         }
     }

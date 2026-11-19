@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -13,13 +14,18 @@ struct TranscriptEntriesStackTests {
         let stack = TranscriptEntriesStack(transcript: transcript, provider: .codex, positionController: controller)
 
         #expect(stack == TranscriptEntriesStack(transcript: transcript, provider: .codex, positionController: controller))
-        #expect(stack != TranscriptEntriesStack(transcript: TranscriptScrollViewFixture.transcript(count: 4), provider: .codex, positionController: controller))
+        #expect(
+            stack
+                != TranscriptEntriesStack(
+                    transcript: TranscriptScrollViewFixture.transcript(count: 4), provider: .codex, positionController: controller))
         #expect(stack != TranscriptEntriesStack(transcript: transcript, provider: .claude, positionController: controller))
-        #expect(stack != TranscriptEntriesStack(
-            transcript: transcript, provider: .codex,
-            positionController: TranscriptScrollPositionController(
-                conversationID: "entries-stack", positionStore: TranscriptReadingPositionStore(), initialPosition: .bottom
-            )
-        ))
+        #expect(
+            stack
+                != TranscriptEntriesStack(
+                    transcript: transcript, provider: .codex,
+                    positionController: TranscriptScrollPositionController(
+                        conversationID: "entries-stack", positionStore: TranscriptReadingPositionStore(), initialPosition: .bottom
+                    )
+                ))
     }
 }

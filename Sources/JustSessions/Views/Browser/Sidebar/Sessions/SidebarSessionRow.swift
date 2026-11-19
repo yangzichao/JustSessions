@@ -59,15 +59,20 @@ struct SidebarSessionRow: View {
                         if isDeletedWhenTabCloses { DeletedWhenTabClosesIndicator() }
                     }
                 },
-                detail: messageMatch == nil && bookmarkMatches.isEmpty ? nil
+                detail: messageMatch == nil && bookmarkMatches.isEmpty
+                    ? nil
                     : SidebarSessionMatchDetail(bookmarks: bookmarkMatches, messageMatch: messageMatch)
             ) {
                 statusOrMoreActionsRoom(statusSource, description: statusDescription)
             }
         }
         .buttonStyle(ThemePlainButtonStyle(showsHover: false))
-        .help("\(title) · \(conversation.provider.rawValue) · \(SidebarSessionDateText.shared.text(for: conversation.updatedAt))\(statusDescription.map { " · \($0)" } ?? "")")
-        .accessibilityLabel("\(title), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(isArchived ? ", archived" : "")\(statusDescription.map { ", \($0)" } ?? "")")
+        .help(
+            "\(title) · \(conversation.provider.rawValue) · \(SidebarSessionDateText.shared.text(for: conversation.updatedAt))\(statusDescription.map { " · \($0)" } ?? "")"
+        )
+        .accessibilityLabel(
+            "\(title), \(conversation.provider.rawValue)\(isPinned ? ", pinned" : "")\(isArchived ? ", archived" : "")\(statusDescription.map { ", \($0)" } ?? "")"
+        )
         .overlay(alignment: .leading) {
             if subagentCount > 0 {
                 SubagentDisclosureButton(
@@ -79,8 +84,11 @@ struct SidebarSessionRow: View {
                 )
             }
         }
-        .accessibilityValue(Text(verbatim: ([SidebarSessionBookmarkMatch.text(of: bookmarkMatches)] + [messageMatch?.snippet.text])
-            .compactMap { $0 }.joined(separator: ", ")))
+        .accessibilityValue(
+            Text(
+                verbatim: ([SidebarSessionBookmarkMatch.text(of: bookmarkMatches)] + [messageMatch?.snippet.text])
+                    .compactMap { $0 }.joined(separator: ", "))
+        )
         // Over the button rather than in it, so a click on the ⋯ opens its menu instead of selecting the session.
         .overlay(alignment: .trailing) {
             // In the view tree only while the pointer is over the row; see `SidebarProjectRow`.

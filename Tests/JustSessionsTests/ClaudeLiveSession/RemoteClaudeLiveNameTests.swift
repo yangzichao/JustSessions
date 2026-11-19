@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// An SSH tab learns the Claude session and its chosen name from its title, never from this Mac's process registry.
@@ -156,10 +157,12 @@ struct RemoteClaudeLiveNameTests {
         #expect(tab.displayTitle == "kept-name")
 
         // The first prompt writes the session, and the relay shows the CLI at work.
-        try transcripts.append(to: clearedID, [
-            #"{"type":"custom-title","customTitle":"kept-name","sessionId":"\#(clearedID)"}"#,
-            #"{"parentUuid":null,"type":"user","message":{"role":"user","content":"After clear"},"uuid":"\#(UUID().uuidString.lowercased())","timestamp":"2026-10-21T20:00:00.000Z","cwd":"/Users/me/project","sessionId":"\#(clearedID)","version":"2.1.306"}"#,
-        ])
+        try transcripts.append(
+            to: clearedID,
+            [
+                #"{"type":"custom-title","customTitle":"kept-name","sessionId":"\#(clearedID)"}"#,
+                #"{"parentUuid":null,"type":"user","message":{"role":"user","content":"After clear"},"uuid":"\#(UUID().uuidString.lowercased())","timestamp":"2026-10-21T20:00:00.000Z","cwd":"/Users/me/project","sessionId":"\#(clearedID)","version":"2.1.306"}"#,
+            ])
         tab.updateTerminalTitle(try Self.title(sessionID: clearedID, name: "kept-name", status: "busy"))
         try await fixture.followTheCLI(on: standIn)
 
@@ -177,9 +180,11 @@ struct RemoteClaudeLiveNameTests {
         let transcripts = try ClaudeBranchCommandTranscripts()
         defer { transcripts.remove() }
         let otherSessionID = UUID().uuidString.lowercased()
-        try transcripts.append(to: otherSessionID, [
-            #"{"parentUuid":null,"type":"user","message":{"role":"user","content":"Other session"},"uuid":"\#(UUID().uuidString.lowercased())","timestamp":"2026-10-21T19:00:00.000Z","cwd":"/Users/me/project","sessionId":"\#(otherSessionID)","version":"2.1.306"}"#,
-        ])
+        try transcripts.append(
+            to: otherSessionID,
+            [
+                #"{"parentUuid":null,"type":"user","message":{"role":"user","content":"Other session"},"uuid":"\#(UUID().uuidString.lowercased())","timestamp":"2026-10-21T19:00:00.000Z","cwd":"/Users/me/project","sessionId":"\#(otherSessionID)","version":"2.1.306"}"#
+            ])
         let standIn = try fixture.standIn(forHostWith: transcripts)
         defer { standIn.remove() }
         let otherWindow = fixture.makeWindow(listing: standIn)

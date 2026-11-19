@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The lock Kiro CLI writes while a CLI runs a session, in the two shapes 2.16.2 and 2.34.0 wrote on this Mac.
@@ -26,8 +27,9 @@ struct KiroSessionLockTests {
         let v3 = URL(fileURLWithPath: "/k/.kiro/sessions/d0ea1a8bdee5da32/sess_f9ea81c4-e3be-407b-8779-6aeeb1646cef/messages.jsonl")
 
         #expect(KiroSessionLock.file(forSessionFile: v2).path == "/k/.kiro/sessions/cli/a117957d-44d3-4375-b552-4373d8e5e74a.lock")
-        #expect(KiroSessionLock.file(forSessionFile: v3).path
-            == "/k/.kiro/sessions/d0ea1a8bdee5da32/sess_f9ea81c4-e3be-407b-8779-6aeeb1646cef/.lock")
+        #expect(
+            KiroSessionLock.file(forSessionFile: v3).path
+                == "/k/.kiro/sessions/d0ea1a8bdee5da32/sess_f9ea81c4-e3be-407b-8779-6aeeb1646cef/.lock")
     }
 
     @Test(arguments: [6, 3])
@@ -95,12 +97,21 @@ struct LostKiroCLIsTests {
     @Test func ambiguousOrUnrelatedLocksNameNothing() {
         let tree = ProcessTree(parentProcessIDs: [100: 50, 101: 100, 102: 100, 200: 50])
 
-        #expect(LostKiroCLIs.sessionIDs(lostPaneProcessIDs: [lostName: 100],
-                                        lockProcessIDsBySessionID: ["one": 101, "two": 102], tree: tree).isEmpty)
-        #expect(LostKiroCLIs.sessionIDs(lostPaneProcessIDs: [lostName: 100],
-                                        lockProcessIDsBySessionID: ["one": 200], tree: tree).isEmpty)
-        #expect(LostKiroCLIs.sessionIDs(lostPaneProcessIDs: [lostName: 100],
-                                        lockProcessIDsBySessionID: ["one": 101],
-                                        tree: ProcessTree(parentProcessIDs: [101: 101])).isEmpty)
+        #expect(
+            LostKiroCLIs.sessionIDs(
+                lostPaneProcessIDs: [lostName: 100],
+                lockProcessIDsBySessionID: ["one": 101, "two": 102], tree: tree
+            ).isEmpty)
+        #expect(
+            LostKiroCLIs.sessionIDs(
+                lostPaneProcessIDs: [lostName: 100],
+                lockProcessIDsBySessionID: ["one": 200], tree: tree
+            ).isEmpty)
+        #expect(
+            LostKiroCLIs.sessionIDs(
+                lostPaneProcessIDs: [lostName: 100],
+                lockProcessIDsBySessionID: ["one": 101],
+                tree: ProcessTree(parentProcessIDs: [101: 101])
+            ).isEmpty)
     }
 }

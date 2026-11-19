@@ -1,6 +1,7 @@
 import Foundation
 import SQLite3
 import Testing
+
 @testable import JustSessions
 
 struct AntigravityAdapterTests {
@@ -73,7 +74,9 @@ struct AntigravityAdapterTests {
         let parentID = UUID().uuidString.lowercased()
         let subagentID = UUID().uuidString.lowercased()
         for (sessionID, prompt) in [(parentID, "Build the app"), (subagentID, "Review the build")] {
-            try makeSession(at: conversations.appendingPathComponent("\(sessionID).db"), sessionID: sessionID, projectURI: projectURI, firstPrompt: prompt)
+            try makeSession(
+                at: conversations.appendingPathComponent("\(sessionID).db"), sessionID: sessionID, projectURI: projectURI,
+                firstPrompt: prompt)
         }
         try execute(
             [
@@ -84,7 +87,8 @@ struct AntigravityAdapterTests {
             at: root.appendingPathComponent("conversation_summaries.db")
         )
 
-        let found = Dictionary(uniqueKeysWithValues: try AntigravityAdapter(configurationDirectory: root).discover().map { ($0.sessionID, $0) })
+        let found = Dictionary(
+            uniqueKeysWithValues: try AntigravityAdapter(configurationDirectory: root).discover().map { ($0.sessionID, $0) })
 
         #expect(found[parentID]?.parentSessionID == nil)
         #expect(found[subagentID]?.parentSessionID == parentID)
@@ -137,6 +141,6 @@ struct AntigravityAdapterTests {
     }
 }
 
-private extension Data {
-    var hex: String { map { String(format: "%02x", $0) }.joined() }
+extension Data {
+    fileprivate var hex: String { map { String(format: "%02x", $0) }.joined() }
 }

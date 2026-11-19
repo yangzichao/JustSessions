@@ -80,7 +80,10 @@ final class RemoteTabReconnector {
         guard tab.hasDroppedConnectionToTmux, let host = tab.host.sshDestination else { return }
         let now = currentDate()
         if let reconnectedAt = reconnectedAtByTab[tab.id],
-           now.timeIntervalSince(reconnectedAt) < Self.shortestRunBeforeReconnectingAgain { return }
+            now.timeIntervalSince(reconnectedAt) < Self.shortestRunBeforeReconnectingAgain
+        {
+            return
+        }
         tab.isWaitingToReconnect = true
         schedule.startTrying(host, now: now)
         scheduleWakeUp()
@@ -112,7 +115,8 @@ final class RemoteTabReconnector {
         let now = currentDate()
         for host in schedule.hostsBeingTried where schedule.isDue(host, now: now) && !hostsBeingAsked.contains(host) {
             guard let oldestStore = registry.stores.first, oldestStore.remoteHostList.hosts.contains(host),
-                  !oldestStore.isDisconnected(host) else {
+                !oldestStore.isDisconnected(host)
+            else {
                 stopTrying(host)
                 continue
             }
@@ -136,9 +140,13 @@ final class RemoteTabReconnector {
     ) {
         hostsBeingAsked.remove(host)
         defer { scheduleWakeUp() }
-        guard hasReconnectCandidate(on: host) else { stopTrying(host); return }
+        guard hasReconnectCandidate(on: host) else {
+            stopTrying(host)
+            return
+        }
         guard let sourceStore, registry.stores.contains(where: { $0 === sourceStore }),
-              sourceStore.isCurrentHostLifecycle(generation, on: .ssh(host)) else { return }
+            sourceStore.isCurrentHostLifecycle(generation, on: .ssh(host))
+        else { return }
         guard let tmuxSessionNames else {
             noteFailure(on: host)
             return
@@ -149,8 +157,9 @@ final class RemoteTabReconnector {
             for tab in store.terminalSessions where tab.host == .ssh(host) && tab.isWaitingToReconnect {
                 tab.isWaitingToReconnect = false
                 guard tab.hasDroppedConnectionToTmux,
-                      let tmuxSessionName = tab.tmuxSessionName,
-                      tmuxSessionNames.contains(tmuxSessionName) else {
+                    let tmuxSessionName = tab.tmuxSessionName,
+                    tmuxSessionNames.contains(tmuxSessionName)
+                else {
                     tabsWhoseCLIEnded.insert(tab.id)
                     continue
                 }
@@ -162,7 +171,10 @@ final class RemoteTabReconnector {
     }
 
     private func noteFailure(on host: String) {
-        guard hasReconnectCandidate(on: host) else { stopTrying(host); return }
+        guard hasReconnectCandidate(on: host) else {
+            stopTrying(host)
+            return
+        }
         if !schedule.noteFailure(on: host, now: currentDate()) { stopTrying(host) }
     }
 

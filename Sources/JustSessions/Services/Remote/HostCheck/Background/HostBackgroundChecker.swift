@@ -29,18 +29,21 @@ final class HostBackgroundChecker {
         let appVersion = appVersion()
         for host in oldestStore.remoteHostList.hosts {
             guard case .refreshed(let refreshedAt)? = oldestStore.hostRefreshStatuses[.ssh(host)],
-                  !oldestStore.sshHostsNeedingLogIn.contains(host), !oldestStore.isDisconnected(host),
-                  oldestStore.shellStartupCheck(on: host) != nil,
-                  !oldestStore.hostsCheckingShellStartup.contains(host),
-                  !stores.contains(where: { $0.isShowingRunningHostCheck(of: host) }) else { continue }
+                !oldestStore.sshHostsNeedingLogIn.contains(host), !oldestStore.isDisconnected(host),
+                oldestStore.shellStartupCheck(on: host) != nil,
+                !oldestStore.hostsCheckingShellStartup.contains(host),
+                !stores.contains(where: { $0.isShowingRunningHostCheck(of: host) })
+            else { continue }
             let tabAskedForCheck = stores.contains { $0.hostsAskingForBackgroundCheck.contains(host) }
-            guard HostBackgroundCheckSchedule.reason(
-                keptCheck: oldestStore.keptHostChecks.check(for: host),
-                appVersion: appVersion,
-                lastRefresh: .init(refreshedAt: refreshedAt, tmuxServerProblem: oldestStore.tmuxServerProblemsByHost[host]),
-                tabAskedForCheck: tabAskedForCheck,
-                now: now
-            ) != nil else { continue }
+            guard
+                HostBackgroundCheckSchedule.reason(
+                    keptCheck: oldestStore.keptHostChecks.check(for: host),
+                    appVersion: appVersion,
+                    lastRefresh: .init(refreshedAt: refreshedAt, tmuxServerProblem: oldestStore.tmuxServerProblemsByHost[host]),
+                    tabAskedForCheck: tabAskedForCheck,
+                    now: now
+                ) != nil
+            else { continue }
             guard let task = checkHost(oldestStore, host) else { continue }
             for store in stores { store.hostsAskingForBackgroundCheck.remove(host) }
             runningCheck = (host, task)

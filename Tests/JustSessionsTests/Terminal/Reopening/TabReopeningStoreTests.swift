@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The tabs open when the app quit open again at launch, as each host lists its sessions, in their saved order.
@@ -13,22 +14,24 @@ struct TabReopeningStoreTests {
         let conversation = sandbox.conversation()
         store.replaceConversations(on: .thisMac, with: [conversation])
 
-        store.openTerminal(TerminalSession(
-            engine: .swiftTerm,
-            conversation: nil,
-            provider: .claude,
-            projectPath: sandbox.project.path,
-            action: .new,
-            displayTitle: "New session",
-            command: NativeCLICommand(executablePath: "/bin/sh", arguments: [], workingDirectory: sandbox.project.path, environment: [])
-        ))
+        store.openTerminal(
+            TerminalSession(
+                engine: .swiftTerm,
+                conversation: nil,
+                provider: .claude,
+                projectPath: sandbox.project.path,
+                action: .new,
+                displayTitle: "New session",
+                command: NativeCLICommand(executablePath: "/bin/sh", arguments: [], workingDirectory: sandbox.project.path, environment: [])
+            ))
         store.launch(conversation, action: .resume)
         store.openPlainTerminal(in: sandbox.projectLocation)
 
-        #expect(store.reopenableTabs == [
-            .session(conversation),
-            .plainTerminal(in: sandbox.projectLocation, wasSelected: true),
-        ])
+        #expect(
+            store.reopenableTabs == [
+                .session(conversation),
+                .plainTerminal(in: sandbox.projectLocation, wasSelected: true),
+            ])
     }
 
     @Test func reopensEachTabInItsSavedPlaceOnceItsHostListsItsSessions() throws {
@@ -56,13 +59,14 @@ struct TabReopeningStoreTests {
         store.replaceConversations(on: .ssh("devbox"), with: [remote])
         store.replaceConversations(on: .thisMac, with: [first, last])
 
-        #expect(store.terminalSessions.map(\.projectDirectoryKey) == [
-            first.projectDirectoryKey,
-            remote.projectDirectoryKey,
-            remoteFolder.key,
-            sandbox.projectLocation.key,
-            last.projectDirectoryKey,
-        ])
+        #expect(
+            store.terminalSessions.map(\.projectDirectoryKey) == [
+                first.projectDirectoryKey,
+                remote.projectDirectoryKey,
+                remoteFolder.key,
+                sandbox.projectLocation.key,
+                last.projectDirectoryKey,
+            ])
         #expect(store.terminalSessions.map(\.isPlainTerminal) == [false, false, true, true, false])
         let selectedTab = try #require(store.selectedTerminal)
         #expect(selectedTab.conversation?.id == last.id)

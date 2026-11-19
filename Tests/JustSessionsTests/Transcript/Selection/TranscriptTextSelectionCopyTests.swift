@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct TranscriptTextSelectionCopyTests {
@@ -28,22 +29,23 @@ struct TranscriptTextSelectionCopyTests {
             Self.piece(2, 1, .line, "Bash swift build"),
         ])
 
-        #expect(text == """
-            tail of the question
+        #expect(
+            text == """
+                tail of the question
 
-            Intro
+                Intro
 
-            • First
-              1. Nested
+                • First
+                  1. Nested
 
-            Name\tValue
-            rows\t12
+                Name\tValue
+                rows\t12
 
-            let x = 1
+                let x = 1
 
-            Read A.swift
-            Bash swift build
-            """)
+                Read A.swift
+                Bash swift build
+                """)
     }
 
     /// A list item selected from partway through has no marker, and blocks with nothing selected add no separator.

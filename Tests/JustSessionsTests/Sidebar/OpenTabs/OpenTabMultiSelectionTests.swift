@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Rows of Open tabs selected with ⌘- and Shift-clicks to close together, as `SidebarOpenTabsView+Selection` picks them.

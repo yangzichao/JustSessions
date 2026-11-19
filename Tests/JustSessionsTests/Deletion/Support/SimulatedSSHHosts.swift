@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Stands in for the SSH hosts a deletion reaches, without `ssh`: counts the deletions tried on each host and
@@ -45,13 +46,14 @@ final class SimulatedSSHHosts: @unchecked Sendable {
     }
 
     var deletion: RemoteConversationDeletion {
-        RemoteConversationDeletion(runner: RemoteHostCommandRunner { host, _, _ in
-            let (attempt, totalAttempts) = self.lock.withLock {
-                self.attemptsByHost[host, default: 0] += 1
-                return (self.attemptsByHost[host] ?? 0, self.attemptsByHost.values.reduce(0, +))
-            }
-            if totalAttempts == self.heldAttempt { self.heldAttemptRelease.wait() }
-            return self.answer(host, attempt)
-        })
+        RemoteConversationDeletion(
+            runner: RemoteHostCommandRunner { host, _, _ in
+                let (attempt, totalAttempts) = self.lock.withLock {
+                    self.attemptsByHost[host, default: 0] += 1
+                    return (self.attemptsByHost[host] ?? 0, self.attemptsByHost.values.reduce(0, +))
+                }
+                if totalAttempts == self.heldAttempt { self.heldAttemptRelease.wait() }
+                return self.answer(host, attempt)
+            })
     }
 }

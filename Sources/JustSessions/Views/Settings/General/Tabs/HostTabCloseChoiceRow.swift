@@ -9,10 +9,12 @@ struct HostTabCloseChoiceRow: View {
     var body: some View {
         GridRow {
             hostName
-            Picker(selection: Binding(
-                get: { tabCloseChoiceSettingsStore.choice(for: host) },
-                set: { tabCloseChoiceSettingsStore.setChoice($0, for: host) }
-            )) {
+            Picker(
+                selection: Binding(
+                    get: { tabCloseChoiceSettingsStore.choice(for: host) },
+                    set: { tabCloseChoiceSettingsStore.setChoice($0, for: host) }
+                )
+            ) {
                 Text("Ask each time").tag(TabCloseChoice.askEachTime)
                 Text("Keep running").tag(TabCloseChoice.keepRunning)
                 Text("End session").tag(TabCloseChoice.endSession)
@@ -27,8 +29,7 @@ struct HostTabCloseChoiceRow: View {
 
     @ViewBuilder
     private var hostName: some View {
-        if host == .thisMac { Text("This Mac") }
-        else { Text(verbatim: host.displayName) }
+        if host == .thisMac { Text("This Mac") } else { Text(verbatim: host.displayName) }
     }
 
     private var accessibilityIdentifier: String {

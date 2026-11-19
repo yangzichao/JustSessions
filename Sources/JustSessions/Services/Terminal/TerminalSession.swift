@@ -164,9 +164,10 @@ final class TerminalSession: ObservableObject, Identifiable {
         let terminalView = engine.makeTabTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.terminalView = terminalView
         // A plain terminal's shell history is in tmux's, while it runs there; see `PlainTerminalFinder`.
-        self.findState = TerminalFindState(finder: tmuxHistory.map { tmuxHistory in
-            PlainTerminalFinder(terminalFinder: terminalView, tmuxHistory: tmuxHistory) { terminalView.isOnAlternateScreen }
-        } ?? terminalView)
+        self.findState = TerminalFindState(
+            finder: tmuxHistory.map { tmuxHistory in
+                PlainTerminalFinder(terminalFinder: terminalView, tmuxHistory: tmuxHistory) { terminalView.isOnAlternateScreen }
+            } ?? terminalView)
         self.conversationOutline = ConversationOutlineModel()
         self.bookmarkNotices = TerminalBookmarkNoticeState()
         self.processObserver = TerminalProcessObserver()

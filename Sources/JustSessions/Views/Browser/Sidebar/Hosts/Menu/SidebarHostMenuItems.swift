@@ -15,8 +15,9 @@ struct SidebarHostMenuItems: View {
     var body: some View {
         Button("Add project…", systemImage: "plus", action: onAddProject)
         if archivedProjectCount > 0 {
-            Button("Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox",
-                   action: onShowArchivedProjects)
+            Button(
+                "Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox",
+                action: onShowArchivedProjects)
         }
         Divider()
         Button("Refresh", systemImage: "arrow.clockwise", action: onRefresh)

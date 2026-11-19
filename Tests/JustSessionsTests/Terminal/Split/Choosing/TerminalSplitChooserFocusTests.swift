@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A split chooser takes the keyboard from the terminal beside it, as Chrome's split view page takes it from the tab
@@ -62,8 +63,8 @@ struct TerminalSplitChooserFocusTests {
     }
 }
 
-private extension SplitWorkspace {
-    enum Key {
+extension SplitWorkspace {
+    fileprivate enum Key {
         case downArrow, `return`
 
         var characters: String {
@@ -89,19 +90,20 @@ private extension SplitWorkspace {
     }
 
     /// Sends the key to the window's first responder, as typing it would.
-    func press(_ key: Key) throws {
-        let event = try #require(NSEvent.keyEvent(
-            with: .keyDown,
-            location: .zero,
-            modifierFlags: key.modifierFlags,
-            timestamp: ProcessInfo.processInfo.systemUptime,
-            windowNumber: window.windowNumber,
-            context: nil,
-            characters: key.characters,
-            charactersIgnoringModifiers: key.characters,
-            isARepeat: false,
-            keyCode: key.keyCode
-        ))
+    fileprivate func press(_ key: Key) throws {
+        let event = try #require(
+            NSEvent.keyEvent(
+                with: .keyDown,
+                location: .zero,
+                modifierFlags: key.modifierFlags,
+                timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: window.windowNumber,
+                context: nil,
+                characters: key.characters,
+                charactersIgnoringModifiers: key.characters,
+                isARepeat: false,
+                keyCode: key.keyCode
+            ))
         window.sendEvent(event)
     }
 }

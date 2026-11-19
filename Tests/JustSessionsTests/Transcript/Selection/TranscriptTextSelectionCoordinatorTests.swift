@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -10,10 +11,11 @@ struct TranscriptTextSelectionCoordinatorTests {
         let fixture = try await TranscriptTextSelectionFixture()
         defer { fixture.close() }
 
-        #expect(try fixture.coordinator.orderedViews.map(\.view.string) == [
-            TranscriptTextSelectionFixture.question, "Intro paragraph.", "First item", "Second item",
-            "A", "B", "1", "2", "let x = 1\n", TranscriptTextSelectionFixture.lastReply,
-        ])
+        #expect(
+            try fixture.coordinator.orderedViews.map(\.view.string) == [
+                TranscriptTextSelectionFixture.question, "Intro paragraph.", "First item", "Second item",
+                "A", "B", "1", "2", "let x = 1\n", TranscriptTextSelectionFixture.lastReply,
+            ])
     }
 
     @Test(arguments: [false, true])
@@ -32,25 +34,27 @@ struct TranscriptTextSelectionCoordinatorTests {
             try fixture.drag(from: start, to: end, in: question)
         }
 
-        #expect(fixture.selectedTexts == [
-            "does the sidebar redraw?", "Intro paragraph.", "First item", "Second item",
-            "A", "B", "1", "2", "let x = 1\n", "Last",
-        ])
-        #expect(try fixture.coordinator.copiedText() == """
-            does the sidebar redraw?
+        #expect(
+            fixture.selectedTexts == [
+                "does the sidebar redraw?", "Intro paragraph.", "First item", "Second item",
+                "A", "B", "1", "2", "let x = 1\n", "Last",
+            ])
+        #expect(
+            try fixture.coordinator.copiedText() == """
+                does the sidebar redraw?
 
-            Intro paragraph.
+                Intro paragraph.
 
-            • First item
-            • Second item
+                • First item
+                • Second item
 
-            A\tB
-            1\t2
+                A\tB
+                1\t2
 
-            let x = 1
+                let x = 1
 
-            Last
-            """)
+                Last
+                """)
         #expect(try fixture.coordinator.isTracking == false)
     }
 
@@ -112,7 +116,8 @@ struct TranscriptTextSelectionCoordinatorTests {
         let blocks = coordinator.orderedViews.map(\.view)
         let question = blocks[0]
         try fixture.drag(from: fixture.point(in: question, atCharacter: 0), to: fixture.point(in: blocks[1], atCharacter: 5), in: question)
-        let doubleClick = try fixture.mouseEvent(.leftMouseDown, at: fixture.point(in: question, atCharacter: 14), modifiers: [], clickCount: 2)
+        let doubleClick = try fixture.mouseEvent(
+            .leftMouseDown, at: fixture.point(in: question, atCharacter: 14), modifiers: [], clickCount: 2)
         #expect(coordinator.trackSelection(startingWith: doubleClick, in: question) == false)
 
         question.setSelectedRange(NSRange(location: 13, length: 7))
@@ -143,7 +148,8 @@ struct TranscriptTextSelectionCoordinatorTests {
         let copyItem = NSMenuItem(title: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
         #expect(lastReply.validateMenuItem(copyItem) == false)
 
-        try fixture.drag(from: fixture.point(in: blocks[8], atCharacter: 4), to: fixture.point(in: lastReply, atCharacter: 4), in: blocks[8])
+        try fixture.drag(
+            from: fixture.point(in: blocks[8], atCharacter: 4), to: fixture.point(in: lastReply, atCharacter: 4), in: blocks[8])
         // A block that only holds the end of the selection still enables Copy for it.
         #expect(lastReply.validateMenuItem(copyItem))
         lastReply.copy(nil)
@@ -209,8 +215,8 @@ struct TranscriptTextSelectionCoordinatorTests {
     }
 }
 
-private extension NSColor {
-    func isClose(to other: NSColor) -> Bool {
+extension NSColor {
+    fileprivate func isClose(to other: NSColor) -> Bool {
         abs(redComponent - other.redComponent) < 0.02 && abs(greenComponent - other.greenComponent) < 0.02
             && abs(blueComponent - other.blueComponent) < 0.02
     }

@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct BoundedProcessRunnerTests {
@@ -8,12 +9,13 @@ struct BoundedProcessRunnerTests {
         let script = "echo out; echo err >&2; exit 3"
 
         let standardOutputOnly = try #require(BoundedProcessRunner.result(ofExecutable: "/bin/sh", arguments: ["-c", script], timeout: 5))
-        let bothStreams = try #require(BoundedProcessRunner.result(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", script],
-            includesStandardError: true,
-            timeout: 5
-        ))
+        let bothStreams = try #require(
+            BoundedProcessRunner.result(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", script],
+                includesStandardError: true,
+                timeout: 5
+            ))
 
         #expect(standardOutputOnly.exitStatus == 3)
         #expect(standardOutputOnly.output == "out\n")
@@ -25,24 +27,26 @@ struct BoundedProcessRunnerTests {
         let folder = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: folder) }
 
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", "pwd -P"],
-            workingDirectory: folder,
-            timeout: 5
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", "pwd -P"],
+                workingDirectory: folder,
+                timeout: 5
+            ))
 
         let workingDirectory = output.trimmingCharacters(in: .newlines)
         #expect(URL(fileURLWithPath: workingDirectory).resolvingSymlinksInPath() == folder.resolvingSymlinksInPath())
     }
 
     @Test func passesTheGivenEnvironmentInsteadOfItsOwn() throws {
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/usr/bin/env",
-            arguments: [],
-            environment: ["JUSTSESSIONS_TEST_VARIABLE": "passed"],
-            timeout: 5
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/usr/bin/env",
+                arguments: [],
+                environment: ["JUSTSESSIONS_TEST_VARIABLE": "passed"],
+                timeout: 5
+            ))
 
         let variableNames = output.split(separator: "\n").map { $0.prefix { $0 != "=" } }
         #expect(output.contains("JUSTSESSIONS_TEST_VARIABLE=passed\n"))
@@ -119,7 +123,8 @@ struct BoundedProcessRunnerTests {
 
     private static func cleanUpDelayedChild(in folder: URL) {
         if let text = try? String(contentsOf: folder.appendingPathComponent("child-id"), encoding: .utf8),
-           let childID = pid_t(text.trimmingCharacters(in: .whitespacesAndNewlines)) {
+            let childID = pid_t(text.trimmingCharacters(in: .whitespacesAndNewlines))
+        {
             kill(childID, SIGKILL)
         }
         try? FileManager.default.removeItem(at: folder)
@@ -130,11 +135,12 @@ struct BoundedProcessRunnerTests {
         let clock = ContinuousClock()
         let startedAt = clock.now
 
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", "/bin/sleep 600 & echo $!"],
-            timeout: 120
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", "/bin/sleep 600 & echo $!"],
+                timeout: 120
+            ))
         let childProcessID = try #require(pid_t(output.trimmingCharacters(in: .whitespacesAndNewlines)))
         kill(childProcessID, SIGKILL)
 
@@ -144,11 +150,12 @@ struct BoundedProcessRunnerTests {
 
     /// A pipe holds 64 KB; a process that writes more than that into an unread pipe stalls until the timeout.
     @Test func moreOutputThanAPipeHoldsComesBackWhole() throws {
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", "/usr/bin/head -c 1000000 /dev/zero | /usr/bin/tr '\\0' x"],
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", "/usr/bin/head -c 1000000 /dev/zero | /usr/bin/tr '\\0' x"],
+                timeout: 10
+            ))
 
         #expect(output.utf8.count == 1_000_000)
         #expect(output.allSatisfy { $0 == "x" })

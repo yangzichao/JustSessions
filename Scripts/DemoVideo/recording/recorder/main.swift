@@ -1,7 +1,7 @@
+import AVFoundation
 // stage-recorder <output.mov> <seconds>: records only the demo app's windows inside the stage rectangle
 // (DEMO_STAGE, in points), over a solid background, at 2x and 60 fps. Stops early when <output>.stop exists.
 import AppKit
-import AVFoundation
 import Foundation
 import ScreenCaptureKit
 
@@ -17,14 +17,17 @@ let backgroundColor = CGColor(srgbRed: 0x15 / 255.0, green: 0x17 / 255.0, blue: 
 final class RecordingDelegate: NSObject, SCRecordingOutputDelegate {
     var finished = false
     func recordingOutputDidStartRecording(_ recordingOutput: SCRecordingOutput) {
-        print(String(format: "RECORDING STARTED %.3f", Date().timeIntervalSince1970)); fflush(stdout)
+        print(String(format: "RECORDING STARTED %.3f", Date().timeIntervalSince1970))
+        fflush(stdout)
     }
     func recordingOutput(_ recordingOutput: SCRecordingOutput, didFailWithError error: any Error) {
-        print("RECORDING FAILED: \(error)"); fflush(stdout)
+        print("RECORDING FAILED: \(error)")
+        fflush(stdout)
         finished = true
     }
     func recordingOutputDidFinishRecording(_ recordingOutput: SCRecordingOutput) {
-        print(String(format: "RECORDING FINISHED %.3f", Date().timeIntervalSince1970)); fflush(stdout)
+        print(String(format: "RECORDING FINISHED %.3f", Date().timeIntervalSince1970))
+        fflush(stdout)
         finished = true
     }
 }
@@ -49,7 +52,7 @@ func demoProcessIdentifier() -> pid_t? {
         guard let processIdentifier = demoProcessIdentifier() else { fatalError("demo app is not running") }
         let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
         guard let application = content.applications.first(where: { $0.processID == processIdentifier }),
-              let display = content.displays.first(where: { $0.displayID == CGMainDisplayID() })
+            let display = content.displays.first(where: { $0.displayID == CGMainDisplayID() })
         else { fatalError("demo app or main display not found") }
         let filter = SCContentFilter(display: display, including: [application], exceptingWindows: [])
         let configuration = SCStreamConfiguration()

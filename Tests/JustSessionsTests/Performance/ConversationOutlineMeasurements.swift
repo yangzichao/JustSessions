@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Measures reading a tab's conversation-map outline (PERF-90), as `ConversationOutlineReader` does off the main
@@ -25,7 +26,10 @@ struct ConversationOutlineMeasurements {
     func readingAnOutline(fixture name: String) async throws {
         guard SidebarInteractionMeasurements.isEnabled else { return }
         if let picked = ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF_FIXTURES"],
-           !picked.split(separator: ",").contains(Substring(name)) { return }
+            !picked.split(separator: ",").contains(Substring(name))
+        {
+            return
+        }
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let fixture = try MeasuredSession(name, in: directory)
@@ -34,9 +38,11 @@ struct ConversationOutlineMeasurements {
         perfReport(scenario, "file", "\(size) bytes")
 
         var outline: ConversationOutline?
-        perfReport(scenario, "cold update()", try await Self.median {
-            outline = try await ConversationOutlineReader(fixture.conversation).update()
-        })
+        perfReport(
+            scenario, "cold update()",
+            try await Self.median {
+                outline = try await ConversationOutlineReader(fixture.conversation).update()
+            })
         let blocks = try #require(outline).blocks
         perfReport(scenario, "blocks, messages", "\(blocks.count), \(outline!.messageCount)")
         perfReport(scenario, "outline bytes a block", Self.footprint(of: blocks) / max(1, blocks.count))
@@ -70,15 +76,19 @@ struct ConversationOutlineMeasurements {
         let perCheck = (ContinuousClock.now - checkStart) / Self.checkCount
         perfReport(scenario, "hasChanged()", String(format: "%.1f µs", Double(perCheck.components.attoseconds) / 1e12))
 
-        perfReport(scenario, "latestMessage() cold", try await Self.median {
-            _ = try await ConversationOutlineReader(fixture.conversation).latestMessage()
-        })
+        perfReport(
+            scenario, "latestMessage() cold",
+            try await Self.median {
+                _ = try await ConversationOutlineReader(fixture.conversation).latestMessage()
+            })
         let warm = ConversationOutlineReader(fixture.conversation)
         _ = try await warm.latestMessage()
-        perfReport(scenario, "latestMessage() warm", try await Self.median {
-            _ = try await warm.latestMessage()
-        })
-        #expect(!blocks.isEmpty) // Record-only: the numbers above are the result.
+        perfReport(
+            scenario, "latestMessage() warm",
+            try await Self.median {
+                _ = try await warm.latestMessage()
+            })
+        #expect(!blocks.isEmpty)  // Record-only: the numbers above are the result.
     }
 
     private static func tenThousandBlocks() -> [ConversationOutline.Block] {
@@ -87,7 +97,8 @@ struct ConversationOutlineMeasurements {
             let kind = kinds[index % kinds.count]
             return ConversationOutline.Block(
                 entryID: TranscriptPageIdentity.entryID(record: index, part: 0), lastRecord: index, kind: kind, timestamp: nil,
-                snippet: "Block \(index)", lineWidths: kind == .toolRun ? [40, 32] : [80, 80, 56, 0, 72], toolCallCount: kind == .toolRun ? 2 : 0
+                snippet: "Block \(index)", lineWidths: kind == .toolRun ? [40, 32] : [80, 80, 56, 0, 72],
+                toolCallCount: kind == .toolRun ? 2 : 0
             )
         }
     }
@@ -99,9 +110,11 @@ struct ConversationOutlineMeasurements {
         guard SidebarInteractionMeasurements.isEnabled else { return }
         let blocks = Self.tenThousandBlocks()
         let outline = ConversationOutline(blocks: blocks)
-        let size = CGSize(width: 110, height: 800), chipSide: CGFloat = 14
-        let layout = ConversationMapLayout(rowCount: outline.rowCount, height: size.height, naturalPitch: 3,
-                                           verticalInset: ConversationMapMetrics.verticalInset)
+        let size = CGSize(width: 110, height: 800)
+        let chipSide: CGFloat = 14
+        let layout = ConversationMapLayout(
+            rowCount: outline.rowCount, height: size.height, naturalPitch: 3,
+            verticalInset: ConversationMapMetrics.verticalInset)
         let bookmarks = "abcdefghijklmnopqrstuvwxyz".enumerated().map { offset, letter in
             MessageBookmark(letter: String(letter), entryID: blocks[offset * 384 + 1].entryID, kind: .assistant, snippet: "")
         }
@@ -129,7 +142,8 @@ struct ConversationOutlineMeasurements {
         guard SidebarInteractionMeasurements.isEnabled else { return }
         let blocks = Self.tenThousandBlocks()
         let outline = ConversationOutline(blocks: blocks)
-        let size = CGSize(width: 110, height: 800), chipSide: CGFloat = 14
+        let size = CGSize(width: 110, height: 800)
+        let chipSide: CGFloat = 14
         let bookmarks = "abcdefghijklmnopqrstuvwxyz".enumerated().map { offset, letter in
             var bookmark = MessageBookmark(letter: String(letter), entryID: blocks[offset * 384 + 1].entryID, kind: .assistant, snippet: "")
             bookmark.label = "Label \(letter): the step that fixed the build"
@@ -141,13 +155,16 @@ struct ConversationOutlineMeasurements {
         var renderTimes: [Duration] = []
         for step in 0..<40 {
             let start = ContinuousClock.now
-            let layout = ConversationMapLayout(rowCount: outline.rowCount, height: size.height, naturalPitch: 3,
-                                               verticalInset: ConversationMapMetrics.verticalInset, minimumPitch: 1,
-                                               offsetFromTop: CGFloat(step) * 120)
-            let chips = layout.chips(for: bookmarks, in: outline, side: chipSide, height: size.height,
-                                     titles: ConversationMapChipTitles.titles(for: bookmarks, side: chipSide, factor: 1))
-            let canvas = ConversationMapCanvas(outline: outline, layout: layout, chips: chips, colors: colors, pixel: 0.5,
-                                               chipSide: chipSide, letterFont: ThemeFont.caption.weight(.semibold))
+            let layout = ConversationMapLayout(
+                rowCount: outline.rowCount, height: size.height, naturalPitch: 3,
+                verticalInset: ConversationMapMetrics.verticalInset, minimumPitch: 1,
+                offsetFromTop: CGFloat(step) * 120)
+            let chips = layout.chips(
+                for: bookmarks, in: outline, side: chipSide, height: size.height,
+                titles: ConversationMapChipTitles.titles(for: bookmarks, side: chipSide, factor: 1))
+            let canvas = ConversationMapCanvas(
+                outline: outline, layout: layout, chips: chips, colors: colors, pixel: 0.5,
+                chipSide: chipSide, letterFont: ThemeFont.caption.weight(.semibold))
             let renderer = ImageRenderer(content: canvas.frame(width: size.width, height: size.height))
             renderer.scale = 2
             let renderStart = ContinuousClock.now
@@ -176,7 +193,8 @@ struct ConversationOutlineMeasurements {
     /// The blocks' own storage, their snippets' beyond the 15 bytes a `String` keeps inline, and their line widths'
     /// arrays with a 32-byte header each.
     static func footprint(of blocks: [ConversationOutline.Block]) -> Int {
-        blocks.reduce(MemoryLayout<ConversationOutline.Block>.stride * blocks.count + MemoryLayout<Int>.stride * blocks.count) { total, block in
+        blocks.reduce(MemoryLayout<ConversationOutline.Block>.stride * blocks.count + MemoryLayout<Int>.stride * blocks.count) {
+            total, block in
             let snippet = block.snippet.utf8.count > 15 ? block.snippet.utf8.count + 32 : 0
             return total + snippet + 32 + block.lineWidths.count
         }
@@ -200,7 +218,8 @@ struct ConversationOutlineMeasurements {
                 self.database = database
                 piLastID = nil
                 scenario = "outline, OpenCode session of 10,000 messages"
-                conversation = .fixture(provider: .opencode, sessionID: OpenCodeTranscriptPagingMeasurements.sessionID, sourceFile: database.file)
+                conversation = .fixture(
+                    provider: .opencode, sessionID: OpenCodeTranscriptPagingMeasurements.sessionID, sourceFile: database.file)
                 isFile = false
             case "pi95":
                 let file = directory.appendingPathComponent("session.jsonl")
@@ -228,8 +247,9 @@ struct ConversationOutlineMeasurements {
         func appendRecord(_ number: Int) throws {
             if let database {
                 let createdAt = Int64(1_800_000_000_000 + number * 1_000)
-                try database.addAssistantReply(String(format: "msg_appended_%03d", number), session: OpenCodeTranscriptPagingMeasurements.sessionID,
-                                               createdAt: createdAt, text: "Appended reply \(number)")
+                try database.addAssistantReply(
+                    String(format: "msg_appended_%03d", number), session: OpenCodeTranscriptPagingMeasurements.sessionID,
+                    createdAt: createdAt, text: "Appended reply \(number)")
                 return
             }
             let handle = try FileHandle(forWritingTo: conversation.sourceFile)
@@ -297,7 +317,8 @@ struct ConversationOutlineMeasurements {
         /// A prompt continuing the line before it, so the active branch keeps every earlier line. Numbers run from 0 up.
         static func appendedLine(_ number: Int, after lastID: String) -> String {
             let parent = number == 0 ? lastID : "a\(number - 1)"
-            return #"{"type":"message","id":"a\#(number)","parentId":"\#(parent)","timestamp":"2026-09-24T10:00:05.000Z","message":{"role":"user","content":"Appended \#(number)","timestamp":1758708005000}}"#
+            return
+                #"{"type":"message","id":"a\#(number)","parentId":"\#(parent)","timestamp":"2026-09-24T10:00:05.000Z","message":{"role":"user","content":"Appended \#(number)","timestamp":1758708005000}}"#
         }
     }
 }

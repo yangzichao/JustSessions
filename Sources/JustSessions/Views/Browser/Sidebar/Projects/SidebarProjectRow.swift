@@ -62,7 +62,9 @@ struct SidebarProjectRow: View {
             .buttonStyle(ThemePlainButtonStyle(showsHover: false))
             .frame(maxWidth: .infinity)
             .help("\(project.location.copyablePath) · ⌘-click to select multiple projects; Shift-click to select a range")
-            .accessibilityLabel("\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(CountedNoun.phrase(count: project.sessionCount, singular: "session")), \(activitySummary.runningCount == 0 ? "none running" : activitySummary.summary)")
+            .accessibilityLabel(
+                "\(project.displayName)\(project.isPinned ? ", pinned" : ""), \(CountedNoun.phrase(count: project.sessionCount, singular: "session")), \(activitySummary.runningCount == 0 ? "none running" : activitySummary.summary)"
+            )
             .accessibilityAddTraits(isSelected ? .isSelected : [])
 
             sessionCountOrHoverActions

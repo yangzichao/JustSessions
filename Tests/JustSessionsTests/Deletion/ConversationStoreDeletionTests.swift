@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Deleting from the store: what leaves the list, what stays, and what the user is told.
@@ -70,8 +71,9 @@ struct ConversationStoreDeletionTests {
     }
 
     private var bookmarkableMessage: TranscriptEntry {
-        TranscriptEntry(id: TranscriptPageIdentity.entryID(record: 2, part: 0), content: .userMessage("Keep this"),
-                        timestamp: nil, startsTurn: true)
+        TranscriptEntry(
+            id: TranscriptPageIdentity.entryID(record: 2, part: 0), content: .userMessage("Keep this"),
+            timestamp: nil, startsTurn: true)
     }
 
     @Test func aRefusedDeletionShowsTheToolsReasonAndKeepsTheSession() async throws {
@@ -114,7 +116,8 @@ struct ConversationStoreDeletionTests {
         try await expectEventually { !store.isDeletingSessions }
 
         #expect(store.alert?.title == "1 session wasn't deleted")
-        #expect(store.errorMessage == "Deleted 1 of 2 sessions. The other one is still listed.\n\nClaude Code · Keep me: Permission denied.")
+        #expect(
+            store.errorMessage == "Deleted 1 of 2 sessions. The other one is still listed.\n\nClaude Code · Keep me: Permission denied.")
         #expect(store.conversations.map(\.id) == [refused.id])
     }
 

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteHostCLIFindingsTests {
@@ -14,8 +15,9 @@ struct RemoteHostCLIFindingsTests {
 
         #expect(codex.status == .passed)
         #expect(codex.hostOutput == "codex-cli 0.50.0")
-        #expect(codex.commandToRunYourself
-            == "ssh devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"command -v codex && codex --version\"'")
+        #expect(
+            codex.commandToRunYourself
+                == "ssh devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"command -v codex && codex --version\"'")
     }
 
     @Test func aCLIThatFailsOrHangsOnItsVersionIsAWarning() throws {
@@ -73,8 +75,9 @@ struct RemoteHostCLIFindingsTests {
         )
 
         #expect(found.first?.status == .passed)
-        #expect(found.first?.commandToRunYourself
-            == "ssh devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"command -v ~/bin/claude-wrapper\"'")
+        #expect(
+            found.first?.commandToRunYourself
+                == "ssh devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"command -v ~/bin/claude-wrapper\"'")
     }
 
     @Test func aStartCommandWhoseProgramIsKnownOnlyWhenItRunsIsLeftOut() {
@@ -101,8 +104,9 @@ struct RemoteHostCLIFindingsTests {
         #expect(claude.status == .passed)
         #expect(claude.summary.contains("alias or function"))
         #expect(claude.hostOutput == "2.1.0 (Claude Code)")
-        #expect(claude.commandToRunYourself
-            == "ssh devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"command -v claude && claude --version\"'")
+        #expect(
+            claude.commandToRunYourself
+                == "ssh devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"command -v claude && claude --version\"'")
         let pi = try #require(found.first { $0.id == "cli-pi" })
         #expect(pi.status == .warning)
         #expect(pi.summary.contains("alias or function"))
@@ -124,8 +128,9 @@ struct RemoteHostCLIFindingsTests {
         #expect(claude.status == .passed)
         #expect(claude.summary.contains(path))
         #expect(claude.summary.contains("PATH"))
-        #expect(claude.commandToRunYourself
-            == "ssh devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"command -v \(path) && \(path) --version\"'")
+        #expect(
+            claude.commandToRunYourself
+                == "ssh devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"command -v \(path) && \(path) --version\"'")
     }
 
     @Test func aStartCommandsProgramKeepsItsPlaceWhereverTheExecutableIs() throws {

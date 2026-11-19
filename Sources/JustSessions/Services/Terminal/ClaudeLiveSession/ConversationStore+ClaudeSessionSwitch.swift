@@ -17,9 +17,11 @@ extension ConversationStore {
             if session.unlistedClaudeSession != nil { stopWaitingForUnlistedSession(of: session) }
             return true
         }
-        guard let switchedConversation = conversations.first(where: {
-            $0.provider == .claude && $0.host == session.host && $0.sessionID == sessionID
-        }) else {
+        guard
+            let switchedConversation = conversations.first(where: {
+                $0.provider == .claude && $0.host == session.host && $0.sessionID == sessionID
+            })
+        else {
             // The CLI moved on again before a refresh listed the session it was in; that one's name goes too.
             if let waitedOn = session.unlistedClaudeSession, waitedOn.sessionID != sessionID {
                 stopWaitingForUnlistedSession(of: session)
@@ -49,7 +51,8 @@ extension ConversationStore {
     func conversationToRename(fromTab session: TerminalSession) -> Conversation? {
         guard let linkedConversation = session.conversation else { return nil }
         guard let unlisted = session.unlistedClaudeSession else { return linkedConversation }
-        let shownTitle = unlisted.chosenName
+        let shownTitle =
+            unlisted.chosenName
             ?? conversationIndex.conversation(withID: linkedConversation.id).map(title(for:))
             ?? title(for: linkedConversation)
         return Conversation(
@@ -98,9 +101,10 @@ extension ConversationStore {
         case .ssh(let destination):
             let windows = [self] + otherWindowStores
             guard remoteHostList.hosts.contains(destination), !isDisconnected(destination),
-                  !windows.contains(where: { $0.sshHostsNeedingLogIn.contains(destination) }),
-                  SSHHostReachability.shared.recentFailureOutput(on: destination) == nil,
-                  !windows.contains(where: { $0.hostRefreshStatuses[session.host] == .refreshing }) else { return }
+                !windows.contains(where: { $0.sshHostsNeedingLogIn.contains(destination) }),
+                SSHHostReachability.shared.recentFailureOutput(on: destination) == nil,
+                !windows.contains(where: { $0.hostRefreshStatuses[session.host] == .refreshing })
+            else { return }
             let copies = RemoteHostCopies.combined(windows.map { $0.remoteHostCopies.copies(of: destination) })
             // A copy that started after the move ended without listing the session.
             if let startedAt = copies.lastStartedAt, startedAt >= unlisted.movedAt, let endedAt = copies.lastEndedAt {
@@ -129,7 +133,8 @@ extension ConversationStore {
     func stopWaitingForUnlistedSession(of session: TerminalSession) {
         session.unlistedClaudeSession = nil
         guard let linkedConversation = session.conversation,
-              let current = conversationIndex.conversation(withID: linkedConversation.id) else { return }
+            let current = conversationIndex.conversation(withID: linkedConversation.id)
+        else { return }
         session.updateDisplayTitle(title(for: current))
     }
 }

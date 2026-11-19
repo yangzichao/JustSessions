@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct TranscriptTextSelectionTests {
@@ -23,7 +24,8 @@ struct TranscriptTextSelectionTests {
     func coversEachBlockInReadingOrder(isDraggedUpward: Bool) {
         let earlier = Self.position(1, 0, 4)
         let later = Self.position(3, 2, 7)
-        let selection = isDraggedUpward
+        let selection =
+            isDraggedUpward
             ? TranscriptTextSelection(anchor: later, focus: earlier)
             : TranscriptTextSelection(anchor: earlier, focus: later)
 

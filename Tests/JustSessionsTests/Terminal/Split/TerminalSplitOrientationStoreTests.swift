@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A split lays its two views out side by side or stacked, one above the other; either way it stays two tabs, the first
@@ -251,10 +252,13 @@ struct TerminalSplitOrientationStoreTests {
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
-        return (store, {
-            store.closeAllTerminals()
-            isolatedUserDefaults.removeSuite()
-        })
+        return (
+            store,
+            {
+                store.closeAllTerminals()
+                isolatedUserDefaults.removeSuite()
+            }
+        )
     }
 
     private func open(_ store: ConversationStore, _ tab: TerminalSession) -> TerminalSession {

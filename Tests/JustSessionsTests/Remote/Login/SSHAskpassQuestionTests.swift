@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// What `ssh` asks while Connect… logs in, as the sheet shows it, and what `ssh` gets back.
@@ -36,12 +37,13 @@ struct SSHAskpassQuestionTests {
         #expect(SSHAskpassQuestion(host: "devbox", request: password, context: nil, previousPrompt: "(me@devbox) Password:").isAskedAgain)
         #expect(!SSHAskpassQuestion(host: "devbox", request: password, context: nil, previousPrompt: "Verification code:").isAskedAgain)
         #expect(!SSHAskpassQuestion(host: "devbox", request: password, context: nil).isAskedAgain)
-        #expect(!SSHAskpassQuestion(
-            host: "devbox",
-            request: hostKey,
-            context: nil,
-            previousPrompt: "Are you sure you want to continue connecting (yes/no)?"
-        ).isAskedAgain)
+        #expect(
+            !SSHAskpassQuestion(
+                host: "devbox",
+                request: hostKey,
+                context: nil,
+                previousPrompt: "Are you sure you want to continue connecting (yes/no)?"
+            ).isAskedAgain)
     }
 
     /// `SSH_ASKPASS_PROMPT` says what kind of question it is.

@@ -15,7 +15,9 @@ struct SidebarToggleButton: View {
     }
 
     var body: some View {
-        Button { isSidebarHidden.toggle() } label: {
+        Button {
+            isSidebarHidden.toggle()
+        } label: {
             Image(systemName: "sidebar.left")
                 .font(ThemeFont.glyph(.titleBar))
                 .foregroundStyle(ThemePalette.secondaryText)

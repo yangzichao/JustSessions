@@ -22,15 +22,17 @@ extension ConversationSidebarView {
                             .padding(.bottom, 4)
 
                         if section.projects.isEmpty {
-                            SidebarEmptyHostNote(message: SidebarEmptyHostMessage(
-                                host: section.host,
-                                refreshStatus: store.hostRefreshStatuses[section.host],
-                                copyStep: store.remoteSessionCopySteps[section.host],
-                                isSearching: isSearching,
-                                recencyFilter: recencyFilter,
-                                statusFilter: statusFilter,
-                                isDisconnected: store.isDisconnected(section.host)
-                            ))
+                            SidebarEmptyHostNote(
+                                message: SidebarEmptyHostMessage(
+                                    host: section.host,
+                                    refreshStatus: store.hostRefreshStatuses[section.host],
+                                    copyStep: store.remoteSessionCopySteps[section.host],
+                                    isSearching: isSearching,
+                                    recencyFilter: recencyFilter,
+                                    statusFilter: statusFilter,
+                                    isDisconnected: store.isDisconnected(section.host)
+                                )
+                            )
                             .onboardingTourStop(section.host == .thisMac ? .noSessionsYet : nil)
                         }
 

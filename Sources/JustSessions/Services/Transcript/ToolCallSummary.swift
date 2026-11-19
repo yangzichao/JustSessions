@@ -10,7 +10,8 @@ enum ToolCallSummary {
     ]
 
     static func summary(toolName: String, arguments: [String: Any]) -> String {
-        let detail = descriptiveArgumentKeys.lazy.compactMap { describe(arguments[$0]) }.first
+        let detail =
+            descriptiveArgumentKeys.lazy.compactMap { describe(arguments[$0]) }.first
             ?? arguments.keys.sorted().lazy.compactMap { describe(arguments[$0]) }.first
         return line(toolName: toolName, detail: detail)
     }
@@ -21,11 +22,12 @@ enum ToolCallSummary {
 
     /// The argument as text, or nil when it is not text or is blank, so the next argument can describe the call.
     private static func describe(_ value: Any?) -> String? {
-        let text: String? = switch value {
-        case let text as String: text
-        case let parts as [String]: parts.joined(separator: " ")
-        default: nil
-        }
+        let text: String? =
+            switch value {
+            case let text as String: text
+            case let parts as [String]: parts.joined(separator: " ")
+            default: nil
+            }
         return text?.contains { !$0.isWhitespace } == true ? text : nil
     }
 

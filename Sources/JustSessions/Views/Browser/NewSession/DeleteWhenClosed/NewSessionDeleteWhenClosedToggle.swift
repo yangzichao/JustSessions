@@ -15,7 +15,8 @@ struct NewSessionDeleteWhenClosedToggle: View {
                     .toggleStyle(ThemedCheckboxToggleStyle())
                 HelpPopoverButton(
                     title: "Deleting when the tab closes",
-                    explanation: "Closing the tab ends the CLI and deletes the session without asking again. Closing the window or quitting JustSessions keeps it until its tab closes. Keep session in the tab's menu keeps it after all."
+                    explanation:
+                        "Closing the tab ends the CLI and deletes the session without asking again. Closing the window or quitting JustSessions keeps it until its tab closes. Keep session in the tab's menu keeps it after all."
                 )
             }
             if deletesSessionWhenClosed {

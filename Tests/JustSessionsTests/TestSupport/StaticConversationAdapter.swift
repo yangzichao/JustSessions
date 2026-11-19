@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Lists a fixed set of Claude Code conversations and never deletes anything.

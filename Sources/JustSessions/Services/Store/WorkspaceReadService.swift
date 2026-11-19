@@ -67,8 +67,10 @@ private actor ThisMacDiscoveryCoordinator {
 
     var waiterCount: Int { inFlight?.waiters.count ?? 0 }
 
-    func discover(adapters: [any ConversationAdapter], commandResolver: NativeCLICommandResolver,
-                  hostWork: HostSessionWorkCoordinator?) async throws -> Discovery {
+    func discover(
+        adapters: [any ConversationAdapter], commandResolver: NativeCLICommandResolver,
+        hostWork: HostSessionWorkCoordinator?
+    ) async throws -> Discovery {
         let waiterID = UUID()
         let cancellation = DiscoveryWaiterCancellation()
         return try await withTaskCancellationHandler {

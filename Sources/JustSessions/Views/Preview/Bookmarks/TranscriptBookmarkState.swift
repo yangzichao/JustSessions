@@ -10,10 +10,14 @@ enum TranscriptBookmarkNotice: Equatable {
 
     func text(language: AppInterfaceLanguage?) -> String {
         switch self {
-        case .noBookmarks: AppLocalization.string("No bookmarks in this conversation. Press ⌘D to bookmark the message you're reading.", language: language)
+        case .noBookmarks:
+            AppLocalization.string(
+                "No bookmarks in this conversation. Press ⌘D to bookmark the message you're reading.", language: language)
         case .allLettersInUse: AppLocalization.string("All 26 letters are in use. Remove a bookmark to add another.", language: language)
         case .nothingToBookmark: AppLocalization.string("Only your messages and the CLI's replies can be bookmarked.", language: language)
-        case .missing(let bookmark): AppLocalization.string("Bookmark \(bookmark.letter)'s message is no longer in this conversation. This is where it was.", language: language)
+        case .missing(let bookmark):
+            AppLocalization.string(
+                "Bookmark \(bookmark.letter)'s message is no longer in this conversation. This is where it was.", language: language)
         }
     }
 }
@@ -60,8 +64,14 @@ final class TranscriptBookmarkState {
         loadingJump = nil
         loadingEntryJump = nil
     }
-    @discardableResult func finishLoadingJump() -> MessageBookmark? { defer { loadingJump = nil }; return loadingJump }
-    @discardableResult func finishLoadingEntryJump() -> Int? { defer { loadingEntryJump = nil }; return loadingEntryJump }
+    @discardableResult func finishLoadingJump() -> MessageBookmark? {
+        defer { loadingJump = nil }
+        return loadingJump
+    }
+    @discardableResult func finishLoadingEntryJump() -> Int? {
+        defer { loadingEntryJump = nil }
+        return loadingEntryJump
+    }
 
     func show(_ notice: TranscriptBookmarkNotice) {
         self.notice = notice
@@ -89,11 +99,15 @@ final class TranscriptBookmarkState {
     /// Also for a tab's notices (TerminalBookmarkNoticeState), which no reader shows.
     static func announce(_ text: String) {
         guard let application = NSApp else { return }
-        NSAccessibility.post(element: application, notification: .announcementRequested,
-                             userInfo: [.announcement: text, .priority: NSAccessibilityPriorityLevel.high.rawValue])
+        NSAccessibility.post(
+            element: application, notification: .announcementRequested,
+            userInfo: [.announcement: text, .priority: NSAccessibilityPriorityLevel.high.rawValue])
     }
 
     /// The missing bookmark an empty page left the reader past, for the reader that replaces it (see `TranscriptView`).
     func carrySeekTarget(_ entryID: Int) { carriedSeekTarget = entryID }
-    func takeCarriedSeekTarget() -> Int? { defer { carriedSeekTarget = nil }; return carriedSeekTarget }
+    func takeCarriedSeekTarget() -> Int? {
+        defer { carriedSeekTarget = nil }
+        return carriedSeekTarget
+    }
 }

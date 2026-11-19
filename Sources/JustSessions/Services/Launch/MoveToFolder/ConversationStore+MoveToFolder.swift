@@ -20,7 +20,7 @@ extension ConversationStore {
     /// Does nothing for the session's own folder, where `/cd` would only say it is already there.
     func moveSession(_ conversation: Conversation, toFolder folderPath: String) {
         guard canMoveSession(conversation),
-              ProjectLocation(host: conversation.host, path: folderPath).key != conversation.projectDirectoryKey
+            ProjectLocation(host: conversation.host, path: folderPath).key != conversation.projectDirectoryKey
         else { return }
         resume(conversation, appendedArguments: conversation.provider.moveToFolderArguments(folderPath))
     }

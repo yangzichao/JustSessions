@@ -8,10 +8,13 @@ struct LaunchAtLoginToggle: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Toggle("Launch JustSessions at login", isOn: Binding(
-                get: { settingsStore.launchesAtLogin },
-                set: { settingsStore.setLaunchesAtLogin($0) }
-            ))
+            Toggle(
+                "Launch JustSessions at login",
+                isOn: Binding(
+                    get: { settingsStore.launchesAtLogin },
+                    set: { settingsStore.setLaunchesAtLogin($0) }
+                )
+            )
             .accessibilityIdentifier("settings.launchAtLogin")
 
             if settingsStore.status == .requiresApproval {

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Claude Code's own `/branch`, typed in a running tab, moves the CLI into a new session; the tab follows it there,
@@ -40,7 +41,8 @@ struct ClaudeBranchCommandTests {
         let tab = TerminalSession(
             engine: .swiftTerm, conversation: parent, provider: .claude, projectPath: parent.projectPath, action: .resume,
             displayTitle: store.title(for: parent),
-            command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [], workingDirectory: transcripts.root.path, environment: []),
+            command: NativeCLICommand(
+                executablePath: "/usr/bin/true", arguments: [], workingDirectory: transcripts.root.path, environment: []),
             tmuxSessionName: TmuxSessionName.forConversation(parent)
         )
         tab.tmuxPaneProcessID = ClaudeBranchCommandTranscripts.processID
@@ -77,9 +79,10 @@ struct ClaudeBranchCommandTests {
 
         let titles = Dictionary(uniqueKeysWithValues: try transcripts.listed().map { ($0.sessionID, $0.suggestedTitle) })
 
-        #expect(titles == [
-            ClaudeBranchCommandTranscripts.parentID: ClaudeBranchCommandTranscripts.parentTitle,
-            ClaudeBranchCommandTranscripts.branchID: "after-branch",
-        ])
+        #expect(
+            titles == [
+                ClaudeBranchCommandTranscripts.parentID: ClaudeBranchCommandTranscripts.parentTitle,
+                ClaudeBranchCommandTranscripts.branchID: "after-branch",
+            ])
     }
 }

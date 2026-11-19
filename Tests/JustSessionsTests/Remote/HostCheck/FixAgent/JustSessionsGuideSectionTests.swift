@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct JustSessionsGuideSectionTests {
@@ -34,8 +35,9 @@ struct JustSessionsGuideSectionTests {
             ### Next
             Other.
             """
-        #expect(JustSessionsGuideText.section(headed: "Shell startup", in: markdown)
-            == "### Shell startup\nLine one.\n```sh\n# not a heading\n```\n#### Detail\nMore.")
+        #expect(
+            JustSessionsGuideText.section(headed: "Shell startup", in: markdown)
+                == "### Shell startup\nLine one.\n```sh\n# not a heading\n```\n#### Detail\nMore.")
         #expect(JustSessionsGuideText.section(headed: "Missing", in: markdown) == nil)
     }
 
@@ -43,8 +45,10 @@ struct JustSessionsGuideSectionTests {
         #expect(JustSessionsGuideText.gitReference(forAppVersion: "1.2.11") == "v1.2.11")
         #expect(JustSessionsGuideText.gitReference(forAppVersion: "1.2.11-3-gabc1234") == "main")
         #expect(JustSessionsGuideText.gitReference(forAppVersion: "1.2") == "main")
-        #expect(JustSessionsGuideSection.whenSomethingFailsOnSSHHost.link(gitReference: "v1.2.11").absoluteString
-            == "https://github.com/yangzichao/JustSessions/blob/v1.2.11/docs/guides/session-management.md#when-something-fails-on-an-ssh-host")
+        #expect(
+            JustSessionsGuideSection.whenSomethingFailsOnSSHHost.link(gitReference: "v1.2.11").absoluteString
+                == "https://github.com/yangzichao/JustSessions/blob/v1.2.11/docs/guides/session-management.md#when-something-fails-on-an-ssh-host"
+        )
     }
 
     @Test func theSectionsAboutAReportFollowItsProblemsAndWarnings() {
@@ -58,7 +62,8 @@ struct JustSessionsGuideSectionTests {
                 HostCheckFinding(id: "rsync", status: .passed, title: "rsync", summary: ""),
             ]
         )
-        #expect(JustSessionsGuideSection.sections(about: report)
-            == [.whenSomethingFailsOnSSHHost, .terminalPersistence, .cliLaunchAndDiscovery])
+        #expect(
+            JustSessionsGuideSection.sections(about: report)
+                == [.whenSomethingFailsOnSSHHost, .terminalPersistence, .cliLaunchAndDiscovery])
     }
 }

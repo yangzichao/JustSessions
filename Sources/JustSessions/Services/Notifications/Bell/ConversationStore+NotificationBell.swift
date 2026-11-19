@@ -21,9 +21,10 @@ extension ConversationStore {
                 terminalIDsOnScreen.contains(tab.id) ? nil : store.notificationBellEntry(for: tab)
             }
         }
-        let conversationIDsWithRunningTab = Set(([self] + otherWindowStores).flatMap { store in
-            store.terminalSessions.filter(\.isRunning).compactMap { $0.conversation?.id }
-        })
+        let conversationIDsWithRunningTab = Set(
+            ([self] + otherWindowStores).flatMap { store in
+                store.terminalSessions.filter(\.isRunning).compactMap { $0.conversation?.id }
+            })
         // Until the next activity sync, a CLI just reattached to in a tab is still listed as running with no tab.
         let detachedEntries = detachedCLIActivities.keys
             .filter { !conversationIDsWithRunningTab.contains($0) }
@@ -39,10 +40,12 @@ extension ConversationStore {
 
     /// Nil unless the tab's CLI runs and waits on you.
     private func notificationBellEntry(for tab: TerminalSession) -> NotificationBellEntry? {
-        guard tab.isRunning, let provider = tab.provider, let reason = WaitingForYou.reason(
-            activity: tab.cliActivity,
-            hasUnseenFinishedTurn: tab.hasUnseenFinishedTurn
-        ) else { return nil }
+        guard tab.isRunning, let provider = tab.provider,
+            let reason = WaitingForYou.reason(
+                activity: tab.cliActivity,
+                hasUnseenFinishedTurn: tab.hasUnseenFinishedTurn
+            )
+        else { return nil }
         return NotificationBellEntry(
             source: tab.attentionSource,
             reason: reason,
@@ -57,10 +60,12 @@ extension ConversationStore {
     /// listed only from an open tab.
     private func notificationBellEntry(forDetachedConversationID conversationID: String) -> NotificationBellEntry? {
         guard let conversation = conversation(withID: conversationID),
-              !hiddenConversationProviders.hides(conversation.provider), let reason = WaitingForYou.reason(
-            activity: detachedCLIActivities[conversationID],
-            hasUnseenFinishedTurn: hasUnseenFinishedTurn(detachedConversationID: conversationID)
-        ) else { return nil }
+            !hiddenConversationProviders.hides(conversation.provider),
+            let reason = WaitingForYou.reason(
+                activity: detachedCLIActivities[conversationID],
+                hasUnseenFinishedTurn: hasUnseenFinishedTurn(detachedConversationID: conversationID)
+            )
+        else { return nil }
         let source = SessionAttentionSource.detachedTmux(conversationID: conversationID)
         return NotificationBellEntry(
             source: source,

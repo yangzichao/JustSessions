@@ -12,7 +12,8 @@ final class FileLinkClickSettingsStore: ObservableObject {
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
-        choice = userDefaults.string(forKey: FileLinkClickChoice.userDefaultsKey).flatMap(FileLinkClickChoice.init(storedValue:))
+        choice =
+            userDefaults.string(forKey: FileLinkClickChoice.userDefaultsKey).flatMap(FileLinkClickChoice.init(storedValue:))
             ?? .defaultApp
     }
 

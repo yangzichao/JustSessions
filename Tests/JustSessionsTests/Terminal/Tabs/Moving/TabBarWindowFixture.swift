@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The tab bar alone in a window out of sight, wide enough that every tab takes its full width, taking clicks and
@@ -46,18 +47,19 @@ final class TabBarWindowFixture {
     }
 
     func showTabBar() async throws {
-        let hostingView = NSHostingView(rootView: AnyView(
-            WorkspaceTabBar(
-                store: store,
-                leadingClearance: 0,
-                onRenameConversation: { _ in },
-                onNewSession: {},
-                onCloseTerminal: { [weak self] in self?.closeRequests.append($0) },
-                onDeleteConversation: { _ in },
-                onCloseTabGroup: { _, _ in }
-            )
-            .frame(width: Self.barSize.width, height: Self.barSize.height)
-        ))
+        let hostingView = NSHostingView(
+            rootView: AnyView(
+                WorkspaceTabBar(
+                    store: store,
+                    leadingClearance: 0,
+                    onRenameConversation: { _ in },
+                    onNewSession: {},
+                    onCloseTerminal: { [weak self] in self?.closeRequests.append($0) },
+                    onDeleteConversation: { _ in },
+                    onCloseTabGroup: { _, _ in }
+                )
+                .frame(width: Self.barSize.width, height: Self.barSize.height)
+            ))
         self.hostingView = hostingView
         window.contentView = hostingView
         window.orderFrontRegardless()
@@ -92,11 +94,12 @@ final class TabBarWindowFixture {
         var durations: [Duration] = []
         for step in 1...stepCount {
             let event = try event(.leftMouseDragged, atX: x + stepDistance * CGFloat(step))
-            durations.append(ContinuousClock().measure {
-                NSApp.sendEvent(event)
-                hostingView?.layoutSubtreeIfNeeded()
-                window.displayIfNeeded()
-            })
+            durations.append(
+                ContinuousClock().measure {
+                    NSApp.sendEvent(event)
+                    hostingView?.layoutSubtreeIfNeeded()
+                    window.displayIfNeeded()
+                })
             try await Task.sleep(for: .milliseconds(2))
         }
         try await send(.leftMouseUp, atX: x + stepDistance * CGFloat(stepCount))
@@ -119,7 +122,8 @@ final class TabBarWindowFixture {
 
     /// Attaches a sheet to the window, as the New Session sheet covers it, and returns a call that ends it.
     func beginSheet() async throws -> () -> Void {
-        let sheet = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 200, height: 100), styleMask: [.titled], backing: .buffered, defer: false)
+        let sheet = NSWindow(
+            contentRect: CGRect(x: 0, y: 0, width: 200, height: 100), styleMask: [.titled], backing: .buffered, defer: false)
         sheet.isReleasedWhenClosed = false
         window.beginSheet(sheet, completionHandler: nil)
         try await expectEventually { self.window.attachedSheet != nil }
@@ -135,11 +139,12 @@ final class TabBarWindowFixture {
     func movePointer(intoTheBar isIntoTheBar: Bool) throws {
         let zone = try #require(hostingView.flatMap { Self.zone(in: $0) })
         eventTimestamp += 0.02
-        let event = try #require(NSEvent.enterExitEvent(
-            with: isIntoTheBar ? .mouseEntered : .mouseExited, location: .zero, modifierFlags: [],
-            timestamp: eventTimestamp, windowNumber: window.windowNumber, context: nil, eventNumber: 0,
-            trackingNumber: 0, userData: nil
-        ))
+        let event = try #require(
+            NSEvent.enterExitEvent(
+                with: isIntoTheBar ? .mouseEntered : .mouseExited, location: .zero, modifierFlags: [],
+                timestamp: eventTimestamp, windowNumber: window.windowNumber, context: nil, eventNumber: 0,
+                trackingNumber: 0, userData: nil
+            ))
         if isIntoTheBar { zone.mouseEntered(with: event) } else { zone.mouseExited(with: event) }
     }
 
@@ -201,11 +206,12 @@ final class TabBarWindowFixture {
 
     private func event(_ type: NSEvent.EventType, atX x: CGFloat, droppedBy drop: CGFloat = 0) throws -> NSEvent {
         eventTimestamp += 0.02
-        return try #require(NSEvent.mouseEvent(
-            with: type, location: CGPoint(x: x, y: Self.pointerY - drop), modifierFlags: [],
-            timestamp: eventTimestamp, windowNumber: window.windowNumber, context: nil, eventNumber: 0,
-            clickCount: 1, pressure: type == .leftMouseUp ? 0 : 1
-        ))
+        return try #require(
+            NSEvent.mouseEvent(
+                with: type, location: CGPoint(x: x, y: Self.pointerY - drop), modifierFlags: [],
+                timestamp: eventTimestamp, windowNumber: window.windowNumber, context: nil, eventNumber: 0,
+                clickCount: 1, pressure: type == .leftMouseUp ? 0 : 1
+            ))
     }
 
     private static func zone(in view: NSView) -> WindowMoveZoneView? {

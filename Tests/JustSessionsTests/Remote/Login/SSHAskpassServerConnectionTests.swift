@@ -2,6 +2,7 @@ import Darwin
 import Foundation
 import SwiftTerm
 import Testing
+
 @testable import JustSessions
 
 /// How the askpass server takes a helper's connection: on a busy app, with tabs starting, and after the helper has gone.
@@ -14,10 +15,11 @@ struct SSHAskpassServerConnectionTests {
         defer { try? FileManager.default.removeItem(atPath: folder) }
         let clock = ContinuousClock()
         let askedAt = LockedValue<ContinuousClock.Instant?>(nil)
-        let server = try #require(SSHAskpassServer(socketPath: folder + "/askpass") { _ in
-            askedAt.update { $0 = clock.now }
-            return SSHAskpassReply(answer: nil)
-        })
+        let server = try #require(
+            SSHAskpassServer(socketPath: folder + "/askpass") { _ in
+                askedAt.update { $0 = clock.now }
+                return SSHAskpassReply(answer: nil)
+            })
         defer { server.stop() }
 
         let busyUntil = clock.now + .seconds(1.5)
@@ -25,7 +27,7 @@ struct SSHAskpassServerConnectionTests {
             Task.detached(priority: .high) {
                 var value: UInt64 = 1
                 while clock.now < busyUntil {
-                    for _ in 0..<20_000 { value = value &* 6364136223846793005 &+ 1 }
+                    for _ in 0..<20_000 { value = value &* 6_364_136_223_846_793_005 &+ 1 }
                     await Task.yield()
                 }
                 return value
@@ -40,7 +42,10 @@ struct SSHAskpassServerConnectionTests {
 
         let asked = try #require(askedAt.value)
         let milliseconds = { (duration: Duration) in duration.formatted(.units(allowed: [.milliseconds])) }
-        #expect(asked < busyUntil, "The question arrived \(milliseconds(asked - sentAt)) after it was sent; the busy tasks ended \(milliseconds(busyUntil - sentAt)) after")
+        #expect(
+            asked < busyUntil,
+            "The question arrived \(milliseconds(asked - sentAt)) after it was sent; the busy tasks ended \(milliseconds(busyUntil - sentAt)) after"
+        )
     }
 
     /// A tab's process starts with a copy of each descriptor the app has open that isn't closed on exec, and keeps it
@@ -52,19 +57,21 @@ struct SSHAskpassServerConnectionTests {
         defer { try? FileManager.default.removeItem(atPath: folder) }
         let isAsked = LockedValue(false)
         let isWithdrawn = LockedValue(false)
-        let server = try #require(SSHAskpassServer(socketPath: folder + "/askpass") { _ in
-            isAsked.update { $0 = true }
-            try? await Task.sleep(for: .seconds(600)) // Ended only by a cancel.
-            isWithdrawn.update { $0 = Task.isCancelled }
-            return SSHAskpassReply(answer: nil)
-        })
+        let server = try #require(
+            SSHAskpassServer(socketPath: folder + "/askpass") { _ in
+                isAsked.update { $0 = true }
+                try? await Task.sleep(for: .seconds(600))  // Ended only by a cancel.
+                isWithdrawn.update { $0 = Task.isCancelled }
+                return SSHAskpassReply(answer: nil)
+            })
         defer { server.stop() }
         let helper = try UnixStreamSocket(connectingTo: server.socketPath, timeout: .seconds(5))
         try helper.write(try #require(SSHAskpassMessageLine.encoded(SSHAskpassRequest(prompt: "Confirm user presence", hint: "none"))))
         try await expectEventually { isAsked.value }
 
         var windowSize = winsize(ws_row: 24, ws_col: 80, ws_xpixel: 0, ws_ypixel: 0)
-        let tab = try #require(PseudoTerminalHelpers.fork(andExec: "/bin/sleep", args: ["sleep", "600"], env: [], desiredWindowSize: &windowSize))
+        let tab = try #require(
+            PseudoTerminalHelpers.fork(andExec: "/bin/sleep", args: ["sleep", "600"], env: [], desiredWindowSize: &windowSize))
         defer {
             kill(tab.pid, SIGKILL)
             var status: Int32 = 0

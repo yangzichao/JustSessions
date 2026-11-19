@@ -14,11 +14,12 @@ enum RemotePiConversationDeletion {
         let mirrorPath = piMirrorDirectory.standardizedFileURL.resolvingSymlinksInPath().path
         let isInRoot = projectFolder.resolvingSymlinksInPath().path == mirrorPath
         guard conversation.provider == .pi,
-              conversation.provider.isValidSessionID(conversation.sessionID),
-              isInRoot || (projectFolder.deletingLastPathComponent().resolvingSymlinksInPath().path == mirrorPath
-                  && RemoteConversationDeletion.isSafeFolderName(projectFolder.lastPathComponent)),
-              RemoteConversationDeletion.isSafeFolderName(sourceFile.lastPathComponent),
-              sourceFile.lastPathComponent.hasSuffix("_\(conversation.sessionID).jsonl")
+            conversation.provider.isValidSessionID(conversation.sessionID),
+            isInRoot
+                || (projectFolder.deletingLastPathComponent().resolvingSymlinksInPath().path == mirrorPath
+                    && RemoteConversationDeletion.isSafeFolderName(projectFolder.lastPathComponent)),
+            RemoteConversationDeletion.isSafeFolderName(sourceFile.lastPathComponent),
+            sourceFile.lastPathComponent.hasSuffix("_\(conversation.sessionID).jsonl")
         else { throw ConversationDeletionError.invalidSource }
         return (isInRoot ? nil : projectFolder.lastPathComponent, sourceFile.lastPathComponent)
     }

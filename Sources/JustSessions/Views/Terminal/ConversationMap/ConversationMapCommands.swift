@@ -10,8 +10,11 @@ struct ConversationMapCommands: Commands {
 
     var body: some Commands {
         CommandGroup(after: .sidebar) {
-            Button(AppLocalization.string(showsConversationMap ? "Hide Conversation Map" : "Show Conversation Map",
-                                          language: languageStore.language)) {
+            Button(
+                AppLocalization.string(
+                    showsConversationMap ? "Hide Conversation Map" : "Show Conversation Map",
+                    language: languageStore.language)
+            ) {
                 showsConversationMap.toggle()
             }
         }

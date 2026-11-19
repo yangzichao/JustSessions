@@ -30,8 +30,9 @@ struct OpenCodeAdapter: ConversationAdapter {
         try cancellation.checkCancellation()
         let conversations = OpenCodeSQLiteReader.sessions(in: databaseFile).compactMap { session -> Conversation? in
             guard !cancellation.isCancelled,
-                  provider.isValidSessionID(session.sessionID), session.projectPath.hasPrefix("/"),
-                  session.parentSessionID.map(provider.isValidSessionID) != false else { return nil }
+                provider.isValidSessionID(session.sessionID), session.projectPath.hasPrefix("/"),
+                session.parentSessionID.map(provider.isValidSessionID) != false
+            else { return nil }
             return Conversation(
                 provider: provider,
                 sessionID: session.sessionID,

@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Claude Code's adapter over a test's folder, counting this Mac's scans. Its next scan can be held once it has read
@@ -68,39 +69,40 @@ final class ClaudeHostStandIn: Sendable {
         try FileManager.default.createDirectory(at: otherToolsHome, withIntermediateDirectories: true)
         let claudeFolder = home.appendingPathComponent(RemoteSessionMirror.remoteFolder(for: .claude))
         let refreshes = refreshes
-        discovery = RemoteSessionDiscovery(mirror: RemoteSessionMirror(
-            cacheRoot: directory.appendingPathComponent("mirrors"),
-            sourceHomeOverride: otherToolsHome.path,
-            toolFoldersLookup: { host in
-                if SSHHostReachability.shared.recentFailureOutput(on: host) != nil {
-                    refreshes.noteFailureWithoutConnecting()
-                    return try RemoteToolFoldersLookup.folders(on: host, runner: RemoteHostCommandRunner())
-                }
-                let (holds, failure) = refreshes.start()
-                if failure == .outOfReach {
+        discovery = RemoteSessionDiscovery(
+            mirror: RemoteSessionMirror(
+                cacheRoot: directory.appendingPathComponent("mirrors"),
+                sourceHomeOverride: otherToolsHome.path,
+                toolFoldersLookup: { host in
+                    if SSHHostReachability.shared.recentFailureOutput(on: host) != nil {
+                        refreshes.noteFailureWithoutConnecting()
+                        return try RemoteToolFoldersLookup.folders(on: host, runner: RemoteHostCommandRunner())
+                    }
+                    let (holds, failure) = refreshes.start()
+                    if failure == .outOfReach {
+                        Self.noteOutOfReach(host)
+                        throw RemoteSessionMirrorError.sshFailed(
+                            host: host, problem: SSHConnectionProblem(sshOutput: Self.outOfReachOutput)
+                        )
+                    }
+                    // What the host has as this refresh reads it, which the refresh copies. It counts as having read the
+                    // host only once that is done, so a test that waits for it writes nothing this refresh could see.
+                    let reading = readings.appendingPathComponent(UUID().uuidString)
+                    try FileManager.default.createDirectory(at: readings, withIntermediateDirectories: true)
+                    try FileManager.default.copyItem(at: claudeFolder, to: reading)
+                    refreshes.noteRead()
+                    if failure == .copy {
+                        throw RemoteSessionMirrorError.rsyncFailed(host: host, output: "Connection reset by peer")
+                    }
+                    if holds { refreshes.waitWhileHeld() }
+                    // So the status lookup after the copy doesn't run `ssh`.
                     Self.noteOutOfReach(host)
-                    throw RemoteSessionMirrorError.sshFailed(
-                        host: host, problem: SSHConnectionProblem(sshOutput: Self.outOfReachOutput)
-                    )
+                    refreshes.noteStatusLookupFailure()
+                    var folders = RemoteToolFolders.standard
+                    folders.claude = reading.path
+                    return folders
                 }
-                // What the host has as this refresh reads it, which the refresh copies. It counts as having read the
-                // host only once that is done, so a test that waits for it writes nothing this refresh could see.
-                let reading = readings.appendingPathComponent(UUID().uuidString)
-                try FileManager.default.createDirectory(at: readings, withIntermediateDirectories: true)
-                try FileManager.default.copyItem(at: claudeFolder, to: reading)
-                refreshes.noteRead()
-                if failure == .copy {
-                    throw RemoteSessionMirrorError.rsyncFailed(host: host, output: "Connection reset by peer")
-                }
-                if holds { refreshes.waitWhileHeld() }
-                // So the status lookup after the copy doesn't run `ssh`.
-                Self.noteOutOfReach(host)
-                refreshes.noteStatusLookupFailure()
-                var folders = RemoteToolFolders.standard
-                folders.claude = reading.path
-                return folders
-            }
-        ))
+            ))
     }
 
     /// Refreshes that have read the host.

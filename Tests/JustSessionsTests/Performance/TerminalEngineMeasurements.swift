@@ -6,6 +6,7 @@ import MetalKit
 import ObjectiveC
 import SwiftTerm
 import Testing
+
 @testable import JustSessions
 
 /// The same controlled output through a Ghostty tab, a SwiftTerm tab, and a SwiftTerm tab drawing with Metal, in a
@@ -551,7 +552,9 @@ private struct BulkStream {
         let level = index % 13 == 0 ? "\u{1B}[1;33mWARN\u{1B}[0m" : "\u{1B}[32mINFO\u{1B}[0m"
         let message: String
         if index % 5 == 0 {
-            let red = index % 256, green = (index / 3) % 256, blue = 255 - index % 256
+            let red = index % 256
+            let green = (index / 3) % 256
+            let blue = 255 - index % 256
             message = "\u{1B}[38;2;\(red);\(green);\(blue)mrequest \(index) finished in \(index % 97) ms, cache warm\u{1B}[0m"
         } else if index % 7 == 0 {
             message = "处理请求 \(index) 完成：日本語のログ行、한국어 로그 줄"
@@ -627,7 +630,7 @@ private final class GhosttyFrameCounter {
     }
 
     func stop() -> Int {
-        observations.forEach { $0.invalidate() }
+        for observation in observations { observation.invalidate() }
         observations = []
         return count.value
     }
@@ -650,7 +653,8 @@ private enum SwiftTermDrawCounter {
 
     static func install() {
         guard originalDraw == nil,
-              let method = class_getInstanceMethod(SwiftTerm.TerminalView.self, #selector(NSView.draw(_:))) else { return }
+            let method = class_getInstanceMethod(SwiftTerm.TerminalView.self, #selector(NSView.draw(_:)))
+        else { return }
         let original = method_getImplementation(method)
         let callOriginal = unsafeBitCast(original, to: Draw.self)
         let countingDraw: @convention(block) (NSView, NSRect) -> Void = { view, dirtyRect in
@@ -682,7 +686,8 @@ private enum SwiftTermMetalDrawCounter {
 
     static func install() {
         guard originalDraw == nil, let rendererClass,
-              let method = class_getInstanceMethod(rendererClass, #selector(MTKViewDelegate.draw(in:))) else { return }
+            let method = class_getInstanceMethod(rendererClass, #selector(MTKViewDelegate.draw(in:)))
+        else { return }
         let original = method_getImplementation(method)
         let callOriginal = unsafeBitCast(original, to: Draw.self)
         let countingDraw: @convention(block) (NSObject, MTKView) -> Void = { renderer, view in
@@ -696,7 +701,8 @@ private enum SwiftTermMetalDrawCounter {
 
     static func uninstall() -> Int {
         if let originalDraw, let rendererClass,
-           let method = class_getInstanceMethod(rendererClass, #selector(MTKViewDelegate.draw(in:))) {
+            let method = class_getInstanceMethod(rendererClass, #selector(MTKViewDelegate.draw(in:)))
+        {
             method_setImplementation(method, originalDraw)
         }
         originalDraw = nil

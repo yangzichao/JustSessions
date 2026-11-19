@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A message's right-click menu: AppKit's own items, with Add bookmark or Remove bookmark first.
@@ -16,13 +17,16 @@ struct TranscriptTextViewBookmarkMenuTests {
     private func id(_ record: Int) -> Int { TranscriptPageIdentity.entryID(record: record, part: 0) }
 
     /// Shows the transcript in a reader that keeps bookmarks, its pages not loaded, as a jump never needs here.
-    private func show(in fixture: TranscriptScrollViewFixture, saving bookmarks: [MessageBookmark] = [],
-                      bookmarkState: TranscriptBookmarkState = TranscriptBookmarkState()) async throws -> ConversationStore {
+    private func show(
+        in fixture: TranscriptScrollViewFixture, saving bookmarks: [MessageBookmark] = [],
+        bookmarkState: TranscriptBookmarkState = TranscriptBookmarkState()
+    ) async throws -> ConversationStore {
         MessageBookmarks(bookmarksByConversationID: bookmarks.isEmpty ? [:] : [conversation.id: bookmarks])
             .save(to: fixture.settings.userDefaults)
         let store = ConversationStore(adapters: [], userDefaults: fixture.settings.userDefaults, startsBackgroundPolling: false)
-        _ = try await fixture.show(conversation, transcript: transcript, paging: TranscriptPagingModel(), store: store,
-                                   bookmarkState: bookmarkState)
+        _ = try await fixture.show(
+            conversation, transcript: transcript, paging: TranscriptPagingModel(), store: store,
+            bookmarkState: bookmarkState)
         return store
     }
 
@@ -30,10 +34,11 @@ struct TranscriptTextViewBookmarkMenuTests {
     private func menu(forEntry entryID: Int, in fixture: TranscriptScrollViewFixture) throws -> NSMenu {
         let textView = try #require(fixture.textViews.first { $0.selectionKey?.entryIndex == entryID })
         let point = textView.convert(NSPoint(x: 4, y: 4), to: nil)
-        let event = try #require(NSEvent.mouseEvent(
-            with: .rightMouseDown, location: point, modifierFlags: [], timestamp: 0, windowNumber: fixture.window.windowNumber,
-            context: nil, eventNumber: 0, clickCount: 1, pressure: 1
-        ))
+        let event = try #require(
+            NSEvent.mouseEvent(
+                with: .rightMouseDown, location: point, modifierFlags: [], timestamp: 0, windowNumber: fixture.window.windowNumber,
+                context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+            ))
         return try #require(textView.menu(for: event))
     }
 
@@ -55,7 +60,8 @@ struct TranscriptTextViewBookmarkMenuTests {
     @Test func aBookmarkedMessagesMenuOffersRemoveWithItsLetter() async throws {
         let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
-        let bookmark = MessageBookmark(letter: "a", entryID: id(1), kind: .assistant, snippet: "The release branch pins an older toolchain.")
+        let bookmark = MessageBookmark(
+            letter: "a", entryID: id(1), kind: .assistant, snippet: "The release branch pins an older toolchain.")
         let store = try await show(in: fixture, saving: [bookmark])
 
         let menu = try menu(forEntry: id(1), in: fixture)
@@ -69,7 +75,8 @@ struct TranscriptTextViewBookmarkMenuTests {
     @Test func aBookmarkedMessagesMenuOffersEditWhichAsksForTheEditor() async throws {
         let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
-        let bookmark = MessageBookmark(letter: "a", entryID: id(1), kind: .assistant, snippet: "The release branch pins an older toolchain.")
+        let bookmark = MessageBookmark(
+            letter: "a", entryID: id(1), kind: .assistant, snippet: "The release branch pins an older toolchain.")
         let bookmarkState = TranscriptBookmarkState()
         let store = try await show(in: fixture, saving: [bookmark], bookmarkState: bookmarkState)
 
@@ -80,7 +87,7 @@ struct TranscriptTextViewBookmarkMenuTests {
         menu.performActionForItem(at: 1)
         #expect(bookmarkState.editor.request?.bookmark == bookmark)
         #expect(bookmarkState.editor.request?.conversation.id == conversation.id)
-        #expect(store.messageBookmarks.bookmarks(forConversationID: conversation.id) == [bookmark])   // editing adds nothing
+        #expect(store.messageBookmarks.bookmarks(forConversationID: conversation.id) == [bookmark])  // editing adds nothing
     }
 
     @Test func aNotesMenuHasNoBookmarkItem() async throws {

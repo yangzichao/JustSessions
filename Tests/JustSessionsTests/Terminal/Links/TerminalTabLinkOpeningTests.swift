@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// What ⌘-clicking a link in a tab does, with the tab's host and project folder and the choice in Settings → General →
@@ -40,9 +41,12 @@ struct TerminalTabLinkOpeningTests {
 
         try await expectEventually { !scenario.editorOpenings.isEmpty }
         #expect(scenario.editorOpenings.map(\.editorName) == ["Zed"])
-        #expect(scenario.editorOpenings.map(\.item) == [TerminalLinkLocalItem(
-            url: scenario.url("Sources/main.swift"), kind: .file, lineNumber: 42, columnNumber: 7
-        )])
+        #expect(
+            scenario.editorOpenings.map(\.item) == [
+                TerminalLinkLocalItem(
+                    url: scenario.url("Sources/main.swift"), kind: .file, lineNumber: 42, columnNumber: 7
+                )
+            ])
         #expect(scenario.openedURLs.isEmpty)
     }
 
@@ -55,9 +59,10 @@ struct TerminalTabLinkOpeningTests {
         scenario.click("Sources/")
         scenario.click("https://example.com/docs")
 
-        #expect(scenario.openedURLs.map(\.path) == [
-            scenario.url("screenshot.png").path, scenario.url("Sources").path, "/docs",
-        ])
+        #expect(
+            scenario.openedURLs.map(\.path) == [
+                scenario.url("screenshot.png").path, scenario.url("Sources").path, "/docs",
+            ])
         #expect(scenario.editorOpenings.isEmpty)
     }
 
@@ -90,10 +95,11 @@ struct TerminalTabLinkOpeningTests {
         scenario.click("plan.md:12")
         scenario.click("screenshot.png")
 
-        #expect(scenario.shownMenus.map { TerminalContextMenuFixture.titles(of: $0.menu) } == [
-            ["Open", "Open in", "Reveal in Finder", "Copy Path"],
-            ["Open", "Open in", "Reveal in Finder", "Copy Path"],
-        ])
+        #expect(
+            scenario.shownMenus.map { TerminalContextMenuFixture.titles(of: $0.menu) } == [
+                ["Open", "Open in", "Reveal in Finder", "Copy Path"],
+                ["Open", "Open in", "Reveal in Finder", "Copy Path"],
+            ])
         #expect(scenario.shownMenus.allSatisfy { $0.view === scenario.tab.terminalView })
         #expect(scenario.openedURLs.isEmpty)
 
@@ -119,14 +125,16 @@ struct TerminalTabLinkOpeningTests {
         defer { fixture.tearDown() }
         let tab = fixture.openTab(engine: .swiftTerm)
         var clickedLinks: [String] = []
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 600, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         defer { window.close() }
-        window.contentView = NSHostingView(rootView: TerminalWorkspaceView(
-            session: tab, isShown: true, isActive: false, onReconnect: nil, onCheckHost: nil, onFocus: {},
-            makeContextMenu: { _ in NSMenu() },
-            onOpenLink: { clickedLinks.append($0) }
-        ))
+        window.contentView = NSHostingView(
+            rootView: TerminalWorkspaceView(
+                session: tab, isShown: true, isActive: false, onReconnect: nil, onCheckHost: nil, onFocus: {},
+                makeContextMenu: { _ in NSMenu() },
+                onOpenLink: { clickedLinks.append($0) }
+            ))
         window.contentView?.layoutSubtreeIfNeeded()
 
         tab.terminalView.onOpenLink?("plan.md:12")

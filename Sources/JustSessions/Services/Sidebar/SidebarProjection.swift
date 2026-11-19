@@ -28,12 +28,14 @@ struct SidebarProjection {
         let listedHostConversations = allConversations.filter {
             listedHosts.contains($0.host) && !removedProjectPaths.contains($0.projectDirectoryKey)
         }
-        conversations = hiddenProviders.isEmpty
+        conversations =
+            hiddenProviders.isEmpty
             ? listedHostConversations
             : listedHostConversations.filter { !hiddenProviders.hides($0.provider) }
         // Every project with sessions is remembered (`rememberSidebarProjects`), so one only hidden CLIs worked in
         // would otherwise stay as an empty project.
-        let projectPathsOnlyHiddenCLIsUse = hiddenProviders.isEmpty
+        let projectPathsOnlyHiddenCLIsUse =
+            hiddenProviders.isEmpty
             ? []
             : Set(listedHostConversations.map(\.projectDirectoryKey)).subtracting(conversations.map(\.projectDirectoryKey))
         projectGroups = ProjectConversationGroup.grouped(

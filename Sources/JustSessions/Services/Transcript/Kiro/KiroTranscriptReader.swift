@@ -21,7 +21,8 @@ struct KiroTranscriptReader {
             return
         }
         guard let data = record["data"] as? [String: Any],
-              let content = data["content"] as? [[String: Any]] else { return }
+            let content = data["content"] as? [[String: Any]]
+        else { return }
         let timestamp = KiroTranscriptTimestamp.date(in: record, data: data)
         switch record["kind"] as? String {
         case "Prompt":
@@ -40,7 +41,8 @@ struct KiroTranscriptReader {
                     builder.append(.assistantMessage, text: part["data"] as? String ?? "", timestamp: timestamp)
                 case "toolUse":
                     guard let tool = part["data"] as? [String: Any] else { continue }
-                    let arguments = (tool["input"] as? [String: Any])
+                    let arguments =
+                        (tool["input"] as? [String: Any])
                         ?? (tool["input"] as? String).flatMap { ConversationMetadata.object(from: Data($0.utf8)) }
                         ?? [:]
                     builder.append(
@@ -49,11 +51,11 @@ struct KiroTranscriptReader {
                         timestamp: timestamp
                     )
                 default:
-                    continue // Thinking and tool outputs stay out of the conversation preview.
+                    continue  // Thinking and tool outputs stay out of the conversation preview.
                 }
             }
         default:
-            return // System context and ToolResults are not visible conversation messages.
+            return  // System context and ToolResults are not visible conversation messages.
         }
     }
 
@@ -65,19 +67,22 @@ struct KiroTranscriptReader {
         switch payload["type"] as? String {
         case "user":
             let images = Array(repeating: "[Image]", count: (payload["images"] as? [Any])?.count ?? 0)
-            builder.append(.userMessage, text: ([payload["content"] as? String ?? ""] + images).joined(separator: "\n\n"),
-                           timestamp: timestamp)
+            builder.append(
+                .userMessage, text: ([payload["content"] as? String ?? ""] + images).joined(separator: "\n\n"),
+                timestamp: timestamp)
         case "assistant":
             guard payload["operationType"] as? String != "Reasoning" else { return }
             builder.append(.assistantMessage, text: payload["content"] as? String ?? "", timestamp: timestamp)
         case "tool_call":
-            let arguments = (payload["args"] as? [String: Any])
+            let arguments =
+                (payload["args"] as? [String: Any])
                 ?? (payload["args"] as? String).flatMap { ConversationMetadata.object(from: Data($0.utf8)) }
                 ?? [:]
             builder.append(
                 .toolCall,
-                text: ToolCallSummary.summary(toolName: payload["toolName"] as? String ?? payload["title"] as? String ?? "Tool",
-                                              arguments: arguments),
+                text: ToolCallSummary.summary(
+                    toolName: payload["toolName"] as? String ?? payload["title"] as? String ?? "Tool",
+                    arguments: arguments),
                 timestamp: timestamp
             )
         default:

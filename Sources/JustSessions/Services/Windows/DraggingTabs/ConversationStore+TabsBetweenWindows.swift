@@ -12,7 +12,8 @@ extension ConversationStore {
         let tabsByID = Dictionary(uniqueKeysWithValues: terminalSessions.map { ($0.id, $0) })
         let tabs = unit.tabs.compactMap { tabsByID[$0.id] }
         let leavingIDs = Set(tabIDs)
-        let tabToSelect = selectedTerminalID.map(leavingIDs.contains) == true
+        let tabToSelect =
+            selectedTerminalID.map(leavingIDs.contains) == true
             ? tabToSelect(afterTakingOut: leavingIDs)
             : selectedTerminalID
         apply(strip)

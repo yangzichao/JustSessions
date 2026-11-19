@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct SessionAttentionReasonTests {
@@ -7,8 +8,9 @@ struct SessionAttentionReasonTests {
     }
 
     @Test func aPromptThatStopsTheCLICallsYouBackWithItsReason() {
-        #expect(SessionAttentionReason.reason(changingFrom: .working, to: .needsInput(reason: "input needed"))
-            == .needsInput(reason: "input needed"))
+        #expect(
+            SessionAttentionReason.reason(changingFrom: .working, to: .needsInput(reason: "input needed"))
+                == .needsInput(reason: "input needed"))
         #expect(SessionAttentionReason.reason(changingFrom: .idle, to: .needsInput(reason: nil)) == .needsInput(reason: nil))
     }
 

@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CodexAdapterTests {
@@ -15,7 +16,8 @@ struct CodexAdapterTests {
         try #"{"type":"session_meta","payload":{"id":"\#(UUID().uuidString)","cwd":"/project"}}"#
             .appending("\n").write(to: target, atomically: true, encoding: .utf8)
         try FileManager.default.createSymbolicLink(at: sessions.appendingPathComponent("rollout-link.jsonl"), withDestinationURL: target)
-        try FileManager.default.createDirectory(at: sessions.appendingPathComponent("rollout-directory.jsonl"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: sessions.appendingPathComponent("rollout-directory.jsonl"), withIntermediateDirectories: true)
         #expect(try CodexAdapter(codexDirectory: root).discover().isEmpty)
         // The reader itself also rejects a pipe, covering replacement after the adapter's regular-file check.
         #expect(CodexRolloutHead(file: pipe) == nil)
@@ -36,7 +38,8 @@ struct CodexAdapterTests {
         let indexLine = "{\"id\":\"\(sessionID)\",\"thread_name\":\"Fix API\",\"updated_at\":\"2026-09-23T10:00:00Z\"}\n"
         try indexLine.write(to: root.appendingPathComponent(".codex/session_index.jsonl"), atomically: true, encoding: .utf8)
         let unindexedRollout = sessions.appendingPathComponent("rollout-2026-09-23T11-00-00-\(unindexedID).jsonl")
-        try "{\"type\":\"session_meta\",\"payload\":{\"id\":\"\(unindexedID)\",\"cwd\":\"\(project.path)\"}}\n{\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"content\":[{\"type\":\"input_text\",\"text\":\"Refactor backend\"}]}}\n"
+        try
+            "{\"type\":\"session_meta\",\"payload\":{\"id\":\"\(unindexedID)\",\"cwd\":\"\(project.path)\"}}\n{\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"content\":[{\"type\":\"input_text\",\"text\":\"Refactor backend\"}]}}\n"
             .write(to: unindexedRollout, atomically: true, encoding: .utf8)
 
         let adapter = CodexAdapter(codexDirectory: root.appendingPathComponent(".codex"))
@@ -56,18 +59,25 @@ struct CodexAdapterTests {
         let parentID = UUID().uuidString.lowercased()
         let spawnedID = UUID().uuidString.lowercased()
         let reviewID = UUID().uuidString.lowercased()
-        let prompt = #"{"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Plan the port"}]}}"#
-        try folder.writeRollout(sessionID: parentID, laterLines: [
-            #"{"type":"turn_context","payload":{"model":"gpt-6-astra","effort":"ultra"}}"#,
-            prompt,
-        ])
-        try folder.writeRollout(named: "rollout-2026-09-24T10-05-00-\(spawnedID).jsonl", lines: [
-            #"{"type":"session_meta","payload":{"id":"\#(spawnedID)","cwd":"/Users/me/app","forked_from_id":"\#(parentID)","source":{"subagent":{"thread_spawn":{"parent_thread_id":"\#(parentID)","depth":1,"agent_path":"/root/decode_plan","agent_nickname":"Bohr","agent_role":null}}}}}"#,
-            prompt,
-        ])
-        try folder.writeRollout(named: "rollout-2026-09-24T10-06-00-\(reviewID).jsonl", lines: [
-            #"{"type":"session_meta","payload":{"id":"\#(reviewID)","cwd":"/Users/me/app","source":{"subagent":"review"}}}"#,
-        ])
+        let prompt =
+            #"{"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Plan the port"}]}}"#
+        try folder.writeRollout(
+            sessionID: parentID,
+            laterLines: [
+                #"{"type":"turn_context","payload":{"model":"gpt-6-astra","effort":"ultra"}}"#,
+                prompt,
+            ])
+        try folder.writeRollout(
+            named: "rollout-2026-09-24T10-05-00-\(spawnedID).jsonl",
+            lines: [
+                #"{"type":"session_meta","payload":{"id":"\#(spawnedID)","cwd":"/Users/me/app","forked_from_id":"\#(parentID)","source":{"subagent":{"thread_spawn":{"parent_thread_id":"\#(parentID)","depth":1,"agent_path":"/root/decode_plan","agent_nickname":"Bohr","agent_role":null}}}}}"#,
+                prompt,
+            ])
+        try folder.writeRollout(
+            named: "rollout-2026-09-24T10-06-00-\(reviewID).jsonl",
+            lines: [
+                #"{"type":"session_meta","payload":{"id":"\#(reviewID)","cwd":"/Users/me/app","source":{"subagent":"review"}}}"#
+            ])
 
         let found = Dictionary(uniqueKeysWithValues: try folder.discover().map { ($0.sessionID, $0) })
 
@@ -86,15 +96,21 @@ struct CodexAdapterTests {
         let listed = UUID().uuidString
         try home.writeRollout(sessionID: listed)
         try home.writeRollout(sessionID: "not-a-uuid")
-        try home.writeRollout(named: "rollout-2026-09-24T10-00-00-\(UUID().uuidString).jsonl", lines: [
-            #"{"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"No meta line first"}]}}"#,
-        ])
-        try home.writeRollout(named: "rollout-2026-09-24T10-00-00-\(UUID().uuidString).jsonl", lines: [
-            #"{"type":"session_meta","payload":{"id":"\#(UUID().uuidString)"}}"#,
-        ])
-        try home.writeRollout(named: "session-\(UUID().uuidString).jsonl", lines: [
-            #"{"type":"session_meta","payload":{"id":"\#(UUID().uuidString)","cwd":"/Users/me/app"}}"#,
-        ])
+        try home.writeRollout(
+            named: "rollout-2026-09-24T10-00-00-\(UUID().uuidString).jsonl",
+            lines: [
+                #"{"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"No meta line first"}]}}"#
+            ])
+        try home.writeRollout(
+            named: "rollout-2026-09-24T10-00-00-\(UUID().uuidString).jsonl",
+            lines: [
+                #"{"type":"session_meta","payload":{"id":"\#(UUID().uuidString)"}}"#
+            ])
+        try home.writeRollout(
+            named: "session-\(UUID().uuidString).jsonl",
+            lines: [
+                #"{"type":"session_meta","payload":{"id":"\#(UUID().uuidString)","cwd":"/Users/me/app"}}"#
+            ])
 
         #expect(try home.discover().map(\.sessionID) == [listed])
     }
@@ -126,9 +142,11 @@ struct CodexAdapterTests {
         try home.writeRollout(sessionID: sessionID)
         #expect(try home.discover().first?.suggestedTitle == ConversationMetadata.untitledConversationTitle)
 
-        try home.writeRollout(sessionID: sessionID, laterLines: [
-            #"{"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Refactor backend"}]}}"#,
-        ])
+        try home.writeRollout(
+            sessionID: sessionID,
+            laterLines: [
+                #"{"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Refactor backend"}]}}"#
+            ])
 
         #expect(try home.discover().first?.suggestedTitle == "Refactor backend")
     }

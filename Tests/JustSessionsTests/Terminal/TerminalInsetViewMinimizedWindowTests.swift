@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A terminal in a minimized window batches its output and stops drawing, as a hidden tab does, and picks up again
@@ -46,7 +47,9 @@ struct TerminalInsetViewMinimizedWindowTests {
         _ = NSApplication.shared
         let (first, insetView, terminal) = makeWindow()
         defer { first.close() }
-        let second = NSWindow(contentRect: NSRect(x: 300, y: 300, width: 400, height: 300), styleMask: [.titled, .miniaturizable], backing: .buffered, defer: false)
+        let second = NSWindow(
+            contentRect: NSRect(x: 300, y: 300, width: 400, height: 300), styleMask: [.titled, .miniaturizable], backing: .buffered,
+            defer: false)
         second.isReleasedWhenClosed = false
         second.orderFrontRegardless()
         defer { second.close() }

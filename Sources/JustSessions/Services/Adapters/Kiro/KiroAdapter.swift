@@ -23,18 +23,20 @@ struct KiroAdapter: ConversationAdapter {
     init(sessionsDirectory: URL? = nil, v3SessionsDirectory: URL? = nil, deletionExecutableURL: URL? = nil) {
         let standard = KiroAdapter.standardSessionsDirectory()
         self.sessionsDirectory = sessionsDirectory ?? standard
-        self.v3SessionsDirectory = v3SessionsDirectory
+        self.v3SessionsDirectory =
+            v3SessionsDirectory
             ?? (sessionsDirectory == nil ? KiroV3Session.sessionsRoot(besideClassicDirectory: standard) : nil)
         self.deletionExecutableURL = deletionExecutableURL
     }
 
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         try cancellation.checkCancellation()
-        let files = (try? FileManager.default.contentsOfDirectory(
-            at: sessionsDirectory,
-            includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey],
-            options: [.skipsHiddenFiles]
-        )) ?? []
+        let files =
+            (try? FileManager.default.contentsOfDirectory(
+                at: sessionsDirectory,
+                includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey],
+                options: [.skipsHiddenFiles]
+            )) ?? []
         var conversations = files.filter { $0.pathExtension == "json" }.compactMap {
             cancellation.isCancelled ? nil : conversation(describedBy: $0)
         }
@@ -66,14 +68,17 @@ struct KiroAdapter: ConversationAdapter {
     private func v3Conversations(cancellation: ConversationDiscoveryCancellation) -> [Conversation] {
         let fileManager = FileManager.default
         guard let v3SessionsDirectory,
-              let workspaces = try? fileManager.contentsOfDirectory(
+            let workspaces = try? fileManager.contentsOfDirectory(
                 at: v3SessionsDirectory, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]
-              ) else { return [] }
+            )
+        else { return [] }
         var conversations: [Conversation] = []
         for workspace in workspaces where workspace.lastPathComponent != sessionsDirectory.lastPathComponent {
-            guard let folders = try? fileManager.contentsOfDirectory(
-                at: workspace, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]
-            ) else { continue }
+            guard
+                let folders = try? fileManager.contentsOfDirectory(
+                    at: workspace, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]
+                )
+            else { continue }
             for folder in folders where KiroV3Session.isSessionID(folder.lastPathComponent) {
                 guard !cancellation.isCancelled else { return conversations }
                 if let conversation = v3Conversation(in: folder) { conversations.append(conversation) }
@@ -87,10 +92,11 @@ struct KiroAdapter: ConversationAdapter {
     private func v3Conversation(in folder: URL) -> Conversation? {
         let messagesFile = folder.appendingPathComponent(KiroV3Session.messagesFileName)
         guard let messagesSize = (try? messagesFile.resourceValues(forKeys: [.fileSizeKey]))?.fileSize, messagesSize > 0,
-              let metadata = KiroV3SessionMetadata(file: folder.appendingPathComponent(KiroV3Session.metadataFileName)),
-              metadata.sessionID == folder.lastPathComponent,
-              !metadata.isSubagentSession,
-              metadata.projectPath.hasPrefix("/") else { return nil }
+            let metadata = KiroV3SessionMetadata(file: folder.appendingPathComponent(KiroV3Session.metadataFileName)),
+            metadata.sessionID == folder.lastPathComponent,
+            !metadata.isSubagentSession,
+            metadata.projectPath.hasPrefix("/")
+        else { return nil }
         return Conversation(
             provider: provider,
             sessionID: metadata.sessionID,
@@ -110,11 +116,12 @@ struct KiroAdapter: ConversationAdapter {
     private func conversation(describedBy metadataFile: URL) -> Conversation? {
         let messagesFile = metadataFile.deletingPathExtension().appendingPathExtension("jsonl")
         guard let messagesSize = (try? messagesFile.resourceValues(forKeys: [.fileSizeKey]))?.fileSize, messagesSize > 0,
-              let metadata = KiroSessionMetadata(file: metadataFile),
-              metadata.parentSessionID == nil,
-              provider.isValidSessionID(metadata.sessionID),
-              metadataFile.lastPathComponent == "\(metadata.sessionID).json",
-              metadata.projectPath.hasPrefix("/") else { return nil }
+            let metadata = KiroSessionMetadata(file: metadataFile),
+            metadata.parentSessionID == nil,
+            provider.isValidSessionID(metadata.sessionID),
+            metadataFile.lastPathComponent == "\(metadata.sessionID).json",
+            metadata.projectPath.hasPrefix("/")
+        else { return nil }
         let title = ConversationMetadata.cleanTitle(
             metadata.title.flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
                 ?? KiroFirstPrompt.find(in: messagesFile),

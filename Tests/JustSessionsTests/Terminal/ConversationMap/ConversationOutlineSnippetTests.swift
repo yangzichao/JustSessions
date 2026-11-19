@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A reply's outline snippet skips the Markdown parse for a head Markdown leaves as it is (PERF-90), and must still be
@@ -24,27 +25,34 @@ struct ConversationOutlineSnippetTests {
             while text.count < length { text += Self.tokens.randomElement(using: &generator)! }
             let head = String(text.prefix(ConversationOutlineBuilder.snippetSourceLength))
             let entry = TranscriptEntry(id: 0, content: .assistantMessage(text), timestamp: nil, startsTurn: false)
-            let parsed = MessageBookmarkNavigation.snippet(of: TranscriptEntry(id: 0, content: .assistantMessage(head), timestamp: nil, startsTurn: false))
+            let parsed = MessageBookmarkNavigation.snippet(
+                of: TranscriptEntry(id: 0, content: .assistantMessage(head), timestamp: nil, startsTurn: false))
             #expect(ConversationOutlineBuilder.snippet(of: entry) == parsed, "\(head.debugDescription)")
-            if ConversationOutlineBuilder.isMarkdownInert(head), !MessageBookmarkNavigation.collapsedHead(of: [head]).isCut { skippedParseCount += 1 }
+            if ConversationOutlineBuilder.isMarkdownInert(head), !MessageBookmarkNavigation.collapsedHead(of: [head]).isCut {
+                skippedParseCount += 1
+            }
         }
         // The parse was skipped often enough for the comparison above to mean something.
         #expect(skippedParseCount > 200, "\(skippedParseCount)")
         // The cut ends the head's words; its paragraphs, without the blank lines, reach the reply's last words.
         let spaced = "Start" + String(repeating: "\n", count: 330) + "end of the reply"
         #expect(ConversationOutlineBuilder.isMarkdownInert(spaced))
-        #expect(ConversationOutlineBuilder.snippet(of: TranscriptEntry(id: 0, content: .assistantMessage(spaced), timestamp: nil, startsTurn: false))
-            == "Start end of the reply")
+        #expect(
+            ConversationOutlineBuilder.snippet(
+                of: TranscriptEntry(id: 0, content: .assistantMessage(spaced), timestamp: nil, startsTurn: false))
+                == "Start end of the reply")
     }
 
     @Test func markdownIsNeverInert() {
         let inert = ConversationOutlineBuilder.isMarkdownInert
         #expect(inert("Fixed. Café ☕️ the build passes, 3 of 4 tests ran (x = 1 + 2) at 10:30 - see www.example.com.\n\nNext line"))
         #expect(inert("Trailing spaces  \n   three leading spaces"))
-        for markdown in ["**bold**", "`code`", "_under_", "[link](x)", "<b>", "&amp;", "a\\b", "~~gone~~", "| a | b |", "![image](x)",
-                         "# Heading", "> quote", "- item", "+ item", "1. first", "Title\n===", "Title\n---", "Fixed it\n:-:\nsee above",
-                         "Done\n   :--", "    code", "\tcode",
-                         "a\r\nb", "a\u{0}b", " \u{301}x", "\u{600} \nb", "\u{FEFF}text"] {
+        for markdown in [
+            "**bold**", "`code`", "_under_", "[link](x)", "<b>", "&amp;", "a\\b", "~~gone~~", "| a | b |", "![image](x)",
+            "# Heading", "> quote", "- item", "+ item", "1. first", "Title\n===", "Title\n---", "Fixed it\n:-:\nsee above",
+            "Done\n   :--", "    code", "\tcode",
+            "a\r\nb", "a\u{0}b", " \u{301}x", "\u{600} \nb", "\u{FEFF}text",
+        ] {
             #expect(!inert(markdown), "\(markdown.debugDescription)")
         }
     }

@@ -19,7 +19,9 @@ struct SeveralTabsCloseConfirmation: ViewModifier {
                 Button("Cancel", role: .cancel) { self.request = nil }
             } message: { request in
                 if case .keepOrEndCLIs(alsoStopsOthers: true) = request.question {
-                    Text("Keep running leaves their CLIs running in tmux; click a session to reattach. End sessions stops them. The other tabs' CLIs and shells stop either way.")
+                    Text(
+                        "Keep running leaves their CLIs running in tmux; click a session to reattach. End sessions stops them. The other tabs' CLIs and shells stop either way."
+                    )
                 } else {
                     Text("Keep running leaves their CLIs running in tmux; click a session to reattach. End sessions stops them.")
                 }

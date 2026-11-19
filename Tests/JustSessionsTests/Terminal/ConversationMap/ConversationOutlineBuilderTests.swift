@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The conversation map's blocks (TAB-10): the reader's message IDs, tool runs merged whatever the page size, and line
@@ -77,7 +78,8 @@ struct ConversationOutlineBuilderTests {
     }
 
     @Test func aReplySnippetIsItsBookmarkSnippet() throws {
-        let text = "Here is **the fix**, in `Parser.swift`:\n\n- read the [file](https://example.com)\n- change `parse()` so it keeps Café ☕️"
+        let text =
+            "Here is **the fix**, in `Parser.swift`:\n\n- read the [file](https://example.com)\n- change `parse()` so it keeps Café ☕️"
         let entry = Self.entry(1, .assistantMessage(text))
         var builder = ConversationOutlineBuilder()
         builder.append([entry])
@@ -136,7 +138,8 @@ struct ConversationOutlineBuilderTests {
     }
 
     private static func block(record: Int, part: Int, lastRecord: Int, kind: Block.Kind, snippet: String = "") -> Block {
-        Block(entryID: TranscriptPageIdentity.entryID(record: record, part: part), lastRecord: lastRecord, kind: kind,
-              timestamp: nil, snippet: snippet, lineWidths: [1], toolCallCount: kind == .toolRun ? 1 : 0)
+        Block(
+            entryID: TranscriptPageIdentity.entryID(record: record, part: part), lastRecord: lastRecord, kind: kind,
+            timestamp: nil, snippet: snippet, lineWidths: [1], toolCallCount: kind == .toolRun ? 1 : 0)
     }
 }

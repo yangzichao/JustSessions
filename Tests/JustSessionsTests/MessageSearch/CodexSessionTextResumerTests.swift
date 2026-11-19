@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A Codex session read after an append resumes from its saved final page, and must give exactly the text a clean
@@ -84,17 +85,19 @@ struct CodexSessionTextResumerTests {
     }
 
     @Test func repeatedSmallAppendsResumeAndEqualACleanRead() async throws {
-        let session = try Session((0..<9).map { $0.isMultiple(of: 3) ? Self.user("Ask \($0) Café 中文") : Self.assistant("Reply \($0) **bold** 👋") })
+        let session = try Session(
+            (0..<9).map { $0.isMultiple(of: 3) ? Self.user("Ask \($0) Café 中文") : Self.assistant("Reply \($0) **bold** 👋") })
         defer { session.remove() }
         var saved = try await savedRead(of: session, limits: Self.smallPages)
 
         for number in 9..<30 {
-            let line = switch number % 4 {
-            case 0: Self.user("Ask \(number) naïve")
-            case 1: Self.event()
-            case 2: Self.toolCall("patch \(number)")
-            default: Self.assistant("Reply \(number) 中文 🧪")
-            }
+            let line =
+                switch number % 4 {
+                case 0: Self.user("Ask \(number) naïve")
+                case 1: Self.event()
+                case 2: Self.toolCall("patch \(number)")
+                default: Self.assistant("Reply \(number) 中文 🧪")
+                }
             try session.append(lines: [line])
             let (read, next) = try await expectCleanReadText(session, resuming: saved, limits: Self.smallPages, resumes: true)
             #expect(read.decodedRecordCount <= Self.smallPages.maximumRecordCount * 2)
@@ -188,9 +191,10 @@ struct CodexSessionTextResumerTests {
         defer { session.remove() }
         let saved = try await savedRead(of: session, limits: SessionMessageTextReader.codexWholeSessionLimits)
 
-        try session.rewrite(SampleTranscriptLines.fileContents([
-            Self.assistant("Amended!"), Self.assistant("Kept"), Self.event(), Self.assistant("After"),
-        ]))
+        try session.rewrite(
+            SampleTranscriptLines.fileContents([
+                Self.assistant("Amended!"), Self.assistant("Kept"), Self.event(), Self.assistant("After"),
+            ]))
         let (read, _) = try await expectCleanReadText(
             session, resuming: saved, limits: SessionMessageTextReader.codexWholeSessionLimits, resumes: false
         )
@@ -239,7 +243,8 @@ struct CodexSessionTextResumerTests {
         defer { session.remove() }
         let saved = try await savedRead(of: session, limits: Self.smallPages)
 
-        try SampleTranscriptLines.fileContents([Self.assistant("Original"), Self.assistant("Grown")]).write(to: session.file, options: .atomic)
+        try SampleTranscriptLines.fileContents([Self.assistant("Original"), Self.assistant("Grown")]).write(
+            to: session.file, options: .atomic)
         let (read, _) = try await expectCleanReadText(session, resuming: saved, limits: Self.smallPages, resumes: false)
         #expect(read.text.entries.flatMap(\.segments) == ["Original", "Grown"])
     }

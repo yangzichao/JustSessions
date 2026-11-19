@@ -33,8 +33,9 @@ struct OpenTabMultiSelection: Equatable {
     /// `orderedTabIDs` holds the rows in sight, so a range skips the tabs of collapsed groups.
     mutating func selectRange(to tabID: UUID, in orderedTabIDs: [UUID]) {
         guard let anchorTabID,
-              let anchorIndex = orderedTabIDs.firstIndex(of: anchorTabID),
-              let targetIndex = orderedTabIDs.firstIndex(of: tabID) else {
+            let anchorIndex = orderedTabIDs.firstIndex(of: anchorTabID),
+            let targetIndex = orderedTabIDs.firstIndex(of: tabID)
+        else {
             selectedTabIDs = [tabID]
             anchorTabID = tabID
             return

@@ -14,7 +14,8 @@ struct NewSessionFileFinder: Sendable {
         var processIDsOfTabsNeedingOpenFiles: [UUID: [Int32]] = [:]
         for tab in tabs {
             if let preassignedSessionID = tab.preassignedSessionID,
-               let transcript = claudeTranscripts.transcriptFile(forSessionID: preassignedSessionID) {
+                let transcript = claudeTranscripts.transcriptFile(forSessionID: preassignedSessionID)
+            {
                 sessionFiles[tab.terminalID] = Self.sessionFile(preassignedSessionID, at: transcript)
                 continue
             }
@@ -25,8 +26,9 @@ struct NewSessionFileFinder: Sendable {
                 // For tabs launched without a preassigned id: before the `--help` check finished, or on an
                 // install without the flag.
                 if let record = claudeRegistry.firstRecord(amongProcessIDs: processIDs),
-                   tab.couldBeOwnSession(record.sessionID),
-                   let transcript = claudeTranscripts.transcriptFile(forSessionID: record.sessionID) {
+                    tab.couldBeOwnSession(record.sessionID),
+                    let transcript = claudeTranscripts.transcriptFile(forSessionID: record.sessionID)
+                {
                     sessionFiles[tab.terminalID] = Self.sessionFile(record.sessionID, at: transcript)
                 }
             case .codex, .antigravity:
@@ -48,7 +50,8 @@ struct NewSessionFileFinder: Sendable {
                 .flatMap { openFilePaths[$0] ?? [] }
                 .compactMap { path -> NewSessionFile? in
                     guard let sessionID = OpenSessionFileName.sessionID(inOpenFilePath: path, provider: tab.provider),
-                          tab.couldBeOwnSession(sessionID) else { return nil }
+                        tab.couldBeOwnSession(sessionID)
+                    else { return nil }
                     return Self.sessionFile(sessionID, at: URL(fileURLWithPath: path))
                 }
                 .first

@@ -2,6 +2,7 @@ import AppKit
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Measures the CPU a selected terminal tab costs while its window is in sight, covered by another window, or minimized,
@@ -35,7 +36,9 @@ struct TerminalWindowVisibilityMeasurements {
             }
             let median = String(format: "%.2f", percentages.sorted()[percentages.count / 2])
             let runs = percentages.map { String(format: "%.2f", $0) }.joined(separator: ", ")
-            print("TerminalWindowPerf | \(state.rawValue) | CPU percent of one core median=\(median) | runs=\(runs) | observed: \(observedStates.sorted().joined(separator: "; "))")
+            print(
+                "TerminalWindowPerf | \(state.rawValue) | CPU percent of one core median=\(median) | runs=\(runs) | observed: \(observedStates.sorted().joined(separator: "; "))"
+            )
         }
     }
 

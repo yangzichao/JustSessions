@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct RemoteHostInputTests {
@@ -18,14 +19,15 @@ struct RemoteHostInputTests {
         #expect(RemoteHostInput(typed) == .destination(destination))
     }
 
-    @Test(arguments: [
-        ("devbox:2222", nil, "devbox", 2222),
-        ("me@10.0.0.5:2200", "me", "10.0.0.5", 2200),
-        ("ssh -p 2222 me@10.0.0.5", "me", "10.0.0.5", 2222),
-        ("ssh -p2222 devbox", nil, "devbox", 2222),
-        ("ssh devbox -p 2222", nil, "devbox", 2222),
-        ("ssh://me@devbox:2222", "me", "devbox", 2222),
-    ] as [(String, String?, String, Int)])
+    @Test(
+        arguments: [
+            ("devbox:2222", nil, "devbox", 2222),
+            ("me@10.0.0.5:2200", "me", "10.0.0.5", 2200),
+            ("ssh -p 2222 me@10.0.0.5", "me", "10.0.0.5", 2222),
+            ("ssh -p2222 devbox", nil, "devbox", 2222),
+            ("ssh devbox -p 2222", nil, "devbox", 2222),
+            ("ssh://me@devbox:2222", "me", "devbox", 2222),
+        ] as [(String, String?, String, Int)])
     func aPortIsShownHowToPutInTheConfig(typed: String, user: String?, hostName: String, port: Int) {
         #expect(RemoteHostInput(typed) == .needsPortInConfig(user: user, hostName: hostName, port: port))
     }
@@ -56,11 +58,12 @@ struct RemoteHostInputTests {
     }
 
     @Test func theConfigLinesGiveTheHostItsPortAndUser() {
-        #expect(RemoteHostInput.configLines(user: "me", hostName: "10.0.0.5", port: 2222) == """
-            Host 10.0.0.5
-              Port 2222
-              User me
-            """)
+        #expect(
+            RemoteHostInput.configLines(user: "me", hostName: "10.0.0.5", port: 2222) == """
+                Host 10.0.0.5
+                  Port 2222
+                  User me
+                """)
         #expect(RemoteHostInput.configLines(user: nil, hostName: "devbox", port: 2222) == "Host devbox\n  Port 2222")
     }
 }

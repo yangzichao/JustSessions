@@ -67,7 +67,9 @@ struct SidebarHeader: View {
     }
 
     private var searchButton: some View {
-        Button { isSearchOpen = true } label: {
+        Button {
+            isSearchOpen = true
+        } label: {
             Image(systemName: "magnifyingglass")
                 .frame(width: InterfaceScale.points(24), height: InterfaceScale.points(24))
                 .contentShape(Rectangle())

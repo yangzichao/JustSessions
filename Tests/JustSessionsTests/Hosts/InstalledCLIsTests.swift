@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -50,8 +51,9 @@ struct InstalledCLIsTests {
     }
 
     @Test func noCLIMessageNamesEveryToolThatRunsOnTheHost() {
-        #expect(NewSessionProviderAvailability.noCLIFoundMessage(on: .ssh("devbox"))
-            == "No supported CLI found on devbox. Install claude, codex, agy, kiro-cli, opencode, or pi there, then refresh.")
+        #expect(
+            NewSessionProviderAvailability.noCLIFoundMessage(on: .ssh("devbox"))
+                == "No supported CLI found on devbox. Install claude, codex, agy, kiro-cli, opencode, or pi there, then refresh.")
         #expect(NewSessionProviderAvailability.noCLIFoundMessage(on: .thisMac).contains("kiro-cli"))
     }
 }

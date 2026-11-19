@@ -44,7 +44,8 @@ struct TranscriptBuilder {
     mutating func append(_ kind: EntryKind, text: String, timestamp: Date?) {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else { return }
-        let limitedText = trimmedText.count > maximumTextLength
+        let limitedText =
+            trimmedText.count > maximumTextLength
             ? String(trimmedText.prefix(maximumTextLength)) + "\n…"
             : trimmedText
 
@@ -57,7 +58,8 @@ struct TranscriptBuilder {
             pendingEntries.append(PendingEntry(content: .note(limitedText), timestamp: timestamp))
         case .toolCall:
             if let lastIndex = pendingEntries.indices.last,
-               case .toolCalls(let summaries) = pendingEntries[lastIndex].content {
+                case .toolCalls(let summaries) = pendingEntries[lastIndex].content
+            {
                 pendingEntries[lastIndex].content = .toolCalls(summaries + [limitedText])
             } else {
                 pendingEntries.append(PendingEntry(content: .toolCalls([limitedText]), timestamp: timestamp))
@@ -87,12 +89,13 @@ struct TranscriptBuilder {
         var previousSpeaker: Speaker?
         for (offset, pendingEntry) in pendingEntries.dropFirst(omittedEntryCount).enumerated() {
             let speaker = Speaker(pendingEntry.content)
-            entries.append(TranscriptEntry(
-                id: offset,
-                content: pendingEntry.content,
-                timestamp: pendingEntry.timestamp,
-                startsTurn: speaker != nil && speaker != previousSpeaker
-            ))
+            entries.append(
+                TranscriptEntry(
+                    id: offset,
+                    content: pendingEntry.content,
+                    timestamp: pendingEntry.timestamp,
+                    startsTurn: speaker != nil && speaker != previousSpeaker
+                ))
             previousSpeaker = speaker
         }
         return TranscriptContent(entries: entries, omittedEntryCount: omittedEntryCount)

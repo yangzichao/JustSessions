@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -10,8 +11,9 @@ struct TranscriptReadingWidthLayoutTests {
     @Test func readableWidthKeepsAWideWindowsColumnCentered() async throws {
         let fixture = try TranscriptScrollViewFixture(width: wideWindowWidth)
         defer { fixture.close() }
-        let scrollView = try await fixture.show(TranscriptScrollViewFixture.conversation("readable-width"),
-                                                transcript: TranscriptScrollViewFixture.transcript(count: 4))
+        let scrollView = try await fixture.show(
+            TranscriptScrollViewFixture.conversation("readable-width"),
+            transcript: TranscriptScrollViewFixture.transcript(count: 4))
         try await waitForEntryFrames(in: scrollView, of: fixture) { frame, visibleWidth in
             abs(frame.width - TranscriptReadingWidth.readableColumnWidth) < 1 && abs(frame.midX - visibleWidth / 2) < 1
         }
@@ -30,8 +32,9 @@ struct TranscriptReadingWidthLayoutTests {
         let fixture = try TranscriptScrollViewFixture(width: wideWindowWidth)
         defer { fixture.close() }
         fixture.settings.userDefaults.set(TranscriptReadingWidth.full.rawValue, forKey: TranscriptReadingWidth.userDefaultsKey)
-        let scrollView = try await fixture.show(TranscriptScrollViewFixture.conversation("full-width"),
-                                                transcript: TranscriptScrollViewFixture.transcript(count: 4))
+        let scrollView = try await fixture.show(
+            TranscriptScrollViewFixture.conversation("full-width"),
+            transcript: TranscriptScrollViewFixture.transcript(count: 4))
         try await waitForEntryFrames(in: scrollView, of: fixture) { frame, visibleWidth in
             abs(frame.width - (visibleWidth - 2 * readingPadding)) < 1 && abs(frame.minX - readingPadding) < 1
         }

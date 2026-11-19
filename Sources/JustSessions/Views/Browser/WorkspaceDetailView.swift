@@ -140,8 +140,8 @@ struct WorkspaceDetailView: View {
                             orientation: orientation,
                             onReverse: reverseShownSplitView
                         )
-                            .frame(width: resizeAreaFrame.width, height: resizeAreaFrame.height)
-                            .offset(x: resizeAreaFrame.minX, y: resizeAreaFrame.minY)
+                        .frame(width: resizeAreaFrame.width, height: resizeAreaFrame.height)
+                        .offset(x: resizeAreaFrame.minX, y: resizeAreaFrame.minY)
                     }
 
                     TerminalSplitDropHighlight(
@@ -164,10 +164,12 @@ struct WorkspaceDetailView: View {
         .background(TerminalFindShortcuts(selectedTabFind: store.selectedTerminal?.findState, onFind: findInSelectedTab))
         // ⌘D, ⌘', and ⇧⌘' in the selected tab (TRM-74). The preview's reporter is active only while no tab is selected
         // (SessionPreviewPane), so one window never has two.
-        .background(TranscriptBookmarkTargetReporter(
-            target: TerminalTabBookmarks(store: store).commandTarget,
-            isActive: store.selectedTerminalID != nil && !store.selectsShownSplitChooser
-        ))
+        .background(
+            TranscriptBookmarkTargetReporter(
+                target: TerminalTabBookmarks(store: store).commandTarget,
+                isActive: store.selectedTerminalID != nil && !store.selectsShownSplitChooser
+            )
+        )
         .onChange(of: store.terminalSplits.map(\.id) + store.terminalSplitChoosers.map(\.id)) { _, splitViewIDs in
             // Forget the pane widths of splits and split choosers that are gone.
             splitFractions = splitFractions.filter { splitViewIDs.contains($0.key) }
@@ -234,9 +236,9 @@ struct WorkspaceDetailView: View {
     }
 }
 
-private extension View {
+extension View {
     /// Hides the view from sight, clicks, and VoiceOver while leaving it in the view tree.
-    func shown(_ isShown: Bool) -> some View {
+    fileprivate func shown(_ isShown: Bool) -> some View {
         opacity(isShown ? 1 : 0)
             .allowsHitTesting(isShown)
             .accessibilityHidden(!isShown)

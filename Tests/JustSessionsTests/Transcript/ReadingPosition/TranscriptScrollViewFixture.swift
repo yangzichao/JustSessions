@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -16,7 +17,8 @@ final class TranscriptScrollViewFixture {
         _ = NSApplication.shared
         settings = try IsolatedUserDefaults()
         hostingView = NSHostingView(rootView: AnyView(EmptyView()))
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: width, height: height), styleMask: [.borderless], backing: .buffered, defer: false)
+        window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: width, height: height), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
     }
@@ -26,10 +28,11 @@ final class TranscriptScrollViewFixture {
         isActive: Bool = true, searchState: TranscriptSearchState = TranscriptSearchState(),
         store: ConversationStore? = nil, bookmarkState: TranscriptBookmarkState = TranscriptBookmarkState()
     ) async throws -> NSScrollView {
-        hostingView.rootView = AnyView(TranscriptPagingTestReader(
-            conversation: conversation, transcript: transcript, positionStore: positionStore, paging: paging,
-            isActive: isActive, searchState: searchState, store: store, bookmarkState: bookmarkState
-        ).id(conversation.id).defaultAppStorage(settings.userDefaults))
+        hostingView.rootView = AnyView(
+            TranscriptPagingTestReader(
+                conversation: conversation, transcript: transcript, positionStore: positionStore, paging: paging,
+                isActive: isActive, searchState: searchState, store: store, bookmarkState: bookmarkState
+            ).id(conversation.id).defaultAppStorage(settings.userDefaults))
         try await settleLayout()
         return try #require(descendant(ofType: NSScrollView.self, in: hostingView))
     }
@@ -40,10 +43,11 @@ final class TranscriptScrollViewFixture {
         _ conversation: Conversation, matchReveal: TranscriptMatchReveal? = nil, store: ConversationStore? = nil,
         readingRequests: SessionReadingRequests? = nil
     ) {
-        hostingView.rootView = AnyView(TranscriptView(
-            conversation: conversation, readingPositionStore: positionStore, matchReveal: matchReveal,
-            readingRequests: readingRequests, store: store
-        ).defaultAppStorage(settings.userDefaults))
+        hostingView.rootView = AnyView(
+            TranscriptView(
+                conversation: conversation, readingPositionStore: positionStore, matchReveal: matchReveal,
+                readingRequests: readingRequests, store: store
+            ).defaultAppStorage(settings.userDefaults))
     }
 
     /// The reader's scroll view, once its first page has loaded.
@@ -157,12 +161,14 @@ final class TranscriptScrollViewFixture {
     }
 
     func expectedPositionForSelectedSearchMatch(in scrollView: NSScrollView, entryIndex: Int) -> TranscriptReadingPosition? {
-        guard let textView = descendants(ofType: TranscriptTextView.self, in: hostingView)
-            .first(where: { $0.selectedSearchRange != nil }),
-              let range = textView.selectedSearchRange, let textContainer = textView.textContainer,
-              let layoutManager = textView.layoutManager,
-              let entryFrame = descendant(ofType: TranscriptEntryGeometryView.self, in: hostingView)?
-                .controller.entryFrameInClipView(at: entryIndex) else { return nil }
+        guard
+            let textView = descendants(ofType: TranscriptTextView.self, in: hostingView)
+                .first(where: { $0.selectedSearchRange != nil }),
+            let range = textView.selectedSearchRange, let textContainer = textView.textContainer,
+            let layoutManager = textView.layoutManager,
+            let entryFrame = descendant(ofType: TranscriptEntryGeometryView.self, in: hostingView)?
+                .controller.entryFrameInClipView(at: entryIndex)
+        else { return nil }
         layoutManager.ensureLayout(for: textContainer)
         let glyphRange = layoutManager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
         var matchRect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
@@ -173,23 +179,28 @@ final class TranscriptScrollViewFixture {
     }
 
     static func conversation(_ sessionID: String) -> Conversation {
-        Conversation(provider: .codex, sessionID: sessionID, projectPath: "/tmp/reading-position", suggestedTitle: sessionID,
-                     updatedAt: .now, sourceFile: URL(fileURLWithPath: "/tmp/\(sessionID).jsonl"))
+        Conversation(
+            provider: .codex, sessionID: sessionID, projectPath: "/tmp/reading-position", suggestedTitle: sessionID,
+            updatedAt: .now, sourceFile: URL(fileURLWithPath: "/tmp/\(sessionID).jsonl"))
     }
 
     static func transcript(count: Int = 120, omittedEntryCount: Int = 0) -> TranscriptContent {
-        TranscriptContent(entries: (0..<count).map { index in
-            let text = (0..<(12 + index % 5)).map { "Message \(index + omittedEntryCount), line \($0): keep this reading position." }.joined(separator: "\n")
-            return TranscriptEntry(id: index, content: .assistantMessage(text), timestamp: nil, startsTurn: true)
-        }, omittedEntryCount: omittedEntryCount)
+        TranscriptContent(
+            entries: (0..<count).map { index in
+                let text = (0..<(12 + index % 5)).map { "Message \(index + omittedEntryCount), line \($0): keep this reading position." }
+                    .joined(separator: "\n")
+                return TranscriptEntry(id: index, content: .assistantMessage(text), timestamp: nil, startsTurn: true)
+            }, omittedEntryCount: omittedEntryCount)
     }
 
     /// A transcript as a paged reader shows it: each entry's ID is its record's (`TranscriptPageIdentity`), and positions
     /// use those IDs.
     static func pagedTranscript(_ contents: [TranscriptEntry.Content]) -> TranscriptContent {
-        TranscriptContent(entries: contents.indices.map { index in
-            TranscriptEntry(id: TranscriptPageIdentity.entryID(record: index, part: 0), content: contents[index], timestamp: nil, startsTurn: true)
-        }, omittedEntryCount: 0, usesEntryIDsForPositions: true)
+        TranscriptContent(
+            entries: contents.indices.map { index in
+                TranscriptEntry(
+                    id: TranscriptPageIdentity.entryID(record: index, part: 0), content: contents[index], timestamp: nil, startsTurn: true)
+            }, omittedEntryCount: 0, usesEntryIDsForPositions: true)
     }
 
     /// How many presses and searches have the enhanced user interface on, across fixtures, and its value before the first.
@@ -199,9 +210,11 @@ final class TranscriptScrollViewFixture {
     /// Turns on the setting an assistive app turns on; see `pressButton(labeled:)`.
     private func turnOnEnhancedUserInterface() {
         if Self.enhancedUserInterfaceUsers == 0 {
-            Self.enhancedUserInterfaceBeforeUse = NSApp.perform(NSSelectorFromString("accessibilityAttributeValue:"), with: Self.enhancedUserInterface)?
+            Self.enhancedUserInterfaceBeforeUse =
+                NSApp.perform(NSSelectorFromString("accessibilityAttributeValue:"), with: Self.enhancedUserInterface)?
                 .takeUnretainedValue() as? NSNumber
-            NSApp.perform(NSSelectorFromString("accessibilitySetValue:forAttribute:"), with: NSNumber(value: true), with: Self.enhancedUserInterface)
+            NSApp.perform(
+                NSSelectorFromString("accessibilitySetValue:forAttribute:"), with: NSNumber(value: true), with: Self.enhancedUserInterface)
         }
         Self.enhancedUserInterfaceUsers += 1
     }
@@ -210,8 +223,10 @@ final class TranscriptScrollViewFixture {
     private func restoreEnhancedUserInterface() {
         Self.enhancedUserInterfaceUsers -= 1
         guard Self.enhancedUserInterfaceUsers == 0 else { return }
-        NSApp.perform(NSSelectorFromString("accessibilitySetValue:forAttribute:"), with: Self.enhancedUserInterfaceBeforeUse ?? NSNumber(value: false),
-                      with: Self.enhancedUserInterface)
+        NSApp.perform(
+            NSSelectorFromString("accessibilitySetValue:forAttribute:"),
+            with: Self.enhancedUserInterfaceBeforeUse ?? NSNumber(value: false),
+            with: Self.enhancedUserInterface)
     }
 
     private static let enhancedUserInterface = "AXEnhancedUserInterface" as NSString
@@ -265,8 +280,9 @@ private struct TranscriptPagingTestReader: View {
     let bookmarkState: TranscriptBookmarkState
 
     var body: some View {
-        TranscriptScrollView(conversation: conversation, transcript: paging?.transcript ?? transcript,
-                             positionStore: positionStore, isActive: isActive, searchState: searchState, paging: paging,
-                             store: store, bookmarkState: bookmarkState)
+        TranscriptScrollView(
+            conversation: conversation, transcript: paging?.transcript ?? transcript,
+            positionStore: positionStore, isActive: isActive, searchState: searchState, paging: paging,
+            store: store, bookmarkState: bookmarkState)
     }
 }

@@ -21,7 +21,8 @@ struct TerminalFindMatchCount: Equatable {
         let exceedsCountLimit = total >= Self.countLimit
         self.total = total
         self.exceedsCountLimit = exceedsCountLimit
-        selectedNumber = !exceedsCountLimit && selectedIndexFromOldest >= 1 && selectedIndexFromOldest <= total
+        selectedNumber =
+            !exceedsCountLimit && selectedIndexFromOldest >= 1 && selectedIndexFromOldest <= total
             ? total - selectedIndexFromOldest + 1
             : nil
     }

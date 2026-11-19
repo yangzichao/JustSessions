@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Recovery projection and appended-name following at many-tab scale, without opening terminals or starting CLIs.
@@ -17,7 +18,8 @@ struct TerminalScalingMeasurements {
             for index in 0..<count / 2 {
                 _ = strip.addSplit(joining: tabs[index].id, beside: tabs[index + count / 2].id, on: .right)
             }
-            var previous: [Duration] = [], projected: [Duration] = []
+            var previous: [Duration] = []
+            var projected: [Duration] = []
             for _ in 0..<7 {
                 let before = clock.now
                 var separated = strip
@@ -40,7 +42,9 @@ struct TerminalScalingMeasurements {
         guard ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF"] != nil else { return }
         let folder = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: folder) }
-        let line = Data(("{\"type\":\"message\",\"message\":{\"role\":\"assistant\",\"content\":\"" + String(repeating: "x", count: 1_968) + "\"}}\n").utf8)
+        let line = Data(
+            ("{\"type\":\"message\",\"message\":{\"role\":\"assistant\",\"content\":\"" + String(repeating: "x", count: 1_968) + "\"}}\n")
+                .utf8)
         var append = Data()
         while append.count < Int(AppendedJSONLinesReader.maximumCatchUpByteCount) { append.append(line) }
         append.append(Data("{\"type\":\"session_info\",\"name\":\"performance-name\"}\n".utf8))
@@ -56,8 +60,10 @@ struct TerminalScalingMeasurements {
             for index in previousReaders.indices { _ = previousReaders[index].newLines() }
             let reader = AppendedSessionNameReaders()
             _ = await Task.detached(priority: .utility) { await reader.names(for: lookups) }.value
-            var oldCPU: [Double] = [], newCPU: [Double] = []
-            var oldGaps: [Duration] = [], newGaps: [Duration] = []
+            var oldCPU: [Double] = []
+            var newCPU: [Double] = []
+            var oldGaps: [Duration] = []
+            var newGaps: [Duration] = []
 
             func previousPass() {
                 let heartbeat = MainThreadPerfHeartbeat()
@@ -65,7 +71,9 @@ struct TerminalScalingMeasurements {
                 let start = clock_gettime_nsec_np(CLOCK_THREAD_CPUTIME_ID)
                 var names = 0
                 for index in previousReaders.indices {
-                    if AppendedSessionNameSource.latestName(for: lookups[index].conversation, amongLines: previousReaders[index].newLines()) != nil {
+                    if AppendedSessionNameSource.latestName(for: lookups[index].conversation, amongLines: previousReaders[index].newLines())
+                        != nil
+                    {
                         names += 1
                     }
                 }
@@ -91,8 +99,13 @@ struct TerminalScalingMeasurements {
                     try handle.write(contentsOf: append)
                     try handle.close()
                 }
-                if round.isMultiple(of: 2) { previousPass(); await actorPass() }
-                else { await actorPass(); previousPass() }
+                if round.isMultiple(of: 2) {
+                    previousPass()
+                    await actorPass()
+                } else {
+                    await actorPass()
+                    previousPass()
+                }
             }
             let label = "appended Pi names, \(count) files, \(append.count) bytes each"
             perfReport(label, "main-thread CPU before / after p50, ms", "\(oldCPU.sorted()[3]) / \(newCPU.sorted()[3])")

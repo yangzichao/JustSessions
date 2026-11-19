@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct SessionMessageTextCacheTests {
@@ -23,7 +24,9 @@ struct SessionMessageTextCacheTests {
         #expect(cache.text(for: conversation.id, fingerprint: after) == nil)
     }
 
-    private func conversation(in directory: URL, provider: ConversationProvider = .codex, contents: String = "one line\n") throws -> Conversation {
+    private func conversation(in directory: URL, provider: ConversationProvider = .codex, contents: String = "one line\n") throws
+        -> Conversation
+    {
         let file = directory.appendingPathComponent("\(UUID().uuidString).jsonl")
         try contents.write(to: file, atomically: true, encoding: .utf8)
         return .fixture(provider: provider, sessionID: "session:with@odd chars/\(UUID().uuidString)", sourceFile: file)
@@ -91,7 +94,8 @@ struct SessionMessageTextCacheTests {
 
         try "one line\nand another\n".write(to: conversation.sourceFile, atomically: false, encoding: .utf8)
 
-        guard case .changed(let saved?) = cache.lookup(for: conversation.id, fingerprint: SessionMessageTextFingerprint(conversation)) else {
+        guard case .changed(let saved?) = cache.lookup(for: conversation.id, fingerprint: SessionMessageTextFingerprint(conversation))
+        else {
             Issue.record("The saved text and resume state should be offered to resume from")
             return
         }
@@ -174,8 +178,9 @@ struct SessionMessageTextCacheTests {
         let second = Conversation.fixture(provider: .codex, sessionID: "another session", sourceFile: first.sourceFile)
 
         cache.save(text, for: second.id, fingerprint: fingerprint)
-        let secondFile = try #require(try FileManager.default.contentsOfDirectory(at: cacheDirectory, includingPropertiesForKeys: nil)
-            .first { $0.lastPathComponent != firstFile.lastPathComponent })
+        let secondFile = try #require(
+            try FileManager.default.contentsOfDirectory(at: cacheDirectory, includingPropertiesForKeys: nil)
+                .first { $0.lastPathComponent != firstFile.lastPathComponent })
 
         try Data(contentsOf: firstFile).write(to: secondFile)
 
@@ -233,7 +238,8 @@ struct SessionMessageTextCacheTests {
 
         #expect(SessionMessageTextFingerprint(session) == before)
         let laterSession = Conversation.fixture(
-            provider: .opencode, sessionID: session.sessionID, updatedAt: session.updatedAt.addingTimeInterval(1), sourceFile: session.sourceFile
+            provider: .opencode, sessionID: session.sessionID, updatedAt: session.updatedAt.addingTimeInterval(1),
+            sourceFile: session.sourceFile
         )
         #expect(SessionMessageTextFingerprint(laterSession) != before)
     }

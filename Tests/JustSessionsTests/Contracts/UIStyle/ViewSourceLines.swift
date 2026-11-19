@@ -37,7 +37,8 @@ struct ViewSourceLines {
     /// Lines matching `pattern` outside the theme's own folder and the drawings.
     func lines(matching pattern: Regex<AnyRegexOutput>) -> [String] {
         let exemptFolders = [Self.themeFolder] + Self.drawingFolders
-        return files
+        return
+            files
             .filter { file in !exemptFolders.contains { file.path.hasPrefix($0) } }
             .flatMap { file in
                 file.lines.enumerated()

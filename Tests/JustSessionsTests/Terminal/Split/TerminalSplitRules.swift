@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The rules every change to the tab order keeps: the tabs of one group sit together, a split's two tabs are both
@@ -16,7 +17,8 @@ func expectSplitRules(_ strip: TerminalTabStrip, sourceLocation: SourceLocation 
         }
         let projectKeys = Set(strip.tabs.filter { split.contains($0.id) }.map(\.projectKey))
         if projectKeys.count == 1 {
-            #expect(split.groupKey == projectKeys.first, "a split of one project shows in that project's group", sourceLocation: sourceLocation)
+            #expect(
+                split.groupKey == projectKeys.first, "a split of one project shows in that project's group", sourceLocation: sourceLocation)
         } else {
             #expect(split.spansProjects, "a split across projects shows in a group of its own", sourceLocation: sourceLocation)
             let tabsInItsGroup = strip.tabs.filter { strip.groupKey(of: $0) == split.groupKey }.map(\.id)

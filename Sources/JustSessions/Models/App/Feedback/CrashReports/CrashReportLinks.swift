@@ -29,15 +29,17 @@ enum CrashReportLinks {
         components.path = AppLinks.feedbackEmailAddress
         components.queryItems = [
             URLQueryItem(name: "subject", value: title(for: summary)),
-            URLQueryItem(name: "body", value: """
-                What I was doing when it quit:
+            URLQueryItem(
+                name: "body",
+                value: """
+                    What I was doing when it quit:
 
 
 
-                JustSessions \(summary.appVersion) · \(summary.macOSVersion)
+                    JustSessions \(summary.appVersion) · \(summary.macOSVersion)
 
-                \(details(of: summary, reportFileName: reportFileName))
-                """),
+                    \(details(of: summary, reportFileName: reportFileName))
+                    """),
         ]
         return withPlusSignsEncoded(components).url!
     }

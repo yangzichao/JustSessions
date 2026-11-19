@@ -11,8 +11,9 @@ enum TerminalFontFamily: Hashable {
     /// `FontFillsTerminalCells`.
     func font(size: CGFloat) -> NSFont {
         guard case .named(let family) = self,
-              let font = NSFontManager.shared.font(withFamily: family, traits: [], weight: Self.regularWeight, size: size),
-              FontFillsTerminalCells.check(font as CTFont) else {
+            let font = NSFontManager.shared.font(withFamily: family, traits: [], weight: Self.regularWeight, size: size),
+            FontFillsTerminalCells.check(font as CTFont)
+        else {
             return Self.systemFont(size: size)
         }
         return TerminalSymbolsFont.addingFallback(to: font)

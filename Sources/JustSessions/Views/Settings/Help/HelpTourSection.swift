@@ -8,7 +8,9 @@ struct HelpTourSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("The tour points at the main controls in the window. Afterwards, tips show again the first time you use each part, such as tabs or split view.")
+            Text(
+                "The tour points at the main controls in the window. Afterwards, tips show again the first time you use each part, such as tabs or split view."
+            )
             HStack(alignment: .firstTextBaseline, spacing: 16) {
                 Button("Take the tour") {
                     // The tour points at the window, so Settings closes first; its tips show once the sheet is gone.

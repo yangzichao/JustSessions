@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -21,10 +22,11 @@ struct BranchTabLinkTests {
         #expect(tab.conversation == nil)
         #expect(tab.waitingNewSessionTab?.branchedFromSessionID == Self.forkedSessionID)
         #expect(!store.hasTerminal(for: forked))
-        let project = try #require(ProjectConversationGroup.grouped(
-            store.conversations,
-            pendingNewSessions: store.pendingNewSessions
-        ).first)
+        let project = try #require(
+            ProjectConversationGroup.grouped(
+                store.conversations,
+                pendingNewSessions: store.pendingNewSessions
+            ).first)
         #expect(project.pendingNewSessions.map(\.terminalID) == [tab.id])
         #expect(project.conversations.count == 2)
 

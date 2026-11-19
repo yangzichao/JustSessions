@@ -12,7 +12,8 @@ enum EndedTabScreenText {
     static func text(ofRows rows: [String]) -> String? {
         let trimmedRows = rows.map { row in String(row.reversed().drop { $0 == " " }.reversed()) }
         guard let firstTextRow = trimmedRows.firstIndex(where: { !$0.isEmpty }),
-              let lastTextRow = trimmedRows.lastIndex(where: { !$0.isEmpty }) else { return nil }
+            let lastTextRow = trimmedRows.lastIndex(where: { !$0.isEmpty })
+        else { return nil }
         let shownRows = trimmedRows[firstTextRow...lastTextRow].suffix(maximumLineCount)
         let text = shownRows.joined(separator: "\n")
         guard text.count > maximumCharacterCount else { return text }

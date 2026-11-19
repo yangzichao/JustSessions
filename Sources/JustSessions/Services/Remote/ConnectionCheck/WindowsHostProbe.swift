@@ -16,7 +16,8 @@ enum WindowsHostProbe {
     /// False also when `ssh` could not connect, or the host did not answer in time.
     static func isWindows(_ host: String, runner: RemoteHostCommandRunner, timeout: TimeInterval) -> Bool {
         guard let result = runner.run(host, command, timeout),
-              result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus else { return false }
+            result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus
+        else { return false }
         return isWindows(output: result.output)
     }
 }

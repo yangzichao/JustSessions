@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ConversationExportFormattingTests {
@@ -59,9 +60,10 @@ struct ConversationExportFormattingTests {
             .toolCalls(["shell · echo ```", "read · file.swift"]),
             .note(TranscriptBuilder.compactionNoteText),
         ]
-        let transcript = TranscriptContent(entries: contents.enumerated().map { index, content in
-            TranscriptEntry(id: index, content: content, timestamp: timestamp, startsTurn: true)
-        }, omittedEntryCount: 0)
+        let transcript = TranscriptContent(
+            entries: contents.enumerated().map { index, content in
+                TranscriptEntry(id: index, content: content, timestamp: timestamp, startsTurn: true)
+            }, omittedEntryCount: 0)
         return ConversationExportDocument(sessions: [.init(selection: selection, transcript: transcript)])
     }
 }

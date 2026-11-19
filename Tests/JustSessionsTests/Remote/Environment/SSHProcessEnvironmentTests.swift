@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct SSHProcessEnvironmentTests {
@@ -16,12 +17,13 @@ struct SSHProcessEnvironmentTests {
             ]
         )
 
-        #expect(environment == [
-            "SSH_AUTH_SOCK": "/Users/me/.1password/agent.sock",
-            "PATH": "/opt/homebrew/bin:/usr/bin:/bin",
-            "AWS_PROFILE": "work",
-            "__CFBundleIdentifier": "dev.zichaoyang.justsessions",
-        ])
+        #expect(
+            environment == [
+                "SSH_AUTH_SOCK": "/Users/me/.1password/agent.sock",
+                "PATH": "/opt/homebrew/bin:/usr/bin:/bin",
+                "AWS_PROFILE": "work",
+                "__CFBundleIdentifier": "dev.zichaoyang.justsessions",
+            ])
     }
 
     @Test func theShellsRecordOfItselfIsLeftOut() {

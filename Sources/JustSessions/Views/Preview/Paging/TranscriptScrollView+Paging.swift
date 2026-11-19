@@ -3,27 +3,35 @@ import SwiftUI
 extension TranscriptScrollView {
     func showFirstMessage() {
         forgetBookmarkJump()
-        if let paging { paging.first(); return }
+        if let paging {
+            paging.first()
+            return
+        }
         guard let index = displayedEntryIndices.first else { return }
         positionController.restore(.entry(index: index, offset: -6))
     }
 
     func showLatestMessage() {
         forgetBookmarkJump()
-        if let paging { paging.latest(); return }
+        if let paging {
+            paging.latest()
+            return
+        }
         positionController.restore(.bottom)
     }
 
     func loadEarlierPage() {
-        paging?.earlier(preserving: positionController.recordedPosition ?? .bottom,
-                        currentPosition: { positionController.recordedPosition },
-                        keepingPages: retainedPageCount(afterLoading: .earlier))
+        paging?.earlier(
+            preserving: positionController.recordedPosition ?? .bottom,
+            currentPosition: { positionController.recordedPosition },
+            keepingPages: retainedPageCount(afterLoading: .earlier))
     }
 
     func loadLaterPage() {
-        paging?.later(preserving: positionController.recordedPosition ?? .bottom,
-                      currentPosition: { positionController.recordedPosition },
-                      keepingPages: retainedPageCount(afterLoading: .later))
+        paging?.later(
+            preserving: positionController.recordedPosition ?? .bottom,
+            currentPosition: { positionController.recordedPosition },
+            keepingPages: retainedPageCount(afterLoading: .later))
     }
 
     /// Keeps the pages the reader is near, so the one that loads does not push out a page it would load straight back.
@@ -37,8 +45,9 @@ extension TranscriptScrollView {
 
     func prefetchIfNeeded(in viewport: TranscriptPagingViewport? = nil) {
         guard isActive, let paging, !paging.isLoading, paging.errorMessage == nil, !searchState.isPresented,
-              !textSelection.isTracking, !positionController.isRestoring, restoredPagingRevision == paging.revision,
-              let viewport = viewport ?? positionController.pagingViewport else { return }
+            !textSelection.isTracking, !positionController.isRestoring, restoredPagingRevision == paging.revision,
+            let viewport = viewport ?? positionController.pagingViewport
+        else { return }
         switch viewport.prefetchDirection(hasEarlier: paging.hasEarlier, hasLater: paging.hasLater, retainedPageCount: paging.pages.count) {
         case .earlier: loadEarlierPage()
         case .later: loadLaterPage()

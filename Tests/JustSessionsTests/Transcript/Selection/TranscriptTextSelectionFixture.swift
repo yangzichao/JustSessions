@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// A reader in a window, with a question, a reply with a paragraph, a list, a table, and code, and a short reply after
@@ -43,18 +44,23 @@ final class TranscriptTextSelectionFixture {
         _ = NSApplication.shared
         let entries = [
             TranscriptEntry(id: 0, content: .userMessage(Self.question), timestamp: nil, startsTurn: true),
-            TranscriptEntry(id: 1, content: .assistantMessage(Self.reply), timestamp: nil, startsTurn: true,
-                            markdown: PreparedTranscriptMarkdown(text: Self.reply)),
-            TranscriptEntry(id: 2, content: .assistantMessage(Self.lastReply), timestamp: nil, startsTurn: false,
-                            markdown: PreparedTranscriptMarkdown(text: Self.lastReply)),
+            TranscriptEntry(
+                id: 1, content: .assistantMessage(Self.reply), timestamp: nil, startsTurn: true,
+                markdown: PreparedTranscriptMarkdown(text: Self.reply)),
+            TranscriptEntry(
+                id: 2, content: .assistantMessage(Self.lastReply), timestamp: nil, startsTurn: false,
+                markdown: PreparedTranscriptMarkdown(text: Self.lastReply)),
         ]
-        hostingView = NSHostingView(rootView: AnyView(TranscriptScrollView(
-            conversation: TranscriptScrollViewFixture.conversation("text-selection"),
-            transcript: TranscriptContent(entries: entries, omittedEntryCount: 0),
-            positionStore: TranscriptReadingPositionStore()
-        )))
+        hostingView = NSHostingView(
+            rootView: AnyView(
+                TranscriptScrollView(
+                    conversation: TranscriptScrollViewFixture.conversation("text-selection"),
+                    transcript: TranscriptContent(entries: entries, omittedEntryCount: 0),
+                    positionStore: TranscriptReadingPositionStore()
+                )))
         let windowClass: NSWindow.Type = isKeyWindow ? KeyWindow.self : NSWindow.self
-        window = windowClass.init(contentRect: NSRect(x: 0, y: 0, width: 900, height: 900), styleMask: [.titled], backing: .buffered, defer: false)
+        window = windowClass.init(
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 900), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
         window.orderFrontRegardless()
@@ -89,9 +95,11 @@ final class TranscriptTextSelectionFixture {
 
     /// Each block's selected text, in reading order, leaving out blocks with nothing selected.
     var selectedTexts: [String] {
-        textViews.sorted { ($0.selectionKey ?? .init(entryIndex: 0, segmentIndex: 0)) < ($1.selectionKey ?? .init(entryIndex: 0, segmentIndex: 0)) }
-            .map { ($0.string as NSString).substring(with: $0.selectedRange()) }
-            .filter { !$0.isEmpty }
+        textViews.sorted {
+            ($0.selectionKey ?? .init(entryIndex: 0, segmentIndex: 0)) < ($1.selectionKey ?? .init(entryIndex: 0, segmentIndex: 0))
+        }
+        .map { ($0.string as NSString).substring(with: $0.selectedRange()) }
+        .filter { !$0.isEmpty }
     }
 
     /// The middle of the character at `offset` in `view`, in window coordinates.
@@ -121,10 +129,11 @@ final class TranscriptTextSelectionFixture {
     }
 
     func mouseEvent(_ type: NSEvent.EventType, at point: NSPoint, modifiers: NSEvent.ModifierFlags, clickCount: Int = 1) throws -> NSEvent {
-        try #require(NSEvent.mouseEvent(
-            with: type, location: point, modifierFlags: modifiers, timestamp: ProcessInfo.processInfo.systemUptime,
-            windowNumber: window.windowNumber, context: nil, eventNumber: 0, clickCount: clickCount, pressure: 1
-        ))
+        try #require(
+            NSEvent.mouseEvent(
+                with: type, location: point, modifierFlags: modifiers, timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: window.windowNumber, context: nil, eventNumber: 0, clickCount: clickCount, pressure: 1
+            ))
     }
 
     private static func descendants(of view: NSView) -> [TranscriptTextView] {

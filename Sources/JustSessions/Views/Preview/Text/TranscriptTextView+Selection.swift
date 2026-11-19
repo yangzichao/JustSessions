@@ -18,8 +18,9 @@ extension TranscriptTextView {
     /// A right click on a selection across blocks keeps it, so the menu's Copy copies all of it.
     override func rightMouseDown(with event: NSEvent) {
         guard let selectionCoordinator, selectionCoordinator.selection?.spansSeveralBlocks == true,
-              NSLocationInRange(insertionOffset(atWindowPoint: event.locationInWindow), selectedRange()),
-              let menu = menu(for: event) else {
+            NSLocationInRange(insertionOffset(atWindowPoint: event.locationInWindow), selectedRange()),
+            let menu = menu(for: event)
+        else {
             selectionCoordinator?.clearSelection()
             super.rightMouseDown(with: event)
             selectionCoordinator?.adoptSelection(of: self)
@@ -76,7 +77,9 @@ extension TranscriptTextView {
         let glyphRect = layoutManager.boundingRect(forGlyphRange: NSRange(location: glyphIndex, length: 1), in: textContainer)
         guard glyphRect.contains(containerPoint) else { return }
         let characterIndex = layoutManager.characterIndexForGlyph(at: glyphIndex)
-        guard characterIndex < textStorage.length, let link = textStorage.attribute(.link, at: characterIndex, effectiveRange: nil) else { return }
+        guard characterIndex < textStorage.length, let link = textStorage.attribute(.link, at: characterIndex, effectiveRange: nil) else {
+            return
+        }
         clicked(onLink: link, at: characterIndex)
     }
 }

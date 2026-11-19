@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Stands in for `ssh`: records each command and answers with a fixed result, or one for each command.

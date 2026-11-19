@@ -27,16 +27,18 @@ final class CodexRolloutTurnTracker: @unchecked Sendable {
         lock.withLock {
             let path = file.path
             guard let attributes = try? FileManager.default.attributesOfItem(atPath: path),
-                  let size = (attributes[.size] as? NSNumber)?.uint64Value,
-                  let fileNumber = (attributes[.systemFileNumber] as? NSNumber)?.uint64Value,
-                  let handle = try? FileHandle(forReadingFrom: file) else {
+                let size = (attributes[.size] as? NSNumber)?.uint64Value,
+                let fileNumber = (attributes[.systemFileNumber] as? NSNumber)?.uint64Value,
+                let handle = try? FileHandle(forReadingFrom: file)
+            else {
                 followedFilesByPath[path] = nil
                 return nil
             }
             defer { try? handle.close() }
             var followedFile: FollowedFile
             if let known = followedFilesByPath[path], known.fileNumber == fileNumber, known.readOffset <= size,
-               size - known.readOffset <= Self.largestReadByteCount {
+                size - known.readOffset <= Self.largestReadByteCount
+            {
                 followedFile = known
                 Self.readAppendedLines(from: handle, upTo: size, into: &followedFile)
             } else {
@@ -57,7 +59,8 @@ final class CodexRolloutTurnTracker: @unchecked Sendable {
         for byteCount in firstLookByteCounts {
             let start = size > byteCount ? size - byteCount : 0
             guard (try? handle.seek(toOffset: start)) != nil,
-                  var text = size > start ? try? handle.read(upToCount: Int(size - start)) : Data() else { break }
+                var text = size > start ? try? handle.read(upToCount: Int(size - start)) : Data()
+            else { break }
             followedFile.readOffset = start + UInt64(text.count)
             // Reading from the middle of the file cuts its first line.
             if start > 0 { text = text.firstIndex(of: newline).map { Data(text[($0 + 1)...]) } ?? Data() }
@@ -72,8 +75,9 @@ final class CodexRolloutTurnTracker: @unchecked Sendable {
 
     private static func readAppendedLines(from handle: FileHandle, upTo size: UInt64, into followedFile: inout FollowedFile) {
         guard size > followedFile.readOffset,
-              (try? handle.seek(toOffset: followedFile.readOffset)) != nil,
-              let appended = try? handle.read(upToCount: Int(size - followedFile.readOffset)) else { return }
+            (try? handle.seek(toOffset: followedFile.readOffset)) != nil,
+            let appended = try? handle.read(upToCount: Int(size - followedFile.readOffset))
+        else { return }
         followedFile.readOffset += UInt64(appended.count)
         let (wholeLines, unfinishedLine) = splitAfterLastNewline(followedFile.unfinishedLine + appended)
         // A line this long is no turn event. Dropping it leaves the rest of it to be read as a line of its own,

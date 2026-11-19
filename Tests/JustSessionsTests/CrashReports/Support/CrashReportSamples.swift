@@ -39,7 +39,10 @@ enum CrashReportSamples {
                     "triggered": true,
                     "queue": "com.apple.root.user-initiated-qos",
                     "frames": [
-                        ["imageIndex": 0, "imageOffset": 1_445_064, "symbol": "_assertionFailure(_:_:file:line:flags:)", "symbolLocation": 172],
+                        [
+                            "imageIndex": 0, "imageOffset": 1_445_064, "symbol": "_assertionFailure(_:_:file:line:flags:)",
+                            "symbolLocation": 172,
+                        ],
                         [
                             "imageIndex": 1, "imageOffset": 4096, "symbol": "ConversationStore.removeDeletedConversations(_:)",
                             "symbolLocation": 40,
@@ -67,11 +70,13 @@ enum CrashReportSamples {
                 "CoreFoundation": ["*** -[__NSArrayM objectAtIndex:]: index 3 beyond bounds [0 .. 2]"],
             ],
             "faultingThread": 0,
-            "threads": [[
-                "queue": "com.apple.main-thread",
-                "triggered": true,
-                "frames": [["imageIndex": 0, "symbol": "__pthread_kill"], ["imageIndex": 1, "symbol": "abort"]],
-            ]],
+            "threads": [
+                [
+                    "queue": "com.apple.main-thread",
+                    "triggered": true,
+                    "frames": [["imageIndex": 0, "symbol": "__pthread_kill"], ["imageIndex": 1, "symbol": "abort"]],
+                ]
+            ],
             "lastExceptionBacktrace": [
                 ["imageIndex": 2, "symbol": "__exceptionPreprocess"],
                 ["imageIndex": 3, "symbol": "objc_exception_throw"],

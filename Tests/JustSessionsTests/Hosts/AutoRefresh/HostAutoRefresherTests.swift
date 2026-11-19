@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The periodic check refreshes the hosts only while a window shows; coming forward refreshes them anyway. This Mac
@@ -24,7 +25,8 @@ struct HostAutoRefresherTests {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
         try await Self.finishFirstRefresh(of: sandbox)
-        let refresher = HostAutoRefresher(registry: sandbox.windowRegistry, isAnyWindowOnScreen: { true }, refreshSSHHost: SSHHostCopies().start)
+        let refresher = HostAutoRefresher(
+            registry: sandbox.windowRegistry, isAnyWindowOnScreen: { true }, refreshSSHHost: SSHHostCopies().start)
         let firstStartedAt = try #require(sandbox.first.lastRefreshStartedAt)
         let secondStartedAt = try #require(sandbox.second.lastRefreshStartedAt)
 

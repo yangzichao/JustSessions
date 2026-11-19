@@ -13,10 +13,11 @@ final class AppLanguageStore: ObservableObject {
     private var systemLocaleObservation: AnyCancellable?
 
     var locale: Locale {
-        Locale(identifier: language.localizationIdentifier(
-            availableLocalizations: choices.compactMap(\.identifier),
-            developmentLocalization: developmentLocalization
-        ))
+        Locale(
+            identifier: language.localizationIdentifier(
+                availableLocalizations: choices.compactMap(\.identifier),
+                developmentLocalization: developmentLocalization
+            ))
     }
 
     init(

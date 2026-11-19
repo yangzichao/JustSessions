@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The per-call options the conversation map reads with (PERF-89): no Markdown, and its own page sizes, with the
@@ -20,7 +21,8 @@ struct TranscriptPageSourceOptionsTests {
     @Test func perCallLimitsKeepTheReadersEntryIDs() async throws {
         let fixture = try TranscriptPagingFixture(count: 0)
         defer { fixture.remove() }
-        try SampleTranscriptLines.fileContents(Array(repeating: SampleTranscriptLines.claude, count: 300).flatMap { $0 }).write(to: fixture.file)
+        try SampleTranscriptLines.fileContents(Array(repeating: SampleTranscriptLines.claude, count: 300).flatMap { $0 }).write(
+            to: fixture.file)
         let source = TranscriptPageSource(file: fixture.file, provider: .claude)
         let readers = try await Self.pages(of: source, limits: nil)
         let outlines = try await Self.pages(of: source, limits: ConversationOutlineReader.pageLimits(for: .claude))

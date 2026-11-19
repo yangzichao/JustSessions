@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PiAdapterTests {
@@ -10,14 +11,18 @@ struct PiAdapterTests {
         let namedID = UUID().uuidString.lowercased()
         let promptedID = UUID().uuidString.lowercased()
         let emptyID = UUID().uuidString.lowercased()
-        try fixture.writeSession(id: namedID, projectPath: "/Users/me/app", lines: [
-            PiSessionFolderFixture.userMessage("Fix the login bug"),
-            PiSessionFolderFixture.sessionName("Old name"),
-            PiSessionFolderFixture.sessionName("Login fix"),
-        ])
-        try fixture.writeSession(id: promptedID, projectPath: "/Users/me/api", lines: [
-            PiSessionFolderFixture.userMessage("Add a health check\\nwith a test"),
-        ], inProjectFolder: false)
+        try fixture.writeSession(
+            id: namedID, projectPath: "/Users/me/app",
+            lines: [
+                PiSessionFolderFixture.userMessage("Fix the login bug"),
+                PiSessionFolderFixture.sessionName("Old name"),
+                PiSessionFolderFixture.sessionName("Login fix"),
+            ])
+        try fixture.writeSession(
+            id: promptedID, projectPath: "/Users/me/api",
+            lines: [
+                PiSessionFolderFixture.userMessage("Add a health check\\nwith a test")
+            ], inProjectFolder: false)
         try fixture.writeSession(id: emptyID, projectPath: "/Users/me/api")
 
         let found = try PiAdapter(sessionsDirectory: root).discover()
@@ -37,10 +42,12 @@ struct PiAdapterTests {
         defer { try? FileManager.default.removeItem(at: root) }
         let sessionID = UUID().uuidString.lowercased()
         let laterPrompts = (0..<2_000).map { PiSessionFolderFixture.userMessage("Step \($0) " + String(repeating: "x", count: 150)) }
-        try PiSessionFolderFixture(sessionsDirectory: root).writeSession(id: sessionID, projectPath: "/Users/me/app", lines: [
-            PiSessionFolderFixture.userMessage("Fix the login bug"),
-            PiSessionFolderFixture.sessionName("Login fix"),
-        ] + laterPrompts)
+        try PiSessionFolderFixture(sessionsDirectory: root).writeSession(
+            id: sessionID, projectPath: "/Users/me/app",
+            lines: [
+                PiSessionFolderFixture.userMessage("Fix the login bug"),
+                PiSessionFolderFixture.sessionName("Login fix"),
+            ] + laterPrompts)
 
         let found = try PiAdapter(sessionsDirectory: root).discover()
 
@@ -56,13 +63,17 @@ struct PiAdapterTests {
         let runID = UUID().uuidString.lowercased()
         let nestedID = UUID().uuidString.lowercased()
         let forkID = UUID().uuidString.lowercased()
-        let parentFile = try fixture.writeSession(id: parentID, projectPath: "/Users/me/app", lines: [
-            PiSessionFolderFixture.userMessage("Plan the release"),
-        ])
-        let runFile = try fixture.writeSubagentSession(id: runID, at: "run-a/run-0/session.jsonl", inFolderOf: parentFile, lines: [
-            PiSessionFolderFixture.userMessage("Task: Review the diff"),
-            PiSessionFolderFixture.sessionName("subagent-reviewer-run-a-1"),
-        ])
+        let parentFile = try fixture.writeSession(
+            id: parentID, projectPath: "/Users/me/app",
+            lines: [
+                PiSessionFolderFixture.userMessage("Plan the release")
+            ])
+        let runFile = try fixture.writeSubagentSession(
+            id: runID, at: "run-a/run-0/session.jsonl", inFolderOf: parentFile,
+            lines: [
+                PiSessionFolderFixture.userMessage("Task: Review the diff"),
+                PiSessionFolderFixture.sessionName("subagent-reviewer-run-a-1"),
+            ])
         try fixture.writeSubagentSession(
             id: nestedID,
             at: "run-a/run-0/session/run-b/run-0/session.jsonl",

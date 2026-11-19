@@ -33,8 +33,9 @@ final class WorkspaceTabCycleShortcutView: NSView {
         guard window != nil else { return }
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self, isEnabled, let window, event.window === window,
-                  NSApp.keyWindow === window, window.attachedSheet == nil,
-                  let movingForward = Self.cycleDirection(for: event) else { return event }
+                NSApp.keyWindow === window, window.attachedSheet == nil,
+                let movingForward = Self.cycleDirection(for: event)
+            else { return event }
             onSelectAdjacentTab?(movingForward)
             return nil
         }

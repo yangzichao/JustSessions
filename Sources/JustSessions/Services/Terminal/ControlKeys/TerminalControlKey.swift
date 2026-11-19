@@ -32,9 +32,9 @@ enum TerminalControlKey: Equatable {
             break
         }
         switch (Self.character(of: event, withShift: withShift), withShift) {
-        case let (character?, false) where Self.punctuationAndDigits.contains(character):
+        case (let character?, false) where Self.punctuationAndDigits.contains(character):
             self = .punctuationOrDigit(character)
-        case let (character?, false) where Self.bracketsAndBackslash.contains(character):
+        case (let character?, false) where Self.bracketsAndBackslash.contains(character):
             self = .bracketOrBackslash(character)
         case ("_", true):
             self = .underscore
@@ -48,10 +48,10 @@ enum TerminalControlKey: Equatable {
     /// `ThisMacTmuxServer.globalOptions` and `RemoteCLICommandBuilder`.
     var bytesForTmux: String {
         switch self {
-        case let .punctuationOrDigit(character): Self.csiU(codepoint: character.asciiValue.map(Int.init) ?? 0, withShift: false)
-        case let .bracketOrBackslash(character): Self.legacyControlCharacter(for: character)
+        case .punctuationOrDigit(let character): Self.csiU(codepoint: character.asciiValue.map(Int.init) ?? 0, withShift: false)
+        case .bracketOrBackslash(let character): Self.legacyControlCharacter(for: character)
         case .underscore: "\u{1F}"
-        case let .returnKey(withShift): Self.csiU(codepoint: 13, withShift: withShift)
+        case .returnKey(let withShift): Self.csiU(codepoint: 13, withShift: withShift)
         case .backspace: Self.csiU(codepoint: 127, withShift: false)
         }
     }
@@ -60,18 +60,21 @@ enum TerminalControlKey: Equatable {
     /// nothing for most of these. Nil where legacy encoding has no byte for the key.
     var legacyBytes: String? {
         switch self {
-        case let .punctuationOrDigit(character): Self.legacyBytesForPunctuationAndDigits[character]
-        case let .bracketOrBackslash(character): Self.legacyControlCharacter(for: character)
+        case .punctuationOrDigit(let character): Self.legacyBytesForPunctuationAndDigits[character]
+        case .bracketOrBackslash(let character): Self.legacyControlCharacter(for: character)
         case .underscore: "\u{1F}"
         case .returnKey, .backspace: nil
         }
     }
 
-    private static let punctuationAndDigits: Set<Character> = ["/", "-", "=", ".", ",", ";", "'", "`", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    private static let punctuationAndDigits: Set<Character> = [
+        "/", "-", "=", ".", ",", ";", "'", "`", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    ]
     private static let bracketsAndBackslash: Set<Character> = ["[", "]", "\\"]
     /// kitty's table, which Ghostty repeats, with Ctrl-- as Ctrl-_, as xterm and Terminal send it.
     private static let legacyBytesForPunctuationAndDigits: [Character: String] = [
-        "/": "\u{1F}", "-": "\u{1F}", "2": "\u{00}", "3": "\u{1B}", "4": "\u{1C}", "5": "\u{1D}", "6": "\u{1E}", "7": "\u{1F}", "8": "\u{7F}",
+        "/": "\u{1F}", "-": "\u{1F}", "2": "\u{00}", "3": "\u{1B}", "4": "\u{1C}", "5": "\u{1D}", "6": "\u{1E}", "7": "\u{1F}",
+        "8": "\u{7F}",
     ]
 
     /// `[`, `\`, and `]` with Control clear the character's 0x40 bit.

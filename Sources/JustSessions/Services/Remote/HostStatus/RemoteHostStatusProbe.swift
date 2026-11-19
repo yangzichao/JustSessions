@@ -16,7 +16,8 @@ enum RemoteHostStatusProbe {
     /// `tmux list-sessions`, whose output goes to a file first: an older tmux server, as 2.6, keeps the output of a
     /// newer client open, which would hold the connection until the refresh gives up; see `RemoteHostCheckScript`.
     /// Where `mktemp` fails, tmux prints to the connection. `sh` runs it, as it runs a tab's tmux.
-    static let tmuxSessionsScript = "tmux_out=$(mktemp 2>/dev/null)"
+    static let tmuxSessionsScript =
+        "tmux_out=$(mktemp 2>/dev/null)"
         + " || exec tmux list-sessions -F '#{session_name}' 2>&1;"
         + " tmux list-sessions -F '#{session_name}' </dev/null >\"$tmux_out\" 2>&1;"
         + " cat \"$tmux_out\"; rm -f \"$tmux_out\""
@@ -59,7 +60,8 @@ enum RemoteHostStatusProbe {
         runner: RemoteHostCommandRunner = RemoteHostCommandRunner()
     ) -> RemoteHostStatus? {
         guard let result = runner.run(host, command(startup: startup), 30),
-              result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus else { return nil }
+            result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus
+        else { return nil }
         return status(inOutput: result.output)
     }
 
@@ -70,7 +72,8 @@ enum RemoteHostStatusProbe {
         guard let headingIndex = lines.lastIndex(of: installedCLIsHeading) else {
             return RemoteHostStatus(tmuxSessionNames: TmuxSessionName.appSessionNames(inListOutput: output), cliLocations: nil)
         }
-        let tmuxLines = lines[..<headingIndex].lastIndex(of: tmuxSessionsHeading)
+        let tmuxLines =
+            lines[..<headingIndex].lastIndex(of: tmuxSessionsHeading)
             .map { lines[($0 + 1)..<headingIndex] } ?? lines[..<headingIndex]
         let tmuxOutput = tmuxLines.joined(separator: "\n")
         let foldersHeadingIndex = lines[headingIndex...].firstIndex(of: installFoldersHeading) ?? lines.endIndex

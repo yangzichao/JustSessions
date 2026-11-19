@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -75,14 +76,20 @@ struct TranscriptTextViewTests {
     ])
     func linesAreAsTallAsSwiftUISetsThem(style: TranscriptTextStyle, text: String) {
         let view = TranscriptTextView()
-        view.setContent(TranscriptTextContent(
-            source: AttributedString(text), style: style,
-            colors: TranscriptTextColors(theme: ResolvedAppTheme(.justSessions), isDark: false)
-        ))
-        let swiftUIText = NSHostingView(rootView: Text(text)
-            .font(.system(size: style.fontSize, weight: style.isSemibold ? .semibold : .regular, design: style.isMonospaced ? .monospaced : .default))
-            .lineSpacing(style.lineSpacing)
-            .fixedSize())
+        view.setContent(
+            TranscriptTextContent(
+                source: AttributedString(text), style: style,
+                colors: TranscriptTextColors(theme: ResolvedAppTheme(.justSessions), isDark: false)
+            ))
+        let swiftUIText = NSHostingView(
+            rootView: Text(text)
+                .font(
+                    .system(
+                        size: style.fontSize, weight: style.isSemibold ? .semibold : .regular,
+                        design: style.isMonospaced ? .monospaced : .default)
+                )
+                .lineSpacing(style.lineSpacing)
+                .fixedSize())
 
         #expect(view.measuredSize(width: nil).height == swiftUIText.fittingSize.height)
     }

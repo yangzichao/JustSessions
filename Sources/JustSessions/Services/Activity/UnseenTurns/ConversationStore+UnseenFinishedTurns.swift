@@ -45,7 +45,8 @@ extension ConversationStore {
         for (conversationID, tab) in runningTerminalsInOtherWindows where tab.isWaitingForYou {
             waiting.conversationIDs.insert(conversationID)
         }
-        for (conversationID, activity) in detachedCLIActivities where WaitingForYou.includes(
+        for (conversationID, activity) in detachedCLIActivities
+        where WaitingForYou.includes(
             activity: activity,
             hasUnseenFinishedTurn: hasUnseenFinishedTurn(detachedConversationID: conversationID)
         ) {

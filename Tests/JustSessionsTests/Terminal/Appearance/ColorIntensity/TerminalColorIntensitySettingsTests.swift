@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// **Color intensity** is saved with the other terminal settings, and dragging it recolors terminals once it pauses.

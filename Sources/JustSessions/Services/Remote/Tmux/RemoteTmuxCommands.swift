@@ -63,7 +63,8 @@ enum RemoteTmuxCommands {
     static func setPrefixOptionsCommand(usingHostPrefix: Bool, on host: String) -> String {
         // `set-option` takes a pane: `=name:` is exactly that session, where a bare `=name` finds nothing.
         let setOptions = RemoteTmuxPrefixOptions.setOptionCommands(usingHostPrefix: usingHostPrefix, target: "\"=$name:\"")
-        let script = "tmux list-sessions -F '#{session_name}' 2>/dev/null | grep '^\(TmuxSessionName.prefix)'"
+        let script =
+            "tmux list-sessions -F '#{session_name}' 2>/dev/null | grep '^\(TmuxSessionName.prefix)'"
             + " | while IFS= read -r name; do tmux \(setOptions.joined(separator: " \\; ")) 2>/dev/null; done; true"
         return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
     }

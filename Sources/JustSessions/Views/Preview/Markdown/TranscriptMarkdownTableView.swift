@@ -11,9 +11,11 @@ struct TranscriptMarkdownTableView: View {
 
     var body: some View {
         ScrollView(.horizontal) {
-            TranscriptMarkdownTableLayout(rowCellCounts: table.rows.map(\.cells.count),
-                                          availableWidth: max(TranscriptMarkdownTableLayout.minimumColumnWidth, columnWidth - indentation),
-                                          minimumWidths: longestWordWidths) {
+            TranscriptMarkdownTableLayout(
+                rowCellCounts: table.rows.map(\.cells.count),
+                availableWidth: max(TranscriptMarkdownTableLayout.minimumColumnWidth, columnWidth - indentation),
+                minimumWidths: longestWordWidths
+            ) {
                 ForEach(Array(table.rows.enumerated()), id: \.element.id) { rowIndex, row in
                     ForEach(Array(row.cells.enumerated()), id: \.offset) { cellIndex, cell in
                         TranscriptTextBlock(
@@ -22,11 +24,11 @@ struct TranscriptMarkdownTableView: View {
                             style: TranscriptTextStyle(fontSize: fontSize, isSemibold: row.isHeader),
                             copyRole: .tableCell(row: rowIndex)
                         )
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 9)
-                            // Fills its column and row, so the cells' backgrounds meet.
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                            .background(row.isHeader ? ThemePalette.trackFill : ThemePalette.hoverFill)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
+                        // Fills its column and row, so the cells' backgrounds meet.
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .background(row.isHeader ? ThemePalette.trackFill : ThemePalette.hoverFill)
                     }
                 }
             }

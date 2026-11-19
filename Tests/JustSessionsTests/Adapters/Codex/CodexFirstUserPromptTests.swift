@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CodexFirstUserPromptTests {
@@ -9,11 +10,13 @@ struct CodexFirstUserPromptTests {
             [
                 responseItemLine(role: "developer", parts: [["type": "input_text", "text": "Developer notes"]]),
                 responseItemLine(role: "user", parts: [["type": "input_text", "text": "# AGENTS.md instructions for /Users/me/app"]]),
-                responseItemLine(role: "user", parts: [
-                    ["type": "input_image", "image_url": "data:image/png;base64,"],
-                    ["type": "input_text", "text": "  \n"],
-                    ["type": "input_text", "text": "  Refactor the parser\n"],
-                ]),
+                responseItemLine(
+                    role: "user",
+                    parts: [
+                        ["type": "input_image", "image_url": "data:image/png;base64,"],
+                        ["type": "input_text", "text": "  \n"],
+                        ["type": "input_text", "text": "  Refactor the parser\n"],
+                    ]),
             ],
         ].flatMap { $0 }
 

@@ -5,9 +5,10 @@ import Foundation
 /// after `unloadDelay` unless a search starts again.
 @MainActor
 final class SessionMessageIndexer: ObservableObject {
-    typealias Reader = @Sendable (
-        Conversation, SessionMessageTextFingerprint, SessionMessageTextCache
-    ) async -> SearchableSessionText?
+    typealias Reader =
+        @Sendable (
+            Conversation, SessionMessageTextFingerprint, SessionMessageTextCache
+        ) async -> SearchableSessionText?
 
     struct Progress: Equatable {
         let readCount: Int
@@ -184,7 +185,8 @@ final class SessionMessageIndexer: ObservableObject {
         retryTask = Task { [weak self, waitBeforeRetry] in
             do { try await waitBeforeRetry(delay) } catch { return }
             guard !Task.isCancelled, let self, !self.users.isEmpty,
-                  generation == self.desiredGeneration else { return }
+                generation == self.desiredGeneration
+            else { return }
             self.retryTask = nil
             let conversations = self.desiredConversations
             let sessions = await self.index.sessionsToRead(among: conversations, generation: generation)

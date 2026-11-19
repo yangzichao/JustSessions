@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CodexConversationDeletionTests {
@@ -8,14 +9,16 @@ struct CodexConversationDeletionTests {
         defer { fixture.remove() }
         let reportFile = fixture.root.appendingPathComponent("report.txt")
 
-        try fixture.delete(runningScript: """
-            #!/bin/sh
-            printf '%s\\n' "$@" "CODEX_HOME=$CODEX_HOME" "$(pwd -P)" > '\(reportFile.path)'
-            /bin/rm -f '\(fixture.conversation.sourceFile.path)'
-            """)
+        try fixture.delete(
+            runningScript: """
+                #!/bin/sh
+                printf '%s\\n' "$@" "CODEX_HOME=$CODEX_HOME" "$(pwd -P)" > '\(reportFile.path)'
+                /bin/rm -f '\(fixture.conversation.sourceFile.path)'
+                """)
 
         let reportLines = try String(contentsOf: reportFile, encoding: .utf8).split(separator: "\n").map(String.init)
-        #expect(reportLines.prefix(4) == ["delete", "--force", fixture.conversation.sessionID, "CODEX_HOME=\(fixture.codexDirectory.path)"])
+        #expect(
+            reportLines.prefix(4) == ["delete", "--force", fixture.conversation.sessionID, "CODEX_HOME=\(fixture.codexDirectory.path)"])
         let workingDirectory = try #require(reportLines.last)
         #expect(URL(fileURLWithPath: workingDirectory).resolvingSymlinksInPath() == fixture.codexDirectory.resolvingSymlinksInPath())
         #expect(!fixture.sessionFileExists)

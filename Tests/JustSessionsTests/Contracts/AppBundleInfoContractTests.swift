@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// `Scripts/build-app.sh` writes the app's Info.plist from a template. These hold the template to what the code,
@@ -59,27 +60,31 @@ struct AppBundleInfoContractTests {
     /// description macOS never asks and gives silence; the hardened runtime also needs the audio-input entitlement.
     @Test func programsInTheTerminalCanAskForTheMicrophone() throws {
         let usageDescription = try #require(try Self.infoPlistTemplate()["NSMicrophoneUsageDescription"] as? String)
-        let entitlements = try #require(try PropertyListSerialization.propertyList(
-            from: Data(try RepositoryFiles.contents(of: "Scripts/JustSessions.entitlements").utf8),
-            format: nil
-        ) as? [String: Any])
+        let entitlements = try #require(
+            try PropertyListSerialization.propertyList(
+                from: Data(try RepositoryFiles.contents(of: "Scripts/JustSessions.entitlements").utf8),
+                format: nil
+            ) as? [String: Any])
 
         #expect(!usageDescription.isEmpty)
         #expect(entitlements["com.apple.security.device.audio-input"] as? Bool == true)
-        #expect(try RepositoryFiles.contents(of: "Scripts/build-app.sh")
-            .contains("--entitlements \"$project_directory/Scripts/JustSessions.entitlements\""))
+        #expect(
+            try RepositoryFiles.contents(of: "Scripts/build-app.sh")
+                .contains("--entitlements \"$project_directory/Scripts/JustSessions.entitlements\""))
     }
 
     /// The interface is in English and Simplified Chinese (PRD-07), so macOS's microphone prompt is too. The
     /// template holds the English; `build-app.sh` copies `Localization/InfoPlist` into the app's `zh-Hans.lproj`,
     /// where macOS reads it.
     @Test func theMicrophonePromptIsInSimplifiedChinese() throws {
-        let translations = try #require(try PropertyListSerialization.propertyList(
-            from: Data(try RepositoryFiles.contents(
-                of: "Localization/InfoPlist/zh-Hans.lproj/InfoPlist.strings"
-            ).utf8),
-            format: nil
-        ) as? [String: String])
+        let translations = try #require(
+            try PropertyListSerialization.propertyList(
+                from: Data(
+                    try RepositoryFiles.contents(
+                        of: "Localization/InfoPlist/zh-Hans.lproj/InfoPlist.strings"
+                    ).utf8),
+                format: nil
+            ) as? [String: String])
 
         let translation = try #require(translations["NSMicrophoneUsageDescription"])
         #expect(translation.contains("JustSessions"))

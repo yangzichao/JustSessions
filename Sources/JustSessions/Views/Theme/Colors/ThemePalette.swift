@@ -41,7 +41,8 @@ enum ThemePalette {
     /// Status glyphs, in the hues of `StatusHexColors`. Text in these hues uses the readable versions below.
     static let live = Color.adaptive(StatusHexColors.live)
     /// `live` for a Core Animation layer, resolved in the drawing appearance; see `WorkingSpinnerArcView`.
-    static let liveNSColor = NSColor.adaptive(light: NSColor(hexValue: StatusHexColors.live.light), dark: NSColor(hexValue: StatusHexColors.live.dark))
+    static let liveNSColor = NSColor.adaptive(
+        light: NSColor(hexValue: StatusHexColors.live.light), dark: NSColor(hexValue: StatusHexColors.live.dark))
     static let warning = Color.adaptive(StatusHexColors.warning)
     static let unseenTurn = Color.adaptive(StatusHexColors.unseenTurn)
     static let warningText = ThemeColor(role: .warningText)

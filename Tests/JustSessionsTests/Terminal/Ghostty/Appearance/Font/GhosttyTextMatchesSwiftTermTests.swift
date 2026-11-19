@@ -1,6 +1,7 @@
 import AppKit
 import GhosttyTerminal
 import Testing
+
 @testable import JustSessions
 
 /// The same output in a Ghostty and a SwiftTerm terminal with the same appearance settings: cells of the same size, and
@@ -81,7 +82,9 @@ struct GhosttyTextMatchesSwiftTermTests {
     }
 
     /// Regular, bold, italic, and bold italic.
-    private static let styledLines = hideCursor + ["", "1", "3", "1;3"]
+    private static let styledLines =
+        hideCursor
+        + ["", "1", "3", "1;3"]
         .map { "\u{1B}[\($0)mHello, world: abcdefghij 0123456789 {}[]\u{1B}[0m" }
         .joined(separator: "\r\n")
 

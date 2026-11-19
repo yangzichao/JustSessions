@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// Double-clicking the tab bar's empty space does what double-clicking a title bar does, as chosen in System Settings.

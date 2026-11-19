@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A remote Claude Code tab's relay, which reads the CLI's record in the host's live registry and puts it in the tab's
@@ -83,8 +84,10 @@ struct RemoteClaudeActivityRelayTests {
         try Self.setRecord(#""status":"busy""#, in: sandbox)
         #expect(sandbox.waitUntil { Self.relayedRecord(of: tmuxName, in: sandbox) == "busy:" })
         let target = ShellQuoting.quoted("=" + tmuxName + ":")
-        let panePID = try #require(Int32(sandbox.run("tmux display-message -p -t \(target) '#{pane_pid}'")
-            .trimmingCharacters(in: .newlines)))
+        let panePID = try #require(
+            Int32(
+                sandbox.run("tmux display-message -p -t \(target) '#{pane_pid}'")
+                    .trimmingCharacters(in: .newlines)))
         #expect(Self.relayCount(inProcessGroup: panePID) == 1)
 
         _ = sandbox.run(#"touch "$HOME/claude-exit""#)
@@ -183,15 +186,17 @@ struct RemoteClaudeActivityRelayTests {
     /// Relays started in one pane. The sandbox's login shell has no job control, so the relay stays in the pane's
     /// process group, which tells it from other tests' relays.
     private static func relayCount(inProcessGroup processGroupID: Int32) -> Int {
-        let processes = BoundedProcessRunner.output(
-            ofExecutable: "/bin/ps",
-            arguments: ["-ax", "-ww", "-o", "pgid=,command="],
-            environment: [:],
-            timeout: 10
-        ) ?? ""
+        let processes =
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/ps",
+                arguments: ["-ax", "-ww", "-o", "pgid=,command="],
+                environment: [:],
+                timeout: 10
+            ) ?? ""
         return processes.split(separator: "\n").filter { line in
             let fields = line.split(separator: " ", maxSplits: 1)
-            return fields.count == 2 && Int32(fields[0]) == processGroupID && fields[1].trimmingCharacters(in: .whitespaces).hasPrefix("sh -c (")
+            return fields.count == 2 && Int32(fields[0]) == processGroupID
+                && fields[1].trimmingCharacters(in: .whitespaces).hasPrefix("sh -c (")
         }.count
     }
 

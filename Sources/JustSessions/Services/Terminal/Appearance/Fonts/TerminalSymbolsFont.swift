@@ -28,7 +28,9 @@ enum TerminalSymbolsFont {
     static func register() -> Bool { isAvailable }
 
     private static let isAvailable: Bool = {
-        if let url = AppLocalization.resourceBundle.url(forResource: "SymbolsNerdFontMono-Regular", withExtension: "ttf", subdirectory: "Fonts") {
+        if let url = AppLocalization.resourceBundle.url(
+            forResource: "SymbolsNerdFontMono-Regular", withExtension: "ttf", subdirectory: "Fonts")
+        {
             CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
         }
         return NSFont(name: postScriptName, size: NSFont.systemFontSize) != nil

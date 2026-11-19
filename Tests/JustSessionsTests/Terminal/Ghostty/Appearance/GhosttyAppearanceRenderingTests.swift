@@ -1,6 +1,7 @@
 import AppKit
 import GhosttyTerminal
 import Testing
+
 @testable import JustSessions
 
 /// Ghostty terminals drawn with a controller from `GhosttyTerminalControllers`, read back from the view's snapshot.
@@ -111,7 +112,8 @@ struct GhosttyAppearanceRenderingTests {
 
         try await expectEventually {
             let colors = terminal.drawnColors()
-            return colors.covers(scheme.selectionBackground, pixels: 2_500) && colors.covers(scheme.readableSelectionForeground, pixels: 800)
+            return colors.covers(scheme.selectionBackground, pixels: 2_500)
+                && colors.covers(scheme.readableSelectionForeground, pixels: 800)
         }
     }
 
@@ -130,7 +132,8 @@ struct GhosttyAppearanceRenderingTests {
 
         try await expectEventually {
             let colors = terminal.drawnColors()
-            return colors.covers(scheme.selectionBackground, pixels: 2_500) && colors.covers(scheme.readableSelectionForeground, pixels: 800)
+            return colors.covers(scheme.selectionBackground, pixels: 2_500)
+                && colors.covers(scheme.readableSelectionForeground, pixels: 800)
         }
     }
 

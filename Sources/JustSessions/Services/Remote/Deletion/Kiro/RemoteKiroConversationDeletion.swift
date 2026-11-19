@@ -58,8 +58,10 @@ enum RemoteKiroConversationDeletion {
 
     /// A V3 session's folder, `<workspace folder>/<sess_ id>` in the `sessions` folder that holds `sessions/cli`
     /// (`sessionsFolder`); see `KiroV3Session`. Kiro deletes the whole folder.
-    static func v3Command(sessionID: String, workspaceFolderName: String, projectPath: String, sessionsFolder: String,
-                          host: String) -> String {
+    static func v3Command(
+        sessionID: String, workspaceFolderName: String, projectPath: String, sessionsFolder: String,
+        host: String
+    ) -> String {
         let script = """
             dir=\(sessionsFolder)
             id=\(ShellQuoting.quoted(sessionID))

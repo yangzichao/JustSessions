@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A plain terminal is a tab, not a session: nothing waits for it to save one, watches it, or counts it as running.

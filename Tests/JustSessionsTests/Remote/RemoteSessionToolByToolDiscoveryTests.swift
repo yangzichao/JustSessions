@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A host's sessions are copied one tool after another, and each tool's are listed before the next copy starts.
@@ -36,14 +37,15 @@ struct RemoteSessionToolByToolDiscoveryTests {
             }
         )
 
-        #expect(await log.entries == [
-            "copying Claude Code 1/6", "copied Claude Code: [\"\(claudeID)\"]", "Codex copied yet: false",
-            "copying Codex 2/6", "copied Codex: [\"\(codexID)\"]",
-            "copying Antigravity 3/6", "copied Antigravity: []",
-            "copying Kiro CLI 4/6", "copied Kiro CLI: []",
-            "copying OpenCode 5/6", "copied OpenCode: []",
-            "copying Pi 6/6", "copied Pi: []",
-        ])
+        #expect(
+            await log.entries == [
+                "copying Claude Code 1/6", "copied Claude Code: [\"\(claudeID)\"]", "Codex copied yet: false",
+                "copying Codex 2/6", "copied Codex: [\"\(codexID)\"]",
+                "copying Antigravity 3/6", "copied Antigravity: []",
+                "copying Kiro CLI 4/6", "copied Kiro CLI: []",
+                "copying OpenCode 5/6", "copied OpenCode: []",
+                "copying Pi 6/6", "copied Pi: []",
+            ])
         #expect(Set(try RemoteSessionDiscovery(mirror: mirror).readMirror(host: "devbox").map(\.sessionID)) == [claudeID, codexID])
     }
 

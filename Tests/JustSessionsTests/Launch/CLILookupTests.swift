@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CLILookupTests {
@@ -21,11 +22,12 @@ struct CLILookupTests {
 
         #expect(Array(directories.prefix(4)) == ["/usr/bin", "/bin", "/from/login/shell", "\(home.path)/.local/bin"])
         #expect(directories.filter { $0 == "/usr/bin" }.count == 1)
-        #expect(Array(directories.suffix(3)) == [
-            "\(home.path)/.nvm/versions/node/v22.3.0/bin",
-            "\(home.path)/.nvm/versions/node/v18.20.1/bin",
-            "\(home.path)/.nvm/versions/node/v9.11.2/bin",
-        ])
+        #expect(
+            Array(directories.suffix(3)) == [
+                "\(home.path)/.nvm/versions/node/v22.3.0/bin",
+                "\(home.path)/.nvm/versions/node/v18.20.1/bin",
+                "\(home.path)/.nvm/versions/node/v9.11.2/bin",
+            ])
     }
 
     @Test func findsCLIThatOnlyTheLoginShellKnowsAbout() throws {

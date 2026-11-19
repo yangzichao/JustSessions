@@ -27,19 +27,20 @@ struct RemoteDroppedFileCopier: Sendable {
     init(
         processLaunch: (@Sendable (_ host: String, _ hostCommand: String, _ connectionOptions: [String]) -> ProcessLaunch)? = nil
     ) {
-        self.processLaunch = processLaunch ?? { host, hostCommand, connectionOptions in
-            ProcessLaunch(
-                executablePath: "/usr/bin/ssh",
-                arguments: RemoteHostCommandRunner.sshArguments(
-                    host: host,
-                    command: hostCommand,
-                    connectionSharingOptions: connectionOptions.isEmpty
-                        ? SSHLoginConnections.shared.connectionOptions(for: host)
-                        : connectionOptions
-                ),
-                environment: SSHProcessEnvironment.standard
-            )
-        }
+        self.processLaunch =
+            processLaunch ?? { host, hostCommand, connectionOptions in
+                ProcessLaunch(
+                    executablePath: "/usr/bin/ssh",
+                    arguments: RemoteHostCommandRunner.sshArguments(
+                        host: host,
+                        command: hostCommand,
+                        connectionSharingOptions: connectionOptions.isEmpty
+                            ? SSHLoginConnections.shared.connectionOptions(for: host)
+                            : connectionOptions
+                    ),
+                    environment: SSHProcessEnvironment.standard
+                )
+            }
     }
 
     /// Blocks until the file is on the host, calling `progress` with the bytes sent so far every `progressInterval`.
@@ -67,7 +68,7 @@ struct RemoteDroppedFileCopier: Sendable {
         let outputFile = FileManager.default.temporaryDirectory
             .appendingPathComponent("justsessions-dropped-file-copy-\(UUID().uuidString)")
         guard FileManager.default.createFile(atPath: outputFile.path, contents: nil),
-              let outputHandle = try? FileHandle(forWritingTo: outputFile)
+            let outputHandle = try? FileHandle(forWritingTo: outputFile)
         else { throw RemoteDroppedFileCopyError.couldNotRun(host: host) }
         defer {
             try? outputHandle.close()

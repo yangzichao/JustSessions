@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// The mark beside the message ⌘D would bookmark (RDR-48): its slot takes clicks and right-clicks, with a letter or
@@ -12,7 +13,8 @@ struct TranscriptBookmarkTargetClickTests {
         let marks = TranscriptBookmarkTargetMarksView()
         marks.frame = NSRect(x: 0, y: 0, width: TranscriptBookmarkTargetMarks.gutterWidth, height: 600)
         container.addSubview(marks)
-        marks.style = TranscriptBookmarkTargetMarkView.Style(color: .secondaryLabelColor, letters: TranscriptBookmarkLetters(letters), side: 16)
+        marks.style = TranscriptBookmarkTargetMarkView.Style(
+            color: .secondaryLabelColor, letters: TranscriptBookmarkLetters(letters), side: 16)
         marks.show(TranscriptBookmarkTarget.Shown(entryID: 4, frame: CGRect(x: 0, y: 100, width: 300, height: 120), topPadding: 12))
         return (container, marks)
     }
@@ -35,7 +37,7 @@ struct TranscriptBookmarkTargetClickTests {
         #expect(marks.clickTarget(at: slot, for: .rightMouseDown) === hit)
         #expect(marks.clickTarget(at: slot, for: .mouseMoved) == nil)
         #expect(marks.clickTarget(at: slot, for: nil) == nil)
-        #expect(marks.clickTarget(at: NSPoint(x: 12, y: 160), for: .leftMouseDown) == nil)   // the line down the message
+        #expect(marks.clickTarget(at: NSPoint(x: 12, y: 160), for: .leftMouseDown) == nil)  // the line down the message
         #expect(marks.clickTarget(at: NSPoint(x: 12, y: 60), for: .leftMouseDown) == nil)
     }
 

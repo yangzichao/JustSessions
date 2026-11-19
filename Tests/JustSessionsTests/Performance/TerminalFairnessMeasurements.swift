@@ -5,6 +5,7 @@ import ObjectiveC
 import SwiftTerm
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// How long a keystroke takes to show in a quiet SwiftTerm tab while other tabs flood output, on the real
@@ -70,7 +71,7 @@ struct TerminalFairnessMeasurements {
             }
             try await Task.sleep(for: .milliseconds(500))
         }
-        #expect(!Self.scenarios.isEmpty) // Record-only: the numbers above are the result.
+        #expect(!Self.scenarios.isEmpty)  // Record-only: the numbers above are the result.
     }
 }
 
@@ -156,15 +157,18 @@ private final class FairnessBench {
             let model = ConversationOutlineModel()
             mapFiles.append(file)
             mapModels.append(model)
-            columns.append(ConversationMapColumn(model: model, conversation: .fixture(provider: .codex, sessionID: "map-\(index)", sourceFile: file),
-                                                 provider: .codex, isShown: true, store: store, hover: ConversationMapHover()))
+            columns.append(
+                ConversationMapColumn(
+                    model: model, conversation: .fixture(provider: .codex, sessionID: "map-\(index)", sourceFile: file),
+                    provider: .codex, isShown: true, store: store, hover: ConversationMapHover()))
         }
-        let host = NSHostingView(rootView: HStack(spacing: 0) {
-            ForEach(columns.indices, id: \.self) { columns[$0].equatable() }
-        }
-        .defaultAppStorage(settings.userDefaults)
-        // macOS reports no occlusion to a test process.
-        .environment(\.ignoresWindowOcclusion, true))
+        let host = NSHostingView(
+            rootView: HStack(spacing: 0) {
+                ForEach(columns.indices, id: \.self) { columns[$0].equatable() }
+            }
+            .defaultAppStorage(settings.userDefaults)
+            // macOS reports no occlusion to a test process.
+            .environment(\.ignoresWindowOcclusion, true))
         host.frame = NSRect(x: Self.frame.width - width, y: 0, width: width, height: Self.frame.height)
         window.contentView?.addSubview(host)
     }
@@ -177,7 +181,9 @@ private final class FairnessBench {
             let text = String(repeating: "Growing reply text. ", count: 45)
             var record = 0
             while !Task.isCancelled {
-                let line = #"{"timestamp":"2026-10-02T12:00:00.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Reply \#(record): \#(text)"}]}}"# + "\n"
+                let line =
+                    #"{"timestamp":"2026-10-02T12:00:00.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Reply \#(record): \#(text)"}]}}"#
+                    + "\n"
                 for file in files {
                     guard let handle = try? FileHandle(forWritingTo: file) else { continue }
                     _ = try? handle.seekToEnd()
@@ -190,7 +196,9 @@ private final class FairnessBench {
         }
     }
 
-    private static func makeView(frame: NSRect, appearanceStore: TerminalAppearanceStore, themeStore: AppThemeStore) -> SelectableTerminalView {
+    private static func makeView(frame: NSRect, appearanceStore: TerminalAppearanceStore, themeStore: AppThemeStore)
+        -> SelectableTerminalView
+    {
         let view = TerminalEngine.swiftTerm.makeTabTerminalView(frame: frame, appearanceStore: appearanceStore, themeStore: themeStore)
         return view as! SelectableTerminalView
     }
@@ -356,7 +364,9 @@ private final class QuietTerminalProbe {
     func uninstall() {
         timer?.cancel()
         timer = nil
-        if let originalDraw = Self.originalDraw, let method = class_getInstanceMethod(SwiftTerm.TerminalView.self, #selector(NSView.draw(_:))) {
+        if let originalDraw = Self.originalDraw,
+            let method = class_getInstanceMethod(SwiftTerm.TerminalView.self, #selector(NSView.draw(_:)))
+        {
             method_setImplementation(method, originalDraw)
         }
         Self.originalDraw = nil
@@ -377,7 +387,8 @@ private final class FloodLineCounter {
             let terminal = view.getTerminal()
             let numbers = (0..<terminal.rows).compactMap { row -> Int? in
                 guard let text = terminal.getLine(row: row)?.translateToString(trimRight: true),
-                      let range = text.firstRange(of: /\d{8}/) else { return nil }
+                    let range = text.firstRange(of: /\d{8}/)
+                else { return nil }
                 return Int(text[range])
             }
             return total + (numbers.max().map { $0 + 1 } ?? 0)

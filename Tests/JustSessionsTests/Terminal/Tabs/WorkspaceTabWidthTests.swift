@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+
 @testable import JustSessions
 
 /// As in Chrome, tabs keep their full width while they fit, narrow together to share the bar as more open, and stop
@@ -33,7 +34,8 @@ struct WorkspaceTabWidthTests {
     }
 
     @Test func tabsTakeTheirFullWidthBeforeTheBarIsMeasured() {
-        let width = WorkspaceTabWidth.fitting(shownTabCount: 40, shownSplitCount: 0, groupCount: 1, groupLabelsWidth: 0, barWidth: .infinity)
+        let width = WorkspaceTabWidth.fitting(
+            shownTabCount: 40, shownSplitCount: 0, groupCount: 1, groupLabelsWidth: 0, barWidth: .infinity)
 
         #expect(width == WorkspaceTabMetrics.maximumWidth)
     }
@@ -50,7 +52,8 @@ struct WorkspaceTabWidthTests {
     @Test func splitsAtTheirNarrowestKeepTheirWidthAndTheOtherTabsShareTheRest() {
         // Ten places, two of them splits, would share 900 at 90 each, but a split's two tabs take 2 × 56 = 112. The splits
         // take their 224, leaving 676 for eight tabs.
-        let tabWidth = WorkspaceTabWidth.fitting(shownTabCount: 10, shownSplitCount: 2, groupCount: 1, groupLabelsWidth: 100, barWidth: 1032)
+        let tabWidth = WorkspaceTabWidth.fitting(
+            shownTabCount: 10, shownSplitCount: 2, groupCount: 1, groupLabelsWidth: 100, barWidth: 1032)
 
         #expect(tabWidth == 84)
         #expect(WorkspaceTabWidth.splitTabWidth(forTabWidth: tabWidth) == WorkspaceTabMetrics.minimumSplitTabWidth)
@@ -66,13 +69,15 @@ struct WorkspaceTabWidthTests {
 
     @Test func tabsBesideSplitsStillStopNarrowingAtTheNarrowestWidth() {
         // Twelve places at 75 each, three of them splits, leave 564 for nine tabs: less than the narrowest width.
-        let tabWidth = WorkspaceTabWidth.fitting(shownTabCount: 12, shownSplitCount: 3, groupCount: 1, groupLabelsWidth: 100, barWidth: 1032)
+        let tabWidth = WorkspaceTabWidth.fitting(
+            shownTabCount: 12, shownSplitCount: 3, groupCount: 1, groupLabelsWidth: 100, barWidth: 1032)
 
         #expect(tabWidth == WorkspaceTabMetrics.minimumWidth)
     }
 
     @Test func withoutSplitsTabsShareTheBarAsBefore() {
-        let tabWidth = WorkspaceTabWidth.fitting(shownTabCount: 10, shownSplitCount: 0, groupCount: 1, groupLabelsWidth: 100, barWidth: 1032)
+        let tabWidth = WorkspaceTabWidth.fitting(
+            shownTabCount: 10, shownSplitCount: 0, groupCount: 1, groupLabelsWidth: 100, barWidth: 1032)
 
         #expect(tabWidth == 90)
     }

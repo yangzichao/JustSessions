@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct TerminalLinkLocalItemTests {
@@ -35,7 +36,8 @@ struct TerminalLinkLocalItemTests {
 
         #expect(TerminalLinkLocalItem(url: url, kind: .file).pathWithLineAndColumn == "/Users/me/paper/main.swift")
         #expect(TerminalLinkLocalItem(url: url, kind: .file, lineNumber: 42).pathWithLineAndColumn == "/Users/me/paper/main.swift:42")
-        #expect(TerminalLinkLocalItem(url: url, kind: .file, lineNumber: 42, columnNumber: 7).pathWithLineAndColumn
-            == "/Users/me/paper/main.swift:42:7")
+        #expect(
+            TerminalLinkLocalItem(url: url, kind: .file, lineNumber: 42, columnNumber: 7).pathWithLineAndColumn
+                == "/Users/me/paper/main.swift:42:7")
     }
 }

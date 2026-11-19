@@ -1,4 +1,5 @@
 import Dispatch
+
 @testable import JustSessions
 
 /// A tmux session's history whose tmux answers each search step with the next of `countOutputs`, and each other
@@ -39,7 +40,8 @@ final class ScriptedTmuxHistory: @unchecked Sendable {
     /// any, by default whether it counted any.
     static func countLine(_ total: Int?, partial: Bool = false, foundAny: Bool? = nil) -> String {
         let found = (foundAny ?? total.map { $0 > 0 }).map { $0 ? "1" : "0" } ?? ""
-        return "\(TmuxHistorySearchCommands.countMarker) \(total.map(String.init) ?? "") \(total == nil ? "" : partial ? "1" : "0") \(found)\n"
+        return
+            "\(TmuxHistorySearchCommands.countMarker) \(total.map(String.init) ?? "") \(total == nil ? "" : partial ? "1" : "0") \(found)\n"
     }
 
     private func answer(_ arguments: [String]) -> String? {

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A remote Antigravity tab's relay, which reads the conversation database the CLI holds open and puts what it does in
@@ -56,8 +57,10 @@ struct RemoteAntigravityActivityRelayTests {
         defer { client.terminate() }
         #expect(sandbox.waitUntil { Self.relayedActivity(of: tmuxName, in: sandbox) == "idle:" })
         let target = ShellQuoting.quoted("=" + tmuxName + ":")
-        let panePID = try #require(Int32(sandbox.run("tmux display-message -p -t \(target) '#{pane_pid}'")
-            .trimmingCharacters(in: .newlines)))
+        let panePID = try #require(
+            Int32(
+                sandbox.run("tmux display-message -p -t \(target) '#{pane_pid}'")
+                    .trimmingCharacters(in: .newlines)))
         #expect(Self.relayCount(inProcessGroup: panePID) == 1)
 
         _ = sandbox.run(#"touch "$HOME/agy-exit""#)
@@ -121,7 +124,8 @@ struct RemoteAntigravityActivityRelayTests {
 
     private static func sandboxWithAntigravity() throws -> TmuxSandbox? {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory,
-              FileManager.default.isExecutableFile(atPath: "/usr/bin/python3") else { return nil }
+            FileManager.default.isExecutableFile(atPath: "/usr/bin/python3")
+        else { return nil }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
         try agyStandIn.write(to: sandbox.root.appendingPathComponent("agy-stand-in.py"), atomically: true, encoding: .utf8)
         try sandbox.addProgram(named: "agy", script: #"exec python3 "$HOME/agy-stand-in.py""#)
@@ -145,9 +149,10 @@ struct RemoteAntigravityActivityRelayTests {
     /// their own, so only its first line is matched, and names the interpreter by its full path, as Homebrew's
     /// `Python.app`, so only what it was started with is.
     private static func relayCount(inProcessGroup processGroupID: Int32) -> Int {
-        let processes = BoundedProcessRunner.output(
-            ofExecutable: "/bin/ps", arguments: ["-ax", "-ww", "-o", "pgid=,command="], environment: [:], timeout: 10
-        ) ?? ""
+        let processes =
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/ps", arguments: ["-ax", "-ww", "-o", "pgid=,command="], environment: [:], timeout: 10
+            ) ?? ""
         return processes.split(separator: "\n").filter { line in
             let fields = line.split(separator: " ", maxSplits: 1)
             return fields.count == 2 && Int32(fields[0]) == processGroupID

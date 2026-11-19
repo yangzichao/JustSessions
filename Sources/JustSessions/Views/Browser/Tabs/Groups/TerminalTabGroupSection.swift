@@ -43,10 +43,13 @@ struct TerminalTabGroupSection: View {
         let groupKey = group.projectDirectoryKey
         let dragDisplays = tabDragBetweenWindows.dragDisplays(in: store)
         let tabDragsInGroup = [tabDrag, dragDisplays.amongTabs(ofGroup: groupKey)]
-        let shownTabDrag = isCollapsed ? nil : tabDragsInGroup.first { display in
-            guard let placement = display.placement else { return false }
-            return placement.itemIDs == store.tabStrip.movingUnits(inGroup: groupKey, keepingTogether: placement.draggedID)
-        }
+        let shownTabDrag =
+            isCollapsed
+            ? nil
+            : tabDragsInGroup.first { display in
+                guard let placement = display.placement else { return false }
+                return placement.itemIDs == store.tabStrip.movingUnits(inGroup: groupKey, keepingTogether: placement.draggedID)
+            }
         let tabDragPlacement = shownTabDrag?.placement
         let tabIDsInSight = tabDragPlacement.map { Array($0.orderedItemIDs.joined()) } ?? shownTabs.map(\.id)
         let projectName = store.projectDisplayName(forProjectPath: group.projectDirectoryKey)
@@ -79,16 +82,17 @@ struct TerminalTabGroupSection: View {
             ForEach(shownTabs, id: \.id) { session in
                 let movingUnit = movingUnits.first { $0.contains(session.id) } ?? [session.id]
                 let dragItem = tabDragPlacement?.itemIDs.first { $0.contains(session.id) } ?? movingUnit
-                let showsLeadingSeparator = tabBefore(session.id, in: tabIDsInSight).map { showsSeparator(between: $0, and: session.id) } ?? false
+                let showsLeadingSeparator =
+                    tabBefore(session.id, in: tabIDsInSight).map { showsSeparator(between: $0, and: session.id) } ?? false
                 tabUnit(of: session, showsLeadingSeparator: showsLeadingSeparator)
-                .id(session.id)
-                .tabBarDragShift(of: dragItem, in: shownTabDrag)
-                .opacity(dragDisplays.leavingTabIDs.contains(session.id) ? 0 : 1)
-                .tabBarDrag(
-                    onChanged: { dragTab(session.id, by: $0, from: $1, among: movingUnits) },
-                    onEnded: { dropDraggedTab(session.id) }
-                )
-                .reportsTabSpanInGroup(session.id, in: store)
+                    .id(session.id)
+                    .tabBarDragShift(of: dragItem, in: shownTabDrag)
+                    .opacity(dragDisplays.leavingTabIDs.contains(session.id) ? 0 : 1)
+                    .tabBarDrag(
+                        onChanged: { dragTab(session.id, by: $0, from: $1, among: movingUnits) },
+                        onEnded: { dropDraggedTab(session.id) }
+                    )
+                    .reportsTabSpanInGroup(session.id, in: store)
             }
         }
         .tabBarGroupCoordinateSpace()
@@ -107,7 +111,9 @@ struct TerminalTabGroupSection: View {
         if let chooser = store.splitChooser(beside: session.id) {
             let halfWidth = WorkspaceTabWidth.splitTabWidth(forTabWidth: tabWidth)
             HStack(spacing: 0) {
-                if chooser.side == .left { splitChooserTab(beside: session, side: .left, width: halfWidth, showsLeadingSeparator: showsLeadingSeparator) }
+                if chooser.side == .left {
+                    splitChooserTab(beside: session, side: .left, width: halfWidth, showsLeadingSeparator: showsLeadingSeparator)
+                }
                 terminalTab(
                     session,
                     width: halfWidth,
@@ -144,7 +150,8 @@ struct TerminalTabGroupSection: View {
             projectDisplayName: store.projectDisplayName(forProjectPath: session.projectDirectoryKey),
             hostDisplayName: store.hasRemoteHosts ? session.host.displayName : nil,
             width: width,
-            isSelected: store.selectedTerminalID == session.id && !(store.selectsShownSplitChooser && store.splitChooser(beside: session.id) != nil),
+            isSelected: store.selectedTerminalID == session.id
+                && !(store.selectsShownSplitChooser && store.splitChooser(beside: session.id) != nil),
             isActive: isActive(session.id),
             splitSide: splitSide,
             splitOrientation: splitOrientation,
@@ -164,7 +171,9 @@ struct TerminalTabGroupSection: View {
     }
 
     /// The half of the split tab that stands for the split chooser beside `session`.
-    private func splitChooserTab(beside session: TerminalSession, side: TerminalSplit.Side, width: CGFloat, showsLeadingSeparator: Bool) -> some View {
+    private func splitChooserTab(beside session: TerminalSession, side: TerminalSplit.Side, width: CGFloat, showsLeadingSeparator: Bool)
+        -> some View
+    {
         let isShown = store.selectedTerminalID == session.id
         return TerminalSplitChooserTab(
             width: width,
@@ -219,13 +228,15 @@ struct TerminalTabGroupSection: View {
     /// or follows the pointer once it has started, until the drag goes on between windows.
     private func dragTab(_ tabID: UUID, by translation: CGFloat, from startLocation: CGPoint, among movingUnits: [[UUID]]) {
         guard let movingUnit = movingUnits.first(where: { $0.contains(tabID) }) else { return }
-        guard tabDragBetweenWindows.followDragInTabBar(
-            of: movingUnit,
-            grabbing: tabID,
-            inGroup: group.projectDirectoryKey,
-            of: store,
-            from: startLocation
-        ) else {
+        guard
+            tabDragBetweenWindows.followDragInTabBar(
+                of: movingUnit,
+                grabbing: tabID,
+                inGroup: group.projectDirectoryKey,
+                of: store,
+                from: startLocation
+            )
+        else {
             // Leaving for a window of their own, the tabs stay hidden where they were drawn until they go, so nothing
             // slides back meanwhile.
             if !tabDragBetweenWindows.dragDisplays(in: store).leavingTabIDs.contains(tabID) { tabDrag.show(nil) }

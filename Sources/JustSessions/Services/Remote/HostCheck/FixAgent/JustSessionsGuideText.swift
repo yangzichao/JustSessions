@@ -12,7 +12,8 @@ enum JustSessionsGuideText {
     /// guide or the heading is missing.
     static func text(of section: JustSessionsGuideSection, in guidesDirectory: URL? = shippedGuidesDirectory) -> String? {
         guard let guideURL = guidesDirectory?.appendingPathComponent(section.fileName),
-              let markdown = try? String(contentsOf: guideURL, encoding: .utf8) else { return nil }
+            let markdown = try? String(contentsOf: guideURL, encoding: .utf8)
+        else { return nil }
         return self.section(headed: section.heading, in: markdown)
     }
 
@@ -52,6 +53,6 @@ enum JustSessionsGuideText {
     }
 }
 
-private extension Character {
-    var isASCIIDigit: Bool { isASCII && isNumber }
+extension Character {
+    fileprivate var isASCIIDigit: Bool { isASCII && isNumber }
 }

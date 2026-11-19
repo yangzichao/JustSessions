@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A CLI that fails in tmux keeps what it printed in its tab, with its own exit status, instead of leaving only tmux's
@@ -35,7 +36,8 @@ struct ThisMacTmuxFailedCLITests {
                 startsBackgroundPolling: false
             )
             _ = NSApplication.shared
-            window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
+            window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
             window.isReleasedWhenClosed = false
         }
 
@@ -68,12 +70,15 @@ struct ThisMacTmuxFailedCLITests {
     }
 
     @Test func aFailedCLIKeepsItsOutputAndStatusUntilItsTabResumesIt() async throws {
-        guard let fixture = try Fixture(cli: """
-            if [ -e "$HOME/failed-once" ]; then echo CLI_RUNNING; exec /bin/sleep 600; fi
-            /usr/bin/touch "$HOME/failed-once"
-            echo "error: unknown option --bogus" >&2
-            exit 2
-            """) else { return }
+        guard
+            let fixture = try Fixture(
+                cli: """
+                    if [ -e "$HOME/failed-once" ]; then echo CLI_RUNNING; exec /bin/sleep 600; fi
+                    /usr/bin/touch "$HOME/failed-once"
+                    echo "error: unknown option --bogus" >&2
+                    exit 2
+                    """)
+        else { return }
         defer { fixture.tearDown() }
         let sandbox = fixture.sandbox
         try await fixture.checkTmux()
@@ -91,7 +96,9 @@ struct ThisMacTmuxFailedCLITests {
         let resumedTab = try await fixture.resume()
 
         #expect(fixture.store.terminalSessions.map(\.id) == [resumedTab.id])
-        #expect(await sandbox.waitUntil { fixture.screen(of: resumedTab).contains("CLI_RUNNING") }, "\(sandbox.launchDiagnostics(for: resumedTab))")
+        #expect(
+            await sandbox.waitUntil { fixture.screen(of: resumedTab).contains("CLI_RUNNING") },
+            "\(sandbox.launchDiagnostics(for: resumedTab))")
         #expect(await sandbox.waitUntil { sandbox.server.paneProcessIDsBySessionName()[fixture.sessionName] != nil })
         #expect(!resumedTab.hasExited)
     }
@@ -131,7 +138,8 @@ struct ThisMacTmuxFailedCLITests {
         let sandbox = fixture.sandbox
         try await fixture.checkTmux()
         let tab = try await fixture.resume()
-        try #require(await sandbox.waitUntil { sandbox.server.sessionNames() == [fixture.sessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil { sandbox.server.sessionNames() == [fixture.sessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
 
         fixture.store.closeTerminal(tab.id, endingTmuxSession: false)
 

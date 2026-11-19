@@ -10,7 +10,8 @@ extension TranscriptScrollView {
         case .bookmark(let requested):
             // As saved now: another window may have moved its entry ID within the record or grown its snippet.
             let record = TranscriptPageIdentity.record(for: requested.entryID)
-            goToBookmark(bookmarks.first { $0.letter == requested.letter && TranscriptPageIdentity.record(for: $0.entryID) == record } ?? requested)
+            goToBookmark(
+                bookmarks.first { $0.letter == requested.letter && TranscriptPageIdentity.record(for: $0.entryID) == record } ?? requested)
         case .entry(let entryID): goToEntry(entryID)
         }
     }
@@ -24,23 +25,26 @@ extension TranscriptScrollView {
         let record = TranscriptPageIdentity.record(for: entryID)
         let entries = transcript.entries
         if !paging.isLoading, let first = entries.first, let last = entries.last,
-           record >= TranscriptPageIdentity.record(for: first.id) || !paging.hasEarlier,
-           record <= TranscriptPageIdentity.record(for: last.id),
-           let target = entries.first(where: { $0.id >= entryID }) {
+            record >= TranscriptPageIdentity.record(for: first.id) || !paging.hasEarlier,
+            record <= TranscriptPageIdentity.record(for: last.id),
+            let target = entries.first(where: { $0.id >= entryID })
+        {
             bookmarkState.cancelLoadingJump()
-            positionController.seek(toEntryAt: target.id)   // records, restores, seeks (TranscriptScrollPositionController.swift:249-254)
+            positionController.seek(toEntryAt: target.id)  // records, restores, seeks (TranscriptScrollPositionController.swift:249-254)
             return
         }
-        if searchState.isPresented { searchState.close() }   // a new page would select Find's first match
+        if searchState.isPresented { searchState.close() }  // a new page would select Find's first match
         bookmarkState.startLoadingEntryJump(entryID)
         positionController.setSeekTarget(entryID)
-        paging.refresh(conversation, position: .entry(index: entryID, offset: -6))   // cancels a page in flight (TranscriptPagingModel.swift:76)
+        // Cancels a page in flight (TranscriptPagingModel.swift:76).
+        paging.refresh(conversation, position: .entry(index: entryID, offset: -6))
     }
 
     /// After the entry jump's page restored the first entry at or after it to the top.
     func settleEntryJump() {
         guard let paging, !paging.isLoading, let ids = paging.transcript?.positionIDs, let last = ids.last,
-              let entryID = bookmarkState.finishLoadingEntryJump() else { return }
+            let entryID = bookmarkState.finishLoadingEntryJump()
+        else { return }
         positionController.setSeekTarget(ids.first { $0 >= entryID } ?? last, recordingPosition: true)
     }
 }

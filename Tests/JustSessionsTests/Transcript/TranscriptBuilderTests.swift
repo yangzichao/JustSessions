@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct TranscriptBuilderTests {
@@ -26,11 +27,12 @@ struct TranscriptBuilderTests {
 
         let transcript = builder.build()
 
-        #expect(transcript.entries.map(\.content) == [
-            .toolCalls(["Bash · ls"]),
-            .note("Earlier messages were compacted"),
-            .toolCalls(["Read · a.swift"]),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .toolCalls(["Bash · ls"]),
+                .note("Earlier messages were compacted"),
+                .toolCalls(["Read · a.swift"]),
+            ])
         #expect(transcript.entries.map(\.startsTurn) == [true, false, true])
     }
 
@@ -47,14 +49,15 @@ struct TranscriptBuilderTests {
 
         let transcript = builder.build()
 
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Look"),
-            .userImage(SampleTranscriptImage.image),
-            .toolCalls(["screenshot"]),
-            .toolResultImage(SampleTranscriptImage.image),
-            .toolCalls(["Bash · ls"]),
-            .userImage(SampleTranscriptImage.image),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Look"),
+                .userImage(SampleTranscriptImage.image),
+                .toolCalls(["screenshot"]),
+                .toolResultImage(SampleTranscriptImage.image),
+                .toolCalls(["Bash · ls"]),
+                .userImage(SampleTranscriptImage.image),
+            ])
         #expect(transcript.entries.map(\.startsTurn) == [true, false, true, false, false, true])
     }
 
@@ -75,12 +78,13 @@ struct TranscriptBuilderTests {
         let transcript = builder.build()
 
         #expect(decodedImageCount == 0)
-        #expect(transcript.entries.map(\.content) == [
-            .userMessage("Look"),
-            .userImage(.undecoded),
-            .toolCalls(["screenshot"]),
-            .toolResultImage(.undecoded),
-        ])
+        #expect(
+            transcript.entries.map(\.content) == [
+                .userMessage("Look"),
+                .userImage(.undecoded),
+                .toolCalls(["screenshot"]),
+                .toolResultImage(.undecoded),
+            ])
         #expect(transcript.entries.map(\.startsTurn) == [true, false, true, false])
     }
 }

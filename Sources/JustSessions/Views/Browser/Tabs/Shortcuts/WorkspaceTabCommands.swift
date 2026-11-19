@@ -51,7 +51,8 @@ struct WorkspaceTabCommands: Commands {
             Divider()
 
             ForEach(1...9, id: \.self) { shortcutNumber in
-                Button(AppLocalization.string(shortcutNumber == 9 ? "Last Tab" : "Tab \(shortcutNumber)", language: languageStore.language)) {
+                Button(AppLocalization.string(shortcutNumber == 9 ? "Last Tab" : "Tab \(shortcutNumber)", language: languageStore.language))
+                {
                     actions?.selectTab(shortcutNumber)
                 }
                 .keyboardShortcut(KeyEquivalent(Character(String(shortcutNumber))), modifiers: .command)

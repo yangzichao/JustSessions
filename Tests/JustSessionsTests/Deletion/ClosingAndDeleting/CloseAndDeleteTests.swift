@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Close and delete: a session a tab shows, or whose CLI runs in tmux, has its CLI ended, then is deleted.
@@ -92,9 +93,11 @@ struct CloseAndDeleteTests {
         #expect(store.alert == nil)
         let commands = recorder.commands.map(\.command)
         #expect(commands.count == 2)
-        #expect(commands.first == RemoteTmuxCommands.killSessionWaitingForCLIExitCommand(
-            tmuxName, on: "devbox", timeoutSeconds: ConversationStore.cliExitTimeoutBeforeDeletion
-        ))
+        #expect(
+            commands.first
+                == RemoteTmuxCommands.killSessionWaitingForCLIExitCommand(
+                    tmuxName, on: "devbox", timeoutSeconds: ConversationStore.cliExitTimeoutBeforeDeletion
+                ))
         #expect(commands.last?.contains(conversation.sessionID) == true)
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct KiroAdapterTests {
@@ -9,12 +10,16 @@ struct KiroAdapterTests {
         let fixture = KiroSessionFolderFixture(sessionsDirectory: root)
         let titledID = UUID().uuidString.lowercased()
         let untitledID = UUID().uuidString.lowercased()
-        try fixture.writeSession(id: titledID, projectPath: "/Users/me/app", title: "Login fix", messageLines: [
-            KiroSessionFolderFixture.prompt("Fix the login bug"), KiroSessionFolderFixture.reply,
-        ])
-        try fixture.writeSession(id: untitledID, projectPath: "/Users/me/api", updatedAt: "2099-01-01T00:00:00Z", messageLines: [
-            KiroSessionFolderFixture.reply, KiroSessionFolderFixture.prompt("Add a health check"),
-        ])
+        try fixture.writeSession(
+            id: titledID, projectPath: "/Users/me/app", title: "Login fix",
+            messageLines: [
+                KiroSessionFolderFixture.prompt("Fix the login bug"), KiroSessionFolderFixture.reply,
+            ])
+        try fixture.writeSession(
+            id: untitledID, projectPath: "/Users/me/api", updatedAt: "2099-01-01T00:00:00Z",
+            messageLines: [
+                KiroSessionFolderFixture.reply, KiroSessionFolderFixture.prompt("Add a health check"),
+            ])
 
         let found = try KiroAdapter(sessionsDirectory: root).discover()
 
@@ -51,10 +56,12 @@ struct KiroAdapterTests {
         defer { try? FileManager.default.removeItem(at: root) }
         let fixture = KiroSessionFolderFixture(sessionsDirectory: root)
         let prompt = [KiroSessionFolderFixture.prompt("Hi")]
-        try fixture.writeSession(id: UUID().uuidString, projectPath: "/Users/me/app", createdReason: "subagent",
-                                 parentSessionID: UUID().uuidString.lowercased(), messageLines: prompt)
-        try fixture.writeSession(id: UUID().uuidString, projectPath: "/Users/me/app", parentSessionID: UUID().uuidString.lowercased(),
-                                 messageLines: prompt)
+        try fixture.writeSession(
+            id: UUID().uuidString, projectPath: "/Users/me/app", createdReason: "subagent",
+            parentSessionID: UUID().uuidString.lowercased(), messageLines: prompt)
+        try fixture.writeSession(
+            id: UUID().uuidString, projectPath: "/Users/me/app", parentSessionID: UUID().uuidString.lowercased(),
+            messageLines: prompt)
         try fixture.writeSession(id: UUID().uuidString, projectPath: "/Users/me/app", createdReason: "subagent", messageLines: [])
         try fixture.writeSession(id: UUID().uuidString, projectPath: "/Users/me/app", messageLines: [])
         try fixture.writeSession(id: "not-a-uuid", projectPath: "/Users/me/app", messageLines: prompt)
@@ -67,10 +74,12 @@ struct KiroAdapterTests {
     }
 
     @Test func sessionsFolderIsInKirosHome() {
-        #expect(KiroAdapter.standardSessionsDirectory(environment: [:], homeDirectory: "/Users/me").path
-            == "/Users/me/.kiro/sessions/cli")
-        #expect(KiroAdapter.standardSessionsDirectory(environment: ["KIRO_HOME": "/opt/kiro"], homeDirectory: "/Users/me").path
-            == "/opt/kiro/sessions/cli")
+        #expect(
+            KiroAdapter.standardSessionsDirectory(environment: [:], homeDirectory: "/Users/me").path
+                == "/Users/me/.kiro/sessions/cli")
+        #expect(
+            KiroAdapter.standardSessionsDirectory(environment: ["KIRO_HOME": "/opt/kiro"], homeDirectory: "/Users/me").path
+                == "/opt/kiro/sessions/cli")
     }
 
     @Test func aMetadataFileNamedForAnotherSessionIsNotListed() throws {

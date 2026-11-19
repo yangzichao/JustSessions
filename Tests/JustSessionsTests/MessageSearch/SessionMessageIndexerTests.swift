@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -58,8 +59,10 @@ struct SessionMessageIndexerTests {
         #expect(await index.sessionCount() == 0)
     }
 
-    private func codexSession(_ messages: [String], in directory: URL, sessionID: String = UUID().uuidString.lowercased(),
-                              updatedAt: Date = .now) throws -> Conversation {
+    private func codexSession(
+        _ messages: [String], in directory: URL, sessionID: String = UUID().uuidString.lowercased(),
+        updatedAt: Date = .now
+    ) throws -> Conversation {
         let file = directory.appendingPathComponent("\(sessionID).jsonl")
         try SampleTranscriptLines.fileContents(messages.map { codexLine($0) }).write(to: file)
         return .fixture(provider: .codex, sessionID: sessionID, updatedAt: updatedAt, sourceFile: file)
@@ -70,7 +73,8 @@ struct SessionMessageIndexerTests {
     }
 
     private func makeIndexer(cacheIn directory: URL) -> SessionMessageIndexer {
-        let indexer = SessionMessageIndexer(index: SessionMessageIndex(cache: SessionMessageTextCache(directory: directory.appendingPathComponent("Cache"))))
+        let indexer = SessionMessageIndexer(
+            index: SessionMessageIndex(cache: SessionMessageTextCache(directory: directory.appendingPathComponent("Cache"))))
         indexer.publishInterval = .zero
         return indexer
     }
@@ -112,8 +116,9 @@ struct SessionMessageIndexerTests {
         try await waitForUpdate(of: indexer, after: 0)
         #expect(try await matches("later message", in: indexer).isEmpty)
 
-        let grown = try codexSession(["First message", "A later message"], in: directory, sessionID: session.sessionID,
-                                     updatedAt: session.updatedAt.addingTimeInterval(5))
+        let grown = try codexSession(
+            ["First message", "A later message"], in: directory, sessionID: session.sessionID,
+            updatedAt: session.updatedAt.addingTimeInterval(5))
         let revision = indexer.revision
         await indexer.update(with: [grown], for: user)
         try await waitForUpdate(of: indexer, after: revision)

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct TranscriptProviderPagingTests {
@@ -19,7 +20,7 @@ struct TranscriptProviderPagingTests {
         limits.targetEntryCount = 1
         let source = TranscriptPageSource(file: fixture.file, provider: .claude, limits: limits)
         let latest = try await source.read(.latest)
-        #expect(latest.entries.count == 3) // All parts of one record stay together.
+        #expect(latest.entries.count == 3)  // All parts of one record stay together.
         let first = try await source.read(.before(latest.records.lowerBound))
         #expect((first.entries + latest.entries).map(\.content) == (try ClaudeTranscriptReader().read(fixture.file)).entries.map(\.content))
     }
@@ -92,7 +93,10 @@ struct TranscriptProviderPagingTests {
         let last = try await source.read(.latest)
         let middle = try await source.read(.before(last.records.lowerBound))
         let first = try await source.read(.before(middle.records.lowerBound))
-        #expect((first.entries + middle.entries + last.entries).map(\.content) == [.userMessage("Start"), .userMessage("New branch"), .assistantMessage("Reply")])
+        #expect(
+            (first.entries + middle.entries + last.entries).map(\.content) == [
+                .userMessage("Start"), .userMessage("New branch"), .assistantMessage("Reply"),
+            ])
         #expect(first.hasEarlier == false)
         #expect(last.hasLater == false)
         #expect(try await source.read(.around(middle.entries[0].id)).entries[0].id == middle.entries[0].id)

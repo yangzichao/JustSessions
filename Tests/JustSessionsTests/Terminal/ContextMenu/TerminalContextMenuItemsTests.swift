@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A right-click in a tab's terminal offers copying, pasting, and selecting its text, then what the tab's menu in the
@@ -14,13 +15,14 @@ struct TerminalContextMenuItemsTests {
         fixture.openTab(engine: engine, title: "Other")
         let tab = fixture.openTab(engine: engine, conversation: .fixture())
 
-        #expect(TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)) == [
-            "Copy", "Paste", "Select All", "—",
-            "Rename", "—",
-            "Copy conversation", "Export conversation", "Copy session ID", "Reveal session file in Finder", "—",
-            "Split right", "Split down", "—",
-            "Close Tab…", "Close and end session", "Close and delete session…",
-        ])
+        #expect(
+            TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)) == [
+                "Copy", "Paste", "Select All", "—",
+                "Rename", "—",
+                "Copy conversation", "Export conversation", "Copy session ID", "Reveal session file in Finder", "—",
+                "Split right", "Split down", "—",
+                "Close Tab…", "Close and end session", "Close and delete session…",
+            ])
     }
 
     /// The Finder can't show a session file that is on an SSH host.
@@ -44,11 +46,12 @@ struct TerminalContextMenuItemsTests {
         fixture.openTab(engine: engine, title: "Other")
         let tab = fixture.openTab(engine: engine, isPlainTerminal: true)
 
-        #expect(TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)) == [
-            "Copy", "Paste", "Select All", "—",
-            "Split right", "Split down", "—",
-            "Close terminal…",
-        ])
+        #expect(
+            TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)) == [
+                "Copy", "Paste", "Select All", "—",
+                "Split right", "Split down", "—",
+                "Close terminal…",
+            ])
     }
 
     /// As in the tab bar, a new session's tab can't be renamed or shared until it is linked to the session its CLI
@@ -60,12 +63,13 @@ struct TerminalContextMenuItemsTests {
         let tab = fixture.openTab(engine: engine)
         let menu = fixture.menu(for: tab)
 
-        #expect(TerminalContextMenuFixture.titles(of: menu) == [
-            "Copy", "Paste", "Select All", "—",
-            "Rename", "—",
-            "Split right", "Split down", "—",
-            "Close Tab…", "Close and end session",
-        ])
+        #expect(
+            TerminalContextMenuFixture.titles(of: menu) == [
+                "Copy", "Paste", "Select All", "—",
+                "Rename", "—",
+                "Split right", "Split down", "—",
+                "Close Tab…", "Close and end session",
+            ])
         #expect(try !TerminalContextMenuFixture.item("Rename", in: menu).isEnabled)
     }
 
@@ -130,9 +134,10 @@ struct TerminalContextMenuItemsTests {
 
         let item = try TerminalContextMenuFixture.item("Arrange split view", in: fixture.menu(for: right))
 
-        #expect(item.submenu.map(TerminalContextMenuFixture.titles(of:)) == [
-            "Separate views", "—", "Close left view", "Close right view", "—", "Reverse views", "Stack views",
-        ])
+        #expect(
+            item.submenu.map(TerminalContextMenuFixture.titles(of:)) == [
+                "Separate views", "—", "Close left view", "Close right view", "—", "Reverse views", "Stack views",
+            ])
     }
 
     /// macOS would otherwise add AutoFill's Contact…, Passwords…, and Credit Card… when it shows the menu.
@@ -152,12 +157,13 @@ struct TerminalContextMenuItemsTests {
         fixture.openTab(engine: engine, title: "Other")
         let tab = fixture.openTab(engine: engine, conversation: .fixture())
 
-        #expect(TerminalContextMenuFixture.titles(of: fixture.menu(for: tab, language: "zh-Hans")) == [
-            "复制", "粘贴", "全选", "—",
-            "重命名", "—",
-            "复制对话", "导出对话", "复制会话 ID", "在 Finder 中显示会话文件", "—",
-            "向右拆分", "向下拆分", "—",
-            "关闭标签…", "关闭并结束会话", "关闭并删除会话…",
-        ])
+        #expect(
+            TerminalContextMenuFixture.titles(of: fixture.menu(for: tab, language: "zh-Hans")) == [
+                "复制", "粘贴", "全选", "—",
+                "重命名", "—",
+                "复制对话", "导出对话", "复制会话 ID", "在 Finder 中显示会话文件", "—",
+                "向右拆分", "向下拆分", "—",
+                "关闭标签…", "关闭并结束会话", "关闭并删除会话…",
+            ])
     }
 }

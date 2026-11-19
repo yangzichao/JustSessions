@@ -23,12 +23,16 @@ struct TerminalAppearanceSection: View {
         GridRow {
             Text("Engine")
             HStack(spacing: 4) {
-                ThemeSegmentedPicker("Engine", selection: Binding(
-                    get: { engineStore.engine },
-                    set: { engineStore.setEngine($0) }
-                ), segments: TerminalEngine.allCases.map { engine in
-                    ThemeSegment(value: engine, title: Text(verbatim: engine.displayName))
-                })
+                ThemeSegmentedPicker(
+                    "Engine",
+                    selection: Binding(
+                        get: { engineStore.engine },
+                        set: { engineStore.setEngine($0) }
+                    ),
+                    segments: TerminalEngine.allCases.map { engine in
+                        ThemeSegment(value: engine, title: Text(verbatim: engine.displayName))
+                    }
+                )
                 .fixedSize()
                 HelpPopoverButton(
                     title: "Terminal engine",
@@ -40,15 +44,19 @@ struct TerminalAppearanceSection: View {
         GridRow {
             Text("Option key")
             HStack(spacing: 4) {
-                Toggle("Use Option as Meta", isOn: Binding(
-                    get: { optionKeyStore.optionIsMeta },
-                    set: { optionKeyStore.setOptionIsMeta($0) }
-                ))
+                Toggle(
+                    "Use Option as Meta",
+                    isOn: Binding(
+                        get: { optionKeyStore.optionIsMeta },
+                        set: { optionKeyStore.setOptionIsMeta($0) }
+                    )
+                )
                 .toggleStyle(ThemedCheckboxToggleStyle())
                 .accessibilityIdentifier("settings.optionIsMeta")
                 HelpPopoverButton(
                     title: "Option key",
-                    explanation: "Option with a key sends Esc and that key, which shells and CLIs read as Alt shortcuts. Turn it off to type the characters your keyboard layout keeps behind Option, such as brackets, braces, or the pipe. Open tabs follow the change."
+                    explanation:
+                        "Option with a key sends Esc and that key, which shells and CLIs read as Alt shortcuts. Turn it off to type the characters your keyboard layout keeps behind Option, such as brackets, braces, or the pipe. Open tabs follow the change."
                 )
                 .accessibilityIdentifier("settings.help.optionKey")
             }
@@ -59,12 +67,16 @@ struct TerminalAppearanceSection: View {
         }
         GridRow {
             Text("Light or dark")
-            ThemeSegmentedPicker("Light or dark", selection: Binding(
-                get: { appearanceStore.preferences.mode },
-                set: { appearanceStore.setMode($0) }
-            ), segments: TerminalAppearanceMode.allCases.map { mode in
-                ThemeSegment(value: mode, title: Text(mode.localizedDisplayName))
-            })
+            ThemeSegmentedPicker(
+                "Light or dark",
+                selection: Binding(
+                    get: { appearanceStore.preferences.mode },
+                    set: { appearanceStore.setMode($0) }
+                ),
+                segments: TerminalAppearanceMode.allCases.map { mode in
+                    ThemeSegment(value: mode, title: Text(mode.localizedDisplayName))
+                }
+            )
             // The theme only matters here for whether the scheme has both versions, and every app theme does.
             .disabled(!appearanceStore.preferences.colorVariants(appTheme: themeStore.resolvedTheme).hasLightAndDarkVersions)
             .help("Picks the light or dark version of color schemes that have both.")
@@ -80,10 +92,12 @@ struct TerminalAppearanceSection: View {
         GridRow {
             Text("Size")
             HStack(spacing: 12) {
-                Slider(value: Binding(
-                    get: { appearanceStore.preferences.fontSize },
-                    set: { appearanceStore.setFontSize($0) }
-                ), in: TerminalAppearancePreferences.fontSizeRange, step: 1)
+                Slider(
+                    value: Binding(
+                        get: { appearanceStore.preferences.fontSize },
+                        set: { appearanceStore.setFontSize($0) }
+                    ), in: TerminalAppearancePreferences.fontSizeRange, step: 1
+                )
                 .accessibilityLabel("Font size")
                 Text("\(Int(appearanceStore.preferences.fontSize)) pt")
                     .monospacedDigit()

@@ -8,11 +8,12 @@ struct ProcessOpenFileReader: Sendable {
     func openFilePaths(ofProcessIDs processIDs: [Int32]) -> [Int32: [String]] {
         let validProcessIDs = processIDs.filter { $0 > 0 }
         guard !validProcessIDs.isEmpty,
-              let output = BoundedProcessRunner.output(
-                  ofExecutable: "/usr/sbin/lsof",
-                  arguments: ["-nP", "-w", "-Fn", "-p", validProcessIDs.map(String.init).joined(separator: ",")],
-                  timeout: timeout
-              ) else { return [:] }
+            let output = BoundedProcessRunner.output(
+                ofExecutable: "/usr/sbin/lsof",
+                arguments: ["-nP", "-w", "-Fn", "-p", validProcessIDs.map(String.init).joined(separator: ",")],
+                timeout: timeout
+            )
+        else { return [:] }
         // lsof exits with status 1 when one of the processes is gone, but still lists the others.
         return Self.openFilePaths(inLsofFieldOutput: output)
     }

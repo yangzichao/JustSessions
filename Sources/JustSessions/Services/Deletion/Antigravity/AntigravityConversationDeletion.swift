@@ -7,12 +7,13 @@ struct AntigravityConversationDeletion {
 
     init(configurationDirectory: URL, moveToTrash: ((URL) throws -> URL)? = nil, isInUse: (([URL]) throws -> Bool)? = nil) {
         self.configurationDirectory = configurationDirectory
-        self.moveToTrash = moveToTrash ?? { file in
-            var destination: NSURL?
-            try FileManager.default.trashItem(at: file, resultingItemURL: &destination)
-            guard let destination else { throw AntigravityDatabaseError.unreadable }
-            return destination as URL
-        }
+        self.moveToTrash =
+            moveToTrash ?? { file in
+                var destination: NSURL?
+                try FileManager.default.trashItem(at: file, resultingItemURL: &destination)
+                guard let destination else { throw AntigravityDatabaseError.unreadable }
+                return destination as URL
+            }
         self.isInUse = isInUse ?? Self.filesAreInUse
     }
 
@@ -28,8 +29,7 @@ struct AntigravityConversationDeletion {
         } catch {
             var restored = true
             for file in movedFiles.reversed() {
-                do { try FileManager.default.moveItem(at: file.trashed, to: file.original) }
-                catch { restored = false }
+                do { try FileManager.default.moveItem(at: file.trashed, to: file.original) } catch { restored = false }
             }
             guard restored else { throw AntigravityConversationDeletionError.couldNotRestoreFiles }
             throw error
@@ -37,10 +37,12 @@ struct AntigravityConversationDeletion {
     }
 
     static func filesAreInUse(_ files: [URL]) throws -> Bool {
-        guard let result = BoundedProcessRunner.result(
-            ofExecutable: "/usr/sbin/lsof", arguments: ["-nP", "-t", "--"] + files.map(\.path),
-            includesStandardError: true, timeout: 5
-        ) else { throw AntigravityConversationDeletionError.couldNotCheckProcesses }
+        guard
+            let result = BoundedProcessRunner.result(
+                ofExecutable: "/usr/sbin/lsof", arguments: ["-nP", "-t", "--"] + files.map(\.path),
+                includesStandardError: true, timeout: 5
+            )
+        else { throw AntigravityConversationDeletionError.couldNotCheckProcesses }
         if result.exitStatus == 0 { return true }
         guard result.exitStatus == 1, result.output.isEmpty else {
             throw AntigravityConversationDeletionError.couldNotCheckProcesses

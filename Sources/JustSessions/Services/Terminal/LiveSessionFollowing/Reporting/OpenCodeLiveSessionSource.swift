@@ -8,7 +8,8 @@ struct OpenCodeLiveSessionSource: LiveSessionSource {
 
     func currentSession(ofCLIProcessID processID: Int32) -> LiveCLISession? {
         guard let report = reporting.report(forProcessID: processID),
-              let sessionID = report.sessionID, provider.isValidSessionID(sessionID) else { return nil }
+            let sessionID = report.sessionID, provider.isValidSessionID(sessionID)
+        else { return nil }
         return LiveCLISession(sessionID: sessionID, file: nil)
     }
 

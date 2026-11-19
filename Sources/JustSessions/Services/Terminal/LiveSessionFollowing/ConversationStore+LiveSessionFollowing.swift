@@ -15,19 +15,22 @@ extension ConversationStore {
         guard !isScanningThisMac, !isDeletingSessions else { return }
         let lookups = terminalSessions.compactMap { tab -> LiveSessionLookup? in
             guard tab.host == .thisMac, tab.isRunning, let provider = tab.provider,
-                  sources.contains(where: { $0.provider == provider }) else { return nil }
+                sources.contains(where: { $0.provider == provider })
+            else { return nil }
             return LiveSessionLookup(tabID: tab.id, provider: provider, processID: tab.cliProcessID)
         }
         guard !lookups.isEmpty else { return }
         let lookedUpProviders = Set(lookups.map(\.provider))
-        let listedSessionIDs = conversations
+        let listedSessionIDs =
+            conversations
             .filter { $0.host == .thisMac && lookedUpProviders.contains($0.provider) }
             .reduce(into: [ConversationProvider: Set<String>]()) { $0[$1.provider, default: []].insert($1.sessionID) }
 
         let foundSessions = await Task.detached(priority: .utility) {
             lookups.compactMap { lookup -> FoundLiveSession? in
                 guard let source = sources.first(where: { $0.provider == lookup.provider }),
-                      let session = source.currentSession(ofCLIProcessID: lookup.processID) else { return nil }
+                    let session = source.currentSession(ofCLIProcessID: lookup.processID)
+                else { return nil }
                 let isListed = listedSessionIDs[lookup.provider]?.contains(session.sessionID) == true
                 return FoundLiveSession(tabID: lookup.tabID, sessionID: session.sessionID, isSaved: !isListed && source.isSaved(session))
             }
@@ -36,9 +39,10 @@ extension ConversationStore {
         var hasSessionToList = false
         for foundSession in foundSessions {
             guard let tab = terminalSessions.first(where: { $0.id == foundSession.tabID }), tab.isRunning,
-                  tab.conversation?.sessionID != foundSession.sessionID,
-                  // A branch's CLI may open the session it forks before the fork.
-                  tab.conversation != nil || foundSession.sessionID != tab.branchedFromSessionID else { continue }
+                tab.conversation?.sessionID != foundSession.sessionID,
+                // A branch's CLI may open the session it forks before the fork.
+                tab.conversation != nil || foundSession.sessionID != tab.branchedFromSessionID
+            else { continue }
             if let conversation = conversations.first(where: {
                 $0.provider == tab.provider && $0.host == .thisMac && $0.sessionID == foundSession.sessionID
             }) {

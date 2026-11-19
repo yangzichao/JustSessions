@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Sessions saved in the sandbox's home where each tool keeps them, titled by their first prompt.
@@ -17,9 +18,11 @@ extension UnseenTurnSandboxApp {
             try saveCodexSession(title)
         case .pi:
             try PiSessionFolderFixture(sessionsDirectory: sandbox.root.appendingPathComponent(Self.piSessionsFolder))
-                .writeSession(id: UUID().uuidString.lowercased(), projectPath: sandbox.project.path, lines: [
-                    PiSessionFolderFixture.userMessage(title),
-                ])
+                .writeSession(
+                    id: UUID().uuidString.lowercased(), projectPath: sandbox.project.path,
+                    lines: [
+                        PiSessionFolderFixture.userMessage(title)
+                    ])
         case .opencode:
             try saveOpenCodeSession(title)
         case .antigravity:
@@ -48,7 +51,8 @@ extension UnseenTurnSandboxApp {
             #"{"timestamp":"2026-10-08T10:00:01.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"\#(title)"}]}}"#,
         ]
         try (lines.joined(separator: "\n") + "\n")
-            .write(to: dayFolder.appendingPathComponent("rollout-2026-10-08T10-00-00-\(sessionID).jsonl"), atomically: true, encoding: .utf8)
+            .write(
+                to: dayFolder.appendingPathComponent("rollout-2026-10-08T10-00-00-\(sessionID).jsonl"), atomically: true, encoding: .utf8)
     }
 
     /// OpenCode keeps every session in one database, titled once the first prompt is in.

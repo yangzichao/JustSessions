@@ -23,7 +23,7 @@ struct TranscriptReadingToolbar: View {
             .font(ThemeFont.caption)
             .foregroundStyle(ThemePalette.secondaryText)
             .lineLimit(1)
-            .frame(maxWidth: .infinity, alignment: .leading)   // takes what the buttons leave, as a Spacer did
+            .frame(maxWidth: .infinity, alignment: .leading)  // takes what the buttons leave, as a Spacer did
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(messageCount == 1 ? "1 message" : "\(messageCount) messages"))
             if let onFind {
@@ -34,14 +34,22 @@ struct TranscriptReadingToolbar: View {
                     .onboardingTourStop(.findInConversation)
             }
             HStack(spacing: 12) {
-                Button { fontSize = TranscriptReadingTextSize.size(after: .zoomOut, from: fontSize) } label: { Text("A−") }
-                    .disabled(fontSize <= TranscriptReadingTextSize.range.lowerBound)
-                    .help("Smaller text")
-                    .accessibilityLabel("Smaller reading text")
-                Button { fontSize = TranscriptReadingTextSize.size(after: .zoomIn, from: fontSize) } label: { Text("A+") }
-                    .disabled(fontSize >= TranscriptReadingTextSize.range.upperBound)
-                    .help("Larger text")
-                    .accessibilityLabel("Larger reading text")
+                Button {
+                    fontSize = TranscriptReadingTextSize.size(after: .zoomOut, from: fontSize)
+                } label: {
+                    Text("A−")
+                }
+                .disabled(fontSize <= TranscriptReadingTextSize.range.lowerBound)
+                .help("Smaller text")
+                .accessibilityLabel("Smaller reading text")
+                Button {
+                    fontSize = TranscriptReadingTextSize.size(after: .zoomIn, from: fontSize)
+                } label: {
+                    Text("A+")
+                }
+                .disabled(fontSize >= TranscriptReadingTextSize.range.upperBound)
+                .help("Larger text")
+                .accessibilityLabel("Larger reading text")
             }
             .font(ThemeFont.body.weight(.medium))
             readingWidthButton

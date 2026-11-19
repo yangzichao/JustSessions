@@ -23,8 +23,9 @@ struct CodexSessionIndex {
         var entriesBySessionID: [String: Entry] = [:]
         for line in lines {
             guard let record = ConversationMetadata.object(from: line),
-                  let sessionID = record["id"] as? String,
-                  let threadName = record["thread_name"] as? String else { continue }
+                let sessionID = record["id"] as? String,
+                let threadName = record["thread_name"] as? String
+            else { continue }
             entriesBySessionID[sessionID] = Entry(
                 threadName: threadName,
                 updatedAt: ConversationMetadata.date(record["updated_at"])

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A start command runs as a shell reads it, with the app's arguments after it, on this Mac and on SSH hosts alike.
@@ -25,12 +26,13 @@ struct CLIStartCommandLineTests {
         let command = try resolver.resolve(
             conversation: conversation, action: .resume, adapter: ClaudeAdapter(), startCommand: Self.startCommand
         )
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: command.executablePath,
-            arguments: command.arguments,
-            environment: command.environmentVariables,
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: command.executablePath,
+                arguments: command.arguments,
+                environment: command.environmentVariables,
+                timeout: 10
+            ))
 
         #expect(command.executablePath == "/bin/sh")
         #expect(output.split(separator: "\n") == ["greeting=hi", "--aws-profile", "dev box", "--resume", "id with space"])
@@ -65,16 +67,17 @@ struct CLIStartCommandLineTests {
             arguments: ["--resume", "id with 'quote'"],
             startCommand: Self.startCommand
         )
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", remoteCommand],
-            environment: [
-                "HOME": root.path,
-                "SHELL": bin.appendingPathComponent("login-shell").path,
-                "PATH": bin.path + ":/usr/bin:/bin",
-            ],
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", remoteCommand],
+                environment: [
+                    "HOME": root.path,
+                    "SHELL": bin.appendingPathComponent("login-shell").path,
+                    "PATH": bin.path + ":/usr/bin:/bin",
+                ],
+                timeout: 10
+            ))
 
         #expect(output.split(separator: "\n") == ["greeting=hi", "--aws-profile", "dev box", "--resume", "id with 'quote'"])
     }
@@ -84,6 +87,9 @@ struct CLIStartCommandLineTests {
             provider: .codex, projectPath: "/home/me/api", arguments: ["resume", "abc"], startCommand: ""
         )
 
-        #expect(remoteCommand == #"exec /usr/bin/env JUSTSESSIONS=1 COLORTERM=truecolor "$SHELL" -lic 'cd '\''/home/me/api'\'' && command -v codex 2>/dev/null | grep -q "^/" && builtin functions codex 2>/dev/null | grep -c . | grep -qx 0 && exec codex '\''-c'\'' '\''tui.terminal_title=["activity","run-state","thread-id"]'\'' '\''resume'\'' '\''abc'\''; cd '\''/home/me/api'\'' 2>/dev/null && codex '\''-c'\'' '\''tui.terminal_title=["activity","run-state","thread-id"]'\'' '\''resume'\'' '\''abc'\'''"#)
+        #expect(
+            remoteCommand
+                == #"exec /usr/bin/env JUSTSESSIONS=1 COLORTERM=truecolor "$SHELL" -lic 'cd '\''/home/me/api'\'' && command -v codex 2>/dev/null | grep -q "^/" && builtin functions codex 2>/dev/null | grep -c . | grep -qx 0 && exec codex '\''-c'\'' '\''tui.terminal_title=["activity","run-state","thread-id"]'\'' '\''resume'\'' '\''abc'\''; cd '\''/home/me/api'\'' 2>/dev/null && codex '\''-c'\'' '\''tui.terminal_title=["activity","run-state","thread-id"]'\'' '\''resume'\'' '\''abc'\'''"#
+        )
     }
 }

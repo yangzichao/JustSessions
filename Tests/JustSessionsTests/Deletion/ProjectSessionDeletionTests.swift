@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ProjectSessionDeletionTests {
@@ -64,7 +65,8 @@ struct ProjectSessionDeletionTests {
         store.refreshThisMac()
         try await expectEventually { !store.isScanningThisMac }
         let deletionPlan = store.deletionPlan(for: selectedProject.path)
-        #expect(deletionPlan.deletableConversations.map(\.id).sorted() == [selectedClaude.id, selectedCodex.id, selectedOpenCode.id].sorted())
+        #expect(
+            deletionPlan.deletableConversations.map(\.id).sorted() == [selectedClaude.id, selectedCodex.id, selectedOpenCode.id].sorted())
 
         store.deleteSessions(in: selectedProject.path)
         try await expectEventually { !store.isDeletingSessions }
@@ -105,7 +107,10 @@ struct ProjectSessionDeletionTests {
         store.refreshThisMac()
         try await expectEventually { !store.isScanningThisMac }
         #expect(store.sidebarProjectGroups.map(\.id) == [otherProject.path])
-        #expect(ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults).sidebarProjectGroups.map(\.id) == [otherProject.path])
+        #expect(
+            ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults).sidebarProjectGroups.map(\.id) == [
+                otherProject.path
+            ])
     }
 
     @Test @MainActor func projectRemovalKeepsTheProjectWhenNothingCanBeDeleted() async throws {

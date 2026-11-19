@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Every tool runs a start command of your own with the app's arguments after it, on this Mac and on SSH hosts. Each
@@ -88,12 +89,13 @@ struct EveryToolStartCommandTests {
             arguments: adapterWithoutSessions(for: toolCase.provider).arguments(for: conversation, action: .resume),
             startCommand: startCommand
         )
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", remoteCommand],
-            environment: ["HOME": root.path, "SHELL": loginShell.path, "PATH": "/usr/bin:/bin"],
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", remoteCommand],
+                environment: ["HOME": root.path, "SHELL": loginShell.path, "PATH": "/usr/bin:/bin"],
+                timeout: 10
+            ))
 
         let titleArguments = toolCase.provider == .codex ? CodexThreadTitle.launchArguments : []
         #expect(output.split(separator: "\n").map(String.init) == toolCase.ownWords + titleArguments + toolCase.resumeArguments)
@@ -110,12 +112,13 @@ struct EveryToolStartCommandTests {
     }
 
     private static func printedArguments(of command: NativeCLICommand) throws -> [String] {
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: command.executablePath,
-            arguments: command.arguments,
-            environment: command.environmentVariables,
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: command.executablePath,
+                arguments: command.arguments,
+                environment: command.environmentVariables,
+                timeout: 10
+            ))
         return output.split(separator: "\n").map(String.init)
     }
 }

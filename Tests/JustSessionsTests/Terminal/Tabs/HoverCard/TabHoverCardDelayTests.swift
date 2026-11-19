@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+
 @testable import JustSessions
 
 /// As in Chrome, the first hover card waits less the narrower the tabs are, since their titles are cut more.

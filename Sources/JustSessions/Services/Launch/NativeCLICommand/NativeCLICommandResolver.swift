@@ -27,10 +27,11 @@ struct NativeCLICommandResolver: @unchecked Sendable {
 
     /// Computed per lookup so a CLI installed while the app is running is still found.
     var searchDirectories: [String] {
-        searchDirectoriesOverride ?? CLISearchDirectories.standard(
-            inheritedEnvironment: inheritedEnvironment,
-            fileManager: fileManager
-        )
+        searchDirectoriesOverride
+            ?? CLISearchDirectories.standard(
+                inheritedEnvironment: inheritedEnvironment,
+                fileManager: fileManager
+            )
     }
 
     /// PATH for spawned CLIs, so npm-installed ones can find `node` via `#!/usr/bin/env node`.
@@ -72,9 +73,11 @@ struct NativeCLICommandResolver: @unchecked Sendable {
 
         // A start command of your own is not looked up: the shell that runs it reports a missing one in the tab.
         let customStartCommand = CLIStartCommandLine.customCommand(startCommand)
-        guard let executablePath = customStartCommand == nil
+        guard
+            let executablePath = customStartCommand == nil
                 ? executablePath(named: provider.executableName)
-                : CLIStartCommandLine.thisMacShellPath else {
+                : CLIStartCommandLine.thisMacShellPath
+        else {
             throw NativeCLICommandError.missingExecutable(provider.executableName)
         }
 
@@ -102,7 +105,8 @@ struct NativeCLICommandResolver: @unchecked Sendable {
     func requireProjectDirectory(_ projectPath: String) throws {
         var isDirectory: ObjCBool = false
         guard fileManager.fileExists(atPath: projectPath, isDirectory: &isDirectory),
-              isDirectory.boolValue else {
+            isDirectory.boolValue
+        else {
             throw NativeCLICommandError.missingProject(projectPath)
         }
     }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct SessionAttentionTrackerTests {
@@ -9,8 +10,9 @@ struct SessionAttentionTrackerTests {
 
         #expect(tracker.events(after: [.init(source: source, activity: .needsInput(reason: nil))]).isEmpty)
         #expect(tracker.events(after: [.init(source: source, activity: .working)]).isEmpty)
-        #expect(tracker.events(after: [.init(source: source, activity: .idle)])
-            == [SessionAttentionEvent(source: source, reason: .finishedTurn)])
+        #expect(
+            tracker.events(after: [.init(source: source, activity: .idle)])
+                == [SessionAttentionEvent(source: source, reason: .finishedTurn)])
         #expect(tracker.events(after: [.init(source: source, activity: .idle)]).isEmpty)
     }
 
@@ -20,8 +22,9 @@ struct SessionAttentionTrackerTests {
 
         _ = tracker.events(after: [.init(source: source, activity: .working)])
         #expect(tracker.events(after: [.init(source: source, activity: nil)]).isEmpty)
-        #expect(tracker.events(after: [.init(source: source, activity: .needsInput(reason: "input needed"))])
-            == [SessionAttentionEvent(source: source, reason: .needsInput(reason: "input needed"))])
+        #expect(
+            tracker.events(after: [.init(source: source, activity: .needsInput(reason: "input needed"))])
+                == [SessionAttentionEvent(source: source, reason: .needsInput(reason: "input needed"))])
     }
 
     @Test func aCLIThatStopsRunningIsForgotten() {
@@ -40,8 +43,9 @@ struct SessionAttentionTrackerTests {
         let detached = SessionAttentionSource.detachedTmux(conversationID: "a")
 
         _ = tracker.events(after: [.init(source: tab, activity: .working)])
-        #expect(tracker.events(after: [.init(source: detached, activity: .idle)])
-            == [SessionAttentionEvent(source: detached, reason: .finishedTurn)])
+        #expect(
+            tracker.events(after: [.init(source: detached, activity: .idle)])
+                == [SessionAttentionEvent(source: detached, reason: .finishedTurn)])
     }
 
     @Test func aNewSessionsTabStaysFollowedOnceItLearnsItsSession() {
@@ -50,8 +54,9 @@ struct SessionAttentionTrackerTests {
 
         _ = tracker.events(after: [.init(source: .tab(id: tabID, conversationID: nil), activity: .working)])
         let linkedTab = SessionAttentionSource.tab(id: tabID, conversationID: "a")
-        #expect(tracker.events(after: [.init(source: linkedTab, activity: .idle)])
-            == [SessionAttentionEvent(source: linkedTab, reason: .finishedTurn)])
+        #expect(
+            tracker.events(after: [.init(source: linkedTab, activity: .idle)])
+                == [SessionAttentionEvent(source: linkedTab, reason: .finishedTurn)])
     }
 
     @Test func followsEachCLIOnItsOwn() {
@@ -60,7 +65,8 @@ struct SessionAttentionTrackerTests {
         let second = SessionAttentionSource.detachedTmux(conversationID: "b")
 
         _ = tracker.events(after: [.init(source: first, activity: .working), .init(source: second, activity: .idle)])
-        #expect(tracker.events(after: [.init(source: first, activity: .idle), .init(source: second, activity: .working)])
-            == [SessionAttentionEvent(source: first, reason: .finishedTurn)])
+        #expect(
+            tracker.events(after: [.init(source: first, activity: .idle), .init(source: second, activity: .working)])
+                == [SessionAttentionEvent(source: first, reason: .finishedTurn)])
     }
 }

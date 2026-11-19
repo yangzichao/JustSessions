@@ -15,7 +15,8 @@ struct CodexRolloutLocator: Sendable {
     /// day from the newest to the day before `earliestStart`, since a refresh that started then listed the threads
     /// already saved; with no `earliestStart`, through every day.
     func sessionID(forThreadIDPrefix threadIDPrefix: String, startedOnOrAfter earliestStart: Date?) -> String? {
-        let earliestDay = earliestStart
+        let earliestDay =
+            earliestStart
             .flatMap { calendar.date(byAdding: .day, value: -1, to: $0) }
             .map { calendar.dateComponents([.year, .month, .day], from: $0) }
             .map { [$0.year ?? 0, $0.month ?? 0, $0.day ?? 0] } ?? [0, 0, 0]
@@ -24,7 +25,8 @@ struct CodexRolloutLocator: Sendable {
             for fileName in fileNames
             where fileName.hasPrefix("rollout-") && fileName.hasSuffix(".jsonl") && fileName.contains("-\(threadIDPrefix)") {
                 if let head = CodexRolloutHead(file: dayDirectory.appendingPathComponent(fileName)),
-                   head.sessionID.hasPrefix(threadIDPrefix) {
+                    head.sessionID.hasPrefix(threadIDPrefix)
+                {
                     return head.sessionID
                 }
             }
@@ -43,7 +45,8 @@ struct CodexRolloutLocator: Sendable {
                 }
             }
         }
-        return dayDirectories
+        return
+            dayDirectories
             .sorted { $1.day.lexicographicallyPrecedes($0.day) }
             .map(\.directory)
     }

@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// A Markdown table in the reader (RDR-04): columns as wide as their widest cells while the table fits the reader's
@@ -8,8 +9,9 @@ import Testing
 @MainActor
 struct TranscriptMarkdownTableLayoutTests {
     private static func columnWidths(_ ideal: [CGFloat], available: CGFloat, minimums: [CGFloat]? = nil) -> [CGFloat] {
-        TranscriptMarkdownTableLayout.columnWidths(idealWidths: ideal, minimumWidths: minimums ?? ideal.map { _ in 120 },
-                                                   availableWidth: available)
+        TranscriptMarkdownTableLayout.columnWidths(
+            idealWidths: ideal, minimumWidths: minimums ?? ideal.map { _ in 120 },
+            availableWidth: available)
     }
 
     @Test func columnsThatFitKeepTheirWidths() {
@@ -34,14 +36,16 @@ struct TranscriptMarkdownTableLayoutTests {
     @Test func aColumnIsNeverCutBelowItsLongestWord() {
         #expect(Self.columnWidths([300, 900, 900], available: 600, minimums: [180, 120, 120]) == [200, 200, 200])
         #expect(Self.columnWidths([300, 900, 900], available: 480, minimums: [180, 120, 120]) == [180, 150, 150])
-        #expect(Self.columnWidths([300, 900, 900, 900, 900], available: 600, minimums: [180, 120, 120, 120, 120])
-            == [180, 120, 120, 120, 120])
+        #expect(
+            Self.columnWidths([300, 900, 900, 900, 900], available: 600, minimums: [180, 120, 120, 120, 120])
+                == [180, 120, 120, 120, 120])
     }
 
     private static func table(_ rows: [[String]]) -> TranscriptMarkdownTable {
-        TranscriptMarkdownTable(rows: rows.enumerated().map { index, cells in
-            TranscriptMarkdownTable.Row(id: index, isHeader: index == 0, cells: cells.map { AttributedString($0) })
-        })
+        TranscriptMarkdownTable(
+            rows: rows.enumerated().map { index, cells in
+                TranscriptMarkdownTable.Row(id: index, isHeader: index == 0, cells: cells.map { AttributedString($0) })
+            })
     }
 
     private static func size(of table: TranscriptMarkdownTable, columnWidth: CGFloat = 760) -> CGSize {
@@ -49,8 +53,9 @@ struct TranscriptMarkdownTableLayoutTests {
             .environment(\.transcriptColumnWidth, columnWidth)
             .frame(width: columnWidth, alignment: .leading)
         let host = NSHostingView(rootView: view)
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: columnWidth, height: 800), styleMask: [.borderless],
-                              backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: columnWidth, height: 800), styleMask: [.borderless],
+            backing: .buffered, defer: false)
         window.contentView = host
         host.layoutSubtreeIfNeeded()
         return host.fittingSize

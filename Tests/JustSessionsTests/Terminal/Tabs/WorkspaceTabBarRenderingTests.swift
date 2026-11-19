@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// The tab bar drawn with a split of one project's tabs in its group and a split across projects as a unit of its own
@@ -26,11 +27,12 @@ struct WorkspaceTabBarRenderingTests {
         store.splitSelectedTerminal(with: secondTools.id)
         let splitAcrossProjects = try #require(store.shownSplit)
         try #require(splitAcrossProjects.spansProjects)
-        try #require(store.tabGroupKeys == [
-            app.projectDirectoryKey, app.projectDirectoryKey,
-            splitAcrossProjects.groupKey, splitAcrossProjects.groupKey,
-            tools.projectDirectoryKey,
-        ])
+        try #require(
+            store.tabGroupKeys == [
+                app.projectDirectoryKey, app.projectDirectoryKey,
+                splitAcrossProjects.groupKey, splitAcrossProjects.groupKey,
+                tools.projectDirectoryKey,
+            ])
         let schemeName = colorScheme == .dark ? "dark" : "light"
 
         // The split across projects shows, both its tabs active.
@@ -75,7 +77,7 @@ struct WorkspaceTabBarRenderingTests {
             store: store, leadingClearance: 0, onRenameConversation: { _ in }, onNewSession: {},
             onCloseTerminal: { _ in }, onDeleteConversation: { _ in }, onCloseTabGroup: { _, _ in }
         )
-            .frame(width: Self.barWidth)
+        .frame(width: Self.barWidth)
         return ThemeSurfaceRenderingFixture(
             content: AnyView(bar),
             size: CGSize(width: Self.barWidth, height: WorkspaceTabMetrics.topInset + WorkspaceTabMetrics.height),
@@ -98,10 +100,13 @@ struct WorkspaceTabBarRenderingTests {
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
-        return (store, {
-            store.closeAllTerminals()
-            isolatedUserDefaults.removeSuite()
-        })
+        return (
+            store,
+            {
+                store.closeAllTerminals()
+                isolatedUserDefaults.removeSuite()
+            }
+        )
     }
 
     private func open(_ store: ConversationStore, _ tab: TerminalSession) -> TerminalSession {

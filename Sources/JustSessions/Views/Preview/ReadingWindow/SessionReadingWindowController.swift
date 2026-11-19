@@ -10,16 +10,19 @@ final class SessionReadingWindowController: NSWindowController, NSWindowDelegate
     private let onClose: () -> Void
     private let userDefaults: UserDefaults
 
-    init(conversation: Conversation, store: ConversationStore, initialPosition: TranscriptReadingPosition?,
-         userDefaults: UserDefaults = .standard, onClose: @escaping () -> Void) {
+    init(
+        conversation: Conversation, store: ConversationStore, initialPosition: TranscriptReadingPosition?,
+        userDefaults: UserDefaults = .standard, onClose: @escaping () -> Void
+    ) {
         self.onClose = onClose
         self.userDefaults = userDefaults
         if let initialPosition { readingPositionStore.record(initialPosition, for: conversation.id) }
         let content = SessionReadingView(
             store: store, conversation: conversation, readingPositionStore: readingPositionStore, requests: requests
         )
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 820, height: 760),
-                              styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 820, height: 760),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         window.title = store.title(for: conversation)
         window.contentViewController = NSHostingController(rootView: content.appTheme(from: .shared).appLanguage(from: .shared))
         window.isReleasedWhenClosed = false
@@ -49,8 +52,9 @@ final class SessionReadingWindowController: NSWindowController, NSWindowDelegate
         let room = CGSize(width: visibleFrame.width - 2 * screenMargin, height: visibleFrame.height - 2 * screenMargin)
         let width = max(minimumSize.width, min(savedSize?.width ?? preferredWidth, room.width))
         let height = max(minimumSize.height, min(savedSize?.height ?? room.height, room.height))
-        return CGRect(x: (visibleFrame.midX - width / 2).rounded(), y: (visibleFrame.midY - height / 2).rounded(),
-                      width: width, height: height)
+        return CGRect(
+            x: (visibleFrame.midX - width / 2).rounded(), y: (visibleFrame.midY - height / 2).rounded(),
+            width: width, height: height)
     }
 
     required init?(coder: NSCoder) { nil }

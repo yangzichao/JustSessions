@@ -18,7 +18,8 @@ extension ConversationStore {
     /// has nothing to reopen.
     func rememberClosedTab(_ tab: TerminalSession, at tabBarIndex: Int) {
         guard !isClosingTabsWithoutRemembering,
-              let reopenableTab = ReopenableTerminalTab(tab: tab, selectedTerminalID: nil) else { return }
+            let reopenableTab = ReopenableTerminalTab(tab: tab, selectedTerminalID: nil)
+        else { return }
         recentlyClosedTabs.remember(reopenableTab, closedAt: tabBarIndex)
     }
 

@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 struct RemoteKiroFixture {
@@ -25,7 +26,8 @@ struct RemoteKiroFixture {
         try FileManager.default.createDirectory(at: mirrorDirectory, withIntermediateDirectories: true)
         for fileExtension in ["json", "jsonl"] {
             let fileName = "\(sessionID).\(fileExtension)"
-            try FileManager.default.copyItem(at: sessionsDirectory.appendingPathComponent(fileName), to: mirrorDirectory.appendingPathComponent(fileName))
+            try FileManager.default.copyItem(
+                at: sessionsDirectory.appendingPathComponent(fileName), to: mirrorDirectory.appendingPathComponent(fileName))
         }
         conversation = .fixture(
             provider: .kiro,

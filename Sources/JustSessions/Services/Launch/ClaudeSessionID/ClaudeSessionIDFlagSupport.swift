@@ -32,7 +32,8 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
         Task.detached(priority: .utility) { [self] in
             let resolver = NativeCLICommandResolver()
             guard let command = try? resolver.resolveNewSession(provider: .claude, projectPath: NSHomeDirectory()),
-                  beginCheckIfUnanswered(command) else { return }
+                beginCheckIfUnanswered(command)
+            else { return }
             check(command)
         }
     }

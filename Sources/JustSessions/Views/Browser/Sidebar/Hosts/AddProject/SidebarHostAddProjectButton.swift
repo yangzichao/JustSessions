@@ -12,8 +12,9 @@ struct SidebarHostAddProjectButton: View {
         if archivedProjectCount > 0 {
             Menu {
                 Button("Add project…", systemImage: "plus", action: onAddProject)
-                Button("Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox",
-                       action: onShowArchivedProjects)
+                Button(
+                    "Archived projects (\(archivedProjectCount))\u{2026}", systemImage: "archivebox",
+                    action: onShowArchivedProjects)
             } label: {
                 plusSymbol
             }

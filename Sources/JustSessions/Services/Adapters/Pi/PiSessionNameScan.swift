@@ -87,9 +87,11 @@ struct PiSessionNameScan: Codable, Equatable, Sendable {
         guard let base = bytes.baseAddress else { return nil }
         var latestName: String?
         var searchStart = start
-        while searchStart < end, let found = marker.withUnsafeBytes({ markerBytes in
-            memmem(base + searchStart, end - searchStart, markerBytes.baseAddress, markerBytes.count)
-        }) {
+        while searchStart < end,
+            let found = marker.withUnsafeBytes({ markerBytes in
+                memmem(base + searchStart, end - searchStart, markerBytes.baseAddress, markerBytes.count)
+            })
+        {
             let hit = base.distance(to: UnsafeRawPointer(found))
             let lineStart = (lastIndex(of: newline, in: bytes, from: start, before: hit) ?? start - 1) + 1
             let lineEnd = firstIndex(of: newline, in: bytes, from: hit) ?? end
@@ -102,7 +104,8 @@ struct PiSessionNameScan: Codable, Equatable, Sendable {
 
     private static func firstIndex(of byte: UInt8, in bytes: UnsafeRawBufferPointer, from start: Int) -> Int? {
         guard let base = bytes.baseAddress, start < bytes.count,
-              let found = memchr(base + start, Int32(byte), bytes.count - start) else { return nil }
+            let found = memchr(base + start, Int32(byte), bytes.count - start)
+        else { return nil }
         return base.distance(to: UnsafeRawPointer(found))
     }
 

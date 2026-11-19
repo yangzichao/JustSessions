@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// Adding a host first logs in to it, so the sheet can say why the app can't reach it.
@@ -28,11 +29,16 @@ struct RemoteHostConnectionCheckTests {
     }
 
     @Test func aFailedLoginSaysWhy() {
-        let check = RemoteHostConnectionCheck(runner: RemoteCommandRecorder().runner(answering: (255, """
-            Warning: Permanently added 'devbox' (ED25519) to the list of known hosts.
-            me@devbox: Permission denied (publickey).
+        let check = RemoteHostConnectionCheck(
+            runner: RemoteCommandRecorder().runner(
+                answering: (
+                    255,
+                    """
+                    Warning: Permanently added 'devbox' (ED25519) to the list of known hosts.
+                    me@devbox: Permission denied (publickey).
 
-            """)))
+                    """
+                )))
 
         #expect(check.problem(connectingTo: "devbox") == .loginRefused)
     }

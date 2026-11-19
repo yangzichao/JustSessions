@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Paths, session ids, and scripts reach SSH hosts inside quoted shell words. Whatever a value holds, the command
@@ -36,12 +37,13 @@ struct ShellQuotingPropertyTests {
         let values = (0..<100).map { _ in generator.string(of: Self.awkwardCharacters, lengthIn: 1...8) }
         let innerScript = "printf '%s\\0' " + values.map(ShellQuoting.quoted).joined(separator: " ")
 
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", "/bin/sh -c " + ShellQuoting.quoted(innerScript)],
-            environment: ["PATH": "/usr/bin:/bin"],
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", "/bin/sh -c " + ShellQuoting.quoted(innerScript)],
+                environment: ["PATH": "/usr/bin:/bin"],
+                timeout: 10
+            ))
 
         #expect(Self.nulTerminatedValues(output) == values)
     }

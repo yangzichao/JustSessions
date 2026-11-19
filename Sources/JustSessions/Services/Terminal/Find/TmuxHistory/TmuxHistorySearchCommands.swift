@@ -38,10 +38,11 @@ enum TmuxHistorySearchCommands {
         let pane = paneTarget(sessionName)
         let backward = searchCommand("search-backward-text", for: query, pane: pane)
         let forward = searchCommand("search-forward-text", for: query, pane: pane)
-        let moves = switch direction {
-        case .towardOlder: backward
-        case .towardNewer: forward + [";"] + forward + [";"] + backward
-        }
+        let moves =
+            switch direction {
+            case .towardOlder: backward
+            case .towardNewer: forward + [";"] + forward + [";"] + backward
+            }
         return moves + [";"] + printingCount(pane: pane)
     }
 
@@ -58,7 +59,12 @@ enum TmuxHistorySearchCommands {
         // An empty field is a field: tmux 3.4 prints `<marker>   1`.
         let fields = line.dropFirst(countMarker.count + 1).split(separator: " ", omittingEmptySubsequences: false)
         func field(_ index: Int) -> Substring? { fields.indices.contains(index) ? fields[index] : nil }
-        let foundAny: Bool? = switch field(2) { case "1": true; case "0": false; default: nil }
+        let foundAny: Bool? =
+            switch field(2) {
+            case "1": true
+            case "0": false
+            default: nil
+            }
         return (field(0).flatMap { Int($0) }, field(1) == "1", foundAny)
     }
 

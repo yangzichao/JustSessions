@@ -38,9 +38,10 @@ struct SelectedSessionsContextMenu: View {
             }
         }
         Divider()
-        ConversationSharingMenuItems(selections: selectedConversations.map {
-            ConversationExportSelection(conversation: $0, title: store.title(for: $0))
-        })
+        ConversationSharingMenuItems(
+            selections: selectedConversations.map {
+                ConversationExportSelection(conversation: $0, title: store.title(for: $0))
+            })
         Divider()
         Button("Delete \(selectedConversations.count) sessions…", systemImage: "trash", role: .destructive, action: onDelete)
             .disabled(selectedConversations.allSatisfy(store.isDeletionPending(for:)))

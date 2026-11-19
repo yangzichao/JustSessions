@@ -151,7 +151,8 @@ final class TranscriptTextView: NSTextView {
 
     private func scheduleReveal() {
         guard selectedSearchRange != nil, bounds.height > 0,
-              revealedRevision != navigationRevision, scheduledRevision != navigationRevision else { return }
+            revealedRevision != navigationRevision, scheduledRevision != navigationRevision
+        else { return }
         let revision = navigationRevision
         revealAttempts = 0
         scheduledRevision = revision

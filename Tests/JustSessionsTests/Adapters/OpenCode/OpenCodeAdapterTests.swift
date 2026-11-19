@@ -1,6 +1,7 @@
 import Foundation
 import SQLite3
 import Testing
+
 @testable import JustSessions
 
 struct OpenCodeAdapterTests {
@@ -8,19 +9,20 @@ struct OpenCodeAdapterTests {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let databaseFile = root.appendingPathComponent("opencode.db")
-        try execute([
-            """
-            CREATE TABLE session (id TEXT PRIMARY KEY, project_id TEXT, parent_id TEXT, directory TEXT, title TEXT,
-                time_created INTEGER, time_updated INTEGER, time_archived INTEGER)
-            """,
-            "INSERT INTO session VALUES ('ses_titled0001', 'p', NULL, '/Users/me/app', 'Fix login', 1, 1790000000500, NULL)",
-            "INSERT INTO session VALUES ('ses_untitled01', 'p', NULL, '/Users/me/app', 'New session - 2026-09-30T10:00:00.000Z', 1, 1790000000000, NULL)",
-            "INSERT INTO session VALUES ('ses_subagent01', 'p', 'ses_titled0001', '/Users/me/app', 'Subtask (@explore subagent)', 1, 1, NULL)",
-            "INSERT INTO session VALUES ('ses_oddparent1', 'p', 'not-an-opencode-id', '/Users/me/app', 'Odd parent', 1, 1, NULL)",
-            "INSERT INTO session VALUES ('ses_archived01', 'p', NULL, '/Users/me/app', 'Archived', 1, 1, 1790000000000)",
-            "INSERT INTO session VALUES ('not-an-opencode-id', 'p', NULL, '/Users/me/app', 'Odd', 1, 1, NULL)",
-            "INSERT INTO session VALUES ('ses_relative01', 'p', NULL, 'relative/app', 'Odd', 1, 1, NULL)",
-        ], at: databaseFile)
+        try execute(
+            [
+                """
+                CREATE TABLE session (id TEXT PRIMARY KEY, project_id TEXT, parent_id TEXT, directory TEXT, title TEXT,
+                    time_created INTEGER, time_updated INTEGER, time_archived INTEGER)
+                """,
+                "INSERT INTO session VALUES ('ses_titled0001', 'p', NULL, '/Users/me/app', 'Fix login', 1, 1790000000500, NULL)",
+                "INSERT INTO session VALUES ('ses_untitled01', 'p', NULL, '/Users/me/app', 'New session - 2026-09-30T10:00:00.000Z', 1, 1790000000000, NULL)",
+                "INSERT INTO session VALUES ('ses_subagent01', 'p', 'ses_titled0001', '/Users/me/app', 'Subtask (@explore subagent)', 1, 1, NULL)",
+                "INSERT INTO session VALUES ('ses_oddparent1', 'p', 'not-an-opencode-id', '/Users/me/app', 'Odd parent', 1, 1, NULL)",
+                "INSERT INTO session VALUES ('ses_archived01', 'p', NULL, '/Users/me/app', 'Archived', 1, 1, 1790000000000)",
+                "INSERT INTO session VALUES ('not-an-opencode-id', 'p', NULL, '/Users/me/app', 'Odd', 1, 1, NULL)",
+                "INSERT INTO session VALUES ('ses_relative01', 'p', NULL, 'relative/app', 'Odd', 1, 1, NULL)",
+            ], at: databaseFile)
 
         let found = try OpenCodeAdapter(databaseFile: databaseFile).discover()
 
@@ -43,24 +45,29 @@ struct OpenCodeAdapterTests {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let databaseFile = root.appendingPathComponent("opencode.db")
-        try execute([
-            "CREATE TABLE session (id TEXT PRIMARY KEY, parent_id TEXT, directory TEXT, title TEXT, time_updated INTEGER)",
-            "INSERT INTO session VALUES ('ses_olderschema', NULL, '/Users/me/app', 'Older', 1790000000000)",
-        ], at: databaseFile)
+        try execute(
+            [
+                "CREATE TABLE session (id TEXT PRIMARY KEY, parent_id TEXT, directory TEXT, title TEXT, time_updated INTEGER)",
+                "INSERT INTO session VALUES ('ses_olderschema', NULL, '/Users/me/app', 'Older', 1790000000000)",
+            ], at: databaseFile)
 
         #expect(try OpenCodeAdapter(databaseFile: databaseFile).discover().map(\.sessionID) == ["ses_olderschema"])
         #expect(try OpenCodeAdapter(databaseFile: root.appendingPathComponent("missing.db")).discover().isEmpty)
     }
 
     @Test func databaseLocationFollowsOpenCodesEnvironment() {
-        #expect(OpenCodeAdapter.standardDatabaseFile(environment: [:], homeDirectory: "/Users/me").path
-            == "/Users/me/.local/share/opencode/opencode.db")
-        #expect(OpenCodeAdapter.standardDatabaseFile(environment: ["XDG_DATA_HOME": "/data"], homeDirectory: "/Users/me").path
-            == "/data/opencode/opencode.db")
-        #expect(OpenCodeAdapter.standardDatabaseFile(environment: ["OPENCODE_DB": "/tmp/oc.db"], homeDirectory: "/Users/me").path
-            == "/tmp/oc.db")
-        #expect(OpenCodeAdapter.standardDatabaseFile(environment: ["OPENCODE_DB": "oc.db"], homeDirectory: "/Users/me").path
-            == "/Users/me/.local/share/opencode/opencode.db")
+        #expect(
+            OpenCodeAdapter.standardDatabaseFile(environment: [:], homeDirectory: "/Users/me").path
+                == "/Users/me/.local/share/opencode/opencode.db")
+        #expect(
+            OpenCodeAdapter.standardDatabaseFile(environment: ["XDG_DATA_HOME": "/data"], homeDirectory: "/Users/me").path
+                == "/data/opencode/opencode.db")
+        #expect(
+            OpenCodeAdapter.standardDatabaseFile(environment: ["OPENCODE_DB": "/tmp/oc.db"], homeDirectory: "/Users/me").path
+                == "/tmp/oc.db")
+        #expect(
+            OpenCodeAdapter.standardDatabaseFile(environment: ["OPENCODE_DB": "oc.db"], homeDirectory: "/Users/me").path
+                == "/Users/me/.local/share/opencode/opencode.db")
     }
 
     @Test func onlyADatedNewSessionTitleIsAPlaceholder() {

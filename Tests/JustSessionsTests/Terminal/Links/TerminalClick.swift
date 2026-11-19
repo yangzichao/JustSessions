@@ -53,10 +53,11 @@ enum TerminalClick {
         _ type: NSEvent.EventType, at location: CGPoint, in view: NSView, modifierFlags: NSEvent.ModifierFlags
     ) throws -> NSEvent {
         let window = try #require(view.window)
-        return try #require(NSEvent.mouseEvent(
-            with: type, location: view.convert(location, to: nil), modifierFlags: modifierFlags, timestamp: 0,
-            windowNumber: window.windowNumber, context: nil, eventNumber: 0,
-            clickCount: type == .mouseMoved ? 0 : 1, pressure: type == .leftMouseUp ? 0 : 1
-        ))
+        return try #require(
+            NSEvent.mouseEvent(
+                with: type, location: view.convert(location, to: nil), modifierFlags: modifierFlags, timestamp: 0,
+                windowNumber: window.windowNumber, context: nil, eventNumber: 0,
+                clickCount: type == .mouseMoved ? 0 : 1, pressure: type == .leftMouseUp ? 0 : 1
+            ))
     }
 }

@@ -45,11 +45,12 @@ struct TranscriptScrollView: View {
         _bookmarkState = State(initialValue: bookmarkState)
         let initialPosition = (positionStore.position(for: conversation.id) ?? .bottom).resolved(in: transcript)
         self.initialPosition = initialPosition
-        _positionController = State(initialValue: TranscriptScrollPositionController(
-            conversationID: conversation.id,
-            positionStore: positionStore,
-            initialPosition: initialPosition
-        ))
+        _positionController = State(
+            initialValue: TranscriptScrollPositionController(
+                conversationID: conversation.id,
+                positionStore: positionStore,
+                initialPosition: initialPosition
+            ))
     }
 
     var body: some View {
@@ -73,7 +74,10 @@ struct TranscriptScrollView: View {
                         .disabled(!isActive)
                         if searchState.isPresented {
                             ThemeDivider()
-                            TranscriptSearchBar(searchState: searchState, hasOmittedEntries: transcript.omittedEntryCount > 0 || paging?.hasEarlier == true || paging?.hasLater == true)
+                            TranscriptSearchBar(
+                                searchState: searchState,
+                                hasOmittedEntries: transcript.omittedEntryCount > 0 || paging?.hasEarlier == true
+                                    || paging?.hasLater == true)
                         }
                         ThemeDivider()
                     }
@@ -82,18 +86,22 @@ struct TranscriptScrollView: View {
                 .environment(\.transcriptReadingFontSize, TranscriptReadingTextSize.clamped(readingFontSize))
                 .environment(\.transcriptTextColors, TranscriptTextColors(theme: appTheme, isDark: colorScheme == .dark))
                 .environment(\.transcriptTextSelection, textSelection)
-                .environment(\.transcriptSearchContext, TranscriptSearchContext(
-                    query: searchState.isPresented ? searchState.query : "",
-                    selectedMatch: searchState.isSearching ? nil : searchState.selectedMatch,
-                    navigationRevision: searchState.navigationRevision,
-                    positionController: positionController
-                ))
+                .environment(
+                    \.transcriptSearchContext,
+                    TranscriptSearchContext(
+                        query: searchState.isPresented ? searchState.query : "",
+                        selectedMatch: searchState.isSearching ? nil : searchState.selectedMatch,
+                        navigationRevision: searchState.navigationRevision,
+                        positionController: positionController
+                    )
+                )
                 .environment(\.transcriptBookmarkLetters, TranscriptBookmarkLetters(bookmarks))
                 .background(TranscriptSearchKeyboardShortcuts(searchState: searchState, isActive: isActive))
                 .background(TranscriptBookmarkTargetReporter(target: bookmarkCommandTarget, isActive: isActive))
-                .task(id: SearchRequest(query: searchState.query, isPresented: searchState.isPresented && isActive, transcript: transcript)) {
-                    await updateSearch()
-                }
+                .task(id: SearchRequest(query: searchState.query, isPresented: searchState.isPresented && isActive, transcript: transcript))
+            {
+                await updateSearch()
+            }
                 .onChange(of: searchState.navigationRevision) {
                     guard let match = searchState.selectedMatch else { return }
                     positionController.clearSeekTarget()
@@ -185,7 +193,10 @@ struct TranscriptScrollView: View {
 
     private var messageCount: Int {
         transcript.entries.filter { entry in
-            switch entry.content { case .userMessage, .assistantMessage: true; default: false }
+            switch entry.content {
+            case .userMessage, .assistantMessage: true
+            default: false
+            }
         }.count
     }
 }

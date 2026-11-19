@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A Ghostty tab owed a theme report after the next background query, as `ConversationStore+RemoteTmuxColors` makes it
@@ -69,7 +70,8 @@ struct GhosttyTabBackgroundQueryReportTests {
     private static func backgroundAnswer(of fixture: GhosttyTabFixture, terminator: String) -> String {
         let preferences = fixture.appearanceStore.preferences.validated
         let usesDarkColors = preferences.mode.usesDarkColors(effectiveAppearance: fixture.view.effectiveAppearance)
-        let background = preferences.colorVariants(appTheme: fixture.themeStore.terminalTheme).palette(usesDarkColors: usesDarkColors).background
+        let background = preferences.colorVariants(appTheme: fixture.themeStore.terminalTheme).palette(usesDarkColors: usesDarkColors)
+            .background
         let components = [16, 8, 0].map { String(format: "%04x", ((background >> UInt32($0)) & 0xFF) * 257) }
         return "\u{1B}]11;rgb:" + components.joined(separator: "/") + terminator
     }

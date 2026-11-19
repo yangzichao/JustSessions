@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// How the check reads what the host printed. The outputs are shaped like those of max2, a Fedora 43 host, whose
@@ -14,7 +15,12 @@ struct RemoteShellStartupCheckTests {
         """
 
     @Test func aStartupThatLetsTheCommandRunNeedsOneRun() {
-        let runs = RecordedRuns([(0, "+JUSTSESSIONS /bin/bash:1: printf '%s%s\\n' __JUSTSESSIONS_SHELL_ STARTUP_OK__\r\n__JUSTSESSIONS_SHELL_STARTUP_OK__\r\nConnection to max2 closed.\r\n")])
+        let runs = RecordedRuns([
+            (
+                0,
+                "+JUSTSESSIONS /bin/bash:1: printf '%s%s\\n' __JUSTSESSIONS_SHELL_ STARTUP_OK__\r\n__JUSTSESSIONS_SHELL_STARTUP_OK__\r\nConnection to max2 closed.\r\n"
+            )
+        ])
         let result = RemoteShellStartupCheck(run: runs.run).check(host: "max2")
 
         #expect(result == RemoteShellStartupCheckResult(outcome: .interactiveStartupWorks, stoppedAt: nil))
@@ -25,32 +31,39 @@ struct RemoteShellStartupCheckTests {
         let runs = RecordedRuns([(nil, Self.tmuxTakeover), (0, "__JUSTSESSIONS_SHELL_STARTUP_OK__\r\n")])
         let result = RemoteShellStartupCheck(run: runs.run).check(host: "max2")
 
-        #expect(result == RemoteShellStartupCheckResult(
-            outcome: .usesLoginShellOnly,
-            stoppedAt: "/home/jr/.bashrc.d/takeover.sh:3: exec tmux"
-        ))
+        #expect(
+            result
+                == RemoteShellStartupCheckResult(
+                    outcome: .usesLoginShellOnly,
+                    stoppedAt: "/home/jr/.bashrc.d/takeover.sh:3: exec tmux"
+                ))
         #expect(runs.commands == [RemoteShellStartupCheck.tracedInteractiveCommand, RemoteShellStartupCheck.loginOnlyCommand])
     }
 
     @Test func aStartupThatTakesOverEvenALoginShellBlocksTheHost() {
-        let zshTakeover = "+++JUSTSESSIONS /home/jr/.bashrc.d/takeover.sh:3: exec /usr/bin/zsh -l\r\n\u{1B}[1m\u{1B}[7m%\u{1B}[27m\u{1B}[1m\u{1B}[0m zsh ~ % \u{1B}[K\u{1B}[?2004h"
+        let zshTakeover =
+            "+++JUSTSESSIONS /home/jr/.bashrc.d/takeover.sh:3: exec /usr/bin/zsh -l\r\n\u{1B}[1m\u{1B}[7m%\u{1B}[27m\u{1B}[1m\u{1B}[0m zsh ~ % \u{1B}[K\u{1B}[?2004h"
         let runs = RecordedRuns([(nil, zshTakeover), (nil, "\u{1B}[1m%\u{1B}[0m zsh ~ % ")])
 
-        #expect(RemoteShellStartupCheck(run: runs.run).check(host: "max2") == RemoteShellStartupCheckResult(
-            outcome: .blocked,
-            stoppedAt: "/home/jr/.bashrc.d/takeover.sh:3: exec /usr/bin/zsh -l"
-        ))
+        #expect(
+            RemoteShellStartupCheck(run: runs.run).check(host: "max2")
+                == RemoteShellStartupCheckResult(
+                    outcome: .blocked,
+                    stoppedAt: "/home/jr/.bashrc.d/takeover.sh:3: exec /usr/bin/zsh -l"
+                ))
     }
 
     @Test func aShellThatTracesNothingStillGetsAnOutcome() {
         let runs = RecordedRuns([(nil, "Welcome to fish\r\nme@host ~> "), (0, "__JUSTSESSIONS_SHELL_STARTUP_OK__\n")])
-        #expect(RemoteShellStartupCheck(run: runs.run).check(host: "max2")
-            == RemoteShellStartupCheckResult(outcome: .usesLoginShellOnly, stoppedAt: nil))
+        #expect(
+            RemoteShellStartupCheck(run: runs.run).check(host: "max2")
+                == RemoteShellStartupCheckResult(outcome: .usesLoginShellOnly, stoppedAt: nil))
     }
 
     @Test func noOutcomeWhenTheHostCouldNotBeReachedOrSaidNothing() {
-        #expect(RemoteShellStartupCheck(run: RecordedRuns([(255, "ssh: connect to host max2 port 22: Network is unreachable")]).run)
-            .check(host: "max2") == nil)
+        #expect(
+            RemoteShellStartupCheck(run: RecordedRuns([(255, "ssh: connect to host max2 port 22: Network is unreachable")]).run)
+                .check(host: "max2") == nil)
         #expect(RemoteShellStartupCheck(run: RecordedRuns([(nil, " \r\n")]).run).check(host: "max2") == nil)
         #expect(RemoteShellStartupCheck(run: RecordedRuns([nil]).run).check(host: "max2") == nil)
         // The login shell's run is needed to tell what to do.

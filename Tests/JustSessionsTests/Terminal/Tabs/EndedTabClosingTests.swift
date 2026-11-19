@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// A tab whose CLI or shell already ended closes without asking, since closing it stops nothing. An SSH tab in tmux

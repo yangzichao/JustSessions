@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct SessionActivitySummaryTests {
@@ -22,8 +23,9 @@ struct SessionActivitySummaryTests {
         #expect(summary.runningCount == 3)
         #expect(summary.mostPressingStatus == .finishedUnseen)
         #expect(summary.summary == "1 not seen yet, 1 working, 1 idle")
-        #expect(SessionActivitySummary(statuses: [.finishedUnseen, .running(.needsInput(reason: nil))]).mostPressingStatus
-            == .running(.needsInput(reason: nil)))
+        #expect(
+            SessionActivitySummary(statuses: [.finishedUnseen, .running(.needsInput(reason: nil))]).mostPressingStatus
+                == .running(.needsInput(reason: nil)))
     }
 
     @Test func wordsSeveralCLIsThatNeedYou() {

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Sessions asked to be deleted while a deletion runs join it: it goes on to them after the others, with one
@@ -35,11 +36,12 @@ struct DeletionJoiningTests {
         #expect(hosts.attempts(on: "devbox") == 3)
         #expect(store.conversations.map(\.id) == [refused.id])
         #expect(store.alert?.title == "1 session wasn't deleted")
-        #expect(store.errorMessage == """
-            Deleted 3 of 4 sessions. The other one is still listed.
+        #expect(
+            store.errorMessage == """
+                Deleted 3 of 4 sessions. The other one is still listed.
 
-            Claude Code · Keep me: Permission denied.
-            """)
+                Claude Code · Keep me: Permission denied.
+                """)
         #expect(store.deletionProgress.totalCount == 0)
     }
 

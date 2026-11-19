@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PinnedItemsTests {
@@ -42,15 +43,17 @@ struct PinnedItemsTests {
         pinnedItems.setPinned(true, projectPath: secondPinned.projectDirectoryKey)
 
         let groups = ProjectConversationGroup.grouped([firstPinned, secondPinned, unpinned], pinnedItems: pinnedItems)
-        #expect(groups.map(\.projectPath) == [
-            firstPinned.projectDirectoryKey, secondPinned.projectDirectoryKey, unpinned.projectDirectoryKey,
-        ])
+        #expect(
+            groups.map(\.projectPath) == [
+                firstPinned.projectDirectoryKey, secondPinned.projectDirectoryKey, unpinned.projectDirectoryKey,
+            ])
 
         pinnedItems.movePinnedProject(secondPinned.projectDirectoryKey, to: .before(firstPinned.projectDirectoryKey))
         let movedGroups = ProjectConversationGroup.grouped([firstPinned, secondPinned, unpinned], pinnedItems: pinnedItems)
-        #expect(movedGroups.map(\.projectPath) == [
-            secondPinned.projectDirectoryKey, firstPinned.projectDirectoryKey, unpinned.projectDirectoryKey,
-        ])
+        #expect(
+            movedGroups.map(\.projectPath) == [
+                secondPinned.projectDirectoryKey, firstPinned.projectDirectoryKey, unpinned.projectDirectoryKey,
+            ])
     }
 
     @Test func pinnedSessionsKeepTheirOrderWhateverTheirActivity() {
@@ -60,9 +63,10 @@ struct PinnedItemsTests {
         let unpinnedNewest = conversation(project: project, time: 30)
         let pinnedItems = PinnedItems(pinnedConversationIDs: [older.id, newer.id])
 
-        #expect(pinnedItems.pinnedConversationsFirst([unpinnedNewest, newer, older]).map(\.id) == [
-            older.id, newer.id, unpinnedNewest.id,
-        ])
+        #expect(
+            pinnedItems.pinnedConversationsFirst([unpinnedNewest, newer, older]).map(\.id) == [
+                older.id, newer.id, unpinnedNewest.id,
+            ])
     }
 
     @Test func pinsSurviveASaveAndLoadInTheirOrder() throws {

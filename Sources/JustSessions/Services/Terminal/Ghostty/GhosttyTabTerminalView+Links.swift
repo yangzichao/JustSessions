@@ -21,12 +21,12 @@ extension GhosttyTabTerminalView: TerminalSurfaceOpenURLDelegate {
     func eventFindingLinks(_ event: NSEvent) -> NSEvent {
         let modifierFlags = event.modifierFlags
         guard modifierFlags.contains(.command), !modifierFlags.contains(.shift), terminalSurface?.isMouseCaptured == true,
-              let shiftedEvent = NSEvent.mouseEvent(
-                  with: event.type, location: event.locationInWindow, modifierFlags: modifierFlags.union(.shift),
-                  timestamp: event.timestamp, windowNumber: event.windowNumber, context: nil,
-                  eventNumber: event.eventNumber, clickCount: event.type == .mouseMoved ? 0 : event.clickCount,
-                  pressure: event.pressure
-              )
+            let shiftedEvent = NSEvent.mouseEvent(
+                with: event.type, location: event.locationInWindow, modifierFlags: modifierFlags.union(.shift),
+                timestamp: event.timestamp, windowNumber: event.windowNumber, context: nil,
+                eventNumber: event.eventNumber, clickCount: event.type == .mouseMoved ? 0 : event.clickCount,
+                pressure: event.pressure
+            )
         else { return event }
         return shiftedEvent
     }
@@ -44,8 +44,8 @@ extension GhosttyTabTerminalView: TerminalSurfaceOpenURLDelegate {
     /// looked in, so the pointer first leaves the terminal, as it does when it leaves the view.
     private func ghosttyLink(under event: NSEvent) -> String? {
         guard let terminalSurface, bounds.contains(convert(event.locationInWindow, from: nil)),
-              let commandMove = pointerMove(like: event, modifierFlags: .command),
-              let restoringMove = pointerMove(like: event, modifierFlags: event.modifierFlags)
+            let commandMove = pointerMove(like: event, modifierFlags: .command),
+            let restoringMove = pointerMove(like: event, modifierFlags: event.modifierFlags)
         else { return nil }
         hoveredLink = nil
         terminalSurface.sendMousePos(x: -1, y: -1, modifiers: TerminalInputModifiers(from: event.modifierFlags))

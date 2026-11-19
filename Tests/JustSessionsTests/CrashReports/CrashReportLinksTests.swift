@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CrashReportLinksTests {
@@ -21,19 +22,20 @@ struct CrashReportLinksTests {
         #expect(queryValue("app-version", in: url) == "1.0.5 (12)")
         #expect(queryValue("macos-version", in: url) == "macOS 26.5.1 (25F80)")
         #expect(queryValue("actual-behavior", in: url) == "JustSessions quit unexpectedly.")
-        #expect(queryValue("supporting-details", in: url) == """
-            Crash report JustSessions-2026-10-05-100000.ips, in ~/Library/Logs/DiagnosticReports
+        #expect(
+            queryValue("supporting-details", in: url) == """
+                Crash report JustSessions-2026-10-05-100000.ips, in ~/Library/Logs/DiagnosticReports
 
-            ```
-            Exception: EXC_BREAKPOINT (SIGTRAP)
+                ```
+                Exception: EXC_BREAKPOINT (SIGTRAP)
 
-            Crashed thread (com.apple.root.user-initiated-qos):
-            0  libswiftCore.dylib  _assertionFailure(_:_:file:line:flags:)
-            1  JustSessions  ConversationStore.removeDeletedConversations(_:) (ConversationStore.swift:494)
-            2  JustSessions  0x2000
-            3  ???  0x10
-            ```
-            """)
+                Crashed thread (com.apple.root.user-initiated-qos):
+                0  libswiftCore.dylib  _assertionFailure(_:_:file:line:flags:)
+                1  JustSessions  ConversationStore.removeDeletedConversations(_:) (ConversationStore.swift:494)
+                2  JustSessions  0x2000
+                3  ???  0x10
+                ```
+                """)
     }
 
     /// GitHub fills a form's fields by their ids; a renamed field would quietly stay empty.
@@ -51,16 +53,19 @@ struct CrashReportLinksTests {
     }
 
     @Test func anObjectiveCExceptionBacktraceComesBeforeTheThreadThatRethrewIt() throws {
-        let details = CrashReportLinks.details(of: try summary(body: CrashReportSamples.objectiveCExceptionBody()), reportFileName: reportFileName)
+        let details = CrashReportLinks.details(
+            of: try summary(body: CrashReportSamples.objectiveCExceptionBody()), reportFileName: reportFileName)
 
-        #expect(details.contains("""
-            Exception: EXC_CRASH (SIGABRT)
-            CoreFoundation: *** -[__NSArrayM objectAtIndex:]: index 3 beyond bounds [0 .. 2]
-            libsystem_c.dylib: abort() called
+        #expect(
+            details.contains(
+                """
+                Exception: EXC_CRASH (SIGABRT)
+                CoreFoundation: *** -[__NSArrayM objectAtIndex:]: index 3 beyond bounds [0 .. 2]
+                libsystem_c.dylib: abort() called
 
-            Last exception backtrace:
-            0  CoreFoundation  __exceptionPreprocess
-            """))
+                Last exception backtrace:
+                0  CoreFoundation  __exceptionPreprocess
+                """))
         let exceptionBacktrace = try #require(details.range(of: "Last exception backtrace:"))
         let crashedThread = try #require(details.range(of: "Crashed thread (com.apple.main-thread):"))
         #expect(exceptionBacktrace.lowerBound < crashedThread.lowerBound)

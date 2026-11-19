@@ -27,9 +27,12 @@ final class AppWideSheetWindowRegistrationView: NSView {
         unregister()
         guard let window else { return }
         registeredWindow = window
-        AppWideSheetPresenters.register(window, isShowingSettings: { [weak self] in
-            self?.sheet?.wrappedValue != nil
-        }) { [weak self] shownSheet in
+        AppWideSheetPresenters.register(
+            window,
+            isShowingSettings: { [weak self] in
+                self?.sheet?.wrappedValue != nil
+            }
+        ) { [weak self] shownSheet in
             self?.sheet?.wrappedValue = shownSheet
         }
     }

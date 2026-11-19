@@ -13,7 +13,9 @@ struct IsolatedUserDefaultsTests {
         let plist = settings.directory.appendingPathComponent("settings.plist")
         try await expectEventually { FileManager.default.fileExists(atPath: plist.path) }
         #expect(!FileManager.default.fileExists(atPath: preferencesDirectory.appendingPathComponent("\(settings.suiteName).plist").path))
-        #expect(!FileManager.default.fileExists(atPath: preferencesDirectory.appendingPathComponent(settings.directory.lastPathComponent + ".plist").path))
+        #expect(
+            !FileManager.default.fileExists(
+                atPath: preferencesDirectory.appendingPathComponent(settings.directory.lastPathComponent + ".plist").path))
 
         settings.removeSuite()
 

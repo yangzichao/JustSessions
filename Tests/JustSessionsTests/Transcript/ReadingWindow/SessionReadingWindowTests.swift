@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -78,8 +79,9 @@ struct SessionReadingWindowTests {
     /// ⌘' pressed again before the reader took the first press goes on from the bookmark that press asked for.
     @Test func pressesBeforeTheReaderTakesARequestAddUp() {
         let bookmarks = ["a", "b", "c"].enumerated().map { index, letter in
-            MessageBookmark(letter: letter, entryID: TranscriptPageIdentity.entryID(record: 10 * (index + 1), part: 0),
-                            kind: .assistant, snippet: "Message \(letter)")
+            MessageBookmark(
+                letter: letter, entryID: TranscriptPageIdentity.entryID(record: 10 * (index + 1), part: 0),
+                kind: .assistant, snippet: "Message \(letter)")
         }
         let requests = SessionReadingRequests()
 
@@ -143,8 +145,9 @@ struct SessionReadingWindowTests {
         defer { settings.removeSuite() }
         let files = try TranscriptPagingFixture(count: 10)
         defer { files.remove() }
-        let store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(),
-                                      startsBackgroundPolling: false)
+        let store = ConversationStore(
+            adapters: [], userDefaults: settings.userDefaults, sessionNotifier: RecordingSessionNotifier(),
+            startsBackgroundPolling: false)
         store.replaceConversations(on: .thisMac, with: [files.conversation])
         let manager = SessionReadingWindowManager()
         let window = manager.open(files.conversation, store: store)
@@ -168,7 +171,10 @@ struct SessionReadingWindowTests {
         let manager = SessionReadingWindowManager()
         let firstWindow = manager.open(first, store: store)
         let secondWindow = manager.open(second, store: store)
-        defer { firstWindow.close(); secondWindow.close() }
+        defer {
+            firstWindow.close()
+            secondWindow.close()
+        }
         #expect(firstWindow !== secondWindow)
         #expect(manager.open(first, store: store) === firstWindow)
         #expect(store.terminalSessions.isEmpty)

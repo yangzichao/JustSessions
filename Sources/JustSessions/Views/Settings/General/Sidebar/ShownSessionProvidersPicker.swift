@@ -35,17 +35,20 @@ struct ShownSessionProvidersPicker: View {
             Text("Show sessions from")
             HelpPopoverButton(
                 title: "Hidden CLIs",
-                explanation: "An unticked CLI's sessions leave the sidebar, search, and the filter menu, and New session stops offering it. Its open tabs stay, and its session files are kept."
+                explanation:
+                    "An unticked CLI's sessions leave the sidebar, search, and the filter menu, and New session stops offering it. Its open tabs stay, and its session files are kept."
             )
             .accessibilityIdentifier("settings.help.shownSessionProviders")
         }
     }
 
     private func toggle(for provider: ConversationProvider) -> some View {
-        Toggle(isOn: Binding(
-            get: { !store.hiddenConversationProviders.hides(provider) },
-            set: { store.setHidden(!$0, provider: provider) }
-        )) {
+        Toggle(
+            isOn: Binding(
+                get: { !store.hiddenConversationProviders.hides(provider) },
+                set: { store.setHidden(!$0, provider: provider) }
+            )
+        ) {
             Text(verbatim: provider.rawValue)
         }
         .fixedSize()

@@ -15,7 +15,8 @@ enum AppearingSessionMatcher {
         var takenConversationIDs = alreadyLinkedConversationIDs
         var matches: [UUID: Conversation] = [:]
         for tab in waitingTabs.sorted(by: { $0.launchedAt < $1.launchedAt }) {
-            let candidate = conversations
+            let candidate =
+                conversations
                 .filter {
                     $0.host == tab.host
                         && $0.provider == tab.provider

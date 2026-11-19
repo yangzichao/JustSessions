@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The CLI activity sync posting notifications, and clicks on them showing their session.
@@ -36,13 +37,15 @@ struct SessionNotificationSyncTests {
 
         let notification = try #require(notifier.notifications.first)
         #expect(notifier.notifications.count == 1)
-        #expect(notification == SessionNotification(
-            source: .tab(id: tab.id, conversationID: conversation.id),
-            reason: .finishedTurn,
-            sessionTitle: "Fix login",
-            provider: .codex,
-            projectName: directory.lastPathComponent
-        ))
+        #expect(
+            notification
+                == SessionNotification(
+                    source: .tab(id: tab.id, conversationID: conversation.id),
+                    reason: .finishedTurn,
+                    sessionTitle: "Fix login",
+                    provider: .codex,
+                    projectName: directory.lastPathComponent
+                ))
         #expect(notification.subtitle == "Codex · \(directory.lastPathComponent)")
         #expect(notification.body == "Finished, waiting for your next prompt")
     }

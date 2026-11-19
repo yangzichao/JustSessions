@@ -83,14 +83,15 @@ struct GhosttyAppearanceConfiguration {
     ///   Ghostty would send `CSI 1;9 A` and `CSI 1;9 B`.
     /// Page Up and Page Down stay unbound: SwiftTerm scrolls with them on the main screen but sends them to the program
     /// on the alternate screen, and a Ghostty binding would take them on both.
-    private static let swiftTermKeybinds = TerminalEditingKey.allCases.map { editingKey in
-        "\(editingKey.ghosttyTrigger)=\(GhosttyTabTerminalView.textAction(typing: editingKey.controlCharacter))"
-    } + [
-        "alt+arrow_left=esc:b",
-        "alt+arrow_right=esc:f",
-        "super+arrow_up=ignore",
-        "super+arrow_down=ignore",
-    ]
+    private static let swiftTermKeybinds =
+        TerminalEditingKey.allCases.map { editingKey in
+            "\(editingKey.ghosttyTrigger)=\(GhosttyTabTerminalView.textAction(typing: editingKey.controlCharacter))"
+        } + [
+            "alt+arrow_left=esc:b",
+            "alt+arrow_right=esc:f",
+            "super+arrow_up=ignore",
+            "super+arrow_down=ignore",
+        ]
 
     private static func colors(_ palette: TerminalPalette) -> TerminalConfiguration {
         let scheme = palette.scheme

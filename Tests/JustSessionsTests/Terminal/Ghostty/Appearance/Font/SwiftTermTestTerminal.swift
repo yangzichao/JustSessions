@@ -1,4 +1,5 @@
 import AppKit
+
 @testable import JustSessions
 
 /// A tab's SwiftTerm terminal in a window that is never shown, as `GhosttyTestTerminal` is for Ghostty.

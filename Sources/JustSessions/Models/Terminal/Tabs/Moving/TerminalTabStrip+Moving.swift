@@ -47,7 +47,8 @@ extension TerminalTabStrip {
     /// once it has left its own place. Its group stays where it is.
     mutating func moveTab(_ tabID: UUID, toPlaceInGroup place: Int) {
         guard let tab = tabs.first(where: { $0.id == tabID }),
-              let unit = movingUnits(inGroup: groupKey(of: tab)).first(where: { $0.contains(tabID) }) else { return }
+            let unit = movingUnits(inGroup: groupKey(of: tab)).first(where: { $0.contains(tabID) })
+        else { return }
         moveTabs(unit, toPlaceInGroup: place)
     }
 
@@ -58,7 +59,8 @@ extension TerminalTabStrip {
         let group = groupKey(of: firstTab)
         var units = movingUnits(inGroup: group, keepingTogether: tabIDs)
         guard let unitIndex = units.firstIndex(where: { $0.contains(firstTab.id) }),
-              let groupStart = tabs.firstIndex(where: { groupKey(of: $0) == group }) else { return }
+            let groupStart = tabs.firstIndex(where: { groupKey(of: $0) == group })
+        else { return }
         let unit = units.remove(at: unitIndex)
         units.insert(unit, at: min(max(place, 0), units.count))
         let tabsByID = Dictionary(uniqueKeysWithValues: tabs.map { ($0.id, $0) })

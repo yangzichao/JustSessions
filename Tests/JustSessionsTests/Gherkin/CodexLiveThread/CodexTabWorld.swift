@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+
 @testable import JustSessions
 
 /// One Codex tab, with the Codex home in the app's temporary folder. The scenario sets the tab's terminal title as
@@ -21,29 +22,31 @@ final class CodexTabWorld: SessionTabWorld {
 
     func openResumedTab(on label: String) throws {
         let conversation = try app.listedConversation(labeled: label)
-        openTab(TerminalSession(
-            engine: .swiftTerm,
-            conversation: conversation,
-            provider: .codex,
-            projectPath: app.projectPath,
-            action: .resume,
-            displayTitle: app.store.title(for: conversation),
-            command: app.command,
-            tmuxSessionName: TmuxSessionName.forConversation(conversation)
-        ))
+        openTab(
+            TerminalSession(
+                engine: .swiftTerm,
+                conversation: conversation,
+                provider: .codex,
+                projectPath: app.projectPath,
+                action: .resume,
+                displayTitle: app.store.title(for: conversation),
+                command: app.command,
+                tmuxSessionName: TmuxSessionName.forConversation(conversation)
+            ))
     }
 
     func openNewSessionTab() {
-        openTab(TerminalSession(
-            engine: .swiftTerm,
-            conversation: nil,
-            provider: .codex,
-            projectPath: app.projectPath,
-            action: .new,
-            displayTitle: ConversationProvider.codex.newSessionTabTitle,
-            command: app.command,
-            tmuxSessionName: TmuxSessionName.unique(for: .codex)
-        ))
+        openTab(
+            TerminalSession(
+                engine: .swiftTerm,
+                conversation: nil,
+                provider: .codex,
+                projectPath: app.projectPath,
+                action: .new,
+                displayTitle: ConversationProvider.codex.newSessionTabTitle,
+                command: app.command,
+                tmuxSessionName: TmuxSessionName.unique(for: .codex)
+            ))
     }
 
     /// Writes the thread's rollout file where Codex does, under today, opening with its `session_meta` line. The next

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// What a CLI on an SSH host does while no tab shows its tmux session, as the app reads it from the host; see
@@ -44,7 +45,8 @@ struct RemoteDetachedActivityTests {
         #expect(try activity(.claude, option: "busy:", title: "✳ Claude Code") == .working)
         #expect(try activity(.claude, option: "", title: "✳ Claude Code") == nil)
         #expect(try activity(.pi, option: "idle:", title: "π") == .idle)
-        #expect(try activity(.opencode, option: "waiting:Allow rm -rf build?", title: "OpenCode") == .needsInput(reason: "Allow rm -rf build?"))
+        #expect(
+            try activity(.opencode, option: "waiting:Allow rm -rf build?", title: "OpenCode") == .needsInput(reason: "Allow rm -rf build?"))
         #expect(try activity(.codex, option: "", title: "⠧ Working | 01a10846-4c77-75e2-bec8-ab638...") == .working)
         #expect(try activity(.codex, option: "", title: "Ready | 01a10846-4c77-75e2-bec8-ab638... ⠸") == .idle)
         #expect(try activity(.kiro, option: "busy:", title: "Kiro") == nil)
@@ -52,7 +54,9 @@ struct RemoteDetachedActivityTests {
 
     /// No server is no session; a cut-off answer, or a server that tmux can't reach, says nothing about them.
     @Test func onlyAFinishedListingFromAReachableServerCounts() {
-        #expect(RemoteTmuxPanes.panes(inOutput: "no server running on /tmp/tmux-1000/default\n\(RemoteTmuxPanes.endMarker)")?.panesBySessionName == [:])
+        #expect(
+            RemoteTmuxPanes.panes(inOutput: "no server running on /tmp/tmux-1000/default\n\(RemoteTmuxPanes.endMarker)")?.panesBySessionName
+                == [:])
         #expect(RemoteTmuxPanes.panes(inOutput: RemoteTmuxPanes.endMarker)?.panesBySessionName == [:])
         #expect(RemoteTmuxPanes.panes(inOutput: Self.line(Self.claudeName, "busy:", "title")) == nil)
         #expect(RemoteTmuxPanes.panes(inOutput: "protocol version mismatch (client 8, server 7)\n\(RemoteTmuxPanes.endMarker)") == nil)
@@ -65,8 +69,11 @@ struct RemoteDetachedActivityTests {
         defer { sandbox.tearDown() }
         #expect(RemoteTmuxPanes.panes(inOutput: sandbox.run(RemoteTmuxPanes.command(on: "devbox")))?.panesBySessionName == [:])
 
-        _ = sandbox.run("tmux new-session -d -s \(Self.claudeName) 'sleep 600' \\; set-option -w \(RemoteCLIActivityTitle.optionName) 'waiting:permission prompt'")
-        _ = sandbox.run("tmux new-session -d -s \(Self.codexName) 'sleep 600' \\; select-pane -T 'Ready | 01a10846-4c77-75e2-bec8-ab638...'")
+        _ = sandbox.run(
+            "tmux new-session -d -s \(Self.claudeName) 'sleep 600' \\; set-option -w \(RemoteCLIActivityTitle.optionName) 'waiting:permission prompt'"
+        )
+        _ = sandbox.run(
+            "tmux new-session -d -s \(Self.codexName) 'sleep 600' \\; select-pane -T 'Ready | 01a10846-4c77-75e2-bec8-ab638...'")
         _ = sandbox.run("tmux new-session -d -s mine 'sleep 600'")
 
         let panes = try #require(RemoteTmuxPanes.panes(inOutput: sandbox.run(RemoteTmuxPanes.command(on: "devbox"))))
@@ -82,7 +89,11 @@ struct RemoteDetachedActivityTests {
         var now = Date(timeIntervalSince1970: 1_000)
         var answers: [RemoteTmuxPanes?] = [RemoteTmuxPanes(panesBySessionName: [:]), nil, RemoteTmuxPanes(panesBySessionName: [:])]
         let answer = AnswerQueue(answers.removeFirst())
-        let reader = RemoteDetachedActivityReader(listPanes: { _ in calls.increment(); return answer.next() }, currentDate: { now })
+        let reader = RemoteDetachedActivityReader(
+            listPanes: { _ in
+                calls.increment()
+                return answer.next()
+            }, currentDate: { now })
 
         await reader.ask("devbox")
         #expect(reader.listing(of: "devbox")?.askedAt == now)
@@ -113,12 +124,14 @@ struct RemoteDetachedActivityTests {
     /// While the app is busy, an answer can come long after the host was asked; it is as new as its answer.
     @Test(.oneHeldThreadAtATime) func aListingIsAsNewAsItsAnswer() async {
         var now = Date(timeIntervalSince1970: 1_000)
-        let asked = CallCounter(), answer = DispatchSemaphore(value: 0)
-        let reader = RemoteDetachedActivityReader(listPanes: { _ in
-            asked.increment()
-            answer.wait()
-            return RemoteTmuxPanes(panesBySessionName: [:])
-        }, currentDate: { now })
+        let asked = CallCounter()
+        let answer = DispatchSemaphore(value: 0)
+        let reader = RemoteDetachedActivityReader(
+            listPanes: { _ in
+                asked.increment()
+                answer.wait()
+                return RemoteTmuxPanes(panesBySessionName: [:])
+            }, currentDate: { now })
         let asking = Task { await reader.ask("devbox") }
         while asked.count == 0 { try? await Task.sleep(for: .milliseconds(10)) }
         now += RemoteDetachedActivityReader.longestUseOfAListing + 5
@@ -133,7 +146,8 @@ struct RemoteDetachedActivityTests {
     @Test func aSessionWithNoTabOnAHostShowsWhatItsCLIDoesAndNotifies() async throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
-        let conversation = Conversation.fixture(provider: .claude, sessionID: Self.claudeID, projectPath: "/srv/app", title: "Fix login", host: .ssh("devbox"))
+        let conversation = Conversation.fixture(
+            provider: .claude, sessionID: Self.claudeID, projectPath: "/srv/app", title: "Fix login", host: .ssh("devbox"))
         let notifier = RecordingSessionNotifier()
         let store = ConversationStore(adapters: [], sessionNotifier: notifier, startsBackgroundPolling: false)
         store.replaceConversations(on: .ssh("devbox"), with: [conversation])
@@ -206,7 +220,9 @@ struct RemoteDetachedActivityTests {
         let tab = TerminalSession(
             engine: .swiftTerm, conversation: withTab, provider: .codex, projectPath: "/srv/app", action: .resume,
             displayTitle: "Tab",
-            command: NativeCLICommand(executablePath: StandInCLI.executablePath, arguments: StandInCLI.arguments, workingDirectory: NSTemporaryDirectory(), environment: []),
+            command: NativeCLICommand(
+                executablePath: StandInCLI.executablePath, arguments: StandInCLI.arguments, workingDirectory: NSTemporaryDirectory(),
+                environment: []),
             host: .ssh("devbox")
         )
         tab.startIfNeeded()

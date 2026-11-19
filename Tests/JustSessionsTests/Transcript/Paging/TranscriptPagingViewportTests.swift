@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct TranscriptPagingViewportTests {
@@ -19,15 +20,17 @@ struct TranscriptPagingViewportTests {
     /// the far page brought the viewport within prefetch distance of the new edge, so that page loaded straight back
     /// and pushed out the one just loaded, over and over.
     @Test func pagesTheReaderIsNearStayWhenAPageLoadsAtTheOtherEnd() {
-        let viewport = TranscriptPagingViewport(document: CGRect(x: 0, y: 0, width: 2_220, height: 3_558),
-                                               visible: CGRect(x: 0, y: 384, width: 2_220, height: 1_308))
+        let viewport = TranscriptPagingViewport(
+            document: CGRect(x: 0, y: 0, width: 2_220, height: 3_558),
+            visible: CGRect(x: 0, y: 384, width: 2_220, height: 1_308))
         #expect(viewport.retainedPageCount(afterLoading: .earlier, pageStarts: [40, 1_300, 2_500]) == 4)
         #expect(viewport.retainedPageCount(afterLoading: .later, pageStarts: [40, 1_300, 2_500]) == 4)
     }
 
     @Test func pagesClearOfTheViewportLeaveAsUsual() {
-        let viewport = TranscriptPagingViewport(document: CGRect(x: 0, y: 0, width: 780, height: 30_000),
-                                               visible: CGRect(x: 0, y: 15_000, width: 780, height: 1_308))
+        let viewport = TranscriptPagingViewport(
+            document: CGRect(x: 0, y: 0, width: 780, height: 30_000),
+            visible: CGRect(x: 0, y: 15_000, width: 780, height: 1_308))
         #expect(viewport.retainedPageCount(afterLoading: .earlier, pageStarts: [0, 9_000, 20_000]) == 3)
         #expect(viewport.retainedPageCount(afterLoading: .later, pageStarts: [0, 9_000, 20_000]) == 3)
         // Only as many leave as the usual three-page budget needs.
@@ -37,15 +40,18 @@ struct TranscriptPagingViewportTests {
     }
 
     @Test func pagesNearTheViewportStayOnlyUpToTheRetentionLimit() {
-        let viewport = TranscriptPagingViewport(document: CGRect(x: 0, y: 0, width: 780, height: 2_000),
-                                               visible: CGRect(x: 0, y: 500, width: 780, height: 1_000))
+        let viewport = TranscriptPagingViewport(
+            document: CGRect(x: 0, y: 0, width: 780, height: 2_000),
+            visible: CGRect(x: 0, y: 500, width: 780, height: 1_000))
         let pageStarts: [CGFloat?] = (0..<TranscriptPagingModel.maximumRetainedPageCount).map { CGFloat($0 * 200) }
-        #expect(viewport.retainedPageCount(afterLoading: .earlier, pageStarts: pageStarts) == TranscriptPagingModel.maximumRetainedPageCount)
+        #expect(
+            viewport.retainedPageCount(afterLoading: .earlier, pageStarts: pageStarts) == TranscriptPagingModel.maximumRetainedPageCount)
     }
 
     @Test func shortPagesFillOnlyToTheMemoryLimitInsteadOfCyclingBetweenEdges() {
-        let viewport = TranscriptPagingViewport(document: CGRect(x: 0, y: 0, width: 780, height: 600),
-                                               visible: CGRect(x: 0, y: 0, width: 780, height: 480))
+        let viewport = TranscriptPagingViewport(
+            document: CGRect(x: 0, y: 0, width: 780, height: 600),
+            visible: CGRect(x: 0, y: 0, width: 780, height: 480))
         #expect(viewport.prefetchDirection(hasEarlier: true, hasLater: true, retainedPageCount: 1) == .earlier)
         #expect(viewport.prefetchDirection(hasEarlier: false, hasLater: true, retainedPageCount: 2) == .later)
         #expect(viewport.prefetchDirection(hasEarlier: true, hasLater: true, retainedPageCount: 3) == nil)

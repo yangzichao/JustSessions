@@ -7,9 +7,10 @@ enum AntigravitySQLiteReader {
         defer { sqlite3_close(database) }
 
         guard let sessionID = firstText(in: database, query: "SELECT cascade_id FROM trajectory_meta LIMIT 1"),
-              let metadata = firstBlob(in: database, query: "SELECT data FROM trajectory_metadata_blob LIMIT 1"),
-              let workspaceURI = AntigravityProtobuf.text(in: metadata, at: [1, 1]),
-              let projectURL = URL(string: workspaceURI), projectURL.isFileURL else { return nil }
+            let metadata = firstBlob(in: database, query: "SELECT data FROM trajectory_metadata_blob LIMIT 1"),
+            let workspaceURI = AntigravityProtobuf.text(in: metadata, at: [1, 1]),
+            let projectURL = URL(string: workspaceURI), projectURL.isFileURL
+        else { return nil }
 
         let firstStep = firstBlob(
             in: database,
@@ -36,8 +37,10 @@ enum AntigravitySQLiteReader {
             SELECT conversation_id, title, preview, workspace_uris, last_modified_time
             FROM conversation_summaries WHERE app_data_dir = 'antigravity-cli'
             """
-        guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK
-            || sqlite3_prepare_v2(database, queryWithoutParents, -1, &statement, nil) == SQLITE_OK else { return [:] }
+        guard
+            sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK
+                || sqlite3_prepare_v2(database, queryWithoutParents, -1, &statement, nil) == SQLITE_OK
+        else { return [:] }
         defer { sqlite3_finalize(statement) }
         let readsParents = sqlite3_column_count(statement) > 5
 
@@ -87,7 +90,8 @@ enum AntigravitySQLiteReader {
         guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK else { return nil }
         defer { sqlite3_finalize(statement) }
         guard sqlite3_step(statement) == SQLITE_ROW,
-              let bytes = sqlite3_column_blob(statement, 0) else { return nil }
+            let bytes = sqlite3_column_blob(statement, 0)
+        else { return nil }
         return Data(bytes: bytes, count: Int(sqlite3_column_bytes(statement, 0)))
     }
 

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct SessionMessageTextReaderTests {
@@ -55,13 +56,15 @@ struct SessionMessageTextReaderTests {
         #expect(shownPage.entries.contains { $0.content == .userImage(SampleTranscriptImage.image) })
         #expect(searchedPage.entries.map(\.id) == shownPage.entries.map(\.id))
         #expect(searchedPage.entries.map(\.startsTurn) == shownPage.entries.map(\.startsTurn))
-        #expect(searchedPage.entries.map(\.content) == shownPage.entries.map { entry in
-            switch entry.content {
-            case .userImage: .userImage(.undecoded)
-            case .toolResultImage: .toolResultImage(.undecoded)
-            default: entry.content
-            }
-        })
+        #expect(
+            searchedPage.entries.map(\.content)
+                == shownPage.entries.map { entry in
+                    switch entry.content {
+                    case .userImage: .userImage(.undecoded)
+                    case .toolResultImage: .toolResultImage(.undecoded)
+                    default: entry.content
+                    }
+                })
     }
 
     @Test func readsEveryPageOfALongSession() async throws {
@@ -82,7 +85,7 @@ struct SessionMessageTextReaderTests {
         let file = directory.appendingPathComponent("session.jsonl")
         let longText = String(repeating: "a", count: TranscriptPageLimits().maximumTextLength) + " past the reader's cut"
         try SampleTranscriptLines.fileContents([
-            #"{"timestamp":"2026-10-02T12:00:00.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"\#(longText)"}]}}"#,
+            #"{"timestamp":"2026-10-02T12:00:00.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"\#(longText)"}]}}"#
         ]).write(to: file)
 
         let text = try await SessionMessageTextReader.read(.fixture(provider: .codex, sourceFile: file))
@@ -93,7 +96,8 @@ struct SessionMessageTextReaderTests {
     }
 
     @Test func aMissingSessionFileFailsTheRead() async {
-        let conversation = Conversation.fixture(provider: .codex, sourceFile: URL(fileURLWithPath: "/tmp/justsessions-tests/missing-\(UUID()).jsonl"))
+        let conversation = Conversation.fixture(
+            provider: .codex, sourceFile: URL(fileURLWithPath: "/tmp/justsessions-tests/missing-\(UUID()).jsonl"))
         await #expect(throws: (any Error).self) { try await SessionMessageTextReader.read(conversation) }
     }
 }

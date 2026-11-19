@@ -11,9 +11,10 @@ enum PiSessionTitle {
     static func latestName(amongLines lines: [Data]) -> String? {
         for line in lines.reversed() {
             guard let record = ConversationMetadata.object(from: line),
-                  record["type"] as? String == "session_info",
-                  let name = (record["name"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines),
-                  !name.isEmpty else { continue }
+                record["type"] as? String == "session_info",
+                let name = (record["name"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines),
+                !name.isEmpty
+            else { continue }
             return name
         }
         return nil
@@ -46,16 +47,18 @@ enum PiSessionTitle {
 
     private static func userPrompt(in line: Data) -> String? {
         guard let record = ConversationMetadata.object(from: line),
-              record["type"] as? String == "message",
-              let message = record["message"] as? [String: Any],
-              message["role"] as? String == "user" else { return nil }
-        let text: String? = if let content = message["content"] as? String {
-            content
-        } else if let parts = message["content"] as? [[String: Any]] {
-            parts.first { $0["type"] as? String == "text" }?["text"] as? String
-        } else {
-            nil
-        }
+            record["type"] as? String == "message",
+            let message = record["message"] as? [String: Any],
+            message["role"] as? String == "user"
+        else { return nil }
+        let text: String? =
+            if let content = message["content"] as? String {
+                content
+            } else if let parts = message["content"] as? [[String: Any]] {
+                parts.first { $0["type"] as? String == "text" }?["text"] as? String
+            } else {
+                nil
+            }
         guard let text = text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else { return nil }
         return text
     }

@@ -27,7 +27,9 @@ let package = Package(
             // `Resources/Guides` links to `docs/guides`. The native build system, which the release workflow's tests
             // use, would `.copy` the link itself, leading nowhere in the bundle; `.process` copies the guides, to the
             // bundle's top level, with either build system.
-            resources: [.process("Resources/Localization"), .copy("Resources/ReleaseNotes"), .copy("Resources/Fonts"), .process("Resources/Guides")],
+            resources: [
+                .process("Resources/Localization"), .copy("Resources/ReleaseNotes"), .copy("Resources/Fonts"), .process("Resources/Guides"),
+            ],
             linkerSettings: [.linkedLibrary("sqlite3"), .linkedLibrary("z")]
         ),
         .testTarget(

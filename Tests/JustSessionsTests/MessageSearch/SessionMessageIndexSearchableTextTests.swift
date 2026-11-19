@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// `SessionMessageIndex.searchableText`: when it keeps a resume state with a session's saved text, and that what it

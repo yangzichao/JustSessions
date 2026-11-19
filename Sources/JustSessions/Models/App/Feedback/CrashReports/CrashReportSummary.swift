@@ -29,10 +29,12 @@ struct CrashReportSummary: Equatable, Sendable {
     init?(reportText: String) {
         let parts = reportText.split(separator: "\n", maxSplits: 1, omittingEmptySubsequences: false)
         guard let headerLine = parts.first,
-              let header = try? JSONDecoder().decode(CrashReportFileFormat.Header.self, from: Data(headerLine.utf8)),
-              header.bugType == CrashReportFileFormat.crashBugType,
-              let bundleIdentifier = header.bundleIdentifier, !bundleIdentifier.isEmpty else { return nil }
-        let body = parts.count > 1
+            let header = try? JSONDecoder().decode(CrashReportFileFormat.Header.self, from: Data(headerLine.utf8)),
+            header.bugType == CrashReportFileFormat.crashBugType,
+            let bundleIdentifier = header.bundleIdentifier, !bundleIdentifier.isEmpty
+        else { return nil }
+        let body =
+            parts.count > 1
             ? try? JSONDecoder().decode(CrashReportFileFormat.Body.self, from: Data(parts[1].utf8))
             : nil
 
@@ -56,9 +58,9 @@ struct CrashReportSummary: Equatable, Sendable {
 
     private static func describe(_ exception: CrashReportFileFormat.Exception) -> String? {
         switch (exception.type, exception.signal) {
-        case let (type?, signal?): "\(type) (\(signal))"
-        case let (type?, nil): type
-        case let (nil, signal?): signal
+        case (let type?, let signal?): "\(type) (\(signal))"
+        case (let type?, nil): type
+        case (nil, let signal?): signal
         case (nil, nil): nil
         }
     }

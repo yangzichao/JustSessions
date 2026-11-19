@@ -16,9 +16,13 @@ struct HostDisconnectConfirmation: ViewModifier {
                 Button("Cancel", role: .cancel) { store.hostDisconnectQuestion = nil }
             } message: { question in
                 if case .keepOrEndCLIs(alsoStopsOthers: true) = question.question {
-                    Text("Its open tabs close. Keep running leaves their CLIs running in tmux; click a session to reattach once you connect again. End sessions stops them. The other tabs' CLIs and shells stop either way.")
+                    Text(
+                        "Its open tabs close. Keep running leaves their CLIs running in tmux; click a session to reattach once you connect again. End sessions stops them. The other tabs' CLIs and shells stop either way."
+                    )
                 } else {
-                    Text("Its open tabs close. Keep running leaves their CLIs running in tmux; click a session to reattach once you connect again. End sessions stops them.")
+                    Text(
+                        "Its open tabs close. Keep running leaves their CLIs running in tmux; click a session to reattach once you connect again. End sessions stops them."
+                    )
                 }
             }
             .alert(title, isPresented: presentation(ofKeepOrEnd: false), presenting: store.hostDisconnectQuestion) { question in

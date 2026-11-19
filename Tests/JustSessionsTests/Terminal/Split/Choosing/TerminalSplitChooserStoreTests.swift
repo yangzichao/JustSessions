@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Add Tab to New Split View (⌘⌥N) as Chrome's NewSplitTab and split view new tab page: the selected tab shows on the
@@ -462,7 +463,9 @@ struct TerminalSplitChooserStoreTests {
         let openTabIDs = Set(store.terminalSessions.map(\.id))
         let chooserTabIDs = store.terminalSplitChoosers.map(\.tabID)
         #expect(chooserTabIDs.allSatisfy(openTabIDs.contains), "a chooser's tab is open", sourceLocation: sourceLocation)
-        #expect(chooserTabIDs.allSatisfy { store.split(containing: $0) == nil }, "a chooser's tab is in no split", sourceLocation: sourceLocation)
+        #expect(
+            chooserTabIDs.allSatisfy { store.split(containing: $0) == nil }, "a chooser's tab is in no split",
+            sourceLocation: sourceLocation)
         #expect(Set(chooserTabIDs).count == chooserTabIDs.count, "a tab has at most one chooser", sourceLocation: sourceLocation)
         if store.selectsShownSplitChooser {
             #expect(store.shownSplitChooser != nil, "only a shown chooser has the keyboard", sourceLocation: sourceLocation)
@@ -472,10 +475,13 @@ struct TerminalSplitChooserStoreTests {
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
-        return (store, {
-            store.closeAllTerminals()
-            isolatedUserDefaults.removeSuite()
-        })
+        return (
+            store,
+            {
+                store.closeAllTerminals()
+                isolatedUserDefaults.removeSuite()
+            }
+        )
     }
 
     private func open(_ store: ConversationStore, _ tab: TerminalSession) -> TerminalSession {

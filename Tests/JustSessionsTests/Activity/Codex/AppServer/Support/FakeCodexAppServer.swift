@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+
 @testable import JustSessions
 
 /// Codex's background server as the app talks to it: JSON-RPC in WebSocket text messages over a Unix socket. It
@@ -116,7 +117,8 @@ final class FakeCodexAppServer: @unchecked Sendable {
                     continue
                 case .text(let payload):
                     guard let request = try? JSONSerialization.jsonObject(with: payload) as? [String: Any],
-                          let method = request["method"] as? String else { continue }
+                        let method = request["method"] as? String
+                    else { continue }
                     let isAnswering = lock.withLock {
                         receivedMethods.append(method)
                         return self.isAnswering

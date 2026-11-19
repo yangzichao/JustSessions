@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+
 @testable import JustSessions
 
 /// Kiro CLI V3's `sessions` folder: `<workspace hash>/sess_<uuid>/session.json` beside `messages.jsonl`, with the fields
@@ -41,7 +42,8 @@ struct KiroV3SessionFixture {
         if let createdReason { metadata["createdReason"] = createdReason }
         try JSONSerialization.data(withJSONObject: metadata).write(to: folder.appendingPathComponent(KiroV3Session.metadataFileName))
         if let events {
-            try Self.lines(events).write(to: folder.appendingPathComponent(KiroV3Session.messagesFileName), atomically: true, encoding: .utf8)
+            try Self.lines(events).write(
+                to: folder.appendingPathComponent(KiroV3Session.messagesFileName), atomically: true, encoding: .utf8)
         }
         for (name, contents) in extraFiles {
             let file = folder.appendingPathComponent(name)
@@ -61,8 +63,10 @@ struct KiroV3SessionFixture {
     }
 
     static func user(_ text: String, images: Int = 0) -> [String: Any] {
-        ["type": "user", "content": text, "images": Array(repeating: ["mimeType": "image/png"], count: images), "documents": [],
-         "_meta": ["kiro": ["userMessageTag": "prompt_1"]]]
+        [
+            "type": "user", "content": text, "images": Array(repeating: ["mimeType": "image/png"], count: images), "documents": [],
+            "_meta": ["kiro": ["userMessageTag": "prompt_1"]],
+        ]
     }
 
     static func say(_ text: String) -> [String: Any] {
@@ -74,26 +78,30 @@ struct KiroV3SessionFixture {
     }
 
     /// As Kiro wrote a shell command it then asked to run; `status` was `denied` because the probe ran without approval.
-    static var toolCall: [String: Any] { [
-        "type": "tool_call", "toolCallId": "run_command_1", "toolName": "execute_bash",
-        "args": ["command": "swift build", "run_in_background": false], "status": "completed", "kind": "execute",
-        "executionId": "exec-1", "actionType": "run_command", "title": "Run Command",
-    ] }
+    static var toolCall: [String: Any] {
+        [
+            "type": "tool_call", "toolCallId": "run_command_1", "toolName": "execute_bash",
+            "args": ["command": "swift build", "run_in_background": false], "status": "completed", "kind": "execute",
+            "executionId": "exec-1", "actionType": "run_command", "title": "Run Command",
+        ]
+    }
 
-    static var sampleEvents: [[String: Any]] { [
-        // 2.34.0 opens each log with context for the model.
-        ["type": "agent_note", "content": "<session_context>\nThe current model is Auto.\n</session_context>"],
-        user("Fix the build"),
-        ["type": "turn_start", "executionId": "exec-1"],
-        ["type": "pending_interaction", "interactionType": "tool_approval", "toolCallId": "run_command_1", "question": "swift build"],
-        ["type": "interaction_resolved", "toolCallId": "run_command_1", "outcome": "accepted"],
-        toolCall,
-        ["type": "tool_result", "toolCallId": "run_command_1", "content": "Build complete!", "success": true, "executionId": "exec-1"],
-        reasoning("The build passes now."),
-        ["type": "session_metadata", "key": "contextUsage", "value": ["usagePercentage": 2.6]],
-        say("The build passes."),
-        ["type": "usage_summary", "promptTurnSummaries": [], "status": "success", "executionId": "exec-1"],
-        ["type": "turn_end", "stopReason": "end_turn", "executionId": "exec-1"],
-        ["type": "session_start", "agentType": "vibe", "content": "You are Kiro, the system prompt.", "forcedRole": true],
-    ] }
+    static var sampleEvents: [[String: Any]] {
+        [
+            // 2.34.0 opens each log with context for the model.
+            ["type": "agent_note", "content": "<session_context>\nThe current model is Auto.\n</session_context>"],
+            user("Fix the build"),
+            ["type": "turn_start", "executionId": "exec-1"],
+            ["type": "pending_interaction", "interactionType": "tool_approval", "toolCallId": "run_command_1", "question": "swift build"],
+            ["type": "interaction_resolved", "toolCallId": "run_command_1", "outcome": "accepted"],
+            toolCall,
+            ["type": "tool_result", "toolCallId": "run_command_1", "content": "Build complete!", "success": true, "executionId": "exec-1"],
+            reasoning("The build passes now."),
+            ["type": "session_metadata", "key": "contextUsage", "value": ["usagePercentage": 2.6]],
+            say("The build passes."),
+            ["type": "usage_summary", "promptTurnSummaries": [], "status": "success", "executionId": "exec-1"],
+            ["type": "turn_end", "stopReason": "end_turn", "executionId": "exec-1"],
+            ["type": "session_start", "agentType": "vibe", "content": "You are Kiro, the system prompt.", "forcedRole": true],
+        ]
+    }
 }

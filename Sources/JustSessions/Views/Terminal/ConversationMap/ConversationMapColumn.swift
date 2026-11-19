@@ -27,8 +27,9 @@ struct ConversationMapColumn: View, Equatable {
             if showsMap {
                 terminalPalette.backgroundColor
                 if isShown {
-                    ConversationMapView(model: model, conversation: conversation, provider: provider, store: store, hover: hover,
-                                        editor: editor)
+                    ConversationMapView(
+                        model: model, conversation: conversation, provider: provider, store: store, hover: hover,
+                        editor: editor)
                 }
             }
         }

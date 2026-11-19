@@ -78,13 +78,16 @@ struct NewSessionStartCommandSection: View {
     }
 
     private var editingField: some View {
-        TextField(provider.defaultStartCommand, text: Binding(
-            get: { editedCommand ?? "" },
-            set: {
-                editedCommand = $0
-                checkFailure = nil
-            }
-        ))
+        TextField(
+            provider.defaultStartCommand,
+            text: Binding(
+                get: { editedCommand ?? "" },
+                set: {
+                    editedCommand = $0
+                    checkFailure = nil
+                }
+            )
+        )
         .textFieldStyle(ThemedTextFieldStyle())
         .font(ThemeFont.body.monospaced())
         .autocorrectionDisabled()

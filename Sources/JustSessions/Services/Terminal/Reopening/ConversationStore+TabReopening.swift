@@ -30,7 +30,8 @@ extension ConversationStore {
         guard openTabPersistence == nil else { return }
         // The packaged launch check explicitly disables reopening through launch arguments. That disposable
         // process must not replace the user's recovery snapshot with its empty workspace.
-        guard userDefaults.volatileDomain(forName: UserDefaults.argumentDomain)[TabReopeningSettingsStore.userDefaultsKey] as? Bool != false else { return }
+        guard userDefaults.volatileDomain(forName: UserDefaults.argumentDomain)[TabReopeningSettingsStore.userDefaultsKey] as? Bool != false
+        else { return }
         let tabs = persistence.take(from: userDefaults)
         openTabPersistence = persistence
         beginReopening(isEnabled ? tabs : [])
@@ -66,9 +67,10 @@ extension ConversationStore {
         for waitingTab in pendingTabReopening.takeWaitingTabs(where: shouldReopen) {
             guard let session = makeReopenedTerminal(for: waitingTab.tab) else {
                 if let conversationID = waitingTab.tab.conversationID,
-                   let conversation = conversation(withID: conversationID),
-                   !terminalSessions.contains(where: { $0.conversation?.id == conversationID }),
-                   runningTerminalInAnotherWindow(for: conversation) == nil {
+                    let conversation = conversation(withID: conversationID),
+                    !terminalSessions.contains(where: { $0.conversation?.id == conversationID }),
+                    runningTerminalInAnotherWindow(for: conversation) == nil
+                {
                     // A missing CLI or temporarily unavailable project can become usable on a later refresh.
                     pendingTabReopening.returnWaitingTab(waitingTab)
                 }
@@ -88,7 +90,8 @@ extension ConversationStore {
     /// is gone.
     private func makeReopenedTerminal(for tab: ReopenableTerminalTab) -> TerminalSession? {
         guard let conversationID = tab.conversationID else {
-            let reattachesNow = tab.host == .thisMac
+            let reattachesNow =
+                tab.host == .thisMac
                 && tab.tmuxSessionName.map { tmuxSessionNamesByHost[.thisMac]?.contains($0) == true } == true
             return try? makePlainTerminal(
                 in: ProjectLocation(key: tab.projectDirectoryKey),
@@ -97,9 +100,10 @@ extension ConversationStore {
             )
         }
         guard let conversation = conversation(withID: conversationID),
-              canLaunch(conversation, action: .resume),
-              runningTerminal(for: conversation) == nil,
-              runningTerminalInAnotherWindow(for: conversation) == nil else { return nil }
+            canLaunch(conversation, action: .resume),
+            runningTerminal(for: conversation) == nil,
+            runningTerminalInAnotherWindow(for: conversation) == nil
+        else { return nil }
         // Reattaching costs nothing, and lets the tab report what the CLI does from the start.
         let reattachesNow = conversation.host == .thisMac && isRunningInTmux(conversation)
         return try? makeTerminal(for: conversation, action: .resume, startsOnceShown: !reattachesNow)

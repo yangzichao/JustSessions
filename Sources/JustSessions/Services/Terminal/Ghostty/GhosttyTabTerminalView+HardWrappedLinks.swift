@@ -10,7 +10,7 @@ extension GhosttyTabTerminalView {
     /// wraps at the edge by itself, and Ghostty joins that.
     func hardWrappedLink(under event: NSEvent) -> HardWrappedLink? {
         guard isOnAlternateScreen || terminalSurface?.isMouseCaptured == true, let gridMetrics,
-              gridMetrics.cellWidthPixels > 0, gridMetrics.cellHeightPixels > 0
+            gridMetrics.cellWidthPixels > 0, gridMetrics.cellHeightPixels > 0
         else { return nil }
         let point = convert(event.locationInWindow, from: nil)
         guard bounds.contains(point) else { return nil }
@@ -20,7 +20,7 @@ extension GhosttyTabTerminalView {
         let column = Int(point.x * scale) / Int(gridMetrics.cellWidthPixels)
         let row = Int((bounds.height - point.y) * scale) / Int(gridMetrics.cellHeightPixels)
         guard column < Int(gridMetrics.columns), row < Int(gridMetrics.rows),
-              let screenText = inMemorySession.readViewportText()
+            let screenText = inMemorySession.readViewportText()
         else { return nil }
         return HardWrappedLink(
             rows: screenText.components(separatedBy: "\n"), columns: Int(gridMetrics.columns), row: row, column: column

@@ -35,10 +35,13 @@ enum MessageBookmarkNavigation {
 
     /// Page `records` are index positions, not record numbers (TranscriptPage.swift:19-21; Pi and Antigravity differ),
     /// so coverage is judged by the loaded entries' records. A record never spans two pages (TranscriptPageReader.swift:4).
-    static func locate(_ bookmark: MessageBookmark, in entries: [TranscriptEntry], hasEarlier: Bool, hasLater: Bool) -> MessageBookmarkLocation {
+    static func locate(_ bookmark: MessageBookmark, in entries: [TranscriptEntry], hasEarlier: Bool, hasLater: Bool)
+        -> MessageBookmarkLocation
+    {
         guard let first = entries.first, let last = entries.last else { return .notLoaded }
         let record = TranscriptPageIdentity.record(for: bookmark.entryID)
-        let isCovered = (record >= TranscriptPageIdentity.record(for: first.id) || !hasEarlier)
+        let isCovered =
+            (record >= TranscriptPageIdentity.record(for: first.id) || !hasEarlier)
             && (record <= TranscriptPageIdentity.record(for: last.id) || !hasLater)
         guard isCovered else { return .notLoaded }
         if let exact = entries.first(where: { $0.id == bookmark.entryID }), matches(bookmark, exact) { return .found(exact) }
@@ -99,21 +102,33 @@ private struct SnippetWords {
     /// Nil, adding nothing, at a CR or a byte past ASCII before the words end, or right after the cut, where it could
     /// join the last Character.
     private mutating func addASCII(_ segment: String) -> Bool? {
-        var bytes: [UInt8] = [], count = length, scanned = 0, inWord = false, reachedCut = false, done = false
+        var bytes: [UInt8] = []
+        var count = length
+        var scanned = 0
+        var inWord = false
+        var reachedCut = false
+        var done = false
         for byte in segment.utf8 {
             if scanned == Self.cut {
                 guard byte < 0x80 else { return nil }
-                reachedCut = true; break
+                reachedCut = true
+                break
             }
             guard byte < 0x80, byte != UInt8(ascii: "\r") else { return nil }
             scanned += 1
             if byte == UInt8(ascii: " ") || (0x09...0x0D).contains(byte) {
                 guard inWord else { continue }
-                inWord = false; count += 1
-                if count >= MessageBookmarkNavigation.snippetLength { done = true; break }
+                inWord = false
+                count += 1
+                if count >= MessageBookmarkNavigation.snippetLength {
+                    done = true
+                    break
+                }
             } else {
                 if !inWord, !text.isEmpty || !bytes.isEmpty { bytes.append(UInt8(ascii: " ")) }
-                inWord = true; bytes.append(byte); count += 1
+                inWord = true
+                bytes.append(byte)
+                count += 1
             }
         }
         text += String(decoding: bytes, as: UTF8.self)
@@ -122,17 +137,29 @@ private struct SnippetWords {
     }
 
     private mutating func addCharacters(_ segment: String) -> Bool {
-        var index = segment.startIndex, wordStart: String.Index?, scanned = 0, reachedCut = false, done = false
+        var index = segment.startIndex
+        var wordStart: String.Index?
+        var scanned = 0
+        var reachedCut = false
+        var done = false
         while index < segment.endIndex {
-            if scanned == Self.cut { reachedCut = true; break }
+            if scanned == Self.cut {
+                reachedCut = true
+                break
+            }
             scanned += 1
             let next = segment.index(after: index)
             if !segment[index].isWhitespace {
                 if wordStart == nil { wordStart = index }
                 length += 1
             } else if let start = wordStart {
-                append(segment[start..<index]); wordStart = nil; length += 1
-                if length >= MessageBookmarkNavigation.snippetLength { done = true; break }
+                append(segment[start..<index])
+                wordStart = nil
+                length += 1
+                if length >= MessageBookmarkNavigation.snippetLength {
+                    done = true
+                    break
+                }
             }
             index = next
         }

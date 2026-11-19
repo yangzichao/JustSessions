@@ -11,7 +11,8 @@ enum RemoteCLIInstallFolders {
     /// order, then in each nvm version's `bin`; `preferredPath(among:)` picks one. It has no single quote or
     /// backslash, so quoting it again for a fish login shell keeps it as it is.
     static func searchScript(executableNames: [String]) -> String {
-        let folders = CLISearchDirectories.wellKnownDirectories(homeDirectory: hostHome).map { "\"\($0)\"" }
+        let folders =
+            CLISearchDirectories.wellKnownDirectories(homeDirectory: hostHome).map { "\"\($0)\"" }
             + ["\"\(CLISearchDirectories.nvmVersionsDirectory(homeDirectory: hostHome))\"/*/bin"]
         return "for name in \(executableNames.joined(separator: " ")); do"
             + " for folder in \(folders.joined(separator: " ")); do"
@@ -32,7 +33,8 @@ enum RemoteCLIInstallFolders {
     private static func nodeVersion(of path: String) -> String? {
         let components = path.split(separator: "/").map(String.init)
         guard components.count >= 6,
-              Array(components.suffix(6).prefix(3)) == [".nvm", "versions", "node"] else { return nil }
+            Array(components.suffix(6).prefix(3)) == [".nvm", "versions", "node"]
+        else { return nil }
         return components[components.count - 3]
     }
 }

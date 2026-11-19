@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A store with open tabs, the menu a right-click in a tab's terminal shows, and what its items asked the window for.
@@ -52,7 +53,8 @@ final class TerminalContextMenuFixture {
     /// has the surface that holds its text and selection.
     func showInWindow(_ tab: TerminalSession) {
         let insetView = TerminalInsetView(terminalView: tab.terminalView)
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 640, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 640, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = insetView
         windows.append(window)

@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Each window's bell lists the tabs waiting for you in every window, except one whose terminal shows in its own
@@ -19,7 +20,10 @@ struct NotificationBellAcrossWindowsTests {
 
         let firstWindowBell = StoreChangeCounter(sandbox.first) { _ = $0.notificationBellEntries }
         let firstWindowChanges = StoreChangeCounter(sandbox.first)
-        defer { firstWindowBell.cancel(); firstWindowChanges.cancel() }
+        defer {
+            firstWindowBell.cancel()
+            firstWindowChanges.cancel()
+        }
         sandbox.second.selectTerminal(tab.id)
         // The first window's bell looks again, as it reads which terminals the second window shows, while nothing else
         // in the first window changes, so its sidebar does not redraw.

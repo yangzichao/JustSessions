@@ -61,7 +61,8 @@ enum SidebarProjectFiltering {
         guard !query.isEmpty else { return projects }
         return projects.compactMap { project in
             if project.displayName.localizedCaseInsensitiveContains(query)
-                || project.projectPath.localizedCaseInsensitiveContains(query) {
+                || project.projectPath.localizedCaseInsensitiveContains(query)
+            {
                 return project
             }
             let matchingConversations = project.conversations.filter {

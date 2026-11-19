@@ -21,7 +21,7 @@ struct KeptHostChecks: Equatable {
 
     static func load(from userDefaults: UserDefaults) -> KeptHostChecks {
         guard let data = userDefaults.data(forKey: userDefaultsKey),
-              let checksByHost = try? JSONDecoder().decode([String: KeptHostCheck].self, from: data)
+            let checksByHost = try? JSONDecoder().decode([String: KeptHostCheck].self, from: data)
         else { return KeptHostChecks() }
         return KeptHostChecks(checksByHost: checksByHost)
     }

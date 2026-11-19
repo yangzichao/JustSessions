@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct ProjectParentLabelsTests {
@@ -9,10 +10,11 @@ struct ProjectParentLabelsTests {
             .fixture(projectPath: "/Users/me/code/work/site"),
         ])
 
-        #expect(labelsByFolderPath(projects) == [
-            "/Users/me/code/work/app": "code/work",
-            "/Users/me/code/personal/app": "code/personal",
-        ])
+        #expect(
+            labelsByFolderPath(projects) == [
+                "/Users/me/code/work/app": "code/work",
+                "/Users/me/code/personal/app": "code/personal",
+            ])
     }
 
     @Test func aCustomNameThatMatchesAnotherProjectsNameAddsLabelsToBoth() {
@@ -21,10 +23,11 @@ struct ProjectParentLabelsTests {
             displayNames: ProjectDisplayNames(customNamesByProjectPath: ["/Users/me/old/backend": "api"])
         )
 
-        #expect(labelsByFolderPath(projects) == [
-            "/Users/me/code/api": "me/code",
-            "/Users/me/old/backend": "me/old",
-        ])
+        #expect(
+            labelsByFolderPath(projects) == [
+                "/Users/me/code/api": "me/code",
+                "/Users/me/old/backend": "me/old",
+            ])
     }
 
     @Test func projectsOnAnSSHHostAreLabelledWithTheirPathThere() {
@@ -33,10 +36,11 @@ struct ProjectParentLabelsTests {
             .fixture(projectPath: "/srv/app", host: .ssh("devbox")),
         ])
 
-        #expect(labelsByFolderPath(projects) == [
-            "/home/me/work/app": "me/work",
-            "/srv/app": "srv",
-        ])
+        #expect(
+            labelsByFolderPath(projects) == [
+                "/home/me/work/app": "me/work",
+                "/srv/app": "srv",
+            ])
     }
 
     @Test func aProjectAtTheTopOfTheDiskIsLabelledWithTheRoot() {

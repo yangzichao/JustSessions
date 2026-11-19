@@ -1,12 +1,15 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CodexTurnStateTests {
     private static let startedAt = Date(timeIntervalSince1970: 1_790_000_000.5)
 
     @Test func aTurnStartsWithTaskStartedAndEndsWithTaskCompleteOrTurnAborted() {
-        #expect(CodexTurnState(turnEventLine: Data(CodexRolloutLines.turnStarted(at: Self.startedAt).utf8)) == .inTurn(startedAt: Self.startedAt))
+        #expect(
+            CodexTurnState(turnEventLine: Data(CodexRolloutLines.turnStarted(at: Self.startedAt).utf8))
+                == .inTurn(startedAt: Self.startedAt))
         #expect(CodexTurnState(turnEventLine: Data(CodexRolloutLines.turnCompleted().utf8)) == .betweenTurns)
         #expect(CodexTurnState(turnEventLine: Data(CodexRolloutLines.turnAborted().utf8)) == .betweenTurns)
         #expect(CodexTurnState(turnEventLine: Data(CodexRolloutLines.agentMessage.utf8)) == nil)

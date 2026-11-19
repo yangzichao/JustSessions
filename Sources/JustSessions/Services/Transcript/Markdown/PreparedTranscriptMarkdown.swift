@@ -23,7 +23,8 @@ extension TranscriptPage {
             }
             return entry
         }
-        return Self(entries: preparedEntries, records: records, totalRecordCount: totalRecordCount, decodedByteCount: decodedByteCount,
-                    precedingSpeaker: precedingSpeaker, sourceLineage: sourceLineage)
+        return Self(
+            entries: preparedEntries, records: records, totalRecordCount: totalRecordCount, decodedByteCount: decodedByteCount,
+            precedingSpeaker: precedingSpeaker, sourceLineage: sourceLineage)
     }
 }

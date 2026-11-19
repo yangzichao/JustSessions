@@ -76,15 +76,17 @@ struct RemoteHostCheck: Sendable {
         let command = RemoteHostCheckScript.command(startup: startup, programs: programs, projectPath: session?.projectPath)
         startingStep(.hostCommand)
         guard let result = runner.run(host, command, Self.scriptTimeout),
-              result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus else {
-            findings.append(HostCheckFinding(
-                id: "script",
-                status: .problem,
-                title: AppLocalization.string("Host check"),
-                summary: AppLocalization.string(
-                    "\(host) didn't answer the rest of the check within \(Int(Self.scriptTimeout)) seconds, or the connection dropped."
-                )
-            ))
+            result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus
+        else {
+            findings.append(
+                HostCheckFinding(
+                    id: "script",
+                    status: .problem,
+                    title: AppLocalization.string("Host check"),
+                    summary: AppLocalization.string(
+                        "\(host) didn't answer the rest of the check within \(Int(Self.scriptTimeout)) seconds, or the connection dropped."
+                    )
+                ))
             return outcome(findings, checkedShellStartup)
         }
         let context = RemoteHostCheckContext(

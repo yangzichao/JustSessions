@@ -36,15 +36,17 @@ enum BoundedProcessRunner {
         timeout: TimeInterval,
         cancelsWithTask: Bool = false
     ) -> (exitStatus: Int32, output: String)? {
-        guard let outcome = outcome(
-            ofExecutable: executablePath,
-            arguments: arguments,
-            environment: environment,
-            workingDirectory: workingDirectory,
-            includesStandardError: includesStandardError,
-            timeout: timeout,
-            cancelsWithTask: cancelsWithTask
-        ), let exitStatus = outcome.exitStatus else { return nil }
+        guard
+            let outcome = outcome(
+                ofExecutable: executablePath,
+                arguments: arguments,
+                environment: environment,
+                workingDirectory: workingDirectory,
+                includesStandardError: includesStandardError,
+                timeout: timeout,
+                cancelsWithTask: cancelsWithTask
+            ), let exitStatus = outcome.exitStatus
+        else { return nil }
         return (exitStatus, outcome.output)
     }
 
@@ -63,7 +65,8 @@ enum BoundedProcessRunner {
         let outputFile = FileManager.default.temporaryDirectory
             .appendingPathComponent("justsessions-process-output-\(UUID().uuidString)")
         guard FileManager.default.createFile(atPath: outputFile.path, contents: nil),
-              let outputHandle = try? FileHandle(forWritingTo: outputFile) else { return nil }
+            let outputHandle = try? FileHandle(forWritingTo: outputFile)
+        else { return nil }
         defer {
             try? outputHandle.close()
             try? FileManager.default.removeItem(at: outputFile)

@@ -10,7 +10,9 @@ enum TerminalAppearanceStyling {
 
     /// Returns the palette the terminal took on.
     @discardableResult
-    static func apply(_ preferences: TerminalAppearancePreferences, theme: ResolvedAppTheme, to terminalView: TerminalView) -> TerminalPalette {
+    static func apply(_ preferences: TerminalAppearancePreferences, theme: ResolvedAppTheme, to terminalView: TerminalView)
+        -> TerminalPalette
+    {
         let preferences = preferences.validated
         let usesDarkColors = preferences.mode.usesDarkColors(effectiveAppearance: terminalView.effectiveAppearance)
         let palette = preferences.colorVariants(appTheme: theme).palette(usesDarkColors: usesDarkColors)

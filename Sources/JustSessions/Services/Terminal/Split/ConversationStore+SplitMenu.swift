@@ -14,7 +14,8 @@ extension ConversationStore {
         guard tabID == selectedTerminalID, let tab = terminalSessions.first(where: { $0.id == tabID }) else {
             return .newSplitWithSelectedTab
         }
-        let candidates = terminalSessions
+        let candidates =
+            terminalSessions
             .filter { $0.id != tabID && !isInSplitOrChooser($0.id) }
             .map { TerminalTabSplitCandidate(session: $0, projectDisplayName: projectDisplayName(forProjectPath: $0.projectDirectoryKey)) }
         let location = ProjectLocation(key: tab.projectDirectoryKey)

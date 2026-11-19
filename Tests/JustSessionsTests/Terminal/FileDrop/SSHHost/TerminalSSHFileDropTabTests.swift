@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A drop on a tab on an SSH host, from the drag to what the tab's CLI receives, whichever engine draws the tab. A
@@ -31,7 +32,8 @@ struct TerminalSSHFileDropTabTests {
             host: .ssh("devbox")
         )
         // Ghostty takes a paste only in a window.
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = tab.terminalView
         defer {

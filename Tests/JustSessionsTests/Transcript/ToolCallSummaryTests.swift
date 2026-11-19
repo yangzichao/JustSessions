@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct ToolCallSummaryTests {
@@ -27,12 +28,13 @@ struct ToolCallSummaryTests {
         #expect(summary == "Grep · TODO")
     }
 
-    @Test(arguments: [
-        [:],
-        ["todos": [["content": "Write tests"]]],
-        ["command": " \n\t "],
-        ["timeout": 30],
-    ] as [[String: any Sendable]])
+    @Test(
+        arguments: [
+            [:],
+            ["todos": [["content": "Write tests"]]],
+            ["command": " \n\t "],
+            ["timeout": 30],
+        ] as [[String: any Sendable]])
     func withoutADescriptiveArgumentOnlyTheToolIsNamed(_ arguments: [String: any Sendable]) {
         #expect(ToolCallSummary.summary(toolName: "Tool", arguments: arguments) == "Tool")
     }

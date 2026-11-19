@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PiConversationDeletionTests {
@@ -19,9 +20,10 @@ struct PiConversationDeletionTests {
         #expect(!FileManager.default.fileExists(atPath: companionDirectory.path))
         #expect(FileManager.default.fileExists(atPath: keptFile.path))
         #expect(sandbox.trashedNames == [sessionFile.lastPathComponent, companionDirectory.lastPathComponent].sorted())
-        #expect(FileManager.default.fileExists(
-            atPath: sandbox.trashDirectory.appendingPathComponent("\(companionDirectory.lastPathComponent)/run-1/session.jsonl").path
-        ))
+        #expect(
+            FileManager.default.fileExists(
+                atPath: sandbox.trashDirectory.appendingPathComponent("\(companionDirectory.lastPathComponent)/run-1/session.jsonl").path
+            ))
     }
 
     @Test func aSessionWithoutAFolderMovesOnlyItsFile() throws {
@@ -69,8 +71,10 @@ struct PiConversationDeletionTests {
         let sessionID = UUID().uuidString.lowercased()
         let outside = try PiSessionFolderFixture(sessionsDirectory: sandbox.root.appendingPathComponent("other"))
             .writeSession(id: sessionID, projectPath: "/Users/me/app")
-        let nested = try PiSessionFolderFixture(sessionsDirectory: sandbox.folder.sessionsDirectory.appendingPathComponent("--Users-me-app--/stem/forks"))
-            .writeSession(id: sessionID, projectPath: "/Users/me/app", inProjectFolder: false)
+        let nested = try PiSessionFolderFixture(
+            sessionsDirectory: sandbox.folder.sessionsDirectory.appendingPathComponent("--Users-me-app--/stem/forks")
+        )
+        .writeSession(id: sessionID, projectPath: "/Users/me/app", inProjectFolder: false)
 
         for sourceFile in [outside, nested] {
             #expect(throws: ConversationDeletionError.invalidSource) {

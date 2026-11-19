@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ClaudeAdapterTests {
@@ -12,7 +13,8 @@ struct ClaudeAdapterTests {
         try FileManager.default.createDirectory(at: sessions, withIntermediateDirectories: true)
         let indexedID = UUID().uuidString
         let unindexedID = UUID().uuidString
-        try "{\"type\":\"user\",\"cwd\":\"\(project.path)\",\"message\":{\"content\":\"Draft intro\"},\"timestamp\":\"2026-09-20T10:00:00Z\"}\n{\"type\":\"custom-title\",\"customTitle\":\"Final paper title\",\"timestamp\":\"2026-09-22T10:00:00Z\"}\n"
+        try
+            "{\"type\":\"user\",\"cwd\":\"\(project.path)\",\"message\":{\"content\":\"Draft intro\"},\"timestamp\":\"2026-09-20T10:00:00Z\"}\n{\"type\":\"custom-title\",\"customTitle\":\"Final paper title\",\"timestamp\":\"2026-09-22T10:00:00Z\"}\n"
             .write(to: sessions.appendingPathComponent("\(indexedID).jsonl"), atomically: true, encoding: .utf8)
         try "{\"type\":\"user\",\"cwd\":\"\(project.path)\",\"message\":{\"content\":\"Revise conclusion\"}}\n"
             .write(to: sessions.appendingPathComponent("\(unindexedID).jsonl"), atomically: true, encoding: .utf8)
@@ -40,11 +42,13 @@ struct ClaudeAdapterTests {
         defer { folder.remove() }
         let sessionID = UUID().uuidString
         let imageData = String(repeating: "A", count: 300_000)
-        try folder.writeTranscript(sessionID, lines: [
-            #"{"type":"mode","mode":"normal","sessionId":"\#(sessionID)"}"#,
-            #"{"type":"file-history-snapshot","messageId":"m1"}"#,
-            #"{"type":"user","cwd":"/Users/me/app","message":{"role":"user","content":[{"type":"text","text":"[Image #1] Is this a bug?"},{"type":"image","source":{"type":"base64","data":"\#(imageData)"}}]},"timestamp":"2026-10-10T07:00:00Z"}"#,
-        ])
+        try folder.writeTranscript(
+            sessionID,
+            lines: [
+                #"{"type":"mode","mode":"normal","sessionId":"\#(sessionID)"}"#,
+                #"{"type":"file-history-snapshot","messageId":"m1"}"#,
+                #"{"type":"user","cwd":"/Users/me/app","message":{"role":"user","content":[{"type":"text","text":"[Image #1] Is this a bug?"},{"type":"image","source":{"type":"base64","data":"\#(imageData)"}}]},"timestamp":"2026-10-10T07:00:00Z"}"#,
+            ])
 
         let found = try #require(folder.discoveredConversationsBySessionID()[sessionID])
 
@@ -58,8 +62,11 @@ struct ClaudeAdapterTests {
         let markedInIndex = UUID().uuidString
         let markedInTranscript = UUID().uuidString
         let mainSession = UUID().uuidString
-        try folder.writeTranscript(markedInIndex, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":"Marked in the index"}}"#])
-        try folder.writeTranscript(markedInTranscript, lines: [#"{"type":"user","cwd":"/Users/me/app","isSidechain":true,"message":{"content":"Marked in the transcript"}}"#])
+        try folder.writeTranscript(
+            markedInIndex, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":"Marked in the index"}}"#])
+        try folder.writeTranscript(
+            markedInTranscript,
+            lines: [#"{"type":"user","cwd":"/Users/me/app","isSidechain":true,"message":{"content":"Marked in the transcript"}}"#])
         try folder.writeTranscript(mainSession, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":"Main session"}}"#])
         try folder.writeIndex(#"{"entries":[{"sessionId":"\#(markedInIndex)","isSidechain":true}]}"#)
 
@@ -70,10 +77,12 @@ struct ClaudeAdapterTests {
         let folder = try ClaudeProjectFolderFixture()
         defer { folder.remove() }
         let sessionID = UUID().uuidString
-        try folder.writeTranscript(sessionID, lines: [
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Ship it"}}"#,
-            #"{"type":"assistant","message":{"model":"claude-opus-4-8","content":[]}}"#,
-        ])
+        try folder.writeTranscript(
+            sessionID,
+            lines: [
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Ship it"}}"#,
+                #"{"type":"assistant","message":{"model":"claude-opus-4-8","content":[]}}"#,
+            ])
         let subagents = folder.projectDirectory.appendingPathComponent("\(sessionID)/subagents")
         let workflow = subagents.appendingPathComponent("workflows/wf_1a2b")
         try FileManager.default.createDirectory(at: workflow, withIntermediateDirectories: true)
@@ -126,14 +135,16 @@ struct ClaudeAdapterTests {
         try folder.writeTranscript(namedByEntry, lines: [promptWithFolder])
         try folder.writeTranscript(namedByTranscript, lines: [promptWithFolder])
         try folder.writeTranscript(namedByOriginalPath, lines: [promptWithoutFolder])
-        try folder.writeIndex(#"{"originalPath":"/from/original-path","entries":[{"sessionId":"\#(namedByEntry)","projectPath":"/from/entry"}]}"#)
+        try folder.writeIndex(
+            #"{"originalPath":"/from/original-path","entries":[{"sessionId":"\#(namedByEntry)","projectPath":"/from/entry"}]}"#)
 
         let projectPaths = try folder.discoveredConversationsBySessionID().mapValues(\.projectPath)
-        #expect(projectPaths == [
-            namedByEntry: "/from/entry",
-            namedByTranscript: "/from/transcript",
-            namedByOriginalPath: "/from/original-path",
-        ])
+        #expect(
+            projectPaths == [
+                namedByEntry: "/from/entry",
+                namedByTranscript: "/from/transcript",
+                namedByOriginalPath: "/from/original-path",
+            ])
 
         try folder.writeIndex("{}")
         try folder.writeTranscript(noFolderAnywhere, lines: [promptWithoutFolder])
@@ -156,10 +167,12 @@ struct ClaudeAdapterTests {
         let movedProjectDirectory = folder.configurationDirectory.appendingPathComponent("projects/-Users-me-other-project")
         try FileManager.default.createDirectory(at: movedProjectDirectory, withIntermediateDirectories: true)
         try FileManager.default.removeItem(at: startFile)
-        try (startedInApp + [
-            #"{"type":"relocated","sessionId":"\#(sessionID)","relocatedCwd":"/Users/me/other/project"}"#,
-            #"{"type":"user","cwd":"/Users/me/other/project","timestamp":"2026-10-13T10:05:00Z","message":{"content":"Keep going here"}}"#,
-        ]).joined(separator: "\n").write(to: movedProjectDirectory.appendingPathComponent("\(sessionID).jsonl"), atomically: true, encoding: .utf8)
+        try
+            (startedInApp + [
+                #"{"type":"relocated","sessionId":"\#(sessionID)","relocatedCwd":"/Users/me/other/project"}"#,
+                #"{"type":"user","cwd":"/Users/me/other/project","timestamp":"2026-10-13T10:05:00Z","message":{"content":"Keep going here"}}"#,
+            ]).joined(separator: "\n").write(
+                to: movedProjectDirectory.appendingPathComponent("\(sessionID).jsonl"), atomically: true, encoding: .utf8)
         try #"{"entries":[{"sessionId":"\#(sessionID)","projectPath":"/Users/me/app"}]}"#
             .write(to: movedProjectDirectory.appendingPathComponent("sessions-index.json"), atomically: true, encoding: .utf8)
 
@@ -182,7 +195,8 @@ struct ClaudeAdapterTests {
             #"{"type":"relocated","sessionId":"\#(sessionID)","relocatedCwd":"/Users/me/app/.claude/worktrees/fix"}"#,
             #"{"type":"worktree-state","worktreeSession":{"originalCwd":"/Users/me/app","worktreePath":"/Users/me/app/.claude/worktrees/fix","worktreeName":"fix"},"sessionId":"\#(sessionID)"}"#,
             #"{"type":"assistant","cwd":"/Users/me/app/.claude/worktrees/fix","timestamp":"2026-10-15T10:05:00Z","message":{"content":"Fixed"}}"#,
-        ].joined(separator: "\n").write(to: worktreeProjectDirectory.appendingPathComponent("\(sessionID).jsonl"), atomically: true, encoding: .utf8)
+        ].joined(separator: "\n").write(
+            to: worktreeProjectDirectory.appendingPathComponent("\(sessionID).jsonl"), atomically: true, encoding: .utf8)
 
         #expect(try folder.discoveredConversationsBySessionID()[sessionID]?.projectPath == "/Users/me/app")
     }
@@ -192,11 +206,13 @@ struct ClaudeAdapterTests {
         let folder = try ClaudeProjectFolderFixture()
         defer { folder.remove() }
         let sessionID = UUID().uuidString
-        try folder.writeTranscript(sessionID, lines: [
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Build the web app"}}"#,
-            #"{"type":"assistant","cwd":"/Users/me/app/web","message":{"content":"Built"}}"#,
-            #"{"type":"user","cwd":"/Users/me/app/web/node_modules/pkg","message":{"content":"Check the package"}}"#,
-        ])
+        try folder.writeTranscript(
+            sessionID,
+            lines: [
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Build the web app"}}"#,
+                #"{"type":"assistant","cwd":"/Users/me/app/web","message":{"content":"Built"}}"#,
+                #"{"type":"user","cwd":"/Users/me/app/web/node_modules/pkg","message":{"content":"Check the package"}}"#,
+            ])
 
         #expect(try folder.discoveredConversationsBySessionID()[sessionID]?.projectPath == "/Users/me/app")
     }
@@ -217,11 +233,12 @@ struct ClaudeAdapterTests {
         try folder.writeTranscript(commandFirst, lines: [command, prompt])
 
         let titles = try folder.discoveredConversationsBySessionID().mapValues(\.suggestedTitle)
-        #expect(titles == [
-            generated: "Generated title",
-            renamed: "Transcript name",
-            commandFirst: "Transcript prompt",
-        ])
+        #expect(
+            titles == [
+                generated: "Generated title",
+                renamed: "Transcript name",
+                commandFirst: "Transcript prompt",
+            ])
     }
 
     @Test func theTitleIsTheLatestCustomTitleThenTheIndexsNameThenAPrompt() throws {
@@ -238,29 +255,34 @@ struct ClaudeAdapterTests {
         try folder.writeTranscript(renamedInIndex, lines: [prompt])
         try folder.writeTranscript(promptInIndex, lines: [prompt])
         try folder.writeTranscript(promptInTranscript, lines: [prompt])
-        try folder.writeTranscript(commandInIndex, lines: [
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<command-name>/model</command-name>"}}"#, prompt,
-        ])
+        try folder.writeTranscript(
+            commandInIndex,
+            lines: [
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":"<command-name>/model</command-name>"}}"#, prompt,
+            ])
         // A tool result is a user record too, but holds nothing the user typed.
-        try folder.writeTranscript(untitled, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":[{"type":"tool_result","content":"ok"}]}}"#])
-        try folder.writeIndex(#"""
-        {"entries":[
-          {"sessionId":"\#(renamedInTranscript)","customTitle":"Index name","firstPrompt":"Index prompt"},
-          {"sessionId":"\#(renamedInIndex)","customTitle":"Index name","firstPrompt":"Index prompt"},
-          {"sessionId":"\#(promptInIndex)","firstPrompt":"Index prompt"},
-          {"sessionId":"\#(commandInIndex)","firstPrompt":"<command-name>/model</command-name>"}
-        ]}
-        """#)
+        try folder.writeTranscript(
+            untitled, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":[{"type":"tool_result","content":"ok"}]}}"#])
+        try folder.writeIndex(
+            #"""
+            {"entries":[
+              {"sessionId":"\#(renamedInTranscript)","customTitle":"Index name","firstPrompt":"Index prompt"},
+              {"sessionId":"\#(renamedInIndex)","customTitle":"Index name","firstPrompt":"Index prompt"},
+              {"sessionId":"\#(promptInIndex)","firstPrompt":"Index prompt"},
+              {"sessionId":"\#(commandInIndex)","firstPrompt":"<command-name>/model</command-name>"}
+            ]}
+            """#)
 
         let titles = try folder.discoveredConversationsBySessionID().mapValues(\.suggestedTitle)
-        #expect(titles == [
-            renamedInTranscript: "Transcript name",
-            renamedInIndex: "Index name",
-            promptInIndex: "Index prompt",
-            promptInTranscript: "Transcript prompt",
-            commandInIndex: "Transcript prompt",
-            untitled: ConversationMetadata.untitledConversationTitle,
-        ])
+        #expect(
+            titles == [
+                renamedInTranscript: "Transcript name",
+                renamedInIndex: "Index name",
+                promptInIndex: "Index prompt",
+                promptInTranscript: "Transcript prompt",
+                commandInIndex: "Transcript prompt",
+                untitled: ConversationMetadata.untitledConversationTitle,
+            ])
     }
 
     /// Only the start and end of a long transcript are read, so a custom title set near its start is not the latest
@@ -272,18 +294,20 @@ struct ClaudeAdapterTests {
         let onlyPromptInIndex = UUID().uuidString
         let filler = Array(repeating: #"{"type":"assistant"}"#, count: 13_000)
         #expect(filler.joined(separator: "\n").utf8.count > ClaudeTranscriptTail.maximumByteCount)
-        let longTranscript = [
-            #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Transcript prompt"}}"#,
-            #"{"type":"custom-title","customTitle":"Early name"}"#,
-        ] + filler
+        let longTranscript =
+            [
+                #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Transcript prompt"}}"#,
+                #"{"type":"custom-title","customTitle":"Early name"}"#,
+            ] + filler
         try folder.writeTranscript(alsoNamedInIndex, lines: longTranscript)
         try folder.writeTranscript(onlyPromptInIndex, lines: longTranscript)
-        try folder.writeIndex(#"""
-        {"entries":[
-          {"sessionId":"\#(alsoNamedInIndex)","customTitle":"Index name"},
-          {"sessionId":"\#(onlyPromptInIndex)","firstPrompt":"Index prompt"}
-        ]}
-        """#)
+        try folder.writeIndex(
+            #"""
+            {"entries":[
+              {"sessionId":"\#(alsoNamedInIndex)","customTitle":"Index name"},
+              {"sessionId":"\#(onlyPromptInIndex)","firstPrompt":"Index prompt"}
+            ]}
+            """#)
 
         let titles = try folder.discoveredConversationsBySessionID().mapValues(\.suggestedTitle)
         #expect(titles == [alsoNamedInIndex: "Index name", onlyPromptInIndex: "Early name"])
@@ -298,15 +322,17 @@ struct ClaudeAdapterTests {
         let promptAtEleven = #"{"type":"user","cwd":"/Users/me/app","timestamp":"2026-09-24T11:00:00Z","message":{"content":"Hi"}}"#
         try folder.writeTranscript(transcriptIsNewer, lines: [promptAtEleven])
         try folder.writeTranscript(indexIsNewer, lines: [promptAtEleven])
-        let untimedFile = try folder.writeTranscript(neitherHasATime, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":"Hi"}}"#])
+        let untimedFile = try folder.writeTranscript(
+            neitherHasATime, lines: [#"{"type":"user","cwd":"/Users/me/app","message":{"content":"Hi"}}"#])
         let fileDate = Date(timeIntervalSince1970: 1_790_000_000)
         try FileManager.default.setAttributes([.modificationDate: fileDate], ofItemAtPath: untimedFile.path)
-        try folder.writeIndex(#"""
-        {"entries":[
-          {"sessionId":"\#(transcriptIsNewer)","modified":"2026-09-24T10:00:00Z"},
-          {"sessionId":"\#(indexIsNewer)","modified":"2026-09-24T12:00:00Z"}
-        ]}
-        """#)
+        try folder.writeIndex(
+            #"""
+            {"entries":[
+              {"sessionId":"\#(transcriptIsNewer)","modified":"2026-09-24T10:00:00Z"},
+              {"sessionId":"\#(indexIsNewer)","modified":"2026-09-24T12:00:00Z"}
+            ]}
+            """#)
 
         let updatedAt = try folder.discoveredConversationsBySessionID().mapValues(\.updatedAt)
         #expect(updatedAt[transcriptIsNewer] == ConversationMetadata.date("2026-09-24T11:00:00Z"))

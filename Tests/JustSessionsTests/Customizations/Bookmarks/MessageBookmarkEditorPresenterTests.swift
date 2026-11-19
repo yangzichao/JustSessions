@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Edit Bookmark… and All Bookmarks show as sheets on the window they were asked for (RDR-51, RDR-52). Windows are on
@@ -11,8 +12,9 @@ struct MessageBookmarkEditorPresenterTests {
     private func onScreenWindow(showing view: some View) -> NSWindow {
         _ = NSApplication.shared
         WindowAnimations.disable()
-        let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 700, height: 640), styleMask: [.titled, .closable],
-                              backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: CGRect(x: 0, y: 0, width: 700, height: 640), styleMask: [.titled, .closable],
+            backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = NSHostingView(rootView: view)
         window.center()
@@ -33,8 +35,9 @@ struct MessageBookmarkEditorPresenterTests {
         let window = onScreenWindow(showing: Color.clear.messageBookmarkEditor(requests, store: store))
         defer { close(window) }
         let conversation = Conversation.fixture(provider: .codex, sessionID: "editor")
-        let bookmark = MessageBookmark(letter: "a", entryID: TranscriptPageIdentity.entryID(record: 1, part: 0), kind: .user,
-                                       snippet: "Hello")
+        let bookmark = MessageBookmark(
+            letter: "a", entryID: TranscriptPageIdentity.entryID(record: 1, part: 0), kind: .user,
+            snippet: "Hello")
 
         requests.open(bookmark, in: conversation)
 
@@ -51,16 +54,19 @@ struct MessageBookmarkEditorPresenterTests {
         let requests = MessageBookmarkEditorRequests()
         let window = onScreenWindow(showing: Color.clear.messageBookmarkEditor(requests, store: store))
         defer { close(window) }
-        let bookmark = MessageBookmark(letter: "a", entryID: TranscriptPageIdentity.entryID(record: 1, part: 0), kind: .user,
-                                       snippet: "Hello")
+        let bookmark = MessageBookmark(
+            letter: "a", entryID: TranscriptPageIdentity.entryID(record: 1, part: 0), kind: .user,
+            snippet: "Hello")
         requests.open(bookmark, in: Conversation.fixture(provider: .codex, sessionID: "editor-click-outside"))
         try await expectEventually { window.attachedSheet != nil }
 
-        NSApp.sendEvent(try #require(NSEvent.mouseEvent(
-            with: .leftMouseDown, location: CGPoint(x: 20, y: 20), modifierFlags: [],
-            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
-            context: nil, eventNumber: 0, clickCount: 1, pressure: 1
-        )))
+        NSApp.sendEvent(
+            try #require(
+                NSEvent.mouseEvent(
+                    with: .leftMouseDown, location: CGPoint(x: 20, y: 20), modifierFlags: [],
+                    timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
+                    context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+                )))
 
         #expect(requests.request == nil)
         try await expectEventually { window.attachedSheet == nil }

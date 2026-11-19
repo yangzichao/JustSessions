@@ -26,9 +26,10 @@ struct TranscriptFileIndex: Sendable {
         let fingerprint = try TranscriptFileFingerprint(handle: handle)
         let byteCount = fingerprint.byteCount
         if let previous, fingerprint == previous.fingerprint {
-            return Self(lineStarts: previous.lineStarts, byteCount: byteCount, fingerprint: fingerprint,
-                        scannedByteCount: 0, validatedByteCount: 0, contentLineage: previous.contentLineage,
-                        digest: previous.digest, lastByte: previous.lastByte)
+            return Self(
+                lineStarts: previous.lineStarts, byteCount: byteCount, fingerprint: fingerprint,
+                scannedByteCount: 0, validatedByteCount: 0, contentLineage: previous.contentLineage,
+                digest: previous.digest, lastByte: previous.lastByte)
         }
         var hasher = CRC32Checksum()
         var validatedByteCount: UInt64 = 0
@@ -78,9 +79,10 @@ struct TranscriptFileIndex: Sendable {
         // A running CLI appends while the scan runs. The offsets still describe the first `byteCount` bytes, and keeping
         // the fingerprint from before the scan makes the next refresh extend them. Only a shrinking file fails the read.
         guard try TranscriptFileFingerprint(handle: handle).byteCount >= byteCount else { throw TranscriptPagingError.sourceChanged }
-        return Self(lineStarts: lineStarts, byteCount: byteCount, fingerprint: fingerprint,
-                    scannedByteCount: byteCount - scanStart, validatedByteCount: validatedByteCount,
-                    contentLineage: appending ? previous!.contentLineage : UUID(), digest: hasher.finalize(), lastByte: lastByte)
+        return Self(
+            lineStarts: lineStarts, byteCount: byteCount, fingerprint: fingerprint,
+            scannedByteCount: byteCount - scanStart, validatedByteCount: validatedByteCount,
+            contentLineage: appending ? previous!.contentLineage : UUID(), digest: hasher.finalize(), lastByte: lastByte)
     }
 
     func byteRange(at record: Int) -> Range<UInt64> {

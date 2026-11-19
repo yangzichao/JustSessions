@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Move to lists the other projects on the session's host whose folder a session can start in, in the sidebar's order.

@@ -19,7 +19,8 @@ enum SeveralTabsClosingQuestion: Equatable, Sendable {
         let needs = tabs.map(\.need)
         let choicesForCLIsToKeep = tabs.filter { $0.need == .canKeepCLIRunning }.map(\.tabCloseChoice)
         let anyCLIToKeepAsks = choicesForCLIsToKeep.contains { $0.endsTmuxSessionWithoutAsking == nil }
-        let stopsOthersAskingFirst = needs.contains(.cliStopsWithTab)
+        let stopsOthersAskingFirst =
+            needs.contains(.cliStopsWithTab)
             || (needs.contains(.plainTerminal) && plainTerminalCloseChoice == .askEachTime)
         if !choicesForCLIsToKeep.isEmpty, anyCLIToKeepAsks || stopsOthersAskingFirst {
             let stopsOthers = needs.contains(.cliStopsWithTab) || needs.contains(.plainTerminal)

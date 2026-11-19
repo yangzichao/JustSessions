@@ -47,9 +47,10 @@ enum TmuxSessionName {
 
     /// Session names from `list-sessions`. Lines a shell profile prints, and sessions not started here, are ignored.
     static func appSessionNames(inListOutput output: String) -> Set<String> {
-        Set(output
-            .split(whereSeparator: \.isNewline)
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { $0.hasPrefix(prefix) && !$0.contains(" ") })
+        Set(
+            output
+                .split(whereSeparator: \.isNewline)
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { $0.hasPrefix(prefix) && !$0.contains(" ") })
     }
 }

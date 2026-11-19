@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ListedProjectSessionRowsTests {
@@ -47,10 +48,11 @@ struct ListedProjectSessionRowsTests {
             conversations: [pinned] + unpinned, pendingNewSessions: [newSession], pinnedItems: pinnedItems, sessionLimit: 3
         )
 
-        #expect(listed.rows.map(\.id) == [
-            "conversation:\(pinned.id)",
-            "pending:\(newSession.id.uuidString)",
-        ] + unpinned.prefix(3).map { "conversation:\($0.id)" })
+        #expect(
+            listed.rows.map(\.id) == [
+                "conversation:\(pinned.id)",
+                "pending:\(newSession.id.uuidString)",
+            ] + unpinned.prefix(3).map { "conversation:\($0.id)" })
         #expect(listed.hiddenSessionCount == 12)
     }
 
@@ -60,21 +62,26 @@ struct ListedProjectSessionRowsTests {
         let pinnedItems = PinnedItems(pinnedConversationIDs: [pinned.id])
         let conversations = [pinned] + unpinned
 
-        #expect(ListedProjectSessionRows.hiddenPlace(
-            of: unpinned[12].id, in: conversations, pinnedItems: pinnedItems, sessionLimit: 10
-        ) == 12)
-        #expect(ListedProjectSessionRows.hiddenPlace(
-            of: unpinned[9].id, in: conversations, pinnedItems: pinnedItems, sessionLimit: 10
-        ) == nil, "Listed")
-        #expect(ListedProjectSessionRows.hiddenPlace(
-            of: pinned.id, in: conversations, pinnedItems: pinnedItems, sessionLimit: 10
-        ) == nil, "Pinned sessions are always listed")
-        #expect(ListedProjectSessionRows.hiddenPlace(
-            of: unpinned[12].id, in: conversations, pinnedItems: pinnedItems, sessionLimit: nil
-        ) == nil, "Nothing hides without a limit")
-        #expect(ListedProjectSessionRows.hiddenPlace(
-            of: "elsewhere", in: conversations, pinnedItems: pinnedItems, sessionLimit: 10
-        ) == nil)
+        #expect(
+            ListedProjectSessionRows.hiddenPlace(
+                of: unpinned[12].id, in: conversations, pinnedItems: pinnedItems, sessionLimit: 10
+            ) == 12)
+        #expect(
+            ListedProjectSessionRows.hiddenPlace(
+                of: unpinned[9].id, in: conversations, pinnedItems: pinnedItems, sessionLimit: 10
+            ) == nil, "Listed")
+        #expect(
+            ListedProjectSessionRows.hiddenPlace(
+                of: pinned.id, in: conversations, pinnedItems: pinnedItems, sessionLimit: 10
+            ) == nil, "Pinned sessions are always listed")
+        #expect(
+            ListedProjectSessionRows.hiddenPlace(
+                of: unpinned[12].id, in: conversations, pinnedItems: pinnedItems, sessionLimit: nil
+            ) == nil, "Nothing hides without a limit")
+        #expect(
+            ListedProjectSessionRows.hiddenPlace(
+                of: "elsewhere", in: conversations, pinnedItems: pinnedItems, sessionLimit: 10
+            ) == nil)
     }
 
     /// Newest first, as a project lists them.

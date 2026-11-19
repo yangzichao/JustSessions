@@ -19,12 +19,14 @@ struct SidebarMessageSearchDriver: View {
 
     var body: some View {
         Color.clear
-            .task(id: SearchInputs(
-                typedQuery: typedQuery,
-                conversationsRevision: conversationsRevision,
-                hiddenProviders: hiddenProviders,
-                indexRevision: indexer.revision
-            )) {
+            .task(
+                id: SearchInputs(
+                    typedQuery: typedQuery,
+                    conversationsRevision: conversationsRevision,
+                    hiddenProviders: hiddenProviders,
+                    indexRevision: indexer.revision
+                )
+            ) {
                 await search.run(typedQuery: typedQuery, conversations: conversations, indexer: indexer)
             }
             .onDisappear { search.stop(indexer: indexer) }

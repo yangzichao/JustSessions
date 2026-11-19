@@ -35,9 +35,11 @@ private struct SessionDeletionDialog: ViewModifier {
                 .disabled(!plan.hasDeletableConversations)
             case .selectedProjectsRemoval(let projectPaths):
                 let plan = store.deletionPlan(forProjects: projectPaths)
-                deleteButton(title: SessionDeletionConfirmationText.selectedProjectsRemovalButtonTitle(
-                    projectCount: projectPaths.count, plan: plan, language: language
-                )) {
+                deleteButton(
+                    title: SessionDeletionConfirmationText.selectedProjectsRemovalButtonTitle(
+                        projectCount: projectPaths.count, plan: plan, language: language
+                    )
+                ) {
                     store.deleteSessionsAndRemoveProjects(projectPaths)
                 }
                 .disabled(!plan.hasDeletableConversations)

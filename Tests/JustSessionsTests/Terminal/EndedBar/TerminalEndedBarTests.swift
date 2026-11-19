@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// An ended remote tab leads to Check host when its host's heading warns of a problem or its CLI failed right after

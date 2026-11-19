@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+
 @testable import JustSessions
 
 /// One Claude Code, Pi, or Codex tab whose CLI appends names to a file in the app's temporary folder, as the tool does:
@@ -54,11 +55,12 @@ final class AppendedSessionNameWorld: SessionTabWorld {
     /// Appends the line the tool writes for `name`, for the tab's session or `sessionID`, then follows once.
     func cliAppendsName(_ name: String, forSessionID sessionID: String? = nil) async throws {
         let conversation = try XCTUnwrap(tab?.conversation)
-        let record: [String: Any] = switch app.provider {
-        case .claude: ["type": "custom-title", "customTitle": name, "sessionId": conversation.sessionID]
-        case .pi: ["type": "session_info", "name": name]
-        default: ["id": sessionID ?? conversation.sessionID, "thread_name": name, "updated_at": "2026-10-05T00:00:00Z"]
-        }
+        let record: [String: Any] =
+            switch app.provider {
+            case .claude: ["type": "custom-title", "customTitle": name, "sessionId": conversation.sessionID]
+            case .pi: ["type": "session_info", "name": name]
+            default: ["id": sessionID ?? conversation.sessionID, "thread_name": name, "updated_at": "2026-10-05T00:00:00Z"]
+            }
         let handle = try FileHandle(forWritingTo: nameFile(for: conversation))
         defer { try? handle.close() }
         try handle.seekToEnd()

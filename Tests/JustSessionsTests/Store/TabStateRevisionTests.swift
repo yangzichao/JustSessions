@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// Views that read tabs through the store follow a tab's own state through `tabStateRevision`: every open tab's own

@@ -37,10 +37,11 @@ struct TranscriptEntryGeometryLayout: Layout {
                 at: CGPoint(x: bounds.minX, y: y), anchor: .topLeading,
                 proposal: ProposedViewSize(width: bounds.width, height: childSize.height)
             )
-            geometries.append(TranscriptEntryGeometry(
-                entryIndex: index,
-                frame: CGRect(x: 0, y: y - bounds.minY, width: bounds.width, height: childSize.height)
-            ))
+            geometries.append(
+                TranscriptEntryGeometry(
+                    entryIndex: index,
+                    frame: CGRect(x: 0, y: y - bounds.minY, width: bounds.width, height: childSize.height)
+                ))
             y += childSize.height
         }
         MainActor.assumeIsolated { controller.updateEntryGeometries(geometries) }

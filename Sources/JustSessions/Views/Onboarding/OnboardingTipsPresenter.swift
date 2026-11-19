@@ -119,7 +119,8 @@ struct OnboardingTipsPresenter: ViewModifier {
     /// Shows the tips due once the window has stayed as it is for `tipDelay`, one after another when several are.
     private func showDueTips() async {
         guard isReadyForTips, !tour.isRunning,
-              !OnboardingTip.due(in: windowContext, among: tipsStore.tipsToShow).isEmpty else { return }
+            !OnboardingTip.due(in: windowContext, among: tipsStore.tipsToShow).isEmpty
+        else { return }
         do { try await Task.sleep(for: Self.tipDelay) } catch { return }
         // Read again, as another workspace window may have shown some meanwhile.
         let windowContext = windowContext

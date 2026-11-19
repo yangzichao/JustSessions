@@ -41,7 +41,7 @@ struct ThisMacTmuxServer: Sendable {
     static let globalHooks: [(name: String, command: String)] = [
         // A failed CLI's dead pane stays only while a tab shows it: its session ends once its last tab detaches,
         // and at once when none is attached, as the session of a CLI that exits cleanly does.
-        ("pane-died", ##"if-shell -F "#{session_attached}" "set-option destroy-unattached on" "kill-session""##),
+        ("pane-died", ##"if-shell -F "#{session_attached}" "set-option destroy-unattached on" "kill-session""##)
     ]
 
     /// tmux sets these in a session itself: `TERM` names tmux's own terminal type, the rest say the CLI runs in tmux.
@@ -58,28 +58,34 @@ struct ThisMacTmuxServer: Sendable {
     func command(attachingTo sessionName: String, running command: NativeCLICommand, historyLimit: Int? = nil) -> NativeCLICommand {
         // The tab's terminal draws RGB colors and OSC 8 hyperlinks; without `hyperlinks` tmux drops a CLI's links.
         let serverArguments = ["-L", Self.socketName, "-f", "/dev/null", "-u", "-T", "RGB,hyperlinks"]
-        let optionArguments = Self.globalOptions.flatMap { ["set-option", "-gq", $0.name, $0.value, ";"] }
+        let optionArguments =
+            Self.globalOptions.flatMap { ["set-option", "-gq", $0.name, $0.value, ";"] }
             + Self.globalHooks.flatMap { ["set-hook", "-g", $0.name, $0.command, ";"] }
         let clientEnvironment = runtimeEnvironment(from: command.environmentVariables)
-        let sessionEnvironment = clientEnvironment
+        let sessionEnvironment =
+            clientEnvironment
             .filter { !Self.variablesTmuxSetsInSessions.contains($0.key) }
             .sorted { $0.key < $1.key }
             .flatMap { ["-e", "\($0.key)=\($0.value)"] }
         // tmux hands a command of a single argument to the user's shell, which splits a path with a space in it
         // and reads the shell's startup files. With `env` in front, tmux runs the CLI itself, as it does one with
         // arguments; `env` execs it, so the pane's process is still the CLI's.
-        let program = command.arguments.isEmpty
+        let program =
+            command.arguments.isEmpty
             ? ["/usr/bin/env", command.executablePath]
             : [command.executablePath] + command.arguments
         let sessionArguments = ["-s", sessionName] + sessionEnvironment + ["--"] + program
         // The target is the session's pane: `set-option` takes a pane, and a bare `=name` is none.
-        let (historyLimitBefore, historyLimitAfter) = historyLimit.map {
-            (
-                ["set-option", "-gq", "history-limit", "\($0)", ";"],
-                [";", "set-option", "-q", "-t", "=\(sessionName):", "history-limit", "\($0)",
-                 ";", "set-option", "-gq", "history-limit", "\(PlainTerminalTmuxHistoryLimit.tmuxDefaultLineCount)"]
-            )
-        } ?? ([], [])
+        let (historyLimitBefore, historyLimitAfter) =
+            historyLimit.map {
+                (
+                    ["set-option", "-gq", "history-limit", "\($0)", ";"],
+                    [
+                        ";", "set-option", "-q", "-t", "=\(sessionName):", "history-limit", "\($0)",
+                        ";", "set-option", "-gq", "history-limit", "\(PlainTerminalTmuxHistoryLimit.tmuxDefaultLineCount)",
+                    ]
+                )
+            } ?? ([], [])
         return NativeCLICommand(
             executablePath: executablePath,
             arguments: serverArguments + optionArguments + historyLimitBefore + ["new-session", "-A"]
@@ -157,12 +163,14 @@ struct ThisMacTmuxServer: Sendable {
 
     /// The output of a tmux command on this server, or nil when it failed, e.g. because the server is not running.
     private func output(of arguments: [String]) -> String? {
-        guard let result = BoundedProcessRunner.result(
-            ofExecutable: executablePath,
-            arguments: ["-L", Self.socketName] + arguments,
-            environment: runtimeEnvironment(from: environment),
-            timeout: 10
-        ), result.exitStatus == 0 else { return nil }
+        guard
+            let result = BoundedProcessRunner.result(
+                ofExecutable: executablePath,
+                arguments: ["-L", Self.socketName] + arguments,
+                environment: runtimeEnvironment(from: environment),
+                timeout: 10
+            ), result.exitStatus == 0
+        else { return nil }
         return result.output
     }
 }

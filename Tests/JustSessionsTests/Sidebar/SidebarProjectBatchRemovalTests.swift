@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -37,7 +38,8 @@ struct SidebarProjectBatchRemovalTests {
             projectPath: selectedLocal.projectPath,
             action: .resume,
             displayTitle: "Open session",
-            command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [], workingDirectory: selectedLocal.projectPath, environment: [])
+            command: NativeCLICommand(
+                executablePath: "/usr/bin/true", arguments: [], workingDirectory: selectedLocal.projectPath, environment: [])
         )
         store.openTerminal(terminal)
         defer { store.closeAllTerminals() }
@@ -69,7 +71,8 @@ struct SidebarProjectBatchRemovalTests {
 
         relaunchedStore.showProjectInSidebar(selectedRemote.projectDirectoryKey)
         #expect(Set(relaunchedStore.sidebarProjectGroups.map(\.id)) == keptProjectIDs.union([selectedRemote.projectDirectoryKey]))
-        #expect(relaunchedStore.sidebarProjectList.removedProjectPaths == removedProjectIDs.subtracting([selectedRemote.projectDirectoryKey]))
+        #expect(
+            relaunchedStore.sidebarProjectList.removedProjectPaths == removedProjectIDs.subtracting([selectedRemote.projectDirectoryKey]))
     }
 
     @Test func emptyBatchKeepsSidebarMembership() throws {

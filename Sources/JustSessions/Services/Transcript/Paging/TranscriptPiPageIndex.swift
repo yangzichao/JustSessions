@@ -3,8 +3,10 @@ import Foundation
 enum TranscriptPiPageIndex {
     /// Pi's active branch needs a metadata pass. Only parent links and offsets survive that pass, never message bodies.
     /// Lines are read a chunk at a time, a line longer than a chunk on its own, rather than with a seek and read each.
-    static func records(in index: TranscriptFileIndex, handle: FileHandle, limits: TranscriptPageLimits,
-                        chunkSize: Int = 1 << 20) throws -> [Int] {
+    static func records(
+        in index: TranscriptFileIndex, handle: FileHandle, limits: TranscriptPageLimits,
+        chunkSize: Int = 1 << 20
+    ) throws -> [Int] {
         precondition(chunkSize > 0)
         var links: [PiEntryLink] = []
         let decoder = JSONDecoder()
@@ -17,7 +19,8 @@ enum TranscriptPiPageIndex {
             // A chunk stops before a line over the limit, so the lines ahead of it are read first, as one at a time would.
             var end = record + 1
             while end < index.lineStarts.count, index.byteRange(at: end).upperBound - start <= UInt64(chunkSize),
-                  index.byteRange(at: end).count <= limits.maximumRecordByteCount { end += 1 }
+                index.byteRange(at: end).count <= limits.maximumRecordByteCount
+            { end += 1 }
             try autoreleasepool {
                 let byteCount = Int(index.byteRange(at: end - 1).upperBound - start)
                 try handle.seek(toOffset: start)

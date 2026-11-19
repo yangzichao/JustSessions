@@ -239,7 +239,7 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         let bytes = Array(GhosttyThemeReportFilter.removingThemeReports(from: data))
         guard !bytes.isEmpty else { return }
         guard let report = themeReportAfterBackgroundAnswer,
-              let answerEnd = GhosttyBackgroundColorAnswer.endIndex(in: bytes)
+            let answerEnd = GhosttyBackgroundColorAnswer.endIndex(in: bytes)
         else {
             process.send(data: bytes[...])
             return
@@ -342,7 +342,8 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
     }
 
     private func observeAppearance(in store: TerminalAppearanceStore, themeStore: AppThemeStore) {
-        appearanceSubscription = store.$terminalPreferences.combineLatest(themeStore.$terminalTheme).sink { [weak self] preferences, theme in
+        appearanceSubscription = store.$terminalPreferences.combineLatest(themeStore.$terminalTheme).sink {
+            [weak self] preferences, theme in
             guard let self else { return }
             appearancePreferences = preferences
             self.theme = theme

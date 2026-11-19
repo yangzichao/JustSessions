@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// ⌘A in either engine's terminal selects the prompt Claude Code draws, and the keys that follow edit it through the

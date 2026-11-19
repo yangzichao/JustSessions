@@ -76,12 +76,15 @@ final class HostAutoRefresher {
         ) {
             for store in stores where !store.isScanningThisMac { store.refreshThisMac() }
         }
-        for host in oldestStore.remoteHostList.hosts where !oldestStore.isDisconnected(host) && schedule.isSSHHostDue(
-            host,
-            status: oldestStore.hostRefreshStatuses[.ssh(host)],
-            needsLogIn: oldestStore.sshHostsNeedingLogIn.contains(host),
-            now: now
-        ) {
+        for host in oldestStore.remoteHostList.hosts
+        where !oldestStore.isDisconnected(host)
+            && schedule.isSSHHostDue(
+                host,
+                status: oldestStore.hostRefreshStatuses[.ssh(host)],
+                needsLogIn: oldestStore.sshHostsNeedingLogIn.contains(host),
+                now: now
+            )
+        {
             guard let refresh = refreshSSHHost(oldestStore, host) else { continue }
             schedule.noteTry(on: host, at: now)
             Task { [weak self, weak oldestStore] in

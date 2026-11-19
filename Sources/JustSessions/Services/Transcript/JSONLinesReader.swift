@@ -39,7 +39,8 @@ enum JSONLinesReader {
         var bytesKnownWithoutNewline = 0
         var remainingByteCount = maximumByteCount
         while remainingByteCount > 0,
-              let chunk = try? handle.read(upToCount: min(chunkSize, remainingByteCount)), !chunk.isEmpty {
+            let chunk = try? handle.read(upToCount: min(chunkSize, remainingByteCount)), !chunk.isEmpty
+        {
             remainingByteCount -= chunk.count
             buffer.append(chunk)
             var lineStart = buffer.startIndex

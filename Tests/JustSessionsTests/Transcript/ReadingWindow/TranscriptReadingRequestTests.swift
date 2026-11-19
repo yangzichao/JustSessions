@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A reading window asked from a tab or the conversation map to go somewhere (RDR-50), in a hosted reader that loads
@@ -24,7 +25,8 @@ struct TranscriptReadingRequestTests {
         /// Whether the entry's top is 6 points below the reader's, where a jump puts it, with nothing left to restore.
         func showsAtTop(_ entryID: Int) -> Bool {
             guard let scrollView = fixture.readerScrollView, let controller = fixture.positionController, !controller.isRestoring,
-                  let frame = controller.entryFrameInClipView(at: entryID) else { return false }
+                let frame = controller.entryFrameInClipView(at: entryID)
+            else { return false }
             return abs(frame.minY - TranscriptScrollPositionController.readableBounds(of: scrollView.contentView).minY - 6) < 1
         }
 
@@ -57,7 +59,8 @@ struct TranscriptReadingRequestTests {
     )
 
     private func makeReader(
-        bookmarks: [MessageBookmark] = [], at position: TranscriptReadingPosition? = nil, waitingFor navigation: SessionReadingNavigation? = nil,
+        bookmarks: [MessageBookmark] = [], at position: TranscriptReadingPosition? = nil,
+        waitingFor navigation: SessionReadingNavigation? = nil,
         lineCount: Int = 1, showing: Bool = true
     ) async throws -> Reader {
         let files = try TranscriptPagingFixture(count: 600, lineCount: lineCount)
@@ -74,8 +77,9 @@ struct TranscriptReadingRequestTests {
 
     /// Messages of 4 lines, so the page read around record 500 can put 570 at the top.
     @Test func anAdjacentRequestGoesOnFromTheReadersOrigin() async throws {
-        let reader = try await makeReader(bookmarks: [bookmark("a", at: 540), bookmark("b", at: 570)],
-                                          at: .entry(index: id(500), offset: -6), lineCount: 4)
+        let reader = try await makeReader(
+            bookmarks: [bookmark("a", at: 540), bookmark("b", at: 570)],
+            at: .entry(index: id(500), offset: -6), lineCount: 4)
         defer { reader.close() }
         try await reader.fixture.waitUntil { reader.showsAtTop(id(500)) }
 
@@ -147,9 +151,10 @@ struct TranscriptReadingRequestTests {
         try await reader.fixture.waitUntil { reader.showsAtTop(id(603)) }
         #expect(reader.showsAtTop(id(603)))
         #expect(reader.fixture.positionController?.seekTarget == id(603))
-        #expect(try await !reader.fixture.hasAccessibilityElement(
-            labeled: "Bookmark a's message is no longer in this conversation. This is where it was."
-        ))
+        #expect(
+            try await !reader.fixture.hasAccessibilityElement(
+                labeled: "Bookmark a's message is no longer in this conversation. This is where it was."
+            ))
     }
 
     /// The file-change refresh asks for the entry jump's page, not the place the pages shown still record.
@@ -197,8 +202,9 @@ struct TranscriptReadingRequestTests {
     /// Before the first page shows, the window's reader has no scroll view; ⌘' then adds to the request waiting.
     @Test func pressesWhileTheFirstPageLoadsAddUp() async throws {
         let bookmarks = [bookmark("a", at: 300), bookmark("b", at: 320)]
-        let reader = try await makeReader(bookmarks: bookmarks, at: .entry(index: id(300), offset: -6),
-                                          waitingFor: .bookmark(bookmarks[0]))
+        let reader = try await makeReader(
+            bookmarks: bookmarks, at: .entry(index: id(300), offset: -6),
+            waitingFor: .bookmark(bookmarks[0]))
         defer { reader.close() }
         reader.fixture.hostingView.layoutSubtreeIfNeeded()
         #expect(reader.fixture.readerScrollView == nil)
@@ -214,8 +220,9 @@ struct TranscriptReadingRequestTests {
     /// A window opened from the preview in the middle of the conversation, then ⌘' twice before its first page shows: the
     /// presses go on from where it opened and add up, rather than starting from the first bookmark.
     @Test func pressesWhileTheFirstPageLoadsGoOnFromWhereTheWindowOpened() async throws {
-        let reader = try await makeReader(bookmarks: [bookmark("a", at: 100), bookmark("b", at: 540), bookmark("c", at: 570)],
-                                          at: .entry(index: id(500), offset: -6), lineCount: 4)
+        let reader = try await makeReader(
+            bookmarks: [bookmark("a", at: 100), bookmark("b", at: 540), bookmark("c", at: 570)],
+            at: .entry(index: id(500), offset: -6), lineCount: 4)
         defer { reader.close() }
         reader.fixture.hostingView.layoutSubtreeIfNeeded()
         #expect(reader.fixture.readerScrollView == nil)
@@ -233,17 +240,20 @@ struct TranscriptReadingRequestTests {
     /// window opened at it shows the latest messages and says the message is gone, instead of "No messages yet" (RDR-49).
     @Test func aWindowOpenedAtAGoneBookmarkShowsTheLatestMessages() async throws {
         let gone = bookmark("a", at: 700)
-        let reader = try await makeReader(bookmarks: [gone], at: .entry(index: gone.entryID, offset: -6), waitingFor: .bookmark(gone),
-                                          showing: false)
+        let reader = try await makeReader(
+            bookmarks: [gone], at: .entry(index: gone.entryID, offset: -6), waitingFor: .bookmark(gone),
+            showing: false)
         defer { reader.close() }
-        try reader.files.append(Data((#"{"timestamp":"2026-10-02T12:00:00.000Z","type":"event_msg","payload":{"type":"token_count"}}"# + "\n").utf8))
+        try reader.files.append(
+            Data((#"{"timestamp":"2026-10-02T12:00:00.000Z","type":"event_msg","payload":{"type":"token_count"}}"# + "\n").utf8))
         reader.show()
 
         try await reader.fixture.waitUntil { reader.visiblePosition == .bottom }
         #expect(reader.visiblePosition == .bottom)
-        #expect(try await reader.fixture.hasAccessibilityElement(
-            labeled: "Bookmark a's message is no longer in this conversation. This is where it was."
-        ))
+        #expect(
+            try await reader.fixture.hasAccessibilityElement(
+                labeled: "Bookmark a's message is no longer in this conversation. This is where it was."
+            ))
         #expect(reader.requests.pendingNavigation == nil)
     }
 

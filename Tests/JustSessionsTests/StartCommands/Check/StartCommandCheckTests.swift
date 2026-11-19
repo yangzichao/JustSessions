@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A start command is checked where the tool runs before it is kept: its program has to be there.
@@ -64,7 +65,10 @@ struct StartCommandCheckTests {
     @Test func commandsThatCannotStartAreRefusedBeforeAnyLookup() throws {
         let check = StartCommandCheck(
             resolver: NativeCLICommandResolver(searchDirectories: [], liveSessionReporting: nil),
-            remoteRunner: RemoteHostCommandRunner { _, _, _ in Issue.record("looked up on the host"); return nil }
+            remoteRunner: RemoteHostCommandRunner { _, _, _ in
+                Issue.record("looked up on the host")
+                return nil
+            }
         )
 
         #expect(throws: StartCommandCheckError.unclosedQuote) { try check.check(#"claude --aws-profile "dev"#, on: .ssh("cloud")) }

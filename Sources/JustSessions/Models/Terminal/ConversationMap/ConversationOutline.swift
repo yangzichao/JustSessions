@@ -44,7 +44,9 @@ struct ConversationOutline: Sendable, Equatable {
     var revision = 0
 
     init(blocks: [Block]) {
-        var starts: [Int] = [], row = 0, messages = 0
+        var starts: [Int] = []
+        var row = 0
+        var messages = 0
         starts.reserveCapacity(blocks.count)
         for (index, block) in blocks.enumerated() {
             if index > 0, blocks[index - 1].isYours != block.isYours { row += 1 }
@@ -52,12 +54,16 @@ struct ConversationOutline: Sendable, Equatable {
             row += max(1, block.lineWidths.count)
             if block.isMessage { messages += 1 }
         }
-        self.blocks = blocks; rowStarts = starts; rowCount = row; messageCount = messages
+        self.blocks = blocks
+        rowStarts = starts
+        rowCount = row
+        messageCount = messages
     }
 
     /// The block holding `row`: the last starting at or before it (binary search on rowStarts); nil when empty.
     func blockIndex(atRow row: Int) -> Int? {
-        var lower = 0, upper = rowStarts.count
+        var lower = 0
+        var upper = rowStarts.count
         while lower < upper {
             let middle = lower + (upper - lower) / 2
             if rowStarts[middle] <= row { lower = middle + 1 } else { upper = middle }
@@ -88,7 +94,8 @@ struct ConversationOutline: Sendable, Equatable {
     }
 
     private func firstBlockIndex(atOrAfter entryID: Int) -> Int {
-        var lower = 0, upper = blocks.count
+        var lower = 0
+        var upper = blocks.count
         while lower < upper {
             let middle = lower + (upper - lower) / 2
             if blocks[middle].entryID < entryID { lower = middle + 1 } else { upper = middle }

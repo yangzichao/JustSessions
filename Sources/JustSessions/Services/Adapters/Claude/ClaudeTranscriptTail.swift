@@ -39,7 +39,8 @@ struct ClaudeTranscriptTail: Sendable, Codable {
     /// the worktree is removed. Leaving the worktree, or a `/cd` from it, moves the session to another folder.
     var movedProjectDirectory: String? {
         if let worktreeRepositoryDirectory,
-           relocatedWorkingDirectory == nil || relocatedWorkingDirectory == worktreeDirectory {
+            relocatedWorkingDirectory == nil || relocatedWorkingDirectory == worktreeDirectory
+        {
             return worktreeRepositoryDirectory
         }
         return relocatedWorkingDirectory
@@ -53,10 +54,13 @@ struct ClaudeTranscriptTail: Sendable, Codable {
     init(lines: [Data]) {
         for line in lines.reversed() {
             if latestTimestamp != nil, latestCustomTitle != nil,
-               latestAITitle != nil || line.range(of: Self.aiTitleKey) == nil,
-               line.range(of: Self.relocatedWorkingDirectoryKey) == nil,
-               worktreeDirectory != nil || line.range(of: Self.worktreeStateKey) == nil,
-               latestModel != nil || line.range(of: Self.modelKey) == nil { continue }
+                latestAITitle != nil || line.range(of: Self.aiTitleKey) == nil,
+                line.range(of: Self.relocatedWorkingDirectoryKey) == nil,
+                worktreeDirectory != nil || line.range(of: Self.worktreeStateKey) == nil,
+                latestModel != nil || line.range(of: Self.modelKey) == nil
+            {
+                continue
+            }
             guard let record = ConversationMetadata.object(from: line) else { continue }
             if latestTimestamp == nil {
                 latestTimestamp = ConversationMetadata.date(record["timestamp"])
@@ -71,7 +75,8 @@ struct ClaudeTranscriptTail: Sendable, Codable {
                 relocatedWorkingDirectory = record["relocatedCwd"] as? String
             }
             if worktreeDirectory == nil, record["type"] as? String == "worktree-state",
-               let worktree = record["worktreeSession"] as? [String: Any] {
+                let worktree = record["worktreeSession"] as? [String: Any]
+            {
                 worktreeDirectory = worktree["worktreePath"] as? String
                 worktreeRepositoryDirectory = worktree["originalCwd"] as? String
             }
@@ -79,7 +84,10 @@ struct ClaudeTranscriptTail: Sendable, Codable {
                 latestModel = SessionModel(id: (record["message"] as? [String: Any])?["model"] as? String)?.id
             }
             if latestTimestamp != nil, latestCustomTitle != nil, relocatedWorkingDirectory != nil, worktreeDirectory != nil,
-               latestModel != nil { break }
+                latestModel != nil
+            {
+                break
+            }
         }
     }
 }

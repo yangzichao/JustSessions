@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Who has the keyboard as a tab's find bar opens and closes, with the tab's view in a window as the app shows it.
@@ -27,24 +28,27 @@ struct TerminalFindBarFocusTests {
                 displayTitle: "Find focus",
                 command: NativeCLICommand(executablePath: "/bin/cat", arguments: [], workingDirectory: "/tmp", environment: [])
             )
-            window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 700, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
+            window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 700, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
             window.isReleasedWhenClosed = false
-            window.contentView = NSHostingView(rootView: TerminalWorkspaceView(
-                session: tab,
-                isShown: true,
-                isActive: isActive,
-                onReconnect: nil,
-                onCheckHost: nil,
-                onFocus: { [unowned self] in focusCount += 1 },
-                makeContextMenu: { _ in NSMenu() },
-                onOpenLink: { _ in }
-            ))
+            window.contentView = NSHostingView(
+                rootView: TerminalWorkspaceView(
+                    session: tab,
+                    isShown: true,
+                    isActive: isActive,
+                    onReconnect: nil,
+                    onCheckHost: nil,
+                    onFocus: { [unowned self] in focusCount += 1 },
+                    makeContextMenu: { _ in NSMenu() },
+                    onOpenLink: { _ in }
+                ))
             window.makeKeyAndOrderFront(nil)
         }
 
         var findFieldHasTheKeyboard: Bool {
             guard let fieldEditor = window.firstResponder as? NSTextView,
-                  let field = fieldEditor.delegate as? NSTextField else { return false }
+                let field = fieldEditor.delegate as? NSTextField
+            else { return false }
             return field.isDescendant(of: window.contentView!)
         }
 

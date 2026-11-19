@@ -53,12 +53,14 @@ struct SessionMessageTextCache: Sendable {
         guard let handle = try? FileHandle(forReadingFrom: file(for: conversationID)) else { return .missing }
         defer { try? handle.close() }
         guard let header = try? Self.header(from: handle), header.version == Self.formatVersion,
-              header.conversationID == conversationID else { return .missing }
+            header.conversationID == conversationID
+        else { return .missing }
         if header.fingerprint == fingerprint {
             return (try? Self.text(from: handle)).map(Lookup.current) ?? .missing
         }
         guard let state = header.resumeState, header.fingerprint.sourceFilePath == fingerprint.sourceFilePath,
-              let text = try? Self.text(from: handle), state.isConsistent(with: text) else { return .changed(nil) }
+            let text = try? Self.text(from: handle), state.isConsistent(with: text)
+        else { return .changed(nil) }
         return .changed(ResumableText(text: text, state: state))
     }
 
@@ -86,9 +88,11 @@ struct SessionMessageTextCache: Sendable {
     /// `unlistedRetention`, such as that of deleted sessions or of a removed SSH host's.
     func removeText(ofSessionsOtherThan listedConversationIDs: Set<String>, now: Date = .now) {
         let listedFileNames = Set(listedConversationIDs.map(Self.fileName(for:)))
-        guard let files = try? FileManager.default.contentsOfDirectory(
-            at: directory, includingPropertiesForKeys: [.contentModificationDateKey]
-        ) else { return }
+        guard
+            let files = try? FileManager.default.contentsOfDirectory(
+                at: directory, includingPropertiesForKeys: [.contentModificationDateKey]
+            )
+        else { return }
         for file in files where !listedFileNames.contains(file.lastPathComponent) {
             let savedAt = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
             if now.timeIntervalSince(savedAt) > Self.unlistedRetention { try? FileManager.default.removeItem(at: file) }
@@ -98,10 +102,12 @@ struct SessionMessageTextCache: Sendable {
     private static func header(from handle: FileHandle) throws -> Header {
         let lengthByteCount = MemoryLayout<UInt32>.size
         guard let start = try handle.read(upToCount: magic.count + lengthByteCount), start.count == magic.count + lengthByteCount,
-              start.prefix(magic.count) == magic else { throw CocoaError(.fileReadCorruptFile) }
+            start.prefix(magic.count) == magic
+        else { throw CocoaError(.fileReadCorruptFile) }
         let headerByteCount = start.suffix(lengthByteCount).reduce(0) { $0 << 8 | Int($1) }
         guard headerByteCount <= maximumHeaderByteCount, let headerData = try handle.read(upToCount: headerByteCount),
-              headerData.count == headerByteCount else { throw CocoaError(.fileReadCorruptFile) }
+            headerData.count == headerByteCount
+        else { throw CocoaError(.fileReadCorruptFile) }
         return try JSONDecoder().decode(Header.self, from: headerData)
     }
 

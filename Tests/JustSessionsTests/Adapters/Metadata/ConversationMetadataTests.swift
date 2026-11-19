@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ConversationMetadataTests {
@@ -14,12 +15,17 @@ struct ConversationMetadataTests {
         TitleCase(rawTitle: "", expectedTitle: "Fallback", testDescription: "empty prompt"),
         TitleCase(rawTitle: " \n\t ", expectedTitle: "Fallback", testDescription: "blank prompt"),
         TitleCase(rawTitle: "<command-name>/clear</command-name>", expectedTitle: "Fallback", testDescription: "injected markup"),
-        TitleCase(rawTitle: "\n<local-command-stdout>ok</local-command-stdout>", expectedTitle: "Fallback", testDescription: "markup after a blank line"),
+        TitleCase(
+            rawTitle: "\n<local-command-stdout>ok</local-command-stdout>", expectedTitle: "Fallback",
+            testDescription: "markup after a blank line"),
         TitleCase(rawTitle: "  Fix the build  ", expectedTitle: "Fix the build", testDescription: "padded prompt"),
         TitleCase(rawTitle: "First line\nSecond line", expectedTitle: "First line", testDescription: "several lines"),
         TitleCase(rawTitle: "Windows line\r\nnext", expectedTitle: "Windows line", testDescription: "CRLF line ending"),
-        TitleCase(rawTitle: "\n\n  Pasted after blank lines", expectedTitle: "Pasted after blank lines", testDescription: "leading blank lines"),
-        TitleCase(rawTitle: "\r\n \r\nAfter CRLF blank lines\r\nnext", expectedTitle: "After CRLF blank lines", testDescription: "leading CRLF blank lines"),
+        TitleCase(
+            rawTitle: "\n\n  Pasted after blank lines", expectedTitle: "Pasted after blank lines", testDescription: "leading blank lines"),
+        TitleCase(
+            rawTitle: "\r\n \r\nAfter CRLF blank lines\r\nnext", expectedTitle: "After CRLF blank lines",
+            testDescription: "leading CRLF blank lines"),
         TitleCase(rawTitle: "\u{2028}First\u{2029}Second", expectedTitle: "First", testDescription: "Unicode line separators"),
         TitleCase(rawTitle: "Compare a < b", expectedTitle: "Compare a < b", testDescription: "angle bracket inside the text"),
         TitleCase(

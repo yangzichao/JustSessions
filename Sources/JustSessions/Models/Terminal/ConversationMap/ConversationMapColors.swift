@@ -7,9 +7,11 @@ struct ConversationMapColors: Equatable {
 
     init(palette: TerminalPalette, provider: ConversationProvider) {
         typealias Contrast = ThemeColorContrast
-        let background = palette.background, foreground = palette.scheme.foreground
+        let background = palette.background
+        let foreground = palette.scheme.foreground
         self.background = background
-        hairline = Contrast.distinguishableFill(Contrast.blend(background, with: foreground, fraction: 0.15), on: background, minimumRatio: 1.3)
+        hairline = Contrast.distinguishableFill(
+            Contrast.blend(background, with: foreground, fraction: 0.15), on: background, minimumRatio: 1.3)
         user = Contrast.distinguishableFill(Contrast.blend(foreground, with: background, fraction: 0.25), on: background, minimumRatio: 3)
         reply = Contrast.distinguishableFill(provider.tintHexColor.value(isDark: palette.isDark), on: background, minimumRatio: 3)
         tool = Contrast.distinguishableFill(Contrast.blend(foreground, with: background, fraction: 0.7), on: background, minimumRatio: 1.6)

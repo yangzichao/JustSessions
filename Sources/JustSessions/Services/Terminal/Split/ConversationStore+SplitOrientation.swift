@@ -13,8 +13,9 @@ extension ConversationStore {
 
     /// The splits and split choosers laid out one above the other, by id, so a view can tell when one changes layout.
     var stackedSplitViewIDs: Set<UUID> {
-        Set(terminalSplits.filter { $0.orientation == .stacked }.map(\.id)
-            + terminalSplitChoosers.filter { $0.orientation == .stacked }.map(\.id))
+        Set(
+            terminalSplits.filter { $0.orientation == .stacked }.map(\.id)
+                + terminalSplitChoosers.filter { $0.orientation == .stacked }.map(\.id))
     }
 
     /// The id of the split the tab is in, or of the split chooser beside it; nil for a tab in neither.
@@ -67,7 +68,8 @@ extension ConversationStore {
         let shownTabID = selectedTerminalID
         openTab()
         guard let shownTabID, let newTabID = selectedTerminalID, newTabID != shownTabID,
-              !isInSplitOrChooser(shownTabID), !isInSplitOrChooser(newTabID) else { return }
+            !isInSplitOrChooser(shownTabID), !isInSplitOrChooser(newTabID)
+        else { return }
         splitTerminal(shownTabID, with: newTabID, on: side, orientation: orientation)
     }
 
@@ -79,7 +81,8 @@ extension ConversationStore {
         orientation: TerminalSplit.Orientation
     ) {
         guard let joiningTab = terminalSessions.first(where: { $0.id == id }),
-              splitChooser(beside: id) == nil, splitChooser(beside: tabID) == nil else { return }
+            splitChooser(beside: id) == nil, splitChooser(beside: tabID) == nil
+        else { return }
         var strip = tabStrip
         guard strip.addSplit(joining: id, beside: tabID, on: side, orientation: orientation) != nil else { return }
         defer { persistOpenTabs() }

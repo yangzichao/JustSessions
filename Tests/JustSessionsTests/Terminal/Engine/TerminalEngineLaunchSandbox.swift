@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// A project folder on this Mac with stand-in `claude` and `codex` CLIs that exit at once, settings of its own, and one

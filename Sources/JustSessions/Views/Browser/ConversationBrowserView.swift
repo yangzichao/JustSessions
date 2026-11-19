@@ -58,8 +58,8 @@ struct ConversationBrowserView: View {
             transcriptMatchReveal = TranscriptMatchReveal(
                 conversationID: conversation.id, entryID: match.entryID, query: messageSearch.results.query
             )
-        // A session whose CLI runs opens on its terminal. Its row stays highlighted through its tab, so,
-        // as for a new session's row, the selection clears and the highlight follows the tabs.
+            // A session whose CLI runs opens on its terminal. Its row stays highlighted through its tab, so,
+            // as for a new session's row, the selection clears and the highlight follows the tabs.
         } else if store.showRunningCLI(for: conversation) {
             sessionSelection.clear()
         } else {
@@ -127,14 +127,16 @@ struct ConversationBrowserView: View {
                 onDelete: { onRequestDeletion(.conversation($0)) }
             )
         }
-        .background(SidebarMessageSearchDriver(
-            indexer: store.messageIndexer,
-            search: messageSearch,
-            typedQuery: searchText,
-            conversations: store.sidebarConversations,
-            conversationsRevision: store.conversationsRevision,
-            hiddenProviders: store.hiddenConversationProviders
-        ))
+        .background(
+            SidebarMessageSearchDriver(
+                indexer: store.messageIndexer,
+                search: messageSearch,
+                typedQuery: searchText,
+                conversations: store.sidebarConversations,
+                conversationsRevision: store.conversationsRevision,
+                hiddenProviders: store.hiddenConversationProviders
+            )
+        )
         // A reveal opens the reader only for the session it was made for, and only once.
         .onChange(of: sessionSelection.onlySelectedConversationID) { _, conversationID in
             if conversationID != transcriptMatchReveal?.conversationID { transcriptMatchReveal = nil }
@@ -143,14 +145,16 @@ struct ConversationBrowserView: View {
         .onChange(of: store.hiddenConversationProviders) { _, hiddenProviders in
             if let provider = providerFilter.provider, hiddenProviders.hides(provider) { providerFilter = .all }
         }
-        .modifier(WorkspaceNavigationControls(
-            store: store,
-            history: $navigationHistory,
-            sessionSelection: $sessionSelection,
-            isSidebarHidden: $isSidebarHidden,
-            listedConversationIDs: filteredProjection.listedConversationIDs,
-            isEnabled: workspaceTabCommandsEnabled
-        ))
+        .modifier(
+            WorkspaceNavigationControls(
+                store: store,
+                history: $navigationHistory,
+                sessionSelection: $sessionSelection,
+                isSidebarHidden: $isSidebarHidden,
+                listedConversationIDs: filteredProjection.listedConversationIDs,
+                isEnabled: workspaceTabCommandsEnabled
+            )
+        )
         .focusedSceneValue(\.isSidebarHidden, $isSidebarHidden)
         .background(SelectedTabTextZoomTarget(store: store))
         .sheet(item: $newSessionSheetHost) { host in
@@ -193,30 +197,35 @@ struct ConversationBrowserView: View {
         }
         .dismissesOnClickOutside(item: hostCheckBinding)
         .showsAppWideSheets($appWideSheet, store: store, onCheckForUpdates: { updateManager.checkForUpdates() })
-        .modifier(WorkspaceTabActionsValue(
-            store: store,
-            isEnabled: workspaceTabCommandsEnabled,
-            newSession: { newSessionSheetHost = defaultNewSessionHost },
-            requestClosingTab: { requestClosingTerminal($0) }
-        ))
-        .modifier(TerminalTabCloseConfirmation(
-            store: store,
-            closingSessionID: $closingTerminalID,
-            tabCloseChoiceSettingsStore: .shared,
-            plainTerminalCloseChoiceSettingsStore: .shared
-        ))
+        .modifier(
+            WorkspaceTabActionsValue(
+                store: store,
+                isEnabled: workspaceTabCommandsEnabled,
+                newSession: { newSessionSheetHost = defaultNewSessionHost },
+                requestClosingTab: { requestClosingTerminal($0) }
+            )
+        )
+        .modifier(
+            TerminalTabCloseConfirmation(
+                store: store,
+                closingSessionID: $closingTerminalID,
+                tabCloseChoiceSettingsStore: .shared,
+                plainTerminalCloseChoiceSettingsStore: .shared
+            )
+        )
         .modifier(SeveralTabsCloseConfirmation(store: store, request: $closingSeveralTabs))
         .modifier(AllBookmarksPresenter(store: store))
-        .modifier(OnboardingTipsPresenter(
-            store: store,
-            tour: onboardingTour,
-            tipsStore: .shared,
-            listsProjectWithSessions: filteredProjection.projects.contains { !$0.conversations.isEmpty },
-            focusedConversation: focusedConversation,
-            isSidebarShown: !isSidebarHidden,
-            isReadyForTips: workspaceTabCommandsEnabled,
-            onStartTour: { isSidebarHidden = false }
-        ))
+        .modifier(
+            OnboardingTipsPresenter(
+                store: store,
+                tour: onboardingTour,
+                tipsStore: .shared,
+                listsProjectWithSessions: filteredProjection.projects.contains { !$0.conversations.isEmpty },
+                focusedConversation: focusedConversation,
+                isSidebarShown: !isSidebarHidden,
+                isReadyForTips: workspaceTabCommandsEnabled,
+                onStartTour: { isSidebarHidden = false }
+            ))
     }
 
     /// A tab still waiting to be shown runs nothing, so it closes without asking what to do with its CLI; so does a tab
@@ -325,39 +334,43 @@ private struct WorkspaceTabActionsValue: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .focusedSceneValue(\.workspaceTabActions, WorkspaceTabActions(
-                tabCount: store.terminalSessions.count,
-                hasSelectedTab: store.selectedTerminal != nil,
-                isSplitShown: store.isSplitViewShown,
-                shownSplitOrientation: store.shownSplitOrientation ?? .sideBySide,
-                canOpenSplitChooser: store.canOpenSplitChooser,
-                canReopenClosedTab: store.canReopenClosedTab,
-                isEnabled: isEnabled,
-                newSession: newSession,
-                reopenClosedTab: { store.reopenClosedTab() },
-                closeSelectedTab: {
-                    // The split chooser with the keyboard closes, as ⌘W closes Chrome's split view page.
-                    if store.selectsShownSplitChooser, let chooser = store.shownSplitChooser {
-                        store.closeSplitChooser(chooser.id)
-                    } else {
-                        requestClosingTab(store.selectedTerminalID)
+            .focusedSceneValue(
+                \.workspaceTabActions,
+                WorkspaceTabActions(
+                    tabCount: store.terminalSessions.count,
+                    hasSelectedTab: store.selectedTerminal != nil,
+                    isSplitShown: store.isSplitViewShown,
+                    shownSplitOrientation: store.shownSplitOrientation ?? .sideBySide,
+                    canOpenSplitChooser: store.canOpenSplitChooser,
+                    canReopenClosedTab: store.canReopenClosedTab,
+                    isEnabled: isEnabled,
+                    newSession: newSession,
+                    reopenClosedTab: { store.reopenClosedTab() },
+                    closeSelectedTab: {
+                        // The split chooser with the keyboard closes, as ⌘W closes Chrome's split view page.
+                        if store.selectsShownSplitChooser, let chooser = store.shownSplitChooser {
+                            store.closeSplitChooser(chooser.id)
+                        } else {
+                            requestClosingTab(store.selectedTerminalID)
+                        }
+                    },
+                    selectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) },
+                    selectTab: { store.selectTerminal(shortcutNumber: $0) },
+                    openSplitChooser: { store.openSplitChooser() },
+                    separateShownSplit: { performOnShownSplitView(.separateViews) },
+                    // The same close request as ⌘W, for the view on that side.
+                    closeShownSplitView: { performOnShownSplitView(.closeView($0)) },
+                    reverseShownSplit: { performOnShownSplitView(.reverseViews) },
+                    toggleShownSplitOrientation: {
+                        performOnShownSplitView(.setOrientation((store.shownSplitOrientation ?? .sideBySide).toggled))
                     }
-                },
-                selectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) },
-                selectTab: { store.selectTerminal(shortcutNumber: $0) },
-                openSplitChooser: { store.openSplitChooser() },
-                separateShownSplit: { performOnShownSplitView(.separateViews) },
-                // The same close request as ⌘W, for the view on that side.
-                closeShownSplitView: { performOnShownSplitView(.closeView($0)) },
-                reverseShownSplit: { performOnShownSplitView(.reverseViews) },
-                toggleShownSplitOrientation: {
-                    performOnShownSplitView(.setOrientation((store.shownSplitOrientation ?? .sideBySide).toggled))
-                }
-            ))
-            .background(WorkspaceTabCycleShortcuts(
-                isEnabled: isEnabled && !store.terminalSessions.isEmpty,
-                onSelectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) }
-            ))
+                )
+            )
+            .background(
+                WorkspaceTabCycleShortcuts(
+                    isEnabled: isEnabled && !store.terminalSessions.isEmpty,
+                    onSelectAdjacentTab: { store.selectAdjacentTerminal(movingForward: $0) }
+                ))
     }
 
     /// The Tabs menu's split view items act on the shown split or split chooser, as the selected tab's own entries do.

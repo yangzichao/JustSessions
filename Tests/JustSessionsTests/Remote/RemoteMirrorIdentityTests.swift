@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteMirrorIdentityTests {
@@ -26,7 +27,8 @@ struct RemoteMirrorIdentityTests {
         let mirror = RemoteSessionMirror(cacheRoot: root)
         let legacy = root.appendingPathComponent("devbox")
         try FileManager.default.createDirectory(at: legacy.appendingPathComponent("pi"), withIntermediateDirectories: true)
-        let folders = RemoteToolFolders(claude: "/private/claude", codex: "/private/codex", kiro: "/private/kiro/sessions/cli", pi: "/private/pi")
+        let folders = RemoteToolFolders(
+            claude: "/private/claude", codex: "/private/codex", kiro: "/private/kiro/sessions/cli", pi: "/private/pi")
         try JSONEncoder().encode(folders).write(to: legacy.appendingPathComponent("tool-folders.json"))
         try "kept".write(to: legacy.appendingPathComponent("pi/owner"), atomically: true, encoding: .utf8)
 
@@ -34,7 +36,9 @@ struct RemoteMirrorIdentityTests {
         mirror.migrateLegacyMirrors(for: ["devbox"])
 
         #expect(mirror.savedToolFolders(host: "devbox") == folders)
-        #expect(try String(contentsOf: mirror.mirrorDirectory(host: "devbox", provider: .pi).appendingPathComponent("owner"), encoding: .utf8) == "kept")
+        #expect(
+            try String(contentsOf: mirror.mirrorDirectory(host: "devbox", provider: .pi).appendingPathComponent("owner"), encoding: .utf8)
+                == "kept")
         #expect(!FileManager.default.fileExists(atPath: legacy.path))
     }
 
@@ -75,7 +79,8 @@ struct RemoteMirrorIdentityTests {
         try await expectEventually { store.conversations.contains { $0.sessionID == id } }
         #expect(store.isDisconnected("devbox"))
         #expect(store.hostRefreshStatuses[.ssh("devbox")] == nil)
-        #expect(store.conversations.first?.sourceFile.resolvingSymlinksInPath().path
-            .hasPrefix(mirror.mirrorDirectory(host: "devbox", provider: .claude).resolvingSymlinksInPath().path + "/") == true)
+        #expect(
+            store.conversations.first?.sourceFile.resolvingSymlinksInPath().path
+                .hasPrefix(mirror.mirrorDirectory(host: "devbox", provider: .claude).resolvingSymlinksInPath().path + "/") == true)
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -23,7 +24,8 @@ struct ArchivedSessionsTests {
 
         store.setArchived(true, conversations: [archivedConversation])
 
-        let relaunchedStore = makeStore(listing: [archivedConversation, otherConversation], userDefaults: isolatedUserDefaults.userDefaults)
+        let relaunchedStore = makeStore(
+            listing: [archivedConversation, otherConversation], userDefaults: isolatedUserDefaults.userDefaults)
         #expect(relaunchedStore.archivedSessions.archivedConversationIDs == [archivedConversation.id])
         relaunchedStore.setArchived(false, conversations: [archivedConversation])
         #expect(ArchivedSessions.load(from: isolatedUserDefaults.userDefaults).archivedConversationIDs.isEmpty)
@@ -57,8 +59,9 @@ struct ArchivedSessionsTests {
         let shown = store.filteredSidebarProjection(
             providerFilter: .all, recencyFilter: .all, archiveFilter: .showArchived, searchText: ""
         )
-        #expect(shown.projects.flatMap { $0.conversations.map(\.id) }
-            == [archivedConversation.id, codexConversation.id, olderArchived.id])
+        #expect(
+            shown.projects.flatMap { $0.conversations.map(\.id) }
+                == [archivedConversation.id, codexConversation.id, olderArchived.id])
         #expect(shown.allSessionCount == 3)
         #expect(shown.recentSessionCount == 2)
         #expect(store.pinnedItems.isPinned(conversationID: archivedConversation.id))

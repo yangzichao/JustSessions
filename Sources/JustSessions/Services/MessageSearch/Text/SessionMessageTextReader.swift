@@ -79,7 +79,8 @@ enum SessionMessageTextReader {
                 }
                 let finalPageRecord = page.records.lowerBound
                 let state = try CodexSessionTextResumer.state(
-                    of: conversation.sourceFile, indexedAs: index.fingerprint, indexedDigest: index.digest, finalPageRecord: finalPageRecord,
+                    of: conversation.sourceFile, indexedAs: index.fingerprint, indexedDigest: index.digest,
+                    finalPageRecord: finalPageRecord,
                     finalPageByteOffset: finalPageRecord < index.lineStarts.count ? index.lineStarts[finalPageRecord] : index.byteCount,
                     committedEntryCount: committedEntryCount, limits: limits
                 )

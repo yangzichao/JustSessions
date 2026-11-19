@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Back and Forward go only to tabs still open in the window and sessions the sidebar lists, named by their titles.
@@ -21,7 +22,8 @@ struct WorkspaceNavigationDestinationsTests {
         store.openTerminal(openTab)
         store.openTerminal(closedTab)
         store.closeTerminal(closedTab.id)
-        let listedConversationIDs = store
+        let listedConversationIDs =
+            store
             .filteredSidebarProjection(providerFilter: .all, recencyFilter: .all, searchText: "listed")
             .listedConversationIDs
         #expect(listedConversationIDs == [listed.id])

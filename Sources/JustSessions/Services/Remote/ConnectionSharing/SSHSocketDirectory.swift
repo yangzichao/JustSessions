@@ -57,12 +57,14 @@ enum SSHSocketDirectory {
         isRunning: (pid_t) -> Bool
     ) -> [URL] {
         guard preparedRoot(at: rootPath) != nil,
-              let names = try? FileManager.default.contentsOfDirectory(atPath: rootPath) else { return [] }
+            let names = try? FileManager.default.contentsOfDirectory(atPath: rootPath)
+        else { return [] }
         let root = URL(fileURLWithPath: rootPath, isDirectory: true)
         return names.sorted().compactMap { name in
             let parts = name.split(separator: "-", maxSplits: 2)
             guard parts.count == 3, parts[0] == prefix, let processID = pid_t(parts[1]),
-                  UUID(uuidString: String(parts[2])) != nil, !isRunning(processID) else { return nil }
+                UUID(uuidString: String(parts[2])) != nil, !isRunning(processID)
+            else { return nil }
             return root.appendingPathComponent(name, isDirectory: true)
         }
     }
@@ -83,9 +85,10 @@ enum SSHSocketDirectory {
         if mkdir(path, 0o700) != 0, errno != EEXIST { return nil }
         var status = stat()
         guard lstat(path, &status) == 0,
-              status.st_mode & S_IFMT == S_IFDIR,
-              status.st_uid == getuid(),
-              status.st_mode & 0o077 == 0 else { return nil }
+            status.st_mode & S_IFMT == S_IFDIR,
+            status.st_uid == getuid(),
+            status.st_mode & 0o077 == 0
+        else { return nil }
         return path
     }
 }

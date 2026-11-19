@@ -3,6 +3,7 @@ import Combine
 import Foundation
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Measures what a user feels in the sidebar, one interaction at a time, with the real sidebar and detail views
@@ -79,8 +80,9 @@ struct SidebarInteractionMeasurements {
     /// Repeats `JUSTSESSIONS_PERF_SOAK`'s scenario at N=2,000 for about 15 s so sample(1) can watch it.
     @Test func soak() async throws {
         guard Self.isEnabled,
-              let scenarioName = ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF_SOAK"],
-              let scenario = SidebarPerfScenario(rawValue: scenarioName) else { return }
+            let scenarioName = ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF_SOAK"],
+            let scenario = SidebarPerfScenario(rawValue: scenarioName)
+        else { return }
         let harness = try await SidebarPerfHarness(sessionCount: 2_000)
         defer { harness.close() }
         let pid = ProcessInfo.processInfo.processIdentifier
@@ -122,7 +124,7 @@ struct SidebarInteractionMeasurements {
         perfReport(label, "store changes observed", median.storeChanges)
         for (name, value) in median.extras { perfReport(label, name, value) }
         perfReport(label, "all 3 totals", runs.map { perfMilliseconds($0.total) }.joined(separator: ", "))
-        #expect(runs.count == 3) // Record-only: the numbers above are the result.
+        #expect(runs.count == 3)  // Record-only: the numbers above are the result.
     }
 }
 
@@ -199,10 +201,10 @@ final class SidebarPerfHarness {
         }
         // A small real Claude-style transcript, so the preview path reads real content.
         let transcript = """
-        {"type":"user","message":{"role":"user","content":"Tidy up the sidebar rendering"},"timestamp":"2025-01-01T12:00:00Z"}
-        {"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Done. The sidebar now renders from the cached projection."}]},"timestamp":"2025-01-01T12:00:05Z"}
+            {"type":"user","message":{"role":"user","content":"Tidy up the sidebar rendering"},"timestamp":"2025-01-01T12:00:00Z"}
+            {"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Done. The sidebar now renders from the cached projection."}]},"timestamp":"2025-01-01T12:00:05Z"}
 
-        """
+            """
         let now = Date.now
         let interval = Self.updatedAtSpread / Double(sessionCount)
         let conversations: [Conversation] = try (0..<sessionCount).map { index in
@@ -235,10 +237,11 @@ final class SidebarPerfHarness {
 
         controls = SidebarPerfControls()
         _ = NSApplication.shared
-        hostingView = NSHostingView(rootView: AnyView(
-            SidebarPerfBrowserHarness(store: store, controls: controls)
-                .defaultAppStorage(sandbox.userDefaults)
-        ))
+        hostingView = NSHostingView(
+            rootView: AnyView(
+                SidebarPerfBrowserHarness(store: store, controls: controls)
+                    .defaultAppStorage(sandbox.userDefaults)
+            ))
         window = PointerClearWindow(
             contentRect: NSRect(x: 0, y: 0, width: 1400, height: 900),
             styleMask: [.titled, .closable, .resizable, .fullSizeContentView],

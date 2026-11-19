@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct SessionAttentionSourceTests {
@@ -22,7 +23,8 @@ struct SessionAttentionSourceTests {
         let detached = SessionAttentionSource.detachedTmux(conversationID: "a")
 
         #expect(tab.notificationIdentifier == detached.notificationIdentifier)
-        #expect(SessionAttentionSource.tab(id: UUID(), conversationID: nil).notificationIdentifier
-            != SessionAttentionSource.tab(id: UUID(), conversationID: nil).notificationIdentifier)
+        #expect(
+            SessionAttentionSource.tab(id: UUID(), conversationID: nil).notificationIdentifier
+                != SessionAttentionSource.tab(id: UUID(), conversationID: nil).notificationIdentifier)
     }
 }

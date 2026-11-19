@@ -13,7 +13,8 @@ final class PlainTerminalCloseChoiceSettingsStore: ObservableObject {
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
-        choice = userDefaults.string(forKey: Self.userDefaultsKey).flatMap(PlainTerminalCloseChoice.init(rawValue:))
+        choice =
+            userDefaults.string(forKey: Self.userDefaultsKey).flatMap(PlainTerminalCloseChoice.init(rawValue:))
             ?? .askEachTime
     }
 

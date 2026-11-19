@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// A right-click on a Ghostty tab's terminal shows the app's menu, as on a SwiftTerm one, never Ghostty's own, and the

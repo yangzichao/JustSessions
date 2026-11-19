@@ -39,7 +39,8 @@ final class TranscriptTextSelectionCoordinator {
 
     func unregister(_ view: TranscriptTextView) {
         guard let key = view.selectionKey, let registeredView = registeredViews[key],
-              registeredView.view === view || registeredView.view == nil else { return }
+            registeredView.view === view || registeredView.view == nil
+        else { return }
         registeredViews[key] = nil
         orderedKeys = nil
     }
@@ -80,20 +81,22 @@ final class TranscriptTextSelectionCoordinator {
     func adoptSelection(of view: TranscriptTextView) {
         guard let key = view.selectionKey else { return }
         let range = view.selectedRange()
-        select(TranscriptTextSelection(
-            anchor: TranscriptTextSelectionPosition(key: key, offset: range.location),
-            focus: TranscriptTextSelectionPosition(key: key, offset: NSMaxRange(range))
-        ), in: view.window)
+        select(
+            TranscriptTextSelection(
+                anchor: TranscriptTextSelectionPosition(key: key, offset: range.location),
+                focus: TranscriptTextSelectionPosition(key: key, offset: NSMaxRange(range))
+            ), in: view.window)
     }
 
     /// Selects the text of every loaded block.
     func selectAll() {
         let views = orderedViews
         guard let first = views.first, let last = views.last else { return }
-        select(TranscriptTextSelection(
-            anchor: TranscriptTextSelectionPosition(key: first.key, offset: 0),
-            focus: TranscriptTextSelectionPosition(key: last.key, offset: last.view.textLength)
-        ), in: first.view.window)
+        select(
+            TranscriptTextSelection(
+                anchor: TranscriptTextSelectionPosition(key: first.key, offset: 0),
+                focus: TranscriptTextSelectionPosition(key: last.key, offset: last.view.textLength)
+            ), in: first.view.window)
     }
 
     /// The text of a selection across blocks, joined for the pasteboard. Nil for a selection inside one block, which its
@@ -117,7 +120,8 @@ final class TranscriptTextSelectionCoordinator {
     /// responder of the key window, as AppKit draws the first responder's own selection.
     var drawsSelectionEmphasized: Bool {
         guard let window = selectionWindow, window.isKeyWindow,
-              let firstResponder = window.firstResponder as? TranscriptTextView else { return false }
+            let firstResponder = window.firstResponder as? TranscriptTextView
+        else { return false }
         return firstResponder.selectionCoordinator === self
     }
 

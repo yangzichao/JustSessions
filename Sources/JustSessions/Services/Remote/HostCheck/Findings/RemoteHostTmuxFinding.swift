@@ -27,9 +27,11 @@ enum RemoteHostTmuxFinding {
         }
 
         guard output.text("tmux-path") != nil else {
-            return finding(.note, AppLocalization.string(
-                "tmux isn't installed on \(host), so CLIs there run without it: closing a tab or losing the connection ends them."
-            ))
+            return finding(
+                .note,
+                AppLocalization.string(
+                    "tmux isn't installed on \(host), so CLIs there run without it: closing a tab or losing the connection ends them."
+                ))
         }
         let clientVersion = version(inVersionOutput: output.text("tmux-version"))
         let clientName = clientVersion.map { "tmux \($0)" } ?? "tmux"
@@ -37,27 +39,35 @@ enum RemoteHostTmuxFinding {
         let lowercasedServerOutput = serverOutput?.lowercased() ?? ""
 
         if unreachableServerPhrases.contains(where: lowercasedServerOutput.contains) {
-            return finding(.problem, AppLocalization.string(
-                "\(host)'s tmux server was started by another tmux version than \(clientName), the one JustSessions finds there, as when tmux is upgraded while sessions run. Its sessions keep running but can't be opened. Reattach with the tmux that started the server, or end its sessions with that tmux and start them again."
-            ), hostOutput: serverOutput)
+            return finding(
+                .problem,
+                AppLocalization.string(
+                    "\(host)'s tmux server was started by another tmux version than \(clientName), the one JustSessions finds there, as when tmux is upgraded while sessions run. Its sessions keep running but can't be opened. Reattach with the tmux that started the server, or end its sessions with that tmux and start them again."
+                ), hostOutput: serverOutput)
         }
         if let clientVersion, isOlderThanSupported(clientVersion) {
-            return finding(.warning, AppLocalization.string(
-                "\(host) has tmux \(clientVersion). JustSessions needs tmux 2.6 or later to pass Control-B to the CLI and to end a session before deleting it."
-            ), hostOutput: output.text("tmux-version"))
+            return finding(
+                .warning,
+                AppLocalization.string(
+                    "\(host) has tmux \(clientVersion). JustSessions needs tmux 2.6 or later to pass Control-B to the CLI and to end a session before deleting it."
+                ), hostOutput: output.text("tmux-version"))
         }
         let serverRuns = output.exitStatus("tmux-server-exit") == 0
         if serverRuns, let serverVersion = serverOutput, let clientVersion, serverVersion != clientVersion {
-            return finding(.warning, AppLocalization.string(
-                "\(host)'s tmux server runs tmux \(serverVersion), but the tmux JustSessions finds is \(clientName). Opening a session in that server can fail until its sessions end and the server starts again."
-            ), hostOutput: output.text("tmux-version"))
+            return finding(
+                .warning,
+                AppLocalization.string(
+                    "\(host)'s tmux server runs tmux \(serverVersion), but the tmux JustSessions finds is \(clientName). Opening a session in that server can fail until its sessions end and the server starts again."
+                ), hostOutput: output.text("tmux-version"))
         }
         if !serverRuns, !lowercasedServerOutput.isEmpty, !noServerPhrases.contains(where: lowercasedServerOutput.contains) {
             return finding(.warning, AppLocalization.string("tmux on \(host) answered with an error."), hostOutput: serverOutput)
         }
-        return finding(.passed, AppLocalization.string(
-            "CLIs run in \(clientName) on \(host), so they keep running when a tab closes or the connection drops."
-        ), hostOutput: output.text("tmux-version"))
+        return finding(
+            .passed,
+            AppLocalization.string(
+                "CLIs run in \(clientName) on \(host), so they keep running when a tab closes or the connection drops."
+            ), hostOutput: output.text("tmux-version"))
     }
 
     /// The line of `output` in which a tmux client says it can't reach the running server, as a refresh's
@@ -76,7 +86,8 @@ enum RemoteHostTmuxFinding {
 
     static func isOlderThanSupported(_ version: String) -> Bool {
         guard let match = version.firstMatch(of: #/(\d+)\.(\d+)/#),
-              let major = Int(match.1), let minor = Int(match.2) else { return false }
+            let major = Int(match.1), let minor = Int(match.2)
+        else { return false }
         return (major, minor) < oldestSupportedVersion
     }
 }

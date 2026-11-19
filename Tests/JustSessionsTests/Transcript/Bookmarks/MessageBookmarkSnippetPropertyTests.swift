@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A bookmark's snippet is matched against the one saved (`MessageBookmarkNavigation.matches`), so the one-pass
@@ -22,9 +23,11 @@ struct MessageBookmarkSnippetPropertyTests {
             #expect(MessageBookmarkNavigation.collapsedHead(of: segments).snippet == Self.splitSnippet(segments), "\(segments)")
         }
         let atTheCut = String(repeating: " ", count: 317) + "abc"
-        for segments in [[atTheCut + "\u{301} more"], [atTheCut + "d more"], [String(repeating: "x", count: 320) + "\u{301}"],
-                         ["a\r\nb"], [String(repeating: "\r\n", count: 200) + String(repeating: "word ", count: 30)],
-                         ["one", "", "  two  ", "three"],(0..<128).map { "w" + String(UnicodeScalar(UInt8($0))) + "v" }] {
+        for segments in [
+            [atTheCut + "\u{301} more"], [atTheCut + "d more"], [String(repeating: "x", count: 320) + "\u{301}"],
+            ["a\r\nb"], [String(repeating: "\r\n", count: 200) + String(repeating: "word ", count: 30)],
+            ["one", "", "  two  ", "three"], (0..<128).map { "w" + String(UnicodeScalar(UInt8($0))) + "v" },
+        ] {
             #expect(MessageBookmarkNavigation.collapsedHead(of: segments).snippet == Self.splitSnippet(segments), "\(segments)")
         }
     }
@@ -41,10 +44,12 @@ struct MessageBookmarkSnippetPropertyTests {
 
     /// `MessageBookmarkNavigation.snippet`'s rule as first written.
     private static func splitSnippet(_ segments: [String]) -> String {
-        var words: [Substring] = [], length = 0
+        var words: [Substring] = []
+        var length = 0
         segments: for segment in segments {
             for word in segment.prefix(MessageBookmarkNavigation.snippetLength * 4).split(whereSeparator: \.isWhitespace) {
-                words.append(word); length += word.count + 1
+                words.append(word)
+                length += word.count + 1
                 if length >= MessageBookmarkNavigation.snippetLength { break segments }
             }
         }

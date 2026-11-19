@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The Running filter lists sessions whose CLI runs in tmux with no tab open, on this Mac and on SSH hosts alike,

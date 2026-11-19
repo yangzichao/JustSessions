@@ -402,7 +402,8 @@ final class SSHPortForwards {
             timeout: probeTimeout
         )
         guard let exitStatus = probe?.exitStatus, exitStatus != 0,
-              let refusal = refusal(in: route.newOutput() ?? probe?.output ?? "") else { return nil }
+            let refusal = refusal(in: route.newOutput() ?? probe?.output ?? "")
+        else { return nil }
         cancel([forward], through: route, sshExecutable: sshExecutable)
         return .refusedByHost(host: forward.host, sshMessage: refusal)
     }

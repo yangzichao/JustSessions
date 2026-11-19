@@ -36,7 +36,8 @@ struct GhosttySymbolsFallback {
 
     private static func makeFallback(fallbackFamilies: [String], terminalFamily: String) -> GhosttySymbolsFallback {
         guard TerminalSymbolsFont.register(),
-              let symbolsFont = NSFont(name: TerminalSymbolsFont.postScriptName, size: NSFont.systemFontSize) else {
+            let symbolsFont = NSFont(name: TerminalSymbolsFont.postScriptName, size: NSFont.systemFontSize)
+        else {
             return GhosttySymbolsFallback(fallbackFamilies: fallbackFamilies, codepointMaps: [])
         }
         let charactersTheTerminalFontLacks = (CTFontCopyCharacterSet(symbolsFont) as CharacterSet)
@@ -48,8 +49,9 @@ struct GhosttySymbolsFallback {
         var codepointsByFamilyIndex: [Int: [UInt32]] = [:]
         for codepoint in codepoints(of: charactersTheTerminalFontLacks.subtracting(TerminalSymbolsFont.privateUseAreas)) {
             guard let character = Unicode.Scalar(codepoint),
-                  let familyIndex = charactersOfFamilies.firstIndex(where: { $0.contains(character) }),
-                  familyIndex >= symbolsFontIndex else { continue }
+                let familyIndex = charactersOfFamilies.firstIndex(where: { $0.contains(character) }),
+                familyIndex >= symbolsFontIndex
+            else { continue }
             codepointsByFamilyIndex[familyIndex, default: []].append(codepoint)
         }
         var families = fallbackFamilies

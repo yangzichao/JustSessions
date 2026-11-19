@@ -15,7 +15,8 @@ struct SessionMessageTextFingerprint: Sendable, Codable, Equatable {
         sourceFilePath = conversation.sourceFile.path
         updatedAt = conversation.updatedAt
         guard conversation.provider != .opencode,
-              let attributes = try? FileManager.default.attributesOfItem(atPath: conversation.sourceFile.path) else {
+            let attributes = try? FileManager.default.attributesOfItem(atPath: conversation.sourceFile.path)
+        else {
             byteCount = nil
             modifiedAt = nil
             device = nil

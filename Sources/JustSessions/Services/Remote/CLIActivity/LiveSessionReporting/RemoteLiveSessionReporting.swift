@@ -47,7 +47,8 @@ enum RemoteLiveSessionReporting {
     /// its place. Each file is written beside its place and then moved there, so a CLI that loads it never reads half
     /// of it. A failure says nothing in the tab, as the CLI then starts as before.
     static func command(for provider: ConversationProvider, reporting: String, otherwise: String) -> String {
-        let arguments = [reporting, otherwise, provider.executableName]
+        let arguments =
+            [reporting, otherwise, provider.executableName]
             + (files(for: provider) ?? []).flatMap { [$0.name, $0.contents] }
         return "exec sh -c \(ShellQuoting.quoted(script)) sh " + arguments.map(ShellQuoting.quoted).joined(separator: " ")
     }

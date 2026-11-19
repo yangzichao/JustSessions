@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -69,7 +70,8 @@ struct GhosttyTabTerminalViewTests {
     func clickingTheTerminalSelectsItsTabAndTakesTheKeyboard(_ engine: TerminalEngine) throws {
         _ = NSApplication.shared
         let terminalView = engine.makeTabTerminalView(frame: NSRect(x: 0, y: 0, width: 600, height: 400))
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 600, height: 400), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = terminalView
         defer { window.close() }
@@ -77,10 +79,12 @@ struct GhosttyTabTerminalViewTests {
         var focusRequests = 0
         terminalView.onFocus = { focusRequests += 1 }
 
-        terminalView.mouseDown(with: try #require(NSEvent.mouseEvent(
-            with: .leftMouseDown, location: CGPoint(x: 100, y: 100), modifierFlags: [], timestamp: 0,
-            windowNumber: window.windowNumber, context: nil, eventNumber: 0, clickCount: 1, pressure: 1
-        )))
+        terminalView.mouseDown(
+            with: try #require(
+                NSEvent.mouseEvent(
+                    with: .leftMouseDown, location: CGPoint(x: 100, y: 100), modifierFlags: [], timestamp: 0,
+                    windowNumber: window.windowNumber, context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+                )))
 
         #expect(focusRequests == 1)
         #expect(window.firstResponder === terminalView)

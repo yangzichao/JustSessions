@@ -32,9 +32,10 @@ struct RemoteSessionMirror: Sendable {
         } else {
             self.toolFoldersLookup = { _, _ in .standard }
         }
-        self.connectionSharing = connectionSharing ?? { host in
-            sourceHomeOverride == nil ? SSHConnectionSharing.startRefresh(to: host) : nil
-        }
+        self.connectionSharing =
+            connectionSharing ?? { host in
+                sourceHomeOverride == nil ? SSHConnectionSharing.startRefresh(to: host) : nil
+            }
     }
 
     static var defaultCacheRoot: URL {
@@ -82,36 +83,44 @@ struct RemoteSessionMirror: Sendable {
         let destination = mirrorDirectory(host: host, provider: provider)
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
         if provider == .antigravity {
-            try AntigravityRemoteSessionMirror(runner: RemoteHostCommandRunner(connectionSharingOptions: connectionSharingOptions, cancelsWithTask: true))
-                .synchronize(
-                    host: host,
-                    sourceHomeOverride: sourceHomeOverride,
-                    destination: destination,
-                    connectionSharingOptions: connectionSharingOptions
-                )
+            try AntigravityRemoteSessionMirror(
+                runner: RemoteHostCommandRunner(connectionSharingOptions: connectionSharingOptions, cancelsWithTask: true)
+            )
+            .synchronize(
+                host: host,
+                sourceHomeOverride: sourceHomeOverride,
+                destination: destination,
+                connectionSharingOptions: connectionSharingOptions
+            )
             return
         }
         if provider == .opencode {
-            try OpenCodeRemoteSessionMirror(runner: RemoteHostCommandRunner(connectionSharingOptions: connectionSharingOptions, cancelsWithTask: true))
-                .synchronize(
-                    host: host,
-                    sourceHomeOverride: sourceHomeOverride,
-                    destination: destination,
-                    connectionSharingOptions: connectionSharingOptions
-                )
+            try OpenCodeRemoteSessionMirror(
+                runner: RemoteHostCommandRunner(connectionSharingOptions: connectionSharingOptions, cancelsWithTask: true)
+            )
+            .synchronize(
+                host: host,
+                sourceHomeOverride: sourceHomeOverride,
+                destination: destination,
+                connectionSharingOptions: connectionSharingOptions
+            )
             return
         }
-        let source = sourceHomeOverride.map { folders.localPath(for: provider, sourceHome: $0) + "/" }
+        let source =
+            sourceHomeOverride.map { folders.localPath(for: provider, sourceHome: $0) + "/" }
             ?? folders.rsyncSource(host: host, provider: provider)
-        try copy(host: host, filters: Self.filters(for: provider), from: source, to: destination,
-                 extraArguments: provider == .opencode ? ["--ignore-times"] : [], connectionSharingOptions: connectionSharingOptions)
+        try copy(
+            host: host, filters: Self.filters(for: provider), from: source, to: destination,
+            extraArguments: provider == .opencode ? ["--ignore-times"] : [], connectionSharingOptions: connectionSharingOptions)
         if provider == .kiro {
             let v3Destination = kiroV3MirrorDirectory(host: host)
             try FileManager.default.createDirectory(at: v3Destination, withIntermediateDirectories: true)
-            let v3Source = sourceHomeOverride.map { RemoteToolFolders.localPath(folders.kiroV3, sourceHome: $0) + "/" }
+            let v3Source =
+                sourceHomeOverride.map { RemoteToolFolders.localPath(folders.kiroV3, sourceHome: $0) + "/" }
                 ?? RemoteToolFolders.rsyncSource(host: host, path: folders.kiroV3)
-            try copy(host: host, filters: Self.kiroV3Filters(excludingClassicFolder: (folders.kiro as NSString).lastPathComponent),
-                     from: v3Source, to: v3Destination, extraArguments: [], connectionSharingOptions: connectionSharingOptions)
+            try copy(
+                host: host, filters: Self.kiroV3Filters(excludingClassicFolder: (folders.kiro as NSString).lastPathComponent),
+                from: v3Source, to: v3Destination, extraArguments: [], connectionSharingOptions: connectionSharingOptions)
         }
     }
 
@@ -124,13 +133,14 @@ struct RemoteSessionMirror: Sendable {
         extraArguments: [String],
         connectionSharingOptions: [String]
     ) throws {
-        guard let result = Self.runRsync(
-            filters: filters,
-            extraArguments: extraArguments,
-            source: source,
-            destination: destination.path + "/",
-            connectionSharingOptions: sourceHomeOverride == nil ? connectionSharingOptions : []
-        )
+        guard
+            let result = Self.runRsync(
+                filters: filters,
+                extraArguments: extraArguments,
+                source: source,
+                destination: destination.path + "/",
+                connectionSharingOptions: sourceHomeOverride == nil ? connectionSharingOptions : []
+            )
         else { throw RemoteSessionMirrorError.couldNotRun(host: host) }
 
         switch result.exitStatus {
@@ -157,8 +167,9 @@ struct RemoteSessionMirror: Sendable {
         destination: String,
         connectionSharingOptions: [String]
     ) -> (exitStatus: Int32, output: String)? {
-        runRsync(filters: filters(for: provider), extraArguments: provider == .opencode ? ["--ignore-times"] : [],
-                 source: source, destination: destination, connectionSharingOptions: connectionSharingOptions)
+        runRsync(
+            filters: filters(for: provider), extraArguments: provider == .opencode ? ["--ignore-times"] : [],
+            source: source, destination: destination, connectionSharingOptions: connectionSharingOptions)
     }
 
     /// Copies `source` with `filters`, as `rsyncArguments(for:source:destination:remoteShell:)` lays a tool's out.
@@ -189,8 +200,10 @@ struct RemoteSessionMirror: Sendable {
     /// and a session's `sub-executions`, `snapshots`, and cursors stay on the host.
     static func kiroV3Filters(excludingClassicFolder classicFolder: String) -> [String] {
         ["--exclude=/\(classicFolder)/"]
-            + ["/*/", "/*/\(KiroV3Session.idPrefix)*/", "/*/\(KiroV3Session.idPrefix)*/\(KiroV3Session.metadataFileName)",
-               "/*/\(KiroV3Session.idPrefix)*/\(KiroV3Session.messagesFileName)"].map { "--include=\($0)" }
+            + [
+                "/*/", "/*/\(KiroV3Session.idPrefix)*/", "/*/\(KiroV3Session.idPrefix)*/\(KiroV3Session.metadataFileName)",
+                "/*/\(KiroV3Session.idPrefix)*/\(KiroV3Session.messagesFileName)",
+            ].map { "--include=\($0)" }
             + ["--exclude=*"]
     }
 
@@ -232,8 +245,10 @@ struct RemoteSessionMirror: Sendable {
         case .kiro:
             ["/*.json", "/*.jsonl"]
         case .antigravity:
-            ["/conversation_summaries.db", "/conversation_summaries.db-wal", "/conversation_summaries.db-shm",
-             "/conversations/", "/conversations/*.db", "/conversations/*.db-wal", "/conversations/*.db-shm"]
+            [
+                "/conversation_summaries.db", "/conversation_summaries.db-wal", "/conversation_summaries.db-shm",
+                "/conversations/", "/conversations/*.db", "/conversations/*.db-wal", "/conversations/*.db-shm",
+            ]
         case .pi:
             ["/*.jsonl", "/*/", "/*/*.jsonl"]
         case .opencode:

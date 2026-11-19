@@ -17,7 +17,8 @@ extension ConversationStore {
 
     func reattachRemoteTmuxClient(of tab: TerminalSession, remoteRunner: RemoteHostCommandRunner = RemoteHostCommandRunner()) {
         guard tab.provider == .claude, tab.isRunning, let destination = tab.host.sshDestination,
-              let tmuxSessionName = tab.tmuxSessionName else { return }
+            let tmuxSessionName = tab.tmuxSessionName
+        else { return }
         let terminalView = tab.terminalView
         terminalView.reportThemeAfterNextBackgroundQuery()
         let command = RemoteTmuxCommands.reattachClientsCommand(tmuxSessionName, on: destination)

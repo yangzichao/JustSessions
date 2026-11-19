@@ -1,6 +1,7 @@
 import AppKit
 import SwiftTerm
 import Testing
+
 @testable import JustSessions
 
 @MainActor

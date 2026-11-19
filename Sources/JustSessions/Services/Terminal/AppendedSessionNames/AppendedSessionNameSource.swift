@@ -20,12 +20,13 @@ enum AppendedSessionNameSource {
         // Most appended lines are the conversation itself, so only lines that can name the session are parsed.
         let nameLines = lines.filter { $0.range(of: marker) != nil }
         guard !nameLines.isEmpty else { return nil }
-        let name: String? = switch conversation.provider {
-        case .claude: ClaudeTranscriptTail(lines: nameLines).latestCustomTitle
-        case .pi: PiSessionTitle.latestName(amongLines: nameLines)
-        case .codex: CodexSessionIndex(lines: nameLines).entry(forSessionID: conversation.sessionID)?.threadName
-        case .antigravity, .kiro, .opencode: nil
-        }
+        let name: String? =
+            switch conversation.provider {
+            case .claude: ClaudeTranscriptTail(lines: nameLines).latestCustomTitle
+            case .pi: PiSessionTitle.latestName(amongLines: nameLines)
+            case .codex: CodexSessionIndex(lines: nameLines).entry(forSessionID: conversation.sessionID)?.threadName
+            case .antigravity, .kiro, .opencode: nil
+            }
         let cleanedName = ConversationMetadata.cleanTitle(name, fallback: "")
         return cleanedName.isEmpty ? nil : cleanedName
     }

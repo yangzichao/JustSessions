@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -15,9 +16,10 @@ struct TabMovingAcrossWindowsCancellationTests {
         let notAFolder = sandbox.root.appendingPathComponent("not-a-folder")
         try Data().write(to: notAFolder)
         for store in [sandbox.first, sandbox.second] {
-            store.remoteSessionDiscovery = RemoteSessionDiscovery(mirror: RemoteSessionMirror(
-                cacheRoot: notAFolder, sourceHomeOverride: sandbox.root.path
-            ))
+            store.remoteSessionDiscovery = RemoteSessionDiscovery(
+                mirror: RemoteSessionMirror(
+                    cacheRoot: notAFolder, sourceHomeOverride: sandbox.root.path
+                ))
         }
         let source = try #require(sandbox.openTab(of: conversation, in: sandbox.first))
         let gate = MoveConfirmationGate()

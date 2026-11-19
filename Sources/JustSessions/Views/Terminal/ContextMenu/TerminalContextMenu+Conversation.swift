@@ -38,10 +38,12 @@ extension TerminalContextMenu {
         }
         copyItem.toolTip = localized("Copy saved messages and tool-call summaries as Markdown")
 
-        let exportItem = submenuItem(title: localized("Export conversation"), systemImage: "square.and.arrow.up", items: [
-            ActionMenuItem(title: localized("Markdown (.md)…")) { sharingController.export(selections, format: .markdown) },
-            ActionMenuItem(title: localized("Plain text (.txt)…")) { sharingController.export(selections, format: .plainText) },
-        ])
+        let exportItem = submenuItem(
+            title: localized("Export conversation"), systemImage: "square.and.arrow.up",
+            items: [
+                ActionMenuItem(title: localized("Markdown (.md)…")) { sharingController.export(selections, format: .markdown) },
+                ActionMenuItem(title: localized("Plain text (.txt)…")) { sharingController.export(selections, format: .plainText) },
+            ])
         exportItem.isEnabled = canShare
         exportItem.toolTip = localized("Save messages and tool-call summaries to a file")
 

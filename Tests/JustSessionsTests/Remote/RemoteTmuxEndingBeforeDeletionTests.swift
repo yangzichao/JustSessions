@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs the commands against a real tmux on this Mac, with a private tmux server and home folder, and stand-ins for
@@ -14,7 +15,8 @@ struct RemoteTmuxEndingBeforeDeletionTests {
         let readyMarker = sandbox.root.appendingPathComponent("ready")
         let exitMarker = sandbox.root.appendingPathComponent("exited")
         try sandbox.replaceCLI(
-            withScript: "#!/bin/sh\ntrap 'sleep 1; touch \"\(exitMarker.path)\"; exit 0' HUP\ntouch \"\(readyMarker.path)\"\nwhile :; do sleep 0.2; done\n"
+            withScript:
+                "#!/bin/sh\ntrap 'sleep 1; touch \"\(exitMarker.path)\"; exit 0' HUP\ntouch \"\(readyMarker.path)\"\nwhile :; do sleep 0.2; done\n"
         )
         let tmuxName = TmuxSessionName.unique(for: .claude)
         let command = RemoteCLICommandBuilder.remoteCommand(
@@ -44,7 +46,8 @@ struct RemoteTmuxEndingBeforeDeletionTests {
         let readyMarker = sandbox.root.appendingPathComponent("ready")
         let exitMarker = sandbox.root.appendingPathComponent("exited")
         try sandbox.replaceCLI(
-            withScript: "#!/bin/sh\ntrap 'sleep 1; touch \"\(exitMarker.path)\"; exit 0' HUP\necho \"$@\" > \"\(readyMarker.path)\"\nwhile :; do sleep 0.2; done\n"
+            withScript:
+                "#!/bin/sh\ntrap 'sleep 1; touch \"\(exitMarker.path)\"; exit 0' HUP\necho \"$@\" > \"\(readyMarker.path)\"\nwhile :; do sleep 0.2; done\n"
         )
         let tmuxName = TmuxSessionName.unique(for: .claude)
         let command = RemoteCLICommandBuilder.remoteCommand(
@@ -82,7 +85,8 @@ struct RemoteTmuxEndingBeforeDeletionTests {
         let client = try sandbox.startClient(command)
         defer { client.terminate() }
         try #require(sandbox.waitUntil { ((try? String(contentsOf: processIDFile, encoding: .utf8)) ?? "").hasSuffix("\n") })
-        let cliProcessID = try #require(Int32((try String(contentsOf: processIDFile, encoding: .utf8)).trimmingCharacters(in: .whitespacesAndNewlines)))
+        let cliProcessID = try #require(
+            Int32((try String(contentsOf: processIDFile, encoding: .utf8)).trimmingCharacters(in: .whitespacesAndNewlines)))
         defer { kill(cliProcessID, SIGKILL) }
         let startedAt = Date()
 
@@ -100,7 +104,8 @@ struct RemoteTmuxEndingBeforeDeletionTests {
         defer { sandbox.tearDown() }
         let startedAt = Date()
 
-        _ = sandbox.run(RemoteTmuxCommands.killSessionWaitingForCLIExitCommand(TmuxSessionName.unique(for: .claude), on: "devbox", timeoutSeconds: 5))
+        _ = sandbox.run(
+            RemoteTmuxCommands.killSessionWaitingForCLIExitCommand(TmuxSessionName.unique(for: .claude), on: "devbox", timeoutSeconds: 5))
 
         #expect(Date().timeIntervalSince(startedAt) < 3)
     }

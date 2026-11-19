@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct AntigravityCLILogTests {
@@ -12,7 +13,8 @@ struct AntigravityCLILogTests {
     }
 
     @Test func theLastStreamLineNamesTheConversation() {
-        let log = Self.streamLine(for: Self.firstConversationID)
+        let log =
+            Self.streamLine(for: Self.firstConversationID)
             + "I1004 15:55:37.838731     667 server.go:1325] Stream goroutine exited for \(Self.firstConversationID)\n"
             + Self.streamLine(for: Self.secondConversationID)
             + "I1004 15:55:46.195270    1209 server.go:1840] Sending user message to conversation \(Self.firstConversationID)\n"
@@ -30,9 +32,17 @@ struct AntigravityCLILogTests {
     @Test func recognizesTheCLIsLogInAntigravitysFolder() {
         let configurationDirectory = URL(fileURLWithPath: "/Users/me/.gemini/antigravity-cli")
 
-        #expect(AntigravityCLILog.isCLILog(atPath: "/Users/me/.gemini/antigravity-cli/log/cli-20261004_155442.log", configurationDirectory: configurationDirectory))
-        #expect(!AntigravityCLILog.isCLILog(atPath: "/Users/me/.gemini/antigravity-cli/crashes/crash_24650.log", configurationDirectory: configurationDirectory))
-        #expect(!AntigravityCLILog.isCLILog(atPath: "/Users/me/.gemini/antigravity-cli/log/language_server.log", configurationDirectory: configurationDirectory))
-        #expect(!AntigravityCLILog.isCLILog(atPath: "/Users/me/elsewhere/log/cli-20261004_155442.log", configurationDirectory: configurationDirectory))
+        #expect(
+            AntigravityCLILog.isCLILog(
+                atPath: "/Users/me/.gemini/antigravity-cli/log/cli-20261004_155442.log", configurationDirectory: configurationDirectory))
+        #expect(
+            !AntigravityCLILog.isCLILog(
+                atPath: "/Users/me/.gemini/antigravity-cli/crashes/crash_24650.log", configurationDirectory: configurationDirectory))
+        #expect(
+            !AntigravityCLILog.isCLILog(
+                atPath: "/Users/me/.gemini/antigravity-cli/log/language_server.log", configurationDirectory: configurationDirectory))
+        #expect(
+            !AntigravityCLILog.isCLILog(
+                atPath: "/Users/me/elsewhere/log/cli-20261004_155442.log", configurationDirectory: configurationDirectory))
     }
 }

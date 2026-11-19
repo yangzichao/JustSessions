@@ -25,19 +25,24 @@ struct CodexAdapter: ConversationAdapter {
     /// Shared by every Codex adapter, this Mac's and each SSH host's mirror, which keep their files apart.
     /// Named for the version of the head it keeps: heads kept before spawned threads were read would list them as
     /// sessions of their own.
-    private static let rolloutHeads = SessionFileSummaryCache<CodexRolloutHead>(persistenceFile: SessionSummaryCacheLocation.file(named: "codex-heads-2"))
-    private static let firstUserPrompts = SessionFileSummaryCache<String>(persistenceFile: SessionSummaryCacheLocation.file(named: "codex-prompts"))
-    private static let models = SessionFileSummaryCache<SessionModel>(persistenceFile: SessionSummaryCacheLocation.file(named: "codex-models"))
+    private static let rolloutHeads = SessionFileSummaryCache<CodexRolloutHead>(
+        persistenceFile: SessionSummaryCacheLocation.file(named: "codex-heads-2"))
+    private static let firstUserPrompts = SessionFileSummaryCache<String>(
+        persistenceFile: SessionSummaryCacheLocation.file(named: "codex-prompts"))
+    private static let models = SessionFileSummaryCache<SessionModel>(
+        persistenceFile: SessionSummaryCacheLocation.file(named: "codex-models"))
 
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         try cancellation.checkCancellation()
         let index = CodexSessionIndex(codexDirectory: codexDirectory)
         let sessionsDirectory = codexDirectory.appendingPathComponent("sessions")
-        guard let enumerator = FileManager.default.enumerator(
-            at: sessionsDirectory,
-            includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey, .isRegularFileKey],
-            options: [.skipsHiddenFiles]
-        ) else { return [] }
+        guard
+            let enumerator = FileManager.default.enumerator(
+                at: sessionsDirectory,
+                includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey, .isRegularFileKey],
+                options: [.skipsHiddenFiles]
+            )
+        else { return [] }
 
         var rolloutFiles: [URL] = []
         var conversations: [Conversation] = []
@@ -54,16 +59,17 @@ struct CodexAdapter: ConversationAdapter {
                 fallback: ConversationMetadata.untitledConversationTitle
             )
             let updatedAt = max(indexEntry?.updatedAt ?? .distantPast, ConversationMetadata.fileModificationDate(file))
-            conversations.append(Conversation(
-                provider: provider,
-                sessionID: head.sessionID,
-                projectPath: head.projectPath,
-                suggestedTitle: title,
-                updatedAt: updatedAt,
-                sourceFile: file,
-                parentSessionID: head.spawn?.parentThreadID,
-                model: Self.models.summary(of: file, read: CodexRolloutModel.latest(in:))
-            ))
+            conversations.append(
+                Conversation(
+                    provider: provider,
+                    sessionID: head.sessionID,
+                    projectPath: head.projectPath,
+                    suggestedTitle: title,
+                    updatedAt: updatedAt,
+                    sourceFile: file,
+                    parentSessionID: head.spawn?.parentThreadID,
+                    model: Self.models.summary(of: file, read: CodexRolloutModel.latest(in:))
+                ))
         }
         try cancellation.checkCancellation()
         Self.rolloutHeads.forgetFiles(in: sessionsDirectory, except: rolloutFiles)

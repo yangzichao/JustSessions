@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -20,7 +21,9 @@ struct AppThemeChooserTests {
         #expect(appThemeStore.theme == .gitHub)
         let preferences = terminalAppearanceStore.preferences
         #expect(preferences.colorChoice == .matchAppTheme)
-        #expect(preferences.colorVariants(appTheme: appThemeStore.resolvedTheme) == TerminalPaletteVariants(appTheme: ResolvedAppTheme(.gitHub)))
+        #expect(
+            preferences.colorVariants(appTheme: appThemeStore.resolvedTheme) == TerminalPaletteVariants(appTheme: ResolvedAppTheme(.gitHub))
+        )
         #expect(preferences.importedColors == importedColors)
         #expect(preferences.mode == .dark)
         #expect(preferences.fontSize == 16)

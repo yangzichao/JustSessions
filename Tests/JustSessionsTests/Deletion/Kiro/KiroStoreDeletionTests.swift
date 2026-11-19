@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -36,7 +37,8 @@ struct KiroStoreDeletionTests {
 
         #expect(store.errorMessage == nil)
         #expect(store.conversations.map(\.sessionID) == [retainedSessionID])
-        #expect(!ConversationTitleAliases.load(from: isolatedUserDefaults.userDefaults).customTitlesByConversationID.keys.contains(selected.id))
+        #expect(
+            !ConversationTitleAliases.load(from: isolatedUserDefaults.userDefaults).customTitlesByConversationID.keys.contains(selected.id))
         #expect(!PinnedItems.load(from: isolatedUserDefaults.userDefaults).isPinned(conversationID: selected.id))
         #expect(store.sidebarProjectGroups.contains { $0.id == selected.projectDirectoryKey && $0.sessionCount == 0 })
     }

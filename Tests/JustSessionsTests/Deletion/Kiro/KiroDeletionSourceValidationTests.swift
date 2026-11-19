@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct KiroDeletionSourceValidationTests {
@@ -7,8 +8,9 @@ struct KiroDeletionSourceValidationTests {
     func refusesMissingSessionFilesBeforeRunningTheCLI(_ missingExtension: String) throws {
         let fixture = try KiroHomeFixture()
         defer { fixture.remove() }
-        try FileManager.default.removeItem(at: fixture.sessionsDirectory
-            .appendingPathComponent("\(fixture.conversation.sessionID).\(missingExtension)"))
+        try FileManager.default.removeItem(
+            at: fixture.sessionsDirectory
+                .appendingPathComponent("\(fixture.conversation.sessionID).\(missingExtension)"))
         try expectRefused(fixture.conversation, in: fixture, error: .missingSource)
     }
 

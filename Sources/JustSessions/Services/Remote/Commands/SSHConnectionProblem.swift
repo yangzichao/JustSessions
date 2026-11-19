@@ -38,7 +38,8 @@ enum SSHConnectionProblem: Hashable, Sendable {
     /// Classifies one line `ssh` printed, such as the one `tellingLine(inOutput:)` picks.
     init(sshMessage: String) {
         let lowercasedMessage = sshMessage.lowercased()
-        self = Self.messageFragments
+        self =
+            Self.messageFragments
             .first { entry in entry.fragments.contains { lowercasedMessage.contains($0) } }?
             .problem ?? .other(sshMessage: sshMessage)
     }
@@ -57,14 +58,16 @@ enum SSHConnectionProblem: Hashable, Sendable {
     /// few lines naming a known problem, otherwise the last one with any words. Trimmed to one line of at most
     /// `maximumMessageLength` characters; nil when `ssh` printed nothing useful.
     static func tellingLine(inOutput output: String) -> String? {
-        let lines = output
+        let lines =
+            output
             .split(whereSeparator: \.isNewline)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { line in line.contains { $0.isLetter } }
-        let line = lines.suffix(linesSearchedForAKnownProblem).last { line in
-            if case .other = SSHConnectionProblem(sshMessage: line) { return false }
-            return true
-        } ?? lines.last
+        let line =
+            lines.suffix(linesSearchedForAKnownProblem).last { line in
+                if case .other = SSHConnectionProblem(sshMessage: line) { return false }
+                return true
+            } ?? lines.last
         guard let line else { return nil }
         return line.count > maximumMessageLength ? line.prefix(maximumMessageLength - 1) + "…" : line
     }

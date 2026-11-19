@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct OpenCodeRemoteDeletionTests {
@@ -20,7 +21,10 @@ struct OpenCodeRemoteDeletionTests {
         let workingDirectory = URL(fileURLWithPath: try #require(report.last)).resolvingSymlinksInPath().path
         #expect(workingDirectory == fixture.hostDatabase.file.deletingLastPathComponent().resolvingSymlinksInPath().path)
         #expect(try fixture.hostDatabase.count("SELECT count(*) FROM session") == 1)
-        #expect(try OpenCodeAdapter(databaseFile: fixture.mirrorDatabase).discover().map(\.sessionID) == [OpenCodeDeletionFixture.retainedSessionID])
+        #expect(
+            try OpenCodeAdapter(databaseFile: fixture.mirrorDatabase).discover().map(\.sessionID) == [
+                OpenCodeDeletionFixture.retainedSessionID
+            ])
         #expect(try OpenCodeTranscriptReader().read(fixture.mirrorDatabase, sessionID: selected.sessionID).entries.isEmpty)
         #expect(try fixture.discovery.readMirror(host: "devbox").map(\.sessionID) == [OpenCodeDeletionFixture.retainedSessionID])
     }
@@ -47,24 +51,28 @@ struct OpenCodeRemoteDeletionTests {
 
         try fixture.deletion().delete(selected)
 
-        #expect(try OpenCodeAdapter(databaseFile: fixture.mirrorDatabase).discover().map(\.sessionID) == [OpenCodeDeletionFixture.retainedSessionID])
+        #expect(
+            try OpenCodeAdapter(databaseFile: fixture.mirrorDatabase).discover().map(\.sessionID) == [
+                OpenCodeDeletionFixture.retainedSessionID
+            ])
     }
 
     @Test func aFailedDeletionKeepsTheMirrorAndReportsOpenCodesError() throws {
         let fixture = try RemoteOpenCodeFixture()
         defer { fixture.remove() }
         let selected = try fixture.mirroredConversation()
-        let deletion = try fixture.deletion(running: #"""
-            #!/bin/sh
-            printf '\033[91m\033[1mError: \033[0mdatabase is locked\n' >&2
-            exit 1
-            """#)
+        let deletion = try fixture.deletion(
+            running: #"""
+                #!/bin/sh
+                printf '\033[91m\033[1mError: \033[0mdatabase is locked\n' >&2
+                exit 1
+                """#)
 
         do {
             try deletion.delete(selected)
             Issue.record("A failed deletion should be reported")
         } catch let error as RemoteConversationDeletionError {
-            guard case let .failed(host, details) = error else {
+            guard case .failed(let host, let details) = error else {
                 Issue.record("Unexpected error: \(error)")
                 return
             }
@@ -80,8 +88,11 @@ struct OpenCodeRemoteDeletionTests {
         defer { fixture.remove() }
         let selected = try fixture.mirroredConversation()
         let recorder = RemoteCommandRecorder()
-        let deletion = RemoteConversationDeletion(runner: recorder.runner(answering: (0, "")), mirror: RemoteSessionMirror(cacheRoot: fixture.cacheRoot))
-        func copy(sessionID: String? = nil, projectPath: String? = nil, sourceFile: URL? = nil, host: SessionHost = .ssh("devbox")) -> Conversation {
+        let deletion = RemoteConversationDeletion(
+            runner: recorder.runner(answering: (0, "")), mirror: RemoteSessionMirror(cacheRoot: fixture.cacheRoot))
+        func copy(sessionID: String? = nil, projectPath: String? = nil, sourceFile: URL? = nil, host: SessionHost = .ssh("devbox"))
+            -> Conversation
+        {
             .fixture(
                 provider: .opencode,
                 sessionID: sessionID ?? selected.sessionID,

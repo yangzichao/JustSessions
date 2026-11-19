@@ -18,14 +18,19 @@ struct NewSessionKindPicker: View {
                         .foregroundStyle(ThemePalette.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
-                    ThemeSegmentedPicker("Tool", selection: $selection, segments: providers.map { provider in
-                        ThemeSegment(value: NewSessionKind.cli(provider), title: Text(provider.rawValue))
-                    })
+                    ThemeSegmentedPicker(
+                        "Tool", selection: $selection,
+                        segments: providers.map { provider in
+                            ThemeSegment(value: NewSessionKind.cli(provider), title: Text(provider.rawValue))
+                        })
                 }
                 HStack(spacing: 10) {
-                    ThemeSegmentedPicker("Terminal", selection: $selection, segments: [
-                        ThemeSegment(value: NewSessionKind.plainTerminal, title: Text("Terminal")),
-                    ])
+                    ThemeSegmentedPicker(
+                        "Terminal", selection: $selection,
+                        segments: [
+                            ThemeSegment(value: NewSessionKind.plainTerminal, title: Text("Terminal"))
+                        ]
+                    )
                     .fixedSize()
                     Text("Your login shell, with no CLI")
                         .font(ThemeFont.callout)

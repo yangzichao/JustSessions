@@ -31,11 +31,13 @@ enum OpenCodeConversationOutline {
         var page: TranscriptPage?
 
         if let resume = ConversationOutlineBuilder.resumePoint(in: previous.blocks), let saved,
-           saved.record == resume.record, saved.record <= index.messageIDs.count {
+            saved.record == resume.record, saved.record <= index.messageIDs.count
+        {
             try hash(0..<saved.record, sessionID: conversation.sessionID, in: database, into: &hasher)
             let checked = hasher
             if Data(checked.finalize()) == saved.digest {
-                let tail = try OpenCodeTranscriptPageSource.read(index, in: database,
+                let tail = try OpenCodeTranscriptPageSource.read(
+                    index, in: database,
                     request: .after(resume.record), limits: limits)
                 decodedRecords += tail.records.count
                 // Every kept block ends before this record. The mutable tail may change or disappear entirely.
@@ -53,7 +55,8 @@ enum OpenCodeConversationOutline {
         builder.append(current.entries)
         while current.hasLater {
             try Task.checkCancellation()
-            current = try OpenCodeTranscriptPageSource.read(index, in: database,
+            current = try OpenCodeTranscriptPageSource.read(
+                index, in: database,
                 request: .after(current.records.upperBound), limits: limits)
             decodedRecords += current.records.count
             builder.append(current.entries)
@@ -63,10 +66,14 @@ enum OpenCodeConversationOutline {
         guard let resume = ConversationOutlineBuilder.resumePoint(in: outline.blocks) else {
             return Read(outline: outline, prefix: nil, decodedRecordCount: decodedRecords)
         }
-        if resume.record < hashedRecords { hasher = SHA256(); hashedRecords = 0 }
+        if resume.record < hashedRecords {
+            hasher = SHA256()
+            hashedRecords = 0
+        }
         try hash(hashedRecords..<resume.record, sessionID: conversation.sessionID, in: database, into: &hasher)
-        return Read(outline: outline, prefix: Prefix(record: resume.record, digest: Data(hasher.finalize())),
-                    decodedRecordCount: decodedRecords)
+        return Read(
+            outline: outline, prefix: Prefix(record: resume.record, digest: Data(hasher.finalize())),
+            decodedRecordCount: decodedRecords)
     }
 
     /// A single ordered cursor avoids a separate message/part lookup for every retained record. Its projections are
@@ -151,12 +158,14 @@ enum OpenCodeConversationOutline {
 
         private mutating func appendBytes(_ bytes: UnsafeRawBufferPointer) {
             if pending.count + bytes.count > Self.capacity { flush() }
-            if bytes.count > Self.capacity { hasher.update(bufferPointer: bytes) }
-            else { pending.append(contentsOf: bytes) }
+            if bytes.count > Self.capacity { hasher.update(bufferPointer: bytes) } else { pending.append(contentsOf: bytes) }
         }
 
         private mutating func flush() {
-            if !pending.isEmpty { hasher.update(data: pending); pending.removeAll(keepingCapacity: true) }
+            if !pending.isEmpty {
+                hasher.update(data: pending)
+                pending.removeAll(keepingCapacity: true)
+            }
         }
 
         mutating func finish() -> SHA256 {

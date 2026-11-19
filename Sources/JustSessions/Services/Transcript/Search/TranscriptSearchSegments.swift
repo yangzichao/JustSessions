@@ -26,15 +26,16 @@ enum TranscriptSearchSegments {
 
     static func startingIndices(in blocks: [TranscriptMarkdownBlock]) -> [Int: Int] {
         var nextIndex = 0
-        return Dictionary(uniqueKeysWithValues: blocks.map { block in
-            defer {
-                switch block.content {
-                case .text, .code: nextIndex += 1
-                case .table(let table): nextIndex += table.rows.reduce(0) { $0 + $1.cells.count }
-                case .divider: break
+        return Dictionary(
+            uniqueKeysWithValues: blocks.map { block in
+                defer {
+                    switch block.content {
+                    case .text, .code: nextIndex += 1
+                    case .table(let table): nextIndex += table.rows.reduce(0) { $0 + $1.cells.count }
+                    case .divider: break
+                    }
                 }
-            }
-            return (block.id, nextIndex)
-        })
+                return (block.id, nextIndex)
+            })
     }
 }

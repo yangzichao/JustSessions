@@ -5,6 +5,7 @@ import Foundation
 import GhosttyTerminal
 import IOSurface
 import Testing
+
 @testable import JustSessions
 
 /// Runs the real Claude Code and Codex CLIs installed on this Mac in a tab's terminal, and saves what each terminal
@@ -21,7 +22,8 @@ import Testing
 /// at empty folders too. Set `JUSTSESSIONS_LIVE_SSH_HOST` to also open a tab on that SSH host. Each run's folders stay
 /// afterwards, with what the CLIs wrote, for a look at the evidence.
 @MainActor
-@Suite(.serialized, .enabled(if: LiveCLIEvidenceSettings.isEnabled, "Runs the CLIs installed on this Mac; set JUSTSESSIONS_LIVE_EVIDENCE=1"))
+@Suite(
+    .serialized, .enabled(if: LiveCLIEvidenceSettings.isEnabled, "Runs the CLIs installed on this Mac; set JUSTSESSIONS_LIVE_EVIDENCE=1"))
 struct LiveCLIEvidence {
     /// How long a CLI has to show its screen.
     fileprivate static let screenTimeout: Duration = .seconds(60)
@@ -205,7 +207,9 @@ struct LiveCLIEvidence {
             named: "live-ssh-shell-ghostty",
             snapshot: snapshot,
             screen: screen,
-            details: ["engine: ghostty", "command: \(shell.commandLine)", "exit: closed the tab; ssh \(shell.clientProcessID) reaped: \(reaped)"]
+            details: [
+                "engine: ghostty", "command: \(shell.commandLine)", "exit: closed the tab; ssh \(shell.clientProcessID) reaped: \(reaped)",
+            ]
         )
         #expect(reaped)
     }
@@ -300,15 +304,15 @@ private final class LiveSSHShell {
     /// folder.
     static func endProcesses(startedWith folder: String, on host: String) -> String {
         let script = """
-        d='\(folder)'
-        count() { grep -l -s -F -- "$d" /proc/[0-9]*/environ 2>/dev/null | wc -l | tr -d ' '; }
-        if [ ! -r /proc/self/environ ]; then rm -rf "$d"; echo "no /proc to look in; folder removed"; exit 0; fi
-        n=$(count); i=0
-        while [ "$n" != 0 ] && [ $i -lt 10 ]; do sleep 1; i=$((i + 1)); n=$(count); done
-        for p in $(grep -l -s -F -- "$d" /proc/[0-9]*/environ 2>/dev/null | cut -d/ -f3); do kill -9 "$p" 2>/dev/null; done
-        rm -rf "$d"
-        echo "processes still running with the folder after the tab closed: $n; folder removed"
-        """
+            d='\(folder)'
+            count() { grep -l -s -F -- "$d" /proc/[0-9]*/environ 2>/dev/null | wc -l | tr -d ' '; }
+            if [ ! -r /proc/self/environ ]; then rm -rf "$d"; echo "no /proc to look in; folder removed"; exit 0; fi
+            n=$(count); i=0
+            while [ "$n" != 0 ] && [ $i -lt 10 ]; do sleep 1; i=$((i + 1)); n=$(count); done
+            for p in $(grep -l -s -F -- "$d" /proc/[0-9]*/environ 2>/dev/null | cut -d/ -f3); do kill -9 "$p" 2>/dev/null; done
+            rm -rf "$d"
+            echo "processes still running with the folder after the tab closed: $n; folder removed"
+            """
         let output = BoundedProcessRunner.output(
             ofExecutable: "/usr/bin/ssh",
             arguments: ["-o", "BatchMode=yes", "-o", "ConnectTimeout=10", host, script],
@@ -343,7 +347,8 @@ private struct LiveCLI {
 
     private init(variable: String, name: String) {
         let home = FileManager.default.homeDirectoryForCurrentUser.path
-        candidatePaths = ProcessInfo.processInfo.environment[variable].map { [$0] }
+        candidatePaths =
+            ProcessInfo.processInfo.environment[variable].map { [$0] }
             ?? ["\(home)/.local/bin/\(name)", "/opt/homebrew/bin/\(name)", "/usr/local/bin/\(name)"]
     }
 
@@ -362,7 +367,8 @@ private struct LiveCLIRun {
     let codexHome: URL
 
     init(name: String) throws {
-        let scratch = ProcessInfo.processInfo.environment["JUSTSESSIONS_LIVE_SCRATCH_DIRECTORY"].map { URL(fileURLWithPath: $0) }
+        let scratch =
+            ProcessInfo.processInfo.environment["JUSTSESSIONS_LIVE_SCRATCH_DIRECTORY"].map { URL(fileURLWithPath: $0) }
             ?? FileManager.default.temporaryDirectory.appendingPathComponent("JustSessionsLiveEvidence")
         root = scratch.appendingPathComponent("\(name)-\(UUID().uuidString.prefix(8))")
         project = root.appendingPathComponent("project")
@@ -438,27 +444,31 @@ private struct LiveCLIRun {
                 lastScreen = screen
                 unchangedSince = clock.now
             } else if marker.map(screen.contains) ?? true, !screen.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-                      clock.now - unchangedSince >= stableFor {
+                clock.now - unchangedSince >= stableFor
+            {
                 return
             }
             try await Task.sleep(for: .milliseconds(100))
         }
-        let message = "The screen never showed \"\(marker ?? "anything")\" within \(LiveCLIEvidence.screenTimeout). "
+        let message =
+            "The screen never showed \"\(marker ?? "anything")\" within \(LiveCLIEvidence.screenTimeout). "
             + "exited: \(tab.hasExited), exit code: \(String(describing: tab.exitCode)). \(diagnostics())\nScreen:\n\(lastScreen)"
         Issue.record(Comment(rawValue: message), sourceLocation: sourceLocation)
         throw LiveCLIEvidenceError.screenTimedOut
     }
 
     func saveEvidence(named name: String, snapshot: LiveCLISnapshot, screen: String, details: [String]) throws {
-        let directory = ProcessInfo.processInfo.environment["JUSTSESSIONS_LIVE_EVIDENCE_DIRECTORY"].map { URL(fileURLWithPath: $0) }
+        let directory =
+            ProcessInfo.processInfo.environment["JUSTSESSIONS_LIVE_EVIDENCE_DIRECTORY"].map { URL(fileURLWithPath: $0) }
             ?? root.deletingLastPathComponent().appendingPathComponent("evidence")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         try snapshot.pngData.write(to: directory.appendingPathComponent("\(name).png"))
-        let header = (details + [
-            "project: \(project.path)",
-            "captured: \(ISO8601DateFormatter().string(from: .now))",
-            "image: \(snapshot.source)",
-        ]).map { "# \($0)" }
+        let header =
+            (details + [
+                "project: \(project.path)",
+                "captured: \(ISO8601DateFormatter().string(from: .now))",
+                "image: \(snapshot.source)",
+            ]).map { "# \($0)" }
         try (header.joined(separator: "\n") + "\n\n" + screen + "\n").write(
             to: directory.appendingPathComponent("\(name).txt"), atomically: true, encoding: .utf8
         )
@@ -509,13 +519,15 @@ private struct LiveCLISnapshot {
     init?(of terminalView: any TabTerminalView) {
         if let ghosttyView = terminalView as? GhosttyTabTerminalView {
             if let image = ghosttyView.snapshotImage(), let bitmap = Self.bitmap(of: image), Self.showsSomething(bitmap),
-               let png = bitmap.representation(using: .png, properties: [:]) {
+                let png = bitmap.representation(using: .png, properties: [:])
+            {
                 pngData = png
                 source = "GhosttyTabTerminalView.snapshotImage()"
                 return
             }
             guard let bitmap = Self.bitmapOfPresentedSurface(in: ghosttyView), Self.showsSomething(bitmap),
-                  let png = bitmap.representation(using: .png, properties: [:]) else { return nil }
+                let png = bitmap.representation(using: .png, properties: [:])
+            else { return nil }
             pngData = png
             source = "the IOSurface in the Ghostty view's layer; snapshotImage() was blank"
             return
@@ -571,7 +583,8 @@ private enum LiveCLIKeys {
         for character in text {
             let characters = String(character)
             let keyCode = character == "\r" ? 36 : 0
-            terminalView.keyDown(with: event(keyCode: keyCode, characters: characters, ignoringModifiers: characters, modifiers: [], window: window))
+            terminalView.keyDown(
+                with: event(keyCode: keyCode, characters: characters, ignoringModifiers: characters, modifiers: [], window: window))
         }
     }
 
@@ -615,7 +628,8 @@ private struct LiveCLIExit {
         let screenChanged = LiveCLIScreen.text(of: tab) != screenBefore
         if !exitedOnItsOwn { tab.close() }
         let reaped = await waitUntilReaped(processID)
-        let how = exitedOnItsOwn
+        let how =
+            exitedOnItsOwn
             ? "Ctrl-C twice; the CLI exited with code \(tab.exitCode.map(String.init) ?? "unknown")"
             : "Ctrl-C twice did not end the CLI within 15 s (the screen \(screenChanged ? "changed" : "did not change")), so the tab was closed"
         return LiveCLIExit(description: "\(how); process \(processID) reaped: \(reaped)", reaped: reaped)

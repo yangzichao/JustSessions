@@ -1,23 +1,34 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct TerminalTabStripRecoveryProjectionTests {
     @Test func splitTabsJoinAnExistingProjectsEndEvenWhenItsGroupIsLater() {
-        let firstA = tab("a"), firstB = tab("b"), ordinaryA = tab("a"), ordinaryC = tab("c")
+        let firstA = tab("a")
+        let firstB = tab("b")
+        let ordinaryA = tab("a")
+        let ordinaryC = tab("c")
         let splitID = UUID()
-        let split = TerminalSplit(id: splitID, tabIDs: (firstA.id, firstB.id), groupKey: TerminalSplit.groupKey(ofSplitAcrossProjects: splitID))
+        let split = TerminalSplit(
+            id: splitID, tabIDs: (firstA.id, firstB.id), groupKey: TerminalSplit.groupKey(ofSplitAcrossProjects: splitID))
         let strip = TerminalTabStrip(tabs: [firstA, firstB, ordinaryC, ordinaryA], splits: [split])
         #expect(strip.tabsWithSplitsSeparated.map(\.id) == [firstB.id, ordinaryC.id, ordinaryA.id, firstA.id])
     }
 
     @Test func projectsWithoutOrdinaryGroupsStartAtTheirFirstSplit() {
-        let a = tab("a"), b = tab("b"), c = tab("c"), anotherA = tab("a")
-        let firstID = UUID(), secondID = UUID()
-        let strip = TerminalTabStrip(tabs: [a, b, c, anotherA], splits: [
-            TerminalSplit(id: firstID, tabIDs: (a.id, b.id), groupKey: TerminalSplit.groupKey(ofSplitAcrossProjects: firstID)),
-            TerminalSplit(id: secondID, tabIDs: (c.id, anotherA.id), groupKey: TerminalSplit.groupKey(ofSplitAcrossProjects: secondID)),
-        ])
+        let a = tab("a")
+        let b = tab("b")
+        let c = tab("c")
+        let anotherA = tab("a")
+        let firstID = UUID()
+        let secondID = UUID()
+        let strip = TerminalTabStrip(
+            tabs: [a, b, c, anotherA],
+            splits: [
+                TerminalSplit(id: firstID, tabIDs: (a.id, b.id), groupKey: TerminalSplit.groupKey(ofSplitAcrossProjects: firstID)),
+                TerminalSplit(id: secondID, tabIDs: (c.id, anotherA.id), groupKey: TerminalSplit.groupKey(ofSplitAcrossProjects: secondID)),
+            ])
         #expect(strip.tabsWithSplitsSeparated.map(\.id) == [a.id, anotherA.id, b.id, c.id])
     }
 

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -20,10 +21,11 @@ struct TranscriptPagingModelTests {
         #expect(model.pages.count == 1)
         #expect(model.restorationPosition == position)
         #expect(model.transcript?.entries.first?.id == position.entryIndex)
-        #expect(model.transcript?.entries.allSatisfy {
-            if case .assistantMessage(let text) = $0.content { return text.hasPrefix("Rewritten longer message") }
-            return false
-        } == true)
+        #expect(
+            model.transcript?.entries.allSatisfy {
+                if case .assistantMessage(let text) = $0.content { return text.hasPrefix("Rewritten longer message") }
+                return false
+            } == true)
     }
 
     @Test func loadingPreservesThePositionReachedWhileThePageWasBeingRead() async throws {

@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
@@ -17,7 +18,8 @@ struct CloseAndDeleteThisMacTmuxTests {
         try "{}\n".write(to: sessionFile, atomically: true, encoding: .utf8)
         try sandbox.writeExecutable(
             named: "claude",
-            script: "#!/bin/sh\ntrap '/bin/sleep 1; echo late >> \"\(sessionFile.path)\"; /usr/bin/touch \"\(exitMarker.path)\"; exit 0' HUP\n/usr/bin/touch \"\(readyMarker.path)\"\nwhile :; do /bin/sleep 0.2; done\n"
+            script:
+                "#!/bin/sh\ntrap '/bin/sleep 1; echo late >> \"\(sessionFile.path)\"; /usr/bin/touch \"\(exitMarker.path)\"; exit 0' HUP\n/usr/bin/touch \"\(readyMarker.path)\"\nwhile :; do /bin/sleep 0.2; done\n"
         )
         let conversation = Conversation(
             provider: .claude,
@@ -39,7 +41,8 @@ struct CloseAndDeleteThisMacTmuxTests {
         let tab = try #require(store.terminalSessions.last)
         tab.startIfNeeded()
         let tmuxSessionName = TmuxSessionName.forConversation(conversation)
-        try #require(await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil { sandbox.server.sessionNames() == [tmuxSessionName] }, "\(sandbox.launchDiagnostics(for: tab))")
         try #require(await sandbox.waitForPaneProcess(in: store, for: tab))
         let cliProcessID = try #require(tab.tmuxPaneProcessID)
         try #require(await sandbox.waitUntil { FileManager.default.fileExists(atPath: readyMarker.path) })

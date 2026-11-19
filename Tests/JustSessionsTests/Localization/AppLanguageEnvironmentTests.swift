@@ -2,6 +2,7 @@ import AppKit
 import Combine
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -12,9 +13,11 @@ struct AppLanguageEnvironmentTests {
         let store = AppLanguageStore(userDefaults: settings.userDefaults)
         store.setLanguage(AppInterfaceLanguage(identifier: "en"))
         var observations: [(ObjectIdentifier, String)] = []
-        let fixture = ThemeSurfaceRenderingFixture(content: AnyView(LanguageLifetimeProbe { identity, locale in
-            observations.append((identity, locale))
-        }.appLanguage(from: store)), size: CGSize(width: 280, height: 120), colorScheme: .light)
+        let fixture = ThemeSurfaceRenderingFixture(
+            content: AnyView(
+                LanguageLifetimeProbe { identity, locale in
+                    observations.append((identity, locale))
+                }.appLanguage(from: store)), size: CGSize(width: 280, height: 120), colorScheme: .light)
         defer { fixture.close() }
         _ = try await fixture.capture(named: "language-en")
         try await expectEventually { !observations.isEmpty }

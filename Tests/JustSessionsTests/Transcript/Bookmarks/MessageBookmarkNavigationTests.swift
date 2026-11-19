@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct MessageBookmarkNavigationTests {
@@ -9,8 +10,10 @@ struct MessageBookmarkNavigationTests {
         TranscriptEntry(id: id(record, part: part), content: content, timestamp: nil, startsTurn: true)
     }
 
-    private func bookmark(_ letter: String, at record: Int, part: Int = 0, kind: MessageBookmark.Kind = .user,
-                          snippet: String = "") -> MessageBookmark {
+    private func bookmark(
+        _ letter: String, at record: Int, part: Int = 0, kind: MessageBookmark.Kind = .user,
+        snippet: String = ""
+    ) -> MessageBookmark {
         MessageBookmark(letter: letter, entryID: id(record, part: part), kind: kind, snippet: snippet)
     }
 
@@ -86,8 +89,10 @@ struct MessageBookmarkNavigationTests {
     }
 
     @Test func locateFollowsAMessageWhosePartMovedWithinItsRecord() {
-        let entries = [entry(1, .userMessage("Question")), entry(2, part: 0, .assistantMessage("Thinking first")),
-                       entry(2, part: 1, .assistantMessage("The real answer")), entry(3, .userMessage("Thanks"))]
+        let entries = [
+            entry(1, .userMessage("Question")), entry(2, part: 0, .assistantMessage("Thinking first")),
+            entry(2, part: 1, .assistantMessage("The real answer")), entry(3, .userMessage("Thanks")),
+        ]
         let saved = bookmark("a", at: 2, part: 0, kind: .assistant, snippet: "The real answer")
 
         #expect(MessageBookmarkNavigation.locate(saved, in: entries, hasEarlier: true, hasLater: true) == .found(entries[2]))
@@ -95,7 +100,9 @@ struct MessageBookmarkNavigationTests {
 
     /// After an OpenCode `/undo`, another message can take the record and part a bookmark saved.
     @Test func locateReportsAnotherMessageAtTheSameIDAsMissing() {
-        let entries = [entry(1, .userMessage("Question")), entry(2, .userMessage("A different message")), entry(3, .assistantMessage("Reply"))]
+        let entries = [
+            entry(1, .userMessage("Question")), entry(2, .userMessage("A different message")), entry(3, .assistantMessage("Reply")),
+        ]
         let saved = bookmark("a", at: 2, snippet: "The message that was undone")
 
         #expect(MessageBookmarkNavigation.locate(saved, in: entries, hasEarlier: true, hasLater: true) == .missing(landingEntryID: id(2)))
@@ -120,10 +127,14 @@ struct MessageBookmarkNavigationTests {
     @Test func locateReportsABookmarkPastTheSessionsEndAsMissing() {
         let entries = [entry(100, .userMessage("Loaded")), entry(101, .assistantMessage("The last reply"))]
 
-        #expect(MessageBookmarkNavigation.locate(bookmark("a", at: 150, snippet: "Truncated away"), in: entries, hasEarlier: true, hasLater: false)
-            == .missing(landingEntryID: id(101)))
-        #expect(MessageBookmarkNavigation.locate(bookmark("a", at: 50, snippet: "Before the start"), in: entries, hasEarlier: false, hasLater: true)
-            == .missing(landingEntryID: id(100)))
+        #expect(
+            MessageBookmarkNavigation.locate(
+                bookmark("a", at: 150, snippet: "Truncated away"), in: entries, hasEarlier: true, hasLater: false)
+                == .missing(landingEntryID: id(101)))
+        #expect(
+            MessageBookmarkNavigation.locate(
+                bookmark("a", at: 50, snippet: "Before the start"), in: entries, hasEarlier: false, hasLater: true)
+                == .missing(landingEntryID: id(100)))
     }
 
     @Test func aReplyThatKeptStreamingStillMatches() {
@@ -153,8 +164,10 @@ struct MessageBookmarkNavigationTests {
     }
 
     @Test func theMessageBeingReadSkipsToolCallsToTheFirstVisibleMessage() {
-        let entries = [entry(1, .userMessage("Earlier")), entry(2, .toolCalls(["Read file"])), entry(3, .toolResultImage(image)),
-                       entry(4, .assistantMessage("Shown")), entry(5, .userMessage("Below"))]
+        let entries = [
+            entry(1, .userMessage("Earlier")), entry(2, .toolCalls(["Read file"])), entry(3, .toolResultImage(image)),
+            entry(4, .assistantMessage("Shown")), entry(5, .userMessage("Below")),
+        ]
 
         let read = MessageBookmarkNavigation.messageBeingRead(in: entries, visibleEntryIDs: [id(2), id(3), id(4), id(5)], seekTarget: nil)
 
@@ -162,8 +175,10 @@ struct MessageBookmarkNavigationTests {
     }
 
     @Test func theMessageBeingReadFallsBackToTheMessageAboveAToolRun() {
-        let entries = [entry(1, .userMessage("Earlier")), entry(2, .assistantMessage("Above")), entry(3, .toolCalls(["Read file"])),
-                       entry(4, .note("Compacted")), entry(5, .userMessage("Below"))]
+        let entries = [
+            entry(1, .userMessage("Earlier")), entry(2, .assistantMessage("Above")), entry(3, .toolCalls(["Read file"])),
+            entry(4, .note("Compacted")), entry(5, .userMessage("Below")),
+        ]
 
         #expect(MessageBookmarkNavigation.messageBeingRead(in: entries, visibleEntryIDs: [id(3), id(4)], seekTarget: nil) == entries[1])
         #expect(MessageBookmarkNavigation.messageBeingRead(in: entries, visibleEntryIDs: [], seekTarget: nil) == nil)

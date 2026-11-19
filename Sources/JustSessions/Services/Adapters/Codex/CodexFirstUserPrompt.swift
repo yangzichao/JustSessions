@@ -15,15 +15,17 @@ enum CodexFirstUserPrompt {
     static func find(amongLines lines: [Data]) -> String? {
         for line in lines.prefix(maximumLineCount) {
             guard let record = ConversationMetadata.object(from: line),
-                  record["type"] as? String == "response_item",
-                  let payload = record["payload"] as? [String: Any],
-                  payload["type"] as? String == "message",
-                  payload["role"] as? String == "user",
-                  let content = payload["content"] as? [[String: Any]] else { continue }
+                record["type"] as? String == "response_item",
+                let payload = record["payload"] as? [String: Any],
+                payload["type"] as? String == "message",
+                payload["role"] as? String == "user",
+                let content = payload["content"] as? [[String: Any]]
+            else { continue }
             for part in content where part["type"] as? String == "input_text" {
                 guard let text = (part["text"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines),
-                      !text.isEmpty,
-                      !injectedContextPrefixes.contains(where: text.hasPrefix) else { continue }
+                    !text.isEmpty,
+                    !injectedContextPrefixes.contains(where: text.hasPrefix)
+                else { continue }
                 return text
             }
         }

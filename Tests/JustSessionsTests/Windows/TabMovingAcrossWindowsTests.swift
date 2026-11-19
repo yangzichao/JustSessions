@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Moving a session's tab to this window closes the other window's tab and opens the session here, only when that

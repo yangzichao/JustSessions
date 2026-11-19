@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+
 @testable import JustSessions
 
 /// One Antigravity, Pi, or OpenCode tab. Its CLI is a `ScenarioCLI`, whose process id the tab knows as a tmux pane's.
@@ -42,30 +43,32 @@ final class LiveSessionTabWorld: SessionTabWorld {
 
     func openResumedTab(on label: String) throws {
         let conversation = try app.listedConversation(labeled: label)
-        openTab(TerminalSession(
-            engine: .swiftTerm,
-            conversation: conversation,
-            provider: app.provider,
-            projectPath: app.projectPath,
-            action: .resume,
-            displayTitle: app.store.title(for: conversation),
-            command: app.command,
-            tmuxSessionName: TmuxSessionName.forConversation(conversation)
-        ))
+        openTab(
+            TerminalSession(
+                engine: .swiftTerm,
+                conversation: conversation,
+                provider: app.provider,
+                projectPath: app.projectPath,
+                action: .resume,
+                displayTitle: app.store.title(for: conversation),
+                command: app.command,
+                tmuxSessionName: TmuxSessionName.forConversation(conversation)
+            ))
         try cli.moves(toSession: conversation.sessionID)
     }
 
     func openNewSessionTab() {
-        openTab(TerminalSession(
-            engine: .swiftTerm,
-            conversation: nil,
-            provider: app.provider,
-            projectPath: app.projectPath,
-            action: .new,
-            displayTitle: app.provider.newSessionTabTitle,
-            command: app.command,
-            tmuxSessionName: TmuxSessionName.unique(for: app.provider)
-        ))
+        openTab(
+            TerminalSession(
+                engine: .swiftTerm,
+                conversation: nil,
+                provider: app.provider,
+                projectPath: app.projectPath,
+                action: .new,
+                displayTitle: app.provider.newSessionTabTitle,
+                command: app.command,
+                tmuxSessionName: TmuxSessionName.unique(for: app.provider)
+            ))
     }
 
     /// The tool saves the session where a refresh finds it, and the next refresh lists it.

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The sidebar's Open tabs list groups the tabs by their own project, in tab bar order, as `SidebarOpenTabsView`
@@ -47,7 +48,8 @@ struct SidebarOpenTabListingTests {
         #expect(groups.map(\.projectDirectoryKey) == [app, docs, tools].map(\.projectDirectoryKey))
         #expect(groups.map { $0.tabs.map(\.id) } == [[app.id], [docs.id], [tools.id]])
         // Each project keeps a color of its own, as in the tab bar, though the split's projects head no group there.
-        #expect(Set(TabGroupPalette.colorsByProjectKey(store.tabProjectKeysInOrder).keys) == Set([app, docs, tools].map(\.projectDirectoryKey)))
+        #expect(
+            Set(TabGroupPalette.colorsByProjectKey(store.tabProjectKeysInOrder).keys) == Set([app, docs, tools].map(\.projectDirectoryKey)))
     }
 
     @Test func aSplitOfOneProjectsTabsListsBothUnderThatProjectWithTheirSides() throws {
@@ -75,10 +77,13 @@ struct SidebarOpenTabListingTests {
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
-        return (store, {
-            store.closeAllTerminals()
-            isolatedUserDefaults.removeSuite()
-        })
+        return (
+            store,
+            {
+                store.closeAllTerminals()
+                isolatedUserDefaults.removeSuite()
+            }
+        )
     }
 
     private func open(_ store: ConversationStore, _ tab: TerminalSession) -> TerminalSession {

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PiEntryLinkTests {
@@ -8,10 +9,14 @@ struct PiEntryLinkTests {
     }
 
     @Test func readsTheLinkFromTheStartOfALineInPisOwnLayout() {
-        let user = #"{"type":"message","id":"a1","parentId":null,"timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","content":"Hi"}}"#
-        let toolResult = #"{"type":"message","id":"b2","parentId":"a1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"toolResult","toolCallId":"t1","content":[]}}"#
-        let modelChange = #"{"type":"model_change","id":"c3","parentId":"b2","timestamp":"2026-09-30T10:00:00.000Z","provider":"anthropic","modelId":"m"}"#
-        let compaction = #"{"type":"compaction","id":"d4","parentId":"c3","timestamp":"2026-09-30T10:00:00.000Z","summary":"s","firstKeptEntryId":"a1"}"#
+        let user =
+            #"{"type":"message","id":"a1","parentId":null,"timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","content":"Hi"}}"#
+        let toolResult =
+            #"{"type":"message","id":"b2","parentId":"a1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"toolResult","toolCallId":"t1","content":[]}}"#
+        let modelChange =
+            #"{"type":"model_change","id":"c3","parentId":"b2","timestamp":"2026-09-30T10:00:00.000Z","provider":"anthropic","modelId":"m"}"#
+        let compaction =
+            #"{"type":"compaction","id":"d4","parentId":"c3","timestamp":"2026-09-30T10:00:00.000Z","summary":"s","firstKeptEntryId":"a1"}"#
 
         #expect(Self.link(user) == PiEntryLink(lineIndex: 7, id: "a1", parentID: nil, mightBeShown: true))
         #expect(Self.link(toolResult) == PiEntryLink(lineIndex: 7, id: "b2", parentID: "a1", mightBeShown: false))
@@ -20,7 +25,8 @@ struct PiEntryLinkTests {
     }
 
     @Test func parsesLinesInAnyOtherLayout() {
-        let customMessage = #"{"type":"custom_message","customType":"intercom_message","content":"Hi","display":true,"id":"e5","parentId":"d4","timestamp":"2026-09-30T10:00:00.000Z"}"#
+        let customMessage =
+            #"{"type":"custom_message","customType":"intercom_message","content":"Hi","display":true,"id":"e5","parentId":"d4","timestamp":"2026-09-30T10:00:00.000Z"}"#
         let reorderedAssistant = #"{"message":{"role":"assistant","content":[]},"type":"message","parentId":"e5","id":"f6"}"#
 
         #expect(Self.link(customMessage) == PiEntryLink(lineIndex: 7, id: "e5", parentID: "d4", mightBeShown: false))
@@ -30,9 +36,11 @@ struct PiEntryLinkTests {
     /// A tool result is shown only for its images, which are found from the line's bytes in either layout.
     @Test func aToolResultWithAnImageMightBeShownInEitherLayout() {
         let imagePart = #"{"type":"image","data":"AAAA","mimeType":"image/png"}"#
-        let pisLayout = #"{"type":"message","id":"b2","parentId":"a1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"toolResult","toolCallId":"t1","content":[\#(imagePart)]}}"#
+        let pisLayout =
+            #"{"type":"message","id":"b2","parentId":"a1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"toolResult","toolCallId":"t1","content":[\#(imagePart)]}}"#
         let reordered = #"{"message":{"role":"toolResult","content":[\#(imagePart)]},"type":"message","parentId":"a1","id":"b3"}"#
-        let reorderedTextOnly = #"{"message":{"role":"toolResult","content":[{"type":"text","text":"ok"}]},"type":"message","parentId":"a1","id":"b4"}"#
+        let reorderedTextOnly =
+            #"{"message":{"role":"toolResult","content":[{"type":"text","text":"ok"}]},"type":"message","parentId":"a1","id":"b4"}"#
 
         #expect(Self.link(pisLayout) == PiEntryLink(lineIndex: 7, id: "b2", parentID: "a1", mightBeShown: true))
         #expect(Self.link(reordered) == PiEntryLink(lineIndex: 7, id: "b3", parentID: "a1", mightBeShown: true))
@@ -44,8 +52,10 @@ struct PiEntryLinkTests {
         let longID = String(repeating: "a", count: 600)
         let longParent = String(repeating: "b", count: 600)
         let longType = "custom_" + String(repeating: "c", count: 600)
-        let longIDLine = #"{"type":"message","id":"\#(longID)","parentId":"p1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","content":"Hi"}}"#
-        let longParentLine = #"{"type":"message","id":"a1","parentId":"\#(longParent)","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"assistant","content":[]}}"#
+        let longIDLine =
+            #"{"type":"message","id":"\#(longID)","parentId":"p1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","content":"Hi"}}"#
+        let longParentLine =
+            #"{"type":"message","id":"a1","parentId":"\#(longParent)","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"assistant","content":[]}}"#
         let longTypeLine = #"{"type":"\#(longType)","id":"a2","parentId":"a1","timestamp":"2026-09-30T10:00:00.000Z"}"#
 
         #expect(Self.link(longIDLine) == PiEntryLink(lineIndex: 7, id: longID, parentID: "p1", mightBeShown: true))
@@ -55,19 +65,23 @@ struct PiEntryLinkTests {
 
     /// Lines are slices of the reader's buffer, so a line's bytes need not start at index zero.
     @Test func readsALineSlicedFromALargerBuffer() {
-        let user = #"{"type":"message","id":"a1","parentId":"p0","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","content":"Hi"}}"#
-        let longIDLine = #"{"type":"message","id":"\#(String(repeating: "a", count: 600))","parentId":"a1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"toolResult","content":[]}}"#
+        let user =
+            #"{"type":"message","id":"a1","parentId":"p0","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","content":"Hi"}}"#
+        let longIDLine =
+            #"{"type":"message","id":"\#(String(repeating: "a", count: 600))","parentId":"a1","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"toolResult","content":[]}}"#
         let buffer = Data((String(repeating: "x", count: 700) + "\n" + user + "\n" + longIDLine).utf8)
         let lines = buffer.split(separator: UInt8(ascii: "\n"))
 
         #expect(lines[1].startIndex == 701)
         #expect(PiEntryLink(line: lines[1], lineIndex: 7) == PiEntryLink(lineIndex: 7, id: "a1", parentID: "p0", mightBeShown: true))
-        #expect(PiEntryLink(line: lines[2], lineIndex: 8) == PiEntryLink(
-            lineIndex: 8,
-            id: String(repeating: "a", count: 600),
-            parentID: "a1",
-            mightBeShown: false
-        ))
+        #expect(
+            PiEntryLink(line: lines[2], lineIndex: 8)
+                == PiEntryLink(
+                    lineIndex: 8,
+                    id: String(repeating: "a", count: 600),
+                    parentID: "a1",
+                    mightBeShown: false
+                ))
     }
 
     @Test func fieldsOfAnotherTypeInAParsedLineReadAsMissing() {
@@ -85,6 +99,8 @@ struct PiEntryLinkTests {
         #expect(Self.link(#"{"type":"session","version":3,"id":"019a0000-0000-7000-8000-000000000000","cwd":"/tmp"}"#) == nil)
         #expect(Self.link("not json") == nil)
         #expect(Self.link(#"{"id":"a1","parentId":null}"#) == nil)
-        #expect(Self.link(#"{"type":"message","id":"a1","parentId":null,"timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","con"#) == nil)
+        #expect(
+            Self.link(#"{"type":"message","id":"a1","parentId":null,"timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","con"#)
+                == nil)
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The store keeps each project's tabs side by side, so the tab bar's groups follow the store's tab order.

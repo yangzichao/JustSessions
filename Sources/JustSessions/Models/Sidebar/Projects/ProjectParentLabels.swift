@@ -6,9 +6,10 @@ struct ProjectParentLabels {
     private let labelsByProjectID: [String: String]
 
     init(projectsOnOneHost projects: [ProjectConversationGroup]) {
-        let repeatedNames = Set(Dictionary(grouping: projects, by: \.displayName)
-            .filter { $0.value.count > 1 }
-            .map(\.key))
+        let repeatedNames = Set(
+            Dictionary(grouping: projects, by: \.displayName)
+                .filter { $0.value.count > 1 }
+                .map(\.key))
         labelsByProjectID = Dictionary(
             projects
                 .filter { repeatedNames.contains($0.displayName) }

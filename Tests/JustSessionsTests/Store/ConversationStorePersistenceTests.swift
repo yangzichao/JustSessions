@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// What the store keeps in settings comes back in the next store, as it would after relaunching the app.
@@ -53,15 +54,17 @@ struct ConversationStorePersistenceTests {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
         let conversation = Conversation.fixture(host: .ssh("devbox"))
-        let entry = TranscriptEntry(id: TranscriptPageIdentity.entryID(record: 7, part: 0),
-                                    content: .userMessage("Why does the  build\nfail?"), timestamp: nil, startsTurn: true)
+        let entry = TranscriptEntry(
+            id: TranscriptPageIdentity.entryID(record: 7, part: 0),
+            content: .userMessage("Why does the  build\nfail?"), timestamp: nil, startsTurn: true)
 
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
         store.toggleMessageBookmark(on: entry, in: conversation)
         let relaunchedStore = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
 
-        #expect(relaunchedStore.messageBookmarks.bookmarks(forConversationID: conversation.id)
-            == [MessageBookmark(letter: "a", entryID: entry.id, kind: .user, snippet: "Why does the build fail?")])
+        #expect(
+            relaunchedStore.messageBookmarks.bookmarks(forConversationID: conversation.id)
+                == [MessageBookmark(letter: "a", entryID: entry.id, kind: .user, snippet: "Why does the build fail?")])
         #expect(relaunchedStore.messageBookmarks == store.messageBookmarks)
     }
 
@@ -74,9 +77,11 @@ struct ConversationStorePersistenceTests {
         RemoteHostList(hosts: ["devbox"]).save(to: isolatedUserDefaults.userDefaults)
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
         store.replaceConversations(on: .ssh("devbox"), with: [conversation])
-        store.toggleMessageBookmark(on: TranscriptEntry(id: TranscriptPageIdentity.entryID(record: 3, part: 0),
-                                                        content: .assistantMessage("Done."), timestamp: nil, startsTurn: true),
-                                    in: conversation)
+        store.toggleMessageBookmark(
+            on: TranscriptEntry(
+                id: TranscriptPageIdentity.entryID(record: 3, part: 0),
+                content: .assistantMessage("Done."), timestamp: nil, startsTurn: true),
+            in: conversation)
         let saved = MessageBookmarks.load(from: isolatedUserDefaults.userDefaults)
 
         store.setArchived(true, conversations: [conversation])

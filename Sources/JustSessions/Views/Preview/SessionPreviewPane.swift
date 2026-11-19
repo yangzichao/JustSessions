@@ -44,7 +44,7 @@ struct SessionPreviewPane: View {
                         },
                         store: store
                     )
-                        .id(conversation.id)
+                    .id(conversation.id)
                 }
             } else if store.isScanningThisMac && store.conversations.isEmpty {
                 ContentUnavailableView("Scanning conversations", systemImage: "magnifyingglass")

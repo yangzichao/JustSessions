@@ -2,6 +2,7 @@ import AppKit
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A tab's terminal, drawn by either engine, in a window that is never shown, with the keyboard, running a process that

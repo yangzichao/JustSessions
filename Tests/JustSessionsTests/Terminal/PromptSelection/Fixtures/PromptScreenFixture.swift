@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// A CLI's screen captured with text typed in its prompt: what `tmux capture-pane` read, with the cursor it reported.

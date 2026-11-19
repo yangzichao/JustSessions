@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The sync on its own; `DetachedCLIActivityTmuxTests` runs it against a real tmux server. It finds a tab's CLI by its
@@ -124,7 +125,8 @@ struct CLIActivitySyncTests {
         ClaudeLiveSessionRegistry(configurationDirectory: directory.appendingPathComponent("claude"))
     }
 
-    private static func claudeRegistry(in directory: URL, record: String, forProcessID processID: Int32) throws -> ClaudeLiveSessionRegistry {
+    private static func claudeRegistry(in directory: URL, record: String, forProcessID processID: Int32) throws -> ClaudeLiveSessionRegistry
+    {
         let registry = emptyClaudeRegistry(in: directory)
         try FileManager.default.createDirectory(at: registry.sessionsDirectory, withIntermediateDirectories: true)
         try record.write(to: registry.sessionsDirectory.appendingPathComponent("\(processID).json"), atomically: true, encoding: .utf8)

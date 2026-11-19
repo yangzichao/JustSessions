@@ -29,7 +29,8 @@ struct PackageResourcesContractTests {
         if let enumerator = FileManager.default.enumerator(at: resource, includingPropertiesForKeys: [.isSymbolicLinkKey]) {
             items += enumerator.compactMap { $0 as? URL }
         }
-        return items
+        return
+            items
             .filter { (try? $0.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) == true }
             .map(\.path)
     }

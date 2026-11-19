@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A session or open tab dragged from the sidebar onto the terminals shows there as a tab dragged from the tab bar

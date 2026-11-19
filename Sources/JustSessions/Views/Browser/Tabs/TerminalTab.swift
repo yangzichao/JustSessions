@@ -116,10 +116,10 @@ struct TerminalTab: View {
     }
 }
 
-private extension View {
+extension View {
     /// Replaces the view's accessibility label with `label`, or leaves it as it is when there is none.
     @ViewBuilder
-    func accessibilityLabel(replacingWith label: Text?) -> some View {
+    fileprivate func accessibilityLabel(replacingWith label: Text?) -> some View {
         if let label {
             accessibilityLabel(label)
         } else {

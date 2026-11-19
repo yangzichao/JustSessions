@@ -10,10 +10,11 @@ struct PiSubagentSession: Sendable, Codable {
     /// Nil for a file that is not a Pi session, such as an extension's own transcript of a run.
     init?(file: URL) {
         guard let header = ConversationMetadata.firstLine(of: file),
-              header["type"] as? String == "session",
-              let sessionID = header["id"] as? String,
-              ConversationMetadata.isValidSessionID(sessionID),
-              let projectPath = header["cwd"] as? String, projectPath.hasPrefix("/") else { return nil }
+            header["type"] as? String == "session",
+            let sessionID = header["id"] as? String,
+            ConversationMetadata.isValidSessionID(sessionID),
+            let projectPath = header["cwd"] as? String, projectPath.hasPrefix("/")
+        else { return nil }
         self.sessionID = sessionID
         self.projectPath = projectPath
         // A fork opens with the history of the session it came from, so its own task is its latest prompt.
@@ -53,11 +54,12 @@ enum PiSubagentSessions {
         into found: inout [Found]
     ) {
         guard depth < maximumFolderDepth,
-              let entries = try? FileManager.default.contentsOfDirectory(
-                  at: folder,
-                  includingPropertiesForKeys: [.isRegularFileKey, .isDirectoryKey, .contentModificationDateKey, .fileSizeKey],
-                  options: [.skipsHiddenFiles]
-              ) else { return }
+            let entries = try? FileManager.default.contentsOfDirectory(
+                at: folder,
+                includingPropertiesForKeys: [.isRegularFileKey, .isDirectoryKey, .contentModificationDateKey, .fileSizeKey],
+                options: [.skipsHiddenFiles]
+            )
+        else { return }
         // Each session's folder is named after its file, without `.jsonl`.
         var sessionIDsByFolderName: [String: String] = [:]
         for file in entries where file.pathExtension == "jsonl" && isRegularFile(file) {

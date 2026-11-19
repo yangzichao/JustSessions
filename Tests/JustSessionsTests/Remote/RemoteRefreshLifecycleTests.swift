@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -20,9 +21,11 @@ struct RemoteRefreshLifecycleTests {
         let probes = RemoteRefreshProbeCount()
         let home = sandbox.root.appendingPathComponent("home")
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
-        let mirror = RemoteSessionMirror(cacheRoot: sandbox.root.appendingPathComponent("cache"), sourceHomeOverride: home.path,
-                                         toolFoldersLookup: { _ in pause.read() })
-        let task = try #require(store.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: mirror, status: { _ in probes.read() })))
+        let mirror = RemoteSessionMirror(
+            cacheRoot: sandbox.root.appendingPathComponent("cache"), sourceHomeOverride: home.path,
+            toolFoldersLookup: { _ in pause.read() })
+        let task = try #require(
+            store.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: mirror, status: { _ in probes.read() })))
         try await expectEventually { pause.isWaiting }
 
         store.disconnectHost("devbox", endingTmuxSessions: false, connections: SSHLoginConnections(close: { _, _ in }))
@@ -52,7 +55,8 @@ struct RemoteRefreshLifecycleTests {
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
         let cache = sandbox.root.appendingPathComponent("cache")
         let oldMirror = RemoteSessionMirror(cacheRoot: cache, sourceHomeOverride: home.path, toolFoldersLookup: { _ in pause.read() })
-        let task = try #require(store.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: oldMirror, status: { _ in probes.read() })))
+        let task = try #require(
+            store.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: oldMirror, status: { _ in probes.read() })))
         try await expectEventually { pause.isWaiting }
 
         store.removeRemoteHost("devbox", mirror: oldMirror)
@@ -63,11 +67,14 @@ struct RemoteRefreshLifecycleTests {
         try #"{"type":"user","cwd":"/srv/new","message":{"content":"New copy"}}"#.appending("\n")
             .write(to: project.appendingPathComponent("\(id).jsonl"), atomically: true, encoding: .utf8)
         let mirror = RemoteSessionMirror(cacheRoot: cache, sourceHomeOverride: home.path)
-        store.remoteSessionDiscovery = RemoteSessionDiscovery(mirror: mirror, status: { _ in RemoteHostStatus(tmuxSessionNames: [], cliLocations: [:]) })
+        store.remoteSessionDiscovery = RemoteSessionDiscovery(
+            mirror: mirror, status: { _ in RemoteHostStatus(tmuxSessionNames: [], cliLocations: [:]) })
         #expect(store.addRemoteHost("devbox"))
         pause.release()
         await task.value
-        try await expectEventually { store.conversations.contains { $0.sessionID == id } && store.hostRefreshStatuses[.ssh("devbox")] != .refreshing }
+        try await expectEventually {
+            store.conversations.contains { $0.sessionID == id } && store.hostRefreshStatuses[.ssh("devbox")] != .refreshing
+        }
 
         #expect(probes.count == 0)
         let copied = store.conversations.filter { $0.host == .ssh("devbox") }
@@ -95,20 +102,23 @@ struct RemoteRefreshLifecycleTests {
         let recorder = RemoteCommandRecorder()
         let conversation = Conversation.fixture(sourceFile: root.appendingPathComponent("old.jsonl"), host: .ssh("devbox"))
         func makeStore() -> ConversationStore {
-            let store = ConversationStore(adapters: [StaticConversationAdapter(discoveredConversations: [])],
-                                          userDefaults: settings.userDefaults, windowRegistry: registry,
-                                          remoteDeletion: RemoteConversationDeletion(runner: recorder.runner(answering: (0, ""))),
-                                          remoteShellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in nil }), startsBackgroundPolling: false)
+            let store = ConversationStore(
+                adapters: [StaticConversationAdapter(discoveredConversations: [])],
+                userDefaults: settings.userDefaults, windowRegistry: registry,
+                remoteDeletion: RemoteConversationDeletion(runner: recorder.runner(answering: (0, ""))),
+                remoteShellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in nil }), startsBackgroundPolling: false)
             store.remoteHostList = RemoteHostList(hosts: ["devbox"])
             store.replaceConversations(on: .ssh("devbox"), with: [conversation])
             return store
         }
-        let first = makeStore(), second = makeStore()
+        let first = makeStore()
+        let second = makeStore()
         let pause = PausedRemoteFolders()
         defer { pause.release() }
         let home = root.appendingPathComponent("home")
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
-        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: home.path, toolFoldersLookup: { _ in pause.read() })
+        let mirror = RemoteSessionMirror(
+            cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: home.path, toolFoldersLookup: { _ in pause.read() })
         let task = try #require(first.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: mirror, status: { _ in nil })))
         try await expectEventually { pause.isWaiting }
         second.deleteConversations([conversation])

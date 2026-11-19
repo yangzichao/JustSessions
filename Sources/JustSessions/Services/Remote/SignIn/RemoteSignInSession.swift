@@ -23,7 +23,8 @@ struct RemoteSignInSession: Sendable {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/usr/bin/ssh")
             let startup = RemoteHostShellStartups.shared.startup(on: host)
-            process.arguments = ["-tt", "-o", "BatchMode=yes", "-o", "LogLevel=ERROR"]
+            process.arguments =
+                ["-tt", "-o", "BatchMode=yes", "-o", "LogLevel=ERROR"]
                 + RemoteHostCommandRunner.connectionSettingOptions
                 + SSHLoginConnections.shared.connectionOptions(for: host)
                 + [host, startup.command(running: command)]
@@ -120,7 +121,8 @@ struct RemoteSignInSession: Sendable {
                     try? input.fileHandleForWriting.write(contentsOf: Data((answer + "\n").utf8))
                 }
             } else if let prompt = snapshot.output.question,
-                      clock.now - snapshot.lastOutputAt >= (snapshot.output.endsMidLine ? timing.promptPause : timing.linePause) {
+                clock.now - snapshot.lastOutputAt >= (snapshot.output.endsMidLine ? timing.promptPause : timing.linePause)
+            {
                 let signInQuestion = SSHAskpassQuestion(
                     signInOn: host,
                     prompt: prompt,

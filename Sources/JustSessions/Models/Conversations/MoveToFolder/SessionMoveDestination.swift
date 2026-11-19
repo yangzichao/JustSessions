@@ -22,7 +22,8 @@ struct SessionMoveDestination: Identifiable, Equatable {
     ) -> [SessionMoveDestination] {
         let projectsOnHost = projects.filter { $0.host == conversation.host }
         let parentLabels = ProjectParentLabels(projectsOnOneHost: projectsOnHost)
-        return projectsOnHost
+        return
+            projectsOnHost
             .filter { $0.projectPath != conversation.projectDirectoryKey && $0.canStartNewSession }
             .map { project in
                 SessionMoveDestination(

@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 struct WaitingForYouTests {
@@ -20,8 +21,9 @@ struct WaitingForYouTests {
     }
 
     @Test func tellsWhyACLIWaitsOnYou() {
-        #expect(WaitingForYou.reason(activity: .needsInput(reason: "input needed"), hasUnseenFinishedTurn: true)
-            == .needsInput(reason: "input needed"))
+        #expect(
+            WaitingForYou.reason(activity: .needsInput(reason: "input needed"), hasUnseenFinishedTurn: true)
+                == .needsInput(reason: "input needed"))
         #expect(WaitingForYou.reason(activity: .idle, hasUnseenFinishedTurn: true) == .finishedTurn)
         #expect(WaitingForYou.reason(activity: nil, hasUnseenFinishedTurn: true) == .finishedTurn)
         #expect(WaitingForYou.reason(activity: .idle, hasUnseenFinishedTurn: false) == nil)

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct CrashReportSummaryTests {
@@ -12,37 +13,42 @@ struct CrashReportSummaryTests {
         #expect(summary.exception == "EXC_BREAKPOINT (SIGTRAP)")
         #expect(summary.crashMessages.isEmpty)
         #expect(summary.crashedThreadQueue == "com.apple.root.user-initiated-qos")
-        #expect(summary.crashedThreadFrames == [
-            "0  libswiftCore.dylib  _assertionFailure(_:_:file:line:flags:)",
-            "1  JustSessions  ConversationStore.removeDeletedConversations(_:) (ConversationStore.swift:494)",
-            "2  JustSessions  0x2000",
-            "3  ???  0x10",
-        ])
+        #expect(
+            summary.crashedThreadFrames == [
+                "0  libswiftCore.dylib  _assertionFailure(_:_:file:line:flags:)",
+                "1  JustSessions  ConversationStore.removeDeletedConversations(_:) (ConversationStore.swift:494)",
+                "2  JustSessions  0x2000",
+                "3  ???  0x10",
+            ])
         #expect(summary.lastExceptionFrames.isEmpty)
         #expect(!summary.crashedThreadFrames.contains { $0.contains("/Users/") })
     }
 
     @Test func anObjectiveCExceptionKeepsWhereItWasRaisedAndWhatTheLibrariesSaid() throws {
-        let summary = try #require(CrashReportSummary(
-            reportText: CrashReportSamples.reportText(body: CrashReportSamples.objectiveCExceptionBody())
-        ))
+        let summary = try #require(
+            CrashReportSummary(
+                reportText: CrashReportSamples.reportText(body: CrashReportSamples.objectiveCExceptionBody())
+            ))
 
         #expect(summary.exception == "EXC_CRASH (SIGABRT)")
-        #expect(summary.crashMessages == [
-            "CoreFoundation: *** -[__NSArrayM objectAtIndex:]: index 3 beyond bounds [0 .. 2]",
-            "libsystem_c.dylib: abort() called",
-        ])
+        #expect(
+            summary.crashMessages == [
+                "CoreFoundation: *** -[__NSArrayM objectAtIndex:]: index 3 beyond bounds [0 .. 2]",
+                "libsystem_c.dylib: abort() called",
+            ])
         #expect(summary.crashedThreadQueue == "com.apple.main-thread")
         #expect(summary.crashedThreadFrames == ["0  libsystem_kernel.dylib  __pthread_kill", "1  libsystem_c.dylib  abort"])
-        #expect(summary.lastExceptionFrames == [
-            "0  CoreFoundation  __exceptionPreprocess",
-            "1  libobjc.A.dylib  objc_exception_throw",
-            "2  AppKit  -[NSTableRowData _availableRowViewWhileUpdatingAtRow:]",
-        ])
+        #expect(
+            summary.lastExceptionFrames == [
+                "0  CoreFoundation  __exceptionPreprocess",
+                "1  libobjc.A.dylib  objc_exception_throw",
+                "2  AppKit  -[NSTableRowData _availableRowViewWhileUpdatingAtRow:]",
+            ])
     }
 
     @Test func aBuildWithTheSameVersionAndBuildNumberShowsTheVersionOnce() throws {
-        let summary = try #require(CrashReportSummary(reportText: CrashReportSamples.reportText(appVersion: "1.0.5", buildVersion: "1.0.5")))
+        let summary = try #require(
+            CrashReportSummary(reportText: CrashReportSamples.reportText(appVersion: "1.0.5", buildVersion: "1.0.5")))
         #expect(summary.appVersion == "1.0.5")
     }
 
@@ -72,9 +78,11 @@ struct CrashReportSummaryTests {
     }
 
     @Test func longBacktracesKeepTheInnermostFramesEachOnOneShortLine() throws {
-        let summary = try #require(CrashReportSummary(reportText: CrashReportSamples.reportText(
-            body: CrashReportSamples.longBacktraceBody(frameCount: 40, symbolLength: 400)
-        )))
+        let summary = try #require(
+            CrashReportSummary(
+                reportText: CrashReportSamples.reportText(
+                    body: CrashReportSamples.longBacktraceBody(frameCount: 40, symbolLength: 400)
+                )))
 
         for frames in [summary.crashedThreadFrames, summary.lastExceptionFrames] {
             #expect(frames.count == CrashReportSummary.maximumFramesPerBacktrace)

@@ -20,14 +20,15 @@ struct HardWrappedLink {
         let screenRows = rows.map(TerminalScreenRow.init)
         let clickedRow = screenRows[row]
         guard let clickedIndex = clickedRow.characterIndex(atColumn: column),
-              let clickedWord = clickedRow.wordRange(around: clickedIndex)
+            let clickedWord = clickedRow.wordRange(around: clickedIndex)
         else { return nil }
 
         var prefix: [Character] = []
         var rowAbove = row
         var wordStartsItsRow = clickedWord.lowerBound == clickedRow.firstTextIndex
         while wordStartsItsRow, rowAbove > 0, Self.runsToEdge(screenRows[rowAbove - 1], columns: columns),
-              let lastWord = screenRows[rowAbove - 1].lastWordRange {
+            let lastWord = screenRows[rowAbove - 1].lastWordRange
+        {
             rowAbove -= 1
             prefix = Array(screenRows[rowAbove].characters[lastWord]) + prefix
             wordStartsItsRow = lastWord.lowerBound == screenRows[rowAbove].firstTextIndex
@@ -37,7 +38,8 @@ struct HardWrappedLink {
         var rowBelow = row
         var wordEndsItsRow = clickedWord.upperBound - 1 == clickedRow.lastTextIndex
         while wordEndsItsRow, Self.runsToEdge(screenRows[rowBelow], columns: columns), rowBelow + 1 < screenRows.count,
-              let firstWord = screenRows[rowBelow + 1].firstWordRange {
+            let firstWord = screenRows[rowBelow + 1].firstWordRange
+        {
             rowBelow += 1
             suffix += screenRows[rowBelow].characters[firstWord]
             wordEndsItsRow = firstWord.upperBound - 1 == screenRows[rowBelow].lastTextIndex
@@ -47,7 +49,7 @@ struct HardWrappedLink {
         let joinedWord = prefix + clickedPart + suffix
         let clickedOffset = prefix.count + clickedIndex - clickedWord.lowerBound
         guard let linkRange = JoinedWordLink.linkRange(in: joinedWord, holding: clickedOffset),
-              linkRange.lowerBound < prefix.count || linkRange.upperBound > prefix.count + clickedPart.count
+            linkRange.lowerBound < prefix.count || linkRange.upperBound > prefix.count + clickedPart.count
         else { return nil }
         text = String(joinedWord[linkRange])
         clickedRowText = rows[row]

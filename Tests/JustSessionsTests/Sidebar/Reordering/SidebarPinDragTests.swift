@@ -1,5 +1,6 @@
 import CoreGraphics
 import Testing
+
 @testable import JustSessions
 
 /// Rows 30 points tall, 1 apart, so row n spans 31n to 31n + 30 and its middle is at 31n + 15.
@@ -139,8 +140,9 @@ struct SidebarPinDragTests {
     }
 
     private func frames(for rowIDs: [String]) -> [String: CGRect] {
-        Dictionary(uniqueKeysWithValues: rowIDs.enumerated().map { index, rowID in
-            (rowID, CGRect(x: 0, y: CGFloat(index) * 31, width: 200, height: 30))
-        })
+        Dictionary(
+            uniqueKeysWithValues: rowIDs.enumerated().map { index, rowID in
+                (rowID, CGRect(x: 0, y: CGFloat(index) * 31, width: 200, height: 30))
+            })
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ClaudeSessionFileLocatorTests {
@@ -19,8 +20,9 @@ struct ClaudeSessionFileLocatorTests {
         let transcript = project.appendingPathComponent("\(Self.sessionID).jsonl")
         try "{}".write(to: transcript, atomically: true, encoding: .utf8)
         #expect(locator.transcriptFile(forSessionID: Self.sessionID)?.lastPathComponent == transcript.lastPathComponent)
-        #expect(locator.transcriptFile(forSessionID: Self.sessionID)?.deletingLastPathComponent().lastPathComponent
-            == "-Users-example-project")
+        #expect(
+            locator.transcriptFile(forSessionID: Self.sessionID)?.deletingLastPathComponent().lastPathComponent
+                == "-Users-example-project")
     }
 
     @Test func rejectsInvalidSessionIDsAndMissingProjectsDirectory() {

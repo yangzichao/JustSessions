@@ -3,12 +3,14 @@ extension TerminalPalette {
     /// and selection colors stay as they are.
     func withANSIColorIntensity(percent: Int) -> TerminalPalette {
         guard percent != TerminalColorIntensity.defaultPercent else { return self }
-        return TerminalPalette(background: background, scheme: TerminalColorScheme(
-            foreground: scheme.foreground,
-            selectionBackground: scheme.selectionBackground,
-            selectionForeground: scheme.selectionForeground,
-            ansiHexColors: scheme.ansiHexColors.map { TerminalColorIntensity.adjusted($0, percent: percent) }
-        ))
+        return TerminalPalette(
+            background: background,
+            scheme: TerminalColorScheme(
+                foreground: scheme.foreground,
+                selectionBackground: scheme.selectionBackground,
+                selectionForeground: scheme.selectionForeground,
+                ansiHexColors: scheme.ansiHexColors.map { TerminalColorIntensity.adjusted($0, percent: percent) }
+            ))
     }
 }
 

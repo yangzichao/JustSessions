@@ -19,7 +19,9 @@ struct TranscriptBookmarkMenu: View {
         Menu {
             if bookmarks.isEmpty { Text("No bookmarks in this conversation") }
             ForEach(bookmarks, id: \.letter) { bookmark in
-                Button { onGoTo(bookmark) } label: {
+                Button {
+                    onGoTo(bookmark)
+                } label: {
                     // A label names the bookmark; without one, who wrote the message and its first words do.
                     if bookmark.label != nil {
                         Text(verbatim: menuTitle(of: bookmark))
@@ -43,7 +45,7 @@ struct TranscriptBookmarkMenu: View {
             Image(systemName: bookmarks.isEmpty ? "bookmark" : "bookmark.fill")
                 .frame(width: InterfaceScale.points(24), height: InterfaceScale.points(24))
         }
-        .menuStyle(.borderlessButton)   // as SessionPreviewHeader's More actions menu
+        .menuStyle(.borderlessButton)  // as SessionPreviewHeader's More actions menu
         .menuIndicator(.hidden)
         .fixedSize()
         .help("Bookmarks (⌘D, ⌘', ⇧⌘')")
@@ -66,6 +68,7 @@ struct TranscriptBookmarkMenu: View {
     }
 
     private func speaker(of bookmark: MessageBookmark) -> String {
-        bookmark.kind == .user ? AppLocalization.string("You", language: AppInterfaceLanguage(identifier: locale.identifier)) : assistantName
+        bookmark.kind == .user
+            ? AppLocalization.string("You", language: AppInterfaceLanguage(identifier: locale.identifier)) : assistantName
     }
 }

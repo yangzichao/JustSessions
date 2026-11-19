@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs a tab's command as the host would, with this Mac's bash and zsh as the login shell, a home folder of the test's
@@ -90,17 +91,21 @@ struct RemoteCLIInvocationTests {
         let cli = installFolder.appendingPathComponent("claude")
         try writeExecutableScript("#!/bin/sh\npwd -P\necho \"${PATH%%:*}\"\nprintf '%s\\n' \"$@\"\n", to: cli)
 
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", RemoteCLICommandBuilder.remoteCommand(
-                provider: .claude,
-                projectPath: project.path,
-                arguments: ["--resume", "abc"],
-                cliLocation: .installed(path: cli.path)
-            )],
-            environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": "/usr/bin:/bin"],
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: [
+                    "-c",
+                    RemoteCLICommandBuilder.remoteCommand(
+                        provider: .claude,
+                        projectPath: project.path,
+                        arguments: ["--resume", "abc"],
+                        cliLocation: .installed(path: cli.path)
+                    ),
+                ],
+                environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": "/usr/bin:/bin"],
+                timeout: 10
+            ))
 
         let lines = output.split(separator: "\n").map(String.init)
         #expect(lines.first?.hasSuffix("/Bob's paper") == true)
@@ -115,17 +120,21 @@ struct RemoteCLIInvocationTests {
         try writeExecutableScript("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
         try writeExecutableScript("#!/bin/sh\necho started\n", to: bin.appendingPathComponent("claude"))
 
-        let result = try #require(BoundedProcessRunner.result(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", RemoteCLICommandBuilder.remoteCommand(
-                provider: .claude,
-                projectPath: root.appendingPathComponent("gone").path,
-                arguments: []
-            )],
-            environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": "\(bin.path):/usr/bin:/bin"],
-            includesStandardError: true,
-            timeout: 10
-        ))
+        let result = try #require(
+            BoundedProcessRunner.result(
+                ofExecutable: "/bin/sh",
+                arguments: [
+                    "-c",
+                    RemoteCLICommandBuilder.remoteCommand(
+                        provider: .claude,
+                        projectPath: root.appendingPathComponent("gone").path,
+                        arguments: []
+                    ),
+                ],
+                environment: ["SHELL": bin.appendingPathComponent("login-shell").path, "PATH": "\(bin.path):/usr/bin:/bin"],
+                includesStandardError: true,
+                timeout: 10
+            ))
 
         #expect(result.exitStatus != 0)
         #expect(!result.output.contains("started"))
@@ -168,11 +177,14 @@ struct RemoteCLIInvocationTests {
 
         _ = BoundedProcessRunner.output(
             ofExecutable: "/bin/sh",
-            arguments: ["-c", RemoteCLICommandBuilder.remoteCommand(
-                provider: .claude,
-                projectPath: project.path,
-                arguments: ["--resume", "id with space"]
-            )],
+            arguments: [
+                "-c",
+                RemoteCLICommandBuilder.remoteCommand(
+                    provider: .claude,
+                    projectPath: project.path,
+                    arguments: ["--resume", "id with space"]
+                ),
+            ],
             environment: [
                 "HOME": home.path,
                 "ZDOTDIR": home.path,
@@ -184,7 +196,8 @@ struct RemoteCLIInvocationTests {
         )
 
         let lines = try String(contentsOf: record, encoding: .utf8).split(separator: "\n").map(String.init)
-        let programsRunBesideTheCLI = (try? String(contentsOf: programsRun, encoding: .utf8))?
+        let programsRunBesideTheCLI =
+            (try? String(contentsOf: programsRun, encoding: .utf8))?
             .split(separator: "\n").map(String.init) ?? []
         return Launch(
             arguments: Array(lines.dropFirst()),

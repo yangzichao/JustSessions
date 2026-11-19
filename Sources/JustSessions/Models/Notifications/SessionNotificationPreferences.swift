@@ -16,7 +16,8 @@ struct SessionNotificationPreferences: Codable, Equatable {
 
     static func load(from userDefaults: UserDefaults) -> Self {
         guard let data = userDefaults.data(forKey: userDefaultsKey),
-              let preferences = try? JSONDecoder().decode(Self.self, from: data) else { return Self() }
+            let preferences = try? JSONDecoder().decode(Self.self, from: data)
+        else { return Self() }
         return preferences
     }
 

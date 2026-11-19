@@ -13,28 +13,29 @@ struct RemoteHostCommandRunner: Sendable {
         cancelsWithTask: Bool = false,
         run: (@Sendable (_ host: String, _ command: String, _ timeout: TimeInterval) -> (exitStatus: Int32, output: String)?)? = nil
     ) {
-        self.run = run ?? { host, command, timeout in
-            if cancelsWithTask, Task.isCancelled { return nil }
-            if let failureOutput = reachability.recentFailureOutput(on: host) {
-                return (Self.connectionFailureExitStatus, failureOutput)
+        self.run =
+            run ?? { host, command, timeout in
+                if cancelsWithTask, Task.isCancelled { return nil }
+                if let failureOutput = reachability.recentFailureOutput(on: host) {
+                    return (Self.connectionFailureExitStatus, failureOutput)
+                }
+                let result = BoundedProcessRunner.result(
+                    ofExecutable: "/usr/bin/ssh",
+                    arguments: Self.sshArguments(
+                        host: host,
+                        command: command,
+                        connectionSharingOptions: connectionSharingOptions.isEmpty
+                            ? SSHLoginConnections.shared.connectionOptions(for: host)
+                            : connectionSharingOptions
+                    ),
+                    environment: SSHProcessEnvironment.standard,
+                    includesStandardError: true,
+                    timeout: timeout,
+                    cancelsWithTask: cancelsWithTask
+                )
+                if let result { reachability.noteResult(exitStatus: result.exitStatus, output: result.output, on: host) }
+                return result
             }
-            let result = BoundedProcessRunner.result(
-                ofExecutable: "/usr/bin/ssh",
-                arguments: Self.sshArguments(
-                    host: host,
-                    command: command,
-                    connectionSharingOptions: connectionSharingOptions.isEmpty
-                        ? SSHLoginConnections.shared.connectionOptions(for: host)
-                        : connectionSharingOptions
-                ),
-                environment: SSHProcessEnvironment.standard,
-                includesStandardError: true,
-                timeout: timeout,
-                cancelsWithTask: cancelsWithTask
-            )
-            if let result { reachability.noteResult(exitStatus: result.exitStatus, output: result.output, on: host) }
-            return result
-        }
     }
 
     /// The `ssh` options of every connection made without a terminal, the `rsync` copies' included. A host that

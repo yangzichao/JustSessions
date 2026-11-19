@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// An OpenCode data folder with one session to delete and one to keep, and a stand-in `opencode` CLI.
@@ -55,8 +56,9 @@ struct OpenCodeDeletionFixture {
     }
 
     func selectedConversation() throws -> Conversation {
-        guard let conversation = try OpenCodeAdapter(databaseFile: database.file).discover()
-            .first(where: { $0.sessionID == Self.selectedSessionID })
+        guard
+            let conversation = try OpenCodeAdapter(databaseFile: database.file).discover()
+                .first(where: { $0.sessionID == Self.selectedSessionID })
         else { throw NSError(domain: "OpenCodeDeletionFixture", code: 1) }
         return conversation
     }

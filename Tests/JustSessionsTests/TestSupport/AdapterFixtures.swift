@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Each tool's adapter, reading from a folder that does not exist, for tests of the arguments it starts its CLI with.

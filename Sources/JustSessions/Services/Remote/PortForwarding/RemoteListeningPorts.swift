@@ -46,7 +46,8 @@ enum RemoteListeningPorts {
     /// Asks the host; nil when it can't be reached or the answer was cut off. Blocks; call it off the main thread.
     static func lookUp(on host: String, runner: RemoteHostCommandRunner = RemoteHostCommandRunner()) -> Listing? {
         guard let result = runner.run(host, command(on: host), 15),
-              result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus else { return nil }
+            result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus
+        else { return nil }
         return listing(inOutput: result.output)
     }
 
@@ -63,22 +64,24 @@ enum RemoteListeningPorts {
                 continue
             }
             let fields = line.split(whereSeparator: \.isWhitespace).map(String.init)
-            let found: (port: Int, programName: String?)? = switch section {
-            case "ss": portInSSLine(fields, line: line)
-            case "proc": portInProcLine(fields)
-            case "netstat": portInNetstatLine(fields)
-            case "lsof": portInLsofLine(fields)
-            default: nil
-            }
+            let found: (port: Int, programName: String?)? =
+                switch section {
+                case "ss": portInSSLine(fields, line: line)
+                case "proc": portInProcLine(fields)
+                case "netstat": portInNetstatLine(fields)
+                case "lsof": portInLsofLine(fields)
+                default: nil
+                }
             guard let found else { continue }
             if programNamesByPort[found.port] == nil || programNamesByPort[found.port] == .some(nil) {
                 programNamesByPort[found.port] = found.programName
             }
         }
         guard foundTool else { return .noTool }
-        return .listed(programNamesByPort.keys.sorted().map {
-            RemoteListeningPort(port: $0, programName: programNamesByPort[$0] ?? nil)
-        })
+        return .listed(
+            programNamesByPort.keys.sorted().map {
+                RemoteListeningPort(port: $0, programName: programNamesByPort[$0] ?? nil)
+            })
     }
 
     // MARK: - Each tool's lines
@@ -87,7 +90,8 @@ enum RemoteListeningPorts {
     /// port; the peer's port is `*`.
     private static func portInSSLine(_ fields: [String], line: String) -> (port: Int, programName: String?)? {
         guard let address = fields.lazy.compactMap({ splitAddress($0, separator: ":") }).first,
-              reachesLocalhost(address.host) else { return nil }
+            reachesLocalhost(address.host)
+        else { return nil }
         return (address.port, programName(inSSLine: line))
     }
 
@@ -96,23 +100,26 @@ enum RemoteListeningPorts {
         guard fields.count > 3, fields[3] == "0A" else { return nil }
         let parts = fields[1].split(separator: ":")
         guard parts.count == 2, let port = Int(parts[1], radix: 16),
-              procLocalhostAddresses.contains(parts[0].uppercased()) else { return nil }
+            procLocalhostAddresses.contains(parts[0].uppercased())
+        else { return nil }
         return (port, nil)
     }
 
     /// macOS: `tcp4 0 0 127.0.0.1.8080 *.* LISTEN`.
     private static func portInNetstatLine(_ fields: [String]) -> (port: Int, programName: String?)? {
         guard fields.count > 5, fields[0].hasPrefix("tcp"), fields.contains("LISTEN"),
-              let address = splitAddress(fields[3], separator: ":") ?? splitAddress(fields[3], separator: "."),
-              reachesLocalhost(address.host) else { return nil }
+            let address = splitAddress(fields[3], separator: ":") ?? splitAddress(fields[3], separator: "."),
+            reachesLocalhost(address.host)
+        else { return nil }
         return (address.port, nil)
     }
 
     /// `python3 2727 me 3u IPv4 787055 0t0 TCP 127.0.0.1:8080 (LISTEN)`.
     private static func portInLsofLine(_ fields: [String]) -> (port: Int, programName: String?)? {
         guard fields.count > 2, fields.last == "(LISTEN)",
-              let address = splitAddress(fields[fields.count - 2], separator: ":"),
-              reachesLocalhost(address.host) else { return nil }
+            let address = splitAddress(fields[fields.count - 2], separator: ":"),
+            reachesLocalhost(address.host)
+        else { return nil }
         // lsof writes a space in a program's name as `\x20`.
         return (address.port, fields[0].replacingOccurrences(of: "\\x20", with: " "))
     }
@@ -122,7 +129,8 @@ enum RemoteListeningPorts {
     /// The address and port of `127.0.0.1:8080`, `[::1]:8080`, `*:22`, or, with `.`, macOS's `127.0.0.1.8080`.
     private static func splitAddress(_ field: String, separator: Character) -> (host: String, port: Int)? {
         guard let index = field.lastIndex(of: separator),
-              let port = Int(field[field.index(after: index)...]), SSHPortForward.validPorts.contains(port) else { return nil }
+            let port = Int(field[field.index(after: index)...]), SSHPortForward.validPorts.contains(port)
+        else { return nil }
         return (String(field[..<index]), port)
     }
 

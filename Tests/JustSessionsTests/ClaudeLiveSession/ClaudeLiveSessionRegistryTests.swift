@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct ClaudeLiveSessionRegistryTests {
@@ -8,10 +9,10 @@ struct ClaudeLiveSessionRegistryTests {
     @Test func readsTheNameChosenWithRename() throws {
         // Shape copied from a real `~/.claude/sessions/<pid>.json` written by Claude Code 2.1.281 after `/rename`.
         let json = """
-        {"pid":14821,"sessionId":"\(Self.sessionID)","cwd":"/Users/example/project","startedAt":1790264417562,\
-        "version":"2.1.281","kind":"interactive","entrypoint":"cli","name":"fix-terminal-color-environment",\
-        "nameSource":"user","nameSince":1790264423665,"status":"busy","updatedAt":1790264450064}
-        """
+            {"pid":14821,"sessionId":"\(Self.sessionID)","cwd":"/Users/example/project","startedAt":1790264417562,\
+            "version":"2.1.281","kind":"interactive","entrypoint":"cli","name":"fix-terminal-color-environment",\
+            "nameSource":"user","nameSince":1790264423665,"status":"busy","updatedAt":1790264450064}
+            """
 
         let record = try #require(ClaudeLiveSessionRecord(jsonData: Data(json.utf8)))
 

@@ -33,7 +33,7 @@ struct RemoteShellStartupChecks: Equatable {
 
     static func load(from userDefaults: UserDefaults) -> RemoteShellStartupChecks {
         guard let data = userDefaults.data(forKey: userDefaultsKey),
-              let resultsByHost = try? JSONDecoder().decode([String: RemoteShellStartupCheckResult].self, from: data)
+            let resultsByHost = try? JSONDecoder().decode([String: RemoteShellStartupCheckResult].self, from: data)
         else { return RemoteShellStartupChecks() }
         return RemoteShellStartupChecks(resultsByHost: resultsByHost)
     }

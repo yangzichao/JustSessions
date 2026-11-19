@@ -105,8 +105,8 @@ struct TerminalThemeReportRequestScanner {
     }
 }
 
-private extension UInt8 {
-    var isParameterByte: Bool {
+extension UInt8 {
+    fileprivate var isParameterByte: Bool {
         (UInt8(ascii: "0")...UInt8(ascii: "9")).contains(self) || self == UInt8(ascii: ";")
     }
 }

@@ -60,7 +60,7 @@ struct PiTranscriptReader {
                     )
                     builder.append(.toolCall, text: summary, timestamp: timestamp)
                 default:
-                    continue // Thinking blocks are left out of the preview.
+                    continue  // Thinking blocks are left out of the preview.
                 }
             }
             if message?.stopReason == "error" {
@@ -101,7 +101,8 @@ struct PiTranscriptReader {
         let skillPrefix = "<skill name=\""
         let skillEnd = "\n</skill>"
         guard text.hasPrefix(skillPrefix),
-              let blockEnd = text.range(of: skillEnd) else { return text }
+            let blockEnd = text.range(of: skillEnd)
+        else { return text }
         let skillName = text.dropFirst(skillPrefix.count).prefix { $0 != "\"" }
         let arguments = text[blockEnd.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
         let command = "/skill:\(skillName)"

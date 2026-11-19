@@ -34,7 +34,8 @@ final class SessionReadingWindowManager {
         }
         let navigation = navigation?.forNewWindow(bookmarks: bookmarks())
         let position = navigation?.entryID.map { TranscriptReadingPosition.entry(index: $0, offset: -6) } ?? initialPosition
-        let controller = SessionReadingWindowController(conversation: conversation, store: store, initialPosition: position) { [weak self] in
+        let controller = SessionReadingWindowController(conversation: conversation, store: store, initialPosition: position) {
+            [weak self] in
             self?.controllersByConversationID.removeValue(forKey: conversation.id)
         }
         controllersByConversationID[conversation.id] = controller

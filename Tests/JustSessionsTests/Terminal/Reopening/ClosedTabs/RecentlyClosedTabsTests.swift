@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The tabs closed in a window, the latest last, as Reopen Closed Tab takes them back.

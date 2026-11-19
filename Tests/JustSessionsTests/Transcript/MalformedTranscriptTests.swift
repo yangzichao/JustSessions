@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Session files are written by other programs, often while the preview reads them. Damaged or unexpected
@@ -25,7 +26,9 @@ struct MalformedTranscriptTests {
             var generator = SeededRandomNumberGenerator(seed: seed)
             var lines = reader.sampleLines.map { Data($0.utf8) }
             for _ in 0..<Int.random(in: 1...12, using: &generator) {
-                lines.insert(SampleTranscriptLines.unusable.randomElement(using: &generator)!, at: Int.random(in: 0...lines.count, using: &generator))
+                lines.insert(
+                    SampleTranscriptLines.unusable.randomElement(using: &generator)!, at: Int.random(in: 0...lines.count, using: &generator)
+                )
             }
 
             let transcript = try reader.read(SampleTranscriptLines.fileContents(lines), in: directory)
@@ -61,8 +64,9 @@ struct MalformedTranscriptTests {
             for (index, entry) in partialEntries.enumerated() {
                 let fullEntry = fullEntries[index]
                 if index == partialEntries.count - 1,
-                   case .toolCalls(let partialSummaries) = entry.content,
-                   case .toolCalls(let fullSummaries) = fullEntry.content {
+                    case .toolCalls(let partialSummaries) = entry.content,
+                    case .toolCalls(let fullSummaries) = fullEntry.content
+                {
                     #expect(Array(fullSummaries.prefix(partialSummaries.count)) == partialSummaries, "cut at \(cutOffset)")
                     #expect(entry.startsTurn == fullEntry.startsTurn, "cut at \(cutOffset)")
                 } else {
@@ -89,7 +93,8 @@ struct MalformedTranscriptTests {
     @Test func aToolCallWhoseArgumentsAreNotJSONStillNamesTheTool() throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
-        let line = #"{"timestamp":"2026-09-24T10:00:00.000Z","type":"response_item","payload":{"type":"function_call","name":"shell","arguments":"{not json"}}"#
+        let line =
+            #"{"timestamp":"2026-09-24T10:00:00.000Z","type":"response_item","payload":{"type":"function_call","name":"shell","arguments":"{not json"}}"#
 
         let transcript = try TranscriptFileReader.codex.read(SampleTranscriptLines.fileContents([line]), in: directory)
 

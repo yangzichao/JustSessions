@@ -14,10 +14,11 @@ struct JustSessionsGuideSection: Hashable, Sendable, Identifiable {
 
     /// The heading's anchor on GitHub: lowercase, without punctuation, with a hyphen for each space.
     var anchor: String {
-        String(heading.lowercased().compactMap { character -> Character? in
-            if character == " " { return "-" }
-            return character.isLetter || character.isNumber || character == "-" || character == "_" ? character : nil
-        })
+        String(
+            heading.lowercased().compactMap { character -> Character? in
+                if character == " " { return "-" }
+                return character.isLetter || character.isNumber || character == "-" || character == "_" ? character : nil
+            })
     }
 
     /// The section on GitHub, in the guides of `gitReference`; see `JustSessionsGuideText.gitReference(forAppVersion:)`.

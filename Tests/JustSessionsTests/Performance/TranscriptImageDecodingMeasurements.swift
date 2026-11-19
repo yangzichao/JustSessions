@@ -2,6 +2,7 @@ import AppKit
 import Darwin
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Measures decoding a transcript's images: opening one, two, or four readers of the same image-heavy session at once,
@@ -48,10 +49,11 @@ struct TranscriptImageDecodingMeasurements {
             Self.report("\(label), reopened after \(readerCount) reader(s) closed", reopening)
             reader.close()
             _ = try await Self.measureUntilSettled {}
-            perfReport("\(label), after \(readerCount) reader(s) and the reopened one closed", "memory footprint kept",
-                       ByteCountFormatter.string(fromByteCount: Self.physicalFootprint() - footprintBeforeOpening, countStyle: .memory))
+            perfReport(
+                "\(label), after \(readerCount) reader(s) and the reopened one closed", "memory footprint kept",
+                ByteCountFormatter.string(fromByteCount: Self.physicalFootprint() - footprintBeforeOpening, countStyle: .memory))
         }
-        #expect(Bool(true)) // Record-only: the numbers above are the result.
+        #expect(Bool(true))  // Record-only: the numbers above are the result.
     }
 
     struct Settling {
@@ -65,7 +67,8 @@ struct TranscriptImageDecodingMeasurements {
         perfReport(scenario, "time until settled", settling.time)
         perfReport(scenario, "CPU until settled", String(format: "%.0f ms", settling.cpuSeconds * 1_000))
         perfReport(scenario, "longest main-thread gap", settling.longestMainThreadGap)
-        perfReport(scenario, "memory footprint growth", ByteCountFormatter.string(fromByteCount: settling.footprintGrowth, countStyle: .memory))
+        perfReport(
+            scenario, "memory footprint growth", ByteCountFormatter.string(fromByteCount: settling.footprintGrowth, countStyle: .memory))
     }
 
     private static func measureUntilSettled(_ change: () -> Void) async throws -> Settling {
@@ -128,11 +131,13 @@ struct TranscriptImageDecodingMeasurements {
     private static func screenshots(count: Int) throws -> [Data] {
         var generator = SeededRandomNumberGenerator(seed: 62)
         return try (0..<count).map { index in
-            let width = 2880, height = 1800
-            let bitmap = try #require(NSBitmapImageRep(
-                bitmapDataPlanes: nil, pixelsWide: width, pixelsHigh: height, bitsPerSample: 8, samplesPerPixel: 4,
-                hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
-            ))
+            let width = 2880
+            let height = 1800
+            let bitmap = try #require(
+                NSBitmapImageRep(
+                    bitmapDataPlanes: nil, pixelsWide: width, pixelsHigh: height, bitsPerSample: 8, samplesPerPixel: 4,
+                    hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
+                ))
             NSGraphicsContext.saveGraphicsState()
             NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
             NSColor(white: 0.95, alpha: 1).setFill()
@@ -167,7 +172,9 @@ struct TranscriptImageDecodingMeasurements {
         var info = task_vm_info_data_t()
         var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<natural_t>.size)
         let result = withUnsafeMutablePointer(to: &info) {
-            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count) }
+            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count)
+            }
         }
         return result == KERN_SUCCESS ? Int64(info.phys_footprint) : 0
     }
@@ -187,10 +194,11 @@ private final class ImageReaderWindow {
         // Opens at the first entry, so the screenshots near the top are the ones in sight.
         let positionStore = TranscriptReadingPositionStore()
         positionStore.record(.entry(index: 0, offset: 0), for: conversation.id)
-        hostingView = NSHostingView(rootView: AnyView(
-            TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: positionStore)
-                .defaultAppStorage(settings.userDefaults)
-        ))
+        hostingView = NSHostingView(
+            rootView: AnyView(
+                TranscriptScrollView(conversation: conversation, transcript: transcript, positionStore: positionStore)
+                    .defaultAppStorage(settings.userDefaults)
+            ))
         window = NSWindow(
             contentRect: NSRect(x: 40 * offset, y: 40 * offset, width: 1000, height: 800),
             styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false

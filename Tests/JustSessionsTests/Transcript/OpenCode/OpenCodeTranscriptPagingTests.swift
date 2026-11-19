@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct OpenCodeTranscriptPagingTests {
@@ -11,9 +12,11 @@ struct OpenCodeTranscriptPagingTests {
         try database.addSession("ses_session0002")
         try database.addUserPrompt("msg_a", session: "ses_session0001", createdAt: 1, text: "First")
         try database.addMessage("msg_b", session: "ses_session0001", createdAt: 2, data: ["role": "assistant"])
-        try database.addPart("prt_b1", message: "msg_b", session: "ses_session0001", data: [
-            "type": "tool", "tool": "bash", "state": ["status": "completed", "input": ["command": "swift test"]],
-        ])
+        try database.addPart(
+            "prt_b1", message: "msg_b", session: "ses_session0001",
+            data: [
+                "type": "tool", "tool": "bash", "state": ["status": "completed", "input": ["command": "swift test"]],
+            ])
         try database.addPart("prt_b2", message: "msg_b", session: "ses_session0001", data: ["type": "text", "text": "Reply"])
         try database.addUserPrompt("msg_c", session: "ses_session0001", createdAt: 3, text: "Last kept")
         try database.addUserPrompt("msg_d", session: "ses_session0001", createdAt: 4, text: "Undone")
@@ -74,9 +77,10 @@ struct OpenCodeTranscriptPagingTests {
             [#"{"role":"assistant","error":{"name":"APIError","data":{"message":"Rate limited"}}}"#]
         )
 
-        #expect(try await source.read(.latest).entries.map(\.content) == [
-            .userMessage("Run it"), .assistantMessage("Running"), .note("Rate limited"),
-        ])
+        #expect(
+            try await source.read(.latest).entries.map(\.content) == [
+                .userMessage("Run it"), .assistantMessage("Running"), .note("Rate limited"),
+            ])
     }
 
     @Test func aSessionIsRequiredToPageOpenCodesDatabase() async throws {

@@ -30,7 +30,8 @@ enum SSHAskpassRelay {
     /// The answer typed or chosen in the app, or nil when it was cancelled or the app could not be reached.
     static func answer(to request: SSHAskpassRequest, socketPath: String) -> String? {
         guard let message = SSHAskpassMessageLine.encoded(request),
-              let socket = try? UnixStreamSocket(connectingTo: socketPath, timeout: answerTimeout) else { return nil }
+            let socket = try? UnixStreamSocket(connectingTo: socketPath, timeout: answerTimeout)
+        else { return nil }
         defer { socket.close() }
         do {
             try socket.write(message)

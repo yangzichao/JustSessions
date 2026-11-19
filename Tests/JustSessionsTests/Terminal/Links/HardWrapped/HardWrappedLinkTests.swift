@@ -1,4 +1,5 @@
 import Testing
+
 @testable import JustSessions
 
 /// A link a CLI broke over rows, found from the screen's text; see `HardWrappedLink`. Unless a test says otherwise,
@@ -35,8 +36,9 @@ struct HardWrappedLinkTests {
             "  th/to/page please",
         ]
 
-        #expect(link(in: rows, columns: rows[0].count + 1, row: 0, column: 10)
-            == "https://example.com/very/long/path/to/page")
+        #expect(
+            link(in: rows, columns: rows[0].count + 1, row: 0, column: 10)
+                == "https://example.com/very/long/path/to/page")
     }
 
     @Test func aRowEndingShortOfTheEdgeEndsTheLink() {

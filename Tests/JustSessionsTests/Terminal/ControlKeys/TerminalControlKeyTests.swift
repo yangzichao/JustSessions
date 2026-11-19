@@ -1,6 +1,7 @@
 import AppKit
 import Carbon.HIToolbox
 import Testing
+
 @testable import JustSessions
 
 /// Which keys with Control a tab sends itself, and what a SwiftTerm terminal without tmux sends for them; see
@@ -9,12 +10,13 @@ import Testing
 @Suite(.serialized)
 struct TerminalControlKeyTests {
     @Test func eachPressIsTheKeyItNames() {
-        #expect(ControlKeyPress.all.map { TerminalControlKey($0.event(windowNumber: 0)) } == [
-            .punctuationOrDigit("/"), .punctuationOrDigit("-"), .underscore, .punctuationOrDigit("7"), .punctuationOrDigit("2"),
-            .punctuationOrDigit("="), .returnKey(withShift: false), .returnKey(withShift: true), .backspace,
-            .bracketOrBackslash("["), .bracketOrBackslash("]"), .bracketOrBackslash("["), .bracketOrBackslash("\\"),
-            .punctuationOrDigit("."), .underscore, nil,
-        ])
+        #expect(
+            ControlKeyPress.all.map { TerminalControlKey($0.event(windowNumber: 0)) } == [
+                .punctuationOrDigit("/"), .punctuationOrDigit("-"), .underscore, .punctuationOrDigit("7"), .punctuationOrDigit("2"),
+                .punctuationOrDigit("="), .returnKey(withShift: false), .returnKey(withShift: true), .backspace,
+                .bracketOrBackslash("["), .bracketOrBackslash("]"), .bracketOrBackslash("["), .bracketOrBackslash("\\"),
+                .punctuationOrDigit("."), .underscore, nil,
+            ])
     }
 
     @Test func keysEachEngineAlreadySendsRightAreLeftToIt() {

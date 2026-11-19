@@ -49,7 +49,8 @@ extension ConversationStore {
         var hasUnlistedSessionFile = false
         for tab in waitingTabs {
             guard let sessionFile = sessionFiles[tab.id],
-                  !linkWaitingNewSessionTab(tab, toSessionID: sessionFile.sessionID) else { continue }
+                !linkWaitingNewSessionTab(tab, toSessionID: sessionFile.sessionID)
+            else { continue }
             if wasModifiedSinceLastRefresh(sessionFile.lastModified) { hasUnlistedSessionFile = true }
         }
         if mayRefresh && hasUnlistedSessionFile { refreshThisMac() }
@@ -58,9 +59,10 @@ extension ConversationStore {
     @discardableResult
     func linkWaitingNewSessionTab(_ session: TerminalSession, toSessionID sessionID: String) -> Bool {
         guard session.isNewSessionAwaitingConversation,
-              let conversation = conversations.first(where: {
-                  $0.provider == session.provider && $0.sessionID == sessionID
-              }) else { return false }
+            let conversation = conversations.first(where: {
+                $0.provider == session.provider && $0.sessionID == sessionID
+            })
+        else { return false }
         link(session, to: conversation)
         return true
     }
@@ -68,13 +70,15 @@ extension ConversationStore {
     /// Also for a tab whose CLI moved to a session as new, as with `/clear`; see `followLiveSessions`.
     private func needsRefreshForFirstPromptTitle(_ session: TerminalSession) -> Bool {
         guard !session.hasExited, session.host == .thisMac,
-              session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
-              let conversation = session.conversation, conversation.isAwaitingFirstPromptTitle else { return false }
+            session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
+            let conversation = session.conversation, conversation.isAwaitingFirstPromptTitle
+        else { return false }
         // A SQLite source, such as OpenCode's, writes to its `-wal` file first.
-        return wasModifiedSinceLastRefresh(max(
-            ConversationMetadata.fileModificationDate(conversation.sourceFile),
-            ConversationMetadata.fileModificationDate(URL(fileURLWithPath: conversation.sourceFile.path + "-wal"))
-        ))
+        return wasModifiedSinceLastRefresh(
+            max(
+                ConversationMetadata.fileModificationDate(conversation.sourceFile),
+                ConversationMetadata.fileModificationDate(URL(fileURLWithPath: conversation.sourceFile.path + "-wal"))
+            ))
     }
 
     /// A refresh links such a tab once it lists the tab's session; see `linkWaitingTabsByAppearance`. A CLI that

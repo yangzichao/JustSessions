@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// The items of a terminal's right-click menu do what the same items of its tab's menu in the tab bar do.
@@ -52,9 +53,10 @@ struct TerminalContextMenuActionTests {
 
         try TerminalContextMenuFixture.choose(TerminalContextMenuFixture.item("Keep session", in: menu))
         #expect(!fixture.store.deletesSessionWhenClosed(tab))
-        #expect(TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)).suffix(3) == [
-            "Close Tab…", "Close and end session", "Close and delete session…",
-        ])
+        #expect(
+            TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)).suffix(3) == [
+                "Close Tab…", "Close and end session", "Close and delete session…",
+            ])
     }
 
     /// Close and delete session… asks the window to delete the tab's session, whose dialog confirms first; the tab
@@ -129,9 +131,12 @@ struct TerminalContextMenuActionTests {
 
         try TerminalContextMenuFixture.choose(arrangeItem("Stack views"))
         #expect(fixture.store.orientation(ofSplitView: split.id) == .stacked)
-        #expect(try TerminalContextMenuFixture.titles(of: #require(
-            TerminalContextMenuFixture.item("Arrange split view", in: fixture.menu(for: right)).submenu
-        )).contains("Close top view"))
+        #expect(
+            try TerminalContextMenuFixture.titles(
+                of: #require(
+                    TerminalContextMenuFixture.item("Arrange split view", in: fixture.menu(for: right)).submenu
+                )
+            ).contains("Close top view"))
         try TerminalContextMenuFixture.choose(arrangeItem("Place views side by side"))
         #expect(fixture.store.orientation(ofSplitView: split.id) == .sideBySide)
 

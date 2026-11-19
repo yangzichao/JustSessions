@@ -1,6 +1,7 @@
 import AppKit
 import Carbon.HIToolbox
 import Testing
+
 @testable import JustSessions
 
 struct ThisMacTmuxServerTests {
@@ -25,11 +26,12 @@ struct ThisMacTmuxServerTests {
             #expect(command.arguments.containsSubsequence(["set-hook", "-g", hook.name, hook.command, ";"]))
         }
         let sessionStart = try #require(command.arguments.firstIndex(of: "new-session"))
-        #expect(Array(command.arguments[sessionStart...]) == [
-            "new-session", "-A", "-s", "justsessions-claude-abc",
-            "-e", "COLORTERM=truecolor", "-e", "PATH=/usr/bin:/bin",
-            "--", "/Users/me/.local/bin/claude", "--resume", "abc",
-        ])
+        #expect(
+            Array(command.arguments[sessionStart...]) == [
+                "new-session", "-A", "-s", "justsessions-claude-abc",
+                "-e", "COLORTERM=truecolor", "-e", "PATH=/usr/bin:/bin",
+                "--", "/Users/me/.local/bin/claude", "--resume", "abc",
+            ])
         // The client starts in the project, so the session does too; it keeps the tab's terminal type.
         #expect(command.workingDirectory == "/Users/me/paper")
         #expect(command.environment == ["COLORTERM=truecolor", "PATH=/usr/bin:/bin", "TERM=xterm-256color"])
@@ -45,11 +47,12 @@ struct ThisMacTmuxServerTests {
 
         let sessionStart = try #require(arguments.firstIndex(of: "new-session"))
         #expect(Array(arguments[(sessionStart - 5)..<sessionStart]) == ["set-option", "-gq", "history-limit", "10000", ";"])
-        #expect(Array(arguments.suffix(15)) == [
-            "--", "/bin/zsh", "-l",
-            ";", "set-option", "-q", "-t", "=justsessions-terminal-a1b2c3d4:", "history-limit", "10000",
-            ";", "set-option", "-gq", "history-limit", "2000",
-        ])
+        #expect(
+            Array(arguments.suffix(15)) == [
+                "--", "/bin/zsh", "-l",
+                ";", "set-option", "-q", "-t", "=justsessions-terminal-a1b2c3d4:", "history-limit", "10000",
+                ";", "set-option", "-gq", "history-limit", "2000",
+            ])
         #expect(!server.command(attachingTo: "justsessions-claude-abc", running: shell).arguments.contains("history-limit"))
     }
 
@@ -88,12 +91,14 @@ struct ThisMacTmuxServerTests {
 
     /// A failed CLI's dead pane, kept while a tab shows it, runs no CLI.
     @Test func paneListingMapsEachSessionToItsCLIProcessLeavingOutDeadPanes() {
-        let output = "justsessions-claude-abc 4242 0\njustsessions-codex-new-1a2b3c4d 77 0\njustsessions-pi-dead 91 1\nbroken line here now\nno-pid\n"
+        let output =
+            "justsessions-claude-abc 4242 0\njustsessions-codex-new-1a2b3c4d 77 0\njustsessions-pi-dead 91 1\nbroken line here now\nno-pid\n"
 
-        #expect(ThisMacTmuxServer.paneProcessIDs(inListOutput: output) == [
-            "justsessions-claude-abc": 4242,
-            "justsessions-codex-new-1a2b3c4d": 77,
-        ])
+        #expect(
+            ThisMacTmuxServer.paneProcessIDs(inListOutput: output) == [
+                "justsessions-claude-abc": 4242,
+                "justsessions-codex-new-1a2b3c4d": 77,
+            ])
     }
 
     @Test func shiftReturnIsReturnOrKeypadEnterWithShiftAlone() {
@@ -121,8 +126,8 @@ struct ThisMacTmuxServerTests {
     }
 }
 
-private extension Array where Element: Equatable {
-    func containsSubsequence(_ subsequence: [Element]) -> Bool {
+extension Array where Element: Equatable {
+    fileprivate func containsSubsequence(_ subsequence: [Element]) -> Bool {
         guard subsequence.count <= count else { return false }
         return indices.dropLast(subsequence.count - 1).contains { Array(self[$0..<($0 + subsequence.count)]) == subsequence }
     }

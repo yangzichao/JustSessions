@@ -1,6 +1,7 @@
 import CoreText
 import GhosttyTerminal
 import Testing
+
 @testable import JustSessions
 
 /// The Ghostty configuration a controller from `GhosttyTerminalControllers` renders from the terminal appearance
@@ -63,7 +64,8 @@ struct GhosttyAppearanceConfigurationTests {
 
     @Test func aFamilyGhosttyCannotFindGivesMenloRatherThanGhosttysBuiltInFont() {
         let configuration = GhosttyAppearanceConfiguration(
-            preferences: TerminalAppearancePreferences(), appTheme: ResolvedAppTheme(.justSessions), ghosttyFindsFontFamily: { $0 == "Menlo" }
+            preferences: TerminalAppearancePreferences(), appTheme: ResolvedAppTheme(.justSessions),
+            ghosttyFindsFontFamily: { $0 == "Menlo" }
         )
 
         #expect(Self.lines(of: configuration.terminalConfiguration).contains("font-family = Menlo"))
@@ -177,29 +179,32 @@ struct GhosttyAppearanceConfigurationTests {
         #expect(controller.lastConfigurationIssue == nil)
         let lines = Self.lines(of: controller)
         let otherLines = lines.filter { line in
-            !["#", "font-", "adjust-cell-", "minimum-contrast ", "background ", "foreground ", "selection-",
-              "cursor-color ", "cursor-text ", "palette "].contains { line.hasPrefix($0) }
+            ![
+                "#", "font-", "adjust-cell-", "minimum-contrast ", "background ", "foreground ", "selection-",
+                "cursor-color ", "cursor-text ", "palette ",
+            ].contains { line.hasPrefix($0) }
         }
-        #expect(otherLines == [
-            "bold-color = bright",
-            "window-padding-x = 0",
-            "window-padding-y = 0",
-            "cursor-style = block",
-            "cursor-style-blink = true",
-            "macos-option-as-alt = true",
-            "clipboard-paste-protection = false",
-            "clipboard-read = allow",
-            "clipboard-write = allow",
-            "keybind = clear",
-            "keybind = super+arrow_left=text:\\x01",
-            "keybind = super+arrow_right=text:\\x05",
-            "keybind = super+backspace=text:\\x15",
-            "keybind = super+z=text:\\x1f",
-            "keybind = alt+arrow_left=esc:b",
-            "keybind = alt+arrow_right=esc:f",
-            "keybind = super+arrow_up=ignore",
-            "keybind = super+arrow_down=ignore",
-        ])
+        #expect(
+            otherLines == [
+                "bold-color = bright",
+                "window-padding-x = 0",
+                "window-padding-y = 0",
+                "cursor-style = block",
+                "cursor-style-blink = true",
+                "macos-option-as-alt = true",
+                "clipboard-paste-protection = false",
+                "clipboard-read = allow",
+                "clipboard-write = allow",
+                "keybind = clear",
+                "keybind = super+arrow_left=text:\\x01",
+                "keybind = super+arrow_right=text:\\x05",
+                "keybind = super+backspace=text:\\x15",
+                "keybind = super+z=text:\\x1f",
+                "keybind = alt+arrow_left=esc:b",
+                "keybind = alt+arrow_right=esc:f",
+                "keybind = super+arrow_up=ignore",
+                "keybind = super+arrow_down=ignore",
+            ])
         // Alabaster, libghostty-spm's default light theme.
         #expect(!lines.contains("background = F7F7F7"))
     }

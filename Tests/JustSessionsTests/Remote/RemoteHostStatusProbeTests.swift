@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteHostStatusProbeTests {
@@ -142,7 +143,10 @@ struct RemoteHostStatusProbeTests {
             timeout: 10
         )
 
-        #expect(RemoteHostStatusProbe.status(inOutput: try #require(output)).installedProviders == [.codex, .antigravity, .kiro, .opencode, .pi])
+        #expect(
+            RemoteHostStatusProbe.status(inOutput: try #require(output)).installedProviders == [
+                .codex, .antigravity, .kiro, .opencode, .pi,
+            ])
     }
 
     @Test func aCLIOnlyInAnInstallFolderStartsFromThereAndTheLoginShellsComesFirst() {
@@ -160,11 +164,12 @@ struct RemoteHostStatusProbeTests {
 
         let status = RemoteHostStatusProbe.status(inOutput: output)
 
-        #expect(status.cliLocations == [
-            .codex: .loginShell,
-            .claude: .installed(path: "\(nvm)/v22.3.0/bin/claude"),
-            .opencode: .installed(path: "/home/me and you/.opencode/bin/opencode"),
-        ])
+        #expect(
+            status.cliLocations == [
+                .codex: .loginShell,
+                .claude: .installed(path: "\(nvm)/v22.3.0/bin/claude"),
+                .opencode: .installed(path: "/home/me and you/.opencode/bin/opencode"),
+            ])
         #expect(status.installedProviders == [.codex, .claude, .opencode])
     }
 
@@ -198,10 +203,10 @@ struct RemoteHostStatusProbeTests {
         let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }
         try """
-            alias pi="$HOME/tools/pi --from-alias"
-            agy() { "$HOME/tools/agy" "$@"; }
+        alias pi="$HOME/tools/pi --from-alias"
+        agy() { "$HOME/tools/agy" "$@"; }
 
-            """.write(to: home.appendingPathComponent(".bash_profile"), atomically: true, encoding: .utf8)
+        """.write(to: home.appendingPathComponent(".bash_profile"), atomically: true, encoding: .utf8)
 
         let output = BoundedProcessRunner.output(
             ofExecutable: "/bin/sh",

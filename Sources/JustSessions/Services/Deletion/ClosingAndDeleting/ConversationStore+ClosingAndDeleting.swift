@@ -47,9 +47,10 @@ extension ConversationStore {
             for store in otherWindowStores {
                 endedTmuxNames.formUnion(store.closeTabsAndEndCLI(of: conversation, cliExits: cliExits, remoteRunner: remoteRunner))
             }
-            endedTmuxNames.formUnion(closeTabsAndEndCLI(
-                of: conversation, alsoEndingTmuxSessionWithoutTab: true, cliExits: cliExits, remoteRunner: remoteRunner
-            ))
+            endedTmuxNames.formUnion(
+                closeTabsAndEndCLI(
+                    of: conversation, alsoEndingTmuxSessionWithoutTab: true, cliExits: cliExits, remoteRunner: remoteRunner
+                ))
             endedTmuxNamesByHost[conversation.host, default: []].formUnion(endedTmuxNames)
         }
         cliExits.notify(queue: .main) { [weak self] in
@@ -74,13 +75,15 @@ extension ConversationStore {
     ) -> Set<String> {
         let host = conversation.host
         let tabs = terminalSessions.filter { $0.conversation?.id == conversation.id }
-        let tmuxNameWithoutTab = alsoEndingTmuxSessionWithoutTab && isRunningInTmux(conversation)
+        let tmuxNameWithoutTab =
+            alsoEndingTmuxSessionWithoutTab && isRunningInTmux(conversation)
             ? [TmuxSessionName.forConversation(conversation)]
             : []
         let tmuxNames = Set(tabs.compactMap(\.tmuxSessionName) + tmuxNameWithoutTab)
         guard !tabs.isEmpty || !tmuxNames.isEmpty else { return [] }
         // Read before the tabs close. A CLI in tmux is the pane's process; a tab without tmux runs its CLI itself.
-        let thisMacCLIProcessIDs: Set<Int32> = host == .thisMac
+        let thisMacCLIProcessIDs: Set<Int32> =
+            host == .thisMac
             ? Set(tabs.map(\.cliProcessID) + tmuxNames.compactMap { thisMacTmuxPaneProcessIDs[$0] }).filter { $0 > 0 }
             : []
         // The session is about to be deleted, so Reopen Closed Tab has nothing to bring back.
@@ -102,7 +105,8 @@ extension ConversationStore {
         case .ssh(let destination):
             tmuxCommandQueues.run(on: host) {
                 for name in tmuxNames {
-                    let command = RemoteTmuxCommands.killSessionWaitingForCLIExitCommand(name, on: destination, timeoutSeconds: timeoutSeconds)
+                    let command = RemoteTmuxCommands.killSessionWaitingForCLIExitCommand(
+                        name, on: destination, timeoutSeconds: timeoutSeconds)
                     _ = remoteRunner.run(destination, command, TimeInterval(timeoutSeconds + 30))
                 }
                 cliExits.leave()

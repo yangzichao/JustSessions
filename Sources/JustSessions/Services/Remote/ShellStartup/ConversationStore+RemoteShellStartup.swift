@@ -44,7 +44,8 @@ extension ConversationStore {
 
     private func checkRemoteShellStartup(on host: String) {
         guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), !isDisconnected(host),
-              RemoteHostShellStartups.shared.beginCheck(on: host) else { return }
+            RemoteHostShellStartups.shared.beginCheck(on: host)
+        else { return }
         hostsCheckingShellStartup.insert(host)
         let check = remoteShellStartupCheck
         let generation = hostLifecycleGeneration(on: .ssh(host))

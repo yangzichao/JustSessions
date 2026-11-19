@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Windows refreshing an SSH host at once, as Connect has them do, copy it once: the windows whose refresh was asked
@@ -65,12 +66,16 @@ struct RefreshingInSeveralWindowsTests {
         defer { sandbox.tearDown() }
         let firstWindowCopies = HostCopyGate(pausesUntilReleased: true)
         let secondWindowCopies = HostCopyGate(pausesUntilReleased: true)
-        defer { firstWindowCopies.release(); secondWindowCopies.release() }
+        defer {
+            firstWindowCopies.release()
+            secondWindowCopies.release()
+        }
         _ = try Self.listDisconnectedHost(in: sandbox, copies: firstWindowCopies, secondWindowCopies: secondWindowCopies)
 
         sandbox.second.connectHost("devbox")
         try await expectEventually { firstWindowCopies.count + secondWindowCopies.count == 1 }
-        let (copyingStore, waitingStore, waitingWindowCopies) = firstWindowCopies.count == 1
+        let (copyingStore, waitingStore, waitingWindowCopies) =
+            firstWindowCopies.count == 1
             ? (sandbox.first, sandbox.second, secondWindowCopies)
             : (sandbox.second, sandbox.first, firstWindowCopies)
         copyingStore.invalidateRemoteHostWork(on: "devbox")
@@ -115,8 +120,8 @@ struct RefreshingInSeveralWindowsTests {
     }
 }
 
-private extension ConversationStore {
-    var hasRefreshedDevbox: Bool {
+extension ConversationStore {
+    fileprivate var hasRefreshedDevbox: Bool {
         if case .refreshed? = hostRefreshStatuses[.ssh("devbox")] { true } else { false }
     }
 }

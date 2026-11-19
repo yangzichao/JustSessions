@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// Find in a Ghostty tab, which scrolls the selected match to the top of the view; see `SwiftTermTerminalFindTests`.

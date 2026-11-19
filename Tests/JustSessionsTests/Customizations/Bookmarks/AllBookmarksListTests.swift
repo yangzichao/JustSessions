@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// What Bookmarks → Show All Bookmarks… lists (RDR-52).
@@ -13,8 +14,9 @@ struct AllBookmarksListTests {
     private var bookmarks: MessageBookmarks {
         MessageBookmarks(bookmarksByConversationID: [
             older.id: [
-                MessageBookmark(letter: "a", entryID: id(1), kind: .user, snippet: "Ship the release", label: "Release day",
-                                tags: ["deploy", "todo"]),
+                MessageBookmark(
+                    letter: "a", entryID: id(1), kind: .user, snippet: "Ship the release", label: "Release day",
+                    tags: ["deploy", "todo"]),
                 MessageBookmark(letter: "b", entryID: id(4), kind: .assistant, snippet: "The tests pass"),
             ],
             newer.id: [MessageBookmark(letter: "a", entryID: id(2), kind: .assistant, snippet: "Use a feature flag", tags: ["Todo"])],
@@ -24,8 +26,9 @@ struct AllBookmarksListTests {
 
     private func list(_ typed: String = "", tags: Set<String> = []) -> AllBookmarksList {
         let listed = [older.id: older, newer.id: newer]
-        return AllBookmarksList(bookmarks: bookmarks, query: MessageBookmarkQuery(typed), requiredTags: tags,
-                                conversation: { listed[$0] }, title: { $0.id == older.id ? "Release work" : "Flags" })
+        return AllBookmarksList(
+            bookmarks: bookmarks, query: MessageBookmarkQuery(typed), requiredTags: tags,
+            conversation: { listed[$0] }, title: { $0.id == older.id ? "Release work" : "Flags" })
     }
 
     @Test func everyListedSessionShowsNewestFirstWithItsBookmarksInOrder() {
@@ -49,7 +52,7 @@ struct AllBookmarksListTests {
     @Test func aHashSearchFindsTagsByTheirStartOnly() {
         #expect(list("#to").sections.map(\.conversation.id) == [newer.id, older.id])
         #expect(list("#dep").sections.map { $0.bookmarks.map(\.letter) } == [["a"]])
-        #expect(list("#release").sections.isEmpty)   // a label, not a tag
+        #expect(list("#release").sections.isEmpty)  // a label, not a tag
     }
 
     @Test func chosenTagsKeepOnlyBookmarksWithAllOfThemIgnoringCase() {

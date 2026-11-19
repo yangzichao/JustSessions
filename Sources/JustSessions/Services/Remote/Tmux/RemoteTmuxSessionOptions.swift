@@ -24,7 +24,9 @@ enum RemoteTmuxSessionOptions {
     // tracks focus, and without it shows a hint to set the option. A program in the host's other sessions hears of it
     // only when it asks.
     static func setOptionCommands(for provider: ConversationProvider, usingHostPrefix: Bool) -> [String] {
-        let titleFormat = provider == .claude ? RemoteClaudeSessionTitle.titleFormat
+        let titleFormat =
+            provider == .claude
+            ? RemoteClaudeSessionTitle.titleFormat
             : RemoteCLIActivityTitle.providers.contains(provider) ? RemoteCLIActivityTitle.titleFormat : "#T"
         return setOptionCommands(titleFormat: titleFormat, usingHostPrefix: usingHostPrefix)
     }

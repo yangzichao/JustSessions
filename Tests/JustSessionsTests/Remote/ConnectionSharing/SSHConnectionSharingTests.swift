@@ -1,15 +1,17 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct SSHConnectionSharingTests {
     @Test func usesOnePrivateSocketForARefresh() {
-        #expect(SSHConnectionSharing.options(controlPath: "/tmp/justsessions-ssh-501/refresh-id/master") == [
-            "-o", "ControlMaster=auto",
-            "-o", "ControlPath=/tmp/justsessions-ssh-501/refresh-id/master",
-            "-o", "ControlPersist=60",
-        ])
+        #expect(
+            SSHConnectionSharing.options(controlPath: "/tmp/justsessions-ssh-501/refresh-id/master") == [
+                "-o", "ControlMaster=auto",
+                "-o", "ControlPath=/tmp/justsessions-ssh-501/refresh-id/master",
+                "-o", "ControlPersist=60",
+            ])
     }
 
     /// `%C` is not used in the app-owned path, but `ssh` still adds 17 characters while it sets the socket up; a
@@ -43,14 +45,16 @@ struct SSHConnectionSharingTests {
         let root = try makeTemporaryDirectory().appendingPathComponent("sockets").path
         defer { try? FileManager.default.removeItem(atPath: root) }
 
-        let first = try #require(SSHSocketDirectory.makeRefreshDirectory(
-            at: root,
-            identifier: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-        ))
-        let second = try #require(SSHSocketDirectory.makeRefreshDirectory(
-            at: root,
-            identifier: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
-        ))
+        let first = try #require(
+            SSHSocketDirectory.makeRefreshDirectory(
+                at: root,
+                identifier: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+            ))
+        let second = try #require(
+            SSHSocketDirectory.makeRefreshDirectory(
+                at: root,
+                identifier: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
+            ))
 
         #expect(first != second)
         let rootPermissions = try FileManager.default.attributesOfItem(atPath: root)[.posixPermissions] as? Int

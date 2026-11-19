@@ -18,12 +18,14 @@ extension RemoteSessionMirror {
             for host in configuredHosts {
                 let oldName = Self.legacyDirectoryName(forHost: host)
                 guard host.unicodeScalars.allSatisfy(\.isASCII), oldName == host,
-                      !oldName.lowercased().hasPrefix("host-v2-"), groups[oldName.lowercased()]?.count == 1 else { continue }
+                    !oldName.lowercased().hasPrefix("host-v2-"), groups[oldName.lowercased()]?.count == 1
+                else { continue }
                 let legacy = cacheRoot.appendingPathComponent(oldName, isDirectory: true)
                 let destination = cacheRoot.appendingPathComponent(Self.directoryName(forHost: host), isDirectory: true)
                 guard let values = try? legacy.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey]),
-                      values.isDirectory == true, values.isSymbolicLink != true,
-                      !FileManager.default.fileExists(atPath: destination.path) else { continue }
+                    values.isDirectory == true, values.isSymbolicLink != true,
+                    !FileManager.default.fileExists(atPath: destination.path)
+                else { continue }
                 try? FileManager.default.moveItem(at: legacy, to: destination)
             }
         }

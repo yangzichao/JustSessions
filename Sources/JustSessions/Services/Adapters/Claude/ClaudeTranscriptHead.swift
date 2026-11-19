@@ -66,7 +66,8 @@ struct ClaudeTranscriptHead: Sendable, Codable {
             aiTitle = title
         }
         if firstPrompt == nil, record["isMeta"] as? Bool != true,
-           let text = ClaudeUserPromptText.text(ofRecord: record), ConversationMetadata.holdsTitle(text) {
+            let text = ClaudeUserPromptText.text(ofRecord: record), ConversationMetadata.holdsTitle(text)
+        {
             firstPrompt = text
         }
     }

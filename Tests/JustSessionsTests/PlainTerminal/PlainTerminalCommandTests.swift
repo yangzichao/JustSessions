@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct PlainTerminalCommandTests {
@@ -56,12 +57,13 @@ struct PlainTerminalCommandTests {
             to: root.appendingPathComponent("login-shell")
         )
 
-        let output = try #require(BoundedProcessRunner.output(
-            ofExecutable: "/bin/sh",
-            arguments: ["-c", RemoteCLICommandBuilder.remotePlainTerminalCommand(projectPath: project.path)],
-            environment: ["SHELL": loginShell.path, "PATH": "/usr/bin:/bin"],
-            timeout: 10
-        ))
+        let output = try #require(
+            BoundedProcessRunner.output(
+                ofExecutable: "/bin/sh",
+                arguments: ["-c", RemoteCLICommandBuilder.remotePlainTerminalCommand(projectPath: project.path)],
+                environment: ["SHELL": loginShell.path, "PATH": "/usr/bin:/bin"],
+                timeout: 10
+            ))
 
         // `pwd -P` keeps the `/private` prefix of the temporary folder, which Foundation paths drop.
         let lines = output.split(separator: "\n").map(String.init)

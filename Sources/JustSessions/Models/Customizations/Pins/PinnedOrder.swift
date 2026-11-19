@@ -37,11 +37,12 @@ struct PinnedOrder: Equatable {
     /// Pins `id` if it is not pinned yet, and puts it at `placement`. A neighbor that is not pinned puts it last.
     mutating func move(_ id: String, to placement: PinnedPlacement) {
         var reorderedIDs = ids.filter { $0 != id }
-        let insertionIndex: Int = switch placement {
-        case .before(let neighborID): reorderedIDs.firstIndex(of: neighborID) ?? reorderedIDs.endIndex
-        case .after(let neighborID): reorderedIDs.firstIndex(of: neighborID).map { $0 + 1 } ?? reorderedIDs.endIndex
-        case .last: reorderedIDs.endIndex
-        }
+        let insertionIndex: Int =
+            switch placement {
+            case .before(let neighborID): reorderedIDs.firstIndex(of: neighborID) ?? reorderedIDs.endIndex
+            case .after(let neighborID): reorderedIDs.firstIndex(of: neighborID).map { $0 + 1 } ?? reorderedIDs.endIndex
+            case .last: reorderedIDs.endIndex
+            }
         reorderedIDs.insert(id, at: insertionIndex)
         ids = reorderedIDs
         placesByID = Self.places(of: ids)

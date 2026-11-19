@@ -1,6 +1,7 @@
 import AppKit
 import SwiftTerm
 import Testing
+
 @testable import JustSessions
 
 /// A SwiftTerm terminal draws the ANSI colors at the chosen **Color intensity**.

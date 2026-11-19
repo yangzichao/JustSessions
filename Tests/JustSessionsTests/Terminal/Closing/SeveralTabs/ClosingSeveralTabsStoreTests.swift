@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Close all tabs in group…, or closing the tabs selected in Open tabs, closes only those tabs, and a tab left open
@@ -140,11 +141,13 @@ struct ClosingSeveralTabsStoreTests {
         try #require(thisMacTab.closingNeed == .canKeepCLIRunning && devboxTab.closingNeed == .canKeepCLIRunning)
 
         let bothSaved = TabCloseChoicesByHost(thisMacChoice: .endSession, sshHostChoices: ["devbox": .keepRunning])
-        #expect(store.closingQuestion(forTabs: tabIDs, tabCloseChoices: bothSaved, plainTerminalCloseChoice: .askEachTime)
-            == .closeWithoutAsking)
+        #expect(
+            store.closingQuestion(forTabs: tabIDs, tabCloseChoices: bothSaved, plainTerminalCloseChoice: .askEachTime)
+                == .closeWithoutAsking)
 
         let devboxAsks = TabCloseChoicesByHost(thisMacChoice: .endSession, sshHostChoices: ["buildbox": .keepRunning])
-        #expect(store.closingQuestion(forTabs: tabIDs, tabCloseChoices: devboxAsks, plainTerminalCloseChoice: .askEachTime)
-            == .keepOrEndCLIs(alsoStopsOthers: false))
+        #expect(
+            store.closingQuestion(forTabs: tabIDs, tabCloseChoices: devboxAsks, plainTerminalCloseChoice: .askEachTime)
+                == .keepOrEndCLIs(alsoStopsOthers: false))
     }
 }

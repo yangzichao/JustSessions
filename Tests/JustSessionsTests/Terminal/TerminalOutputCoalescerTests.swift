@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -8,7 +9,10 @@ struct TerminalOutputCoalescerTests {
         let coalescer = TerminalOutputCoalescer()
         var received: [UInt8] = []
         var deliveries = 0
-        coalescer.consume = { received += $0; deliveries += 1 }
+        coalescer.consume = {
+            received += $0
+            deliveries += 1
+        }
         coalescer.isActive = false
         let bytes = Array("\u{1B}[31m你好 🐈\u{1B}[0m".utf8)
         for byte in bytes { coalescer.receive([byte][...]) }

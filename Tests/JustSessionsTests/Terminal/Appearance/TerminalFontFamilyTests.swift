@@ -2,6 +2,7 @@ import AppKit
 import CoreText
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 @MainActor
@@ -12,9 +13,10 @@ struct TerminalFontFamilyTests {
     /// The PostScript names of the fonts CoreText draws `text` with, run by run.
     private static func drawingFonts(of text: String, in font: NSFont) -> Set<String> {
         let line = CTLineCreateWithAttributedString(NSAttributedString(string: text, attributes: [.font: font]))
-        return Set((CTLineGetGlyphRuns(line) as? [CTRun] ?? []).compactMap { run in
-            ((CTRunGetAttributes(run) as NSDictionary)[kCTFontAttributeName]).map { CTFontCopyPostScriptName($0 as! CTFont) as String }
-        })
+        return Set(
+            (CTLineGetGlyphRuns(line) as? [CTRun] ?? []).compactMap { run in
+                ((CTRunGetAttributes(run) as NSDictionary)[kCTFontAttributeName]).map { CTFontCopyPostScriptName($0 as! CTFont) as String }
+            })
     }
 
     @Test func savedFamiliesLoadIncludingTheThreeEarlierChoices() throws {
@@ -47,11 +49,15 @@ struct TerminalFontFamilyTests {
     /// Letters keep the chosen font, and symbols outside the Private Use Areas keep the system's usual fallback.
     @Test(arguments: [TerminalFontFamily.named("Menlo"), .named("Monaco")])
     func nerdFontIconsDrawWithTheBundledSymbolsWithAnyFont(_ family: TerminalFontFamily) throws {
-        let bundledFont = try #require(AppLocalization.resourceBundle.url(
-            forResource: "SymbolsNerdFontMono-Regular", withExtension: "ttf", subdirectory: "Fonts"
-        ))
+        let bundledFont = try #require(
+            AppLocalization.resourceBundle.url(
+                forResource: "SymbolsNerdFontMono-Regular", withExtension: "ttf", subdirectory: "Fonts"
+            ))
         let bundledDescriptors = CTFontManagerCreateFontDescriptorsFromURL(bundledFont as CFURL) as? [CTFontDescriptor] ?? []
-        #expect(bundledDescriptors.compactMap { CTFontDescriptorCopyAttribute($0, kCTFontNameAttribute) as? String } == [TerminalSymbolsFont.postScriptName])
+        #expect(
+            bundledDescriptors.compactMap { CTFontDescriptorCopyAttribute($0, kCTFontNameAttribute) as? String } == [
+                TerminalSymbolsFont.postScriptName
+            ])
 
         let font = family.font(size: 13)
         let bold = NSFontManager.shared.convert(font, toHaveTrait: .boldFontMask)
@@ -129,12 +135,21 @@ struct TerminalFontFamilyTests {
         typealias Choice = TerminalFontPicker.Choice
         let installed = InstalledMonospacedFontFamilies(fillingCells: ["Menlo", "Monaco"], notFillingCells: ["Osaka"])
 
-        #expect(TerminalFontPicker.choices(installed: installed, chosen: .named("Menlo"))
-            == [Choice(family: "Menlo", unavailability: nil), Choice(family: "Monaco", unavailability: nil)])
-        #expect(TerminalFontPicker.choices(installed: installed, chosen: .named("Hack"))
-            == [Choice(family: "Hack", unavailability: .notInstalled), Choice(family: "Menlo", unavailability: nil), Choice(family: "Monaco", unavailability: nil)])
-        #expect(TerminalFontPicker.choices(installed: installed, chosen: .named("Osaka"))
-            == [Choice(family: "Menlo", unavailability: nil), Choice(family: "Monaco", unavailability: nil), Choice(family: "Osaka", unavailability: .notFillingCells)])
+        #expect(
+            TerminalFontPicker.choices(installed: installed, chosen: .named("Menlo"))
+                == [Choice(family: "Menlo", unavailability: nil), Choice(family: "Monaco", unavailability: nil)])
+        #expect(
+            TerminalFontPicker.choices(installed: installed, chosen: .named("Hack"))
+                == [
+                    Choice(family: "Hack", unavailability: .notInstalled), Choice(family: "Menlo", unavailability: nil),
+                    Choice(family: "Monaco", unavailability: nil),
+                ])
+        #expect(
+            TerminalFontPicker.choices(installed: installed, chosen: .named("Osaka"))
+                == [
+                    Choice(family: "Menlo", unavailability: nil), Choice(family: "Monaco", unavailability: nil),
+                    Choice(family: "Osaka", unavailability: .notFillingCells),
+                ])
         #expect(TerminalFontPicker.choices(installed: nil, chosen: .named("Hack")) == [Choice(family: "Hack", unavailability: nil)])
         #expect(TerminalFontPicker.choices(installed: nil, chosen: .system).isEmpty)
     }

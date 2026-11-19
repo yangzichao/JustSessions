@@ -1,6 +1,7 @@
 import CoreGraphics
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Where a tab dragged between windows joins or leaves a tab bar, where it goes in the bar, and where the window
@@ -105,12 +106,13 @@ struct TabDragBetweenWindowsGeometryTests {
 
     /// Tab 0 in group `/a`, then tabs 1 and 2 in a split; tab 3 in group `/b`.
     private func makeStrip() -> TerminalTabStrip {
-        TerminalTabStrip(tabs: [
-            TerminalTabStrip.Tab(id: tabID(0), projectKey: "/a"),
-            TerminalTabStrip.Tab(id: tabID(1), projectKey: "/a"),
-            TerminalTabStrip.Tab(id: tabID(2), projectKey: "/a"),
-            TerminalTabStrip.Tab(id: tabID(3), projectKey: "/b"),
-        ], splits: [TerminalSplit(tabIDs: (tabID(1), tabID(2)), groupKey: "/a")])
+        TerminalTabStrip(
+            tabs: [
+                TerminalTabStrip.Tab(id: tabID(0), projectKey: "/a"),
+                TerminalTabStrip.Tab(id: tabID(1), projectKey: "/a"),
+                TerminalTabStrip.Tab(id: tabID(2), projectKey: "/a"),
+                TerminalTabStrip.Tab(id: tabID(3), projectKey: "/b"),
+            ], splits: [TerminalSplit(tabIDs: (tabID(1), tabID(2)), groupKey: "/a")])
     }
 
     /// For tabs whose group's label is 40 points wide.

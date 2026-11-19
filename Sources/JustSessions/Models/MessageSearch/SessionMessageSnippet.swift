@@ -19,9 +19,11 @@ struct SessionMessageSnippet: Sendable, Equatable {
 
     /// Cut from `segment` around `match`, with "…" where the cut leaves text out.
     init(segment: String, match: Range<String.Index>) {
-        let leadingStart = segment.index(match.lowerBound, offsetBy: -Self.leadingCharacterCount, limitedBy: segment.startIndex)
+        let leadingStart =
+            segment.index(match.lowerBound, offsetBy: -Self.leadingCharacterCount, limitedBy: segment.startIndex)
             ?? segment.startIndex
-        let trailingEnd = segment.index(match.upperBound, offsetBy: Self.trailingCharacterCount, limitedBy: segment.endIndex)
+        let trailingEnd =
+            segment.index(match.upperBound, offsetBy: Self.trailingCharacterCount, limitedBy: segment.endIndex)
             ?? segment.endIndex
         let leadingContext = Self.singleSpaced(segment[leadingStart..<match.lowerBound]).drop(while: \.isWhitespace)
         leadingText = (leadingStart > segment.startIndex ? "…" : "") + leadingContext

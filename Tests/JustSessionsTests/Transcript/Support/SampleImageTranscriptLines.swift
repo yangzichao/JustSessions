@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import JustSessions
 
 /// Session files with a user's image and a tool's image, each followed by text, as the CLIs write them.

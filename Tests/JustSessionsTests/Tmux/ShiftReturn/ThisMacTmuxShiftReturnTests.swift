@@ -1,6 +1,7 @@
 import AppKit
 import Carbon.HIToolbox
 import Testing
+
 @testable import JustSessions
 
 /// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`. Either engine sends the same bytes.
@@ -28,7 +29,8 @@ struct ThisMacTmuxShiftReturnTests {
             tmuxSessionName: tmuxSessionName
         )
         _ = NSApplication.shared
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = tab.terminalView
         defer {
@@ -39,11 +41,12 @@ struct ThisMacTmuxShiftReturnTests {
         tab.startIfNeeded()
         // A file can appear before tmux's initial screen reaches the terminal. Wait for rendered output too,
         // so key events are sent through an attached, initialized terminal rather than during its handshake.
-        try #require(await sandbox.waitUntil {
-            FileManager.default.fileExists(atPath: readyMarker.path)
-                && sandbox.tmuxOutput(["list-clients", "-F", "#{session_name}"]) == "\(tmuxSessionName)\n"
-                && screenText(of: tab.terminalView).contains("KEY_READER_READY")
-        }, "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil {
+                FileManager.default.fileExists(atPath: readyMarker.path)
+                    && sandbox.tmuxOutput(["list-clients", "-F", "#{session_name}"]) == "\(tmuxSessionName)\n"
+                    && screenText(of: tab.terminalView).contains("KEY_READER_READY")
+            }, "\(sandbox.launchDiagnostics(for: tab))")
         // Reproduce a late initialization reply deterministically, rather than relying on CI timing.
         _ = sandbox.tmuxOutput(["send-keys", "-t", "=\(tmuxSessionName):", "-l", "\u{1b}[?65;4;6;18;22c"])
         tab.terminalView.keyDown(with: returnKeyEvent(modifiers: .shift, windowNumber: window.windowNumber))

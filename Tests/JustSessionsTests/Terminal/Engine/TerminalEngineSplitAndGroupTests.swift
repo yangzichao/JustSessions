@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Splitting and grouping only arrange tabs: each tab keeps its own terminal, drawn by the engine it opened with, so

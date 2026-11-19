@@ -46,7 +46,7 @@ final class SSHAskpassServer: @unchecked Sendable {
         // Here rather than when the listener closes on its queue, so the socket is gone once this returns.
         unlink(socketPath)
         acceptSource.cancel()
-        tasks.forEach { $0.cancel() }
+        for task in tasks { task.cancel() }
     }
 
     private static func listeningSocket(at path: String) -> Int32? {

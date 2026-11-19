@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+
 @testable import JustSessions
 
 /// One Claude Code tab whose CLI runs in tmux, and Claude Code's live registry in the app's temporary folder, which
@@ -37,29 +38,31 @@ final class ClaudeCodeTabWorld: SessionTabWorld {
     func openResumedTab(on label: String) throws {
         let conversation = try app.listedConversation(labeled: label)
         cliSessionID = conversation.sessionID
-        openTab(TerminalSession(
-            engine: .swiftTerm,
-            conversation: conversation,
-            provider: .claude,
-            projectPath: app.projectPath,
-            action: .resume,
-            displayTitle: app.store.title(for: conversation),
-            command: app.command,
-            tmuxSessionName: TmuxSessionName.forConversation(conversation)
-        ))
+        openTab(
+            TerminalSession(
+                engine: .swiftTerm,
+                conversation: conversation,
+                provider: .claude,
+                projectPath: app.projectPath,
+                action: .resume,
+                displayTitle: app.store.title(for: conversation),
+                command: app.command,
+                tmuxSessionName: TmuxSessionName.forConversation(conversation)
+            ))
     }
 
     func openNewSessionTab() {
-        openTab(TerminalSession(
-            engine: .swiftTerm,
-            conversation: nil,
-            provider: .claude,
-            projectPath: app.projectPath,
-            action: .new,
-            displayTitle: "New Claude Code session",
-            command: app.command,
-            tmuxSessionName: TmuxSessionName.unique(for: .claude)
-        ))
+        openTab(
+            TerminalSession(
+                engine: .swiftTerm,
+                conversation: nil,
+                provider: .claude,
+                projectPath: app.projectPath,
+                action: .new,
+                displayTitle: "New Claude Code session",
+                command: app.command,
+                tmuxSessionName: TmuxSessionName.unique(for: .claude)
+            ))
     }
 
     func cliChoosesName(_ name: String, source: String) throws {

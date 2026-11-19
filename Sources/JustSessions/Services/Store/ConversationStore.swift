@@ -308,9 +308,10 @@ final class ConversationStore {
     /// This window's scan of this Mac, or another window's, which a refresh asked for here would join (see
     /// `WorkspaceReadService`); either may have read the session folders before the change that prompted the refresh.
     var isThisMacScanUnderWay: Bool {
-        isScanningThisMac || windowRegistry.stores.contains {
-            $0 !== self && $0.readService === readService && $0.isScanningThisMac
-        }
+        isScanningThisMac
+            || windowRegistry.stores.contains {
+                $0 !== self && $0.readService === readService && $0.isScanningThisMac
+            }
     }
 
     /// Scans the session folders on this Mac. SSH hosts refresh on their own, so a slow host never holds this up.
@@ -341,7 +342,8 @@ final class ConversationStore {
                 )
                 self.linkWaitingTabsByAppearance(on: .thisMac)
                 self.recoverLostKiroCLIs()
-                self.hostRefreshStatuses[.thisMac] = result.failures.isEmpty
+                self.hostRefreshStatuses[.thisMac] =
+                    result.failures.isEmpty
                     ? .refreshed(.now)
                     : .failed(result.failures.joined(separator: "\n"))
                 if self.isRefreshQueued {
@@ -391,7 +393,8 @@ final class ConversationStore {
 
     func applySuggestedTitle(_ title: String, toSessionID sessionID: String, provider: ConversationProvider, on host: SessionHost) {
         guard let index = conversations.firstIndex(where: { $0.provider == provider && $0.host == host && $0.sessionID == sessionID }),
-              conversations[index].suggestedTitle != title else { return }
+            conversations[index].suggestedTitle != title
+        else { return }
         conversations[index] = conversations[index].withSuggestedTitle(title)
     }
 
@@ -456,8 +459,8 @@ final class ConversationStore {
         changeSavedCustomization(\.messageBookmarks) { bookmarks in
             let saved = bookmarks.bookmarks(forConversationID: conversation.id).first { $0.entryID == entry.id }
             switch (shown, saved) {
-            case (nil, let saved?): toggle = .added(saved)   // another window added it
-            case (let shown?, nil): toggle = .removed(shown)   // another window removed it
+            case (nil, let saved?): toggle = .added(saved)  // another window added it
+            case (let shown?, nil): toggle = .removed(shown)  // another window removed it
             default: toggle = bookmarks.toggle(entryID: entry.id, kind: kind, snippet: snippet, conversationID: conversation.id)
             }
         }
@@ -473,7 +476,9 @@ final class ConversationStore {
     }
 
     func updateMessageBookmark(_ bookmark: MessageBookmark, entryID: Int, snippet: String, in conversation: Conversation) {
-        changeSavedCustomization(\.messageBookmarks) { $0.update(bookmark, entryID: entryID, snippet: snippet, conversationID: conversation.id) }
+        changeSavedCustomization(\.messageBookmarks) {
+            $0.update(bookmark, entryID: entryID, snippet: snippet, conversationID: conversation.id)
+        }
     }
 
     /// The message's bookmark, adding one when it has none, for Edit Bookmark… (⇧⌘D). Nil for an entry that is
@@ -490,8 +495,10 @@ final class ConversationStore {
 
     /// Saves a bookmark's label and tags; nil when another window removed the bookmark meanwhile (RDR-51).
     @discardableResult
-    func setMessageBookmarkDetails(of bookmark: MessageBookmark, label: String?, tags: [String],
-                                   in conversation: Conversation) -> MessageBookmark? {
+    func setMessageBookmarkDetails(
+        of bookmark: MessageBookmark, label: String?, tags: [String],
+        in conversation: Conversation
+    ) -> MessageBookmark? {
         var saved: MessageBookmark?
         changeSavedCustomization(\.messageBookmarks) {
             saved = $0.setDetails(of: bookmark, label: label, tags: tags, conversationID: conversation.id)
@@ -600,10 +607,11 @@ final class ConversationStore {
 
     func delete(_ conversation: Conversation) {
         guard !hasTerminal(for: conversation) else {
-            show(StoreAlert(
-                title: SessionDeletionReport.oneSessionTitle(title(for: conversation)),
-                message: ConversationDeletionError.activeTerminal.localizedDescription
-            ))
+            show(
+                StoreAlert(
+                    title: SessionDeletionReport.oneSessionTitle(title(for: conversation)),
+                    message: ConversationDeletionError.activeTerminal.localizedDescription
+                ))
             return
         }
         guard adapter(for: conversation.provider) != nil else { return }
@@ -728,14 +736,16 @@ final class ConversationStore {
                         }
                         attemptedCount += 1
                         if let unresponsiveHost = conversation.host.sshDestination.flatMap({ unresponsiveHosts[$0] }) {
-                            failures.append(ConversationDeletionFailure(
-                                conversation: conversation,
-                                reason: RemoteConversationDeletionError.notAttempted(unresponsiveHost).localizedDescription,
-                                unresponsiveHost: unresponsiveHost
-                            ))
+                            failures.append(
+                                ConversationDeletionFailure(
+                                    conversation: conversation,
+                                    reason: RemoteConversationDeletionError.notAttempted(unresponsiveHost).localizedDescription,
+                                    unresponsiveHost: unresponsiveHost
+                                ))
                         } else if let adapter = adapters.first(where: { $0.provider == conversation.provider }) {
                             do {
-                                try Self.deleteFromDisk(conversation, adapter: adapter, remoteDeletion: remoteDeletion, claudeIndexBatch: claudeIndexBatch)
+                                try Self.deleteFromDisk(
+                                    conversation, adapter: adapter, remoteDeletion: remoteDeletion, claudeIndexBatch: claudeIndexBatch)
                                 deletedSinceListUpdate.append(conversation)
                             } catch ConversationDeletionError.missingSource {
                                 // Already gone, as after an earlier deletion whose result was lost: it counts as deleted.
@@ -744,16 +754,19 @@ final class ConversationStore {
                                 let unresponsiveHost = (error as? RemoteConversationDeletionError)?.unresponsiveHost
                                 if let unresponsiveHost { unresponsiveHosts[unresponsiveHost.host] = unresponsiveHost }
                                 let isFileGone = !FileManager.default.fileExists(atPath: conversation.sourceFile.path)
-                                failures.append(ConversationDeletionFailure(
-                                    conversation: conversation,
-                                    reason: error.localizedDescription,
-                                    unresponsiveHost: unresponsiveHost,
-                                    isStillListed: !isFileGone
-                                ))
+                                failures.append(
+                                    ConversationDeletionFailure(
+                                        conversation: conversation,
+                                        reason: error.localizedDescription,
+                                        unresponsiveHost: unresponsiveHost,
+                                        isStillListed: !isFileGone
+                                    ))
                                 if isFileGone { deletedSinceListUpdate.append(conversation) }
                             }
                         }
-                        if clock.now - lastListUpdate >= listUpdateInterval || claudeIndexBatch.pendingCount >= ClaudeDeletionIndexBatch.maximumSessionCount {
+                        if clock.now - lastListUpdate >= listUpdateInterval
+                            || claudeIndexBatch.pendingCount >= ClaudeDeletionIndexBatch.maximumSessionCount
+                        {
                             failures += claudeIndexBatch.flush()
                             let deleted = deletedSinceListUpdate
                             let completedCount = completedCountBeforeRound + attemptedCount
@@ -774,9 +787,11 @@ final class ConversationStore {
                     await self.finishDeletionRound(removing: deleted, report: report)
                 }
             } catch {
-                await self.finishDeletionRound(removing: [], report: SessionDeletionReport(
-                    requestedCount: deletableConversations.count, deletedCount: 0, failures: [], wasCanceled: true
-                ))
+                await self.finishDeletionRound(
+                    removing: [],
+                    report: SessionDeletionReport(
+                        requestedCount: deletableConversations.count, deletedCount: 0, failures: [], wasCanceled: true
+                    ))
             }
         }
     }
@@ -791,8 +806,11 @@ final class ConversationStore {
         switch conversation.host {
         case .thisMac:
             if let claude = adapter as? ClaudeAdapter {
-                try ClaudeConversationDeletion(configurationDirectory: claude.configurationDirectory, indexBatch: claudeIndexBatch).delete(conversation)
-            } else { try adapter.delete(conversation) }
+                try ClaudeConversationDeletion(configurationDirectory: claude.configurationDirectory, indexBatch: claudeIndexBatch).delete(
+                    conversation)
+            } else {
+                try adapter.delete(conversation)
+            }
         case .ssh: try remoteDeletion.delete(conversation)
         }
     }
@@ -815,9 +833,10 @@ final class ConversationStore {
         // A disconnected host may have been skipped while other hosts can still proceed. Only the progress bar's
         // Cancel stops the entire batch, including joined sessions.
         guard !deletionProgress.isStopping else {
-            report = report.followed(by: SessionDeletionReport(
-                requestedCount: joinedSessions.count, deletedCount: 0, failures: [], wasCanceled: true
-            ))
+            report = report.followed(
+                by: SessionDeletionReport(
+                    requestedCount: joinedSessions.count, deletedCount: 0, failures: [], wasCanceled: true
+                ))
             finishDeletion(removing: deleted, report: report)
             return
         }
@@ -849,7 +868,8 @@ final class ConversationStore {
         guard !deleted.isEmpty else { return }
         let deletedIDs = Set(deleted.map(\.id))
         // Some CLIs delete a session's subagents' sessions with it; Antigravity's stay as conversations of their own.
-        let deletedSubagentIDs = Set(deleted.filter(\.provider.deletesSubagentsWithSession).flatMap { descendantSubagents(of: $0).map(\.id) })
+        let deletedSubagentIDs = Set(
+            deleted.filter(\.provider.deletesSubagentsWithSession).flatMap { descendantSubagents(of: $0).map(\.id) })
         conversations.removeAll { deletedIDs.contains($0.id) }
         // Gone at once, as their sessions are, rather than at the next refresh; a reading window left open on one then
         // keeps no bookmarks (`SessionReadingView`).
@@ -1051,8 +1071,9 @@ final class ConversationStore {
     /// selected instead. A reopened tab still waiting to be shown starts as it joins.
     func moveIntoShownSplit(_ tabID: UUID, swappingWith side: TerminalSplit.Side) {
         guard let shownSplit, let sides = sides(of: shownSplit),
-              let incomingTab = terminalSessions.first(where: { $0.id == tabID }),
-              splitChooser(beside: tabID) == nil else { return }
+            let incomingTab = terminalSessions.first(where: { $0.id == tabID }),
+            splitChooser(beside: tabID) == nil
+        else { return }
         let outgoingID = sides.tabID(on: side)
         var strip = tabStrip
         guard strip.swap(tabID, intoSplit: shownSplit.id, replacing: outgoingID) else { return }

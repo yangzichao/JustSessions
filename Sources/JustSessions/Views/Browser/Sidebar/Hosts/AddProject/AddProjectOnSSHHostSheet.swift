@@ -90,11 +90,12 @@ struct AddProjectOnSSHHostSheet: View {
         errorMessage = nil
         Task {
             do {
-                onAdded(try await store.addProjectToSidebar(
-                    folder: folder,
-                    on: host,
-                    creatingMissingFolder: creatingMissingFolder
-                ))
+                onAdded(
+                    try await store.addProjectToSidebar(
+                        folder: folder,
+                        on: host,
+                        creatingMissingFolder: creatingMissingFolder
+                    ))
                 dismiss()
             } catch RemoteFolderResolutionError.missingFolder {
                 missingFolder = folder

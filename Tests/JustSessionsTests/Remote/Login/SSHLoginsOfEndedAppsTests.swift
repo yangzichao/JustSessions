@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// A login made with Connect… has no idle limit, so one left by an app that crashed is closed at the next launch.
@@ -17,9 +18,11 @@ struct SSHLoginsOfEndedAppsTests {
         }
         let closed = LockedValue<[String]>([])
 
-        SSHLoginConnections.closeLoginsOfEndedApps(socketRoot: root, close: { _, controlPath in
-            closed.update { $0.append(controlPath) }
-        })
+        SSHLoginConnections.closeLoginsOfEndedApps(
+            socketRoot: root,
+            close: { _, controlPath in
+                closed.update { $0.append(controlPath) }
+            })
 
         #expect(closed.value == [SSHLoginConnections.controlPath(in: crashed)])
         #expect(!FileManager.default.fileExists(atPath: crashed.path))

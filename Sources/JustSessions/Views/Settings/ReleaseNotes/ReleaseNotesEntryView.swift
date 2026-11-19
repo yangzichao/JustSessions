@@ -37,8 +37,8 @@ struct ReleaseNotesEntryView: View {
     }
 }
 
-private extension AppReleaseNotes.Section.Kind {
-    var title: LocalizedStringKey {
+extension AppReleaseNotes.Section.Kind {
+    fileprivate var title: LocalizedStringKey {
         switch self {
         case .new: "New"
         case .improved: "Improved"

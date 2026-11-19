@@ -11,8 +11,9 @@ struct ClaudeLiveSessionRecord: Sendable, Equatable {
 
     init?(jsonData: Data) {
         guard let object = ConversationMetadata.object(from: jsonData),
-              let sessionID = object["sessionId"] as? String,
-              ConversationMetadata.isValidSessionID(sessionID) else { return nil }
+            let sessionID = object["sessionId"] as? String,
+            ConversationMetadata.isValidSessionID(sessionID)
+        else { return nil }
         self.sessionID = sessionID
         self.userChosenName = Self.userChosenName(from: object)
         self.activity = Self.activity(status: object["status"] as? String, waitingFor: object["waitingFor"] as? String)

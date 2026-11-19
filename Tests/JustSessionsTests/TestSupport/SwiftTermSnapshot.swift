@@ -6,8 +6,9 @@ extension TerminalView {
     /// layer's background color to show through, and `cacheDisplay` draws only the view, so this draws it over that color.
     func snapshotOverLayerBackground() -> NSBitmapImageRep? {
         guard let drawn = bitmapImageRepForCachingDisplay(in: bounds),
-              let snapshot = bitmapImageRepForCachingDisplay(in: bounds),
-              let context = NSGraphicsContext(bitmapImageRep: snapshot) else {
+            let snapshot = bitmapImageRepForCachingDisplay(in: bounds),
+            let context = NSGraphicsContext(bitmapImageRep: snapshot)
+        else {
             return nil
         }
         cacheDisplay(in: bounds, to: drawn)

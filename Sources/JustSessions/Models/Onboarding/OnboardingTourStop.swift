@@ -44,7 +44,8 @@ enum OnboardingTourStop: CaseIterable, Sendable {
         switch self {
         case .noSessionsYet, .projects, .sessions: true
         case .newSession, .sshHosts, .keepRunning, .resume, .findInConversation, .sessionMenu, .searchSessions, .tabGroup,
-             .hideSidebar, .openTabs, .splitView: false
+            .hideSidebar, .openTabs, .splitView:
+            false
         }
     }
 

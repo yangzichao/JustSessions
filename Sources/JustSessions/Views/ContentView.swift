@@ -57,12 +57,14 @@ struct ContentView: View {
         }
         .background(WorkspaceWindowRegistration(store: store))
         .onDisappear { store.closeWorkspace() }
-        .modifier(RenameDialogs(
-            store: store,
-            conversation: $renamingConversation,
-            project: $renamingProject,
-            openCount: renameDialogOpenCount
-        ))
+        .modifier(
+            RenameDialogs(
+                store: store,
+                conversation: $renamingConversation,
+                project: $renamingProject,
+                openCount: renameDialogOpenCount
+            )
+        )
         .sessionDeletionDialog(for: $deletionRequest, store: store)
         .storeAlert(store)
     }

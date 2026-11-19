@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 struct RemoteSSHCommandLineToolTests {
@@ -12,8 +13,9 @@ struct RemoteSSHCommandLineToolTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let application = try makeApplication(in: directory, product: Self.productWithSSHTip, tool: "code")
 
-        #expect(RemoteSSHCommandLineTool.find(inApplicationAt: application)
-            == application.appendingPathComponent("Contents/Resources/app/bin/code"))
+        #expect(
+            RemoteSSHCommandLineTool.find(inApplicationAt: application)
+                == application.appendingPathComponent("Contents/Resources/app/bin/code"))
     }
 
     @Test func skipsAnEditorWithoutAnSSHExtensionTip() throws {

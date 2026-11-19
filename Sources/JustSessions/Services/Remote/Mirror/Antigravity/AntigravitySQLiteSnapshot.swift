@@ -19,8 +19,9 @@ enum AntigravitySQLiteSnapshot {
         let finishResult = sqlite3_backup_finish(backup)
         guard result == SQLITE_DONE, finishResult == SQLITE_OK else { throw AntigravityDatabaseError.unreadable }
         try AntigravityDatabase.execute("PRAGMA journal_mode=DELETE", in: copied)
-        let updatedAt = max(ConversationMetadata.fileModificationDate(source),
-                            ConversationMetadata.fileModificationDate(URL(fileURLWithPath: source.path + "-wal")))
+        let updatedAt = max(
+            ConversationMetadata.fileModificationDate(source),
+            ConversationMetadata.fileModificationDate(URL(fileURLWithPath: source.path + "-wal")))
         try FileManager.default.setAttributes([.modificationDate: updatedAt], ofItemAtPath: destination.path)
     }
 
@@ -29,16 +30,24 @@ enum AntigravitySQLiteSnapshot {
         let destinationConversations = destination.appendingPathComponent("conversations")
         try FileManager.default.createDirectory(at: destinationConversations, withIntermediateDirectories: true)
         let files = (try? FileManager.default.contentsOfDirectory(at: conversations, includingPropertiesForKeys: nil)) ?? []
-        for file in files where file.pathExtension == "db"
-            && ConversationMetadata.isValidSessionID(file.deletingPathExtension().lastPathComponent) {
-            guard file.resolvingSymlinksInPath().path == conversations.resolvingSymlinksInPath().appendingPathComponent(file.lastPathComponent).path else {
+        for file in files
+        where file.pathExtension == "db"
+            && ConversationMetadata.isValidSessionID(file.deletingPathExtension().lastPathComponent)
+        {
+            guard
+                file.resolvingSymlinksInPath().path
+                    == conversations.resolvingSymlinksInPath().appendingPathComponent(file.lastPathComponent).path
+            else {
                 throw AntigravityDatabaseError.unreadable
             }
             try copyDatabase(at: file, to: destinationConversations.appendingPathComponent(file.lastPathComponent))
         }
         let index = source.appendingPathComponent("conversation_summaries.db")
         if FileManager.default.fileExists(atPath: index.path) {
-            guard index.resolvingSymlinksInPath().path == source.resolvingSymlinksInPath().appendingPathComponent(index.lastPathComponent).path else {
+            guard
+                index.resolvingSymlinksInPath().path
+                    == source.resolvingSymlinksInPath().appendingPathComponent(index.lastPathComponent).path
+            else {
                 throw AntigravityDatabaseError.unreadable
             }
             try copyDatabase(at: index, to: destination.appendingPathComponent(index.lastPathComponent))

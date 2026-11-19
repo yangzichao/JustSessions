@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
@@ -29,7 +30,9 @@ struct DetachedCLIActivityTmuxTests {
         store.launch(conversation, action: .resume)
         let tab = try #require(store.terminalSessions.last)
         tab.startIfNeeded()
-        try #require(await sandbox.waitUntil { sandbox.server.sessionNames() == [TmuxSessionName.forConversation(conversation)] }, "\(sandbox.launchDiagnostics(for: tab))")
+        try #require(
+            await sandbox.waitUntil { sandbox.server.sessionNames() == [TmuxSessionName.forConversation(conversation)] },
+            "\(sandbox.launchDiagnostics(for: tab))")
         // A session can be listed before its pane process is ready. Wait for the production lookup to
         // record the PID; stop here on failure rather than passing PID 0 to the registry or kill().
         try #require(await sandbox.waitForPaneProcess(in: store, for: tab))

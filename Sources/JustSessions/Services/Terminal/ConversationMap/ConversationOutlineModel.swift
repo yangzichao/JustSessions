@@ -30,7 +30,8 @@ final class ConversationOutlineModel {
     @ObservationIgnored private let minimumInterval: Duration
 
     init(checkInterval: Duration? = nil, minimumReadInterval: Duration = ConversationOutlineModel.minimumReadInterval) {
-        checkIntervalOverride = checkInterval; minimumInterval = minimumReadInterval
+        checkIntervalOverride = checkInterval
+        minimumInterval = minimumReadInterval
     }
 
     /// While the map shows this session on screen (ConversationMapView's .task): a stat every check interval, a read
@@ -65,7 +66,8 @@ final class ConversationOutlineModel {
     /// The map was turned off or the tab closed: drop the outline and the reader with its index.
     func release() {
         watchGeneration += 1
-        reader = nil; sourceKey = nil
+        reader = nil
+        sourceKey = nil
         if outline != nil { outline = nil }
         if couldNotRead { couldNotRead = false }
     }
@@ -79,12 +81,13 @@ final class ConversationOutlineModel {
         do {
             if let updated = try await reader.update(), reader === self.reader {
                 revision += 1
-                var stamped = updated; stamped.revision = revision
+                var stamped = updated
+                stamped.revision = revision
                 outline = stamped
             }
             if couldNotRead { couldNotRead = false }
         } catch is CancellationError {
-            return   // the map was hidden: showing it again reads at once
+            return  // the map was hidden: showing it again reads at once
         } catch {
             if outline == nil, reader === self.reader { couldNotRead = true }
         }

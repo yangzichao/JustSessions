@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import JustSessions
 
 /// The saved choice of what ⌘-clicking a file link does, and which files a chosen editor opens.

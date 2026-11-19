@@ -1,5 +1,6 @@
 import AppKit
 import Testing
+
 @testable import JustSessions
 
 /// The Edit menu's Select All, Copy, and Paste in a Ghostty tab; see `TerminalInteractionTests` for SwiftTerm's.

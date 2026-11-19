@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
+
 @testable import JustSessions
 
 /// Reversing, swapping into, or separating a split reorders the tabs, and with them the terminals the workspace lays

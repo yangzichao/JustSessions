@@ -17,7 +17,8 @@ struct KiroSessionMetadata: Equatable {
 
     init?(object: [String: Any]) {
         guard let sessionID = object["session_id"] as? String,
-              let projectPath = object["cwd"] as? String else { return nil }
+            let projectPath = object["cwd"] as? String
+        else { return nil }
         self.sessionID = sessionID
         self.projectPath = projectPath
         self.title = object["title"] as? String
@@ -35,8 +36,9 @@ struct KiroSessionMetadata: Equatable {
             guard let object = ConversationMetadata.object(from: head) else { return nil }
             self.init(object: object)
         } else if let object = Self.objectBeforeSessionState(in: head),
-                  ["session_id", "cwd", "title", "updated_at", "session_created_reason", "parent_session_id"]
-                    .allSatisfy({ object[$0] != nil }) {
+            ["session_id", "cwd", "title", "updated_at", "session_created_reason", "parent_session_id"]
+                .allSatisfy({ object[$0] != nil })
+        {
             // Only a complete metadata prefix proves no field we use was omitted. A missing optional field may
             // occur after session_state in a reordered file; explicit JSON null still counts as present here.
             self.init(object: object)
@@ -56,7 +58,8 @@ struct KiroSessionMetadata: Equatable {
             searchStart = keyRange.upperBound
             // A member name follows `{` or `,`. Inside a string, the quote would be escaped instead.
             guard let previous = data[..<keyRange.lowerBound].last(where: { !isJSONWhitespace($0) }),
-                  previous == UInt8(ascii: ",") || previous == UInt8(ascii: "{") else { continue }
+                previous == UInt8(ascii: ",") || previous == UInt8(ascii: "{")
+            else { continue }
             var members = Data(data[..<keyRange.lowerBound])
             while let last = members.last, isJSONWhitespace(last) || last == UInt8(ascii: ",") { members.removeLast() }
             members.append(UInt8(ascii: "}"))
