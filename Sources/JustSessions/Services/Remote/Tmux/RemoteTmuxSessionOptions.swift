@@ -1,7 +1,5 @@
 import Foundation
 
-/// The tmux commands a remote tab's session runs on every attach, after `new-session -A`; see `RemoteTmuxAttachScript`.
-/// The agent that fixes what a host check found is told them too; see `HostFixAgentHostFacts`.
 enum RemoteTmuxSessionOptions {
     // The status line and mouse settings make it look and scroll like the CLI on its own, and with no prefix key
     // Ctrl-B reaches the CLI, unless the host uses its own; see `RemoteTmuxPrefixOptions`. `set-titles` passes the
@@ -31,8 +29,6 @@ enum RemoteTmuxSessionOptions {
         return setOptionCommands(titleFormat: titleFormat, usingHostPrefix: usingHostPrefix)
     }
 
-    /// A plain terminal's shell tells nothing but its own title. Its scrollback is the pane's history, which keeps as
-    /// many lines as the tab's terminal does where tmux allows it; see `PlainTerminalTmuxHistoryLimit`.
     static func setOptionCommandsForPlainTerminal(usingHostPrefix: Bool) -> [String] {
         setOptionCommands(titleFormat: "#T", usingHostPrefix: usingHostPrefix)
             + [PlainTerminalTmuxHistoryLimit.remoteSessionOptionCommand]

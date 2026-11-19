@@ -1,7 +1,5 @@
 import Foundation
 
-/// Reads the answers of `RemoteHostCheckScript` into findings, in the order the app depends on them: the system,
-/// `rsync` for copying, the session's folder, tmux, the CLIs, then `python3` for the tools copied through it.
 enum RemoteHostCheckFindings {
     static func findings(in output: RemoteHostCheckOutput, context: RemoteHostCheckContext) -> [HostCheckFinding] {
         var findings = [rsyncFinding(in: output, host: context.host)]
@@ -96,8 +94,6 @@ enum RemoteHostCheckFindings {
         )
     }
 
-    /// OpenCode's and Antigravity's sessions are copied from snapshots `python3` makes with its `sqlite3` module.
-    /// Nil when neither tool is on the host or has sessions listed under it.
     static func pythonFinding(in output: RemoteHostCheckOutput, context: RemoteHostCheckContext) -> HostCheckFinding? {
         let toolsNeedingPython = context.programs.map(\.provider).filter { provider in
             [.opencode, .antigravity].contains(provider)

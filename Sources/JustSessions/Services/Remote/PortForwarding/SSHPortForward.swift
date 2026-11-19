@@ -1,7 +1,5 @@
 import Foundation
 
-/// A port on this Mac forwarded to `localhost:<remotePort>` on an SSH host; see `SSHPortForwards`. Only this Mac can
-/// use it: it listens on 127.0.0.1.
 struct SSHPortForward: Hashable, Sendable {
     static let validPorts = 1...65535
 
@@ -9,12 +7,10 @@ struct SSHPortForward: Hashable, Sendable {
     let localPort: Int
     let remotePort: Int
 
-    /// What to type in a browser or a client on this Mac.
     var address: String { "localhost:\(localPort)" }
 
     var browserURL: URL? { URL(string: "http://localhost:\(localPort)") }
 
-    /// `ssh -L`'s argument.
     var specification: String { "127.0.0.1:\(localPort):localhost:\(remotePort)" }
 }
 
@@ -28,8 +24,6 @@ enum SSHPortForwardCommands {
         case cancel
     }
 
-    /// A connection that carries forwards and runs nothing: the background commands' settings (SSH-20, SSH-23), in
-    /// the foreground, listening on `controlPath` for the forwards to add.
     static func connectionArguments(host: String, controlPath: String) -> [String] {
         ["-N", RemoteHostCommandRunner.noTerminalOption]
             + RemoteHostCommandRunner.nonInteractiveSSHOptions

@@ -1,21 +1,9 @@
 import Foundation
 
-/// Finds out whether an SSH host's interactive shell startup lets the app's commands run, as a tab runs them: in a
-/// terminal, through `RemoteShellStartup.interactive`. Some startup files start another program for every
-/// interactive shell, such as tmux or another shell; a tab then shows that program's prompt instead of the CLI. Such a
-/// host gets `RemoteShellStartup.loginOnly` when a login shell without the interactive startup runs the app's
-/// command; otherwise its startup files need a change, which the user guide explains.
-///
-/// Each step runs a marker command in a terminal and looks for what it prints. bash and zsh also trace their startup,
-/// so the last command they ran says where it stopped. A terminal is needed, since startup files often start that
-/// program only in one; letting it start can leave it running on the host, so the check runs rarely.
 struct RemoteShellStartupCheck: Sendable {
-    /// Runs a command on the host in a terminal. The exit status is nil when the command ran past the timeout.
     let run: @Sendable (_ host: String, _ command: String, _ timeout: TimeInterval) -> (exitStatus: Int32?, output: String)?
     let timeout: TimeInterval
 
-    /// Startup that takes longer than `timeout` counts as having started another program, so it is generous. A host
-    /// that couldn't be reached a moment ago isn't asked; see `SSHHostReachability`.
     init(
         reachability: SSHHostReachability = .shared,
         run: (@Sendable (_ host: String, _ command: String, _ timeout: TimeInterval) -> (exitStatus: Int32?, output: String)?)? = nil,
@@ -33,7 +21,6 @@ struct RemoteShellStartupCheck: Sendable {
                         command: command,
                         connectionSharingOptions: SSHLoginConnections.shared.connectionOptions(for: host)
                     ),
-                    // A tab's terminal settings, which startup files may look at, such as TERM.
                     environment: TerminalColorEnvironment.embeddedTerminalEnvironment(from: SSHProcessEnvironment.standard),
                     includesStandardError: true,
                     timeout: timeout,
@@ -47,12 +34,10 @@ struct RemoteShellStartupCheck: Sendable {
         self.timeout = timeout
     }
 
-    /// The background commands' options, with a terminal in place of their `-T`.
     static func sshArguments(host: String, command: String, connectionSharingOptions: [String]) -> [String] {
         ["-tt"] + RemoteHostCommandRunner.nonInteractiveSSHOptions + connectionSharingOptions + [host, command]
     }
 
-    /// Nil when it could not tell, as when the host could not be reached; a later refresh checks again.
     func check(host: String) -> RemoteShellStartupCheckResult? {
         guard !Task.isCancelled else { return nil }
         guard let interactive = conclusiveRun(host, Self.tracedInteractiveCommand) else { return nil }
@@ -66,7 +51,6 @@ struct RemoteShellStartupCheck: Sendable {
         )
     }
 
-    /// Nil when `ssh` could not connect, or when nothing came back before the timeout, as when the connection stalled.
     private func conclusiveRun(_ host: String, _ command: String) -> (exitStatus: Int32?, output: String)? {
         guard !Task.isCancelled else { return nil }
         guard let result = run(host, command, timeout),
@@ -76,8 +60,6 @@ struct RemoteShellStartupCheck: Sendable {
         return result
     }
 
-    // MARK: - Commands
-
     static let marker = "__JUSTSESSIONS_SHELL_STARTUP_OK__"
     /// Short, since bash 3.2 cuts its trace prefix off at about 100 characters, location included.
     static let traceMarker = "JUSTSESSIONS "
@@ -85,8 +67,6 @@ struct RemoteShellStartupCheck: Sendable {
     /// Prints the marker from two halves, so a shell that echoes or traces the command doesn't print it whole.
     static let markerCommand = "printf '%s%s\\n' __JUSTSESSIONS_SHELL_ STARTUP_OK__"
 
-    /// `RemoteShellStartup.interactive`, traced when the host's shell is bash or zsh. `/bin/sh` reads it, whatever the
-    /// host's own shell.
     static var tracedInteractiveCommand: String {
         let script = """
             case "${SHELL##*/}" in
@@ -103,14 +83,10 @@ struct RemoteShellStartupCheck: Sendable {
         RemoteShellStartup.loginOnly.command(running: markerCommand)
     }
 
-    // MARK: - Output
-
-    /// Anywhere in a line, after whatever the terminal printed first; the commands hold it only in halves.
     static func printedMarker(_ output: String) -> Bool {
         lines(of: output).contains { $0.contains(marker) }
     }
 
-    /// `file:line: command` from the last line the startup's trace printed, shortened for a tooltip.
     static func lastTracedCommand(in output: String) -> String? {
         guard let line = lines(of: output).last(where: { $0.drop(while: { $0 == "+" }).hasPrefix(traceMarker) })
         else { return nil }
@@ -120,7 +96,6 @@ struct RemoteShellStartupCheck: Sendable {
         return command.count > 160 ? String(command.prefix(159)) + "…" : command
     }
 
-    /// The output's lines without terminal escape sequences, carriage returns, or other control characters.
     private static func lines(of output: String) -> [String] {
         let withoutEscapes = output.replacingOccurrences(
             of: "\u{1B}(\\[[0-9;?]*[ -/]*[@-~]|\\][^\u{07}\u{1B}]*(\u{07}|\u{1B}\\\\)|[@-_])",

@@ -1,32 +1,21 @@
 import AppKit
 import Observation
 
-/// Each SSH host's sign-in command, for every window: when it's due, and signing in with it. A host's command is due
-/// when its check command exits with anything but 0, run on the host every 5 minutes, or with no check command, every
-/// few hours after the last sign-in through the app; see `RemoteSignInSchedule`. A due host shows Sign in… on its
-/// heading. Its dialog opens by itself only when you've just come to the app: when the app comes forward, or when the
-/// first look at the host since launch, or since its command was set, finds it due while the app is in front. One
-/// that comes due while you're using the app, or while it's in the background, posts a notification instead, once,
-/// so a dialog never takes typing meant for a terminal. One sign-in runs at a time, in one window; see
-/// `RemoteSignInSession`.
 @MainActor
 @Observable
 final class RemoteSignIns {
     static let shared = RemoteSignIns()
 
     enum State: Equatable {
-        /// Not looked at yet, or the host couldn't be asked.
         case unknown
         case signedIn
         case due
         case signingIn
     }
 
-    /// Asks the questions of the sign-in running now, in the window `presentingStoreID` names.
     let prompter = SSHLoginPrompter()
     private(set) var settings: RemoteSignInSettings
     private(set) var states: [String: State] = [:]
-    /// The store of the window that shows the running sign-in's questions.
     private(set) var presentingStoreID: ObjectIdentifier?
 
     @ObservationIgnored private let userDefaults: UserDefaults
@@ -37,9 +26,7 @@ final class RemoteSignIns {
     @ObservationIgnored private let frontStore: @MainActor () -> ConversationStore?
     @ObservationIgnored private var lastCheckedAt: [String: Date] = [:]
     @ObservationIgnored private var hostsBeingChecked: Set<String> = []
-    /// Hosts looked at since launch, or since their command was set.
     @ObservationIgnored private var lookedAt: Set<String> = []
-    /// Hosts whose due sign-in has posted its notification or opened its dialog, until they're signed in again.
     @ObservationIgnored private var notified: Set<String> = []
     @ObservationIgnored private var opened: Set<String> = []
     @ObservationIgnored private var signingIn: (host: String, task: Task<Void, Never>)?
@@ -69,8 +56,6 @@ final class RemoteSignIns {
         settings.command(on: host) == nil ? .unknown : states[host] ?? .unknown
     }
 
-    /// Nil removes the host's command. The host is then looked at again at once, as at launch, so a command that's
-    /// due opens its dialog in the front window.
     func setCommand(_ command: RemoteSignInCommand?, on host: String, needsLogIn: Bool = false, now: Date = .now) {
         settings.setCommand(command, on: host)
         settings.save(to: userDefaults)
@@ -82,7 +67,6 @@ final class RemoteSignIns {
         look(at: host, needsLogIn: needsLogIn, now: now)
     }
 
-    /// For a removed host.
     func forget(_ host: String) {
         guard settings.command(on: host) != nil || settings.signedInAt(on: host) != nil else { return }
         settings.forget(host)
@@ -92,15 +76,12 @@ final class RemoteSignIns {
         if signingIn?.host == host { signingIn?.task.cancel() }
     }
 
-    /// The host auto refresh's beat: looks at each listed host with a command. A host that needs Connect… is left
-    /// alone, since its check would only fail to connect.
     func lookAtHosts(_ hosts: [String], needingLogIn: Set<String>, now: Date = .now) {
         for host in hosts where settings.command(on: host) != nil {
             look(at: host, needsLogIn: needingLogIn.contains(host), now: now)
         }
     }
 
-    /// You came to the app: a due host whose dialog hasn't opened since it came due opens it now.
     func appCameForward() {
         guard signingIn == nil,
             let host = states.keys.sorted().first(where: { states[$0] == .due && !opened.contains($0) })
@@ -108,7 +89,6 @@ final class RemoteSignIns {
         openDialog(on: host)
     }
 
-    /// Sign in… from a heading or menu, or a clicked notification, in the window that asked.
     func signIn(on host: String, presentingIn store: ConversationStore) {
         guard signingIn == nil, let command = settings.command(on: host) else { return }
         let stateBefore = state(on: host)
@@ -124,7 +104,6 @@ final class RemoteSignIns {
         signingIn = (host, task)
     }
 
-    /// A clicked notification: signs in in the front window.
     func signInFromNotification(on host: String) {
         NSApp?.activate()
         guard state(on: host) == .due else { return }
@@ -152,7 +131,6 @@ final class RemoteSignIns {
             let exitStatus = await runCheck(host, checkCommand)
             guard let self else { return }
             hostsBeingChecked.remove(host)
-            // The command may have changed or gone while the check ran.
             guard settings.command(on: host)?.checkCommand == checkCommand else { return }
             apply(RemoteSignInSchedule.checkResult(exitStatus: exitStatus), on: host)
         }

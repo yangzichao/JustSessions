@@ -1,8 +1,6 @@
 import Foundation
 import SQLite3
 
-/// Builds an OpenCode mirror database on this Mac, as the host's python3 snapshot does; tests copy from a local
-/// folder that stands in for the host's home.
 enum OpenCodeSQLiteSnapshot {
     static func copy(_ source: URL, to destination: URL) throws {
         guard FileManager.default.fileExists(atPath: source.path) else { throw OpenCodeDatabaseError.unreadable }
@@ -20,7 +18,6 @@ enum OpenCodeSQLiteSnapshot {
         sqlite3_finalize(attach)
         guard attachResult == SQLITE_DONE else { throw OpenCodeDatabaseError.unreadable }
 
-        // One transaction reads every table from the same moment.
         try OpenCodeDatabase.execute("BEGIN", in: database)
         do {
             for alternatives in OpenCodeMirrorSnapshotSteps.steps {
@@ -34,7 +31,6 @@ enum OpenCodeSQLiteSnapshot {
         try OpenCodeDatabase.execute("DETACH DATABASE source", in: database)
     }
 
-    /// Moves on to a step's next statement only when the database or SQLite lacks what the previous one needs.
     private static func run(_ alternatives: [String], in database: OpaquePointer) throws {
         for statement in alternatives {
             if sqlite3_exec(database, statement, nil, nil, nil) == SQLITE_OK { return }

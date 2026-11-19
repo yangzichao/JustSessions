@@ -5,25 +5,17 @@ import Foundation
 /// returns the file's absolute path there; see `RemoteDroppedFileCopyScript`. `ssh` reads the file itself, as its
 /// standard input, and shares the file's read position with the app, so that position is how far the copy has gone.
 struct RemoteDroppedFileCopier: Sendable {
-    /// What starts the process that runs a command on the host.
     struct ProcessLaunch: Sendable {
         let executablePath: String
         let arguments: [String]
         let environment: [String: String]
     }
 
-    /// How long a copy may go without `ssh` reading more of the file before it is given up, as when the host stops
-    /// writing. A dead connection ends sooner, through `ServerAliveInterval`; see
-    /// `RemoteHostCommandRunner.nonInteractiveSSHOptions`.
     static let stallTimeout: TimeInterval = 60
-    /// How often the copy reports its progress while it runs.
     static let progressInterval: TimeInterval = 0.2
 
-    /// Runs `hostCommand` on `host`: `ssh`, unless a test runs it in a local shell instead.
     let processLaunch: @Sendable (_ host: String, _ hostCommand: String, _ connectionOptions: [String]) -> ProcessLaunch
 
-    /// Without `connectionOptions` from a shared connection, a host logged in to with Connect… is reached through
-    /// that login, as `RemoteHostCommandRunner` does.
     init(
         processLaunch: (@Sendable (_ host: String, _ hostCommand: String, _ connectionOptions: [String]) -> ProcessLaunch)? = nil
     ) {
@@ -43,8 +35,6 @@ struct RemoteDroppedFileCopier: Sendable {
             }
     }
 
-    /// Blocks until the file is on the host, calling `progress` with the bytes sent so far every `progressInterval`.
-    /// Throws `CancellationError` once `cancellation` is cancelled, and `RemoteDroppedFileCopyError` otherwise.
     func copy(
         _ fileURL: URL,
         to host: String,
@@ -57,14 +47,12 @@ struct RemoteDroppedFileCopier: Sendable {
             throw RemoteDroppedFileCopyError.couldNotRead(fileName: fileName)
         }
         defer { try? fileHandle.close() }
-        // The size of the file opened, which a symbolic link leads to.
         var fileStatus = stat()
         guard fstat(fileHandle.fileDescriptor, &fileStatus) == 0, fileStatus.st_mode & S_IFMT == S_IFREG else {
             throw RemoteDroppedFileCopyError.couldNotRead(fileName: fileName)
         }
         let byteCount = Int64(fileStatus.st_size)
 
-        // What the host and `ssh` print goes to a file rather than a pipe, as in `BoundedProcessRunner`.
         let outputFile = FileManager.default.temporaryDirectory
             .appendingPathComponent("justsessions-dropped-file-copy-\(UUID().uuidString)")
         guard FileManager.default.createFile(atPath: outputFile.path, contents: nil),
@@ -121,8 +109,6 @@ struct RemoteDroppedFileCopier: Sendable {
         return folder + "/" + fileName
     }
 
-    /// Reports how far `ssh` has read until it exits, and stops it if it reads nothing more for `stallTimeout`
-    /// before the end of the file. Returns whether it stalled.
     private func waitForExit(
         of process: Process,
         finished: DispatchSemaphore,

@@ -1,9 +1,5 @@
 import Foundation
 
-/// Finds where an SSH host keeps each tool's sessions as the tools find it there: from `CLAUDE_CONFIG_DIR`,
-/// `CODEX_HOME`, `KIRO_HOME`, `PI_CODING_AGENT_SESSION_DIR`, `PI_CODING_AGENT_DIR`, and Pi's `sessionDir` setting, set
-/// in the host's login shell. The host prints them, and this Mac works the folders out with the rules its own adapters
-/// use. Only absolute paths, or ones under `~`, are followed; the folders' standard places stand in for the rest.
 enum RemoteToolFoldersLookup {
     static let variableNames = [
         "CLAUDE_CONFIG_DIR", "CODEX_HOME", "KIRO_HOME", "PI_CODING_AGENT_SESSION_DIR", "PI_CODING_AGENT_DIR",
@@ -12,8 +8,6 @@ enum RemoteToolFoldersLookup {
     static let piSettingsStart = "__JUSTSESSIONS_PI_SETTINGS_START__"
     static let piSettingsEnd = "__JUSTSESSIONS_PI_SETTINGS_END__"
 
-    /// The standard folders when the host's shell printed nothing that can be read, as when it timed out. A shell
-    /// that ran none of it may be Windows', which is asked; the app's other commands would fail there too.
     static func folders(on host: String, runner: RemoteHostCommandRunner) throws -> RemoteToolFolders {
         guard let result = runner.run(host, command(on: host), 30) else { return .standard }
         if result.exitStatus == RemoteHostCommandRunner.connectionFailureExitStatus {
@@ -25,7 +19,6 @@ enum RemoteToolFoldersLookup {
         return folders(inOutput: result.output)
     }
 
-    /// Whether the lookup ran: it prints the home folder first, even an empty one.
     static func printedHome(_ output: String) -> Bool {
         output.split(whereSeparator: \.isNewline).contains { $0.hasPrefix(linePrefix + "HOME=") }
     }
@@ -34,7 +27,6 @@ enum RemoteToolFoldersLookup {
         RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
     }
 
-    /// POSIX `sh`. Prints `$HOME` and each variable made absolute, or empty, then Pi's settings file.
     static var script: String {
         let printedVariables = variableNames.map { name in
             "printf '\(linePrefix)\(name)=%s\\n\' \"$(absolute \"${\(name):-}\")\""
@@ -51,7 +43,6 @@ enum RemoteToolFoldersLookup {
             ]).joined(separator: "\n")
     }
 
-    /// Lines a shell profile prints come before the lookup's, and are skipped.
     static func folders(inOutput output: String) -> RemoteToolFolders {
         let lines = output.components(separatedBy: "\n").map { $0.hasSuffix("\r") ? String($0.dropLast()) : $0 }
         var values: [String: String] = [:]
@@ -69,7 +60,6 @@ enum RemoteToolFoldersLookup {
             claude: ClaudeAdapter.standardConfigurationDirectory(environment: environment, homeDirectory: home).path,
             codex: CodexAdapter.standardCodexDirectory(environment: environment, homeDirectory: home).path,
             kiro: KiroAdapter.standardSessionsDirectory(environment: environment, homeDirectory: home).path,
-            // A relative `sessionDir` is relative to a folder the lookup doesn't know.
             pi: piPath.hasPrefix("/")
                 ? piPath
                 : PiSessionsDirectory.standardPath(environment: environment, homeDirectory: home, settingsData: { _ in nil })

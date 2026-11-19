@@ -1,15 +1,11 @@
 import Foundation
 
-/// Where an SSH host keeps each tool's session files, found from the host's login shell by `RemoteToolFoldersLookup`.
-/// A path is absolute, or relative to the host's home when the lookup could not tell. Antigravity keeps the standard
-/// folder, and OpenCode's database is found by its own snapshot command; see `OpenCodeRemoteDatabaseLocation`.
 struct RemoteToolFolders: Codable, Equatable, Sendable {
     var claude: String
     var codex: String
     var kiro: String
     var pi: String
 
-    /// The folders of a host that sets none of the tools' variables, relative to its home.
     static let standard = RemoteToolFolders(
         claude: RemoteSessionMirror.remoteFolder(for: .claude),
         codex: RemoteSessionMirror.remoteFolder(for: .codex),
@@ -27,7 +23,6 @@ struct RemoteToolFolders: Codable, Equatable, Sendable {
         }
     }
 
-    /// Kiro V3's sessions: the `sessions` folder that holds V2's `sessions/cli`; see `KiroV3Session`.
     var kiroV3: String { (kiro as NSString).deletingLastPathComponent }
 
     /// `rsync`'s source for the folder's contents. The host's shell reads the path again, so one with a space or
@@ -40,13 +35,11 @@ struct RemoteToolFolders: Codable, Equatable, Sendable {
         "\(host):\(quotedIfNeeded(path))/"
     }
 
-    /// The folder in a POSIX `sh` script, a relative one from `$HOME`.
     func shellPath(for provider: ConversationProvider) -> String {
         let path = path(for: provider)
         return path.hasPrefix("/") ? ShellQuoting.quoted(path) : "\"$HOME\"/" + ShellQuoting.quoted(path)
     }
 
-    /// The folder with this Mac's stand-in for the host's home in place of a relative path's home, for tests.
     func localPath(for provider: ConversationProvider, sourceHome: String) -> String {
         Self.localPath(path(for: provider), sourceHome: sourceHome)
     }

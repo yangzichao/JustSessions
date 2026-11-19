@@ -1,6 +1,5 @@
 import Foundation
 
-/// Lists a remote host's sessions: refreshes the local mirror, then reads it with the regular adapters.
 struct RemoteSessionDiscovery: Sendable {
     let mirror: RemoteSessionMirror
     let status: @Sendable (String) -> RemoteHostStatus?
@@ -15,9 +14,6 @@ struct RemoteSessionDiscovery: Sendable {
         return try readMirror(host: host)
     }
 
-    /// Copies the host's sessions one tool after another, as `discover(host:)` does. `copying` is told which tool is
-    /// next, and `copied` gets that tool's sessions as soon as they are copied, so a slow copy of one tool does not
-    /// keep the others' sessions from being listed. Each callback finishes before the copy goes on.
     func discoverToolByTool(
         host: String,
         copying: @Sendable (RemoteSessionCopyStep) async -> Void,

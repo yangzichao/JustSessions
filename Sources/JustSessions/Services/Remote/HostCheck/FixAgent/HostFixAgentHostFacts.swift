@@ -1,26 +1,16 @@
 import Foundation
 
-/// How JustSessions uses the checked host, for the agent that fixes what the check found, with the host's own values:
-/// the agent can't see the app, and would otherwise guess.
 struct HostFixAgentHostFacts: Equatable, Sendable {
     let host: String
     let shellStartup: RemoteShellStartup
     let usesHostTmuxPrefix: Bool
-    /// JustSessions' tmux sessions on the host, as its last refresh listed them; nil when it couldn't list them.
     let runningTmuxSessionNames: Set<String>?
-    /// What the last refresh's tmux printed when it couldn't reach the server; see `RemoteHostStatus`.
     let tmuxServerProblem: String?
-    /// The session the check came from, whose tab command the facts describe; nil describes Claude Code's in a made-up
-    /// folder.
     let session: HostCheckSession?
 
     var lines: [String] {
         let exampleProvider = session?.provider ?? .claude
         let exampleFolder = session?.projectPath ?? "/path/to/project"
-        // The tab's whole command quotes the CLI's start inside the pane's command, and that inside tmux's script, so
-        // it holds thousands of single quotes and backslashes, each 32 bytes once the prompt is quoted for the host:
-        // Claude Code's made it over 400 KB there, too long to send. Its parts read on their own, and the agent can
-        // print the rest.
         let commandWithoutTmux = RemoteCLICommandBuilder.remoteCommand(
             provider: exampleProvider,
             projectPath: exampleFolder,
@@ -61,7 +51,6 @@ struct HostFixAgentHostFacts: Equatable, Sendable {
         return lines
     }
 
-    /// What the pane command does before the CLI starts, as in the tab's command without tmux.
     private static func paneCommandSentence(for provider: ConversationProvider) -> String {
         switch provider {
         case .codex:

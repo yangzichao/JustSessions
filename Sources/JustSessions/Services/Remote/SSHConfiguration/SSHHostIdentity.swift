@@ -1,8 +1,5 @@
 import Foundation
 
-/// The account and machine `ssh` reaches for a host, after `~/.ssh/config`. Two hosts with the same identity list the
-/// same sessions, such as an alias `devbox` and the `me@192.0.2.10` it stands for. The jump host and proxy are part of
-/// it, since one address behind two jump hosts can be two machines.
 struct SSHHostIdentity: Hashable, Sendable {
     let user: String
     let hostName: String
@@ -22,16 +19,13 @@ struct SSHHostIdentity: Hashable, Sendable {
 
     var userAtHostName: String { "\(user)@\(hostName)" }
 
-    /// Nil for the standard port.
     var nonStandardPort: String? { port == "22" ? nil : port }
 }
 
-/// Where a host being added connects, and which listed host connects to the same place.
 struct SSHHostSameMachineCheck: Equatable, Sendable {
     let identity: SSHHostIdentity?
     let listedHostWithSameIdentity: String?
 
-    /// `resolve` stands in for `ssh -G`.
     static func check(
         host: String,
         listedHosts: [String],

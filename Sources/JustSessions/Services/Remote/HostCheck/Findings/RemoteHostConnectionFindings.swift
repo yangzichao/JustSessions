@@ -1,8 +1,5 @@
 import Foundation
 
-/// The first two findings, which the others depend on: whether the app can log in, and how the host's shell startup
-/// lets the app's commands run. Both come from the checks the app already runs; see `RemoteHostConnectionCheck` and
-/// `RemoteShellStartupCheck`.
 enum RemoteHostConnectionFindings {
     static func connectionFinding(problem: SSHConnectionProblem?, host: String) -> HostCheckFinding {
         HostCheckFinding(

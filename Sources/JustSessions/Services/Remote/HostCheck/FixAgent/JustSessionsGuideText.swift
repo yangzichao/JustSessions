@@ -1,15 +1,10 @@
 import Foundation
 
-/// Reads `JustSessionsGuideSection`s out of the guides the app ships, so an agent reads the guides of the version
-/// that checked the host.
 enum JustSessionsGuideText {
-    /// The guides are at the top level of the app's resource bundle; see `Package.swift`.
     static var shippedGuidesDirectory: URL? {
         AppLocalization.resourceBundle.resourceURL
     }
 
-    /// The section's text from its heading line up to the next heading of the same or a higher level; nil when the
-    /// guide or the heading is missing.
     static func text(of section: JustSessionsGuideSection, in guidesDirectory: URL? = shippedGuidesDirectory) -> String? {
         guard let guideURL = guidesDirectory?.appendingPathComponent(section.fileName),
             let markdown = try? String(contentsOf: guideURL, encoding: .utf8)
@@ -38,8 +33,6 @@ enum JustSessionsGuideText {
         return lines[sectionStart.index..<sectionEnd].joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// The git tag of a release build's guides, `v1.2.11`, or `main` for a development build, whose version has more
-    /// than the release's three numbers.
     static func gitReference(forAppVersion appVersion: String) -> String {
         let numbers = appVersion.split(separator: ".", omittingEmptySubsequences: false)
         let isReleaseVersion = numbers.count == 3 && numbers.allSatisfy { !$0.isEmpty && $0.allSatisfy(\.isASCIIDigit) }

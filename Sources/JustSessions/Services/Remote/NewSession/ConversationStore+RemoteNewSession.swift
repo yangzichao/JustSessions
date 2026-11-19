@@ -1,11 +1,6 @@
 import Foundation
 
-/// New sessions and branches started in a project on a remote host. While such a tab runs, its host is copied
-/// again every few seconds until the tab is linked to its session and that session has a title.
 extension ConversationStore {
-    /// A new Claude Code session starts with an id of its own when the host's CLI takes one, and its tmux session
-    /// has that session's name from the start; see `RemoteClaudeSessionIDFlagSupport`. See
-    /// `launchNewSession(provider:in:initialPrompt:runsInTmux:deletesSessionWhenClosed:)` for the rest.
     func launchNewRemoteSession(
         provider: ConversationProvider,
         host: String,
@@ -53,8 +48,6 @@ extension ConversationStore {
         openTerminal(session)
     }
 
-    /// How often an SSH host is copied again while a tab there waits for its session to be listed: a new session's or
-    /// branch's tab, or a Claude Code tab whose CLI moved to another session (see `followClaudeSessionSwitch`).
     static let refreshIntervalWhileWaitingForRemoteSession: TimeInterval = 10
 
     func startRemoteNewSessionPolling(interval: Duration = .seconds(refreshIntervalWhileWaitingForRemoteSession)) {

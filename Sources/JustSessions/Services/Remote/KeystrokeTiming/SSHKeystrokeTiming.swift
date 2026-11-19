@@ -7,7 +7,6 @@ import Foundation
 enum SSHKeystrokeTiming {
     static let unobscuredOptions = ["-o", "ObscureKeystrokeTiming=no"]
 
-    /// Checked once per run.
     static let options: [String] = sshAccepts(unobscuredOptions) ? unobscuredOptions : []
 
     /// `ssh -G` reads the options without connecting. `-F /dev/null` leaves out the user's and the system's

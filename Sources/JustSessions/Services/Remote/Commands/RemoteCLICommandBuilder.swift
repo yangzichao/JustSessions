@@ -1,12 +1,8 @@
 import Foundation
 
-/// Builds the `ssh -t <host> …` command a terminal tab runs to open a session on a remote host.
-/// With a tmux session name, the CLI runs inside that tmux session, so it keeps running when the connection
-/// drops or the tab closes, and opening the same name again reattaches to it.
 struct RemoteCLICommandBuilder {
     let inheritedEnvironment: [String: String]
     let loginConnections: SSHLoginConnections
-    /// See `SSHKeystrokeTiming`.
     let keystrokeTimingOptions: [String]
 
     init(
@@ -19,9 +15,6 @@ struct RemoteCLICommandBuilder {
         self.keystrokeTimingOptions = keystrokeTimingOptions
     }
 
-    /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable. It stands in for
-    /// `defaultStartCommand`, so the app's arguments that follow leave out what it holds. `usesHostTmuxPrefix` is the
-    /// host's choice in `RemoteHostsUsingTmuxPrefix`, so every tab's command passes it.
     func command(
         host: String,
         provider: ConversationProvider,
@@ -46,18 +39,13 @@ struct RemoteCLICommandBuilder {
         )
     }
 
-    /// `ssh -t <host> <remoteCommand>`, with a terminal for the remote command. On a host logged in to with
-    /// Connect…, the tab goes through that login, so it asks nothing; without one, `ssh` asks in the tab's terminal.
     func sshCommand(host: String, remoteCommand: String) -> NativeCLICommand {
         NativeCLICommand(
             executablePath: "/usr/bin/ssh",
             arguments: ["-t"]
                 + loginConnections.connectionOptions(for: host)
                 + [
-                    // A host that doesn't answer ends the tab within 10 seconds, as the background commands do,
-                    // instead of after the system's own connection timeout.
                     "-o", "ConnectTimeout=10",
-                    // Notice a dead connection within a minute, so the tab ends and offers to reconnect.
                     "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4",
                 ]
                 + keystrokeTimingOptions
@@ -74,8 +62,6 @@ struct RemoteCLICommandBuilder {
         )
     }
 
-    /// A tab's command to connect again, through the host's login open now: the login it went through may have
-    /// closed since, and Connect… may have opened another, or the first, since the tab opened.
     func withCurrentLogin(_ command: NativeCLICommand, host: String) -> NativeCLICommand {
         var arguments = command.arguments
         if Self.goesThroughLogin(command) { arguments.removeSubrange(1...4) }
@@ -88,8 +74,6 @@ struct RemoteCLICommandBuilder {
         )
     }
 
-    /// Whether a tab's command connects through a login made with Connect…, whose options `sshCommand` puts right
-    /// after `-t`.
     static func goesThroughLogin(_ command: NativeCLICommand) -> Bool {
         let arguments = command.arguments
         return arguments.count > 5 && Array(arguments[1...3]) == ["-o", "ControlMaster=no", "-o"]
@@ -102,9 +86,6 @@ struct RemoteCLICommandBuilder {
     /// tmux 3.6 and later also read it as the tab showing RGB colors.
     static let terminalEnvironment = ["COLORTERM=truecolor"]
 
-    /// Runs the CLI through the host's login shell, so the PATH set up in the host's shell profile
-    /// (for example `~/.local/bin` or an nvm-managed `node`) is in effect, and so are its aliases and functions; see
-    /// `RemoteShellStartup` and `RemoteCLIInvocation`. Without tmux on the host, the CLI runs directly.
     static func remoteCommand(
         provider: ConversationProvider,
         projectPath: String,
@@ -118,7 +99,6 @@ struct RemoteCLICommandBuilder {
         // Codex says which thread it is in, and what it is doing, only in its terminal title, and only when asked, as
         // on this Mac; see `CodexThreadTitle` and `CodexTitleActivity`.
         let titleArguments = provider == .codex ? CodexThreadTitle.launchArguments.map(ShellQuoting.quoted) : []
-        // Starts the CLI with these words, already quoted, in front of the app's arguments.
         func cliStartCommand(after quotedLeadingArguments: [String]) -> String {
             CLIStartCommandLine.customCommand(startCommand).map {
                 let invocation = CLIStartCommandLine.remoteInvocation(
@@ -140,8 +120,6 @@ struct RemoteCLICommandBuilder {
             shellStartup.command(running: command, environment: terminalEnvironment + environment)
         }
         guard let tmuxSessionName else { return inLoginShell(directCommand) }
-        // `-A` attaches when the session already runs, and the options after it are set again on every attach; see
-        // `RemoteTmuxSessionOptions`.
         let paneCommand =
             switch provider {
             case .claude:
@@ -172,7 +150,6 @@ struct RemoteCLICommandBuilder {
         return inLoginShell("command -v tmux >/dev/null 2>&1 && \(tmuxCommand); \(directCommand)")
     }
 
-    /// Runs `innerCommand` in the host's login shell, started as the host needs; see `RemoteShellStartup`.
     static func loginShellCommand(_ innerCommand: String, on host: String) -> String {
         RemoteHostShellStartups.shared.startup(on: host).command(running: innerCommand)
     }

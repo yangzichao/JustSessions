@@ -1,10 +1,6 @@
 import Foundation
 
-/// Deletes a Pi session in the host's sessions folder, the one the mirror copied from: the folder of the same name
-/// beside its `.jsonl` file, where extensions keep subagent runs and forks, then the file.
 enum RemotePiConversationDeletion {
-    /// The project folder and file names of a mirrored session, which name the same file on the host. Only a file
-    /// directly in its sessions root or a project folder, named for the session, is accepted. Nil names the root.
     static func hostFileNames(
         of conversation: Conversation,
         piMirrorDirectory: URL
@@ -24,14 +20,7 @@ enum RemotePiConversationDeletion {
         return (isInRoot ? nil : projectFolder.lastPathComponent, sourceFile.lastPathComponent)
     }
 
-    /// A POSIX `sh` script that takes the names and id as arguments, so none of them is ever read as shell code.
-    /// It refuses a project folder or session file that is a symbolic link, anything but a regular file, and a file
-    /// whose first line is not that session's header. A symbolically linked folder beside the session is left in place.
-    /// The folder goes first, so if removing the file then fails the session is still listed.
-    ///
     /// The header is checked as text, not parsed: Pi writes it as flat, compact JSON whose first key is `type`.
-    ///
-    /// `sessionsFolder` is absolute, or relative to the host's home; see `RemoteToolFolders`.
     static func command(sessionsFolder: String, projectFolderName: String?, fileName: String, sessionID: String) -> String {
         let script = #"""
             project=$1 file=$2 id=$3

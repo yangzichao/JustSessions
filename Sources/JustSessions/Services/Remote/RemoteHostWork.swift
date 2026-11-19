@@ -1,7 +1,5 @@
 import Foundation
 
-/// A window's outstanding work for a host. Lifecycle epochs survive removal, so removing and adding the same
-/// destination cannot make an old callback current again. The registry's host gate owns disk exclusion separately.
 @MainActor
 final class RemoteHostWork {
     struct Token: Equatable, Sendable {
@@ -70,7 +68,6 @@ final class RemoteHostWork {
         return task
     }
 
-    /// Only the newest listing request may publish, including requests whose disk reads finish out of order.
     func beginRead(on host: String, copiedAt: Date? = nil) -> Token? {
         if let copiedAt {
             guard copiedAt >= latestCopies[host, default: .distantPast] else { return nil }

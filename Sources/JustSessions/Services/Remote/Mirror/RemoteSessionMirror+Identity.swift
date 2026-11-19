@@ -9,9 +9,6 @@ extension RemoteSessionMirror {
 
     private static let migrationLock = NSLock()
 
-    /// Old copies did not record their owner. Adopt only an exact ASCII name with one configured candidate;
-    /// sanitized names and collisions remain untouched rather than assigning another host's history to this one.
-    /// Called on a worker before listing, including when a disconnected host is listed without reaching the network.
     func migrateLegacyMirrors(for configuredHosts: [String]) {
         Self.migrationLock.withLock {
             let groups = Dictionary(grouping: Set(configuredHosts)) { Self.legacyDirectoryName(forHost: $0).lowercased() }
@@ -31,7 +28,6 @@ extension RemoteSessionMirror {
         }
     }
 
-    /// Kept solely to locate pre-identity caches during the conservative migration above.
     static func legacyDirectoryName(forHost host: String) -> String {
         let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: ".-_@"))
         let name = String(host.unicodeScalars.map { allowed.contains($0) ? Character($0) : "_" })

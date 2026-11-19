@@ -1,13 +1,6 @@
 import Foundation
 
-/// Check this host…: logs in as the app's background commands do, checks the host's shell startup, looks up its CLIs
-/// as a refresh does, then asks the host about everything else in one command; see `RemoteHostCheckScript`. A host
-/// the app can't log in to is not asked anything more. Runs `ssh` several times, so call it off the main actor.
-/// A check the app runs on its own takes the shell startup check's kept result instead of running it again, since
-/// that check runs the host's interactive startup, which can leave what it starts, such as tmux, running there; see
-/// `HostBackgroundChecker`. `startingStep` hears of each step as it starts, for the sheet to show.
 struct RemoteHostCheck: Sendable {
-    /// Room for every CLI's version within its own time limit.
     static let scriptTimeout: TimeInterval = 120
 
     let runner: RemoteHostCommandRunner
@@ -26,9 +19,7 @@ struct RemoteHostCheck: Sendable {
 
     struct Outcome: Sendable {
         let report: HostCheckReport
-        /// For the store to keep, as after Check shell startup; nil when it didn't run or didn't finish.
         let shellStartupResult: RemoteShellStartupCheckResult?
-        /// For the store to keep, as after a refresh; nil when the lookup didn't answer.
         var cliLocations: [ConversationProvider: RemoteCLILocation]? = nil
     }
 
@@ -69,7 +60,6 @@ struct RemoteHostCheck: Sendable {
         let startup = shellStartupResult?.shellStartup ?? RemoteHostShellStartups.shared.startup(on: host)
         findings.append(RemoteHostConnectionFindings.shellStartupFinding(shellStartupResult, host: host, startup: startup))
 
-        // Where tabs start each CLI from now, so the script checks that.
         startingStep(.cliLookup)
         cliLocations = RemoteHostStatusProbe.status(ofHost: host, startup: startup, runner: runner)?.cliLocations
         let programs = cliLocations.map { locations in programs.map { $0.located(by: locations) } } ?? programs

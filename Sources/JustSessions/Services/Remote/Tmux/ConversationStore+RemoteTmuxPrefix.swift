@@ -1,15 +1,11 @@
 import Foundation
 
-/// Whether an SSH host's JustSessions tmux sessions use the host's own prefix keys, chosen from the host heading's
-/// ⋯ or right-click menu; see `RemoteHostsUsingTmuxPrefix`. This Mac's sessions never do: its tmux server reads no
-/// configuration, so it has no prefix of yours to use.
 extension ConversationStore {
     func usesTmuxPrefix(on host: SessionHost) -> Bool {
         guard let destination = host.sshDestination else { return false }
         return remoteHostsUsingTmuxPrefix.usesTmuxPrefix(destination)
     }
 
-    /// Saves the choice and applies it right away to every JustSessions session on the host, attached or not.
     func setUsesTmuxPrefix(
         _ usesTmuxPrefix: Bool,
         on host: String,
@@ -24,9 +20,6 @@ extension ConversationStore {
         tmuxCommandQueues.run(on: .ssh(host)) { _ = remoteRunner.run(host, command, 30) }
     }
 
-    /// A tab reopened from the last quit holds the command it was made with, which uses the host's old settings when it
-    /// attaches, such as its tmux prefix choice or its shell startup; it gets one made with the new settings, in its
-    /// place in the tab bar, drawn by the same engine. A plain terminal keeps its tmux session's name.
     func remakeTabsWaitingToBeShown(on host: SessionHost) {
         for index in terminalSessions.indices {
             let tab = terminalSessions[index]

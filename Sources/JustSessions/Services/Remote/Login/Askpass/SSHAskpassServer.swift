@@ -1,10 +1,6 @@
 import Darwin
 import Foundation
 
-/// Listens for the askpass helper while the app logs in to a host, at a socket in the login's private folder; see
-/// `SSHAskpassRelay`. Each connection is one question: the helper sends an `SSHAskpassRequest` and gets an
-/// `SSHAskpassReply` once `ask` returns. When the helper goes away first, as when `ssh` ends a notice it no longer
-/// needs, `ask`'s task is cancelled. Connections from another user are closed unread.
 final class SSHAskpassServer: @unchecked Sendable {
     let socketPath: String
     private let ask: @Sendable (SSHAskpassRequest) async -> SSHAskpassReply
@@ -13,10 +9,8 @@ final class SSHAskpassServer: @unchecked Sendable {
     private var questionTasks: [UUID: Task<Void, Never>] = [:]
     private var isStopped = false
 
-    /// How long the helper has to send its question once it connects.
     static let requestTimeout: TimeInterval = 10
 
-    /// Nil when the socket can't be made, as for a path longer than a socket address holds.
     init?(socketPath: String, ask: @escaping @Sendable (SSHAskpassRequest) async -> SSHAskpassReply) {
         guard let descriptor = Self.listeningSocket(at: socketPath) else { return nil }
         self.socketPath = socketPath
@@ -34,8 +28,6 @@ final class SSHAskpassServer: @unchecked Sendable {
         stop()
     }
 
-    /// Stops listening, removes the socket, and cancels the questions still waiting for an answer. Safe to call more
-    /// than once.
     func stop() {
         let tasks: [Task<Void, Never>]? = lock.withLock {
             guard !isStopped else { return nil }
@@ -43,7 +35,6 @@ final class SSHAskpassServer: @unchecked Sendable {
             return Array(questionTasks.values)
         }
         guard let tasks else { return }
-        // Here rather than when the listener closes on its queue, so the socket is gone once this returns.
         unlink(socketPath)
         acceptSource.cancel()
         for task in tasks { task.cancel() }
@@ -77,7 +68,6 @@ final class SSHAskpassServer: @unchecked Sendable {
         let descriptor = accept(listeningDescriptor, nil, nil)
         guard descriptor >= 0 else { return }
         CloseOnExecDescriptor.mark(descriptor)
-        // Each connection has a queue of its own, as reading its question blocks.
         let connectionQueue = DispatchQueue(label: "SSHAskpassServer.connection", qos: .userInitiated)
         connectionQueue.async { [self] in serve(descriptor, on: connectionQueue) }
     }
@@ -88,8 +78,6 @@ final class SSHAskpassServer: @unchecked Sendable {
             return
         }
         let id = UUID()
-        // The connection is closed only after the reply, so no write can reach a descriptor reused meanwhile; the
-        // watch for the helper going away reads a copy of it.
         let hangUpWatch = HangUpWatch(copying: descriptor, queue: connectionQueue)
         let task = Task { [ask] in
             let reply = await ask(request)
@@ -146,7 +134,6 @@ final class SSHAskpassServer: @unchecked Sendable {
         }
     }
 
-    /// Tells when the helper closes its end, as `ssh` ending it does, by watching a copy of its connection.
     private final class HangUpWatch: @unchecked Sendable {
         private let source: DispatchSourceRead
         private let lock = NSLock()
@@ -159,7 +146,6 @@ final class SSHAskpassServer: @unchecked Sendable {
             source.setCancelHandler { Darwin.close(copy) }
         }
 
-        /// The helper sends nothing after its question, so anything readable is its end closing.
         func start(onHangUp: @escaping @Sendable () -> Void) {
             source.setEventHandler { [weak self] in
                 self?.stop()

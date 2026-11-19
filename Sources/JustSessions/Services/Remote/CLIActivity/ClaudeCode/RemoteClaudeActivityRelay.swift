@@ -13,15 +13,9 @@ import Foundation
 /// reads the record, one line of JSON, with the shell's own `read`, and looks for it again only while it is missing, as
 /// before Claude Code writes it. A record cut short, as one read while Claude Code writes it, leaves the last activity.
 ///
-/// It also relays the registry record and the latest explicit custom-title line in the session's transcript, for
-/// `/rename` and `/clear`; see `RemoteClaudeSessionTitle`. Base64 keeps arbitrary names out of shell commands and tmux
-/// formats. No new SSH command or dependency on Python is needed. The transcript is found only until it exists, and
-/// only its last 64 KiB are read when its size changes; the last title is kept across turns but not session switches.
-///
 /// A window option works in tmux before 3.0, which has no pane options, and tmux 3.0 and later redraw the title when it
 /// changes, as they don't for a session option. `refresh-client -S` makes tmux before 2.6 redraw it too.
 enum RemoteClaudeActivityRelay {
-    /// Starts the relay in the background and returns at once, so the CLI starts as before.
     static let launchCommand = "sh -c \(ShellQuoting.quoted("(\n\(script)\n) </dev/null >/dev/null 2>&1 &"))"
 
     static let script = #"""

@@ -1,30 +1,17 @@
 import Foundation
 
-/// Why `ssh` could not connect to a host or lost the connection, read from what it printed, or why a host it reached
-/// can't be used, so a message can say what happened and what to do about it in plain English.
 enum SSHConnectionProblem: Hashable, Sendable {
-    /// The host name did not resolve.
     case hostNotFound
-    /// Nothing answered: the connection attempt timed out, or there was no route.
     case noAnswer
-    /// The host answered but nothing accepts SSH connections on its port.
     case refused
-    /// The connection was made and then lost, as when the Mac sleeps or the network changes.
     case connectionLost
-    /// The host did not accept a login without a password, or refused the password or code given to Connect….
     case loginRefused
-    /// The host's key changed, or it is not known and `BatchMode` cannot ask about it.
     case hostKeyNotTrusted
-    /// The host runs Windows, whose shells can't run the app's commands; see `WindowsHostProbe`.
     case windowsHost
-    /// Anything else, with the line `ssh` printed.
     case other(sshMessage: String)
 
-    /// The longest line of `ssh`'s output kept to explain a failure.
     static let maximumMessageLength = 200
 
-    /// Stable parts of OpenSSH's messages, compared without regard to case; the first problem whose text a line
-    /// contains wins.
     private static let messageFragments: [(problem: SSHConnectionProblem, fragments: [String])] = [
         (.hostKeyNotTrusted, ["host key verification failed", "remote host identification has changed"]),
         // ssh's own form, "Permission denied (publickey,password).", not a remote command's "…: Permission denied".
@@ -35,7 +22,6 @@ enum SSHConnectionProblem: Hashable, Sendable {
         (.noAnswer, ["operation timed out", "connection timed out", "no route to host", "network is unreachable", "host is down"]),
     ]
 
-    /// Classifies one line `ssh` printed, such as the one `tellingLine(inOutput:)` picks.
     init(sshMessage: String) {
         let lowercasedMessage = sshMessage.lowercased()
         self =
@@ -44,7 +30,6 @@ enum SSHConnectionProblem: Hashable, Sendable {
             .problem ?? .other(sshMessage: sshMessage)
     }
 
-    /// Classifies all that `ssh` printed, or `rsync` with the `ssh` it ran, by the line `tellingLine(inOutput:)` picks.
     init(sshOutput output: String) {
         self.init(sshMessage: Self.tellingLine(inOutput: output) ?? "ssh exited without saying why.")
     }
@@ -54,9 +39,6 @@ enum SSHConnectionProblem: Hashable, Sendable {
     /// command's own output.
     static let linesSearchedForAKnownProblem = 3
 
-    /// The line of `ssh`'s output, its standard error included, that tells what went wrong: the last of the final
-    /// few lines naming a known problem, otherwise the last one with any words. Trimmed to one line of at most
-    /// `maximumMessageLength` characters; nil when `ssh` printed nothing useful.
     static func tellingLine(inOutput output: String) -> String? {
         let lines =
             output
@@ -72,7 +54,6 @@ enum SSHConnectionProblem: Hashable, Sendable {
         return line.count > maximumMessageLength ? line.prefix(maximumMessageLength - 1) + "…" : line
     }
 
-    /// What happened to `host` and what to do about it, in a sentence or two.
     func explanation(host: String) -> String {
         switch self {
         case .hostNotFound:
@@ -94,7 +75,6 @@ enum SSHConnectionProblem: Hashable, Sendable {
         }
     }
 
-    /// The explanation where Connect… is offered right beside it, as in the Add SSH host sheet.
     func explanationBesideConnect(host: String) -> String {
         switch self {
         case .loginRefused:
@@ -122,8 +102,6 @@ enum SSHConnectionProblem: Hashable, Sendable {
         }
     }
 
-    /// Whether logging in with Connect… can get past it: it asks for the password or code, and whether to trust a
-    /// new host key.
     var isFixedByLoggingIn: Bool {
         switch self {
         case .loginRefused, .hostKeyNotTrusted: true
@@ -131,8 +109,6 @@ enum SSHConnectionProblem: Hashable, Sendable {
         }
     }
 
-    /// Whether `ssh` never got to the host's SSH server, so another command now would wait and fail the same way;
-    /// see `SSHHostReachability`. A connection that was made and then lost may work again at once.
     var meansHostIsOutOfReach: Bool {
         switch self {
         case .hostNotFound, .noAnswer, .refused: true
@@ -140,8 +116,6 @@ enum SSHConnectionProblem: Hashable, Sendable {
         }
     }
 
-    /// Whether trying again later may work without changing anything: the network or the host may be back. A
-    /// refused login, an untrusted host key, or a Windows host needs a change first.
     var isLikelyTemporary: Bool {
         switch self {
         case .hostNotFound, .noAnswer, .refused, .connectionLost, .other: true

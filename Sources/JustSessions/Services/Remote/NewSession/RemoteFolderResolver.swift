@@ -1,8 +1,5 @@
 import Foundation
 
-/// Looks up a folder typed for a new session on an SSH host and returns its absolute path with symlinks resolved,
-/// which is the path the CLI records for the session. `~` is the home folder on the host, and so is the base of a
-/// relative path. Adding a project can create the folder first, with any missing parents, once asked to.
 struct RemoteFolderResolver: Sendable {
     let runner: RemoteHostCommandRunner
 
@@ -32,7 +29,6 @@ struct RemoteFolderResolver: Sendable {
         return "sh -c \(ShellQuoting.quoted(script)) sh \(ShellQuoting.quoted(homeRelativeFolder(typedFolder)))"
     }
 
-    /// `~` and `~/…` become relative to the home folder, where the lookup starts.
     static func homeRelativeFolder(_ typedFolder: String) -> String {
         guard typedFolder == "~" || typedFolder.hasPrefix("~/") else { return typedFolder }
         let pathInHome = typedFolder.dropFirst(2)

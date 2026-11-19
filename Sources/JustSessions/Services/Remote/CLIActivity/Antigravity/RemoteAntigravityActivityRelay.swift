@@ -19,7 +19,6 @@ enum RemoteAntigravityActivityRelay {
     static let waitingName = "waiting"
     static let idleName = "idle"
 
-    /// What a name the relay keeps means; nil for any other.
     static func activity(named name: String) -> CLIActivity? {
         switch name {
         case workingName: .working
@@ -29,7 +28,6 @@ enum RemoteAntigravityActivityRelay {
         }
     }
 
-    /// Starts the relay in the background and returns at once, so the CLI starts as before.
     static let launchCommand =
         "sh -c "
         + ShellQuoting.quoted(#"command -v python3 >/dev/null 2>&1 || exit 0; python3 -c "$1" </dev/null >/dev/null 2>&1 &"#)

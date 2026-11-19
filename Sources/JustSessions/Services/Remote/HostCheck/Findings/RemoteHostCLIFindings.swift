@@ -1,10 +1,5 @@
 import Foundation
 
-/// Each tool's CLI where tabs start it from: a program, an alias, or a function of the login shell the app's commands
-/// use, or a program in an install folder that shell's PATH leaves out; see `RemoteCLILocation`. A CLI found but
-/// failing to print its version, such as a Node CLI whose `node` isn't on the PATH, would fail to start a session too.
-/// A missing CLI matters for the tab's session and for tools with sessions listed under the host; the others are
-/// listed together.
 enum RemoteHostCLIFindings {
     static func findings(in output: RemoteHostCheckOutput, context: RemoteHostCheckContext) -> [HostCheckFinding] {
         var findings: [HostCheckFinding] = []
@@ -74,7 +69,6 @@ enum RemoteHostCLIFindings {
         )
     }
 
-    /// No program `sh` finds, but the login shell has an alias or function by the name, which tabs run there.
     private static func aliasOrFunctionFinding(
         _ program: RemoteHostCheckProgram,
         output: RemoteHostCheckOutput,

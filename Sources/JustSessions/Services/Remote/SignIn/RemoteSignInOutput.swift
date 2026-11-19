@@ -1,28 +1,19 @@
 import Foundation
 
-/// What a sign-in command printed since it was last answered, as plain text: the terminal on the host adds carriage
-/// returns, escape sequences such as colors, and echoes an answer typed with its echo on, which this leaves out. Once
-/// the command waits, its last line is the question and the lines before it are its context.
 struct RemoteSignInOutput {
-    /// How many lines before the question its context keeps.
     static let contextLineLimit = 12
-    /// How many lines a failure's message keeps.
     static let failureLineLimit = 8
 
-    /// What was printed since the last answer.
     private(set) var text = ""
-    /// The last lines printed over the whole run, for a failure's message.
     private(set) var recentLines: [String] = []
     private var currentLine = ""
     private var undecodedBytes = Data()
     private var escapeState = EscapeState.none
-    /// What the host's terminal would echo of the last answer, swallowed while the output matches it.
     private var pendingEcho: [Character] = []
     private var swallowedEcho = ""
 
     private enum EscapeState {
         case none
-        /// After ESC.
         case escape
         /// In `ESC [`, until its final byte.
         case controlSequence
@@ -31,18 +22,15 @@ struct RemoteSignInOutput {
         case operatingSystemCommandEscape
     }
 
-    /// Whether the last line was left without a newline, as a prompt that reads on the same line is.
     var endsMidLine: Bool {
         !lastLine(of: text, includingCompleteLines: false).isEmpty
     }
 
-    /// The line the command waits after: the last one with text, finished or not.
     var question: String? {
         let line = lastLine(of: text, includingCompleteLines: true)
         return line.isEmpty ? nil : line
     }
 
-    /// The lines before the question, up to `contextLineLimit`; nil when there are none.
     var context: String? {
         var lines = nonEmptyLines(of: text)
         guard !lines.isEmpty else { return nil }
@@ -51,7 +39,6 @@ struct RemoteSignInOutput {
         return kept.isEmpty ? nil : kept
     }
 
-    /// The command's last lines, for a message saying why it failed; nil when it printed nothing.
     var failureText: String? {
         let lines = (recentLines + [currentLine]).map(Self.trimmedTrailing).filter { !$0.isEmpty }
         let kept = lines.suffix(Self.failureLineLimit).joined(separator: "\n")
@@ -70,13 +57,11 @@ struct RemoteSignInOutput {
             }
             decodable -= 1
         }
-        // Not UTF-8 at all: show what can be shown rather than waiting forever.
         let decoded = String(decoding: undecodedBytes, as: UTF8.self)
         undecodedBytes.removeAll()
         for character in decoded { append(character) }
     }
 
-    /// Starts a new question's text, and expects the host's terminal to echo `answer`.
     mutating func noteAnswered(_ answer: String) {
         text = ""
         pendingEcho = Array(answer + "\n")
@@ -123,7 +108,6 @@ struct RemoteSignInOutput {
                 swallowedEcho.append(character)
                 return
             }
-            // Not an echo after all, as from a command that reads with its echo off: what was held back is output.
             let heldBack = swallowedEcho
             pendingEcho = []
             swallowedEcho = ""

@@ -1,7 +1,5 @@
 import Foundation
 
-/// tmux commands for a remote host's JustSessions sessions, run through the login shell so `tmux` is found
-/// wherever the host's profile puts it.
 enum RemoteTmuxCommands {
     static func renameSessionCommand(from oldName: String, to newName: String, on host: String) -> String {
         RemoteCLICommandBuilder.loginShellCommand(
@@ -49,7 +47,6 @@ enum RemoteTmuxCommands {
             "pids=\"$pid $([ -n \"$pid\" ] && ps -A -o pid= -o ppid= 2>/dev/null | awk -v parent=\"$pid\" '$2 == parent { print $1 }')\"",
             "tmux kill-session -t \(ShellQuoting.quoted("=" + name)) 2>/dev/null",
             "running() { for p in $pids; do kill -0 \"$p\" 2>/dev/null && return 0; done; return 1; }",
-            // A deadline rather than a count of polls: each poll starts `sleep`, which takes its own time.
             "deadline=$(($(date +%s) + \(timeoutSeconds)))",
             "while [ -n \"$pid\" ] && running && [ \"$(date +%s)\" -lt \"$deadline\" ]; do sleep 0.1; done",
             "true",

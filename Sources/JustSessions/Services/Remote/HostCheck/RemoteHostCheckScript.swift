@@ -1,9 +1,5 @@
 import Foundation
 
-/// The one SSH command Check this host… runs on the host. It only reads: it looks programs up, asks them for their
-/// version, and lists a folder. Each answer follows a `marker` line naming it, which `RemoteHostCheckOutput` reads, so
-/// whatever a shell profile prints lands under a key nothing reads.
-///
 /// `rsync` is looked up before the login shell starts: `rsync` on this Mac starts the host's `rsync` through the shell
 /// `ssh` runs a command in, without the login shell's startup. Everything else is looked up in the login shell the
 /// app's commands use, see `RemoteShellStartup`, where the CLIs, `tmux`, and `python3` are found. Both parts run in
@@ -12,12 +8,9 @@ import Foundation
 /// would turn into backslashes; values go in double quotes instead, see `doubleQuoted(_:)`.
 enum RemoteHostCheckScript {
     static let marker = "@@JUSTSESSIONS-CHECK"
-    /// How long a CLI may take to print its version.
     static let versionTimeoutSeconds = 10
-    /// The exit status `wait` gives a CLI stopped at that time limit (128 + SIGTERM).
     static let stoppedAtTimeLimitStatus: Int32 = 143
 
-    /// `startup` is the one the shell startup check just found, which the app's commands use from then on.
     static func command(
         startup: RemoteShellStartup,
         programs: [RemoteHostCheckProgram],
@@ -34,8 +27,6 @@ enum RemoteHostCheckScript {
             + startup.command(running: "sh -c \(ShellQuoting.quoted(loginShellScript))")
     }
 
-    /// The value in double quotes, or nil when it has a character that `sh` reads inside them, or one the scripts
-    /// can't have.
     static func doubleQuoted(_ value: String) -> String? {
         guard !value.contains(where: { "\"$`\\'\n".contains($0) }) else { return nil }
         return "\"\(value)\""
@@ -107,12 +98,10 @@ enum RemoteHostCheckScript {
             "fi",
         ]
         for program in programs {
-            // `RemoteHostCheckProgram.all` leaves out a program that can't be quoted.
             guard let quotedProgram = doubleQuoted(program.program) else { continue }
             lines += [
                 "marker \(program.key)-path",
                 "program=\(quotedProgram)",
-                // `~/` as the shell that starts the CLI reads it; see `StartCommandCheck.lookupScript`.
                 "case $program in \"~/\"*) program=$HOME/${program#\"~/\"} ;; esac",
                 "found=$(command -v \"$program\" 2>/dev/null) || found=",
                 "echo \"$found\"",
@@ -125,8 +114,6 @@ enum RemoteHostCheckScript {
                     "  marker \(program.key)-version-exit",
                     "  echo \"$limited_status\"",
                 ]
-                // Not a program `sh` finds, but the login shell found it: an alias or function, asked there, as a tab
-                // runs it.
                 if program.location == .loginShell {
                     lines += [
                         "else",
@@ -149,7 +136,6 @@ enum RemoteHostCheckScript {
             "  echo \"import sqlite3\" | python3 >/dev/null 2>&1; echo $?",
             "fi",
         ]
-        // A folder that can't be quoted has no answer, which its finding says.
         if let quotedProjectPath = projectPath.flatMap(doubleQuoted) {
             lines += [
                 "marker folder",
@@ -162,8 +148,6 @@ enum RemoteHostCheckScript {
         return lines.joined(separator: "\n")
     }
 
-    /// The found program, with its folder first on PATH when it is in an install folder, as a tab starts it; see
-    /// `RemoteCLIInvocation`. `RemoteHostCheckProgram.all` keeps only a path that can go in double quotes.
     private static func versionInvocation(of program: RemoteHostCheckProgram) -> String {
         guard case .installed(let path) = program.location else { return "\"$found\"" }
         let folder = (path as NSString).deletingLastPathComponent

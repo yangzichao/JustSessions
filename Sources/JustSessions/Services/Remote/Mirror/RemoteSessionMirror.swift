@@ -1,17 +1,11 @@
 import Foundation
 
-/// Keeps a local copy of a remote host's session files, so the local adapters and transcript readers work on
-/// them unchanged. `rsync` over SSH only transfers what changed since the last copy.
 struct RemoteSessionMirror: Sendable {
     let cacheRoot: URL
-    /// Replaces `<host>:` as the source, so tests can copy from a local folder that stands in for the remote home.
     let sourceHomeOverride: String?
-    /// Finds where the host keeps each tool's files; see `RemoteToolFoldersLookup`.
     let toolFoldersLookup: @Sendable (_ host: String, _ connectionSharingOptions: [String]) throws -> RemoteToolFolders
-    /// Makes the private connection scope shared by one refresh's commands and copies.
     let connectionSharing: @Sendable (_ host: String) -> SSHConnectionSharing?
 
-    /// Without a `toolFoldersLookup`, a host stood in for by `sourceHomeOverride` keeps the standard folders.
     init(
         cacheRoot: URL = RemoteSessionMirror.defaultCacheRoot,
         sourceHomeOverride: String? = nil,
@@ -49,12 +43,10 @@ struct RemoteSessionMirror: Sendable {
             .appendingPathComponent(Self.mirroredFolderName(for: provider))
     }
 
-    /// Where Kiro V3's sessions are copied, beside V2's `mirrorDirectory(host:provider: .kiro)`; see `KiroV3Session`.
     func kiroV3MirrorDirectory(host: String) -> URL {
         cacheRoot.appendingPathComponent(Self.directoryName(forHost: host)).appendingPathComponent("kiro-v3")
     }
 
-    /// Copies the host's session files for each tool through one app-owned connection scope.
     func synchronize(host: String) throws {
         let sharing = connectionSharing(host)
         defer { sharing?.finish() }
@@ -119,7 +111,6 @@ struct RemoteSessionMirror: Sendable {
         }
     }
 
-    /// One `rsync` of `source` into `destination`; a source the host doesn't have empties the copy.
     private func copy(
         host: String,
         filters: [String],
@@ -142,7 +133,6 @@ struct RemoteSessionMirror: Sendable {
         case 0:
             return
         case 23 where result.output.contains("No such file or directory"):
-            // The tool was never used on this host.
             try? FileManager.default.removeItem(at: destination)
         case RemoteHostCommandRunner.connectionFailureExitStatus:
             // rsync passes on the exit status of the `ssh` it runs, and prints what `ssh` printed.
@@ -155,7 +145,6 @@ struct RemoteSessionMirror: Sendable {
         }
     }
 
-    /// Copies one tool's files, with `ssh` running in the login shell's environment like the app's other connections.
     static func runRsync(
         for provider: ConversationProvider,
         source: String,
@@ -167,7 +156,6 @@ struct RemoteSessionMirror: Sendable {
             source: source, destination: destination, connectionSharingOptions: connectionSharingOptions)
     }
 
-    /// Copies `source` with `filters`, as `rsyncArguments(for:source:destination:remoteShell:)` lays a tool's out.
     static func runRsync(
         filters: [String],
         extraArguments: [String],
@@ -186,13 +174,10 @@ struct RemoteSessionMirror: Sendable {
         )
     }
 
-    /// The tool's `includedPatterns`, then everything else left out.
     static func filters(for provider: ConversationProvider) -> [String] {
         includedPatterns(for: provider).map { "--include=\($0)" } + ["--exclude=*"]
     }
 
-    /// Each V3 session's `session.json` and `messages.jsonl`, in its workspace folder. V2's own folder, copied apart,
-    /// and a session's `sub-executions`, `snapshots`, and cursors stay on the host.
     static func kiroV3Filters(excludingClassicFolder classicFolder: String) -> [String] {
         ["--exclude=/\(classicFolder)/"]
             + [
@@ -221,16 +206,11 @@ struct RemoteSessionMirror: Sendable {
             + ["--exclude=*", source, destination]
     }
 
-    /// The `ssh` command `rsync` connects with; none of the options has a space, the socket folder's path included,
-    /// so joining them needs no quoting.
     static func rsyncRemoteShell(connectionSharingOptions: [String]) -> String {
         (["ssh", RemoteHostCommandRunner.noTerminalOption] + RemoteHostCommandRunner.nonInteractiveSSHOptions + connectionSharingOptions)
             .joined(separator: " ")
     }
 
-    /// Only the files the adapters read; Claude Code's subagent transcripts and caches stay on the host, and so do
-    /// the subagent runs, forks, and artifacts Pi extensions keep in folders inside a Pi project folder. OpenCode's
-    /// database is copied from a snapshot that holds only its sessions.
     static func includedPatterns(for provider: ConversationProvider) -> [String] {
         switch provider {
         case .claude:
@@ -251,8 +231,6 @@ struct RemoteSessionMirror: Sendable {
         }
     }
 
-    /// Relative to the remote home directory, where the tool keeps its files unless the host's environment says
-    /// otherwise; see `RemoteToolFolders`.
     static func remoteFolder(for provider: ConversationProvider) -> String {
         switch provider {
         case .claude: ".claude"

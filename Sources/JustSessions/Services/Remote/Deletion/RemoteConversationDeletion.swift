@@ -1,11 +1,7 @@
 import Foundation
 
-/// Deletes a session on its remote host over SSH. Remote hosts have no Trash, so this is permanent.
-/// Claude Code and Antigravity lose their stored history and index entry; Codex, Kiro, and OpenCode use their
-/// native CLIs; Pi loses its session file and the folder beside it. A session already gone from the host counts as deleted.
 struct RemoteConversationDeletion: Sendable {
     let runner: RemoteHostCommandRunner
-    /// Where the host's sessions were copied, so a Pi session's file is found relative to that host's Pi mirror.
     let mirror: RemoteSessionMirror
 
     init(runner: RemoteHostCommandRunner = RemoteHostCommandRunner(), mirror: RemoteSessionMirror = RemoteSessionMirror()) {
@@ -13,7 +9,6 @@ struct RemoteConversationDeletion: Sendable {
         self.mirror = mirror
     }
 
-    /// Exit status of a deletion script when the transcript is already gone.
     static let missingTranscriptExitStatus: Int32 = 3
 
     func delete(_ conversation: Conversation) throws {
@@ -22,7 +17,6 @@ struct RemoteConversationDeletion: Sendable {
         else {
             throw ConversationDeletionError.invalidSource
         }
-        // The folders the host's sessions were copied from.
         let folders = mirror.savedToolFolders(host: host)
         let command: String
         switch conversation.provider {
@@ -103,8 +97,6 @@ struct RemoteConversationDeletion: Sendable {
                 details: SSHConnectionProblem.tellingLine(inOutput: result.output) ?? "exit status \(result.exitStatus)"
             )
         case Self.missingTranscriptExitStatus where [.claude, .kiro, .antigravity, .opencode, .pi].contains(conversation.provider):
-            // Already gone, for example deleted just before a dropped connection hid the result: it counts as
-            // deleted.
             removeMirrorCopies(of: conversation)
         default:
             let details = TerminalEscapeSequences.removed(from: result.output).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -115,7 +107,6 @@ struct RemoteConversationDeletion: Sendable {
         }
     }
 
-    /// The mirror would drop the session on the next copy; dropping it now keeps the list right until then.
     private func removeMirrorCopies(of conversation: Conversation) {
         if conversation.provider == .opencode {
             RemoteOpenCodeConversationDeletion.removeMirrorRows(of: conversation.sessionID, from: conversation.sourceFile)
@@ -134,8 +125,6 @@ struct RemoteConversationDeletion: Sendable {
         }
     }
 
-    /// A POSIX `sh` script, so it runs the same whatever the host's login shell is. `claudeFolder` is the folder in
-    /// `sh`; see `RemoteToolFolders.shellPath(for:)`.
     static func claudeDeletionCommand(claudeFolder: String, projectFolderName: String, sessionID: String) -> String {
         let script = """
             dir=\(claudeFolder)/projects/\(ShellQuoting.quoted(projectFolderName))

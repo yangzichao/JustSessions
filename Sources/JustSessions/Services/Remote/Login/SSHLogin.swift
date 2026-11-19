@@ -1,12 +1,7 @@
 import Darwin
 import Foundation
 
-/// Logs in to a host for Connect…, as `ssh <host>` does in Terminal: it starts the host's master connection, and each
-/// question `ssh` asks on the way, such as a password, a passphrase, a code, or whether to trust a new host key, is
-/// asked in the app through `SSHAskpassRelay`. The master then waits in the background for the app's other
-/// connections, and `SSHLoginConnections` keeps it.
 struct SSHLogin: Sendable {
-    /// Started by `ssh` for each question: this app's own executable.
     let askpassProgram: String
     let sshExecutable: String
     let socketRoot: String
@@ -46,8 +41,6 @@ struct SSHLogin: Sendable {
             ]
     }
 
-    /// `ask` returns what to answer, or nil when the question was cancelled. A question whose task is cancelled went
-    /// away on its own, as a notice does once `ssh` is done with it.
     func logIn(to host: String, ask: @escaping @Sendable (SSHAskpassQuestion) async -> String?) async -> SSHLoginOutcome {
         guard let directory = SSHSocketDirectory.makeLoginDirectory(at: socketRoot),
             let output = SSHLoginOutput(file: directory.appendingPathComponent("ssh-output"))
@@ -96,7 +89,6 @@ struct SSHLogin: Sendable {
         } else if FileManager.default.fileExists(atPath: controlPath) {
             outcome = .loggedIn
         } else {
-            // Logged in, but the master did not stay, as when the host refuses sessions to share the connection.
             outcome = .failed(
                 .other(
                     sshMessage: SSHConnectionProblem.tellingLine(inOutput: printed)
@@ -110,7 +102,6 @@ struct SSHLogin: Sendable {
         return outcome
     }
 
-    /// The exit status, or nil when `ssh` could not start, was cancelled, or ran past the timeout.
     private func runSSH(
         host: String,
         controlPath: String,
@@ -150,7 +141,6 @@ struct SSHLogin: Sendable {
         }
     }
 
-    /// The login's `ssh`, which a cancelled question, a cancelled task, or the timeout stops.
     private final class LoginRun: @unchecked Sendable {
         private let lock = NSLock()
         private var process: Process?
@@ -161,7 +151,6 @@ struct SSHLogin: Sendable {
         var isCancelled: Bool { lock.withLock { wasCancelled } }
         var isStopped: Bool { lock.withLock { wasStopped } }
 
-        /// Keeps `prompt` as the latest question's, and returns the one before it.
         func notePrompt(_ prompt: String) -> String? {
             lock.withLock {
                 defer { lastPrompt = prompt }

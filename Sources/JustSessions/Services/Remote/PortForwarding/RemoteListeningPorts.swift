@@ -1,6 +1,5 @@
 import Foundation
 
-/// A TCP port an SSH host listens on that a forward to `localhost` reaches; see `RemoteListeningPorts`.
 struct RemoteListeningPort: Hashable, Sendable, Identifiable {
     let port: Int
     /// The program that listens, when the host tells: `ss` and `lsof` name only the user's own programs.
@@ -9,20 +8,13 @@ struct RemoteListeningPort: Hashable, Sendable, Identifiable {
     var id: Int { port }
 }
 
-/// The ports an SSH host listens on, for the Forward a port sheet to offer. Only ports bound to every address, to
-/// `127.0.0.1`, or to `::1` are listed, since a forward reaches `localhost` on the host. Each host lists them with what
-/// it has: `ss` on Linux, or else `/proc/net/tcp`, which every Linux has and which lists every user's ports, or else
-/// `netstat`, as on macOS; with the last two, `lsof` adds the names of the user's own programs.
 enum RemoteListeningPorts {
     enum Listing: Equatable, Sendable {
         case listed([RemoteListeningPort])
-        /// The host has none of the tools; a port can still be typed.
         case noTool
     }
 
-    /// Printed once the listing is done, so a cut-off answer isn't taken for a host that listens on nothing.
     static let endMarker = "justsessions-ports-listed"
-    /// Comes before each tool's output, followed by the tool's name.
     static let sectionMarker = "justsessions-ports:"
 
     /// Run by `sh`, as the login shell may be fish; it has no single quote or backslash. `ss` and `lsof` may be in a
@@ -43,7 +35,6 @@ enum RemoteListeningPorts {
         RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
     }
 
-    /// Asks the host; nil when it can't be reached or the answer was cut off. Blocks; call it off the main thread.
     static func lookUp(on host: String, runner: RemoteHostCommandRunner = RemoteHostCommandRunner()) -> Listing? {
         guard let result = runner.run(host, command(on: host), 15),
             result.exitStatus != RemoteHostCommandRunner.connectionFailureExitStatus
@@ -84,8 +75,6 @@ enum RemoteListeningPorts {
             })
     }
 
-    // MARK: - Each tool's lines
-
     /// `LISTEN 0 5 127.0.0.1:8080 0.0.0.0:* users:(("python3",pid=2727,fd=3))`: the local address is the first with a
     /// port; the peer's port is `*`.
     private static func portInSSLine(_ fields: [String], line: String) -> (port: Int, programName: String?)? {
@@ -124,9 +113,6 @@ enum RemoteListeningPorts {
         return (address.port, fields[0].replacingOccurrences(of: "\\x20", with: " "))
     }
 
-    // MARK: - Addresses
-
-    /// The address and port of `127.0.0.1:8080`, `[::1]:8080`, `*:22`, or, with `.`, macOS's `127.0.0.1.8080`.
     private static func splitAddress(_ field: String, separator: Character) -> (host: String, port: Int)? {
         guard let index = field.lastIndex(of: separator),
             let port = Int(field[field.index(after: index)...]), SSHPortForward.validPorts.contains(port)
@@ -134,7 +120,6 @@ enum RemoteListeningPorts {
         return (String(field[..<index]), port)
     }
 
-    /// Whether a connection to `localhost` reaches a port bound to `host`: every address, `127.0.0.1`, or `::1`.
     static func reachesLocalhost(_ host: String) -> Bool {
         var address = host.lowercased()
         if address.hasPrefix("["), address.hasSuffix("]") { address = String(address.dropFirst().dropLast()) }

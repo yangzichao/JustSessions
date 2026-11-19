@@ -8,7 +8,6 @@ final class SSHLoginOutput: @unchecked Sendable {
     private let lock = NSLock()
     private var readLength = 0
 
-    /// Lines `ssh` prints as a matter of course, which say nothing to someone logging in.
     static let routineLinePrefixes = ["Warning: Permanently added"]
 
     init?(file: URL) {
@@ -25,7 +24,6 @@ final class SSHLoginOutput: @unchecked Sendable {
         (try? Data(contentsOf: file)).map { String(decoding: $0, as: UTF8.self) } ?? ""
     }
 
-    /// What was printed since the last call, without routine lines; nil when nothing else was.
     func newText() -> String? {
         guard let data = try? Data(contentsOf: file) else { return nil }
         let newData = lock.withLock {

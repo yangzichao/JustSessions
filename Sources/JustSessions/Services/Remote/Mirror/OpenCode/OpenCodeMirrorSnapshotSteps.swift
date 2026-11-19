@@ -1,9 +1,5 @@
 import Foundation
 
-/// The SQL that builds an SSH host's OpenCode mirror from its database, attached as `source`: the sessions JustSessions
-/// lists and what their previews read, and nothing else. OpenCode's accounts, credentials, and event log stay on the
-/// host, and so do tool outputs, attachments, and subagent sessions. The same steps run on the host, in python3,
-/// and in the tests, so both build the same mirror.
 enum OpenCodeMirrorSnapshotSteps {
     /// Each step is a list of statements tried in order until one succeeds: a database from before OpenCode recorded
     /// archiving still lists, and a host whose SQLite lacks JSON functions copies messages and parts whole.

@@ -1,7 +1,5 @@
 import Foundation
 
-/// Builds the host's OpenCode mirror database in a private folder under `/tmp`, for `rsync` to copy. A host
-/// without an OpenCode database exits with 3 before python3 is needed.
 enum OpenCodeRemoteSnapshotCommand {
     static let pathPrefix = "/tmp/justsessions-opencode-"
     static let outputHeading = "JUSTSESSIONS_OPENCODE_SNAPSHOT="
@@ -28,8 +26,6 @@ enum OpenCodeRemoteSnapshotCommand {
         return path
     }
 
-    /// Runs `OpenCodeMirrorSnapshotSteps` with OpenCode's database attached read-only. A step's next statement is
-    /// tried only when the database or SQLite lacks a column or function the previous one needs.
     static var pythonScript: String {
         """
         import pathlib, shutil, sqlite3, sys, tempfile

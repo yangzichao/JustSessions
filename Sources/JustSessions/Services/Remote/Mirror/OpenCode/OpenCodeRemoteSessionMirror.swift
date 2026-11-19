@@ -34,7 +34,6 @@ struct OpenCodeRemoteSessionMirror {
                 throw RemoteSessionMirrorError.couldNotRun(host: host)
             }
             if result.exitStatus == OpenCodeRemoteSnapshotCommand.noDatabaseExitStatus {
-                // OpenCode was never used on this host.
                 try? FileManager.default.removeItem(at: destination)
                 return
             }
