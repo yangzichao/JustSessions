@@ -115,7 +115,7 @@ struct RemoteShellStartupStoreTests {
         let windows = RemoteSessionDiscovery(
             mirror: RemoteSessionMirror(
                 cacheRoot: cacheRoot,
-                sourceHomeOverride: cacheRoot.path,
+                hostAccess: .standIn(home: cacheRoot.path),
                 toolFoldersLookup: { host in throw RemoteSessionMirrorError.sshFailed(host: host, problem: .windowsHost) }
             ))
 
@@ -134,7 +134,7 @@ struct RemoteShellStartupStoreTests {
         return RemoteSessionDiscovery(
             mirror: RemoteSessionMirror(
                 cacheRoot: notAFolder,
-                sourceHomeOverride: FileManager.default.temporaryDirectory.path
+                hostAccess: .standIn(home: FileManager.default.temporaryDirectory.path)
             ))
     }
 

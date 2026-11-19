@@ -30,7 +30,7 @@ struct RemoteToolFoldersTests {
     @Test func theMirrorKeepsTheFoldersOfItsLastCopy() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
-        let mirror = RemoteSessionMirror(cacheRoot: root, sourceHomeOverride: root.path, toolFoldersLookup: { _ in Self.custom })
+        let mirror = RemoteSessionMirror(cacheRoot: root, hostAccess: .standIn(home: root.path), toolFoldersLookup: { _ in Self.custom })
 
         #expect(mirror.savedToolFolders(host: "devbox") == .standard)
         #expect(try mirror.lookUpToolFolders(host: "devbox") == Self.custom)
@@ -61,7 +61,7 @@ struct RemoteToolFoldersTests {
         var folders = RemoteToolFolders.standard
         folders.claude = claudeFolder.path
         let mirror = RemoteSessionMirror(
-            cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path,
+            cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path),
             toolFoldersLookup: { [folders] _ in folders }
         )
 

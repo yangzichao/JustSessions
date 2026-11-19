@@ -72,7 +72,7 @@ final class ClaudeHostStandIn: Sendable {
         discovery = RemoteSessionDiscovery(
             mirror: RemoteSessionMirror(
                 cacheRoot: directory.appendingPathComponent("mirrors"),
-                sourceHomeOverride: otherToolsHome.path,
+                hostAccess: .standIn(home: otherToolsHome.path),
                 toolFoldersLookup: { host in
                     if SSHHostReachability.shared.recentFailureOutput(on: host) != nil {
                         refreshes.noteFailureWithoutConnecting()

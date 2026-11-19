@@ -97,7 +97,7 @@ Live SSH checks follow [SSH development testing](../../development/ssh-testing.m
 
 | ID | Requirement | Origin | Related tests |
 | --- | --- | --- | --- |
-| SSH-106 | Host copies stay distinct for destinations differing in punctuation, case, or Unicode, including on case-insensitive disks. Before cached listing, an exact safe legacy name with one configured owner is migrated. Sanitized, colliding, or reserved legacy names remain untouched and unassigned because their owner cannot be proven; those hosts need a fresh copy after reconnecting. This one-time isolation migration is an exception to SSH-101's cached-list continuity, not deletion of remote sessions. | November 2026 audit AUD-01 | `RemoteMirrorIdentityTests` |
+| SSH-106 | Host copies stay distinct for destinations differing in punctuation, case, or Unicode, including on case-insensitive disks. A copy kept under the folder names from before this isn't reused: the copy is a cache, so such a host copies again at its next refresh, and lists nothing from the cache until then. This is an exception to SSH-101's cached-list continuity, not deletion of remote sessions. | November 2026 audit AUD-01 | `RemoteMirrorIdentityTests` |
 | SSH-107 | Pi custom session directories support JSONL files directly in the root as well as one level below it; root deletion keeps the same regular-file, header, and companion safeguards. | November 2026 audit AUD-04 | `PiRemoteMirrorTests`, `PiRemoteDeletionTests`; disposable Ubuntu copy/deletion fixture |
 
 ## Sign-in command

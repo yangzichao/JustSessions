@@ -6,7 +6,7 @@ enum RemoteOpenCodeConversationDeletion {
     /// subagent sessions. OpenCode's error for an unknown session means it is already gone.
     static func command(sessionID: String, host: String) -> String {
         let script =
-            OpenCodeRemoteDatabaseLocation.shellAssignment + """
+            OpenCodeRemoteDatabaseLocation.shellAssignment(to: "db") + """
 
                 id=\(ShellQuoting.quoted(sessionID))
                 [ -f "$db" ] || exit \(RemoteConversationDeletion.missingTranscriptExitStatus)

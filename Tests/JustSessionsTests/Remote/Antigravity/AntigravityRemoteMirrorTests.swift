@@ -20,7 +20,7 @@ struct AntigravityRemoteMirrorTests {
         let brain = configuration.appendingPathComponent("brain/\(fixture.sessionID)")
         try FileManager.default.createDirectory(at: brain, withIntermediateDirectories: true)
         try Data("private artifact".utf8).write(to: brain.appendingPathComponent("artifact.md"))
-        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: home.path)
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: home.path))
         let discovery = RemoteSessionDiscovery(mirror: mirror)
 
         let conversation = try #require(discovery.discover(host: "devbox").first)
@@ -52,7 +52,8 @@ struct AntigravityRemoteMirrorTests {
     @Test func deletedRemoteSessionsDisappearFromTheNextSnapshot() throws {
         let fixture = try RemoteAntigravityFixture()
         defer { fixture.remove() }
-        let mirror = RemoteSessionMirror(cacheRoot: fixture.root.appendingPathComponent("cache"), sourceHomeOverride: fixture.home.path)
+        let mirror = RemoteSessionMirror(
+            cacheRoot: fixture.root.appendingPathComponent("cache"), hostAccess: .standIn(home: fixture.home.path))
         let discovery = RemoteSessionDiscovery(mirror: mirror)
         let conversation = try #require(discovery.discover(host: "devbox").first)
         try FileManager.default.removeItem(at: fixture.session.databaseFile)

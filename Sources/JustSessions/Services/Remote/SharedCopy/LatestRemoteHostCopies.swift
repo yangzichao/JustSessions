@@ -15,12 +15,10 @@ final class LatestRemoteHostCopies {
     private struct CopyPlace: Hashable {
         let host: String
         let cacheRoot: URL
-        let sourceHomeOverride: String?
 
         init(host: String, mirror: RemoteSessionMirror) {
             self.host = host
             cacheRoot = mirror.cacheRoot
-            sourceHomeOverride = mirror.sourceHomeOverride
         }
     }
 

@@ -40,14 +40,6 @@ struct RemoteToolFolders: Codable, Equatable, Sendable {
         return path.hasPrefix("/") ? ShellQuoting.quoted(path) : "\"$HOME\"/" + ShellQuoting.quoted(path)
     }
 
-    func localPath(for provider: ConversationProvider, sourceHome: String) -> String {
-        Self.localPath(path(for: provider), sourceHome: sourceHome)
-    }
-
-    static func localPath(_ path: String, sourceHome: String) -> String {
-        path.hasPrefix("/") ? path : "\(sourceHome)/\(path)"
-    }
-
     private static func quotedIfNeeded(_ path: String) -> String {
         let plain = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "/._-+@%,:"))
         return path.unicodeScalars.allSatisfy { plain.contains($0) && $0.isASCII } ? path : ShellQuoting.quoted(path)

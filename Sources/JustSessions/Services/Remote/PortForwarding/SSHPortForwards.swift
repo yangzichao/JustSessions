@@ -7,7 +7,6 @@ final class SSHPortForwards {
     static let shared = SSHPortForwards()
 
     static let loginCheckInterval: TimeInterval = 5
-    nonisolated static let probeTimeout: TimeInterval = 3
 
     enum State: Hashable {
         case active
@@ -51,7 +50,7 @@ final class SSHPortForwards {
     private let loginConnections: SSHLoginConnections
     private let isLocalPortFree: @Sendable (Int) -> Bool
     private let currentDate: () -> Date
-    private let wakesItselfUp: Bool
+    private let sleepUntilWakeUp: @Sendable (Duration) async throws -> Void
     @ObservationIgnored private var routes: [String: Route] = [:]
     @ObservationIgnored private var connecting: [String: Task<RouteOutcome, Never>] = [:]
     @ObservationIgnored private var forwardsBeingAdded: [String: Int] = [:]
@@ -67,14 +66,14 @@ final class SSHPortForwards {
         loginConnections: SSHLoginConnections = .shared,
         isLocalPortFree: @escaping @Sendable (Int) -> Bool = LocalPortAvailability.isFree,
         currentDate: @escaping () -> Date = Date.init,
-        wakesItselfUp: Bool = true
+        sleepUntilWakeUp: @escaping @Sendable (Duration) async throws -> Void = { try await Task.sleep(for: $0) }
     ) {
         self.sshExecutable = sshExecutable
         self.socketRoot = socketRoot
         self.loginConnections = loginConnections
         self.isLocalPortFree = isLocalPortFree
         self.currentDate = currentDate
-        self.wakesItselfUp = wakesItselfUp
+        self.sleepUntilWakeUp = sleepUntilWakeUp
     }
 
     func start() {
@@ -305,7 +304,6 @@ final class SSHPortForwards {
     private func scheduleWakeUp() {
         wakeUp?.cancel()
         wakeUp = nil
-        guard wakesItselfUp else { return }
         var next = schedule.nextTryAt(excluding: hostsBeingReconnected)
         if routes.values.contains(where: { if case .login = $0 { true } else { false } }) {
             let loginCheck = currentDate().addingTimeInterval(Self.loginCheckInterval)
@@ -313,8 +311,9 @@ final class SSHPortForwards {
         }
         guard let next else { return }
         let delay = max(next.timeIntervalSince(currentDate()), 0)
+        let sleepUntilWakeUp = sleepUntilWakeUp
         wakeUp = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(delay))
+            try? await sleepUntilWakeUp(.seconds(delay))
             guard !Task.isCancelled else { return }
             self?.askDueHosts()
         }
@@ -356,18 +355,14 @@ final class SSHPortForwards {
             return .refused(sshMessage: sshMessage)
         }
         guard probing else { return nil }
-        let probe = BoundedProcessRunner.outcome(
-            ofExecutable: sshExecutable,
-            arguments: SSHPortForwardCommands.probeArguments(forward, controlPath: route.controlPath),
-            environment: SSHProcessEnvironment.standard,
-            includesStandardError: true,
-            timeout: probeTimeout
-        )
-        guard let exitStatus = probe?.exitStatus, exitStatus != 0,
-            let refusal = refusal(in: route.newOutput() ?? probe?.output ?? "")
-        else { return nil }
-        cancel([forward], through: route, sshExecutable: sshExecutable)
-        return .refusedByHost(host: forward.host, sshMessage: refusal)
+        switch SSHPortForwardProbe.run(forward, controlPath: route.controlPath, sshExecutable: sshExecutable) {
+        case .couldNotStart, .reachedPort, .stillOpenAtTimeout:
+            return nil
+        case .failed(let probeOutput):
+            guard let refusal = refusal(in: route.newOutput() ?? probeOutput) else { return nil }
+            cancel([forward], through: route, sshExecutable: sshExecutable)
+            return .refusedByHost(host: forward.host, sshMessage: refusal)
+        }
     }
 
     /// The line of a failed probe that says the host refused to open the port, such as "administratively

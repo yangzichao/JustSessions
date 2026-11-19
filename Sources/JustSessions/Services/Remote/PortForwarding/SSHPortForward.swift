@@ -11,7 +11,7 @@ struct SSHPortForward: Hashable, Sendable {
 
     var browserURL: URL? { URL(string: "http://localhost:\(localPort)") }
 
-    var specification: String { "127.0.0.1:\(localPort):localhost:\(remotePort)" }
+    var sshLocalForwardArgument: String { "127.0.0.1:\(localPort):localhost:\(remotePort)" }
 }
 
 /// The `ssh` commands of port forwarding. Forwards are added to a running connection one by one with `-O forward`, from
@@ -39,7 +39,7 @@ enum SSHPortForwardCommands {
     static func requestArguments(_ request: Request, _ forward: SSHPortForward, controlPath: String) -> [String] {
         [
             "-F", "/dev/null", "-o", "BatchMode=yes", "-S", controlPath,
-            "-O", request.rawValue, "-L", forward.specification, "--", forward.host,
+            "-O", request.rawValue, "-L", forward.sshLocalForwardArgument, "--", forward.host,
         ]
     }
 

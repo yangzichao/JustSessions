@@ -25,7 +25,7 @@ struct RemoteSessionMirrorTests {
             .appending("\n")
             .write(to: codexDay.appendingPathComponent("rollout-2026-09-24T10-00-00-\(codexID).jsonl"), atomically: true, encoding: .utf8)
 
-        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path)
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path))
         let discovery = RemoteSessionDiscovery(mirror: mirror)
         let conversations = try discovery.discover(host: "devbox")
 
@@ -49,7 +49,7 @@ struct RemoteSessionMirrorTests {
         let remoteHome = root.appendingPathComponent("remote-home")
         try FileManager.default.createDirectory(at: remoteHome, withIntermediateDirectories: true)
 
-        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path)
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path))
         #expect(try RemoteSessionDiscovery(mirror: mirror).discover(host: "devbox").isEmpty)
     }
 

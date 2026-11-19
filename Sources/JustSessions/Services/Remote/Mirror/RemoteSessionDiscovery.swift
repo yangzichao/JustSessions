@@ -20,7 +20,7 @@ struct RemoteSessionDiscovery: Sendable {
         copied: @Sendable (RemoteSessionCopyStep, [Conversation]) async -> Void
     ) async throws {
         try Task.checkCancellation()
-        let sharing = mirror.connectionSharing(host)
+        let sharing = mirror.hostAccess.connectionSharing(host)
         defer { sharing?.finish() }
         let options = sharing?.options ?? []
         let providers = ConversationProvider.allCases

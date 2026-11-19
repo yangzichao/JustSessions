@@ -89,8 +89,12 @@ struct SSHPortForwardsTests {
                 loginConnections: loginConnections,
                 isLocalPortFree: { !busyLocalPorts.value.contains($0) },
                 currentDate: { clock.value },
-                wakesItselfUp: false
+                sleepUntilWakeUp: Self.sleepUntilCancelled
             )
+        }
+
+        nonisolated private static func sleepUntilCancelled(_: Duration) async throws {
+            while true { try await Task.sleep(for: .seconds(60)) }
         }
 
         func remove() {

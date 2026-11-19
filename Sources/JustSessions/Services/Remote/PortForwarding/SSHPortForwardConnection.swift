@@ -1,7 +1,8 @@
 import Foundation
 
 final class SSHPortForwardConnection: @unchecked Sendable {
-    static let defaultStartTimeout: TimeInterval = 30
+    static let defaultStartTimeout = SSHConnectTimeout.plus(slowLoginAllowance)
+    private static let slowLoginAllowance: TimeInterval = 20
 
     enum StartOutcome {
         case started(SSHPortForwardConnection)

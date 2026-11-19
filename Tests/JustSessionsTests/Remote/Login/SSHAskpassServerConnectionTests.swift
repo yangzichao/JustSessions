@@ -97,11 +97,9 @@ struct SSHAskpassServerConnectionTests {
         if helperHasGone { helper.close() }
         defer { if !helperHasGone { helper.close() } }
 
-        let connection = accept(listener, nil, nil)
-        try #require(connection >= 0)
-        defer { close(connection) }
+        let connection = try #require(SSHAskpassConnection.accept(on: listener))
 
-        #expect(SSHAskpassServer.prepare(connection) == !helperHasGone)
+        #expect(connection.prepare(requestTimeout: SSHAskpassServer.requestTimeout) == !helperHasGone)
     }
 
     private static func listeningSocket(at path: String) -> Int32? {

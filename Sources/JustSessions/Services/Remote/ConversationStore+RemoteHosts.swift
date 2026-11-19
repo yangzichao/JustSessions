@@ -13,7 +13,6 @@ extension ConversationStore {
         let discovery = discovery ?? remoteSessionDiscovery
         let token = remoteHostWork.beginRefresh(on: host, previousStatus: hostRefreshStatuses[.ssh(host)])
         let requestNumber = windowRegistry.latestRemoteHostCopies.noteRefreshAsked()
-        let configuredHosts = Array(Set(storesOfEveryWindow.flatMap { $0.remoteHostList.hosts }))
         let coordinator = windowRegistry.hostSessionWork
         hostRefreshStatuses[.ssh(host)] = .refreshing
         remoteHostCopies.noteStart(of: host)
@@ -23,7 +22,6 @@ extension ConversationStore {
                     try Task.checkCancellation()
                     let turn = await self?.remoteHostRefreshTurn(token, on: host, into: discovery.mirror, askedAt: requestNumber)
                     guard let turn else { throw CancellationError() }
-                    discovery.mirror.migrateLegacyMirrors(for: configuredHosts)
                     guard case .copy(let copyNumber) = turn else {
                         if case .take(let outcome) = turn {
                             try await self?.takeAnotherWindowsCopy(outcome, host: host, token: token, discovery: discovery)
@@ -151,10 +149,8 @@ extension ConversationStore {
         else { return }
         let discovery = remoteSessionDiscovery
         let coordinator = windowRegistry.hostSessionWork
-        let configuredHosts = Array(Set(storesOfEveryWindow.flatMap { $0.remoteHostList.hosts }))
         Task.detached(priority: .userInitiated) { [weak self] in
             try? await coordinator.withAccess(to: [.ssh(host)]) { [weak self] in
-                discovery.mirror.migrateLegacyMirrors(for: configuredHosts)
                 guard let mirroredConversations = try? discovery.readMirror(host: host) else { return }
                 await self?.applyRemoteMirrorListing(mirroredConversations, host: host, token: token)
             }

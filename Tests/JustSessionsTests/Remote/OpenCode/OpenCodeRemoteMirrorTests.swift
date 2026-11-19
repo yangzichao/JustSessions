@@ -49,7 +49,7 @@ struct OpenCodeRemoteMirrorTests {
         #expect(try FileManager.default.contentsOfDirectory(atPath: mirrorDirectory.path) == ["opencode.db"])
     }
 
-    @Test func pythonSnapshotOnTheHostBuildsTheSameMirror() throws {
+    @Test func pythonSnapshotOnTheHostReadsAsItsDatabaseDoes() throws {
         let fixture = try RemoteOpenCodeFixture()
         defer { fixture.remove() }
         try fixture.hostDatabase.addMessage(
@@ -69,15 +69,13 @@ struct OpenCodeRemoteMirrorTests {
         let path = try #require(OpenCodeRemoteSnapshotCommand.snapshotPath(in: result.output))
         defer { try? FileManager.default.removeItem(atPath: path) }
         let snapshot = URL(fileURLWithPath: path).appendingPathComponent("opencode.db")
-        let swiftSnapshot = fixture.root.appendingPathComponent("swift-snapshot.db")
-        try OpenCodeSQLiteSnapshot.copy(fixture.hostDatabase.file, to: swiftSnapshot)
         #expect(
             try OpenCodeAdapter(databaseFile: snapshot).discover().map(\.sessionID).sorted()
                 == [OpenCodeDeletionFixture.retainedSessionID, OpenCodeDeletionFixture.selectedSessionID])
         for sessionID in [OpenCodeDeletionFixture.retainedSessionID, OpenCodeDeletionFixture.selectedSessionID] {
             #expect(
                 try OpenCodeTranscriptReader().read(snapshot, sessionID: sessionID).entries.map(\.content)
-                    == (try OpenCodeTranscriptReader().read(swiftSnapshot, sessionID: sessionID)).entries.map(\.content))
+                    == (try OpenCodeTranscriptReader().read(fixture.hostDatabase.file, sessionID: sessionID)).entries.map(\.content))
         }
         let mirrored = String(decoding: try Data(contentsOf: snapshot), as: UTF8.self)
         #expect(!mirrored.contains("secret-tool-output") && !mirrored.contains("secret-access-token"))
@@ -105,7 +103,7 @@ struct OpenCodeRemoteMirrorTests {
         let runner = fixture.runner(environment: ["PATH": fixture.binaryDirectory.path + ":/bin"])
 
         let result = try #require(runner.run("devbox", OpenCodeRemoteSnapshotCommand.create(on: "devbox"), 30))
-        try OpenCodeRemoteSessionMirror(runner: runner).synchronize(host: "devbox", sourceHomeOverride: nil, destination: destination)
+        try OpenCodeRemoteSessionMirror(runner: runner).synchronize(host: "devbox", destination: destination)
 
         #expect(result.exitStatus == OpenCodeRemoteSnapshotCommand.noDatabaseExitStatus)
         #expect(!FileManager.default.fileExists(atPath: destination.path))
@@ -119,11 +117,11 @@ struct OpenCodeRemoteMirrorTests {
 
         #expect(throws: RemoteSessionMirrorError.self) {
             try OpenCodeRemoteSessionMirror(runner: recorder.runner(answering: (127, "python3: command not found")))
-                .synchronize(host: "devbox", sourceHomeOverride: nil, destination: destination)
+                .synchronize(host: "devbox", destination: destination)
         }
         #expect(throws: RemoteSessionMirrorError.self) {
             try OpenCodeRemoteSessionMirror(runner: recorder.runner(answering: (0, "JUSTSESSIONS_OPENCODE_SNAPSHOT=/etc")))
-                .synchronize(host: "devbox", sourceHomeOverride: nil, destination: destination)
+                .synchronize(host: "devbox", destination: destination)
         }
         // Neither attempt reached rsync or removed anything on the host.
         #expect(recorder.commands.count == 2)
@@ -137,7 +135,7 @@ struct OpenCodeRemoteMirrorTests {
 
         #expect(throws: RemoteSessionMirrorError.sshFailed(host: "devbox", problem: .hostNotFound)) {
             try OpenCodeRemoteSessionMirror(runner: runner)
-                .synchronize(host: "devbox", sourceHomeOverride: nil, destination: fixture.mirrorDatabase.deletingLastPathComponent())
+                .synchronize(host: "devbox", destination: fixture.mirrorDatabase.deletingLastPathComponent())
         }
         #expect(
             RemoteSessionMirrorError.sshFailed(host: "devbox", problem: .hostNotFound).errorDescription
@@ -155,7 +153,7 @@ struct OpenCodeRemoteMirrorTests {
         for (environment, expectedPath) in cases {
             let output = BoundedProcessRunner.output(
                 ofExecutable: "/bin/sh",
-                arguments: ["-c", OpenCodeRemoteDatabaseLocation.shellAssignment + "\nprintf '%s' \"$db\""],
+                arguments: ["-c", OpenCodeRemoteDatabaseLocation.shellAssignment(to: "db") + "\nprintf '%s' \"$db\""],
                 environment: ["HOME": "/home/me", "PATH": "/usr/bin:/bin"].merging(environment) { $1 },
                 timeout: 10
             )
@@ -165,9 +163,9 @@ struct OpenCodeRemoteMirrorTests {
     }
 
     @Test func databaseFromBeforeArchivingStillMirrors() throws {
-        let root = try makeTemporaryDirectory()
-        defer { try? FileManager.default.removeItem(at: root) }
-        let source = root.appendingPathComponent("opencode.db")
+        let fixture = try RemoteOpenCodeFixture()
+        defer { fixture.remove() }
+        let source = fixture.root.appendingPathComponent("older.db")
         try OpenCodeDatabaseFixture(file: source, createsTables: false).execute(
             """
             CREATE TABLE session (id TEXT PRIMARY KEY, parent_id TEXT, directory TEXT, title TEXT, time_updated INTEGER);
@@ -177,9 +175,14 @@ struct OpenCodeRemoteMirrorTests {
             INSERT INTO message VALUES ('msg_a', 'ses_olderschema1', 1, 1, '{"role":"user"}');
             INSERT INTO part VALUES ('prt_a', 'msg_a', 'ses_olderschema1', 1, 1, '{"type":"text","text":"Hello"}');
             """)
-        let snapshot = root.appendingPathComponent("snapshot.db")
 
-        try OpenCodeSQLiteSnapshot.copy(source, to: snapshot)
+        let result = try #require(
+            fixture.runner(environment: ["OPENCODE_DB": source.path]).run("devbox", OpenCodeRemoteSnapshotCommand.create(on: "devbox"), 30))
+
+        #expect(result.exitStatus == 0, "\(result.output)")
+        let path = try #require(OpenCodeRemoteSnapshotCommand.snapshotPath(in: result.output))
+        defer { try? FileManager.default.removeItem(atPath: path) }
+        let snapshot = URL(fileURLWithPath: path).appendingPathComponent("opencode.db")
 
         #expect(try OpenCodeAdapter(databaseFile: snapshot).discover().map(\.sessionID) == ["ses_olderschema1"])
         #expect(

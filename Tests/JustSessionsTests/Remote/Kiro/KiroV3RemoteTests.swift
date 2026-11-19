@@ -17,7 +17,7 @@ struct KiroV3RemoteTests {
             remoteHome = root.appendingPathComponent("remote home")
             projectDirectory = root.appendingPathComponent("Bob's paper; $dollar")
             try FileManager.default.createDirectory(at: projectDirectory, withIntermediateDirectories: true)
-            mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path)
+            mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path))
         }
 
         func remove() { try? FileManager.default.removeItem(at: root) }

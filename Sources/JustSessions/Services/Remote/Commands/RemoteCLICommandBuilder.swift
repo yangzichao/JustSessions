@@ -44,10 +44,8 @@ struct RemoteCLICommandBuilder {
             executablePath: "/usr/bin/ssh",
             arguments: ["-t"]
                 + loginConnections.connectionOptions(for: host)
-                + [
-                    "-o", "ConnectTimeout=10",
-                    "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4",
-                ]
+                + SSHConnectTimeout.options
+                + ["-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4"]
                 + keystrokeTimingOptions
                 + [
                     // With a `RemoteCommand` in `~/.ssh/config`, `ssh` would refuse to run the tab's command.
