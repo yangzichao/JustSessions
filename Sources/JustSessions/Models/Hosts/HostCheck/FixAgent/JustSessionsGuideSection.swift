@@ -54,14 +54,14 @@ extension JustSessionsGuideSection {
         return all.filter { $0 == .whenSomethingFailsOnSSHHost || sectionsAboutFindings.contains($0) }
     }
 
-    private static func sections(aboutFindingID findingID: String) -> [Self] {
+    private static func sections(aboutFindingID findingID: HostCheckFindingID) -> [Self] {
         switch findingID {
-        case "connection": [.hostsThatAskForPassword]
-        case "login-shell", "shell-startup": [.shellStartupOnSSHHosts]
-        case "tmux": [.terminalPersistence]
-        case "rsync", "python3": [.sshSessionCache]
-        case "folder", "script": [.cliLaunchAndDiscovery]
-        default: findingID.hasPrefix("cli-") ? [.cliLaunchAndDiscovery] : []
+        case .connection: [.hostsThatAskForPassword]
+        case .loginShell, .shellStartup: [.shellStartupOnSSHHosts]
+        case .tmux: [.terminalPersistence]
+        case .rsync, .python3: [.sshSessionCache]
+        case .folder, .script, .cli, .otherCLIs: [.cliLaunchAndDiscovery]
+        case .system: []
         }
     }
 }

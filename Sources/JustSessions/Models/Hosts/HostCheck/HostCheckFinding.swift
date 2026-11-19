@@ -14,8 +14,7 @@ struct HostCheckFinding: Codable, Equatable, Sendable, Identifiable {
         case problem
     }
 
-    /// Stable within a report, such as "tmux" or "cli-claude".
-    let id: String
+    let id: HostCheckFindingID
     let status: Status
     let title: String
     let summary: String

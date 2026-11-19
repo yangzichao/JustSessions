@@ -9,14 +9,14 @@ extension ConversationStore {
             return newSessionProviders(on: .thisMac)
         case .checkedHost:
             return newSessionProviders(on: .ssh(report.host)).filter { provider in
-                !report.findings.contains { $0.id == "cli-\(provider.executableName)" && $0.status == .problem }
+                !report.findings.contains { $0.id == .cli(provider) && $0.status == .problem }
             }
         }
     }
 
     func hostFixAgentDraft(for state: HostCheckSheetState, report: HostCheckReport) -> HostFixAgentDraft {
         let hostCantStartAgent = report.findings.contains {
-            $0.status == .problem && ["connection", "login-shell", "shell-startup"].contains($0.id)
+            $0.status == .problem && [HostCheckFindingID.connection, .loginShell, .shellStartup].contains($0.id)
         }
         let machine: HostFixAgentMachine =
             hostCantStartAgent || hostFixAgentProviders(on: .checkedHost, report: report).isEmpty
@@ -38,7 +38,7 @@ extension ConversationStore {
 
     func hostFixAgentFolder(on machine: HostFixAgentMachine, for state: HostCheckSheetState, report: HostCheckReport) -> String {
         guard machine == .checkedHost, let session = state.session,
-            report.findings.contains(where: { $0.id == "folder" && $0.status == .passed })
+            report.findings.contains(where: { $0.id == .folder && $0.status == .passed })
         else { return "~" }
         return session.projectPath
     }

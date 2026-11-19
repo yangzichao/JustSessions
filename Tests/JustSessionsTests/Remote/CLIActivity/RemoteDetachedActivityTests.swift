@@ -95,7 +95,7 @@ struct RemoteDetachedActivityTests {
                 return answer.next()
             }, currentDate: { now })
 
-        await reader.ask("devbox")
+        await reader.askIfDue("devbox")?.value
         #expect(reader.listing(of: "devbox")?.askedAt == now)
         #expect(reader.listing(of: "devbox")?.answeredAt == now)
         reader.askIfDue("devbox")
@@ -103,7 +103,7 @@ struct RemoteDetachedActivityTests {
 
         now += RemoteDetachedActivityReader.interval
         answer.set(answers.removeFirst())
-        await reader.ask("devbox")
+        await reader.askIfDue("devbox")?.value
         #expect(calls.count == 2)
         // A failure keeps the last listing while it is new enough, and waits before asking again.
         now += RemoteDetachedActivityReader.interval
@@ -132,7 +132,7 @@ struct RemoteDetachedActivityTests {
                 answer.wait()
                 return RemoteTmuxPanes(panesBySessionName: [:])
             }, currentDate: { now })
-        let asking = Task { await reader.ask("devbox") }
+        let asking = Task { await reader.askIfDue("devbox")?.value }
         while asked.count == 0 { try? await Task.sleep(for: .milliseconds(10)) }
         now += RemoteDetachedActivityReader.longestUseOfAListing + 5
         answer.signal()
@@ -153,15 +153,15 @@ struct RemoteDetachedActivityTests {
         store.replaceConversations(on: .ssh("devbox"), with: [conversation])
         store.tmuxSessionNamesByHost[.ssh("devbox")] = [Self.claudeName]
         let host = StandInHost()
-        // A clock of the test's own, a second on each step, so how long the busy suite holds the test up doesn't age
-        // the listings.
+        // A clock of the test's own, one asking interval on each step, so how long the busy suite holds the test up
+        // doesn't age the listings.
         var now = Date(timeIntervalSince1970: 1_000)
         store.remoteDetachedActivityReader = RemoteDetachedActivityReader(listPanes: { _ in host.panes() }, currentDate: { now })
         let registry = ClaudeLiveSessionRegistry(configurationDirectory: directory.appendingPathComponent("claude"))
         func sync(option: String?) async {
             host.set(option.map { [Self.claudeName: .init(activityOption: $0, title: "✳ Fix login")] } ?? [:])
-            now += 1
-            await store.remoteDetachedActivityReader.ask("devbox")
+            now += RemoteDetachedActivityReader.interval
+            await store.remoteDetachedActivityReader.askIfDue("devbox")?.value
             await store.synchronizeCLIActivity(claudeRegistry: registry, liveSessionReporting: nil)
         }
 
@@ -194,7 +194,7 @@ struct RemoteDetachedActivityTests {
         var now = Date(timeIntervalSince1970: 1_000)
         store.remoteDetachedActivityReader = RemoteDetachedActivityReader(listPanes: { _ in host.panes() }, currentDate: { now })
         let registry = ClaudeLiveSessionRegistry(configurationDirectory: directory.appendingPathComponent("claude"))
-        await store.remoteDetachedActivityReader.ask("devbox")
+        await store.remoteDetachedActivityReader.askIfDue("devbox")?.value
 
         now += 1
         store.tmuxSessionNamesByHost[.ssh("devbox")] = [Self.codexName]

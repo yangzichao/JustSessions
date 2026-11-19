@@ -5,6 +5,7 @@ struct NativeCLICommand {
     let arguments: [String]
     let workingDirectory: String
     let environment: [String]
+    var sshTabArguments: SSHTabArguments? = nil
 
     func appendingArguments(_ extraArguments: [String]) -> NativeCLICommand {
         NativeCLICommand(

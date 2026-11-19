@@ -3,7 +3,7 @@ import Foundation
 enum RemoteHostConnectionFindings {
     static func connectionFinding(problem: SSHConnectionProblem?, host: String) -> HostCheckFinding {
         HostCheckFinding(
-            id: "connection",
+            id: .connection,
             status: problem == nil ? .passed : .problem,
             title: AppLocalization.string("Connection"),
             summary: problem?.explanation(host: host) ?? AppLocalization.string("Logged in to \(host)."),
@@ -39,7 +39,7 @@ enum RemoteHostConnectionFindings {
             summary = AppLocalization.string("The check of \(host)'s shell startup didn't finish.")
         }
         return HostCheckFinding(
-            id: "shell-startup",
+            id: .shellStartup,
             status: status,
             title: AppLocalization.string("Shell startup"),
             summary: summary,

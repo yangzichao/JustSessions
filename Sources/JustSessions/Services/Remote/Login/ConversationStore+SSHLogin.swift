@@ -26,7 +26,7 @@ extension ConversationStore {
 
     func closeLogin(on host: String, connections: SSHLoginConnections = .shared) {
         for tab in storesOfEveryWindow.flatMap(\.terminalSessions)
-        where tab.host == .ssh(host) && RemoteCLICommandBuilder.goesThroughLogin(tab.command) {
+        where tab.host == .ssh(host) && tab.command.goesThroughSSHLogin {
             tab.connectionEndedOnPurpose = true
         }
         SSHPortForwards.shared.loginEnding(on: host)

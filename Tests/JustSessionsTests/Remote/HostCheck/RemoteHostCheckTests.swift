@@ -34,7 +34,7 @@ struct RemoteHostCheckTests {
         )
 
         #expect(steps == [.logIn])
-        #expect(outcome.report.findings.map(\.id) == ["connection"])
+        #expect(outcome.report.findings.map(\.id) == [.connection])
         #expect(outcome.report.findings.first?.status == .problem)
         #expect(outcome.shellStartupResult == nil)
         #expect(recorder.commands.map(\.command) == [WindowsHostProbe.command])
@@ -71,7 +71,7 @@ struct RemoteHostCheckTests {
         )
 
         #expect(outcome.shellStartupResult?.outcome == .usesLoginShellOnly)
-        #expect(outcome.report.findings.map(\.id) == ["connection", "shell-startup", "system", "rsync", "tmux"])
+        #expect(outcome.report.findings.map(\.id) == [.connection, .shellStartup, .system, .rsync, .tmux])
         #expect(outcome.report.findings[1].status == .warning)
         #expect(outcome.report.findings[1].hostOutput == "/home/me/.bashrc:7: exec tmux")
         #expect(outcome.report.thisMacSummary == "JustSessions 1.2.10 · macOS 26.0.1")
@@ -145,7 +145,7 @@ struct RemoteHostCheckTests {
 
         let outcome = check.check(host: "devbox", programs: [], session: nil, providersWithSessions: [], thisMacSummary: "This Mac")
 
-        #expect(outcome.report.findings.map(\.id) == ["connection", "shell-startup", "script"])
+        #expect(outcome.report.findings.map(\.id) == [.connection, .shellStartup, .script])
         #expect(outcome.report.findings.map(\.status) == [.passed, .passed, .problem])
         #expect(outcome.shellStartupResult?.outcome == .interactiveStartupWorks)
     }
@@ -182,7 +182,7 @@ struct RemoteHostCheckTests {
         #expect(outcome.cliLocations == [.codex: .loginShell, .claude: .installed(path: installedClaude)])
         let scriptCommand = try #require(recorder.commands.last?.command)
         #expect(scriptCommand.contains("program=\"\(installedClaude)\""))
-        let claude = try #require(outcome.report.findings.first { $0.id == "cli-claude" })
+        let claude = try #require(outcome.report.findings.first { $0.id == .cli(.claude) })
         #expect(claude.summary.contains(installedClaude))
     }
 }

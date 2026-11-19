@@ -17,7 +17,11 @@ struct HostCheckReport: Codable, Equatable, Sendable {
 
     /// The problems that are the host's own, which its heading warns of. A missing project folder is one session's.
     var hostProblems: [HostCheckFinding] {
-        findings.filter { $0.status == .problem && $0.id != "folder" }
+        findings.filter { $0.status == .problem && $0.id != .folder }
+    }
+
+    var foundTmuxServerUnreachable: Bool {
+        findings.contains { $0.id == .tmux && $0.status == .problem }
     }
 
     /// Whether there is anything for an agent to fix: a problem, a warning, or an ended tab's output to explain.

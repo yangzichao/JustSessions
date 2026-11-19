@@ -57,9 +57,9 @@ struct JustSessionsGuideSectionTests {
             checkedAt: .now,
             thisMacSummary: "",
             findings: [
-                HostCheckFinding(id: "tmux", status: .problem, title: "tmux", summary: ""),
-                HostCheckFinding(id: "cli-claude", status: .warning, title: "Claude Code", summary: ""),
-                HostCheckFinding(id: "rsync", status: .passed, title: "rsync", summary: ""),
+                HostCheckFinding(id: .tmux, status: .problem, title: "tmux", summary: ""),
+                HostCheckFinding(id: .cli(.claude), status: .warning, title: "Claude Code", summary: ""),
+                HostCheckFinding(id: .rsync, status: .passed, title: "rsync", summary: ""),
             ]
         )
         #expect(

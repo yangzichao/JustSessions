@@ -10,7 +10,7 @@ struct HostFixAgentPromptTests {
         thisMacSummary: "JustSessions 1.2.11",
         findings: [
             HostCheckFinding(
-                id: "tmux",
+                id: .tmux,
                 status: .problem,
                 title: "tmux",
                 summary: "Started by another tmux version.",
