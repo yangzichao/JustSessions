@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Settings… (⌘,) opens General; JustSessions Help opens Help in the same Settings sheet. Take the Tour
-/// starts the active workspace window's onboarding tour. Send Feedback opens the website's form in the browser.
 struct AppWideSheetCommands: Commands {
     @ObservedObject private var languageStore = AppLanguageStore.shared
     @Environment(\.openWindow) private var openWindow

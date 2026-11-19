@@ -5,7 +5,6 @@ struct CodexConversationDeletion {
     let codexDirectory: URL
     let executableURL: URL?
     let fileManager: FileManager
-    /// How long `codex delete` may take before it is stopped and the deletion reported as failed.
     let timeout: TimeInterval
 
     init(codexDirectory: URL, executableURL: URL? = nil, fileManager: FileManager = .default, timeout: TimeInterval = 60) {

@@ -8,11 +8,8 @@
 /// Claude Code starts the first row with `❯` (or `!` in bash mode) and Antigravity with `>`; both indent the other rows
 /// to line up. Pi draws no marker. Claude Code shows `Try "…"` while the prompt is empty.
 struct RuledPromptRecognizer: Sendable {
-    /// What the first row may start with, a cell before the text's indent; empty when the text starts the row.
     let firstRowMarkers: Set<Character>
-    /// The cell every row's text starts at.
     let textStartColumn: Int
-    /// The cells a row keeps free of text: the indent and those the CLI leaves at the end. Measured at 80 columns.
     let columnsWithoutText: Int
     let isPlaceholder: @Sendable (String) -> Bool
 
@@ -42,7 +39,6 @@ struct RuledPromptRecognizer: Sendable {
         )
     }
 
-    /// A row of `─` and nothing else, at least half the screen wide.
     private func isRule(_ row: TerminalScreenRow, on screen: TerminalScreen) -> Bool {
         guard let first = row.firstTextIndex, let last = row.lastTextIndex else { return false }
         return row.characters[first...last].allSatisfy { $0 == "─" } && last - first + 1 >= screen.columnCount / 2

@@ -2,16 +2,6 @@ import CoreGraphics
 import CryptoKit
 import Foundation
 
-/// Decodes the images transcripts show, once for every view that shows the same image. Two readers of one session, or
-/// a session read again after switching away, read their images into new `Data` from the session file, so an image is
-/// known by a digest of its bytes rather than by its `Data`.
-///
-/// - Views asking for an image that is decoding wait for that decode instead of starting their own.
-/// - Decoded images stay in a cache of `cacheByteLimit` pixel bytes, which `NSCache` also empties when memory runs low.
-///   A view that shows an image holds it anyway, so the cache costs memory only for images no view shows.
-/// - A view that goes away stops waiting. A decode that hasn't started by the time nobody waits for it doesn't start.
-///
-/// The digest names the bytes, so a cached image can never be an older version of the one asked for.
 actor TranscriptImageDecoder {
     static let shared = TranscriptImageDecoder(cacheByteLimit: 128 << 20) { image, maximumPixelSize in
         image.decoded(maximumPixelSize: maximumPixelSize)
@@ -27,7 +17,6 @@ actor TranscriptImageDecoder {
         }
     }
 
-    /// A decode under way, and the views waiting for it.
     private struct Decoding {
         let id = UUID()
         var waiters: [UUID: CheckedContinuation<CGImage?, Never>] = [:]
@@ -41,15 +30,11 @@ actor TranscriptImageDecoder {
         self.init(storage: CachedTranscriptImages(byteLimit: cacheByteLimit), decode: decode)
     }
 
-    /// Keeps decoded images in `storage`. Tests pass one that never lets an image go, since `NSCache` can.
     init(storage: any TranscriptImageStorage, decode: @escaping @Sendable (TranscriptImage, Int) -> CGImage?) {
         self.decode = decode
         self.storage = storage
     }
 
-    /// The image decoded for display, downsampled to at most `maximumPixelSize` on its longer side; see
-    /// `TranscriptImage.decoded(maximumPixelSize:)`. Nil when the image can't be decoded, or when the calling task is
-    /// cancelled first. Digests the image's bytes before it waits its turn on this actor, so digests run in parallel.
     nonisolated func image(for image: TranscriptImage, maximumPixelSize: Int) async -> CGImage? {
         guard !image.data.isEmpty else { return nil }
         let key = Key(image, maximumPixelSize: maximumPixelSize)
@@ -84,12 +69,10 @@ actor TranscriptImageDecoder {
         }
     }
 
-    /// Forgets every decoded image, so a measurement can start cold. Decodes under way still finish.
     func removeCachedImages() {
         storage.removeAll()
     }
 
-    /// How many views wait on the decode of `image` under way, so a test can tell when a view has joined it.
     func waitingViewCount(for image: TranscriptImage, maximumPixelSize: Int) -> Int {
         decodings[Key(image, maximumPixelSize: maximumPixelSize)]?.waiters.count ?? 0
     }
@@ -114,15 +97,12 @@ actor TranscriptImageDecoder {
     }
 }
 
-/// Where `TranscriptImageDecoder` keeps the images it decoded. Only the decoder calls it, on its own actor.
 protocol TranscriptImageStorage: AnyObject {
     func image(for key: TranscriptImageDecoder.Key) -> CGImage?
-    /// `cost` is the image's pixel bytes.
     func store(_ image: CGImage, for key: TranscriptImageDecoder.Key, cost: Int)
     func removeAll()
 }
 
-/// The app's storage: an `NSCache` of at most `byteLimit` pixel bytes, which it also empties when memory runs low.
 private final class CachedTranscriptImages: TranscriptImageStorage {
     private let cache = NSCache<CacheKey, CachedImage>()
 

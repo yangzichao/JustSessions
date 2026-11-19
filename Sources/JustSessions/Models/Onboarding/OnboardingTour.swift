@@ -1,7 +1,5 @@
 import Combine
 
-/// The onboarding stops showing in one workspace window, the tour's or a tip's, and the one whose tip shows. A tip's
-/// buttons move it on, so you can try what a tip points at while it shows; so does that control going out of use.
 @MainActor
 final class OnboardingTour: ObservableObject {
     @Published private(set) var stops: [OnboardingTourStop] = []
@@ -21,7 +19,6 @@ final class OnboardingTour: ObservableObject {
         currentStopIndex = 0
     }
 
-    /// Shows the next stop's tip, or ends the tour after its last.
     func showNextStop() {
         guard let currentStopIndex else { return }
         if currentStopIndex + 1 < stops.count {
@@ -31,7 +28,6 @@ final class OnboardingTour: ObservableObject {
         }
     }
 
-    /// Moves past the current stop, and those after it, while they can't show; ends the tour if none after can.
     func moveOnFromStops(thatCannotShow canShow: (OnboardingTourStop) -> Bool) {
         while let currentStop, !canShow(currentStop) {
             showNextStop()

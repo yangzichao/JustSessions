@@ -1,12 +1,10 @@
 import SwiftUI
 
-/// Status, time, tool, and archive filters apply only to the project library, never to open terminals.
 struct SidebarProjectFilterMenu: View {
     @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
     @Binding var statusFilter: SessionStatusFilter
     @Binding var archiveFilter: SessionArchiveFilter
-    /// Tools installed on a host or with listed sessions; the menu offers only these.
     let offeredProviders: Set<ConversationProvider>
     let allSessionCount: Int
     let recentSessionCount: Int
@@ -26,7 +24,6 @@ struct SidebarProjectFilterMenu: View {
         )
     }
 
-    /// Running and Waiting for you each list by the CLI's status, so turning one on turns the other off.
     private func isStatusOnly(_ status: SessionStatusFilter) -> Binding<Bool> {
         Binding(
             get: { statusFilter == status },
@@ -34,8 +31,6 @@ struct SidebarProjectFilterMenu: View {
         )
     }
 
-    /// Shows the chosen tool's icon on a tinted chip while it filters the list,
-    /// so the filter stays visible without opening the menu.
     var body: some View {
         let filteredProvider = providerFilter.provider
 
@@ -67,7 +62,6 @@ struct SidebarProjectFilterMenu: View {
             .pickerStyle(.inline)
             .labelsHidden()
             Divider()
-            // Archived sessions stay out of the list until asked for, like archived projects.
             Toggle(isOn: showsArchived) {
                 Text("Show archived") + Text(verbatim: " · \(archivedSessionCount.formatted())")
             }
@@ -97,7 +91,6 @@ struct SidebarProjectFilterMenu: View {
             in: RoundedRectangle(.control)
         )
         .overlay(alignment: .topTrailing) {
-            // The tool's icon takes the chip, so a dot tells that another filter is on too.
             if recencyFilter == .recent || statusFilter != .all || archiveFilter != .hideArchived, filteredProvider != nil {
                 Circle().fill(.foreground).frame(width: InterfaceScale.points(4), height: InterfaceScale.points(4))
             }

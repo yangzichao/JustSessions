@@ -1,9 +1,5 @@
 import GhosttyTerminal
 
-/// Ghostty searches through its binding actions, the ones its own find bar uses, highlighting every match and scrolling
-/// the selected one to the top of the view. Its "next" match is the older one, as the app's find goes. Ghostty reports
-/// how many matches it found, but the wrapper drops those reports (`TerminalCallbackBridge.handleAction`), so this tab
-/// shows no count.
 extension GhosttyTabTerminalView: TerminalTextFinding {
     /// `search:` takes the rest of the action as its text, colons and backslashes included. It selects no match, so
     /// the first move selects the newest.

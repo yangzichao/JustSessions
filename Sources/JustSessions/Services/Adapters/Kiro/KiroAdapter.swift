@@ -1,11 +1,7 @@
 import Foundation
 
-/// Kiro CLI's chat keeps each session as `<id>.json`, its metadata, beside `<id>.jsonl`, its messages, in
-/// `sessions/cli` of its home folder (`KIRO_HOME`, or `~/.kiro`). Its V3 engine keeps each in a folder of its own under
-/// `sessions` instead; see `KiroV3Session`. Both are listed.
 struct KiroAdapter: ConversationAdapter {
     let sessionsDirectory: URL
-    /// V3's sessions: `sessions/<workspace hash>/sess_<uuid>/`. Nil reads V2's alone.
     let v3SessionsDirectory: URL?
     let deletionExecutableURL: URL?
     var provider: ConversationProvider { .kiro }
@@ -18,8 +14,6 @@ struct KiroAdapter: ConversationAdapter {
         return URL(fileURLWithPath: kiroHome).appendingPathComponent("sessions/cli")
     }
 
-    /// With the standard folders, V3's sessions are read beside V2's; a `sessionsDirectory` of your own reads V2's
-    /// alone unless `v3SessionsDirectory` is given too.
     init(sessionsDirectory: URL? = nil, v3SessionsDirectory: URL? = nil, deletionExecutableURL: URL? = nil) {
         let standard = KiroAdapter.standardSessionsDirectory()
         self.sessionsDirectory = sessionsDirectory ?? standard
@@ -64,7 +58,6 @@ struct KiroAdapter: ConversationAdapter {
         ).delete(conversation)
     }
 
-    /// Each workspace's `sess_<uuid>` folders under `v3SessionsDirectory`, `sessions/cli` aside.
     private func v3Conversations(cancellation: ConversationDiscoveryCancellation) -> [Conversation] {
         let fileManager = FileManager.default
         guard let v3SessionsDirectory,

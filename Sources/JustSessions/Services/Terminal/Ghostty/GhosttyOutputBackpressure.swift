@@ -6,15 +6,9 @@ import GhosttyTerminal
 /// `LocalProcess` does for a SwiftTerm tab. Ghostty's session takes output without limit, so without this a fast
 /// process could fill memory. While the reading waits, the pseudo-terminal's buffer fills and the process blocks in
 /// its writes, as in any terminal.
-///
-/// The output waiting is what the tab has handed to the main thread and not yet passed to Ghostty, plus what Ghostty
-/// has not parsed yet.
 final class GhosttyOutputBackpressure: @unchecked Sendable {
-    /// Reading stops once this much output waits, as SwiftTerm's `LocalProcess` does.
     static let defaultHighWaterByteCount = 4 << 20
-    /// Reading starts again once no more than this waits.
     static let defaultLowWaterByteCount = 1 << 20
-    /// How long one wait lasts before the count is read again, in case a wake-up was missed.
     private static let waitSlice = DispatchTimeInterval.milliseconds(100)
 
     let highWaterByteCount: Int
@@ -39,22 +33,17 @@ final class GhosttyOutputBackpressure: @unchecked Sendable {
         }
     }
 
-    /// Output read from the process that Ghostty has not parsed yet.
     var unparsedByteCount: Int {
         lock.withLock { bytesOnTheWayToGhostty } + session.pendingOutputByteCount
     }
 
-    /// Whether a read waits in `waitForRoom()`, for tests.
     var isWaitingForRoom: Bool {
         lock.withLock { isWaiting }
     }
 
-    /// Called before each read is handed on; returns once there is room for it. Blocks the calling thread, which must
-    /// not be the main thread, while at least the high-water mark waits, until the low-water mark is reached.
     func waitForRoom() {
         guard unparsedByteCount >= highWaterByteCount else { return }
         while true {
-            // Marked before the count is read, so a wake-up that comes in between is kept by the semaphore.
             let hasStopped = lock.withLock {
                 isWaiting = true
                 return self.hasStopped
@@ -65,12 +54,10 @@ final class GhosttyOutputBackpressure: @unchecked Sendable {
         lock.withLock { isWaiting = false }
     }
 
-    /// The tab handed `byteCount` bytes of output to the main thread, on their way to Ghostty.
     func outputHandedToMainThread(byteCount: Int) {
         lock.withLock { bytesOnTheWayToGhostty += byteCount }
     }
 
-    /// The tab passed `byteCount` bytes of output to Ghostty's session.
     func outputPassedToGhostty(byteCount: Int) {
         let waitingBytes = lock.withLock {
             bytesOnTheWayToGhostty -= byteCount
@@ -79,7 +66,6 @@ final class GhosttyOutputBackpressure: @unchecked Sendable {
         if waitingBytes + session.pendingOutputByteCount <= lowWaterByteCount { wakeIfWaiting() }
     }
 
-    /// The tab stopped reading from its process, so nothing waits for room any more.
     func stop() {
         lock.withLock { hasStopped = true }
         wakeIfWaiting()

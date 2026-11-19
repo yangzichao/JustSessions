@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// A checkbox for each guide section an agent may be given, in two columns, those about what the check found checked
-/// at first; see `JustSessionsGuideSection.sections(about:)`.
 struct HostFixAgentGuideSectionToggles: View {
     @Binding var selection: Set<JustSessionsGuideSection>
 

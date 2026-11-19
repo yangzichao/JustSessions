@@ -1,13 +1,10 @@
 import Foundation
 
-/// Each host's choice of what closing a tab does when tmux can keep its CLI running there. A host with no saved choice
-/// asks each time, so only the hosts that keep running or end without asking are saved.
 struct TabCloseChoicesByHost: Equatable {
     static let thisMacUserDefaultsKey = "tabCloseChoiceOnThisMac"
     static let sshHostsUserDefaultsKey = "tabCloseChoiceBySSHHost"
 
     private(set) var thisMacChoice: TabCloseChoice
-    /// Keyed by the SSH destination, as `SessionHost.ssh` holds it.
     private(set) var sshHostChoices: [String: TabCloseChoice]
 
     init(thisMacChoice: TabCloseChoice = .askEachTime, sshHostChoices: [String: TabCloseChoice] = [:]) {
@@ -15,7 +12,6 @@ struct TabCloseChoicesByHost: Equatable {
         self.sshHostChoices = sshHostChoices.filter { $0.value != .askEachTime }
     }
 
-    /// Unknown saved values ask each time.
     static func load(from userDefaults: UserDefaults) -> TabCloseChoicesByHost {
         let thisMacChoice = userDefaults.string(forKey: thisMacUserDefaultsKey).flatMap(TabCloseChoice.init(rawValue:))
         let savedSSHHostChoices = userDefaults.dictionary(forKey: sshHostsUserDefaultsKey) as? [String: String] ?? [:]

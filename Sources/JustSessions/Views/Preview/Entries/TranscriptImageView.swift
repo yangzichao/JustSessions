@@ -1,17 +1,12 @@
 import SwiftUI
 
-/// Shows an image across the reading column, no taller than a screen's worth. Its shape is reserved from the
-/// image's header while it decodes off the main thread, so the entries below it do not move. Every reader showing the
-/// same image shares one decode; see `TranscriptImageDecoder`.
 struct TranscriptImageView: View {
     let image: TranscriptImage
     @State private var decodedImage: CGImage?
     @State private var failedToDecode = false
 
     private static let maximumHeight: CGFloat = 400
-    /// Twice the readable column, for Retina displays; larger images are downsampled as they decode.
     private static let maximumPixelSize = 1_600
-    /// A short strip for an image whose header could not be read, which is unlikely to decode either.
     private static let placeholderAspectRatio: CGFloat = 4
 
     var body: some View {

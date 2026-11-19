@@ -8,16 +8,13 @@ struct ConversationSidebarView: View {
     @Binding var statusFilter: SessionStatusFilter
     @Binding var archiveFilter: SessionArchiveFilter
     @Binding var sessionSelection: SessionMultiSelection
-    /// Already narrowed by the tool, recency, status, archive, and search filters.
     let projects: [ProjectConversationGroup]
     let allSessionCount: Int
     let recentSessionCount: Int
     let runningSessionCount: Int
     let waitingSessionCount: Int
     let archivedSessionCount: Int
-    /// While searching, the first match in each session whose messages hold the search text.
     var messageMatches: [String: SessionMessageMatch] = [:]
-    /// While searching, each session's bookmarks whose label or tags hold the search text (SBF-05).
     var bookmarkMatches: [String: [MessageBookmark]] = [:]
     let onNewSession: () -> Void
     let onSelectConversation: (Conversation) -> Void
@@ -31,32 +28,20 @@ struct ConversationSidebarView: View {
     @SceneStorage("sidebarContentMode") private var contentMode: SidebarContentMode = .projects
     @SceneStorage("sidebarOpenTabSearch") private var openTabSearchText = ""
     @State var projectExpansion = ProjectExpansion()
-    /// How many sessions each expanded project lists before "Show N more".
     @State var sessionRowLimits = ProjectSessionRowLimits()
-    /// Whether sessions offer a chevron that lists their subagents' sessions, set in Settings → General.
     @AppStorage(SidebarSubagentRows.showsSubagentsUserDefaultsKey) var showsSubagents = false
-    /// Sessions start with their subagents' sessions hidden; each shows them once you expand it.
     @State var subagentRows = SidebarSubagentRows()
     @State var projectSelection = ProjectMultiSelection()
-    /// Rows of Open tabs selected to close together.
     @State var openTabSelection = OpenTabMultiSelection()
-    /// A project or session being dragged among the pinned ones.
     @State var pinDrag: SidebarPinDrag?
     @State var sidebarRowFrames = SidebarRowFrames()
     @State private var isAddRemoteHostSheetPresented = false
-    /// Asks for a password or code while Connect… on a host's heading logs in.
     @StateObject private var sshLoginPrompter = SSHLoginPrompter()
-    /// The host whose archived projects are listed, from its heading's context menu.
     @State private var hostShowingArchivedProjects: SessionHost?
-    /// The SSH host a folder path is being typed for, from its heading's +.
     @State private var sshHostAddingProject: SessionHost?
     @State private var sshHostForwardingPort: SessionHost?
     @State private var sshHostEditingSignInCommand: SessionHost?
-    /// A project to scroll into view once it is listed: one just added from a host's heading, as a project with no
-    /// sessions sorts last under its host and could otherwise be added out of sight, or the onboarding tour's.
     @State var projectToReveal: String?
-    /// Set once a deletion of several sessions has run for `deletionProgressBarDelay`, so a quick one never
-    /// flashes the progress bar.
     @State private var isDeletionProgressBarShown = false
     @FocusState var isSidebarListFocused: Bool
 
@@ -70,7 +55,6 @@ struct ConversationSidebarView: View {
         HostProjectSection.sections(hosts: store.hosts, projects: projects)
     }
 
-    /// The project the onboarding tour shows sessions in: the first listed one that has any.
     var onboardingTourProjectID: String? {
         hostSections.lazy.flatMap(\.projects).first { !$0.conversations.isEmpty }?.id
     }
@@ -83,8 +67,6 @@ struct ConversationSidebarView: View {
         Set(visibleProjectIDs)
     }
 
-    /// Session rows in the order they appear in the sidebar, used for Shift-click ranges, which leave out the rows
-    /// hidden below a project's "Show N more".
     private var visibleConversationIDs: [String] {
         hostSections
             .flatMap(\.projects)
@@ -96,7 +78,6 @@ struct ConversationSidebarView: View {
         Set(projects.flatMap { $0.conversations.map(\.id) })
     }
 
-    /// The session of the tab shown, whose row is highlighted through the tab; none while a filter leaves its row out.
     private var listedConversationIDShownThroughTab: String? {
         guard let conversationID = store.selectedTerminal?.conversation?.id,
             listedConversationIDs.contains(conversationID)
@@ -105,7 +86,6 @@ struct ConversationSidebarView: View {
     }
 
     var selectedConversations: [Conversation] {
-        // Nothing selected is the common case, and this runs on every render, so it skips the walk of every row.
         guard !sessionSelection.selectedConversationIDs.isEmpty else { return [] }
         return projects.flatMap(\.conversations).filter { sessionSelection.contains($0.id) }
     }
@@ -175,7 +155,6 @@ struct ConversationSidebarView: View {
             } else if contentMode == .projects && sessionSelection.hasMultipleSelected
                 && !selectedConversations.allSatisfy(store.isDeletionPending(for:))
             {
-                // Hidden while every selected session is already being deleted, as after deleting the selection.
                 ThemeDivider()
                 SidebarSelectionActionBar(
                     selectedCount: sessionSelection.selectedConversationIDs.count,
@@ -237,7 +216,6 @@ struct ConversationSidebarView: View {
             expandProjectsWithOpenTerminals()
         }
         .onChange(of: listedConversationIDs) { _, newListedConversationIDs in
-            // Rows hidden by a filter or search, or deleted, leave the selection so actions only touch listed rows.
             sessionSelection.keepOnly(newListedConversationIDs)
         }
         .onChange(of: listedProjectIDs) { _, newListedProjectIDs in
@@ -250,14 +228,11 @@ struct ConversationSidebarView: View {
                 return
             }
             do { try await Task.sleep(for: Self.deletionProgressBarDelay) } catch { return }
-            // A deletion ending right at the delay can resume the sleep just before the task is cancelled;
-            // showing the bar then would leave it stuck at "0 of 0", as nothing restarts this task.
             guard !Task.isCancelled, store.isDeletingSeveralSessions else { return }
             isDeletionProgressBarShown = true
         }
     }
 
-    /// The theme's sidebar surface, reaching up behind the title bar, sets the list apart from the detail.
     private var sidebarBackground: some View {
         Rectangle().fill(ThemePalette.sidebarSurface).ignoresSafeArea()
     }
@@ -316,7 +291,6 @@ struct ConversationSidebarView: View {
         return .notLoggedIn(needsLogIn: store.sshHostsNeedingLogIn.contains(host))
     }
 
-    /// This Mac's folder is picked in the system's panel; an SSH host's is typed, as nothing can browse it.
     private func addProject(on host: SessionHost) {
         guard host == .thisMac else {
             sshHostAddingProject = host
@@ -330,7 +304,6 @@ struct ConversationSidebarView: View {
         }
     }
 
-    /// Selects the added project, as a click on it would, and scrolls to it.
     private func revealAddedProject(_ projectPath: String) {
         contentMode = .projects
         isSidebarListFocused = true
@@ -343,7 +316,6 @@ struct ConversationSidebarView: View {
         projectExpansion.isExpanded(project.id, whileSearching: isSearching)
     }
 
-    /// A subagent's session is only read, so a click on its row, with or without Shift or Command, just shows it.
     func handleConversationClick(_ conversation: Conversation) {
         projectSelection.clear()
         let modifiers = NSEvent.modifierFlags
@@ -365,7 +337,6 @@ struct ConversationSidebarView: View {
         }
     }
 
-    /// Shows the tab's terminal; the rows highlighted for it replace any selection in the list.
     func selectTab(_ terminalID: UUID) {
         projectSelection.clear()
         sessionSelection.clear()
@@ -373,8 +344,6 @@ struct ConversationSidebarView: View {
         store.selectTerminal(terminalID)
     }
 
-    /// A row dragged onto the terminals shows there in a tab, so, as for a tab selected, the rows highlighted for the
-    /// tabs shown replace any selection in the list.
     func clearSelectionForDroppedRow() {
         projectSelection.clear()
         sessionSelection.clear()
@@ -408,13 +377,10 @@ struct ConversationSidebarView: View {
         projectSelection.clear()
     }
 
-    /// Asks to confirm first; once confirmed, the archived projects leave the list and so the selection.
     func requestRemovalOfSelectedProjectsAndTheirSessions() {
         onRequestDeletion(.selectedProjectsRemoval(projectSelection.selectedProjectIDs.intersection(listedProjectIDs)))
     }
 
-    /// A tour stop among the projects needs the project list in front, with the tour's project in sight and, for its
-    /// sessions, open.
     private func showOnboardingTourStop(_ stop: OnboardingTourStop) {
         guard stop.isTourStopInProjectList else { return }
         contentMode = .projects

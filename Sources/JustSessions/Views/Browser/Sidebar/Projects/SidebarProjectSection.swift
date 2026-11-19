@@ -5,32 +5,24 @@ struct SidebarProjectSection: View {
     let project: ProjectConversationGroup
     let parentLabel: String?
     let pinDragging: SidebarPinDragging
-    /// The host's projects as listed, for a drag of this one among them.
     let hostProjectRows: () -> [SidebarPinDrag.Row]
     let isExpanded: Bool
-    /// How many sessions that are not pinned are listed before "Show N more"; nil lists them all.
     let sessionLimit: Int?
-    /// The project whose row and first session the onboarding tour points at.
     let isOnboardingTourProject: Bool
     let projectSelection: ProjectMultiSelection
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
-    /// Whether sessions offer a chevron that lists their subagents' sessions; without it, none are listed.
     let showsSubagents: Bool
-    /// Which sessions show their subagents' sessions under them.
     let subagentRows: SidebarSubagentRows
     let onToggleSubagents: (Conversation) -> Void
     let messageMatches: [String: SessionMessageMatch]
-    /// While searching, each session's bookmarks the search found by label or tag (SBF-05).
     var bookmarkMatches: [String: [MessageBookmark]] = [:]
     let onToggleExpansion: () -> Void
-    /// Lists more of the project's sessions, given how many are hidden.
     let onShowMoreSessions: (Int) -> Void
     let onClickProject: () -> Void
     let onNewSession: (ConversationProvider) -> Void
     let onClickConversation: (Conversation) -> Void
     let onSelectPendingNewSession: (UUID) -> Void
-    /// Called once a session or a new session's tab dragged onto the terminals shows there.
     let onDroppedRowIntoTerminals: () -> Void
     let onRenameConversation: (Conversation) -> Void
     let onRenameProject: () -> Void
@@ -46,9 +38,6 @@ struct SidebarProjectSection: View {
         pinDragging.drag?.scope.landingLineLeadingInset ?? 0
     }
 
-    /// The project row, then its sessions while it is expanded, as separate views: the sidebar's lazy list then
-    /// builds only the rows in sight, even for a project with hundreds of sessions. Pinned sessions come first, then
-    /// new sessions, then the rest up to `sessionLimit`, then "Show N more" while some are left.
     var body: some View {
         let pendingNewSessionTerminals = isExpanded ? self.pendingNewSessionTerminals : [:]
         let listedRows =
@@ -112,7 +101,6 @@ struct SidebarProjectSection: View {
         }
     }
 
-    /// The project's own row, which drags among its host's projects.
     private var projectRow: some View {
         SidebarProjectRow(
             store: store,
@@ -149,8 +137,6 @@ struct SidebarProjectSection: View {
         }
     }
 
-    /// A session's row, which drags among the project's sessions and onto the terminals, then its subagents' rows while
-    /// they show.
     @ViewBuilder
     private func conversationRows(
         _ conversation: Conversation,
@@ -227,7 +213,6 @@ struct SidebarProjectSection: View {
         showsSubagents ? store.subagents(of: conversation) : []
     }
 
-    /// The tabs of the project's new sessions whose tab is still open, by the new session's id.
     private var pendingNewSessionTerminals: [UUID: TerminalSession] {
         var terminals: [UUID: TerminalSession] = [:]
         for pendingNewSession in project.pendingNewSessions {

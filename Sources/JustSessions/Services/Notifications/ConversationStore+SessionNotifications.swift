@@ -1,7 +1,5 @@
 import Foundation
 
-/// Notifies you when a CLI on this Mac finishes its turn or stops to wait on you, unless its tab is in view, and
-/// shows that session when you click the notification. The CLI activity sync reports what each CLI does.
 extension ConversationStore {
     func notifyOfSessionsWantingAttention(_ events: [SessionAttentionEvent]) {
         for event in events where !isInView(event.source) {
@@ -10,27 +8,22 @@ extension ConversationStore {
         }
     }
 
-    /// Selects the tab that runs the session, if this window has one.
     func showTab(notifiedAbout source: SessionAttentionSource) -> Bool {
         guard let tab = runningTab(for: source) else { return false }
         selectTerminal(tab.id)
         return true
     }
 
-    /// Opens a new tab on the session's CLI, which runs in tmux with no tab open.
     func reattach(notifiedAbout source: SessionAttentionSource) {
         guard let conversationID = source.conversationID, let conversation = conversation(withID: conversationID) else { return }
         showRunningCLI(for: conversation)
     }
 
-    /// The app is in front with the CLI's terminal on screen: its tab is selected, or it is the other half of the
-    /// split shown beside the selected tab.
     func isInView(_ source: SessionAttentionSource) -> Bool {
         guard let tabID = source.tabID else { return false }
         return sessionNotifier.isApplicationActive && terminalIDsOnScreen.contains(tabID)
     }
 
-    /// The tab the source names, or else a tab opened on the same session since, such as by reattaching.
     private func runningTab(for source: SessionAttentionSource) -> TerminalSession? {
         let runningTabs = terminalSessions.filter { !$0.hasExited }
         if let tabID = source.tabID, let tab = runningTabs.first(where: { $0.id == tabID }) { return tab }
@@ -48,7 +41,6 @@ extension ConversationStore {
                 projectName: projectDisplayName(forProjectPath: tab.projectDirectoryKey)
             )
         }
-        // A hidden CLI's session notifies only from an open tab, which still shows it.
         guard let conversationID = event.source.conversationID, let conversation = conversation(withID: conversationID),
             !hiddenConversationProviders.hides(conversation.provider)
         else {

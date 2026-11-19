@@ -60,7 +60,6 @@ struct AntigravityAdapter: ConversationAdapter {
         return conversations
     }
 
-    /// The title of a conversation with no title and no prompt yet, such as one `/clear` just started.
     static func fallbackTitle(forSessionID sessionID: String) -> String {
         "Antigravity session \(sessionID.prefix(8))"
     }

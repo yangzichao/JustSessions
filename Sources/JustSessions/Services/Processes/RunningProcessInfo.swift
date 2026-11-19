@@ -1,15 +1,12 @@
 import Darwin
 import Foundation
 
-/// What the kernel says about one process on this Mac.
 enum RunningProcessInfo {
-    /// Whether the process exists, including one this app may not signal.
     static func isRunning(_ processID: Int32) -> Bool {
         guard processID > 0 else { return false }
         return kill(processID, 0) == 0 || errno == EPERM
     }
 
-    /// When the process started, or nil when it does not run.
     static func startDate(of processID: Int32) -> Date? {
         guard processID > 0 else { return nil }
         var request: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, processID]

@@ -1,7 +1,6 @@
 import SwiftTerm
 
 extension TerminalPalette {
-    /// The ANSI colors the terminal draws with, `distinguishableANSIHexColors`, in SwiftTerm's 16-bit components.
     var ansiColors: [SwiftTerm.Color] {
         distinguishableANSIHexColors.map { hexValue in
             SwiftTerm.Color(

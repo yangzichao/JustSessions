@@ -1,7 +1,5 @@
 import Foundation
 
-/// A bounded, ordered backlog for invisible terminals. It drains at 8 Hz, on activation, or before process exit.
-/// PTY reads continue normally; large bursts flush immediately instead of growing an unbounded buffer.
 @MainActor
 final class TerminalOutputCoalescer {
     static let maximumBufferedByteCount = 64 << 10

@@ -1,12 +1,9 @@
 import SwiftUI
 
-/// The line under the Add SSH host sheet's field: why the host can't be added or reached, or else where it connects.
 struct AddRemoteHostFieldNote: View {
     let input: RemoteHostInput
     let isListed: Bool
-    /// For the host typed, once `ssh -G` has read it.
     let sameMachineCheck: SSHHostSameMachineCheck?
-    /// Why logging in to the host failed.
     let connectionFailure: String?
 
     var body: some View {

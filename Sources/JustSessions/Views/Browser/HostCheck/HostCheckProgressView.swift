@@ -1,12 +1,9 @@
 import SwiftUI
 
-/// Check this host… while it runs: a bar for the steps done, then each step, the running one with how long it has run,
-/// so a slow host shows where it is slow. It takes the report's place, with its card where the findings will be.
 struct HostCheckProgressView: View {
     let host: String
     let step: HostCheckStep
     let stepStartedAt: Date
-    /// A check from an ended tab also checks the tab's folder.
     let checksTabFolder: Bool
 
     var body: some View {

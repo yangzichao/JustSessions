@@ -1,9 +1,5 @@
 import Foundation
 
-/// ⌘F in a plain terminal whose shell may run in tmux. While it does, the tab's terminal shows tmux on its alternate
-/// screen, and the shell's history is tmux's, so tmux finds in it (`TmuxHistoryFinder`). Otherwise, as on an SSH host
-/// without tmux, the terminal finds in its own scrollback. A search keeps the finder it started with until it ends,
-/// and one tmux couldn't run goes on in the terminal.
 @MainActor
 final class PlainTerminalFinder: TerminalTextFindingCountingLater {
     var onMatchCount: ((TerminalFindMatchCount?) -> Void)?
@@ -11,7 +7,6 @@ final class PlainTerminalFinder: TerminalTextFindingCountingLater {
     private let terminalFinder: any TerminalTextFinding
     private let tmuxFinder: TmuxHistoryFinder
     private let terminalIsOnAlternateScreen: () -> Bool
-    /// Which finder the current search uses; nil between searches.
     private var searchesInTmux: Bool?
     private var query = ""
 
@@ -75,7 +70,6 @@ final class PlainTerminalFinder: TerminalTextFindingCountingLater {
         }
     }
 
-    /// The terminal searches even with no one to tell, as `onMatchCount?(…)` would skip its argument.
     private func report(_ count: TerminalFindMatchCount?) {
         onMatchCount?(count)
     }

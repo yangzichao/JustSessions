@@ -1,14 +1,9 @@
 import AppKit
 
-/// The terminal's font: the system's monospaced font, or an installed family chosen by name. An installed family draws
-/// Nerd Font icons it lacks with the bundled symbols font; see `TerminalSymbolsFont`.
 enum TerminalFontFamily: Hashable {
     case system
     case named(String)
 
-    /// A family that is no longer installed, as after its font is removed, gives the system's monospaced font, as does
-    /// one whose letters don't fill a terminal's cells, which the font picker no longer offers; see
-    /// `FontFillsTerminalCells`.
     func font(size: CGFloat) -> NSFont {
         guard case .named(let family) = self,
             let font = NSFontManager.shared.font(withFamily: family, traits: [], weight: Self.regularWeight, size: size),
@@ -31,7 +26,6 @@ enum TerminalFontFamily: Hashable {
 }
 
 extension TerminalFontFamily: Codable {
-    /// Saved as the family's name, or as `system`. Versions that offered only three fonts saved `menlo` or `monaco`.
     private static let systemValue = "system"
     private static let earlierFamilyNames = ["menlo": "Menlo", "monaco": "Monaco"]
 

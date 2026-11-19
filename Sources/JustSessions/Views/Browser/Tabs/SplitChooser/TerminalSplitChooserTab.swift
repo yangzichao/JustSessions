@@ -1,22 +1,14 @@
 import SwiftUI
 
-/// A split chooser's half of the split tab it makes with the tab beside it, titled as Chrome titles its split view
-/// page's tab: drawn as a split's tab, it joins its tab's half into one shape. A click gives the chooser the keyboard,
-/// and its × closes it, leaving its tab full width.
 struct TerminalSplitChooserTab: View {
     let width: CGFloat
-    /// The chooser has the keyboard.
     let isSelected: Bool
-    /// The chooser shows, so it is drawn as the selected tab, as its tab is.
     let isActive: Bool
     let side: TerminalSplit.Side
-    /// How the split it makes lays out its views, which names its side for VoiceOver.
     let orientation: TerminalSplit.Orientation
-    /// The pointer is over the tab beside it, which lights this half too.
     let isPartnerHovered: Bool
     let showsLeadingSeparator: Bool
     let groupColor: ThemeColor
-    /// What a right-click on it offers: its split's entries.
     let menuItems: TerminalTabSplitMenuItems
     let onHoverChange: (Bool) -> Void
     let onSelect: () -> Void
@@ -26,7 +18,6 @@ struct TerminalSplitChooserTab: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var isHovered = false
 
-    /// Which view of the split the chooser is, as a split's tab says (`TerminalTab`).
     private var accessibilityLabel: Text {
         switch (side, orientation) {
         case (.left, .sideBySide): Text("Choose a tab - Left view")
@@ -87,7 +78,6 @@ struct TerminalSplitChooserTab: View {
         }
     }
 
-    /// As on a terminal's tab: a narrow half hides its × until active or pointed at.
     private var showsCloseButton: Bool {
         isActive || isHovered || width >= WorkspaceTabMetrics.minimumWidthForCloseButton
     }

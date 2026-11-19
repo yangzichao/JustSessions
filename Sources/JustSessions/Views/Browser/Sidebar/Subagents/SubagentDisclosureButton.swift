@@ -1,12 +1,9 @@
 import SwiftUI
 
-/// The chevron before a session's icon that shows or hides the sessions its subagents ran in. Laid over the row's
-/// button, so a click on it doesn't also open the session.
 struct SubagentDisclosureButton: View {
     let isExpanded: Bool
     let subagentCount: Int
     let sessionTitle: String
-    /// The level of the row it sits on, 0 for a session.
     let indentLevel: Int
     let action: () -> Void
 

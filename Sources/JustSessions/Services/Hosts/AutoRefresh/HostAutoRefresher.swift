@@ -1,24 +1,15 @@
 import AppKit
 
-/// Refreshes the hosts on their own, as `HostAutoRefreshSchedule` says: checked every 15 seconds while a workspace
-/// window shows on screen, and as soon as the app comes forward. This Mac's scan is shared by every window. An SSH host
-/// is copied by the oldest window, and the others list its copy, so more windows don't mean more copies. The app's
-/// own host checks run on the same beat; see `HostBackgroundChecker`, and so do hosts' sign-in commands; see
-/// `RemoteSignIns`. A host you disconnected from is left alone by all of them; see `ConversationStore+RemoteHostDisconnect`.
 @MainActor
 final class HostAutoRefresher {
     static let shared = HostAutoRefresher(backgroundChecker: HostBackgroundChecker(), signIns: .shared)
 
-    /// How often the schedule is checked; much shorter than its intervals, so a host is refreshed soon after it is due.
     static let checkInterval: Duration = .seconds(15)
 
     private let registry: WorkspaceWindowRegistry
     private let isAnyWindowOnScreen: () -> Bool
-    /// Starts a window's refresh of an SSH host, as `refreshRemoteHost(_:)` does; tests copy from a local folder.
     private let refreshSSHHost: (ConversationStore, String) -> Task<Void, Never>?
-    /// Nil checks no host on its own, as in tests, which would otherwise log in to their made-up hosts.
     private let backgroundChecker: HostBackgroundChecker?
-    /// Nil looks at no host's sign-in command, as in tests.
     private let signIns: RemoteSignIns?
     private var schedule = HostAutoRefreshSchedule()
     private var checking: Task<Void, Never>?
@@ -60,8 +51,6 @@ final class HostAutoRefresher {
         }
     }
 
-    /// The periodic check: nothing is refreshed while no workspace window shows, as when the app is hidden, its
-    /// windows are minimized or covered, or the screen is locked.
     func check(now: Date = .now) {
         guard isAnyWindowOnScreen() else { return }
         refreshDueHosts(now: now)

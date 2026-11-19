@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Whether the bottom of the sidebar shows a random tip each launch. Turning it on shows one right away.
 struct HelpRandomTipsToggle: View {
     @ObservedObject var tipsStore: RandomTipsStore = .shared
 

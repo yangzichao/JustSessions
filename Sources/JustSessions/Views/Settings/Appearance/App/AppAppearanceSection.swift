@@ -1,12 +1,8 @@
 import SwiftUI
 
-/// The app part of the Appearance tab: System, Light, or Dark for the whole app, and the theme it is drawn in, each
-/// shown as a sketch of the window, with your changes to the theme's colors under it, then the interface size. Rows of
-/// the tab's grid.
 struct AppAppearanceSection: View {
     let appAppearanceStore: AppAppearanceStore
     let appThemeStore: AppThemeStore
-    /// Choosing a theme gives terminals its colors too.
     let terminalAppearanceStore: TerminalAppearanceStore
     var interfaceSizeStore = InterfaceSizeStore.shared
 

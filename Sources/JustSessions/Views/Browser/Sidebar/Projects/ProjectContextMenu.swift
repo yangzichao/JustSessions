@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A project row's menu, from a right-click or its ⋯ button.
 struct ProjectContextMenu: View {
     let store: ConversationStore
     let project: ProjectConversationGroup

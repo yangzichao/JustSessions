@@ -1,7 +1,5 @@
 import AppKit
 
-/// Everything one transcript text view draws: its text, how it is set, and Find's matches in it. Equal contents leave
-/// the view alone, so the text is converted for AppKit only when one of these changes.
 struct TranscriptTextContent: Equatable {
     let source: AttributedString
     let style: TranscriptTextStyle

@@ -1,9 +1,5 @@
 import Foundation
 
-/// SSH hosts you disconnected from with Disconnect in the host heading's ⋯ or right-click menu. The app runs nothing on
-/// such a host on its own, lists its sessions from the last copy, and connects again when you choose Connect or use
-/// the host; see `ConversationStore+RemoteHostDisconnect`. The choice outlives a relaunch, so a host out of reach
-/// stays alone until you say otherwise.
 struct DisconnectedRemoteHosts: Equatable {
     static let userDefaultsKey = "disconnectedRemoteHosts"
 

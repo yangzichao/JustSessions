@@ -1,14 +1,10 @@
 import Combine
 import Foundation
 
-/// How far the running deletion has got. Kept apart from `ConversationStore`, so a change re-renders only the
-/// progress bar that observes it, not the whole sidebar.
 @MainActor
 final class SessionDeletionProgress: ObservableObject {
-    /// Sessions attempted so far, deleted or not.
     @Published private(set) var completedCount = 0
     @Published private(set) var totalCount = 0
-    /// Cancel was chosen; the deletion stops after the session it is deleting.
     @Published private(set) var isStopping = false
 
     var fractionCompleted: Double {
@@ -21,7 +17,6 @@ final class SessionDeletionProgress: ObservableObject {
         isStopping = false
     }
 
-    /// Sessions that joined the running deletion; it goes on to them after the others.
     func add(sessionCount: Int) {
         totalCount += sessionCount
     }

@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// A project's tab group's menu, from its label in the tab bar or its heading in Open tabs: what a project's menu
-/// offers for its folder, starting with New session, whose tab opens at the end of the group; collapsing the group or
-/// every group; then closing the group's tabs.
 struct TabGroupMenuItems: View {
     let store: ConversationStore
     let projectKey: String

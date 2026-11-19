@@ -2,17 +2,10 @@ import SwiftUI
 
 struct EmbeddedTerminalView: NSViewRepresentable {
     let session: TerminalSession
-    /// The terminal is on screen, full width or as either half of a split, so it draws its output, unless its window is
-    /// minimized; see `TerminalInsetView.isShown`.
     let isShown: Bool
-    /// The tab is selected, so its terminal gets the keyboard.
     let isActive: Bool
-    /// Called when a click lands on the terminal or its margin, or files are dropped on it, before the terminal takes
-    /// the keyboard.
     let onFocus: () -> Void
-    /// Builds the menu a right-click on the terminal or its margin shows, with the link under the pointer, if any.
     let makeContextMenu: (_ linkUnderPointer: String?) -> NSMenu
-    /// Does what ⌘-clicking a link in the terminal does; see `TerminalLinkActions+Click`.
     let onOpenLink: (_ link: String) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator() }
@@ -42,10 +35,6 @@ struct EmbeddedTerminalView: NSViewRepresentable {
         context.coordinator.wasActive = isActive
     }
 
-    /// The tab's session holds its terminal, and these closures hold the session, so a closed tab's terminal would
-    /// otherwise never be freed: for Ghostty, a GPU surface and its scrollback. A terminal another view already took,
-    /// as when its tab moved to another window and that window built its view before this one went, keeps the closures
-    /// that view set.
     static func dismantleNSView(_ insetView: TerminalInsetView, coordinator: Coordinator) {
         if let host = insetView.terminalView.superview, host !== insetView { return }
         insetView.terminalView.onFocus = nil

@@ -1,8 +1,6 @@
 import Darwin
 import Foundation
 
-/// A blocking connection to a Unix domain socket, each read and write bounded by `timeout`. It is used from one
-/// thread at a time.
 final class UnixStreamSocket {
     enum SocketError: Error {
         case pathTooLong
@@ -64,7 +62,6 @@ final class UnixStreamSocket {
         }
     }
 
-    /// What arrived, waiting at most the timeout for something to.
     func read() throws -> Data {
         var buffer = [UInt8](repeating: 0, count: 64 << 10)
         let result = recv(descriptor, &buffer, buffer.count, 0)

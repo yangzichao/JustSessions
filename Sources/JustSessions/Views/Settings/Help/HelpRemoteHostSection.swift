@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// SSH setup guidance in the Help page: adding a host, and what it needs.
 struct HelpRemoteHostSection: View {
     var body: some View {
         HelpSection(title: "SSH hosts") {

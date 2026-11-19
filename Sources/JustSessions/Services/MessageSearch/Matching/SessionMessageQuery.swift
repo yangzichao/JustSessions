@@ -1,6 +1,5 @@
 import Foundation
 
-/// Searched text as typed, without surrounding whitespace, and folded the way session text is for the byte search.
 struct SessionMessageQuery: Sendable, Equatable {
     let text: String
     let foldedBytes: [UInt8]
@@ -12,7 +11,6 @@ struct SessionMessageQuery: Sendable, Equatable {
         foldedBytes = Array(Self.folded(text).utf8)
     }
 
-    /// Case and accents aside, as Find matches.
     static func folded(_ text: String) -> String {
         text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
     }

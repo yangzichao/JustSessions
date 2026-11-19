@@ -1,8 +1,5 @@
 import Foundation
 
-/// Sessions started with **Delete the session when its tab closes** in the New session sheet, keyed by
-/// `Conversation.id`. Closing the session's tab deletes it without asking again; ticking the box was the question.
-/// Kept in settings so a tab reopened at launch, or moved to another window, still deletes its session when it closes.
 struct SessionsDeletedWhenTabCloses: Equatable {
     static let userDefaultsKey = "conversationIDsDeletedWhenTabCloses"
 
@@ -16,7 +13,6 @@ struct SessionsDeletedWhenTabCloses: Equatable {
         SessionsDeletedWhenTabCloses(conversationIDs: Set(userDefaults.stringArray(forKey: userDefaultsKey) ?? []))
     }
 
-    /// Sorted, so the same sessions save the same value.
     func save(to userDefaults: UserDefaults) {
         userDefaults.set(conversationIDs.sorted(), forKey: Self.userDefaultsKey)
     }

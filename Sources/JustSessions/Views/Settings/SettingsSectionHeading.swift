@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A section's title across a settings grid, with an optional control at its trailing edge that acts on that section.
 struct SettingsSectionHeading<Accessory: View>: View {
     let title: LocalizedStringKey
     @ViewBuilder let accessory: () -> Accessory

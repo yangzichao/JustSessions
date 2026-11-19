@@ -1,8 +1,6 @@
 import Foundation
 import UniformTypeIdentifiers
 
-/// Which files a ⌘-click opens in the editor chosen in Settings, as iTerm2 sends only text files to its editor: images,
-/// PDFs, packages such as an Xcode project, and other files an editor isn't for still open in their default app.
 enum FileLinkEditorScope {
     /// A file of a text type, such as source code, Markdown, or JSON; one macOS has no type for, as `main.rs`,
     /// `Dockerfile`, or `.env` may be on a Mac without an app that declares one; or a `.ts` file, which macOS takes

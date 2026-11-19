@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Takes keyboard focus as it opens. Escape or its × clears and closes it; so does leaving it empty.
 struct SidebarSearchField: View {
     @Binding var text: String
     let placeholder: LocalizedStringKey

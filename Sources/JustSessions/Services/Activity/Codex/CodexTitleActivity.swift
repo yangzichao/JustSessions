@@ -6,10 +6,6 @@ import Foundation
 /// Codex 0.128 or later waits for your approval or answer, the title starts `[ ! ] Action Required` instead,
 /// alternating each second with `[ . ] Action Required`. Items are joined with ` | `, and `●` comes first while Codex
 /// listens to the microphone; see codex-rs `tui/src/chatwidget/status_surfaces.rs`.
-///
-/// The title reaches the tab on this Mac and on an SSH host alike, so this is how the app knows what a Codex on a
-/// host does. On this Mac it also tells waits that Codex's background server can't, since Codex started with `-c`
-/// runs without that server.
 enum CodexTitleActivity {
     static let actionRequired = "Action Required"
     private static let workingStates: Set<Substring> = ["Working", "Thinking", "Waiting", "Starting", "Undoing"]

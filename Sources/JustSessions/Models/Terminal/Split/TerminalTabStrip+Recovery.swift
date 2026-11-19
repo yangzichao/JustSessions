@@ -1,10 +1,6 @@
 import Foundation
 
 extension TerminalTabStrip {
-    /// The order recovery saves, with every split separated. Ordinary project groups keep their place and their tabs
-    /// first; tabs from cross-project splits join their project's end in the order those splits occur. A project with
-    /// no ordinary group starts where its first split tab occurred. This matches separateAllSplits() without repeatedly
-    /// rebuilding every remaining split's group keys while a selection is saved.
     var tabsWithSplitsSeparated: [Tab] {
         let crossProjectTabIDs = Set(splits.filter(\.spansProjects).flatMap(\.tabIDs))
         guard !crossProjectTabIDs.isEmpty else { return tabs }

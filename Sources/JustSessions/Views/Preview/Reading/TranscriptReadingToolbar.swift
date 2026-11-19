@@ -7,14 +7,11 @@ struct TranscriptReadingToolbar: View {
     let onFirstMessage: () -> Void
     let onLatestMessage: () -> Void
     var onFind: (() -> Void)?
-    /// Set in the workspace preview only; a reading window has no button that opens another.
     var onOpenInNewWindow: (() -> Void)?
-    /// Set when the reader keeps bookmarks.
     var bookmarkMenu: TranscriptBookmarkMenu? = nil
 
     var body: some View {
         HStack(spacing: 14) {
-            // A narrow reading window shortens the count to its number, then leaves it out, so the buttons keep one line.
             ViewThatFits(in: .horizontal) {
                 Text(messageCount == 1 ? "1 message" : "\(messageCount) messages")
                 Text(messageCount, format: .number)
@@ -23,7 +20,7 @@ struct TranscriptReadingToolbar: View {
             .font(ThemeFont.caption)
             .foregroundStyle(ThemePalette.secondaryText)
             .lineLimit(1)
-            .frame(maxWidth: .infinity, alignment: .leading)  // takes what the buttons leave, as a Spacer did
+            .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(messageCount == 1 ? "1 message" : "\(messageCount) messages"))
             if let onFind {
@@ -74,7 +71,6 @@ struct TranscriptReadingToolbar: View {
         .accessibilityIdentifier("preview.reading-toolbar")
     }
 
-    /// The icon shows what a click does: widen to the full window, or narrow back to the readable column.
     private var readingWidthButton: some View {
         Button("Reading width", systemImage: readingWidthSymbol) { readingWidth = readingWidth.toggled }
             .labelStyle(.iconOnly)

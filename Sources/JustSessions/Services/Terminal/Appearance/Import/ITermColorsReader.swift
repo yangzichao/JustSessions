@@ -1,11 +1,9 @@
 import AppKit
 
-/// Reads colors in iTerm2's format, shared by its profiles and .itermcolors files, into terminal palettes.
 enum ITermColorsReader {
     static let lightSuffix = " (Light)"
     static let darkSuffix = " (Dark)"
 
-    /// Reads one palette, or a light and a dark one when the colors are kept apart under " (Light)" and " (Dark)" keys.
     static func variants(from colors: [String: Any], usesSeparateLightAndDarkColors: Bool) throws -> TerminalPaletteVariants {
         guard usesSeparateLightAndDarkColors else { return .single(try palette(from: colors, keySuffix: "")) }
         return .lightAndDark(

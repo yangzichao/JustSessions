@@ -28,7 +28,6 @@ enum AntigravitySQLiteReader {
         guard let database = openReadOnly(file) else { return [:] }
         defer { sqlite3_close(database) }
         var statement: OpaquePointer?
-        // A subagent's conversation names the one that started it, where the table records that.
         let query = """
             SELECT conversation_id, title, preview, workspace_uris, last_modified_time, parent_conversation_id
             FROM conversation_summaries WHERE app_data_dir = 'antigravity-cli'

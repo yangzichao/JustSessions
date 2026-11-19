@@ -1,12 +1,6 @@
 import Foundation
 
-/// A Kiro CLI still running in tmux under a temporary name no tab shows (`LostKiroCLIs`) runs a session nothing here
-/// knew of: the sidebar didn't show it running, selecting the session started a second CLI on it, and deleting it
-/// asked Kiro, which keeps a session a CLI runs. Once Kiro's lock tells which session it runs, the tmux session takes
-/// that session's own name, as a tab's does when it links (`adoptSessionTmuxName(for:)`), and all of those work.
 extension ConversationStore {
-    /// After each refresh of this Mac. Free unless a temporary-named Kiro tmux session no tab shows is running; then
-    /// the locks of this Mac's Kiro sessions and the process table are read off the main thread.
     func recoverLostKiroCLIs() {
         let lostPaneProcessIDs = lostKiroPaneProcessIDs()
         guard !lostPaneProcessIDs.isEmpty, let tmuxServer = commandResolver.thisMacTmuxServer() else { return }
@@ -40,7 +34,6 @@ extension ConversationStore {
         return LostKiroCLIs.lostPaneProcessIDs(in: thisMacTmuxPaneProcessIDs, tabTmuxNames: tabTmuxNames)
     }
 
-    /// Checked again here, as a tab may have taken a name or a refresh changed them while the locks were read.
     private func adoptLostKiroTmuxSessions(_ sessionIDsByTmuxName: [String: String], tmuxServer: ThisMacTmuxServer) {
         let lostPaneProcessIDs = lostKiroPaneProcessIDs()
         for (temporaryName, sessionID) in sessionIDsByTmuxName {

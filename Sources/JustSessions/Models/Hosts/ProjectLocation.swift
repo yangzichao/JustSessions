@@ -1,7 +1,5 @@
 import Foundation
 
-/// A project folder on a host. Its `key` is what grouping, pinning, and custom project names use: the folder's path
-/// on this Mac, and `ssh://<host><absolute path>` on an SSH host, so folders at the same path on two hosts never merge.
 struct ProjectLocation: Hashable, Sendable {
     private static let sshKeyScheme = "ssh://"
 
@@ -13,7 +11,6 @@ struct ProjectLocation: Hashable, Sendable {
         self.path = path
     }
 
-    /// Reads a project key back. Anything that is not an SSH key is a folder on this Mac.
     init(key: String) {
         if key.hasPrefix(Self.sshKeyScheme) {
             let hostAndPath = key.dropFirst(Self.sshKeyScheme.count)
@@ -42,14 +39,12 @@ struct ProjectLocation: Hashable, Sendable {
         }
     }
 
-    /// Whether the folder exists on this Mac; always false on an SSH host.
     var folderExistsOnThisMac: Bool {
         guard host == .thisMac else { return false }
         var isDirectory: ObjCBool = false
         return FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) && isDirectory.boolValue
     }
 
-    /// A folder on an SSH host is not checked; the SSH command reports it when it is gone.
     var canStartSessions: Bool {
         host != .thisMac || folderExistsOnThisMac
     }

@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// Forward a port…, from an SSH host's menu: forwards a port on this Mac to `localhost` on the host, picked from the
-/// ports the host listens on or typed; see `SSHPortForwards`. The sheet stays open with ssh's reason when the forward
-/// fails, and closes once it works, leaving the forward in the host's menu.
 struct ForwardPortSheet: View {
     let host: String
     var forwards: SSHPortForwards = .shared
@@ -14,7 +11,6 @@ struct ForwardPortSheet: View {
         case failed
     }
 
-    /// More rows than this scroll, so a busy host doesn't grow the sheet past the window.
     private static let rowsShownWithoutScrolling = 6
 
     @Environment(\.dismiss) private var dismiss
@@ -75,7 +71,6 @@ struct ForwardPortSheet: View {
         .task { await lookUpListeningPorts() }
     }
 
-    /// The host's port, which this Mac's port is unless another is typed.
     private var localPortPrompt: Text {
         form.remotePort.map { Text(verbatim: String($0)) } ?? Text("Same as on the host")
     }

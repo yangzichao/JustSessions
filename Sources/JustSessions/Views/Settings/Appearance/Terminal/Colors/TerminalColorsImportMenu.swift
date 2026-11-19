@@ -1,7 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Copies colors from iTerm2's default profile or from an .itermcolors file. Nothing is read until one is chosen.
 struct TerminalColorsImportMenu: View {
     let onImport: (Result<ImportedTerminalColors, TerminalColorsImportError>) -> Void
 

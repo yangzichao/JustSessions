@@ -8,7 +8,6 @@ struct ConversationExportDocument: Sendable {
 
     let sessions: [SessionTranscript]
 
-    /// Reads saved messages without the preview's entry or text limits. Remote sessions use their local mirror.
     static func load(_ selections: [ConversationExportSelection]) async throws -> Self {
         guard !selections.isEmpty else { throw ConversationExportError.emptySelection }
         var sessions: [SessionTranscript] = []

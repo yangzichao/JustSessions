@@ -23,7 +23,6 @@ enum WebSocketClientFrame {
         Data((0..<16).map { _ in UInt8.random(in: .min ... .max) }).base64EncodedString()
     }
 
-    /// The response's head, up to the blank line, accepts the upgrade.
     static func acceptsUpgrade(_ responseHead: Data) -> Bool {
         responseHead.starts(with: Data("HTTP/1.1 101".utf8))
     }

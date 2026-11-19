@@ -1,6 +1,5 @@
 import Foundation
 
-/// Reads the visible conversation from a Claude Code session file (`~/.claude/projects/<project>/<session>.jsonl`).
 struct ClaudeTranscriptReader {
     var maximumEntryCount = 2_000
     var maximumTextLength = 12_000
@@ -55,8 +54,6 @@ struct ClaudeTranscriptReader {
         }
     }
 
-    /// The text of a user message; its images follow it as entries of their own. A tool result's text is shown
-    /// through the tool call that produced it.
     private func userText(from content: Any?) -> String {
         if let text = content as? String { return visibleUserText(text) ?? "" }
         let parts = content as? [[String: Any]] ?? []
@@ -66,7 +63,6 @@ struct ClaudeTranscriptReader {
             .joined(separator: "\n\n")
     }
 
-    /// The base64 of an `image` part, which Claude Code stores as `{"source":{"type":"base64","data":…}}`.
     private static func imageBase64(from part: [String: Any]) -> String? {
         guard part["type"] as? String == "image",
             let source = part["source"] as? [String: Any]
@@ -110,7 +106,7 @@ struct ClaudeTranscriptReader {
                 )
                 return (.toolCall, summary)
             default:
-                return nil  // Thinking blocks are left out of the preview.
+                return nil
             }
         }
     }

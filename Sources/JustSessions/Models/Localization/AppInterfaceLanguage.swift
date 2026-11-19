@@ -1,6 +1,5 @@
 import Foundation
 
-/// A resource identifier, rather than one enum case per translation. Adding a localization needs no Swift edits.
 struct AppInterfaceLanguage: Hashable, Identifiable, Sendable {
     static let followSystem = AppInterfaceLanguage(identifier: nil)
     static let userDefaultsKey = "interfaceLanguage"
@@ -16,7 +15,6 @@ struct AppInterfaceLanguage: Hashable, Identifiable, Sendable {
         Locale.canonicalLanguageIdentifier(from: identifier)
     }
 
-    /// Use each language's own name so users can always recognize the choice they need.
     var nativeName: String {
         guard let identifier else { return "Follow System" }
         let locale = Locale(identifier: identifier)
@@ -41,8 +39,6 @@ struct AppInterfaceLanguage: Hashable, Identifiable, Sendable {
             let languageCode = Locale(identifier: preference).language.languageCode
             let matchingLanguage = supported.filter { Locale(identifier: $0).language.languageCode == languageCode }
             guard !matchingLanguage.isEmpty else { continue }
-            // Foundation chooses the best region/script. If only another script is translated, use that
-            // language rather than unexpectedly falling back to English. This rule applies to every language.
             return Bundle.preferredLocalizations(from: matchingLanguage, forPreferences: [preference]).first
                 ?? matchingLanguage.sorted().first ?? fallback
         }

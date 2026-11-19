@@ -18,8 +18,6 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
         self.helpTimeout = helpTimeout
     }
 
-    /// Adds `--session-id <new id>` when the executable is known to accept it. Never waits: an executable
-    /// that has not been checked yet gets a background check, and this launch goes without the flag.
     func preassigningSessionID(to command: NativeCLICommand) -> (command: NativeCLICommand, sessionID: String)? {
         guard isKnownToAcceptFlag(command) else { return nil }
         // Claude Code's own ids are lowercase, and it names the transcript by the id exactly as given.
@@ -27,7 +25,6 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
         return (command.appendingArguments([Self.flag, sessionID]), sessionID)
     }
 
-    /// Checks the `claude` a new session would launch, so the first new session can already use the flag.
     func warmUpInBackground() {
         Task.detached(priority: .utility) { [self] in
             let resolver = NativeCLICommandResolver()
@@ -38,8 +35,6 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
         }
     }
 
-    /// Runs `<claude> <its arguments> --help` and records whether it lists the flag. Returns nil when the check
-    /// could not finish, so a later launch tries again.
     @discardableResult
     func check(_ command: NativeCLICommand) -> Bool? {
         let helpText = BoundedProcessRunner.output(
@@ -72,7 +67,6 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
         return false
     }
 
-    /// Marks the command as being checked; false when it already has an answer or a running check.
     private func beginCheckIfUnanswered(_ command: NativeCLICommand) -> Bool {
         let commandLine = Self.commandLine(of: command)
         return lock.withLock {
@@ -81,7 +75,6 @@ final class ClaudeSessionIDFlagSupport: @unchecked Sendable {
         }
     }
 
-    /// The executable and its arguments, which no argument can make ambiguous.
     private static func commandLine(of command: NativeCLICommand) -> String {
         ([command.executablePath] + command.arguments).joined(separator: "\u{0}")
     }

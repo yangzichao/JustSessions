@@ -1,16 +1,12 @@
 import SwiftUI
 
-/// A tab's title, filling the room the tab leaves it. A title too long for that room fades out at its end, as in
-/// Chrome, instead of ending in an ellipsis, which would take up much of a narrow tab.
 struct TerminalTabTitle: View {
     private let title: Text
 
-    /// A title of the user's or the CLI's, shown as it is.
     init(title: String) {
         self.title = Text(verbatim: title)
     }
 
-    /// A title of the app's own, translated.
     init(localizedTitle: LocalizedStringKey) {
         self.title = Text(localizedTitle)
     }

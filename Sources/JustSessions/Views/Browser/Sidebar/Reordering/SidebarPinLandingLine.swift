@@ -1,8 +1,6 @@
 import SwiftUI
 
-/// The line that shows where a dragged project or session would land, across the gap between two rows.
 struct SidebarPinLandingLine: View {
-    /// Lines a session's up with the sessions' icons rather than the project's chevron.
     let leadingInset: CGFloat
 
     static let thickness: CGFloat = 2
@@ -18,7 +16,6 @@ struct SidebarPinLandingLine: View {
 }
 
 extension SidebarPinDrag.Scope {
-    /// Where a landing line in the scope starts: under a project's chevron, or before its sessions' icons.
     var landingLineLeadingInset: CGFloat {
         switch self {
         case .projects: 0

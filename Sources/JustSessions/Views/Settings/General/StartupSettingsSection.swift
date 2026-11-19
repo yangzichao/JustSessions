@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// The startup part of the General tab: whether JustSessions opens when you log in, and whether it reopens the tabs
-/// that were open when it quit.
 struct StartupSettingsSection: View {
     let launchAtLoginSettingsStore: LaunchAtLoginSettingsStore
     @ObservedObject var tabReopeningSettingsStore: TabReopeningSettingsStore

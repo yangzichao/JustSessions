@@ -9,21 +9,14 @@ struct NewSessionSheet: View {
     @State private var isStarting = false
     @State private var isCreatingMissingFolder = false
     @State private var deletesSessionWhenClosed = false
-    /// The folder as typed, on its host, when the host reported it missing. Editing the path or switching hosts
-    /// withdraws the offer to create it.
     @State private var missingFolder: MissingFolder?
     @State private var errorMessage: String?
-    /// Start commands being edited, per tool and host, so switching back to a tool shows the edit in progress.
     @State private var editedStartCommands: [StartCommandTarget: String] = [:]
 
     let hosts: [SessionHost]
-    /// The tools installed on each host; the picker offers the selected host's.
     let providersByHost: [SessionHost: [ConversationProvider]]
-    /// Projects on every host; the menu shows the selected host's.
     let recentProjects: [ProjectConversationGroup]
-    /// The kept start commands, which the locked field shows.
     let startCommands: CLIStartCommands
-    /// Checks a start command where the tool runs, then keeps it; throws when it would not start.
     let onSaveStartCommand: (_ command: String, _ provider: ConversationProvider, _ host: SessionHost) async throws -> Void
     let onStart: (NewSessionRequest) async throws -> Void
 
@@ -53,8 +46,6 @@ struct NewSessionSheet: View {
         providersByHost[selectedHost] ?? []
     }
 
-    /// A picked tool while the host has it, or else the host's first. Hosts are checked as they refresh, so the list
-    /// can change while the sheet is open. A terminal when picked or when the host has no tool.
     private var startingKind: NewSessionKind {
         guard case .cli(let provider) = selectedKind else { return .plainTerminal }
         if providersOnSelectedHost.contains(provider) { return selectedKind }
@@ -76,7 +67,6 @@ struct NewSessionSheet: View {
         )
     }
 
-    /// A session starts with the kept command, so it waits until an edit to the shown one is saved or cancelled.
     private var isEditingShownStartCommand: Bool {
         guard case .cli(let provider) = startingKind else { return false }
         return editedStartCommands[StartCommandTarget(provider: provider, host: selectedHost)] != nil
@@ -94,7 +84,6 @@ struct NewSessionSheet: View {
         missingFolder == MissingFolder(host: selectedHost, folder: trimmedProjectPath)
     }
 
-    /// Switching hosts keeps the tool when the host has it and suggests the host's most recent project.
     private var hostSelection: Binding<SessionHost> {
         Binding(
             get: { selectedHost },
@@ -112,7 +101,6 @@ struct NewSessionSheet: View {
             intro: Text("Start a native CLI or a plain terminal in a project folder."),
             width: ThemeSheetMetrics.regularWidth
         ) {
-            // The host comes first: it decides which tools can run and which recent projects are offered.
             if hosts.count > 1 {
                 Picker("Host", selection: hostSelection) {
                     ForEach(hosts) { host in
@@ -143,7 +131,6 @@ struct NewSessionSheet: View {
                     host: selectedHost,
                     onSave: { [selectedHost] in try await onSaveStartCommand($0, provider, selectedHost) }
                 )
-                // A check in progress or its failure belongs to one tool on one host.
                 .id(StartCommandTarget(provider: provider, host: selectedHost))
             }
 
@@ -188,7 +175,6 @@ struct NewSessionSheet: View {
         } message: {
             if let errorMessage { Text(verbatim: errorMessage) } else { Text("Unknown error") }
         }
-        // The alert covers this sheet, so a click on the sheet around it closes only the alert.
         .dismissesOnClickOutside(item: $errorMessage)
     }
 
@@ -227,13 +213,11 @@ struct NewSessionSheet: View {
     }
 }
 
-/// A folder the host reported missing, as typed.
 private struct MissingFolder: Equatable {
     let host: SessionHost
     let folder: String
 }
 
-/// A tool on a host, whose start command edit the sheet keeps while it is open.
 private struct StartCommandTarget: Hashable {
     let provider: ConversationProvider
     let host: SessionHost

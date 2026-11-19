@@ -1,9 +1,5 @@
 import Foundation
 
-/// The model a Codex session used last: the `model` and `effort` of the last `turn_context` line in its rollout file,
-/// which Codex writes as each turn starts, such as
-/// `{"type":"turn_context","payload":{"model":"gpt-5.5","effort":"medium",…}}`.
-///
 /// A long turn writes megabytes after its `turn_context`, so the line is looked for from the end backwards, a chunk at
 /// a time, as raw bytes; only the line found is parsed.
 enum CodexRolloutModel {
@@ -11,14 +7,12 @@ enum CodexRolloutModel {
     private static let marker = Data(#""type":"turn_context""#.utf8)
     private static let newline = UInt8(ascii: "\n")
 
-    /// Nil when the file has no `turn_context` naming a model, or can't be read.
     static func latest(in file: URL) -> SessionModel? {
         guard let handle = try? FileHandle(forReadingFrom: file) else { return nil }
         defer { try? handle.close() }
         guard let size = try? handle.seekToEnd(), size > 0 else { return nil }
         var searchEnd = size
         while searchEnd > 0 {
-            // Each chunk overlaps the one after it by the marker's length, so a marker cut by the boundary is found.
             let chunkStart = searchEnd > UInt64(chunkByteCount) ? searchEnd - UInt64(chunkByteCount) : 0
             let readEnd = min(size, searchEnd + UInt64(marker.count))
             guard let chunk = read(handle, from: chunkStart, to: readEnd) else { return nil }
@@ -33,7 +27,6 @@ enum CodexRolloutModel {
         return nil
     }
 
-    /// The model named by the `turn_context` line holding the byte at `offset`.
     private static func model(inLineAt offset: UInt64, of handle: FileHandle, size: UInt64) -> SessionModel? {
         guard let line = line(around: offset, of: handle, size: size),
             let record = ConversationMetadata.object(from: line),
@@ -43,7 +36,6 @@ enum CodexRolloutModel {
         return SessionModel(id: payload["model"] as? String, effort: payload["effort"] as? String)
     }
 
-    /// The whole line around `offset`, read outwards a chunk at a time.
     private static func line(around offset: UInt64, of handle: FileHandle, size: UInt64) -> Data? {
         var start = offset
         while start > 0 {

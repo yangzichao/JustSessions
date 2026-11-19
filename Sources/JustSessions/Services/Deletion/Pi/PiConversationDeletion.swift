@@ -20,11 +20,6 @@ struct PiConversationDeletion {
             }
     }
 
-    /// Only a file Pi would list is deleted: one directly in the sessions folder or in one of its project folders,
-    /// named for the session, and whose header names the same session.
-    ///
-    /// The folder goes first. If moving it fails, nothing has changed; if moving the file then fails, the session is
-    /// still listed. Either way, deleting it again finishes the job.
     func delete(_ conversation: Conversation) throws {
         let sourceFile = conversation.sourceFile.standardizedFileURL
         let sessionsPath = sessionsDirectory.standardizedFileURL.resolvingSymlinksInPath().path
@@ -50,7 +45,6 @@ struct PiConversationDeletion {
         try moveToTrash(sourceFile)
     }
 
-    /// The item's own type, so a symbolic link is reported as one rather than as what it points to.
     private func itemType(at url: URL) -> FileAttributeType? {
         (try? fileManager.attributesOfItem(atPath: url.path))?[.type] as? FileAttributeType
     }

@@ -1,10 +1,6 @@
 import SwiftUI
 
-/// The tabs part of the General tab: what closing a tab does when its CLI can keep running in tmux, one choice per host,
-/// and what closing a plain terminal does, which Don't ask again in the close dialog sets too; then what ⌘-clicking a
-/// link to a file in a terminal does.
 struct TabSettingsSection: View {
-    /// This Mac first, then the SSH hosts, as the sidebar lists them.
     let hosts: [SessionHost]
     @ObservedObject var tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
     @ObservedObject var plainTerminalCloseChoiceSettingsStore: PlainTerminalCloseChoiceSettingsStore

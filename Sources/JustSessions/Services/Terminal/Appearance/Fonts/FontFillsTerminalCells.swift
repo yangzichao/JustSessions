@@ -8,7 +8,6 @@ import CoreText
 ///
 /// Core Text is thread-safe, so this can run off the main thread.
 enum FontFillsTerminalCells {
-    /// Every printable ASCII character has a glyph as wide as the cell, give or take this share of it.
     private static let widthTolerance: CGFloat = 0.02
 
     static func check(_ font: CTFont) -> Bool {

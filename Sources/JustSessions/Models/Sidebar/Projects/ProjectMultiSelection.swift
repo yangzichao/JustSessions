@@ -1,4 +1,3 @@
-/// Project selection follows the displayed host and project order, independently of session rows.
 struct ProjectMultiSelection: Equatable {
     private(set) var selectedProjectIDs: Set<String> = []
     private(set) var anchorProjectID: String?
@@ -39,7 +38,6 @@ struct ProjectMultiSelection: Equatable {
         anchorProjectID = nil
     }
 
-    /// Hidden, removed, or filtered projects must not be included in a sidebar action.
     mutating func keepOnly(_ availableProjectIDs: Set<String>) {
         selectedProjectIDs.formIntersection(availableProjectIDs)
         if let anchorProjectID, !availableProjectIDs.contains(anchorProjectID) {

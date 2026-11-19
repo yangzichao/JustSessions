@@ -1,27 +1,18 @@
 import AppKit
 
-/// Moves the window from the empty space of a `windowMoveZone()` in its title bar, where the window can't be moved by
-/// AppKit, so a tab or label there takes its own drag instead. AppKit moves a window from a press in its title bar on
-/// any view that allows it, and every SwiftUI view does, so without the zone, dragging a tab would move the window.
-///
-/// While the pointer is over a zone, its window can't be moved. A press on a view marked with
-/// `windowMoveZoneExclusion()`, or on an AppKit control such as a scroller, goes to it. A press anywhere else in the
-/// zone moves the window, handed to the system with `performDrag(with:)` as a title bar does, or zooms or minimizes it
-/// on a double-click, as chosen in System Settings. Out of the zones, the window moves as usual, and is movable, which
-/// the Window menu's Move & Resize items and tiling need: they turn off for a window that can't move, as Zed found
-/// when it made its windows unmovable. While a sheet covers the window, presses pass, for `SheetClickOutsideMonitor` to
-/// close the sheet as a click elsewhere in the window does; both monitors see presses first, in an order AppKit
-/// doesn't promise.
+/// AppKit moves a window from a press in its title bar on any view that allows it, and every SwiftUI view does, so
+/// without the zone, dragging a tab would move the window. Out of the zones, the window moves as usual, and is
+/// movable, which the Window menu's Move & Resize items and tiling need: they turn off for a window that can't move,
+/// as Zed found when it made its windows unmovable. While a sheet covers the window, presses pass, for
+/// `SheetClickOutsideMonitor` to close the sheet as a click elsewhere in the window does; both monitors see presses
+/// first, in an order AppKit doesn't promise.
 @MainActor
 final class WindowMoveZoneMonitor {
     static let shared = WindowMoveZoneMonitor()
 
     enum Response: Equatable {
-        /// The press goes on to the window, as usual.
         case pass
-        /// The press goes to a view in a zone that takes its own drags, with the window held still.
         case holdWindowStill
-        /// The press moves the window, and goes nowhere else.
         case moveWindow
     }
 
@@ -50,7 +41,6 @@ final class WindowMoveZoneMonitor {
         exclusions.remove(exclusion)
     }
 
-    /// Runs before the window handles the event, and returns whether the event goes on to the window.
     func handle(_ event: NSEvent) -> Bool {
         guard let window = event.window else { return true }
         switch response(to: event) {
@@ -80,14 +70,12 @@ final class WindowMoveZoneMonitor {
     }
 
     private func moveWindow(_ window: NSWindow, from event: NSEvent) {
-        // The zone stands in for a title bar, so it moves no window without one, nor one in full screen.
         guard window.styleMask.contains(.titled), !window.styleMask.contains(.fullScreen) else { return }
         if event.clickCount == 2 {
             TitleBarDoubleClickAction.chosenInSystemSettings.perform(on: window)
             return
         }
-        // An unmovable window keeps its place on screen. The drag runs until the button comes up, with the pointer
-        // still over the zone, which the window followed.
+        // An unmovable window keeps its place on screen.
         window.isMovable = true
         window.performDrag(with: event)
         window.isMovable = false
@@ -105,8 +93,8 @@ final class WindowMoveZoneMonitor {
         exclusions.allObjects.contains { $0.window === window && Self.areaInSight(of: $0).contains(point) }
     }
 
-    /// In window coordinates, or nothing for a hidden view. Clipped by hand to the scroll view a view is in, such as a
-    /// tab partly scrolled out of the tab bar: a view SwiftUI hosts reports all of its scroll view as its `visibleRect`.
+    /// Clipped by hand to the scroll view a view is in, such as a tab partly scrolled out of the tab bar: a view SwiftUI
+    /// hosts reports all of its scroll view as its `visibleRect`.
     private static func areaInSight(of view: NSView) -> NSRect {
         guard !view.isHiddenOrHasHiddenAncestor else { return .zero }
         let frame = view.convert(view.bounds, to: nil)

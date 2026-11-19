@@ -1,17 +1,9 @@
 import AppKit
 import SwiftUI
 
-/// Follows a shown split's pane dragged by its mini toolbar, as a tab is dragged onto the terminals: the edge of the
-/// terminals under the pointer lights up where the pane's tab would sit, on the left or right side by side, on top or
-/// below stacked, or the middle, on its own with the split separated; let go, the split is laid out that way. See
-/// `ConversationStore.rearrangeShownSplit(placing:at:)`. Only the pane's own window takes it, while no other window is in
-/// front of it under the pointer.
 @MainActor
 final class SplitPaneDragToRearrange {
     static let shared = SplitPaneDragToRearrange()
-    /// How far the pointer moves from where it pressed the toolbar before the drag places the pane anywhere. The
-    /// toolbar sits in a pane's bottom corner, already over an edge's third, so a click whose pointer slips a few points,
-    /// on the toolbar's × too, must not lay the split out again.
     static let distanceBeforePlacing: CGFloat = 24
 
     private struct Drag {
@@ -25,8 +17,6 @@ final class SplitPaneDragToRearrange {
 
     private init() {}
 
-    /// Follows the pointer, `translation` from where it pressed, highlighting where the tab, which the highlight names
-    /// `title`, would sit; nowhere until it has moved `distanceBeforePlacing`.
     func follow(_ tabID: UUID, titled title: String, translation: CGSize, in store: ConversationStore) {
         guard store.shownSplit?.contains(tabID) == true else { return cancel() }
         let hasMovedFarEnough = hypot(translation.width, translation.height) >= Self.distanceBeforePlacing
@@ -35,14 +25,12 @@ final class SplitPaneDragToRearrange {
         splitDropTargets.show(place.map { TerminalSplitDropTargets.Target(storeID: ObjectIdentifier(store), place: $0, title: title) })
     }
 
-    /// Ends the drag, laying the split out where the pane was let go over the terminals, if it was.
     func drop() {
         defer { cancel() }
         guard let drag, let place = drag.place else { return }
         drag.store.rearrangeShownSplit(placing: drag.tabID, at: place)
     }
 
-    /// Ends the drag of the tab's pane, if it goes on, leaving everything as it was.
     func cancel(_ tabID: UUID) {
         if drag?.tabID == tabID { cancel() }
     }
@@ -61,8 +49,6 @@ final class SplitPaneDragToRearrange {
 }
 
 extension View {
-    /// Lets a shown split's pane be dragged by this view, its mini toolbar, to another edge of the terminals; see
-    /// `SplitPaneDragToRearrange`. A click still selects the pane's tab.
     func splitPaneDragToRearrange(_ tabID: UUID, titled title: String, in store: ConversationStore) -> some View {
         modifier(SplitPaneDragToRearrangeGesture(tabID: tabID, title: title, store: store))
     }

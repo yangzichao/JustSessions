@@ -1,4 +1,3 @@
-/// Where terminals take their colors from: the app theme, a preset, or colors imported from iTerm2.
 enum TerminalColorChoice: Hashable, Sendable {
     case matchAppTheme
     case preset(TerminalColorPreset)

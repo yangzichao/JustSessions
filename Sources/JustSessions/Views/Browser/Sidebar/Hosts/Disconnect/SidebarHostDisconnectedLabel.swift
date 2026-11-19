@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Says a disconnected SSH host is, where its heading otherwise shows when it was last copied; see
-/// `ConversationStore+RemoteHostDisconnect`.
 struct SidebarHostDisconnectedLabel: View {
     let host: SessionHost
 

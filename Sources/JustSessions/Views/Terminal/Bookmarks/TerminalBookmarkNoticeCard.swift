@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// Over the top-trailing corner of a tab: what ⌘D, ⌘', or ⇧⌘' did (TRM-74), for a few seconds. It floats over the
-/// terminal instead of taking a row from it, so the CLI's screen keeps its size, as `TerminalSSHFileDropNotice` does, and
-/// it reads the notice in its own body, so a notice never updates the terminal's view.
 struct TerminalBookmarkNoticeCard: View {
     let state: TerminalBookmarkNoticeState
     @Environment(\.locale) private var locale

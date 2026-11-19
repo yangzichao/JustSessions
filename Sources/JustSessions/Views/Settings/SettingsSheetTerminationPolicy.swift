@@ -1,8 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Settings save immediately, so leaving this sheet open must not block Quit or Sparkle's Install and Relaunch.
-/// Apply this only to the settings sheet's native window; other sheets keep their normal termination protection.
 struct SettingsSheetTerminationPolicy: NSViewRepresentable {
     func makeNSView(context: Context) -> SettingsSheetTerminationPolicyView {
         SettingsSheetTerminationPolicyView()

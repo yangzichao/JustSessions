@@ -1,9 +1,5 @@
 import Foundation
 
-/// Finds the session file each waiting "New session" or "Branch" tab is writing, from facts rather than
-/// guesses: the session id the app asked Claude Code to use, Claude Code's per-process registry, and the
-/// files the CLI holds open. Process lookups cover the CLI's whole process tree, so a CLI that an install's
-/// wrapper script starts as a child process still counts.
 struct NewSessionFileFinder: Sendable {
     var claudeTranscripts = ClaudeSessionFileLocator()
     var claudeRegistry = ClaudeLiveSessionRegistry()
@@ -23,8 +19,6 @@ struct NewSessionFileFinder: Sendable {
             let processIDs = processTree.processIDs(rootedAt: tab.processID)
             switch tab.provider {
             case .claude:
-                // For tabs launched without a preassigned id: before the `--help` check finished, or on an
-                // install without the flag.
                 if let record = claudeRegistry.firstRecord(amongProcessIDs: processIDs),
                     tab.couldBeOwnSession(record.sessionID),
                     let transcript = claudeTranscripts.transcriptFile(forSessionID: record.sessionID)
@@ -34,7 +28,6 @@ struct NewSessionFileFinder: Sendable {
             case .codex, .antigravity:
                 processIDsOfTabsNeedingOpenFiles[tab.terminalID] = processIDs
             case .kiro, .opencode, .pi:
-                // Linked by appearance once a refresh lists the session; see `linkWaitingTabsByAppearance`.
                 continue
             }
         }
@@ -45,7 +38,6 @@ struct NewSessionFileFinder: Sendable {
         )
         for tab in tabs {
             guard let processIDs = processIDsOfTabsNeedingOpenFiles[tab.terminalID] else { continue }
-            // The CLI's own process first, then the processes it started.
             let openSessionFile = processIDs.lazy
                 .flatMap { openFilePaths[$0] ?? [] }
                 .compactMap { path -> NewSessionFile? in

@@ -1,17 +1,9 @@
 import Foundation
 
-/// Reads a whole session the way its reader pages through it, keeping the text of what you wrote, the CLI's replies,
-/// and its tool calls. Notes, such as one for a record too large to show, and images are left out. Images are not even
-/// decoded: their entries only hold their place, so every other entry keeps the ID the reader gives it.
 enum SessionMessageTextReader {
-    /// The reader's own cuts of long messages and large records, so a search never finds text the reader leaves out,
-    /// in pages far larger than the reader's, as a session is read from start to end in one go.
     static let wholeSessionLimits = TranscriptPageLimits(
         targetEntryCount: 5_000, maximumRecordCount: 50_000, targetByteCount: 64 << 20
     )
-    /// Codex's pages are smaller, so a session resuming after an append reads its final page again cheaply. Every
-    /// Codex read uses them, so tool calls merge into the same entries whether a session is read in full or resumed.
-    /// Other providers keep `wholeSessionLimits`: smaller pages made reading an OpenCode session about 10% slower.
     static let codexWholeSessionLimits = TranscriptPageLimits(
         targetEntryCount: 256, maximumRecordCount: 4_096, targetByteCount: 8 << 20
     )
@@ -44,8 +36,6 @@ enum SessionMessageTextReader {
         return try await readInFull(conversation, keepsResumeState: true, limits: limits)
     }
 
-    /// Reads the session from its first page to its last; a Codex read that `keepsResumeState` reuses the index's digest
-    /// after a final fingerprint check, for where the next read can resume.
     static func readInFull(
         _ conversation: Conversation, keepsResumeState: Bool, limits: TranscriptPageLimits
     ) async throws -> SessionMessageTextRead {
@@ -108,16 +98,10 @@ enum SessionMessageTextReader {
     }
 }
 
-/// A changed session's text, where the next read can resume, and what this read took.
 struct SessionMessageTextRead: Sendable {
     let text: SessionMessageText
-    /// Nil for a provider other than Codex, or when the session changed while it was read; the next change then
-    /// reads it in full again.
     let resumeState: SessionMessageTextResumeState?
-    /// Whether the read resumed from saved text rather than reading the session in full.
     let resumed: Bool
-    /// Records handed to the decoder, not counting the look back for the speaker before a page.
     let decodedRecordCount: Int
-    /// Bytes read from the session file: to index it, the records decoded, and to hash it.
     let sourceByteCount: UInt64
 }

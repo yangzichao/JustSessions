@@ -1,13 +1,10 @@
 import Foundation
 
-/// What a subagent's Pi session file says about it.
 struct PiSubagentSession: Sendable, Codable {
     let sessionID: String
     let projectPath: String
-    /// The first line of its task, kept short, since extensions start subagents with long prompts.
     let title: String
 
-    /// Nil for a file that is not a Pi session, such as an extension's own transcript of a run.
     init?(file: URL) {
         guard let header = ConversationMetadata.firstLine(of: file),
             header["type"] as? String == "session",
@@ -35,11 +32,8 @@ enum PiSubagentSessions {
         let parentSessionID: String
     }
 
-    /// Deeper than any extension nests its runs, and a stop for a folder that links back into itself.
     static let maximumFolderDepth = 12
 
-    /// Every subagent session under the folder beside `sessionFile`, each with the session that started it.
-    /// `read` summarizes a file, so a caller can keep what it read between refreshes.
     static func find(startedBy sessionFile: URL, sessionID: String, read: (URL) -> PiSubagentSession?) -> [Found] {
         var found: [Found] = []
         collect(in: sessionFile.deletingPathExtension(), parentSessionID: sessionID, depth: 0, read: read, into: &found)
@@ -60,7 +54,6 @@ enum PiSubagentSessions {
                 options: [.skipsHiddenFiles]
             )
         else { return }
-        // Each session's folder is named after its file, without `.jsonl`.
         var sessionIDsByFolderName: [String: String] = [:]
         for file in entries where file.pathExtension == "jsonl" && isRegularFile(file) {
             guard let session = read(file) else { continue }

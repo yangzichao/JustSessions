@@ -1,17 +1,12 @@
 import Foundation
 
-/// Each reader owns an index and at most three pages. JSON decoding runs on this actor, away from UI updates.
 actor TranscriptPageSource {
     let file: URL
     let provider: ConversationProvider
-    /// Picks the session out of a database that holds every session, as OpenCode's does.
     let sessionID: String?
-    /// Reads a subagent's transcript; see `ClaudeTranscriptReader.includesSidechains`.
     let isSubagentTranscript: Bool
     let limits: TranscriptPageLimits
-    /// See `TranscriptBuilder.decodesImages`.
     let decodesImages: Bool
-    /// The index pages are read from; message search takes the byte offset of its final page from it.
     private(set) var fileIndex: TranscriptFileIndex?
     private var piRecordIndices: [Int]?
     private var pageLineage: UUID?
@@ -32,8 +27,6 @@ actor TranscriptPageSource {
         self.decodesImages = decodesImages
     }
 
-    /// `limits` overrides the source's page sizes for one call; the conversation map passes its own, keeping the reader's
-    /// text and record cuts so entry IDs stay the reader's. Without `preparesMarkdown`, replies are not parsed (PERF-89).
     func read(
         _ request: TranscriptPageRequest, refreshIndex: Bool = false, limits pageLimits: TranscriptPageLimits? = nil,
         preparesMarkdown: Bool = true
@@ -68,7 +61,6 @@ actor TranscriptPageSource {
         }
         let index = fileIndex!
         if provider == .pi, piRecordIndices == nil {
-            // The source's own limits, never a call's: the cached branch must not depend on who asked first.
             let records = try TranscriptPiPageIndex.records(in: index, handle: handle, limits: self.limits)
             piRecordIndices = records
             // A Pi branch change appends bytes but replaces the logical conversation before its end.

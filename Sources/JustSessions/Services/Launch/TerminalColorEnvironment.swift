@@ -1,7 +1,5 @@
 import Foundation
 
-/// The embedded terminal is a truecolor terminal, so variables that ask CLIs to turn colors off
-/// must not leak in from whatever process launched the app.
 enum TerminalColorEnvironment {
     private static let variablesThatAlwaysDisableColor = ["NO_COLOR", "NODE_DISABLE_COLORS"]
     private static let variablesThatDisableColorWhenFalse = ["CLICOLOR", "FORCE_COLOR"]
@@ -20,9 +18,6 @@ enum TerminalColorEnvironment {
         return cleanedEnvironment
     }
 
-    /// What a CLI in the embedded terminal runs with: `inheritedEnvironment` without the variables above, Ghostty's
-    /// (see `GhosttyAppEnvironment`), or a Claude Code session's the app was opened from (see
-    /// `ClaudeCodeSessionEnvironment`), describing the terminal as the truecolor xterm it emulates.
     static func embeddedTerminalEnvironment(from inheritedEnvironment: [String: String]) -> [String: String] {
         var environment = ClaudeCodeSessionEnvironment.removingSessionVariables(
             from: GhosttyAppEnvironment.removingGhosttyVariables(from: removingColorDisablingVariables(from: inheritedEnvironment))

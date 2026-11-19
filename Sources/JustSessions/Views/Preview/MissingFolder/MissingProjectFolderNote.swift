@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Under a session's header while its project folder is gone from this Mac, moved or renamed after the session ran.
-/// Resume and Branch start the CLI in that folder, so they stay off until it is back, and this says why.
 struct MissingProjectFolderNote: View {
     let projectPath: String
 

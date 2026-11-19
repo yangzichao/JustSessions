@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// The warning after an SSH host's name while its shell startup keeps CLIs from starting there; see
-/// `RemoteShellStartupCheck`. Its tooltip says where the startup stopped, and clicking it opens the user guide's
-/// section on what to change.
 struct SidebarHostShellStartupWarning: View {
     let host: SessionHost
     let stoppedAt: String?

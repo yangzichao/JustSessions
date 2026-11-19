@@ -1,7 +1,6 @@
 import AppKit
 import Combine
 
-/// Records and restores a transcript position from the entry frames produced by the entries' layout.
 @MainActor
 final class TranscriptScrollPositionController {
     private struct RestorationGeometry: Equatable {
@@ -22,25 +21,19 @@ final class TranscriptScrollPositionController {
     private var isStopped = false
     private var restorationGeometry: RestorationGeometry?
     private var geometryStableSince: TimeInterval = 0
-    /// Whether the pending restoration has put the reader in place at least once; see `handOverToScrolling()`.
     private var hasAppliedRestoration = false
     private var restoresDuringLayout = false
     private var scrollWheelMonitor: Any?
-    /// The pointer, in the window's coordinates, while it is over the reader (RDR-48).
     private(set) var pointerLocation: CGPoint?
-    /// Whether the pointer moved since a jump set the seek target; until it does, the jumped-to message is the one read.
     private(set) var pointerMovedSinceSeek = false
     private var pointerTracking: TranscriptPointerTracking?
 
     var isRestoring: Bool { pendingRestoration != nil }
-    /// How long the layout stays put before a restoration ends. Tests lengthen it to act while one is pending.
     var settlingDuration: TimeInterval = 0.05
     var recordedPosition: TranscriptReadingPosition? { positionStore.position(for: conversationID) }
     var tracksTranscriptBottom = true
     let entrySeekingRequests = PassthroughSubject<Int, Never>()
     let viewportUpdates = PassthroughSubject<TranscriptPagingViewport, Never>()
-    /// After every scroll update, restoration step, and layout, for what follows the message being read: the bookmark
-    /// target's highlight (RDR-48). Layouts are coalesced into one send on the next turn of the run loop.
     let readingUpdates = PassthroughSubject<Void, Never>()
     private var hasScheduledReadingUpdate = false
 
@@ -49,7 +42,6 @@ final class TranscriptScrollPositionController {
         return TranscriptPagingViewport(document: clipView.documentRect, visible: clipView.bounds)
     }
 
-    /// Where the row of the entry at `index` starts in the document, measured as `pagingViewport` is.
     func documentMinY(ofEntryAt index: Int) -> CGFloat? {
         entryFrameInClipView(at: index)?.minY
     }
@@ -78,7 +70,6 @@ final class TranscriptScrollPositionController {
         }
     }
 
-    /// The row of the entry at `index` in the entries' own layout, as an overlay on the stack is placed.
     func entryFrameInStack(at index: Int) -> CGRect? {
         guard let geometryIndex = geometryIndexByEntry[index], entryGeometries.indices.contains(geometryIndex) else { return nil }
         return entryGeometries[geometryIndex].frame
@@ -140,8 +131,6 @@ final class TranscriptScrollPositionController {
         pointerLocation = nil
     }
 
-    /// One tracking area over the scroll view, whose moves update the bookmark target as scrolling does: through
-    /// `readingUpdates`, with no SwiftUI view following the pointer (PERF-73).
     private func trackPointer(in scrollView: NSScrollView) {
         pointerTracking?.remove()
         pointerTracking = TranscriptPointerTracking(controller: self, view: scrollView)
@@ -160,8 +149,6 @@ final class TranscriptScrollPositionController {
         readingUpdates.send()
     }
 
-    /// The entry whose row is at the pointer's height, wherever across the reader the pointer is, its gutter included, by
-    /// binary search of the rows; nil while the pointer is outside the reader or over the toolbar above its text.
     func entryIDAtPointer() -> Int? {
         guard let pointerLocation, let scrollView, let geometryView, geometryView.enclosingScrollView === scrollView,
             scrollView.window != nil, !entryGeometries.isEmpty
@@ -199,11 +186,8 @@ final class TranscriptScrollPositionController {
         }
     }
 
-    /// Scrolling over the transcript ends a restoration once it has put the reader in place, forgets a bookmark jump's
-    /// seek target, and carries on from there.
-    /// A mouse wheel posts no live-scroll notification, and neither does momentum after a page loads, so the restoration
-    /// otherwise pulled the view back on every update until the wheel stopped, and the reader bounced. Before that, the
-    /// restoration still applies, or the reader would lose its place to the page that just loaded above it.
+    /// A mouse wheel posts no live-scroll notification, and neither does momentum after a page loads, so without this
+    /// the restoration pulled the view back on every update until the wheel stopped.
     func handOverToScrolling() {
         seekTargetStorage = nil
         guard pendingRestoration != nil, hasAppliedRestoration else { return }
@@ -211,8 +195,6 @@ final class TranscriptScrollPositionController {
         restorationGeometry = nil
     }
 
-    /// A reader action takes priority over a restoration still waiting for layout. With `duringNextLayout`, the entry is
-    /// on screen already, as when a page loads around it. The geometry layout restores in that pass before the window draws.
     func restore(_ position: TranscriptReadingPosition, duringNextLayout: Bool = false) {
         pendingRestoration = position
         restorationGeometry = nil
@@ -222,7 +204,6 @@ final class TranscriptScrollPositionController {
         scheduleUpdate()
     }
 
-    /// Rewrapping, such as after a text size or reading width change, resizes every entry; return to the entry being read.
     func restoreRecordedPosition() {
         guard pendingRestoration == nil, let position = positionStore.position(for: conversationID) else { return }
         restore(position)
@@ -232,7 +213,6 @@ final class TranscriptScrollPositionController {
     private func scheduleUpdate() {
         guard !hasScheduledUpdate, !isStopped else { return }
         hasScheduledUpdate = true
-        // Let SwiftUI commit row measurements before applying a native offset.
         let delay = pendingRestoration == nil ? 0.0 : 0.016
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
             guard let self, !self.isStopped else { return }
@@ -240,7 +220,6 @@ final class TranscriptScrollPositionController {
             self.restorePositionIfNeeded()
             self.forgetSeekTargetOutOfView()
             let hasReadingPosition = self.recordPosition()
-            // Recheck after restoration and layout, even if the first visible message did not change.
             if hasReadingPosition, let viewport = self.pagingViewport { self.viewportUpdates.send(viewport) }
             self.readingUpdates.send()
         }
@@ -259,7 +238,6 @@ final class TranscriptScrollPositionController {
         case .entry(let index, let offset):
             guard let entryFrame = entryFrameInClipView(at: index), entryFrame.height > 0 else { return }
             restoredEntryFrame = entryFrame
-            // The offset is from the reader's top, below the toolbar (`readableBounds(of:)`).
             proposedBounds.origin.y = entryFrame.minY + min(offset, max(0, entryFrame.height - 1)) - clipView.contentInsets.top
         }
         let geometry = RestorationGeometry(
@@ -312,10 +290,6 @@ final class TranscriptScrollPositionController {
             .map { geometryView.convert($0.frame, to: clipView) }
     }
 
-    /// The entry a bookmark jump last went to; see `TranscriptScrollView+Bookmarks`. Next and previous go on from it, and ⌘D
-    /// acts on it: the reading position is unknown while a restoration is pending (`currentReadingPosition()`), and an entry
-    /// near the end can't reach the top (`constrainBoundsRect`). It lasts while pending, while its row overlaps the viewport,
-    /// or while it isn't laid out (a page loading, or a missing message), until a scroll over the transcript.
     private var seekTargetStorage: Int? {
         didSet { if let seekTargetStorage, seekTargetStorage != oldValue { pointerMovedSinceSeek = false } }
     }
@@ -325,8 +299,6 @@ final class TranscriptScrollPositionController {
         return seekTargetStorage
     }
 
-    /// A seek target moved out of view without a wheel, as by the keyboard or a selection's autoscroll, is forgotten for
-    /// good: once its page left, it would no longer be laid out and would hold again.
     private func forgetSeekTargetOutOfView() {
         guard let index = seekTargetStorage, pendingRestoration == nil, let frame = entryFrameInClipView(at: index),
             let clipView = scrollView?.contentView, !frame.intersects(Self.readableBounds(of: clipView))
@@ -334,8 +306,6 @@ final class TranscriptScrollPositionController {
         seekTargetStorage = nil
     }
 
-    /// Goes to a loaded entry as Find does: recorded first, so a page that loads meanwhile restores it (`earlier`/`later`
-    /// read `recordedPosition` on arrival), then restored and brought into view, as `restoreRecordedPosition()` does.
     func seek(toEntryAt index: Int) {
         seekTargetStorage = index
         positionStore.record(.entry(index: index, offset: -6), for: conversationID)
@@ -343,7 +313,6 @@ final class TranscriptScrollPositionController {
         entrySeekingRequests.send(index)
     }
 
-    /// With `recordingPosition`, a refresh goes there rather than to the place recorded before (`TranscriptView.refresh()`).
     func setSeekTarget(_ index: Int, recordingPosition: Bool = false) {
         seekTargetStorage = index
         if recordingPosition { positionStore.record(.entry(index: index, offset: -6), for: conversationID) }
@@ -351,7 +320,6 @@ final class TranscriptScrollPositionController {
 
     func clearSeekTarget() { seekTargetStorage = nil }
 
-    /// The entries with at least `minimumVisibleHeight` points of their rows on screen, top to bottom. Run only by a command.
     func visibleEntryIDs(minimumVisibleHeight: CGFloat) -> [Int] {
         guard let scrollView, let geometryView, geometryView.enclosingScrollView === scrollView else { return [] }
         let bounds = geometryView.convert(Self.readableBounds(of: scrollView.contentView), from: scrollView.contentView)
@@ -361,9 +329,6 @@ final class TranscriptScrollPositionController {
             .map(\.entryIndex)
     }
 
-    /// The part of the clip view the reader shows: its bounds without its content insets. The reading toolbar, and Find's
-    /// bar under it, are a safe-area inset over the scroll view's top (`TranscriptScrollView`), and the text scrolls on
-    /// under them, so a message there isn't on screen. Positions, the message being read, and jumps measure from its top.
     static func readableBounds(of clipView: NSClipView) -> CGRect {
         let insets = clipView.contentInsets
         var bounds = clipView.bounds
@@ -383,7 +348,6 @@ final class TranscriptScrollPositionController {
         firstGeometryIndex(overlapping: bounds).map { entryGeometries[$0] }
     }
 
-    /// Entry frames are ordered from top to bottom, so a scroll update finds the first visible entry in O(log n).
     private func firstGeometryIndex(overlapping bounds: CGRect) -> Int? {
         var lowerBound = 0
         var upperBound = entryGeometries.count
@@ -419,7 +383,6 @@ private final class TranscriptPointerTracking {
     func remove() { view?.removeTrackingArea(area) }
 }
 
-/// Hands the pointer's moves over a reader's scroll view to its position controller.
 @MainActor
 private final class TranscriptPointerTrackingOwner: NSResponder {
     weak var controller: TranscriptScrollPositionController?

@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// Over the bottom of the reader: why a bookmark command did nothing, for a few seconds, or that a bookmarked message is
-/// gone, with Remove bookmark, until closed. It floats over the transcript instead of taking a row from it, so the reading
-/// position never shifts, and it reads the notice in its own body, so a notice never updates the reader around it.
 struct TranscriptBookmarkNoticeCard: View {
     let state: TranscriptBookmarkState
     let onRemoveBookmark: (MessageBookmark) -> Void

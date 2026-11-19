@@ -6,17 +6,11 @@ struct Conversation: Identifiable, Sendable, Equatable {
     let projectPath: String
     private(set) var suggestedTitle: String
     let updatedAt: Date
-    /// For a session on this Mac, the file the CLI wrote. For one on an SSH host, its copy in the local mirror.
     let sourceFile: URL
     private(set) var host: SessionHost
-    /// The session that started this one as a subagent, with the same CLI on the same host. Nil for a session
-    /// started on its own.
     let parentSessionID: String?
-    /// A session on an SSH host adds the host, so the same session id on two hosts stays two sessions.
     private(set) var id: String
-    /// Worked out once: on this Mac it resolves symlinks on disk, and the sidebar asks for it for every session.
     private(set) var projectDirectoryKey: String
-    /// The model the CLI used last, as its session files record it; nil when they don't, or for a CLI not read yet.
     let model: SessionModel?
 
     init(
@@ -61,9 +55,7 @@ struct Conversation: Identifiable, Sendable, Equatable {
             model: model
         )
     }
-    /// A subagent's session, listed under the session that started it and only read, never resumed or deleted on its own.
     var isSubagent: Bool { parentSessionID != nil }
-    /// The `id` of the session that started this one.
     var parentID: String? {
         parentSessionID.map { Self.id(provider: provider, sessionID: $0, host: host) }
     }
@@ -72,7 +64,6 @@ struct Conversation: Identifiable, Sendable, Equatable {
     }
     var isProjectAvailable: Bool { projectLocation.canStartSessions }
 
-    /// The id a session with this provider and session id has on the host; also for a session not listed yet.
     static func id(provider: ConversationProvider, sessionID: String, host: SessionHost) -> String {
         let providerSessionID = "\(provider.rawValue):\(sessionID)"
         guard let sshDestination = host.sshDestination else { return providerSessionID }

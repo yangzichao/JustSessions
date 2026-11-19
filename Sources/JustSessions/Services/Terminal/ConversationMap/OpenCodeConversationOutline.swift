@@ -2,8 +2,6 @@ import CryptoKit
 import Foundation
 import SQLite3
 
-/// A map's retained prefix, tail pages, and next proof all belong to one SQLite read snapshot. Earlier messages and
-/// parts can change without moving the final anchor, so the proof covers the reader's visible SQL projections.
 enum OpenCodeConversationOutline {
     struct Prefix: Sendable {
         let record: Int
@@ -13,7 +11,6 @@ enum OpenCodeConversationOutline {
     struct Read: Sendable {
         let outline: ConversationOutline
         let prefix: Prefix?
-        /// Records decoded into entries, excluding the raw columns hashed for prefix validation.
         let decodedRecordCount: Int
     }
 
@@ -40,7 +37,6 @@ enum OpenCodeConversationOutline {
                     index, in: database,
                     request: .after(resume.record), limits: limits)
                 decodedRecords += tail.records.count
-                // Every kept block ends before this record. The mutable tail may change or disappear entirely.
                 builder = ConversationOutlineBuilder(keeping: previous.blocks[..<resume.keptCount])
                 hashedRecords = saved.record
                 page = tail
@@ -76,9 +72,6 @@ enum OpenCodeConversationOutline {
             decodedRecordCount: decodedRecords)
     }
 
-    /// A single ordered cursor avoids a separate message/part lookup for every retained record. Its projections are
-    /// the reader's, so tool output, image URLs, and file diffs are neither kept nor hashed. No Swift JSON objects or
-    /// Markdown are built for the retained records.
     private static let prefixQuery = """
         SELECT m.id, m.time_created, m.visible_data, p.id, p.visible_data
         FROM (
@@ -125,8 +118,6 @@ enum OpenCodeConversationOutline {
         hasher = input.finish()
     }
 
-    /// Length framing distinguishes field boundaries, empty values, and NULL. Batch small fields for CryptoKit;
-    /// large columns go directly from SQLite to the hasher, so the temporary buffer stays at most 64 KiB.
     private struct DigestInput {
         static let capacity = 64 << 10
         var hasher: SHA256

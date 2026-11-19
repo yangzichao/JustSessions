@@ -1,8 +1,6 @@
 import Combine
 import Foundation
 
-/// Each host's saved choice of what closing a tab does when tmux can keep its CLI running there. A host asks each time
-/// until you tick Don't ask again in that dialog for one of its tabs, or pick an answer for it in Settings.
 @MainActor
 final class TabCloseChoiceSettingsStore: ObservableObject {
     static let shared = TabCloseChoiceSettingsStore()
@@ -27,7 +25,6 @@ final class TabCloseChoiceSettingsStore: ObservableObject {
         choices = newChoices
     }
 
-    /// A removed SSH host's choice goes with it, so adding the host again asks each time.
     func forgetSSHHost(_ destination: String) {
         setChoice(.askEachTime, for: .ssh(destination))
     }

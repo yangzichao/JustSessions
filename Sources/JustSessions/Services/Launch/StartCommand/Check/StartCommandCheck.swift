@@ -1,14 +1,9 @@
 import Foundation
 
-/// Checks a start command before it is kept, so one that cannot start does not break every later launch of the tool
-/// on the host, resumes included. The command is read without running it, see `StartCommandShape`, and its program is
-/// looked up where the CLI would run: on this Mac on the PATH the app gives CLIs, on an SSH host in its login shell.
-/// Flags are not checked; only the program knows its own.
 struct StartCommandCheck: Sendable {
     static let thisMacTimeout: TimeInterval = 10
     static let remoteTimeout: TimeInterval = 30
 
-    /// PATH and HOME of the CLIs the app starts on this Mac.
     let thisMacEnvironment: [String: String]
     let remoteRunner: RemoteHostCommandRunner
 
@@ -20,8 +15,6 @@ struct StartCommandCheck: Sendable {
         self.remoteRunner = remoteRunner
     }
 
-    /// Throws `StartCommandCheckError` when the command would not start. Runs processes, and on an SSH host `ssh`,
-    /// so call it off the main actor.
     func check(_ command: String, on host: SessionHost) throws {
         switch StartCommandShape(command) {
         case .program(let program):
@@ -61,8 +54,6 @@ struct StartCommandCheck: Sendable {
         guard lookup.exitStatus == 0 else { throw StartCommandCheckError.missingProgram(program, host: host) }
     }
 
-    /// POSIX `sh`, so it runs the same whatever the host's login shell is. `~` is the home folder, as in the shell
-    /// that starts the CLI.
     static let lookupScript = """
         program=$1
         case $program in

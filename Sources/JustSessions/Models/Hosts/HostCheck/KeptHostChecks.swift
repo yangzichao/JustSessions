@@ -1,15 +1,10 @@
 import Foundation
 
-/// An SSH host's last host check, from Check this host… or one the app ran on its own, with the version of the app
-/// that ran it, since a newer version may check more.
 struct KeptHostCheck: Codable, Equatable, Sendable {
     let report: HostCheckReport
-    /// The app's version, as `FeedbackEnvironment.appVersion` gives it.
     let appVersion: String
 }
 
-/// Each SSH host's last host check, kept across launches, so its heading warns of a problem it found and the app
-/// knows when the host is due another; see `HostBackgroundCheckSchedule`.
 struct KeptHostChecks: Equatable {
     static let userDefaultsKey = "keptHostChecks"
 

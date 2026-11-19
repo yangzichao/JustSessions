@@ -1,7 +1,5 @@
 import Foundation
 
-/// OpenCode keeps every session in one SQLite database, `opencode.db` in its data folder. Each listed session's
-/// source file is that database.
 struct OpenCodeAdapter: ConversationAdapter {
     let databaseFile: URL
     let deletionExecutableURL: URL?
@@ -25,7 +23,6 @@ struct OpenCodeAdapter: ConversationAdapter {
         self.deletionExecutableURL = deletionExecutableURL
     }
 
-    /// Every session, a subagent's under the session that started it.
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         try cancellation.checkCancellation()
         let conversations = OpenCodeSQLiteReader.sessions(in: databaseFile).compactMap { session -> Conversation? in

@@ -1,8 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Tells the hover card about every press, key, and scroll in the app, which hide it as in Chrome, and about the app
-/// going to the background. It draws nothing and takes no clicks; events go on to where they were headed.
 struct TabHoverCardEventWatcher: NSViewRepresentable {
     let controller: TabHoverCardController
 
@@ -56,7 +54,6 @@ final class TabHoverCardEventWatcherView: NSView {
         switch event.type {
         case .leftMouseDown: controller?.mouseDown()
         case .leftMouseUp: controller?.mouseUp()
-        // A right-click opens a menu, which the card would sit under.
         default: controller?.dismiss()
         }
     }

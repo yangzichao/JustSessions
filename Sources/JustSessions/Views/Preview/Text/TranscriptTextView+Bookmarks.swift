@@ -1,8 +1,7 @@
 import AppKit
 
 extension TranscriptTextView {
-    /// AppKit's menu for the text, Copy and Look Up included, with Add bookmark or Remove bookmark first when the text is in
-    /// your message or a reply. AppKit builds a new menu on every call.
+    /// AppKit builds a new menu on every call.
     override func menu(for event: NSEvent) -> NSMenu? {
         let menu = super.menu(for: event) ?? NSMenu()
         guard let entryID = selectionKey?.entryIndex,

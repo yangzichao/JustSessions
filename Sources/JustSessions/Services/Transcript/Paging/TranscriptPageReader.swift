@@ -1,7 +1,6 @@
 import Foundation
 
 enum TranscriptPageReader {
-    /// Stops on entry, record, or byte budget. One source record stays atomic, so its messages are never lost at a page boundary.
     static func read(
         _ request: TranscriptPageRequest, recordCount: Int, limits: TranscriptPageLimits,
         sourceID: (Int) -> Int, decode: (Int) throws -> ([TranscriptEntry], Int)
@@ -22,7 +21,6 @@ enum TranscriptPageReader {
             backwards = false
             position = max(0, boundary)
         case .around(let entryID):
-            // Binary search also works for sparse Pi branches and SQLite step IDs.
             let sourceRecord = TranscriptPageIdentity.record(for: entryID)
             var lower = 0
             var upper = recordCount
@@ -55,7 +53,6 @@ enum TranscriptPageReader {
             {
                 break
             }
-            // Hidden records do not need to remain in memory while looking for the next visible message.
             if entries.isEmpty { records.removeLast() }
         }
         return TranscriptPage(
@@ -65,7 +62,6 @@ enum TranscriptPageReader {
             precedingSpeaker: try speaker(before: lowerBound, limit: limits.maximumRecordCount, decode: decode))
     }
 
-    /// The speaker of the last entry before `position`, looking back at most `limit` records past hidden ones.
     private static func speaker(before position: Int, limit: Int, decode: (Int) throws -> ([TranscriptEntry], Int)) throws -> Int? {
         var record = position - 1
         while record >= 0, position - record <= limit {

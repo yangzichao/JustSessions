@@ -1,12 +1,6 @@
 import SwiftUI
 
 extension HelpKeyboardShortcutGroup {
-    /// Every shortcut JustSessions adds. The Back and Forward, tab, sidebar, text size, bookmark, and Settings shortcuts
-    /// are menu commands (`WorkspaceNavigationCommands`, `WorkspaceTabCommands`, `SidebarToggleCommands`,
-    /// `TextZoomCommands`, `TranscriptBookmarkCommands`, which a selected tab answers through `TerminalTabBookmarks`,
-    /// `AppWideSheetCommands`); Control-Tab is `WorkspaceTabCycleShortcuts`, ⌘= is `ZoomInEqualsKey`, Find is
-    /// `TranscriptSearchKeyboardShortcuts` in the conversation and `TerminalFindShortcuts` in a tab, the terminal's line
-    /// editing keys are `TerminalEditingKey`, and ⌘A in a CLI's prompt is `TerminalPromptSelection`.
     static var all: [HelpKeyboardShortcutGroup] {
         [
             HelpKeyboardShortcutGroup(

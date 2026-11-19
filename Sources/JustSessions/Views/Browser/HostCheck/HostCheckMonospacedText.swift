@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// What a host printed, or a command, as a terminal shows it, and selectable.
 struct HostCheckMonospacedText: View {
     let text: String
 

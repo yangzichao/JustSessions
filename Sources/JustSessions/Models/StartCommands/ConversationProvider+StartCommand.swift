@@ -12,8 +12,6 @@ extension ConversationProvider {
         self == .kiro ? [executableName, "chat"] : [executableName]
     }
 
-    /// The app's arguments for the tool, to go after a start command of your own: without the subcommand that the
-    /// start command already holds.
     func argumentsAfterCustomStartCommand(_ arguments: [String]) -> [String] {
         let subcommand = defaultStartCommandWords.dropFirst()
         return arguments.starts(with: subcommand) ? Array(arguments.dropFirst(subcommand.count)) : arguments

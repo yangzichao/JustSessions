@@ -1,8 +1,6 @@
 import Combine
 import Foundation
 
-/// The saved choice of terminal engine for tabs opened from now on; see `TerminalEngine`. Tabs open with SwiftTerm
-/// until Ghostty is chosen. Kept apart from the terminal appearance, so restoring its defaults leaves the engine alone.
 @MainActor
 final class TerminalEngineStore: ObservableObject {
     static let shared = TerminalEngineStore()

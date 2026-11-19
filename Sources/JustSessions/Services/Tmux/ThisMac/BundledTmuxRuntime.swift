@@ -1,6 +1,5 @@
 import Foundation
 
-/// A relocatable, signed runtime shipped inside the app, with its own terminal database.
 struct BundledTmuxRuntime: Sendable {
     let directory: URL
 

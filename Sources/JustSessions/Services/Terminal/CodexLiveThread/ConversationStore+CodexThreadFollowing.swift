@@ -1,15 +1,10 @@
 import Foundation
 
-/// A Codex tab follows the thread its CLI is in, as the terminal title names it; see `CodexThreadTitle`. A new
-/// session's tab links to its thread, and a tab whose CLI moved to another thread, as with `/new` or `/resume`, shows
-/// that one from then on, the way a Claude Code tab follows `/clear`. Only tabs on this Mac start Codex that way.
 extension ConversationStore {
     func startCodexThreadFollowing(interval: Duration = .seconds(1)) {
         runPeriodically(every: interval) { await $0.followCodexThreads() }
     }
 
-    /// A thread no refresh listed yet gets one refresh of this Mac once its rollout file is saved, and the tab links
-    /// to it once a refresh lists it.
     func followCodexThreads(locator: CodexRolloutLocator = CodexRolloutLocator()) async {
         guard !isScanningThisMac, !isDeletingSessions else { return }
         var unlistedThreads: [(tab: TerminalSession, threadIDPrefix: String)] = []
@@ -40,7 +35,6 @@ extension ConversationStore {
         if hasThreadToList { refreshThisMac() }
     }
 
-    /// Nil unless the id of exactly one listed Codex session starts with `threadIDPrefix`.
     private func listedCodexThread(on host: SessionHost, threadIDPrefix: String) -> Conversation? {
         let matches = conversations.filter {
             $0.provider == .codex && $0.host == host && $0.sessionID.hasPrefix(threadIDPrefix)

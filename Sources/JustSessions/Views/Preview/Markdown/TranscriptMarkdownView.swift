@@ -4,8 +4,6 @@ struct TranscriptMarkdownView: View {
     @Environment(\.transcriptReadingFontSize) private var fontSize
     private let markdown: PreparedTranscriptMarkdown
 
-    /// Pages prepare their Markdown on the reader actor. A transcript built any other way is prepared here, before its
-    /// first layout, so the message never changes height after the reader has restored a position.
     init(text: String, prepared: PreparedTranscriptMarkdown?) {
         markdown = prepared ?? PreparedTranscriptMarkdown(text: text)
     }
@@ -25,7 +23,6 @@ struct TranscriptMarkdownView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// Plain messages need only one text view, keeping their lazy scroll measurements inexpensive and stable.
     private var singleParagraph: AttributedString? {
         guard blocks.count == 1, blocks[0].listDepth == 0, blocks[0].quoteDepth == 0,
             case .text(let text, nil) = blocks[0].content
@@ -71,13 +68,10 @@ struct TranscriptMarkdownView: View {
         }
     }
 
-    /// The room `structuredBlocks` gives a block's quote bar and list marker, with the spacing after each, and its depth.
     private func indentation(of block: TranscriptMarkdownBlock) -> CGFloat {
         (block.quoteDepth > 0 ? 3 + 10 : 0) + (block.listDepth > 0 ? 18 + 10 : 0) + CGFloat(max(0, block.listDepth - 1)) * 20
     }
 
-    /// A list item copies with its marker, indented by its depth; a later paragraph of the item, without a marker, lines
-    /// up under the first.
     private func copyRole(of block: TranscriptMarkdownBlock) -> TranscriptTextCopyRole {
         guard block.listDepth > 0 else { return .paragraph }
         let indentation = String(repeating: "  ", count: block.listDepth - 1)

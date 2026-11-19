@@ -1,26 +1,18 @@
 import SwiftUI
 
-/// Runs a workspace window's onboarding: the tour once a fresh install has listed This Mac's sessions at its first
-/// launch, then each tip the first time what it is about comes into use, such as reading a session or opening a tab.
-/// Help and the Help menu start the tour again, and show every tip again after it.
 struct OnboardingTipsPresenter: ViewModifier {
     let store: ConversationStore
     @ObservedObject var tour: OnboardingTour
     let tipsStore: OnboardingTipsStore
     let listsProjectWithSessions: Bool
-    /// The one session selected in the sidebar, whose conversation shows unless a tab is selected.
     let focusedConversation: Conversation?
     let isSidebarShown: Bool
-    /// No sheet, alert, or dialog is up, so a tip that starts now shows right away.
     let isReadyForTips: Bool
-    /// Shows the sidebar, where the tour starts.
     let onStartTour: () -> Void
 
     @State private var sessionReadAtReadingTip: String?
 
-    /// How long the sidebar gets to draw what was found, so the tour starts on it.
     static let tourStartDelay: Duration = .milliseconds(600)
-    /// How long the window stays as it is before a tip shows, so none flashes while sessions or tabs are switched.
     static let tipDelay: Duration = .seconds(1)
 
     private struct FirstLaunchTourTrigger: Equatable {
@@ -46,8 +38,6 @@ struct OnboardingTipsPresenter: ViewModifier {
         }
     }
 
-    /// The session whose conversation shows; nil while a tab, or nothing, shows instead. Worked out here rather than by
-    /// the browser, so a tab switch redraws this modifier and not the browser.
     private var readSession: Conversation? {
         store.selectedTerminalID == nil ? focusedConversation : nil
     }
@@ -93,13 +83,10 @@ struct OnboardingTipsPresenter: ViewModifier {
     private func startTourAtFirstLaunch() async {
         guard tipsStore.shouldShow(.tour), hasListedThisMac, isReadyForTips, !tour.isRunning else { return }
         do { try await Task.sleep(for: Self.tourStartDelay) } catch { return }
-        // Another workspace window may have started it meanwhile.
         guard tipsStore.shouldShow(.tour) else { return }
         startTour()
     }
 
-    /// Help's Take the tour: the tour now, then every tip again the next time its part of the window comes into use,
-    /// also on an install that showed none.
     private func restartTour() {
         tipsStore.showEveryTipAgain()
         startTour()
@@ -116,13 +103,11 @@ struct OnboardingTipsPresenter: ViewModifier {
         tour.start(stops)
     }
 
-    /// Shows the tips due once the window has stayed as it is for `tipDelay`, one after another when several are.
     private func showDueTips() async {
         guard isReadyForTips, !tour.isRunning,
             !OnboardingTip.due(in: windowContext, among: tipsStore.tipsToShow).isEmpty
         else { return }
         do { try await Task.sleep(for: Self.tipDelay) } catch { return }
-        // Read again, as another workspace window may have shown some meanwhile.
         let windowContext = windowContext
         let dueTips = OnboardingTip.due(in: windowContext, among: tipsStore.tipsToShow)
         guard !dueTips.isEmpty else { return }

@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// A session a subagent ran in, under the session that started it. Clicking it reads it in the preview; it is never
-/// resumed, renamed, pinned, or deleted on its own. Its model, shortened, comes before its age, as a subagent often runs
-/// on another model than the session that started it; both give way to a ⋯ while the pointer is over the row.
 struct SidebarSubagentRow: View {
     let store: ConversationStore
     let row: SidebarSubagentRows.Row
@@ -12,7 +9,6 @@ struct SidebarSubagentRow: View {
     let onToggleSubagents: () -> Void
 
     @State private var isHovered = false
-    /// Holds the pointer-over state for a test; nil follows `onHover` as in use.
     var isHoveredForTests: Bool? = nil
     private var hovered: Bool { isHoveredForTests ?? isHovered }
 
@@ -58,7 +54,6 @@ struct SidebarSubagentRow: View {
             }
         }
         .overlay(alignment: .trailing) {
-            // In the view tree only while the pointer is over the row; see `SidebarProjectRow`.
             if hovered {
                 SidebarRowMoreActionsMenu(accessibilityLabel: "More actions for \(title)") {
                     menuItems

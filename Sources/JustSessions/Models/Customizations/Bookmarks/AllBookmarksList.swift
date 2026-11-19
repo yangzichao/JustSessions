@@ -1,7 +1,5 @@
 import Foundation
 
-/// What All Bookmarks lists (RDR-52): each listed session's bookmarks that the search and the chosen tags keep, the most
-/// recently active session first, each session's in conversation order.
 struct AllBookmarksList: Equatable {
     struct Section: Identifiable, Equatable {
         let conversation: Conversation
@@ -10,16 +8,10 @@ struct AllBookmarksList: Equatable {
     }
 
     let sections: [Section]
-    /// Bookmarks kept for sessions no host lists now, as after removing an SSH host (RDR-29); they show again once listed.
     let unlistedBookmarkCount: Int
 
     var bookmarkCount: Int { sections.reduce(0) { $0 + $1.bookmarks.count } }
 
-    /// - Parameters:
-    ///   - query: matches a bookmark's label, tags, or message, or its session's title; nil keeps every bookmark.
-    ///   - requiredTags: a bookmark must have every one, ignoring case and accents.
-    ///   - conversation: the listed session with an ID, or nil.
-    ///   - title: the session's title as the sidebar shows it.
     init(
         bookmarks: MessageBookmarks, query: MessageBookmarkQuery?, requiredTags: Set<String>,
         conversation: (String) -> Conversation?, title: (Conversation) -> String

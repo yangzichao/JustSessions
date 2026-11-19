@@ -1,9 +1,7 @@
 import SwiftUI
 
-/// The notifications part of the General tab: which moments of a session post a macOS notification.
 struct NotificationSettingsSection: View {
     @ObservedObject var settingsStore: SessionNotificationSettingsStore
-    /// Whether notifications for the app are turned off in System Settings, which overrides the choices here.
     @State private var isTurnedOffInSystemSettings = false
 
     var body: some View {

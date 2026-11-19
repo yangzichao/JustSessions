@@ -1,11 +1,9 @@
 import SwiftUI
 
-/// A host's own refresh action and progress; another host's refresh never changes this control.
 struct SidebarHostRefreshButton: View {
     let host: SessionHost
     let refreshStatus: HostRefreshStatus?
     let isDisabled: Bool
-    /// The host is disconnected, so refreshing connects it first; see `ConversationStore+RemoteHostDisconnect`.
     let connectsFirst: Bool
     let action: () -> Void
 

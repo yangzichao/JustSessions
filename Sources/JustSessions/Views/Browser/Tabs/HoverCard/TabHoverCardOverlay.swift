@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// The shown hover card, hanging under the tab or group label it is about, over the terminal below the tab bar, as
-/// Chrome's hangs under its tab. It lines up with the tab's leading edge, kept inside the window, and slides from tab
-/// to tab while it shows. It takes no clicks and never the keyboard, so the terminal under it keeps both.
 struct TabHoverCardOverlay: View {
     let store: ConversationStore
     @ObservedObject var controller: TabHoverCardController
@@ -10,7 +7,6 @@ struct TabHoverCardOverlay: View {
     var body: some View {
         GeometryReader { geometry in
             if let shownCard = controller.shownCard {
-                // The tab's frame is in the window's coordinates; the card is placed in this view's.
                 let overlayOrigin = geometry.frame(in: .global).origin
                 let anchorFrame = shownCard.anchorFrame.offsetBy(dx: -overlayOrigin.x, dy: -overlayOrigin.y)
                 let leadingEdge = min(

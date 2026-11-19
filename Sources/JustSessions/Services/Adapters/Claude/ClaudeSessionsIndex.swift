@@ -1,7 +1,5 @@
 import Foundation
 
-/// The `sessions-index.json` Claude Code may keep in a project folder. Sessions it leaves out are still found from
-/// their transcripts.
 struct ClaudeSessionsIndex {
     struct Entry {
         let projectPath: String?
@@ -19,7 +17,6 @@ struct ClaudeSessionsIndex {
         }
     }
 
-    /// The project folder the index was written for, used when neither an entry nor its transcript names one.
     let originalProjectPath: String?
     private let entriesBySessionID: [String: Entry]
 
@@ -28,7 +25,6 @@ struct ClaudeSessionsIndex {
         self.init(jsonData: data ?? Data())
     }
 
-    /// When the index lists a session more than once, the last entry wins.
     init(jsonData: Data) {
         let root = ConversationMetadata.object(from: jsonData) ?? [:]
         let records = root["entries"] as? [[String: Any]] ?? []

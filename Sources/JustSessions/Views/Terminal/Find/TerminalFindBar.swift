@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// A tab's find bar, floating over its terminal's top trailing corner, as in Chrome and Ghostty. Floating rather than
-/// pushing the terminal down keeps its size, so opening the bar never makes the CLI or shell draw again. Return and
-/// Shift-Return in the field, and Escape, are `TerminalFindShortcuts`', so they never reach the terminal's program.
 struct TerminalFindBar: View {
     @Bindable var findState: TerminalFindState
     @FocusState private var isFieldFocused: Bool
@@ -52,7 +49,6 @@ struct TerminalFindBar: View {
         .font(ThemeFont.body)
         .foregroundStyle(ThemePalette.ink)
         .padding(6)
-        // A narrow split pane's bar narrows with it, the field giving way first.
         .frame(maxWidth: Self.width)
         .background {
             shape

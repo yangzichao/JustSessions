@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// One random tip: a "Tip" heading with Next tip and close buttons, then the tip. Its right-click menu also turns tips
-/// off, as Settings → Help does.
 struct RandomTipCard: View {
     let tip: RandomTip
     let onShowNextTip: () -> Void
@@ -46,7 +44,6 @@ struct RandomTipCard: View {
     }
 }
 
-/// A round icon button in the tip's heading, named by its tooltip and for VoiceOver.
 private struct RandomTipCardButton: View {
     let title: LocalizedStringKey
     let systemImage: String

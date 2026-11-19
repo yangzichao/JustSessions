@@ -1,10 +1,9 @@
 import SwiftUI
 
-/// The reading toolbar's bookmark button. SwiftUI builds a menu's items with its view, not when it opens, so every title
-/// here depends only on the bookmarks; Add or remove bookmark decides its message when chosen.
+/// SwiftUI builds a menu's items with its view, not when it opens, so every title here depends only on the bookmarks;
+/// Add or remove bookmark decides its message when chosen.
 struct TranscriptBookmarkMenu: View {
     let bookmarks: [MessageBookmark]
-    /// How the reader labels the CLI's replies: `conversation.provider.rawValue`.
     let assistantName: String
     let onGoTo: (MessageBookmark) -> Void
     let onGoToAdjacent: (_ forward: Bool) -> Void
@@ -22,7 +21,6 @@ struct TranscriptBookmarkMenu: View {
                 Button {
                     onGoTo(bookmark)
                 } label: {
-                    // A label names the bookmark; without one, who wrote the message and its first words do.
                     if bookmark.label != nil {
                         Text(verbatim: menuTitle(of: bookmark))
                     } else {
@@ -45,7 +43,7 @@ struct TranscriptBookmarkMenu: View {
             Image(systemName: bookmarks.isEmpty ? "bookmark" : "bookmark.fill")
                 .frame(width: InterfaceScale.points(24), height: InterfaceScale.points(24))
         }
-        .menuStyle(.borderlessButton)  // as SessionPreviewHeader's More actions menu
+        .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
         .help("Bookmarks (⌘D, ⌘', ⇧⌘')")
@@ -61,7 +59,6 @@ struct TranscriptBookmarkMenu: View {
         .dismissesOnClickOutside(isPresented: $isConfirmingRemoveAll)
     }
 
-    /// `a · Label  #tag #tag`.
     private func menuTitle(of bookmark: MessageBookmark) -> String {
         let tags = bookmark.tags.isEmpty ? "" : "  " + MessageBookmarkDetails.typedText(of: bookmark.tags)
         return "\(bookmark.letter) · \(bookmark.menuTitle)\(tags)"

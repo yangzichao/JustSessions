@@ -5,7 +5,6 @@ extension AppThemeColors {
     static let gitHubLight = AppThemeColors(
         sidebarSurface: 0xF6F8FA,
         contentSurface: 0xFFFFFF,
-        // White like the content, as Primer's selected side-nav item is. Raised controls here also draw a hairline.
         raisedSurface: 0xFFFFFF,
         userMessageSurface: 0xF6F8FA,
         ink: 0x1F2328,

@@ -6,14 +6,10 @@ import Foundation
 /// reattaches to all belong to that session. `/clear` keeps a name chosen with `/rename`, and Claude Code writes it
 /// into the new session too, so the name comes along.
 extension ConversationStore {
-    /// Whether the tab is linked to `sessionID` afterwards. Until a refresh lists that session, the tab waits on it
-    /// (`TerminalSession.unlistedClaudeSession`) and asks its host for refreshes; see `askToList(_:for:linkedTo:now:)`.
     @discardableResult
     func followClaudeSessionSwitch(of session: TerminalSession, to sessionID: String, now: Date = .now) -> Bool {
-        // A new session's tab is linked by new session discovery instead.
         guard let linkedConversation = session.conversation else { return false }
         guard linkedConversation.sessionID != sessionID else {
-            // The CLI went back, as with `/resume` of the session the tab is linked to.
             if session.unlistedClaudeSession != nil { stopWaitingForUnlistedSession(of: session) }
             return true
         }
@@ -22,7 +18,6 @@ extension ConversationStore {
                 $0.provider == .claude && $0.host == session.host && $0.sessionID == sessionID
             })
         else {
-            // The CLI moved on again before a refresh listed the session it was in; that one's name goes too.
             if let waitedOn = session.unlistedClaudeSession, waitedOn.sessionID != sessionID {
                 stopWaitingForUnlistedSession(of: session)
             }
@@ -36,18 +31,12 @@ extension ConversationStore {
         return true
     }
 
-    /// The tab's title while it waits on a session no refresh has listed: the name given in the app to that session,
-    /// which wins as once it is listed (LIV-01), or else the name the CLI gave it. Nil while the tab waits on none, or
-    /// neither named it, and the tab shows the session it is linked to.
     func titleWhileWaitingForUnlistedSession(of session: TerminalSession) -> String? {
         guard let unlisted = session.unlistedClaudeSession else { return nil }
         let conversationID = Conversation.id(provider: .claude, sessionID: unlisted.sessionID, host: session.host)
         return titleAliases.customTitlesByConversationID[conversationID] ?? unlisted.chosenName
     }
 
-    /// The session a tab's Rename renames, which its dialog opens on: the one the tab shows (LIV-08). While the tab
-    /// waits for a refresh to list the session its CLI moved to, that one, so the name is kept for it, shows on the tab
-    /// at once, and names its row once listed, rather than renaming the row of the session the tab is still linked to.
     func conversationToRename(fromTab session: TerminalSession) -> Conversation? {
         guard let linkedConversation = session.conversation else { return nil }
         guard let unlisted = session.unlistedClaudeSession else { return linkedConversation }
@@ -67,19 +56,6 @@ extension ConversationStore {
         )
     }
 
-    /// Asks for a refresh of the tab's host that starts after the move, so it can list the session, and again until
-    /// one does (LIV-07): never while a refresh that may have read the host before the move runs, since an SSH host's
-    /// refresh drops a request then, and on this Mac a request joins any window's scan in flight. After the first
-    /// request, this Mac asks again once the session's transcript beside the linked session's has changed since, as new
-    /// session discovery does, and no sooner than a new session's tab refreshes it. An SSH host, whose files the app
-    /// can't see, is copied once more only once every window's copies of it end, as often as for a new session's tab
-    /// (SSH-66) counted from the end of the last, and, after one that didn't fail, only once the relay's title has
-    /// changed since the tab last asked: an idle tab after `/clear` writes nothing. After a few failures in a row it
-    /// waits as the auto refresh does. A host removed, disconnected (SSH-101), or waiting for Connect… in any window
-    /// isn't asked; connecting refreshes it. Nor is one `SSHHostReachability` remembers out of reach, whose copy would
-    /// fail at once without connecting, so the tab's own copies count as failures only when they tried the host;
-    /// copies other tabs or the auto refresh start meanwhile still count. Each move starts over: the first request for a
-    /// new session goes as soon as nothing that may have read the host before the move runs.
     private func askToList(
         _ unlisted: inout UnlistedClaudeSession,
         for session: TerminalSession,
@@ -106,7 +82,6 @@ extension ConversationStore {
                 !windows.contains(where: { $0.hostRefreshStatuses[session.host] == .refreshing })
             else { return }
             let copies = RemoteHostCopies.combined(windows.map { $0.remoteHostCopies.copies(of: destination) })
-            // A copy that started after the move ended without listing the session.
             if let startedAt = copies.lastStartedAt, startedAt >= unlisted.movedAt, let endedAt = copies.lastEndedAt {
                 guard now.timeIntervalSince(endedAt) >= Self.waitBeforeCopyingAgainForUnlistedSession(after: copies)
                 else { return }
@@ -118,8 +93,6 @@ extension ConversationStore {
         }
     }
 
-    /// How many failed copies in a row a waiting tab tries again after 10 seconds before it waits as the auto refresh
-    /// does after so many failures.
     static let failedCopiesBeforeWaitingLonger = 3
 
     static func waitBeforeCopyingAgainForUnlistedSession(after copies: RemoteHostCopies.Copies) -> TimeInterval {
@@ -129,7 +102,6 @@ extension ConversationStore {
         return HostAutoRefreshSchedule.wait(afterFailuresInARow: copies.failuresInARow - failedCopiesBeforeWaitingLonger + 1)
     }
 
-    /// The tab shows the session it is linked to again.
     func stopWaitingForUnlistedSession(of session: TerminalSession) {
         session.unlistedClaudeSession = nil
         guard let linkedConversation = session.conversation,

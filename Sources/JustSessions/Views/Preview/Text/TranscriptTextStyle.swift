@@ -1,7 +1,5 @@
 import AppKit
 
-/// How one transcript text block is set. Conversation text follows the reading text size; code, headings, tool
-/// summaries, and notes derive their own sizes from it or use a fixed size.
 struct TranscriptTextStyle: Equatable {
     var fontSize: CGFloat
     var isMonospaced = false
@@ -15,12 +13,8 @@ struct TranscriptTextStyle: Equatable {
     }
 }
 
-/// Which of the reader's text colors a block is drawn in.
 enum TranscriptTextTone: Equatable {
-    /// Messages, which SwiftUI drew in its default primary color before the reader drew text with AppKit.
     case primary
-    /// Tool call summaries.
     case secondary
-    /// Notes, such as a compaction.
     case tertiary
 }

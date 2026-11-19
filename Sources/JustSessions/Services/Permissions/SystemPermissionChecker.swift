@@ -1,6 +1,5 @@
 import UserNotifications
 
-/// Reads each permission's status from macOS without asking for it, so a check never shows a prompt.
 struct SystemPermissionChecker: Sendable {
     var fullDiskAccessProbe = FullDiskAccessProbe()
     var accessibilityTrustProbe = AccessibilityTrustProbe()

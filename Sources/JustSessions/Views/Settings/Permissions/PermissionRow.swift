@@ -1,11 +1,8 @@
 import SwiftUI
 
-/// One permission: its name, on-demand explanation, status, and the button that changes it.
 struct PermissionRow: View {
     let permission: AppPermission
-    /// Nil until the first check finishes.
     let status: AppPermissionStatus?
-    /// Shows macOS's notification prompt, which only notifications offer before macOS has asked.
     let onAskForNotifications: () -> Void
 
     var body: some View {

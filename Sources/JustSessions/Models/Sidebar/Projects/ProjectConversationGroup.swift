@@ -3,13 +3,9 @@ import Foundation
 struct ProjectConversationGroup: Identifiable {
     let projectPath: String
     let displayName: String
-    /// The project's place among the pinned projects, which sets its order among them; nil when it is not pinned.
     let pinnedPlace: Int?
     let conversations: [Conversation]
-    /// Newest first; listed below pinned sessions and above the other sessions.
     let pendingNewSessions: [PendingNewSession]
-    /// Pinned sessions come first, so the newest one is not necessarily `conversations.first`. Stored, not worked
-    /// out on each read: `orderedForSidebar` reads it on every comparison of a sort that runs on every render.
     let latestActivity: Date
 
     init(
@@ -70,8 +66,6 @@ struct ProjectConversationGroup: Identifiable {
         return orderedForSidebar(projects)
     }
 
-    /// Pinned projects first, in the order you put them, which activity never changes; then the rest, most recently
-    /// active first.
     static func orderedForSidebar(_ projects: [ProjectConversationGroup]) -> [ProjectConversationGroup] {
         projects.sorted { first, second in
             switch (first.pinnedPlace, second.pinnedPlace) {

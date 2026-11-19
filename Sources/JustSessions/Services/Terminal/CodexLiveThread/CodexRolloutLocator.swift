@@ -1,8 +1,6 @@
 import Foundation
 
-/// Finds the rollout file of a Codex thread from the start of its id, as a Codex terminal title shows it; see
-/// `CodexThreadTitle`. Codex files each rollout under the day the thread started,
-/// `sessions/YYYY/MM/DD/rollout-<time>-<id>.jsonl`.
+/// Codex files each rollout under the day the thread started, `sessions/YYYY/MM/DD/rollout-<time>-<id>.jsonl`.
 struct CodexRolloutLocator: Sendable {
     let sessionsDirectory: URL
     var calendar = Calendar.current
@@ -11,9 +9,6 @@ struct CodexRolloutLocator: Sendable {
         self.sessionsDirectory = codexDirectory.appendingPathComponent("sessions")
     }
 
-    /// The full id of the thread, once its rollout file opens with a complete `session_meta` line. Looks back day by
-    /// day from the newest to the day before `earliestStart`, since a refresh that started then listed the threads
-    /// already saved; with no `earliestStart`, through every day.
     func sessionID(forThreadIDPrefix threadIDPrefix: String, startedOnOrAfter earliestStart: Date?) -> String? {
         let earliestDay =
             earliestStart
@@ -34,7 +29,6 @@ struct CodexRolloutLocator: Sendable {
         return nil
     }
 
-    /// Days are `[year, month, day]`.
     private func dayDirectoriesNewestFirst(notBefore earliestDay: [Int]) -> [URL] {
         var dayDirectories: [(day: [Int], directory: URL)] = []
         for (year, yearDirectory) in numberedSubdirectories(of: sessionsDirectory) where year >= earliestDay[0] {

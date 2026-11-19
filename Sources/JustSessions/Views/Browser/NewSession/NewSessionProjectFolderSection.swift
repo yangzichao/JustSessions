@@ -1,13 +1,9 @@
 import SwiftUI
 
-/// The New session sheet's folder: typed, chosen with Browse… on this Mac, or picked from the host's recent projects.
-/// After the host reports the typed folder missing, it says so until the path or host changes.
 struct NewSessionProjectFolderSection: View {
     @Binding var projectPath: String
     let host: SessionHost
-    /// The host's projects, most recent first.
     let recentProjects: [ProjectConversationGroup]
-    /// The missing folder, as typed, while the sheet offers to create it.
     let missingFolder: String?
 
     var body: some View {

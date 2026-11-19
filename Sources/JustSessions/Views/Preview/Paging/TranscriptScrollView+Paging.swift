@@ -34,7 +34,6 @@ extension TranscriptScrollView {
             keepingPages: retainedPageCount(afterLoading: .later))
     }
 
-    /// Keeps the pages the reader is near, so the one that loads does not push out a page it would load straight back.
     private func retainedPageCount(afterLoading direction: TranscriptPagingViewport.Direction) -> Int {
         guard let paging, let viewport = positionController.pagingViewport else { return TranscriptPagingModel.maximumPageCount }
         let pageStarts = paging.pages.map { page in
@@ -58,13 +57,11 @@ extension TranscriptScrollView {
     func restorePagedPosition(using scrollProxy: ScrollViewProxy) {
         guard let paging else { return }
         restoredPagingRevision = paging.revision
-        // Old indexes and snapshots must not keep pages alive after eviction, even while Find is closed.
         searchIndex = nil
         indexedTranscript = nil
         positionController.tracksTranscriptBottom = !paging.hasLater
         let position = paging.restorationPosition
         if let index = position.entryIndex, positionController.documentMinY(ofEntryAt: index) == nil {
-            // The entry is new, as after going to the first message: SwiftUI brings its row into view first.
             positionController.restore(position)
             scrollProxy.scrollTo(index, anchor: .top)
         } else {

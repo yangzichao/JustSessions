@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// One finding in Check this host…'s report: what was checked and what it found, what the host printed, and the
-/// command to run in your own Terminal, which fails there the same way when the problem is on the host. A finding that
-/// passed shows only what it found; Copy report keeps the rest.
 struct HostCheckFindingRow: View {
     let finding: HostCheckFinding
     let host: String

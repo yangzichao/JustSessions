@@ -1,8 +1,5 @@
 import Foundation
 
-/// The sessions and projects the sidebar lists, before the browser's tool, recency, and search filters. The sidebar
-/// asks for them on every store change, such as a CLI's status changing, and grouping a few thousand sessions takes
-/// milliseconds, so the store keeps them until one of `Inputs` changes.
 struct SidebarProjection {
     struct Inputs: Equatable {
         let conversationsRevision: Int
@@ -15,9 +12,7 @@ struct SidebarProjection {
     }
 
     let inputs: Inputs
-    /// The listed hosts' sessions, leaving out projects removed from the sidebar and the sessions of hidden CLIs.
     let conversations: [Conversation]
-    /// Includes saved empty projects, but not a project whose only sessions are hidden CLIs'.
     let projectGroups: [ProjectConversationGroup]
 
     init(inputs: Inputs, conversations allConversations: [Conversation]) {
@@ -32,8 +27,6 @@ struct SidebarProjection {
             hiddenProviders.isEmpty
             ? listedHostConversations
             : listedHostConversations.filter { !hiddenProviders.hides($0.provider) }
-        // Every project with sessions is remembered (`rememberSidebarProjects`), so one only hidden CLIs worked in
-        // would otherwise stay as an empty project.
         let projectPathsOnlyHiddenCLIsUse =
             hiddenProviders.isEmpty
             ? []

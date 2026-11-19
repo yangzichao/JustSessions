@@ -1,9 +1,7 @@
 import SwiftUI
 
-/// Shown at the bottom of the sidebar while several rows of Open tabs are selected.
 struct SidebarOpenTabSelectionActionBar: View {
     let selectedCount: Int
-    /// Asks once for them all, as Close all tabs in group… does.
     let onClose: () -> Void
 
     var body: some View {

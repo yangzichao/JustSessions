@@ -1,11 +1,6 @@
 import Foundation
 
-/// Moves a session's tab here from the other window that has it. That tab closes and leaves its CLI running in tmux,
-/// and a tab here reattaches to it, the way resuming does after a tab closes. A CLI that does not run in tmux would end
-/// with that tab, so its tab stays where it is.
 extension ConversationStore {
-    /// Whether the session's tab in another window can move here: it has not started its CLI yet, or its CLI runs in
-    /// the tmux session named after the session, which resuming here attaches to.
     func canMoveTerminalHere(for conversation: Conversation) -> Bool {
         guard isCurrentHostLifecycle(hostLifecycleGeneration(on: conversation.host), on: conversation.host),
             runningTerminal(for: conversation) == nil, canLaunch(conversation, action: .resume),
@@ -15,8 +10,6 @@ extension ConversationStore {
             || (tab.canKeepCLIRunningAfterClose && tab.tmuxSessionName == TmuxSessionName.forConversation(conversation))
     }
 
-    /// Over SSH, the host first confirms that its tmux runs the CLI: an SSH tab names a tmux session even on a host
-    /// without tmux, where its CLI runs directly.
     func moveTerminalHere(for conversation: Conversation, remoteRunner: RemoteHostCommandRunner = RemoteHostCommandRunner()) {
         guard canMoveTerminalHere(for: conversation),
             let (otherStore, tab) = otherWindowRunningTerminal(for: conversation)
@@ -29,7 +22,6 @@ extension ConversationStore {
         }
         let destinationLifecycle = hostLifecycleGeneration(on: conversation.host)
         let sourceLifecycle = otherStore.hostLifecycleGeneration(on: conversation.host)
-        // After that window's own tmux commands for the host, such as the rename that gave the session this name.
         otherStore.tmuxCommandQueues.run(on: tab.host) { [weak self, weak otherStore] in
             let runsInTmux =
                 remoteRunner.run(destination, RemoteTmuxCommands.hasSessionCommand(tmuxSessionName, on: destination), 30)?.exitStatus == 0
@@ -51,12 +43,8 @@ extension ConversationStore {
         }
     }
 
-    /// The tab may have closed or ended in its window while the host answered. Resuming here then reattaches to the
-    /// CLI or starts it, as it does for any session. The tab here is drawn by the engine the moved tab had, as a
-    /// reconnected SSH tab is, since it is the same tab in another window.
     private func finishMovingTerminal(_ tab: TerminalSession, from otherStore: ConversationStore, for conversation: Conversation) {
         if !tab.hasExited, otherStore.terminalSessions.contains(where: { $0.id == tab.id }) {
-            // The tab moved rather than closed, so Reopen Closed Tab there doesn't bring it back.
             otherStore.closingTabsWithoutRemembering {
                 otherStore.closeTerminal(tab.id, endingTmuxSession: false)
             }

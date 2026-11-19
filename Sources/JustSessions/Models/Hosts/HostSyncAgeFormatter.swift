@@ -1,7 +1,5 @@
 import Foundation
 
-/// How long ago an SSH host's sessions were last copied, for its sidebar heading: "synced just now",
-/// "synced 5m ago", and after a week a date such as "synced Sep 3".
 enum HostSyncAgeFormatter {
     static func string(
         forSyncedAt syncDate: Date,

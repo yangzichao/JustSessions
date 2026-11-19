@@ -7,7 +7,6 @@ extension TranscriptScrollView {
         let transcript: TranscriptContent
     }
 
-    /// Parsing and matching happen off the main actor; cancelled queries never replace newer results.
     func updateSearch() async {
         guard isActive, searchState.isPresented, !searchState.query.isEmpty else {
             searchState.update(matches: [], preservingSelection: false)
@@ -35,7 +34,6 @@ extension TranscriptScrollView {
             indexedQuery = query
             searchState.update(matches: matches, preservingSelection: preservingSelection)
         } catch is CancellationError {
-            // A newer query or conversation superseded this search.
         } catch {
             searchState.update(matches: [], preservingSelection: false)
         }

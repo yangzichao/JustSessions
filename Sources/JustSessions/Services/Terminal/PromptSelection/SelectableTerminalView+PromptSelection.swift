@@ -1,8 +1,6 @@
 import AppKit
 import SwiftTerm
 
-/// See `TerminalPromptSelection`. ⌘A reaches the terminal in `performKeyEquivalent`, before the Edit menu's Select All
-/// (see `SelectableTerminalView+EditingKeys`), and the menus' Copy and Paste come to `SelectableTerminalView`'s own.
 extension SelectableTerminalView: PromptSelectableTerminal {
     /// SwiftTerm's screen as it shows it; nil while scrolled back from the bottom. The second cell of a wide character
     /// is left out, and a cell nothing was written to reads as a space, as in Ghostty.

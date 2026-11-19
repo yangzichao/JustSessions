@@ -14,8 +14,6 @@ extension GhosttyTabTerminalView {
         else { return nil }
         let point = convert(event.locationInWindow, from: nil)
         guard bounds.contains(point) else { return nil }
-        // Ghostty lays the text out from the view's top left corner, with no padding, in cells of whole pixels at the
-        // window's scale.
         let scale = window?.backingScaleFactor ?? 1
         let column = Int(point.x * scale) / Int(gridMetrics.cellWidthPixels)
         let row = Int((bounds.height - point.y) * scale) / Int(gridMetrics.cellHeightPixels)
@@ -28,8 +26,6 @@ extension GhosttyTabTerminalView {
     }
 }
 
-/// Ghostty reports its grid here each time it lays the text out, with the cell size a click's cell is found by. The
-/// in-memory session's viewport, which the pseudo-terminal gets, leaves the cell size out.
 extension GhosttyTabTerminalView: TerminalSurfaceGridResizeDelegate {
     func terminalDidResize(_ size: TerminalGridMetrics) {
         gridMetrics = size

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// At the top of the project list while a search reads sessions it has not read before, or since they changed.
 struct SidebarMessageSearchProgress: View {
     @ObservedObject var indexer: SessionMessageIndexer
 

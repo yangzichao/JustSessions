@@ -3,7 +3,6 @@ import Carbon.HIToolbox
 import SwiftUI
 
 /// Control-Tab can be consumed by AppKit focus traversal or a CLI's keyboard protocol before menu commands.
-/// Handle only those two aliases, and only in this workspace's window while no sheet or close dialog is open.
 struct WorkspaceTabCycleShortcuts: NSViewRepresentable {
     let isEnabled: Bool
     let onSelectAdjacentTab: (_ movingForward: Bool) -> Void
@@ -46,7 +45,6 @@ final class WorkspaceTabCycleShortcutView: NSView {
         eventMonitor = nil
     }
 
-    /// Ignore Caps Lock and Fn, which do not change the intended shortcut.
     static func cycleDirection(for event: NSEvent) -> Bool? {
         guard event.type == .keyDown, event.keyCode == UInt16(kVK_Tab) else { return nil }
         let modifiers = event.modifierFlags.intersection([.command, .control, .option, .shift])

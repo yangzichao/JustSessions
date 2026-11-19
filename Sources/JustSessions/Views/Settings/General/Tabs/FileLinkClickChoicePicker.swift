@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// What ⌘-clicking a link to a file on this Mac does; see `FileLinkClickChoice`. The editors are the installed ones
-/// "Open in" lists. A chosen editor that has since been removed shows as the default app, which is where such a file
-/// then opens.
 struct FileLinkClickChoicePicker: View {
     @ObservedObject var fileLinkClickSettingsStore: FileLinkClickSettingsStore
     @ObservedObject var editorStore: ExternalEditorStore

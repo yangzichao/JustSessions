@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// After an SSH host's name when its last refresh needed a login: Connect… logs in, asking for the password or code
-/// in a sheet. While it logs in, a spinner takes its place. Its tooltip says why the refresh failed.
 struct SidebarHostConnectButton: View {
     let host: SessionHost
     let isLoggingIn: Bool

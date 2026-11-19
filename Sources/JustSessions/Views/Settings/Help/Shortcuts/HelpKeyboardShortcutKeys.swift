@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A shortcut's keys, each as a key cap. A slash separates alternatives.
 struct HelpKeyboardShortcutKeys: View {
     let keys: [Text]
 

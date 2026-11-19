@@ -10,7 +10,6 @@ import CoreText
 enum TerminalSymbolsFont {
     static let postScriptName = "SymbolsNFM"
     static let familyName = "Symbols Nerd Font Mono"
-    /// The symbols-only families, which the font picker leaves out: they have icons but no letters.
     static let familyNames: Set<String> = [familyName, "Symbols Nerd Font"]
 
     /// The font, falling back to the symbols font for icons. SwiftTerm derives its bold and italic fonts from it, and
@@ -22,8 +21,6 @@ enum TerminalSymbolsFont {
         return NSFont(descriptor: descriptor, size: font.pointSize) ?? font
     }
 
-    /// Registers the bundled font for this process, once, and returns whether the symbols font is available. A copy
-    /// installed on the Mac has the same name and draws the same icons, so either one serves.
     @discardableResult
     static func register() -> Bool { isAvailable }
 
@@ -36,7 +33,6 @@ enum TerminalSymbolsFont {
         return NSFont(name: postScriptName, size: NSFont.systemFontSize) != nil
     }()
 
-    /// The Private Use Areas, where Nerd Fonts put their icons.
     static let privateUseAreas: CharacterSet = {
         var characters = CharacterSet(charactersIn: "\u{E000}"..."\u{F8FF}")
         characters.insert(charactersIn: "\u{F0000}"..."\u{FFFFD}")

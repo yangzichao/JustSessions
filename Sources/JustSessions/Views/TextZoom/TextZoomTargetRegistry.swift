@@ -1,6 +1,5 @@
 import AppKit
 
-/// What View → Zoom In, Zoom Out, and Actual Size size, read from AppKit's key and main windows when one is chosen.
 /// A SwiftUI focused value can be missing when the menu command runs, as while no scene has focus, and the shortcut
 /// would then do nothing.
 @MainActor

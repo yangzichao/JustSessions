@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Stands in for a host's projects when it lists none, saying why.
 struct SidebarEmptyHostNote: View {
     @Environment(\.locale) private var locale
     let message: SidebarEmptyHostMessage

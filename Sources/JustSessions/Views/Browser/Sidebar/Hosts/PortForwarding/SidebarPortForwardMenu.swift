@@ -1,8 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// One port forward in its SSH host's menu, `localhost:<port on this Mac> → <port on the host>`, with what can be done
-/// with it. One that isn't working says why, with a warning sign.
 struct SidebarPortForwardMenu: View {
     let entry: SSHPortForwards.Entry
     let onTryAgain: () -> Void

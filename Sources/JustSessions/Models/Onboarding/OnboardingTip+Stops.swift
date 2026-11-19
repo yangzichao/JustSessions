@@ -1,6 +1,4 @@
 extension OnboardingTip {
-    /// The tips whose moment has come in `context`, among `tipsToShow`, each with the stops it shows. None while the
-    /// tour is still to show, so it comes first.
     static func due(
         in context: OnboardingWindowContext,
         among tipsToShow: Set<OnboardingTip>
@@ -12,14 +10,12 @@ extension OnboardingTip {
         }
     }
 
-    /// The stops this tip shows in `context`; none until its moment. The tour starts at the first launch instead.
     private func stops(in context: OnboardingWindowContext, among tipsToShow: Set<OnboardingTip>) -> [OnboardingTourStop] {
         let stops: [OnboardingTourStop]
         switch self {
         case .tour:
             return []
         case .readingSession:
-            // Its first stop points at Resume, so it waits for a session that can resume.
             guard context.canResumeReadSession else { return [] }
             stops = [.resume, .findInConversation]
         case .browsingSessions:

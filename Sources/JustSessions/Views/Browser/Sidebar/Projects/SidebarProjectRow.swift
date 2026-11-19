@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Project selection and disclosure have separate controls so expanding a project preserves a multi-selection.
 struct SidebarProjectRow: View {
     let store: ConversationStore
     let project: ProjectConversationGroup
@@ -17,7 +16,6 @@ struct SidebarProjectRow: View {
     let onRemoveSelectedProjectsAndDeleteSessions: () -> Void
 
     @State private var isHovered = false
-    /// Holds the pointer-over state for a test; nil follows `onHover` as in use.
     var isHoveredForTests: Bool? = nil
     private var hovered: Bool { isHoveredForTests ?? isHovered }
 
@@ -75,7 +73,6 @@ struct SidebarProjectRow: View {
         .contextMenu { menuItems }
     }
 
-    /// The same items whether the menu comes from a right-click or the ⋯ button.
     @ViewBuilder
     private var menuItems: some View {
         if isSelected && projectSelection.hasMultipleSelected {
@@ -99,7 +96,7 @@ struct SidebarProjectRow: View {
 
     /// The session count gives way to the ⋯ and + menus while the pointer is over the row. The menus are in the view
     /// tree only then: each is an AppKit pop-up button underneath, and one per row for every row re-laid out on
-    /// every change costs more than the rows themselves; see item 20 in docs/development/performance.md. Their room
+    /// every change costs more than the rows themselves; see item 21 in docs/development/performance.md. Their room
     /// is kept while they are not, so nothing in the row moves as the pointer passes over it.
     private var sessionCountOrHoverActions: some View {
         ZStack(alignment: .trailing) {

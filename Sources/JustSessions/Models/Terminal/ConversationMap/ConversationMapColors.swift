@@ -1,7 +1,3 @@
-/// The conversation map's colors as 0xRRGGBB values, all opaque (DNR-13). They are worked out from the terminal's
-/// palette, not the app theme's roles, because the terminal can be dark in a light window (TabBarTerminalPalette.swift),
-/// as `splitPaneOutlineColor` is: your messages, the CLI's replies, and chips keep 3:1 on the terminal's background,
-/// letters and captions 4.5:1. Tool runs stay faint marks (TAB-10), at least 1.6:1 so they never fade out.
 struct ConversationMapColors: Equatable {
     let background, hairline, user, reply, tool, hoverBand, chip, chipText, caption: UInt32
 

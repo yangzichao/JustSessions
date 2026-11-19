@@ -4,52 +4,34 @@ import Combine
 import GhosttyTerminal
 import SwiftTerm
 
-/// A tab's terminal drawn by Ghostty. The app runs the tab's process on a pseudo-terminal of its own, as it does for
-/// SwiftTerm's, and hands Ghostty the output; Ghostty hands back what you type and the size it lays the text out at.
-/// Ghostty's colors and font come from its controller's configuration; see `GhosttyTerminalControllers`.
 final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
     /// For a tab whose CLI runs in tmux, on this Mac or an SSH host; see `SelectableTerminalView.cliRunsInTmux`. Ghostty
     /// would send Shift-Return as `CSI 27 ; 2 ; 13 ~`, so the tab sends CSI u itself, and Control keys as
     /// `GhosttyTabTerminalView+ControlKeys` does.
     var cliRunsInTmux = false
     var onBackgroundColorChange: (() -> Void)?
-    /// See `SelectableTerminalView.onUnheardLightDarkChange`.
     var onUnheardLightDarkChange: (() -> Void)?
     var onFocus: (() -> Void)?
-    /// Builds the menu a right-click shows in place of Ghostty's own; see `GhosttyTabTerminalView+ContextMenu`.
     var makeContextMenu: ((_ linkUnderPointer: String?) -> NSMenu)?
     /// Shows that menu: AppKit's pop-up, which a test replaces, since a menu shown in a test run ends the run.
     var popUpContextMenu: (NSMenu, NSEvent, NSView) -> Void = NSMenu.popUpContextMenu(_:with:for:)
-    /// See `TabTerminalView.onOpenLink` and `GhosttyTabTerminalView+Links`.
     var onOpenLink: ((String) -> Void)?
-    /// The link Ghostty last reported under the pointer, which it does only while ⌘ is held; see `link(under:)`.
     var hoveredLink: String?
-    /// The link a CLI broke over rows under a ⌘-click being released, until the click opens it; see `mouseUp(with:)`.
     var pendingHardWrappedLink: HardWrappedLink?
-    /// The terminal takes files dropped on it; see `GhosttyTabTerminalView+FileDrop`.
     var acceptsDroppedFiles = false {
         didSet {
             guard acceptsDroppedFiles != oldValue else { return }
             if acceptsDroppedFiles { registerForDraggedTypes([.fileURL]) } else { unregisterDraggedTypes() }
         }
     }
-    /// See `TabTerminalView.copyDroppedFilesToHost`.
     var copyDroppedFilesToHost: ((_ fileURLs: [URL]) -> Bool)?
-    /// See `GhosttyTabTerminalView+ImagePaste`.
     let imagePaste = TerminalImagePaste()
-    /// ⌘A's selection of the CLI's prompt; see `GhosttyTabTerminalView+PromptSelection`.
     lazy var promptSelection = TerminalPromptSelection(terminal: self)
     private(set) var marginColor = NSColor.textBackgroundColor
-    /// The width a SwiftTerm terminal keeps free for its scroller, which Ghostty doesn't draw, so text lines up the
-    /// same in both.
     var trailingMarginWidth: CGFloat { NSScroller.scrollerWidth(for: .regular, scrollerStyle: .overlay) }
-    /// Where the process's output goes to Ghostty, and what Ghostty's screen shows.
     let inMemorySession: InMemoryTerminalSession
-    /// Ghostty's surface while it has one, which holds the selection.
     private(set) weak var terminalSurface: TerminalSurface?
 
-    /// Where `LocalProcess` hands over the process's output and exit. Off the main thread, so the reading can wait
-    /// for Ghostty to catch up; see `GhosttyOutputBackpressure`.
     private let processQueue = DispatchQueue(label: "JustSessions.GhosttyTabTerminalView.process")
     private let processDelegate: GhosttyProcessDelegate
     private lazy var process = LocalProcess(delegate: processDelegate, dispatchQueue: processQueue)
@@ -60,29 +42,20 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         return coalescer
     }()
     private weak var processObserver: TerminalProcessObserver?
-    /// The grid Ghostty last laid the text out at, which the pseudo-terminal reports to the process.
     private(set) var viewport: InMemoryTerminalViewport?
-    /// The same grid with its cells' size, as Ghostty last reported it to the view; see
-    /// `GhosttyTabTerminalView+HardWrappedLinks`.
     var gridMetrics: TerminalGridMetrics?
     private(set) var appearancePreferences = TerminalAppearancePreferences()
     private var theme = ResolvedAppTheme(.justSessions)
     private var appearanceSubscription: AnyCancellable?
-    /// The colors the terminal last took on, so a theme report goes out only when they change.
     private(set) var appliedPalette: TerminalPalette?
     private var themeReporting = TerminalThemeReporting()
-    /// The report owed after a background query that Ghostty has been handed but not answered yet; see
-    /// `sendToProcess(_:)`.
     private var themeReportAfterBackgroundAnswer: String?
-    /// The screen, keyboard, and paste modes the process's output last set, for Page Up and Page Down and for an
-    /// image pasted on a tab on this Mac.
     private(set) var outputModeScanner = TerminalOutputModeScanner()
 
     override convenience init(frame: NSRect) {
         self.init(frame: frame, appearanceStore: .shared, themeStore: .shared)
     }
 
-    /// The output limits are `GhosttyOutputBackpressure`'s; a test can make them small.
     init(
         frame: NSRect,
         appearanceStore: TerminalAppearanceStore,
@@ -136,18 +109,12 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
 
     var processID: Int32 { process.shellPid }
 
-    /// Closing a tab whose process still runs. The reading stops first: a read waiting for room on `processQueue`
-    /// waits for the main thread, which would wait for it here forever.
     func terminate() {
         outputBackpressure.stop()
-        // On the queue `LocalProcess` reports the exit on, so the two never run at once.
         let process = process
         processQueue.sync { process.terminate() }
     }
 
-    /// A tab whose process already ended goes away without `terminate()` (see `TerminalSession.close()`), while a
-    /// job the process left behind may still be writing. A read waiting for room then stops waiting rather than wait
-    /// for a terminal that is gone.
     deinit {
         outputBackpressure.stop()
     }
@@ -157,7 +124,6 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
     }
 
     override func setFrameSize(_ newSize: NSSize) {
-        // Output that arrived at the old size is parsed at it before Ghostty lays the text out again.
         outputCoalescer.flush()
         if newSize != frame.size { promptSelection.cancel() }
         super.setFrameSize(newSize)
@@ -169,9 +135,6 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         super.mouseDown(with: eventFindingLinks(event))
     }
 
-    /// The pointer's moves and the left button go to Ghostty so that a ⌘-click finds links as in a SwiftTerm tab; see
-    /// `eventFindingLinks(_:)`. Ghostty reports the link it found from within the release, and a link a CLI broke over
-    /// rows opens whole; see `GhosttyTabTerminalView+HardWrappedLinks`.
     override func mouseUp(with event: NSEvent) {
         pendingHardWrappedLink = event.modifierFlags.contains(.command) ? hardWrappedLink(under: event) : nil
         super.mouseUp(with: eventFindingLinks(event))
@@ -197,10 +160,6 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         super.keyDown(with: event)
     }
 
-    /// As in a SwiftTerm tab while the program hasn't turned on the kitty keyboard protocol: on the main screen the
-    /// key scrolls the scrollback a page and sends nothing; on the alternate screen it sends the key, without Shift.
-    /// Ghostty would always send it, with Shift when held. Under the kitty protocol a SwiftTerm tab sends the key,
-    /// encoded under it, on either screen, so then this tab leaves the key to Ghostty, which also sends it encoded.
     private func pressPageKey(_ pageKey: PageKey) {
         if outputModeScanner.isOnAlternateScreen {
             sendAsTyped(pageKey.sequence)
@@ -231,10 +190,6 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         updateMarginColor()
     }
 
-    /// What Ghostty sends the process: typing, pastes, and its replies to the process's requests. A theme report owed
-    /// after a background query follows Ghostty's answer to it, as in a SwiftTerm tab, which reports once it has read
-    /// the query and answered it. Ghostty answers on its IO thread, after `consumeOutput` handed it the query, so the
-    /// report waits here for the answer rather than going out from `consumeOutput` ahead of it.
     private func sendToProcess(_ data: Data) {
         let bytes = Array(GhosttyThemeReportFilter.removingThemeReports(from: data))
         guard !bytes.isEmpty else { return }
@@ -250,13 +205,10 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         if answerEnd < bytes.endIndex { process.send(data: bytes[answerEnd...]) }
     }
 
-    /// Hands output to Ghostty and answers the theme report requests in it, which the tab answers instead of Ghostty.
-    /// A report owed after a background query waits for Ghostty's answer; see `sendToProcess(_:)`.
     private func consumeOutput(_ bytes: ArraySlice<UInt8>) {
         let owedReportAfterBackgroundQuery = themeReporting.reportsAfterNextBackgroundQuery
         var themeReports = themeReporting.reports(answering: bytes, isDark: appliedPalette?.isDark ?? false)
         if owedReportAfterBackgroundQuery, !themeReporting.reportsAfterNextBackgroundQuery {
-            // The query was in this output. Every report from one call is the same, so any of them can be the owed one.
             themeReportAfterBackgroundAnswer = themeReports.popLast()
         }
         outputModeScanner.scan(bytes)
@@ -268,22 +220,18 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
 
     var reportsThemeAfterNextBackgroundQuery: Bool { themeReporting.reportsAfterNextBackgroundQuery }
 
-    /// The process's output last switched to the alternate screen, where a full-screen program draws.
     var isOnAlternateScreen: Bool { outputModeScanner.isOnAlternateScreen }
 
-    /// The process's output last turned bracketed paste on, so the process can tell a paste from typing.
     var isBracketedPasteOn: Bool { outputModeScanner.isBracketedPasteOn }
 
     func reportThemeAfterNextBackgroundQuery() {
         themeReporting.reportAfterNextBackgroundQuery()
     }
 
-    /// Leaves a report already waiting for Ghostty's answer to go out, as a SwiftTerm tab would have sent it already.
     func cancelThemeReportAfterNextBackgroundQuery() {
         themeReporting.cancelReportAfterNextBackgroundQuery()
     }
 
-    /// Goes straight to the process, unlike typing, which would scroll Ghostty to the bottom.
     private func sendTerminalReport(_ report: String) {
         process.send(data: Array(report.utf8)[...])
     }
@@ -292,7 +240,6 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         outputCoalescer.receive(bytes[...])
     }
 
-    /// The process's output stays on screen, as in a SwiftTerm tab; the tab's bar says the CLI ended.
     fileprivate func reportProcessExit(rawWaitStatus: Int32?) {
         outputCoalescer.flush()
         processObserver?.processEnded(rawWaitStatus: rawWaitStatus)
@@ -305,7 +252,6 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         _ = PseudoTerminalHelpers.setWinSize(masterPtyDescriptor: process.childfd, windowSize: &size)
     }
 
-    /// The size the pseudo-terminal reports to the process: Ghostty's grid, or an estimate before Ghostty lays out text.
     var processWindowSize: winsize {
         viewport.map(Self.windowSize(of:)) ?? estimatedWindowSize
     }
@@ -352,8 +298,6 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         }
     }
 
-    /// The background Ghostty draws with the same settings, which the controller's configuration gives it, and a
-    /// theme report when those colors change.
     private func updateMarginColor() {
         let preferences = appearancePreferences.validated
         let usesDarkColors = preferences.mode.usesDarkColors(effectiveAppearance: effectiveAppearance)
@@ -399,8 +343,6 @@ private final class GhosttyProcessDelegate: LocalProcessDelegate, @unchecked Sen
         self.outputBackpressure = outputBackpressure
     }
 
-    /// Waits while too much output is unparsed, which pauses reading the pseudo-terminal, then hands the output to
-    /// the main thread.
     func dataReceived(slice: ArraySlice<UInt8>) {
         outputBackpressure.waitForRoom()
         let bytes = Array(slice)
@@ -410,7 +352,6 @@ private final class GhosttyProcessDelegate: LocalProcessDelegate, @unchecked Sen
         }
     }
 
-    /// Goes to the main thread the way output does, from the same queue, so it comes after the output read before it.
     func processTerminated(_ source: LocalProcess, exitCode: Int32?) {
         DispatchQueue.main.async {
             MainActor.assumeIsolated { self.view?.reportProcessExit(rawWaitStatus: exitCode) }
@@ -425,7 +366,6 @@ private final class GhosttyProcessDelegate: LocalProcessDelegate, @unchecked Sen
     }
 }
 
-/// Page Up or Page Down, also as Fn-↑ or Fn-↓, alone or with Shift.
 private enum PageKey {
     case up
     case down
@@ -454,8 +394,6 @@ private enum PageKey {
     }
 }
 
-/// Lets Ghostty's IO-thread callbacks, which the session holds from before the view exists, reach the view. Only
-/// read and written on the main thread.
 private final class MainThreadCallbackTarget: @unchecked Sendable {
     weak var view: GhosttyTabTerminalView?
 }

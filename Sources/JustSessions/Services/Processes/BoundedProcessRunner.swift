@@ -1,11 +1,9 @@
 import Darwin
 import Foundation
 
-/// Runs a short-lived helper process and returns what it printed, giving up after a timeout.
 /// Output goes to a temporary file instead of a pipe: a pipe can fill up and stall the process,
 /// or stay open forever when the process leaves a child behind.
 enum BoundedProcessRunner {
-    /// Returns the output whatever the exit status, or nil when the process could not start or timed out.
     static func output(
         ofExecutable executablePath: String,
         arguments: [String],
@@ -26,7 +24,6 @@ enum BoundedProcessRunner {
         )?.output
     }
 
-    /// The exit status and output, or nil when the process could not start or timed out.
     static func result(
         ofExecutable executablePath: String,
         arguments: [String],
@@ -50,8 +47,6 @@ enum BoundedProcessRunner {
         return (exitStatus, outcome.output)
     }
 
-    /// The exit status and output, or what the process printed before it was stopped at the timeout, with no exit
-    /// status. Nil when the process could not start.
     static func outcome(
         ofExecutable executablePath: String,
         arguments: [String],
@@ -87,15 +82,11 @@ enum BoundedProcessRunner {
         let ownsProcessGroup = getpgid(processID) == processID
         let stopped = !waitForExit(finished, timeout: timeout, cancelsWithTask: cancelsWithTask)
         if stopped {
-            // Foundation starts a Process in its own process group. Verify ownership before addressing the group:
-            // a timed-out shell wrapper can otherwise leave children still deleting files after we report failure.
             if ownsProcessGroup {
                 kill(-processID, SIGKILL)
             } else if process.isRunning {
                 kill(processID, SIGKILL)
             }
-            // Reap the direct child before returning or releasing a host's mutation reservation. Successful helpers
-            // can deliberately leave a daemon running; only the timeout/cancellation path stops the group.
             _ = finished.wait(timeout: .now() + 5)
         }
 

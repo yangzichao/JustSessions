@@ -1,19 +1,13 @@
 import SwiftUI
 
-/// A session under its project: tool icon and title, then a pin, an archive box, an hourglass for a session deleted
-/// when its tab closes, and either its CLI's status or how long ago it was active.
-/// The status gives way to a ⋯ while the pointer is over the row, which opens the same menu as a right-click.
 struct SidebarSessionRow: View {
     let store: ConversationStore
     let conversation: Conversation
     let sessionSelection: SessionMultiSelection
     let selectedConversations: [Conversation]
-    /// The sessions its subagents ran in; a chevron before its icon shows or hides them.
     let subagentCount: Int
     let isShowingSubagents: Bool
-    /// While searching, the session's first match in its messages, shown under the title.
     var messageMatch: SessionMessageMatch? = nil
-    /// While searching, the session's bookmarks whose label or tags hold the search text (SBF-05), shown first.
     var bookmarkMatches: [MessageBookmark] = []
     let onClick: (Conversation) -> Void
     let onToggleSubagents: () -> Void
@@ -21,7 +15,6 @@ struct SidebarSessionRow: View {
     let onRequestDeletion: (SessionDeletionRequest) -> Void
 
     @State private var isHovered = false
-    /// Holds the pointer-over state for a test; nil follows `onHover` as in use.
     var isHoveredForTests: Bool? = nil
     private var hovered: Bool { isHoveredForTests ?? isHovered }
 
@@ -51,7 +44,6 @@ struct SidebarSessionRow: View {
                 provider: conversation.provider,
                 isSelected: isHighlighted,
                 title: {
-                    // Beside the title, as in the preview's header, so the pin isn't taken for one of the status icons.
                     HStack(spacing: 4) {
                         Text(title)
                         if isPinned { PinnedIndicator() }
@@ -89,9 +81,7 @@ struct SidebarSessionRow: View {
                 verbatim: ([SidebarSessionBookmarkMatch.text(of: bookmarkMatches)] + [messageMatch?.snippet.text])
                     .compactMap { $0 }.joined(separator: ", "))
         )
-        // Over the button rather than in it, so a click on the ⋯ opens its menu instead of selecting the session.
         .overlay(alignment: .trailing) {
-            // In the view tree only while the pointer is over the row; see `SidebarProjectRow`.
             if hovered {
                 SidebarRowMoreActionsMenu(accessibilityLabel: "More actions for \(title)") {
                     menuItems
@@ -106,7 +96,6 @@ struct SidebarSessionRow: View {
         .contextMenu { menuItems }
     }
 
-    /// The same items whether the menu comes from a right-click or the ⋯ button.
     @ViewBuilder
     private var menuItems: some View {
         if sessionSelection.hasMultipleSelected && sessionSelection.contains(conversation.id) {
@@ -125,8 +114,6 @@ struct SidebarSessionRow: View {
         }
     }
 
-    /// The status hides while the ⋯ is laid over its place. The row keeps the ⋯'s room either way, so the title doesn't
-    /// move as the pointer passes over it.
     private func statusOrMoreActionsRoom(_ source: SessionRowStatusSource?, description: String?) -> some View {
         ZStack(alignment: .trailing) {
             statusIndicator(source, description: description)

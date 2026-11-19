@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// After an SSH host's name while its sign-in command is due: Sign in… runs it, asking its questions in a dialog. While
-/// it runs, a spinner takes its place. See `RemoteSignIns`.
 struct SidebarHostSignInButton: View {
     let host: SessionHost
     let isSigningIn: Bool

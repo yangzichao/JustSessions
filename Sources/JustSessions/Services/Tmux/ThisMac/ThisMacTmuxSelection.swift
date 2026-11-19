@@ -1,6 +1,5 @@
 import Foundation
 
-/// The background refresh chooses a compatible server; opening a tab reads that choice without spawning probes.
 final class ThisMacTmuxSelection: @unchecked Sendable {
     private let lock = NSLock()
     private var selectedServer: ThisMacTmuxServer?
@@ -10,8 +9,6 @@ final class ThisMacTmuxSelection: @unchecked Sendable {
         lock.withLock { selectedServer }
     }
 
-    /// Reserves the generation that may commit a probe. Beginning a newer probe invalidates every older answer,
-    /// including one produced by a different coordinator sharing this resolver.
     func beginProbeGeneration() -> Int {
         lock.withLock {
             latestGeneration &+= 1
@@ -19,8 +16,6 @@ final class ThisMacTmuxSelection: @unchecked Sendable {
         }
     }
 
-    /// Probes candidates without changing the server new tabs use. A shared discovery commits the answer only after
-    /// confirming that its generation is still current.
     func probe(from candidates: [ThisMacTmuxServer]) -> ThisMacTmuxServer? {
         let supportedServers = candidates.filter { $0.hasSupportedVersion() }
         // An installed version may already own running work. Keep its client until that server exits,
@@ -37,7 +32,6 @@ final class ThisMacTmuxSelection: @unchecked Sendable {
         }
     }
 
-    /// A direct refresh probes and commits as one generation. Shared workspace discovery does these steps separately.
     func select(from candidates: [ThisMacTmuxServer]) -> ThisMacTmuxServer? {
         let generation = beginProbeGeneration()
         return commit(probe(from: candidates), generation: generation)

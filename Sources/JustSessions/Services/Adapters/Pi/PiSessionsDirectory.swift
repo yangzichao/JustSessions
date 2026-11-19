@@ -1,6 +1,5 @@
 import Foundation
 
-/// Where Pi saves sessions, and the session files in it.
 enum PiSessionsDirectory {
     /// Pi's own order: `PI_CODING_AGENT_SESSION_DIR`, then `sessionDir` in the agent folder's `settings.json`, then
     /// `sessions` in the agent folder (`PI_CODING_AGENT_DIR`, or `~/.pi/agent`).
@@ -16,8 +15,6 @@ enum PiSessionsDirectory {
             ))
     }
 
-    /// The folder's path, which is relative when a setting gives a relative one. `settingsData` reads the agent
-    /// folder's `settings.json`, so an SSH host's folder is found with the file from the host.
     static func standardPath(
         environment: [String: String],
         homeDirectory: String,
@@ -36,9 +33,6 @@ enum PiSessionsDirectory {
         return (agentDirectory as NSString).appendingPathComponent("sessions")
     }
 
-    /// The `.jsonl` files directly in the folder, and in its per-project folders. Pi saves sessions as plain files, so
-    /// a symbolic link or a pipe with a session's name is left out. An SSH host's sessions are copied with their links
-    /// and pipes as they are, and reading one would show a file from elsewhere on this Mac or wait forever.
     static func sessionFiles(in sessionsDirectory: URL) -> [URL] {
         let fileManager = FileManager.default
         guard

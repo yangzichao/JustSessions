@@ -1,7 +1,5 @@
 import Foundation
 
-/// Custom project names chosen in JustSessions, keyed by `projectDirectoryKey`.
-/// Projects without a custom name fall back to their folder name.
 struct ProjectDisplayNames: Equatable {
     static let userDefaultsKey = "projectAliases"
 
@@ -34,7 +32,6 @@ struct ProjectDisplayNames: Equatable {
         customNamesByProjectPath[projectPath] != nil
     }
 
-    /// An empty name, or one equal to the folder name, clears the custom name.
     mutating func rename(projectPath: String, to proposedName: String) {
         let trimmedName = proposedName.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmedName.isEmpty || trimmedName == Self.folderName(forProjectPath: projectPath) {

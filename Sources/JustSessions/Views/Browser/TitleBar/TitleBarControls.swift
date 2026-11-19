@@ -1,16 +1,11 @@
 import SwiftUI
 
 extension View {
-    /// Puts the sidebar toggle in the title bar, just right of the close, minimize, and zoom buttons, with Back and
-    /// Forward after it, where they stay while the sidebar is hidden. The content reads the title bar's layout from
-    /// `titleBarRow`.
     func titleBarControls(isSidebarHidden: Binding<Bool>, navigation: WorkspaceNavigation) -> some View {
         modifier(TitleBarControls(isSidebarHidden: isSidebarHidden, navigation: navigation))
     }
 }
 
-/// Full screen has no title bar, so there the content moves down by a title bar's height to leave the controls a
-/// strip of their own at the window's leading edge.
 private struct TitleBarControls: ViewModifier {
     @Binding var isSidebarHidden: Bool
     let navigation: WorkspaceNavigation
@@ -48,7 +43,6 @@ private struct TitleBarControls: ViewModifier {
                 .ignoresSafeArea(edges: .top)
             }
             .background {
-                // Measured outside the padding above, so it reads the window's own title bar.
                 Color.clear
                     .ignoresSafeArea(edges: .top)
                     .onGeometryChange(for: CGFloat.self, of: \.safeAreaInsets.top) { titleBarHeight = $0 }

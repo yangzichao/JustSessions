@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// System, Light, and Dark, each drawn as the window in the chosen theme.
 struct AppAppearanceModePicker: View {
     @ObservedObject var appAppearanceStore: AppAppearanceStore
 
@@ -16,7 +15,6 @@ struct AppAppearanceModePicker: View {
                 }
             }
         }
-        // A settings grid can offer this row less than the cards need, and a squeezed card loses its name.
         .fixedSize()
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Appearance")

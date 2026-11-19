@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// An offline, native history of shipped changes; the website also covers releases newer than this app. It opens
-/// from General, so it leads with a way back.
 struct ReleaseNotesSettingsView: View {
     let onShowGeneral: () -> Void
 

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Right side of the window when no terminal tab is showing: the selected session's conversation.
 struct SessionPreviewPane: View {
     let store: ConversationStore
     let sessionSelection: SessionMultiSelection

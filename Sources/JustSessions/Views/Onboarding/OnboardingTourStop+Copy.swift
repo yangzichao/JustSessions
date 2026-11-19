@@ -53,8 +53,6 @@ extension OnboardingTourStop {
         }
     }
 
-    /// The side of its control a tip opens on: below the controls at the top of the window, so the tip stays inside it,
-    /// and beside the sidebar's other controls, into the window.
     var tipEdge: Edge {
         switch self {
         case .newSession, .keepRunning, .resume, .findInConversation, .searchSessions, .tabGroup, .hideSidebar, .splitView: .bottom

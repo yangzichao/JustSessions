@@ -16,7 +16,6 @@ enum ZoomInEqualsKey {
         }
     }
 
-    /// The ⌘+ that a ⌘= stands for, or nil for any other key. Caps Lock and Fn do not change the shortcut.
     static func zoomInEvent(for event: NSEvent) -> NSEvent? {
         guard event.type == .keyDown,
             event.modifierFlags.intersection([.command, .control, .option, .shift]) == .command,

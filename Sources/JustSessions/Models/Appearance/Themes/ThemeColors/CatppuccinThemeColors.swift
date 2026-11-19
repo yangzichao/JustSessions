@@ -1,4 +1,3 @@
-/// Catppuccin Latte for light and Mocha for dark, with the ANSI colors from catppuccin/palette 1.8.0.
 extension AppThemeColors {
     static let catppuccinLatte = AppThemeColors(
         sidebarSurface: 0xE6E9EF,

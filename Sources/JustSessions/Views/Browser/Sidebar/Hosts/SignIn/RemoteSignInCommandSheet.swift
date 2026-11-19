@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// Sign-in command…, from an SSH host's menu: the command that signs in again on the host, an optional check command
-/// that says when it's due, and otherwise how often; see `RemoteSignIns`. Saving looks at the host at once, so a
-/// command that's due asks its questions straight away.
 struct RemoteSignInCommandSheet: View {
     let host: String
     let needsLogIn: Bool
@@ -98,7 +95,6 @@ struct RemoteSignInCommandSheet: View {
             )
         else { return }
         dismiss()
-        // After the sheet has gone, so the sign-in's own dialog can open in its place.
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(300))
             if signIns.command(on: host) != signInCommand {

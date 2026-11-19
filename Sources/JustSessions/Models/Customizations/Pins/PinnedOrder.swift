@@ -1,13 +1,9 @@
 import Foundation
 
-/// The pinned projects, or the pinned sessions, in the order you put them. A newly pinned one goes last, and only a
-/// drag in the sidebar moves one, so activity never reorders them.
 struct PinnedOrder: Equatable {
     private(set) var ids: [String]
-    /// Each pinned id's place in `ids`, for the sorts that ask on every comparison.
     private var placesByID: [String: Int]
 
-    /// Keeps the first of any repeated id.
     init(_ ids: [String] = []) {
         var seenIDs = Set<String>()
         self.ids = ids.filter { seenIDs.insert($0).inserted }
@@ -18,7 +14,6 @@ struct PinnedOrder: Equatable {
         placesByID[id] != nil
     }
 
-    /// Nil when `id` is not pinned.
     func place(of id: String) -> Int? {
         placesByID[id]
     }
@@ -34,7 +29,6 @@ struct PinnedOrder: Equatable {
         placesByID = Self.places(of: ids)
     }
 
-    /// Pins `id` if it is not pinned yet, and puts it at `placement`. A neighbor that is not pinned puts it last.
     mutating func move(_ id: String, to placement: PinnedPlacement) {
         var reorderedIDs = ids.filter { $0 != id }
         let insertionIndex: Int =

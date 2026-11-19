@@ -2,7 +2,6 @@ import Darwin
 import Foundation
 
 enum ConversationMetadata {
-    /// Title of a session whose first prompt is not known yet.
     static let untitledConversationTitle = "Untitled conversation"
     static let maximumTitleLength = 120
 
@@ -46,19 +45,15 @@ enum ConversationMetadata {
         UUID(uuidString: value) != nil
     }
 
-    /// The first non-blank line of a prompt, or `fallback` when there is none or it is markup the CLI injected
-    /// (such as `<command-name>`) rather than something the user typed.
     static func cleanTitle(_ rawTitle: String?, fallback: String) -> String {
         guard let firstLine = rawTitle.flatMap(firstNonBlankLine(of:)), !firstLine.hasPrefix("<") else { return fallback }
         return String(firstLine.prefix(maximumTitleLength))
     }
 
-    /// Whether `cleanTitle` would take a title from `text`: it has a line with text that is not injected markup.
     static func holdsTitle(_ text: String) -> Bool {
         firstNonBlankLine(of: text).map { !$0.hasPrefix("<") } ?? false
     }
 
-    /// Stops at the first line with text, since a prompt can run to hundreds of kilobytes of pasted text.
     private static func firstNonBlankLine(of text: String) -> String? {
         let scalars = text.unicodeScalars
         var lineStart = scalars.startIndex

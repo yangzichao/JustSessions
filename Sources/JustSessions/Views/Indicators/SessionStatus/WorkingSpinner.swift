@@ -2,16 +2,12 @@ import AppKit
 import QuartzCore
 import SwiftUI
 
-/// A small green arc that turns while a CLI works. With Reduce Motion on it holds still; its open shape still sets
-/// it apart from the dot of a CLI that is not working.
-///
 /// The arc is a Core Animation layer turned by the render server, not a SwiftUI animation: a `TimelineView` ticking
 /// 30 times a second made the window's whole hosting view re-render on every tick, about a quarter of the main
 /// thread's time at idle with one CLI working; see item 19 in docs/development/performance.md.
 struct WorkingSpinner: View {
     static let secondsPerTurn = 0.9
 
-    /// Held still regardless of Reduce Motion, for a test to compare the arc with one drawn another way.
     var holdsStill = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -22,8 +18,6 @@ struct WorkingSpinner: View {
     }
 }
 
-/// The arc as an AppKit view, so its turning costs the SwiftUI view graph nothing. A test hosts it directly to choose
-/// `turns` whatever the Mac's Reduce Motion is.
 struct WorkingSpinnerArc: NSViewRepresentable {
     let turns: Bool
 
@@ -40,11 +34,6 @@ struct WorkingSpinnerArc: NSViewRepresentable {
     }
 }
 
-/// A layer-backed view whose shape layer draws the arc, in the live status color of the view's appearance, and turns
-/// it with a repeating rotation. The rotation runs only while the arc can be seen: the view is in a window that is
-/// not minimized, neither it nor an ancestor is hidden, and the SwiftUI view hosting it is not at zero opacity, which
-/// is how the app keeps hidden content mounted. Otherwise the animation is removed, so no spinner out of sight keeps
-/// the render server busy.
 final class WorkingSpinnerArcView: NSView {
     private static let rotationKey = "turn"
 
@@ -58,7 +47,6 @@ final class WorkingSpinnerArcView: NSView {
     override init(frame: NSRect) {
         super.init(frame: frame)
         wantsLayer = true
-        // The arc stays where SwiftUI puts the view; only the shape layer turns.
         layer?.addSublayer(arcLayer)
         arcLayer.fillColor = nil
         arcLayer.lineWidth = 1.6
@@ -82,8 +70,6 @@ final class WorkingSpinnerArcView: NSView {
         let side = min(bounds.width, bounds.height)
         let frame = CGRect(x: (bounds.width - side) / 2, y: (bounds.height - side) / 2, width: side, height: side)
         arcLayer.frame = frame
-        // The stroke is centered on the view's edge, as SwiftUI strokes a `Circle` filling the view; the layer does not
-        // clip, so the outer half of the stroke draws past the frame as it did.
         let path = CGMutablePath()
         path.addEllipse(in: CGRect(origin: .zero, size: frame.size))
         arcLayer.path = path
@@ -140,19 +126,15 @@ final class WorkingSpinnerArcView: NSView {
         }
     }
 
-    /// Whether the arc can be seen, as far as AppKit tells: in a window that is up, not hidden, and not faded out by
-    /// the SwiftUI view hosting it.
     var canBeSeen: Bool {
         guard let window, !window.isMiniaturized, !isHiddenOrHasHiddenAncestor else { return false }
         return (superview?.alphaValue ?? 1) > 0
     }
 
-    /// Whether the rotation is running; see `updateRotation()`.
     var isTurning: Bool {
         arcLayer.animation(forKey: Self.rotationKey) != nil
     }
 
-    /// Turns while it can be seen and asked to; otherwise stops.
     private func updateRotation() {
         if turns && canBeSeen {
             guard !isTurning else { return }

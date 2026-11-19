@@ -5,12 +5,10 @@ extension ConversationStore {
         sidebarProjection.conversations
     }
 
-    /// Includes saved empty projects; provider, recency, status, archive, and search filters are applied by the browser.
     var sidebarProjectGroups: [ProjectConversationGroup] {
         sidebarProjection.projectGroups
     }
 
-    /// `sidebarProjectGroups` narrowed by the browser's filters, with the filter bar's session counts.
     func filteredSidebarProjection(
         providerFilter: ConversationProviderFilter,
         recencyFilter: SessionRecencyFilter,
@@ -64,7 +62,6 @@ extension ConversationStore {
         updateSidebarProjectList(updatedList)
     }
 
-    /// Archived projects for the restore list: by display name, then by key so equal names keep a stable order.
     var archivedProjectPaths: [String] {
         sidebarProjectList.removedProjectPaths
             .map { (projectPath: $0, displayName: projectDisplayName(forProjectPath: $0)) }
@@ -78,12 +75,10 @@ extension ConversationStore {
             .map(\.projectPath)
     }
 
-    /// One host's archived projects, in the restore list's order, for the list opened from that host's heading.
     func archivedProjectPaths(on host: SessionHost) -> [String] {
         archivedProjectPaths.filter { ProjectLocation(key: $0).host == host }
     }
 
-    /// How many of one host's projects are archived, for its heading, which asks on every render: no sort.
     func archivedProjectCount(on host: SessionHost) -> Int {
         sidebarProjectList.removedProjectPaths.count { ProjectLocation(key: $0).host == host }
     }
@@ -94,10 +89,6 @@ extension ConversationStore {
         updateSidebarProjectList(updatedList)
     }
 
-    /// From a host heading's +: lists a folder under its host before it has any sessions, or brings it back from the
-    /// archive, and returns its project key. The folder is looked up on its host first, so a missing folder is
-    /// reported, or created when `creatingMissingFolder` is set, and the project is keyed by the path the CLIs record.
-    /// On this Mac the folder panel creates a new folder itself.
     @discardableResult
     func addProjectToSidebar(
         folder: String,
@@ -115,12 +106,10 @@ extension ConversationStore {
         return projectPath
     }
 
-    /// Archiving only changes sidebar membership. Session files, open tabs, names, and pins are kept.
     func removeProjectFromSidebar(_ projectPath: String) {
         removeProjectsFromSidebar([projectPath])
     }
 
-    /// Saves one sidebar update for the whole selection, including projects on different hosts.
     func removeProjectsFromSidebar(_ projectPaths: Set<String>) {
         var updatedList = sidebarProjectList
         updatedList.remove(projectPaths)
@@ -131,9 +120,6 @@ extension ConversationStore {
         deleteSessionsAndRemoveProjects([projectPath])
     }
 
-    /// Deletes the projects' deletable sessions, ending the CLIs of those that run first, and archives the projects
-    /// right away. Sessions that fail to delete stay on disk and come back if a project is restored. When none of
-    /// the sessions is deletable, the projects stay.
     func deleteSessionsAndRemoveProjects(_ projectPaths: Set<String>) {
         let plan = deletionPlan(forProjects: projectPaths)
         guard plan.hasDeletableConversations else { return }

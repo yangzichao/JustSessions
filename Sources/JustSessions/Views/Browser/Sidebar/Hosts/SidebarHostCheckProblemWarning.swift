@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// The warning after an SSH host's name while the host's last check found a problem, or its last refresh found that
-/// tmux there can't reach its server, though the refresh itself worked; its tooltip says what. Clicking it shows the
-/// check's report, from where Fix with agent… can start an agent to fix it. See `ConversationStore+BackgroundHostCheck`.
 struct SidebarHostCheckProblemWarning: View {
     let host: SessionHost
     let problemMessage: String

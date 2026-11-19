@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The window sketch in its environment's theme, light and dark side by side, split on a slant.
 struct LightAndDarkWindowSketch: View {
     var body: some View {
         AppWindowSketch()
@@ -13,7 +12,6 @@ struct LightAndDarkWindowSketch: View {
     }
 }
 
-/// The part of a rectangle right of a line leaning from the bottom left to the top right through its center.
 private struct SlantedTrailingHalf: Shape {
     func path(in rect: CGRect) -> Path {
         Path { path in

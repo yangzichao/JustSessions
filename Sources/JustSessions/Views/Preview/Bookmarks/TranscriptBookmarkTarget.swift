@@ -1,16 +1,11 @@
 import AppKit
 import SwiftUI
 
-/// The message ⌘D would bookmark now, the message being read (RDR-48), where the reader's entries laid it out, and its
-/// mark beside it. Not observable: the reader sets it after every scroll update, and a SwiftUI view following it cost 2 ms
-/// a scroll step at 240 entries and 5 at 640 (performance.md item 34), so it moves the mark's AppKit view itself.
 @MainActor
 final class TranscriptBookmarkTarget {
     struct Shown: Equatable {
         let entryID: Int
-        /// The entry's row in the entries' layout (`TranscriptScrollPositionController.entryFrameInStack(at:)`).
         let frame: CGRect
-        /// The space above the message in its row (`TranscriptEntryView.topPadding(startsTurn:)`).
         let topPadding: CGFloat
     }
 
@@ -19,7 +14,6 @@ final class TranscriptBookmarkTarget {
         didSet { marks?.show(shown) }
     }
 
-    /// Moves the mark only when the target changes, so scrolling within one message does nothing.
     func show(_ shown: Shown?) {
         guard self.shown != shown else { return }
         self.shown = shown
@@ -27,11 +21,8 @@ final class TranscriptBookmarkTarget {
     }
 }
 
-/// The gutter left of the entries, where the mark of the message ⌘D would bookmark goes (RDR-48). Its `updateNSView` runs
-/// only when the theme or the bookmarks change; the target moves the mark without SwiftUI.
 struct TranscriptBookmarkTargetMarks: NSViewRepresentable {
     let target: TranscriptBookmarkTarget
-    /// The reader's padding left of the entries (`TranscriptScrollView`), which the letters sit in.
     static let gutterWidth: CGFloat = 24
 
     func makeNSView(context: Context) -> TranscriptBookmarkTargetMarksView {
@@ -70,17 +61,14 @@ final class TranscriptBookmarkTargetMarksView: NSView {
 
     required init?(coder: NSCoder) { nil }
 
-    /// Only the mark's slot takes clicks; the rest of the gutter passes them on (`TranscriptBookmarkTargetMarkView`).
     override func hitTest(_ point: NSPoint) -> NSView? { clickTarget(at: point, for: NSApp.currentEvent?.type) }
 
-    /// `point` is in the superview's coordinates, as in `hitTest(_:)`.
     func clickTarget(at point: NSPoint, for eventType: NSEvent.EventType?) -> NSView? {
         mark.isHidden ? nil : mark.clickTarget(at: convert(point, from: superview), for: eventType)
     }
 
     override func isAccessibilityElement() -> Bool { false }
 
-    /// Puts the mark at the message's first line, in the letter's slot, and as tall as the message.
     func show(_ shown: TranscriptBookmarkTarget.Shown?) {
         self.shown = shown
         guard let shown, let style else {
@@ -97,7 +85,6 @@ final class TranscriptBookmarkTargetMarksView: NSView {
         if mark.content != content {
             mark.content = content
             mark.needsDisplay = true
-            // A letter shows its own card while the pointer is on it (RDR-51).
             mark.toolTip = content.hasLetter ? nil : AppLocalization.string("Add bookmark")
         }
         mark.isHidden = false
@@ -105,13 +92,6 @@ final class TranscriptBookmarkTargetMarksView: NSView {
     }
 }
 
-/// The mark itself: a ring around the letter's slot, an outline bookmark in it while the message has none, and a line down
-/// the slot's column for the rest of the message, so its whole extent shows. Off the text, so no text's contrast changes;
-/// the secondary text color keeps 3:1 on the reader's surface.
-///
-/// A click on the slot adds the message's bookmark, or removes it once it has a letter, as ⌘D does; a right-click or a
-/// Control-click shows the message's bookmark menu, with Edit bookmark… (RDR-48, RDR-51). It takes only clicks: the
-/// pointer's moves pass through, so a labelled letter under it still shows its card.
 final class TranscriptBookmarkTargetMarkView: NSView {
     struct Style: Equatable {
         let color: NSColor
@@ -122,7 +102,6 @@ final class TranscriptBookmarkTargetMarkView: NSView {
     struct Content: Equatable {
         let style: Style
         let entryID: Int
-        /// The message's bookmark letter, if it has one.
         let letter: String?
 
         var hasLetter: Bool { letter != nil }
@@ -139,7 +118,6 @@ final class TranscriptBookmarkTargetMarkView: NSView {
 
     override var isFlipped: Bool { true }
 
-    /// The letter's slot.
     private var slot: CGRect {
         let side = content?.style.side ?? 0
         return CGRect(x: 0, y: 0, width: side, height: side)
@@ -149,8 +127,6 @@ final class TranscriptBookmarkTargetMarkView: NSView {
 
     override func hitTest(_ point: NSPoint) -> NSView? { clickTarget(at: point, for: NSApp.currentEvent?.type) }
 
-    /// Itself for a click on the slot; nil for anything else, as the pointer's moves. `point` is in the superview's
-    /// coordinates.
     func clickTarget(at point: NSPoint, for eventType: NSEvent.EventType?) -> NSView? {
         guard isShown, let eventType, Self.clickEvents.contains(eventType), slot.contains(convert(point, from: superview))
         else { return nil }
@@ -172,12 +148,9 @@ final class TranscriptBookmarkTargetMarkView: NSView {
         if isShown { addCursorRect(slot, cursor: .pointingHand) }
     }
 
-    /// The message's right-click menu: Add bookmark, or Remove bookmark and Edit bookmark…; and Edit bookmark… on a
-    /// message without one, which adds it first, as ⇧⌘D does.
     override func menu(for event: NSEvent) -> NSMenu? {
         guard let content, let commands = TranscriptBookmarkTargetRegistry.shared.target(for: self) else { return nil }
         var items = commands.contextMenuItems(content.entryID)
-        // None has an action when all 26 letters are in use, and editing would only say so again.
         if !content.hasLetter, items.contains(where: { $0.action != nil }) {
             items.append(
                 ActionMenuItem(title: AppLocalization.string("Edit bookmark…"), systemImage: "pencil") {
@@ -237,7 +210,6 @@ final class TranscriptBookmarkTargetMarkView: NSView {
         }
     }
 
-    /// A bookmark ribbon's outline, a rectangle with a notch cut up into its bottom edge, in flipped coordinates.
     static func bookmarkOutline(in rect: CGRect) -> NSBezierPath {
         let path = NSBezierPath()
         path.move(to: CGPoint(x: rect.minX, y: rect.minY))

@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Shows the store's alert: its title and message, OK, and Try Again when the alert offers it. Each button, and
-/// the alert's own closing, dismisses only the alert it belongs to, so a newer one set meanwhile still shows.
 private struct StoreAlertPresenter: ViewModifier {
     let store: ConversationStore
 
@@ -14,7 +12,6 @@ private struct StoreAlertPresenter: ViewModifier {
             }
         )
         content.alert(Text(shownAlert?.title ?? StoreAlert.defaultTitle), isPresented: isPresented, presenting: shownAlert) { alert in
-            // Return keeps OK: Try Again deletes, permanently on SSH hosts, so it is never the default.
             Button("OK") { store.dismissAlert(alert) }
                 .keyboardShortcut(.defaultAction)
             if alert.offersTryAgain {

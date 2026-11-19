@@ -1,9 +1,5 @@
 import AppKit
 
-/// What each bookmark's chip on the map shows (TAB-10): its label on one line, cut with … to fit at most
-/// `ConversationMapMetrics.labelChipMaximumWidth`, in a chip as wide as it needs; a bookmark without a label, its
-/// letter in a square. Measured with the font the Canvas draws in, `ThemeFont.caption` semibold, and kept, so a scroll or
-/// a redraw measures nothing again.
 @MainActor
 enum ConversationMapChipTitles {
     private struct Key: Hashable {
@@ -12,7 +8,6 @@ enum ConversationMapChipTitles {
         let maximumWidth: CGFloat
     }
 
-    /// Enough for every label of the sessions shown in a few windows; cleared past it.
     private static let cacheLimit = 512
     private static var cache: [Key: ConversationMapLayout.ChipTitle] = [:]
 
@@ -44,7 +39,6 @@ enum ConversationMapChipTitles {
         func width(_ text: String) -> CGFloat { ((text as NSString).size(withAttributes: attributes).width + 2 * padding).rounded(.up) }
         let full = width(key.label)
         guard full > key.maximumWidth else { return .init(text: key.label, width: max(side, full)) }
-        // The longest start that fits with …, by binary search over its characters.
         let characters = Array(key.label)
         var low = 0
         var high = characters.count

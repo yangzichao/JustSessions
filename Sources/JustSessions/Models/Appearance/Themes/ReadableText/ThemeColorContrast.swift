@@ -4,8 +4,6 @@ enum ThemeColorContrast {
     /// WCAG's minimum for body text.
     static let minimumTextRatio = 4.5
 
-    /// The color, darkened on light surfaces or lightened on dark ones just enough to stay readable on every surface,
-    /// so it keeps as much of its hue as it can.
     static func readableText(_ text: UInt32, on surfaces: [UInt32]) -> UInt32 {
         let contrastTarget: UInt32 = isDark(surfaces[0]) ? 0xFFFFFF : 0x000000
         for step in 0...100 {
@@ -15,8 +13,6 @@ enum ThemeColorContrast {
         return contrastTarget
     }
 
-    /// Keeps the hue as close to the theme as possible while making the small group label readable when hovered, on
-    /// each surface the label sits on.
     static func readableAccent(_ accent: UInt32, on surfaces: [UInt32]) -> UInt32 {
         let contrastTarget: UInt32 = isDark(surfaces[0]) ? 0xFFFFFF : 0x000000
         for step in 0...100 {
@@ -29,8 +25,6 @@ enum ThemeColorContrast {
         return contrastTarget
     }
 
-    /// The color, lightened on a dark surface or darkened on a light one just enough to stand apart from the surface
-    /// as a fill, by `minimumRatio`. A color already that far apart is unchanged.
     static func distinguishableFill(_ fill: UInt32, on surface: UInt32, minimumRatio: Double) -> UInt32 {
         guard ratio(fill, surface) < minimumRatio else { return fill }
         let contrastTarget: UInt32 = isDark(surface) ? 0xFFFFFF : 0x000000
@@ -41,7 +35,6 @@ enum ThemeColorContrast {
         return contrastTarget
     }
 
-    /// Whether white text reads better than black on the surface.
     static func isDark(_ surface: UInt32) -> Bool {
         ratio(0xFFFFFF, surface) > ratio(0x000000, surface)
     }

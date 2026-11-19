@@ -1,15 +1,11 @@
 import Foundation
 
-/// A crash as a new GitHub issue on the bug report form, or as an email, with the crash's versions and summary filled
-/// in, for the person to add what they were doing before sending it. The text stays in English: it is for the
-/// maintainers, like the crash report itself.
 enum CrashReportLinks {
     /// The details are cut to this many characters, last frames first, so the issue's link stays well within the
     /// length GitHub accepts. The whole crash report can be attached.
     static let maximumDetailsLength = 2_500
     static let bugReportTemplate = "bug_report.yml"
 
-    /// Fills the bug report form's fields by their ids in `.github/ISSUE_TEMPLATE/bug_report.yml`.
     static func gitHubIssueURL(for summary: CrashReportSummary, reportFileName: String) -> URL {
         var components = URLComponents(url: AppLinks.newGitHubIssueURL, resolvingAgainstBaseURL: false)!
         components.queryItems = [
@@ -44,13 +40,10 @@ enum CrashReportLinks {
         return withPlusSignsEncoded(components).url!
     }
 
-    /// Such as "Crash: EXC_BREAKPOINT (SIGTRAP) in JustSessions 1.0.5 (12)".
     static func title(for summary: CrashReportSummary) -> String {
         "Crash: \(summary.exception ?? "unknown exception") in JustSessions \(summary.appVersion)"
     }
 
-    /// The report's file name, then the exception, the crashing libraries' messages, and the backtraces in a code
-    /// block. An Objective-C exception's own backtrace comes first: the crashed thread then only rethrows it.
     static func details(of summary: CrashReportSummary, reportFileName: String) -> String {
         var lines = ["Exception: \(summary.exception ?? "unknown")"] + summary.crashMessages
         if !summary.lastExceptionFrames.isEmpty {

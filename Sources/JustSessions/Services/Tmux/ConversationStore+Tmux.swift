@@ -1,30 +1,21 @@
 import Foundation
 
-/// A tab runs its CLI inside tmux when the host has it, this Mac included, so a closed tab, a dropped connection,
-/// or a quit app leaves the CLI running. Reopening the session reattaches; ending it from here stops the tmux
-/// session too.
 extension ConversationStore {
-    /// Resuming uses the session's own name, so it reattaches to a CLI still running there.
     func tmuxSessionName(forLaunching conversation: Conversation, action: ConversationAction) -> String {
         action == .resume
             ? TmuxSessionName.forConversation(conversation)
             : TmuxSessionName.unique(for: conversation.provider)
     }
 
-    /// Whether the session's CLI still runs in tmux on its host, as of the host's last refresh.
     func isRunningInTmux(_ conversation: Conversation) -> Bool {
         tmuxSessionNamesByHost[conversation.host]?.contains(TmuxSessionName.forConversation(conversation)) == true
     }
 
-    /// Nothing is published when the names haven't changed, as after most refreshes (PERF-05).
     func setTmuxSessionNames(_ names: Set<String>, on host: SessionHost) {
         guard hosts.contains(host), tmuxSessionNamesByHost[host] != names else { return }
         tmuxSessionNamesByHost[host] = names
     }
 
-    /// A new session's or branch's tab started under a temporary name; once its session is known, it takes the
-    /// session's own name, so resuming that session later reattaches to it. A tab that followed its CLI to another
-    /// session, as after `/clear`, takes that session's name the same way.
     func adoptSessionTmuxName(for session: TerminalSession, remoteRunner: RemoteHostCommandRunner = RemoteHostCommandRunner()) {
         guard let currentName = session.tmuxSessionName, let conversation = session.conversation else { return }
         let sessionName = TmuxSessionName.forConversation(conversation)
@@ -55,8 +46,6 @@ extension ConversationStore {
         }
     }
 
-    /// Closes the tab. With `endingTmuxSession`, the tmux session its CLI runs in stops too; without it, the CLI
-    /// keeps running and resuming reattaches. A plain terminal's shell stops either way, as closing it ends it.
     func closeTerminal(_ id: UUID, endingTmuxSession: Bool) {
         guard let session = terminalSessions.first(where: { $0.id == id }) else { return }
         let host = session.host
@@ -69,7 +58,6 @@ extension ConversationStore {
             endTmuxSession(named: tmuxName, on: host)
         } else if canKeepCLIRunning {
             tmuxSessionNamesByHost[host, default: []].insert(tmuxName)
-            // Lets the CLI activity sync tell when the CLI ends, before the next refresh.
             if host == .thisMac, let paneProcessID { thisMacTmuxPaneProcessIDs[tmuxName] = paneProcessID }
         }
     }

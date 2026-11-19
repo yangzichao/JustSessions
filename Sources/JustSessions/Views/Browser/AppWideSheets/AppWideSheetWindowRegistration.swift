@@ -1,7 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Registers the workspace window so menu commands can open Settings or select a page already showing there.
 struct AppWideSheetWindowRegistration: NSViewRepresentable {
     @Binding var sheet: AppWideSheet?
 
@@ -37,7 +36,6 @@ final class AppWideSheetWindowRegistrationView: NSView {
         }
     }
 
-    /// Only registers; clicks go to the views it sits behind.
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
 
     func unregister() {

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Small pin glyph shown beside a pinned session's title. A pinned project shows a pin in place of its folder.
 struct PinnedIndicator: View {
     var size: ThemeGlyphSize = .statusMark
 

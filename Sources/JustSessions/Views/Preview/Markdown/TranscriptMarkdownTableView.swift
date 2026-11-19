@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// A Markdown table in the reader (RDR-04), laid out by `TranscriptMarkdownTableLayout` within the reader's column less
-/// `indentation`, the room its list marker or quote bar takes; a table too wide even then scrolls sideways.
 struct TranscriptMarkdownTableView: View {
     let table: TranscriptMarkdownTable
     var segmentIndex = 0
@@ -26,7 +24,6 @@ struct TranscriptMarkdownTableView: View {
                         )
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
-                        // Fills its column and row, so the cells' backgrounds meet.
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                         .background(row.isHeader ? ThemePalette.trackFill : ThemePalette.hoverFill)
                     }
@@ -37,8 +34,6 @@ struct TranscriptMarkdownTableView: View {
         .clipShape(RoundedRectangle(.card))
     }
 
-    /// Each column's longest word, by its characters, in its row's font, with the cell's padding: a column is never
-    /// cut below it (TranscriptMarkdownTableLayout). Code in a cell is set smaller, so this errs wide.
     private var longestWordWidths: [CGFloat] {
         var widths: [CGFloat] = []
         for row in table.rows {
@@ -54,7 +49,5 @@ struct TranscriptMarkdownTableView: View {
 }
 
 extension EnvironmentValues {
-    /// The reader's column, as wide as the reading width and the window allow (TranscriptScrollView); a table fits
-    /// its columns to it.
     @Entry var transcriptColumnWidth: CGFloat = TranscriptReadingWidth.readableColumnWidth
 }

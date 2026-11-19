@@ -1,13 +1,10 @@
 import SwiftUI
 
-/// A tab group's hover card, from its label, as Chrome's group hover card: the project, its folder, and each of the
-/// group's tabs with what its CLI is doing, which shows what a collapsed group holds.
 struct TabGroupHoverCard: View {
     let projectName: String
     let location: ProjectLocation
     let tabs: [TerminalSession]
 
-    /// Past this many, the card counts the rest instead of listing them.
     static let maximumListedTabs = 8
 
     var body: some View {
@@ -37,13 +34,11 @@ struct TabGroupHoverCard: View {
         }
     }
 
-    /// This Mac's folders start from ~, as in the Finder; an SSH host's keep the host in front.
     private var folder: String {
         location.host == .thisMac ? (location.path as NSString).abbreviatingWithTildeInPath : location.copyablePath
     }
 }
 
-/// One of the group's tabs on its hover card, kept current while the card shows.
 private struct TabGroupHoverCardRow: View {
     @ObservedObject var session: TerminalSession
 

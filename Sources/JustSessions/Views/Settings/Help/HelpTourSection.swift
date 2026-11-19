@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// The top of Help: the tour, which also shows every tip again, the user guide, and whether the sidebar shows a
-/// random tip.
 struct HelpTourSection: View {
     @Environment(\.startOnboardingTour) private var startOnboardingTour
     @Environment(\.dismiss) private var dismiss
@@ -13,7 +11,6 @@ struct HelpTourSection: View {
             )
             HStack(alignment: .firstTextBaseline, spacing: 16) {
                 Button("Take the tour") {
-                    // The tour points at the window, so Settings closes first; its tips show once the sheet is gone.
                     dismiss()
                     startOnboardingTour()
                 }

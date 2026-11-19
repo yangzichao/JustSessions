@@ -1,6 +1,5 @@
 import AppKit
 
-/// Codex's icon: a rounded hexagon with the `>_` prompt that opens Codex CLI's banner cut out of it.
 enum CodexPromptHexagonIcon {
     static func image(size: CGFloat) -> NSImage {
         let image = NSImage(size: NSSize(width: size, height: size), flipped: true) { bounds in
@@ -30,7 +29,6 @@ enum CodexPromptHexagonIcon {
         return image
     }
 
-    /// A hexagon with a corner at the top, centered on the 16-point grid.
     private static func roundedHexagonPath() -> NSBezierPath {
         let cornerDistanceFromCenter: CGFloat = 7.6
         let corners = (0..<6).map { cornerIndex in

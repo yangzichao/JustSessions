@@ -1,7 +1,5 @@
 import Foundation
 
-/// Projects on one host that share a display name also show their parent folders, so their rows can be told apart.
-/// The same name on two hosts needs nothing, since the host headings already tell those projects apart.
 struct ProjectParentLabels {
     private let labelsByProjectID: [String: String]
 
@@ -18,7 +16,6 @@ struct ProjectParentLabels {
         )
     }
 
-    /// Nil for a project whose name no other project on the host has.
     func label(for project: ProjectConversationGroup) -> String? {
         labelsByProjectID[project.id]
     }

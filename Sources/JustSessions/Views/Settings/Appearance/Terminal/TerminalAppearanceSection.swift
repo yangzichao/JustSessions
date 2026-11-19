@@ -1,13 +1,9 @@
 import SwiftUI
 
-/// The terminal part of the Appearance tab: the engine new tabs open with, what the Option key does, the color scheme, which matches the app
-/// theme unless set here, its light or dark version, how strongly its colors show, the font, and a preview. Rows of
-/// the tab's grid.
 struct TerminalAppearanceSection: View {
     @ObservedObject var appearanceStore: TerminalAppearanceStore
     @ObservedObject var engineStore: TerminalEngineStore
     @ObservedObject var optionKeyStore: TerminalOptionKeyStore
-    /// For the preview, which can show the theme's terminal colors.
     let themeStore: AppThemeStore
 
     var body: some View {
@@ -77,7 +73,6 @@ struct TerminalAppearanceSection: View {
                     ThemeSegment(value: mode, title: Text(mode.localizedDisplayName))
                 }
             )
-            // The theme only matters here for whether the scheme has both versions, and every app theme does.
             .disabled(!appearanceStore.preferences.colorVariants(appTheme: themeStore.resolvedTheme).hasLightAndDarkVersions)
             .help("Picks the light or dark version of color schemes that have both.")
         }
@@ -107,9 +102,7 @@ struct TerminalAppearanceSection: View {
         GridRow(alignment: .top) {
             Text("Preview")
             TerminalAppearancePreview(engine: engineStore.engine, appearanceStore: appearanceStore, themeStore: themeStore)
-                // A new terminal, drawn by the newly chosen engine.
                 .id(engineStore.engine)
-                // A fixed height, so a bigger font shows fewer lines instead of making the tab taller.
                 .frame(height: 130)
                 .clipShape(RoundedRectangle(.card))
                 .overlay(RoundedRectangle(.card).strokeBorder(ThemePalette.hairline))

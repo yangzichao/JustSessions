@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Lists a "New session" or "Branch" tab under its project until the CLI saves a session the sidebar can show instead.
 struct PendingNewSessionRow: View {
     @ObservedObject var terminal: TerminalSession
     let provider: ConversationProvider

@@ -1,10 +1,8 @@
 import Foundation
 
-/// The wording of the dialog that confirms deleting sessions: one session, a selection, or a whole project.
 enum SessionDeletionConfirmationText {
     static let oneSessionButtonTitle = "Delete session"
 
-    /// Close and delete when the plan ends any CLIs first.
     static func buttonTitle(for plan: SessionDeletionPlan, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
         let count = plan.deletableConversations.count
         if plan.cliEndingCount > 0 {
@@ -24,8 +22,6 @@ enum SessionDeletionConfirmationText {
         )
     }
 
-    /// With `plan`, also says how many of the session's subagent sessions go with it, or stay. With
-    /// `cliEnding`, as for Close and delete, first says what ends before the deletion.
     static func message(
         forDeleting conversation: Conversation,
         plan: SessionDeletionPlan? = nil,
@@ -89,7 +85,6 @@ enum SessionDeletionConfirmationText {
         }
     }
 
-    /// With a plan made for Close and delete, first says how many of the sessions have their CLIs ended.
     static func message(
         forDeletingSelectionWith plan: SessionDeletionPlan, language: AppInterfaceLanguage = AppLocalization.developmentLanguage
     ) -> String {

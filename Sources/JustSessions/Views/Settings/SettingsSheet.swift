@@ -1,9 +1,7 @@
 import SwiftUI
 
-/// Settings as a sheet on a workspace window: the tabs, then Done.
 struct SettingsSheet: View {
     @Binding var selectedTab: SettingsTab
-    /// The window's store: its hosts, and the settings it keeps.
     let store: ConversationStore
     let onCheckForUpdates: () -> Void
     @Environment(\.dismiss) private var dismiss

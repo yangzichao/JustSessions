@@ -8,7 +8,6 @@ protocol LaunchAtLoginService {
     func openSystemSettings()
 }
 
-/// macOS owns the login item and its approval, including changes made outside JustSessions.
 @MainActor
 struct SystemLaunchAtLoginService: LaunchAtLoginService {
     var status: SMAppService.Status { SMAppService.mainApp.status }

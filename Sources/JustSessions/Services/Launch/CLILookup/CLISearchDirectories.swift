@@ -1,7 +1,5 @@
 import Foundation
 
-/// Where to look for each tool's CLI, in priority order. SSH hosts look in the same install folders when their login
-/// shell doesn't find a CLI; see `RemoteCLIInstallFolders`.
 enum CLISearchDirectories {
     static func standard(
         inheritedEnvironment: [String: String],
@@ -18,8 +16,6 @@ enum CLISearchDirectories {
         )
     }
 
-    /// Fallbacks for when the login shell can't be read (slow rc file, unusual shell), and the folders where the CLIs'
-    /// installers and package managers put them on macOS and Linux.
     static func wellKnownDirectories(homeDirectory: String) -> [String] {
         [
             "\(homeDirectory)/.local/bin",
@@ -41,12 +37,10 @@ enum CLISearchDirectories {
         ]
     }
 
-    /// The folder of nvm's Node versions, each of which keeps its global packages in its own `bin`.
     static func nvmVersionsDirectory(homeDirectory: String) -> String {
         "\(homeDirectory)/.nvm/versions/node"
     }
 
-    /// Whether one nvm version folder's name, such as `v22.3.0`, is a newer version than another's.
     static func isNewerNodeVersion(_ version: String, than otherVersion: String) -> Bool {
         version.compare(otherVersion, options: .numeric) == .orderedDescending
     }
@@ -61,7 +55,6 @@ enum CLISearchDirectories {
             .map { "\(versionsDirectory)/\($0)/bin" }
     }
 
-    /// CLIs that ship inside an app bundle and may never have been linked onto PATH.
     static func bundledExecutablePaths(named executableName: String) -> [String] {
         switch executableName {
         case "codex": ["/Applications/ChatGPT.app/Contents/Resources/codex"]

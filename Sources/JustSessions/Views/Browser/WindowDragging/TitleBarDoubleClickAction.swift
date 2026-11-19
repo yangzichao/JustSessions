@@ -1,6 +1,5 @@
 import AppKit
 
-/// What double-clicking a window's title bar does, as chosen in System Settings under Desktop & Dock.
 enum TitleBarDoubleClickAction: Equatable {
     case zoom
     case minimize

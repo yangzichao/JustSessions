@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Short parallel items in Help, such as what an SSH host needs, each after a bullet.
 struct HelpBulletList: View {
     let items: [LocalizedStringKey]
 

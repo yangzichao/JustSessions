@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The app's start, unless `ssh` started it as its askpass program; see `SSHAskpassRelay`.
 @main
 enum JustSessionsMain {
     static func main() {
@@ -22,7 +21,6 @@ struct JustSessionsApp: App {
                 .appTheme(from: .shared)
                 .appLanguage(from: languageStore)
         }
-        // The sidebar and detail colors run up behind the traffic lights instead of under a gray title bar.
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1100, height: 720)
         .commands {

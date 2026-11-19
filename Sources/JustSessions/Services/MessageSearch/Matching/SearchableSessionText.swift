@@ -1,9 +1,6 @@
 import Darwin
 import Foundation
 
-/// A session's text ready to search as you type: every segment folded once, case and accents aside, into one buffer
-/// that a byte search runs through. A hit there is checked against the segment itself, so a session is listed only
-/// for a match that Find highlights once the session opens.
 struct SearchableSessionText: Sendable {
     private struct SegmentPosition: Sendable {
         let entry: Int
@@ -12,7 +9,6 @@ struct SearchableSessionText: Sendable {
 
     let text: SessionMessageText
     private let foldedBytes: [UInt8]
-    /// Where each segment starts in `foldedBytes`, in entry order and then segment order.
     private let segmentStarts: [Int]
     private let segmentPositions: [SegmentPosition]
 
@@ -26,7 +22,6 @@ struct SearchableSessionText: Sendable {
                 segmentStarts.append(foldedBytes.count)
                 segmentPositions.append(SegmentPosition(entry: entryIndex, segment: segmentIndex))
                 foldedBytes += SessionMessageQuery.folded(segment).utf8
-                // No typed text holds a zero byte, so no match runs from one segment into the next.
                 foldedBytes.append(0)
             }
         }
@@ -35,7 +30,6 @@ struct SearchableSessionText: Sendable {
         self.segmentPositions = segmentPositions
     }
 
-    /// The first entry with `query`, in reading order.
     func firstMatch(of query: SessionMessageQuery) -> SessionMessageMatch? {
         foldedBytes.withUnsafeBytes { haystack in
             query.foldedBytes.withUnsafeBytes { needle in
@@ -51,7 +45,6 @@ struct SearchableSessionText: Sendable {
                     if let range = TranscriptTextSearch.firstRange(of: query.text, in: segment) {
                         return SessionMessageMatch(entryID: entry.id, snippet: SessionMessageSnippet(segment: segment, match: range))
                     }
-                    // Folded, the segment matches where Find doesn't; look on from the next one.
                     searchStart = segmentNumber + 1 < segmentStarts.count ? segmentStarts[segmentNumber + 1] : haystack.count
                 }
                 return nil
@@ -59,7 +52,6 @@ struct SearchableSessionText: Sendable {
         }
     }
 
-    /// The last segment starting at or before `offset`.
     private func segmentNumber(containing offset: Int) -> Int {
         var lower = 0
         var upper = segmentStarts.count

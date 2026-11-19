@@ -1,15 +1,10 @@
 import Foundation
 
-/// Pi and OpenCode say which session they are in, and what they are doing, only to code that runs inside them. The
-/// app starts them on this Mac with a small extension of its own, which writes both to `reports/<pid>.json` whenever
-/// they change; see `PiLiveSessionExtension` and `OpenCodeLiveSessionPlugin`. The app keeps the extensions in
-/// `directory` and rewrites them when they change.
 struct LiveSessionReporting: Sendable {
     static let reportsDirectoryVariable = "JUSTSESSIONS_LIVE_SESSION_REPORTS"
 
     let directory: URL
 
-    /// Only the packaged app reports, so tests and `swift run` leave the app's own folder alone.
     static var thisApp: LiveSessionReporting? {
         guard Bundle.main.bundleURL.pathExtension == "app" else { return nil }
         return LiveSessionReporting(
@@ -22,8 +17,6 @@ struct LiveSessionReporting: Sendable {
         directory.appendingPathComponent("reports", isDirectory: true)
     }
 
-    /// What the tool's CLI is started with so it reports its session; nil for a tool that cannot, or when the
-    /// extension could not be written. `environment` is what the CLI runs with otherwise.
     func launchAdditions(for provider: ConversationProvider, environment: [String: String]) -> LiveSessionReporterLaunch? {
         let reportsVariable = [Self.reportsDirectoryVariable: reportsDirectory.path]
         switch provider {
@@ -32,7 +25,6 @@ struct LiveSessionReporting: Sendable {
             guard Self.write(PiLiveSessionExtension.source, to: extensionFile) else { return nil }
             return LiveSessionReporterLaunch(arguments: ["--extension", extensionFile.path], environment: reportsVariable)
         case .opencode:
-            // A TUI configuration of the user's own stays in place; that OpenCode does not report.
             guard environment[OpenCodeLiveSessionPlugin.tuiConfigurationVariable] == nil else { return nil }
             let pluginFile = directory.appendingPathComponent("opencode/\(OpenCodeLiveSessionPlugin.fileName)")
             let tuiConfigurationFile = directory.appendingPathComponent("opencode/tui.json")
@@ -49,7 +41,6 @@ struct LiveSessionReporting: Sendable {
         }
     }
 
-    /// What the CLI with this process id last reported; nil when it reported nothing.
     func report(forProcessID processID: Int32) -> LiveSessionReport? {
         guard processID > 0,
             let data = try? Data(contentsOf: reportsDirectory.appendingPathComponent("\(processID).json"))
@@ -57,7 +48,6 @@ struct LiveSessionReporting: Sendable {
         return LiveSessionReport(jsonData: data, processID: processID)
     }
 
-    /// A CLI removes its report when it quits, but not when it is killed.
     func removeReportsOfExitedProcessesInBackground() {
         let reportsDirectory = self.reportsDirectory
         Task.detached(priority: .background) {
@@ -71,7 +61,6 @@ struct LiveSessionReporting: Sendable {
         }
     }
 
-    /// Writes the file only when it differs, and atomically, so a CLI that loads it never reads half of it.
     private static func write(_ contents: String, to file: URL) -> Bool {
         let data = Data(contents.utf8)
         if (try? Data(contentsOf: file)) == data { return true }

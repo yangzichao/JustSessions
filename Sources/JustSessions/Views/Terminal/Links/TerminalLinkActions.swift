@@ -1,23 +1,12 @@
 import AppKit
 
-/// What can be done with a link in a tab's terminal, in the tab's window: the items a right-click on it shows, and what
-/// a ⌘-click does (`TerminalLinkActions+Click`). `TerminalLinkOpener` says what the link points at and runs each one.
-/// - A web page or an email address: Open Link, as ⌘-clicking does, and Copy Link.
-/// - A file on this Mac: Open, unless opening it would run it; Open in, with the installed editors; Reveal in Finder;
-///   Copy Path.
-/// - A folder on this Mac: Open in Finder, Open in, and Copy Path.
-/// - A path in a tab on an SSH host: Copy Path, since the file is on the host.
 @MainActor
 struct TerminalLinkActions {
     let store: ConversationStore
     let tab: TerminalSession
-    /// The language chosen in Settings when nil.
     var language: AppInterfaceLanguage? = nil
-    /// The editors a file or folder the link names can open in.
     var editorStore: ExternalEditorStore = .shared
     var fileLinkClickSettingsStore: FileLinkClickSettingsStore = .shared
-    /// Shows the menu a ⌘-click on a file asks with, at the pointer; replaced in tests, since a shown menu waits for a
-    /// choice.
     var popUpMenu: @MainActor (NSMenu, NSView) -> Void = TerminalLinkActions.popUpAtPointer
 
     func menuItems(for link: String) -> [NSMenuItem] {
@@ -53,7 +42,6 @@ struct TerminalLinkActions {
         }
     }
 
-    /// Opens the file or folder in `editor`, and says so in the window when the editor can't.
     func open(_ item: TerminalLinkLocalItem, in editor: InstalledExternalEditor) {
         let opener = tab.linkOpener
         let store = store
@@ -78,7 +66,6 @@ struct TerminalLinkActions {
         }
     }
 
-    /// The installed editors, as "Open project in" lists them; none shows no item.
     private func openInEditorItem(for item: TerminalLinkLocalItem) -> NSMenuItem? {
         let editors = editorStore.editors(opening: .thisMac)
         guard !editors.isEmpty else { return nil }

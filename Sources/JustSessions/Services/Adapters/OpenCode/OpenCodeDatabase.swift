@@ -1,8 +1,6 @@
 import Foundation
 import SQLite3
 
-/// Opens OpenCode's database, or its copy in an SSH host's mirror. OpenCode writes while it runs, so each
-/// connection waits briefly for its lock.
 enum OpenCodeDatabase {
     static func open(_ file: URL, writable: Bool = false) throws -> OpaquePointer {
         guard FileManager.default.fileExists(atPath: file.path) else { throw OpenCodeDatabaseError.unreadable }
@@ -38,7 +36,6 @@ enum OpenCodeDatabase {
         return String(cString: bytes)
     }
 
-    /// Whether the session is in the database, as a top-level session with that project folder.
     static func containsTopLevelSession(_ sessionID: String, projectPath: String, in file: URL) throws -> Bool {
         let database = try open(file)
         defer { sqlite3_close(database) }
@@ -52,7 +49,6 @@ enum OpenCodeDatabase {
         }
     }
 
-    /// Whether the session is in the database as a top-level session, in any project folder.
     static func containsTopLevelSession(_ sessionID: String, in file: URL) throws -> Bool {
         let database = try open(file)
         defer { sqlite3_close(database) }
@@ -66,7 +62,6 @@ enum OpenCodeDatabase {
         }
     }
 
-    /// Whether any row for the session is left, so a deletion can confirm it is gone.
     static func containsSession(_ sessionID: String, in file: URL) throws -> Bool {
         let database = try open(file)
         defer { sqlite3_close(database) }

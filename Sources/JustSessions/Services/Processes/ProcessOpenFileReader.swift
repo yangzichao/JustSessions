@@ -1,10 +1,8 @@
 import Foundation
 
-/// Lists the files that running processes hold open, using one `lsof` call for all of them.
 struct ProcessOpenFileReader: Sendable {
     var timeout: TimeInterval = 5
 
-    /// Paths keyed by process id. Processes that have already exited are simply missing.
     func openFilePaths(ofProcessIDs processIDs: [Int32]) -> [Int32: [String]] {
         let validProcessIDs = processIDs.filter { $0 > 0 }
         guard !validProcessIDs.isEmpty,
@@ -18,7 +16,6 @@ struct ProcessOpenFileReader: Sendable {
         return Self.openFilePaths(inLsofFieldOutput: output)
     }
 
-    /// Parses `lsof -F` output: a `p<pid>` line starts each process, `n<path>` lines name its files.
     static func openFilePaths(inLsofFieldOutput output: String) -> [Int32: [String]] {
         var pathsByProcessID: [Int32: [String]] = [:]
         var currentProcessID: Int32?

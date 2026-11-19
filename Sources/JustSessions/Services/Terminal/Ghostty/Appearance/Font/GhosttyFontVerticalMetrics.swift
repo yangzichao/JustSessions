@@ -5,7 +5,6 @@ import Foundation
 /// the OS/2 typographic metrics when the font says to use them, or else `hhea`'s, the typographic ones, and the
 /// Windows ones, the first that are set. CoreText's own metrics stand in when the font has no `hhea` table.
 struct GhosttyFontVerticalMetrics {
-    /// In pixels, for `font` at its size in pixels.
     let lineHeight: Double
 
     init(font: CTFont) {
@@ -47,7 +46,6 @@ struct GhosttyFontVerticalMetrics {
     }
 }
 
-/// Big-endian reads, as OpenType tables store their numbers.
 extension Data {
     fileprivate func uint16(at offset: Int) -> Int? {
         guard offset + 2 <= count else { return nil }

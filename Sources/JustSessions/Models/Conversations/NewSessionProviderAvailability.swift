@@ -1,6 +1,5 @@
 import Foundation
 
-/// Wording for a host where no supported CLI was found.
 enum NewSessionProviderAvailability {
     static func noCLIFoundMessage(on host: SessionHost, language: AppInterfaceLanguage = AppLocalization.developmentLanguage) -> String {
         let locale = Locale(

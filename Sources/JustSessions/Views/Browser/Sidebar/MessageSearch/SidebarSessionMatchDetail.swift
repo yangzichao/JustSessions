@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Under a session's title while searching: the bookmarks the search found by label or tag (SBF-05), then the text around
-/// its first match in its messages (SBF-02).
 struct SidebarSessionMatchDetail: View {
     let bookmarks: [MessageBookmark]
     let messageMatch: SessionMessageMatch?
@@ -14,7 +12,6 @@ struct SidebarSessionMatchDetail: View {
     }
 }
 
-/// The first bookmark found, `a · Label #tag`, and how many more the session has; clicking the row opens the first.
 struct SidebarSessionBookmarkMatch: View {
     let bookmarks: [MessageBookmark]
 
@@ -36,7 +33,6 @@ struct SidebarSessionBookmarkMatch: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// `a · Label #tag #tag` for each, or nil for none; also the row's VoiceOver value.
     static func text(of bookmarks: [MessageBookmark]) -> String? {
         guard !bookmarks.isEmpty else { return nil }
         return bookmarks.map { bookmark in

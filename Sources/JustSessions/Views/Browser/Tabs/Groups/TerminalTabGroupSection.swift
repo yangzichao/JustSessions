@@ -1,10 +1,5 @@
 import SwiftUI
 
-/// One project's tabs behind its group label, underlined in the group color along the tab bar's bottom edge. The
-/// selected tab covers the line as it joins its terminal, and its outline in the group color rises from the line. A collapsed group shows only its label. A tab drags among the
-/// group's tabs, with the other tab of its split, and shows once dropped; dragged off the bar, it goes on between
-/// windows, see `TabDragBetweenWindows`, which also draws tabs dragged in from another window among the group's. The
-/// label drags the whole group, which the tab bar moves, and which goes on between windows once dragged off the bar.
 struct TerminalTabGroupSection: View {
     let store: ConversationStore
     @Environment(\.tabHoverCards) private var hoverCards
@@ -14,21 +9,16 @@ struct TerminalTabGroupSection: View {
     let tabWidth: CGFloat
     let onToggleCollapsed: () -> Void
     let allGroups: AllTabGroupsCollapsing
-    /// The label's width with the space after it, which the bar leaves out of the room its tabs share.
     let onLabelWidthChange: (CGFloat) -> Void
-    /// The label's drag along the bar, which moves the group among the groups until it goes on between windows.
     let onLabelDragChanged: (_ translation: CGFloat) -> Void
     let onLabelDragEnded: () -> Void
     let onRenameConversation: (Conversation) -> Void
     let onCloseTab: (UUID) -> Void
     let onDeleteConversation: (Conversation) -> Void
-    /// Closes the group's tabs, asking once for them all; see `SeveralTabsCloseConfirmation`.
     let onCloseTabs: ([UUID], _ projectName: String) -> Void
 
     @State private var hoveredTabID: UUID?
-    /// The tab whose split chooser's half is under the pointer, which lights the tab too.
     @State private var hoveredSplitChooserTabID: UUID?
-    /// The tab, or split, being dragged among the group's tabs and splits, each named by its tabs' ids.
     @State private var tabDrag = TabBarDragDisplay<[UUID]>()
 
     private var tabDragBetweenWindows: TabDragBetweenWindows { .shared }
@@ -37,9 +27,6 @@ struct TerminalTabGroupSection: View {
         let hiddenTabs = isCollapsed ? group.tabs : []
         let shownTabs = isCollapsed ? [] : group.tabs
         let movingUnits = isCollapsed ? [] : store.tabStrip.movingUnits(inGroup: group.projectDirectoryKey)
-        // A drag begun before a tab of the group opened or closed is no longer drawn, and is let go once the bar
-        // catches up; see the `onChange` below. Tabs dragged in from another window, such as a whole group's, move
-        // together as one.
         let groupKey = group.projectDirectoryKey
         let dragDisplays = tabDragBetweenWindows.dragDisplays(in: store)
         let tabDragsInGroup = [tabDrag, dragDisplays.amongTabs(ofGroup: groupKey)]
@@ -98,14 +85,12 @@ struct TerminalTabGroupSection: View {
         .tabBarGroupCoordinateSpace()
         .onChange(of: movingUnits) { tabDrag.show(nil) }
         .background(alignment: .bottom) {
-            // Opaque, so it meets the selected tab's outline without a brighter seam where the two overlap.
             Capsule()
                 .fill(color)
                 .frame(height: WorkspaceTabMetrics.groupLineWidth)
         }
     }
 
-    /// The tab, joined with its split chooser's half when it has a chooser, as a split's two tabs join.
     @ViewBuilder
     private func tabUnit(of session: TerminalSession, showsLeadingSeparator: Bool) -> some View {
         if let chooser = store.splitChooser(beside: session.id) {
@@ -170,7 +155,6 @@ struct TerminalTabGroupSection: View {
         .tabHoverCardAnchor(.tab(session.id))
     }
 
-    /// The half of the split tab that stands for the split chooser beside `session`.
     private func splitChooserTab(beside session: TerminalSession, side: TerminalSplit.Side, width: CGFloat, showsLeadingSeparator: Bool)
         -> some View
     {
@@ -199,33 +183,26 @@ struct TerminalTabGroupSection: View {
         )
     }
 
-    /// A split's tab is half as wide as the others, so the split's two take one tab's place, as a tab and its split
-    /// chooser's half do.
     private func width(ofTab tabID: UUID) -> CGFloat {
         if store.splitChooser(beside: tabID) != nil { return 2 * WorkspaceTabWidth.splitTabWidth(forTabWidth: tabWidth) }
         return store.split(containing: tabID) == nil ? tabWidth : WorkspaceTabWidth.splitTabWidth(forTabWidth: tabWidth)
     }
 
-    /// The tab drawn right before this one, in the order the tabs show in mid-drag.
     private func tabBefore(_ tabID: UUID, in tabIDsInSight: [UUID]) -> UUID? {
         guard let index = tabIDsInSight.firstIndex(of: tabID), index > 0 else { return nil }
         return tabIDsInSight[index - 1]
     }
 
-    /// Moves the group among the groups as the pointer moves along the bar, until the drag goes on between windows.
     private func dragGroup(by translation: CGFloat, from startLocation: CGPoint) {
         guard tabDragBetweenWindows.followGroupDragInTabBar(group.projectDirectoryKey, of: store, from: startLocation) else { return }
         onLabelDragChanged(translation)
     }
 
-    /// Leaves the group where it was let go along the bar.
     private func dropDraggedGroup() {
         tabDragBetweenWindows.endDragInTabBar()
         onLabelDragEnded()
     }
 
-    /// Starts dragging the tab, with the other tab of its split, among the group's tabs and splits as they are now,
-    /// or follows the pointer once it has started, until the drag goes on between windows.
     private func dragTab(_ tabID: UUID, by translation: CGFloat, from startLocation: CGPoint, among movingUnits: [[UUID]]) {
         guard let movingUnit = movingUnits.first(where: { $0.contains(tabID) }) else { return }
         guard
@@ -237,8 +214,6 @@ struct TerminalTabGroupSection: View {
                 from: startLocation
             )
         else {
-            // Leaving for a window of their own, the tabs stay hidden where they were drawn until they go, so nothing
-            // slides back meanwhile.
             if !tabDragBetweenWindows.dragDisplays(in: store).leavingTabIDs.contains(tabID) { tabDrag.show(nil) }
             return
         }
@@ -251,8 +226,6 @@ struct TerminalTabGroupSection: View {
         tabDrag.show(drag)
     }
 
-    /// Moves the dragged tab to where it was let go, unless a tab of the group opened or closed meanwhile, and shows
-    /// it, as a click on it would.
     private func dropDraggedTab(_ tabID: UUID) {
         tabDragBetweenWindows.endDragInTabBar()
         guard let drag = tabDrag.drag else { return }
@@ -264,20 +237,16 @@ struct TerminalTabGroupSection: View {
         store.selectTerminal(tabID)
     }
 
-    /// Drawn as the selected tab: the selected tab and the other tab of its split.
     private func isActive(_ tabID: UUID) -> Bool {
         tabID == store.selectedTerminalID || store.shownSplit?.contains(tabID) == true
     }
 
-    /// Under the pointer, itself or through the other tab of its split or its split chooser's half.
     private func isLitByHover(_ tabID: UUID) -> Bool {
         if hoveredSplitChooserTabID == tabID { return true }
         guard let hoveredTabID else { return false }
         return tabID == hoveredTabID || store.split(containing: hoveredTabID)?.contains(tabID) == true
     }
 
-    /// No separator runs beside a tab drawing a shape of its own, active or under the pointer, nor between a split's
-    /// two tabs, which join into one shape.
     private func showsSeparator(between previousTabID: UUID, and tabID: UUID) -> Bool {
         let standsOut = { (tabID: UUID) in self.isActive(tabID) || self.isLitByHover(tabID) }
         let isSameSplit = store.split(containing: tabID)?.contains(previousTabID) == true
@@ -293,7 +262,6 @@ struct TerminalTabGroupSection: View {
         trackHover(of: .tab(tabID), isHovering: isHovering)
     }
 
-    /// Tells the window's hover card where the pointer is.
     private func trackHover(of target: TabHoverCardTarget, isHovering: Bool) {
         if isHovering {
             hoverCards?.pointerEntered(target, tabWidth: tabWidth)

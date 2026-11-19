@@ -1,24 +1,14 @@
 import Darwin
 import Foundation
 
-/// Where a Codex session's saved search text can resume once the CLI appends: the bytes the text came from, and the
-/// start of its final page, the only page an append can change. The digest covers every one of those bytes, so a file
-/// that grew after an earlier record changed is read in full, as is one replaced, truncated, or rewritten.
 struct SessionMessageTextResumeState: Sendable, Codable, Equatable {
     let device: Int32
     let inode: UInt64
-    /// How many bytes of the file the text came from.
     let byteCount: UInt64
-    /// CRC-32 of the first `byteCount` bytes. A digest of another length, as SHA-256 states saved before, never resumes.
     let digest: Data
-    /// The final page's first record, read again on resume.
     let finalPageRecord: Int
-    /// Where `finalPageRecord` starts in the file.
     let finalPageByteOffset: UInt64
-    /// How many of the text's entries come from records before `finalPageRecord`.
     let committedEntryCount: Int
-    /// The page limits the text was read with. Where pages end decides which tool calls merge into one entry, so text
-    /// read with other limits is never resumed from, even if they changed without a new cache format.
     let pageLimits: [Int]
 
     static func pageLimits(of limits: TranscriptPageLimits) -> [Int] {
@@ -28,7 +18,6 @@ struct SessionMessageTextResumeState: Sendable, Codable, Equatable {
         ]
     }
 
-    /// Whether this state could have been saved with `text`; a saved file that fails this is read in full again.
     func isConsistent(with text: SessionMessageText) -> Bool {
         guard digest.count == CRC32Checksum.byteCount, finalPageRecord >= 0, finalPageByteOffset <= byteCount,
             (0...text.entries.count).contains(committedEntryCount)
@@ -39,18 +28,10 @@ struct SessionMessageTextResumeState: Sendable, Codable, Equatable {
     }
 }
 
-/// Reads a grown Codex session from its saved final page on, after checking that every byte saved text came from is
-/// unchanged. Every byte is read once: the bytes before the final page are only hashed, and the rest, read into
-/// memory, is both hashed and parsed, so the saved digest and the parsed records describe the same bytes even while the
-/// CLI writes.
 enum CodexSessionTextResumer {
-    /// The most bytes from the final page's start to the file's end a resume holds in memory; past this the session is
-    /// read in full.
     static let maximumResumedByteCount: UInt64 = 64 << 20
     private static let hashChunkByteCount = 1 << 20
 
-    /// Nil when `saved` can't be resumed from, as when the file was replaced, didn't grow, or changed before its end;
-    /// the session is then read in full.
     static func read(
         _ file: URL, resuming saved: SessionMessageTextCache.ResumableText, limits: TranscriptPageLimits
     ) throws -> SessionMessageTextRead? {
@@ -88,7 +69,6 @@ enum CodexSessionTextResumer {
             let page = try TranscriptPageReader.read(
                 request, recordCount: firstRecord + recordStarts.count, limits: limits, sourceID: { $0 },
                 decode: { position in
-                    // Earlier records are only decoded for the speaker before a page, which search text doesn't use.
                     guard position >= firstRecord else { return ([], 0) }
                     let tailRecord = position - firstRecord
                     let range = recordStarts[tailRecord]..<(tailRecord + 1 < recordStarts.count ? recordStarts[tailRecord + 1] : tail.count)
@@ -105,7 +85,6 @@ enum CodexSessionTextResumer {
             guard page.hasLater else { break }
             request = .after(page.records.upperBound)
         }
-        // A running CLI appends while the read runs; only a file that shrank fails it, as `TranscriptFileIndex` does.
         guard try TranscriptFileFingerprint(handle: handle).byteCount >= byteCount else { throw TranscriptPagingError.sourceChanged }
         let resumeState = SessionMessageTextResumeState(
             device: fingerprint.device, inode: fingerprint.inode, byteCount: byteCount, digest: hasher.finalize(),
@@ -119,9 +98,6 @@ enum CodexSessionTextResumer {
         )
     }
 
-    /// The resume state after a full read whose index is `indexFingerprint`, reusing its digest when provided. Nil
-    /// when the file changed in any way since it was indexed, as the text may then come from other bytes than these;
-    /// the next change reads it in full again.
     static func state(
         of file: URL, indexedAs indexFingerprint: TranscriptFileFingerprint, indexedDigest: Data? = nil,
         finalPageRecord: Int, finalPageByteOffset: UInt64,
@@ -150,8 +126,6 @@ enum CodexSessionTextResumer {
         )
     }
 
-    /// Where each record starts in `bytes`, as `TranscriptFileIndex` splits a file: a record runs through its newline,
-    /// the last may have none, and nothing after a final newline is a record.
     private static func recordStarts(in bytes: [UInt8]) -> [Int] {
         guard !bytes.isEmpty else { return [] }
         var starts = [0]
@@ -173,7 +147,6 @@ enum CodexSessionTextResumer {
         }
     }
 
-    /// Hashes the first `byteCount` bytes in chunks through one buffer.
     private static func hash(_ descriptor: Int32, upTo byteCount: UInt64, into hasher: inout CRC32Checksum) throws {
         let buffer = UnsafeMutableRawBufferPointer.allocate(byteCount: hashChunkByteCount, alignment: 1)
         defer { buffer.deallocate() }
@@ -187,7 +160,6 @@ enum CodexSessionTextResumer {
         }
     }
 
-    /// Fills `buffer` from `offset`; a file that ends first has shrunk since its size was read.
     private static func read(_ descriptor: Int32, from offset: UInt64, into buffer: UnsafeMutableRawBufferPointer) throws {
         var filled = 0
         while filled < buffer.count {

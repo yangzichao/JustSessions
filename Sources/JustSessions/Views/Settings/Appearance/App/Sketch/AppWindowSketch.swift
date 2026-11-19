@@ -1,9 +1,6 @@
 import SwiftUI
 
-/// A miniature of the main window, sized for a 112 by 72 point thumbnail: the sidebar with a selected Claude Code
-/// session, and that session's terminal tab. It draws in its environment's theme and color scheme.
 struct AppWindowSketch: View {
-    /// Close, minimize, and zoom.
     private static let windowButtonColors: [UInt32] = [0xFF5F57, 0xFEBC2E, 0x28C840]
 
     var body: some View {
@@ -19,7 +16,6 @@ struct AppWindowSketch: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(ThemePalette.contentSurface)
         }
-        // The divider is translucent; this keeps whatever lies under the sketch from showing through it.
         .background(ThemePalette.contentSurface)
         .accessibilityHidden(true)
     }
@@ -53,7 +49,6 @@ struct AppWindowSketch: View {
         .padding(.top, 5)
     }
 
-    /// Like `SidebarSessionRowLayout`: the CLI's dot and a title, washed in the CLI's hue with a bar when selected.
     private func sessionRow(provider: ConversationProvider, titleWidth: CGFloat, isSelected: Bool) -> some View {
         HStack(spacing: 3) {
             Circle()

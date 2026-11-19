@@ -1,7 +1,5 @@
 import Foundation
 
-/// Custom session titles chosen in JustSessions, keyed by `Conversation.id`.
-/// Sessions without a custom title show the title their CLI suggests.
 struct ConversationTitleAliases: Equatable {
     static let userDefaultsKey = "conversationAliases"
 
@@ -24,7 +22,6 @@ struct ConversationTitleAliases: Equatable {
         customTitlesByConversationID[conversation.id] ?? conversation.suggestedTitle
     }
 
-    /// An empty title, or one equal to the suggested title, clears the custom title.
     mutating func rename(_ conversation: Conversation, to proposedTitle: String) {
         let trimmedTitle = proposedTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmedTitle.isEmpty || trimmedTitle == conversation.suggestedTitle {

@@ -1,15 +1,8 @@
-/// How many matches a terminal's find counted, and which one is selected, for the find bar's "2 of 14". Matches are
-/// numbered from the newest, the one a search selects first, so moving toward older output counts up.
 struct TerminalFindMatchCount: Equatable {
-    /// The matches counted, at most `countLimit`.
     let total: Int
-    /// The selected match's number, 1 for the newest. Nil when none is selected, as after new output cleared the
-    /// selection, or when there are more matches than were counted.
     let selectedNumber: Int?
-    /// More matches than the count goes to.
     let exceedsCountLimit: Bool
 
-    /// Counting stops here, so a one-letter search through a long scrollback stays quick.
     static let countLimit = 5_000
 
     static let none = TerminalFindMatchCount(total: 0, selectedNumber: nil, exceedsCountLimit: false)

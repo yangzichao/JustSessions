@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// Over the top-trailing corner of a tab on an SSH host: the copy of files dropped on it, with Cancel, while it takes
-/// longer than a moment, and why a copy failed, until closed or the next drop. It floats over the terminal instead of
-/// taking a row from it, so the CLI's screen keeps its size; a split pane's mini toolbar is in the opposite corner.
 struct TerminalSSHFileDropNotice: View {
     @ObservedObject var fileDrop: TerminalSSHFileDrop
 
@@ -41,7 +38,6 @@ struct TerminalSSHFileDropNotice: View {
                     Text("Copying to \(fileDrop.host)…")
                         .font(ThemeFont.callout.weight(.medium))
                         .foregroundStyle(ThemePalette.ink)
-                    // A long name loses its middle, so its extension and the file's number stay.
                     Group {
                         if fileCount == 1 {
                             Text(verbatim: fileName)
@@ -55,7 +51,6 @@ struct TerminalSSHFileDropNotice: View {
                 }
                 .lineLimit(1)
                 Spacer(minLength: 4)
-                // No Escape shortcut: Escape belongs to the terminal.
                 Button("Cancel", action: fileDrop.cancel)
                     .buttonStyle(QuietBorderedButtonStyle())
                     .controlSize(.small)

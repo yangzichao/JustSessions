@@ -15,7 +15,6 @@ final class LaunchAtLoginSettingsStore: ObservableObject {
         status = service.status
     }
 
-    /// A pending registration stays selected so it can also be turned off while awaiting approval.
     var launchesAtLogin: Bool {
         status == .enabled || status == .requiresApproval
     }

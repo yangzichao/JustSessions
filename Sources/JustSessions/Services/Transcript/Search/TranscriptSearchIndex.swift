@@ -1,6 +1,5 @@
 import Foundation
 
-/// A temporary index of this reader's displayed entries; no files or global history index are written.
 struct TranscriptSearchIndex: Sendable {
     private struct Segment: Sendable {
         let entryIndex: Int

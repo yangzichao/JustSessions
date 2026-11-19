@@ -1,6 +1,5 @@
 import Foundation
 
-/// AppKit panels share SwiftUI's language choice. Typed values preserve interpolation and compiler extraction.
 enum AppLocalization {
     /// The packaged app keeps SwiftPM's resource bundle in Contents/Resources. `Bundle.module` never looks there:
     /// it checks only the .app root and the absolute path of the machine that built it, then stops the app.
@@ -29,7 +28,6 @@ enum AppLocalization {
         return String(localized: value, bundle: localizedBundle, locale: locale)
     }
 
-    /// An explicit resource may have a stable key, a custom table, and a different bundle. Preserve all three.
     static func string(
         resource: LocalizedStringResource,
         language: AppInterfaceLanguage? = nil,

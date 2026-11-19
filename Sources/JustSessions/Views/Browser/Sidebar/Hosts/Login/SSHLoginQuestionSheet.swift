@@ -1,17 +1,9 @@
 import SwiftUI
 
-/// One question `ssh` asks while Connect… logs in to a host: a password, passphrase, or code typed out of sight;
-/// whether to trust a host key it has not seen, with the fingerprint to check; a yes or no question; or a notice,
-/// such as to touch a security key, which leaves by itself once `ssh` is done with it. What `ssh` printed since the
-/// last question, such as a second factor's options or "Permission denied, please try again.", comes first, and a
-/// secret asked again says the last answer wasn't accepted.
 struct SSHLoginQuestionSheet: View {
     let question: SSHAskpassQuestion
-    /// The answer for `ssh`, or nil for Cancel.
     let onAnswer: (String?) -> Void
     @State private var typedText = ""
-    /// The answer field takes the typing at once, also for a question that follows another, such as a code after
-    /// the password.
     @FocusState private var isAnswerFocused: Bool
 
     var body: some View {
@@ -79,7 +71,6 @@ struct SSHLoginQuestionSheet: View {
         }
     }
 
-    /// What `ssh` printed, as it printed it.
     private func sshText(_ text: String) -> some View {
         Text(verbatim: text)
             .font(ThemeFont.callout.monospaced())

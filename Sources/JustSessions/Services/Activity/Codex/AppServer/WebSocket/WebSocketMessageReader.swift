@@ -1,6 +1,5 @@
 import Foundation
 
-/// Splits the bytes a WebSocket server sends into its messages, joining a message sent in fragments.
 struct WebSocketMessageReader {
     enum Message: Equatable {
         case text(Data)
@@ -9,7 +8,6 @@ struct WebSocketMessageReader {
     }
 
     enum ReadError: Error {
-        /// A frame longer than any the app waits for, which it does not keep in memory.
         case frameTooLong
     }
 
@@ -22,7 +20,6 @@ struct WebSocketMessageReader {
         unread.append(bytes)
     }
 
-    /// The next whole message, or nil until more bytes arrive. A binary message is read as text; pongs are skipped.
     mutating func nextMessage() throws -> Message? {
         while let frame = try nextFrame() {
             switch frame.opcode {
@@ -71,7 +68,6 @@ struct WebSocketMessageReader {
             payload = Data(payload.enumerated().map { index, byte in byte ^ mask[index % 4] })
         }
         unread = Data(unread[(payloadStart + payloadLength)...])
-        // An opcode the protocol leaves reserved is read as the end of the connection.
         let opcode = WebSocketOpcode(rawValue: bytes[0] & 0x0F) ?? .close
         return (opcode, bytes[0] & 0x80 != 0, payload)
     }

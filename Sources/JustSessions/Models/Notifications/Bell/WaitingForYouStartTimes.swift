@@ -1,10 +1,5 @@
 import Foundation
 
-/// When each CLI on this Mac started waiting on you, as `WaitingForYou` decides it, for the notification bell's
-/// newest-first order and its rows' ages. A wait starts at the activity sync that first sees it, so a CLI first seen
-/// while it waits, as at launch, starts waiting then. Kept under every key the CLI goes by, like
-/// `SessionAttentionTracker`, so a tab keeps its time once it learns its session, and its CLI keeps it after the tab
-/// closes with the CLI left running in tmux.
 struct WaitingForYouStartTimes: Equatable {
     private enum WaitKind: Equatable {
         case needsInput
@@ -25,15 +20,10 @@ struct WaitingForYouStartTimes: Equatable {
 
     private var waitsByActivityKey: [String: Wait] = [:]
 
-    /// Nil when the CLI does not wait on you, as of the last activity sync.
     func startTime(of source: SessionAttentionSource) -> Date? {
         wait(of: source)?.startTime
     }
 
-    /// After an activity sync, which saw `observations` at `now` and has just updated `unseenFinishedTurns`. A wait
-    /// that goes on keeps its time, even when the CLI words what it waits for differently; a CLI that stops for your
-    /// answer after finishing its turn starts waiting again. A CLI missing from `observations` no longer runs and is
-    /// forgotten.
     mutating func update(
         after observations: [SessionActivityObservation],
         unseenFinishedTurns: UnseenFinishedTurns,
@@ -51,7 +41,6 @@ struct WaitingForYouStartTimes: Equatable {
                 let kind = WaitKind(reason)
                 nextWait = previousWait?.kind == kind ? previousWait : Wait(kind: kind, startTime: now)
             } else {
-                // A CLI that tells nothing for a moment keeps waiting as it did.
                 nextWait = observation.activity == nil ? previousWait : nil
             }
             guard let nextWait else { continue }

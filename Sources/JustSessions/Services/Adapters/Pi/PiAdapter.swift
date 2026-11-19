@@ -1,10 +1,7 @@
 import Foundation
 
-/// Pi keeps each session in `<sessions>/--<encoded cwd>--/<timestamp>_<session id>.jsonl`, or directly in a custom
-/// sessions folder. The first line names the session and its folder.
 struct PiAdapter: ConversationAdapter {
     let sessionsDirectory: URL
-    /// Nil moves deleted sessions to the macOS Trash; tests pass their own.
     let moveToTrash: (@Sendable (URL) throws -> Void)?
     var provider: ConversationProvider { .pi }
 
@@ -13,15 +10,11 @@ struct PiAdapter: ConversationAdapter {
         self.moveToTrash = moveToTrash
     }
 
-    /// Shared by every Pi adapter, this Mac's and each SSH host's mirror, which keep their files apart. Subagents' files
-    /// can be large and are rarely written to once their run ends.
     private static let subagentSessions = SessionFileSummaryCache<PiSubagentSession>(
         persistenceFile: SessionSummaryCacheLocation.file(named: "pi-subagents"))
-    /// Each session's `/name`, read on from where the last refresh stopped; see `PiSessionNameScan`.
     private static let sessionNames = SessionFileSummaryCache<PiSessionNameScan>(
         persistenceFile: SessionSummaryCacheLocation.file(named: "pi-session-names"))
 
-    /// Each session, then the sessions its subagents ran in.
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         try cancellation.checkCancellation()
         var subagentFiles: [URL] = []

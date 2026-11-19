@@ -6,7 +6,6 @@ enum GhosttyBackgroundColorAnswer {
     private static let bell: UInt8 = 0x07
     private static let escape: UInt8 = 0x1B
 
-    /// The index just after the first answer's terminator, or nil without a whole answer.
     static func endIndex(in bytes: [UInt8]) -> Int? {
         var index = bytes.startIndex
         while index < bytes.endIndex {

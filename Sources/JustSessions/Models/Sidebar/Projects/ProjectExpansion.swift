@@ -1,6 +1,5 @@
 import Foundation
 
-/// Which projects in the sidebar show their sessions. While searching, every project shows its matches.
 struct ProjectExpansion: Equatable {
     private(set) var expandedProjectIDs: Set<String> = []
 
@@ -14,7 +13,6 @@ struct ProjectExpansion: Equatable {
         }
     }
 
-    /// Opens each of these projects that is closed; open ones stay open.
     mutating func expand(_ projectIDs: [String]) {
         expandedProjectIDs.formUnion(projectIDs)
     }

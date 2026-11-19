@@ -1,12 +1,5 @@
 import SwiftUI
 
-/// A project's name above its open tabs, in its tab bar group's color, with its SSH host and its tab count. Clicking it
-/// collapses or expands the group, as a project's chevron does in Projects; a collapsed group shows the most pressing
-/// status among its tabs, so a CLI waiting on you still shows. It lines up with the rows below instead of indenting
-/// them: its chevron sits in their icon column and its name starts where their titles do, so the rows keep the
-/// sidebar's full width. As a project row does, it trades its count for ⋯ and + while the pointer is over it. Its menu
-/// is its group label's in the tab bar: what a project row's offers for the folder, leaving out what arranges projects
-/// in the sidebar, then collapsing groups and closing the group's tabs.
 struct SidebarOpenTabGroupHeading: View {
     let store: ConversationStore
     let projectName: String
@@ -14,14 +7,12 @@ struct SidebarOpenTabGroupHeading: View {
     let color: ThemeColor
     let tabCount: Int
     let isCollapsed: Bool
-    /// What the collapsed group's CLIs are doing. Ignored while the group is expanded, as each row shows its own.
     let hiddenTabsActivity: SessionActivitySummary
     let onToggleCollapsed: () -> Void
     let onNewSession: (ConversationProvider) -> Void
     let menuItems: TabGroupMenuItems
 
     @State private var isHovered = false
-    /// Holds the pointer-over state for a test; nil follows `onHover` as in use.
     var isHoveredForTests: Bool? = nil
     private var hovered: Bool { isHoveredForTests ?? isHovered }
 
@@ -75,9 +66,6 @@ struct SidebarOpenTabGroupHeading: View {
         .contextMenu { menuItems }
     }
 
-    /// The tab count gives way to the ⋯ and + menus while the pointer is over the heading. The menus are in the view
-    /// tree only then, see `SidebarProjectRow`; their room is kept while they are not, so nothing in the heading
-    /// moves as the pointer passes over it.
     private var tabCountOrHoverActions: some View {
         ZStack(alignment: .trailing) {
             Text(verbatim: "\(tabCount)")
@@ -87,7 +75,6 @@ struct SidebarOpenTabGroupHeading: View {
             ProjectHoverActions<EmptyView>.placeholder
                 .font(ThemeFont.body)
         }
-        // Over the placeholder's room, so the menus never take part in the layout; see `SidebarProjectRow`.
         .overlay(alignment: .trailing) {
             if hovered {
                 ProjectHoverActions(store: store, location: location, projectDisplayName: projectName, onNewSession: onNewSession) {

@@ -1,10 +1,6 @@
 import Foundation
 
-/// Picks each tab group's color from a palette. A project keeps the color its key hashes to, across launches, unless
-/// a group before it already took that color; then it takes the next free one, so open groups differ while the
-/// palette has colors to go around.
 enum TabGroupColorAssignment {
-    /// Palette indices, one per project key, in the given order.
     static func colorIndices(forProjectKeys projectKeys: [String], paletteSize: Int) -> [Int] {
         guard paletteSize > 0 else { return projectKeys.map { _ in 0 } }
         var takenColorIndices: Set<Int> = []

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Tools stay behind a compact disclosure, including runs with only one call.
 struct TranscriptToolCallsView: View {
     let summaries: [String]
     @State private var isExpanded = false
@@ -11,7 +10,6 @@ struct TranscriptToolCallsView: View {
         DisclosureGroup(isExpanded: $isExpanded) {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(Array(summaries.enumerated()), id: \.offset) { segmentIndex, summary in
-                    // ThemeFont.callout's size, in monospace.
                     TranscriptTextBlock(
                         source: AttributedString(summary), segmentIndex: segmentIndex,
                         style: TranscriptTextStyle(fontSize: 12, isMonospaced: true, lineSpacing: 0, tone: .secondary), copyRole: .line

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A separate, read-only window for a session. It shares discovery updates, without launching a terminal.
 struct SessionReadingView: View {
     let store: ConversationStore
     let conversation: Conversation
@@ -38,7 +37,6 @@ struct SessionReadingView: View {
                 conversation: conversation,
                 readingPositionStore: readingPositionStore,
                 readingRequests: requests,
-                // A session deleted while its window stays open has had its bookmarks forgotten; none are saved again.
                 store: store.conversation(withID: conversation.id) == nil ? nil : store
             )
             .id(conversation.id)

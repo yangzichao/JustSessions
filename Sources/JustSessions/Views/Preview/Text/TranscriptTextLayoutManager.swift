@@ -1,12 +1,8 @@
 import AppKit
 
-/// Lays out a transcript text block as SwiftUI's text did, and draws its part of a selection across blocks.
-///
 /// AppKit draws a text view's selection in the accent only while that view is the window's first responder, and in
-/// gray otherwise. A selection across blocks covers several text views, and only one of them can be first responder,
-/// so this draws the others' part in the accent too while the reader's selection is active.
+/// gray otherwise.
 final class TranscriptTextLayoutManager: NSLayoutManager {
-    /// Height added below each line; see `lineHeightPadding(for:)`.
     var lineHeightPadding: CGFloat = 0
 
     override init() {

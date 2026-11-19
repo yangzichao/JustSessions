@@ -1,8 +1,5 @@
 import Foundation
 
-/// A message's line around a match, for a session row: a little of the text before the match, so the match shows in
-/// a narrow sidebar, and more after it. Runs of whitespace, line breaks among them, read as single spaces, and none is
-/// kept at either end.
 struct SessionMessageSnippet: Sendable, Equatable {
     let leadingText: String
     let matchedText: String
@@ -17,7 +14,6 @@ struct SessionMessageSnippet: Sendable, Equatable {
         self.trailingText = trailingText
     }
 
-    /// Cut from `segment` around `match`, with "…" where the cut leaves text out.
     init(segment: String, match: Range<String.Index>) {
         let leadingStart =
             segment.index(match.lowerBound, offsetBy: -Self.leadingCharacterCount, limitedBy: segment.startIndex)

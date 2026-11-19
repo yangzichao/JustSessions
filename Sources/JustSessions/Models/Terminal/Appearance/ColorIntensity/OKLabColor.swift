@@ -1,14 +1,10 @@
 import Foundation
 
-/// A color in Björn Ottosson's OKLab, where equal steps of lightness and chroma look equal, so a color can grow more
-/// or less vivid while it keeps the lightness and hue the eye sees. Made from and turned back into 0xRRGGBB values
-/// in sRGB.
 struct OKLabColor: Equatable {
     let lightness: Double
     let greenRed: Double
     let blueYellow: Double
 
-    /// How far the color stands from the gray of its lightness.
     var chroma: Double {
         (greenRed * greenRed + blueYellow * blueYellow).squareRoot()
     }
@@ -31,7 +27,6 @@ struct OKLabColor: Equatable {
         blueYellow = 0.0259040371 * long + 0.7827717662 * medium - 0.8086757660 * short
     }
 
-    /// The color with the same lightness and hue at `newChroma`. A gray has no hue, so it stays gray.
     func withChroma(_ newChroma: Double) -> OKLabColor {
         let currentChroma = chroma
         guard currentChroma > 0 else { return self }
@@ -39,12 +34,10 @@ struct OKLabColor: Equatable {
         return OKLabColor(lightness: lightness, greenRed: greenRed * scale, blueYellow: blueYellow * scale)
     }
 
-    /// Whether sRGB can show the color, allowing for rounding in the conversion.
     var isInSRGB: Bool {
         linearSRGBChannels.allSatisfy { (-0.0001...1.0001).contains($0) }
     }
 
-    /// The nearest 0xRRGGBB value, each channel held inside sRGB.
     var hexValue: UInt32 {
         linearSRGBChannels.reduce(0) { result, linearChannel in
             let clamped = min(max(linearChannel, 0), 1)
@@ -53,7 +46,6 @@ struct OKLabColor: Equatable {
         }
     }
 
-    /// Red, green, and blue in linear sRGB, outside 0...1 for a color sRGB can't show.
     private var linearSRGBChannels: [Double] {
         let long = pow(lightness + 0.3963377774 * greenRed + 0.2158037573 * blueYellow, 3)
         let medium = pow(lightness - 0.1055613458 * greenRed - 0.0638541728 * blueYellow, 3)

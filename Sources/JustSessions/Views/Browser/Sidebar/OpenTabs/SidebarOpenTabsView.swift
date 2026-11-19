@@ -1,32 +1,21 @@
 import SwiftUI
 
-/// A full-height list in tab-bar order, grouped by project like the tab bar, each group under a heading in its color
-/// that collapses it. It stays mounted beside the project list to retain its scroll position and collapsed groups.
-/// Each tab of a split across projects lists under its own project, marked with its side of the split, as is each
-/// tab of a split in its project's group. Rows, headings, and the space around them offer the menus of the tab bar's
-/// tabs, group labels, and space. A row drags onto the terminals as its tab would from the tab bar. ⌘- and Shift-clicks
-/// select several rows to close together; see `SidebarOpenTabsView+Selection`.
 struct SidebarOpenTabsView: View {
     let store: ConversationStore
     let searchText: String
     @Binding var selection: OpenTabMultiSelection
     let onSelectTab: (UUID) -> Void
-    /// Called once a tab dragged onto the terminals shows there.
     let onDroppedTabIntoTerminals: () -> Void
     let onRenameConversation: (Conversation) -> Void
     let onCloseTab: (UUID) -> Void
     let onDeleteConversation: (Conversation) -> Void
-    /// Closes a group's tabs, asking once for them all.
     let onCloseTabGroup: ([UUID], _ projectName: String) -> Void
-    /// Closes the selected tabs, asking once for them all.
     let onCloseSelectedTabs: ([UUID]) -> Void
     let onNewSession: () -> Void
 
     @State var groupCollapse = OpenTabGroupCollapse()
-    /// Set by a ⌘- or Shift-click, so Escape cancels the selection; see `SidebarSelectionScrollView`.
     @FocusState var isListFocused: Bool
 
-    /// Space above each group's heading after the first, which sets the groups apart without indenting their rows.
     static let groupSpacing: CGFloat = 10
 
     var matchingTabs: [TerminalSession] {
@@ -48,7 +37,6 @@ struct SidebarOpenTabsView: View {
     var body: some View {
         let tabs = matchingTabs
         let groups = TerminalTabGroup.groups(of: tabs, projectDirectoryKey: \.projectDirectoryKey)
-        // Colors come from every open tab's project, as in the tab bar, so a search that hides a group recolors no other.
         let colorsByProjectKey = TabGroupPalette.colorsByProjectKey(store.tabProjectKeysInOrder)
         let allGroups = allGroupsCollapsing(groups.map(\.projectDirectoryKey))
 
@@ -118,7 +106,6 @@ struct SidebarOpenTabsView: View {
             .padding(.top, 8)
             .padding(.bottom, 12)
         }
-        // Rows and headings have menus of their own, which a right-click on them shows instead.
         .contextMenu { TabGroupsBackgroundMenuItems(onNewSession: onNewSession, allGroups: allGroups) }
         .overlay {
             if tabs.isEmpty {
@@ -142,8 +129,6 @@ struct SidebarOpenTabsView: View {
         }
         .accessibilityIdentifier("sidebar.openTabs")
         .onChange(of: store.selectedTerminalID) { _, _ in
-            // A tab selected from the tab bar or by shortcut shows its row, as selecting one there expands its group,
-            // and its row is the one highlighted, in place of any rows selected to close.
             expandSelectedTabsGroup()
             selection.clear()
         }
@@ -155,7 +140,6 @@ struct SidebarOpenTabsView: View {
         }
     }
 
-    /// A search shows every group expanded, but these still collapse and expand the groups it leaves for afterwards.
     private func allGroupsCollapsing(_ groupKeys: [String]) -> AllTabGroupsCollapsing {
         AllTabGroupsCollapsing(
             canCollapseAll: groupKeys.contains { !groupCollapse.collapsedProjectKeys.contains($0) },

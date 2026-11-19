@@ -1,14 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Find's keys while the window shows a tab: ⌘F for the selected tab, and while its find bar shows, ⌘G and ⇧⌘G. Return,
-/// Shift-Return, and Escape belong to the bar only while its field has the keyboard; otherwise they go to the terminal,
-/// so a CLI keeps its Escape. The conversation reader has its own (`TranscriptSearchKeyboardShortcuts`), active only
-/// while no tab is selected.
 struct TerminalFindShortcuts: NSViewRepresentable {
-    /// The selected tab's find bar; nil while no tab is selected, which leaves every key alone.
     let selectedTabFind: TerminalFindState?
-    /// What ⌘F does in the selected tab; see `TerminalFindTarget`.
     let onFind: () -> Void
 
     func makeNSView(context: Context) -> ShortcutView { ShortcutView() }

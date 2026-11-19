@@ -1,14 +1,11 @@
 import Foundation
 
-/// What was read from each session file, kept while the file keeps its size and modification date, so a refresh
-/// reads only the files a CLI wrote to since the last one. A file that held nothing worth listing is remembered too.
 final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sendable {
     private struct Fingerprint: Equatable, Codable {
         let modificationDate: Date
         let size: Int
         let fileNumber: UInt64
 
-        /// Uses the values a directory listing already fetched for `file`, when it fetched them.
         init?(file: URL) {
             guard let values = try? file.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey]),
                 let modificationDate = values.contentModificationDate,
@@ -44,7 +41,6 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         self.persistsTemporaryFiles = persistsTemporaryFiles
     }
 
-    /// Called on the discovery worker. A cache is disposable; incompatible/corrupt snapshots are ignored.
     private func loadSnapshotIfNeeded() {
         guard !hasLoadedSnapshot else { return }
         hasLoadedSnapshot = true
@@ -57,15 +53,11 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         entriesByPath = snapshot.entries
     }
 
-    /// The summary kept for `file` if the file has not changed since, or else what `read` makes of it now.
     func summary(of file: URL, read: (URL) -> Summary?) -> Summary? {
         summary(ofGrowingFile: file) { file, _ in read(file) }
     }
 
-    /// For a file its CLI only adds to: when `file` changed, `read` gets the summary kept for it, if there is one, to
-    /// read on from. `read` checks the file still starts with what that summary read.
     func summary(ofGrowingFile file: URL, read: (URL, Summary?) -> Summary?) -> Summary? {
-        // Taken before reading: a write landing during the read then shows as a change at the next refresh.
         guard let fingerprint = Fingerprint(file: file) else { return read(file, nil) }
         let path = file.path
         let entry = lock.withLock {
@@ -81,7 +73,6 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         return summary
     }
 
-    /// Forgets the files in `directory` that a scan of it no longer found, such as deleted sessions.
     func forgetFiles(in directory: URL, except foundFiles: [URL]) {
         let directoryPrefix = directory.path.hasSuffix("/") ? directory.path : directory.path + "/"
         let foundPaths = Set(foundFiles.map(\.path))
@@ -96,7 +87,6 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         }
     }
 
-    /// One atomic write at the end of discovery, serialized with other hosts' writes. Temporary fixtures stay out.
     private func saveSnapshotIfNeeded() {
         guard needsSaving, let persistenceFile else { return }
         let temporaryPrefix = FileManager.default.temporaryDirectory.resolvingSymlinksInPath().path + "/"
@@ -117,7 +107,6 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
             try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: persistenceFile.path)
             needsSaving = false
         } catch {
-            // Rebuild from the source files when a cache cannot be saved.
         }
     }
 }

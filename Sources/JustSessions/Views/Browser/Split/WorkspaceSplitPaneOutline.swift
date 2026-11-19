@@ -1,37 +1,21 @@
 import SwiftUI
 
-/// Sizes of a split pane's outline, as Chrome's `ContentsContainerOutline` and `kSplitViewContentPadding`, and of the
-/// mini toolbar in its corner.
 enum WorkspaceSplitPaneMetrics {
     static let outlineWidth: CGFloat = 1
     static let outlineCornerRadius = ThemeCornerRadius.card.rawValue
-    /// Between the outline and the terminal inside it.
     static let contentPadding: CGFloat = 4
-    /// From the pane's edge to its terminal.
     static var terminalInset: CGFloat { outlineWidth + contentPadding }
-    /// The mini toolbar's × button, the tallest thing in the toolbar.
     static let miniToolbarButtonSize: CGFloat = 20
-    /// Chrome's `kMiniToolbarContentPadding`: from the notch's curve to the toolbar's contents.
     static let miniToolbarContentPadding: CGFloat = 4
-    /// The mini toolbar's height, the same in either pane: its ×, with Chrome's margins clear of the notch's curve
-    /// above it and on the outline's edge below it. Worked out from the toolbar's own sizes rather than measured, so a
-    /// split's terminal keeps the same room while its pane is hidden.
     static var miniToolbarHeight: CGFloat {
         outlineCornerRadius + miniToolbarContentPadding + miniToolbarButtonSize + outlineWidth
     }
-    /// From the pane's edges to its terminal, which ends at the top of the mini toolbar's notch, so the toolbar covers
-    /// none of the terminal's last rows, where CLIs draw their input and status.
     static var terminalInsets: EdgeInsets {
         EdgeInsets(top: terminalInset, leading: terminalInset, bottom: miniToolbarHeight, trailing: terminalInset)
     }
 }
 
-/// The rounded outline around a split pane, as Chrome's `ContentsContainerOutline::GetPath` draws it: with a mini
-/// toolbar in the pane's bottom-trailing corner, the outline turns in above the toolbar and runs down its leading side,
-/// curving out into the bottom edge, so the toolbar sits in a notch of the outline. Stroked with `lineWidth`, the line
-/// stays inside the pane's bounds.
 struct WorkspaceSplitPaneOutlineShape: Shape {
-    /// The mini toolbar's size, from its measured frame; zero for no toolbar, which draws a plain rounded rectangle.
     var toolbarSize: CGSize
     var lineWidth = WorkspaceSplitPaneMetrics.outlineWidth
     var cornerRadius = WorkspaceSplitPaneMetrics.outlineCornerRadius
@@ -39,7 +23,6 @@ struct WorkspaceSplitPaneOutlineShape: Shape {
     func path(in rect: CGRect) -> Path {
         let bounds = rect.insetBy(dx: lineWidth / 2, dy: lineWidth / 2)
         let radius = cornerRadius - lineWidth / 2
-        // The notch keeps the toolbar's full corner radius, as in Chrome.
         let notchRadius = cornerRadius
         var path = Path()
         path.move(to: CGPoint(x: bounds.minX, y: bounds.minY + radius))
@@ -53,20 +36,17 @@ struct WorkspaceSplitPaneOutlineShape: Shape {
         } else {
             let toolbarTop = bounds.maxY - toolbarSize.height
             let toolbarLeading = bounds.maxX - toolbarSize.width
-            // Down the trailing side to the toolbar's top, then in over the toolbar.
             path.addLine(to: CGPoint(x: bounds.maxX, y: toolbarTop))
             path.addArc(
                 tangent1End: CGPoint(x: bounds.maxX, y: toolbarTop + notchRadius),
                 tangent2End: CGPoint(x: toolbarLeading, y: toolbarTop + notchRadius),
                 radius: notchRadius
             )
-            // Around the toolbar's leading top corner and down its leading side.
             path.addArc(
                 tangent1End: CGPoint(x: toolbarLeading + notchRadius, y: toolbarTop + notchRadius),
                 tangent2End: CGPoint(x: toolbarLeading + notchRadius, y: bounds.maxY),
                 radius: notchRadius
             )
-            // Out into the bottom edge.
             path.addArc(
                 tangent1End: CGPoint(x: toolbarLeading + notchRadius, y: bounds.maxY),
                 tangent2End: CGPoint(x: bounds.minX, y: bounds.maxY),
@@ -80,9 +60,6 @@ struct WorkspaceSplitPaneOutlineShape: Shape {
     }
 }
 
-/// The mini toolbar's own shape, which fills the pane outline's notch exactly, as Chrome clips its mini toolbar in
-/// `ContentsContainerOutline::SetClipPath`: a rectangle whose top and leading sides curve in, with feet running out
-/// along the pane's trailing and bottom edges.
 struct WorkspaceSplitMiniToolbarShape: Shape {
     var lineWidth = WorkspaceSplitPaneMetrics.outlineWidth
     var cornerRadius = WorkspaceSplitPaneMetrics.outlineCornerRadius
@@ -114,8 +91,6 @@ struct WorkspaceSplitMiniToolbarShape: Shape {
 }
 
 extension TerminalPalette {
-    /// A split pane's outline, by Chrome's color mixer: darker around the selected tab's pane than around the other,
-    /// in Chrome's greys for a light or a dark background.
     func splitPaneOutlineColor(isSelected: Bool) -> Color {
         let hexValue: UInt32 =
             switch (isSelected, isDark) {

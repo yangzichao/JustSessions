@@ -1,16 +1,10 @@
 import Foundation
 import ImageIO
 
-/// An image a message or a tool result carries, as the session file holds it.
 struct TranscriptImage: Sendable, Equatable {
-    /// The image file's bytes, such as a PNG. Empty when the session file's base64 did not decode.
     let data: Data
-    /// Read from the image's header, so the preview can reserve its shape before decoding it. Nil when the data is
-    /// not an image ImageIO can read.
     let pixelSize: CGSize?
 
-    /// Holds the place of an image a reader leaves undecoded, as message search does; see
-    /// `TranscriptBuilder.decodesImages`. It reads as an image whose base64 did not decode.
     static let undecoded = TranscriptImage(data: Data())
 
     init(data: Data) {
@@ -22,8 +16,6 @@ struct TranscriptImage: Sendable, Equatable {
         self.init(data: Data(base64Encoded: string, options: .ignoreUnknownCharacters) ?? Data())
     }
 
-    /// The image decoded for display, downsampled to at most `maximumPixelSize` on its longer side and turned the
-    /// way its orientation metadata says. Nil when the data is not an image ImageIO can read.
     func decoded(maximumPixelSize: Int) -> CGImage? {
         guard let source = Self.source(for: data) else { return nil }
         let options: [CFString: Any] = [

@@ -1,6 +1,4 @@
 extension TerminalPalette {
-    /// How far an ANSI color stands apart from the background at least, as a contrast ratio. A fill this far apart is
-    /// plain to see; Nord's black, at 1.24, needs no change.
     static let minimumANSIFillRatio = 1.2
 
     /// The ANSI colors the terminal draws with: each moved away from the background until a fill in it can be seen. A

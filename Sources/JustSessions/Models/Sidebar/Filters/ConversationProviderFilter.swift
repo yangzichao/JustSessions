@@ -13,7 +13,6 @@ enum ConversationProviderFilter: Hashable, Identifiable {
         }
     }
 
-    /// The one tool this filter keeps, or nil when it keeps all of them.
     var provider: ConversationProvider? {
         switch self {
         case .all: nil
@@ -25,8 +24,6 @@ enum ConversationProviderFilter: Hashable, Identifiable {
         self == .all || self == .only(provider)
     }
 
-    /// "All tools", then one filter per tool offered, in the tools' usual order. The selected filter stays listed
-    /// even when its tool is no longer offered, so the menu always shows what filters the list.
     static func choices(offering providers: Set<ConversationProvider>, selected: ConversationProviderFilter) -> [ConversationProviderFilter]
     {
         [.all]

@@ -1,8 +1,5 @@
 import Foundation
 
-/// The projects and filter-bar counts the browser shows for one combination of its tool, recency, status, archive, and search
-/// filters, with the sessions a search found in messages. The browser re-renders on every keystroke, click, and poll tick, and filtering a few thousand sessions
-/// takes milliseconds, so the store keeps the last answer until one of `Inputs` changes.
 struct FilteredSidebarProjection {
     struct Inputs: Equatable {
         let projectionInputs: SidebarProjection.Inputs
@@ -12,32 +9,20 @@ struct FilteredSidebarProjection {
         let statusFilter: SessionStatusFilter
         let archiveFilter: SessionArchiveFilter
         let archived: ArchivedSessions
-        /// Kept whatever the status filter, for the filter bar's counts.
         let running: SessionsRunning
         let waiting: SessionsWaitingForYou
         let searchText: String
-        /// Sessions whose messages hold the search text, listed along with those whose title or ID does.
         let messageMatchConversationIDs: Set<String>
-        /// `Date.now` rounded down to the minute. The Recent filter classifies against the current time, so the
-        /// time belongs to the inputs; minute precision re-classifies an aging session at most a minute late
-        /// without making every render a cache miss.
         let recencyNow: Date
     }
 
     let inputs: Inputs
-    /// Narrowed by the tool, recency, and search filters, in sidebar order.
     let projects: [ProjectConversationGroup]
-    /// The sessions `projects` list, so Back and Forward can tell which ones the sidebar still lists.
     let listedConversationIDs: Set<String>
-    /// The tool and archive filters' sessions before the recency filter: the filter bar's "All" count.
     let allSessionCount: Int
-    /// The tool filter's archived sessions, listed or not: the filter bar's "Show archived" count.
     let archivedSessionCount: Int
-    /// Those of `allSessionCount`'s sessions the Recent filter keeps: the filter bar's "Recent" count.
     let recentSessionCount: Int
-    /// Those of `allSessionCount`'s sessions whose CLI runs: the filter bar's "Running" count.
     let runningSessionCount: Int
-    /// Those of `allSessionCount`'s sessions whose CLI waits on you: the filter bar's "Waiting for you" count.
     let waitingSessionCount: Int
 
     init(inputs: Inputs, projection: SidebarProjection, title: (Conversation) -> String) {

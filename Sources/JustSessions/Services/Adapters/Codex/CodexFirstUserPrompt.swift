@@ -1,6 +1,5 @@
 import Foundation
 
-/// Finds the first thing the user typed in a Codex rollout file, which titles a session the index has no name for.
 enum CodexFirstUserPrompt {
     static let maximumByteCount = 262_144
     static let maximumLineCount = 80
@@ -11,7 +10,6 @@ enum CodexFirstUserPrompt {
         find(amongLines: JSONLinesReader.leadingLines(in: file, maximumByteCount: maximumByteCount))
     }
 
-    /// `lines` are oldest first, as they are in the file. Returns the text trimmed.
     static func find(amongLines lines: [Data]) -> String? {
         for line in lines.prefix(maximumLineCount) {
             guard let record = ConversationMetadata.object(from: line),

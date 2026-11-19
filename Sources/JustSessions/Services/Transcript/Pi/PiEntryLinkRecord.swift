@@ -1,9 +1,6 @@
 import Foundation
 
-/// The fields `PiEntryLink` reads from a line it has to parse because its start is not in Pi's own layout. Every
-/// field is optional and one of another type reads as missing.
 struct PiEntryLinkRecord: Decodable {
-    /// Only a message's role is needed to tell whether the preview might show it.
     struct Message: Decodable {
         private enum CodingKeys: String, CodingKey {
             case role

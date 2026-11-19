@@ -1,19 +1,10 @@
 import Foundation
 
-/// What a start command runs, read the way the shell that starts it reads it, far enough to check the command before
-/// it is kept. It runs as `env <command> <the app's arguments>`, see `CLIStartCommandLine`, so it has to be one
-/// simple command: `NAME=value` words for `env`, then the program and its arguments. Reading it runs nothing in it.
 enum StartCommandShape: Equatable {
-    /// The program with its quotes removed. `~` and `~/…` are left for the host to expand.
     case program(String)
-    /// A program only the shell can tell, such as one in a variable, one relative to the project folder, or an option
-    /// for `env` instead of a program.
     case programKnownOnlyWhenItRuns
     case noProgram
-    /// A quote, `$(`, or backquote that is never closed, or a backslash at the end.
     case unclosedQuote
-    /// A shell operator such as `;`, `&`, `|`, `>`, or `(`, or a `#` that starts a comment. The app's arguments would
-    /// go to whatever follows it, or into the comment.
     case shellOperator(String)
 
     init(_ command: String) {
@@ -46,7 +37,6 @@ enum StartCommandShape: Equatable {
 
     private struct Word {
         var text = ""
-        /// Holds `$` or a backquote, whose value only the shell knows.
         var hasExpansion = false
     }
 
@@ -108,8 +98,6 @@ enum StartCommandShape: Equatable {
         return words
     }
 
-    /// Inside double quotes a backslash escapes only `$`, a backquote, `"`, and itself. Returns the closing quote's
-    /// index.
     private static func readDoubleQuoted(_ characters: [Character], openingAt openingIndex: Int, into word: inout Word) throws -> Int {
         var index = openingIndex + 1
         while index < characters.count {

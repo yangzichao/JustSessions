@@ -1,11 +1,8 @@
 import SwiftUI
 
-/// One tab a split chooser lists, as Chrome's split view page lists a tab: its status and title, with where it runs and
-/// what it runs under them. A click chooses it.
 struct TerminalSplitChooserRow: View {
     @ObservedObject var tab: TerminalSession
     let details: String
-    /// ↑ and ↓ moved to it while the chooser has the keyboard, so Return chooses it.
     let isHighlighted: Bool
     let onChoose: () -> Void
 

@@ -2,8 +2,6 @@ import AppKit
 import SwiftTerm
 
 extension SelectableTerminalView {
-    /// The link a ⌘-click where `event` happened would hand over, found as SwiftTerm finds it: an OSC 8 hyperlink's
-    /// target, or the URL or path at that cell. Nil outside the text, as in the margin.
     func link(under event: NSEvent) -> String? {
         let point = convert(event.locationInWindow, from: nil)
         // SwiftTerm keeps its cell size to itself, but reports it in pixels, which are whole since it snaps cells to

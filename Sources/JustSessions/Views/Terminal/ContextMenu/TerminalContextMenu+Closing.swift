@@ -1,10 +1,6 @@
 import AppKit
 
-/// Closing the tab, as the tab's menu in the tab bar offers it; see `TerminalTabMenuItems`.
 extension TerminalContextMenu {
-    /// Close Tab… asks what to do with the CLI, as the tab's × does. Close and end session stops a running CLI without
-    /// asking, and Close and delete session… asks before it deletes the tab's session. A session started with Delete
-    /// the session when its tab closes offers Keep session, and Close and delete session, which doesn't ask.
     var closingItems: [NSMenuItem] {
         if store.deletesSessionWhenClosed(tab) {
             return [

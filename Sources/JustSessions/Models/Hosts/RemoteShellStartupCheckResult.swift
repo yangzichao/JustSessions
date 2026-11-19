@@ -1,27 +1,18 @@
 import Foundation
 
-/// What `RemoteShellStartupCheck` found about an SSH host's shell startup.
 struct RemoteShellStartupCheckResult: Codable, Equatable, Sendable {
     enum Outcome: String, Codable, Sendable {
-        /// The interactive startup lets the app's commands run.
         case interactiveStartupWorks
-        /// The interactive startup starts another program first; a login shell without it runs the app's commands.
         case usesLoginShellOnly
-        /// Neither runs the app's commands, so a tab opens a shell or another program instead of its CLI until the
-        /// host's startup files change.
         case blocked
     }
 
     let outcome: Outcome
-    /// The last command the interactive startup ran, as `file:line: command`, when it did not let the app's command
-    /// run and the shell, bash or zsh, could trace it.
     let stoppedAt: String?
 
     var shellStartup: RemoteShellStartup { outcome == .usesLoginShellOnly ? .loginOnly : .interactive }
 }
 
-/// Each SSH host's last shell startup check, kept so a host is checked again only when something suggests its
-/// startup changed; see `ConversationStore+RemoteShellStartup`.
 struct RemoteShellStartupChecks: Equatable {
     static let userDefaultsKey = "remoteShellStartupChecks"
 

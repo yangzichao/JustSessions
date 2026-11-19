@@ -1,38 +1,21 @@
 import SwiftUI
 
-/// A host's heading above its projects: its name, how its last refresh went, and its project count. A failed refresh
-/// shows a warning after the name, which checks an SSH host; see `SidebarHostRefreshFailureWarning`. So does an SSH host whose shell startup keeps
-/// CLIs from starting; see `SidebarHostShellStartupWarning`. A refresh that needed a password, a code, or a new host
-/// key's approval shows Connect… in place of the first warning; see `SidebarHostConnectButton`. Otherwise a host whose
-/// sign-in command is due shows Sign in… there; see `SidebarHostSignInButton`. With none of these, a
-/// problem the host's last check found shows a warning too; see `SidebarHostCheckProblemWarning`. A host you
-/// disconnected from shows none of these, and Disconnected in place of its refresh status; its refresh button
-/// connects it again. While the pointer is over the heading, the
-/// count gives way to a +, and an SSH host's refresh status to a ⋯. The + adds a project there, or
-/// restores an archived one; the ⋯ holds the host's own settings, and a right-click opens all the heading's actions.
-/// New sessions start from a project's own +, so the heading manages the host's projects instead. Its refresh button
-/// refreshes this host alone, and shows its progress. While an SSH host's refresh copies its sessions, the refresh status
-/// says how far it is through the tools, and the tooltip which tool it is copying.
 struct SidebarHostHeading: View {
     let host: SessionHost
     let refreshStatus: HostRefreshStatus?
-    /// Nil unless an SSH host's refresh is copying its sessions.
     let copyStep: RemoteSessionCopyStep?
     let projectCount: Int
     let onAddProject: () -> Void
     let onRefresh: () -> Void
-    /// While sessions are being deleted, manual refresh is disabled.
     let isRefreshDisabled: Bool
     let archivedProjectCount: Int
     let onShowArchivedProjects: () -> Void
-    /// Nil for this Mac; see `SidebarHostMenuItems`.
     let sshHostActions: SidebarSSHHostActions?
 
     @State private var isHovered = false
 
     var body: some View {
         HStack(spacing: 6) {
-            // One width for every host's symbol keeps the host names lined up.
             Image(systemName: host.symbolName)
                 .font(ThemeFont.glyph(.control, weight: .medium))
                 .foregroundStyle(ThemePalette.tertiaryText)
@@ -81,7 +64,6 @@ struct SidebarHostHeading: View {
         sshHostActions?.login == .disconnected
     }
 
-    /// Connect…, Sign in…, or the warnings, after the host's name, while the host is connected.
     @ViewBuilder
     private var warningsAndButtons: some View {
         Group {
@@ -127,8 +109,6 @@ struct SidebarHostHeading: View {
         return message
     }
 
-    /// The ⋯ takes the refresh status's place rather than room of its own, which the host's name would lose. The
-    /// heading's tooltip still says when the host was refreshed, or why it could not be.
     private var refreshStatusOrMoreActions: some View {
         ZStack(alignment: .trailing) {
             refreshStatusIndicator
@@ -168,7 +148,6 @@ struct SidebarHostHeading: View {
         case .failed?:
             EmptyView()
         case .refreshed(let syncDate)?:
-            // This Mac's files are read in place; only an SSH host's copy can be behind.
             if host != .thisMac {
                 TimelineView(.everyMinute) { context in
                     Text(HostSyncAgeFormatter.string(forSyncedAt: syncDate, relativeTo: context.date))

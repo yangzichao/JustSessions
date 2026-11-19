@@ -1,14 +1,9 @@
 import Foundation
 
-/// What the `session_meta` line opening a Codex rollout file says: the session and the folder it ran in, and, for a
-/// subagent's thread, the thread that spawned it.
 struct CodexRolloutHead: Sendable, Codable {
-    /// A thread another thread spawned as a subagent, from `source.subagent.thread_spawn`.
     struct Spawn: Sendable, Codable, Equatable {
         let parentThreadID: String
-        /// The name Codex gave the agent, such as `Volta`.
         let agentNickname: String?
-        /// Where the agent sits among its parent's agents, such as `/root/decode_plan`.
         let agentPath: String?
     }
 
@@ -16,7 +11,6 @@ struct CodexRolloutHead: Sendable, Codable {
     let projectPath: String
     let spawn: Spawn?
 
-    /// Nil when the file does not open with a valid `session_meta` line, such as one Codex has not finished writing.
     init?(file: URL) {
         guard let root = ConversationMetadata.firstLine(of: file, requiresRegularFile: true),
             root["type"] as? String == "session_meta",

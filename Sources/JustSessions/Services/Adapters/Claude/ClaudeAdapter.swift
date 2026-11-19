@@ -8,7 +8,6 @@ struct ClaudeAdapter: ConversationAdapter {
         standardConfigurationDirectory()
     }
 
-    /// `CLAUDE_CONFIG_DIR`, or `~/.claude`. An SSH host's is found with the host's environment and home.
     static func standardConfigurationDirectory(
         environment: [String: String] = ProcessInfo.processInfo.environment,
         homeDirectory: String = NSHomeDirectory()
@@ -20,12 +19,8 @@ struct ClaudeAdapter: ConversationAdapter {
         self.configurationDirectory = configurationDirectory
     }
 
-    /// Shared by every Claude Code adapter, this Mac's and each SSH host's mirror, which keep their files apart.
     private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>(
         persistenceFile: SessionSummaryCacheLocation.file(named: "claude-heads-2"))
-    /// Named for the version of the tail it keeps: tails kept before `relocated` and `worktree-state` lines were read
-    /// would leave a session moved with `/cd` under the folder it started in, and one in a worktree under the
-    /// worktree's folder.
     private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>(
         persistenceFile: SessionSummaryCacheLocation.file(named: "claude-tails-5"))
     private static let subagentSessions = SessionFileSummaryCache<ClaudeSubagentSession>(
@@ -83,7 +78,6 @@ struct ClaudeAdapter: ConversationAdapter {
         try ClaudeConversationDeletion(configurationDirectory: configurationDirectory).delete(conversation)
     }
 
-    /// Nil for a file that is not a session transcript, for a sidechain session, or when no project folder is known.
     /// A session moved with `/cd` is listed under the folder it moved to, and one in a git worktree under the
     /// repository it entered the worktree from, as Claude Code lists them.
     private func conversation(in file: URL, index: ClaudeSessionsIndex) -> Conversation? {

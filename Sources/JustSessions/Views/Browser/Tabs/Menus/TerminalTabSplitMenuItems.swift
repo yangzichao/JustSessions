@@ -1,10 +1,6 @@
 import SwiftUI
 
-/// The split view entries of a tab's menu, as Chrome's tab menu offers them, each a submenu but the first and each
-/// followed by a separator. The selected tab in no split offers Split right and Split down instead of Chrome's Add tab to
-/// new split view, each listing new sessions of its project's CLIs, a terminal, and the other tabs.
 struct TerminalTabSplitMenuItems: View {
-    /// Nil for no entries.
     let splitMenu: TerminalTabSplitMenu?
     let onSplitAction: (TerminalTabSplitAction) -> Void
 
@@ -63,7 +59,6 @@ struct TerminalTabSplitMenuItems: View {
         }
     }
 
-    /// Split right or Split down: a new session of each CLI and a terminal in the tab's project, then the other tabs.
     private func newSplitMenu(
         _ orientation: TerminalSplit.Orientation,
         candidates: [TerminalTabSplitCandidate],

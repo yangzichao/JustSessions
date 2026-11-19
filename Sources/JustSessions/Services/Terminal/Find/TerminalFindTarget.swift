@@ -4,9 +4,7 @@
 /// CLI, screen mode, host, and engine. So a tab linked to a session finds in its conversation, and only the others, a
 /// plain terminal or a CLI tab not linked yet, find in the terminal.
 enum TerminalFindTarget: Equatable {
-    /// The conversation's Find, in its reading window, which leaves the selected tab as it is.
     case conversation(Conversation)
-    /// The tab's own find bar; see `TerminalTextFinding`.
     case terminal
 
     @MainActor

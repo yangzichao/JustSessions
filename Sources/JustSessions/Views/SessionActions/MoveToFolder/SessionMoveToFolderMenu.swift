@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// **Move to** in a Claude Code session's menus: the other projects on the session's host, then, on this Mac, a folder
-/// picker. There is no folder picker for another machine, so a new folder on an SSH host is added as a project from
-/// the host's + first. See `ConversationStore.moveSession(_:toFolder:)`.
 struct SessionMoveToFolderMenu: View {
     let store: ConversationStore
     let conversation: Conversation

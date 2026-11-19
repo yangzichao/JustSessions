@@ -1,7 +1,5 @@
 import Foundation
 
-/// What the preview needs of one row of OpenCode's `message` table. The text, tool calls, and attachments are in
-/// the message's parts.
 struct OpenCodeTranscriptMessage: Sendable, Equatable {
     enum Role: Sendable {
         case user
@@ -15,12 +13,9 @@ struct OpenCodeTranscriptMessage: Sendable, Equatable {
     let id: String
     let role: Role
     let timestamp: Date
-    /// The reply OpenCode wrote to stand in for older messages when it compacted the conversation.
     let isCompactionSummary: Bool
-    /// Why the reply failed, as OpenCode shows it. Nil when it succeeded or was interrupted by the user.
     let errorText: String?
 
-    /// Nil for a message whose data is not a user or assistant message.
     init?(id: String, createdAtMilliseconds: Int64, data: Data?) {
         guard let data, let object = ConversationMetadata.object(from: data) else { return nil }
         switch object["role"] as? String {

@@ -1,6 +1,5 @@
 import Foundation
 
-/// Foundation supplies the Markdown structure and inline attributes; the reader supplies its layout.
 enum TranscriptMarkdownParser {
     static func blocks(from source: String) -> [TranscriptMarkdownBlock] {
         let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .full)
@@ -21,7 +20,6 @@ enum TranscriptMarkdownParser {
             if let item = listItems.first, seenListItems.insert(item.identity).inserted,
                 case .listItem(let ordinal) = item.kind
             {
-                // The closest list, rather than an outer ordered list, controls the marker.
                 let nearestList = components.first { component in
                     switch component.kind {
                     case .orderedList, .unorderedList: true

@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// The + on a host's heading. While the host has archived projects it opens a menu that adds a project or lists the
-/// archived ones to restore, so they are found where projects are added; otherwise it adds a project straight away.
 struct SidebarHostAddProjectButton: View {
     let host: SessionHost
     let archivedProjectCount: Int

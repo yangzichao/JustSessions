@@ -7,7 +7,6 @@ import Foundation
 /// without removing it; they go once Kiro has deleted the rest.
 struct KiroConversationDeletion {
     let sessionsDirectory: URL
-    /// V3's sessions; see `KiroV3Session`. Nil deletes V2's alone.
     let v3SessionsDirectory: URL?
     let executableURL: URL?
     let fileManager: FileManager
@@ -65,7 +64,6 @@ struct KiroConversationDeletion {
         removeLeftovers(of: conversation, named: ["history", "lock"])
     }
 
-    /// `sess_<uuid>/messages.jsonl` in a workspace folder of `v3SessionsDirectory`, beside a `session.json` that names it.
     private func deleteV3(_ conversation: Conversation) throws {
         let sourceFile = conversation.sourceFile.standardizedFileURL
         let sessionFolder = sourceFile.deletingLastPathComponent()
@@ -108,8 +106,6 @@ struct KiroConversationDeletion {
         }
     }
 
-    /// `<id>.<extension>` in `sessions/cli`, V2 and V3 sessions' alike, when it is a regular file there. The session is
-    /// already deleted, so a failure here only leaves these behind.
     private func removeLeftovers(of conversation: Conversation, named fileExtensions: [String]) {
         for fileExtension in fileExtensions {
             let file = sessionsDirectory.appendingPathComponent("\(conversation.sessionID).\(fileExtension)")

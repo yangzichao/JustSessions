@@ -6,7 +6,6 @@ import Foundation
 enum AntigravityCLILog {
     static let conversationStreamMarker = "Starting conversation update stream for "
 
-    /// The conversation the last line in `text` that opens a conversation stream names.
     static func lastConversationID(in text: String) -> String? {
         var searchEnd = text.endIndex
         while let markerRange = text.range(of: conversationStreamMarker, options: .backwards, range: text.startIndex..<searchEnd) {

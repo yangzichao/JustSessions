@@ -1,13 +1,10 @@
 import AppKit
 
-/// One reading window per session, keyed by its host-qualified ID. Closing it releases its retained workspace.
 @MainActor
 final class SessionReadingWindowManager {
     static let shared = SessionReadingWindowManager()
     private var controllersByConversationID: [String: SessionReadingWindowController] = [:]
 
-    /// With `showingFind`, the reader opens Find, or puts the keyboard back in it in a window already open. With
-    /// `navigation`, a new window opens there and one already open goes there (RDR-45, RDR-50).
     @discardableResult
     func open(
         _ conversation: Conversation, store: ConversationStore, initialPosition: TranscriptReadingPosition? = nil,
@@ -18,8 +15,6 @@ final class SessionReadingWindowManager {
             if showingFind { controller.requests.requestFind() }
             switch navigation {
             case .adjacentBookmark(let forward)?:
-                // As ⌘' in the window: from the message being read, or, while no pages show, from where it was left
-                // (TranscriptView.waitingNavigationTarget). A window not yet drawn shows none.
                 if let target = TranscriptBookmarkTargetRegistry.shared.target(in: controller.readingWindow) {
                     target.goToAdjacentBookmark(forward)
                 } else {
@@ -40,7 +35,6 @@ final class SessionReadingWindowManager {
         }
         controllersByConversationID[conversation.id] = controller
         if showingFind { controller.requests.requestFind() }
-        // Taken in a new window too, as its first page shows: it sets the seek target ⌘' goes on from.
         if let navigation { controller.requests.request(navigation) }
         let window = controller.readingWindow
         window.makeKeyAndOrderFront(nil)

@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// The last lines of the ended tab Check host was started from, under the report's findings, as Copy report ends with
-/// them. See `TerminalSession.shownTextForHostCheck`.
 struct HostCheckEndedTabScreenRow: View {
     let screenText: String
 
