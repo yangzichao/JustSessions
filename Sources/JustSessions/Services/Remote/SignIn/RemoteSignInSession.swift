@@ -98,9 +98,9 @@ struct RemoteSignInSession: Sendable {
                 if snapshot.outputVersion != question.outputVersion {
                     question.task.cancel()
                     shownQuestion = nil
-                } else if let answer = question.answer.value {
+                } else if let reply = question.answer.reply {
                     shownQuestion = nil
-                    guard let answer else {
+                    guard case .answered(let answer) = reply else {
                         stop()
                         return .cancelled
                     }
@@ -118,7 +118,7 @@ struct RemoteSignInSession: Sendable {
                     previousPrompt: lastAskedPrompt
                 )
                 let answer = AnswerBox()
-                let task = Task { answer.set(await ask(signInQuestion)) }
+                let task = Task { answer.set(await ask(signInQuestion).map(QuestionReply.answered) ?? .cancelled) }
                 shownQuestion = (task, answer, snapshot.outputVersion, prompt)
             }
             try? await Task.sleep(for: timing.pollInterval)
@@ -201,13 +201,18 @@ private final class RunState: @unchecked Sendable {
     }
 }
 
+private enum QuestionReply: Sendable {
+    case answered(String)
+    case cancelled
+}
+
 private final class AnswerBox: @unchecked Sendable {
     private let lock = NSLock()
-    private var answer: String??
+    private var storedReply: QuestionReply?
 
-    var value: String?? { lock.withLock { answer } }
+    var reply: QuestionReply? { lock.withLock { storedReply } }
 
-    func set(_ answer: String?) {
-        lock.withLock { self.answer = .some(answer) }
+    func set(_ reply: QuestionReply) {
+        lock.withLock { storedReply = reply }
     }
 }

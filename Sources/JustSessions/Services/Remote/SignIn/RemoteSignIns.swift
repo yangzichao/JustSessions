@@ -148,11 +148,27 @@ final class RemoteSignIns {
         let cameDue = states[host] != .due
         states[host] = .due
         guard cameDue else { return }
-        if isFirstLook, isAppActive(), signingIn == nil {
+        switch announcementOfDueSignIn(on: host, isFirstLook: isFirstLook) {
+        case .dialog:
             openDialog(on: host)
-        } else if notified.insert(host).inserted {
+        case .notification:
+            notified.insert(host)
             notify(host)
+        case .alreadyNotified:
+            break
         }
+    }
+
+    private enum DueSignInAnnouncement {
+        case dialog
+        case notification
+        case alreadyNotified
+    }
+
+    private func announcementOfDueSignIn(on host: String, isFirstLook: Bool) -> DueSignInAnnouncement {
+        let youJustCameToTheApp = isFirstLook && isAppActive()
+        if youJustCameToTheApp, signingIn == nil { return .dialog }
+        return notified.contains(host) ? .alreadyNotified : .notification
     }
 
     private func openDialog(on host: String) {

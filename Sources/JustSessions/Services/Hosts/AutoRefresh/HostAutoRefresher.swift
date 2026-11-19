@@ -15,7 +15,7 @@ final class HostAutoRefresher {
     private let registry: WorkspaceWindowRegistry
     private let isAnyWindowOnScreen: () -> Bool
     /// Starts a window's refresh of an SSH host, as `refreshRemoteHost(_:)` does; tests copy from a local folder.
-    private let refreshSSHHost: (ConversationStore, String) -> Task<Void, Never>?
+    private let refreshSSHHost: (ConversationStore, String) -> RemoteHostRefreshStart
     /// Nil checks no host on its own, as in tests, which would otherwise log in to their made-up hosts.
     private let backgroundChecker: HostBackgroundChecker?
     /// Nil looks at no host's sign-in command, as in tests.
@@ -28,7 +28,7 @@ final class HostAutoRefresher {
     init(
         registry: WorkspaceWindowRegistry = .shared,
         isAnyWindowOnScreen: (() -> Bool)? = nil,
-        refreshSSHHost: @escaping (ConversationStore, String) -> Task<Void, Never>? = { $0.refreshRemoteHost($1) },
+        refreshSSHHost: @escaping (ConversationStore, String) -> RemoteHostRefreshStart = { $0.refreshRemoteHost($1) },
         backgroundChecker: HostBackgroundChecker? = nil,
         signIns: RemoteSignIns? = nil
     ) {
@@ -86,7 +86,7 @@ final class HostAutoRefresher {
                 now: now
             )
         {
-            guard let refresh = refreshSSHHost(oldestStore, host) else { continue }
+            guard case .started(let refresh) = refreshSSHHost(oldestStore, host) else { continue }
             schedule.noteTry(on: host, at: now)
             Task { [weak self, weak oldestStore] in
                 await refresh.value

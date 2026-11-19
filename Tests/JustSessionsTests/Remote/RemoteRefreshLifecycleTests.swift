@@ -25,7 +25,7 @@ struct RemoteRefreshLifecycleTests {
             cacheRoot: sandbox.root.appendingPathComponent("cache"), sourceHomeOverride: home.path,
             toolFoldersLookup: { _ in pause.read() })
         let task = try #require(
-            store.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: mirror, status: { _ in probes.read() })))
+            store.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: mirror, status: { _ in probes.read() })).task)
         try await expectEventually { pause.isWaiting }
 
         store.disconnectHost("devbox", endingTmuxSessions: false, connections: SSHLoginConnections(close: { _, _ in }))
@@ -56,7 +56,7 @@ struct RemoteRefreshLifecycleTests {
         let cache = sandbox.root.appendingPathComponent("cache")
         let oldMirror = RemoteSessionMirror(cacheRoot: cache, sourceHomeOverride: home.path, toolFoldersLookup: { _ in pause.read() })
         let task = try #require(
-            store.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: oldMirror, status: { _ in probes.read() })))
+            store.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: oldMirror, status: { _ in probes.read() })).task)
         try await expectEventually { pause.isWaiting }
 
         store.removeRemoteHost("devbox", mirror: oldMirror)
@@ -84,11 +84,11 @@ struct RemoteRefreshLifecycleTests {
 
     @Test func listingTokensRejectOldLifecyclesAndOutOfOrderCopies() {
         let work = RemoteHostWork()
-        let first = work.beginRead(on: "devbox", copiedAt: Date(timeIntervalSinceReferenceDate: 10))!
-        let second = work.beginRead(on: "devbox", copiedAt: Date(timeIntervalSinceReferenceDate: 20))!
+        let first = work.beginReadIfNewestCopy(on: "devbox", copiedAt: Date(timeIntervalSinceReferenceDate: 10))!
+        let second = work.beginReadIfNewestCopy(on: "devbox", copiedAt: Date(timeIntervalSinceReferenceDate: 20))!
         #expect(!work.isCurrentRead(first, on: "devbox"))
         #expect(work.isCurrentRead(second, on: "devbox"))
-        #expect(work.beginRead(on: "devbox", copiedAt: Date(timeIntervalSinceReferenceDate: 15)) == nil)
+        #expect(work.beginReadIfNewestCopy(on: "devbox", copiedAt: Date(timeIntervalSinceReferenceDate: 15)) == nil)
         work.invalidate("devbox")
         #expect(!work.isCurrentRead(second, on: "devbox"))
     }
@@ -119,7 +119,8 @@ struct RemoteRefreshLifecycleTests {
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
         let mirror = RemoteSessionMirror(
             cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: home.path, toolFoldersLookup: { _ in pause.read() })
-        let task = try #require(first.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: mirror, status: { _ in nil })))
+        let task = try #require(
+            first.refreshRemoteHost("devbox", discovery: RemoteSessionDiscovery(mirror: mirror, status: { _ in nil })).task)
         try await expectEventually { pause.isWaiting }
         second.deleteConversations([conversation])
         #expect(second.queuedDeletionConversationIDs == [conversation.id])

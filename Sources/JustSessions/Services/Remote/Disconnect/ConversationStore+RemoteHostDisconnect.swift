@@ -62,21 +62,29 @@ extension ConversationStore {
         closingTabs: (ConversationStore, [UUID]) -> Void
     ) {
         guard remoteHostList.hosts.contains(host), !isDisconnected(host) else { return }
-        let stores = storesSharingHostWork
+        let disconnection = markDisconnected(host, in: storesSharingHostWork)
+        closeTabs(after: disconnection, closingTabs: closingTabs)
+        for store in disconnection.stores { store.forgetRunningMarks(on: host) }
+        SSHPortForwards.shared.stopAll(on: host)
+        closeLoginAfterTabsClose(on: host, in: disconnection.stores, connections: connections)
+    }
+
+    private func markDisconnected(_ host: String, in stores: [ConversationStore]) -> HostMarkedDisconnected {
         for store in stores { store.disconnectedRemoteHosts.setDisconnected(true, for: host) }
         for store in stores {
             store.discardQueuedDeletions(on: .ssh(host))
             store.invalidateRemoteHostWork(on: host)
         }
         disconnectedRemoteHosts.save(to: userDefaults)
-        for store in stores {
-            let tabs = store.terminalSessions.filter { $0.host == .ssh(host) }
+        return HostMarkedDisconnected(host: host, stores: stores)
+    }
+
+    private func closeTabs(after disconnection: HostMarkedDisconnected, closingTabs: (ConversationStore, [UUID]) -> Void) {
+        for store in disconnection.stores {
+            let tabs = store.terminalSessions.filter { $0.host == .ssh(disconnection.host) }
             for tab in tabs { tab.connectionEndedOnPurpose = true }
             store.closingTabsWithoutRemembering { closingTabs(store, tabs.map(\.id)) }
         }
-        for store in stores { store.forgetRunningMarks(on: host) }
-        SSHPortForwards.shared.stopAll(on: host)
-        closeLoginAfterTabsClose(on: host, in: stores, connections: connections)
     }
 
     private func forgetRunningMarks(on host: String) {
@@ -101,4 +109,9 @@ extension ConversationStore {
     private func openTabsInEveryWindow(on host: String) -> [TerminalSession] {
         storesOfEveryWindow.flatMap { store in store.terminalSessions.filter { $0.host == .ssh(host) } }
     }
+}
+
+private struct HostMarkedDisconnected {
+    let host: String
+    let stores: [ConversationStore]
 }
