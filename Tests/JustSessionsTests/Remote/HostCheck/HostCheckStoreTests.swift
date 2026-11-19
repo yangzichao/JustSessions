@@ -19,7 +19,7 @@ struct HostCheckStoreTests {
         #expect(store.hostCheck?.isChecking == true)
         gate.open()
         try await expectEventually { store.hostCheck?.report != nil }
-        #expect(store.hostCheck?.report?.findings.first?.id == "connection")
+        #expect(store.hostCheck?.report?.findings.first?.id == .connection)
         #expect(store.shellStartupCheck(on: host)?.outcome == .usesLoginShellOnly)
         #expect(RemoteHostShellStartups.shared.startup(on: host) == .loginOnly)
     }

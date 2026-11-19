@@ -11,7 +11,11 @@ struct HostCheckReport: Codable, Equatable, Sendable {
     var warningCount: Int { findings.count { $0.status == .warning } }
 
     var hostProblems: [HostCheckFinding] {
-        findings.filter { $0.status == .problem && $0.id != "folder" }
+        findings.filter { $0.status == .problem && $0.id != .folder }
+    }
+
+    var foundTmuxServerUnreachable: Bool {
+        findings.contains { $0.id == .tmux && $0.status == .problem }
     }
 
     var hasSomethingToFix: Bool {

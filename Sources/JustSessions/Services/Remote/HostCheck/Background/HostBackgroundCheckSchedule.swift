@@ -4,7 +4,7 @@ enum HostBackgroundCheckSchedule {
     static let dailyInterval: TimeInterval = 24 * 60 * 60
     static let shortestInterval: TimeInterval = 10 * 60
     static let unfinishedCheckInterval: TimeInterval = 60 * 60
-    static let unfinishedCheckFindingIDs: Set<String> = ["connection", "login-shell", "script"]
+    static let unfinishedCheckFindingIDs: Set<HostCheckFindingID> = [.connection, .loginShell, .script]
 
     enum Reason: Equatable, Sendable {
         case neverChecked
@@ -35,8 +35,7 @@ enum HostBackgroundCheckSchedule {
         guard age >= shortestInterval else { return nil }
         if tabAskedForCheck { return .tabEndedSoonAfterStarting }
         if lastRefresh.refreshedAt > checkedAt {
-            let checkFoundTmuxServerUnreachable = keptCheck.report.findings.contains { $0.id == "tmux" && $0.status == .problem }
-            switch (lastRefresh.tmuxServerProblem != nil, checkFoundTmuxServerUnreachable) {
+            switch (lastRefresh.tmuxServerProblem != nil, keptCheck.report.foundTmuxServerUnreachable) {
             case (true, false): return .tmuxServerUnreachable
             case (false, true): return .tmuxServerReachableAgain
             default: break

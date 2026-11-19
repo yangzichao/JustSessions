@@ -15,12 +15,17 @@ extension ConversationStore {
     }
 
     func checkRemoteShellStartupIfNeeded(on host: String, statusListedCLIs: Bool) {
-        guard let result = RemoteShellStartupChecks.load(from: userDefaults).result(for: host) else {
-            guard statusListedCLIs || hostsRecheckedShellStartup.insert(host).inserted else { return }
+        let keptResult = RemoteShellStartupChecks.load(from: userDefaults).result(for: host)
+        if keptResult == nil, statusListedCLIs {
             checkRemoteShellStartup(on: host)
-            return
+        } else if !statusListedCLIs, keptResult?.outcome != .blocked {
+            recheckRemoteShellStartupOncePerRun(on: host)
         }
-        guard !statusListedCLIs, result.outcome != .blocked, hostsRecheckedShellStartup.insert(host).inserted else { return }
+    }
+
+    private func recheckRemoteShellStartupOncePerRun(on host: String) {
+        guard !hostsRecheckedShellStartup.contains(host) else { return }
+        hostsRecheckedShellStartup.insert(host)
         checkRemoteShellStartup(on: host)
     }
 

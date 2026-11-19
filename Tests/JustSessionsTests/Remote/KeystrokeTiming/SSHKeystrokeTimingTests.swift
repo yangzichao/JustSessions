@@ -15,7 +15,7 @@ struct SSHKeystrokeTimingTests {
         #expect(!SSHKeystrokeTiming.sshAccepts(SSHKeystrokeTiming.unobscuredOptions, sshExecutable: "/nonexistent/ssh"))
     }
 
-    /// `withCurrentLogin` finds a login's options right after `-t`, so the option comes after them.
+    /// A login's options come first, since `ssh` keeps the first value it gets, so the option comes after them.
     @Test func aTabPassesTheOptionAfterItsLogin() throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }

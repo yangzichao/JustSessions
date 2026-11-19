@@ -242,6 +242,13 @@ struct RemoteSessionMirror: Sendable {
         }
     }
 
+    static func copiesSessionsWithPython3(for provider: ConversationProvider) -> Bool {
+        switch provider {
+        case .antigravity, .opencode: true
+        case .claude, .codex, .kiro, .pi: false
+        }
+    }
+
     private static func mirroredFolderName(for provider: ConversationProvider) -> String {
         switch provider {
         case .claude: "claude"

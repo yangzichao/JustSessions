@@ -41,21 +41,20 @@ struct RemoteCLICommandBuilder {
 
     func sshCommand(host: String, remoteCommand: String) -> NativeCLICommand {
         NativeCLICommand(
-            executablePath: "/usr/bin/ssh",
-            arguments: ["-t"]
-                + loginConnections.connectionOptions(for: host)
-                + [
+            sshTab: SSHTabArguments(
+                loginOptions: loginConnections.connectionOptions(for: host),
+                optionsAndRemoteCommand: [
                     "-o", "ConnectTimeout=10",
                     "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4",
                 ]
-                + keystrokeTimingOptions
-                + [
-                    // With a `RemoteCommand` in `~/.ssh/config`, `ssh` would refuse to run the tab's command.
-                    "-o", "RemoteCommand=none",
-                    host,
-                    remoteCommand,
-                ],
-            workingDirectory: NSHomeDirectory(),
+                    + keystrokeTimingOptions
+                    + [
+                        // With a `RemoteCommand` in `~/.ssh/config`, `ssh` would refuse to run the tab's command.
+                        "-o", "RemoteCommand=none",
+                        host,
+                        remoteCommand,
+                    ]
+            ),
             environment: NativeCLICommand.environmentEntries(
                 TerminalColorEnvironment.embeddedTerminalEnvironment(from: inheritedEnvironment)
             )
@@ -63,21 +62,11 @@ struct RemoteCLICommandBuilder {
     }
 
     func withCurrentLogin(_ command: NativeCLICommand, host: String) -> NativeCLICommand {
-        var arguments = command.arguments
-        if Self.goesThroughLogin(command) { arguments.removeSubrange(1...4) }
-        arguments.insert(contentsOf: loginConnections.connectionOptions(for: host), at: 1)
+        guard let sshTabArguments = command.sshTabArguments else { return command }
         return NativeCLICommand(
-            executablePath: command.executablePath,
-            arguments: arguments,
-            workingDirectory: command.workingDirectory,
+            sshTab: sshTabArguments.throughLogin(options: loginConnections.connectionOptions(for: host)),
             environment: command.environment
         )
-    }
-
-    static func goesThroughLogin(_ command: NativeCLICommand) -> Bool {
-        let arguments = command.arguments
-        return arguments.count > 5 && Array(arguments[1...3]) == ["-o", "ControlMaster=no", "-o"]
-            && arguments[4].hasPrefix("ControlPath=")
     }
 
     /// What the tab's login shells on the host set for the CLI and for tmux. `ssh` gives the host the tab's `TERM` but

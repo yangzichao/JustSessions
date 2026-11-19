@@ -19,7 +19,7 @@ struct BackgroundHostCheckStoreTests {
 
         let keptCheck = try #require(store.keptHostChecks.check(for: host))
         #expect(keptCheck.appVersion == FeedbackEnvironment.current.appVersion)
-        #expect(keptCheck.report.findings.contains { $0.id == "tmux" && $0.status == .problem })
+        #expect(keptCheck.report.findings.contains { $0.id == .tmux && $0.status == .problem })
         #expect(KeptHostChecks.load(from: settings.userDefaults) == store.keptHostChecks)
         #expect(tracedStartups.count == 0)
         // No sheet opens for it.

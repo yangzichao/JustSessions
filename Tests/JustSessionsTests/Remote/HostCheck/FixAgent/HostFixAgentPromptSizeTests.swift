@@ -12,7 +12,7 @@ struct HostFixAgentPromptSizeTests {
         thisMacSummary: "JustSessions 1.2.21 · macOS 27.0.1 · OpenSSH_10.0p2",
         findings: [
             HostCheckFinding(
-                id: "tmux",
+                id: .tmux,
                 status: .problem,
                 title: "tmux",
                 summary: "Started by another tmux version.",
@@ -20,7 +20,7 @@ struct HostFixAgentPromptSizeTests {
                 commandToRunYourself: "ssh devbox 'tmux ls'"
             ),
             HostCheckFinding(
-                id: "shell-startup",
+                id: .shellStartup,
                 status: .warning,
                 title: "Shell startup",
                 summary: "The interactive startup files start another program.",

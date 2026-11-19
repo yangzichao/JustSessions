@@ -21,13 +21,16 @@ extension ConversationStore {
 
     func showHostCheck(_ host: String) {
         guard let keptCheck = keptHostChecks.check(for: host),
-            tmuxServerProblemsByHost[host] == nil
-                || keptCheck.report.findings.contains(where: { $0.id == "tmux" && $0.status == .problem })
+            !keptReportMissesTmuxServerProblem(keptCheck.report, on: host)
         else {
             checkHost(host)
             return
         }
         hostCheck = HostCheckSheetState(host: host, session: nil, report: keptCheck.report)
+    }
+
+    private func keptReportMissesTmuxServerProblem(_ report: HostCheckReport, on host: String) -> Bool {
+        tmuxServerProblemsByHost[host] != nil && !report.foundTmuxServerUnreachable
     }
 
     func checkShownHostAgain() {

@@ -10,7 +10,7 @@ struct RemoteHostCheckFindingsTests {
             context: hostCheckContext()
         )
 
-        #expect(findings.map(\.id) == ["rsync", "login-shell"])
+        #expect(findings.map(\.id) == [.rsync, .loginShell])
         #expect(findings.map(\.status) == [.passed, .problem])
         #expect(findings[1].commandToRunYourself == "ssh -t devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"echo Startup finished\"'")
     }
@@ -30,7 +30,7 @@ struct RemoteHostCheckFindingsTests {
             context: hostCheckContext(session: HostCheckSession(provider: nil, projectPath: "/home/me/app"))
         )
 
-        #expect(findings.map(\.id) == ["system", "rsync", "folder", "tmux", "cli-others"])
+        #expect(findings.map(\.id) == [.system, .rsync, .folder, .tmux, .otherCLIs])
         #expect(findings[0].summary == "Ubuntu 24.04.3 LTS · Linux 6.8.0-85-generic aarch64")
         #expect(findings[0].hostOutput == "SHELL=/bin/bash\nPATH=/usr/local/bin:/usr/bin:/bin")
         #expect(findings[2].status == .passed)

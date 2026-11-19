@@ -1,31 +1,36 @@
 import Foundation
 
 struct RemoteHostCheckProgram: Equatable, Sendable {
+    enum Source: Equatable, Sendable {
+        case cliExecutable
+        case customStartCommand
+    }
+
     let provider: ConversationProvider
     let program: String
-    let asksVersion: Bool
+    let source: Source
     var location: RemoteCLILocation? = nil
 
-    var key: String { "cli-" + provider.executableName }
+    var key: String { HostCheckFindingID.cli(provider).rawValue }
 
     static func all(startCommands: (ConversationProvider) -> String?) -> [RemoteHostCheckProgram] {
         ConversationProvider.allCases.compactMap { provider in
             guard let startCommand = CLIStartCommandLine.customCommand(startCommands(provider)) else {
-                return RemoteHostCheckProgram(provider: provider, program: provider.executableName, asksVersion: true)
+                return RemoteHostCheckProgram(provider: provider, program: provider.executableName, source: .cliExecutable)
             }
             guard case .program(let program) = StartCommandShape(startCommand),
                 RemoteHostCheckScript.doubleQuoted(program) != nil
             else { return nil }
-            return RemoteHostCheckProgram(provider: provider, program: program, asksVersion: false)
+            return RemoteHostCheckProgram(provider: provider, program: program, source: .customStartCommand)
         }
     }
 
     func located(by cliLocations: [ConversationProvider: RemoteCLILocation]) -> RemoteHostCheckProgram {
-        guard asksVersion, let location = cliLocations[provider] else { return self }
+        guard source == .cliExecutable, let location = cliLocations[provider] else { return self }
         if case .installed(let path) = location {
             guard RemoteHostCheckScript.doubleQuoted(path) != nil else { return self }
-            return RemoteHostCheckProgram(provider: provider, program: path, asksVersion: true, location: location)
+            return RemoteHostCheckProgram(provider: provider, program: path, source: .cliExecutable, location: location)
         }
-        return RemoteHostCheckProgram(provider: provider, program: program, asksVersion: true, location: location)
+        return RemoteHostCheckProgram(provider: provider, program: program, source: .cliExecutable, location: location)
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 enum RemoteHostCheckScript {
     static let marker = "@@JUSTSESSIONS-CHECK"
     static let versionTimeoutSeconds = 10
-    static let stoppedAtTimeLimitStatus: Int32 = 143
+    static let stoppedAtTimeLimitStatus = 128 + SIGTERM
 
     static func command(
         startup: RemoteShellStartup,
@@ -106,7 +106,7 @@ enum RemoteHostCheckScript {
                 "found=$(command -v \"$program\" 2>/dev/null) || found=",
                 "echo \"$found\"",
             ]
-            if program.asksVersion {
+            if program.source == .cliExecutable {
                 lines += [
                     "if [ -n \"$found\" ]; then",
                     "  marker \(program.key)-version",

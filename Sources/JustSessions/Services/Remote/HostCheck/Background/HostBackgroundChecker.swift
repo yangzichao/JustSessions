@@ -21,10 +21,7 @@ final class HostBackgroundChecker {
         let appVersion = appVersion()
         for host in oldestStore.remoteHostList.hosts {
             guard case .refreshed(let refreshedAt)? = oldestStore.hostRefreshStatuses[.ssh(host)],
-                !oldestStore.sshHostsNeedingLogIn.contains(host), !oldestStore.isDisconnected(host),
-                oldestStore.shellStartupCheck(on: host) != nil,
-                !oldestStore.hostsCheckingShellStartup.contains(host),
-                !stores.contains(where: { $0.isShowingRunningHostCheck(of: host) })
+                Self.isFreeToCheck(host, oldestStore: oldestStore, stores: stores)
             else { continue }
             let tabAskedForCheck = stores.contains { $0.hostsAskingForBackgroundCheck.contains(host) }
             guard
@@ -45,5 +42,12 @@ final class HostBackgroundChecker {
             }
             return
         }
+    }
+
+    private static func isFreeToCheck(_ host: String, oldestStore: ConversationStore, stores: [ConversationStore]) -> Bool {
+        !oldestStore.sshHostsNeedingLogIn.contains(host) && !oldestStore.isDisconnected(host)
+            && oldestStore.shellStartupCheck(on: host) != nil
+            && !oldestStore.hostsCheckingShellStartup.contains(host)
+            && !stores.contains(where: { $0.isShowingRunningHostCheck(of: host) })
     }
 }

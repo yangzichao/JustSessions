@@ -19,7 +19,7 @@ enum RemoteHostTmuxFinding {
         let command = RemoteHostCheckCommands.inLoginShell(host, "tmux -V; tmux ls", startup: context.shellStartup)
         func finding(_ status: HostCheckFinding.Status, _ summary: String, hostOutput: String? = nil) -> HostCheckFinding {
             HostCheckFinding(
-                id: "tmux", status: status, title: "tmux", summary: summary,
+                id: .tmux, status: status, title: "tmux", summary: summary,
                 hostOutput: hostOutput, commandToRunYourself: command
             )
         }

@@ -8,7 +8,7 @@ struct HostCheckFinding: Codable, Equatable, Sendable, Identifiable {
         case problem
     }
 
-    let id: String
+    let id: HostCheckFindingID
     let status: Status
     let title: String
     let summary: String

@@ -70,7 +70,7 @@ struct RemoteHostCheck: Sendable {
         else {
             findings.append(
                 HostCheckFinding(
-                    id: "script",
+                    id: .script,
                     status: .problem,
                     title: AppLocalization.string("Host check"),
                     summary: AppLocalization.string(

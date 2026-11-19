@@ -48,26 +48,19 @@ final class RemoteDetachedActivityReader {
         return listing
     }
 
-    func askIfDue(_ host: String) {
+    @discardableResult
+    func askIfDue(_ host: String) -> Task<Void, Never>? {
         let now = currentDate()
-        guard !hostsBeingAsked.contains(host) else { return }
-        if let failedAt = failedAt[host], now.timeIntervalSince(failedAt) < Self.retryAfterFailure { return }
-        if let lastAskedAt = lastAskedAt[host], now.timeIntervalSince(lastAskedAt) < Self.interval { return }
+        guard !hostsBeingAsked.contains(host) else { return nil }
+        if let failedAt = failedAt[host], now.timeIntervalSince(failedAt) < Self.retryAfterFailure { return nil }
+        if let lastAskedAt = lastAskedAt[host], now.timeIntervalSince(lastAskedAt) < Self.interval { return nil }
         hostsBeingAsked.insert(host)
         lastAskedAt[host] = now
         let listPanes = listPanes
-        Task { [weak self] in
+        return Task { [weak self] in
             let panes = await Task.detached(priority: .utility) { listPanes(host) }.value
             self?.take(panes, from: host, askedAt: now)
         }
-    }
-
-    func ask(_ host: String) async {
-        let now = currentDate()
-        lastAskedAt[host] = now
-        let listPanes = listPanes
-        let panes = await Task.detached(priority: .utility) { listPanes(host) }.value
-        take(panes, from: host, askedAt: now)
     }
 
     private func take(_ panes: RemoteTmuxPanes?, from host: String, askedAt: Date) {
