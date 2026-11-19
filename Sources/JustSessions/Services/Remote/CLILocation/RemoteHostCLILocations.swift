@@ -15,11 +15,6 @@ final class RemoteHostCLILocations: @unchecked Sendable {
         lock.withLock { locationsByHost[host]?[provider] } ?? .loginShell
     }
 
-    /// The locations of the CLIs the host's last refresh found; nil before one did.
-    func locations(on host: String) -> [ConversationProvider: RemoteCLILocation]? {
-        lock.withLock { locationsByHost[host] }
-    }
-
     func setLocations(_ locations: [ConversationProvider: RemoteCLILocation], on host: String) {
         lock.withLock { locationsByHost[host] = locations }
     }

@@ -39,7 +39,7 @@ extension TranscriptTextSelectionCoordinator {
                         nextEvent.locationInWindow.x - event.locationInWindow.x,
                         nextEvent.locationInWindow.y - event.locationInWindow.y) > Self.clickTolerance
                 extendSelection(to: nextEvent.locationInWindow, in: window)
-                autoscroll(with: nextEvent, in: window)
+                autoscroll(with: nextEvent)
             default:
                 // Periodic events keep the reader scrolling while the pointer is held still past its edge.
                 let location = window.mouseLocationOutsideOfEventStream
@@ -50,7 +50,7 @@ extension TranscriptTextSelectionCoordinator {
                         windowNumber: window.windowNumber, context: nil, eventNumber: 0, clickCount: 1, pressure: 1
                     )
                 else { continue }
-                if autoscroll(with: scrollEvent, in: window) { extendSelection(to: location, in: window) }
+                if autoscroll(with: scrollEvent) { extendSelection(to: location, in: window) }
             }
         }
         return true
@@ -93,7 +93,7 @@ extension TranscriptTextSelectionCoordinator {
 
     /// Scrolls the reader, and the code block or table under the pointer, toward a pointer held past their edges.
     @discardableResult
-    private func autoscroll(with event: NSEvent, in window: NSWindow) -> Bool {
+    private func autoscroll(with event: NSEvent) -> Bool {
         let focusView = selection.flatMap { view(for: $0.focus.key) }
         var ancestor = focusView?.superview
         var didScroll = false

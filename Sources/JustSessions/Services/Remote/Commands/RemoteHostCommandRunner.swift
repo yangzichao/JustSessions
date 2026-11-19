@@ -59,10 +59,6 @@ struct RemoteHostCommandRunner: Sendable {
     /// what passes through it, such as `rsync`'s transfer.
     static let noTerminalOption = "-T"
 
-    static func sshArguments(host: String, command: String) -> [String] {
-        sshArguments(host: host, command: command, connectionSharingOptions: [])
-    }
-
     static func sshArguments(host: String, command: String, connectionSharingOptions: [String]) -> [String] {
         [noTerminalOption] + nonInteractiveSSHOptions + connectionSharingOptions + [host, command]
     }

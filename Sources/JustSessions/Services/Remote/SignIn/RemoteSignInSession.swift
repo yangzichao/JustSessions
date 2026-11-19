@@ -98,7 +98,7 @@ struct RemoteSignInSession: Sendable {
             }
             if state.exitStatus != nil {
                 shownQuestion?.task.cancel()
-                return await finish(state: state, process: process, clock: clock)
+                return await finish(state: state, clock: clock)
             }
             if clock.now >= deadline {
                 stop()
@@ -137,7 +137,7 @@ struct RemoteSignInSession: Sendable {
         }
     }
 
-    private func finish(state: RunState, process: Process, clock: ContinuousClock) async -> RemoteSignInOutcome {
+    private func finish(state: RunState, clock: ContinuousClock) async -> RemoteSignInOutcome {
         // The last of the output can arrive just after the command ends.
         let drainDeadline = clock.now + .milliseconds(500)
         while clock.now < drainDeadline, !state.hasReachedEndOfOutput { try? await Task.sleep(for: .milliseconds(20)) }

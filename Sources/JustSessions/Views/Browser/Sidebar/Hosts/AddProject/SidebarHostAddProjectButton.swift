@@ -32,14 +32,6 @@ struct SidebarHostAddProjectButton: View {
         }
     }
 
-    /// The room the button takes, for a heading to lay out while the pointer is elsewhere.
-    static var placeholder: some View {
-        Image(systemName: "plus")
-            .font(ThemeFont.glyph(.control, weight: .bold))
-            .frame(width: InterfaceScale.points(16), height: InterfaceScale.points(16))
-            .hidden()
-    }
-
     private var plusSymbol: some View {
         Image(systemName: "plus")
             .font(ThemeFont.glyph(.control, weight: .bold))

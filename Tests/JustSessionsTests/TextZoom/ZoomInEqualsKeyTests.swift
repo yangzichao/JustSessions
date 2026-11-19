@@ -41,5 +41,5 @@ struct ZoomInEqualsKeyTests {
 
 private final class MenuItemChoices: NSObject {
     var count = 0
-    @objc func choose(_ sender: NSMenuItem) { count += 1 }
+    @objc func choose(_: NSMenuItem) { count += 1 }
 }

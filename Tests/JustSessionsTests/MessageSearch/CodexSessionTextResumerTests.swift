@@ -136,7 +136,7 @@ struct CodexSessionTextResumerTests {
         ("partial JSON", "Second 中文 🧪", 30),
         ("partial UTF-8", "Second 中文 🧪", -1),
     ])
-    func aPartialFinalRecordCompletedByAnAppendIsReadOnce(_ name: String, text: String, cutFromEnd: Int) async throws {
+    func aPartialFinalRecordCompletedByAnAppendIsReadOnce(_: String, text: String, cutFromEnd: Int) async throws {
         let line = Data(Self.assistant(text).utf8)
         let cut: Int
         if cutFromEnd > 0 {

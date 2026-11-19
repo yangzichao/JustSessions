@@ -38,7 +38,7 @@ struct WindowVisibilityReader: NSViewRepresentable {
             report()
         }
 
-        @objc private func windowChanged(_ notification: Notification) {
+        @objc private func windowChanged(_: Notification) {
             report()
         }
 

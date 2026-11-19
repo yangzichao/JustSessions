@@ -20,7 +20,7 @@ struct SessionMessageIndexerTests {
             if await reads.value == 1 { return nil }
             return await SessionMessageIndex.searchableText(of: conversation, fingerprint: fingerprint, cache: cache)
         }
-        indexer.waitBeforeRetry = { await retry.wait($0) }
+        indexer.waitBeforeRetry = { _ in await retry.wait() }
         defer { indexer.endUse(by: user) }
         indexer.beginUse(by: user)
         await indexer.update(with: [session], for: user)
@@ -47,7 +47,7 @@ struct SessionMessageIndexerTests {
             await reads.increment()
             return nil
         }
-        indexer.waitBeforeRetry = { await retry.wait($0) }
+        indexer.waitBeforeRetry = { _ in await retry.wait() }
         indexer.beginUse(by: user)
         await indexer.update(with: [session], for: user)
         try await expectEventually { retry.waitCount == 1 }
@@ -410,7 +410,7 @@ private final class MessageSearchRetryGate {
     private(set) var wasCancelled = false
     private var continuation: CheckedContinuation<Void, Never>?
 
-    func wait(_ delay: Duration) async {
+    func wait() async {
         waitCount += 1
         await withCheckedContinuation { continuation = $0 }
         wasCancelled = Task.isCancelled

@@ -22,6 +22,7 @@ final class HostAutoRefresher {
     private let signIns: RemoteSignIns?
     private var schedule = HostAutoRefreshSchedule()
     private var checking: Task<Void, Never>?
+    // periphery:ignore - held so the observation lasts as long as the refresher.
     private var activationObserver: (any NSObjectProtocol)?
 
     init(

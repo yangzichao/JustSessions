@@ -5,7 +5,7 @@ import Testing
 @testable import JustSessions
 
 @_silgen_name("proc_reset_footprint_interval")
-private func resetProcessFootprintInterval(_ pid: pid_t) -> Int32
+private func resetProcessFootprintInterval(_: pid_t) -> Int32
 
 /// Measures message search's text for a growing Codex session (issue #56): the baseline, which reads the session in
 /// full on every change in 5,000-entry pages and saves the first cache format, against resuming from the saved final

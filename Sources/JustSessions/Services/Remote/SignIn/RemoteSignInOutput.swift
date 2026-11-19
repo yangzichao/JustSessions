@@ -31,10 +31,6 @@ struct RemoteSignInOutput {
         case operatingSystemCommandEscape
     }
 
-    var hasText: Bool {
-        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
     /// Whether the last line was left without a newline, as a prompt that reads on the same line is.
     var endsMidLine: Bool {
         !lastLine(of: text, includingCompleteLines: false).isEmpty

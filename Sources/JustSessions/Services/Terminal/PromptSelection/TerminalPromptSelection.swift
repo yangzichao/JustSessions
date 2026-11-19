@@ -23,6 +23,7 @@ final class TerminalPromptSelection {
 
     private weak var terminal: (any PromptSelectableTerminal)?
     private var overlay: TerminalPromptSelectionOverlay?
+    // periphery:ignore - held so the monitor lasts as long as the selection.
     private var eventMonitor: PromptSelectionEventMonitor?
     private var screenCheck: Task<Void, Never>?
 

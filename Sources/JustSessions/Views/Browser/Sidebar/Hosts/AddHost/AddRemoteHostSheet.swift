@@ -19,6 +19,7 @@ struct AddRemoteHostSheet: View {
     @State private var failedConnection: FailedConnection?
     /// Where the typed host connects, read by `ssh -G` shortly after typing stops.
     @State private var sameMachineCheck: (host: String, result: SSHHostSameMachineCheck)?
+    // periphery:ignore - read through its $ binding, which Periphery does not see.
     @State private var showsSetupRequirements = false
 
     private struct FailedConnection {

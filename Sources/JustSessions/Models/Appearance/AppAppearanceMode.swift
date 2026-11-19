@@ -11,14 +11,6 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var displayName: String {
-        switch self {
-        case .system: "System"
-        case .light: "Light"
-        case .dark: "Dark"
-        }
-    }
-
     /// Nil lets the app follow the Mac's appearance.
     var nativeAppearance: NSAppearance? {
         switch self {

@@ -145,6 +145,7 @@ final class TranscriptScrollViewFixture {
         settings.removeSuite()
     }
 
+    // periphery:ignore:parameters scrollView - callers pass the reader's scroll view to read it only when it exists.
     func visiblePosition(in scrollView: NSScrollView) -> TranscriptReadingPosition? {
         descendant(ofType: TranscriptEntryGeometryView.self, in: hostingView)?.controller.currentReadingPosition()
     }
@@ -156,6 +157,7 @@ final class TranscriptScrollViewFixture {
 
     /// The frames of the entries on screen, in the scroll view's visible area. Entries fill the transcript column's
     /// width; entries scrolled out of sight can keep an earlier layout, so they are left out.
+    // periphery:ignore:parameters scrollView - callers pass the reader's scroll view to read it only when it exists.
     func visibleEntryFrames(in scrollView: NSScrollView) -> [CGRect] {
         descendant(ofType: TranscriptEntryGeometryView.self, in: hostingView)?.controller.visibleEntryFrames() ?? []
     }

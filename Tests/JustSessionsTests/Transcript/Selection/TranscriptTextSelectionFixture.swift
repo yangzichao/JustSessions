@@ -85,10 +85,6 @@ final class TranscriptTextSelectionFixture {
 
     var textViews: [TranscriptTextView] { Self.descendants(of: hostingView) }
 
-    func textView(entry: Int, segment: Int) throws -> TranscriptTextView {
-        try #require(textViews.first { $0.selectionKey == TranscriptTextSelectionKey(entryIndex: entry, segmentIndex: segment) })
-    }
-
     var coordinator: TranscriptTextSelectionCoordinator {
         get throws { try #require(textViews.first?.selectionCoordinator) }
     }

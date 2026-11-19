@@ -31,10 +31,6 @@ struct SidebarProjectList: Equatable {
         projectPaths.insert(projectPath)
     }
 
-    mutating func remove(_ projectPath: String) {
-        remove([projectPath])
-    }
-
     mutating func remove(_ projectPathsToRemove: Set<String>) {
         projectPaths.subtract(projectPathsToRemove)
         removedProjectPaths.formUnion(projectPathsToRemove)

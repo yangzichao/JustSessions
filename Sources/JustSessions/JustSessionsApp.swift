@@ -12,6 +12,7 @@ enum JustSessionsMain {
 struct JustSessionsApp: App {
     @StateObject private var languageStore = AppLanguageStore.shared
     @StateObject private var workspaceReads = WorkspaceReadService()
+    // periphery:ignore - SwiftUI reads the adaptor to install the delegate.
     @NSApplicationDelegateAdaptor(JustSessionsAppDelegate.self) private var appDelegate
 
     var body: some Scene {

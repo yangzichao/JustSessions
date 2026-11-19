@@ -120,7 +120,7 @@ final class WorkingSpinnerArcView: NSView {
         updateRotation()
     }
 
-    @objc private func windowMiniaturizationChanged(_ notification: Notification) {
+    @objc private func windowMiniaturizationChanged(_: Notification) {
         updateRotation()
     }
 

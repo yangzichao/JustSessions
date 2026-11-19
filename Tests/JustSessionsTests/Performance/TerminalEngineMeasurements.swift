@@ -152,7 +152,7 @@ struct TerminalEngineMeasurements {
         let meter = EngineMeter(variant: variant)
         meter.start(tabs: bench.tabs)
         bench.signalGo()
-        try await waitUntil(timeout: .seconds(180)) { bench.hasShownEverything(of: stream) }
+        try await waitUntil(timeout: .seconds(180)) { bench.hasShownEverything() }
         return meter.stop()
     }
 
@@ -168,7 +168,7 @@ struct TerminalEngineMeasurements {
         try await bench.waitUntilLaidOut()
         let idle = try await settledMemory()
         bench.signalGo()
-        try await waitUntil(timeout: .seconds(180)) { bench.hasShownEverything(of: stream) }
+        try await waitUntil(timeout: .seconds(180)) { bench.hasShownEverything() }
         let afterBulk = try await settledMemory()
         let keptRows = stream.rowsKept(in: allText(of: bench.tabs[0]))
         return MemoryRun(
@@ -398,7 +398,7 @@ private final class EngineBench {
     }
 
     /// Every tab's command finished writing, its terminal parsed all of it, and its screen has the last line.
-    func hasShownEverything(of stream: BulkStream) -> Bool {
+    func hasShownEverything() -> Bool {
         tabs.indices.allSatisfy { index in
             let tab = tabs[index]
             guard FileManager.default.fileExists(atPath: folder.appendingPathComponent("done-\(index)").path) else { return false }

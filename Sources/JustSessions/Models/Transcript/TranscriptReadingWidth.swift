@@ -21,13 +21,6 @@ enum TranscriptReadingWidth: String, CaseIterable {
         }
     }
 
-    var displayName: String {
-        switch self {
-        case .readable: "Readable"
-        case .full: "Full"
-        }
-    }
-
     /// The other width, which the reading toolbar switches to.
     var toggled: Self {
         switch self {

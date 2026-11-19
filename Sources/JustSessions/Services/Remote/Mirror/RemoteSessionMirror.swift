@@ -69,11 +69,6 @@ struct RemoteSessionMirror: Sendable {
         try? FileManager.default.removeItem(at: cacheRoot.appendingPathComponent(Self.directoryName(forHost: host)))
     }
 
-    /// `folders` comes from `lookUpToolFolders(host:)`, once for all of the host's tools.
-    func synchronize(host: String, provider: ConversationProvider, folders: RemoteToolFolders) throws {
-        try synchronize(host: host, provider: provider, folders: folders, connectionSharingOptions: [])
-    }
-
     func synchronize(
         host: String,
         provider: ConversationProvider,

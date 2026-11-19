@@ -13,7 +13,6 @@ struct KiroV3SessionFixture {
         let sessionID: String
         let folder: URL
         var messagesFile: URL { folder.appendingPathComponent(KiroV3Session.messagesFileName) }
-        var metadataFile: URL { folder.appendingPathComponent(KiroV3Session.metadataFileName) }
     }
 
     /// The first 16 hex digits of the SHA-256 of the folder, as Kiro names a workspace's folder.
