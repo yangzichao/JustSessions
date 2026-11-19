@@ -43,7 +43,6 @@ struct RemoteKiroActivityRelayTests {
         #expect(FileManager.default.fileExists(atPath: sandbox.root.appendingPathComponent("data home/kiro-cli/run/turn-markers").path))
     }
 
-    /// A Kiro too old to keep the folder tells nothing, rather than seeming idle.
     @Test func withoutTheFolderItSaysNothing() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
@@ -83,8 +82,6 @@ struct RemoteKiroActivityRelayTests {
         #expect(sandbox.waitUntil { Self.relayCount(inProcessGroup: panePID) == 0 })
     }
 
-    /// Makes the marker folder where Kiro keeps it, unless `$HOME/kiro-no-markers` is there, and starts a `sleep` as
-    /// its TUI. Keeps a marker named after it while `$HOME/kiro-turn` is there, until `$HOME/kiro-exit` appears.
     private static let kiroMarkingItsTurns = #"""
         case $(uname -s) in
         Darwin) markers="$HOME/Library/Application Support/kiro-cli/run/turn-markers" ;;
@@ -111,7 +108,6 @@ struct RemoteKiroActivityRelayTests {
             .trimmingCharacters(in: .newlines)
     }
 
-    /// Relays started in one pane; see `RemoteClaudeActivityRelayTests.relayCount(inProcessGroup:)`.
     private static func relayCount(inProcessGroup processGroupID: Int32) -> Int {
         let processes =
             BoundedProcessRunner.output(

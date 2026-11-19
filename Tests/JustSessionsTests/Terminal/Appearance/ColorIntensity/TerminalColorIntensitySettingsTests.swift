@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// **Color intensity** is saved with the other terminal settings, and dragging it recolors terminals once it pauses.
 @MainActor
 struct TerminalColorIntensitySettingsTests {
     @Test func intensitySurvivesReopeningAndRestoreDefaultsResetsIt() throws {
@@ -46,7 +45,6 @@ struct TerminalColorIntensitySettingsTests {
         let subscription = store.$terminalPreferences.dropFirst().sink { terminalIntensities.append($0.colorIntensityPercent) }
         defer { subscription.cancel() }
 
-        // A drag along the slider.
         for percent in [110, 125, 140] {
             store.setColorIntensityPercent(percent)
         }
@@ -57,7 +55,6 @@ struct TerminalColorIntensitySettingsTests {
         #expect(terminalIntensities == [140])
     }
 
-    /// Another setting reaches terminals at once, and takes an intensity still waiting along with it.
     @Test func anotherSettingReachesTerminalsAtOnceWithAWaitingIntensity() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

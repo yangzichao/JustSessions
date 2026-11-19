@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The tabs closed in a window, the latest last, as Reopen Closed Tab takes them back.
 struct RecentlyClosedTabsTests {
     private let projectKey = ProjectLocation(host: .thisMac, path: "/tmp/project").key
 

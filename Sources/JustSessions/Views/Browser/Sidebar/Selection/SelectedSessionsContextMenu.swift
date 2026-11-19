@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Right-click menu for a sidebar row that is part of a multi-selection.
 struct SelectedSessionsContextMenu: View {
     let store: ConversationStore
     let selectedConversations: [Conversation]
@@ -26,7 +25,6 @@ struct SelectedSessionsContextMenu: View {
             }
         }
         Divider()
-        // Show archived lists archived and other sessions together, so a selection can hold both.
         if archivedCount < selectedConversations.count {
             Button("Archive \(selectedConversations.count - archivedCount) sessions", systemImage: "archivebox") {
                 store.setArchived(true, conversations: selectedConversations)

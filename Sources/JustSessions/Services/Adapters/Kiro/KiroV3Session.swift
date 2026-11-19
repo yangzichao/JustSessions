@@ -21,12 +21,10 @@ enum KiroV3Session {
         value.hasPrefix(idPrefix) && UUID(uuidString: String(value.dropFirst(idPrefix.count))) != nil
     }
 
-    /// Whether `file` is a V3 session's log: `…/<workspace hash>/sess_<uuid>/messages.jsonl`.
     static func isMessagesFile(_ file: URL) -> Bool {
         file.lastPathComponent == messagesFileName && isSessionID(file.deletingLastPathComponent().lastPathComponent)
     }
 
-    /// Where the V3 sessions are: `sessions` in Kiro's home, the folder that holds V2's `sessions/cli`.
     static func sessionsRoot(besideClassicDirectory classicDirectory: URL) -> URL {
         classicDirectory.deletingLastPathComponent()
     }
@@ -57,7 +55,6 @@ struct KiroV3SessionMetadata: Equatable {
         parentSessionID = (object["parentSessionId"] as? String).flatMap { $0.isEmpty ? nil : $0 }
     }
 
-    /// Nil for a file that is missing, not a session's, or too large to be one.
     init?(file: URL) {
         guard let size = (try? file.resourceValues(forKeys: [.fileSizeKey]))?.fileSize, size <= Self.maximumByteCount,
             let data = try? Data(contentsOf: file), let object = ConversationMetadata.object(from: data)

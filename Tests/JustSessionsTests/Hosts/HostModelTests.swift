@@ -90,7 +90,6 @@ struct HostModelTests {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "UTC")!
         let locale = Locale(identifier: "en_US")
-        /// 2026-09-25 12:00:00 UTC.
         let now = Date(timeIntervalSince1970: 1_790_337_600)
         func syncAge(secondsAgo: TimeInterval) -> String {
             HostSyncAgeFormatter.string(

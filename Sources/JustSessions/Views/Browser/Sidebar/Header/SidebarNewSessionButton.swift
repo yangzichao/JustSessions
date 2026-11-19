@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// The sidebar's primary action: a + on a soft chip at the end of the header line, the same chip as the project
-/// filter below it, so it stands out from the plain search icon without outweighing the session list.
 struct SidebarNewSessionButton: View {
     let action: () -> Void
 

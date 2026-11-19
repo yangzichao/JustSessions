@@ -1,9 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Bookmarks → Show All Bookmarks…: every listed session's bookmarks in one list, found by a search of their labels, tags,
-/// and messages or by `#tag`, and narrowed by tags (RDR-52). Choosing one opens its session's reading window there
-/// (RDR-45, RDR-50); a row's right-click menu edits or removes it.
 struct AllBookmarksSheet: View {
     let store: ConversationStore
     @Environment(\.dismiss) private var dismiss
@@ -56,14 +53,12 @@ struct AllBookmarksSheet: View {
         .accessibilityIdentifier("all-bookmarks")
     }
 
-    /// Opens the session's reading window at the bookmark, or moves the one open, without changing the selection.
     private func open(_ bookmark: MessageBookmark, in conversation: Conversation) {
         dismiss()
         SessionReadingWindowManager.shared.open(conversation, store: store, navigation: .bookmark(bookmark))
     }
 }
 
-/// Each tag in use, the most used first; choosing tags keeps only bookmarks with all of them.
 private struct AllBookmarksTagFilter: View {
     let tags: [String]
     @Binding var selected: Set<String>
@@ -96,7 +91,6 @@ private struct AllBookmarksTagFilter: View {
     }
 }
 
-/// The sessions and their bookmarks, or why there are none.
 private struct AllBookmarksRows: View {
     let list: AllBookmarksList
     let store: ConversationStore
@@ -157,7 +151,6 @@ private struct AllBookmarksRows: View {
     }
 }
 
-/// One bookmark: its letter, its label or the head of its message, the head under a label, and its tags.
 private struct AllBookmarksRow: View {
     let bookmark: MessageBookmark
     let speaker: String
@@ -200,8 +193,6 @@ private struct AllBookmarksRow: View {
     }
 }
 
-/// Shows All Bookmarks on the workspace window while its store asks for it. A modifier of its own, so the browser reads
-/// the request only here.
 struct AllBookmarksPresenter: ViewModifier {
     let store: ConversationStore
 
@@ -209,13 +200,10 @@ struct AllBookmarksPresenter: ViewModifier {
         let isPresented = Binding(get: { store.showsAllBookmarks }, set: { store.showsAllBookmarks = $0 })
         content
             .sheet(isPresented: isPresented) { AllBookmarksSheet(store: store) }
-            // Only while it shows, as the bookmark editor's (MessageBookmarkEditorPresenter).
             .background { if store.showsAllBookmarks { Color.clear.dismissesOnClickOutside(isPresented: isPresented) } }
     }
 }
 
-/// Bookmarks → Show All Bookmarks… shows the list on the frontmost workspace window, bringing it forward, also while a
-/// reading window has the keyboard. A window showing another sheet, alert, or dialog only comes forward.
 @MainActor
 enum AllBookmarksCommand {
     static func show(registry: WorkspaceWindowRegistry = .shared) {

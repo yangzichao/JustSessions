@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A drop on a tab on an SSH host, from the drag to what the tab's CLI receives, whichever engine draws the tab. A
-/// local shell stands in for `ssh` and the host, and the tab's process records what it is sent.
 @MainActor
 struct TerminalSSHFileDropTabTests {
     @Test(arguments: TerminalEngine.allCases)

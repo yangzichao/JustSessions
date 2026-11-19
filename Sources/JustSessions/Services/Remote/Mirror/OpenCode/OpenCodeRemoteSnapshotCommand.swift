@@ -1,7 +1,5 @@
 import Foundation
 
-/// Builds the host's OpenCode mirror database in a private folder under `/tmp`, for `rsync` to copy. A host
-/// without an OpenCode database exits with 3 before python3 is needed.
 enum OpenCodeRemoteSnapshotCommand {
     static let pathPrefix = "/tmp/justsessions-opencode-"
     static let outputHeading = "JUSTSESSIONS_OPENCODE_SNAPSHOT="
@@ -9,7 +7,7 @@ enum OpenCodeRemoteSnapshotCommand {
 
     static func create(on host: String) -> String {
         let script =
-            OpenCodeRemoteDatabaseLocation.shellAssignment + """
+            OpenCodeRemoteDatabaseLocation.shellAssignment(to: "db") + """
 
                 [ -f "$db" ] || exit \(noDatabaseExitStatus)
                 exec python3 -c \(ShellQuoting.quoted(pythonScript)) "$db"
@@ -28,8 +26,6 @@ enum OpenCodeRemoteSnapshotCommand {
         return path
     }
 
-    /// Runs `OpenCodeMirrorSnapshotSteps` with OpenCode's database attached read-only. A step's next statement is
-    /// tried only when the database or SQLite lacks a column or function the previous one needs.
     static var pythonScript: String {
         """
         import pathlib, shutil, sqlite3, sys, tempfile
@@ -41,13 +37,12 @@ enum OpenCodeRemoteSnapshotCommand {
             copy = sqlite3.connect(str(target), uri=True, timeout=5, isolation_level=None)
             copy.execute('ATTACH DATABASE ? AS source', (source.as_uri() + '?mode=ro',))
             copy.execute('BEGIN')
-            for alternatives in steps:
-                for index, statement in enumerate(alternatives):
-                    try:
-                        copy.execute(statement)
-                        break
-                    except sqlite3.OperationalError as error:
-                        if index == len(alternatives) - 1 or 'no such' not in str(error): raise
+            for step in steps:
+                try:
+                    copy.execute(step['statement'])
+                except sqlite3.OperationalError as error:
+                    if 'fallbackWhenSomethingIsMissing' not in step or 'no such' not in str(error): raise
+                    copy.execute(step['fallbackWhenSomethingIsMissing'])
             copy.execute('COMMIT')
             copy.execute('DETACH DATABASE source')
             copy.close()

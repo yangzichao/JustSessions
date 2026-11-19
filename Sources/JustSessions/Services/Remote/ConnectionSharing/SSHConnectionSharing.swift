@@ -1,21 +1,13 @@
 import Darwin
 import Foundation
 
-/// One app-owned SSH connection for one remote-session refresh. Snapshot commands, rsync copies, and cleanup
-/// commands receive the same private control path, then the refresh explicitly ends that master and removes its
-/// socket directory. A concurrent refresh gets a different path, and a user's own multiplexing policy is left alone.
-/// A host logged in to with Connect… shares that login instead, which the refresh leaves open.
 struct SSHConnectionSharing: Sendable {
     static let socketRoot = "/tmp/justsessions-ssh-\(getuid())"
     static let crashFallbackSeconds = 60
 
     let options: [String]
-    /// Nil when the refresh goes through a login it does not own.
     private let state: State?
 
-    /// Starts a scope only when the user's SSH configuration leaves connection sharing unset. The first command in
-    /// the refresh starts the master; `ControlPersist` keeps it available between sequential commands and limits
-    /// its life if the app exits before explicit teardown.
     static func startRefresh(
         to host: String,
         loginConnections: SSHLoginConnections = .shared
@@ -60,7 +52,6 @@ struct SSHConnectionSharing: Sendable {
         ]
     }
 
-    /// Safe to call more than once. The explicit path can only name this refresh's master, never one the user owns.
     func finish() {
         state?.finish()
     }

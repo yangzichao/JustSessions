@@ -4,7 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct RemoteFolderResolverTests {
-    /// Runs the lookup in a local shell that starts in a temporary home folder, the way `ssh host <command>` would.
     @Test func resolvesHomeRelativeAbsoluteAndSymlinkedFolders() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -25,8 +24,6 @@ struct RemoteFolderResolverTests {
         }
     }
 
-    /// Adding a project can create its folder with any missing parents. A folder that cannot be made, here because a
-    /// file has its parent's name, is reported as such rather than as missing.
     @Test func createsAMissingFolderOnlyWhenAsked() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }

@@ -1,21 +1,15 @@
 import Foundation
 
-/// The rows under a session for the subagents it started, shown only once you expand the session: each subagent, then,
-/// while that one is expanded too, its own.
 struct SidebarSubagentRows {
-    /// Whether sessions offer a chevron that lists their subagents' sessions, as set in Settings → General. Off until
-    /// you turn it on, so the sidebar lists only the sessions you started.
     static let showsSubagentsUserDefaultsKey = "sidebarShowsSubagentSessions"
 
     struct Row: Identifiable, Equatable {
         let conversation: Conversation
-        /// 1 for a subagent of a listed session, 2 for one of its subagents, and so on.
         let depth: Int
         let subagentCount: Int
         var id: String { conversation.id }
     }
 
-    /// The sessions whose subagents show. Every session starts collapsed.
     private(set) var expandedConversationIDs: Set<String> = []
 
     func isExpanded(_ conversationID: String) -> Bool {
@@ -28,8 +22,6 @@ struct SidebarSubagentRows {
         }
     }
 
-    /// The rows under `conversation`, in order, while it is expanded; none while it is collapsed. A subagent that names
-    /// one of the sessions above it as its own subagent shows once.
     func rows(under conversation: Conversation, subagents: (Conversation) -> [Conversation]) -> [Row] {
         var rows: [Row] = []
         var shownIDs: Set<String> = [conversation.id]

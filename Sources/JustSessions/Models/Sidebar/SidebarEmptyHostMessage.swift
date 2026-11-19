@@ -1,11 +1,8 @@
 import Foundation
 
-/// What the sidebar says under a host that lists no projects: that its refresh is running or failed, that you
-/// disconnected from it before it was copied, or that the filters and search left nothing.
 struct SidebarEmptyHostMessage: Equatable {
     let text: String
     let localizedText: LocalizedStringResource?
-    /// The host's refresh failed, and `text` is its error.
     let isFailure: Bool
 
     init(
@@ -17,7 +14,6 @@ struct SidebarEmptyHostMessage: Equatable {
         statusFilter: SessionStatusFilter,
         isDisconnected: Bool = false
     ) {
-        // Nothing is known of a disconnected host beyond its last copy, which lists nothing here.
         if isDisconnected, refreshStatus != .refreshing {
             self.init(text: isSearching ? "No matching projects or sessions" : "Disconnected. Connect to copy its sessions.")
             return
@@ -37,15 +33,11 @@ struct SidebarEmptyHostMessage: Equatable {
             if isSearching {
                 self.init(text: "No matching projects or sessions")
             } else if statusFilter == .running {
-                // An SSH host's running sessions are known as of its last refresh, so say so rather than claim
-                // nothing runs there now.
                 self.init(
                     text: host == .thisMac
                         ? "No session is running"
                         : "No session was running at the last refresh")
             } else if statusFilter == .waitingForYou {
-                // Only Claude Code, Codex, Antigravity, Pi, and OpenCode on this Mac tell what they are doing, so say
-                // so rather than suggest nothing else waits.
                 self.init(
                     text: host == .thisMac
                         ? "No Claude Code, Codex, Antigravity, Pi, or OpenCode session is waiting for you"

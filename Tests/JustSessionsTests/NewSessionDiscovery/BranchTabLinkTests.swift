@@ -53,7 +53,6 @@ struct BranchTabLinkTests {
         store.closeAllTerminals()
     }
 
-    /// A store that lists `conversations` and launches a stand-in `claude` found under `root/bin`.
     private func makeStore(discovering conversations: [Conversation], under root: URL) async throws -> ConversationStore {
         let binaryDirectory = root.appendingPathComponent("bin")
         try FileManager.default.createDirectory(at: binaryDirectory, withIntermediateDirectories: true)
@@ -69,7 +68,6 @@ struct BranchTabLinkTests {
         return store
     }
 
-    /// A temporary folder holding the `project` folder the sessions run in.
     private func makeRootWithProjectFolder() throws -> URL {
         let root = try makeTemporaryDirectory()
         try FileManager.default.createDirectory(at: root.appendingPathComponent("project"), withIntermediateDirectories: true)

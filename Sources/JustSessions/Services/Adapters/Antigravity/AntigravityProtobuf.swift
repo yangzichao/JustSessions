@@ -1,6 +1,5 @@
 import Foundation
 
-/// Reads the protobuf fields used by Antigravity's local metadata and visible conversation steps.
 enum AntigravityProtobuf {
     static func text(in data: Data, at fieldPath: [UInt64]) -> String? {
         bytes(in: data, at: fieldPath).flatMap { String(data: $0, encoding: .utf8) }

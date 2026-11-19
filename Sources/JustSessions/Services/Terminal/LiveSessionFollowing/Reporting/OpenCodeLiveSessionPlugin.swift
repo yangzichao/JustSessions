@@ -4,13 +4,6 @@ import Foundation
 /// `LiveSessionReporting`. OpenCode loads it from the TUI configuration that `OPENCODE_TUI_CONFIG` names, on top of the
 /// user's own `tui.json` files. The plugin API has no event for a change of screen, so the plugin checks the screen
 /// twice a second.
-///
-/// `activity` is "waiting" while a permission or question of the session, or of a subagent it started, waits on you,
-/// with `waitingFor` saying which; "working" while OpenCode's status for the session is busy or retrying; and "idle"
-/// otherwise. The plugin reads these from the TUI's own state, as the TUI shows them. A subagent's session on screen
-/// reports the activity of the top-level session that started it, the one the app lists.
-///
-/// On an SSH host, where the app can't read its reports, it tells the tab through tmux; see `LiveSessionTmuxActivity`.
 enum OpenCodeLiveSessionPlugin {
     static let fileName = "justsessions-live-session.js"
     static let tuiConfigurationVariable = "OPENCODE_TUI_CONFIG"

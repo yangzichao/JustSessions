@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Help in Settings: what each part of the window does, in the order a session is found, read, resumed, and kept
-/// running, then organizing sessions and notifications.
 struct HelpFeatureOverview: View {
     @Environment(\.locale) private var locale
 

@@ -1,16 +1,11 @@
 import Foundation
 
-/// The fields of a Pi session entry that the preview shows, decoded from one line of the session file. Every field is
-/// optional and one of another type reads as missing, so an odd field never hides the rest of the entry.
 struct PiSessionEntry: Decodable {
-    /// The message of a `message` entry. Only the fields of the roles the preview shows are kept.
     struct Message: Decodable {
-        /// A message's content: plain text, or parts such as text, images, thinking, and tool calls.
         enum Content: Decodable {
             case text(String)
             case parts([Part])
 
-            /// Fails for anything but a string or an array of objects, so that content reads as missing.
             init(from decoder: any Decoder) throws {
                 let container = try decoder.singleValueContainer()
                 if let text = try? container.decode(String.self) {
@@ -21,20 +16,15 @@ struct PiSessionEntry: Decodable {
             }
         }
 
-        /// One part of a message's content.
         struct Part: Decodable {
             private enum CodingKeys: String, CodingKey {
                 case type, text, name, arguments, data
             }
 
-            /// Such as `text`, `image`, `thinking`, or `toolCall`.
             let type: String?
             let text: String?
-            /// The tool a `toolCall` part calls.
             let name: String?
-            /// The arguments of a `toolCall` part, in whatever shape the tool takes them.
             let arguments: PiJSONValue?
-            /// The base64 of an `image` part.
             let data: String?
 
             init(from decoder: any Decoder) throws {
@@ -46,7 +36,6 @@ struct PiSessionEntry: Decodable {
                 data = container.lenientlyDecode(String.self, forKey: .data)
             }
 
-            /// The base64 of an `image` part; nil for other parts and for one without base64.
             var imageBase64: String? {
                 type == "image" ? data : nil
             }
@@ -56,14 +45,10 @@ struct PiSessionEntry: Decodable {
             case role, content, command, excludeFromContext, stopReason, errorMessage
         }
 
-        /// Such as `user`, `assistant`, `bashExecution`, or `toolResult`.
         let role: String?
         let content: Content?
-        /// The command of a `bashExecution` message.
         let command: String?
-        /// True for a `bashExecution` message run with `!!`, whose output is kept out of the model's context.
         let excludeFromContext: Bool?
-        /// Why an assistant message ended; `error` when the request failed.
         let stopReason: String?
         let errorMessage: String?
 
@@ -72,7 +57,6 @@ struct PiSessionEntry: Decodable {
             role = container.lenientlyDecode(String.self, forKey: .role)
             content = container.lenientlyDecode(Content.self, forKey: .content)
             command = container.lenientlyDecode(String.self, forKey: .command)
-            // Like a JSON dictionary's `as? Bool`, which also reads the numbers 0 and 1 as false and true.
             excludeFromContext =
                 container.lenientlyDecode(Bool.self, forKey: .excludeFromContext)
                 ?? container.lenientlyDecode(Double.self, forKey: .excludeFromContext).flatMap { number in
@@ -87,11 +71,8 @@ struct PiSessionEntry: Decodable {
         case type, timestamp, message
     }
 
-    /// Such as `message`, `compaction`, `branch_summary`, or `model_change`.
     let type: String?
-    /// An ISO 8601 date.
     let timestamp: String?
-    /// Present for `message` entries.
     let message: Message?
 
     init(from decoder: any Decoder) throws {
@@ -101,7 +82,6 @@ struct PiSessionEntry: Decodable {
         message = container.lenientlyDecode(Message.self, forKey: .message)
     }
 
-    /// What the preview shows this entry as, or nil when it shows nothing for it.
     var previewedEntry: PiPreviewedEntry? {
         type.flatMap { PiPreviewedEntry(entryType: $0, role: message?.role) }
     }

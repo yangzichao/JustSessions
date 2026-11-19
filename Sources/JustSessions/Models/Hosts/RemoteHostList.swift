@@ -1,7 +1,5 @@
 import Foundation
 
-/// SSH hosts whose sessions JustSessions lists after this Mac's. Each entry is what you would type after `ssh`:
-/// a `Host` alias from `~/.ssh/config`, or `user@hostname`.
 struct RemoteHostList: Equatable {
     static let userDefaultsKey = "remoteHosts"
 
@@ -19,7 +17,6 @@ struct RemoteHostList: Equatable {
         userDefaults.set(hosts, forKey: Self.userDefaultsKey)
     }
 
-    /// The host as it will be stored, or nil when it cannot be passed to `ssh` safely.
     static func normalizedHost(_ proposedHost: String) -> String? {
         let host = proposedHost.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !host.isEmpty, !host.hasPrefix("-"),
@@ -30,7 +27,6 @@ struct RemoteHostList: Equatable {
         return host
     }
 
-    /// Adds the host unless it is invalid or already listed; returns whether the list changed.
     @discardableResult
     mutating func add(_ proposedHost: String) -> Bool {
         guard let host = Self.normalizedHost(proposedHost), !hosts.contains(host) else { return false }

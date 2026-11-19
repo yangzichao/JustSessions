@@ -1,6 +1,5 @@
 import Foundation
 
-/// Serial file reads and name extraction for open tabs, kept off the main actor. Each file keeps its reader between looks.
 actor AppendedSessionNameReaders {
     struct Lookup: Sendable {
         let tabID: UUID
@@ -20,7 +19,6 @@ actor AppendedSessionNameReaders {
         self.readLines = readLines
     }
 
-    /// Reads a shared file once, then extracts each tab's name. The first look marks its end and returns no old names.
     func names(for lookups: [Lookup]) -> [Name] {
         let lookupsByFile = Dictionary(grouping: lookups, by: \.file)
         readersByFile = readersByFile.filter { lookupsByFile[$0.key] != nil }

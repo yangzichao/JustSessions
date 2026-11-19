@@ -1,21 +1,16 @@
 import AppKit
 
-/// A transcript text view hands plain clicks and drags to the reader's `TranscriptTextSelectionCoordinator`, so a
-/// selection can continue into the blocks around it, and copies or selects all through it.
 extension TranscriptTextView {
-    /// Whether this view's part of the reader's selection is drawn in the accent, as the first responder's is.
     var drawsSelectionEmphasized: Bool { selectionCoordinator?.drawsSelectionEmphasized ?? false }
 
     override func mouseDown(with event: NSEvent) {
         guard let selectionCoordinator else { return super.mouseDown(with: event) }
         if selectionCoordinator.trackSelection(startingWith: event, in: self) { return }
-        // A double or triple click selects a word or a paragraph inside this block, as AppKit does.
         selectionCoordinator.clearSelection()
         super.mouseDown(with: event)
         selectionCoordinator.adoptSelection(of: self)
     }
 
-    /// A right click on a selection across blocks keeps it, so the menu's Copy copies all of it.
     override func rightMouseDown(with event: NSEvent) {
         guard let selectionCoordinator, selectionCoordinator.selection?.spansSeveralBlocks == true,
             NSLocationInRange(insertionOffset(atWindowPoint: event.locationInWindow), selectedRange()),
@@ -46,7 +41,6 @@ extension TranscriptTextView {
         return super.validateUserInterfaceItem(item)
     }
 
-    /// Escape clears the selection.
     override func cancelOperation(_ sender: Any?) {
         selectionCoordinator?.clearSelection()
     }
@@ -63,12 +57,10 @@ extension TranscriptTextView {
         return didResign
     }
 
-    /// Where a click at `point`, in window coordinates, puts the selection's end, between two characters.
     func insertionOffset(atWindowPoint point: NSPoint) -> Int {
         min(max(0, characterIndexForInsertion(at: convert(point, from: nil))), textLength)
     }
 
-    /// Opens the link under `point`, in window coordinates, as a click without a drag does.
     func openLink(atWindowPoint point: NSPoint) {
         guard let layoutManager, let textContainer, let textStorage, textStorage.length > 0 else { return }
         let viewPoint = convert(point, from: nil)

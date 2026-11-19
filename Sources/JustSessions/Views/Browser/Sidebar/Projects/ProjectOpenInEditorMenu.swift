@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// "Open project in" submenu of a project's menus, listing the installed editors that can open its folder: every one
-/// for a folder on this Mac, and the VS Code-family ones for a folder on an SSH host. Shows nothing when none can.
 struct ProjectOpenInEditorMenu: View {
     @ObservedObject var editorStore: ExternalEditorStore
     let location: ProjectLocation

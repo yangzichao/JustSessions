@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The sidebar's Open tabs list groups the tabs by their own project, in tab bar order, as `SidebarOpenTabsView`
-/// does: each tab of a split across projects lists under its project, marked with its side, while the tab bar shows
-/// the split as a unit of its own between the groups.
 @MainActor
 struct SidebarOpenTabListingTests {
     @Test func eachTabOfASplitAcrossProjectsListsUnderItsOwnProjectWithItsSide() throws {
@@ -19,7 +16,6 @@ struct SidebarOpenTabListingTests {
         store.splitSelectedTerminal(with: secondTools.id)
         let split = try #require(store.shownSplit)
         try #require(split.spansProjects)
-        // The tab bar: the app group, the split as a unit of its own, then the tools group.
         try #require(store.tabGroupKeys == [app.projectDirectoryKey, split.groupKey, split.groupKey, tools.projectDirectoryKey])
 
         let groups = TerminalTabGroup.groups(of: store.terminalSessions, projectDirectoryKey: \.projectDirectoryKey)
@@ -47,7 +43,6 @@ struct SidebarOpenTabListingTests {
 
         #expect(groups.map(\.projectDirectoryKey) == [app, docs, tools].map(\.projectDirectoryKey))
         #expect(groups.map { $0.tabs.map(\.id) } == [[app.id], [docs.id], [tools.id]])
-        // Each project keeps a color of its own, as in the tab bar, though the split's projects head no group there.
         #expect(
             Set(TabGroupPalette.colorsByProjectKey(store.tabProjectKeysInOrder).keys) == Set([app, docs, tools].map(\.projectDirectoryKey)))
     }
@@ -67,9 +62,6 @@ struct SidebarOpenTabListingTests {
         #expect(splitSide(of: secondApp, in: store) == .right)
     }
 
-    // MARK: - Helpers
-
-    /// As `SidebarOpenTabsView` works out the side its row marks.
     private func splitSide(of tab: TerminalSession, in store: ConversationStore) -> TerminalSplit.Side? {
         store.split(containing: tab.id).flatMap { store.sides(of: $0)?.side(of: tab.id) }
     }

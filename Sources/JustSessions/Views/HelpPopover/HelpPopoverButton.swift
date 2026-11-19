@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Supplementary copy beside a heading or control, opened explicitly so it stays readable until dismissed.
 struct HelpPopoverButton: View {
     let title: LocalizedStringKey
     let explanation: LocalizedStringKey

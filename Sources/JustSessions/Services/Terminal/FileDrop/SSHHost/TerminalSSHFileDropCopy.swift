@@ -1,22 +1,17 @@
 import Foundation
 
-/// One running copy of files dropped on a tab to its SSH host: the files still to copy, the host paths of those done,
-/// and how far it has gone; see `TerminalSSHFileDrop`.
 @MainActor
 final class TerminalSSHFileDropCopy {
     struct File: Sendable {
         let id = UUID()
         let url: URL
-        /// For the progress of all the files; the copy itself reads the size of the file it opens.
         let byteCount: Int64
-        /// An image pasted on the tab, saved for this copy (`TerminalPastedImageFile`), which removes it once it ends.
         var isPastedImage = false
     }
 
     let id = UUID()
     let startedAt = Date()
     let cancellation = RemoteDroppedFileCopyCancellation()
-    /// Every file dropped for this copy, those still queued included.
     private(set) var fileCount: Int
     private(set) var hostPaths: [String] = []
     private(set) var currentFile: File?
@@ -24,7 +19,6 @@ final class TerminalSSHFileDropCopy {
     private var totalByteCount: Int64
     private var copiedByteCountOfFinishedFiles: Int64 = 0
     private var copiedByteCountOfCurrentFile: Int64 = 0
-    /// The pasted images among this copy's files, those still queued included.
     private var pastedImageURLs: [URL]
 
     init(files: [File]) {
@@ -41,7 +35,6 @@ final class TerminalSSHFileDropCopy {
         return min(1, Double(copiedByteCountOfFinishedFiles + copiedByteCountOfCurrentFile) / Double(totalByteCount))
     }
 
-    /// Files dropped while the copy runs, copied after those before them.
     func add(_ files: [File]) {
         queuedFiles += files
         fileCount += files.count
@@ -49,7 +42,6 @@ final class TerminalSSHFileDropCopy {
         pastedImageURLs += files.filter(\.isPastedImage).map(\.url)
     }
 
-    /// Removes the pasted images saved for this copy, once it has ended.
     func removePastedImages() {
         pastedImageURLs.forEach(TerminalPastedImageFile.remove)
         pastedImageURLs = []
@@ -63,7 +55,6 @@ final class TerminalSSHFileDropCopy {
         return file
     }
 
-    /// Ignored for a file that is no longer the one being copied.
     func updateProgress(of fileID: UUID, copiedByteCount: Int64) {
         guard currentFile?.id == fileID else { return }
         copiedByteCountOfCurrentFile = copiedByteCount

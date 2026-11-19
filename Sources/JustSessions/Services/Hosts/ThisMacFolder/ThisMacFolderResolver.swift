@@ -1,8 +1,5 @@
 import Foundation
 
-/// Looks up a folder typed for a new session or project on this Mac and returns its absolute path. `~` is the home
-/// folder, and so is the base of a relative path, as on an SSH host (`RemoteFolderResolver`). A missing folder is
-/// reported, or created with any missing parents once asked to, so a typo is never created without a second look.
 enum ThisMacFolderResolver {
     static func resolvedPath(of typedFolder: String, creatingMissingFolder: Bool = false) throws -> String {
         let path = absolutePath(of: typedFolder)
@@ -20,7 +17,6 @@ enum ThisMacFolderResolver {
         return path
     }
 
-    /// Standardized, so `..` and a trailing `/` don't make a second project for the same folder.
     static func absolutePath(of typedFolder: String) -> String {
         let expandedFolder = (typedFolder as NSString).expandingTildeInPath
         let absoluteFolder = expandedFolder.hasPrefix("/") ? expandedFolder : NSHomeDirectory() + "/" + expandedFolder

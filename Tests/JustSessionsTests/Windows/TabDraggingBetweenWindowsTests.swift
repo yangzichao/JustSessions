@@ -4,10 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab dragged to another window goes there as it is: the same tab, its terminal and CLI still running, with nothing
-/// closed or started again, so even a CLI that does not run in tmux moves. The window it left shows another tab, and
-/// both windows save their tabs for the next launch. See `TabTerminalDraggingBetweenWindowsTests` for the terminal view
-/// in its new window.
 @MainActor
 struct TabDraggingBetweenWindowsTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -33,7 +29,6 @@ struct TabDraggingBetweenWindowsTests {
         expectSplitRules(sandbox.second)
     }
 
-    /// As when it closes: its group's next tab shows, and the groups keep their order.
     @Test(arguments: TerminalEngine.allCases)
     func aSelectedTabLeavesItsGroupsNextTabShowing(engine: TerminalEngine) throws {
         let sandbox = try TwoWindowSandbox()
@@ -97,7 +92,6 @@ struct TabDraggingBetweenWindowsTests {
         expectSplitRules(sandbox.second)
     }
 
-    /// A stacked split stays stacked in the window it moves to (SPL-18); the window it left forgets its layout.
     @Test func aStackedSplitStaysStackedInTheOtherWindow() throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
@@ -116,7 +110,6 @@ struct TabDraggingBetweenWindowsTests {
         #expect(sandbox.first.stackedSplitViewIDs.isEmpty)
     }
 
-    /// A group dragged by its label moves with all its tabs and their split, and the window it left shows another tab.
     @Test(arguments: TerminalEngine.allCases)
     func aWholeGroupMovesToAnotherWindowWithItsSplit(engine: TerminalEngine) throws {
         let sandbox = try TwoWindowSandbox()
@@ -145,7 +138,6 @@ struct TabDraggingBetweenWindowsTests {
         expectSplitRules(sandbox.second)
     }
 
-    /// Its CLI ending lists what it saved in the window it is in now.
     @Test(arguments: TerminalEngine.allCases)
     func aMovedTabsCLIEndingRefreshesItsNewWindow(engine: TerminalEngine) throws {
         let sandbox = try TwoWindowSandbox()
@@ -161,17 +153,12 @@ struct TabDraggingBetweenWindowsTests {
         #expect(sandbox.first.hostRefreshStatuses[.thisMac] == nil)
     }
 
-    // MARK: - Opening a window for the tab
-
     @Test func noWindowOpensBeforeAWorkspaceWindowHandsOverHowTo() {
         let registry = WorkspaceWindowRegistry()
 
         #expect(!registry.openWindow { _, _ in })
     }
 
-    /// The window that opens next goes to the oldest hand-over, once SwiftUI has put it on screen, out of sight and
-    /// with no opening animation until then; a window already open takes none, even as SwiftUI puts its views in it
-    /// again.
     @Test func aNewWindowGoesToTheWaitingHandOver() async throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
@@ -205,14 +192,11 @@ struct TabDraggingBetweenWindowsTests {
         #expect(registry.workspace(withWindowNumber: newWindow.windowNumber)?.store === sandbox.second)
     }
 
-    // MARK: - Helpers
-
     private func open(_ store: ConversationStore, _ tab: TerminalSession) -> TerminalSession {
         store.openTerminal(tab)
         return tab
     }
 
-    /// A plain terminal that runs nothing until its view starts it.
     private func makeTab(engine: TerminalEngine, projectPath: String) -> TerminalSession {
         TerminalSession(
             engine: engine,

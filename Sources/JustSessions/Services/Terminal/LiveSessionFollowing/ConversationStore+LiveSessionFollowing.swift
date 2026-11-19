@@ -1,16 +1,11 @@
 import Foundation
 
-/// An Antigravity, Pi, or OpenCode tab follows the session its CLI is in, as the tool's `LiveSessionSource` reads it:
-/// a new session's tab links to its session, and a tab whose CLI moved to another session, as with `/new`, `/clear`,
-/// or `/resume`, shows that one from then on, the way a Claude Code tab follows `/clear`. Only tabs on this Mac.
 extension ConversationStore {
     func startLiveSessionFollowing(interval: Duration = .seconds(1), sources: [any LiveSessionSource] = LiveSessionSources.thisMac()) {
         LiveSessionReporting.thisApp?.removeReportsOfExitedProcessesInBackground()
         runPeriodically(every: interval) { await $0.followLiveSessions(sources: sources) }
     }
 
-    /// A session no refresh listed yet gets one refresh of this Mac once its tool saved it, and the tab links to it
-    /// once a refresh lists it.
     func followLiveSessions(sources: [any LiveSessionSource]) async {
         guard !isScanningThisMac, !isDeletingSessions else { return }
         let lookups = terminalSessions.compactMap { tab -> LiveSessionLookup? in
@@ -56,17 +51,14 @@ extension ConversationStore {
     }
 }
 
-/// A running tab whose CLI's session is looked up, copied off the main actor.
 private struct LiveSessionLookup: Sendable {
     let tabID: UUID
     let provider: ConversationProvider
-    /// The CLI's process, or 0 while it is unknown.
     let processID: Int32
 }
 
 private struct FoundLiveSession: Sendable {
     let tabID: UUID
     let sessionID: String
-    /// Saved, but not listed when the lookup started.
     let isSaved: Bool
 }

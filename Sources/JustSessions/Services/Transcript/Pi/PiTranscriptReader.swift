@@ -1,12 +1,8 @@
 import Foundation
 
-/// Reads the visible conversation from a Pi session file (`~/.pi/agent/sessions/<project>/<timestamp>_<id>.jsonl`).
-/// The file holds every branch of the session, so it is read twice: once to find the current branch from how its
-/// entries link together, then again to decode only that branch's entries.
 struct PiTranscriptReader {
     var maximumEntryCount = 2_000
     var maximumTextLength = 12_000
-    /// Marks where the user went back to an earlier message and Pi summarized the branch they left.
     static let branchSummaryNoteText = "Returned to an earlier message; the branch left behind was summarized"
 
     func read(_ file: URL) throws -> TranscriptContent {
@@ -17,7 +13,6 @@ struct PiTranscriptReader {
             if let link = PiEntryLink(line: line, lineIndex: lineCount, decoder: decoder) { links.append(link) }
             lineCount += 1
         }
-        // Lines Pi appends after the first pass have higher indices than any of these, so they are left out.
         var remainingLineIndices = PiActiveBranch.entries(in: links).filter(\.mightBeShown).map(\.lineIndex)[...]
 
         var builder = TranscriptBuilder(maximumEntryCount: maximumEntryCount, maximumTextLength: maximumTextLength)
@@ -43,7 +38,6 @@ struct PiTranscriptReader {
                 builder.appendUserImage(TranscriptImage(base64Encoded: base64), timestamp: timestamp)
             }
         case .shellCommand:
-            // `!!` runs a command whose output is kept out of the model's context.
             let prefix = message?.excludeFromContext == true ? "!!" : "!"
             let command = (message?.command ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
             guard !command.isEmpty else { return }
@@ -60,7 +54,7 @@ struct PiTranscriptReader {
                     )
                     builder.append(.toolCall, text: summary, timestamp: timestamp)
                 default:
-                    continue  // Thinking blocks are left out of the preview.
+                    continue
                 }
             }
             if message?.stopReason == "error" {
@@ -77,7 +71,6 @@ struct PiTranscriptReader {
         }
     }
 
-    /// The text of a user message; its images follow it as entries of their own.
     private func userText(from content: PiSessionEntry.Message.Content?) -> String {
         if case .text(let text) = content { return visibleUserText(text) }
         return Self.parts(of: content)
@@ -85,7 +78,6 @@ struct PiTranscriptReader {
             .joined(separator: "\n\n")
     }
 
-    /// The parts of `content`; none when it is plain text or missing.
     private static func parts(of content: PiSessionEntry.Message.Content?) -> [PiSessionEntry.Message.Part] {
         guard case .parts(let parts) = content else { return [] }
         return parts

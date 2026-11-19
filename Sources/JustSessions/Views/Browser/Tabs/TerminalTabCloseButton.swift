@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The × inside a tab, with a round fill under the pointer as in Chrome.
 struct TerminalTabCloseButton: View {
     let title: String
     let action: () -> Void

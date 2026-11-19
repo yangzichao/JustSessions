@@ -33,13 +33,11 @@ struct PiPreviewedEntryTests {
         }
     }
 
-    /// A role belongs to a message, so it does not change what another entry type shows as.
     @Test func onlyMessagesAreJudgedByTheirRole() {
         #expect(PiPreviewedEntry(entryType: "compaction", role: "toolResult") == .compaction)
         #expect(PiPreviewedEntry(entryType: "custom_message", role: "user") == nil)
     }
 
-    /// Only a tool result's images are shown, so one without an image part is not worth decoding.
     @Test func aToolResultMightBeShownOnlyWhenItsLineMentionsAnImagePart() {
         let textOnly = Data(#"{"type":"message","message":{"role":"toolResult","content":[{"type":"text","text":"ok"}]}}"#.utf8)
         let withImage = Data(

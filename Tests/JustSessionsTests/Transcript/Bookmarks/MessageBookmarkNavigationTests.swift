@@ -19,8 +19,6 @@ struct MessageBookmarkNavigationTests {
 
     private var image: TranscriptImage { .undecoded }
 
-    // MARK: - Kind and snippet
-
     @Test func onlyYourMessagesAndRepliesHaveAKind() {
         #expect(MessageBookmark.Kind(.userMessage("Hi")) == .user)
         #expect(MessageBookmark.Kind(.assistantMessage("Hello")) == .assistant)
@@ -42,8 +40,6 @@ struct MessageBookmarkNavigationTests {
         #expect(!snippet.contains("\n") && !snippet.contains("  ") && !snippet.contains("*") && !snippet.contains("#"))
         #expect(MessageBookmarkNavigation.snippet(of: entry(2, .userMessage("  Why\tdoes\n\nit fail?  "))) == "Why does it fail?")
     }
-
-    // MARK: - Next and previous
 
     @Test func nextGoesToTheFirstBookmarkAfterTheOriginAndWraps() {
         let bookmarks = [bookmark("a", at: 10), bookmark("b", at: 20), bookmark("c", at: 30)]
@@ -79,8 +75,6 @@ struct MessageBookmarkNavigationTests {
         #expect(MessageBookmarkNavigation.bookmark(before: id(10), in: bookmarks)?.letter == "a")
     }
 
-    // MARK: - Locate
-
     @Test func locateFindsTheExactMessage() {
         let entries = [entry(1, .userMessage("First question")), entry(2, .assistantMessage("An answer")), entry(3, .userMessage("Next"))]
         let saved = bookmark("a", at: 2, kind: .assistant, snippet: "An answer")
@@ -108,7 +102,6 @@ struct MessageBookmarkNavigationTests {
         #expect(MessageBookmarkNavigation.locate(saved, in: entries, hasEarlier: true, hasLater: true) == .missing(landingEntryID: id(2)))
     }
 
-    /// Pi's records are sparse once a branch is left: the bookmark's record is between loaded ones but has no entry.
     @Test func locateReportsAGoneMessageInsideTheLoadedRecordsAsMissingAtTheNextEntry() {
         let entries = [entry(10, .userMessage("Before")), entry(14, .assistantMessage("After")), entry(20, .userMessage("Later"))]
         let saved = bookmark("a", at: 12, snippet: "On the abandoned branch")
@@ -146,8 +139,6 @@ struct MessageBookmarkNavigationTests {
         #expect(!MessageBookmarkNavigation.matches(saved, entry(2, .assistantMessage("The tests fail because"))))
     }
 
-    // MARK: - The message being read
-
     @Test func theMessageBeingReadPrefersTheSeekTarget() {
         let entries = [entry(1, .userMessage("One")), entry(2, .assistantMessage("Two")), entry(3, .userMessage("Three"))]
 
@@ -184,7 +175,6 @@ struct MessageBookmarkNavigationTests {
         #expect(MessageBookmarkNavigation.messageBeingRead(in: entries, visibleEntryIDs: [], seekTarget: nil) == nil)
     }
 
-    /// The pointer over a tool run or a note reads the message above it, or below at the very top (RDR-48).
     @Test func thePointersMessageIsTheEntryOrTheNearestMessageAboveIt() {
         let entries = [
             TranscriptEntry(id: 1, content: .note("Compacted"), timestamp: nil, startsTurn: false),

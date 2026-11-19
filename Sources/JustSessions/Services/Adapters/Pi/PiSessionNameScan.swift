@@ -4,22 +4,16 @@ import Foundation
 /// in a long session it can sit megabytes before the end. A scan reads on from where the previous one stopped, once
 /// the bytes it ended on are still in place there, so a refresh reads only what Pi wrote since.
 struct PiSessionNameScan: Codable, Equatable, Sendable {
-    /// The name in the last `session_info` line read so far; nil before there is one.
     let latestName: String?
-    /// Where the lines read so far end: just past the last complete line's newline.
     let scannedByteCount: Int
-    /// The bytes just before `scannedByteCount`, which the next scan checks before it reads on from there.
     let endingBytes: Data
 
     static let defaultChunkSize = 1 << 20
-    /// A `session_info` line is short, so a longer line, such as a tool's output, is skipped without being kept.
     static let maximumNameLineByteCount = 65_536
     private static let endingByteCount = 256
     private static let marker = Data(#""session_info""#.utf8)
     private static let newline = UInt8(ascii: "\n")
 
-    /// Reads `file` on from `previous`, or from the start when there is no previous scan or the file no longer holds
-    /// the bytes that scan ended on, as when it was replaced or rewritten. Nil when the file can't be read.
     static func scan(_ file: URL, continuing previous: PiSessionNameScan?, chunkSize: Int = defaultChunkSize) -> PiSessionNameScan? {
         guard let handle = try? FileHandle(forReadingFrom: file) else { return nil }
         defer { try? handle.close() }
@@ -82,7 +76,6 @@ struct PiSessionNameScan: Codable, Equatable, Sendable {
         }
     }
 
-    /// The name in the last `session_info` line among the complete lines from `start` through the newline at `end`.
     private static func latestNameInLines(of bytes: UnsafeRawBufferPointer, from start: Int, through end: Int) -> String? {
         guard let base = bytes.baseAddress else { return nil }
         var latestName: String?
@@ -109,7 +102,6 @@ struct PiSessionNameScan: Codable, Equatable, Sendable {
         return base.distance(to: UnsafeRawPointer(found))
     }
 
-    /// The last `byte` at or after `start` and before `limit`, which defaults to the end.
     private static func lastIndex(of byte: UInt8, in bytes: UnsafeRawBufferPointer, from start: Int, before limit: Int? = nil) -> Int? {
         var index = (limit ?? bytes.count) - 1
         while index >= start {

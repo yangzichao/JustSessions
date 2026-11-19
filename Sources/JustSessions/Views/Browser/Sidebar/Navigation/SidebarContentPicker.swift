@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Projects browse the library; Open tabs switches among terminals already open in this window.
 struct SidebarContentPicker: View {
     @Binding var selection: SidebarContentMode
     let openTabCount: Int

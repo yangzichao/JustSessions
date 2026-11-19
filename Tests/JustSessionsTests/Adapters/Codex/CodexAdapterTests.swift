@@ -19,7 +19,6 @@ struct CodexAdapterTests {
         try FileManager.default.createDirectory(
             at: sessions.appendingPathComponent("rollout-directory.jsonl"), withIntermediateDirectories: true)
         #expect(try CodexAdapter(codexDirectory: root).discover().isEmpty)
-        // The reader itself also rejects a pipe, covering replacement after the adapter's regular-file check.
         #expect(CodexRolloutHead(file: pipe) == nil)
     }
 

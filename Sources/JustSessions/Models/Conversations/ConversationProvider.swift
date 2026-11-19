@@ -9,7 +9,6 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
     case pi = "Pi"
 
     var id: String { rawValue }
-    /// The CLI's command name, on this Mac and on SSH hosts.
     var executableName: String {
         switch self {
         case .claude: "claude"
@@ -21,7 +20,6 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
         }
     }
 
-    /// A new session's tab title until the tab is linked to the session its CLI saves.
     var newSessionTabTitle: String { "New \(rawValue) session" }
 
     var supportsBranchFromLauncher: Bool {
@@ -43,8 +41,6 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
         }
     }
 
-    /// Session ids end up in file names, tmux session names, and shell commands, so only the tool's own id
-    /// format is accepted. OpenCode ids look like `ses_` and letters and digits; the other tools use UUIDs.
     func isValidSessionID(_ value: String) -> Bool {
         switch self {
         case .opencode:
@@ -52,7 +48,6 @@ enum ConversationProvider: String, CaseIterable, Codable, Identifiable, Sendable
             let suffix = value.dropFirst("ses_".count)
             return (8...64).contains(suffix.count) && suffix.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber) }
         case .kiro:
-            // A V3 session's id is `sess_<uuid>`; see `KiroV3Session`.
             return ConversationMetadata.isValidSessionID(value) || KiroV3Session.isSessionID(value)
         case .claude, .codex, .antigravity, .pi:
             return ConversationMetadata.isValidSessionID(value)

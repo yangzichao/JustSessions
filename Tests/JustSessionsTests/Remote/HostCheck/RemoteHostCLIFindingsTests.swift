@@ -11,7 +11,7 @@ struct RemoteHostCLIFindingsTests {
             "cli-codex-version-exit": "0",
         ])
 
-        let codex = try #require(findings(in: output).first { $0.id == "cli-codex" })
+        let codex = try #require(findings(in: output).first { $0.id == .cli(.codex) })
 
         #expect(codex.status == .passed)
         #expect(codex.hostOutput == "codex-cli 0.50.0")
@@ -31,10 +31,10 @@ struct RemoteHostCLIFindingsTests {
         ])
         let found = findings(in: output)
 
-        let opencode = try #require(found.first { $0.id == "cli-opencode" })
+        let opencode = try #require(found.first { $0.id == .cli(.opencode) })
         #expect(opencode.status == .warning)
         #expect(opencode.hostOutput == "env: node: No such file or directory")
-        let pi = try #require(found.first { $0.id == "cli-pi" })
+        let pi = try #require(found.first { $0.id == .cli(.pi) })
         #expect(pi.status == .warning)
         #expect(pi.summary.contains("\(RemoteHostCheckScript.versionTimeoutSeconds) seconds"))
     }
@@ -46,9 +46,9 @@ struct RemoteHostCLIFindingsTests {
             providersWithSessions: [.codex]
         )
 
-        #expect(found.first { $0.id == "cli-claude" }?.status == .problem)
-        #expect(found.first { $0.id == "cli-codex" }?.status == .warning)
-        let others = try #require(found.first { $0.id == "cli-others" })
+        #expect(found.first { $0.id == .cli(.claude) }?.status == .problem)
+        #expect(found.first { $0.id == .cli(.codex) }?.status == .warning)
+        let others = try #require(found.first { $0.id == .otherCLIs })
         #expect(others.status == .note)
         #expect(!others.summary.contains("Claude Code"))
         #expect(!others.summary.contains("Codex"))
@@ -60,14 +60,14 @@ struct RemoteHostCLIFindingsTests {
             in: hostCheckOutput([:]),
             session: HostCheckSession(provider: nil, projectPath: "/home/me/app")
         )
-        #expect(found.map(\.id) == ["cli-others"])
+        #expect(found.map(\.id) == [.otherCLIs])
     }
 
     @Test func yourStartCommandsProgramIsLookedUpButNotAskedForItsVersion() throws {
         let programs = RemoteHostCheckProgram.all { $0 == .claude ? "~/bin/claude-wrapper --fast" : nil }
         let claude = try #require(programs.first { $0.provider == .claude })
         #expect(claude.program == "~/bin/claude-wrapper")
-        #expect(!claude.asksVersion)
+        #expect(claude.source == .customStartCommand)
 
         let found = findings(
             in: hostCheckOutput(["cli-claude-path": "/home/me/bin/claude-wrapper"]),
@@ -100,14 +100,14 @@ struct RemoteHostCLIFindingsTests {
             programs: programs
         )
 
-        let claude = try #require(found.first { $0.id == "cli-claude" })
+        let claude = try #require(found.first { $0.id == .cli(.claude) })
         #expect(claude.status == .passed)
         #expect(claude.summary.contains("alias or function"))
         #expect(claude.hostOutput == "2.1.0 (Claude Code)")
         #expect(
             claude.commandToRunYourself
                 == "ssh devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"command -v claude && claude --version\"'")
-        let pi = try #require(found.first { $0.id == "cli-pi" })
+        let pi = try #require(found.first { $0.id == .cli(.pi) })
         #expect(pi.status == .warning)
         #expect(pi.summary.contains("alias or function"))
     }
@@ -124,7 +124,7 @@ struct RemoteHostCLIFindingsTests {
             programs: programs
         )
 
-        let claude = try #require(found.first { $0.id == "cli-claude" })
+        let claude = try #require(found.first { $0.id == .cli(.claude) })
         #expect(claude.status == .passed)
         #expect(claude.summary.contains(path))
         #expect(claude.summary.contains("PATH"))

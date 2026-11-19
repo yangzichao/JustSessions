@@ -21,7 +21,6 @@ enum OpenCodePromptRecognizer {
         else { return nil }
         let borderColumn = rows[bottomRow].startColumn(ofCharacterAt: borderIndex)
         let topRow = rows[..<bottomRow].lastIndex { $0.character(atColumn: borderColumn) != "┃" }.map { $0 + 1 } ?? 0
-        // The box's empty first row, then the prompt, then an empty row and the agent's row.
         let promptRows = (topRow + 1)..<(bottomRow - 2)
         guard promptRows.contains(caretRow) else { return nil }
         let textStartColumn = borderColumn + 3

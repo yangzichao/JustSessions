@@ -7,17 +7,11 @@ import Foundation
 /// Pi's and OpenCode's extensions from what they report on this Mac (`RemoteLiveSessionReporting`). Until it is set, as before the CLI says anything, the title is the CLI's own, except
 /// that tmux 2.6 shows the prefix alone. The app shows neither; it only reads what the CLI does from it.
 enum RemoteCLIActivityTitle {
-    /// The CLIs whose tmux session shows it.
     static let providers: Set<ConversationProvider> = [.claude, .pi, .opencode, .kiro, .antigravity]
-    /// A window option of the tab's tmux session, holding `<state>:<what it waits for>`.
     static let optionName = "@justsessions-activity"
     static let titlePrefix = "justsessions-activity:"
-    /// The session's `set-titles-string`.
     static let titleFormat = "#{?\(optionName),\(titlePrefix)#{\(optionName)},#T}"
 
-    /// Nil for any other title, and for a state this app does not know: Claude Code's states as
-    /// `ClaudeLiveSessionRecord` reads them, Pi's and OpenCode's as `LiveSessionReport` does, Kiro CLI's as
-    /// `KiroTurnMarkers` names them, and Antigravity's as `RemoteAntigravityActivityRelay` does.
     static func activity(inTerminalTitle title: String, of provider: ConversationProvider) -> CLIActivity? {
         if provider == .claude, let record = RemoteClaudeSessionTitle.record(inTerminalTitle: title) {
             return record.activity

@@ -1,8 +1,6 @@
 import SwiftUI
 
-/// The last row under a project that lists only its first sessions: "Show 20 more", lined up with the session titles.
 struct SidebarShowMoreSessionsRow: View {
-    /// How many sessions a click lists.
     let sessionCount: Int
     let onShowMore: () -> Void
 

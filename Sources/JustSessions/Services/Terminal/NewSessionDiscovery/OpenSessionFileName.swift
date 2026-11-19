@@ -1,6 +1,5 @@
 import Foundation
 
-/// Recognizes a session file among the files a CLI holds open and reads the session id from its name.
 /// A Codex CLI that runs its threads itself (`--no-daemon`, or a Codex from before its background server) keeps
 /// `sessions/YYYY/MM/DD/rollout-<timestamp>-<session id>.jsonl` open while it runs; one whose threads run in the
 /// background server names its thread in the terminal title instead, see `CodexThreadTitle`. Antigravity keeps its

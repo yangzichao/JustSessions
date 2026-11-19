@@ -8,7 +8,6 @@ import Carbon.HIToolbox
 enum ShiftReturnKey {
     static let csiUSequence = "\u{1b}[13;2u"
 
-    /// Return or the keypad's Enter, with Shift and no other modifier.
     static func matches(_ event: NSEvent) -> Bool {
         let returnKeyCodes: Set<UInt16> = [UInt16(kVK_Return), UInt16(kVK_ANSI_KeypadEnter)]
         return event.type == .keyDown

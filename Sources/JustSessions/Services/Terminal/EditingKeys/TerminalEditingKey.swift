@@ -3,7 +3,7 @@ import Carbon.HIToolbox
 
 /// ⌘←, ⌘→, ⌘Delete, and ⌘Z, which a terminal sends as the control keys a shell or a CLI such as Claude Code reads as the
 /// same edits, as iTerm2's Natural Text Editing does: Ctrl-A and Ctrl-E go to the start and end of the line, Ctrl-U
-/// deletes back to its start, and Ctrl-_ undoes the last edit. Either engine sends the same bytes.
+/// deletes back to its start, and Ctrl-_ undoes the last edit.
 enum TerminalEditingKey: CaseIterable {
     case moveToLineStart
     case moveToLineEnd
@@ -35,7 +35,6 @@ enum TerminalEditingKey: CaseIterable {
         }
     }
 
-    /// The key a Ghostty keybinding names for it; see `GhosttyAppearanceConfiguration`.
     var ghosttyTrigger: String {
         switch self {
         case .moveToLineStart: "super+arrow_left"

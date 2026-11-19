@@ -84,7 +84,6 @@ struct ListedProjectSessionRowsTests {
             ) == nil)
     }
 
-    /// Newest first, as a project lists them.
     private func sessions(count: Int) -> [Conversation] {
         (0..<count).map { index in
             Conversation.fixture(sessionID: "session-\(index)", updatedAt: Date(timeIntervalSince1970: TimeInterval(1_000 - index)))

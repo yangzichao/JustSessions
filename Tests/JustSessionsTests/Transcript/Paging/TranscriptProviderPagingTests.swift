@@ -20,7 +20,7 @@ struct TranscriptProviderPagingTests {
         limits.targetEntryCount = 1
         let source = TranscriptPageSource(file: fixture.file, provider: .claude, limits: limits)
         let latest = try await source.read(.latest)
-        #expect(latest.entries.count == 3)  // All parts of one record stay together.
+        #expect(latest.entries.count == 3)
         let first = try await source.read(.before(latest.records.lowerBound))
         #expect((first.entries + latest.entries).map(\.content) == (try ClaudeTranscriptReader().read(fixture.file)).entries.map(\.content))
     }
@@ -45,8 +45,6 @@ struct TranscriptProviderPagingTests {
         #expect(asSession.entries.isEmpty)
     }
 
-    /// A turn's label depends on the entry before it in the session, not on whether the page holding that entry is
-    /// loaded, so no entry gains or loses its label, and moves what is below it, as pages load and leave.
     @Test func turnLabelsDoNotDependOnWhichPagesAreLoaded() async throws {
         let fixture = try TranscriptPagingFixture(count: 0)
         defer { fixture.remove() }
@@ -66,7 +64,6 @@ struct TranscriptProviderPagingTests {
         let latest = try await source.read(.latest)
         let earlier = try await source.read(.before(latest.records.lowerBound))
 
-        // The record just before the latest page shows nothing, so its speaker comes from the one before that.
         #expect(latest.precedingSpeaker == 1)
         #expect(earlier.precedingSpeaker == 0)
         let alone = TranscriptPageAssembler.transcript(pages: [latest])

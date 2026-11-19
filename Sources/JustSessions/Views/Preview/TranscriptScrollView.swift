@@ -6,22 +6,19 @@ struct TranscriptScrollView: View {
     let isActive: Bool
     let paging: TranscriptPagingModel?
     let onOpenInNewWindow: (() -> Void)?
-    /// Records the reading position and restores it. Nothing else tracks where the reader is: SwiftUI's own tracking, with
-    /// `.scrollPosition(id:)`, searched every entry on each scroll step for the one at the top.
+    /// SwiftUI's own tracking, with `.scrollPosition(id:)`, searched every entry on each scroll step for the one at
+    /// the top.
     @State var positionController: TranscriptScrollPositionController
     @State var restoredPagingRevision: Int?
     @AppStorage(TranscriptReadingTextSize.userDefaultsKey) private var readingFontSize = TranscriptReadingTextSize.defaultSize
     @State var searchState: TranscriptSearchState
-    /// Keeps the session's message bookmarks; see `TranscriptScrollView+Bookmarks`.
     let store: ConversationStore?
     @State var bookmarkState: TranscriptBookmarkState
-    /// A reading window's requests from a tab or the map; see `TranscriptScrollView+ReadingRequests`.
     let readingRequests: SessionReadingRequests?
     @State var searchIndex: TranscriptSearchIndex?
     @State var indexedTranscript: TranscriptContent?
     @State var indexedQuery = ""
     @AppStorage(TranscriptReadingWidth.userDefaultsKey) private var readingWidth = TranscriptReadingWidth.readable
-    /// The selection across the reader's text blocks.
     @State var textSelection = TranscriptTextSelectionCoordinator()
     @Environment(\.appTheme) private var appTheme
     @Environment(\.colorScheme) private var colorScheme
@@ -120,7 +117,6 @@ struct TranscriptScrollView: View {
                     settleBookmarkJump()
                     settleEntryJump()
                 }
-                // A fresh window's request is taken as its first page shows (initial), a later one as it comes.
                 .onChange(of: readingRequests?.navigationRevision ?? 0, initial: true) { takeReadingNavigation() }
                 .onReceive(positionController.viewportUpdates) { prefetchIfNeeded(in: $0) }
                 .onReceive(positionController.readingUpdates) { updateBookmarkTarget() }
@@ -154,7 +150,6 @@ struct TranscriptScrollView: View {
                     }
                     TranscriptEntriesStack(transcript: transcript, provider: conversation.provider, positionController: positionController)
                         .equatable()
-                        // In the entries' own coordinates, where the target's row is measured.
                         .overlay(alignment: .topLeading) {
                             if bookmarksAreEnabled {
                                 TranscriptBookmarkTargetMarks(target: bookmarkState.target)
@@ -178,13 +173,11 @@ struct TranscriptScrollView: View {
                 .padding(.bottom, 36)
                 .frame(width: viewport.size.width)
             }
-            // Short conversations start at the top; the explicit restoration still opens long ones on their latest entry.
             .defaultScrollAnchor(.top)
             .onDisappear { positionController.stop() }
         }
     }
 
-    /// As wide as the reading width allows, inside the reading padding on each side.
     private func columnWidth(in viewportWidth: CGFloat) -> CGFloat {
         min(readingWidth.maximumColumnWidth, max(0, viewportWidth - 48))
     }

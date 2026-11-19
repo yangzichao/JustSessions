@@ -3,14 +3,10 @@ import Testing
 
 @testable import JustSessions
 
-/// Every tool runs a start command of your own with the app's arguments after it, on this Mac and on SSH hosts. Each
-/// start command here is a stand-in for the tool's CLI that prints its arguments, with options the tool takes.
 struct EveryToolStartCommandTests {
     struct ToolCase: Sendable, CustomTestStringConvertible {
         let provider: ConversationProvider
-        /// The start command's words after its executable.
         let ownWords: [String]
-        /// The app's arguments to resume the session, after `ownWords`.
         let resumeArguments: [String]
         var testDescription: String { provider.rawValue }
     }
@@ -21,7 +17,6 @@ struct EveryToolStartCommandTests {
         ToolCase(provider: .claude, ownWords: ["--dangerously-skip-permissions"], resumeArguments: ["--resume", sessionID]),
         ToolCase(provider: .codex, ownWords: ["--dangerously-bypass-approvals-and-sandbox"], resumeArguments: ["resume", sessionID]),
         ToolCase(provider: .antigravity, ownWords: ["--dangerously-skip-permissions"], resumeArguments: ["--conversation", sessionID]),
-        // Kiro CLI's options belong to `chat`, which the start command holds, so the app leaves it out.
         ToolCase(provider: .kiro, ownWords: ["chat", "--trust-all-tools"], resumeArguments: ["--resume-id", sessionID]),
         ToolCase(provider: .opencode, ownWords: ["--model", "anthropic/claude-sonnet"], resumeArguments: ["--session", sessionID]),
         ToolCase(provider: .pi, ownWords: ["--model", "sonnet"], resumeArguments: ["--session", sessionID]),
@@ -50,7 +45,6 @@ struct EveryToolStartCommandTests {
             startCommand: startCommand
         )
 
-        // Codex on this Mac also names its thread in the terminal title; see `CodexThreadTitle`.
         let titleArguments = toolCase.provider == .codex ? CodexThreadTitle.launchArguments : []
         #expect(try Self.printedArguments(of: command) == toolCase.ownWords + titleArguments + toolCase.resumeArguments)
     }
@@ -72,7 +66,6 @@ struct EveryToolStartCommandTests {
         #expect(try Self.printedArguments(of: command) == toolCase.ownWords + titleArguments)
     }
 
-    /// Runs the remote command the way the host's shell would, with a stand-in for the login shell.
     @Test(arguments: toolCases)
     func anSSHHostResumesWithTheStartCommand(_ toolCase: ToolCase) throws {
         let root = try makeTemporaryDirectory()
@@ -101,7 +94,6 @@ struct EveryToolStartCommandTests {
         #expect(output.split(separator: "\n").map(String.init) == toolCase.ownWords + titleArguments + toolCase.resumeArguments)
     }
 
-    /// Writes a stand-in for the tool's CLI in `~/tools`, and returns the start command that runs it.
     private static func writeStandIn(for toolCase: ToolCase, in home: URL) throws -> String {
         let tools = home.appendingPathComponent("tools")
         try FileManager.default.createDirectory(at: tools, withIntermediateDirectories: true)

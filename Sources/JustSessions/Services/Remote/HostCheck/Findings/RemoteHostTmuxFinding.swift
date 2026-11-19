@@ -7,13 +7,11 @@ import Foundation
 enum RemoteHostTmuxFinding {
     static let oldestSupportedVersion = (major: 2, minor: 6)
 
-    /// What a tmux client prints when the running server is of a version it can't talk to.
     static let unreachableServerPhrases = [
         "protocol version mismatch",
         "server exited unexpectedly",
         "server version is too old",
     ]
-    /// What a tmux client prints when no server runs, which is fine.
     static let noServerPhrases = ["no server running", "error connecting to", "no sessions", "no current session"]
 
     static func finding(in output: RemoteHostCheckOutput, context: RemoteHostCheckContext) -> HostCheckFinding {
@@ -21,7 +19,7 @@ enum RemoteHostTmuxFinding {
         let command = RemoteHostCheckCommands.inLoginShell(host, "tmux -V; tmux ls", startup: context.shellStartup)
         func finding(_ status: HostCheckFinding.Status, _ summary: String, hostOutput: String? = nil) -> HostCheckFinding {
             HostCheckFinding(
-                id: "tmux", status: status, title: "tmux", summary: summary,
+                id: .tmux, status: status, title: "tmux", summary: summary,
                 hostOutput: hostOutput, commandToRunYourself: command
             )
         }
@@ -70,15 +68,12 @@ enum RemoteHostTmuxFinding {
             ), hostOutput: output.text("tmux-version"))
     }
 
-    /// The line of `output` in which a tmux client says it can't reach the running server, as a refresh's
-    /// `tmux list-sessions` prints it; nil when there is none. See `RemoteHostStatusProbe`.
     static func unreachableServerMessage(in output: String) -> String? {
         output.split(whereSeparator: \.isNewline)
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .first { line in unreachableServerPhrases.contains(where: line.lowercased().contains) }
     }
 
-    /// "3.4" from "tmux 3.4", or "next-3.7" from a build from source.
     static func version(inVersionOutput output: String?) -> String? {
         guard let line = output?.split(separator: "\n").first, line.hasPrefix("tmux ") else { return nil }
         return String(line.dropFirst("tmux ".count)).trimmingCharacters(in: .whitespaces)

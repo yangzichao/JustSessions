@@ -1,12 +1,6 @@
 import Foundation
 
-/// SSH hosts whose shell startup gets in the way of the app's commands; see `RemoteShellStartupCheck`. A host is checked
-/// the first time it refreshes without a result: right after it is added, or, for a host added before the check
-/// existed, on its next refresh. A refresh that fails or says nothing about the host's CLIs, as such a startup causes,
-/// checks it again, once a run, unless the last check found nothing the app can do. Check this host… in its ⋯ menu
-/// checks it too, as after you changed its startup files; see `ConversationStore+HostCheck`.
 extension ConversationStore {
-    /// Gives `RemoteHostShellStartups` each listed host's startup, as its last check found.
     func applyRemoteShellStartups() {
         for host in remoteHostList.hosts {
             RemoteHostShellStartups.shared.setStartup(
@@ -20,22 +14,21 @@ extension ConversationStore {
         remoteShellStartupChecks.result(for: host)
     }
 
-    /// After a refresh of the host. `statusListedCLIs` is whether its status probe said which CLIs the host has; it is
-    /// false when the refresh failed, which a startup that gets in the way can cause too, as when it starts tmux in the
-    /// shell an OpenCode or Antigravity snapshot runs in.
     func checkRemoteShellStartupIfNeeded(on host: String, statusListedCLIs: Bool) {
-        // Another window may have checked the host since this one loaded the results.
-        guard let result = RemoteShellStartupChecks.load(from: userDefaults).result(for: host) else {
-            // A host that could not be reached is tried once a run, not on every refresh.
-            guard statusListedCLIs || hostsRecheckedShellStartup.insert(host).inserted else { return }
+        let keptResult = RemoteShellStartupChecks.load(from: userDefaults).result(for: host)
+        if keptResult == nil, statusListedCLIs {
             checkRemoteShellStartup(on: host)
-            return
+        } else if !statusListedCLIs, keptResult?.outcome != .blocked {
+            recheckRemoteShellStartupOncePerRun(on: host)
         }
-        guard !statusListedCLIs, result.outcome != .blocked, hostsRecheckedShellStartup.insert(host).inserted else { return }
+    }
+
+    private func recheckRemoteShellStartupOncePerRun(on host: String) {
+        guard !hostsRecheckedShellStartup.contains(host) else { return }
+        hostsRecheckedShellStartup.insert(host)
         checkRemoteShellStartup(on: host)
     }
 
-    /// When the host is removed.
     func forgetRemoteShellStartup(on host: String) {
         saveRemoteShellStartupCheck(nil, on: host)
         RemoteHostShellStartups.shared.setStartup(.interactive, on: host)
@@ -64,7 +57,6 @@ extension ConversationStore {
         applyRemoteShellStartupCheckResult(result, on: host)
     }
 
-    /// Keeps a check's result, from this check or from Check this host…, and remakes what the host's new startup changes.
     func applyRemoteShellStartupCheckResult(_ result: RemoteShellStartupCheckResult, on host: String) {
         guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), !isDisconnected(host) else { return }
         let previousStartup = RemoteHostShellStartups.shared.startup(on: host)
@@ -74,11 +66,9 @@ extension ConversationStore {
         for store in windowRegistry.stores {
             store.remakeTabsWaitingToBeShown(on: .ssh(host))
         }
-        // The status probe lists the CLIs the host's shell finds as it now starts.
         refreshRemoteHost(host)
     }
 
-    /// Saves over what is saved, which another window may have changed, and shows the result in every window.
     private func saveRemoteShellStartupCheck(_ result: RemoteShellStartupCheckResult?, on host: String) {
         var checks = RemoteShellStartupChecks.load(from: userDefaults)
         checks.setResult(result, for: host)

@@ -1,25 +1,15 @@
 import Foundation
 
-/// Sessions on SSH hosts. Each host is copied into a local mirror in the background, apart from this Mac's scan,
-/// so a slow or unreachable host never holds up the rest of the list.
 extension ConversationStore {
-    /// Returns the refresh's task, or nil when none started: the host is disconnected (see
-    /// `ConversationStore+RemoteHostDisconnect`), is refreshing already, or a deletion from it runs and the refresh
-    /// waits for it. Copies with `discovery`, or else the store's, unless another window's copy that started after
-    /// this refresh was asked for stands for it; see `LatestRemoteHostCopies`.
     @discardableResult
     func refreshRemoteHost(
         _ host: String,
         discovery: RemoteSessionDiscovery? = nil
-    ) -> Task<Void, Never>? {
-        guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), !isDisconnected(host),
-            !deferRefreshWhileDeleting(on: .ssh(host)),
-            hostRefreshStatuses[.ssh(host)] != .refreshing
-        else { return nil }
+    ) -> RemoteHostRefreshStart {
+        if let refusal = remoteHostRefreshRefusal(on: host) { return .refused(refusal) }
         let discovery = discovery ?? remoteSessionDiscovery
         let token = remoteHostWork.beginRefresh(on: host, previousStatus: hostRefreshStatuses[.ssh(host)])
-        let requestNumber = windowRegistry.latestRemoteHostCopies.noteRefreshAsked()
-        let configuredHosts = Array(Set(storesOfEveryWindow.flatMap { $0.remoteHostList.hosts }))
+        let refreshAskedAt = windowRegistry.latestRemoteHostCopies.noteRefreshAsked()
         let coordinator = windowRegistry.hostSessionWork
         hostRefreshStatuses[.ssh(host)] = .refreshing
         remoteHostCopies.noteStart(of: host)
@@ -27,54 +17,34 @@ extension ConversationStore {
             do {
                 try await coordinator.withAccess(to: [.ssh(host)]) { [weak self] in
                     try Task.checkCancellation()
-                    let turn = await self?.remoteHostRefreshTurn(token, on: host, into: discovery.mirror, askedAt: requestNumber)
+                    let turn = await self?.remoteHostRefreshTurn(token, on: host, into: discovery.mirror, askedAt: refreshAskedAt)
                     guard let turn else { throw CancellationError() }
-                    discovery.mirror.migrateLegacyMirrors(for: configuredHosts)
-                    guard case .copy(let copyNumber) = turn else {
-                        if case .take(let outcome) = turn {
-                            try await self?.takeAnotherWindowsCopy(outcome, host: host, token: token, discovery: discovery)
-                        }
-                        return
-                    }
-                    do {
-                        // The last copy lists right away; the host may be slow or offline.
-                        if let mirrored = try? discovery.readMirror(host: host), !mirrored.isEmpty {
-                            await self?.applyRemoteRefreshConversations(mirrored, host: host, token: token)
-                        }
-                        try Task.checkCancellation()
-                        try await discovery.discoverToolByTool(
-                            host: host,
-                            copying: { [weak self] step in await self?.setRemoteSessionCopyStep(step, host: host, token: token) },
-                            copied: { [weak self] step, conversations in
-                                await self?.applyRemoteRefreshConversations(conversations, host: host, token: token, step: step)
-                            }
-                        )
-                        try Task.checkCancellation()
-                        guard await self?.isCurrentRemoteHostRefresh(token, on: host) == true else { throw CancellationError() }
-                        let status = discovery.status(host)
-                        try Task.checkCancellation()
-                        await self?.finishRemoteHostRefresh(
-                            host, token: token, status: status, discovery: discovery, copyNumber: copyNumber
-                        )
-                    } catch {
-                        // Noted before the host is let go, so the refreshes waiting for this copy take its failure.
-                        if !(error is CancellationError), !Task.isCancelled {
-                            await self?.noteRemoteHostCopyFailed(
-                                host, token: token, mirror: discovery.mirror, copyNumber: copyNumber, error: error
-                            )
-                        }
-                        throw error
+                    switch turn {
+                    case .take(let outcome):
+                        try await self?.takeAnotherWindowsCopy(outcome, host: host, token: token, discovery: discovery)
+                    case .copy(let copyStartedAt):
+                        try await RemoteHostRefreshCopy(
+                            store: self, host: host, token: token, discovery: discovery, startedAt: copyStartedAt
+                        ).copyNotingItsEnd()
                     }
                 }
             } catch is CancellationError {
-                // Disconnect/removal already invalidated the generation and restored the last completed status.
             } catch {
                 if !Task.isCancelled { await self?.failRemoteHostRefresh(host, token: token, error: error) }
             }
             await self?.completeRemoteHostRefreshTask(host, token: token, wasCancelled: Task.isCancelled)
         }
         remoteHostWork.keep(task, on: host, token: token)
-        return task
+        return .started(task)
+    }
+
+    private func remoteHostRefreshRefusal(on host: String) -> RemoteHostRefreshStart.Refusal? {
+        if isTearingDownWorkspace { return .workspaceClosing }
+        if !remoteHostList.hosts.contains(host) { return .hostNotListed }
+        if isDisconnected(host) { return .hostDisconnected }
+        if deferRefreshWhileDeleting(on: .ssh(host)) { return .deferredUntilDeletionEnds }
+        if hostRefreshStatuses[.ssh(host)] == .refreshing { return .alreadyRefreshing }
+        return nil
     }
 
     func isCurrentRemoteHostRefresh(_ token: RemoteHostWork.Token, on host: String) -> Bool {
@@ -82,22 +52,28 @@ extension ConversationStore {
             && remoteHostWork.isCurrent(token, on: host)
     }
 
-    /// Nil when the refresh no longer counts.
     private func remoteHostRefreshTurn(
-        _ token: RemoteHostWork.Token, on host: String, into mirror: RemoteSessionMirror, askedAt requestNumber: UInt64
+        _ token: RemoteHostWork.Token, on host: String, into mirror: RemoteSessionMirror,
+        askedAt refreshAskedAt: LatestRemoteHostCopies.Moment
     ) -> LatestRemoteHostCopies.Turn? {
         guard isCurrentRemoteHostRefresh(token, on: host) else { return nil }
-        return windowRegistry.latestRemoteHostCopies.turn(on: host, into: mirror, askedAt: requestNumber)
+        return windowRegistry.latestRemoteHostCopies.turn(on: host, into: mirror, askedAt: refreshAskedAt)
     }
 
-    private func noteRemoteHostCopyFailed(
-        _ host: String, token: RemoteHostWork.Token, mirror: RemoteSessionMirror, copyNumber: UInt64, error: any Error
+    fileprivate func noteRemoteHostCopyFailed(
+        _ host: String,
+        token: RemoteHostWork.Token,
+        mirror: RemoteSessionMirror,
+        copyStartedAt: LatestRemoteHostCopies.Moment,
+        error: any Error
     ) {
         guard isCurrentRemoteHostRefresh(token, on: host) else { return }
-        windowRegistry.latestRemoteHostCopies.noteCopyEnded(on: host, into: mirror, number: copyNumber, outcome: .failed(error))
+        windowRegistry.latestRemoteHostCopies.noteCopyEnded(
+            on: host, into: mirror, startedAt: copyStartedAt, outcome: .failed(error)
+        )
     }
 
-    private func applyRemoteRefreshConversations(
+    fileprivate func applyRemoteRefreshConversations(
         _ conversations: [Conversation], host: String, token: RemoteHostWork.Token, step: RemoteSessionCopyStep? = nil
     ) {
         guard isCurrentRemoteHostRefresh(token, on: host) else { return }
@@ -108,17 +84,17 @@ extension ConversationStore {
         }
     }
 
-    private func finishRemoteHostRefresh(
+    fileprivate func finishRemoteHostRefresh(
         _ host: String,
         token: RemoteHostWork.Token,
         status: RemoteHostStatus?,
         discovery: RemoteSessionDiscovery,
-        copyNumber: UInt64
+        copyStartedAt: LatestRemoteHostCopies.Moment
     ) {
         guard isCurrentRemoteHostRefresh(token, on: host) else { return }
         let refreshedAt = Date.now
         windowRegistry.latestRemoteHostCopies.noteCopyEnded(
-            on: host, into: discovery.mirror, number: copyNumber, outcome: .copied(refreshedAt: refreshedAt, status: status)
+            on: host, into: discovery.mirror, startedAt: copyStartedAt, outcome: .copied(refreshedAt: refreshedAt, status: status)
         )
         if let status {
             setTmuxSessionNames(status.tmuxSessionNames, on: .ssh(host))
@@ -135,7 +111,6 @@ extension ConversationStore {
         if let status { checkRemoteShellStartupIfNeeded(on: host, statusListedCLIs: status.installedProviders != nil) }
     }
 
-    /// Without `checksShellStartup`, as when another window's copy failed, the window that tried the host checks it.
     func failRemoteHostRefresh(_ host: String, token: RemoteHostWork.Token, error: any Error, checksShellStartup: Bool = true) {
         guard isCurrentRemoteHostRefresh(token, on: host) else { return }
         setRemoteHostRefreshStatus(.failed(error.localizedDescription), host: host)
@@ -156,18 +131,14 @@ extension ConversationStore {
         remoteHostWork.finishRefresh(on: host, token: token)
     }
 
-    /// Lists a disconnected host's sessions from its last copy, as at launch, without reaching the host; see
-    /// `ConversationStore+RemoteHostDisconnect`. Its refresh status stays as it was, since nothing was refreshed.
     func listRemoteHostFromMirror(_ host: String) {
-        guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), hostRefreshStatuses[.ssh(host)] != .refreshing,
-            let token = remoteHostWork.beginRead(on: host)
+        guard !isTearingDownWorkspace, remoteHostList.hosts.contains(host), hostRefreshStatuses[.ssh(host)] != .refreshing
         else { return }
+        let token = remoteHostWork.beginRead(on: host)
         let discovery = remoteSessionDiscovery
         let coordinator = windowRegistry.hostSessionWork
-        let configuredHosts = Array(Set(storesOfEveryWindow.flatMap { $0.remoteHostList.hosts }))
         Task.detached(priority: .userInitiated) { [weak self] in
             try? await coordinator.withAccess(to: [.ssh(host)]) { [weak self] in
-                discovery.mirror.migrateLegacyMirrors(for: configuredHosts)
                 guard let mirroredConversations = try? discovery.readMirror(host: host) else { return }
                 await self?.applyRemoteMirrorListing(mirroredConversations, host: host, token: token)
             }
@@ -179,8 +150,6 @@ extension ConversationStore {
         applyRemoteHostConversations(conversations, host: host, discardMissingReopeningTabs: false)
     }
 
-    /// Why the app can't log in to `host` without a prompt, or through a login made with Connect…, or nil when it
-    /// can; checked before the host is added, also when it couldn't be reached a moment ago.
     func connectionProblem(
         on host: String,
         check: RemoteHostConnectionCheck = RemoteHostConnectionCheck()
@@ -189,8 +158,6 @@ extension ConversationStore {
         return await Task.detached(priority: .userInitiated) { check.problem(connectingTo: host) }.value
     }
 
-    /// Where `ssh` would connect for the host, and the listed host that connects to the same place, read off the main
-    /// actor with `ssh -G`.
     func sameMachineCheck(for host: String) async -> SSHHostSameMachineCheck {
         let listedHosts = remoteHostList.hosts
         return await Task.detached(priority: .userInitiated) {
@@ -198,7 +165,6 @@ extension ConversationStore {
         }.value
     }
 
-    /// Returns false when the host is not a valid `ssh` destination or is already listed.
     @discardableResult
     func addRemoteHost(_ proposedHost: String) -> Bool {
         guard remoteHostList.add(proposedHost), let host = RemoteHostList.normalizedHost(proposedHost) else { return false }
@@ -244,8 +210,6 @@ extension ConversationStore {
                 mirror.removeMirror(host: host)
             }
         }
-        // A Try Again that waited for this host's refresh can start for the other hosts' sessions; the refresh
-        // ends without reporting, now that the host is gone.
         resumeQueuedHostWorkInAllWindows()
     }
 
@@ -253,24 +217,17 @@ extension ConversationStore {
         !remoteHostList.hosts.contains(host) && remoteHostWork.lifecycle(on: host) == generation
     }
 
-    /// Lists a host's sessions from its copy, and links the tabs waiting for them.
     func applyRemoteHostConversations(
         _ hostConversations: [Conversation],
         host: String,
         discardMissingReopeningTabs: Bool = true
     ) {
-        // The host may have been removed while its copy ran.
         guard remoteHostList.hosts.contains(host) else { return }
         replaceConversations(on: .ssh(host), with: hostConversations, discardMissingReopeningTabs: discardMissingReopeningTabs)
         linkWaitingTabsToPreassignedSessions(on: .ssh(host))
         linkWaitingTabsByAppearance(on: .ssh(host))
     }
 
-    /// Lists one tool's sessions as soon as they are copied, in place of that tool's earlier ones; the host's other
-    /// tools keep theirs until their own copy. A copy that lists the same sessions as before changes nothing, so the
-    /// whole list isn't sorted, compared, and shown again for it: each of the 6 tools' steps did that on every
-    /// refresh, 5–24 ms apiece with 3,365 sessions listed (PERF-88). A tab waiting to reopen is given up only once
-    /// every tool is listed, since its session may be one of a tool not copied yet.
     func applyRemoteHostConversations(_ toolConversations: [Conversation], of step: RemoteSessionCopyStep, host: String) {
         guard remoteHostList.hosts.contains(host) else { return }
         if listsSameSessions(toolConversations, of: step.provider, on: .ssh(host)) {
@@ -288,8 +245,6 @@ extension ConversationStore {
         )
     }
 
-    /// Whether the list has the tool's sessions on the host as `copied` has them, in any order: one pass over the
-    /// list, and no second array of it.
     private func listsSameSessions(_ copied: [Conversation], of provider: ConversationProvider, on host: SessionHost) -> Bool {
         var copiedByID = Dictionary(copied.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         guard copiedByID.count == copied.count else { return false }
@@ -302,7 +257,7 @@ extension ConversationStore {
         return copiedByID.isEmpty
     }
 
-    private func setRemoteSessionCopyStep(_ step: RemoteSessionCopyStep, host: String, token: RemoteHostWork.Token) {
+    fileprivate func setRemoteSessionCopyStep(_ step: RemoteSessionCopyStep, host: String, token: RemoteHostWork.Token) {
         guard isCurrentRemoteHostRefresh(token, on: host) else { return }
         remoteSessionCopySteps[.ssh(host)] = step
     }
@@ -316,7 +271,46 @@ extension ConversationStore {
             remoteHostCopies.noteEnd(of: host, failed: false)
         }
         remoteSessionCopySteps.removeValue(forKey: .ssh(host))
-        // A Try Again that waited for this refresh can start now.
         resumeQueuedHostWorkInAllWindows()
+    }
+}
+
+private struct RemoteHostRefreshCopy: Sendable {
+    weak let store: ConversationStore?
+    let host: String
+    let token: RemoteHostWork.Token
+    let discovery: RemoteSessionDiscovery
+    let startedAt: LatestRemoteHostCopies.Moment
+
+    func copyNotingItsEnd() async throws {
+        do {
+            try await copy()
+        } catch {
+            if !(error is CancellationError), !Task.isCancelled {
+                await store?.noteRemoteHostCopyFailed(
+                    host, token: token, mirror: discovery.mirror, copyStartedAt: startedAt, error: error
+                )
+            }
+            throw error
+        }
+    }
+
+    private func copy() async throws {
+        if let mirrored = try? discovery.readMirror(host: host), !mirrored.isEmpty {
+            await store?.applyRemoteRefreshConversations(mirrored, host: host, token: token)
+        }
+        try Task.checkCancellation()
+        try await discovery.discoverToolByTool(
+            host: host,
+            copying: { step in await store?.setRemoteSessionCopyStep(step, host: host, token: token) },
+            copied: { step, conversations in
+                await store?.applyRemoteRefreshConversations(conversations, host: host, token: token, step: step)
+            }
+        )
+        try Task.checkCancellation()
+        guard await store?.isCurrentRemoteHostRefresh(token, on: host) == true else { throw CancellationError() }
+        let status = discovery.status(host)
+        try Task.checkCancellation()
+        await store?.finishRemoteHostRefresh(host, token: token, status: status, discovery: discovery, copyStartedAt: startedAt)
     }
 }

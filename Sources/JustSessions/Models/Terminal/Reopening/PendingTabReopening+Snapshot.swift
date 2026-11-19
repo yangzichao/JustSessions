@@ -1,7 +1,6 @@
 import Foundation
 
 extension PendingTabReopening {
-    /// Merge still-waiting hosts back into their original positions, rather than appending them after local tabs.
     func snapshot(openTabs: [(UUID, ReopenableTerminalTab)], hasSelectedOpenTab: Bool) -> [ReopenableTerminalTab] {
         var positions = self
         var result = openTabs

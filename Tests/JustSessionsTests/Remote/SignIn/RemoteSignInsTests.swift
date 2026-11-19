@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The sign-ins of a store's own, with each host's command run as a local `sh` script and its check answered by the
-/// test, so no test reaches a host.
 @MainActor
 struct RemoteSignInsTests {
     private final class Fakes: @unchecked Sendable {
@@ -84,7 +82,6 @@ struct RemoteSignInsTests {
         signIns.lookAtHosts(["devbox"], needingLogIn: [], now: signedInAt.addingTimeInterval(11 * 3600))
         signIns.lookAtHosts(["devbox"], needingLogIn: [], now: signedInAt.addingTimeInterval(12 * 3600))
 
-        // Come due while you use the app: a notification, once, and no dialog.
         #expect(signIns.state(on: "devbox") == .due)
         #expect(fakes.notifiedHosts == ["devbox"])
         #expect(signIns.presentingStoreID == nil)
@@ -114,7 +111,6 @@ struct RemoteSignInsTests {
         signIns.setCommand(command(check: "check"), on: "devbox", now: start)
         try await expectEventually { signIns.state(on: "devbox") == .signedIn }
 
-        // Not asked again within 5 minutes, nor while the host needs Connect….
         fakes.setCheckStatus(1)
         signIns.lookAtHosts(["devbox"], needingLogIn: [], now: start.addingTimeInterval(60))
         signIns.lookAtHosts(["devbox"], needingLogIn: ["devbox"], now: start.addingTimeInterval(400))
@@ -124,7 +120,6 @@ struct RemoteSignInsTests {
         try await expectEventually { signIns.state(on: "devbox") == .due }
         #expect(fakes.notifiedHosts == ["devbox"])
 
-        // A host that can't be reached tells nothing.
         fakes.setCheckStatus(RemoteHostCommandRunner.connectionFailureExitStatus)
         signIns.lookAtHosts(["devbox"], needingLogIn: [], now: start.addingTimeInterval(800))
         try await expectEventually { fakes.checks == 3 }

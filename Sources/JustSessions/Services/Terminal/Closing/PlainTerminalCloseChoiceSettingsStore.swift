@@ -1,8 +1,6 @@
 import Combine
 import Foundation
 
-/// The saved choice of what closing a plain terminal's tab does. Asks each time until you tick Don't ask again in that
-/// dialog or pick an answer in Settings.
 @MainActor
 final class PlainTerminalCloseChoiceSettingsStore: ObservableObject {
     static let shared = PlainTerminalCloseChoiceSettingsStore()

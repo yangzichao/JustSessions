@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// New Claude Code tabs on an SSH host whose `claude` takes `--session-id`.
 @MainActor
 struct RemoteClaudeNewSessionLinkingTests {
     private static let host = "devbox"
@@ -25,7 +24,6 @@ struct RemoteClaudeNewSessionLinkingTests {
         #expect(!tab.isWaitingForAppearingSession)
     }
 
-    /// A session started outside the app in the same project is not the tab's, though it appeared first.
     @Test func aNewTabTakesOnlyItsOwnSession() throws {
         let (store, settings) = try makeStore(hostTakesSessionIDs: true)
         defer { tearDown(store, settings) }
@@ -42,7 +40,6 @@ struct RemoteClaudeNewSessionLinkingTests {
         #expect(tab.tmuxSessionName == TmuxSessionName.forConversation(own))
     }
 
-    /// The second tab's CLI may write its session first.
     @Test func twoNewTabsInAProjectEachTakeTheirOwnSession() throws {
         let (store, settings) = try makeStore(hostTakesSessionIDs: true)
         defer { tearDown(store, settings) }
@@ -60,8 +57,6 @@ struct RemoteClaudeNewSessionLinkingTests {
         #expect(second.conversation?.id == secondSession.id)
     }
 
-    /// A tab waiting for any new session, as one started before the host's answer came, never takes a session that
-    /// another tab started with.
     @Test func aTabWaitingForAnyNewSessionLeavesOtherTabsSessionsAlone() throws {
         let support = RemoteClaudeSessionIDFlagSupport(
             runner: RemoteCommandRecorder().runner(
@@ -77,6 +72,24 @@ struct RemoteClaudeNewSessionLinkingTests {
         listOnHost(store, [startedWithIDSession])
 
         #expect(startedWithID.conversation?.id == startedWithIDSession.id)
+        #expect(waitingForAny.conversation == nil)
+    }
+
+    @Test func linkingByAppearanceBeforeTheTabStartedWithAnIDIsLinkedLeavesItsSessionAlone() throws {
+        let support = RemoteClaudeSessionIDFlagSupport(
+            runner: RemoteCommandRecorder().runner(
+                answering: (0, RemoteClaudeSessionIDFlagSupportTests.helpWithFlag)
+            ))
+        let (store, settings) = try makeStore(support: support)
+        defer { tearDown(store, settings) }
+        let waitingForAny = try openNewClaudeTab(in: store)
+        #expect(support.check(host: Self.host, startCommand: nil) == true)
+        let startedWithID = try openNewClaudeTab(in: store)
+
+        store.replaceConversations(
+            on: .ssh(Self.host), with: [conversation(sessionID: try #require(startedWithID.preassignedSessionID))])
+        store.linkWaitingTabsByAppearance(on: .ssh(Self.host))
+
         #expect(waitingForAny.conversation == nil)
     }
 
@@ -110,8 +123,6 @@ struct RemoteClaudeNewSessionLinkingTests {
         #expect(recorder.commands.first?.host == Self.host)
     }
 
-    // MARK: Helpers
-
     private func makeStore(hostTakesSessionIDs: Bool) throws -> (ConversationStore, IsolatedUserDefaults) {
         let support = RemoteClaudeSessionIDFlagSupport(
             runner: RemoteCommandRecorder().runner(
@@ -144,7 +155,6 @@ struct RemoteClaudeNewSessionLinkingTests {
         return try #require(store.terminalSessions.last)
     }
 
-    /// What a refresh of the host does once its copy is in.
     private func listOnHost(_ store: ConversationStore, _ conversations: [Conversation]) {
         store.applyRemoteHostConversations(conversations, host: Self.host)
     }

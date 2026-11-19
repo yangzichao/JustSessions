@@ -3,8 +3,6 @@ import XCTest
 
 @testable import JustSessions
 
-/// One Codex tab, with the Codex home in the app's temporary folder. The scenario sets the tab's terminal title as
-/// the CLI would, and saves rollout files as Codex does.
 @MainActor
 final class CodexTabWorld: SessionTabWorld {
     let app: ScenarioApp
@@ -49,8 +47,6 @@ final class CodexTabWorld: SessionTabWorld {
             ))
     }
 
-    /// Writes the thread's rollout file where Codex does, under today, opening with its `session_meta` line. The next
-    /// refresh lists the thread.
     func saveThread(labeled label: String) throws {
         let sessionID = app.addSessionWithoutListing(labeled: label)
         let now = Date.now

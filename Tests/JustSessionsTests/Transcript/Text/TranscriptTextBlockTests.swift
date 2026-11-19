@@ -6,7 +6,6 @@ import Testing
 
 @MainActor
 struct TranscriptTextBlockTests {
-    /// Every block is an AppKit text view; only a block with a match for Find's query draws highlights.
     @Test(arguments: [("", false), ("absent", false), ("needle", true)])
     func drawsHighlightsOnlyForAMatch(query: String, isHighlighted: Bool) throws {
         _ = NSApplication.shared

@@ -22,10 +22,8 @@ extension ConversationStore {
         let terminalView = tab.terminalView
         terminalView.reportThemeAfterNextBackgroundQuery()
         let command = RemoteTmuxCommands.reattachClientsCommand(tmuxSessionName, on: destination)
-        // After the host's other tmux commands, such as the rename that gave the session this name.
         tmuxCommandQueues.run(on: tab.host) {
             guard remoteRunner.run(destination, command, 30)?.exitStatus != 0 else { return }
-            // Without tmux, or without the session, no client attaches again to ask for the colors.
             Task { @MainActor in terminalView.cancelThemeReportAfterNextBackgroundQuery() }
         }
     }

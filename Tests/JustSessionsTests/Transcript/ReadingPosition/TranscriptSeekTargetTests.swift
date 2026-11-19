@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Where a bookmark jump went, which next, previous, and ⌘D go on from until the reader scrolls away from it.
 @MainActor
 @Suite(.serialized)
 struct TranscriptSeekTargetTests {
@@ -22,7 +21,6 @@ struct TranscriptSeekTargetTests {
         }
     }
 
-    /// Shows the transcript and jumps to record 20, then waits until the jump has put it 6 points below the top.
     private func showAfterSeekingToRecord20(in fixture: TranscriptScrollViewFixture) async throws
         -> (NSScrollView, TranscriptScrollPositionController)
     {
@@ -63,7 +61,6 @@ struct TranscriptSeekTargetTests {
         let (scrollView, controller) = try await showAfterSeekingToRecord20(in: fixture)
         #expect(controller.seekTarget == id(20))
 
-        // Moved without a live-scroll notification or a wheel event, as a page load or a layout change can move it.
         scrollView.contentView.scroll(to: NSPoint(x: 0, y: scrollView.contentView.documentRect.maxY - scrollView.contentView.bounds.height))
         scrollView.reflectScrolledClipView(scrollView.contentView)
         try await fixture.settleLayout()
@@ -71,7 +68,6 @@ struct TranscriptSeekTargetTests {
         #expect(controller.seekTarget == nil)
     }
 
-    /// Forgotten for good: once its page left, the target would no longer be laid out, and one that isn't laid out holds.
     @Test func aSeekTargetScrolledOutOfViewStaysForgottenWhenItComesBack() async throws {
         let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
@@ -104,7 +100,6 @@ struct TranscriptSeekTargetTests {
         #expect(controller.seekTarget == missing)
     }
 
-    /// A jump leaves the last 6 points of the entry above its target on screen, which isn't the message being read.
     @Test func visibleEntryIDsLeaveOutARowWithLessThanTheMinimumOnScreen() async throws {
         let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }

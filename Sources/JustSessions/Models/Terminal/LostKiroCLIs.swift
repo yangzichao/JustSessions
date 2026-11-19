@@ -1,6 +1,6 @@
 /// Which session each lost Kiro CLI on this Mac runs: a tab that closed before it linked to its session left its CLI
 /// running in tmux under the tab's temporary name (`TmuxSessionName.unique(for:)`), as every Kiro tab did before Kiro
-/// CLI 2.16's sessions were listed (DSC-08). Kiro's lock on a session names a process of that CLI
+/// CLI 2.16's sessions were listed. Kiro's lock on a session names a process of that CLI
 /// (`KiroSessionLock`), so the pane it runs under tells which tmux session runs it.
 enum LostKiroCLIs {
     /// How far above a lock's process its tmux pane may be: Kiro CLI 2.16.2's V2 lock names the process three below
@@ -9,13 +9,10 @@ enum LostKiroCLIs {
 
     static var temporaryNamePrefix: String { TmuxSessionName.prefix + ConversationProvider.kiro.executableName + "-new-" }
 
-    /// The temporary-named Kiro tmux sessions of `paneProcessIDs` that no tab shows.
     static func lostPaneProcessIDs(in paneProcessIDs: [String: Int32], tabTmuxNames: Set<String>) -> [String: Int32] {
         paneProcessIDs.filter { $0.key.hasPrefix(temporaryNamePrefix) && !tabTmuxNames.contains($0.key) }
     }
 
-    /// The session each lost tmux session runs, by tmux name, from the process id each locked session's lock names.
-    /// A tmux session two locks lead to is left out, as is a session two tmux sessions would run.
     static func sessionIDs(
         lostPaneProcessIDs: [String: Int32],
         lockProcessIDsBySessionID: [String: Int32],

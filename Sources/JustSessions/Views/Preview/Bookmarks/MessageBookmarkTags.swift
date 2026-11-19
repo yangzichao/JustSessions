@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// A bookmark's tag as cards, rows, and the editor show it: `#tag` on the letter chip's fill, which keeps the secondary
-/// text at 4.5:1 as the letters beside messages do (TranscriptBookmarkMarker).
 struct MessageBookmarkTagChip: View {
     let tag: String
 
@@ -16,7 +14,6 @@ struct MessageBookmarkTagChip: View {
     }
 }
 
-/// A bookmark's tags in a row that wraps, for cards and the All Bookmarks list.
 struct MessageBookmarkTagList: View {
     let tags: [String]
 
@@ -31,7 +28,6 @@ struct MessageBookmarkTagList: View {
     }
 }
 
-/// Lays its views out left to right, starting a new line when the next one wouldn't fit.
 struct MessageBookmarkFlowLayout: Layout {
     var spacing: CGFloat
 

@@ -1,12 +1,8 @@
 import Foundation
 
-/// Every theme's customization, saved together under one key, such as
-/// `{"catppuccin": {"dark": {"contentSurface": 1973806}}}`.
 extension AppThemeCustomization {
     static let userDefaultsKey = "appThemeCustomizations"
 
-    /// The saved customizations. Each color is read on its own, so a theme, color, or value this version does not
-    /// know leaves out only itself, and a version's changes are left out once its surfaces no longer suit it.
     static func loadAll(from userDefaults: UserDefaults) -> [AppTheme: AppThemeCustomization] {
         guard let data = userDefaults.data(forKey: userDefaultsKey),
             let saved = try? JSONSerialization.jsonObject(with: data) as? [String: Any]

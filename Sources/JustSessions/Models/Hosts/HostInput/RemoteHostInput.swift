@@ -6,9 +6,7 @@ import Foundation
 enum RemoteHostInput: Equatable {
     case empty
     case destination(String)
-    /// A port other than 22.
     case needsPortInConfig(user: String?, hostName: String, port: Int)
-    /// `ssh` options, a command, or anything else that isn't one destination.
     case notADestination
 
     init(_ text: String) {
@@ -28,12 +26,10 @@ enum RemoteHostInput: Equatable {
         return destination
     }
 
-    /// The `~/.ssh/config` lines that give the host its port, so it can be entered without one.
     static func configLines(user: String?, hostName: String, port: Int) -> String {
         (["Host \(hostName)", "  Port \(port)"] + (user.map { ["  User \($0)"] } ?? [])).joined(separator: "\n")
     }
 
-    /// What follows `ssh`: one destination, with `-p` as the only option it can take.
     private static func reading(sshArguments: [String]) -> RemoteHostInput {
         var port: Int?
         var destinations: [String] = []
@@ -57,7 +53,6 @@ enum RemoteHostInput: Equatable {
         return .needsPortInConfig(user: user, hostName: hostName, port: port)
     }
 
-    /// `host`, `user@host`, `host:port`, or `ssh://user@host:port`.
     private static func reading(destination: String) -> RemoteHostInput {
         if destination.lowercased().hasPrefix("ssh://") {
             guard let components = URLComponents(string: destination),

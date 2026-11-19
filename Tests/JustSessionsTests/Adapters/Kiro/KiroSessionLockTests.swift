@@ -13,7 +13,6 @@ struct KiroSessionLockTests {
         try text.write(to: file, atomically: true, encoding: .utf8)
     }
 
-    /// A process id no process has now.
     static func endedProcessID() throws -> Int32 {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/true")
@@ -59,13 +58,11 @@ struct KiroSessionLockTests {
 
         #expect(KiroSessionLock(processID: running, startedAt: .now).isHeld)
         #expect(KiroSessionLock(processID: running, startedAt: nil).isHeld)
-        // A crashed CLI's lock, whose process id this newer process took.
         #expect(!KiroSessionLock(processID: running, startedAt: Date(timeIntervalSince1970: 1_000_000_000)).isHeld)
         #expect(!KiroSessionLock(processID: try Self.endedProcessID(), startedAt: .now).isHeld)
     }
 }
 
-/// `LostKiroCLIs`: which session the CLI in a tmux session no tab shows runs, from Kiro's locks.
 struct LostKiroCLIsTests {
     let lostName = LostKiroCLIs.temporaryNamePrefix + "33825d05"
 
@@ -93,7 +90,6 @@ struct LostKiroCLIsTests {
         #expect(matches == [lostName: "a117957d-44d3-4375-b552-4373d8e5e74a"])
     }
 
-    /// A lock held outside the app's tmux, as in your own terminal, and a pane two locks lead to, name nothing.
     @Test func ambiguousOrUnrelatedLocksNameNothing() {
         let tree = ProcessTree(parentProcessIDs: [100: 50, 101: 100, 102: 100, 200: 50])
 

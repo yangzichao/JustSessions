@@ -2,7 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Double-clicking the tab bar's empty space does what double-clicking a title bar does, as chosen in System Settings.
 struct TitleBarDoubleClickActionTests {
     @Test func aDoubleClickDoesWhatSystemSettingsChose() {
         #expect(TitleBarDoubleClickAction(actionSetting: nil, minimizesSetting: false) == .zoom)

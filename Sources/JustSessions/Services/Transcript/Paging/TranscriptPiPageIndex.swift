@@ -1,8 +1,6 @@
 import Foundation
 
 enum TranscriptPiPageIndex {
-    /// Pi's active branch needs a metadata pass. Only parent links and offsets survive that pass, never message bodies.
-    /// Lines are read a chunk at a time, a line longer than a chunk on its own, rather than with a seek and read each.
     static func records(
         in index: TranscriptFileIndex, handle: FileHandle, limits: TranscriptPageLimits,
         chunkSize: Int = 1 << 20
@@ -14,9 +12,7 @@ enum TranscriptPiPageIndex {
         while record < index.lineStarts.count {
             try Task.checkCancellation()
             let start = index.byteRange(at: record).lowerBound
-            // Losing a parent could select the wrong branch. Fail instead of silently showing another conversation.
             guard index.byteRange(at: record).count <= limits.maximumRecordByteCount else { throw CocoaError(.fileReadTooLarge) }
-            // A chunk stops before a line over the limit, so the lines ahead of it are read first, as one at a time would.
             var end = record + 1
             while end < index.lineStarts.count, index.byteRange(at: end).upperBound - start <= UInt64(chunkSize),
                 index.byteRange(at: end).count <= limits.maximumRecordByteCount

@@ -2,7 +2,6 @@ import Foundation
 import SQLite3
 
 enum AntigravityDeletionIndex {
-    /// Holds the index transaction until all session files have moved successfully.
     static func removingEntry<T>(sessionID: String, configurationDirectory: URL, perform: () throws -> T) throws -> T {
         let index = configurationDirectory.appendingPathComponent("conversation_summaries.db")
         guard FileManager.default.fileExists(atPath: index.path) else { return try perform() }

@@ -12,7 +12,6 @@ enum AppLinks {
     static let newGitHubIssueURL = gitHubRepositoryURL.appendingPathComponent("issues/new")
     static let feedbackEmailAddress = "zichaoyangphys@gmail.com"
 
-    /// The user guide at one of its sections, by the section's id in `website/guide.html`.
     private static func userGuideSection(_ sectionID: String) -> URL {
         var components = URLComponents(url: userGuideURL, resolvingAgainstBaseURL: false)!
         components.fragment = sectionID

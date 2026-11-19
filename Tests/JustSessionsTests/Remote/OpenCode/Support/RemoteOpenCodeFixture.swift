@@ -2,8 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// A folder that stands in for an SSH host's home, with an OpenCode database in its standard place, a fake login
-/// shell, and the host's mirror on this Mac.
 struct RemoteOpenCodeFixture {
     static let projectPath = "/srv/Bob's paper; $dollar"
 
@@ -32,9 +30,8 @@ struct RemoteOpenCodeFixture {
         try hostDatabase.addUserPrompt("msg_retained", session: OpenCodeDeletionFixture.retainedSessionID, createdAt: 1, text: "Keep me")
     }
 
-    /// Copies from the stand-in home as the host's snapshot would.
     var discovery: RemoteSessionDiscovery {
-        RemoteSessionDiscovery(mirror: RemoteSessionMirror(cacheRoot: cacheRoot, sourceHomeOverride: home.path))
+        RemoteSessionDiscovery(mirror: RemoteSessionMirror(cacheRoot: cacheRoot, hostAccess: .standIn(home: home.path)))
     }
 
     var mirrorDatabase: URL {
@@ -58,7 +55,6 @@ struct RemoteOpenCodeFixture {
         return RemoteConversationDeletion(runner: runner(environment: environment), mirror: RemoteSessionMirror(cacheRoot: cacheRoot))
     }
 
-    /// Runs commands as `ssh` would on the host, through the fake login shell.
     func runner(environment: [String: String] = [:]) -> RemoteHostCommandRunner {
         let hostEnvironment = [
             "HOME": home.path,

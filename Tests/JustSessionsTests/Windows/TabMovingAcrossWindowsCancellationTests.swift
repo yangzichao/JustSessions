@@ -18,7 +18,7 @@ struct TabMovingAcrossWindowsCancellationTests {
         for store in [sandbox.first, sandbox.second] {
             store.remoteSessionDiscovery = RemoteSessionDiscovery(
                 mirror: RemoteSessionMirror(
-                    cacheRoot: notAFolder, sourceHomeOverride: sandbox.root.path
+                    cacheRoot: notAFolder, hostAccess: .standIn(home: sandbox.root.path)
                 ))
         }
         let source = try #require(sandbox.openTab(of: conversation, in: sandbox.first))
@@ -41,7 +41,6 @@ struct TabMovingAcrossWindowsCancellationTests {
         }
         gate.release()
         try await expectEventually { gate.hasReturned }
-        // The confirmation schedules its result on the main actor after the injected runner returns.
         for _ in 0..<10 { await Task.yield() }
         try await Task.sleep(for: .milliseconds(100))
 

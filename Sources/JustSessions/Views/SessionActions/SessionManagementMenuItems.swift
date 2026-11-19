@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Rename, pin, archive, move, copy, reveal, and delete for one session, in its sidebar row's menu and the preview's More menu. A
-/// subagent's session is only shared, copied, and revealed: it goes with the session that started it.
 struct SessionManagementMenuItems: View {
     let store: ConversationStore
     let conversation: Conversation
@@ -36,7 +34,6 @@ struct SessionManagementMenuItems: View {
         }
         if !conversation.isSubagent {
             Divider()
-            // The deletion dialog closes the session's tab and ends its CLI first; see `closeAndDelete`.
             let endsCLIFirst = store.cliEndingBeforeDeletion(of: conversation) != nil
             Button(
                 endsCLIFirst ? "Close and delete session…" : "Delete session…", systemImage: "trash", role: .destructive, action: onDelete

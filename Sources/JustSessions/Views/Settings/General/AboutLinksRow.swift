@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Feedback first, in the website's form or as a GitHub issue, each started with `environment`'s versions; then the
-/// website and the source code.
 struct AboutLinksRow: View {
     let environment: FeedbackEnvironment
 

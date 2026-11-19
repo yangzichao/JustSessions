@@ -4,14 +4,10 @@ import Foundation
 /// Private folders for app-owned SSH control sockets. `/tmp` is open to every user, so the root is used only when
 /// it is a real folder of this user that no one else can enter; anyone who connects to a socket uses that connection.
 enum SSHSocketDirectory {
-    /// Makes a new directory for one refresh. A unique path keeps a stale socket left by a crashed app, or another
-    /// refresh of the same host, from ever being mistaken for this refresh's master.
     static func makeRefreshDirectory(at rootPath: String, identifier: UUID = UUID()) -> URL? {
         makeDirectory(at: rootPath, named: "refresh-\(identifier.uuidString)")
     }
 
-    /// Makes a new directory for one login made with Connect…, unique for the same reason as a refresh's. Its name
-    /// carries the app's process ID, so a later launch can tell a login left by an app that crashed.
     static func makeLoginDirectory(
         at rootPath: String,
         processID: pid_t = getpid(),
@@ -20,8 +16,6 @@ enum SSHSocketDirectory {
         makeDirectory(at: rootPath, named: "\(loginPrefix)-\(processID)-\(identifier.uuidString)")
     }
 
-    /// Makes a new directory for the connection that carries one host's port forwards, named as a login's is, for the
-    /// same reason; see `SSHPortForwardConnection`.
     static func makePortForwardDirectory(
         at rootPath: String,
         processID: pid_t = getpid(),
@@ -33,9 +27,6 @@ enum SSHSocketDirectory {
     private static let loginPrefix = "login"
     private static let portForwardPrefix = "forward"
 
-    /// The login directories whose app is no longer running, as after a crash; another copy of the app that still
-    /// runs keeps its own. Only names made by `makeLoginDirectory` count, so a folder named any other way, whose
-    /// first part may happen to be digits, is never taken for a login of an ended app.
     static func loginDirectoriesOfEndedProcesses(
         at rootPath: String,
         isRunning: (pid_t) -> Bool = SSHSocketDirectory.isRunning
@@ -43,7 +34,6 @@ enum SSHSocketDirectory {
         directoriesOfEndedProcesses(at: rootPath, prefix: loginPrefix, isRunning: isRunning)
     }
 
-    /// The port forward connections' directories whose app is no longer running, told apart as logins' are.
     static func portForwardDirectoriesOfEndedProcesses(
         at rootPath: String,
         isRunning: (pid_t) -> Bool = SSHSocketDirectory.isRunning
@@ -80,7 +70,6 @@ enum SSHSocketDirectory {
         return directory
     }
 
-    /// The root, created when missing, or nil when it isn't safe to use.
     static func preparedRoot(at path: String) -> String? {
         if mkdir(path, 0o700) != 0, errno != EEXIST { return nil }
         var status = stat()

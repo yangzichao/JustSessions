@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A split lays its two views out side by side or stacked, one above the other; either way it stays two tabs, the first
-/// in the tab bar on the left or on top. A tab dropped on the top or bottom edge opens below or above the selected tab,
-/// a split's pane dragged to an edge moves its tab there, and a new session can open straight into a new split.
 @MainActor
 struct TerminalSplitOrientationStoreTests {
     @Test func aSplitIsSideBySideUntilStacked() throws {
@@ -21,7 +18,6 @@ struct TerminalSplitOrientationStoreTests {
         store.setOrientation(.stacked, ofSplitView: split.id)
 
         #expect(store.shownSplitOrientation == .stacked)
-        // Each tab keeps its side: the left one is now on top.
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: first.id, right: second.id))
         #expect(store.selectedTerminalID == first.id)
 
@@ -136,8 +132,6 @@ struct TerminalSplitOrientationStoreTests {
         expectSplitRules(store)
     }
 
-    /// Split right or Split down with a new session: its tab never leaves the screen on its way into the split, which
-    /// would refresh its host, an SSH listing on a remote one, before its CLI saved anything (SPL-10).
     @Test func aNewSessionOpenedIntoANewSplitRefreshesNoHost() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -184,7 +178,6 @@ struct TerminalSplitOrientationStoreTests {
         store.performSplitAction(.addToNewSplit(third.id, .stacked), fromTab: first.id) { _ in }
         let split = try #require(store.shownSplit)
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: first.id, right: third.id))
-        // An open tab joins beside the selected tab, which stays selected, as in Chrome (SPL-20).
         #expect(store.selectedTerminalID == first.id)
         guard case .arrangeSplit(.stacked) = store.splitMenu(forTab: first.id) else {
             Issue.record("A stacked split's tab arranges it stacked")
@@ -246,8 +239,6 @@ struct TerminalSplitOrientationStoreTests {
 
         #expect(store.stackedSplitViewIDs.isEmpty)
     }
-
-    // MARK: - Helpers
 
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()

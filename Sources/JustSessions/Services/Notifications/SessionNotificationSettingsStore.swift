@@ -1,7 +1,6 @@
 import Combine
 import Foundation
 
-/// The saved choice of which moments post a macOS notification.
 @MainActor
 final class SessionNotificationSettingsStore: ObservableObject {
     static let shared = SessionNotificationSettingsStore()

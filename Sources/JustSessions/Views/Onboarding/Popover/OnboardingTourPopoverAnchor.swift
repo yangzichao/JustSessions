@@ -6,9 +6,7 @@ import SwiftUI
 /// takes keyboard focus from a terminal. It steps aside while a sheet covers the window, or while the view is
 /// scrolled out of sight or out of the window, and comes back after.
 struct OnboardingTourPopoverAnchor: NSViewRepresentable {
-    /// Nil closes the popover.
     let card: OnboardingTourCard?
-    /// The side of the view the popover opens on.
     let edge: Edge
 
     func makeNSView(context: Context) -> OnboardingTourPopoverAnchorView {
@@ -32,7 +30,6 @@ final class OnboardingTourPopoverAnchorView: NSView {
     private var observers: [NSObjectProtocol] = []
     private var isPopoverUpdateScheduled = false
 
-    /// Only anchors the popover; clicks go to the view it backs.
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
 
     func show(_ card: OnboardingTourCard?, on preferredEdge: NSRectEdge) {
@@ -53,7 +50,6 @@ final class OnboardingTourPopoverAnchorView: NSView {
         schedulePopoverUpdate()
     }
 
-    /// After the SwiftUI update or scroll that asked for it, once the view has its place in the window.
     private func schedulePopoverUpdate() {
         guard !isPopoverUpdateScheduled else { return }
         isPopoverUpdateScheduled = true
@@ -65,7 +61,6 @@ final class OnboardingTourPopoverAnchorView: NSView {
         }
     }
 
-    /// At least half the view shows, so the arrow points at what the card is about rather than past a list's edge.
     private var isInSight: Bool {
         guard let window, window.isVisible, window.attachedSheet == nil, !isHiddenOrHasHiddenAncestor,
             !bounds.isEmpty

@@ -1,6 +1,5 @@
 import Foundation
 
-/// Searches live tabs independently of the historical library's provider and recency filters.
 enum SidebarOpenTabSearch {
     static func matches(
         _ query: String,

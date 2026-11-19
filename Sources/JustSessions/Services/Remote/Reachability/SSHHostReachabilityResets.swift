@@ -1,8 +1,6 @@
 import AppKit
 import Network
 
-/// Forgets every host `SSHHostReachability` couldn't reach when the Mac's network changes, as when Wi-Fi or a VPN
-/// connects, and when the Mac wakes, since a host out of reach before may answer now.
 @MainActor
 final class SSHHostReachabilityResets {
     static let shared = SSHHostReachabilityResets()

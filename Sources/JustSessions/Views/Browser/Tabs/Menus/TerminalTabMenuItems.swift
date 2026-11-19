@@ -1,17 +1,10 @@
 import SwiftUI
 
-/// A tab's menu, from a right-click on it in the tab bar or on its row in Open tabs. A session's tab starts with
-/// Rename, then sharing and finding its session, in the order its sidebar row's menu has them; then the split view
-/// entries; then closing it. New session is about the tab's project, so it is in the group's menu instead. Pinning is
-/// left to the session's row: a pinned session stays at the top of the sidebar, which a tab has nothing to do with. A
-/// tab's terminal offers the same items after its text's; see `TerminalContextMenu`.
 struct TerminalTabMenuItems: View {
     let store: ConversationStore
     @ObservedObject var tab: TerminalSession
     let onRename: (Conversation) -> Void
-    /// Asks what to do with a tab's CLI, as its × does; also for the split entries that close one of its views.
     let onCloseTab: (UUID) -> Void
-    /// Asks to delete the tab's session, as its row's Close and delete session… does.
     let onDelete: (Conversation) -> Void
 
     var body: some View {
@@ -32,8 +25,6 @@ struct TerminalTabMenuItems: View {
         }
     }
 
-    /// A session started with Delete the session when its tab closes goes with its tab, without asking, unless Keep
-    /// session takes that back.
     @ViewBuilder private var closingDeletingSessionItems: some View {
         Button("Keep session", systemImage: "tray.and.arrow.down") {
             store.keepSessionAfterClosing(tab)
@@ -43,7 +34,6 @@ struct TerminalTabMenuItems: View {
         }
     }
 
-    /// A new session's tab can't be renamed or shared until it is linked to the session its CLI writes.
     @ViewBuilder private var sessionItems: some View {
         Button("Rename", systemImage: "pencil") {
             if let conversation = store.conversationToRename(fromTab: tab) { onRename(conversation) }
@@ -63,8 +53,6 @@ struct TerminalTabMenuItems: View {
         }
     }
 
-    /// Close and end session stops the CLI without asking, as End session does from the session's row: choosing it is
-    /// already deliberate, and the session can be resumed. Deleting still asks first.
     @ViewBuilder private var closingWithSessionItems: some View {
         if tab.closingNeed.hasRunningCLI {
             Button("Close and end session", systemImage: "stop.circle", role: .destructive) {

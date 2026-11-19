@@ -17,7 +17,6 @@ struct TerminalEngineStoreTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let store = TerminalEngineStore(userDefaults: settings.userDefaults)
-        // Choosing the engine already in use saves nothing, so each case first chooses the other one.
         store.setEngine(TerminalEngine.allCases.first { $0 != engine }!)
 
         store.setEngine(engine)
@@ -38,7 +37,6 @@ struct TerminalEngineStoreTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let engineStore = TerminalEngineStore(userDefaults: settings.userDefaults)
-        // The engine other than the default, so a reset would show.
         engineStore.setEngine(.ghostty)
 
         TerminalAppearanceStore(userDefaults: settings.userDefaults).restoreDefaults()

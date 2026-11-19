@@ -1,11 +1,7 @@
 import AppKit
 
-/// Asks whether to report the crash, on GitHub's bug report form or by email, each filled in from the crash report,
-/// which also shows in Finder to attach. A sheet on the key window, where a click outside it is Not Now. At launch the
-/// first window may not be key yet, or may show another sheet; the offer then waits for a window it can show on.
 @MainActor
 enum CrashReportAlert {
-    /// While the offer waits for a window, the observers that show it once one becomes key or a sheet on one ends.
     private static var windowObservers: [NSObjectProtocol] = []
 
     static func show(_ report: FoundCrashReport) {

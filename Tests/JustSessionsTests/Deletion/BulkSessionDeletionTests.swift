@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Deleting many sessions at once: SSH hosts that cannot be reached, Cancel, and how often the list changes.
 @Suite(.oneHeldThreadAtATime)
 @MainActor
 struct BulkSessionDeletionTests {
@@ -36,7 +35,6 @@ struct BulkSessionDeletionTests {
     @Test func aConnectionThatDropsPartwaySkipsTheRestOfThatHostOnly() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
-        // Newest first, the order deletion goes in: devbox, buildbox, and this Mac take turns.
         var onDevbox: [Conversation] = []
         var onBuildbox: [Conversation] = []
         var onThisMac: [Conversation] = []
@@ -46,7 +44,6 @@ struct BulkSessionDeletionTests {
             onBuildbox.append(try sandbox.savedConversation(onHost: "buildbox", updatedAt: updatedAt.addingTimeInterval(-60)))
             onThisMac.append(try sandbox.savedConversation(updatedAt: updatedAt.addingTimeInterval(-120)))
         }
-        // devbox deletes three sessions, then its connection drops.
         let hosts = SimulatedSSHHosts { host, attempt in
             host == "devbox" && attempt > 3 ? SimulatedSSHHosts.connectionLost : SimulatedSSHHosts.deleted
         }
@@ -68,7 +65,6 @@ struct BulkSessionDeletionTests {
                 """)
     }
 
-    /// A host that answers too slowly may still be reachable, so the message says it did not respond in time.
     @Test func aHostThatDoesNotRespondInTimeIsTriedOnceAndReportedAsSuch() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
@@ -93,19 +89,15 @@ struct BulkSessionDeletionTests {
         #expect(store.alert?.offersTryAgain == true)
     }
 
-    /// The bar counts every session the deletion has dealt with, the skipped ones of an unreachable host included,
-    /// and moving it does not change the store, so the sidebar is not drawn again for it.
     @Test func progressCountsEachSessionDealtWithWithoutChangingTheStore() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
-        // Newest first, the order deletion goes in: three on devbox, then two on buildbox.
         let onDevbox = try (0..<3).map {
             try sandbox.savedConversation(onHost: "devbox", updatedAt: Date.now.addingTimeInterval(-Double($0) * 60))
         }
         let onBuildbox = try (3..<5).map {
             try sandbox.savedConversation(onHost: "buildbox", updatedAt: Date.now.addingTimeInterval(-Double($0) * 60))
         }
-        // devbox cannot be reached; the first buildbox deletion, the second tried overall, waits.
         let hosts = SimulatedSSHHosts(holdingAttempt: 2) { host, _ in
             host == "devbox" ? SimulatedSSHHosts.connectionFailure : SimulatedSSHHosts.deleted
         }
@@ -152,7 +144,6 @@ struct BulkSessionDeletionTests {
         #expect(store.errorMessage == nil)
         #expect(!store.deletionProgress.isStopping)
 
-        // A later deletion starts as usual.
         store.deleteConversations([sessions[1]])
         try await expectEventually { !store.isDeletingSessions }
         #expect(hosts.totalAttempts == 2)
@@ -212,7 +203,6 @@ struct BulkSessionDeletionTests {
         store.deleteConversations(deleted)
         try await expectEventually { !store.isDeletingSessions }
 
-        // One change to start, a few per group of deleted sessions, and one to end; not about three per session.
         #expect(storeChanges.count <= 20)
         #expect(store.conversations.count == 1_850)
         #expect(!deleted.contains { sandbox.fileExists(for: $0) })

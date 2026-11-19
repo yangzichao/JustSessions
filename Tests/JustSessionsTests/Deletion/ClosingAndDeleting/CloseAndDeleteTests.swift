@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Close and delete: a session a tab shows, or whose CLI runs in tmux, has its CLI ended, then is deleted.
 @MainActor
 struct CloseAndDeleteTests {
     @Test func aSessionWhoseTabIsInAnotherWindowHasItClosedThenIsDeleted() async throws {
@@ -55,8 +54,6 @@ struct CloseAndDeleteTests {
         #expect(sandbox.first.cliEndingBeforeDeletion(of: sandbox.conversation) == nil)
     }
 
-    /// The refresh read tmux before the CLI ended. Had the deletion waited for it as usual, it would have skipped the
-    /// session, which that refresh still listed as running.
     @Test func aRefreshThatListedTheCLIBeforeItEndedDoesNotKeepTheSession() async throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }

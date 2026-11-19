@@ -38,8 +38,6 @@ struct PiLineHeadScannerTests {
         #expect(!skippedPastTheLimit)
     }
 
-    /// Lines are slices of the reader's buffer, so a line's bytes need not start at index zero, and the limit counts
-    /// from where they do start.
     @Test func readsALineSlicedFromALargerBufferFromItsOwnStart() {
         let buffer = Data((String(repeating: "x", count: 600) + "\n" + #"{"type":"message","id":"a1"}"#).utf8)
         let line = buffer[601...]
@@ -48,7 +46,6 @@ struct PiLineHeadScannerTests {
         let skippedType = scanner.skip(#"{"type":""#)
         let entryType = scanner.plainString()
         let skippedID = scanner.skip(#","id":""#)
-        // The id's closing quote is the 27th byte, past the limit.
         let id = scanner.plainString()
 
         #expect(skippedType)

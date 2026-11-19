@@ -26,7 +26,6 @@ struct SidebarStoreObservationTests {
         #expect(publications.count == 1)
     }
 
-    /// A refresh ends by noting the host's tmux sessions and login state, which mostly haven't changed.
     @Test func unchangedTmuxSessionsAndLoginStateDoNotPublish() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
@@ -37,7 +36,6 @@ struct SidebarStoreObservationTests {
         store.setTmuxSessionNames(["justsessions-claude-a"], on: .ssh("devbox"))
         store.noteLoginState(on: "devbox", refreshProblem: .hostKeyNotTrusted, connections: connections)
         #expect(store.sshHostsNeedingLogIn == ["devbox"])
-        // The counter counts once per turn, so the unchanged calls come first.
         let publications = StoreChangeCounter(store) {
             _ = $0.tmuxSessionNamesByHost
             _ = $0.sshHostsNeedingLogIn
@@ -54,7 +52,6 @@ struct SidebarStoreObservationTests {
         #expect(store.sshHostsNeedingLogIn.isEmpty)
     }
 
-    /// A bookmark changes only the bookmarks, so the sidebar's lists don't re-run for it (PERF-05).
     @Test func aBookmarkChangePublishesOnlyBookmarks() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
@@ -76,7 +73,6 @@ struct SidebarStoreObservationTests {
             sidebar.cancel()
             bookmarks.cancel()
         }
-        // The counter counts once per turn, so the change that saves nothing comes first.
         store.removeMessageBookmark(MessageBookmark(letter: "a", entryID: entry.id, kind: .user, snippet: "Hello"), in: conversation)
         #expect(bookmarks.count == 0)
 

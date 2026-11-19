@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Under a session's title while searching: the text around the session's first match in its messages, the match
-/// in bold.
 struct SidebarSessionMessageSnippet: View {
     let snippet: SessionMessageSnippet
     @Environment(\.self) private var environment

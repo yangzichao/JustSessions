@@ -1,13 +1,10 @@
 import AppKit
 import SwiftUI
 
-/// Hosts one `TranscriptTextView`. It is compared by its inputs, so SwiftUI leaves the text view alone while they stay
-/// the same, as they do for most blocks when Find opens or its query changes.
 struct TranscriptTextSurface: NSViewRepresentable, Equatable {
     let content: TranscriptTextContent
     let selectionKey: TranscriptTextSelectionKey
     let copyRole: TranscriptTextCopyRole
-    /// Rises each time Find moves between matches; it stays 0 in blocks without the selected match.
     let navigationRevision: Int
     let positionController: TranscriptScrollPositionController?
     let selectionCoordinator: TranscriptTextSelectionCoordinator?

@@ -3,9 +3,7 @@ import Testing
 
 @testable import JustSessions
 
-/// A start command is checked where the tool runs before it is kept: its program has to be there.
 struct StartCommandCheckTests {
-    /// A home folder with `bin/my-claude` in it, which is also on PATH.
     private struct Home {
         let root: URL
         var binPath: String { root.appendingPathComponent("bin").path }
@@ -25,7 +23,6 @@ struct StartCommandCheckTests {
             return StartCommandCheck(resolver: resolver, remoteRunner: remoteRunner)
         }
 
-        /// Runs the remote command as `ssh` would, in a stand-in for the host's login shell.
         func remoteRunner() throws -> RemoteHostCommandRunner {
             let loginShell = try writeExecutableScript(
                 "#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: root.appendingPathComponent("login-shell")
@@ -74,7 +71,6 @@ struct StartCommandCheckTests {
         #expect(throws: StartCommandCheckError.unclosedQuote) { try check.check(#"claude --aws-profile "dev"#, on: .ssh("cloud")) }
         #expect(throws: StartCommandCheckError.shellOperator(";")) { try check.check("claude; ls", on: .ssh("cloud")) }
         #expect(throws: StartCommandCheckError.noProgram) { try check.check("FOO=bar", on: .ssh("cloud")) }
-        // Only the shell knows a program in a variable, so it is kept unchecked.
         try check.check("$HOME/bin/claude", on: .ssh("cloud"))
     }
 

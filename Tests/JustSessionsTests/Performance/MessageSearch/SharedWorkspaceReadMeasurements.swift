@@ -4,16 +4,12 @@ import Testing
 
 @testable import JustSessions
 
-/// Service-level proxy for 1, 2, and 4 simultaneously searching workspace windows. "isolated" models the former
-/// per-window indexes; "shared" uses one `SessionMessageIndexer`. Run with:
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter SharedWorkspaceReadMeasurements
 @MainActor
 @Suite(.serialized)
 struct SharedWorkspaceReadMeasurements {
     static let sessionCount = 8
     static let repetitionCount = 3
 
-    /// Query/progress reruns carry unchanged lists; use a distinct array to include element equality in the cost.
     @Test(arguments: [1_000, 10_000])
     func unchangedSearchInputs(sessionCount: Int) async throws {
         guard SidebarInteractionMeasurements.isEnabled else { return }
@@ -59,7 +55,6 @@ struct SharedWorkspaceReadMeasurements {
         #expect(await index.sessionCount() == sessionCount)
     }
 
-    /// The pre-fix unchanged-input bookkeeping, on exactly the same Conversation values as the current path.
     private static func previousSearchUnion(_ inputs: [UUID: [Conversation]]) -> [Conversation] {
         var byID: [String: Conversation] = [:]
         for conversations in inputs.values {
@@ -134,7 +129,6 @@ struct SharedWorkspaceReadMeasurements {
         let cpu = Self.processCPUTime() - cpuStart
         let firstCounts = await counters.snapshot()
 
-        // Repeating the same simultaneous search generation must do no further source or cache reads.
         for (window, user) in users.enumerated() {
             let indexer = shared ? indexers[0] : indexers[window]
             await indexer.update(with: conversations, for: user)

@@ -1,6 +1,5 @@
 import Foundation
 
-/// Project membership outlives its sessions. Explicitly removed projects stay hidden during discovery.
 struct SidebarProjectList: Equatable {
     private static let listedPathsKey = "sidebarProjectPaths"
     private static let removedPathsKey = "removedSidebarProjectPaths"
@@ -25,7 +24,6 @@ struct SidebarProjectList: Equatable {
         projectPaths.formUnion(discoveredPaths.subtracting(removedProjectPaths))
     }
 
-    /// Starting a session explicitly brings its project back.
     mutating func show(_ projectPath: String) {
         removedProjectPaths.remove(projectPath)
         projectPaths.insert(projectPath)

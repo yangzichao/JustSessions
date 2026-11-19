@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Kiro CLI's V3 sessions, `sessions/<workspace hash>/sess_<uuid>/`: listed beside V2's, read, and resumed under V3.
 struct KiroV3SessionTests {
     private struct Home {
         let root: URL
@@ -75,7 +74,6 @@ struct KiroV3SessionTests {
         #expect(try home.adapter.discover().count == 3)
     }
 
-    /// The app's own adapter reads V3 beside the standard V2 folder; one given V2's folder alone reads V2's alone.
     @Test func v3IsReadBesideTheStandardFolderOnly() {
         let standard = KiroAdapter.standardSessionsDirectory()
         #expect(KiroAdapter().v3SessionsDirectory == standard.deletingLastPathComponent())
@@ -108,8 +106,6 @@ struct KiroV3SessionTests {
         #expect(TmuxSessionName.session(named: name)?.sessionID == sessionID)
     }
 
-    /// Your prompt, its image, the reply, and the tool call; the context Kiro adds for the model, the reasoning, the result,
-    /// the approval, usage, and the system prompt stay out.
     @Test func theReaderShowsPromptsRepliesAndToolCallsFromV3Events() throws {
         let home = try Home()
         defer { home.remove() }
@@ -128,7 +124,6 @@ struct KiroV3SessionTests {
             ])
     }
 
-    /// The paged reader the reader, message search, and the conversation map share decodes each record as `read` does.
     @Test func eachV3RecordDecodesAsTheWholeFileReads() throws {
         let home = try Home()
         defer { home.remove() }

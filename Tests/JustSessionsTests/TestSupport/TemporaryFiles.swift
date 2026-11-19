@@ -1,6 +1,5 @@
 import Foundation
 
-/// A new, empty folder for one test; the test removes it with `defer`.
 func makeTemporaryDirectory() throws -> URL {
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent("JustSessionsTests-\(UUID().uuidString)")
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

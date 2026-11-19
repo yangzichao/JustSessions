@@ -4,7 +4,6 @@ import Foundation
 /// package managers put them, the same folders this Mac looks in; see `CLISearchDirectories`. A login shell that
 /// skips the startup file adding one to PATH, as `$SHELL -lc` skips `.bashrc`, still finds the CLI this way.
 enum RemoteCLIInstallFolders {
-    /// `$HOME` stands for the host's home folder; the search script reads it.
     static let hostHome = "$HOME"
 
     /// An `sh` script that prints `<executable name> <path>` for each executable it finds in the folders, in their
@@ -20,8 +19,6 @@ enum RemoteCLIInstallFolders {
             + " done; done; true"
     }
 
-    /// The path a tab starts: the first one found outside nvm, or else the one of the newest Node version, as on
-    /// this Mac.
     static func preferredPath(among paths: [String]) -> String? {
         if let path = paths.first(where: { nodeVersion(of: $0) == nil }) { return path }
         return paths.max { first, second in
@@ -29,7 +26,6 @@ enum RemoteCLIInstallFolders {
         }
     }
 
-    /// `v22.3.0` for `…/.nvm/versions/node/v22.3.0/bin/claude`.
     private static func nodeVersion(of path: String) -> String? {
         let components = path.split(separator: "/").map(String.init)
         guard components.count >= 6,

@@ -1,8 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// The Permissions tab of Settings: what macOS allows JustSessions, read again whenever the tab shows or you come back
-/// from System Settings, so one that is off stands out.
 struct PermissionsSettingsView: View {
     var checker = SystemPermissionChecker()
     @State private var statuses: [AppPermission: AppPermissionStatus] = [:]

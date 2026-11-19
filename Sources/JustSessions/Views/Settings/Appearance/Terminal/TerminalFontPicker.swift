@@ -1,11 +1,7 @@
 import SwiftUI
 
-/// The terminal font: the system's monospaced font, or any monospaced family installed on this Mac whose letters fill a
-/// terminal's cells. A chosen family that is no longer installed, or whose letters don't fill the cells, stays listed,
-/// marked, while terminals use the system's font.
 struct TerminalFontPicker: View {
     @ObservedObject var appearanceStore: TerminalAppearanceStore
-    /// Nil until the installed families have loaded.
     @State private var installedFamilies: InstalledMonospacedFontFamilies?
 
     var body: some View {
@@ -51,18 +47,14 @@ struct TerminalFontPicker: View {
 
     struct Choice: Hashable {
         let family: String
-        /// Why terminals use the system's font instead, known only once the installed families have loaded.
         let unavailability: Unavailability?
     }
 
     enum Unavailability: Hashable {
         case notInstalled
-        /// See `FontFillsTerminalCells`.
         case notFillingCells
     }
 
-    /// The families whose letters fill the cells, and the chosen one even before they load, after it is removed, or
-    /// when its letters don't, so the picker always shows the current choice.
     static func choices(installed: InstalledMonospacedFontFamilies?, chosen: TerminalFontFamily) -> [Choice] {
         var families = installed?.fillingCells ?? []
         if case .named(let chosenFamily) = chosen, !families.contains(chosenFamily) {

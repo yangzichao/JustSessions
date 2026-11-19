@@ -1,12 +1,8 @@
 import Foundation
 
-/// The settings `ssh` would connect to a host with, after `~/.ssh/config`, as `ssh -G` prints them. `ssh -G` reads
-/// the config and exits without connecting, in a few milliseconds.
 struct SSHHostConfiguration: Equatable, Sendable {
-    /// Each setting's values, under its name in lowercase, as `ssh -G` prints them.
     let settings: [String: [String]]
 
-    /// Nil when `ssh -G` failed, as for a destination it can't parse. `configFile` stands in for `~/.ssh/config`.
     static func resolve(host: String, configFile: String? = nil) -> SSHHostConfiguration? {
         resolve(host: host, arguments: configFile.map { ["-F", $0] } ?? [])
     }
@@ -71,7 +67,6 @@ struct SSHHostConfiguration: Equatable, Sendable {
     var controlMaster: String? { value(of: "controlmaster") }
     var controlPersist: String? { value(of: "controlpersist") }
 
-    /// Where the user's own shared connections are kept, or nil when the config sets none.
     var controlPath: String? {
         guard let path = value(of: "controlpath"), path != "none" else { return nil }
         return path

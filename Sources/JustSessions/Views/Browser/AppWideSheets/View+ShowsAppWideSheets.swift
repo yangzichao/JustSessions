@@ -1,8 +1,6 @@
 import SwiftUI
 
 extension View {
-    /// Shows Settings while `sheet` holds a selected page. Help opens its Help tab in the same sheet. `store` is the
-    /// window's, whose hosts' settings Settings lists.
     func showsAppWideSheets(
         _ sheet: Binding<AppWideSheet?>,
         store: ConversationStore,

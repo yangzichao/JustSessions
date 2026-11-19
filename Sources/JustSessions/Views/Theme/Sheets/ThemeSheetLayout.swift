@@ -1,14 +1,8 @@
 import SwiftUI
 
-/// The layout every sheet shares: its title, with an optional ? beside it, and a line saying what the sheet is for;
-/// then its content; then its footer, which puts the progress of what the default action started first, then a
-/// `Spacer`, then Cancel and the default action. Buttons in a sheet are quiet unless they set a style of their own, so
-/// only the default action stands out, with `ThemeProminentButtonStyle` or, when it starts a CLI,
-/// `ProviderProminentButtonStyle`.
 struct ThemeSheetLayout<TitleAccessory: View, Content: View, Footer: View>: View {
     let title: Text
     var intro: Text?
-    /// The sheet's width, which suits its content; the margins and spacing inside are the same in every sheet.
     let width: CGFloat
     @ViewBuilder let titleAccessory: () -> TitleAccessory
     @ViewBuilder let content: () -> Content

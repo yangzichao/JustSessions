@@ -30,7 +30,7 @@ struct RemoteToolFoldersTests {
     @Test func theMirrorKeepsTheFoldersOfItsLastCopy() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
-        let mirror = RemoteSessionMirror(cacheRoot: root, sourceHomeOverride: root.path, toolFoldersLookup: { _ in Self.custom })
+        let mirror = RemoteSessionMirror(cacheRoot: root, hostAccess: .standIn(home: root.path), toolFoldersLookup: { _ in Self.custom })
 
         #expect(mirror.savedToolFolders(host: "devbox") == .standard)
         #expect(try mirror.lookUpToolFolders(host: "devbox") == Self.custom)
@@ -41,7 +41,6 @@ struct RemoteToolFoldersTests {
         #expect(mirror.savedToolFolders(host: "devbox") == .standard)
     }
 
-    /// Copies from a folder outside the stand-in home, as from a host whose `CLAUDE_CONFIG_DIR` points elsewhere.
     @Test func copiesAndDeletesInTheFolderTheHostSet() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -54,14 +53,13 @@ struct RemoteToolFoldersTests {
         let sessionID = UUID().uuidString.lowercased()
         let transcript = #"{"type":"user","cwd":"/home/me/paper","message":{"content":"Draft intro"}}"# + "\n"
         try transcript.write(to: projectFolder.appendingPathComponent("\(sessionID).jsonl"), atomically: true, encoding: .utf8)
-        // The standard folder holds another session, which isn't the host's.
         try transcript.write(
             to: remoteHome.appendingPathComponent(".claude/projects/-home-me-paper/\(UUID().uuidString.lowercased()).jsonl"),
             atomically: true, encoding: .utf8)
         var folders = RemoteToolFolders.standard
         folders.claude = claudeFolder.path
         let mirror = RemoteSessionMirror(
-            cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path,
+            cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path),
             toolFoldersLookup: { [folders] _ in folders }
         )
 

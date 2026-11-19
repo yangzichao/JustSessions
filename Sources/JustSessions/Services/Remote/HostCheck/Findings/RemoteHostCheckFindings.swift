@@ -1,14 +1,12 @@
 import Foundation
 
-/// Reads the answers of `RemoteHostCheckScript` into findings, in the order the app depends on them: the system,
-/// `rsync` for copying, the session's folder, tmux, the CLIs, then `python3` for the tools copied through it.
 enum RemoteHostCheckFindings {
     static func findings(in output: RemoteHostCheckOutput, context: RemoteHostCheckContext) -> [HostCheckFinding] {
         var findings = [rsyncFinding(in: output, host: context.host)]
         guard output.reachedLoginShell else {
             findings.append(
                 HostCheckFinding(
-                    id: "login-shell",
+                    id: .loginShell,
                     status: .problem,
                     title: AppLocalization.string("Login shell"),
                     summary: AppLocalization.string(
@@ -37,7 +35,7 @@ enum RemoteHostCheckFindings {
             output.text("path").map { "PATH=\($0)" },
         ].compactMap { $0 }.joined(separator: "\n")
         return HostCheckFinding(
-            id: "system",
+            id: .system,
             status: .note,
             title: AppLocalization.string("System"),
             summary: summary.isEmpty ? AppLocalization.string("Unknown") : summary,
@@ -49,7 +47,7 @@ enum RemoteHostCheckFindings {
         let command = RemoteHostCheckCommands.ssh(host, "command -v rsync && rsync --version")
         guard output.text("rsync-path") != nil else {
             return HostCheckFinding(
-                id: "rsync",
+                id: .rsync,
                 status: .problem,
                 title: "rsync",
                 summary: AppLocalization.string(
@@ -59,7 +57,7 @@ enum RemoteHostCheckFindings {
             )
         }
         return HostCheckFinding(
-            id: "rsync",
+            id: .rsync,
             status: .passed,
             title: "rsync",
             summary: AppLocalization.string("Copies \(host)'s sessions to this Mac."),
@@ -71,7 +69,7 @@ enum RemoteHostCheckFindings {
     static func folderFinding(in output: RemoteHostCheckOutput, projectPath: String, host: String) -> HostCheckFinding {
         guard let folderExitStatus = output.exitStatus("folder-exit") else {
             return HostCheckFinding(
-                id: "folder",
+                id: .folder,
                 status: .note,
                 title: AppLocalization.string("Project folder"),
                 summary: AppLocalization.string(
@@ -81,7 +79,7 @@ enum RemoteHostCheckFindings {
         }
         let exists = folderExitStatus == 0
         return HostCheckFinding(
-            id: "folder",
+            id: .folder,
             status: exists ? .passed : .problem,
             title: AppLocalization.string("Project folder"),
             summary: exists
@@ -96,20 +94,18 @@ enum RemoteHostCheckFindings {
         )
     }
 
-    /// OpenCode's and Antigravity's sessions are copied from snapshots `python3` makes with its `sqlite3` module.
-    /// Nil when neither tool is on the host or has sessions listed under it.
     static func pythonFinding(in output: RemoteHostCheckOutput, context: RemoteHostCheckContext) -> HostCheckFinding? {
-        let toolsNeedingPython = context.programs.map(\.provider).filter { provider in
-            [.opencode, .antigravity].contains(provider)
-                && (output.text("cli-\(provider.executableName)-path") != nil || context.providersWithSessions.contains(provider))
-        }
+        let toolsNeedingPython = context.programs.filter { program in
+            RemoteSessionMirror.copiesSessionsWithPython3(for: program.provider)
+                && (output.text(program.key + "-path") != nil || context.providersWithSessions.contains(program.provider))
+        }.map(\.provider)
         guard !toolsNeedingPython.isEmpty else { return nil }
         let host = context.host
         let names = toolsNeedingPython.map(\.rawValue).joined(separator: ", ")
         let command = RemoteHostCheckCommands.inLoginShell(host, "echo import sqlite3 | python3", startup: context.shellStartup)
         guard output.text("python3-path") != nil else {
             return HostCheckFinding(
-                id: "python3",
+                id: .python3,
                 status: .problem,
                 title: "python3",
                 summary: AppLocalization.string(
@@ -120,7 +116,7 @@ enum RemoteHostCheckFindings {
         }
         let canLoadSQLite = output.exitStatus("python3-sqlite3-exit") == 0
         return HostCheckFinding(
-            id: "python3",
+            id: .python3,
             status: canLoadSQLite ? .passed : .problem,
             title: "python3",
             summary: canLoadSQLite

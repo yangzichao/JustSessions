@@ -52,7 +52,6 @@ struct AppLanguageStoreTests {
         #expect(AppLanguageStore(userDefaults: settings.userDefaults, bundle: fixture.bundle).language == japanese)
         #expect(AppLocalization.string("General", language: japanese, bundle: fixture.bundle) == "一般")
         #expect(AppLocalization.string("General", language: .followSystem, bundle: fixture.bundle, preferredLanguages: ["ja-JP"]) == "一般")
-        // A key without a Japanese translation falls back to its English source rather than an empty label.
         #expect(AppLocalization.string("English fallback", language: japanese, bundle: fixture.bundle) == "English fallback")
         let englishOnlyFixture = try LocalizationBundleFixture(localizations: ["en"])
         defer { englishOnlyFixture.remove() }

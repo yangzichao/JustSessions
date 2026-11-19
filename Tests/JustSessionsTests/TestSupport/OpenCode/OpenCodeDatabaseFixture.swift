@@ -1,12 +1,9 @@
 import Foundation
 import SQLite3
 
-/// An OpenCode database with the tables JustSessions reads, plus the account and credential tables that must
-/// never leave an SSH host. Columns match OpenCode's migrations; ones JustSessions never reads are left out.
 struct OpenCodeDatabaseFixture {
     let file: URL
 
-    /// Without `createsTables`, the file is left for the test to set up, as an older OpenCode would have.
     init(file: URL, createsTables: Bool = true) throws {
         self.file = file
         guard createsTables else { return }
@@ -77,7 +74,6 @@ struct OpenCodeDatabaseFixture {
         return Int(sqlite3_column_int64(statement, 0))
     }
 
-    /// Adds prompts numbered from zero in one transaction, which is much faster than adding them one at a time.
     func addUserPrompts(_ texts: [String], session: String) throws {
         let database = try open()
         defer { sqlite3_close(database) }
@@ -94,8 +90,6 @@ struct OpenCodeDatabaseFixture {
         try run("COMMIT", in: database)
     }
 
-    /// Adds messages and their parts in one transaction, with their data as JSON text, for sessions too long to add one
-    /// row at a time.
     func addRows(
         messages: [(id: String, session: String, createdAt: Int64, data: String)],
         parts: [(id: String, message: String, session: String, data: String)]

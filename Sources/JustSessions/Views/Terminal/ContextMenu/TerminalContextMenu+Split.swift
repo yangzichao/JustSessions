@@ -1,6 +1,5 @@
 import AppKit
 
-/// The split entries, as the tab's menu in the tab bar offers them: submenus followed by a separator.
 extension TerminalContextMenu {
     var splitItems: [NSMenuItem] {
         let perform = { (action: TerminalTabSplitAction) in
@@ -39,13 +38,10 @@ extension TerminalContextMenu {
                 ])
             return [item, .separator()]
         case .newSplitWithSelectedTab, .moveIntoShownSplit, nil:
-            // A terminal on screen is the selected tab's or in its split, so the entries for tabs off screen never
-            // come up here.
             return []
         }
     }
 
-    /// Split right or Split down: a new session of each CLI and a terminal in the tab's project, then the other tabs.
     private func newSplitItem(
         _ orientation: TerminalSplit.Orientation,
         candidates: [TerminalTabSplitCandidate],

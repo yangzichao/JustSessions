@@ -1,23 +1,13 @@
 import SwiftUI
 
-/// Adds an SSH host. Its sessions are listed under a heading of their own, below this Mac's; refreshing and
-/// removing it are on that heading's right-click menu. What is typed is read as `ssh` would read it, so a pasted
-/// `ssh devbox` adds `devbox`, a port is shown how to put in `~/.ssh/config`, and a host that connects where a listed
-/// one does is refused. Adding first logs in to the host as the app's background commands do, so a host they can't
-/// reach says why here; Add anyway keeps it, as for a host that is only offline now. A host that asks for a password,
-/// a code, or a new host key's approval offers Connect…, which logs in, asking in a sheet over this one, then adds it.
-/// A Windows host is told apart by the same login, and said to be unsupported.
 struct AddRemoteHostSheet: View {
     let store: ConversationStore
     @Environment(\.dismiss) private var dismiss
     @StateObject private var loginPrompter = SSHLoginPrompter()
     @State private var proposedHost = ""
-    /// The host being logged in to before it is added. The field is locked meanwhile.
     @State private var hostBeingChecked: String?
     @State private var connectionCheck: Task<Void, Never>?
-    /// Why the host could not be reached. Editing the host withdraws it, and with it Add anyway.
     @State private var failedConnection: FailedConnection?
-    /// Where the typed host connects, read by `ssh -G` shortly after typing stops.
     @State private var sameMachineCheck: (host: String, result: SSHHostSameMachineCheck)?
     // periphery:ignore - read through its $ binding, which Periphery does not see.
     @State private var showsSetupRequirements = false
@@ -25,7 +15,6 @@ struct AddRemoteHostSheet: View {
     private struct FailedConnection {
         let host: String
         let problem: SSHConnectionProblem
-        /// Connect… asked its questions and still failed.
         var afterLoggingIn = false
 
         var explanation: String {
@@ -46,7 +35,6 @@ struct AddRemoteHostSheet: View {
         return sameMachineCheck.result
     }
 
-    /// The host as it will be stored, or nil when it is invalid or already listed, under its name or another.
     private var hostToAdd: String? {
         guard let host = input.validDestination, !isListed,
             sameMachineCheckOfInput?.listedHostWithSameIdentity == nil
@@ -101,8 +89,6 @@ struct AddRemoteHostSheet: View {
             if let failedConnection = failedConnectionToHostToAdd {
                 Button("Add anyway") { add(failedConnection.host) }
             }
-            // Connect… stands in for Try again: once nothing needs asking, it logs in without a question. After a
-            // failed login, trying again is logging in again.
             if let failedConnection = failedConnectionToHostToAdd,
                 failedConnection.problem.isFixedByLoggingIn || failedConnection.afterLoggingIn
             {
@@ -141,7 +127,6 @@ struct AddRemoteHostSheet: View {
         .padding(.top, 6)
     }
 
-    /// Waits for typing to pause; a new host cancels the wait.
     private func readWhereTheHostConnects() async {
         guard let host = input.validDestination, !isListed else { return }
         try? await Task.sleep(for: .milliseconds(250))
@@ -156,7 +141,6 @@ struct AddRemoteHostSheet: View {
         hostBeingChecked = host
         failedConnection = nil
         connectionCheck = Task {
-            // Return can come before the read that follows typing.
             let sameMachine = await store.sameMachineCheck(for: host)
             guard !Task.isCancelled else { return }
             sameMachineCheck = (host, sameMachine)
@@ -165,7 +149,6 @@ struct AddRemoteHostSheet: View {
                 return
             }
             let problem = await store.connectionProblem(on: host)
-            // Cancel, or a click outside the sheet, closed it during the check.
             guard !Task.isCancelled else { return }
             hostBeingChecked = nil
             if let problem {
@@ -176,7 +159,6 @@ struct AddRemoteHostSheet: View {
         }
     }
 
-    /// Logs in with Connect…, then adds the host, whose refresh goes through that login.
     private func logInAndAdd(_ host: String) {
         guard hostBeingChecked == nil else { return }
         hostBeingChecked = host

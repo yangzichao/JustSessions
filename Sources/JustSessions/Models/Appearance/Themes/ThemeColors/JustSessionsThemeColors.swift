@@ -1,5 +1,3 @@
-/// The app's own theme: warm neutrals in place of system gray and white, with the brand Ink. Its ANSI colors are
-/// tuned separately for paper and charcoal so colored text stays readable on either.
 extension AppThemeColors {
     static let justSessionsLight = AppThemeColors(
         sidebarSurface: 0xF3F1EC,

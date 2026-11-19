@@ -1,12 +1,8 @@
 import SwiftUI
 
-/// The host's CLIs, and under them a plain terminal, set apart because it runs no CLI. Both rows pick the same thing,
-/// so choosing in one clears the other.
 struct NewSessionKindPicker: View {
     @Binding var selection: NewSessionKind
-    /// The tools installed on the selected host.
     let providers: [ConversationProvider]
-    /// Shown in place of the tools when the host has none.
     let noCLIFoundMessage: String
 
     var body: some View {

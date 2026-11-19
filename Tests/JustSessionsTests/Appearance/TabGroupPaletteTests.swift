@@ -6,7 +6,6 @@ import Testing
 struct TabGroupPaletteTests {
     @Test func existingProjectColorsChangeWithTheThemeAndAppearance() {
         let projectKeys = (0..<8).map { "/tmp/project-\($0)" }
-        // Keep these same styles alive, as the tab bar does while its terminals stay open.
         let projectColors = TabGroupPalette.colorsByProjectKey(projectKeys)
         var resolvedPalettes: Set<[UInt32]> = []
         for theme in AppTheme.allCases {

@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// The header's bell, which lists the sessions waiting for you; see `ConversationStore+NotificationBell`. A blue dot,
-/// the unseen-turn hue, marks it while the list is not empty.
 struct SidebarNotificationBellButton: View {
     let store: ConversationStore
     @Environment(\.locale) private var locale

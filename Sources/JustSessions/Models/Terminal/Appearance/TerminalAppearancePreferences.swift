@@ -6,12 +6,10 @@ struct TerminalAppearancePreferences: Codable, Equatable {
     static let defaultFontSize = 13.0
 
     var colorChoice: TerminalColorChoice = .matchAppTheme
-    /// Kept after choosing another scheme, so the imported colors stay one click away.
     var importedColors: ImportedTerminalColors?
     var mode: TerminalAppearanceMode = .matchApp
     var fontFamily: TerminalFontFamily = .system
     var fontSize: Double = defaultFontSize
-    /// How strongly the 16 ANSI colors show, as a percentage of the scheme's own; see `TerminalColorIntensity`.
     var colorIntensityPercent = TerminalColorIntensity.defaultPercent
 
     var validated: Self {
@@ -26,7 +24,6 @@ struct TerminalAppearancePreferences: Codable, Equatable {
         return preferences
     }
 
-    /// The chosen colors, in one version or in light and dark, with their ANSI colors at the chosen intensity.
     func colorVariants(appTheme: ResolvedAppTheme) -> TerminalPaletteVariants {
         let chosenVariants =
             switch colorChoice {
@@ -51,7 +48,6 @@ struct TerminalAppearancePreferences: Codable, Equatable {
 }
 
 extension TerminalAppearancePreferences {
-    /// Reads each setting on its own, so a missing value, or one this version does not know, resets only that setting.
     init(from decoder: any Decoder) throws {
         self.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)

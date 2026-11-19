@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The ⋯ on an SSH host's heading, drawn like the heading's + and refresh button rather than a row's ⋯.
 struct SidebarSSHHostMoreActionsMenu: View {
     let host: SessionHost
     let actions: SidebarSSHHostActions

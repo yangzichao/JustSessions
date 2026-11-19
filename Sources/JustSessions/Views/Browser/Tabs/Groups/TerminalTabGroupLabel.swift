@@ -1,9 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// The project's name in its group color, in front of its tabs. Clicking it collapses or expands the group. A
-/// collapsed group counts its hidden tabs and shows the most pressing status among them, so a CLI waiting on you
-/// still shows. It sits on the tab bar, whose surface its fill is blended with.
 struct TerminalTabGroupLabel: View {
     let projectName: String
     let location: ProjectLocation
@@ -45,20 +42,17 @@ struct TerminalTabGroupLabel: View {
             .padding(.horizontal, 8)
             .frame(height: WorkspaceTabMetrics.height - 8)
             .background(labelShape.fill(OpaqueWash(surface: ThemePalette.sidebarSurface, wash: color, opacity: isHovered ? 0.24 : 0.15)))
-            // The click target runs the full height of the tabs beside it, not just the pill.
             .padding(.vertical, 4)
             .contentShape(Rectangle())
         }
         .buttonStyle(ThemePressButtonStyle())
         .onHover { isHovered = $0 }
-        // The group's hover card names its folder too; see `TabGroupHoverCard`.
         .accessibilityHint(Text(verbatim: location.copyablePath))
         .accessibilityLabel("\(projectName) tab group")
         .accessibilityValue("\(isCollapsed ? "Collapsed" : "Expanded"), \(CountedNoun.phrase(count: tabCount, singular: "tab"))")
         .contextMenu { menuItems }
     }
 
-    /// A double-click counts as one click. Its second click would otherwise open the group right back up.
     private func toggleOnFirstClick() {
         if let event = NSApp.currentEvent, event.type == .leftMouseUp, event.clickCount > 1 { return }
         onToggleCollapsed()

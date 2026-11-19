@@ -1,13 +1,9 @@
-/// Finder-style session selection: a plain click selects one row, Command toggles a row,
-/// and Shift selects the range between the anchor and the clicked row.
 struct SessionMultiSelection: Equatable {
     private(set) var selectedConversationIDs: Set<String> = []
-    /// Start of the next Shift-click range: the last row clicked without Shift.
     private(set) var anchorConversationID: String?
 
     var hasMultipleSelected: Bool { selectedConversationIDs.count > 1 }
 
-    /// The selected row when it is the only one, which the preview shows and a new session starts next to.
     var onlySelectedConversationID: String? {
         selectedConversationIDs.count == 1 ? selectedConversationIDs.first : nil
     }
@@ -28,8 +24,6 @@ struct SessionMultiSelection: Equatable {
         anchorConversationID = conversationID
     }
 
-    /// Clicking a running session shows its tab and highlights its row through the tab rather than selecting it. While
-    /// no row is selected, that row counts as selected, so a ⌘- or Shift-click that follows adds to it.
     mutating func selectRowShownThroughTabWhileNothingIsSelected(_ conversationIDShownThroughTab: String?) {
         guard selectedConversationIDs.isEmpty, let conversationIDShownThroughTab else { return }
         selectOnly(conversationIDShownThroughTab)

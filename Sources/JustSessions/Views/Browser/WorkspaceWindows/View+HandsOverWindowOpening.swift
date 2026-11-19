@@ -1,8 +1,6 @@
 import SwiftUI
 
 extension View {
-    /// Lets the Dock menu's New Window, and a tab dragged out of its window, open a workspace window through this
-    /// view's `openWindow`.
     func handsOverWindowOpening() -> some View {
         modifier(WindowOpeningHandOver())
     }

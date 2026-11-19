@@ -1,15 +1,11 @@
 import SwiftUI
 
-/// Shown at the bottom of the sidebar while several sessions are being deleted, in place of the session
-/// selection's action bar.
 struct SidebarDeletionProgressBar: View {
     @ObservedObject var progress: SessionDeletionProgress
     let onCancel: () -> Void
 
-    /// Cancel was chosen while this bar was shown, so its disappearance means the deletion stopped early.
     @State private var wasStopped = false
 
-    /// Names the session being deleted, so the first one reads "1 of 140" rather than "0 of 140".
     private var sessionBeingDeleted: Int {
         min(progress.completedCount + 1, progress.totalCount)
     }
@@ -26,7 +22,6 @@ struct SidebarDeletionProgressBar: View {
                     .lineLimit(1)
                     .accessibilityHidden(true)
                 Spacer(minLength: 4)
-                // No Escape shortcut: Escape belongs to the terminal and to clearing the sidebar selection.
                 Button("Cancel", action: onCancel)
                     .buttonStyle(QuietBorderedButtonStyle())
                     .controlSize(.small)
@@ -51,7 +46,6 @@ struct SidebarDeletionProgressBar: View {
             AccessibilityNotification.Announcement("Stopping deletion after the current session").post()
         }
         .onDisappear {
-            // The sidebar can also be hidden while the deletion runs; only an ended deletion has been reset.
             guard progress.totalCount == 0 else { return }
             AccessibilityNotification.Announcement(wasStopped ? "Deletion stopped" : "Deletion finished").post()
         }

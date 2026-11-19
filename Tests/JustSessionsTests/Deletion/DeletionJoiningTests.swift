@@ -3,15 +3,12 @@ import Testing
 
 @testable import JustSessions
 
-/// Sessions asked to be deleted while a deletion runs join it: it goes on to them after the others, with one
-/// progress bar and one report.
 @Suite(.oneHeldThreadAtATime)
 @MainActor
 struct DeletionJoiningTests {
     @Test func sessionsAskedForWhileADeletionRunsShareItsProgressAndReport() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
-        // Newest first, the order deletion goes in.
         let onDevbox = try (0..<3).map {
             try sandbox.savedConversation(onHost: "devbox", updatedAt: Date.now.addingTimeInterval(-Double($0) * 60))
         }
@@ -66,8 +63,6 @@ struct DeletionJoiningTests {
         #expect(store.alert?.retryConversationIDs == Set(onDevbox.map(\.id)))
     }
 
-    /// Cancel drops the sessions that joined; those asked for after Cancel wait for the deletion to stop, then
-    /// start on their own.
     @Test func cancelDropsTheSessionsThatJoinedAndLaterOnesStartAfterIt() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }

@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The sidebar header's bell lists the sessions waiting for you, the wait that started last first, except one whose
-/// terminal shows, and clicking a row shows its session. Each test runs the app's own launch, tmux, activity sync, and
-/// bell against CLIs that report what they do as Claude Code does; see `UnseenTurnSandboxApp`.
 @MainActor
 struct NotificationBellEndToEndTests {
     @Test func aTurnThatFinishesOffScreenIsListedUntilYouLook() async throws {
@@ -25,7 +22,6 @@ struct NotificationBellEndToEndTests {
 
         try await app.clickNotificationBellRow(of: "Revise the abstract")
         #expect(app.notificationBellTitles.isEmpty)
-        // Seen once shown, so it stays off the list when another tab comes to the front.
         try app.select("Check the references")
         #expect(app.notificationBellTitles.isEmpty)
     }
@@ -46,7 +42,6 @@ struct NotificationBellEndToEndTests {
 
         try app.select("Revise the abstract")
         #expect(app.notificationBellTitles.isEmpty)
-        // Looking at it does not answer it, so it is listed again, still waiting since it stopped.
         try app.select("Check the references")
         await app.followCLIsOnce()
         #expect(try app.notificationBellEntry(of: "Revise the abstract").waitingSince == waitingSince)

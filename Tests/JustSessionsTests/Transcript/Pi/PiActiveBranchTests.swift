@@ -4,7 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct PiActiveBranchTests {
-    /// Links numbered by line from 1, as `(id, parent id)`.
     private static func links(_ pairs: [(String?, String?)]) -> [PiEntryLink] {
         pairs.enumerated().map { offset, pair in
             PiEntryLink(lineIndex: offset + 1, id: pair.0, parentID: pair.1, mightBeShown: true)
@@ -20,7 +19,6 @@ struct PiActiveBranchTests {
     }
 
     @Test func aBranchTheUserLeftIsLeftOut() {
-        // b and c were abandoned when the user went back to a and continued with d.
         #expect(Self.lineIndices([("a", nil), ("b", "a"), ("c", "b"), ("d", "a"), ("e", "d")]) == [1, 4, 5])
     }
 

@@ -1,10 +1,5 @@
 import SwiftUI
 
-/// A session row's split entries, which show the session where dragging its row onto the terminals would: on the right
-/// of the selected tab or below it in a new split, or, while a split shows, in place of either of its views. Its tab
-/// shows if one is open here; otherwise it resumes in a new tab. They are left out where the row can't drop: with no tab
-/// selected, for the selected tab's own session or a split's, and for a session another window runs or one that can't
-/// be resumed; see `ConversationStore.dropPlace(for:at:)`.
 struct SessionSplitMenuItems: View {
     let store: ConversationStore
     let conversation: Conversation

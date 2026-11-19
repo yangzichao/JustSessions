@@ -1,10 +1,8 @@
 import SwiftUI
 
-/// A lightweight action with a faint hover surface and a stronger surface while held down.
 struct ThemePlainButtonStyle: ButtonStyle {
     var horizontalPadding: CGFloat = 0
     var verticalPadding: CGFloat = 0
-    /// The corners of the hover and pressed surfaces; nil makes them a circle, for a round icon button.
     var cornerRadius: ThemeCornerRadius? = .control
     var showsHover = true
 
@@ -44,7 +42,6 @@ private struct ThemePlainButtonSurface<Label: View>: View {
                     shape.fill(ThemePalette.hoverFill)
                 }
             }
-            // An overlay remains visible on labels that already draw a selected surface.
             .overlay {
                 if isEnabled && isPressed {
                     shape.fill(ThemePalette.pressedFill).allowsHitTesting(false)

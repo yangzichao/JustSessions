@@ -39,8 +39,6 @@ struct FilteredSidebarProjectionTests {
         let first = store.filteredSidebarProjection(providerFilter: .all, recencyFilter: .all, searchText: "")
         #expect(first.projects.flatMap { $0.conversations.map(\.id) } == [newer.id, older.id])
 
-        // A planted answer with the same inputs but no sessions: getting it back proves the next call read the
-        // cache rather than recomputing.
         store.cachedFilteredSidebarProjection = FilteredSidebarProjection(
             inputs: first.inputs,
             projection: SidebarProjection(inputs: first.inputs.projectionInputs, conversations: []),
@@ -49,18 +47,15 @@ struct FilteredSidebarProjectionTests {
         let cached = store.filteredSidebarProjection(providerFilter: .all, recencyFilter: .all, searchText: "")
         #expect(cached.projects.flatMap(\.conversations).isEmpty)
 
-        // Changing the listed sessions recomputes past the planted answer.
         store.replaceConversations(on: .thisMac, with: [newer])
         let afterReplacing = store.filteredSidebarProjection(providerFilter: .all, recencyFilter: .all, searchText: "")
         #expect(afterReplacing.projects.flatMap { $0.conversations.map(\.id) } == [newer.id])
 
-        // So does pinning: the pinned session moves to the front of its project.
         store.replaceConversations(on: .thisMac, with: [newer, older])
         store.setPinned(true, conversation: older)
         let afterPinning = store.filteredSidebarProjection(providerFilter: .all, recencyFilter: .all, searchText: "")
         #expect(afterPinning.projects.flatMap { $0.conversations.map(\.id) } == [older.id, newer.id])
 
-        // And the search text: a rename out of the match drops the session.
         let searched = store.filteredSidebarProjection(providerFilter: .all, recencyFilter: .all, searchText: "one")
         #expect(searched.projects.flatMap { $0.conversations.map(\.id) } == [newer.id])
         store.rename(newer, to: "Renamed beyond the search")

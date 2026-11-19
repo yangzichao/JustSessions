@@ -3,9 +3,7 @@ import Testing
 
 @testable import JustSessions
 
-/// A start command runs as a shell reads it, with the app's arguments after it, on this Mac and on SSH hosts alike.
 struct CLIStartCommandLineTests {
-    /// Prints the variable a start command can set, then each argument on a line of its own.
     private static let argumentPrinter = "#!/bin/sh\nprintf '%s\\n' \"greeting=$GREETING\" \"$@\"\n"
     private static let startCommand = #"GREETING=hi ~/tools/my-claude --aws-profile "dev box""#
 
@@ -16,7 +14,6 @@ struct CLIStartCommandLineTests {
         try FileManager.default.createDirectory(at: project, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: root.appendingPathComponent("tools"), withIntermediateDirectories: true)
         try writeExecutableScript(Self.argumentPrinter, to: root.appendingPathComponent("tools/my-claude"))
-        // No `claude` on the search path: a start command of your own is not looked up.
         let resolver = NativeCLICommandResolver(
             searchDirectories: ["/usr/bin", "/bin"],
             inheritedEnvironment: ["HOME": root.path]
@@ -50,14 +47,12 @@ struct CLIStartCommandLineTests {
         #expect(command.arguments.isEmpty)
     }
 
-    /// Runs the remote command the way the host's shell would, with a stand-in for the login shell.
     @Test func anSSHHostRunsTheStartCommandWithTheAppsArgumentsAfterIt() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let bin = root.appendingPathComponent("bin")
         try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: root.appendingPathComponent("tools"), withIntermediateDirectories: true)
-        // `$SHELL -lic <command>`: drop the flags and run the command.
         try writeExecutableScript("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
         try writeExecutableScript(Self.argumentPrinter, to: root.appendingPathComponent("tools/my-claude"))
 

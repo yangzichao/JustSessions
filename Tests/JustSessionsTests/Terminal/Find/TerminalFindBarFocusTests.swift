@@ -54,9 +54,6 @@ struct TerminalFindBarFocusTests {
 
         var terminalHasTheKeyboard: Bool { window.firstResponder === tab.terminalView }
 
-        /// Waits for the condition as `expectEventually` does. A failure says who had the keyboard and how far the bar
-        /// got. Laying the window out on every check did not stop the wait running out, and v1.3.0's release run then
-        /// saw the field take the keyboard and lose it, which no release run had before, so the window lays itself out.
         func expectEventually(_ condition: () -> Bool, sourceLocation: SourceLocation = #_sourceLocation) async throws {
             let clock = ContinuousClock()
             let deadline = clock.now + .seconds(120)
@@ -94,7 +91,6 @@ struct TerminalFindBarFocusTests {
         #expect(!fixture.tab.findState.isFieldFocused)
     }
 
-    /// ⌘F with the bar open but the terminal typing puts the keyboard back in the field.
     @Test func showingTheOpenBarAgainTakesTheKeyboardBack() async throws {
         let fixture = Fixture()
         defer { fixture.tearDown() }
@@ -109,7 +105,6 @@ struct TerminalFindBarFocusTests {
         try await fixture.expectEventually { fixture.findFieldHasTheKeyboard && fixture.tab.findState.isFieldFocused }
     }
 
-    /// In a split, the field of the pane that is not selected selects its tab when it takes the keyboard.
     @Test func theFieldOfAPaneNotSelectedSelectsItsTab() async throws {
         let fixture = Fixture(isActive: false)
         defer { fixture.tearDown() }

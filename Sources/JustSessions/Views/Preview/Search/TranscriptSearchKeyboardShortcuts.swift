@@ -1,7 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Window-local shortcuts work even when the sidebar has focus. A hidden preview leaves CLI keys alone.
 struct TranscriptSearchKeyboardShortcuts: NSViewRepresentable {
     let searchState: TranscriptSearchState
     let isActive: Bool

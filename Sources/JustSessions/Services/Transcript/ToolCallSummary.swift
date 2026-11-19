@@ -1,6 +1,5 @@
 import Foundation
 
-/// One-line descriptions of tool calls, such as "Bash · git status".
 enum ToolCallSummary {
     static let maximumLength = 240
 
@@ -20,7 +19,6 @@ enum ToolCallSummary {
         line(toolName: toolName, detail: freeformInput)
     }
 
-    /// The argument as text, or nil when it is not text or is blank, so the next argument can describe the call.
     private static func describe(_ value: Any?) -> String? {
         let text: String? =
             switch value {

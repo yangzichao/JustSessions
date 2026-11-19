@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct ThisMacTmuxKeepAliveTests {
     @Test func theCLIOutlivesItsTabsClientAndReattachingStartsNoSecondOne() async throws {
@@ -48,7 +47,6 @@ struct ThisMacTmuxKeepAliveTests {
         // tmux prints on and off options as 1 and 0.
         #expect(options == "\(name) off 1 None 1 10 always csi-u 1\n")
 
-        // Closing a tab ends its tmux client with SIGTERM.
         let clientProcessIDs = sandbox.tmuxOutput(["list-clients", "-F", "#{client_pid}"]).split(separator: "\n").compactMap { Int32($0) }
         #expect(clientProcessIDs.count == 1)
         for clientProcessID in clientProcessIDs { kill(clientProcessID, SIGTERM) }

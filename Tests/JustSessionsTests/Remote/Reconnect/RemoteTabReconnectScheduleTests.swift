@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A host with dropped tabs is asked 2 seconds after the event that started the tries, then less often after each
-/// failure, up to once a minute, and given up 15 minutes after that event.
 struct RemoteTabReconnectScheduleTests {
     private let start = Date(timeIntervalSinceReferenceDate: 800_000_000)
 
@@ -43,7 +41,6 @@ struct RemoteTabReconnectScheduleTests {
         #expect(schedule.nextTryAt(excluding: []) == nil)
     }
 
-    /// The Mac waking or the app coming forward starts over: soon, without the failures before it.
     @Test func startingAgainForgetsTheFailures() {
         var schedule = RemoteTabReconnectSchedule()
         schedule.startTrying("devbox", now: start)
@@ -56,7 +53,6 @@ struct RemoteTabReconnectScheduleTests {
         #expect(schedule.isDue("devbox", now: start + 47))
     }
 
-    /// A host stays due while it is asked, so the reconnector's next wake-up leaves it out.
     @Test func theNextTryLeavesOutHostsBeingAsked() {
         var schedule = RemoteTabReconnectSchedule()
         schedule.startTrying("devbox", now: start)

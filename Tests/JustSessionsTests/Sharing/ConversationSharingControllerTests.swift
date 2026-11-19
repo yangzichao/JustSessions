@@ -19,7 +19,6 @@ struct ConversationSharingControllerTests {
         let controller = ConversationSharingController(pasteboard: pasteboard)
         controller.copy([ConversationExportSelection(conversation: .fixture(sourceFile: file), title: "Custom title")])
         #expect(controller.isSharing)
-        // Loading happens after the menu's synchronous action has finished.
         #expect(pasteboard.string(forType: .string) == "Previous clipboard")
         try await expectEventually { !controller.isSharing }
         let copiedText = try #require(pasteboard.string(forType: .string))

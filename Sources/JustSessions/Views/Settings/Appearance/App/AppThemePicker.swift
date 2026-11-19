@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// The themes, three to a row, each drawn as the window in that theme, light and dark split on a slant, so a theme
-/// shows both whatever the current appearance, with your changes to it. Choosing one also gives terminals its colors.
 struct AppThemePicker: View {
     @ObservedObject var appThemeStore: AppThemeStore
     let terminalAppearanceStore: TerminalAppearanceStore
@@ -25,7 +23,6 @@ struct AppThemePicker: View {
                 }
             }
         }
-        // A settings grid can offer this block less than the cards need, and a squeezed card loses its name.
         .fixedSize()
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Theme")

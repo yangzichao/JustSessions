@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// While a program takes the mouse, a Ghostty tab hands Ghostty a ⌘-click with Shift added, so it finds the link as a
-/// SwiftTerm tab does (`GhosttyTabTerminalView.eventFindingLinks`). A click without ⌘ still goes to the program.
 @MainActor
 @Suite(.serialized)
 struct GhosttyTabLinkClickTests {
@@ -32,7 +30,6 @@ struct GhosttyTabLinkClickTests {
         try await expectEventually { fixture.screen.contains("READY") }
 
         try TerminalClick.click(fixture.view, column: 3, modifierFlags: .command)
-        // Typed after the click, so once it arrives anything the click sent would have too.
         fixture.view.keyDown(with: SyntheticKey.event(keyCode: kVK_ANSI_X, characters: "x", window: fixture.window))
 
         try await expectEventually { fixture.receivedInput.contains("x") }

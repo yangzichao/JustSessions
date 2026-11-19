@@ -5,8 +5,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The font keys that make Ghostty draw text as SwiftTerm does. `GhosttyTextMatchesSwiftTermTests` compares the drawn
-/// text.
 @MainActor
 @Suite(.serialized)
 struct GhosttyFontConfigurationTests {
@@ -25,7 +23,6 @@ struct GhosttyFontConfigurationTests {
         #expect(families.dropFirst().contains { Self.family($0, draws: "中") })
     }
 
-    /// Italic text finds its missing characters among the regular ones.
     @Test func boldTextFindsMissingCharactersInBoldAndItalicTextInTheRegularFamilies() {
         let lines = Self.lines(of: TerminalAppearancePreferences(fontFamily: .named("Menlo")))
         let families = Self.values(of: "font-family", in: lines)

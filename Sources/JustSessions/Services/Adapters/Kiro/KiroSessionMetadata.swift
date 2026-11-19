@@ -32,31 +32,24 @@ struct KiroSessionMetadata: Equatable {
         defer { try? handle.close() }
         guard let head = try? handle.read(upToCount: Self.maximumHeadByteCount) else { return nil }
         if head.count < Self.maximumHeadByteCount {
-            // That was the whole file.
             guard let object = ConversationMetadata.object(from: head) else { return nil }
             self.init(object: object)
         } else if let object = Self.objectBeforeSessionState(in: head),
             ["session_id", "cwd", "title", "updated_at", "session_created_reason", "parent_session_id"]
                 .allSatisfy({ object[$0] != nil })
         {
-            // Only a complete metadata prefix proves no field we use was omitted. A missing optional field may
-            // occur after session_state in a reordered file; explicit JSON null still counts as present here.
             self.init(object: object)
         } else {
-            // The metadata can straddle session_state; finding only its id is not enough to accept a partial object.
             guard let rest = try? handle.readToEnd(), let object = ConversationMetadata.object(from: head + rest) else { return nil }
             self.init(object: object)
         }
     }
 
-    /// The object's members up to `session_state`, closed into an object of their own. Nil when `session_state`
-    /// is not in `data` as a member of the outer object.
     static func objectBeforeSessionState(in data: Data) -> [String: Any]? {
         let key = Data(#""session_state""#.utf8)
         var searchStart = data.startIndex
         while let keyRange = data.range(of: key, in: searchStart..<data.endIndex) {
             searchStart = keyRange.upperBound
-            // A member name follows `{` or `,`. Inside a string, the quote would be escaped instead.
             guard let previous = data[..<keyRange.lowerBound].last(where: { !isJSONWhitespace($0) }),
                 previous == UInt8(ascii: ",") || previous == UInt8(ascii: "{")
             else { continue }

@@ -27,7 +27,6 @@ struct ExternalEditorStoreTests {
         let installedApplications = [
             "com.sublimetext.3": sublimeText3,
             "com.sublimetext.4": sublimeText4,
-            // An app answering to two catalog entries' identifiers is listed once, under the first entry.
             "com.vscodium": vscodium,
             "com.microsoft.VSCodeInsiders": vscodium,
         ]

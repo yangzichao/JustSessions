@@ -3,13 +3,8 @@ import Testing
 
 @testable import JustSessions
 
-/// Splitting links two tabs side by side as Chrome's split view does: any number of splits, each outliving the
-/// selection, showing while either of its tabs is selected, with the tab first in the tab bar on the left. A tab
-/// joining from another project makes a split of its own, right after the selected tab's group, until it leaves it.
 @MainActor
 struct TerminalSplitStoreTests {
-    // MARK: - New split
-
     @Test func splittingLinksTheTabBesideTheSelectedTab() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -23,7 +18,6 @@ struct TerminalSplitStoreTests {
         let split = try #require(store.shownSplit)
         #expect(split.tabIDs == [first.id, third.id])
         #expect(store.terminalSplits == [split])
-        // The tab came from the right, so it lands right after the selected tab, as the right pane.
         #expect(ids(store) == [first.id, third.id, second.id])
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: first.id, right: third.id))
         #expect(store.selectedTerminalID == first.id)
@@ -70,11 +64,9 @@ struct TerminalSplitStoreTests {
         let split = try #require(store.shownSplit)
         let orderBefore = ids(store)
 
-        // The selected tab is in a split.
         store.splitSelectedTerminal(with: third.id)
         #expect(store.terminalSplits == [split])
 
-        // The other tab is in a split.
         store.selectTerminal(third.id)
         store.splitSelectedTerminal(with: first.id)
         #expect(store.terminalSplits == [split])
@@ -114,7 +106,6 @@ struct TerminalSplitStoreTests {
 
         let split = try #require(store.shownSplit)
         #expect(split.spansProjects)
-        // Right after the app group, which the selected tab leaves for the split, in its own group.
         #expect(ids(store) == [secondApp.id, app.id, secondTools.id, tools.id])
         #expect(store.tabGroupKey(of: app) == split.groupKey)
         #expect(store.tabGroupKey(of: secondTools) == split.groupKey)
@@ -167,8 +158,6 @@ struct TerminalSplitStoreTests {
         let newApp = open(store, makeTab(projectPath: "/tmp/app"))
         let newTools = open(store, makeTab(projectPath: "/tmp/tools"))
 
-        // The split's right tab is in the app's group, so the new app tab comes after it, and the tools tab starts
-        // a tools group of its own.
         #expect(ids(store) == [app.id, tools.id, newApp.id, newTools.id])
         expectSplitRules(store)
     }
@@ -194,8 +183,6 @@ struct TerminalSplitStoreTests {
         #expect(waitingTab.processID > 0)
         expectSplitRules(store)
     }
-
-    // MARK: - Reverse and separate
 
     @Test func reversingTradesTheTabsPlacesAndSoThePanesSides() throws {
         let (store, cleanUp) = try makeStore()
@@ -230,8 +217,6 @@ struct TerminalSplitStoreTests {
         #expect(store.selectedTerminalID == first.id)
         expectSplitRules(store)
     }
-
-    // MARK: - Move into the split
 
     @Test func aTabMovedIntoTheRightPaneTradesPlacesWithItsTab() throws {
         let (store, cleanUp) = try makeStore()
@@ -302,7 +287,6 @@ struct TerminalSplitStoreTests {
 
         store.moveIntoShownSplit(docs.id, swappingWith: .right)
 
-        // The tools tab took the docs tab's place at the end, then went back after the other tools tab.
         #expect(ids(store) == [app.id, docs.id, secondTools.id, tools.id])
         let split = try #require(store.shownSplit)
         #expect(split.spansProjects)
@@ -359,13 +343,10 @@ struct TerminalSplitStoreTests {
         expectSplitRules(store)
     }
 
-    // MARK: - Closing
-
     @Test func closingTheSelectedTabOfASplitLeavesTheOtherInFront() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
         let first = open(store, makeTab())
-        // A tab next to the closed one in the bar would otherwise be the one selected after closing.
         let other = open(store, makeTab())
         let second = open(store, makeTab())
         store.selectTerminal(first.id)
@@ -443,7 +424,6 @@ struct TerminalSplitStoreTests {
 
         store.closeTerminal(lastApp.id)
 
-        // The split is in no project's group, so the closed tab's group has no other tab; its right neighbor shows.
         #expect(store.selectedTerminalID == app.id)
         #expect(store.shownSplit != nil)
         expectSplitRules(store)
@@ -498,13 +478,10 @@ struct TerminalSplitStoreTests {
 
         store.separateSplit(split.id)
 
-        // The selection stays while the selected tab's group changes: the tab bar expands that group if collapsed.
         #expect(store.selectedTerminalID == secondTools.id)
         #expect(try store.tabGroupKey(of: #require(store.selectedTerminal)) == tools.projectDirectoryKey)
         expectSplitRules(store)
     }
-
-    // MARK: - Reconnecting
 
     @Test func aTabReplacedInPlaceKeepsItsPlaceInTheSplit() throws {
         let (store, cleanUp) = try makeStore()
@@ -544,8 +521,6 @@ struct TerminalSplitStoreTests {
         expectSplitRules(store)
     }
 
-    // MARK: - Host refreshes
-
     @Test func movingBetweenThePanesOfAShownSplitRefreshesNoHost() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -570,7 +545,6 @@ struct TerminalSplitStoreTests {
         store.splitSelectedTerminal(with: newSessionTab.id)
         #expect(store.hostRefreshStatuses[.thisMac] == nil)
 
-        // The other tab is the selected one; the new session's tab still goes off screen with it.
         store.selectTerminal(outside.id)
 
         #expect(store.hostRefreshStatuses[.thisMac] == .refreshing)
@@ -620,8 +594,6 @@ struct TerminalSplitStoreTests {
         #expect(store.hostRefreshStatuses[.thisMac] == .refreshing)
     }
 
-    // MARK: - Reopening after quit
-
     @Test func tabsAreSavedInTheOrderTheyWouldTakeWithEverySplitSeparated() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -635,7 +607,6 @@ struct TerminalSplitStoreTests {
 
         let saved = store.reopenableTabs
 
-        // Each split tab is saved after its project's other tab, where separating the split sends it.
         #expect(saved.map(\.projectDirectoryKey) == [secondApp, app, secondTools, tools].map(\.projectDirectoryKey))
         #expect(saved.map(\.wasSelected) == [false, true, false, false])
         #expect(ids(store) == [secondApp.id, app.id, tools.id, secondTools.id])
@@ -662,8 +633,6 @@ struct TerminalSplitStoreTests {
         #expect(store.selectedTerminalID == app.id)
         expectSplitRules(store)
     }
-
-    // MARK: - Helpers
 
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()

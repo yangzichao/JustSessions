@@ -12,7 +12,6 @@ struct PreparedTranscriptMarkdownTests {
         let content = TranscriptPageAssembler.transcript(pages: [page])
         #expect(content.entries.map(\.markdown) == page.entries.map(\.markdown))
         #expect(try TranscriptSearchIndex(transcript: content).matches(for: "Message").count == 3)
-        // The export reader retains original strings without allocating rendered blocks for the whole log.
         #expect(try CodexTranscriptReader().read(fixture.file).entries.allSatisfy { $0.markdown == nil })
     }
 

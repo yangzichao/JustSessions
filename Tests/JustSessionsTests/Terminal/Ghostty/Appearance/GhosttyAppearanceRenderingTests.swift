@@ -4,14 +4,12 @@ import Testing
 
 @testable import JustSessions
 
-/// Ghostty terminals drawn with a controller from `GhosttyTerminalControllers`, read back from the view's snapshot.
 @MainActor
 @Suite(.serialized)
 struct GhosttyAppearanceRenderingTests {
     private static let hideCursor = "\u{1B}[?25l"
     /// Full blocks fill their cells, so their color is drawn without antialiasing.
     private static let blocks = String(repeating: "\u{2588}", count: 4)
-    /// See `TestMachine.isVirtual`.
     private static let exactColorsNeedAMac: Comment = "Checks exact text and cell colors, which a virtual machine's GPU draws differently"
 
     @Test(.enabled(if: !TestMachine.isVirtual, Self.exactColorsNeedAMac))
@@ -31,7 +29,6 @@ struct GhosttyAppearanceRenderingTests {
         }
     }
 
-    /// As in SwiftTerm, bold text in one of the first ANSI colors is drawn in its bright version.
     @Test(.enabled(if: !TestMachine.isVirtual, Self.exactColorsNeedAMac))
     func boldTextInTheFirstANSIColorsIsDrawnBright() async throws {
         let stores = try IsolatedAppearanceStores()
@@ -97,15 +94,12 @@ struct GhosttyAppearanceRenderingTests {
         try await expectEventually { terminal.drawnColors().covers(0xE1E1FA, pixels: 1_000) }
     }
 
-    /// Select All from the Edit menu runs Ghostty's action directly, so it works with Ghostty's shortcuts cleared.
     @Test(.enabled(if: !TestMachine.isVirtual, Self.exactColorsNeedAMac))
     func selectAllDrawsTheSelectionInTheThemesColors() async throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
         let terminal = GhosttyTestTerminal(controller: stores.controller(), appearance: .aqua)
         let scheme = AppThemeColors.justSessionsLight.terminal
-        // The two blocks show the selection's text color, and the six spaces after them, three times the area, its
-        // background.
         terminal.show(Self.hideCursor + "\u{2588}\u{2588}      .")
 
         terminal.view.selectAll(nil)
@@ -117,8 +111,6 @@ struct GhosttyAppearanceRenderingTests {
         }
     }
 
-    /// Tokyo Night Day's own selection colors are 3.3 apart, so its selected text is drawn in the readable color, as
-    /// in SwiftTerm; see `TerminalMinimumContrastRenderingTests`.
     @Test(.enabled(if: !TestMachine.isVirtual, Self.exactColorsNeedAMac))
     func selectedTextIsDrawnReadableOnTheSelection() async throws {
         let stores = try IsolatedAppearanceStores()
@@ -147,7 +139,6 @@ struct GhosttyAppearanceRenderingTests {
         // A private-use character no font has, which Ghostty draws as a small placeholder.
         missing.show(Self.hideCursor + "\u{10FFFD}")
         let icon = GhosttyTestTerminal(controller: controller, appearance: .aqua)
-        // Nerd Fonts' house icon.
         icon.show(Self.hideCursor + "\u{F015}")
 
         try await expectEventually {

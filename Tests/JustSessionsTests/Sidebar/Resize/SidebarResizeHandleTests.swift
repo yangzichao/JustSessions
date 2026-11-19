@@ -4,10 +4,8 @@ import Testing
 
 @testable import JustSessions
 
-/// The sidebar's resize handle lies over the detail's leading edge, not in a strip of its own beside it.
 @MainActor
 struct SidebarResizeHandleTests {
-    /// The sidebar's width with no width saved, so the divider's place is known.
     private let sidebarWidth: CGFloat = 248
     private let windowSize = CGSize(width: 1000, height: 600)
 
@@ -21,7 +19,6 @@ struct SidebarResizeHandleTests {
         defer { fixture.close() }
         let bitmap = try await fixture.capture()
         let renderingScale = CGFloat(bitmap.pixelsWide) / windowSize.width
-        // One row through the top band, where the tab bar sits, and one through the rest, where the terminal does.
         for row in [CGFloat(20), 300] {
             let pixelY = Int(row * renderingScale)
             let underHandle = try #require(bitmap.colorAt(x: Int((sidebarWidth + 5) * renderingScale), y: pixelY))
@@ -30,7 +27,6 @@ struct SidebarResizeHandleTests {
         }
     }
 
-    /// The terminal is an AppKit view, which would take every click over it from a handle drawn underneath.
     @Test func handleTakesTheMouseOverAnAppKitDetail() async throws {
         let fixture = try ResizableSidebarLayoutFixture(size: windowSize, detail: AppKitDetail())
         defer { fixture.close() }
@@ -88,7 +84,6 @@ private final class ResizableSidebarLayoutFixture {
         return bitmap
     }
 
-    /// The view a click at `point`, from the window's top-leading corner, would go to.
     func hitView(at point: CGPoint) -> NSView? {
         hostingView.hitTest(hostingView.convert(point, to: hostingView.superview))
     }

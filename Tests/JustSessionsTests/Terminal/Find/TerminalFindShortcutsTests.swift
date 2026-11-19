@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Find's keys in a window showing a tab. Escape and Return reach the terminal's program unless the find field has the
-/// keyboard, so a CLI keeps its Escape.
 @MainActor
 struct TerminalFindShortcutsTests {
     @MainActor
@@ -31,7 +29,6 @@ struct TerminalFindShortcutsTests {
             shortcutView.handle(SyntheticKey.event(keyCode: keyCode, characters: characters, modifiers: modifiers, window: window))
         }
 
-        /// The find bar shows with "needle" typed and its field has the keyboard.
         func showBarWithFocusedField() {
             findState.show()
             findState.query = "needle"
@@ -86,7 +83,6 @@ struct TerminalFindShortcutsTests {
         #expect(!fixture.findState.isPresented)
     }
 
-    /// The bar shows, but the terminal has the keyboard: its program gets Escape and Return.
     @Test func escapeAndReturnReachTheTerminalWhileTheFieldIsNotFocused() {
         let fixture = Fixture()
         defer { fixture.tearDown() }
@@ -113,7 +109,6 @@ struct TerminalFindShortcutsTests {
     }
 }
 
-/// A finder that counts nothing, for tests about keys rather than matches.
 @MainActor
 private final class SilentTerminalFinder: TerminalTextFinding {
     func findText(_ query: String) -> TerminalFindMatchCount? { nil }

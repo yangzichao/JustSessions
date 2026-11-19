@@ -1,8 +1,5 @@
 import Foundation
 
-/// One session as the conversation map draws it (TAB-10): a block per message, run of tool calls, or attached image,
-/// in conversation order. In memory only (PERF-89). A message's `entryID` is the reader's paged ID
-/// (`TranscriptPageIdentity`), which its bookmark keeps; a tool run's is its first entry's, an anchor only.
 struct ConversationOutline: Sendable, Equatable {
     struct Block: Sendable, Equatable {
         enum Kind: Sendable, Equatable {
@@ -20,13 +17,10 @@ struct ConversationOutline: Sendable, Equatable {
         }
 
         let entryID: Int
-        /// The source record of the block's last entry, so an update re-reads from a record no kept block reaches into.
         var lastRecord: Int
         let kind: Kind
         let timestamp: Date?
-        /// At most 80 characters: the bookmark snippet of a message's head, or a run's first summary.
         var snippet: String
-        /// Each line's length in map columns (0 = blank row inside), ≤ 24 for a message, ≤ 4 for a run.
         var lineWidths: [UInt8]
         var toolCallCount: Int
 
@@ -36,11 +30,9 @@ struct ConversationOutline: Sendable, Equatable {
     }
 
     let blocks: [Block]
-    /// Each block's first row: its lines are rows, and one blank row comes before a block whose side changed.
     let rowStarts: [Int]
     let rowCount: Int
     let messageCount: Int
-    /// Set by `ConversationOutlineModel` when it publishes, rising across relinks, so the Canvas compares one number.
     var revision = 0
 
     init(blocks: [Block]) {
@@ -60,7 +52,6 @@ struct ConversationOutline: Sendable, Equatable {
         messageCount = messages
     }
 
-    /// The block holding `row`: the last starting at or before it (binary search on rowStarts); nil when empty.
     func blockIndex(atRow row: Int) -> Int? {
         var lower = 0
         var upper = rowStarts.count
@@ -71,10 +62,6 @@ struct ConversationOutline: Sendable, Equatable {
         return lower > 0 ? lower - 1 : nil
     }
 
-    /// A bookmark's block: its exact entry ID (binary search; IDs ascend), else a block in its record, each matched by
-    /// kind and snippet head as `MessageBookmarkNavigation.locate` follows a moved part (MessageBookmarkNavigation.swift:
-    /// 44-47). A head that changed since keeps a chip: its ID by kind alone, else its record's first block of its kind.
-    /// Nil when its message is gone or newer than the last read.
     func blockIndex(for bookmark: MessageBookmark) -> Int? {
         let kind: Block.Kind = bookmark.kind == .user ? .user : .assistant
         let head = bookmark.snippet.prefix(40).lowercased()
@@ -87,7 +74,6 @@ struct ConversationOutline: Sendable, Equatable {
         return inRecord.first { blocks[$0].snippet.lowercased().hasPrefix(head) } ?? (exactKind ? exact : inRecord.first)
     }
 
-    /// What a click on block `index` opens: a message's or image's own ID; for a tool run the message before it, or after.
     func targetEntryID(forBlockAt index: Int) -> Int? {
         if blocks[index].kind != .toolRun { return blocks[index].entryID }
         return blocks[..<index].last(where: \.isMessage)?.entryID ?? blocks[(index + 1)...].first(where: \.isMessage)?.entryID

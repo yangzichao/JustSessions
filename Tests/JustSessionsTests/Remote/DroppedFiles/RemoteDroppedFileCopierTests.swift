@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Copying one dropped file to a host, with a local shell standing in for `ssh` and the host.
 struct RemoteDroppedFileCopierTests {
     @Test func theFileArrivesAndItsPathOnTheHostIsReturned() throws {
         let home = try makeTemporaryDirectory()
@@ -24,7 +23,6 @@ struct RemoteDroppedFileCopierTests {
         #expect(progress.value.last == 300_000)
     }
 
-    /// A symbolic link is copied as the file it leads to, under the link's name.
     @Test func aSymbolicLinkSendsTheFileItLeadsTo() throws {
         let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }
@@ -43,7 +41,6 @@ struct RemoteDroppedFileCopierTests {
         #expect(try Data(contentsOf: URL(fileURLWithPath: hostPath)) == Data(contentsOf: file))
     }
 
-    /// `ssh` connects as the app's background commands do, through the connection the drop's files share.
     @Test func sshConnectsAsTheAppsBackgroundCommandsDo() {
         let launch = RemoteDroppedFileCopier().processLaunch("devbox", "HOST_COMMAND", ["-o", "ControlPath=/tmp/shared"])
 
@@ -66,7 +63,6 @@ struct RemoteDroppedFileCopierTests {
         }
     }
 
-    /// As when the host stops mid-copy and `ssh` exits without a word.
     @Test func aConnectionThatEndsMidCopyWasLost() throws {
         let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }
@@ -118,13 +114,10 @@ struct RemoteDroppedFileCopierTests {
         }
     }
 
-    /// The copy, its cancel, and the clock all run on dispatch queues, as the app copies: a full run on the release
-    /// workflow's three-core runner can keep this test's own task waiting far longer than the copy takes.
     @Test func cancellingStopsTheCopy() async throws {
         let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }
         let file = try makeDroppedFile(named: "shot.png", byteCount: 10, in: home)
-        // A connection that never finishes.
         let copier = RemoteDroppedFileCopier.replacingSSH(with: "exec sleep 600")
         let cancellation = RemoteDroppedFileCopyCancellation()
 
@@ -141,7 +134,6 @@ struct RemoteDroppedFileCopierTests {
         }
 
         #expect(throws: CancellationError.self) { try outcome.get() }
-        // Well short of the connection's 600 seconds, so the cancel, not `ssh` ending, stopped the copy.
         #expect(copyDuration < .seconds(120))
     }
 }

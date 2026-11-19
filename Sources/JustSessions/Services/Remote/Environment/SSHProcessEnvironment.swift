@@ -8,13 +8,11 @@ enum SSHProcessEnvironment {
         merged(inherited: ProcessInfo.processInfo.environment, loginShell: LoginShellEnvironment.cachedVariables)
     }
 
-    /// The app's own environment with the login shell's values on top, but for the shell's record of itself.
     static func merged(inherited: [String: String], loginShell: [String: String]) -> [String: String] {
         inherited.merging(loginShell.filter { !shellOwnVariables.contains($0.key) }) { _, loginShellValue in
             loginShellValue
         }
     }
 
-    /// Where the shell that was read ran and how deeply it was nested, not anything its rc files set up.
     static let shellOwnVariables: Set<String> = ["PWD", "OLDPWD", "SHLVL", "_"]
 }

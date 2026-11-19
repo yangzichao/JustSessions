@@ -4,7 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct JustSessionsGuideSectionTests {
-    /// The headings are the guides' own, so a renamed heading fails here rather than leaving the agent without it.
     @Test(arguments: JustSessionsGuideSection.all)
     func everySectionIsInTheGuidesAndShipsWithTheApp(_ section: JustSessionsGuideSection) throws {
         let guide = try RepositoryFiles.contents(of: "docs/guides/\(section.fileName)")
@@ -57,9 +56,9 @@ struct JustSessionsGuideSectionTests {
             checkedAt: .now,
             thisMacSummary: "",
             findings: [
-                HostCheckFinding(id: "tmux", status: .problem, title: "tmux", summary: ""),
-                HostCheckFinding(id: "cli-claude", status: .warning, title: "Claude Code", summary: ""),
-                HostCheckFinding(id: "rsync", status: .passed, title: "rsync", summary: ""),
+                HostCheckFinding(id: .tmux, status: .problem, title: "tmux", summary: ""),
+                HostCheckFinding(id: .cli(.claude), status: .warning, title: "Claude Code", summary: ""),
+                HostCheckFinding(id: .rsync, status: .passed, title: "rsync", summary: ""),
             ]
         )
         #expect(

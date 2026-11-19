@@ -1,7 +1,5 @@
 import Foundation
 
-/// Serializes disk work for a host across workspace windows. The operation keeps its reservation until it actually
-/// ends, even when its window closes or its caller cancels; unrelated hosts can still work independently.
 actor HostSessionWorkCoordinator {
     private struct Waiter {
         let id: UUID
@@ -56,8 +54,6 @@ actor HostSessionWorkCoordinator {
             } else {
                 remaining.append(waiter)
             }
-            // A later request for one of these hosts cannot overtake this waiter indefinitely. Requests touching
-            // entirely different hosts can still start while it waits.
             occupied.formUnion(waiter.hosts)
         }
         waiters = remaining

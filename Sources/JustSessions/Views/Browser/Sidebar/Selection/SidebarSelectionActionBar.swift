@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Shown at the bottom of the sidebar while several sessions are selected. End shows while any of them runs; it doesn't
-/// ask first, as End session from one row doesn't.
 struct SidebarSelectionActionBar: View {
     let selectedCount: Int
     let endableCount: Int

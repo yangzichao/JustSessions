@@ -1,6 +1,4 @@
 extension TerminalPalette {
-    /// The palette with its 16 ANSI colors at `percent` intensity; see `TerminalColorIntensity`. The background, text,
-    /// and selection colors stay as they are.
     func withANSIColorIntensity(percent: Int) -> TerminalPalette {
         guard percent != TerminalColorIntensity.defaultPercent else { return self }
         return TerminalPalette(
@@ -15,7 +13,6 @@ extension TerminalPalette {
 }
 
 extension TerminalPaletteVariants {
-    /// Each version's ANSI colors at `percent` intensity.
     func withANSIColorIntensity(percent: Int) -> TerminalPaletteVariants {
         switch self {
         case .single(let palette):

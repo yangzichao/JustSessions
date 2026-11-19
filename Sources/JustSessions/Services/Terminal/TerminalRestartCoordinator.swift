@@ -1,8 +1,5 @@
 import Foundation
 
-/// A failed pane is removed before any window can start another CLI under its session name. A second Resume waits
-/// for that cleanup instead of queuing another kill that could arrive after the replacement started. Requests retain
-/// their windows weakly, and the queued cleanup keeps this coordinator alive even if the first window closes.
 @MainActor
 final class TerminalRestartCoordinator {
     private struct Cleanup {

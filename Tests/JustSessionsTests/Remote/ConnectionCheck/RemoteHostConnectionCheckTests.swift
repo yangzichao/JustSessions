@@ -2,7 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Adding a host first logs in to it, so the sheet can say why the app can't reach it.
 struct RemoteHostConnectionCheckTests {
     @Test func aHostThatAcceptsTheLoginPasses() {
         let recorder = RemoteCommandRecorder()
@@ -13,7 +12,6 @@ struct RemoteHostConnectionCheckTests {
         #expect(recorder.commands.map(\.command) == [WindowsHostProbe.command])
     }
 
-    /// Only `ssh`'s own exit status is a failure to connect.
     @Test func aShellStartupErrorStillPasses() {
         let check = RemoteHostConnectionCheck(runner: RemoteCommandRecorder().runner(answering: (1, "bash: nvm: command not found\n")))
 
@@ -43,7 +41,6 @@ struct RemoteHostConnectionCheckTests {
         #expect(check.problem(connectingTo: "devbox") == .loginRefused)
     }
 
-    /// The runner gives up after the check's timeout, as when a login hangs.
     @Test func noResultCountsAsNoAnswer() {
         let check = RemoteHostConnectionCheck(runner: RemoteCommandRecorder().runner(answering: nil))
 

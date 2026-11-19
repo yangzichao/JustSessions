@@ -1,9 +1,5 @@
 import SwiftUI
 
-/// Asks before Disconnect closes the host's open tabs, as closing them together asks: Keep running or End sessions
-/// while tmux can keep some of their CLIs running, and otherwise whether to close tabs that stop their CLIs and
-/// shells; see `SeveralTabsCloseConfirmation`. Return keeps the CLIs running, or closes the tabs when nothing can
-/// keep running, and Escape cancels, leaving the host connected.
 struct HostDisconnectConfirmation: ViewModifier {
     let store: ConversationStore
 
@@ -43,7 +39,6 @@ struct HostDisconnectConfirmation: ViewModifier {
         Binding(get: { store.hostDisconnectQuestion }, set: { store.hostDisconnectQuestion = $0 })
     }
 
-    /// Shows the Keep running or End sessions alert, or the one that stops everything, for the question waiting.
     private func presentation(ofKeepOrEnd showsKeepOrEnd: Bool) -> Binding<Bool> {
         Binding(
             get: {

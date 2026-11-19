@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Adds an SSH host, whose sessions get a heading of their own below this Mac's.
 struct SidebarAddRemoteHostButton: View {
     let action: () -> Void
 

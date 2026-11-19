@@ -1,9 +1,6 @@
 import AppKit
 import GhosttyTerminal
 
-/// See `TerminalPromptSelection`. Ghostty has no keybinding for ⌘A (see `GhosttyAppearanceConfiguration`), so ⌘A
-/// reaches the terminal in `performKeyEquivalent`, before the Edit menu's Select All. Control keys in tmux go
-/// there too; see `GhosttyTabTerminalView+ControlKeys`.
 extension GhosttyTabTerminalView: PromptSelectableTerminal {
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
         if window?.firstResponder === self, PromptSelectionKeyAction.isSelectAll(event), promptSelection.selectPrompt() {
@@ -23,8 +20,6 @@ extension GhosttyTabTerminalView: PromptSelectableTerminal {
         return TerminalScreen(lines: screenText.components(separatedBy: "\n"), columnCount: Int(gridMetrics.columns), cursor: cursor)
     }
 
-    /// Ghostty lays the text out from the view's top left corner, with no padding, in cells of whole pixels at the
-    /// window's scale.
     func frame(ofCells columns: Range<Int>, inRow row: Int) -> NSRect? {
         guard let gridMetrics, gridMetrics.cellWidthPixels > 0, gridMetrics.cellHeightPixels > 0 else { return nil }
         let scale = window?.backingScaleFactor ?? 1
@@ -59,13 +54,11 @@ extension GhosttyTabTerminalView: PromptSelectableTerminal {
         )
     }
 
-    /// The Edit menu's Copy, which the context menu's also comes to, copies the selected prompt.
     override func copy(_ sender: Any?) {
         guard !promptSelection.copySelectedPrompt() else { return }
         super.copy(sender)
     }
 
-    /// The Edit menu's Select All, which the context menu's also comes to, ends the prompt's selection first.
     override func selectAll(_ sender: Any?) {
         promptSelection.cancel()
         super.selectAll(sender)

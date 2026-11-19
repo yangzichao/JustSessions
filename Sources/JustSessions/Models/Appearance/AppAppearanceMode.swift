@@ -1,7 +1,5 @@
 import AppKit
 
-/// Light or Dark for the whole app, or following the Mac. Every window, sheet, and menu takes it on, and so does
-/// every terminal set to match the app.
 enum AppAppearanceMode: String, CaseIterable, Identifiable {
     case system
     case light
@@ -20,7 +18,6 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable {
         }
     }
 
-    /// The saved mode, or System when nothing is saved or the saved value is not a mode.
     static func load(from userDefaults: UserDefaults) -> Self {
         userDefaults.string(forKey: userDefaultsKey).flatMap(Self.init(rawValue:)) ?? .system
     }

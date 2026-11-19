@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A subagent's session stays out of the listed sessions, is found under the session that started it, and is only
-/// read: never launched or deleted on its own.
 @MainActor
 struct SubagentConversationsTests {
     @Test func subagentsAreKeptApartAndFoundUnderTheSessionThatStartedThem() throws {
@@ -22,7 +20,6 @@ struct SubagentConversationsTests {
         #expect(store.subagents(of: parent).map(\.id) == [newer.id, older.id])
         #expect(store.subagents(of: older).map(\.id) == [nested.id])
         #expect(store.conversation(withID: nested.id)?.parentID == older.id)
-        // A subagent that ran in another folder adds no project to the sidebar.
         #expect(!store.sidebarProjectGroups.contains { $0.projectPath == "/work/other" })
     }
 
@@ -44,8 +41,6 @@ struct SubagentConversationsTests {
         #expect(remoteSubagent.parentID == remoteParent.id)
     }
 
-    /// The delete confirmation names the subagent sessions, at any depth, that go with the sessions it deletes, and
-    /// the ones that stay on disk, as Antigravity's do.
     @Test func aDeletionPlanCountsTheSubagentSessionsThatGoOrStay() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
@@ -72,7 +67,6 @@ struct SubagentConversationsTests {
         #expect(store.deletionPlan(for: [alone]).deletedSubagentCount == 0)
     }
 
-    /// A subagent listed again under one of its own subagents, as two copies of one session can be, is listed once.
     @Test func descendantSubagentsListEachSessionOnce() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

@@ -7,7 +7,6 @@ struct WorkspaceTabCommands: Commands {
 
     private var closesTab: Bool { (actions?.tabCount ?? 0) > 0 }
 
-    /// The split view items, as in Chrome's split view button, act on the shown split, so only while one shows.
     private var isSplitShown: Bool { actions?.isEnabled == true && actions?.isSplitShown == true }
 
     private var isStacked: Bool { isSplitShown && actions?.shownSplitOrientation == .stacked }
@@ -22,7 +21,6 @@ struct WorkspaceTabCommands: Commands {
                 .disabled(actions?.isEnabled != true)
             Button(AppLocalization.string("New Window", language: languageStore.language)) { openWindow(id: "workspace") }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
-            // Chrome's shortcut, and its place in Chrome's File menu.
             Button(AppLocalization.string("Reopen Closed Tab", language: languageStore.language)) { actions?.reopenClosedTab() }
                 .keyboardShortcut("t", modifiers: [.command, .shift])
                 .disabled(actions?.isEnabled != true || actions?.canReopenClosedTab != true)
@@ -61,7 +59,6 @@ struct WorkspaceTabCommands: Commands {
 
             Divider()
 
-            // Chrome's shortcut and its Tab menu's name for it.
             Button(AppLocalization.string("Add Tab to New Split View", language: languageStore.language)) { actions?.openSplitChooser() }
                 .keyboardShortcut("n", modifiers: [.command, .option])
                 .disabled(actions?.isEnabled != true || actions?.canOpenSplitChooser != true)

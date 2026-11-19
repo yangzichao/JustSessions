@@ -16,11 +16,9 @@ struct TerminalThemeReportRequestScanner {
         case controlSequenceStart
         case privateParameters
         case operatingSystemCommand
-        /// An escape inside an operating system command: the start of its `ESC \` terminator, or of another sequence.
         case operatingSystemCommandEscape
     }
 
-    /// Longer parameters are no request this scanner knows, so it stops collecting them.
     private static let maximumParameterByteCount = 64
     private static let escape: UInt8 = 0x1B
     private static let bell: UInt8 = 0x07
@@ -70,7 +68,6 @@ struct TerminalThemeReportRequestScanner {
             if byte == Self.escape {
                 state = .operatingSystemCommandEscape
             } else if commandBytes.count <= Self.backgroundColorQuery.count {
-                // Only a short command can be the query; a long one, such as a link, is read to its end uncollected.
                 commandBytes.append(byte)
             }
         case .operatingSystemCommandEscape:

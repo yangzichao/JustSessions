@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Dropping a dragged tab or group reorders the store's tabs, keeps the selection and the shown split, and saves the
-/// new order for the next launch.
 @MainActor
 struct TabMovingStoreTests {
     @Test func droppingATabReordersItsGroupAndKeepsTheSelection() throws {
@@ -53,8 +51,6 @@ struct TabMovingStoreTests {
         expectSplitRules(store)
     }
 
-    // MARK: - Helpers
-
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         let store = ConversationStore(adapters: [], userDefaults: isolatedUserDefaults.userDefaults)
@@ -72,7 +68,6 @@ struct TabMovingStoreTests {
         return tab
     }
 
-    /// A plain terminal, which the next launch reopens without a session to resume.
     private func makeTab(projectPath: String) -> TerminalSession {
         TerminalSession(
             engine: .swiftTerm,

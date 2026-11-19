@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// ⌘A in either engine's terminal selects the prompt Claude Code draws, and the keys that follow edit it through the
-/// keys the CLI reads; see `TerminalPromptSelection`. A process that records the bytes it gets stands in for the CLI,
-/// and the test draws the CLI's prompt in the terminal itself.
 @MainActor
 @Suite(.serialized)
 struct TerminalPromptSelectionTests {
@@ -74,8 +71,6 @@ struct TerminalPromptSelectionTests {
         try await fixture.expectInput(CLIPromptEditingKeys.movingToStart(of: prompt))
     }
 
-    /// Edit → Paste chosen with the pointer reaches neither the keys nor Ghostty's own paste, so the selection hears the
-    /// menu item's action instead.
     @Test(arguments: TerminalEngine.allCases)
     func editMenuPasteReplacesThePrompt(_ engine: TerminalEngine) async throws {
         let fixture = try await PromptDrawingFixture(engine: engine)
@@ -91,7 +86,6 @@ struct TerminalPromptSelectionTests {
         try await fixture.expectInput(CLIPromptEditingKeys.clearing(prompt))
     }
 
-    /// Edit → Copy is on while the prompt is selected, though the terminal's own selection is empty.
     @Test(arguments: TerminalEngine.allCases)
     func editMenuCopyIsOnWhileThePromptIsSelected(_ engine: TerminalEngine) async throws {
         let fixture = try await PromptDrawingFixture(engine: engine)
@@ -107,7 +101,6 @@ struct TerminalPromptSelectionTests {
         #expect(copyItem.isEnabled)
     }
 
-    /// Any other key ends the selection and goes to the CLI as usual.
     @Test(arguments: TerminalEngine.allCases)
     func otherKeysEndTheSelection(_ engine: TerminalEngine) async throws {
         let fixture = try await PromptDrawingFixture(engine: engine)
@@ -122,7 +115,6 @@ struct TerminalPromptSelectionTests {
         #expect(fixture.recorder.receivedInput.isEmpty)
     }
 
-    /// The selection follows the prompt while it shows the same text, and ends once the text changes.
     @Test(arguments: TerminalEngine.allCases)
     func theSelectionEndsWhenThePromptChanges(_ engine: TerminalEngine) async throws {
         let fixture = try await PromptDrawingFixture(engine: engine)
@@ -139,7 +131,6 @@ struct TerminalPromptSelectionTests {
         #expect(!fixture.promptSelection.isActive)
     }
 
-    /// Without a prompt with text in it, or for a CLI without a layout, ⌘A goes on to Edit → Select All.
     @Test(arguments: TerminalEngine.allCases)
     func withoutAPromptCommandAGoesOnToSelectAll(_ engine: TerminalEngine) async throws {
         let fixture = try await PromptDrawingFixture(engine: engine)
@@ -154,7 +145,6 @@ struct TerminalPromptSelectionTests {
     }
 }
 
-/// A terminal of either engine, whose prompt selection reads Claude Code's prompt, with a process recording its input.
 @MainActor
 final class PromptDrawingFixture {
     let recorder: KeyRecordingTerminalFixture

@@ -1,6 +1,5 @@
 import Foundation
 
-/// Search and rendering use the same segment order, including code and individual table cells.
 enum TranscriptSearchSegments {
     static func texts(in entry: TranscriptEntry) -> [String] {
         entry.markdown?.searchSegments ?? texts(in: entry.content)

@@ -47,14 +47,12 @@ struct SSHConnectionProblemTests {
                     Offending ED25519 key in /Users/me/.ssh/known_hosts:12
                     Host key verification failed.
                     """) == "Host key verification failed.")
-        // Output of the remote command before the connection dropped does not hide ssh's own message.
         #expect(
             SSHConnectionProblem.tellingLine(
                 inOutput: "rm: cannot remove 'x': Permission denied (os error 13)\nTimeout, server devbox not responding.\n")
                 == "Timeout, server devbox not responding.")
     }
 
-    /// The remote command's own output comes before ssh's; it must not be taken for ssh's reason.
     @Test func aRemoteCommandsErrorIsNotTakenForSSHs() {
         #expect(
             SSHConnectionProblem(sshMessage: "rm: cannot remove 'x': Permission denied")
@@ -122,7 +120,6 @@ struct SSHConnectionProblemTests {
         #expect(SSHConnectionProblem.other(sshMessage: "Bad owner").explanation(host: "devbox") == "Couldn't connect to devbox: Bad owner")
     }
 
-    /// The Add SSH host sheet shows Connect… beside the note.
     @Test func explainsAProblemConnectFixesBesideItsButton() {
         #expect(
             SSHConnectionProblem.loginRefused.explanationBesideConnect(host: "devbox")
@@ -135,7 +132,6 @@ struct SSHConnectionProblemTests {
                 == SSHConnectionProblem.noAnswer.explanation(host: "devbox"))
     }
 
-    /// Connect… asked its questions, so what was typed was wrong, or the host key really changed.
     @Test func explainsAFailedLogin() {
         #expect(
             SSHConnectionProblem.loginRefused.loginFailureExplanation(host: "devbox")

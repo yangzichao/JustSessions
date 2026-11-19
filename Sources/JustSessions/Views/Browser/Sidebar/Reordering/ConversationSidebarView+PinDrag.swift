@@ -11,7 +11,6 @@ extension ConversationSidebarView {
         )
     }
 
-    /// Starts a drag of the row among its scope's rows as they are now, or follows the pointer once it has started.
     private func followPinDrag(
         of rowID: String,
         in scope: SidebarPinDrag.Scope,
@@ -31,7 +30,6 @@ extension ConversationSidebarView {
         pinDrag?.movePointer(to: pointer)
     }
 
-    /// The bottom of the host's last project, or of the project's last session.
     private func scopeBottom(of scope: SidebarPinDrag.Scope) -> CGFloat? {
         switch scope {
         case .projects(let host):
@@ -41,7 +39,6 @@ extension ConversationSidebarView {
         }
     }
 
-    /// Pins the dragged project or session where it was let go, unless it went away meanwhile.
     private func dropPinDrag() {
         guard let pinDrag else { return }
         withAnimation(SidebarPinDragMetrics.dropAnimation) {

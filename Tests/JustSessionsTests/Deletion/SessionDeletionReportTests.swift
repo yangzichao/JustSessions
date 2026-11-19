@@ -4,8 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct SessionDeletionReportTests {
-    // MARK: - One session
-
     @Test func oneSessionShowsTheReasonAloneUnderItsTitle() throws {
         let report = SessionDeletionReport(
             requestedCount: 1,
@@ -47,8 +45,6 @@ struct SessionDeletionReportTests {
         )
     }
 
-    // MARK: - Several sessions
-
     @Test func noAlertWhenEverySessionWasDeleted() {
         #expect(SessionDeletionReport(requestedCount: 5, deletedCount: 5, failures: []).alert(titleOf: \.suggestedTitle) == nil)
     }
@@ -87,8 +83,6 @@ struct SessionDeletionReportTests {
             alert.message == "Deleted 1 of 2 sessions. The other one is still listed.\n\nClaude Code · Custom Refactor: Permission denied.")
     }
 
-    /// The lid closed after 37 of 140 sessions on devbox: the 38th lost its connection and the rest were skipped.
-    /// One cause accounts for every session not deleted, so the summary tells it, then when to try again.
     @Test func aLostConnectionIsExplainedOnceWithTheSessionsItLeftAndTryAgain() throws {
         let failures = hostFailures(host: "devbox", count: 103, sshMessage: "Timeout, server devbox not responding.")
         let alert = try #require(
@@ -235,8 +229,6 @@ struct SessionDeletionReportTests {
         #expect(lines.last == "Try Again retries the 40 sessions on 20 hosts.")
     }
 
-    // MARK: - Support
-
     private func oneSessionReport(reason: String) -> SessionDeletionReport {
         SessionDeletionReport(
             requestedCount: 1, deletedCount: 0,
@@ -245,7 +237,6 @@ struct SessionDeletionReportTests {
             ])
     }
 
-    /// The first session on `host` failed with `sshMessage`; the rest were skipped because of it.
     private func hostFailures(host: String, count: Int, sshMessage: String) -> [ConversationDeletionFailure] {
         let error = RemoteConversationDeletionError.sshFailed(host: host, details: sshMessage)
         let unresponsiveHost = error.unresponsiveHost

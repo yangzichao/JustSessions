@@ -1,18 +1,13 @@
 import Foundation
 
-/// When this window's copies of each SSH host started and ended, and how many ended in failure in a row, for a Claude
-/// Code tab waiting on a session its host hasn't listed; see `followClaudeSessionSwitch`. Every window's are combined, so
-/// the tabs waiting on a host, in one window or several, share one copy and the wait after it.
 struct RemoteHostCopies {
     struct Copies: Equatable {
         var lastStartedAt: Date?
         var lastEndedAt: Date?
-        /// How many of the copies that ended last failed in a row; 0 after one that didn't.
         var failuresInARow = 0
     }
 
     private var copiesByHost: [String: Copies] = [:]
-    /// When a copy starts or ends; tests set the time.
     private let currentDate: () -> Date
 
     init(currentDate: @escaping () -> Date = Date.init) {
@@ -36,7 +31,6 @@ struct RemoteHostCopies {
         copiesByHost.removeValue(forKey: host)
     }
 
-    /// The windows' copies as one: the latest start, and the latest end with its window's run of failures.
     static func combined(_ windows: [Copies]) -> Copies {
         var combined = Copies()
         for copies in windows {

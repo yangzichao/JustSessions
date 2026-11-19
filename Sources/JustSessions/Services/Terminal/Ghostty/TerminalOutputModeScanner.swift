@@ -1,17 +1,6 @@
-/// Follows, in a program's output, the modes a Ghostty tab needs and Ghostty can't report: for Page Up and Page Down,
-/// whether the program shows the alternate screen, as full-screen programs such as tmux do, and whether it turned on
-/// the kitty keyboard protocol there; and for an image pasted on a tab on this Mac, whether it turned on bracketed
-/// paste (see `GhosttyTabTerminalView+ImagePaste`).
-///
-/// - `CSI ? 1049 h`, `CSI ? 1047 h` or `CSI ? 47 h` switch to the alternate screen, and the same with `l` back to the
-///   main screen.
-/// - Each screen keeps its own kitty keyboard flags, as in Ghostty and SwiftTerm: `CSI > n u` pushes flags `n`,
-///   `CSI < n u` pops `n` entries, and `CSI = n ; m u` sets (`m` = 1), adds (2) or removes (3) flags `n`. These follow
-///   Ghostty's parsing and stack, which is what encodes the key.
-/// - `CSI ? 2004 h` turns bracketed paste on, and `CSI ? 2004 l` off, on both screens.
-/// - A reset (`ESC c`) goes back to the main screen, clears both screens' flags, and turns bracketed paste off.
-///
-/// A sequence can arrive split across reads.
+/// Each screen keeps its own kitty keyboard flags, as in Ghostty and SwiftTerm: `CSI > n u` pushes flags `n`, `CSI < n u`
+/// pops `n` entries, and `CSI = n ; m u` sets (`m` = 1), adds (2) or removes (3) flags `n`. These follow Ghostty's
+/// parsing and stack, which is what encodes the key.
 struct TerminalOutputModeScanner {
     private enum State {
         case ground
@@ -20,7 +9,6 @@ struct TerminalOutputModeScanner {
         case parameters(marker: UInt8)
     }
 
-    /// Longer parameters are no mode this scanner knows, so it stops collecting them.
     private static let maximumParameterByteCount = 64
     private static let escape: UInt8 = 0x1B
     private static let alternateScreenModes: Set<Int> = [1049, 1047, 47]
@@ -34,7 +22,6 @@ struct TerminalOutputModeScanner {
     private var state = State.ground
     private var parameterBytes: [UInt8] = []
 
-    /// The program turned on at least one kitty keyboard protocol flag on the screen it shows.
     var hasKittyKeyboardFlags: Bool {
         (isOnAlternateScreen ? alternateScreenKittyFlags : mainScreenKittyFlags).current != 0
     }
@@ -140,7 +127,6 @@ private struct KittyKeyboardFlagStack {
 
     var current: UInt8 { entries[top] }
 
-    /// The flags a number gives, or nil for one Ghostty rejects.
     static func flags(_ number: Int) -> UInt8? {
         (0...31).contains(number) ? UInt8(number) : nil
     }
@@ -161,7 +147,6 @@ private struct KittyKeyboardFlagStack {
         }
     }
 
-    /// Ghostty ignores any other mode.
     mutating func set(_ flags: UInt8, mode: Int) {
         switch mode {
         case 1: entries[top] = flags

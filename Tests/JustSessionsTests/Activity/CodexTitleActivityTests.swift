@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// What a Codex CLI does, as its terminal title says. The titles are Codex 0.160's with
-/// `tui.terminal_title=["activity","run-state","thread-id"]`, as seen on this Mac and over SSH.
 @MainActor
 struct CodexTitleActivityTests {
     private static let threadID = "01a10846-4c77-75e2-bec8-ab638c1d2e3f"
@@ -17,7 +15,6 @@ struct CodexTitleActivityTests {
             ("⠧ Working | \(Self.cutThreadID)", .working),
             ("Working | \(Self.cutThreadID)", .working),
             ("● ⠋ Thinking | \(Self.cutThreadID)", .working),
-            // For a background terminal, still in the turn.
             ("⠙ Waiting | \(Self.cutThreadID)", .working),
             ("Starting | \(Self.cutThreadID)", .working),
             ("⠹ Undoing | \(Self.cutThreadID)", .working),
@@ -40,12 +37,10 @@ struct CodexTitleActivityTests {
         #expect(CodexThreadTitle.threadIDPrefix(inTerminalTitle: "⠧ Working | \(Self.cutThreadID)") == "01a10846-4c77-75e2-bec8-ab638")
         #expect(CodexThreadTitle.threadIDPrefix(inTerminalTitle: "[ ! ] Action Required | \(Self.threadID)") == Self.threadID)
         #expect(CodexThreadTitle.threadIDPrefix(inTerminalTitle: "Ready") == nil)
-        // While Codex names a new thread, as seen over SSH with Codex 0.160.
         #expect(CodexThreadTitle.threadIDPrefix(inTerminalTitle: "Ready | \(Self.cutThreadID) ⠸") == "01a10846-4c77-75e2-bec8-ab638")
         #expect(CodexTitleActivity.activity(inTerminalTitle: "⠴ Working | \(Self.cutThreadID) ⠴") == .working)
     }
 
-    /// Its title wins over the session file, which records no approval wait.
     @Test func aCodexTitleTellsMoreThanItsSessionFile() throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -70,9 +65,6 @@ struct CodexTitleActivityTests {
         #expect(activities == [.needsInput(reason: nil), .idle, .working, .working])
     }
 
-    /// On an SSH host, Codex tells what it does only through its title: the copy of its session file on this Mac is
-    /// only as new as the host's last refresh. Claude Code, Pi, and OpenCode there tell through the title of the tab's
-    /// tmux session, and no other CLI tells; see `RemoteCLIActivityTitleTests`.
     @Test func onAnSSHHostACodexTabIsAskedOnlyItsTitle() {
         let codexTab = Self.makeTab(for: .fixture(provider: .codex, projectPath: "/srv/app", host: .ssh("devbox")))
         codexTab.updateTerminalTitle("⠧ Working | \(Self.cutThreadID)")
@@ -92,7 +84,6 @@ struct CodexTitleActivityTests {
         let store = ConversationStore(adapters: [], sessionNotifier: notifier)
         store.replaceConversations(on: .ssh("devbox"), with: [conversation])
         defer { store.closeAllTerminals() }
-        // Stands in for the tab's `ssh`.
         let tab = Self.makeTab(for: conversation)
         tab.startIfNeeded()
         store.openTerminal(tab)

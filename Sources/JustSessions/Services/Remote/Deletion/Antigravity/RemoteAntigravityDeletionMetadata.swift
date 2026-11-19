@@ -1,5 +1,4 @@
 enum RemoteAntigravityDeletionMetadata {
-    /// Decode only the workspace URI needed to verify the selected session on its actual host.
     static let script = """
         def field(data, wanted):
             position = 0

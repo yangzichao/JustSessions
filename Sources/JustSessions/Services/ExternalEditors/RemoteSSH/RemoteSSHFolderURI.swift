@@ -11,7 +11,6 @@ enum RemoteSSHFolderURI {
         return "vscode-remote://ssh-remote+" + authorityHost(destination: destination) + encodedPath
     }
 
-    /// `destination` is `host` or `user@host`, as `SessionHost.ssh` keeps it.
     private static func authorityHost(destination: String) -> String {
         var user: String?
         var hostName = destination

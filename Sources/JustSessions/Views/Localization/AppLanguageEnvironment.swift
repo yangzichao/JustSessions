@@ -1,7 +1,6 @@
 import SwiftUI
 
 extension View {
-    /// Update text in place: changing a language must preserve terminals, selection, and reading positions.
     func appLanguage(from languageStore: AppLanguageStore) -> some View {
         modifier(ChosenAppLanguage(languageStore: languageStore))
     }

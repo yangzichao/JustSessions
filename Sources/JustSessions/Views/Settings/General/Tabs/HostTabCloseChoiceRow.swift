@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// One host's name and what closing a CLI tab on it does, as a row of the closing section's grid, so the pickers line
-/// up whatever the hosts' names.
 struct HostTabCloseChoiceRow: View {
     let host: SessionHost
     @ObservedObject var tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore

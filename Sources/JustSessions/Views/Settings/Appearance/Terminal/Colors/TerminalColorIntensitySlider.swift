@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// **Color intensity**: how strongly the terminal's 16 ANSI colors show, as a percentage of the scheme's own; see
-/// `TerminalColorIntensity`. Open terminals and the preview recolor once dragging pauses.
 struct TerminalColorIntensitySlider: View {
     @ObservedObject var appearanceStore: TerminalAppearanceStore
 

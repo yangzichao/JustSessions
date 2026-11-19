@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The window sketch in one mode's colors. System shows the light and dark sketches side by side, split on a slant.
 struct AppAppearanceThumbnail: View {
     let mode: AppAppearanceMode
 

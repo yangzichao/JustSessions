@@ -29,7 +29,6 @@ struct TerminalFileDropAcceptanceTests {
         }
     }
 
-    /// A tab reopened at launch runs nothing until it shows, so nothing could take the paths.
     @Test(arguments: TerminalEngine.allCases)
     func anSSHTabWaitingToBeShownTakesNoFiles(_ engine: TerminalEngine) throws {
         let tab = makeTab(engine: engine, provider: .codex, host: .ssh("devbox"), startsOnceShown: true)

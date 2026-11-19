@@ -1,7 +1,5 @@
 import Foundation
 
-/// The answers in `RemoteHostCheckScript`'s output, by key. What comes before the first marker, such as a shell
-/// profile's greeting, belongs to no key.
 struct RemoteHostCheckOutput: Equatable, Sendable {
     private(set) var textsByKey: [String: String] = [:]
 
@@ -23,10 +21,8 @@ struct RemoteHostCheckOutput: Equatable, Sendable {
         }
     }
 
-    /// Whether the script got as far as the login shell; false when the login shell never ran it.
     var reachedLoginShell: Bool { textsByKey["shell"] != nil }
 
-    /// The answer, or nil when the key is missing or its answer empty.
     func text(_ key: String) -> String? {
         guard let text = textsByKey[key], !text.isEmpty else { return nil }
         return text

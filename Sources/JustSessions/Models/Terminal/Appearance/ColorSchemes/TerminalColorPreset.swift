@@ -1,5 +1,3 @@
-/// The color schemes terminals can use whatever the app theme is: each app theme's terminal colors, then schemes made
-/// for terminals.
 enum TerminalColorPreset: String, CaseIterable, Identifiable, Sendable {
     case justSessions
     case gitHub

@@ -1,11 +1,8 @@
 import SwiftUI
 
-/// Back and Forward in the title bar, after the sidebar toggle, drawn as Chrome's arrows. Right-clicking either lists
-/// the places it goes through, nearest first, as Chrome does.
 struct WorkspaceNavigationButtons: View {
     static let buttonWidth = SidebarToggleButton.width
     static let width = buttonWidth * 2
-    /// The places a right-click menu lists, so it stays short.
     private static let menuDestinationLimit = 15
 
     let navigation: WorkspaceNavigation
@@ -58,7 +55,6 @@ struct WorkspaceNavigationButtons: View {
         }
     }
 
-    /// A tab's place shows its terminal; a session's shows its conversation.
     private static func symbolName(of location: WorkspaceLocation) -> String {
         switch location {
         case .tab: "terminal"

@@ -2,8 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Where Ghostty's answer to a background query ends in what it sends the tab's process, so an owed theme report can
-/// follow it.
 struct GhosttyBackgroundColorAnswerTests {
     @Test(arguments: ["\u{07}", "\u{1B}\\"])
     func theAnswerEndsAfterItsTerminator(terminator: String) {
@@ -16,7 +14,6 @@ struct GhosttyBackgroundColorAnswerTests {
     }
 
     @Test func otherRepliesAndUnendedAnswersAreNoAnswer() {
-        // Palette color 11, the foreground, and a background color query typed as text.
         #expect(endIndex(in: "\u{1B}]4;11;rgb:ffff/0000/0000\u{07}") == nil)
         #expect(endIndex(in: "\u{1B}]10;rgb:ffff/ffff/ffff\u{1B}\\") == nil)
         #expect(endIndex(in: "]11;rgb:ffff/ffff/ffff\u{07}") == nil)

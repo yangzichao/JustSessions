@@ -19,11 +19,7 @@ final class TranscriptSearchState {
     private(set) var isSearching = false
     private(set) var navigationRevision = 0
     private(set) var focusRevision = 0
-    /// Whether the field takes the keyboard as Find opens: not when a search through every session's messages opened
-    /// it, so typing goes on in the sidebar's search.
     private(set) var focusesFieldOnOpen = true
-    /// The entry whose match, or the first one after it, is selected each time the transcript is searched, until
-    /// another match is chosen, the query changes, or Find closes; see `reveal(_:at:)`.
     private(set) var preferredEntryID: Int?
 
     var selectedMatch: TranscriptSearchMatch? {
@@ -36,9 +32,6 @@ final class TranscriptSearchState {
         focusRevision += 1
     }
 
-    /// Opens Find on `query` and selects its match in the entry `entryID`, where a search through every session's
-    /// messages found it, or else the next match after it. The pages around the entry can arrive after the pages shown
-    /// before are searched, so the preference outlasts one search.
     func reveal(_ query: String, at entryID: Int) {
         self.query = query
         preferredEntryID = entryID
@@ -79,7 +72,6 @@ final class TranscriptSearchState {
         navigationRevision += 1
     }
 
-    /// A paged transcript's entry IDs go by source record, the same in every page read around it.
     private func preferredMatchIndex(in matches: [TranscriptSearchMatch]) -> Int? {
         guard let preferredEntryID else { return nil }
         let preferredRecord = TranscriptPageIdentity.record(for: preferredEntryID)

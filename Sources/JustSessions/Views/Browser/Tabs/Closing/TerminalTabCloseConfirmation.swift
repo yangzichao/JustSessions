@@ -1,9 +1,5 @@
 import SwiftUI
 
-/// Mouse and keyboard closes share the same choice about keeping a tmux CLI running, and about closing a plain
-/// terminal. Don't ask again saves the answer picked with it, so later closes do the same without asking: on the tab's
-/// host for a CLI tmux can keep running, and for every plain terminal. Settings can change it back.
-///
 /// Return closes the tab, and Escape cancels. The dialogs are alerts rather than confirmation dialogs: on macOS, a
 /// confirmation dialog gives no button Return.
 struct TerminalTabCloseConfirmation: ViewModifier {
@@ -11,14 +7,11 @@ struct TerminalTabCloseConfirmation: ViewModifier {
     @Binding var closingSessionID: UUID?
     let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore
     let plainTerminalCloseChoiceSettingsStore: PlainTerminalCloseChoiceSettingsStore
-    /// Don't ask again, ticked in the dialog that shows now; unticked again each time a dialog closes.
     @State private var savesCloseChoice = false
 
     private enum ClosingDialog {
-        /// Keep running or End session, for a CLI tmux can keep running.
         case keepOrEndCLI
         case closePlainTerminal
-        /// End session only, for a CLI that ends with its tab.
         case endCLI
     }
 
@@ -36,7 +29,6 @@ struct TerminalTabCloseConfirmation: ViewModifier {
     func body(content: Content) -> some View {
         content
             .alert("Close this tab?", isPresented: presentation(of: .keepOrEndCLI)) {
-                // Return keeps the CLI running: that close can be undone by reattaching.
                 Button("Keep running") { closeTab(endingTmuxSession: false) }
                     .keyboardShortcut(.defaultAction)
                 Button("End session", role: .destructive) { closeTab(endingTmuxSession: true) }
@@ -70,7 +62,6 @@ struct TerminalTabCloseConfirmation: ViewModifier {
             }
     }
 
-    /// A CLI tab's answer is saved for its host only, so its checkbox names the host.
     private var dontAskAgainLabel: Text {
         if let closingTabTmuxHost {
             Text("Don't ask again on \(closingTabTmuxHost.nameInSentence)")
@@ -79,7 +70,6 @@ struct TerminalTabCloseConfirmation: ViewModifier {
         }
     }
 
-    /// Shows `dialog` while a tab waits to close and it is the dialog for that tab.
     private func presentation(of dialog: ClosingDialog) -> Binding<Bool> {
         Binding(
             get: { closingDialog == dialog },

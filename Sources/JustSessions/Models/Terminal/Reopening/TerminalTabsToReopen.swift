@@ -1,6 +1,5 @@
 import Foundation
 
-/// The latest durable snapshot of open and still-restoring tabs, in tab bar order.
 struct TerminalTabsToReopen: Codable, Equatable {
     static let userDefaultsKey = "terminalTabsToReopen"
 

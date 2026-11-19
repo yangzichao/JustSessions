@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The sync on its own; `DetachedCLIActivityTmuxTests` runs it against a real tmux server. It finds a tab's CLI by its
-/// process, whichever engine draws the tab.
 @MainActor
 struct CLIActivitySyncTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -38,8 +36,6 @@ struct CLIActivitySyncTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let conversation = Conversation.fixture(provider: .claude, projectPath: directory.path)
         let store = Self.makeStore(listing: [conversation], searching: directory)
-        // Stands in for the CLI in a tmux session whose tab closed. It runs until the test ends it: on the release runner
-        // the first sync came 87 seconds after the test started, when a 30-second CLI had long ended.
         let cli = Process()
         cli.executableURL = URL(fileURLWithPath: "/bin/sleep")
         cli.arguments = ["600"]
@@ -87,7 +83,6 @@ struct CLIActivitySyncTests {
         #expect(store.activitySummary(forProjectDirectoryKey: conversation.projectDirectoryKey).summary == "1 idle")
     }
 
-    /// Finds no tmux, so the app's own tmux server is never asked.
     private static func makeStore(listing conversations: [Conversation], searching directory: URL) -> ConversationStore {
         let store = ConversationStore(
             adapters: [],

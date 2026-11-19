@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A window shows a session whose tab is in another window by that tab: its row and project follow the tab's CLI,
-/// the session is not taken for a CLI in tmux with no tab, and a clicked notification shows the tab where it is.
 @MainActor
 struct SessionStatusAcrossWindowsTests {
     @Test func aSessionsRowFollowsItsTabInAnotherWindowRatherThanTmux() throws {
@@ -18,7 +16,6 @@ struct SessionStatusAcrossWindowsTests {
             return
         }
         #expect(rowTab.id == tab.id)
-        // Counted once, as the tab's CLI, not again as one running in tmux.
         #expect(sandbox.second.activitySummary(forProjectDirectoryKey: sandbox.conversation.projectDirectoryKey).runningCount == 1)
     }
 
@@ -85,7 +82,6 @@ struct SessionStatusAcrossWindowsTests {
         #expect(sandbox.first.terminalSessions.isEmpty)
     }
 
-    /// Finds no tmux, so the app's own tmux server is never asked.
     private static func makeStore(
         listing conversations: [Conversation],
         searching directory: URL,

@@ -1,6 +1,5 @@
 import Foundation
 
-/// This Mac's side of a host check's report: the app, macOS, and the `ssh` every SSH command runs.
 enum HostCheckThisMacSummary {
     /// Such as "JustSessions 1.2.10 · macOS 26.0.1 · OpenSSH_10.3p1". `ssh -V` prints its version on standard error,
     /// followed by its TLS library's.

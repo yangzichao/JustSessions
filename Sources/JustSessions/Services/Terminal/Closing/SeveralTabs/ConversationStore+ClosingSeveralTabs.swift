@@ -1,11 +1,6 @@
 import Foundation
 
-/// Closing several tabs with one answer, such as every tab of a group from its menu. Each tab closes as it would on
-/// its own: a tab that hasn't started leaves its tmux session alone, an ended one ends its dead tmux session, and one
-/// whose session is deleted when its tab closes deletes it.
 extension ConversationStore {
-    /// What closing these tabs asks, with the choices saved with Don't ask again, each tab's for its own host. Tabs
-    /// whose sessions are deleted when they close ask nothing.
     func closingQuestion(
         forTabs ids: [UUID],
         tabCloseChoices: TabCloseChoicesByHost,
@@ -16,14 +11,10 @@ extension ConversationStore {
         return SeveralTabsClosingQuestion(tabs: tabs, plainTerminalCloseChoice: plainTerminalCloseChoice)
     }
 
-    /// Closes the tabs, the selected one last, so the tab shown next is one left open. With `endingTmuxSessions`, the
-    /// CLIs tmux could keep running stop too.
     func closeTabs(_ ids: [UUID], endingTmuxSessions: Bool) {
         closeTabs(ids) { _ in endingTmuxSessions }
     }
 
-    /// Closes the tabs without asking: each CLI tmux could keep running ends or keeps running as its host's saved
-    /// choice says.
     func closeTabs(_ ids: [UUID], as tabCloseChoices: TabCloseChoicesByHost) {
         closeTabs(ids) { tabCloseChoices.choice(for: $0).endsTmuxSessionWithoutAsking ?? true }
     }

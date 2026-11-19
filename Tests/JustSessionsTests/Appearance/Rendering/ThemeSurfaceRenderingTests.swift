@@ -38,7 +38,6 @@ struct ThemeSurfaceRenderingTests {
         }
         let generalView = settingsView(selectedTab: .general)
         let helpView = settingsView(selectedTab: .help)
-        // Settings pages share a fixed size, so the reference strip lands at the same bottom edge.
         let views: [(String, AnyView, CGSize)] = [
             ("help", helpView, fittingSize(of: helpView)),
             ("settings", generalView, fittingSize(of: generalView)),
@@ -64,12 +63,8 @@ struct ThemeSurfaceRenderingTests {
                 for theme in AppTheme.allCases {
                     themeStore.setTheme(theme)
                     let bitmap = try await fixture.capture(named: "\(name)-\(theme.rawValue)-\(colorScheme)")
-                    // Compare pixels rendered through the same display profile instead of unconverted RGB bytes.
                     let referencePixel = try #require(bitmap.colorAt(x: bitmap.pixelsWide / 6, y: bitmap.pixelsHigh - 2))
                     let expectedColor = hexValue(of: referencePixel)
-                    // Ten points up, in points rather than pixels: on a display without Retina, as on CI, 20 pixels
-                    // reach the sheet's bottom controls. Ten points in from the left, in the margin every page keeps
-                    // clear: the Help page's text runs to its bottom edge, and at 1x a line of it sat under the middle.
                     let renderingScale = Double(bitmap.pixelsWide) / size.width
                     let pixel = try #require(
                         bitmap.colorAt(
@@ -91,13 +86,8 @@ struct ThemeSurfaceRenderingTests {
         let ink = hexValue(of: try #require(bitmap.colorAt(x: bitmap.pixelsWide * 5 / 6, y: referenceRow)))
         let renderingScale = Double(bitmap.pixelsWide) / viewWidth
         let edgeInset = Int(20 * renderingScale)
-        // The guide and feedback links are the first row below the tab picker and the page's top padding.
         let actionRows = Int(70 * renderingScale)..<Int(100 * renderingScale)
-        // Without a Retina display, as on CI, a link has as little as 27 pixels of solid ink, as the guide link has in
-        // the theme's 12pt callout font; the rest of its text is antialiased. With the links in another color, other
-        // text still leaves up to about 18.
         let minimumInkPixels = Int(23 * renderingScale * renderingScale)
-        // The guide link comes first, then the feedback links.
         let linkPixels = matchingPixelCount(ink, in: bitmap, columns: edgeInset..<(bitmap.pixelsWide / 4), rows: actionRows)
         #expect(linkPixels > minimumInkPixels, "\(description) guide link uses theme ink")
         let feedbackLinkPixels = matchingPixelCount(
@@ -111,7 +101,6 @@ struct ThemeSurfaceRenderingTests {
                 + columns.filter { column in
                     bitmap.colorAt(x: column, y: row).map { pixel in
                         let actualColor = hexValue(of: pixel)
-                        // Text rasterization can round a channel differently from the solid reference swatch.
                         return [16, 8, 0].allSatisfy { shift in
                             abs(Int((actualColor >> shift) & 0xFF) - Int((color >> shift) & 0xFF)) <= 1
                         }

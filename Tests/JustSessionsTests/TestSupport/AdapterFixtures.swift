@@ -2,7 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// Each tool's adapter, reading from a folder that does not exist, for tests of the arguments it starts its CLI with.
 func adapterWithoutSessions(for provider: ConversationProvider) -> any ConversationAdapter {
     let unusedDirectory = URL(fileURLWithPath: "/nonexistent/justsessions-tests")
     return switch provider {

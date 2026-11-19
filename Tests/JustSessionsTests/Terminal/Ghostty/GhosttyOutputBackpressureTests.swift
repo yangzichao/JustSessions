@@ -29,7 +29,6 @@ struct GhosttyOutputBackpressureTests {
         #expect(backpressure.unparsedByteCount == 16 << 10)
     }
 
-    /// Output Ghostty has not parsed counts too: here it waits for a surface, which it gets once in a window.
     @Test func readingWaitsWhileGhosttyHasNotParsedTheOutput() async throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
@@ -75,14 +74,10 @@ struct GhosttyOutputBackpressureTests {
     }
 }
 
-/// Calls `waitForRoom()` on a thread of its own, as the tab's process queue does. Each test stops its backpressure
-/// when it ends, so a wait a failed expectation leaves behind ends too.
 private final class Waiter: @unchecked Sendable {
     private let lock = NSLock()
     private var returned = false
 
-    /// Returns once the read waits. On a busy machine its thread can start late: on the release runner it started
-    /// after the test had passed output on and made room, so the read didn't wait at all.
     static func waitingForRoom(in backpressure: GhosttyOutputBackpressure) async throws -> Waiter {
         let waiter = Waiter(backpressure)
         try await expectEventually { backpressure.isWaitingForRoom }

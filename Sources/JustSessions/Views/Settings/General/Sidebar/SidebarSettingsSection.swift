@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// The sidebar part of the General tab: whether a session whose subagents ran sessions of their own offers a chevron
-/// that lists them under it, off by default so the sidebar lists only the sessions you started; and which CLIs'
-/// sessions it lists at all.
 struct SidebarSettingsSection: View {
     let store: ConversationStore
     @AppStorage(SidebarSubagentRows.showsSubagentsUserDefaultsKey) private var showsSubagents = false

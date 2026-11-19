@@ -1,10 +1,6 @@
 import AppKit
 import CoreText
 
-/// The font families macOS draws a font's missing characters with, in the order it tries them, for the preferred
-/// languages: what SwiftTerm draws Chinese, Japanese, and other characters outside the terminal font with. Families
-/// Ghostty's font discovery doesn't find by name are left out. Looking each one up takes a moment, so the families
-/// are kept for each font family and language list.
 @MainActor
 enum CoreTextFallbackFamilies {
     private static var familiesByKey: [String: [String]] = [:]

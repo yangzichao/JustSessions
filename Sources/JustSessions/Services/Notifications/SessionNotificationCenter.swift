@@ -8,7 +8,6 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
     static let shared = SessionNotificationCenter()
 
     private let settingsStore: SessionNotificationSettingsStore
-    /// The windows a clicked notification shows its session in.
     private let windowRegistry: WorkspaceWindowRegistry
 
     init(settingsStore: SessionNotificationSettingsStore = .shared, windowRegistry: WorkspaceWindowRegistry = .shared) {
@@ -16,7 +15,6 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
         self.windowRegistry = windowRegistry
     }
 
-    /// Whether the app runs from its bundle, which macOS posts notifications for.
     nonisolated static var isAvailable: Bool {
         Bundle.main.bundleURL.pathExtension == "app"
     }
@@ -25,7 +23,6 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
         NSApp?.isActive ?? false
     }
 
-    /// `JustSessionsAppDelegate` calls this at launch, so clicks on notifications reach the app.
     func startHandlingClicks() {
         guard Self.isAvailable else { return }
         UNUserNotificationCenter.current().delegate = self
@@ -36,8 +33,6 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
         Task.detached(priority: .utility) { await Self.post(notification) }
     }
 
-    /// A host's sign-in command is due; see `RemoteSignIns`. It waits on your PIN or code, so it follows the setting
-    /// for sessions that need your input. Clicking it opens the sign-in.
     func notifySignInNeeded(on host: String) {
         guard Self.isAvailable, settingsStore.preferences.allows(.needsInput(reason: nil)) else { return }
         let title = AppLocalization.string("Sign in on \(host)")
@@ -74,21 +69,17 @@ final class SessionNotificationCenter: NSObject, SessionNotifying {
         try? await UNUserNotificationCenter.current().add(request)
     }
 
-    /// Shows macOS's prompt if it hasn't asked yet, and returns whether notifications are allowed.
     nonisolated static func requestAuthorization() async -> Bool {
         guard isAvailable else { return false }
         return (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])) == true
     }
 
-    /// Shows the session in the window whose tab runs it, or else reattaches to it in the first window, and brings
-    /// that window forward.
     func showSession(notifiedAbout source: SessionAttentionSource) {
         windowRegistry.showSession(wantingAttention: source)
     }
 }
 
 extension SessionNotificationCenter: UNUserNotificationCenterDelegate {
-    /// The store only notifies about sessions out of view, so a notification shows even while the app is in front.
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification

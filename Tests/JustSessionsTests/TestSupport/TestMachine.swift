@@ -1,6 +1,5 @@
 import Darwin
 
-/// The machine the tests run on.
 enum TestMachine {
     /// Running in a virtual machine, such as the release workflow's GitHub runner. There, Ghostty's terminal drew its
     /// background in the configured color but its text and cell colors in others, so checks of those exact colors run

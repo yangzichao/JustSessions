@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Once one window has copied an SSH host, the other windows list that copy instead of copying the host again.
 @MainActor
 struct SharedRemoteCopyTests {
     @Test func anotherWindowListsTheCopy() async throws {
@@ -21,7 +20,6 @@ struct SharedRemoteCopyTests {
         #expect(sandbox.first.hostRefreshStatuses[.ssh("devbox")] == nil)
     }
 
-    /// Its own refresh lists the host when it ends.
     @Test func aWindowRefreshingTheHostItselfIsLeftToItsRefresh() async throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
@@ -75,10 +73,10 @@ struct SharedRemoteCopyTests {
         #expect(sandbox.second.conversations.filter { $0.host == .ssh("devbox") }.isEmpty)
     }
 
-    /// Both windows list `devbox`, whose copy holds one Claude Code session.
     private static func copyWithOneClaudeSession(in sandbox: TwoWindowSandbox) throws -> (RemoteSessionDiscovery, String) {
         for store in [sandbox.first, sandbox.second] { store.remoteHostList = RemoteHostList(hosts: ["devbox"]) }
-        let mirror = RemoteSessionMirror(cacheRoot: sandbox.root.appendingPathComponent("cache"), sourceHomeOverride: sandbox.root.path)
+        let mirror = RemoteSessionMirror(
+            cacheRoot: sandbox.root.appendingPathComponent("cache"), hostAccess: .standIn(home: sandbox.root.path))
         let project = mirror.mirrorDirectory(host: "devbox", provider: .claude).appendingPathComponent("projects/-srv-app")
         try FileManager.default.createDirectory(at: project, withIntermediateDirectories: true)
         let sessionID = UUID().uuidString.lowercased()

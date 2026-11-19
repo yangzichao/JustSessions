@@ -1,12 +1,6 @@
 import Foundation
 
-/// One tab's session, read for its conversation map and for ⌘D in the tab, with the reader's decoder (as
-/// TranscriptPagingModel.refresh makes it, TranscriptPagingModel.swift:30-35), without Markdown or images. Keeps the
-/// outline it last returned, so a grown file is read again only from its last block's record.
 actor ConversationOutlineReader {
-    /// File-backed: mid-size pages, so ⌘D waits behind at most one on the shared source. SQLite: whole-session pages,
-    /// since each page reopens the database (TranscriptPageSource.swift:47-53; SessionMessageTextReader.swift:13-17).
-    /// Tool calls are left unmerged: the builder merges them itself, recording each run's last record.
     static func pageLimits(for provider: ConversationProvider) -> TranscriptPageLimits {
         var limits =
             switch provider {
@@ -43,9 +37,8 @@ actor ConversationOutlineReader {
 
     func hasChanged() -> Bool { !hasRead || ConversationOutlineChangeStamp(of: conversation) != readStamp }
 
-    /// The outline after reading what changed; nil when no block changed since the last outline returned.
     func update() async throws -> ConversationOutline? {
-        let stamp = ConversationOutlineChangeStamp(of: conversation)  // before reading: anything appended meanwhile shows next check
+        let stamp = ConversationOutlineChangeStamp(of: conversation)
         let updated: ReadOutline
         do {
             do {
@@ -59,13 +52,13 @@ actor ConversationOutlineReader {
                     updated = try await readInFull()
                 }
             } catch TranscriptPagingError.sourceChanged {
-                updated = try await readInFull()  // shrank while its index was scanned (TranscriptFileIndex.swift:55)
+                updated = try await readInFull()
             }
         } catch is CancellationError {
-            throw CancellationError()  // nothing recorded: the next watch reads again
+            throw CancellationError()
         } catch {
             readStamp = stamp
-            hasRead = true  // tried again once the file changes again
+            hasRead = true
             throw error
         }
         let isNew = !hasRead || updated.outline.blocks != outline.blocks
@@ -76,12 +69,7 @@ actor ConversationOutlineReader {
         return isNew ? updated.outline : nil
     }
 
-    /// Everything from the resume record on, read again: a reply growing in its record, a run still adding calls,
-    /// what was appended. Nil, for a read in full, without an outline or when the record read again no longer starts
-    /// with its block: a Pi branch left with /tree (the record left the branch, so .around lands past it), a truncated
-    /// file (.around lands before it), or a rewritten one.
     private func extended() async throws -> ReadOutline? {
-        // Database rows are mutable, including earlier messages. A final anchor cannot prove their prefix unchanged.
         guard conversation.provider != .opencode, conversation.provider != .antigravity else { return nil }
         guard let resume = ConversationOutlineBuilder.resumePoint(in: outline.blocks) else { return nil }
         let anchor = outline.blocks[resume.keptCount]
@@ -118,8 +106,6 @@ actor ConversationOutlineReader {
         return ReadOutline(outline: ConversationOutline(blocks: builder.blocks), lineage: lineage)
     }
 
-    /// ⌘D in the tab (TRM-74): the newest of your messages or the CLI's replies in the file now. The reader's last page
-    /// first, then up to `latestMessagePagesBack` outline-size pages back. Nil when none is found.
     func latestMessage() async throws -> TranscriptEntry? {
         var page = try await source.read(.latest, refreshIndex: true, limits: TranscriptPageLimits(), preparesMarkdown: false)
         var pagesBack = 0

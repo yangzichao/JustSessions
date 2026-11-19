@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A right-click in a tab's terminal offers copying, pasting, and selecting its text, then what the tab's menu in the
-/// tab bar offers, in the same order and in the app's language: Rename first, then the session's other items. Pinning
-/// stays in the session's sidebar row, since a tab is not its session.
 @MainActor
 struct TerminalContextMenuItemsTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -25,7 +22,6 @@ struct TerminalContextMenuItemsTests {
             ])
     }
 
-    /// The Finder can't show a session file that is on an SSH host.
     @Test(arguments: TerminalEngine.allCases)
     func aSessionOnAnSSHHostIsNotRevealedInFinder(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
@@ -54,8 +50,6 @@ struct TerminalContextMenuItemsTests {
             ])
     }
 
-    /// As in the tab bar, a new session's tab can't be renamed or shared until it is linked to the session its CLI
-    /// writes.
     @Test(arguments: TerminalEngine.allCases)
     func aTabNotYetLinkedToItsSessionCannotBeRenamedOrShared(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
@@ -73,8 +67,6 @@ struct TerminalContextMenuItemsTests {
         #expect(try !TerminalContextMenuFixture.item("Rename", in: menu).isEnabled)
     }
 
-    /// Once its CLI has ended, closing the tab stops nothing and asks nothing, so there is no session to end; the
-    /// session can still be deleted.
     @Test(arguments: TerminalEngine.allCases)
     func aTabWhoseCLIEndedOffersNoCloseAndEndSession(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
@@ -104,7 +96,6 @@ struct TerminalContextMenuItemsTests {
         #expect(try TerminalContextMenuFixture.item("Copy", in: fixture.menu(for: tab)).isEnabled)
     }
 
-    /// Each lists a new session of the host's CLIs and a terminal, then the window's other tabs in no split.
     @Test(arguments: TerminalEngine.allCases)
     func splitRightAndSplitDownListNewTabsThenEveryOtherTabInNoSplit(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()

@@ -8,14 +8,12 @@ struct ControlKeyPress {
     let name: String
     let keyCode: Int
     let withShift: Bool
-    /// What macOS puts in `characters`: the control character where Control makes one.
     let characters: String
     let charactersIgnoringModifiers: String
     /// What a CLI in tmux receives once it asks for modifyOtherKeys 2, as Codex, Claude Code, and Pi do.
     let bytesForCLIAskingForModifyOtherKeys: String
     /// What a CLI in tmux receives otherwise, or with modifyOtherKeys 1, as OpenCode asks for.
     let bytesForLegacyCLI: String
-    /// What a SwiftTerm terminal sends without tmux; nil where it sends nothing.
     let bytesWithoutTmux: String?
 
     static let slash = ControlKeyPress(
@@ -78,7 +76,6 @@ struct ControlKeyPress {
         name: "Pinyin Ctrl-——", keyCode: kVK_ANSI_Minus, withShift: true, characters: "\u{1f}", charactersIgnoringModifiers: "——",
         bytesForCLIAskingForModifyOtherKeys: "\u{1b}[95;5u", bytesForLegacyCLI: "\u{1f}", bytesWithoutTmux: "\u{1f}"
     )
-    /// Each engine sends Ctrl-A itself, which tmux names correctly.
     static let letterA = ControlKeyPress(
         name: "Ctrl-A", keyCode: kVK_ANSI_A, withShift: false, characters: "\u{01}", charactersIgnoringModifiers: "a",
         bytesForCLIAskingForModifyOtherKeys: "\u{1b}[97;5u", bytesForLegacyCLI: "\u{01}", bytesWithoutTmux: "\u{01}"

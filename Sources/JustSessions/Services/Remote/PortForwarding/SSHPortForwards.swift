@@ -1,32 +1,17 @@
 import AppKit
 import Observation
 
-/// Ports on this Mac forwarded on demand to `localhost` on SSH hosts, from a host's menu, for every window. A host's
-/// forwards go through its Connect… login while it has one, and otherwise through one connection the app opens for
-/// them, `SSHPortForwardConnection`; either way each is added to that connection on its own, without the forwards of
-/// the user's `~/.ssh/config`; see `SSHPortForwardCommands`. A host's connection closes once its last forward stops.
-///
-/// Forwards end when stopped, when their host is removed, on Disconnect for those going through the login, and when
-/// the app quits. A connection that drops, as when the Mac sleeps, is made again as `RemoteTabReconnectSchedule` says,
-/// and at once when the Mac wakes, the app comes forward, or a login to the host opens; its forwards are added again.
 @MainActor
 @Observable
 final class SSHPortForwards {
     static let shared = SSHPortForwards()
 
-    /// How often a login carrying forwards is checked for having closed on its own, which nothing announces.
     static let loginCheckInterval: TimeInterval = 5
-    /// A probe whose connection is still open by then reached the port.
-    nonisolated static let probeTimeout: TimeInterval = 3
 
     enum State: Hashable {
         case active
-        /// The host's connection dropped, and is being made again.
         case reconnecting
-        /// The tries to connect again gave up, saying why; the Mac waking, the app coming forward, or a login to the
-        /// host opening tries again.
         case connectionLost(String)
-        /// The connection is back, but the forward couldn't be added again, as when another program took its port.
         case failed(String)
     }
 
@@ -36,10 +21,8 @@ final class SSHPortForwards {
         var id: Int { forward.localPort }
     }
 
-    /// Every forward, in the order they were made.
     private(set) var entries: [Entry] = []
 
-    /// How a host's forwards reach it.
     private enum Route: Sendable {
         case connection(SSHPortForwardConnection)
         case login(controlPath: String)
@@ -51,7 +34,6 @@ final class SSHPortForwards {
             }
         }
 
-        /// What the connection printed since last asked. A login's output can't be read.
         func newOutput() -> String? {
             guard case .connection(let connection) = self else { return nil }
             return connection.output.newText()
@@ -68,15 +50,12 @@ final class SSHPortForwards {
     private let loginConnections: SSHLoginConnections
     private let isLocalPortFree: @Sendable (Int) -> Bool
     private let currentDate: () -> Date
-    /// Whether it tries hosts again once due on its own; tests call `askDueHosts()` instead.
-    private let wakesItselfUp: Bool
+    private let sleepUntilWakeUp: @Sendable (Duration) async throws -> Void
     @ObservationIgnored private var routes: [String: Route] = [:]
     @ObservationIgnored private var connecting: [String: Task<RouteOutcome, Never>] = [:]
-    /// Forwards being added, by host, whose connection must stay.
     @ObservationIgnored private var forwardsBeingAdded: [String: Int] = [:]
     @ObservationIgnored private var localPortsBeingAdded: Set<Int> = []
     @ObservationIgnored private var schedule = RemoteTabReconnectSchedule()
-    /// Hosts whose connection is being made again now.
     @ObservationIgnored private(set) var hostsBeingReconnected: Set<String> = []
     @ObservationIgnored private var wakeUp: Task<Void, Never>?
     @ObservationIgnored private var observers: [any NSObjectProtocol] = []
@@ -87,14 +66,14 @@ final class SSHPortForwards {
         loginConnections: SSHLoginConnections = .shared,
         isLocalPortFree: @escaping @Sendable (Int) -> Bool = LocalPortAvailability.isFree,
         currentDate: @escaping () -> Date = Date.init,
-        wakesItselfUp: Bool = true
+        sleepUntilWakeUp: @escaping @Sendable (Duration) async throws -> Void = { try await Task.sleep(for: $0) }
     ) {
         self.sshExecutable = sshExecutable
         self.socketRoot = socketRoot
         self.loginConnections = loginConnections
         self.isLocalPortFree = isLocalPortFree
         self.currentDate = currentDate
-        self.wakesItselfUp = wakesItselfUp
+        self.sleepUntilWakeUp = sleepUntilWakeUp
     }
 
     func start() {
@@ -122,8 +101,6 @@ final class SSHPortForwards {
         entries.filter { $0.forward.host == host }
     }
 
-    /// Forwards `localPort` on this Mac to `remotePort` on the host: nil once it works, or why it doesn't. Nothing need
-    /// listen on the host's port yet; a host that doesn't let the connection reach it is a failure.
     func forward(remotePort: Int, localPort: Int, on host: String) async -> SSHPortForwardFailure? {
         guard SSHPortForward.validPorts.contains(remotePort), SSHPortForward.validPorts.contains(localPort) else {
             return .invalidPort
@@ -152,7 +129,6 @@ final class SSHPortForwards {
         if isCurrent(hostRoute, of: host) {
             entries.append(Entry(forward: forward, state: .active))
         } else if schedule.hostsBeingTried.contains(host) {
-            // The connection dropped meanwhile; the forward is added again with the others.
             entries.append(Entry(forward: forward, state: .reconnecting))
         } else {
             return .couldNotConnect(host: host, .connectionLost)
@@ -160,7 +136,6 @@ final class SSHPortForwards {
         return nil
     }
 
-    /// Stop forwarding, from the forward's menu.
     func stop(_ forward: SSHPortForward) {
         guard entries.contains(where: { $0.forward == forward }) else { return }
         entries.removeAll { $0.forward == forward }
@@ -168,7 +143,6 @@ final class SSHPortForwards {
         endRouteIfUnused(forward.host)
     }
 
-    /// When the host is removed: its forwards end.
     func stopAll(on host: String) {
         let forwards = entries(on: host).map(\.forward)
         entries.removeAll { $0.forward.host == host }
@@ -176,15 +150,12 @@ final class SSHPortForwards {
         endRoute(host)
     }
 
-    /// Disconnect: the forwards going through the host's login end with it. Call it before the login closes.
     func loginEnding(on host: String) {
         guard case .login = routes[host] else { return }
         entries.removeAll { $0.forward.host == host }
         endRoute(host)
     }
 
-    /// When the app quits: ends every connection it opened for forwards, and waits for each. Forwards going through a
-    /// login end with it.
     func endAll() {
         wakeUp?.cancel()
         for case .connection(let connection) in routes.values { connection.end() }
@@ -193,8 +164,6 @@ final class SSHPortForwards {
         schedule = RemoteTabReconnectSchedule()
     }
 
-    /// Tries again each host with forwards that aren't working, also one whose tries gave up, on every host or only
-    /// on `onlyOn`.
     func tryAgain(onlyOn onlyHost: String? = nil) {
         let now = currentDate()
         var hosts: Set<String> = []
@@ -208,7 +177,6 @@ final class SSHPortForwards {
         scheduleWakeUp()
     }
 
-    /// Notices a login carrying forwards that closed on its own, and tries each host that is due.
     func askDueHosts() {
         for (host, route) in routes where !isCurrent(route, of: host) {
             routes.removeValue(forKey: host)
@@ -225,8 +193,6 @@ final class SSHPortForwards {
         }
         scheduleWakeUp()
     }
-
-    // MARK: - Connections
 
     private func route(to host: String) async -> RouteOutcome {
         if let route = routes[host], isCurrent(route, of: host) { return .connected(route) }
@@ -313,7 +279,6 @@ final class SSHPortForwards {
             for forward in entries.filter({ $0.forward.host == host && $0.state != .active }).map(\.forward) {
                 let failure = await add(forward, through: route, probing: false)
                 guard let index = entries.firstIndex(where: { $0.forward == forward }) else {
-                    // Stopped meanwhile.
                     if failure == nil { cancelInBackground([forward], through: route) }
                     continue
                 }
@@ -322,7 +287,6 @@ final class SSHPortForwards {
         }
     }
 
-    /// Closes the host's connection once nothing uses it. A login stays open.
     private func endRouteIfUnused(_ host: String) {
         guard !entries.contains(where: { $0.forward.host == host }), forwardsBeingAdded[host] == nil else { return }
         endRoute(host)
@@ -340,7 +304,6 @@ final class SSHPortForwards {
     private func scheduleWakeUp() {
         wakeUp?.cancel()
         wakeUp = nil
-        guard wakesItselfUp else { return }
         var next = schedule.nextTryAt(excluding: hostsBeingReconnected)
         if routes.values.contains(where: { if case .login = $0 { true } else { false } }) {
             let loginCheck = currentDate().addingTimeInterval(Self.loginCheckInterval)
@@ -348,14 +311,13 @@ final class SSHPortForwards {
         }
         guard let next else { return }
         let delay = max(next.timeIntervalSince(currentDate()), 0)
+        let sleepUntilWakeUp = sleepUntilWakeUp
         wakeUp = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(delay))
+            try? await sleepUntilWakeUp(.seconds(delay))
             guard !Task.isCancelled else { return }
             self?.askDueHosts()
         }
     }
-
-    // MARK: - Forwards
 
     private func add(_ forward: SSHPortForward, through route: Route, probing: Bool) async -> SSHPortForwardFailure? {
         let sshExecutable = sshExecutable
@@ -371,7 +333,6 @@ final class SSHPortForwards {
         }.value
     }
 
-    /// Blocks.
     private nonisolated static func add(
         _ forward: SSHPortForward,
         through route: Route,
@@ -394,18 +355,14 @@ final class SSHPortForwards {
             return .refused(sshMessage: sshMessage)
         }
         guard probing else { return nil }
-        let probe = BoundedProcessRunner.outcome(
-            ofExecutable: sshExecutable,
-            arguments: SSHPortForwardCommands.probeArguments(forward, controlPath: route.controlPath),
-            environment: SSHProcessEnvironment.standard,
-            includesStandardError: true,
-            timeout: probeTimeout
-        )
-        guard let exitStatus = probe?.exitStatus, exitStatus != 0,
-            let refusal = refusal(in: route.newOutput() ?? probe?.output ?? "")
-        else { return nil }
-        cancel([forward], through: route, sshExecutable: sshExecutable)
-        return .refusedByHost(host: forward.host, sshMessage: refusal)
+        switch SSHPortForwardProbe.run(forward, controlPath: route.controlPath, sshExecutable: sshExecutable) {
+        case .couldNotStart, .reachedPort, .stillOpenAtTimeout:
+            return nil
+        case .failed(let probeOutput):
+            guard let refusal = refusal(in: route.newOutput() ?? probeOutput) else { return nil }
+            cancel([forward], through: route, sshExecutable: sshExecutable)
+            return .refusedByHost(host: forward.host, sshMessage: refusal)
+        }
     }
 
     /// The line of a failed probe that says the host refused to open the port, such as "administratively

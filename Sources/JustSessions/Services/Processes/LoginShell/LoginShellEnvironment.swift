@@ -5,8 +5,6 @@ import Foundation
 /// shell rc files: the PATH of nvm, Homebrew, bun, …, or an `SSH_AUTH_SOCK` for 1Password or Secretive. Ask the
 /// user's login shell for the real one.
 enum LoginShellEnvironment {
-    /// Read once per app run. Call `warmUpInBackground()` at launch so the first session doesn't wait. Empty when
-    /// the shell could not be read.
     static let cachedVariables: [String: String] = readVariables()
 
     static var cachedPathDirectories: [String] {
@@ -47,7 +45,6 @@ enum LoginShellEnvironment {
         return parseVariables(output)
     }
 
-    /// `env -0` output: `NAME=value` entries ended by NUL, so a value may hold a newline.
     static func parseVariables(_ output: Data) -> [String: String] {
         output.split(separator: 0).reduce(into: [String: String]()) { variables, entry in
             guard let text = String(data: Data(entry), encoding: .utf8),
@@ -58,7 +55,6 @@ enum LoginShellEnvironment {
         }
     }
 
-    /// Keeps absolute entries only; a relative entry like "." would make lookup depend on the cwd.
     static func parsePathDirectories(_ pathValue: String) -> [String] {
         pathValue
             .trimmingCharacters(in: .whitespacesAndNewlines)

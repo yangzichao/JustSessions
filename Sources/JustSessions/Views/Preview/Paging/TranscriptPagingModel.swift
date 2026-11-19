@@ -5,8 +5,6 @@ import Observation
 @Observable
 final class TranscriptPagingModel {
     nonisolated static let maximumPageCount = 3
-    /// Pages near the viewport stay past `maximumPageCount`, up to this many; see
-    /// `TranscriptPagingViewport.retainedPageCount(afterLoading:pageStarts:)`.
     nonisolated static let maximumRetainedPageCount = 8
     private(set) var transcript: TranscriptContent?
     private(set) var pages: [TranscriptPage] = []
@@ -40,7 +38,6 @@ final class TranscriptPagingModel {
         request(position.entryIndex.map(TranscriptPageRequest.around) ?? .latest, preserving: position, refreshIndex: true)
     }
 
-    /// Keeps `keepingPages` pages once the earlier page loads, dropping later ones.
     func earlier(
         preserving position: TranscriptReadingPosition, currentPosition: (() -> TranscriptReadingPosition?)? = nil,
         keepingPages: Int = maximumPageCount
@@ -49,7 +46,6 @@ final class TranscriptPagingModel {
         request(.before(first.records.lowerBound), preserving: position, currentPosition: currentPosition, keepingPages: keepingPages)
     }
 
-    /// Keeps `keepingPages` pages once the later page loads, dropping earlier ones.
     func later(
         preserving position: TranscriptReadingPosition, currentPosition: (() -> TranscriptReadingPosition?)? = nil,
         keepingPages: Int = maximumPageCount
@@ -92,7 +88,6 @@ final class TranscriptPagingModel {
                     page = loaded
                 } catch TranscriptPagingError.sourceChanged {
                     try Task.checkCancellation()
-                    // The old window's record ranges belong to another file generation. Rebuild around the reader.
                     let current = currentPosition?() ?? position
                     let retry: TranscriptPageRequest
                     switch request {
@@ -104,7 +99,6 @@ final class TranscriptPagingModel {
                 }
                 try Task.checkCancellation()
                 guard let self, self.requestRevision == requestRevision else { return }
-                // A reader may keep scrolling while the next page is decoded. Preserve where they are now.
                 let position = currentPosition?() ?? position
                 switch (request, replacedSource) {
                 case (.before, false):
@@ -126,7 +120,6 @@ final class TranscriptPagingModel {
                 self.isLoading = false
                 self.loadTask = nil
             } catch is CancellationError {
-                // A new request owns the loading state.
             } catch {
                 guard let self, self.requestRevision == requestRevision else { return }
                 self.errorMessage = error.localizedDescription

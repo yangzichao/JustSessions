@@ -3,13 +3,9 @@ import Testing
 
 @testable import JustSessions
 
-/// The reading toolbar's buttons move the reader or reflow it. Both tests press buttons through
-/// `TranscriptScrollViewFixture.pressButton(labeled:)`, which turns an app-wide accessibility setting on and off, so they
-/// run one at a time.
 @MainActor
 @Suite(.serialized)
 struct TranscriptReadingToolbarPositionTests {
-    /// A reader without paging moves through its position controller alone; nothing else tracks the entry at the top.
     @Test func firstAndLatestMessageMoveAReaderWithoutPaging() async throws {
         let fixture = try TranscriptScrollViewFixture()
         defer { fixture.close() }
@@ -41,8 +37,6 @@ struct TranscriptReadingToolbarPositionTests {
             }, omittedEntryCount: 0)
         fixture.positionStore.record(.entry(index: 40, offset: 0), for: conversation.id)
         let scrollView = try await fixture.show(conversation, transcript: transcript)
-        // Restoring the saved position takes several layout passes, and a scroll cancels a restoration still under way,
-        // so the scroll waits for it to finish instead of for a fixed time that a slow machine can outlast.
         try await fixture.waitUntil { fixture.visiblePosition(in: scrollView) == .entry(index: 40, offset: 0) }
         try await fixture.scroll(scrollView, to: scrollView.contentView.bounds.minY + 300)
         let readingPosition = TranscriptReadingPosition.entry(index: 40, offset: 300)

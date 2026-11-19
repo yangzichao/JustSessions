@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Confirms a `SessionDeletionRequest`, then hands it to the store.
 private struct SessionDeletionDialog: ViewModifier {
     @Environment(\.locale) private var locale
     let store: ConversationStore
@@ -62,7 +61,6 @@ private struct SessionDeletionDialog: ViewModifier {
         }
     }
 
-    /// Names how many sessions the plan deletes, and is disabled when that is none.
     private func deleteButton(for plan: SessionDeletionPlan, delete: @escaping () -> Void) -> some View {
         deleteButton(title: SessionDeletionConfirmationText.buttonTitle(for: plan, language: language), delete: delete)
             .disabled(!plan.hasDeletableConversations)
@@ -94,7 +92,6 @@ private struct SessionDeletionDialog: ViewModifier {
         }
     }
 
-    /// For a session a tab or tmux runs, also says what Close and delete ends first.
     private func message(forDeleting conversation: Conversation) -> String {
         let cliEnding = store.cliEndingBeforeDeletion(of: conversation)
         return SessionDeletionConfirmationText.message(

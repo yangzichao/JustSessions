@@ -1,8 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// One of the theme's colors, drawn in the theme and the light or dark appearance of the view that uses it. So a view
-/// can show a theme other than the window's, as the thumbnails in Settings do.
 struct ThemeColor: ShapeStyle {
     enum Role: Sendable {
         case sidebarSurface
@@ -15,14 +13,11 @@ struct ThemeColor: ShapeStyle {
         case tertiaryText
         case warningText
         case errorText
-        /// Text in a CLI's hue.
         case providerText(ConversationProvider)
         case line
-        /// A selected sidebar row's background, washed in its CLI's hue, or in the ink when nil.
         case selectedRow(ConversationProvider?)
         case tabGroup(Int)
         case terminalForeground
-        /// One of the terminal's 16 ANSI colors, by its index.
         case terminalANSI(Int)
     }
 
@@ -41,7 +36,6 @@ struct ThemeColor: ShapeStyle {
         .resolve(in: environment)
     }
 
-    /// The color for AppKit drawing, such as the transcript's text views, in `theme`'s light or dark colors.
     func nsColor(in theme: ResolvedAppTheme, isDark: Bool) -> NSColor {
         let hexValue = hexValue(in: theme.colors(isDark: isDark))
         return NSColor(

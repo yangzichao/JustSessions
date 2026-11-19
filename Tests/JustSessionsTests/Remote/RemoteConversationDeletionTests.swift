@@ -4,7 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct RemoteConversationDeletionTests {
-    /// Runs the deletion script with a temporary folder as the remote home, the way `ssh host <command>` would.
     @Test func claudeDeletionRemovesTranscriptCompanionFolderAndIndexEntry() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -39,7 +38,6 @@ struct RemoteConversationDeletionTests {
         #expect(remainingIDs == [keptID])
         #expect(updatedIndex?["originalPath"] as? String == "/home/me")
 
-        // Already gone from the host: deleting it again counts as deleted.
         try deletion.delete(conversation)
     }
 

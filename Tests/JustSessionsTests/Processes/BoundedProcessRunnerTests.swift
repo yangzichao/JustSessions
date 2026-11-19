@@ -59,7 +59,6 @@ struct BoundedProcessRunnerTests {
         let startedAt = clock.now
 
         #expect(BoundedProcessRunner.result(ofExecutable: "/bin/sleep", arguments: ["600"], timeout: 0.3) == nil)
-        // Well short of the 600 seconds `sleep` runs, so the timeout, not the process ending, stopped the wait.
         #expect(clock.now - startedAt < .seconds(120))
     }
 
@@ -112,8 +111,6 @@ struct BoundedProcessRunnerTests {
         #expect(!FileManager.default.fileExists(atPath: marker.path))
     }
 
-    // The side effect is released only AFTER the helper reports timeout/cancellation, so a busy test machine
-    // cannot let the child write before the test gets a chance to cancel it.
     private static let delayedChildScript = """
         (while [ ! -e release ]; do sleep 0.01; done; touch late-write) &
         echo $! > child-id
@@ -130,7 +127,6 @@ struct BoundedProcessRunnerTests {
         try? FileManager.default.removeItem(at: folder)
     }
 
-    /// A pipe would stay open while the child it leaves behind runs; output in a file does not wait for it.
     @Test func aChildLeftRunningDoesNotHoldUpTheResult() throws {
         let clock = ContinuousClock()
         let startedAt = clock.now
@@ -144,11 +140,9 @@ struct BoundedProcessRunnerTests {
         let childProcessID = try #require(pid_t(output.trimmingCharacters(in: .whitespacesAndNewlines)))
         kill(childProcessID, SIGKILL)
 
-        // Well short of the child's 600 seconds, so the result came back without waiting for it.
         #expect(clock.now - startedAt < .seconds(120))
     }
 
-    /// A pipe holds 64 KB; a process that writes more than that into an unread pipe stalls until the timeout.
     @Test func moreOutputThanAPipeHoldsComesBackWhole() throws {
         let output = try #require(
             BoundedProcessRunner.output(

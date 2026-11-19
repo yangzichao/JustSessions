@@ -1,10 +1,6 @@
 import Foundation
 
-/// The first message of the agent that Fix with agent… starts: where the agent runs, then the task you can edit in
-/// the form, which holds what the check found, how JustSessions uses the host, and the rules the agent keeps to, then
-/// the sections of JustSessions' guides about what the check found.
 enum HostFixAgentPrompt {
-    /// The task as the form first shows it.
     static func task(for report: HostCheckReport, facts: HostFixAgentHostFacts) -> String {
         var lines = [
             "Fix what JustSessions' host check found on \(report.host).",
@@ -37,8 +33,6 @@ enum HostFixAgentPrompt {
         return lines.joined(separator: "\n")
     }
 
-    /// The whole message: `task` between where the agent runs and the guide sections, each with its text as the
-    /// app ships it. A section the app can't read is left out.
     static func message(
         task: String,
         machine: HostFixAgentMachine,

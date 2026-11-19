@@ -8,24 +8,10 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the real Claude Code and Codex CLIs installed on this Mac in a tab's terminal, and saves what each terminal
-/// shows: a PNG and its screen text. Opt-in, since it runs the installed CLIs:
-///
-///     JUSTSESSIONS_LIVE_EVIDENCE=1 JUSTSESSIONS_LIVE_EVIDENCE_DIRECTORY=<folder for the evidence> \
-///     CLAUDE_CONFIG_DIR="$(mktemp -d)" CODEX_HOME="$(mktemp -d)" \
-///     JUSTSESSIONS_TEST_TMUX_RUNTIME="$(./Scripts/Tmux/build-runtime.sh)" swift test --filter LiveCLIEvidence
-///
-/// Each run gets a project folder, home folder, and CLI settings folders of its own under
-/// `JUSTSESSIONS_LIVE_SCRATCH_DIRECTORY`, or else the temporary folder, so a CLI never reads or changes your own
-/// sessions or settings, and shows its first-run or sign-in screen. A `ConversationStore` checks the installed `claude`'s
-/// `--help` with the test process's environment, so the process's own `CLAUDE_CONFIG_DIR` and `CODEX_HOME` must point
-/// at empty folders too. Set `JUSTSESSIONS_LIVE_SSH_HOST` to also open a tab on that SSH host. Each run's folders stay
-/// afterwards, with what the CLIs wrote, for a look at the evidence.
 @MainActor
 @Suite(
     .serialized, .enabled(if: LiveCLIEvidenceSettings.isEnabled, "Runs the CLIs installed on this Mac; set JUSTSESSIONS_LIVE_EVIDENCE=1"))
 struct LiveCLIEvidence {
-    /// How long a CLI has to show its screen.
     fileprivate static let screenTimeout: Duration = .seconds(60)
 
     @Test(arguments: TerminalEngine.allCases)
@@ -69,7 +55,6 @@ struct LiveCLIEvidence {
         #expect(exit.reaped, "Claude Code's process \(processID) was not reaped: \(exit.description)")
     }
 
-    /// As the app runs a new Claude Code session: in a sandboxed tmux server, through `ConversationStore`.
     @Test func claudeCodeRunsInTmuxInAGhosttyTab() async throws {
         let claude = try #require(LiveCLI.claude.path, "No claude found in \(LiveCLI.claude.candidatePaths)")
         try LiveCLIRun.requireIsolatedProcessSettings()
@@ -78,7 +63,6 @@ struct LiveCLIEvidence {
             "No supported tmux; set JUSTSESSIONS_TEST_TMUX_RUNTIME=\"$(./Scripts/Tmux/build-runtime.sh)\""
         )
         defer { sandbox.tearDown() }
-        // The sandbox's own server: its socket sits in the sandbox's folder, never in the app's.
         try #require(sandbox.environment["TMUX_TMPDIR"] == sandbox.root.path)
         let run = try LiveCLIRun(name: "tmux-claude-ghostty")
         try FileManager.default.createSymbolicLink(
@@ -100,7 +84,6 @@ struct LiveCLIEvidence {
             startsBackgroundPolling: false
         )
         defer { store.closeAllTerminals() }
-        // Tabs run the CLI directly until a refresh has checked the tmux version.
         store.refreshThisMac()
         try #require(await sandbox.waitUntil { !store.isScanningThisMac })
         try #require(store.commandResolver.thisMacTmuxServer()?.executablePath == sandbox.server.executablePath)
@@ -120,7 +103,6 @@ struct LiveCLIEvidence {
         let cliProcessID = try #require(sandbox.server.paneProcessIDsBySessionName()[tmuxSessionName])
         let clientProcessID = tab.processID
 
-        // Closing the tab and ending its tmux session, as Close and End does.
         store.closeTerminal(tab.id, endingTmuxSession: true)
         let sessionEnded = await sandbox.waitUntil { !sandbox.server.sessionNames().contains(tmuxSessionName) }
         let cliEnded = await LiveCLIExit.waitUntilReaped(cliProcessID)
@@ -163,7 +145,6 @@ struct LiveCLIEvidence {
         defer {
             tab.close()
             window.close()
-            // Also when the case fails before Codex exits; after a passing case nothing is left to end.
             _ = run.endProcessesStartedFromCodexHome()
         }
 
@@ -188,8 +169,6 @@ struct LiveCLIEvidence {
         #expect(exit.reaped, "Codex's process \(processID) was not reaped: \(exit.description)")
     }
 
-    /// A plain terminal on the host, opened the way the app opens one: `ssh` runs a login shell in the folder. The test
-    /// types a command whose output differs from what it types.
     @Test(.enabled(if: LiveCLIEvidenceSettings.sshHost != nil, "Set JUSTSESSIONS_LIVE_SSH_HOST to an SSH host to open a tab on it"))
     func anSSHTabRunsAShellOnTheHostInAGhosttyTab() async throws {
         let host = try #require(LiveCLIEvidenceSettings.sshHost)
@@ -214,9 +193,6 @@ struct LiveCLIEvidence {
         #expect(reaped)
     }
 
-    /// Claude Code installed on the host, started from a plain terminal on it with a settings folder of its own, so it
-    /// shows its first-run screen and never reads the host's own settings. Closing the tab hangs up on it; the test then
-    /// removes the folder and checks that nothing started with it still runs.
     @Test(.enabled(if: LiveCLIEvidenceSettings.sshHost != nil, "Set JUSTSESSIONS_LIVE_SSH_HOST to an SSH host to open a tab on it"))
     func claudeCodeRunsOnTheSSHHostInAGhosttyTab() async throws {
         let host = try #require(LiveCLIEvidenceSettings.sshHost)
@@ -250,8 +226,6 @@ struct LiveCLIEvidence {
     }
 }
 
-/// A plain terminal tab on an SSH host in a Ghostty terminal, opened through `ConversationStore` as the app opens one,
-/// in an off-screen window, once its login shell's prompt shows.
 @MainActor
 private final class LiveSSHShell {
     let tab: TerminalSession
@@ -277,7 +251,6 @@ private final class LiveSSHShell {
         window = LiveCLIWindow(showing: tab.terminalView)
         tab.startIfNeeded()
         clientProcessID = tab.processID
-        // The login shell's prompt, whatever it looks like.
         try await run.waitForScreen(of: tab, toShow: nil, stableFor: .seconds(2))
     }
 
@@ -287,7 +260,6 @@ private final class LiveSSHShell {
         LiveCLIKeys.type(text, into: tab.terminalView, window: window)
     }
 
-    /// Closes the tab, which hangs up on `ssh`, and returns whether its process was reaped.
     func closeTab() async -> Bool {
         store.closeTerminal(tab.id)
         return await LiveCLIExit.waitUntilReaped(clientProcessID)
@@ -299,9 +271,6 @@ private final class LiveSSHShell {
         settings.removeSuite()
     }
 
-    /// Waits up to 10 seconds for the host's processes started with `folder` in their environment to end, ends any
-    /// left, removes the folder, and says what it found. Reads `/proc`, so on a host without it, it only removes the
-    /// folder.
     static func endProcesses(startedWith folder: String, on host: String) -> String {
         let script = """
             d='\(folder)'
@@ -331,14 +300,12 @@ private enum LiveCLIScreen {
     }
 }
 
-/// Whether the suite runs, and the SSH host it opens a tab on, if any.
 private enum LiveCLIEvidenceSettings {
     static var isEnabled: Bool { environment["JUSTSESSIONS_LIVE_EVIDENCE"] == "1" }
     static var sshHost: String? { environment["JUSTSESSIONS_LIVE_SSH_HOST"].flatMap { $0.isEmpty ? nil : $0 } }
     private static var environment: [String: String] { ProcessInfo.processInfo.environment }
 }
 
-/// Where a CLI is installed: an override in the environment, or else the first of the usual places.
 private struct LiveCLI {
     let candidatePaths: [String]
 
@@ -357,7 +324,6 @@ private struct LiveCLI {
     }
 }
 
-/// One case's folders: a project, a home folder, and the CLIs' settings folders, all new and all its own.
 @MainActor
 private struct LiveCLIRun {
     let root: URL
@@ -380,7 +346,6 @@ private struct LiveCLIRun {
         }
     }
 
-    /// A `ConversationStore` asks the installed `claude` for its `--help` with the test process's own environment.
     static func requireIsolatedProcessSettings(sourceLocation: SourceLocation = #_sourceLocation) throws {
         let environment = ProcessInfo.processInfo.environment
         let home = FileManager.default.homeDirectoryForCurrentUser.path
@@ -401,19 +366,16 @@ private struct LiveCLIRun {
         let output = BoundedProcessRunner.output(ofExecutable: "/usr/bin/pgrep", arguments: ["-f", pathInCodexHome], timeout: 5) ?? ""
         let processIDs = output.split(whereSeparator: \.isNewline).compactMap { Int32($0) }.filter { $0 > 0 }
         for processID in processIDs { kill(processID, SIGTERM) }
-        // One that is still running two seconds later is killed.
         let deadline = Date.now.addingTimeInterval(2)
         while Date.now < deadline, processIDs.contains(where: { kill($0, 0) == 0 }) { usleep(50_000) }
         for processID in processIDs where kill(processID, 0) == 0 { kill(processID, SIGKILL) }
         return processIDs
     }
 
-    /// Points both CLIs at this run's settings folders, and keeps Claude Code from updating itself.
     var cliSettingsEnvironment: [String: String] {
         ["CLAUDE_CONFIG_DIR": claudeConfiguration.path, "CODEX_HOME": codexHome.path, "DISABLE_AUTOUPDATER": "1"]
     }
 
-    /// What a CLI run directly in a tab gets: this run's home and settings folders, and the system's tools.
     func cliEnvironment(executableDirectory: String) -> [String] {
         let environment = cliSettingsEnvironment.merging([
             "HOME": home.path,
@@ -425,8 +387,6 @@ private struct LiveCLIRun {
         return environment.map { "\($0.key)=\($0.value)" }.sorted()
     }
 
-    /// Waits until the tab's screen shows `marker`, or anything when it is nil, and stays the same for `stableFor`, so
-    /// the snapshot catches a finished screen; fails after a minute with what the screen showed.
     func waitForScreen(
         of tab: TerminalSession,
         toShow marker: String?,
@@ -513,7 +473,6 @@ private final class LiveCLIWindow {
 @MainActor
 private struct LiveCLISnapshot {
     let pngData: Data
-    /// How the image was made.
     let source: String
 
     init?(of terminalView: any TabTerminalView) {
@@ -552,8 +511,6 @@ private struct LiveCLISnapshot {
         return NSBitmapImageRep(cgImage: cgImage)
     }
 
-    /// More than one color anywhere in the image: a blank or all-black capture has one. A shell's few short lines
-    /// cover little of the terminal, so every pixel is looked at, until a second color turns up.
     private static func showsSomething(_ bitmap: NSBitmapImageRep) -> Bool {
         var firstPixel: [Int]?
         var pixel = [Int](repeating: 0, count: max(bitmap.samplesPerPixel, 1))
@@ -571,14 +528,12 @@ private struct LiveCLISnapshot {
     }
 }
 
-/// Keys pressed in the terminal, through the engine's own `keyDown`, as a US keyboard sends them.
 @MainActor
 private enum LiveCLIKeys {
     static func pressControlC(in terminalView: NSView, window: LiveCLIWindow) {
         terminalView.keyDown(with: event(keyCode: 8, characters: "\u{3}", ignoringModifiers: "c", modifiers: .control, window: window))
     }
 
-    /// Printable ASCII and Return only.
     static func type(_ text: String, into terminalView: NSView, window: LiveCLIWindow) {
         for character in text {
             let characters = String(character)
@@ -610,13 +565,11 @@ private enum LiveCLIKeys {
     }
 }
 
-/// How a CLI's tab ended, and whether its process was reaped.
 @MainActor
 private struct LiveCLIExit {
     let description: String
     let reaped: Bool
 
-    /// Ctrl-C twice, as you quit Claude Code or Codex; closing the tab if the CLI still runs after that.
     static func pressControlCTwice(in tab: TerminalSession, window: LiveCLIWindow) async -> LiveCLIExit {
         let processID = tab.processID
         let screenBefore = LiveCLIScreen.text(of: tab)

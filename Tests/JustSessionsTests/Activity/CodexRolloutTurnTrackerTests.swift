@@ -13,7 +13,6 @@ struct CodexRolloutTurnTrackerTests {
         try CodexRolloutLines.write([CodexRolloutLines.sessionMeta], to: file)
         let tracker = CodexRolloutTurnTracker()
 
-        // The whole file was read, and no turn has started.
         #expect(tracker.turnState(ofRolloutFile: file) == .betweenTurns)
 
         try CodexRolloutLines.append(CodexRolloutLines.text([CodexRolloutLines.turnStarted(at: Self.startedAt)]), to: file)
@@ -49,7 +48,6 @@ struct CodexRolloutTurnTrackerTests {
         let tracker = CodexRolloutTurnTracker()
         #expect(tracker.turnState(ofRolloutFile: file) == .betweenTurns)
 
-        // A shorter file in its place: what was read so far no longer lines up with it.
         try FileManager.default.removeItem(at: file)
         try CodexRolloutLines.write([CodexRolloutLines.turnStarted(at: Self.startedAt)], to: file)
         #expect(tracker.turnState(ofRolloutFile: file) == .inTurn(startedAt: Self.startedAt))

@@ -1,6 +1,5 @@
 import Foundation
 
-/// Copies the colors of iTerm2's default profile. It reads iTerm2's settings only when asked, and reads nothing else.
 enum ITermProfileColorsImporter {
     private static let preferencesDomain = "com.googlecode.iterm2"
 

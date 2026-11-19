@@ -1,15 +1,12 @@
 import AppKit
 import SwiftUI
 
-/// One color of the theme you can change: its name, a color well, a button that gives it back the theme's own color
-/// once changed, and a note when your color was made readable or a pick was refused. A row of the editor's grid.
 struct ThemeColorWellRow: View {
     let color: CustomizableThemeColor
     let value: UInt32
     let isChanged: Bool
     let isAdjustedForReadability: Bool
     let refusal: LocalizedStringKey?
-    /// Nil gives the color back the theme's own.
     let onChange: (UInt32?) -> Void
 
     var body: some View {

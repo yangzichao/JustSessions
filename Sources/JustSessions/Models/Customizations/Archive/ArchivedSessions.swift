@@ -1,7 +1,5 @@
 import Foundation
 
-/// Sessions archived from the sidebar, keyed by `Conversation.id`. Archiving only hides a session from the Projects
-/// list until the filter menu's Show archived is on; its file, name, and pin are kept.
 struct ArchivedSessions: Equatable {
     static let userDefaultsKey = "archivedConversationIDs"
 
@@ -15,7 +13,6 @@ struct ArchivedSessions: Equatable {
         ArchivedSessions(archivedConversationIDs: Set(userDefaults.stringArray(forKey: userDefaultsKey) ?? []))
     }
 
-    /// Sorted, so the same archive saves the same value.
     func save(to userDefaults: UserDefaults) {
         userDefaults.set(archivedConversationIDs.sorted(), forKey: Self.userDefaultsKey)
     }

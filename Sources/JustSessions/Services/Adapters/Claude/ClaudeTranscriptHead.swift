@@ -9,21 +9,16 @@ import Foundation
 struct ClaudeTranscriptHead: Sendable, Codable {
     static let maximumByteCount = 8 << 20
     static let maximumLineCount = 30
-    /// Bytes every `user` line holds.
     private static let userKey = Data(#""user""#.utf8)
 
-    /// The first `cwd` a line records.
     private(set) var workingDirectory: String?
     /// What the user typed in the first user message that holds a prompt; see `ClaudeUserPromptText`. A message
     /// Claude Code wrote for the user is not one: a slash command, its output, or a line marked `isMeta`.
     private(set) var firstPrompt: String?
     private(set) var customTitle: String?
-    /// The title Claude Code generated, from the last `ai-title` line within `maximumLineCount` lines.
     private(set) var aiTitle: String?
-    /// Whether a line read is marked `isSidechain`.
     private(set) var isSidechain = false
 
-    /// Reads only as far as needed, so a transcript is never loaded whole.
     init(file: URL) {
         var head = ClaudeTranscriptHead()
         var lineCount = 0
@@ -35,7 +30,6 @@ struct ClaudeTranscriptHead: Sendable, Codable {
         self = head
     }
 
-    /// `lines` are oldest first, as they are in the file.
     init(lines: [Data]) {
         for (index, line) in lines.enumerated() {
             read(line, pastLineLimit: index >= Self.maximumLineCount)
@@ -49,7 +43,6 @@ struct ClaudeTranscriptHead: Sendable, Codable {
         workingDirectory != nil && firstPrompt != nil && customTitle != nil
     }
 
-    /// Whether to read the line after the first `lineCount`.
     private func wantsLine(after lineCount: Int) -> Bool {
         !isComplete && (lineCount < Self.maximumLineCount || firstPrompt == nil)
     }

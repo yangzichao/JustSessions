@@ -55,7 +55,6 @@ struct ThemeReportAfterBackgroundQueryTests {
         #expect(cancelledReports.isEmpty)
     }
 
-    /// A command cut short by another sequence does not hide that sequence.
     @Test func findsARequestThatInterruptsAnUnendedCommand() {
         var reporting = TerminalThemeReporting()
 

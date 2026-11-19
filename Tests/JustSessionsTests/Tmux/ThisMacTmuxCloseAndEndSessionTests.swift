@@ -4,9 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Close and end session, from a tab's menu, closes the tab and ends the tmux session its CLI runs in without asking,
-/// for a session's tab and for a new session's tab not yet linked to its session. Runs the installed tmux in a sandbox
-/// server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct ThisMacTmuxCloseAndEndSessionTests {
     @Test func aSessionsTabClosesAndItsCLIInTmuxEnds() async throws {

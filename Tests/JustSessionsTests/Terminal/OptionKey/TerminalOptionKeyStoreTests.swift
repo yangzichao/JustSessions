@@ -17,7 +17,6 @@ struct TerminalOptionKeyStoreTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let store = TerminalOptionKeyStore(userDefaults: settings.userDefaults)
-        // Choosing what is already chosen saves nothing, so each case first chooses the other.
         store.setOptionIsMeta(!optionIsMeta)
 
         store.setOptionIsMeta(optionIsMeta)
@@ -36,8 +35,6 @@ struct TerminalOptionKeyStoreTests {
         #expect(!TerminalOptionKeyStore(userDefaults: settings.userDefaults).optionIsMeta)
     }
 
-    /// A SwiftTerm terminal sends Esc before a key pressed with Option only while Option is Meta, and one already open
-    /// follows a change.
     @Test func aSwiftTermTerminalFollowsTheChoice() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Disconnect leaves an SSH host alone: it closes the host's tabs in every window, forgets what ran there, and keeps
-/// the choice; the host is listed from its last copy and not refreshed until Connect, or using the host, connects it.
 @MainActor
 struct RemoteHostDisconnectTests {
     @Test func disconnectingWithNoTabOpenAsksNothingAndMarksTheHostInEveryWindowForGood() throws {
@@ -52,7 +50,6 @@ struct RemoteHostDisconnectTests {
         #expect(second.connectionEndedOnPurpose)
     }
 
-    /// Each tab closes as its host's saved choice says, so nothing asks.
     @Test func aSavedCloseChoiceDisconnectsAtOnce() throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
@@ -88,7 +85,7 @@ struct RemoteHostDisconnectTests {
         store.disconnectedRemoteHosts.setDisconnected(true, for: "devbox")
         store.remoteSessionDiscovery = RemoteSessionDiscovery(mirror: mirror)
 
-        #expect(store.refreshRemoteHost("devbox") == nil)
+        #expect(store.refreshRemoteHost("devbox") == .refused(.hostDisconnected))
         store.refresh(.ssh("devbox"))
 
         try await expectEventually { store.conversations.contains { $0.sessionID == sessionID && $0.host == .ssh("devbox") } }
@@ -118,7 +115,6 @@ struct RemoteHostDisconnectTests {
         }
     }
 
-    /// Resuming a session there, as starting one or deleting there, is using the host, which connects it.
     @Test func usingADisconnectedHostConnectsIt() async throws {
         let sandbox = try TwoWindowSandbox(remoteShellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in nil }))
         defer { sandbox.tearDown() }
@@ -156,14 +152,13 @@ struct RemoteHostDisconnectTests {
         #expect(!DisconnectedRemoteHosts.load(from: settings.userDefaults).isDisconnected("devbox"))
     }
 
-    /// Its copy's folder is a file, so the refresh fails before it would run `ssh`.
     private static func discoveryThatFailsWithoutSSH() throws -> RemoteSessionDiscovery {
         let notAFolder = FileManager.default.temporaryDirectory.appendingPathComponent("not-a-folder-\(UUID().uuidString.prefix(8))")
         try "".write(to: notAFolder, atomically: true, encoding: .utf8)
         return RemoteSessionDiscovery(
             mirror: RemoteSessionMirror(
                 cacheRoot: notAFolder,
-                sourceHomeOverride: FileManager.default.temporaryDirectory.path
+                hostAccess: .standIn(home: FileManager.default.temporaryDirectory.path)
             ))
     }
 }

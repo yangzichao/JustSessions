@@ -3,13 +3,7 @@ import Testing
 
 @testable import JustSessions
 
-/// The tab order as Chrome's split view changes it: a tab joining a split moves beside the selected tab on the side it
-/// came from; a split of one project's tabs stays in that project's group, and a split across two projects becomes a
-/// unit of its own right after the selected tab's project's group; reversing trades the tabs' places; a tab leaving a
-/// split goes back to its project's tabs. Tabs are named by their project's letter and a number, such as `a1`.
 struct TerminalTabStripTests {
-    // MARK: - New split
-
     @Test func aTabJoiningFromTheLeftLandsRightBeforeThePivotAsTheLeftPane() throws {
         var strip = makeStrip("a1", "a2", "a3")
 
@@ -107,7 +101,6 @@ struct TerminalTabStripTests {
 
         let split = try #require(added)
 
-        // Past the rest of project b's group, which the split would otherwise part.
         #expect(names(strip) == ["b1", "b3", "a1", "b2"])
         #expect(strip.groupKeys == ["/b", "/b", split.groupKey, split.groupKey])
         expectSplitRules(strip)
@@ -141,8 +134,6 @@ struct TerminalTabStripTests {
         #expect(joiningFromASplit == nil)
         #expect(strip == before)
     }
-
-    // MARK: - Reverse and separate
 
     @Test func reversingTradesTheTabsPlaces() throws {
         var strip = makeStrip("a1", "a2", "a3")
@@ -226,8 +217,6 @@ struct TerminalTabStripTests {
         expectSplitRules(strip)
     }
 
-    // MARK: - Swap into a split
-
     @Test func aSwappedInTabTakesTheRightTabsPlaceAndThatTabTakesItsOldOne() throws {
         var strip = makeStrip("a1", "a2", "a3", "a4")
         let added = strip.addSplit(joining: id("a3"), beside: id("a2"))
@@ -288,7 +277,6 @@ struct TerminalTabStripTests {
         let made = strip.swap(id("b2"), intoSplit: split.id, replacing: id("c1"))
         #expect(made)
 
-        // Past the rest of project b's group, which it would otherwise part.
         #expect(names(strip) == ["b1", "b3", "c1", "a1", "b2"])
         #expect(strip.groupKeys == ["/b", "/b", "/c", split.groupKey, split.groupKey])
         expectSplitRules(strip)
@@ -308,8 +296,6 @@ struct TerminalTabStripTests {
         #expect(!fromAnotherSplit && !fromTheSameSplit && !ofAClosedTab)
         #expect(strip == before)
     }
-
-    // MARK: - A split's group
 
     @Test func aSplitAcrossProjectsKeepsItsOwnGroupWhateverOtherTabsClose() throws {
         var strip = makeStrip("a1", "b1", "b2", "c1", "c2")
@@ -375,8 +361,6 @@ struct TerminalTabStripTests {
         #expect(strip.groupKeysInOrder == ["/a", split.groupKey, "/b"])
     }
 
-    // MARK: - Closing and opening
-
     @Test func removingATabOfASplitSendsTheOtherBackToItsProject() throws {
         var strip = makeStrip("a1", "a2", "b1", "b2")
         let added = strip.addSplit(joining: id("b1"), beside: id("a1"))
@@ -439,14 +423,10 @@ struct TerminalTabStripTests {
         let added = strip.addSplit(joining: id("a2"), beside: id("a1"))
         #expect(added != nil)
 
-        // Between the split's tabs, its own project's group or not.
         #expect(strip.insertionIndex(forReopenedTabOfProject: "/a", at: 1) == 2)
         #expect(strip.insertionIndex(forReopenedTabOfProject: "/c", at: 1) == 4)
-        // Among another project's tabs.
         #expect(strip.insertionIndex(forReopenedTabOfProject: "/c", at: 3) == 4)
     }
-
-    // MARK: - Helpers
 
     private let tabIDsByName: [String: UUID] = Dictionary(
         uniqueKeysWithValues: ["a", "b", "c"].flatMap { project in (1...4).map { ("\(project)\($0)", UUID()) } }

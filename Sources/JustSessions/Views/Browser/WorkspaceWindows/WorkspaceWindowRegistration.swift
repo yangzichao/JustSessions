@@ -1,8 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Tells the window registry which window shows the store, so a session opened in another window can bring this one
-/// forward to its tab. See `WorkspaceWindowRegistry`.
 struct WorkspaceWindowRegistration: NSViewRepresentable {
     let store: ConversationStore
 
@@ -29,6 +27,5 @@ final class WorkspaceWindowRegistrationView: NSView {
         store.windowRegistry.setWindow(window, for: store)
     }
 
-    /// Only registers; clicks go to the views it sits behind.
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
 }

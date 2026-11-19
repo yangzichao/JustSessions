@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A terminal in a minimized window batches its output and stops drawing, as a hidden tab does, and picks up again
-/// when the window comes back. `SelectableTerminalView.setWorkspaceActive(false)` hides the view, which is what's
-/// checked here; see `TerminalInsetView.isShown`.
 @MainActor
 struct TerminalInsetViewMinimizedWindowTests {
     @Test func aShownTerminalStopsWhileItsWindowIsMinimizedAndResumesAfter() async throws {
@@ -42,7 +39,6 @@ struct TerminalInsetViewMinimizedWindowTests {
         #expect(!terminal.isHidden)
     }
 
-    /// A tab dragged into a minimized window follows that window.
     @Test func aTerminalMovedIntoAMinimizedWindowStopsThere() async throws {
         _ = NSApplication.shared
         let (first, insetView, terminal) = makeWindow()

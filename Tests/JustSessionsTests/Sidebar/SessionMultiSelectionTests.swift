@@ -23,7 +23,6 @@ struct SessionMultiSelectionTests {
         selection.selectRange(to: "d", in: orderedConversationIDs)
         #expect(selection.selectedConversationIDs == ["b", "c", "d"])
 
-        // A second Shift-click replaces the range but keeps the original anchor.
         selection.selectRange(to: "a", in: orderedConversationIDs)
         #expect(selection.selectedConversationIDs == ["a", "b"])
         #expect(selection.anchorConversationID == "b")
@@ -41,7 +40,6 @@ struct SessionMultiSelectionTests {
     }
 
     @Test func rowShownThroughTabStartsShiftAndCommandClicksWhileNothingIsSelected() {
-        // Clicking a running session clears the selection and shows its tab, which highlights its row.
         var shiftSelection = SessionMultiSelection()
         shiftSelection.selectOnly("a")
         shiftSelection.clear()

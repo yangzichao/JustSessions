@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Puts `SidebarRowBackground` behind a row that tracks the pointer on its own.
 private struct SidebarRowHighlight: ViewModifier {
     let isSelected: Bool
     let selectionProvider: ConversationProvider?

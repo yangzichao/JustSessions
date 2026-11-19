@@ -4,9 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The tab bar alone in a window out of sight, wide enough that every tab takes its full width, taking clicks and
-/// drags sent as mouse events. Places in the bar are worked out from the tab bar's own sizes and each group label's
-/// measured width, so a click lands where the bar draws the tab or label.
 @MainActor
 final class TabBarWindowFixture {
     let store: ConversationStore
@@ -30,7 +27,6 @@ final class TabBarWindowFixture {
         window.isReleasedWhenClosed = false
     }
 
-    /// Opens a plain terminal tab titled `title` in the project.
     @discardableResult
     func openTab(_ title: String, in projectPath: String) -> TerminalSession {
         let tab = TerminalSession(
@@ -66,16 +62,12 @@ final class TabBarWindowFixture {
         try await settle()
     }
 
-    // MARK: - Mouse
-
     func click(atX x: CGFloat) async throws {
         try await send(.leftMouseDown, atX: x)
         try await send(.leftMouseUp, atX: x)
         try await settle()
     }
 
-    /// Presses at `x`, moves the pointer `distance` along the bar in steps, and lets go. With `drop`, the pointer also
-    /// moves that far down, out of the bar and the window.
     func drag(fromX x: CGFloat, by distance: CGFloat, droppingBy drop: CGFloat = 0) async throws {
         try await send(.leftMouseDown, atX: x)
         let stepCount = 10
@@ -87,8 +79,6 @@ final class TabBarWindowFixture {
         try await settle()
     }
 
-    /// Presses at `x`, moves the pointer along the bar `stepCount` times by `stepDistance`, and lets go. Returns how long
-    /// each move took with the layout and drawing it forced, as the window's next frame would draw it.
     func timedDrag(fromX x: CGFloat, stepCount: Int, by stepDistance: CGFloat) async throws -> [Duration] {
         try await send(.leftMouseDown, atX: x)
         var durations: [Duration] = []
@@ -116,11 +106,8 @@ final class TabBarWindowFixture {
         try await settle()
     }
 
-    // MARK: - Moving the window
-
     var isWindowMovable: Bool { window.isMovable }
 
-    /// Attaches a sheet to the window, as the New Session sheet covers it, and returns a call that ends it.
     func beginSheet() async throws -> () -> Void {
         let sheet = NSWindow(
             contentRect: CGRect(x: 0, y: 0, width: 200, height: 100), styleMask: [.titled], backing: .buffered, defer: false)
@@ -130,12 +117,10 @@ final class TabBarWindowFixture {
         return { [window] in window.endSheet(sheet) }
     }
 
-    /// What a press at `x` would do, worked out without sending it, so it moves no window.
     func response(toPressAtX x: CGFloat) throws -> WindowMoveZoneMonitor.Response {
         WindowMoveZoneMonitor.shared.response(to: try event(.leftMouseDown, atX: x))
     }
 
-    /// Moves the pointer into or out of the bar's window move zone, as its tracking area reports it.
     func movePointer(intoTheBar isIntoTheBar: Bool) throws {
         let zone = try #require(hostingView.flatMap { Self.zone(in: $0) })
         eventTimestamp += 0.02
@@ -148,15 +133,11 @@ final class TabBarWindowFixture {
         if isIntoTheBar { zone.mouseEntered(with: event) } else { zone.mouseExited(with: event) }
     }
 
-    // MARK: - Places in the bar
-
-    /// The middle of the tab's select button, with the tab bar's tabs at their full width.
     func middle(ofTab tabID: UUID) throws -> CGFloat {
         let (leadingEdge, width) = try tabSpan(tabID)
         return leadingEdge + width / 2 - 10
     }
 
-    /// The middle of the tab's select button where the bar laid it out, also once its tabs narrow to fit.
     func middleAsLaidOut(ofTab tabID: UUID) throws -> CGFloat {
         let tab = try #require(store.terminalSessions.first { $0.id == tabID })
         let layout = TabDragBetweenWindows.shared.layouts.layout(of: store)
@@ -166,7 +147,6 @@ final class TabBarWindowFixture {
 
     func middle(ofCloseButtonOf tabID: UUID) throws -> CGFloat {
         let (leadingEdge, width) = try tabSpan(tabID)
-        // The 16-point × ends 6 points before the tab's trailing edge.
         return leadingEdge + width - 6 - 8
     }
 
@@ -174,17 +154,14 @@ final class TabBarWindowFixture {
         try groupLeadingEdge(groupKey) + (labelWidth(groupKey) - 6) / 2
     }
 
-    /// Between the group's label and its first tab.
     func gap(afterGroupLabel groupKey: String) throws -> CGFloat {
         try groupLeadingEdge(groupKey) + labelWidth(groupKey) - 3
     }
 
-    /// Between the group and the one before it.
     func gap(beforeGroup groupKey: String) throws -> CGFloat {
         try groupLeadingEdge(groupKey) - WorkspaceTabMetrics.groupSpacing / 2
     }
 
-    /// Past every tab.
     var emptyEndOfTheBar: CGFloat { Self.barSize.width - 20 }
 
     func close() {
@@ -194,9 +171,6 @@ final class TabBarWindowFixture {
         settings.removeSuite()
     }
 
-    // MARK: - Helpers
-
-    /// Halfway down the tabs, in window coordinates.
     private static let pointerY = barSize.height / 2 - 2
 
     private func send(_ type: NSEvent.EventType, atX x: CGFloat, droppedBy drop: CGFloat = 0) async throws {
@@ -219,7 +193,6 @@ final class TabBarWindowFixture {
         return view.subviews.lazy.compactMap { zone(in: $0) }.first
     }
 
-    /// Lets the bar lay out what the store changed.
     func settle() async throws {
         for _ in 0..<6 {
             hostingView?.layoutSubtreeIfNeeded()
@@ -255,7 +228,6 @@ final class TabBarWindowFixture {
         return leadingEdge
     }
 
-    /// The expanded group's label, measured on its own, with the 6 points the group leaves after it.
     private func labelWidth(_ groupKey: String) -> CGFloat {
         let label = TerminalTabGroupLabel(
             projectName: store.projectDisplayName(forProjectPath: groupKey),

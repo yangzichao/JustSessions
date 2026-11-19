@@ -52,7 +52,6 @@ struct KiroV3SessionFixture {
         return Written(sessionID: sessionID, folder: folder)
     }
 
-    /// One line per event; none for none, as an empty file.
     static func lines(_ events: [[String: Any]]) throws -> String {
         guard !events.isEmpty else { return "" }
         return try events.enumerated().map { index, payload in

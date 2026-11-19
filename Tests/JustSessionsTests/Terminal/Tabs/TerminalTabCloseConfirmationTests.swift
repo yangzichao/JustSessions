@@ -4,12 +4,9 @@ import Testing
 
 @testable import JustSessions
 
-/// Return answers the dialog that asks before a tab closes, and Escape cancels it. The dialog is shown on a window on
-/// screen, as the browser shows it; no tab starts a process, since no terminal is shown.
 @MainActor
 @Suite(.serialized)
 struct TerminalTabCloseConfirmationTests {
-    /// A CLI tmux can keep running closes that way: its tab goes, and the CLI can be reattached.
     @Test func returnKeepsATmuxCLIRunning() async throws {
         let scenario = try CloseConfirmationScenario()
         defer { scenario.remove() }
@@ -33,8 +30,6 @@ struct TerminalTabCloseConfirmationTests {
         try await scenario.pressReturn(in: sheet) { !scenario.isOpen(tab) }
     }
 
-    /// Don't ask again stays in the dialog for a CLI tmux can keep running, naming the tab's host, and Return with it
-    /// ticked saves Keep running for that host only, so later closes there keep the CLI running without asking.
     @Test func returnWithDontAskAgainTickedSavesKeepRunning() async throws {
         let scenario = try CloseConfirmationScenario()
         defer { scenario.remove() }
@@ -49,8 +44,6 @@ struct TerminalTabCloseConfirmationTests {
         #expect(scenario.plainTerminalCloseChoiceSettingsStore.choice == .askEachTime)
     }
 
-    /// A plain terminal's dialog offers Don't ask again too, and Return with it ticked saves closing terminals without
-    /// asking; the choice for CLI tabs stays as it was.
     @Test func returnWithDontAskAgainTickedClosesTerminalsWithoutAsking() async throws {
         let scenario = try CloseConfirmationScenario()
         defer { scenario.remove() }
@@ -86,8 +79,6 @@ struct TerminalTabCloseConfirmationTests {
 
 @MainActor
 private final class CloseConfirmationScenario {
-    /// A dialog shows in well under a second, but at the start of a full run, when every suite starts at once, the
-    /// main thread can stay busy for far longer; 20 seconds once ran out. Passing runs still finish at once.
     private static let timeoutSeconds = 120
 
     let store: ConversationStore
@@ -126,7 +117,6 @@ private final class CloseConfirmationScenario {
         store.terminalSessions.contains { $0.id == tab.id }
     }
 
-    /// Asks to close `tab`, as its close button does, and returns the dialog once it is on screen.
     func confirmClosing(_ tab: TerminalSession) async throws -> NSWindow {
         hostingView.rootView = AnyView(
             CloseConfirmationHost(
@@ -146,7 +136,6 @@ private final class CloseConfirmationScenario {
         throw CancellationError()
     }
 
-    /// The button Return presses, or a description of every button when none has Return.
     func defaultButtonTitle(in sheet: NSWindow) -> String {
         let buttons = Self.buttons(in: sheet)
         return buttons.first { $0.keyEquivalent == "\r" }?.title
@@ -166,7 +155,6 @@ private final class CloseConfirmationScenario {
         if let action = checkbox.action { #expect(checkbox.sendAction(action, to: checkbox.target)) }
     }
 
-    /// Presses Return as the keyboard does, through the dialog's key equivalents, then waits for `tookEffect`.
     func pressReturn(in sheet: NSWindow, until tookEffect: () -> Bool) async throws {
         try press("\r", keyCode: 36, in: sheet)
         try await expectEventually(timeout: .seconds(Self.timeoutSeconds)) { tookEffect() }
@@ -205,7 +193,6 @@ private final class CloseConfirmationScenario {
     }
 }
 
-/// The browser's close confirmation, asking about `closingSessionID` from the start.
 private struct CloseConfirmationHost: View {
     let store: ConversationStore
     let tabCloseChoiceSettingsStore: TabCloseChoiceSettingsStore

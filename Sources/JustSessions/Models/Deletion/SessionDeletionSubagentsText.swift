@@ -1,8 +1,6 @@
 import Foundation
 
 extension SessionDeletionConfirmationText {
-    /// How many subagent sessions go with the sessions being deleted, and how many stay on disk: a session's subagents
-    /// are listed only under it, so deleting it could otherwise take them, or strand them, unannounced.
     static func subagentSentences(
         for plan: SessionDeletionPlan,
         language: AppInterfaceLanguage = AppLocalization.developmentLanguage

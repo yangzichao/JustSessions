@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the deletion script in a local shell whose `$HOME` is a temporary folder standing in for the host's home,
-/// under both macOS's `/bin/sh` and dash, the `/bin/sh` of Debian and Ubuntu hosts. Serialized because each case
-/// blocks a thread while its shell runs.
 @Suite(.serialized)
 struct PiRemoteDeletionTests {
     typealias HostShell = RemotePiFixture.HostShell
@@ -26,7 +23,7 @@ struct PiRemoteDeletionTests {
             provider: .pi, sessionID: id, projectPath: "/srv/project", sourceFile: mirrored, host: .ssh("devbox"))
         #expect(
             try RemotePiConversationDeletion.hostFileNames(of: conversation, piMirrorDirectory: mirrored.deletingLastPathComponent())
-                .projectFolderName == nil)
+                .folder == .sessionsRoot)
 
         try fixture.deletion().delete(conversation)
 
@@ -157,7 +154,6 @@ struct PiRemoteDeletionTests {
         let companionFile = fixture.hostCompanionFolder.appendingPathComponent("forks/kept.jsonl")
         try FileManager.default.createDirectory(at: companionFile.deletingLastPathComponent(), withIntermediateDirectories: true)
         try "fork".write(to: companionFile, atomically: true, encoding: .utf8)
-        // The session's own header further down does not count.
         let original = try String(contentsOf: fixture.hostSessionFile, encoding: .utf8)
         try (headerCase.firstLine + "\n" + original).write(to: fixture.hostSessionFile, atomically: true, encoding: .utf8)
 
@@ -265,8 +261,6 @@ struct PiRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.hostSessionFile.path))
     }
 
-    /// The script checks its arguments itself too, so a session file reached through `..` or a nested folder, or
-    /// named for another session, is never removed even if a caller skipped the checks in `hostFileNames`.
     @Test(arguments: HostShell.installed)
     func theScriptRefusesUnexpectedNamesWithoutRemovingAnything(shell: HostShell) throws {
         let fixture = try RemotePiFixture(shell: shell)
@@ -276,7 +270,6 @@ struct PiRemoteDeletionTests {
         let agentFolder = fixture.sessionsDirectory.deletingLastPathComponent()
         let nestedFolder = fixture.sessionsDirectory.appendingPathComponent("a/b")
         try FileManager.default.createDirectory(at: nestedFolder, withIntermediateDirectories: true)
-        // Session files with this session's header wherever the unexpected names would lead.
         let decoys = [agentFolder.appendingPathComponent(fileName), nestedFolder.appendingPathComponent(fileName)]
         for decoy in decoys { try FileManager.default.copyItem(at: fixture.hostSessionFile, to: decoy) }
         let otherIDFileName = "2026-09-30T10-00-00-000Z_019a0000-0000-7000-8000-0000000000bb.jsonl"
@@ -294,7 +287,7 @@ struct PiRemoteDeletionTests {
             let result = fixture.runOnHost(
                 RemotePiConversationDeletion.command(
                     sessionsFolder: RemoteToolFolders.standard.pi,
-                    projectFolderName: scriptCase.project,
+                    folder: .project(scriptCase.project),
                     fileName: scriptCase.file,
                     sessionID: id
                 ))
@@ -317,7 +310,7 @@ struct PiRemoteDeletionTests {
         let result = fixture.runOnHost(
             RemotePiConversationDeletion.command(
                 sessionsFolder: RemoteToolFolders.standard.pi,
-                projectFolderName: "--home-me-gone--",
+                folder: .project("--home-me-gone--"),
                 fileName: fixture.hostSessionFile.lastPathComponent,
                 sessionID: fixture.conversation.sessionID
             ))
@@ -326,7 +319,6 @@ struct PiRemoteDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.hostSessionFile.path))
     }
 
-    /// The details of the failure the host reported; the deletion must fail without removing anything.
     private func deletionFailure(_ fixture: RemotePiFixture) -> String? {
         let error = #expect(throws: RemoteConversationDeletionError.self) { try fixture.deletion().delete(fixture.conversation) }
         guard case .failed(let host, let details) = error else {

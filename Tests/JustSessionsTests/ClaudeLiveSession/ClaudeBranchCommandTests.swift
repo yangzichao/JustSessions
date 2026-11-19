@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Claude Code's own `/branch`, typed in a running tab, moves the CLI into a new session; the tab follows it there,
-/// and `/rename` names the branch, never the session it branched from. On SSH hosts, see `RemoteClaudeLiveNameTests`.
 @MainActor
 struct ClaudeBranchCommandTests {
     @Test func theTabFollowsTheBranchAndARenameThereNamesOnlyTheBranch() async throws {
@@ -12,7 +10,6 @@ struct ClaudeBranchCommandTests {
         defer { transcripts.remove() }
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
-        // No tmux in reach, so following never renames a session on the app's own tmux server.
         let store = ConversationStore(
             adapters: [ClaudeAdapter(configurationDirectory: transcripts.configurationDirectory)],
             commandResolver: NativeCLICommandResolver(
@@ -69,8 +66,6 @@ struct ClaudeBranchCommandTests {
         #expect(title(of: ClaudeBranchCommandTranscripts.parentID) == ClaudeBranchCommandTranscripts.parentTitle)
     }
 
-    /// The branch's copied lines keep the uuids, timestamps, and a `session_id` of the session it branched from, and
-    /// name it in `forkedFrom`; each file is still a session of its own, titled by its own latest custom-title.
     @Test func theBranchIsListedApartFromTheSessionItBranchedFrom() throws {
         let transcripts = try ClaudeBranchCommandTranscripts()
         defer { transcripts.remove() }

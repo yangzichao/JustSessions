@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab whose connection dropped, as when the Mac slept, is reconnected in its place once its host lists its tmux
-/// session again, and left ended when the host doesn't, since its CLI ended there too.
 @MainActor
 struct RemoteTabReconnectorTests {
     @Test func closingTheLastDroppedTabBeforeItsFirstTryStartsNoProbe() throws {
@@ -66,7 +64,6 @@ struct RemoteTabReconnectorTests {
         #expect(setup.host.askCount.value == 1)
     }
 
-    /// A plain terminal's shell runs on in tmux on the host, as a CLI does.
     @Test func aDroppedPlainTerminalIsReconnectedToItsShell() async throws {
         let setup = try DroppedTabSetup()
         defer { setup.tearDown() }
@@ -88,7 +85,6 @@ struct RemoteTabReconnectorTests {
         #expect(store.selectedTerminalID == replacement.id)
     }
 
-    /// Its CLI ended on the host, so reconnecting would start it again; nothing does that on its own.
     @Test func aDroppedTabWhoseTmuxSessionIsGoneStaysEnded() async throws {
         let setup = try DroppedTabSetup()
         defer { setup.tearDown() }
@@ -129,7 +125,6 @@ struct RemoteTabReconnectorTests {
         #expect(store.terminalSessions.first?.hasExited == false)
     }
 
-    /// The host's login may have closed with the connection; once Connect… opens it again, the host is asked at once.
     @Test func aHostThatNeedsConnectIsAskedOnceItsLoginOpens() async throws {
         let setup = try DroppedTabSetup()
         defer { setup.tearDown() }
@@ -193,8 +188,6 @@ struct RemoteTabReconnectorTests {
         setup.sandbox.first.openTerminal(couldntConnect)
 
         couldntConnect.startIfNeeded()
-        // It ends at once, as `ssh` that can't connect does within seconds. The real exit can reach the tab much later
-        // on a busy machine: on the release runner it took over 30 seconds, no longer right after starting.
         setup.end(couldntConnect, exitCode: RemoteHostCommandRunner.connectionFailureExitStatus)
         setup.reconnector.tryAgain()
         setup.clock.advance(by: 2)
@@ -206,8 +199,6 @@ struct RemoteTabReconnectorTests {
         #expect(setup.host.askCount.value == 0)
     }
 
-    /// A connection that keeps failing right after it reconnects is left for you, until the Mac wakes or the app
-    /// comes forward.
     @Test func aTabThatDropsSoonAfterReconnectingWaitsForTheNextWake() async throws {
         let setup = try DroppedTabSetup()
         defer { setup.tearDown() }
@@ -227,7 +218,6 @@ struct RemoteTabReconnectorTests {
         #expect(replacement.isWaitingToReconnect)
     }
 
-    /// You disconnected from the host, so nothing asks it; see `ConversationStore+RemoteHostDisconnect`.
     @Test func aDroppedTabOnADisconnectedHostIsGivenUp() throws {
         let setup = try DroppedTabSetup()
         defer { setup.tearDown() }
@@ -244,7 +234,6 @@ struct RemoteTabReconnectorTests {
         #expect(!setup.tab.isWaitingToReconnect)
     }
 
-    /// Closing the host's login ends the tabs that went through it on purpose.
     @Test func aTabEndedByClosingTheLoginIsNotReconnected() throws {
         let setup = try DroppedTabSetup()
         defer { setup.tearDown() }
@@ -267,7 +256,6 @@ struct RemoteTabReconnectorTests {
             tmuxSessionName: "justsessions-claude-through-login"
         )
         store.openTerminal(throughLogin)
-        // Closing the login refreshes a listed host in every window, which would connect to it.
         for window in [setup.sandbox.first, setup.sandbox.second] { window.remoteHostList = RemoteHostList(hosts: []) }
 
         store.closeLogin(on: "devbox", connections: connections)
@@ -281,8 +269,6 @@ struct RemoteTabReconnectorTests {
     }
 }
 
-/// A Claude Code session on the SSH host `devbox` with its tab open in the first of two windows, and a reconnector
-/// that asks a made-up host on a clock the test moves.
 @MainActor
 private struct DroppedTabSetup {
     let sandbox: TwoWindowSandbox
@@ -308,12 +294,10 @@ private struct DroppedTabSetup {
         )
     }
 
-    /// As when `ssh` gives up on the connection.
     func drop(_ tab: TerminalSession) {
         end(tab, exitCode: RemoteHostCommandRunner.connectionFailureExitStatus)
     }
 
-    /// Without the refresh of the host an ended tab starts, which would connect to it.
     func end(_ tab: TerminalSession, exitCode: Int32) {
         tab.onProcessFinished = nil
         tab.processFinished(exitCode: exitCode)
@@ -329,7 +313,6 @@ private struct DroppedTabSetup {
     }
 }
 
-/// Answers with the tmux sessions it is given, or as a host that can't be reached while it has none.
 private final class MadeUpHost: Sendable {
     let answer = LockedValue<Set<String>?>(nil)
     let askCount = LockedValue(0)

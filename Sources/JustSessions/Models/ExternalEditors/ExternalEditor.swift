@@ -1,15 +1,11 @@
 import Foundation
 
-/// A code editor or IDE that "Open project in" offers when it is installed on this Mac. An editor published under
-/// several bundle identifiers lists them newest first; the first one found is used.
 struct ExternalEditor: Hashable, Sendable {
     let name: String
     let bundleIdentifiers: [String]
 }
 
 extension ExternalEditor {
-    /// Every editor the menu knows, in menu order. The bundle identifiers match GitHub Desktop's editor list
-    /// (`app/src/lib/editors/darwin.ts`), plus Antigravity.
     static let knownEditors: [ExternalEditor] = [
         ExternalEditor(name: "Android Studio", bundleIdentifiers: ["com.google.android.studio"]),
         ExternalEditor(name: "Antigravity", bundleIdentifiers: ["com.google.antigravity"]),

@@ -1,8 +1,6 @@
 import Foundation
 
 enum ClaudeConversationIndex {
-    // Atomic replacement protects readers, but concurrent read/modify/write operations still lose removals.
-    // Index updates run off-main and are batched, so one short app-wide critical section also protects direct callers.
     private static let mutationLock = NSLock()
 
     static func remove(sessionIDs: Set<String>, in projectDirectory: URL) throws {

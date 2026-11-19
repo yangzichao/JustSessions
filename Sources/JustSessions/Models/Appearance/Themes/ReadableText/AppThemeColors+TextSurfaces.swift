@@ -1,5 +1,4 @@
 extension AppThemeColors {
-    /// The CLIs whose hue can wash a selected sidebar row, and nil for a row without a CLI, which takes the ink.
     static let selectedRowProviders: [ConversationProvider?] = ConversationProvider.allCases + [nil]
 
     /// A selected sidebar row's background: the sidebar washed in the row's CLI hue, or in the ink. Views draw this
@@ -14,8 +13,6 @@ extension AppThemeColors {
             })
     }
 
-    /// Every background the app sets text on: the four surfaces, a row or table header under a faint fill, and the
-    /// selected sidebar rows. The content surface comes first, so it decides whether text is darkened or lightened.
     static func textSurfaces(
         sidebarSurface: UInt32, contentSurface: UInt32, raisedSurface: UInt32, userMessageSurface: UInt32,
         line: UInt32, selectedRowSurfaces: [ConversationProvider?: UInt32]

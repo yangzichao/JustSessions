@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A right-click on a link hands the menu the same link a ⌘-click there would open, whichever engine draws the
-/// terminal, and whether or not a program takes the mouse; see `TerminalLinkClickTests`.
 @MainActor
 @Suite(.serialized)
 struct TerminalLinkRightClickTests {
@@ -50,7 +48,6 @@ struct TerminalLinkRightClickTests {
         #expect(linkHandedToTheMenu(rightClicking: terminal, column: 3) == .some(nil))
     }
 
-    /// The margin around the terminal shows the terminal's menu too, but has no text.
     @Test(arguments: TerminalEngine.allCases)
     func theMarginHasNoLink(_ engine: TerminalEngine) throws {
         let terminal = try ClickableTerminal(engine: engine)
@@ -62,7 +59,6 @@ struct TerminalLinkRightClickTests {
         #expect(terminal.view.link(under: outside) == nil)
     }
 
-    /// Finding the link leaves the terminal as it was: a plain click afterwards opens nothing.
     @Test(arguments: TerminalLinkClickTests.mouseReportingCases)
     func findingTheLinkOpensNothing(_ engine: TerminalEngine, programTakesTheMouse: Bool) throws {
         let terminal = try ClickableTerminal(engine: engine)
@@ -76,8 +72,6 @@ struct TerminalLinkRightClickTests {
         #expect(terminal.openedLinks.isEmpty)
     }
 
-    /// What the view hands `makeContextMenu` for a right-click over `column` of the first row; nil when it builds no
-    /// menu, and `.some(nil)` when it hands over no link.
     private func linkHandedToTheMenu(rightClicking terminal: ClickableTerminal, column: Int) -> String?? {
         var handedLinks: [String?] = []
         terminal.view.makeContextMenu = { link in

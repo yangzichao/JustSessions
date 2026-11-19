@@ -1,28 +1,22 @@
 import Foundation
 
-/// Fix with agent… in the host check sheet starts a CLI session whose first message is the check's report, how
-/// JustSessions uses the host, and the guide sections about what the check found; see `HostFixAgentPrompt`. It runs on
-/// the checked host, or on this Mac when the host can't start a CLI, and outside tmux, which may be what is broken.
 extension ConversationStore {
     static let lastHostFixAgentProviderKey = "hostFixAgentProvider"
 
-    /// The tools the agent can be on the machine: on the host, those the check didn't find failing.
     func hostFixAgentProviders(on machine: HostFixAgentMachine, report: HostCheckReport) -> [ConversationProvider] {
         switch machine {
         case .thisMac:
             return newSessionProviders(on: .thisMac)
         case .checkedHost:
             return newSessionProviders(on: .ssh(report.host)).filter { provider in
-                !report.findings.contains { $0.id == "cli-\(provider.executableName)" && $0.status == .problem }
+                !report.findings.contains { $0.id == .cli(provider) && $0.status == .problem }
             }
         }
     }
 
-    /// The form as it first shows: on this Mac when the host's login shell or its CLIs can't start an agent, with
-    /// the tool started last time when the machine has it.
     func hostFixAgentDraft(for state: HostCheckSheetState, report: HostCheckReport) -> HostFixAgentDraft {
         let hostCantStartAgent = report.findings.contains {
-            $0.status == .problem && ["connection", "login-shell", "shell-startup"].contains($0.id)
+            $0.status == .problem && [HostCheckFindingID.connection, .loginShell, .shellStartup].contains($0.id)
         }
         let machine: HostFixAgentMachine =
             hostCantStartAgent || hostFixAgentProviders(on: .checkedHost, report: report).isEmpty
@@ -42,16 +36,13 @@ extension ConversationStore {
         return providers.first
     }
 
-    /// The folder the agent starts in, as typed in the New session sheet: the tab's folder on the host, when the
-    /// check came from a tab and found its folder, or else the home folder.
     func hostFixAgentFolder(on machine: HostFixAgentMachine, for state: HostCheckSheetState, report: HostCheckReport) -> String {
         guard machine == .checkedHost, let session = state.session,
-            report.findings.contains(where: { $0.id == "folder" && $0.status == .passed })
+            report.findings.contains(where: { $0.id == .folder && $0.status == .passed })
         else { return "~" }
         return session.projectPath
     }
 
-    /// Opens the agent's tab; the sheet closes once it opens.
     func startHostFixAgent(
         _ draft: HostFixAgentDraft,
         for state: HostCheckSheetState,

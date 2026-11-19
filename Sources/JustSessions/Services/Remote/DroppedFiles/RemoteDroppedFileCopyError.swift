@@ -1,18 +1,13 @@
 import Foundation
 
-/// Why a file dropped on a tab could not be copied to the tab's SSH host.
 enum RemoteDroppedFileCopyError: LocalizedError, Equatable {
-    /// The file could not be opened on this Mac.
     case couldNotRead(fileName: String)
     case couldNotRun(host: String)
-    /// `ssh` could not connect, or lost the connection, for the reason its output gave.
     case sshFailed(host: String, problem: SSHConnectionProblem)
     case couldNotMakeFolder(host: String)
     case couldNotWrite(host: String, fileName: String)
     case incomplete(host: String, fileName: String)
-    /// Nothing arrived for `RemoteDroppedFileCopier.stallTimeout`.
     case stalled(host: String)
-    /// The host's command failed some other way, with the last line it printed.
     case failed(host: String, output: String)
 
     var errorDescription: String? {

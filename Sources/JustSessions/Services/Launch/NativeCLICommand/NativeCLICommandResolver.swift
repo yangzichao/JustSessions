@@ -1,13 +1,10 @@
 import Foundation
 
-/// Sendable so a refresh can look up installed CLIs off the main actor. Its `FileManager` only checks paths, which
-/// is safe from any thread.
 struct NativeCLICommandResolver: @unchecked Sendable {
     let fileManager: FileManager
     let inheritedEnvironment: [String: String]
     let bundledTmuxRuntime: BundledTmuxRuntime?
     let tmuxSelection = ThisMacTmuxSelection()
-    /// Nil starts Pi and OpenCode without the extension that reports their session.
     let liveSessionReporting: LiveSessionReporting?
     private let searchDirectoriesOverride: [String]?
 
@@ -25,7 +22,6 @@ struct NativeCLICommandResolver: @unchecked Sendable {
         self.searchDirectoriesOverride = searchDirectories
     }
 
-    /// Computed per lookup so a CLI installed while the app is running is still found.
     var searchDirectories: [String] {
         searchDirectoriesOverride
             ?? CLISearchDirectories.standard(
@@ -39,8 +35,6 @@ struct NativeCLICommandResolver: @unchecked Sendable {
         searchDirectories.joined(separator: ":")
     }
 
-    /// `startCommand` is one set in the New session sheet; nil starts the tool's own executable. It stands in for
-    /// `defaultStartCommand`, so the app's arguments that follow leave out what it holds.
     func resolve(
         conversation: Conversation,
         action: ConversationAction,
@@ -71,7 +65,6 @@ struct NativeCLICommandResolver: @unchecked Sendable {
     ) throws -> NativeCLICommand {
         try requireProjectDirectory(projectPath)
 
-        // A start command of your own is not looked up: the shell that runs it reports a missing one in the tab.
         let customStartCommand = CLIStartCommandLine.customCommand(startCommand)
         guard
             let executablePath = customStartCommand == nil
@@ -83,7 +76,6 @@ struct NativeCLICommandResolver: @unchecked Sendable {
 
         var environment = TerminalColorEnvironment.embeddedTerminalEnvironment(from: inheritedEnvironment)
         environment["PATH"] = pathEnvironmentValue
-        // The session a CLI is in can change while it runs; see `followLiveSessions` and `followCodexThreads`.
         let reporterLaunch = liveSessionReporting?.launchAdditions(for: provider, environment: environment)
         environment.merge(reporterLaunch?.environment ?? [:]) { _, reporterValue in reporterValue }
         // Codex names the thread its CLI is in only in the terminal title, and only when asked.

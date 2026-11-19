@@ -1,18 +1,5 @@
 import SwiftUI
 
-/// Right side of the window: the tab bar while tabs are open, above the selected tab's terminal or, with no tab
-/// selected, the selected session's preview. Every tab's terminal stays in the view tree; only the selected one
-/// shows, filling the area, or both views of a split while either of its tabs is selected, laid out as Chrome's split
-/// view: in the terminals' background, each terminal inside a rounded outline with a mini toolbar in its corner, and a
-/// resize area between them. Unlike Chrome, whose mini toolbar overlaps the page under it, each terminal ends above
-/// its toolbar: a page scrolls and seldom puts anything in its bottom corner, but a terminal's last rows stay put and
-/// hold the CLI's input and status. A click in the pane whose tab is not selected, or on its toolbar, selects that tab,
-/// bringing it the keyboard, and a click in the pane still reaches its terminal, so scrolling and selecting text work
-/// there too. Every split's tabs keep their terminals' sizes while another tab shows, so coming back resizes no
-/// terminal. A tab dragged over the terminals lights up the pane it would take in a split; see
-/// `TerminalSplitDropHighlight`. A split chooser lays out as a split's other view, its list in that pane; see
-/// `TerminalSplitChooserPane`.
-/// The tab bar runs up into the title bar beside the window buttons; with no tabs open, the title bar stays clear.
 struct WorkspaceDetailView: View {
     let store: ConversationStore
     let sessionSelection: SessionMultiSelection
@@ -20,17 +7,12 @@ struct WorkspaceDetailView: View {
     let isSidebarHidden: Bool
     let onRename: (Conversation) -> Void
     let onNewSession: () -> Void
-    /// A split chooser's New Session…, whose tab takes the chooser's place.
     let onNewSessionInSplitChooser: (UUID) -> Void
     let onCloseTerminal: (UUID) -> Void
     let onCloseTabGroup: ([UUID], _ projectName: String) -> Void
     let onDelete: (Conversation) -> Void
 
     @Environment(\.titleBarRow) private var titleBarRow
-    /// Each split's first pane share of the panes' width, or height when stacked, by split id: even until its resize area
-    /// is dragged, and kept as
-    /// its views are reversed or swapped, as Chrome keeps a split's sizes. A split chooser's is under its id, which the
-    /// split takes once a tab is chosen.
     @State private var splitFractions: [UUID: CGFloat] = [:]
     @StateObject private var hoverCards = TabHoverCardController()
 
@@ -41,7 +23,6 @@ struct WorkspaceDetailView: View {
             } else {
                 WorkspaceTabBar(
                     store: store,
-                    // With the sidebar hidden, the bar's leading edge is the window's, under the title bar's controls.
                     leadingClearance: isSidebarHidden ? titleBarRow.controlsTrailingEdge : 0,
                     onRenameConversation: onRename,
                     onNewSession: onNewSession,
@@ -57,7 +38,6 @@ struct WorkspaceDetailView: View {
             GeometryReader { geometry in
                 let shownSplit = store.shownSplit
                 let shownSplitChooser = store.shownSplitChooser
-                // The split, or split chooser, that shows, by the id its panes' widths are kept under.
                 let shownSplitViewID = shownSplit?.id ?? shownSplitChooser?.id
                 ZStack(alignment: .topLeading) {
                     SessionPreviewPane(
@@ -75,7 +55,6 @@ struct WorkspaceDetailView: View {
                     ForEach(store.terminalSessions) { session in
                         let isSelected = store.selectedTerminalID == session.id
                         let isShown = isSelected || shownSplit?.contains(session.id) == true
-                        // Beside a split chooser that has the keyboard, the tab's terminal does not take it.
                         let isActive = isSelected && !(store.selectsShownSplitChooser && shownSplitChooser?.tabID == session.id)
                         let split = store.split(containing: session.id)
                         let splitChooser = store.splitChooser(beside: session.id)
@@ -98,8 +77,6 @@ struct WorkspaceDetailView: View {
                             onOpenLink: { link in TerminalLinkActions(store: store, tab: session).openClicked(link) },
                             store: store
                         )
-                        // A split's terminal keeps its place inside the pane's outline, above the mini toolbar, while
-                        // another tab shows too, so selecting another tab resizes no terminal.
                         .padding(isInSplitView ? WorkspaceSplitPaneMetrics.terminalInsets : EdgeInsets())
                         .overlay {
                             if isInSplitView && isShown {
@@ -158,12 +135,9 @@ struct WorkspaceDetailView: View {
         }
         .ignoresSafeArea(edges: .top)
         .environment(\.tabHoverCards, hoverCards)
-        // Over the terminals too, which the card hangs over from the tab bar.
         .overlay { TabHoverCardOverlay(store: store, controller: hoverCards) }
         .background(TabHoverCardEventWatcher(controller: hoverCards))
         .background(TerminalFindShortcuts(selectedTabFind: store.selectedTerminal?.findState, onFind: findInSelectedTab))
-        // ⌘D, ⌘', and ⇧⌘' in the selected tab (TRM-74). The preview's reporter is active only while no tab is selected
-        // (SessionPreviewPane), so one window never has two.
         .background(
             TranscriptBookmarkTargetReporter(
                 target: TerminalTabBookmarks(store: store).commandTarget,
@@ -171,17 +145,13 @@ struct WorkspaceDetailView: View {
             )
         )
         .onChange(of: store.terminalSplits.map(\.id) + store.terminalSplitChoosers.map(\.id)) { _, splitViewIDs in
-            // Forget the pane widths of splits and split choosers that are gone.
             splitFractions = splitFractions.filter { splitViewIDs.contains($0.key) }
         }
         .onChange(of: store.stackedSplitViewIDs) { oldStackedIDs, newStackedIDs in
-            // A split laid out the other way starts even, as the highlight of a pane dragged there shows (SPL-18).
             for splitViewID in oldStackedIDs.symmetricDifference(newStackedIDs) { splitFractions[splitViewID] = nil }
         }
     }
 
-    /// ⌘F in the selected tab: its conversation's Find in a reading window, or the tab's find bar; see
-    /// `TerminalFindTarget`.
     private func findInSelectedTab() {
         guard let tab = store.selectedTerminal else { return }
         switch TerminalFindTarget(tab: tab) {
@@ -192,7 +162,6 @@ struct WorkspaceDetailView: View {
         }
     }
 
-    /// The split's, or split chooser's, left pane share, by its id.
     private func splitFraction(ofSplitView id: UUID) -> CGFloat {
         splitFractions[id] ?? TerminalSplitLayout.evenFraction
     }
@@ -205,12 +174,10 @@ struct WorkspaceDetailView: View {
         TerminalSplitDropArea.ShownSplit(fraction: splitFraction(ofSplitView: id), orientation: store.orientation(ofSplitView: id))
     }
 
-    /// The split's, or split chooser's, panes and resize area in an area of `size`, side by side or stacked.
     private func splitFrames(ofSplitView id: UUID, size: CGSize) -> TerminalSplitLayout.Frames {
         TerminalSplitLayout.frames(fraction: splitFraction(ofSplitView: id), size: size, orientation: store.orientation(ofSplitView: id))
     }
 
-    /// A double-click on the resize area reverses the shown split's views, or the shown split chooser and its tab.
     private func reverseShownSplitView() {
         if let shownSplit = store.shownSplit {
             store.reverseSplit(shownSplit.id)
@@ -219,8 +186,6 @@ struct WorkspaceDetailView: View {
         }
     }
 
-    /// Where the tab's terminal sits: its side's pane of its split, or the side a split chooser beside it leaves it, or
-    /// the whole area for a tab in neither.
     private func paneFrame(of tabID: UUID, in split: TerminalSplit?, besideChooser chooser: TerminalSplitChooser?, size: CGSize) -> CGRect {
         let side: TerminalSplit.Side
         let splitViewID: UUID
@@ -237,7 +202,6 @@ struct WorkspaceDetailView: View {
 }
 
 extension View {
-    /// Hides the view from sight, clicks, and VoiceOver while leaving it in the view tree.
     fileprivate func shown(_ isShown: Bool) -> some View {
         opacity(isShown ? 1 : 0)
             .allowsHitTesting(isShown)

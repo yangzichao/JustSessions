@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Blank space dismisses batch selection; Escape belongs to this list only while it has keyboard focus.
 struct SidebarSelectionScrollView<Content: View>: View {
     @FocusState.Binding var isFocused: Bool
     let onDismissSelection: () -> Void

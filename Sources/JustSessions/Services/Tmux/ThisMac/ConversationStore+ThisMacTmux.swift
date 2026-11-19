@@ -1,10 +1,6 @@
 import Foundation
 
-/// With tmux installed, this Mac's tabs run their CLI in JustSessions' own tmux server; see `ThisMacTmuxServer`.
 extension ConversationStore {
-    /// The command a tab on this Mac runs: `command` in the tmux session `tmuxSessionName` when tmux is installed,
-    /// or `command` alone. Also returns the tmux session's name when there is one. `historyLimit` is the lines the
-    /// session's pane keeps, when not tmux's default.
     func thisMacTabCommand(
         running command: NativeCLICommand,
         tmuxSessionName: String,
@@ -18,8 +14,6 @@ extension ConversationStore {
         runPeriodically(every: interval) { await $0.lookUpTmuxPaneProcesses() }
     }
 
-    /// A tab whose CLI runs in tmux on this Mac runs a tmux client; the CLI is a process of the tmux server. This
-    /// finds it for tabs that do not know it yet, for the lookups that go by the CLI's process.
     func lookUpTmuxPaneProcesses() async {
         let tabs = terminalSessions.filter {
             $0.host == .thisMac && !$0.isPlainTerminal && $0.tmuxSessionName != nil && $0.tmuxPaneProcessID == nil && !$0.hasExited

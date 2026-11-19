@@ -1,10 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// View → Actual Size, Zoom In, and Zoom Out, with Chrome's ⌘0, ⌘+, and ⌘−, size the text you are looking at: the
-/// terminals' while a tab shows, otherwise the conversation's. As Chrome keeps one zoom for a site, every terminal
-/// shares one size and every conversation another, and both stay after quitting. ⌘= zooms in too, through
-/// `ZoomInEqualsKey`. Command shortcuts never reach a tab's CLI.
 struct TextZoomCommands: Commands {
     @ObservedObject private var languageStore = AppLanguageStore.shared
 
@@ -20,7 +16,6 @@ struct TextZoomCommands: Commands {
         }
     }
 
-    /// Read when the item is chosen. A Read window is AppKit's, outside the workspace windows' scene.
     private func zoom(_ step: TextZoomStep) {
         let target = TextZoomTargetRegistry.shared.target(keyWindow: NSApp.keyWindow, mainWindow: NSApp.mainWindow) {
             $0.windowController is SessionReadingWindowController

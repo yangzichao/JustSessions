@@ -1,18 +1,12 @@
 import Foundation
 
-/// What a subagent's Claude Code transcript, and the `.meta.json` beside it, say about it.
 struct ClaudeSubagentSession: Sendable, Codable {
-    /// The first `cwd` the transcript records.
     let workingDirectory: String?
-    /// The task's short description, or else the first line of the prompt the subagent was given. Kept short, since
-    /// a session can start thousands of subagents with long prompts.
     let title: String
     /// The model of the first assistant line; a subagent keeps one model while it runs.
     let model: String?
     private static let assistantMarker = Data(#""type":"assistant""#.utf8)
 
-    /// Reads as far as the first prompt, which a subagent's transcript usually opens with, the folder it names, and
-    /// the first reply, which names the model.
     init(file: URL) {
         var workingDirectory: String?
         var firstPrompt: String?
@@ -20,8 +14,6 @@ struct ClaudeSubagentSession: Sendable, Codable {
         var lineCount = 0
         JSONLinesReader.forEachLeadingLine(in: file, maximumByteCount: ClaudeTranscriptHead.maximumByteCount) { line in
             lineCount += 1
-            // Once the folder and prompt are known, only an assistant line is worth parsing; tool output in between
-            // can be large.
             let needsRecord = workingDirectory == nil || firstPrompt == nil || line.range(of: Self.assistantMarker) != nil
             if needsRecord, let record = ConversationMetadata.object(from: line) {
                 workingDirectory = workingDirectory ?? record["cwd"] as? String
@@ -51,7 +43,6 @@ struct ClaudeSubagentSession: Sendable, Codable {
 enum ClaudeSubagentSessions {
     static let filePrefix = "agent-"
 
-    /// The subagent transcripts in the folder of the session with `sessionID`, in any order.
     static func files(ofSessionID sessionID: String, inProjectDirectory projectDirectory: URL) -> [URL] {
         let folder = projectDirectory.appendingPathComponent(sessionID).appendingPathComponent("subagents")
         guard
@@ -67,7 +58,6 @@ enum ClaudeSubagentSessions {
         }
     }
 
-    /// The id in an `agent-<id>.jsonl` file's name.
     static func agentID(of file: URL) -> String? {
         let name = file.deletingPathExtension().lastPathComponent
         guard name.hasPrefix(filePrefix) else { return nil }

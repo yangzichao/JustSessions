@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A drag along the tab bar is drawn so that a move of the pointer re-runs only the shifts of the tabs or groups: the
-/// placement, which the tabs, their groups, and the bar read, changes only as the drag starts or ends, or as the
-/// dragged item passes another.
 @MainActor
 struct TabBarDragDisplayTests {
     @Test func aMoveWithinTheDraggedItemsPlaceChangesOnlyTheDrag() throws {
@@ -53,14 +50,11 @@ struct TabBarDragDisplayTests {
         #expect(observedChanges(of: display) { display.show(nil) }.isEmpty)
     }
 
-    // MARK: - Helpers
-
     private enum Property: Hashable {
         case drag
         case placement
     }
 
-    /// The display's properties that views reading them would see change through `change`.
     private func observedChanges(of display: TabBarDragDisplay<String>, through change: () -> Void) -> Set<Property> {
         let changes = ObservedChanges()
         withObservationTracking {

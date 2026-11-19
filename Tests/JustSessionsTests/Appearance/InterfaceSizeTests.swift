@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Settings → Appearance → Interface size: what it saves, and that the app's type and the sizes that hold it follow it.
 @MainActor
 @Suite(.serialized)
 struct InterfaceSizeTests {
@@ -25,7 +24,6 @@ struct InterfaceSizeTests {
         #expect(store.scale == 0.9)
         store.setScale(.nan)
         #expect(store.scale == 1.0)
-        // The default is no saved value, so a later default applies.
         #expect(settings.userDefaults.object(forKey: InterfaceSizeStore.userDefaultsKey) == nil)
 
         settings.userDefaults.set(1.17, forKey: InterfaceSizeStore.userDefaultsKey)
@@ -42,13 +40,9 @@ struct InterfaceSizeTests {
         #expect(InterfaceScale.controlSize(at: 1.1) == .regular)
         #expect(InterfaceScale.controlSize(at: 1.3) == .large)
         #expect(InterfaceScale.controlSize(at: 1.5) == .extraLarge)
-        // Tests run beside others that draw the app's views, so none changes the app's own size.
         #expect(InterfaceSizeStore.shared.scale == InterfaceSizeStore.defaultScale)
     }
 
-    /// A view on screen whose body sets its text in the theme's scaled font redraws larger when its store's size
-    /// changes, with nothing else telling it to. The store is the test's own, read through the same path the app's
-    /// tokens read the shared one, so other tests keep drawing at the default size.
     @Test func textOnScreenGrowsWhenTheInterfaceSizeChanges() async throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
@@ -68,7 +62,6 @@ struct InterfaceSizeTests {
     }
 }
 
-/// Reads the theme's scaled font in its body, as the app's views read `ThemeFont`'s tokens.
 private struct ScaledLabel: View {
     let store: InterfaceSizeStore
 

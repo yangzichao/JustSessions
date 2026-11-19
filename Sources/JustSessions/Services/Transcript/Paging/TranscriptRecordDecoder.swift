@@ -3,15 +3,10 @@ import Foundation
 struct TranscriptRecordDecoder {
     let provider: ConversationProvider
     let maximumTextLength: Int
-    /// Reads a subagent's transcript; see `ClaudeTranscriptReader.includesSidechains`.
     var isSubagentTranscript = false
-    /// See `TranscriptBuilder.decodesImages`.
     var decodesImages = true
     private let jsonDecoder = JSONDecoder()
 
-    /// A record's entries and the bytes decoded, as `TranscriptPageReader` takes them. `data` is nil for a record over
-    /// the page limits' `maximumRecordByteCount`. A Codex record that large is judged by its first bytes, read by `head`,
-    /// and left out when it can't hold a transcript item, rather than shown as a note.
     func pageEntries(from data: Data?, head: (_ byteCount: Int) throws -> Data) rethrows -> ([TranscriptEntry], Int) {
         if data == nil, provider == .codex, !CodexTranscriptReader.mightContainTranscriptItem(try head(512)) { return ([], 0) }
         return (entries(from: data), data?.count ?? 0)

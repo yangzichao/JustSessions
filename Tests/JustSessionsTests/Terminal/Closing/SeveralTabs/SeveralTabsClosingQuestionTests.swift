@@ -2,9 +2,7 @@ import Testing
 
 @testable import JustSessions
 
-/// Close all tabs in group… asks once for every tab, and only what a single tab's close would ask.
 struct SeveralTabsClosingQuestionTests {
-    /// Every tab on hosts with the same saved choice.
     private func question(
         _ needs: [TabClosingNeed],
         tabCloseChoice: TabCloseChoice = .askEachTime,
@@ -23,7 +21,6 @@ struct SeveralTabsClosingQuestionTests {
     @Test func otherTabsStoppingEitherWayAreNamedInTheQuestion() {
         #expect(question([.canKeepCLIRunning, .plainTerminal]) == .keepOrEndCLIs(alsoStopsOthers: true))
         #expect(question([.canKeepCLIRunning, .cliStopsWithTab]) == .keepOrEndCLIs(alsoStopsOthers: true))
-        // A plain terminal you chose to close without asking still stops, so the question still says so.
         #expect(
             question([.canKeepCLIRunning, .plainTerminal], plainTerminalCloseChoice: .closeWithoutAsking)
                 == .keepOrEndCLIs(alsoStopsOthers: true))
@@ -38,7 +35,6 @@ struct SeveralTabsClosingQuestionTests {
                 == .closeWithoutAsking)
     }
 
-    /// Tabs on hosts that each saved a choice close without asking, each as its host's choice says.
     @Test func tabsOnHostsWithDifferentSavedChoicesCloseWithoutAsking() {
         let tabs: [(need: TabClosingNeed, tabCloseChoice: TabCloseChoice)] = [
             (.canKeepCLIRunning, .keepRunning), (.canKeepCLIRunning, .endSession),
@@ -46,8 +42,6 @@ struct SeveralTabsClosingQuestionTests {
         #expect(SeveralTabsClosingQuestion(tabs: tabs, plainTerminalCloseChoice: .askEachTime) == .closeWithoutAsking)
     }
 
-    /// One CLI in tmux on a host that asks each time makes the whole close ask; a host's choice matters only to a CLI
-    /// tmux can keep running there.
     @Test func aCLIOnAHostThatAsksMakesTheCloseAsk() {
         let askingHostTabs: [(need: TabClosingNeed, tabCloseChoice: TabCloseChoice)] = [
             (.canKeepCLIRunning, .keepRunning), (.canKeepCLIRunning, .askEachTime),
@@ -63,7 +57,6 @@ struct SeveralTabsClosingQuestionTests {
                 == .closeWithoutAsking)
     }
 
-    /// The saved choice answers for the CLIs in tmux, but a tab whose CLI or shell stops still asks first.
     @Test func aSavedTmuxChoiceStillAsksWhenOtherTabsWouldStop() {
         #expect(question([.canKeepCLIRunning, .cliStopsWithTab], tabCloseChoice: .keepRunning) == .keepOrEndCLIs(alsoStopsOthers: true))
         #expect(question([.canKeepCLIRunning, .plainTerminal], tabCloseChoice: .keepRunning) == .keepOrEndCLIs(alsoStopsOthers: true))

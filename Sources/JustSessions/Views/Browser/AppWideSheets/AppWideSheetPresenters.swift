@@ -1,7 +1,5 @@
 import AppKit
 
-/// The open workspace windows and how each shows Settings or Help, so the app menu shows them on the frontmost
-/// workspace window, also while a reading window has focus.
 @MainActor
 enum AppWideSheetPresenters {
     private struct Registration {
@@ -11,7 +9,6 @@ enum AppWideSheetPresenters {
     }
 
     private static var registrations: [Registration] = []
-    /// Asked for while no workspace window was open, so the window opened for it shows it as it appears.
     private static var sheetForNewWorkspaceWindow: AppWideSheet?
 
     static func register(
@@ -27,15 +24,13 @@ enum AppWideSheetPresenters {
         registrations.removeAll { $0.window == nil || $0.window === window }
     }
 
-    /// Shows `sheet` on the frontmost workspace window, or on one `openWorkspaceWindow` opens when none is open. A
-    /// window showing Settings switches pages; one showing another sheet, alert, or dialog only comes forward.
     static func show(_ sheet: AppWideSheet, openWorkspaceWindow: () -> Void) {
         registrations.removeAll { $0.window == nil }
         let frontmostRegistration = NSApp.orderedWindows.lazy
             .filter(\.isVisible)
             .compactMap { window in registrations.first { $0.window === window } }
             .first
-        // A closed window can stay registered until it is released; only a minimized one comes back.
+        // A closed window can stay registered until it is released.
         let minimizedRegistration = registrations.first { $0.window?.isMiniaturized == true }
         guard let registration = frontmostRegistration ?? minimizedRegistration, let window = registration.window else {
             sheetForNewWorkspaceWindow = sheet
@@ -47,7 +42,6 @@ enum AppWideSheetPresenters {
         if window.attachedSheet == nil || registration.isShowingSettings() { registration.show(sheet) }
     }
 
-    /// The sheet asked for while no workspace window was open, handed out once.
     static func takeSheetForNewWorkspaceWindow() -> AppWideSheet? {
         defer { sheetForNewWorkspaceWindow = nil }
         return sheetForNewWorkspaceWindow

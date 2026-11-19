@@ -1,7 +1,6 @@
 import Darwin
 
-/// A session file's device, inode, size, and modification time by `stat`, and for a SQLite source its `-wal`'s, which is
-/// written first (ConversationStore+NewSessionDiscovery.swift:73-77). Microseconds; run on the outline reader's actor.
+/// For a SQLite source, also its `-wal`, which is written first.
 struct ConversationOutlineChangeStamp: Equatable, Sendable {
     struct FileStamp: Equatable, Sendable {
         let device: Int32

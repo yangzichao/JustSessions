@@ -4,8 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct JSONLinesReaderPropertyTests {
-    /// Random bytes, newlines included, read in chunks of every size give the same lines as splitting the bytes
-    /// at each newline. Lines are compared as bytes: a line may end in `\r` or hold invalid UTF-8.
     @Test(arguments: [1, 2, 3, 7, 64, 1 << 20])
     func everyLineArrivesWholeWhateverTheChunkSize(chunkSize: Int) throws {
         let directory = try makeTemporaryDirectory()
@@ -25,8 +23,6 @@ struct JSONLinesReaderPropertyTests {
         }
     }
 
-    /// Reading the leading lines in chunks of any size gives the same lines as reading the leading bytes at once, and
-    /// stops at the first line its body declines.
     @Test(arguments: [1, 2, 3, 7, 64, 1 << 16])
     func leadingLinesArriveWholeAndStopWhenAsked(chunkSize: Int) throws {
         let directory = try makeTemporaryDirectory()

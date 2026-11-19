@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The Pi branch scan reads lines a chunk at a time. Whatever the chunk size, it finds the branch a seek and read for
-/// each line found, and it still refuses a line over the record limit and a file cut short.
 struct TranscriptPiPageIndexTests {
     @Test(arguments: [1, 7, 64, 333, 4_096, 1 << 20])
     func everyChunkSizeFindsTheBranchALineAtATimeFinds(chunkSize: Int) throws {
@@ -45,7 +43,6 @@ struct TranscriptPiPageIndexTests {
         }
     }
 
-    /// The lines before an over-limit line are read first, so a file cut inside them fails as changed, not as too large.
     @Test func aFileCutShortBeforeALineOverTheLimitFailsAsChanged() throws {
         let fixture = try TranscriptPagingFixture(count: 0)
         defer { fixture.remove() }
@@ -77,8 +74,6 @@ struct TranscriptPiPageIndexTests {
         }
     }
 
-    /// A tree with abandoned branches, in Pi's own layout and reordered, with blank and CR LF lines, entries never shown,
-    /// tool results with and without images, lines long enough to span chunks, and sometimes no final newline.
     private static func randomSession(using generator: inout SeededRandomNumberGenerator) -> Data {
         var lines = [#"{"type":"session","version":3,"id":"s"}"#]
         var ids: [String] = []
@@ -113,7 +108,6 @@ struct TranscriptPiPageIndexTests {
         #"{"type":"message","id":"\#(id)","parentId":\#(parent.map { "\"\($0)\"" } ?? "null"),"timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"assistant","content":[{"type":"text","text":"\#(text)"}]}}"#
     }
 
-    /// The scan as first written: a seek and read for each line.
     private static func lineAtATime(in index: TranscriptFileIndex, handle: FileHandle) throws -> [Int] {
         let links = try index.lineStarts.indices.compactMap { record -> PiEntryLink? in
             var data = try #require(

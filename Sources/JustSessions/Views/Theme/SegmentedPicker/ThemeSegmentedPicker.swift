@@ -4,7 +4,6 @@ import SwiftUI
 /// differs from its track on dark theme surfaces, so here the selected segment is filled with the ink, like a checked
 /// `ThemedCheckboxToggleStyle` box. It fills the width it is offered; use `.fixedSize()` to fit its titles.
 struct ThemeSegmentedPicker<Value: Hashable>: View {
-    /// Not shown; VoiceOver reads it as the control's label.
     let accessibilityTitle: LocalizedStringKey
     @Binding var selection: Value
     let segments: [ThemeSegment<Value>]

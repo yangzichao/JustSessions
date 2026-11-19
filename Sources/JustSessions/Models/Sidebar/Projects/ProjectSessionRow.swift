@@ -1,6 +1,5 @@
 import Foundation
 
-/// A row under a project in the sidebar: a listed session, or a new session's tab whose CLI has not written one yet.
 enum ProjectSessionRow: Identifiable {
     case conversation(Conversation)
     case pendingNewSession(PendingNewSession)
@@ -12,7 +11,6 @@ enum ProjectSessionRow: Identifiable {
         }
     }
 
-    /// Pinned sessions stay on top, then new sessions, then the rest. `conversations` lists pinned sessions first.
     static func ordered(
         conversations: [Conversation],
         pendingNewSessions: [PendingNewSession],

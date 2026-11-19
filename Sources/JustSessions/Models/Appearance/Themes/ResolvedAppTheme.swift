@@ -1,4 +1,3 @@
-/// A theme as the app draws it: the theme's light and dark colors with your changes to them, worked out once.
 struct ResolvedAppTheme: Sendable {
     let theme: AppTheme
     let customization: AppThemeCustomization
@@ -24,8 +23,6 @@ struct ResolvedAppTheme: Sendable {
         isDark ? darkColors : lightColors
     }
 
-    /// The theme with a customization that differs from this one only in the light or the dark version. Only that
-    /// version is worked out again.
     func replacingCustomization(with customization: AppThemeCustomization, changedVersionIsDark isDark: Bool) -> ResolvedAppTheme {
         let changedColors = theme.colors(isDark: isDark).applying(customization.changes(isDark: isDark))
         return ResolvedAppTheme(
@@ -37,7 +34,6 @@ struct ResolvedAppTheme: Sendable {
 }
 
 extension ResolvedAppTheme: Equatable {
-    /// The colors follow from the theme and its customization, so comparing those is enough, and cheaper.
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.theme == rhs.theme && lhs.customization == rhs.customization
     }

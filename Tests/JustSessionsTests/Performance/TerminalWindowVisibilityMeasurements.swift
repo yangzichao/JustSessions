@@ -5,15 +5,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Measures the CPU a selected terminal tab costs while its window is in sight, covered by another window, or minimized,
-/// against the same tab coalesced as a hidden one. A hidden tab's output is batched and not drawn, which is the most a
-/// window-visibility check could save for a covered or minimized window. `TerminalInsetView` batches a minimized
-/// window's terminals that way; a covered window's aren't, since macOS reports no occlusion to a test process, so a
-/// check on it couldn't be tested here. Replays the same output through the real
-/// SwiftTerm input path; no CLI or shell is started. Reports `TerminalWindowPerf | …` lines.
-///
-/// The suite records nothing unless `JUSTSESSIONS_PERF` is set:
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter TerminalWindowVisibilityMeasurements
 @MainActor
 @Suite(.serialized)
 struct TerminalWindowVisibilityMeasurements {
@@ -42,14 +33,12 @@ struct TerminalWindowVisibilityMeasurements {
         }
     }
 
-    /// Three seconds of a full-screen TUI repainting 40 rows at 30 frames a second, as a CLI's busy status does.
     private func measure(_ state: WindowState) async throws -> (cpuPercentage: Double, observedWindowState: String) {
         _ = NSApplication.shared
         let frame = NSRect(x: 200, y: 200, width: 1000, height: 650)
         let window = NSWindow(contentRect: frame, styleMask: [.titled, .miniaturizable], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         let terminal = SelectableTerminalView(frame: NSRect(origin: .zero, size: frame.size))
-        // In its inset view, as in the app, which also minds whether the window is minimized.
         let insetView = TerminalInsetView(terminalView: terminal)
         window.contentView = insetView
         insetView.isShown = state != .hiddenTab
@@ -96,7 +85,6 @@ struct TerminalWindowVisibilityMeasurements {
             frameNumber += 1
             try await Task.sleep(for: .milliseconds(33))
         }
-        // Include the final flush instead of leaving its CPU outside the measurement.
         terminal.setWorkspaceActive(true)
         let elapsed = ContinuousClock.now - start
         let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18

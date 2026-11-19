@@ -1,7 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// A finding's command for your own Terminal, with a button that copies it.
 struct HostCheckCommandToRunYourself: View {
     let command: String
     @State private var hasCopied = false

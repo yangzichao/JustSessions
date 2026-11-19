@@ -1,6 +1,5 @@
 import Foundation
 
-/// Leaves archived sessions out of the Projects list, as it does by default, or lists them with the others.
 enum SessionArchiveFilter: Hashable {
     case hideArchived
     case showArchived

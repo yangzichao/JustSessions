@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Find in a Ghostty tab, which scrolls the selected match to the top of the view; see `SwiftTermTerminalFindTests`.
 /// Each test waits for Ghostty's final layout before any output: a resize drops the selected match, so the next move
 /// selects the newest again.
 @MainActor

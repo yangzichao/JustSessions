@@ -4,7 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct CodexThreadStatusTests {
-    /// Statuses as Codex's background server gave them for a thread whose command waited for approval, then ran.
     @Test(arguments: [
         (#"{"type":"active","activeFlags":["waitingOnApproval"]}"#, true),
         (#"{"type":"active","activeFlags":["waitingOnUserInput"]}"#, true),

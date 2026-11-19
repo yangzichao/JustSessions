@@ -5,8 +5,6 @@ struct SessionPreviewHeader: View {
     let conversation: Conversation
     let onRename: () -> Void
     let onDelete: () -> Void
-    /// The project folder last found gone: checked when the session shows and whenever the app comes back to the
-    /// front, so a folder moved back in Finder turns Resume on again without picking the session again.
     @State private var missingProjectFolder: ProjectLocation?
 
     private var isProjectFolderMissing: Bool {
@@ -80,12 +78,10 @@ struct SessionPreviewHeader: View {
                 HStack(spacing: 5) {
                     Text(conversation.provider.rawValue)
                     Text("·")
-                    // The model the CLI used last, as it records it.
                     if let model = conversation.model {
                         Text(verbatim: model.label)
                         Text("·")
                     }
-                    // With SSH hosts added, every session names its host, this Mac included.
                     if store.hasRemoteHosts {
                         Label(conversation.host.displayName, systemImage: conversation.host.symbolName)
                         Text("·")
@@ -104,7 +100,6 @@ struct SessionPreviewHeader: View {
         .frame(minWidth: 180, maxWidth: .infinity, alignment: .leading)
     }
 
-    /// A subagent's session names the session that started it instead, since it is only read.
     private var sessionActions: some View {
         HStack(spacing: 10) {
             if conversation.isSubagent {

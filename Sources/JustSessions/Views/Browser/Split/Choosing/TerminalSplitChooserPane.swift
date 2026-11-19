@@ -1,23 +1,15 @@
 import SwiftUI
 
-/// A split chooser's pane, as Chrome's split view new tab page: on the split area's background, inside a pane outline
-/// that is darker while it has the keyboard, with a × in its top-trailing corner that closes it and a card listing the
-/// tabs it can show; see `ConversationStore.splitChooserCandidates`. It takes the keyboard with the first tab
-/// highlighted: ↑ and ↓ move the highlight, and Return or Space chooses that tab, as a click on a tab does. With no tab
-/// to list, it offers New Session…, whose tab takes its place.
 struct TerminalSplitChooserPane: View {
     let store: ConversationStore
     let chooser: TerminalSplitChooser
-    /// The chooser has the keyboard.
     let isSelected: Bool
     let onNewSession: () -> Void
 
     @Environment(\.tabBarTerminalPalette) private var terminalPalette
     @FocusState private var hasKeyboard: Bool
-    /// The tab ↑ and ↓ last moved to; the first listed while none is, or once it leaves the list.
     @State private var highlightedTabID: UUID?
 
-    /// Chrome's list is at most 394 points wide, with 16 on either side.
     private static let listMaximumWidth: CGFloat = 394
     private static let listMargin: CGFloat = 16
 
@@ -44,7 +36,6 @@ struct TerminalSplitChooserPane: View {
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
         }
-        // A click anywhere in the pane gives it the keyboard, as a click in a terminal's pane does.
         .contentShape(Rectangle())
         .onTapGesture { store.selectSplitChooser(beside: chooser.tabID) }
         .focusable()
@@ -60,7 +51,6 @@ struct TerminalSplitChooserPane: View {
         .onChange(of: hasKeyboard) { _, hasKeyboard in
             if hasKeyboard && !isSelected { store.selectSplitChooser(beside: chooser.tabID) }
         }
-        // It sits on the terminal's background, which can be dark in a light window or the reverse.
         .environment(\.colorScheme, terminalPalette.colorScheme)
     }
 
@@ -81,7 +71,6 @@ struct TerminalSplitChooserPane: View {
         .padding(WorkspaceSplitPaneMetrics.outlineCornerRadius)
     }
 
-    /// The card of tabs, as tall as its tabs until it fills the pane, then scrolling.
     private func tabList(_ candidates: [TerminalSession], highlightedTabID: UUID?) -> some View {
         let rows = LazyVStack(spacing: 0) {
             ForEach(candidates, id: \.id) { tab in
@@ -110,7 +99,6 @@ struct TerminalSplitChooserPane: View {
         .accessibilityLabel("Choose a tab to add to split view")
     }
 
-    /// Where the tab runs and what it runs, as its tab's hover card says: "JustSessions · Claude Code".
     private func details(of tab: TerminalSession) -> String {
         [
             store.projectDisplayName(forProjectPath: tab.projectDirectoryKey),
@@ -135,7 +123,6 @@ struct TerminalSplitChooserPane: View {
         return .handled
     }
 
-    /// Chooses the highlighted tab, or, with none to list, opens New Session….
     private func chooseHighlightedTab(among candidates: [TerminalSession]) -> KeyPress.Result {
         guard let tabID = highlightedTabID(among: candidates) else {
             onNewSession()

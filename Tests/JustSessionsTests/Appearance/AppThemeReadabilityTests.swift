@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Guards against a mistyped color leaving text unreadable. The limits are WCAG contrast ratios.
 struct AppThemeReadabilityTests {
     @Test func everyThemeKeepsTextReadableInLightAndDark() {
         for theme in AppTheme.allCases {
@@ -13,10 +12,8 @@ struct AppThemeReadabilityTests {
                 let variant = "\(theme) \(isDark ? "dark" : "light")"
 
                 #expect(terminal.ansiHexColors.count == 16, "\(variant)")
-                // Tokyo Night Day's body text is the palest of these, just above 4.5.
                 #expect(contrastRatio(terminal.foreground, colors.contentSurface) >= 4.5, "\(variant) terminal text")
                 #expect(contrastRatio(terminal.selectionForeground, terminal.selectionBackground) >= 3, "\(variant) selection")
-                // Bright black carries hints and dim text in many CLIs, so it must not vanish into the background.
                 #expect(contrastRatio(terminal.ansiHexColors[8], colors.contentSurface) >= 1.5, "\(variant) bright black")
                 #expect(contrastRatio(colors.inkForeground, colors.ink) >= 4.5, "\(variant) ink foreground")
             }
@@ -45,7 +42,6 @@ struct AppThemeReadabilityTests {
         }
     }
 
-    /// The check a customized theme's surfaces must pass takes every built-in theme's own, in its own version only.
     @Test func everyThemesSurfacesSuitTheirOwnVersionAndNotTheOther() {
         for theme in AppTheme.allCases {
             for isDark in [false, true] {
@@ -86,7 +82,6 @@ struct AppThemeReadabilityTests {
             for isDark in [false, true] {
                 let colors = theme.colors(isDark: isDark)
                 #expect(colors.tabGroupHexColors.count == 8)
-                // The tab bar's labels sit on the sidebar surface, and the open tabs list names groups in the sidebar.
                 for surface in [colors.contentSurface, colors.sidebarSurface] {
                     for foreground in colors.tabGroupHexColors {
                         for fillOpacity in [0.0, 0.15, 0.24] {
@@ -100,7 +95,6 @@ struct AppThemeReadabilityTests {
                         }
                     }
                 }
-                // The open tabs list names a group in its color on a sidebar row, which the pointer fills faintly.
                 let hoveredHeading = ThemeColorContrast.blend(colors.sidebarSurface, with: colors.line, fraction: ThemeFillOpacity.hover)
                 for foreground in colors.tabGroupHexColors {
                     #expect(contrastRatio(foreground, hoveredHeading) >= 4.5, "\(theme) dark=\(isDark) hovered heading")

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The same raised surface as search fields and other app controls, including in secondary windows and sheets.
 struct ThemedTextFieldStyle: TextFieldStyle {
     // periphery:ignore - the TextFieldStyle requirement SwiftUI calls.
     func _body(configuration: TextField<Self._Label>) -> some View {
@@ -11,8 +10,6 @@ struct ThemedTextFieldStyle: TextFieldStyle {
 }
 
 extension View {
-    /// A themed text field's padding, surface, and outline, also for text shown in place of a field, such as a
-    /// locked one.
     nonisolated func themedTextFieldSurface() -> some View {
         padding(.horizontal, 8)
             .padding(.vertical, 6)

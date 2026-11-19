@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The SSH hosts you disconnected from, kept across launches.
 struct DisconnectedRemoteHostsTests {
     @Test func theChoiceIsSavedAndLoadedPerHost() throws {
         let settings = try IsolatedUserDefaults()

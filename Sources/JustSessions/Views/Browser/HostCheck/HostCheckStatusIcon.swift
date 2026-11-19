@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A finding's status before its title in Check this host…'s report.
 struct HostCheckStatusIcon: View {
     let status: HostCheckFinding.Status
 

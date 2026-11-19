@@ -53,7 +53,6 @@ struct OnboardingTourStopTests {
             !OnboardingTourStop.splitView.canShow(
                 in: OnboardingWindowContext(hasSelectedTab: true, isSelectedTabInSplit: true, openTabCount: 2)
             ))
-        // It points at the tab, so it shows while the sidebar is hidden too.
         #expect(
             OnboardingTourStop.splitView.canShow(
                 in: OnboardingWindowContext(hasSelectedTab: true, openTabCount: 2, isSidebarShown: false)

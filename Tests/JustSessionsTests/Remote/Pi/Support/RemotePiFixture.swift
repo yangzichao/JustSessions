@@ -2,10 +2,7 @@ import Foundation
 
 @testable import JustSessions
 
-/// A temporary folder standing in for an SSH host's home, with one Pi session in `~/.pi/agent/sessions` and its copy
-/// in that host's Pi mirror. The project folder's name has spaces, quotes, and shell syntax in it.
 struct RemotePiFixture {
-    /// The shell a host runs commands with as `sh`.
     enum HostShell: String, CaseIterable {
         /// macOS's `/bin/sh`: bash in POSIX mode, which still accepts some bash-only syntax.
         case sh
@@ -20,8 +17,6 @@ struct RemotePiFixture {
             FileManager.default.isExecutableFile(atPath: path)
         }
 
-        /// The shells a test runs under. A missing one is left out rather than failing every case; a test enabled
-        /// only when `/bin/dash` is installed shows as skipped instead.
         static let installed = allCases.filter(\.isInstalled)
     }
 
@@ -29,7 +24,6 @@ struct RemotePiFixture {
 
     let shell: HostShell
     let root: URL
-    /// Holds the `sh` that commands on the host find on their `PATH`, which is `shell`.
     let hostBinDirectory: URL
     let remoteHome: URL
     let sessionsDirectory: URL
@@ -71,13 +65,10 @@ struct RemotePiFixture {
         hostSessionFile.deletingPathExtension()
     }
 
-    /// Deletes through `shell` with the temporary home as `$HOME`, the way `ssh devbox <command>` would run it.
     func deletion() -> RemoteConversationDeletion {
         RemoteConversationDeletion(runner: RemoteHostCommandRunner { [self] _, command, _ in runOnHost(command) }, mirror: mirror)
     }
 
-    /// Runs a command through `shell` with the temporary home as `$HOME`. A command that starts `sh` runs `shell`
-    /// too, as it would on a host whose `/bin/sh` is that shell.
     func runOnHost(_ command: String) -> (exitStatus: Int32, output: String)? {
         BoundedProcessRunner.result(
             ofExecutable: shell.path,

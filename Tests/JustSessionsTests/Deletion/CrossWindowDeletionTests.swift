@@ -50,7 +50,6 @@ struct CrossWindowDeletionTests {
         fixture.second.delete(fixture.conversations[0])
         #expect(fixture.second.queuedDeletionConversationIDs == [fixture.conversations[0].id])
         fixture.first.closeWorkspace()
-        // The window is gone and its waiter canceled, but the producer still holds the host's reservation.
         try await Task.sleep(for: .milliseconds(100))
         #expect(fixture.adapter.deleteCalls == 0)
         fixture.adapter.release()

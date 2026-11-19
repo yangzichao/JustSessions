@@ -2,8 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The store shows one alert at a time; one that comes meanwhile waits, and dismissing an alert never dismisses
-/// a newer one.
 @MainActor
 struct StoreAlertQueueTests {
     @Test func anAlertThatComesWhileOneIsShownWaitsForIt() throws {
@@ -21,7 +19,6 @@ struct StoreAlertQueueTests {
         #expect(store.alert == nil)
     }
 
-    /// As when an alert's closing reports after a newer alert was set.
     @Test func dismissingAnAlertThatAlreadyWentLeavesTheNewerOne() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }

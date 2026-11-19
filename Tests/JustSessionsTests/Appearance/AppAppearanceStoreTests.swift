@@ -35,7 +35,6 @@ struct AppAppearanceStoreTests {
     }
 }
 
-/// Stands in for `NSApp`, which unit tests run without.
 @MainActor
 private final class RecordedApplicationAppearance {
     private(set) var appliedNames: [NSAppearance.Name?] = []

@@ -16,9 +16,6 @@ struct TranscriptPagingViewportTests {
         #expect(nearBottom.prefetchDirection(hasEarlier: true, hasLater: false, retainedPageCount: 3) == nil)
     }
 
-    /// The geometry the reader bounced in: three pages of a few screenshots each in a 1,308-point viewport. Dropping
-    /// the far page brought the viewport within prefetch distance of the new edge, so that page loaded straight back
-    /// and pushed out the one just loaded, over and over.
     @Test func pagesTheReaderIsNearStayWhenAPageLoadsAtTheOtherEnd() {
         let viewport = TranscriptPagingViewport(
             document: CGRect(x: 0, y: 0, width: 2_220, height: 3_558),
@@ -33,9 +30,7 @@ struct TranscriptPagingViewportTests {
             visible: CGRect(x: 0, y: 15_000, width: 780, height: 1_308))
         #expect(viewport.retainedPageCount(afterLoading: .earlier, pageStarts: [0, 9_000, 20_000]) == 3)
         #expect(viewport.retainedPageCount(afterLoading: .later, pageStarts: [0, 9_000, 20_000]) == 3)
-        // Only as many leave as the usual three-page budget needs.
         #expect(viewport.retainedPageCount(afterLoading: .later, pageStarts: [0, 9_000]) == 3)
-        // A page with no laid-out rows starts where the next one does, so it leaves with the clear page after it.
         #expect(viewport.retainedPageCount(afterLoading: .earlier, pageStarts: [0, 9_000, nil, 20_000]) == 3)
     }
 

@@ -1,7 +1,5 @@
 import Foundation
 
-/// Editorial release history shared with the website, GitHub, and Sparkle. Copy is kept in the release catalog,
-/// rather than extracted as UI labels, so each version's English and Chinese notes stay together.
 struct AppReleaseNotes: Decodable, Identifiable, Sendable {
     let version: String
     let publishedOn: String
@@ -19,7 +17,6 @@ struct AppReleaseNotes: Decodable, Identifiable, Sendable {
         }
     }
 
-    /// A release date is a calendar day, so changing the Mac's time zone must not shift it to the previous day.
     func formattedDate(locale: Locale) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")

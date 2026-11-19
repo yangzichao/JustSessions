@@ -3,10 +3,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// A private tmux server for tests: its socket sits in a temporary folder of its own, next to a project folder and a
-/// `bin` folder holding stand-in CLIs and a link to the installed tmux. The app's own server is never touched.
-/// `make()` returns nil where tmux is missing or older than the app supports, so the tests that need it pass there
-/// without running.
 struct ThisMacTmuxSandbox {
     let root: URL
     let project: URL
@@ -54,20 +50,15 @@ struct ThisMacTmuxSandbox {
         server = ThisMacTmuxServer(executablePath: tmuxLink.path, environment: environment)
     }
 
-    /// Finds the CLIs and tmux in `bin` only, and hands the sandbox's environment to what it launches.
     var resolver: NativeCLICommandResolver {
         NativeCLICommandResolver(searchDirectories: [binaryDirectory.path], inheritedEnvironment: environment)
     }
 
-    /// A stand-in CLI the test needs running sleeps 600 seconds, so it runs until the test or `tearDown()` ends it.
-    /// On the release runner a test can take minutes, and a CLI that ended on its own timer would end its tmux
-    /// session in the middle of the test.
     @discardableResult
     func writeExecutable(named name: String, script: String) throws -> URL {
         try writeExecutableScript(script, to: binaryDirectory.appendingPathComponent(name))
     }
 
-    /// A CLI stand-in's command in the project folder, before tmux wraps it.
     func cliCommand(_ executable: URL, arguments: [String] = [], extraEnvironment: [String: String] = [:]) -> NativeCLICommand {
         NativeCLICommand(
             executablePath: executable.path,
@@ -100,9 +91,6 @@ struct ThisMacTmuxSandbox {
         ) ?? ""
     }
 
-    /// Waits up to 120 seconds without blocking the main thread, where a tab reads its terminal's output. The start of
-    /// a full run can hold up tmux and the store's background work for tens of seconds, as `expectEventually` notes;
-    /// a passing condition still returns at once.
     @MainActor
     func waitUntil(_ condition: () -> Bool) async -> Bool {
         let deadline = ContinuousClock.now + .seconds(120)
@@ -124,7 +112,6 @@ struct ThisMacTmuxSandbox {
         return false
     }
 
-    /// Keep a failed real-terminal launch actionable on a headless CI runner.
     @MainActor
     func launchDiagnostics(for tab: TerminalSession) -> String {
         let terminalOutput = screenText(of: tab.terminalView)

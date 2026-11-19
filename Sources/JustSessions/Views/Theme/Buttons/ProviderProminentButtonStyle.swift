@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// A filled button in one CLI's hue, for the action that starts that CLI (Resume, Start session). It is flat like
-/// `ThemeProminentButtonStyle` and differs from it only in color.
 struct ProviderProminentButtonStyle: ButtonStyle {
     let tint: Color
 

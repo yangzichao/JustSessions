@@ -1,13 +1,9 @@
 import AppKit
 
-/// Acts on a link in a tab's terminal, whichever engine draws it; `TerminalLinkActions` says which action a ⌘-click or
-/// a right-click menu's item takes. `TerminalLinkTarget` says what a link points at.
 @MainActor
 struct TerminalLinkOpener {
     let host: SessionHost
-    /// The tab's project folder, which a relative path is in.
     let workingDirectory: String
-    /// Replaced in tests, which must not open, reveal, or copy anything.
     var openURL: (URL) -> Void = { NSWorkspace.shared.open($0) }
     var revealInFinder: (URL) -> Void = { NSWorkspace.shared.activateFileViewerSelecting([$0]) }
     var copyText: (String) -> Void = { text in
@@ -20,8 +16,6 @@ struct TerminalLinkOpener {
         TerminalLinkTarget(link: link, host: host, workingDirectory: workingDirectory)
     }
 
-    /// Opens a web page in the default browser, and a file or folder on this Mac in the app macOS opens its kind with,
-    /// ignoring any line number, when `canOpen(_:)` allows it.
     func open(_ target: TerminalLinkTarget) {
         guard canOpen(target) else { return }
         switch target {
@@ -31,7 +25,6 @@ struct TerminalLinkOpener {
         }
     }
 
-    /// A path on an SSH host never opens, nor a file on this Mac that opening would run; see `LocalFileLinkSafety`.
     func canOpen(_ target: TerminalLinkTarget) -> Bool {
         switch target {
         case .webAddress: true

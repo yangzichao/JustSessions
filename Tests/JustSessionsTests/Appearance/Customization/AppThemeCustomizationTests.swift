@@ -35,7 +35,6 @@ struct AppThemeCustomizationTests {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let store = AppThemeStore(userDefaults: settings.userDefaults)
-        // Far too pale to read on the light version's paper.
         let paleBlue: UInt32 = 0xE0E8FF
 
         #expect(store.setColor(paleBlue, for: .ink, isDark: false))
@@ -53,9 +52,7 @@ struct AppThemeCustomizationTests {
         defer { settings.removeSuite() }
         let store = AppThemeStore(userDefaults: settings.userDefaults)
 
-        // A light background in the dark version.
         #expect(!store.setColor(0xF0F0F0, for: .contentSurface, isDark: true))
-        // Light enough for the light version, but under a selected row's wash dark text falls below 4.5.
         #expect(!ThemeColorContrast.isDark(0x808080))
         #expect(!store.setColor(0x808080, for: .sidebarSurface, isDark: false))
 
@@ -78,8 +75,6 @@ struct AppThemeCustomizationTests {
         #expect(store.resolvedTheme.customization.isEmpty)
     }
 
-    /// Off the main actor: its thousands of contrast checks would hold the main thread for seconds in a full run, while
-    /// other tests wait there for their views.
     @Test nonisolated func everyCombinationOfTakenColorsKeepsTextReadable() {
         var random = SeededRandomNumberGenerator(seed: 116)
         var takenCount = 0
@@ -111,7 +106,6 @@ struct AppThemeCustomizationTests {
         store.setColor(AppThemeColors.justSessionsLight.sidebarSurface, for: .sidebarSurface, isDark: false)
         #expect(store.resolvedTheme.customization.isEmpty)
 
-        // Tokyo Night Day's ink is drawn darker than the theme's own blue; either one is the theme's own.
         store.setTheme(.tokyoNight)
         store.setColor(AppThemeColors.tokyoNightDay.ink, for: .ink, isDark: false)
         store.setColor(AppThemeColors.tokyoNightDay.seeds.ink, for: .ink, isDark: false)
@@ -174,19 +168,16 @@ struct AppThemeCustomizationTests {
 
         #expect(Set(customizations.keys) == [.gitHub, .gruvbox])
         #expect(customizations[.gitHub]?.lightChanges == [.sidebarSurface: 0xFAFAFA])
-        // A white background no longer suits the dark version.
         #expect(customizations[.gitHub]?.darkChanges.isEmpty == true)
         #expect(customizations[.gruvbox]?.darkChanges == [.contentSurface: 0x111111])
     }
 
     @Test func aChangedBackgroundKeepsTheTerminalSelectionVisible() {
-        // JustSessions dark's own selection color.
         let background: UInt32 = 0x3C4B62
         let colors = AppThemeColors.justSessionsDark.applying([.contentSurface: background])
 
         #expect(AppThemeColors.justSessionsDark.terminal.selectionBackground == background)
         #expect(ThemeColorContrast.ratio(colors.terminal.selectionBackground, background) >= AppThemeSeeds.minimumSelectionContrast)
-        // A background the selection still stands out from keeps the theme's selection.
         #expect(AppThemeColors.justSessionsDark.applying([.contentSurface: 0x000000]).terminal.selectionBackground == background)
     }
 
@@ -203,7 +194,6 @@ struct AppThemeCustomizationTests {
         let subscription = themeStore.$terminalTheme.dropFirst().sink { terminalThemes.append($0) }
         defer { subscription.cancel() }
 
-        // A drag across the color panel.
         for background: UInt32 in [0x101010, 0x080808, 0x000000] {
             themeStore.setColor(background, for: .contentSurface, isDark: true)
         }
@@ -216,7 +206,6 @@ struct AppThemeCustomizationTests {
         #expect(terminalView.nativeBackgroundColor == NSColor(hexValue: AppThemeColors.justSessionsDark.contentSurface))
     }
 
-    /// Every text color reads at 4.5 on every surface it sits on, and on the ink.
     private nonisolated func keepsTextReadable(_ colors: AppThemeColors) -> Bool {
         let textColors =
             [colors.ink, colors.secondaryText, colors.tertiaryText, colors.warningText, colors.errorText]

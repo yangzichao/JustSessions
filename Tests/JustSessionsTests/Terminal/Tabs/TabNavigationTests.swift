@@ -100,7 +100,6 @@ struct TabNavigationTests {
     }
 }
 
-/// Unstarted terminals and private settings; no CLI processes or real sessions are touched.
 @MainActor
 private struct TabNavigationSandbox {
     let store: ConversationStore

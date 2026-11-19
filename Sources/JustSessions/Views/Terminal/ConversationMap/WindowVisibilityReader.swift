@@ -1,9 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Whether the view's window shows on screen: not minimized, hidden with the app, on another Space, or covered whole,
-/// by `occlusionState` as `WorkspaceWindowRegistry.hasWindowOnScreen` tells. A map out of sight checks and reads nothing
-/// (PERF-89). Reported on the next turn, never during an update.
 struct WindowVisibilityReader: NSViewRepresentable {
     let onChange: @MainActor (Bool) -> Void
     @Environment(\.ignoresWindowOcclusion) private var ignoresOcclusion
@@ -27,7 +24,6 @@ struct WindowVisibilityReader: NSViewRepresentable {
 
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
-            // Selector observers go with the view, as WorkingSpinner's do.
             let center = NotificationCenter.default
             for name in [
                 NSWindow.didChangeOcclusionStateNotification, NSWindow.didMiniaturizeNotification, NSWindow.didDeminiaturizeNotification,

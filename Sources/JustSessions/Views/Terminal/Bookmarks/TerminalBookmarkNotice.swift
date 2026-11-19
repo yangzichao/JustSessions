@@ -1,12 +1,10 @@
 import Observation
 
-/// What a bookmark command in a tab did, or why it did nothing (TRM-74). The terminal shows no letters, so each press says.
 enum TerminalBookmarkNotice: Equatable {
     case added(MessageBookmark, assistantName: String)
     case removed(MessageBookmark, assistantName: String)
     case plainTerminal, notLinkedYet, noMessagesYet, allLettersInUse, noBookmarks, couldNotRead, findingLatestMessage
 
-    /// "Finding…" stays until the press's result replaces it.
     var hidesByItself: Bool { self != .findingLatestMessage }
 
     func text(language: AppInterfaceLanguage?) -> String {
@@ -34,18 +32,14 @@ enum TerminalBookmarkNotice: Equatable {
     }
 }
 
-/// A tab's bookmark notice and the order of its ⌘D presses; on the tab as its find state is, so both follow it to
-/// another window. The card reads `notice` in its own body only.
 @MainActor
 @Observable
 final class TerminalBookmarkNoticeState {
     private(set) var notice: TerminalBookmarkNotice?
-    /// Edit Bookmark… in this tab (TRM-74) or from its map (TAB-10); `TerminalWorkspaceView` presents it.
     @ObservationIgnored let editor = MessageBookmarkEditorRequests()
     @ObservationIgnored private var hidingTask: Task<Void, Never>?
     @ObservationIgnored private var lastCommand: Task<Void, Never>?
 
-    /// Runs after every command enqueued before it, so two quick ⌘Ds add, then remove.
     @discardableResult
     func enqueue(_ command: @escaping @MainActor () async -> Void) -> Task<Void, Never> {
         let previous = lastCommand
@@ -57,7 +51,6 @@ final class TerminalBookmarkNoticeState {
         return task
     }
 
-    /// As `TranscriptBookmarkState.show`: a notice goes after `TranscriptBookmarkState.hintDuration`, and VoiceOver reads it.
     func show(_ notice: TerminalBookmarkNotice) {
         self.notice = notice
         hidingTask?.cancel()

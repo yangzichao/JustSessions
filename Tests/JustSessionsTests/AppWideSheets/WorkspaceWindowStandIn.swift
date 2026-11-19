@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A window on screen that shows Settings and Help the way a workspace window does.
 @MainActor
 final class WorkspaceWindowStandIn {
     let state = AppWideSheetState()
@@ -44,7 +43,6 @@ final class AppWideSheetState: ObservableObject {
 
 struct AppWideSheetHostingStandIn: View {
     @ObservedObject var state: AppWideSheetState
-    /// Only shows Settings, which reads it; nothing here changes a setting it keeps.
     @State private var store = ConversationStore(adapters: [], startsBackgroundPolling: false)
 
     var body: some View {

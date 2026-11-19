@@ -7,10 +7,8 @@ enum SSHPortForwardFailure: Hashable, Sendable {
     case invalidPort
     case localPortForwardedAlready(SSHPortForward)
     case couldNotConnect(host: String, SSHConnectionProblem)
-    /// Another program on this Mac listens on the port; `sshMessage` is what `ssh` printed, when it could be read.
     case localPortInUse(port: Int, sshMessage: String)
     case refused(sshMessage: String)
-    /// The host doesn't let the connection reach the port, as when its `sshd` turns off forwarding.
     case refusedByHost(host: String, sshMessage: String)
 
     var message: String {

@@ -1,14 +1,9 @@
 import Foundation
 
-/// A project's rows as the sidebar lists them: its pinned sessions and new sessions' tabs, then its other sessions up to
-/// a limit (see `ProjectSessionRowLimits`), with how many it leaves for "Show N more".
 struct ListedProjectSessionRows {
     let rows: [ProjectSessionRow]
-    /// The project's sessions below the listed ones.
     let hiddenSessionCount: Int
 
-    /// `sessionLimit` caps the sessions that are not pinned; nil lists them all. `conversations` lists pinned sessions
-    /// first, as `ProjectConversationGroup` does.
     init(
         conversations: [Conversation],
         pendingNewSessions: [PendingNewSession],
@@ -26,15 +21,12 @@ struct ListedProjectSessionRows {
         hiddenSessionCount = otherSessionCount - listedOtherSessionCount
     }
 
-    /// The listed sessions' ids, top to bottom, leaving out new sessions' tabs.
     var conversationIDs: [String] {
         rows.compactMap { row in
             if case .conversation(let conversation) = row { conversation.id } else { nil }
         }
     }
 
-    /// The place of a session hidden below the listed ones among the sessions the limit counts, for
-    /// `ProjectSessionRowLimits.reveal`; nil when it is listed or not in `conversations`.
     static func hiddenPlace(
         of conversationID: String,
         in conversations: [Conversation],

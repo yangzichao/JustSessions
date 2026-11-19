@@ -1,7 +1,6 @@
 import CucumberSwift
 import XCTest
 
-/// The Claude Code steps of `Features/ClaudeLiveSession/RenameInClaudeCodeTab.feature`; the rest are `SessionTabSteps`.
 @MainActor
 enum ClaudeLiveRenameSteps {
     static func register() {

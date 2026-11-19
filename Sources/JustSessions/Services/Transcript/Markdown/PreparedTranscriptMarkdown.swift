@@ -1,6 +1,5 @@
 import Foundation
 
-/// Immutable, font-independent work shared by rendering and Find. Pages prepare it on their reader actor.
 struct PreparedTranscriptMarkdown: Sendable, Equatable {
     let blocks: [TranscriptMarkdownBlock]
     let segmentStarts: [Int: Int]

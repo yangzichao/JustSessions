@@ -1,8 +1,6 @@
 import AppKit
 import Combine
 
-/// The editors from `ExternalEditor.knownEditors` that are installed on this Mac. `ContentView` refreshes it whenever
-/// the app comes forward, so an editor installed or removed meanwhile shows up in the menu.
 @MainActor
 final class ExternalEditorStore: ObservableObject {
     static let shared = ExternalEditorStore()
@@ -40,8 +38,6 @@ final class ExternalEditorStore: ObservableObject {
         if foundEditors != installedEditors { installedEditors = foundEditors }
     }
 
-    /// The installed editors that can open a folder on `host`: every one on this Mac, and on an SSH host only those
-    /// with an SSH folder tool.
     func editors(opening host: SessionHost) -> [InstalledExternalEditor] {
         switch host {
         case .thisMac: installedEditors

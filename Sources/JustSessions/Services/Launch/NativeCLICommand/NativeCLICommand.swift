@@ -5,6 +5,7 @@ struct NativeCLICommand {
     let arguments: [String]
     let workingDirectory: String
     let environment: [String]
+    var sshTabArguments: SSHTabArguments? = nil
 
     func appendingArguments(_ extraArguments: [String]) -> NativeCLICommand {
         NativeCLICommand(
@@ -15,12 +16,10 @@ struct NativeCLICommand {
         )
     }
 
-    /// `variables` as the sorted `NAME=value` entries `environment` holds.
     static func environmentEntries(_ variables: [String: String]) -> [String] {
         variables.map { "\($0.key)=\($0.value)" }.sorted()
     }
 
-    /// `environment` as a dictionary, for running the same executable outside a terminal.
     var environmentVariables: [String: String] {
         environment.reduce(into: [String: String]()) { variables, entry in
             guard let separator = entry.firstIndex(of: "=") else { return }

@@ -1,7 +1,5 @@
 import Foundation
 
-/// Any JSON value, for the parts of a Pi session line whose shape is up to the tool that wrote it, such as a tool
-/// call's arguments.
 enum PiJSONValue: Decodable {
     case null
     case bool(Bool)
@@ -27,9 +25,6 @@ enum PiJSONValue: Decodable {
         }
     }
 
-    /// The value in the shape of `JSONSerialization`'s output, for code that reads JSON as `[String: Any]`: objects
-    /// become dictionaries, arrays become `[Any]`, and null becomes `NSNull`. Unlike `JSONSerialization`'s `NSNumber`,
-    /// a number is a `Double` and a boolean is a `Bool`, so `as? Int` fails on a whole number.
     var foundationValue: Any {
         switch self {
         case .null: NSNull()

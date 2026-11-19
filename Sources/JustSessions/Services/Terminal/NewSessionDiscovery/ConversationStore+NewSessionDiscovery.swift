@@ -1,15 +1,8 @@
 import Foundation
 
-/// A tab started with "New session" or "Branch" has no conversation until the CLI writes its session file;
-/// a branch runs a fork with an id of its own. The sidebar lists such a tab under its project right away
-/// (`pendingNewSessions`). Meanwhile this finds the file the tab's CLI is writing, refreshes so the real
-/// session shows up, and links the tab to it. A Codex tab whose CLI names its thread in the terminal title is also
-/// linked by `followCodexThreads`, and an Antigravity, Pi, or OpenCode tab by `followLiveSessions`.
 extension ConversationStore {
-    /// Claude Code writes a new transcript before the first prompt, so a freshly listed session can still be
-    /// untitled. This many refreshes after its file changes are enough to pick up the first prompt.
+    /// Claude Code writes a new transcript before the first prompt, so a freshly listed session can still be untitled.
     static let maximumTitleRefreshesPerNewSession = 3
-    /// A tab linked by appearance has no file to watch, so while one waits on this Mac, it refreshes this often.
     static let refreshIntervalWhileWaitingForAppearingSession: TimeInterval = 6
 
     var pendingNewSessions: [PendingNewSession] {
@@ -20,9 +13,6 @@ extension ConversationStore {
         runPeriodically(every: interval) { await $0.discoverNewSessions(mayRefresh: true) }
     }
 
-    /// Links waiting tabs to their conversations. With `mayRefresh` it also refreshes when a tab's session
-    /// file changed since the last refresh started. Only the periodic pass passes it, so these refreshes
-    /// happen at most once per interval.
     func discoverNewSessions(mayRefresh: Bool, finder: NewSessionFileFinder = NewSessionFileFinder()) async {
         guard !isScanningThisMac, !isDeletingSessions else { return }
         if mayRefresh, let untitledTab = terminalSessions.first(where: { needsRefreshForFirstPromptTitle($0) }) {
@@ -35,8 +25,6 @@ extension ConversationStore {
             return
         }
 
-        // Tabs on SSH hosts run `ssh`, whose open files say nothing, and some tools leave no trace of their session;
-        // see `linkWaitingTabsByAppearance`.
         let waitingTabs = terminalSessions.filter {
             $0.isNewSessionAwaitingConversation && $0.host == .thisMac && !$0.isWaitingForAppearingSession
         }
@@ -67,7 +55,6 @@ extension ConversationStore {
         return true
     }
 
-    /// Also for a tab whose CLI moved to a session as new, as with `/clear`; see `followLiveSessions`.
     private func needsRefreshForFirstPromptTitle(_ session: TerminalSession) -> Bool {
         guard !session.hasExited, session.host == .thisMac,
             session.titleRefreshCount < Self.maximumTitleRefreshesPerNewSession,
@@ -81,8 +68,6 @@ extension ConversationStore {
             ))
     }
 
-    /// A refresh links such a tab once it lists the tab's session; see `linkWaitingTabsByAppearance`. A CLI that
-    /// exited writes no more sessions, and its tab refreshed when it did.
     private var isWaitingForAppearingSessionOnThisMac: Bool {
         terminalSessions.contains { $0.host == .thisMac && $0.isWaitingForAppearingSession && !$0.hasExited }
     }
@@ -92,7 +77,6 @@ extension ConversationStore {
         return Date.now.timeIntervalSince(lastRefreshStartedAt) >= Self.refreshIntervalWhileWaitingForAppearingSession
     }
 
-    /// A refresh already saw every change made before it started, so only later changes are worth another.
     private func wasModifiedSinceLastRefresh(_ modificationDate: Date) -> Bool {
         guard let lastRefreshStartedAt else { return true }
         return modificationDate > lastRefreshStartedAt

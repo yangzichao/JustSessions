@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The active window's sidebar visibility, so the View menu can toggle it even while a terminal has keyboard focus.
 private struct SidebarHiddenFocusedValueKey: FocusedValueKey {
     typealias Value = Binding<Bool>
 }

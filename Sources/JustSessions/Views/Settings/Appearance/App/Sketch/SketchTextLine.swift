@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A line of text in a window sketch, drawn as a bar.
 struct SketchTextLine<Style: ShapeStyle>: View {
     let width: CGFloat
     var height: CGFloat = 2

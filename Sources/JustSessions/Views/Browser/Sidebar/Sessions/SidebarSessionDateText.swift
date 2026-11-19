@@ -9,14 +9,11 @@ final class SidebarSessionDateText {
     static let shared = SidebarSessionDateText()
 
     private static let style = Date.FormatStyle(date: .abbreviated, time: .shortened)
-    /// Big enough for every session a sidebar realistically lists; emptied rather than evicted when passed, so the
-    /// cache cannot grow with years of changing dates.
     private static let maximumCachedDates = 4_096
 
     private var textsByDate: [Date: String] = [:]
     private var localeOrTimeZoneChanges: AnyCancellable?
 
-    /// How many distinct dates are kept; the tests check that the notifications below empty the cache.
     var cachedTextCount: Int { textsByDate.count }
 
     init(notificationCenter: NotificationCenter = .default) {

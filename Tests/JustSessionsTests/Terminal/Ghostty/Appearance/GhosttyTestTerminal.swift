@@ -1,13 +1,11 @@
 import AppKit
 import GhosttyTerminal
 
-/// An `AppTerminalView` in a window that is never shown, fed output through an in-memory session.
 @MainActor
 final class GhosttyTestTerminal {
     let window: NSWindow
     let view: AppTerminalView
     let session: InMemoryTerminalSession
-    /// What the terminal has sent to its process, such as the bytes of a key.
     private let sentBytes = SentBytes()
     private var lastKeyEventTime: TimeInterval = 0
 
@@ -101,7 +99,6 @@ final class GhosttyTestTerminal {
     }
 }
 
-/// Collects what Ghostty's thread sends.
 private final class SentBytes: @unchecked Sendable {
     private let lock = NSLock()
     private var bytes: [UInt8] = []
@@ -118,7 +115,6 @@ private final class SentBytes: @unchecked Sendable {
     }
 }
 
-/// A key as the US keyboard layout gives it to AppKit.
 struct USKey: CustomStringConvertible {
     let description: String
     let keyCode: UInt16
@@ -129,12 +125,10 @@ struct USKey: CustomStringConvertible {
 }
 
 extension [UInt32: Int] {
-    /// Whether at least `pixels` pixels are within a step or two of `color`.
     func covers(_ color: UInt32, pixels: Int) -> Bool {
         self.pixels(near: color) >= pixels
     }
 
-    /// How many pixels are within a step or two of `color`, which color conversion can be off by.
     func pixels(near color: UInt32) -> Int {
         filter { drawn, _ in
             [16, 8, 0].allSatisfy { shift in abs(Int((drawn >> UInt32(shift)) & 0xFF) - Int((color >> UInt32(shift)) & 0xFF)) <= 2 }

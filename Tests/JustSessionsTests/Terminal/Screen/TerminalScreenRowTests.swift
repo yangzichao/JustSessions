@@ -2,7 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A screen row's text measured in cells; see `TerminalScreenRow`.
 struct TerminalScreenRowTests {
     @Test func wideCharactersTakeTwoCells() {
         let row = TerminalScreenRow("说明：ok  ")
@@ -18,7 +17,6 @@ struct TerminalScreenRowTests {
         #expect(TerminalScreenRow("⚠️ ok").textWidth == 5)
     }
 
-    /// A prompt's text in a row starts at the cell its CLI keeps for it, after a marker such as `❯`.
     @Test func textFromAColumnSkipsWhatComesBefore() {
         let row = TerminalScreenRow("❯ 你好 kiwi   ")
 

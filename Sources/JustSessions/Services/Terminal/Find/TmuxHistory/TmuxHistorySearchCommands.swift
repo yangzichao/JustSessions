@@ -17,13 +17,9 @@ import Foundation
 /// so no other command comes between a search's steps, and a new search leaves copy mode and enters it again first.
 /// tmux 3.4 counts nothing, and only says whether the search found any; 3.6a and 3.7c count.
 enum TmuxHistorySearchCommands {
-    /// Prints the matches tmux counted, 1 when it stopped counting before the last, and 1 when the search found any or
-    /// 0 when it found none, after a word that tells the line from what an SSH host's startup files print. A tmux that
-    /// doesn't count prints nothing for the first two.
     static let countMarker = "justsessions-find-count"
     static let countFormat = "\(countMarker) #{search_count} #{search_count_partial} #{search_present}"
 
-    /// Starts a search for the newest match, from the end of the last line, whether or not a search runs already.
     static func startingSearch(for query: String, inSession sessionName: String) -> [String] {
         let pane = paneTarget(sessionName)
         return ["if-shell", "-F", "-t", pane, "#{pane_in_mode}", "send-keys -t \(pane) -X cancel", ";"]
@@ -46,14 +42,10 @@ enum TmuxHistorySearchCommands {
         return moves + [";"] + printingCount(pane: pane)
     }
 
-    /// Leaves copy mode, which takes the highlight away and shows the shell's screen again.
     static func endingSearch(inSession sessionName: String) -> [String] {
         copyModeCommand("cancel", pane: paneTarget(sessionName))
     }
 
-    /// Nil for output without the count's line, as when tmux could not run the search. The total is nil when tmux kept
-    /// no count, as after a key you pressed in copy mode took the search's highlight away, and when it counts nothing.
-    /// `foundAny` is nil when tmux doesn't say.
     static func printedCount(inOutput output: String) -> (total: Int?, isPartial: Bool, foundAny: Bool?)? {
         guard let line = output.split(whereSeparator: \.isNewline).last(where: { $0.hasPrefix(countMarker) }) else { return nil }
         // An empty field is a field: tmux 3.4 prints `<marker>   1`.

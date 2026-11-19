@@ -1,9 +1,5 @@
 import AppKit
 
-/// What ⌘-clicking a link does. A web page opens in the browser, a folder in the Finder, and a path on an SSH host
-/// nowhere, as `TerminalLinkOpener.open(_:)` has them. A file on this Mac goes where Settings → General → Tabs says
-/// (`FileLinkClickChoice`): its default app; the right-click menu's link items, shown at the pointer; or the chosen
-/// editor, for a text file (`FileLinkEditorScope`) while the editor is installed, and otherwise its default app.
 extension TerminalLinkActions {
     func openClicked(_ link: String) {
         let opener = tab.linkOpener

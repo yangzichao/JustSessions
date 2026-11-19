@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A CLI that fails in tmux keeps what it printed in its tab, with its own exit status, instead of leaving only tmux's
-/// `[exited]` and the tmux client's status of 0. Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct ThisMacTmuxFailedCLITests {
     @MainActor
@@ -15,7 +13,6 @@ struct ThisMacTmuxFailedCLITests {
         let window: NSWindow
         var sessionName: String { TmuxSessionName.forConversation(conversation) }
 
-        /// `script` is the stand-in CLI's body.
         init?(cli script: String) throws {
             guard let sandbox = try ThisMacTmuxSandbox.make() else { return nil }
             self.sandbox = sandbox
@@ -41,13 +38,11 @@ struct ThisMacTmuxFailedCLITests {
             window.isReleasedWhenClosed = false
         }
 
-        /// The store runs tabs in tmux once a refresh has checked its version, as it does at launch.
         func checkTmux() async throws {
             store.refreshThisMac()
             try #require(await sandbox.waitUntil { !store.isScanningThisMac })
         }
 
-        /// Resumes the session, in its ended tab if it has one, and starts the tab it shows.
         func resume() async throws -> TerminalSession {
             let earlierTabID = store.terminalSessions.first?.id
             store.launch(conversation, action: .resume)
@@ -88,7 +83,6 @@ struct ThisMacTmuxFailedCLITests {
         try #require(await sandbox.waitUntil { failedTab.hasExited }, "\(sandbox.launchDiagnostics(for: failedTab))")
         #expect(failedTab.exitCode == 2)
         #expect(await sandbox.waitUntil { fixture.screen(of: failedTab).contains("error: unknown option --bogus") })
-        // The dead pane stays for the tab to show, but runs no CLI.
         #expect(sandbox.server.sessionNames() == [fixture.sessionName])
         #expect(sandbox.server.paneProcessIDsBySessionName().isEmpty)
         #expect(failedTab.tmuxSessionKeptForEndedCLI == fixture.sessionName)
@@ -131,7 +125,6 @@ struct ThisMacTmuxFailedCLITests {
         #expect(tab.tmuxSessionKeptForEndedCLI == nil)
     }
 
-    /// With no tab to show it, a failed CLI's session ends at once, as a cleanly exited one's does.
     @Test func aCLIThatFailsWithNoTabAttachedLeavesNoSession() async throws {
         guard let fixture = try Fixture(cli: "/bin/sleep 1\necho 'error: crashed' >&2\nexit 3") else { return }
         defer { fixture.tearDown() }
@@ -146,7 +139,6 @@ struct ThisMacTmuxFailedCLITests {
         #expect(await sandbox.waitUntil { sandbox.server.sessionNames().isEmpty })
     }
 
-    /// Without tmux, the tab's process is the CLI, and its status is the CLI's own, not the raw wait status.
     @Test func aCLIRunWithoutTmuxReportsTheStatusItExitedWith() async throws {
         guard let fixture = try Fixture(cli: "exit 2") else { return }
         defer { fixture.tearDown() }

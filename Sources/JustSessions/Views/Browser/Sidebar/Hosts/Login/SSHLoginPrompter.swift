@@ -17,7 +17,6 @@ final class SSHLoginPrompter: ObservableObject {
         }
     }
 
-    /// Nil cancels the question shown.
     func answer(_ answer: String?) {
         let continuation = continuation
         self.continuation = nil
@@ -41,14 +40,12 @@ final class SSHLoginPrompter: ObservableObject {
 }
 
 extension View {
-    /// Shows the questions `prompter` asks; closing the sheet cancels the question.
     func sshLoginQuestions(from prompter: SSHLoginPrompter) -> some View {
         modifier(SSHLoginQuestionPresenter(prompter: prompter))
     }
 }
 
 extension View {
-    /// Shows a host sign-in's questions in this window when it's the one the sign-in runs in; see `RemoteSignIns`.
     func remoteSignInQuestions(in store: ConversationStore, signIns: RemoteSignIns = .shared) -> some View {
         modifier(RemoteSignInQuestionPresenter(store: store, signIns: signIns, prompter: signIns.prompter))
     }

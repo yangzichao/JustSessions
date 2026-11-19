@@ -9,23 +9,11 @@ import Testing
 
 @testable import JustSessions
 
-/// The same controlled output through a Ghostty tab, a SwiftTerm tab, and a SwiftTerm tab drawing with Metal, in a
-/// window ordered front; see `EngineVariant`. Each tab runs a
-/// script through its own `startProcess`, so the output comes from a pseudo-terminal as a CLI's does; it starts no CLI
-/// sessions. Records process CPU as a percentage of one core, the main thread's CPU, its longest gap, frames drawn,
-/// and memory; see docs/development/performance.md. Each test runs every engine three times, alternating which goes
-/// first, so background load falls on both alike.
-///
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter TerminalEngineMeasurements
-///
-/// With `JUSTSESSIONS_PERF_SAMPLE_DIR` set, the repaint test also records a 5-second `sample` profile of each engine
-/// there, in a run of its own that isn't measured.
 @MainActor
 @Suite(.serialized)
 struct TerminalEngineMeasurements {
     private static let runCount = 3
 
-    /// Workload 1: one visible tab, a TUI-style repaint of 8 rows at 30 frames a second for 5 seconds.
     @Test func tuiRepaint() async throws {
         guard ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF"] != nil else { return }
         let runs = try await Self.alternatingRuns(of: EngineVariant.allCases) { variant in
@@ -42,7 +30,6 @@ struct TerminalEngineMeasurements {
         }
     }
 
-    /// Workload 2: one visible tab, about 20 MB of colored log lines with some truecolor and CJK.
     @Test func bulkStream() async throws {
         guard ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF"] != nil else { return }
         let stream = try BulkStream()
@@ -55,7 +42,6 @@ struct TerminalEngineMeasurements {
         }
     }
 
-    /// Workload 3: the repaint in every tab, with one tab shown and the rest hidden as a workspace hides them.
     @Test(arguments: [5, 10])
     func hiddenTabsRepaint(tabCount: Int) async throws {
         guard ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF"] != nil else { return }
@@ -67,16 +53,6 @@ struct TerminalEngineMeasurements {
         }
     }
 
-    /// Workload 4: memory before any tab, with 10 idle tabs, and once every tab's scrollback is full after the bulk
-    /// stream, so each tab's share is a tenth of the change. Each engine keeps its shipped scrollback; one SwiftTerm
-    /// case raises it to 10,000 lines.
-    ///
-    /// One run per process: memory the process freed and then uses again is not always counted again, so a later run
-    /// in the same process reads too low. Run each case in a process of its own, three times, alternating the cases:
-    ///
-    ///     JUSTSESSIONS_PERF=1 JUSTSESSIONS_PERF_MEMORY_CASE=ghostty swift test -c release --filter TerminalEngineMeasurements/memory
-    ///
-    /// The cases are `ghostty`, `swiftTerm`, `swiftTerm10k`, and `swiftTermMetal`.
     @Test func memory() async throws {
         guard ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF"] != nil else { return }
         let caseName = ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF_MEMORY_CASE"]
@@ -100,7 +76,6 @@ struct TerminalEngineMeasurements {
         perfReport(scenario, "columns", run.columns)
     }
 
-    /// Runs `measure` for each case `runCount` times, a round at a time, reversing the order every other round.
     private static func alternatingRuns<Case: Hashable, Run>(
         of cases: [Case],
         _ measure: @MainActor (Case) async throws -> Run
@@ -113,8 +88,6 @@ struct TerminalEngineMeasurements {
         }
         return runs
     }
-
-    // MARK: - Runs
 
     private static func measureRepaint(
         variant: EngineVariant,
@@ -181,8 +154,6 @@ struct TerminalEngineMeasurements {
         )
     }
 
-    // MARK: - Profile
-
     private static func startSampling(into file: URL) throws -> Process {
         try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
         let sampler = Process()
@@ -198,8 +169,6 @@ struct TerminalEngineMeasurements {
         try await waitUntil(timeout: .seconds(120)) { !process.isRunning }
     }
 
-    // MARK: - Reporting
-
     private static func report(_ scenario: String, _ variant: EngineVariant, _ runs: [EngineRun]) {
         let name = variant.displayName
         perfReport(scenario, "\(name) seconds", summary(runs.map(\.seconds), digits: 2))
@@ -209,7 +178,6 @@ struct TerminalEngineMeasurements {
         perfReport(scenario, "\(name) frames drawn", summary(runs.map { Double($0.framesDrawn) }, digits: 0))
     }
 
-    /// The median, the lowest and highest, and each run in the order it ran.
     private static func summary(_ values: [Double], digits: Int) -> String {
         guard !values.isEmpty else { return "no runs" }
         let format = "%.\(digits)f"
@@ -220,11 +188,6 @@ struct TerminalEngineMeasurements {
     }
 }
 
-// MARK: - Cases and results
-
-/// An engine as a tab can be drawn: Ghostty, SwiftTerm with Core Graphics as it ships, or SwiftTerm with its Metal
-/// drawing on, which the bench turns on with `setUseMetal(true)` once the view is in the window. The app itself never
-/// turns Metal on; see item 6 in docs/development/performance.md for why.
 private enum EngineVariant: String, CaseIterable, Hashable {
     case ghostty
     case swiftTerm
@@ -248,7 +211,6 @@ private enum EngineVariant: String, CaseIterable, Hashable {
 }
 
 private struct ScrollbackCase: CustomStringConvertible {
-    /// What `JUSTSESSIONS_PERF_MEMORY_CASE` names it.
     let name: String
     let variant: EngineVariant
     /// Nil keeps the engine's shipped scrollback: SwiftTerm's 500 lines, or Ghostty's default 10 MB limit.
@@ -285,7 +247,6 @@ private struct MemoryRun {
     let keptRows: Int
     let columns: Int
 
-    /// Each figure in MB, for the footprint or resident memory.
     func megabytes(_ measure: KeyPath<MemoryUsage, UInt64>) -> MemoryFigures {
         let before = Double(before[keyPath: measure]) / 1_048_576
         let idle = Double(idle[keyPath: measure]) / 1_048_576
@@ -308,10 +269,6 @@ private struct MemoryFigures {
     let perFullTab: Double
 }
 
-// MARK: - Bench
-
-/// Tabs of one engine in a window ordered front, each running a shell command on its own pseudo-terminal. Each command
-/// waits for the `go` file, so output starts when the measurement does.
 @MainActor
 private final class EngineBench {
     static let frame = NSRect(x: 0, y: 0, width: 1000, height: 650)
@@ -339,7 +296,6 @@ private final class EngineBench {
         window.orderFrontRegardless()
     }
 
-    /// The first tab is shown; the rest are hidden, as the workspace hides a tab that isn't on screen.
     func addTabs(_ count: Int) {
         for index in 0..<count {
             let view = engine.makeTabTerminalView(frame: Self.frame, appearanceStore: appearanceStore, themeStore: themeStore)
@@ -390,14 +346,12 @@ private final class EngineBench {
         FileManager.default.createFile(atPath: folder.appendingPathComponent("go").path, contents: nil)
     }
 
-    /// Every tab writes the stream once `go` appears.
     func startStreaming(_ stream: BulkStream) {
         for (index, tab) in tabs.enumerated() {
             start(tab, command: stream.command(touchingWhenWritten: "done-\(index)"))
         }
     }
 
-    /// Every tab's command finished writing, its terminal parsed all of it, and its screen has the last line.
     func hasShownEverything() -> Bool {
         tabs.indices.allSatisfy { index in
             let tab = tabs[index]
@@ -424,7 +378,6 @@ private final class EngineBench {
     }
 }
 
-/// What the shown tab's screen holds now, without its scrollback.
 @MainActor
 private func visibleText(of tab: any TabTerminalView) -> String {
     switch tab {
@@ -438,7 +391,6 @@ private func visibleText(of tab: any TabTerminalView) -> String {
     }
 }
 
-/// The tab's scrollback and screen.
 @MainActor
 private func allText(of tab: any TabTerminalView) -> String {
     switch tab {
@@ -472,10 +424,6 @@ private func waitUntil(timeout: Duration, _ condition: () -> Bool) async throws 
 
 private struct MeasurementTimeout: Error {}
 
-// MARK: - Workloads
-
-/// Rewrites 8 rows 30 times a second, as `TerminalVisibilityMeasurements` does, with a spinner and the frame number
-/// on the last row. Arguments: the file to wait for, then the number of frames.
 private enum RepaintScript {
     static func write(to folder: URL) throws {
         try source.write(to: folder.appendingPathComponent("repaint.pl"), atomically: true, encoding: .utf8)
@@ -505,8 +453,6 @@ private enum RepaintScript {
         """#
 }
 
-/// About 20 MB of numbered, colored log lines: every fifth in truecolor, every seventh with CJK, some warnings. The
-/// tab's command waits for `go`, writes the file with `cat`, then touches a file of its own.
 private struct BulkStream {
     static let lastLine = "BULK-DONE"
     private static let targetByteCount = 20_000_000
@@ -540,7 +486,6 @@ private struct BulkStream {
         try? FileManager.default.removeItem(at: file)
     }
 
-    /// The rows from the oldest numbered line the terminal kept to the last.
     func rowsKept(in text: String) -> Int {
         guard let match = text.firstMatch(of: #/L(\d{6}) /#), let first = Int(match.1) else { return 0 }
         return lineCount - first + 1
@@ -565,9 +510,6 @@ private struct BulkStream {
     }
 }
 
-// MARK: - Meter
-
-/// Process CPU, the main thread's CPU and longest gap, and frames drawn, from `start()` to `stop()`.
 @MainActor
 private final class EngineMeter {
     private let variant: EngineVariant
@@ -644,7 +586,6 @@ private final class FrameCount: @unchecked Sendable {
     var value: Int { lock.withLock { frames } }
 }
 
-/// Counts SwiftTerm's `draw(_:)` calls, one for each time a terminal view draws, while installed.
 @MainActor
 private enum SwiftTermDrawCounter {
     private typealias Draw = @convention(c) (NSView, Selector, NSRect) -> Void
@@ -717,7 +658,6 @@ private func processCPUSeconds() -> Double {
         + Double(usage.ru_utime.tv_usec + usage.ru_stime.tv_usec) / 1_000_000
 }
 
-/// Called on the main thread, so the thread it reads is the main thread.
 @MainActor
 private func mainThreadCPUSeconds() -> Double {
     let thread = mach_thread_self()
@@ -734,8 +674,6 @@ private func mainThreadCPUSeconds() -> Double {
         + Double(info.user_time.microseconds + info.system_time.microseconds) / 1_000_000
 }
 
-/// The process's memory once its footprint has stopped changing for 2 seconds, after at least 3: a closed tab's
-/// memory is let go a while after it closes, and a new tab's settles a while after it opens.
 @MainActor
 private func settledMemory() async throws -> MemoryUsage {
     try await Task.sleep(for: .seconds(3))

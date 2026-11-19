@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Tabs reopened at launch open with the engine chosen now. The engine is not saved with a tab: reopening happens at
-/// a new launch, and like every tab opened then, a reopened tab takes the engine chosen in Settings, even when the tab
-/// had another before the app quit.
 @MainActor
 struct TerminalEngineReopeningTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -19,7 +16,6 @@ struct TerminalEngineReopeningTests {
         lastLaunch.launch(onThisMac, action: .resume)
         lastLaunch.launch(onSSHHost, action: .resume)
         lastLaunch.openPlainTerminal(in: sandbox.projectLocation)
-        // Nothing is selected, so no reopened tab starts.
         lastLaunch.selectTerminal(nil)
         let savedTabs = lastLaunch.reopenableTabs
         try #require(savedTabs.count == 3)

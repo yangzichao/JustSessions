@@ -2,13 +2,6 @@ import AppKit
 import CoreText
 import GhosttyTerminal
 
-/// The font keys that make a Ghostty terminal's text look like a SwiftTerm terminal's with the same font settings:
-/// the same font, faces, and fallback fonts at the same size, including the symbols font for Nerd Font icons, in cells
-/// of the same size, with strokes as thick.
-///
-/// Two differences remain: SwiftTerm centers a wide character, such as a Chinese one, in its two cells, while Ghostty
-/// draws it from the left, a point or two further left. And with System Monospaced, Ghostty draws Nerd Font icons,
-/// which SwiftTerm can't; see `GhosttySymbolsFallback`.
 @MainActor
 enum GhosttyFontConfiguration {
     static func add(
@@ -27,8 +20,6 @@ enum GhosttyFontConfiguration {
             addStyleFaces(to: &builder, swiftTermFont: swiftTermFont)
         }
         addCellAdjustments(to: &builder, family: family, swiftTermFont: swiftTermFont, backingScaleFactor: backingScaleFactor)
-        // SwiftTerm smooths fonts, which thickens strokes, more for lighter text. Ghostty's thickening is the same
-        // smoothing, as strong as `thickenStrength(drawing:)` gives for the theme's text color.
         builder.withFontThicken(true)
     }
 
@@ -41,9 +32,6 @@ enum GhosttyFontConfiguration {
         return Int((gray * 255).rounded())
     }
 
-    /// The scale of the sharpest screen, which Ghostty's cells are sized for; see `TerminalCellPixelSize`. One
-    /// configuration serves every terminal, so on a Mac with screens of two scales, a font whose cells round
-    /// differently on each can be a pixel off on the other.
     static var screensBackingScaleFactor: CGFloat {
         NSScreen.screens.map(\.backingScaleFactor).max() ?? 2
     }
@@ -70,11 +58,6 @@ enum GhosttyFontConfiguration {
         }
     }
 
-    /// Bold and italic text in the faces SwiftTerm draws it with, which `NSFontManager` picks, such as SF Mono's
-    /// Semibold for bold where Ghostty would pick its Bold. A font without such a face draws it in its regular face,
-    /// as SwiftTerm does, where Ghostty would embolden or slant the regular one. Ghostty takes the face of the same name
-    /// from each fallback family, which gives bold Chinese in Semibold, as SwiftTerm draws it with SF Mono. A fallback
-    /// family without a face of that name draws in its regular face.
     private static func addStyleFaces(to builder: inout TerminalConfiguration.Builder, swiftTermFont: NSFont) {
         let styles: [(key: String, traits: NSFontTraitMask)] = [
             ("font-style-bold", .boldFontMask),

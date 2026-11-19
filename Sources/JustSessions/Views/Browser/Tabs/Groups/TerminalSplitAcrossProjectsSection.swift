@@ -1,20 +1,12 @@
 import SwiftUI
 
-/// A split across two projects in the tab bar: a container of its own among the groups, with no label, holding the
-/// split's two tabs as smaller tabs of their own, each in its project's color and with its project's name, hover
-/// card, and menus, so neither tab leaves its project for the other's. The container is a track under the two tabs,
-/// underlined half in each project's color along the tab bar's bottom edge, which the selected tab covers as it joins
-/// its terminal. Dragging either tab moves the whole split among the groups, which the tab bar moves, or on between
-/// windows, see `TabDragBetweenWindows`.
 struct TerminalSplitAcrossProjectsSection: View {
     let store: ConversationStore
     private var tabDragBetweenWindows: TabDragBetweenWindows { .shared }
     @Environment(\.tabHoverCards) private var hoverCards
     let split: TerminalSplit
-    /// The split's two tabs, the left pane's first.
     let tabs: [TerminalSession]
     let colorsByProjectKey: [String: ThemeColor]
-    /// The width of a tab in no split; each of the split's is half as wide.
     let tabWidth: CGFloat
     let onDragChanged: (_ translation: CGFloat) -> Void
     let onDragEnded: () -> Void
@@ -24,13 +16,10 @@ struct TerminalSplitAcrossProjectsSection: View {
 
     @State private var hoveredTabID: UUID?
 
-    /// Room between the two tabs for both their feet, which curve out past their sides.
     private static let gapBetweenTabs = 2 * WorkspaceTabMetrics.footRadius
-    /// Room at the container's ends for the outer feet.
     private static let endInset = WorkspaceTabMetrics.footRadius
     private static let cornerRadius = ThemeCornerRadius.panel.rawValue
 
-    /// The container's width past its two tabs', which the bar leaves out of the room its tabs share.
     static let widthBesidesTabs = gapBetweenTabs + 2 * endInset
 
     var body: some View {
@@ -73,8 +62,6 @@ struct TerminalSplitAcrossProjectsSection: View {
         .padding(.horizontal, Self.endInset)
         .background {
             VStack(spacing: 0) {
-                // The track sits on the underline, so each half of the line is in its project's color on the bar's
-                // surface, as a group's underline is.
                 UnevenRoundedRectangle(topLeadingRadius: Self.cornerRadius, topTrailingRadius: Self.cornerRadius, style: .continuous)
                     .fill(ThemePalette.trackFill)
                 HStack(spacing: 0) {
@@ -90,7 +77,6 @@ struct TerminalSplitAcrossProjectsSection: View {
         .accessibilityLabel("Split view across projects")
     }
 
-    /// Moves the split among the groups as the pointer moves along the bar, until the drag goes on between windows.
     private func drag(grabbing tabID: UUID, by translation: CGFloat, from startLocation: CGPoint) {
         guard
             tabDragBetweenWindows.followDragInTabBar(
@@ -104,7 +90,6 @@ struct TerminalSplitAcrossProjectsSection: View {
         onDragChanged(translation)
     }
 
-    /// Leaves the split where it was let go and shows the grabbed tab, as a click on it would.
     private func drop(_ tabID: UUID) {
         tabDragBetweenWindows.endDragInTabBar()
         onDragEnded()

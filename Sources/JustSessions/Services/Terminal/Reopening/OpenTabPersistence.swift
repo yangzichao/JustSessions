@@ -1,6 +1,5 @@
 import Foundation
 
-/// One launch-wide snapshot, updated in place per window. An empty second window cannot erase the first's tabs.
 @MainActor
 final class OpenTabPersistence {
     static let shared = OpenTabPersistence()
@@ -9,7 +8,6 @@ final class OpenTabPersistence {
     private var windowOrder: [UUID] = []
     private var tabsByWindow: [UUID: [ReopenableTerminalTab]] = [:]
 
-    /// The tabs the last quit, or the last window closed, saved, the first time it is asked; empty after that.
     func take(from userDefaults: UserDefaults) -> [ReopenableTerminalTab] {
         guard !haveBeenTaken else { return [] }
         haveBeenTaken = true
@@ -22,8 +20,6 @@ final class OpenTabPersistence {
         save(to: userDefaults)
     }
 
-    /// Closing one of several windows drops its tabs. Closing the last one keeps them saved, as a quit does, and the
-    /// next window to open, in this launch or the next, takes them again.
     func closeWindow(_ windowID: UUID, in userDefaults: UserDefaults) {
         tabsByWindow[windowID] = nil
         windowOrder.removeAll { $0 == windowID }

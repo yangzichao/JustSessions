@@ -1,6 +1,5 @@
 import Foundation
 
-/// Why an editor's command-line tool did not open a file; see `ExternalEditorFileOpener`.
 enum ExternalEditorCommandLineToolError: LocalizedError, Equatable {
     case didNotFinish
     case failed(String)

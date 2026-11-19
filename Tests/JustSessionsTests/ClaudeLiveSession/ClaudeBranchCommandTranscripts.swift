@@ -16,7 +16,6 @@ struct ClaudeBranchCommandTranscripts {
     static let parentTitle = "Single word OK reply"
     static let branchTitle = "Reply with the single word OK. (Branch)"
 
-    /// What the registry says about the CLI at each step, as one line of JSON.
     enum Step {
         case beforeBranch, branched, renamed
 
@@ -38,7 +37,6 @@ struct ClaudeBranchCommandTranscripts {
     let configurationDirectory: URL
     let projectDirectory: URL
 
-    /// The session to branch from, with one prompt answered.
     init() throws {
         root = try makeTemporaryDirectory()
         configurationDirectory = root.appendingPathComponent(".claude")
@@ -83,7 +81,6 @@ struct ClaudeBranchCommandTranscripts {
         try writeRecord(.branched)
     }
 
-    /// `/rename after-branch` in the branch.
     func rename() throws {
         try append(
             to: Self.branchID,
@@ -98,9 +95,6 @@ struct ClaudeBranchCommandTranscripts {
         try ClaudeAdapter(configurationDirectory: configurationDirectory).discover().map { $0.onHost(host) }
     }
 
-    /// The title an SSH host's relay gives the tab at `step`: the registry record and the last custom-title line in the
-    /// session's transcript, each in base64; see `RemoteClaudeActivityRelay`. These files are well under the 64 KiB
-    /// the relay reads.
     func relayTitle(at step: Step) throws -> String {
         let transcript = try String(contentsOf: file(of: step.sessionID), encoding: .utf8)
         let titleLine = transcript.split(separator: "\n").last { $0.contains(#""type":"custom-title""#) }.map(String.init) ?? ""
@@ -108,7 +102,6 @@ struct ClaudeBranchCommandTranscripts {
             + Data(titleLine.utf8).base64EncodedString()
     }
 
-    /// A registry record of the CLI's other than the steps', such as one `/clear` writes.
     func writeRecord(_ record: String) throws {
         try Data(record.utf8).write(to: configurationDirectory.appendingPathComponent("sessions/\(Self.processID).json"))
     }

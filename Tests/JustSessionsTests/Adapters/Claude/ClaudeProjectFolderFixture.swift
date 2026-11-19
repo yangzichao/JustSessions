@@ -2,7 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// A Claude Code configuration folder holding one project folder, for adapter tests. The test calls `remove()`.
 struct ClaudeProjectFolderFixture {
     let root: URL
     let configurationDirectory: URL

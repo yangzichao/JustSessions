@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A session started with Delete the session when its tab closes goes when its tab closes, without asking again.
 @MainActor
 struct DeletingWhenTabClosesTests {
     @Test func aNewSessionsTabPassesItsChoiceToTheSessionItLinksToInEveryWindow() throws {
@@ -84,7 +83,6 @@ struct DeletingWhenTabClosesTests {
         #expect(store.sessionsDeletedWhenTabCloses.conversationIDs.isEmpty)
     }
 
-    /// `/resume` can take the tab to a session it didn't start, which must never be deleted with it.
     @Test func aTabThatFollowsItsCLIToAnotherSessionKeepsBoth() throws {
         let sandbox = try TwoWindowSandbox(sessionCount: 2)
         defer { sandbox.tearDown() }
@@ -98,7 +96,6 @@ struct DeletingWhenTabClosesTests {
         #expect(store.sessionsDeletedWhenTabCloses.conversationIDs.isEmpty)
     }
 
-    /// As a tab reopened at launch, or moved to another window, is: a new tab for the session.
     @Test func anotherTabOfTheSessionStillDeletesIt() throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }

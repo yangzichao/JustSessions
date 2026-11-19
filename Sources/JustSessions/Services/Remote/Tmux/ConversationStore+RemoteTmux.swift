@@ -1,10 +1,6 @@
 import Foundation
 
-/// What only SSH hosts need of tmux: reconnecting a tab whose connection ended. A refresh lists the host's tmux
-/// sessions through `RemoteHostStatusProbe`; the rest is shared with this Mac, see `ConversationStore+Tmux`.
 extension ConversationStore {
-    /// Opens a fresh connection for a remote tab whose connection ended, in its place in the tab bar, drawn by the
-    /// engine the tab opened with. Returns the new tab's id, or nil when the tab isn't one that can reconnect.
     @discardableResult
     func reconnectRemoteTerminal(_ id: UUID) -> UUID? {
         guard let index = terminalSessions.firstIndex(where: { $0.id == id }),
@@ -33,14 +29,11 @@ extension ConversationStore {
         return replacement.id
     }
 
-    /// A new session's or branch's tab that took its session's tmux name must attach under that name, not the
-    /// one it started with. Attaching ignores the CLI arguments, so resume arguments are right whenever tmux still runs it.
-    /// Either way the tab connects through the host's login open now, if any.
     private func reconnectCommand(for ended: TerminalSession) -> NativeCLICommand {
         guard let host = ended.host.sshDestination else { return ended.command }
-        guard let conversation = ended.conversation,
+        guard ended.hasTakenOverItsSessionsTmuxName,
+            let conversation = ended.conversation,
             let tmuxName = ended.tmuxSessionName,
-            tmuxName == TmuxSessionName.forConversation(conversation),
             let adapter = adapter(for: conversation.provider)
         else {
             return RemoteCLICommandBuilder().withCurrentLogin(ended.command, host: host)
@@ -54,5 +47,12 @@ extension ConversationStore {
             usesHostTmuxPrefix: usesTmuxPrefix(on: ended.host),
             startCommand: customStartCommand(for: conversation.provider, on: ended.host)
         )
+    }
+}
+
+extension TerminalSession {
+    fileprivate var hasTakenOverItsSessionsTmuxName: Bool {
+        guard let conversation, let tmuxSessionName else { return false }
+        return tmuxSessionName == TmuxSessionName.forConversation(conversation)
     }
 }

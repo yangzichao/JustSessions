@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Small hourglass beside the title of a session started with Delete the session when its tab closes, in its tab and
-/// its sidebar row, so a session about to go is never taken for one that stays.
 struct DeletedWhenTabClosesIndicator: View {
     var size: ThemeGlyphSize = .statusMark
 

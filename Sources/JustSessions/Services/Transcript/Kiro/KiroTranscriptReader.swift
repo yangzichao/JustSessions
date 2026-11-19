@@ -1,7 +1,5 @@
 import Foundation
 
-/// Reads Kiro's visible prompts, replies, and tool calls from a session's log: V2's `{version, kind, data}` lines, or
-/// V3's `{id, timestamp, payload}` events (`KiroV3Session`), each line read as what it is.
 struct KiroTranscriptReader {
     var maximumEntryCount = 2_000
     var maximumTextLength = 12_000
@@ -51,11 +49,11 @@ struct KiroTranscriptReader {
                         timestamp: timestamp
                     )
                 default:
-                    continue  // Thinking and tool outputs stay out of the conversation preview.
+                    continue
                 }
             }
         default:
-            return  // System context and ToolResults are not visible conversation messages.
+            return
         }
     }
 

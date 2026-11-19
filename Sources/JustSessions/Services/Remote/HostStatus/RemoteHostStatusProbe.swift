@@ -1,17 +1,8 @@
 import Foundation
 
-/// Asks a remote host, in one SSH round trip per refresh, which tmux sessions JustSessions started there still run
-/// and where each tool's CLI is. Runs through the login shell so `tmux` is found on the `PATH` the host's profile
-/// sets, and the CLIs wherever it puts them, as its aliases and functions too; a CLI that shell doesn't find is looked
-/// for in the folders installers put it in; see `RemoteCLILocation`. What tmux prints when it can't reach the server
-/// running there is kept too, so every refresh notices a tmux upgraded while sessions ran; see `RemoteHostTmuxFinding`.
 enum RemoteHostStatusProbe {
-    /// Comes before what `tmux list-sessions` prints, after any lines a shell profile prints.
     static let tmuxSessionsHeading = "JustSessions tmux sessions:"
-    /// Separates the tmux session names above it from the CLIs the login shell finds below it. Has spaces, so it is
-    /// never taken for a tmux session name.
     static let installedCLIsHeading = "JustSessions installed CLIs:"
-    /// Comes after those CLIs, before the `<executable name> <path>` lines of the install folders' search.
     static let installFoldersHeading = "JustSessions CLIs in install folders:"
     /// `tmux list-sessions`, whose output goes to a file first: an older tmux server, as 2.6, keeps the output of a
     /// newer client open, which would hold the connection until the refresh gives up; see `RemoteHostCheckScript`.
@@ -46,7 +37,6 @@ enum RemoteHostStatusProbe {
         )
     }
 
-    /// Nil when the host could not be reached.
     static func status(
         ofHost host: String,
         runner: RemoteHostCommandRunner = RemoteHostCommandRunner()

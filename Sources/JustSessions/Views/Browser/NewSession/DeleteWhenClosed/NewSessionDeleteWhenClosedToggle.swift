@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// The New session sheet's **Delete the session when its tab closes**, for a session you need once. Ticking it is the
-/// question deleting asks (PRD-26), so while it is ticked it says where the session goes, as the deletion dialog does:
-/// the Trash, or gone for good.
 struct NewSessionDeleteWhenClosedToggle: View {
     @Binding var deletesSessionWhenClosed: Bool
     let provider: ConversationProvider

@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Connect… logs in the way `ssh` does in Terminal, asking `ssh`'s questions in the app, and keeps the master. A
-/// script stands in for `ssh`: it asks for a password through `SSH_ASKPASS`, twice if the first is wrong, and makes the
-/// control socket's file when the answer is right. Another stands in for the app as the askpass program.
 struct SSHLoginTests {
     static let fakeSSH = """
         #!/bin/sh
@@ -24,7 +21,6 @@ struct SSHLoginTests {
         exit 255
         """
 
-    /// Does what `SSHAskpassRelay` does when `ssh` starts the app.
     static let fakeAskpass = """
         #!/usr/bin/env python3
         import json, os, socket, sys
@@ -76,8 +72,6 @@ struct SSHLoginTests {
         }
     }
 
-    /// The login has no idle limit: it stays open until Disconnect, the host's removal, quitting, or a dropped
-    /// connection ends it.
     @Test func theMasterStartsWithTheBackgroundSettingsAndMayAsk() {
         #expect(
             SSHLogin.sshArguments(
@@ -105,7 +99,6 @@ struct SSHLoginTests {
         #expect(asked.value.map(\.context) == ["Authorized users only."])
         #expect(asked.value.map(\.kind) == [.secret])
         #expect(fixture.connections.isLoggedIn("devbox"))
-        // Only the master's socket stays; what `ssh` printed and the askpass socket are gone.
         let loginFolder = try #require(fixture.loginFolders.first)
         #expect(try FileManager.default.contentsOfDirectory(atPath: fixture.socketRoot + "/" + loginFolder) == ["master"])
     }
@@ -147,7 +140,6 @@ struct SSHLoginTests {
         #expect(fixture.loginFolders.isEmpty)
     }
 
-    /// Closing the Add SSH host sheet while it logs in stops `ssh`.
     @Test func cancellingTheTaskStopsTheLogin() async throws {
         let fixture = try Fixture()
         defer { fixture.remove() }

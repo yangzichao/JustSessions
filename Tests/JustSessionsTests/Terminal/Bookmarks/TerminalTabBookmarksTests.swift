@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// ⌘D, ⌘', and ⇧⌘' in a tab (TRM-74): ⌘D bookmarks the newest message in the session's file, ⌘' and ⇧⌘' hand the jump to
-/// its reading window, and a notice over the terminal says what happened.
 @MainActor
 @Suite(.serialized)
 struct TerminalTabBookmarksTests {
@@ -33,7 +31,6 @@ struct TerminalTabBookmarksTests {
                 displayTitle: "Tab bookmarks",
                 command: NativeCLICommand(executablePath: "/usr/bin/true", arguments: [], workingDirectory: "/tmp", environment: [])
             )
-            // Selected, so a command that changed the selected tab would show.
             store.openTerminal(tab)
         }
 
@@ -48,7 +45,6 @@ struct TerminalTabBookmarksTests {
             await task.value
         }
 
-        /// The session's reading window, if one is open; opening it again without a request only brings it forward.
         func openController() throws -> SessionReadingWindowController {
             let conversation = try #require(conversation)
             return try #require(readingWindows.open(conversation, store: store).windowController as? SessionReadingWindowController)
@@ -100,7 +96,6 @@ struct TerminalTabBookmarksTests {
         #expect(harness.store.selectedTerminalID == harness.tab.id)
     }
 
-    /// Unlike ⌘D, it never removes: a bookmarked newest message keeps its bookmark and its label.
     @Test func shiftCommandDKeepsAnExistingBookmark() async throws {
         let files = try TranscriptPagingFixture(count: 30)
         defer { files.remove() }
@@ -144,7 +139,6 @@ struct TerminalTabBookmarksTests {
         #expect(harness.tab.bookmarkNotices.notice == .removed(saved, assistantName: "Codex"))
     }
 
-    /// The second press waits for the first's read and toggle, so it removes what the first added.
     @Test func rapidPressesRunInOrder() async throws {
         let files = try TranscriptPagingFixture(count: 30)
         defer { files.remove() }
@@ -162,7 +156,6 @@ struct TerminalTabBookmarksTests {
         }
         #expect(bookmark.entryID == id(29))
 
-        // Reads on one tab's reader tend to finish in order anyway, so a slower first command shows the queue waits.
         var ran: [String] = []
         harness.tab.bookmarkNotices.enqueue {
             try? await Task.sleep(for: .milliseconds(100))
@@ -226,7 +219,6 @@ struct TerminalTabBookmarksTests {
         let files = try TranscriptPagingFixture(count: 30)
         defer { files.remove() }
         let bookmarks = MessageBookmarks.letters.enumerated().map { record, letter in bookmark(letter, at: record) }
-        // Record 29, the newest, isn't among the 26 bookmarked.
         let harness = try Harness(conversation: files.conversation, bookmarks: bookmarks)
         defer { harness.close() }
 
@@ -258,15 +250,12 @@ struct TerminalTabBookmarksTests {
         harness.bookmarks.goToAdjacentBookmark(forward: true, from: harness.tab)
 
         #expect(harness.tab.bookmarkNotices.notice == .noBookmarks)
-        // Had the press opened a window, this would bring it forward with the press's request waiting.
         let controller = try harness.openController()
         defer { controller.readingWindow.close() }
         #expect(controller.requests.navigationRevision == 0)
         #expect(controller.requests.pendingNavigation == nil)
     }
 
-    /// A window opened by the press starts as from the conversation's end: Next at the first bookmark, Previous at the
-    /// last, with that bookmark's page read first.
     @Test(arguments: [true, false])
     func nextOpensANewWindowAtTheFirstAndPreviousAtTheLast(forward: Bool) throws {
         let files = try TranscriptPagingFixture(count: 30)
@@ -286,8 +275,6 @@ struct TerminalTabBookmarksTests {
         #expect(harness.tab.bookmarkNotices.notice == nil)
     }
 
-    /// An open window goes on from where its reader is; before its pages show, from where it was left, here the
-    /// conversation's end, so Next asks for the first bookmark (RDR-50).
     @Test func nextInAnOpenWindowAsksItToGoOn() throws {
         let files = try TranscriptPagingFixture(count: 30)
         defer { files.remove() }
@@ -306,15 +293,12 @@ struct TerminalTabBookmarksTests {
         #expect(harness.store.selectedTerminalID == harness.tab.id)
     }
 
-    /// A window showing its pages goes on at once from the message being read at its top, through its own reader, as ⌘'
-    /// in the window does, rather than through a request (RDR-50). Messages of 4 lines, so 540 can come to the top.
     @Test func nextInADrawnWindowGoesOnFromTheMessageAtItsTop() async throws {
         let files = try TranscriptPagingFixture(count: 600, lineCount: 4)
         defer { files.remove() }
         let bookmarks = [bookmark("a", at: 100), bookmark("b", at: 540), bookmark("c", at: 570)]
         let harness = try Harness(conversation: files.conversation, bookmarks: bookmarks)
         defer { harness.close() }
-        // Listed, as a session open in a tab is, so the window's reader keeps bookmarks.
         harness.store.replaceConversations(on: .thisMac, with: [files.conversation])
         let window = harness.readingWindows.open(
             files.conversation, store: harness.store,
@@ -334,8 +318,6 @@ struct TerminalTabBookmarksTests {
         #expect(harness.store.selectedTerminalID == harness.tab.id)
     }
 
-    /// Whether the window's reader has the entry's top 6 points below its own, where a jump puts it, with nothing left to
-    /// restore.
     private static func showsAtTop(_ entryID: Int, in window: NSWindow) -> Bool {
         guard let contentView = window.contentView else { return false }
         contentView.layoutSubtreeIfNeeded()

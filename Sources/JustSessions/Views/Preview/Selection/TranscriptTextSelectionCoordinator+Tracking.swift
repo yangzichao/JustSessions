@@ -1,13 +1,9 @@
 import AppKit
 
-/// Following a drag across text blocks. AppKit's own drag selection stays inside the text view it started in.
+/// AppKit's own drag selection stays inside the text view it started in.
 extension TranscriptTextSelectionCoordinator {
-    /// A drag shorter than this is a click, which opens a link under it.
     private static let clickTolerance: CGFloat = 3
 
-    /// Selects from a click in `view` to wherever the pointer is dragged, across every block it passes, scrolling while
-    /// the pointer is held past an edge of the reader. Shift extends the current selection. Returns false for the clicks
-    /// the text view handles itself, such as a double click, which selects a word inside its block.
     func trackSelection(startingWith event: NSEvent, in view: TranscriptTextView) -> Bool {
         guard event.clickCount == 1, event.modifierFlags.isDisjoint(with: [.command, .control, .option]),
             let window = view.window, let clickedPosition = position(at: event.locationInWindow, in: window)
@@ -41,7 +37,6 @@ extension TranscriptTextSelectionCoordinator {
                 extendSelection(to: nextEvent.locationInWindow, in: window)
                 autoscroll(with: nextEvent)
             default:
-                // Periodic events keep the reader scrolling while the pointer is held still past its edge.
                 let location = window.mouseLocationOutsideOfEventStream
                 guard
                     let scrollEvent = NSEvent.mouseEvent(
@@ -62,9 +57,6 @@ extension TranscriptTextSelectionCoordinator {
         if extendedSelection != selection { select(extendedSelection, in: window) }
     }
 
-    /// The place between two characters that a pointer at `point`, in window coordinates, selects to. Over a block, it
-    /// is the nearest place in it; beside blocks, as next to a short line or in a table's padding, the nearest place in
-    /// the closest block on that line; between blocks, the start of the block below.
     func position(at point: NSPoint, in window: NSWindow) -> TranscriptTextSelectionPosition? {
         let blocks = orderedViews.compactMap { key, view -> (key: TranscriptTextSelectionKey, view: TranscriptTextView, frame: NSRect)? in
             view.window === window ? (key, view, view.convert(view.bounds, to: nil)) : nil
@@ -91,7 +83,6 @@ extension TranscriptTextSelectionCoordinator {
         point.x < frame.minX ? frame.minX - point.x : max(0, point.x - frame.maxX)
     }
 
-    /// Scrolls the reader, and the code block or table under the pointer, toward a pointer held past their edges.
     @discardableResult
     private func autoscroll(with event: NSEvent) -> Bool {
         let focusView = selection.flatMap { view(for: $0.focus.key) }

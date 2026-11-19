@@ -1,6 +1,3 @@
-/// How many cells a character takes in a terminal row: two for East Asian wide and fullwidth characters and for emoji
-/// drawn as pictures, one for everything else. Close enough to Ghostty's own table to tell where a row's text ends and
-/// which character a click landed on; see `TerminalScreenRow`.
 enum TerminalCellWidth {
     static func cellCount(of character: Character) -> Int {
         guard let firstScalar = character.unicodeScalars.first else { return 1 }
@@ -10,11 +7,8 @@ enum TerminalCellWidth {
         return wideScalarRanges.contains { $0.contains(firstScalar.value) } ? 2 : 1
     }
 
-    /// U+FE0F, which asks for a character's emoji picture, as in ⚠️.
     private static let emojiPresentationSelector: Unicode.Scalar = "\u{FE0F}"
 
-    /// The East Asian wide and fullwidth blocks: Hangul, CJK and its punctuation, kana, Yi, fullwidth forms, and the
-    /// supplementary ideographs.
     private static let wideScalarRanges: [ClosedRange<UInt32>] = [
         0x1100...0x115F,
         0x2E80...0x303E,

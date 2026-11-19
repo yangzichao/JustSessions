@@ -3,11 +3,7 @@ import Testing
 
 @testable import JustSessions
 
-/// A reply's outline snippet skips the Markdown parse for a head Markdown leaves as it is (PERF-90), and must still be
-/// the bookmark snippet of the parsed head.
 struct ConversationOutlineSnippetTests {
-    /// Mostly inert text, with the whitespace Markdown strips or joins, digits and markers inside lines and at their starts,
-    /// autolinks, a mark that can join a space, U+FEFF, and runs long enough to reach the 320-character cut.
     private static let tokens = [
         "word", "Café", "☕️", "中文", "e\u{301}", "\u{301}", " \u{301}", "\u{600}", "\u{600} ", "\u{FEFF}", "\u{A0}", "\u{2028}",
         "\u{3000}", "\u{85}", "\u{200B}", " ", "  ", "   ", "    ", "\n", "\n\n", "\n ", "\n   ", " \n", "  \n", "x1", "2.", "a-b", "-",
@@ -32,9 +28,7 @@ struct ConversationOutlineSnippetTests {
                 skippedParseCount += 1
             }
         }
-        // The parse was skipped often enough for the comparison above to mean something.
         #expect(skippedParseCount > 200, "\(skippedParseCount)")
-        // The cut ends the head's words; its paragraphs, without the blank lines, reach the reply's last words.
         let spaced = "Start" + String(repeating: "\n", count: 330) + "end of the reply"
         #expect(ConversationOutlineBuilder.isMarkdownInert(spaced))
         #expect(

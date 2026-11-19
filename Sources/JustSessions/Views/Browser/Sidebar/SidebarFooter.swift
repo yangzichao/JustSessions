@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// One line: adding an SSH host, then settings.
 struct SidebarFooter: View {
     let onAddRemoteHost: () -> Void
 

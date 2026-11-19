@@ -5,7 +5,6 @@ enum AntigravityTranscriptPageSource {
     static func read(_ file: URL, request: TranscriptPageRequest, limits: TranscriptPageLimits) throws -> TranscriptPage {
         let database = try AntigravityDatabase.open(file)
         defer { sqlite3_close(database) }
-        // A read transaction keeps the lightweight step index and the selected payloads in the same snapshot.
         try AntigravityDatabase.execute("BEGIN", in: database)
         defer { try? AntigravityDatabase.execute("ROLLBACK", in: database) }
         var indexStatement: OpaquePointer?

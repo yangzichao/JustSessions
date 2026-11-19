@@ -16,9 +16,6 @@ struct WorkspaceReadServiceTests {
         first?.refreshThisMac()
         try await expectEventually { adapter.discoveryCount == 1 }
         second.refreshThisMac()
-        // The second refresh joins from a task of its own, which a full run's load can hold up for longer than a
-        // short sleep. Had the first window gone before it joined, its join would end the first window's scan and
-        // start another, so the first window goes only once both wait on the one scan.
         let joinDeadline = ContinuousClock.now + .seconds(120)
         while await service.thisMacDiscoveryWaiterCount() < 2, ContinuousClock.now < joinDeadline {
             try await Task.sleep(for: .milliseconds(10))
@@ -26,7 +23,6 @@ struct WorkspaceReadServiceTests {
         #expect(await service.thisMacDiscoveryWaiterCount() == 2)
         #expect(adapter.discoveryCount == 1)
 
-        // Releasing one waiter must not cancel the producer the other window is awaiting.
         first = nil
         adapter.allowDiscoveryToFinish()
         try await expectEventually { !second.isScanningThisMac }
@@ -108,9 +104,6 @@ private final class FirstDiscoveryBlocksAdapter: ConversationAdapter, @unchecked
     func delete(_ conversation: Conversation) throws {}
 }
 
-/// Each discovery waits until `allowDiscoveryToFinish()`, which lets every discovery finish, later ones too. A
-/// one-shot signal let a scan the test didn't expect wait out the test's whole time limit: the scan it ended took
-/// the signal. Now such a scan finishes, and the test fails on the count.
 private final class BlockingCountingAdapter: ConversationAdapter, @unchecked Sendable {
     let provider = ConversationProvider.claude
     private let lock = NSLock()

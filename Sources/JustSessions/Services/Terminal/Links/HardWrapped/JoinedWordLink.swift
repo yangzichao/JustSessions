@@ -16,7 +16,6 @@ enum JoinedWordLink {
     private static let urlPunctuation = Set("-.~:/?#@!$&*+,;=%_()[]")
     private static let pathPunctuation = Set("-.~:/?#@!$&*+;=%_")
 
-    /// The first URL in the word that reaches `index`, as a search from the word's start finds it.
     private static func urlRange(in word: [Character], holding index: Int) -> Range<Int>? {
         for start in 0...index {
             guard let scheme = urlSchemes.first(where: { word[start...].starts(with: $0) }) else { continue }

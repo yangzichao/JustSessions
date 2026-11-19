@@ -39,7 +39,6 @@ struct OnboardingTipDueTests {
         anotherSession.readSessionID = "codex:2"
         #expect(dueStops(in: anotherSession, among: tipsToShow) == [.sessionMenu, .searchSessions])
 
-        // Before the reading tip, another session gets the reading tip instead.
         #expect(dueStops(in: anotherSession, among: everyTipButTheTour) == [.resume, .findInConversation])
     }
 

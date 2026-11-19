@@ -46,7 +46,6 @@ struct TerminalFindStateTests {
         #expect(finder.calls.isEmpty)
     }
 
-    /// Closing ends the engine's search, which takes its highlight away, and keeps the text for the next ⌘F.
     @Test func closingEndsTheSearchAndKeepsTheText() {
         let finder = RecordingTerminalFinder()
         let findState = TerminalFindState(finder: finder)
@@ -66,7 +65,6 @@ struct TerminalFindStateTests {
         #expect(finder.calls.last == .find("needle"))
     }
 
-    /// ⌘F while the bar shows puts the keyboard back in its field without searching again.
     @Test func showingAgainOnlyFocusesTheField() {
         let finder = RecordingTerminalFinder()
         let findState = TerminalFindState(finder: finder)
@@ -81,7 +79,6 @@ struct TerminalFindStateTests {
         #expect(findState.focusRevision == focusRevision + 1)
     }
 
-    /// As tmux's, for a plain terminal: the bar shows each count as it arrives, and none once it closed.
     @Test func aFinderThatCountsLaterShowsEachCountAsItArrives() {
         let finder = LaterCountingTerminalFinder()
         let findState = TerminalFindState(finder: finder)
@@ -108,7 +105,6 @@ struct TerminalFindStateTests {
 private final class LaterCountingTerminalFinder: TerminalTextFindingCountingLater {
     var onMatchCount: ((TerminalFindMatchCount?) -> Void)?
 
-    /// What a finder that counts later returns is not its count, so the bar must not show it.
     func findText(_ query: String) -> TerminalFindMatchCount? { TerminalFindMatchCount.none }
     func findTextAgain(_ query: String, direction: TerminalFindDirection) -> TerminalFindMatchCount? { TerminalFindMatchCount.none }
     func endTextFind() {}

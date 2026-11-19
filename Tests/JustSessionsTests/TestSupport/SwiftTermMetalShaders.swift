@@ -24,7 +24,6 @@ enum SwiftTermMetalShaders {
         }
     }()
 
-    /// Whether the shaders are in place, so `setUseMetal(true)` can succeed.
     @discardableResult
     static func install() -> Bool { installed }
 }

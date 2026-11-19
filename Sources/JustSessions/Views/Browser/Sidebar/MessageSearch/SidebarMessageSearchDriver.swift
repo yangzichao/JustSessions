@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Runs a window's search through every session's messages again whenever its text, the listed sessions, the CLIs
-/// hidden in Settings, or the sessions the indexer has read change. Draws nothing.
 struct SidebarMessageSearchDriver: View {
     @ObservedObject var indexer: SessionMessageIndexer
     let search: SidebarMessageSearch

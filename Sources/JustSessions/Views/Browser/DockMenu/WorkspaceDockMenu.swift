@@ -1,6 +1,5 @@
 import AppKit
 
-/// The Dock icon's right-click menu. New Window opens another workspace window, as File > New Window (⌘⇧N) does.
 @MainActor
 final class WorkspaceDockMenu: NSObject {
     static let shared = WorkspaceDockMenu()

@@ -5,8 +5,6 @@ import UniformTypeIdentifiers
 
 @testable import JustSessions
 
-/// Generated Claude and Codex sessions in which each user message attaches one PNG, as a screenshot is attached, and
-/// gets a reply. Without an image, the same conversation is text only.
 enum ImageHeavySessionFixture {
     static func write(
         provider: ConversationProvider, messageCount: Int, imageBase64: String?, in directory: URL
@@ -43,7 +41,6 @@ enum ImageHeavySessionFixture {
         return file
     }
 
-    /// A PNG of random pixels, which do not compress, so its base64 is about `length` characters.
     static func noisePNGBase64(length: Int) -> String {
         let side = Int((Double(length) / 4).squareRoot())  // 3 bytes a pixel, and base64 takes 4 characters for 3 bytes.
         var pixels = (0..<side * side * 4).map { $0 % 4 == 3 ? 255 : UInt8.random(in: 0...255) }

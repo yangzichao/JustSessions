@@ -1,24 +1,15 @@
 import AppKit
 import SwiftUI
 
-/// Check this host…: what on an SSH host could keep its sessions from working, each finding with what the host
-/// printed and a command to run in your own Terminal, so you can see a problem is on the host and not in the app.
-/// Copy report puts it all as text on the clipboard, for an issue or for whoever runs the host. Fix with agent…, the
-/// sheet's main button when the report has something to fix, turns the sheet to `HostFixAgentForm`, which starts a CLI
-/// to fix what the check found. See `ConversationStore+HostCheck`.
 struct HostCheckSheet: View {
     let store: ConversationStore
-    /// The check as the sheet opened; the store's has its report once the check finishes.
     let presentedState: HostCheckSheetState
     @Environment(\.dismiss) private var dismiss
     @State private var hasCopiedReport = false
-    /// Set while the sheet shows Fix with agent…'s page.
     @State private var fixAgentDraft: HostFixAgentDraft?
     @State private var isStartingFixAgent = false
     @State private var fixAgentStartError: String?
 
-    /// The progress and the report take one fixed height, so the sheet keeps its size from one to the other; the
-    /// findings scroll once they don't fit.
     private static let findingsHeight: CGFloat = 420
 
     private var state: HostCheckSheetState {
@@ -83,7 +74,6 @@ struct HostCheckSheet: View {
         Button("Check again", systemImage: "arrow.clockwise") { store.checkShownHostAgain() }
             .disabled(state.isChecking)
         Spacer()
-        // A report with something to fix leads to fixing it.
         if let report = state.report, report.hasSomethingToFix {
             Button("Done") { dismiss() }
                 .keyboardShortcut(.cancelAction)
@@ -148,7 +138,6 @@ struct HostCheckSheet: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .font(ThemeFont.body.weight(.medium))
-            // The card ends with its last row, and scrolls only once its rows don't fit.
             ViewThatFits(in: .vertical) {
                 findingsList(report)
                 ScrollView { findingsList(report) }

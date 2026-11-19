@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A session whose project folder was moved or renamed after it ran: its header says where the folder was, and stops
-/// once the folder is back and the app comes to the front again.
 @MainActor
 struct MissingProjectFolderNoteTests {
     @Test func headerNotesTheMissingFolderUntilItIsBackAndTheAppIsActiveAgain() async throws {
@@ -27,7 +25,6 @@ struct MissingProjectFolderNoteTests {
             #expect(heightBeforeTheAppIsActiveAgain == heightWithNote)
             NotificationCenter.default.post(name: NSApplication.didBecomeActiveNotification, object: NSApp)
             let heightOnceTheAppIsActiveAgain = try await sessionHeader.settledHeight()
-            // The note is a line of callout text or two, below the title and actions.
             #expect(heightWithNote - heightOnceTheAppIsActiveAgain >= 20)
             #expect(store.canLaunch(conversation(in: movedFolder), action: .resume))
             try FileManager.default.removeItem(at: movedFolder)
@@ -65,7 +62,6 @@ struct MissingProjectFolderNoteTests {
     }
 }
 
-/// A session header in a window of a fixed width, so its height shows whether the note is there.
 @MainActor
 private final class HostedSessionHeader {
     private let hostingView: NSHostingView<AnyView>
@@ -82,7 +78,6 @@ private final class HostedSessionHeader {
         window.contentView = hostingView
     }
 
-    /// The header's height once its folder check and layout have run.
     func settledHeight() async throws -> CGFloat {
         for _ in 0..<4 {
             hostingView.layoutSubtreeIfNeeded()

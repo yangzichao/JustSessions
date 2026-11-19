@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Moving a session's tab to another window opens a tab for it there, which is the same tab to you, so it keeps the
-/// engine it had, as a reconnected SSH tab does, even after another engine was chosen.
 @MainActor
 struct TerminalEngineTabMovingTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -15,7 +13,6 @@ struct TerminalEngineTabMovingTests {
         let first = sandbox.makeStore(listing: [conversation])
         let second = sandbox.makeStore(listing: [conversation])
         let waitingTab = try #require(try first.makeTerminal(for: conversation, action: .resume, startsOnceShown: true))
-        // As a tab from the last quit that was not selected; selecting it would start it.
         first.insertReopenedTerminal(waitingTab, at: 0, selecting: false)
         sandbox.engineStore.setEngine(engine.otherEngine)
 
@@ -28,7 +25,6 @@ struct TerminalEngineTabMovingTests {
         #expect(engine.draws(movedTab.terminalView))
     }
 
-    /// The tab never starts, so nothing connects to the host; a stand-in answers that the host's tmux runs its CLI.
     @Test(arguments: TerminalEngine.allCases)
     func anSSHTabKeepsItsEngineInItsNewWindow(_ engine: TerminalEngine) async throws {
         let sandbox = try TerminalEngineLaunchSandbox(engine: engine)
@@ -51,8 +47,6 @@ struct TerminalEngineTabMovingTests {
         #expect(engine.draws(movedTab.terminalView))
     }
 
-    /// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`. The moved tab reattaches to the same CLI,
-    /// drawn by the same engine.
     @Test(arguments: TerminalEngine.allCases)
     func aTabWhoseCLIRunsInTmuxKeepsItsEngineInItsNewWindow(_ engine: TerminalEngine) async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
@@ -81,7 +75,6 @@ struct TerminalEngineTabMovingTests {
             first.closeAllTerminals()
             second.closeAllTerminals()
         }
-        // Tabs run the CLI directly until a refresh has checked the tmux version.
         for store in [first, second] {
             store.refreshThisMac()
             #expect(await sandbox.waitUntil { !store.isScanningThisMac })

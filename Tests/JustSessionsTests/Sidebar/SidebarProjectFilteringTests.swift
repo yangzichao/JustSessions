@@ -98,7 +98,6 @@ struct SidebarProjectFilteringTests {
         #expect(Set(filtered.map(\.id)) == ["/work/app", runningOnDevbox.projectDirectoryKey])
         #expect(Set(filtered.flatMap(\.conversations).map(\.id)) == [running.id, runningOnDevbox.id])
         #expect(filtered.flatMap(\.pendingNewSessions).map(\.id) == [runningNewSession.id])
-        // A session that runs but does not wait on you is not listed by Waiting for you.
         let waitingOnly = SidebarProjectFiltering.projects(
             projects, providerFilter: .all, recencyFilter: .all, statusFilter: .waitingForYou, running: runningSessions
         )
@@ -187,7 +186,6 @@ struct SidebarProjectFilteringTests {
         #expect(hidden.map(\.sessionCount) == [1, 0])
         #expect(hidden.first?.conversations.map(\.id) == [keptInMixed.id])
 
-        // Like any empty project, it hides while a status filter is on.
         let running = SidebarProjectFiltering.projects(
             projects,
             providerFilter: .all,

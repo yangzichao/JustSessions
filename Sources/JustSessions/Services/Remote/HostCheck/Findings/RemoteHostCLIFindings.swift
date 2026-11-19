@@ -1,10 +1,5 @@
 import Foundation
 
-/// Each tool's CLI where tabs start it from: a program, an alias, or a function of the login shell the app's commands
-/// use, or a program in an install folder that shell's PATH leaves out; see `RemoteCLILocation`. A CLI found but
-/// failing to print its version, such as a Node CLI whose `node` isn't on the PATH, would fail to start a session too.
-/// A missing CLI matters for the tab's session and for tools with sessions listed under the host; the others are
-/// listed together.
 enum RemoteHostCLIFindings {
     static func findings(in output: RemoteHostCheckOutput, context: RemoteHostCheckContext) -> [HostCheckFinding] {
         var findings: [HostCheckFinding] = []
@@ -24,7 +19,7 @@ enum RemoteHostCLIFindings {
             let names = unneededMissingProviders.map(\.rawValue).joined(separator: ", ")
             findings.append(
                 HostCheckFinding(
-                    id: "cli-others",
+                    id: .otherCLIs,
                     status: .note,
                     title: AppLocalization.string("Other CLIs"),
                     summary: AppLocalization.string("Not found on \(context.host): \(names).")
@@ -42,19 +37,19 @@ enum RemoteHostCLIFindings {
         let versionOutput = output.text(program.key + "-version")
         let status: HostCheckFinding.Status
         let summary: String
-        switch (program.asksVersion, output.exitStatus(program.key + "-version-exit")) {
-        case (false, _):
+        switch (program.source, output.exitStatus(program.key + "-version-exit")) {
+        case (.customStartCommand, _):
             status = .passed
             summary = AppLocalization.string("Your start command's program, found at \(path).")
-        case (true, 0):
+        case (.cliExecutable, 0):
             status = .passed
             summary = AppLocalization.string("Found at \(path).")
-        case (true, RemoteHostCheckScript.stoppedAtTimeLimitStatus):
+        case (.cliExecutable, RemoteHostCheckScript.stoppedAtTimeLimitStatus):
             status = .warning
             summary = AppLocalization.string(
                 "Found at \(path), but it didn't print its version within \(RemoteHostCheckScript.versionTimeoutSeconds) seconds."
             )
-        case (true, _):
+        case (.cliExecutable, _):
             status = .warning
             summary = AppLocalization.string(
                 "Found at \(path), but it failed when asked for its version, so it may fail to start sessions too."
@@ -65,7 +60,7 @@ enum RemoteHostCLIFindings {
             ? " " + AppLocalization.string("It isn't on the PATH of \(context.host)'s login shell, so tabs start it from this folder.")
             : ""
         return HostCheckFinding(
-            id: program.key,
+            id: .cli(program.provider),
             status: status,
             title: program.provider.rawValue,
             summary: summary + installFolderNote,
@@ -74,7 +69,6 @@ enum RemoteHostCLIFindings {
         )
     }
 
-    /// No program `sh` finds, but the login shell has an alias or function by the name, which tabs run there.
     private static func aliasOrFunctionFinding(
         _ program: RemoteHostCheckProgram,
         output: RemoteHostCheckOutput,
@@ -105,7 +99,7 @@ enum RemoteHostCLIFindings {
                 )
         }
         return HostCheckFinding(
-            id: program.key,
+            id: .cli(program.provider),
             status: status,
             title: program.provider.rawValue,
             summary: summary,
@@ -126,7 +120,7 @@ enum RemoteHostCLIFindings {
                 "\(program.program) isn't on the PATH of \(host)'s login shell, so its sessions listed here can't resume. If it's installed, add its folder to PATH in a startup file that shell reads."
             )
         return HostCheckFinding(
-            id: program.key,
+            id: .cli(program.provider),
             status: isTheSessionsTool ? .problem : .warning,
             title: program.provider.rawValue,
             summary: summary,
@@ -139,7 +133,7 @@ enum RemoteHostCLIFindings {
         let lookup = "command -v \(program.program)"
         return RemoteHostCheckCommands.inLoginShell(
             context.host,
-            program.asksVersion ? "\(lookup) && \(program.program) --version" : lookup,
+            program.source == .cliExecutable ? "\(lookup) && \(program.program) --version" : lookup,
             startup: context.shellStartup
         )
     }

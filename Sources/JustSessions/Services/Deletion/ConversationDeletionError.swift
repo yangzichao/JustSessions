@@ -3,7 +3,6 @@ import Foundation
 enum ConversationDeletionError: LocalizedError, Equatable {
     case invalidSource
     case missingSource
-    /// The file is where the session's file should be, but it is no longer that session's file.
     case sourceMismatch
     case activeTerminal
     case codexFailed(String)

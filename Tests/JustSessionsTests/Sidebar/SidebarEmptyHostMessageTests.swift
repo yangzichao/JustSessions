@@ -47,7 +47,6 @@ struct SidebarEmptyHostMessageTests {
         #expect(message(nil, isSearching: true, statusFilter: .waitingForYou).text == "No matching projects or sessions")
     }
 
-    /// Nothing is known of a disconnected host beyond its last copy, whatever the filters.
     @Test func aDisconnectedHostSaysToConnectUnlessItIsCopyingOrSearched() {
         #expect(message(nil, on: .ssh("devbox"), isDisconnected: true).text == "Disconnected. Connect to copy its sessions.")
         #expect(

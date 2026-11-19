@@ -1,18 +1,15 @@
 import Foundation
 import SQLite3
 
-/// Reads the sessions in OpenCode's database, opened read-only.
 enum OpenCodeSQLiteReader {
     struct Session: Equatable {
         let sessionID: String
         let projectPath: String
         let title: String?
         let updatedAt: Date
-        /// The session that started this one as a subagent; nil for a session started on its own.
         var parentSessionID: String? = nil
     }
 
-    /// Archived sessions are left out where the database records archiving.
     static let sessionsQuery = """
         SELECT id, directory, title, time_updated, parent_id FROM session WHERE time_archived IS NULL
         """
@@ -28,7 +25,6 @@ enum OpenCodeSQLiteReader {
             return []
         }
         defer { sqlite3_close(database) }
-        // OpenCode writes while it runs; wait briefly for its lock instead of listing nothing.
         sqlite3_busy_timeout(database, 1_000)
 
         var statement: OpaquePointer?

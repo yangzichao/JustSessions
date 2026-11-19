@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the lookup's script in a local shell whose environment stands in for the host's login shell.
 struct RemoteToolFoldersLookupTests {
     typealias HostShell = RemotePiFixture.HostShell
 
@@ -110,7 +109,6 @@ struct RemoteToolFoldersLookupTests {
         #expect(recorder.commands.map(\.command) == [RemoteToolFoldersLookup.command(on: "devbox"), WindowsHostProbe.command])
     }
 
-    /// A POSIX host whose shell startup fails before the lookup runs is not Windows.
     @Test func aShellThatRanNothingOnAnotherHostKeepsTheStandardFolders() throws {
         let runner = Self.runner(
             recorder: RemoteCommandRecorder(), lookupOutput: (1, "bash: /etc/profile: Permission denied\n"),
@@ -119,7 +117,6 @@ struct RemoteToolFoldersLookupTests {
         #expect(try RemoteToolFoldersLookup.folders(on: "devbox", runner: runner) == .standard)
     }
 
-    /// A lookup that ran, even with an empty home, is from a POSIX shell, so it isn't asked again.
     @Test(arguments: ["__JUSTSESSIONS_FOLDER__HOME=/home/me\n", "__JUSTSESSIONS_FOLDER__HOME=\n"])
     func aLookupThatRanAsksNothingMore(output: String) throws {
         let recorder = RemoteCommandRecorder()
@@ -140,7 +137,6 @@ struct RemoteToolFoldersLookupTests {
                 == RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(RemoteToolFoldersLookup.script))", on: "devbox"))
     }
 
-    /// Answers the lookup and the Windows probe.
     private static func runner(
         recorder: RemoteCommandRecorder,
         lookupOutput: (exitStatus: Int32, output: String),

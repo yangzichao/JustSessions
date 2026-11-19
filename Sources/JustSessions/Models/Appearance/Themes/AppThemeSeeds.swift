@@ -1,5 +1,3 @@
-/// The colors one theme variant is made from, as 0xRRGGBB values. `AppThemeColors` makes its text colors readable on
-/// them and works out the rest.
 struct AppThemeSeeds: Equatable, Sendable {
     var sidebarSurface: UInt32
     var contentSurface: UInt32

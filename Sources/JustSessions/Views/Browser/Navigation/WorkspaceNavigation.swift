@@ -1,7 +1,5 @@
 import Foundation
 
-/// Back and Forward in one workspace window as things stand: where each goes, nearest first, for the title bar's
-/// buttons, their right-click menus, and the Go menu.
 struct WorkspaceNavigation {
     struct Destination: Identifiable {
         let entryIndex: Int
@@ -27,7 +25,6 @@ struct WorkspaceNavigation {
 }
 
 extension WorkspaceNavigation {
-    /// The history's places that `store` can show, each named by its tab's or session's title.
     @MainActor
     init(
         history: WorkspaceNavigationHistory,

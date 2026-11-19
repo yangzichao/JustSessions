@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The hover card's raised surface: outlined in the theme's hairline and lifted off the terminal under it.
 struct TabHoverCardSurface<Content: View>: View {
     @ViewBuilder let content: Content
 

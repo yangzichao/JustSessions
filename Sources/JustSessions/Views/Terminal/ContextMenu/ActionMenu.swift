@@ -1,7 +1,5 @@
 import AppKit
 
-/// Menus built in AppKit from `ActionMenuItem`s, for a terminal's right-click menu and the menu a ⌘-click on a file
-/// link shows.
 @MainActor
 enum ActionMenu {
     /// A menu whose items are enabled or not as they were built. AppKit's own check would turn every item on, since

@@ -1,10 +1,6 @@
 import SwiftUI
 
 extension View {
-    /// Shows the column-resize pointer over a divider between two columns, such as the sidebar's edge or the gutter
-    /// between split panes, or the row-resize pointer over one between two rows, such as the gutter between stacked split
-    /// panes. When the column or row before the divider is as small or as large as it gets, the pointer only points the
-    /// way the divider can still move, like a native split view divider.
     func columnResizeCursor(canShrink: Bool, canGrow: Bool, betweenRows: Bool = false) -> some View {
         modifier(ColumnResizeCursor(canShrink: canShrink, canGrow: canGrow, betweenRows: betweenRows))
     }

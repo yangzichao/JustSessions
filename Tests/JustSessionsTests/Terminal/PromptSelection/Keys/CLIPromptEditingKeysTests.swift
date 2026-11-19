@@ -2,10 +2,7 @@ import Testing
 
 @testable import JustSessions
 
-/// The keys that delete a selected prompt or move to one of its ends, which step a couple of rows and characters past
-/// what the screen shows; see `CLIPromptEditingKeys`.
 struct CLIPromptEditingKeysTests {
-    /// Two rows with the caret in the first.
     private let prompt = CLIPrompt(
         lines: [
             CLIPromptLine(row: 4, startColumn: 2, text: "kiwi", cellCount: 4),

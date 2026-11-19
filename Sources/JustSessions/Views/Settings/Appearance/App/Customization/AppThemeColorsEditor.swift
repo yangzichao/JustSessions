@@ -1,15 +1,11 @@
 import SwiftUI
 
-/// Under the theme picker: the chosen theme's colors you can change, in its light or its dark version, which apply
-/// to the whole app as you pick them. Collapsed until opened, unless the theme already has changes.
 struct AppThemeColorsEditor: View {
     @ObservedObject var appThemeStore: AppThemeStore
 
     @Environment(\.colorScheme) private var colorScheme
     @State private var isExpanded: Bool
-    /// Nil follows the window's appearance, so the version you see is the one you edit.
     @State private var editedVersionIsDark: Bool?
-    /// The last pick that was refused, until a pick is taken or the theme changes. It shows only in its own version.
     @State private var refusedPick: RefusedThemeColorPick?
 
     init(appThemeStore: AppThemeStore) {
@@ -93,12 +89,10 @@ struct AppThemeColorsEditor: View {
     }
 }
 
-/// A surface color pick the theme store refused, and the version it was for.
 struct RefusedThemeColorPick: Equatable {
     let color: CustomizableThemeColor
     let isDark: Bool
 
-    /// Only surfaces are refused: of the wrong lightness, or too close to it for text to stay readable.
     static func message(isDark: Bool) -> LocalizedStringKey {
         isDark
             ? "Text can't stay readable on that color. Choose a darker one."

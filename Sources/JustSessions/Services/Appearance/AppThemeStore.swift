@@ -1,19 +1,12 @@
 import Combine
 import Foundation
 
-/// The theme chosen in Settings, and your changes to each theme's colors. Each window puts the chosen theme in its
-/// views' environment, and terminals restyle from it.
 @MainActor
 final class AppThemeStore: ObservableObject {
     static let shared = AppThemeStore()
 
-    /// The chosen theme with your changes to its colors.
     @Published private(set) var resolvedTheme: ResolvedAppTheme
-    /// The chosen theme as terminals and the tab bar take it. It follows `resolvedTheme` at once, except while colors
-    /// are picked: then it waits until picking pauses, so a drag across the color panel restyles terminals, and tells
-    /// the CLIs that subscribe to theme changes, once rather than at every step.
     @Published private(set) var terminalTheme: ResolvedAppTheme
-    /// The themes with your changes, kept when you choose another theme so they come back with it.
     private var customizedThemes: [AppTheme: ResolvedAppTheme]
     private let userDefaults: UserDefaults
     private let terminalThemeDelay: Duration
@@ -40,14 +33,10 @@ final class AppThemeStore: ObservableObject {
         publish(resolvedTheme(for: newTheme), terminalsWait: false)
     }
 
-    /// Any theme with your changes, as the theme picker draws it.
     func resolvedTheme(for theme: AppTheme) -> ResolvedAppTheme {
         customizedThemes[theme] ?? ResolvedAppTheme(theme)
     }
 
-    /// Changes one color of the chosen theme's light or dark version; nil, or the theme's own color, gives it back the
-    /// theme's own. Returns false, changing nothing, when a surface would not suit the version: of the wrong lightness,
-    /// or too close to it for text to stay readable. Any text color, and going back to the theme's own, is taken.
     @discardableResult
     func setColor(_ value: UInt32?, for color: CustomizableThemeColor, isDark: Bool) -> Bool {
         let themeColors = theme.colors(isDark: isDark)
@@ -60,7 +49,6 @@ final class AppThemeStore: ObservableObject {
         return true
     }
 
-    /// Gives the chosen theme back all its own colors.
     func removeCustomization() {
         guard !resolvedTheme.customization.isEmpty else { return }
         save(ResolvedAppTheme(theme), terminalsWait: false)

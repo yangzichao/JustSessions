@@ -3,11 +3,9 @@ import SwiftUI
 struct ProjectNewSessionMenu: View {
     let location: ProjectLocation
     let projectDisplayName: String
-    /// The tools installed on the project's host.
     let providers: [ConversationProvider]
     let showsTitle: Bool
     let onStart: (ConversationProvider) -> Void
-    /// Adds a Terminal item, which opens a plain terminal in the project folder.
     var onOpenTerminal: (() -> Void)?
 
     var body: some View {

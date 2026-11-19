@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// The random tip at the bottom of the sidebar, above its footer, while tips are on and the tip wasn't closed this
-/// launch. It steps aside while the window's onboarding tour or a first-use tip shows, since those point at the
-/// window's controls.
 struct SidebarRandomTip: View {
     @Environment(\.onboardingTour) private var onboardingTour
 

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The command that receives a dropped file on a host, run by a local login shell with a temporary home folder that
-/// stands in for the host's.
 struct RemoteDroppedFileCopyScriptTests {
     @Test func theLastFolderLineNamesTheFolderWhateverAProfilePrintsFirst() {
         let output = """
@@ -22,7 +20,6 @@ struct RemoteDroppedFileCopyScriptTests {
         #expect(RemoteDroppedFileCopyScript.folder(inOutput: "__JUSTSESSIONS_DROPPED_FILE_FOLDER__relative/path\n") == nil)
     }
 
-    /// The command is read first by the host's login shell, whichever it is.
     @Test(arguments: ["/bin/sh", "/bin/bash", "/bin/zsh", "/bin/dash"])
     func theFileArrivesUnderItsOwnNameInAFolderOnlyItsOwnerCanOpen(loginShell: String) throws {
         let home = try makeTemporaryDirectory()
@@ -74,7 +71,6 @@ struct RemoteDroppedFileCopyScriptTests {
     @Test func aHomeFolderWithNoRoomForTheFolderFailsWithItsOwnStatus() throws {
         let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }
-        // A file where the cache folder would be.
         try Data().write(to: home.appendingPathComponent(".cache"))
         let source = try makeDroppedFile(named: "source", byteCount: 10, in: home)
 
@@ -87,7 +83,6 @@ struct RemoteDroppedFileCopyScriptTests {
         home.appendingPathComponent(RemoteDroppedFileCopyScript.droppedFilesFolder)
     }
 
-    /// Runs the command as `ssh` would on the host: through the login shell, in the home folder, reading `source`.
     private static func run(
         fileName: String,
         byteCount: Int64,

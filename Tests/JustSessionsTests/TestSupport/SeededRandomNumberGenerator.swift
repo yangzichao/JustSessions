@@ -1,4 +1,3 @@
-/// SplitMix64. The same seed gives the same values, so a failing property test fails the same way on every run.
 struct SeededRandomNumberGenerator: RandomNumberGenerator {
     private var state: UInt64
 

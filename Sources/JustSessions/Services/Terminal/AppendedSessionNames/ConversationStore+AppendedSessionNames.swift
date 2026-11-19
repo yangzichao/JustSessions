@@ -1,9 +1,7 @@
 import Foundation
 
-/// Shows a name a CLI appends to a file as soon as it does, instead of at the next refresh: a name chosen with
-/// `/rename` in Claude Code or `/name` in Pi, or a name Codex gives a thread. For Claude Code this backs up its live
-/// registry, which `synchronizeClaudeLiveNames` reads but which some setups leave without the name. Only tabs on
-/// this Mac; see `AppendedSessionNameSource`.
+/// For Claude Code this backs up its live registry, which `synchronizeClaudeLiveNames` reads but which some setups leave
+/// without the name.
 extension ConversationStore {
     func startAppendedSessionNameFollowing(
         interval: Duration = .seconds(1),

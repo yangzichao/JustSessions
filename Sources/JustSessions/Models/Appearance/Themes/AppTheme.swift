@@ -1,7 +1,5 @@
 import Foundation
 
-/// A named set of colors for the whole app, terminals included. Each theme has a light and a dark version, and the
-/// Appearance setting picks between them.
 enum AppTheme: String, CaseIterable, Identifiable, Sendable {
     case justSessions
     case gitHub
@@ -36,7 +34,6 @@ enum AppTheme: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// The saved theme, or JustSessions when nothing is saved or the saved value is not a theme.
     static func load(from userDefaults: UserDefaults) -> Self {
         userDefaults.string(forKey: userDefaultsKey).flatMap(Self.init(rawValue:)) ?? .justSessions
     }

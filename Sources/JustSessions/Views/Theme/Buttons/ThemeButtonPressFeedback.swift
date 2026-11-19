@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Filled controls and thumbnails dim and depress slightly without changing their layout.
 struct ThemeButtonPressFeedback: ViewModifier {
     let isPressed: Bool
     @Environment(\.isEnabled) private var isEnabled
@@ -13,7 +12,6 @@ struct ThemeButtonPressFeedback: ViewModifier {
     }
 }
 
-/// Preserves a label's existing hover and selection design while adding feedback during a press.
 struct ThemePressButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

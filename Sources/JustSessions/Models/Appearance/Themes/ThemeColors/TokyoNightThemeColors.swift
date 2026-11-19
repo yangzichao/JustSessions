@@ -1,4 +1,3 @@
-/// Tokyo Night's Day and Night styles, with the colors of the terminal themes in folke/tokyonight.nvim's extras.
 extension AppThemeColors {
     static let tokyoNightDay = AppThemeColors(
         sidebarSurface: 0xD0D5E3,

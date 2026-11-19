@@ -10,8 +10,6 @@ struct TranscriptSearchContextTests {
             conversationID: "search-context", positionStore: TranscriptReadingPositionStore(), initialPosition: .bottom)
     }
 
-    /// The transcript sets a new context each time its view updates, as it does while you scroll. Only a context that
-    /// differs in what text blocks read may compare unequal, or every block updates and is remeasured each time.
     @Test func comparesOnlyWhatTextBlocksRead() {
         let controller = Self.controller()
         let match = TranscriptSearchMatch(entryIndex: 2, segmentIndex: 0, range: NSRange(location: 1, length: 3))

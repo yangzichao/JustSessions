@@ -2,7 +2,6 @@ import AppKit
 import Combine
 import UniformTypeIdentifiers
 
-/// Keeps Copy and Export running after a transient context menu closes.
 @MainActor
 final class ConversationSharingController: ObservableObject {
     static let shared = ConversationSharingController()
@@ -53,7 +52,6 @@ final class ConversationSharingController: ObservableObject {
                 let document = try await ConversationExportDocument.load(selections)
                 try await operation(document, window)
             } catch is CancellationError {
-                // A cancelled read leaves the clipboard and destination unchanged.
             } catch {
                 let alert = NSAlert()
                 alert.alertStyle = .warning

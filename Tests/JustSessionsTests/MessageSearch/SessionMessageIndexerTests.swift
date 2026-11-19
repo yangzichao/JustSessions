@@ -27,7 +27,6 @@ struct SessionMessageIndexerTests {
         try await expectEventually { retry.waitCount == 1 }
         #expect(await index.sessionCount() == 0)
         let revision = indexer.revision
-        // Progress and query reruns cannot bypass the pending backoff or create a retry loop.
         for _ in 0..<100 { await indexer.update(with: [session], for: user) }
         #expect(await reads.value == 1)
         retry.release()
@@ -83,8 +82,6 @@ struct SessionMessageIndexerTests {
         try await indexer.index.matches(for: try #require(SessionMessageQuery(text)))
     }
 
-    /// Waits for the update started after `revision` to finish. The update publishes on the main actor, which the
-    /// suite's window tests keep busy for half a minute or more on shared CI runners as the suite starts.
     private func waitForUpdate(of indexer: SessionMessageIndexer, after revision: Int) async throws {
         try await expectEventually(timeout: .seconds(120)) { indexer.revision > revision && indexer.progress == nil }
     }

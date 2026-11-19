@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Files dropped on a tab on an SSH host are copied there, then their host paths typed; a local shell stands in for
-/// `ssh` and the host.
 @MainActor
 struct TerminalSSHFileDropTests {
     @Test func copiedFilesTypeTheirHostPathsTogetherInTheOrderDropped() async throws {
@@ -51,7 +49,6 @@ struct TerminalSSHFileDropTests {
         let fileDrop = makeFileDrop(copier: .local(home: home, firstCommands: "sleep 1.5; "))
         var typedPaths: [[String]] = []
         fileDrop.typePaths = { typedPaths.append($0) }
-        // Every status shown: a full test run can keep the main thread busy past the whole copy between two checks.
         var shownStatuses: [TerminalSSHFileDropStatus?] = []
         let subscription = fileDrop.$status.sink { shownStatuses.append($0) }
         defer { subscription.cancel() }
@@ -127,7 +124,6 @@ struct TerminalSSHFileDropTests {
 
         #expect(!fileDrop.isCopying)
         #expect(fileDrop.status == nil)
-        // Longer than the copy would have taken.
         try await Task.sleep(for: .seconds(2))
         #expect(typedPaths.isEmpty)
         #expect(fileDrop.status == nil)

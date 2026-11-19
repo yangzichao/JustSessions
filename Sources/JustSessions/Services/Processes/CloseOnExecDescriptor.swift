@@ -10,7 +10,6 @@ enum CloseOnExecDescriptor {
         if flags >= 0 { _ = fcntl(descriptor, F_SETFD, flags | FD_CLOEXEC) }
     }
 
-    /// A copy of `descriptor`, marked as it is made; -1 if it could not be made.
     static func duplicate(_ descriptor: Int32) -> Int32 {
         fcntl(descriptor, F_DUPFD_CLOEXEC, 0)
     }

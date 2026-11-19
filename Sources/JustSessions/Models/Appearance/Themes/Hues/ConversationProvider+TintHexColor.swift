@@ -1,6 +1,4 @@
 extension ConversationProvider {
-    /// The CLI's hue, from the brand palette (Branding/README.md) for the first three, a little lighter in dark mode so it
-    /// keeps its contrast.
     var tintHexColor: AdaptiveHexColor {
         switch self {
         case .claude: AdaptiveHexColor(light: 0xFF8A1F, dark: 0xFF9C45)

@@ -1,6 +1,5 @@
 import Foundation
 
-/// Source record numbers stay stable when new records are appended. Parts of one record have distinct IDs.
 enum TranscriptPageIdentity {
     static let partsPerRecord = 1 << 20
     static func entryID(record: Int, part: Int) -> Int { record * partsPerRecord + part }
@@ -17,14 +16,10 @@ enum TranscriptPageRequest: Sendable, Equatable {
 
 struct TranscriptPage: Sendable {
     let entries: [TranscriptEntry]
-    /// Half-open range of source record positions, including records with no visible content.
     let records: Range<Int>
     let totalRecordCount: Int
     let decodedByteCount: Int
-    /// Who the last entry before the page is from, as `TranscriptPageAssembler.speaker(of:)` tells; nil when there is
-    /// none or it is a note. Labels the page's first entry as it is labeled with every earlier page loaded.
     let precedingSpeaker: Int?
-    /// File-backed pages from different lineages cannot be combined: earlier bytes were rewritten.
     var sourceLineage: UUID? = nil
 
     var hasEarlier: Bool { records.lowerBound > 0 }
@@ -37,8 +32,6 @@ struct TranscriptPageLimits: Sendable {
     var targetByteCount = 1 << 20
     var maximumRecordByteCount = 16 << 20
     var maximumTextLength = 12_000
-    /// Consecutive tool calls a page merges into one row. The conversation map merges none, so each call keeps its own
-    /// record and a run's last record is known (`ConversationOutline.Block.lastRecord`); message IDs don't change.
     var maximumMergedToolCallCount = 50
 }
 

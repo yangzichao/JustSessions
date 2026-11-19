@@ -5,8 +5,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Controlled replay through the actual SwiftTerm input path; no paid CLI sessions or user terminals are started.
-/// JUSTSESSIONS_PERF=1 swift test -c release --filter TerminalVisibilityMeasurements
 @MainActor
 @Suite(.serialized)
 struct TerminalVisibilityMeasurements {
@@ -64,7 +62,6 @@ struct TerminalVisibilityMeasurements {
             frameNumber += 1
             try await Task.sleep(for: .milliseconds(33))
         }
-        // Include the final flush instead of leaving its CPU outside the measurement.
         for view in views { view.setWorkspaceActive(true) }
         let elapsed = ContinuousClock.now - start
         let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18

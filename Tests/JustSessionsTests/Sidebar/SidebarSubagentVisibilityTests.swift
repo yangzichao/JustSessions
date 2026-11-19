@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Subagents' sessions stay out of the sidebar until Settings → General turns them on, even under a session that was
-/// expanded while they showed.
 @MainActor
 struct SidebarSubagentVisibilityTests {
     @Test func anExpandedSessionListsItsSubagentsOnlyWhileTheSettingIsOn() throws {

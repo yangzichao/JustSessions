@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The custom CLI icons are template images whose cut-outs stay clear, so the tint shows only on the shape and the
-/// surface shows through the prompt and the ring's hole. Points are on the icons' 16-point grid, y down.
 @MainActor
 struct ProviderIconImageTests {
     private static let gridSide: CGFloat = 16

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The check's command, run here through `sh` with a stand-in login shell and stand-in programs on its PATH, as
-/// `RemoteHostStatusProbeTests` runs the status probe.
 struct RemoteHostCheckScriptTests {
     @Test func theScriptsHaveNoBackslashOrSingleQuoteForFishToReadDifferently() {
         let programs = RemoteHostCheckProgram.all { $0 == .claude ? "~/bin/claude-wrapper --fast" : nil }
@@ -53,10 +51,6 @@ struct RemoteHostCheckScriptTests {
         let command = RemoteHostCheckScript.command(
             startup: .interactive,
             programs: programs,
-            // The app's own time limit, 10 seconds. The check runs in processes of its own, which a stall of this test
-            // process doesn't slow, and each stand-in has run once already, so those that answer at once start in
-            // milliseconds. `pi`, which sleeps far longer, runs into it. This synchronous test holds one of the shared
-            // threads for as long as `pi` takes, so the limit stays short.
             projectPath: root.path
         )
 
@@ -70,7 +64,6 @@ struct RemoteHostCheckScriptTests {
         )
 
         let output = RemoteHostCheckOutput(try #require(result).output)
-        // Well short of `pi`'s 600 seconds, so the time limit, not `pi` ending, let the check finish.
         #expect(Date().timeIntervalSince(started) < 300)
         #expect(output.text("rsync-path") == bin.appendingPathComponent("rsync").path)
         #expect(output.text("outside-login-shell-done") == nil)
@@ -120,8 +113,6 @@ struct RemoteHostCheckScriptTests {
         #expect(output.text("folder")?.contains("No such file or directory") == true)
     }
 
-    /// An alias or function `sh` can't see is asked in the login shell; a CLI in an install folder runs with its
-    /// folder first on PATH, as tabs start them.
     @Test func asksEachCLIForItsVersionWhereTabsStartIt() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -155,7 +146,6 @@ struct RemoteHostCheckScriptTests {
         #expect(output.text("cli-pi-path") == nil)
         #expect(output.text("cli-pi-version") == "pi-from-function")
         #expect(output.exitStatus("cli-pi-version-exit") == 0)
-        // Found by neither, so not asked.
         #expect(output.text("cli-codex-version-exit") == nil)
     }
 }

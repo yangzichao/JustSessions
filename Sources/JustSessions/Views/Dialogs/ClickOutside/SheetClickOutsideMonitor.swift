@@ -1,13 +1,9 @@
 import AppKit
 
-/// Watches a window for clicks while a sheet covers it, which AppKit would only answer with a beep, and hands each to
-/// `onClickOutside` so the sheet can close as Cancel would. That includes the title bar, where the tab bar sits. Clicks
-/// in the sheet itself and in other windows pass.
 @MainActor
 final class SheetClickOutsideMonitor {
     private var eventMonitor: Any?
 
-    /// `onClickOutside` returns whether it took the click. A click it takes goes no further.
     init(window: NSWindow, onClickOutside: @escaping @MainActor () -> Bool) {
         eventMonitor = NSEvent.addLocalMonitorForEvents(
             matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]

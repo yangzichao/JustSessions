@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// **Show sessions from**: one box per CLI, all ticked by default, beside the label in two rows so General stays short.
-/// Unticking one hides its sessions and stops New session offering it, in every window; see `HiddenConversationProviders`.
 struct ShownSessionProvidersPicker: View {
     let store: ConversationStore
 

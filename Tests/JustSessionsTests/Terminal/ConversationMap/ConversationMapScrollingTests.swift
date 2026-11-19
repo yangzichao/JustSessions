@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A conversation too long to show at a third of full size scrolls (TAB-10): it starts at, and follows, its newest
-/// rows; scrolled away it keeps its rows in view; only rows in view are drawn; and bookmarks scrolled away wait at the
-/// column's edges. Labelled bookmarks' chips show their label.
 @MainActor
 struct ConversationMapScrollingTests {
     private static let height: CGFloat = 700
@@ -26,7 +23,6 @@ struct ConversationMapScrollingTests {
             offsetFromTop: offsetFromTop)
     }
 
-    /// On a reply: the odd records are the CLI's.
     private static func bookmark(_ letter: String, at record: Int, label: String? = nil) -> MessageBookmark {
         var bookmark = MessageBookmark(
             letter: letter, entryID: TranscriptPageIdentity.entryID(record: record, part: 0),
@@ -36,9 +32,7 @@ struct ConversationMapScrollingTests {
     }
 
     @Test func aConversationThatFitsAtAThirdOfFullSizeIsSqueezedAndNeverScrolls() {
-        // 229 blocks of two lines, each after a blank row: 686 rows, a little over a point each in the 688 there are.
         let fits = Self.layout(Self.outline(blocks: 229), offsetFromTop: 200)
-        // One more needs 689 rows: at the minimum of a point each, the last point scrolls.
         let overflows = Self.layout(Self.outline(blocks: 230))
 
         #expect(fits.pitch > 1 && fits.pitch < 3)
@@ -137,7 +131,6 @@ struct ConversationMapScrollingTests {
     }
 }
 
-/// A label shows whole while it fits, else cut with …, never wider than the most a label's chip may be.
 @MainActor
 struct ConversationMapChipTitlesTests {
     private static func bookmark(_ letter: String, label: String?) -> MessageBookmark {

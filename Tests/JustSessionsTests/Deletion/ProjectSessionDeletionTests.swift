@@ -78,7 +78,6 @@ struct ProjectSessionDeletionTests {
         #expect(store.errorMessage == nil)
     }
 
-    /// A running session's CLI is ended first, as Close and delete does, so it goes too.
     @Test @MainActor func projectRemovalDeletesItsSessionsAndRemovesItFromTheSidebar() async throws {
         let temporaryDirectory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
@@ -123,7 +122,6 @@ struct ProjectSessionDeletionTests {
         let store = makeStore(listing: [conversation], userDefaults: isolatedUserDefaults.userDefaults)
         store.refreshThisMac()
         try await expectEventually { !store.isScanningThisMac }
-        // Its deletion waits for the host's refresh, so it is already being deleted.
         store.hostRefreshStatuses[.thisMac] = .refreshing
         store.deleteConversations([conversation])
         #expect(store.isDeletionPending(for: conversation))

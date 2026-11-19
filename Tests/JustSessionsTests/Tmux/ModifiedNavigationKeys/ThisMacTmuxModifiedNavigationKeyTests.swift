@@ -3,10 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Arrows, Home, and End with Shift, Option, or Control reach a CLI in this Mac's tmux as xterm sends them, with either
-/// engine. The stand-in asks for keyboard modes as Codex does. tmux ignores the kitty protocol, so the tab's terminal
-/// stays in its legacy keyboard mode, where SwiftTerm sent nothing for Shift-Left, Codex's key for a waiting question.
-/// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct ThisMacTmuxModifiedNavigationKeyTests {
     @Test(arguments: TerminalEngine.allCases)

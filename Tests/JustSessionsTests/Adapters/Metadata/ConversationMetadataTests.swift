@@ -48,7 +48,6 @@ struct ConversationMetadataTests {
         #expect(ConversationMetadata.isValidSessionID(sessionID))
     }
 
-    /// Session ids end up in file paths and in commands run on SSH hosts, so nothing but a UUID gets through.
     @Test(arguments: [
         "",
         "not-a-uuid",

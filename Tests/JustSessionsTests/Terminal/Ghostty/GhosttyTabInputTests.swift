@@ -5,12 +5,9 @@ import Testing
 
 @testable import JustSessions
 
-/// What a Ghostty tab sends its process for keys, scrolling, and dropped files, compared with a SwiftTerm tab.
 @MainActor
 @Suite(.serialized)
 struct GhosttyTabInputTests {
-    // MARK: Shift-Return
-
     @Test func aTabInTmuxSendsShiftReturnAsCSIuAndReturnAsItself() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
@@ -25,7 +22,6 @@ struct GhosttyTabInputTests {
         #expect(fixture.receivedInput == "\u{1B}[13;2u\r")
     }
 
-    /// Other tabs get Ghostty's own Shift-Return.
     @Test func otherTabsSendGhosttysShiftReturn() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
@@ -77,10 +73,6 @@ struct GhosttyTabInputTests {
         #expect(fixture.receivedInput == text)
     }
 
-    // MARK: Page Up and Page Down
-
-    /// On the main screen Page Up scrolls back a page and sends nothing; on the alternate screen it sends `CSI 5 ~`,
-    /// with or without Shift, and Page Down `CSI 6 ~`; back on the main screen it scrolls again, as in SwiftTerm.
     @Test func pageKeysScrollTheMainScreenAndGoToAProgramOnTheAlternateScreen() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
@@ -123,9 +115,6 @@ struct GhosttyTabInputTests {
         #expect(fixture.receivedInput == alternateScreenKeys)
     }
 
-    /// While a program has turned on the kitty keyboard protocol, a SwiftTerm tab sends the page keys encoded under it
-    /// on either screen, so this tab leaves them to Ghostty, which sends them with Shift when held, and doesn't scroll.
-    /// Once the program turns the protocol off, they scroll again.
     @Test func underTheKittyKeyboardProtocolPageKeysGoToTheProgramOnEitherScreen() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
@@ -158,8 +147,6 @@ struct GhosttyTabInputTests {
         #expect(fixture.receivedInput == keys + keys)
     }
 
-    /// Page Up and Page Down with Control, Option, or Command are left to Ghostty, which sends them with the
-    /// modifier, on either screen.
     @Test func pageKeysWithControlOptionOrCommandGoToGhostty() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
@@ -188,8 +175,6 @@ struct GhosttyTabInputTests {
         view.keyDown(with: Self.pageKey(kVK_PageDown, modifiers: .shift, window: window))
     }
 
-    // MARK: Scrolling
-
     @Test func theScrollWheelScrollsBackThroughTheOutput() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
@@ -207,16 +192,12 @@ struct GhosttyTabInputTests {
         }
     }
 
-    /// The numbers of the `line-NNN` lines a screen shows, top to bottom.
     private static func lineNumbers(on screen: String) -> [Int] {
         screen.split(separator: "\n").compactMap { line in
             line.hasPrefix("line-") ? Int(line.dropFirst("line-".count).prefix(3)) : nil
         }
     }
 
-    // MARK: Dropped files
-
-    /// Each path goes as its own paste, as `TerminalFileDropPaste` gives it, marked as one when the program asked.
     @Test(arguments: [false, true])
     func droppedFilesTypeTheirPathsAsASwiftTermTabDoes(isBracketed: Bool) async throws {
         let fixture = try GhosttyTabFixture()
@@ -275,7 +256,6 @@ struct GhosttyTabInputTests {
         SyntheticKey.event(keyCode: kVK_Return, characters: "\r", modifiers: modifiers, window: window)
     }
 
-    /// Page Up and Page Down as a US keyboard sends them, the same as Fn-↑ and Fn-↓.
     private static func pageKey(_ keyCode: Int, modifiers: NSEvent.ModifierFlags = [], window: NSWindow) -> NSEvent {
         let character = keyCode == kVK_PageUp ? NSPageUpFunctionKey : NSPageDownFunctionKey
         return SyntheticKey.event(

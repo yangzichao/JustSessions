@@ -5,11 +5,7 @@ import Foundation
 final class TerminalAppearanceStore: ObservableObject {
     static let shared = TerminalAppearanceStore()
 
-    /// The settings as Settings shows them.
     @Published private(set) var preferences: TerminalAppearancePreferences
-    /// The settings as terminals and the tab bar take them. They follow `preferences` at once, except while the color
-    /// intensity is dragged: then they wait until dragging pauses, so terminals recolor, and tell the CLIs that
-    /// subscribe to color changes, once rather than at every step.
     @Published private(set) var terminalPreferences: TerminalAppearancePreferences
     private let userDefaults: UserDefaults
     private let terminalPreferencesDelay: Duration
@@ -29,7 +25,6 @@ final class TerminalAppearanceStore: ObservableObject {
         update(updated)
     }
 
-    /// Saves colors read from iTerm2 or an .itermcolors file, replacing any imported before, and switches to them.
     func useImportedColors(_ importedColors: ImportedTerminalColors) {
         var updated = preferences
         updated.importedColors = importedColors
@@ -61,7 +56,6 @@ final class TerminalAppearanceStore: ObservableObject {
         update(updated, terminalsWait: true)
     }
 
-    /// View → Zoom In, Zoom Out, and Actual Size while a tab shows. Every terminal shares the size, as in Settings.
     func zoomFont(_ step: TextZoomStep) {
         setFontSize(
             step.size(

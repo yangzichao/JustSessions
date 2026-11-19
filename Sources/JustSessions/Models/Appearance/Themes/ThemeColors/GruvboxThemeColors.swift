@@ -1,4 +1,3 @@
-/// morhetz's Gruvbox, from `gruvbox.vim`, with the terminal colors of gruvbox-contrib's iTerm2 themes.
 extension AppThemeColors {
     static let gruvboxLight = AppThemeColors(
         sidebarSurface: 0xF2E5BC,

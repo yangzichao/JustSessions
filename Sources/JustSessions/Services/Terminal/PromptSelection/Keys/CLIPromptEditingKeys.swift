@@ -9,12 +9,9 @@ enum CLIPromptEditingKeys {
     static let right = "\u{1B}[C"
     static let deleteBackward = "\u{7F}"
 
-    /// Rows past the prompt's first or last row that a sequence also steps over, for a row the screen didn't show.
     static let extraRowCount = 2
-    /// Characters past the prompt's text that clearing also deletes.
     static let extraDeleteCount = 16
 
-    /// Deletes the whole prompt, from its end back.
     static func clearing(_ prompt: CLIPrompt) -> String {
         movingToEnd(of: prompt) + String(repeating: deleteBackward, count: deleteCount(for: prompt))
     }

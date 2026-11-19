@@ -60,7 +60,6 @@ struct CodexTranscriptReaderTests {
         #expect(
             CodexTranscriptReader.mightContainTranscriptItem(
                 line(#"{"timestamp":"t","type":"response_item","payload":{"type":"message"}}"#)))
-        // Lines in an unexpected shape are parsed rather than skipped.
         #expect(CodexTranscriptReader.mightContainTranscriptItem(line(#"{"type":"event_msg","timestamp":"t"}"#)))
     }
 

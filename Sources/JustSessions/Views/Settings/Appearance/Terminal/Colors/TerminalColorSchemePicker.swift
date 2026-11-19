@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Chooses the terminal colors: the app theme's, a preset, or colors imported from iTerm2, which the menu beside it
-/// imports.
 struct TerminalColorSchemePicker: View {
     @ObservedObject var appearanceStore: TerminalAppearanceStore
     @State private var importError: TerminalColorsImportError?

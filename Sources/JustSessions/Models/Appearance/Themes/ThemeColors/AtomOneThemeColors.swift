@@ -1,6 +1,3 @@
-/// Atom's One Light and One Dark. The surfaces are the editor background and the One UI themes' tree view, button,
-/// and highlight colors, and the ink is their active tab text, from atom/atom 1c3bd35 compiled with Less. The ANSI
-/// colors are One Half's, the terminal port of One, from sonph/onehalf 75eb2e9's iTerm2 colors.
 extension AppThemeColors {
     static let atomOneLight = AppThemeColors(
         sidebarSurface: 0xEAEAEB,

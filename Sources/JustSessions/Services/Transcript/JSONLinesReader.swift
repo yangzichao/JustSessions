@@ -1,8 +1,6 @@
 import Foundation
 
 enum JSONLinesReader {
-    /// Calls `body` with each non-empty line, reading in chunks so a large session file is never loaded at once.
-    /// Throws `CancellationError` between chunks when the calling task is cancelled.
     static func forEachLine(in file: URL, chunkSize: Int = 1 << 20, _ body: (Data) throws -> Void) throws {
         let handle = try FileHandle(forReadingFrom: file)
         defer { try? handle.close() }
@@ -24,9 +22,6 @@ enum JSONLinesReader {
         if !buffer.isEmpty { try body(buffer) }
     }
 
-    /// Calls `body` with each non-empty line in the first `maximumByteCount` bytes of `file`, oldest first, until it
-    /// returns false, reading only as far as that. The last line may be cut off at the limit. Nothing is read when
-    /// the file cannot be opened.
     static func forEachLeadingLine(
         in file: URL,
         maximumByteCount: Int,
@@ -56,8 +51,6 @@ enum JSONLinesReader {
         if !buffer.isEmpty { _ = body(buffer) }
     }
 
-    /// The non-empty lines in the first `maximumByteCount` bytes of `file`, or none when it cannot be read. The last
-    /// line may be cut off at the limit.
     static func leadingLines(in file: URL, maximumByteCount: Int) -> [Data] {
         do {
             let handle = try FileHandle(forReadingFrom: file)
@@ -68,8 +61,6 @@ enum JSONLinesReader {
         }
     }
 
-    /// The non-empty lines in the last `maximumByteCount` bytes of `file`, oldest first, or none when it cannot be
-    /// read. When those bytes start partway into the file, their first line is left out, since it may be cut off.
     static func trailingLines(in file: URL, maximumByteCount: Int) -> [Data] {
         do {
             let handle = try FileHandle(forReadingFrom: file)

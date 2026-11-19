@@ -9,7 +9,6 @@ struct CodexAdapter: ConversationAdapter {
         standardCodexDirectory()
     }
 
-    /// `CODEX_HOME`, or `~/.codex`. An SSH host's is found with the host's environment and home.
     static func standardCodexDirectory(
         environment: [String: String] = ProcessInfo.processInfo.environment,
         homeDirectory: String = NSHomeDirectory()
@@ -22,9 +21,6 @@ struct CodexAdapter: ConversationAdapter {
         self.deletionExecutableURL = deletionExecutableURL
     }
 
-    /// Shared by every Codex adapter, this Mac's and each SSH host's mirror, which keep their files apart.
-    /// Named for the version of the head it keeps: heads kept before spawned threads were read would list them as
-    /// sessions of their own.
     private static let rolloutHeads = SessionFileSummaryCache<CodexRolloutHead>(
         persistenceFile: SessionSummaryCacheLocation.file(named: "codex-heads-2"))
     private static let firstUserPrompts = SessionFileSummaryCache<String>(

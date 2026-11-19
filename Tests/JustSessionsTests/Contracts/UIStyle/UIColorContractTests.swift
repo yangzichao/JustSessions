@@ -1,9 +1,6 @@
 import Foundation
 import Testing
 
-/// The system's `.secondary` and `.tertiary` text is 3.0 and 1.7 on the light themes' surfaces, its red falls short
-/// too, and `.primary` and the named system colors ignore the chosen theme. Views draw in `ThemePalette`'s colors,
-/// which follow the theme and are readable on every surface.
 struct UIColorContractTests {
     @Test func viewsDrawInTheThemesColors() throws {
         let systemColor = try Regex(

@@ -1,7 +1,6 @@
 import AppKit
 
 extension NewSessionProviderMenuItems {
-    /// The same items for an AppKit menu, such as a terminal's.
     static func appKitItems(
         providers: [ConversationProvider],
         host: SessionHost,

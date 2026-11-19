@@ -1,8 +1,6 @@
 import Foundation
 import Testing
 
-/// Shadows and animations come from `ThemeShadow` and `ThemeMotion`, so what floats casts the same shadow and the
-/// same kind of change moves at the same pace everywhere.
 struct UIShadowAndMotionContractTests {
     @Test func viewsCastTheThemesShadows() throws {
         let systemShadow = try Regex(#"\.shadow\("#)

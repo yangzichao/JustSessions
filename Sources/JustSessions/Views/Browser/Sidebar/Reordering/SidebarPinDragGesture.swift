@@ -1,12 +1,6 @@
 import SwiftUI
 
 extension View {
-    /// Lets the row be dragged among the pinned rows of its scope; see `SidebarPinDrag`. Once the pointer has moved a
-    /// few points, the drag takes over from the row's buttons, so letting go doesn't click the row, while a click still
-    /// does. `onEnded` comes when the drag ends or is cancelled, and `onCancelled` when the row goes away mid-drag, so a
-    /// drag never stays half done. While dragged, the row fades, `ghost` follows the pointer `ghostOffset` below the
-    /// row's top, unless nil, and the landing line shows `landingLineOffset` below it. Both are drawn by the dragged
-    /// row, over the rows they pass, the line over the ghost.
     func sidebarPinDragSource<Ghost: View>(
         isDragged: Bool,
         ghostOffset: CGFloat?,
@@ -32,12 +26,9 @@ extension View {
 }
 
 enum SidebarPinDragMetrics {
-    /// How far the pointer moves before a press on a row becomes a drag.
     static let minimumDistance: CGFloat = 4
-    /// How long the rows take to settle into their new order once the dragged one is let go.
     static let dropAnimation = ThemeMotion.slide
     static let draggedRowOpacity: Double = 0.4
-    /// See-through, as a macOS drag image is, so the rows around where it would land still show.
     static let ghostOpacity: Double = 0.7
 }
 
@@ -78,7 +69,6 @@ private struct SidebarPinDragGesture<Ghost: View>: ViewModifier {
                     .allowsHitTesting(false)
                 }
             }
-            // Over the rows after it, which the ghost and the line pass over.
             .zIndex(isDragged ? 1 : 0)
             .highPriorityGesture(
                 DragGesture(

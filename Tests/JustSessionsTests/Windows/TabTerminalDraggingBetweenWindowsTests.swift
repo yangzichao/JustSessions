@@ -4,10 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab dragged to another window takes its terminal view along, into that window's inset view: the terminal keeps
-/// what it showed and its process, shows the process's new output, and takes typing. A Ghostty terminal keeps its
-/// surface, which holds its screen and scrollback, and the shared controller that draws it; see
-/// `TabDraggingBetweenWindowsTests` for the stores.
 @MainActor
 struct TabTerminalDraggingBetweenWindowsTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -46,9 +42,6 @@ struct TabTerminalDraggingBetweenWindowsTests {
         try await expectEventually { screenText(of: tab.terminalView).contains("GOT:moved") }
     }
 
-    /// The window a tab went to can build its view of the terminal before the window it left takes its own down.
-    /// Taking it down left the terminal with no click, menu, or link handling: a click didn't select its tab, a
-    /// right-click showed no app menu, and ⌘-click opened no link, until something redrew the tab.
     @Test(arguments: TerminalEngine.allCases)
     func aDraggedTabsTerminalKeepsItsClickMenuAndLinkHandling(engine: TerminalEngine) async throws {
         let first = try WorkspaceWindow()
@@ -72,7 +65,6 @@ struct TabTerminalDraggingBetweenWindowsTests {
         #expect(tab.terminalView.onOpenLink != nil)
     }
 
-    /// Those closures hold the tab, so a closed tab's terminal lets go of them, or it would never be freed.
     @Test(arguments: TerminalEngine.allCases)
     func aClosedTabsTerminalLetsGoOfItsHandling(engine: TerminalEngine) async throws {
         let window = try WorkspaceWindow()
@@ -90,7 +82,6 @@ struct TabTerminalDraggingBetweenWindowsTests {
     }
 }
 
-/// A workspace window: a store of its own and its detail view in a window that is never shown.
 @MainActor
 private final class WorkspaceWindow {
     let store: ConversationStore
@@ -109,7 +100,6 @@ private final class WorkspaceWindow {
         window.contentView = hostingView
     }
 
-    /// A plain terminal whose shell prints `BEFORE-MOVE`, then answers each line typed with `GOT:` and the line.
     func openEchoingTab(engine: TerminalEngine) -> TerminalSession {
         let script = "printf 'BEFORE-MOVE\\n'; while read line; do echo \"GOT:$line\"; done"
         let tab = TerminalSession(

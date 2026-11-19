@@ -12,20 +12,13 @@ import CoreText
 /// The symbols font also has a few characters outside the Private Use Areas, such as the power symbols from U+23FB,
 /// which SwiftTerm draws with the system's usual fallback. Those that a family after the symbols font drew go back to
 /// that family through `font-codepoint-map`, which Ghostty applies before looking in the fallback families.
-///
-/// System Monospaced gets the symbols font too. SwiftTerm can't give it one, but Ghostty drew icons for it anyway from
-/// its own copy of the font, which it tries after the configured families.
 @MainActor
 struct GhosttySymbolsFallback {
-    /// The fallback families, with the symbols font among them.
     let fallbackFamilies: [String]
-    /// `font-codepoint-map` values, such as `U+23FB-U+23FE=STIX Two Math`.
     let codepointMaps: [String]
 
     private static var fallbacksByKey: [String: GhosttySymbolsFallback] = [:]
 
-    /// The symbols font placed among `fallbackFamilies` for a terminal drawn in `terminalFamily`. Working it out reads
-    /// each family's characters, which takes a moment, so it is kept for each terminal family and fallback list.
     static func placing(in fallbackFamilies: [String], terminalFamily: String) -> GhosttySymbolsFallback {
         let key = ([terminalFamily] + fallbackFamilies).joined(separator: "\n")
         if let fallback = fallbacksByKey[key] { return fallback }
@@ -62,13 +55,11 @@ struct GhosttySymbolsFallback {
         return GhosttySymbolsFallback(fallbackFamilies: families, codepointMaps: codepointMaps)
     }
 
-    /// The characters of the face Ghostty's font discovery finds for `family`.
     private static func characters(ofFamily family: String) -> CharacterSet {
         let descriptor = CTFontDescriptorCreateWithAttributes([kCTFontFamilyNameAttribute: family] as CFDictionary)
         return CTFontCopyCharacterSet(CTFontCreateWithFontDescriptor(descriptor, 0, nil)) as CharacterSet
     }
 
-    /// The codepoints of `characters`, in order.
     private static func codepoints(of characters: CharacterSet) -> [UInt32] {
         let planes = (0...16).filter { characters.hasMember(inPlane: UInt8($0)) }
         return planes.flatMap { plane in
@@ -79,7 +70,6 @@ struct GhosttySymbolsFallback {
         }
     }
 
-    /// Ascending `codepoints` as Ghostty's ranges, such as `U+23FB-U+23FE,U+2630`.
     private static func codepointRanges(_ codepoints: [UInt32]) -> String {
         var ranges: [ClosedRange<UInt32>] = []
         for codepoint in codepoints {

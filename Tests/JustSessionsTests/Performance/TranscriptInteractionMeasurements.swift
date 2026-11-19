@@ -4,17 +4,9 @@ import Testing
 
 @testable import JustSessions
 
-/// Measures reading a long transcript with the real reader hosted in a visible 1000×800 window, as
-/// `Perf | <scenario> | <metric> | <value>` lines. Each measurement runs with SwiftUI's accessibility off, then on, as it
-/// is while an assistive app is connected: VoiceOver, or apps such as Raycast and window managers. SwiftUI then also keeps
-/// an accessibility tree and walks its views to track the accessibility focus; see docs/development/performance.md.
-///
-/// The suite records nothing unless `JUSTSESSIONS_PERF` is set:
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter TranscriptInteractionMeasurements
 @MainActor
 @Suite(.serialized)
 struct TranscriptInteractionMeasurements {
-    /// 80 entries make a page, and the reader keeps up to `TranscriptPagingModel.maximumRetainedPageCount` pages.
     @Test(arguments: [240, 640])
     func reading(entryCount: Int) async throws {
         guard SidebarInteractionMeasurements.isEnabled else { return }
@@ -31,11 +23,9 @@ struct TranscriptInteractionMeasurements {
             for (name, value) in try await harness.measureOpeningFind() { perfReport(label, name, value) }
             for (name, value) in try await harness.measurePositionLookup() { perfReport(label, name, value) }
         }
-        #expect(entryCount > 0)  // Record-only: the numbers above are the result.
+        #expect(entryCount > 0)
     }
 
-    /// Reading as the app's readers do, with the bookmark commands on: a store and a paging model, so each scroll update
-    /// finds the message being read and highlights it (RDR-48, PERF-73). The paging model loads nothing.
     @Test(arguments: [240, 640])
     func readingWithTheBookmarkCommandsOn(entryCount: Int) async throws {
         guard SidebarInteractionMeasurements.isEnabled else { return }
@@ -50,11 +40,9 @@ struct TranscriptInteractionMeasurements {
             for (name, value) in try await harness.measureHitTesting() { perfReport(label, name, value) }
             for (name, value) in try await harness.measurePointerMoves() { perfReport(label, name, value) }
         }
-        #expect(entryCount > 0)  // Record-only: the numbers above are the result.
+        #expect(entryCount > 0)
     }
 
-    /// The same reading with a letter beside 26 messages, so the markers' cost shows beside the plain reader's. Labelled,
-    /// each letter takes the pointer for its hover card (RDR-51, PERF-73).
     @Test(arguments: [(240, false), (640, false), (240, true), (640, true)])
     func readingWithTwentySixBookmarks(entryCount: Int, labelled: Bool) async throws {
         guard SidebarInteractionMeasurements.isEnabled else { return }
@@ -69,7 +57,7 @@ struct TranscriptInteractionMeasurements {
             for (name, value) in try await harness.measureScrolling() { perfReport(label, name, value) }
             for (name, value) in try await harness.measureHitTesting() { perfReport(label, name, value) }
         }
-        #expect(entryCount > 0)  // Record-only: the numbers above are the result.
+        #expect(entryCount > 0)
     }
 }
 
@@ -81,9 +69,6 @@ final class TranscriptPerfHarness {
     private let searchState = TranscriptSearchState()
     private var earlierAccessibilityValue: NSNumber?
 
-    /// With `bookmarkCount`, that many of the first messages are bookmarked, `labelled` with a label and two tags. The reader
-    /// isn't paged, so the markers show and the bookmark commands stay off.
-    /// With `bookmarkCommands`, the reader keeps bookmarks and has a paging model, as the app's readers do.
     init(entryCount: Int, bookmarkCount: Int = 0, labelled: Bool = false, bookmarkCommands: Bool = false) async throws {
         _ = NSApplication.shared
         settings = try IsolatedUserDefaults()
@@ -132,7 +117,6 @@ final class TranscriptPerfHarness {
         settings.removeSuite()
     }
 
-    /// What an assistive app turns on, as `TranscriptScrollViewFixture.pressButton(labeled:)` describes.
     func setAccessibility(_ isOn: Bool) async throws {
         Self.enhancedUserInterface = NSNumber(value: isOn)
         if isOn { _ = hostingView.accessibilityChildren() }
@@ -169,8 +153,6 @@ final class TranscriptPerfHarness {
         try await pumpTurns(3)
     }
 
-    /// The transcript from top to bottom in 60 steps. Each step is the scroll, the layout and drawing it forces, and
-    /// then what the reader does in response on the next turn of the run loop, such as recording the reading position.
     func measureScrolling(steps: Int = 60) async throws -> [(String, String)] {
         try await resetViewport(to: .top)
         let scrollView = try #require(transcriptScrollView)
@@ -210,8 +192,6 @@ final class TranscriptPerfHarness {
         return [("position lookup: \(iterations)", "\(perfMilliseconds(total)); checksum \(checksum)")]
     }
 
-    /// What AppKit and SwiftUI do to find the view under the pointer, which they repeat for hover and cursor updates
-    /// after every change to the window's content: 200 points spread over the transcript.
     func measureHitTesting() async throws -> [(String, String)] {
         try await resetViewport(to: .middle)
         let bounds = hostingView.bounds
@@ -229,9 +209,6 @@ final class TranscriptPerfHarness {
         return [("hit test: 200 points", perfMilliseconds(total))]
     }
 
-    /// The pointer moving down the reader with the bookmark commands on (RDR-48): 200 moves over the middle of the
-    /// transcript, each handed to the reader as its tracking area hands it, which finds the row at the pointer's height and
-    /// moves the mark when that message changes. Reports the time to handle them, then the mark's moves.
     func measurePointerMoves() async throws -> [(String, String)] {
         try await resetViewport(to: .middle)
         guard let controller = Self.descendant(ofType: TranscriptEntryGeometryView.self, in: hostingView)?.controller else { return [] }
@@ -255,7 +232,6 @@ final class TranscriptPerfHarness {
         return nil
     }
 
-    /// Opening and closing Find without a query updates every text block, as any change to the search context does.
     func measureOpeningFind() async throws -> [(String, String)] {
         try await resetViewport(to: .middle)
         let opening = turn { searchState.show() }
@@ -297,7 +273,6 @@ final class TranscriptPerfHarness {
         }
     }
 
-    /// Reading entries as a session has them: prompts, replies with prose, lists, and code, and runs of tool calls.
     static func transcript(count: Int) -> TranscriptContent {
         TranscriptContent(
             entries: (0..<count).map { index in

@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The Edit menu's Select All, Copy, and Paste in a Ghostty tab; see `TerminalInteractionTests` for SwiftTerm's.
 /// Ghostty copies to and pastes from the general pasteboard only, so these tests put back what it held.
 @MainActor
 @Suite(.serialized)
@@ -52,7 +51,6 @@ struct GhosttyTabInteractionTests {
         try await expectEventually { fixture.receivedInput == "pasted text 你好" }
     }
 
-    /// The terminal's right-click menu calls these through `TabTerminalView`; see `TerminalContextMenu`.
     @Test func theRightClickMenusCopyAndPasteDoWhatTheEditMenusDo() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }
@@ -93,7 +91,6 @@ struct GhosttyTabInteractionTests {
     }
 }
 
-/// The general pasteboard's items, put back by `restore()`.
 @MainActor
 private struct SavedGeneralPasteboard {
     private let items: [[NSPasteboard.PasteboardType: Data]]

@@ -2,7 +2,6 @@ import AppKit
 import ServiceManagement
 import SwiftUI
 
-/// Whether JustSessions opens when you log in, with what to do when macOS still needs your approval or refuses.
 struct LaunchAtLoginToggle: View {
     @ObservedObject var settingsStore: LaunchAtLoginSettingsStore
 

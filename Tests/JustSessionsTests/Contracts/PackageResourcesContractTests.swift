@@ -23,7 +23,6 @@ struct PackageResourcesContractTests {
 
     private static let targetDirectories = ["Sources/JustSessions", "Tests/JustSessionsTests"]
 
-    /// The resource, if it is a link, and every link inside it.
     private static func links(at resource: URL) -> [String] {
         var items = [resource]
         if let enumerator = FileManager.default.enumerator(at: resource, includingPropertiesForKeys: [.isSymbolicLinkKey]) {

@@ -4,17 +4,12 @@
 struct TerminalThemeReporting {
     private var scanner = TerminalThemeReportRequestScanner()
     private(set) var isSubscribed = false
-    /// Set for a change no program subscribed to; see `ConversationStore+RemoteTmuxColors`. The report then follows
-    /// the terminal's answer to the next background query, as tmux makes when its client attaches again.
     private(set) var reportsAfterNextBackgroundQuery = false
 
-    /// `CSI ? 997 ; 1 n` for a dark background, `CSI ? 997 ; 2 n` for a light one.
     static func report(isDark: Bool) -> String {
         "\u{1B}[?997;\(isDark ? 1 : 2)n"
     }
 
-    /// The reports that answer the requests in `output`, in order. They go out after the terminal has read `output`,
-    /// so a report owed after a background query follows the terminal's own answer to it.
     mutating func reports(answering output: ArraySlice<UInt8>, isDark: Bool) -> [String] {
         scanner.scan(output).compactMap { request in
             switch request {
@@ -34,7 +29,6 @@ struct TerminalThemeReporting {
         }
     }
 
-    /// The report for colors the terminal just took on, while a program subscribes.
     func reportAfterColorChange(isDark: Bool) -> String? {
         isSubscribed ? Self.report(isDark: isDark) : nil
     }

@@ -2,8 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Tabs open next to their project's other tabs, and closing one stays in its project while the project has tabs.
-/// Collapsing the selected tab's group shows the nearest tab still in sight.
 struct TerminalTabOrderTests {
     @Test func aTabOpensAfterItsProjectsLastTab() {
         let tabProjectKeys = ["/a", "/a", "/b", "/c"]
@@ -18,12 +16,10 @@ struct TerminalTabOrderTests {
     }
 
     @Test func closingATabShowsItsRightNeighborInTheSameProject() {
-        // Closing the first /b tab leaves ["/a", "/b", "/c"]; the other /b tab took its place.
         #expect(TerminalTabOrder.indexToSelect(afterClosingTabAt: 1, amongTabProjectKeys: ["/a", "/b", "/b", "/c"]) == 1)
     }
 
     @Test func closingAProjectsLastTabOnTheRightShowsItsLeftNeighborInTheSameProject() {
-        // The right neighbor, /c, is another project; the left one, /b, is the same.
         #expect(TerminalTabOrder.indexToSelect(afterClosingTabAt: 2, amongTabProjectKeys: ["/a", "/b", "/b", "/c"]) == 1)
     }
 

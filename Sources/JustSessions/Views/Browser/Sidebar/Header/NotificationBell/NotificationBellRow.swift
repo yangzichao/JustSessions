@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// A session waiting for you, on two lines: its CLI's icon and title, then why it waits, its project, and for how
-/// long, with the status mark its sidebar row shows.
 struct NotificationBellRow: View {
     let entry: NotificationBellEntry
     let onShow: () -> Void
@@ -35,7 +33,6 @@ struct NotificationBellRow: View {
         .accessibilityLabel(Text(verbatim: "\(entry.sessionTitle), ") + Text(reason) + Text(verbatim: ", \(entry.projectName)"))
     }
 
-    /// The project gives way first, so why the session waits and for how long stay readable.
     private var details: some View {
         HStack(spacing: 4) {
             Text(reason)

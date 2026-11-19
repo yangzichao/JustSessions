@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A refresh lists each tool's sessions on an SSH host as soon as that tool is copied, keeps the host's other tools'
-/// sessions meanwhile, and gives up a tab waiting to reopen only once every tool is listed.
 @MainActor
 struct RemoteToolByToolListingTests {
     @Test func eachToolReplacesOnlyItsOwnSessions() throws {
@@ -21,7 +19,6 @@ struct RemoteToolByToolListingTests {
         #expect(Set(store.conversations.map(\.id)) == [newClaude.id, codex.id])
     }
 
-    /// The sandbox's store launches only Claude Code, so the tab that reopens is one; the Pi session is gone.
     @Test func aWaitingTabReopensOnceItsToolIsListedAndIsGivenUpOnlyAfterTheLastTool() throws {
         let sandbox = try TabReopeningSandbox(remoteHosts: ["devbox"])
         defer { sandbox.tearDown() }
@@ -48,7 +45,6 @@ struct RemoteToolByToolListingTests {
         #expect(store.terminalSessions.map(\.displayTitle) == ["Local", "Remote"])
     }
 
-    /// Most copies find what the last one did; listing them again would sort and publish the whole list for nothing.
     @Test func aToolCopiedWithNoChangeIsNotListedAgain() throws {
         let sandbox = try TabReopeningSandbox(remoteHosts: ["devbox"])
         defer { sandbox.tearDown() }
@@ -76,7 +72,6 @@ struct RemoteToolByToolListingTests {
         #expect(store.subagentConversations.isEmpty)
     }
 
-    /// The tab's session was never listed, so no tool's copy changes anything; the last still gives it up.
     @Test func aWaitingTabIsGivenUpAfterTheLastToolEvenWhenNoCopyChangedAnything() throws {
         let sandbox = try TabReopeningSandbox(remoteHosts: ["devbox"])
         defer { sandbox.tearDown() }

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The conversation map's blocks (TAB-10): the reader's message IDs, tool runs merged whatever the page size, and line
-/// widths as the map draws them.
 struct ConversationOutlineBuilderTests {
     typealias Block = ConversationOutline.Block
 
@@ -100,8 +98,6 @@ struct ConversationOutlineBuilderTests {
         #expect(ConversationOutlineBuilder.resumePoint(in: []) == nil)
     }
 
-    /// A part shifts while an OpenCode message streams (MessageBookmarkNavigation.swift:45-47): the bookmark's chip
-    /// follows its snippet within the record, as the reader's `locate` does, rather than whatever block now has its ID.
     @Test func aBookmarkFollowsItsSnippetWithinItsRecord() {
         let outline = ConversationOutline(blocks: [
             Self.block(record: 5, part: 0, lastRecord: 5, kind: .assistant, snippet: "Alpha"),
@@ -114,7 +110,6 @@ struct ConversationOutlineBuilderTests {
         }
         #expect(outline.blockIndex(for: bookmark(part: 2, "Gamma reply here")) == 3)
         #expect(outline.blockIndex(for: bookmark(part: 1, "beta")) == 2)
-        // A head that changed since keeps today's choice: its own ID, else the first block of its kind in the record.
         #expect(outline.blockIndex(for: bookmark(part: 2, "Delta")) == 2)
         #expect(outline.blockIndex(for: bookmark(part: 1, "Delta")) == 0)
     }

@@ -1,10 +1,6 @@
 import AppKit
 
-/// One block of transcript text. AppKit draws it so a selection can run across blocks (see
-/// `TranscriptTextSelectionCoordinator`), and so Find gets the actual location of a match, even deep inside a tall
-/// message.
 final class TranscriptTextView: NSTextView {
-    /// Code is laid out at this width, so its lines never wrap; it scrolls sideways instead.
     static let unboundedWidth: CGFloat = 100_000
 
     var revealSelectedRange: ((NSTextView, NSRange) -> Bool)?
@@ -22,7 +18,6 @@ final class TranscriptTextView: NSTextView {
     // periphery:ignore - held to keep the text system alive.
     private var assembledTextStorage: NSTextStorage?
     private var measuredSizes: [CGFloat: CGSize] = [:]
-    /// The width of the text laid out at the text container's current width.
     private var laidOutTextWidth: CGFloat?
 
     init() {
@@ -58,8 +53,6 @@ final class TranscriptTextView: NSTextView {
 
     var textLength: Int { textStorage?.length ?? 0 }
 
-    // MARK: Content
-
     func setContent(_ newContent: TranscriptTextContent) {
         guard newContent != content else { return }
         let changesLayout = newContent.source != content?.source || newContent.style != content?.style
@@ -92,16 +85,11 @@ final class TranscriptTextView: NSTextView {
         if window != nil { selectionCoordinator?.register(self) } else { selectionCoordinator?.unregister(self) }
     }
 
-    // MARK: Layout
-
-    /// The size of the text laid out at `width`, or on one line per paragraph without one, as code is. Like SwiftUI's
-    /// text, it is only as wide as its longest line, so a table column fits its widest cell.
     func measuredSize(width: CGFloat?) -> CGSize {
         let containerWidth = width.flatMap { $0.isFinite ? max(1, $0) : nil } ?? Self.unboundedWidth
         if let size = measuredSizes[containerWidth] { return size }
         guard let textContainer, let layoutManager else { return .zero }
         let usedSize = layOut(atWidth: containerWidth, textContainer: textContainer, layoutManager: layoutManager)
-        // Rounded up to whole pixels, as SwiftUI's text was, so a placed view never wraps its last word.
         let scale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2
         let size = CGSize(width: min(ceil(usedSize.width * scale) / scale, containerWidth), height: ceil(usedSize.height * scale) / scale)
         measuredSizes[containerWidth] = size
@@ -113,8 +101,7 @@ final class TranscriptTextView: NSTextView {
         measuredSizes = [:]
     }
 
-    /// SwiftUI may measure at several widths before it places the view, so the text is laid out again at the width it
-    /// is placed at, unless the lines already laid out fit it and wrap the same.
+    /// SwiftUI may measure at several widths before it places the view.
     override func setFrameSize(_ newSize: NSSize) {
         super.setFrameSize(newSize)
         guard newSize.width > 0, let textContainer, let layoutManager else { return }
@@ -147,8 +134,6 @@ final class TranscriptTextView: NSTextView {
         super.layout()
         scheduleReveal()
     }
-
-    // MARK: Find
 
     private func scheduleReveal() {
         guard selectedSearchRange != nil, bounds.height > 0,

@@ -1,7 +1,6 @@
 import AppKit
 
 enum TerminalAppearanceMode: String, CaseIterable, Codable, Identifiable {
-    /// Takes on the app's appearance, whether that follows the Mac or is set to Light or Dark.
     case matchApp
     case light
     case dark
@@ -25,12 +24,10 @@ enum TerminalAppearanceMode: String, CaseIterable, Codable, Identifiable {
         }
     }
 
-    /// Whether the terminal takes the dark version of the theme's colors.
     func usesDarkColors(effectiveAppearance: NSAppearance) -> Bool {
         usesDarkColors(whenAppIsDark: effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua)
     }
 
-    /// The same, for a view that knows only whether the app around it is dark.
     func usesDarkColors(whenAppIsDark appIsDark: Bool) -> Bool {
         switch self {
         case .matchApp: appIsDark

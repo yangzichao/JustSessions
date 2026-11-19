@@ -3,8 +3,6 @@ import Foundation
 /// As on this Mac (`KiroConversationDeletion`): a session a running Kiro CLI holds isn't handed to Kiro, and the prompts
 /// Kiro leaves in `sessions/cli/<id>.history`, with a V2 session's lock its CLI left, go once it has deleted the rest.
 enum RemoteKiroConversationDeletion {
-    /// Stops before Kiro runs when the lock file `$lock` still names a running process after about 2 seconds, as on this
-    /// Mac (`KiroSessionLock`). Unlike there, a process that took a crashed CLI's id since counts too, until it ends.
     static let refusingWhileLocked = """
         lock_is_held() {
           [ -f "$lock" ] || return 1
@@ -19,7 +17,6 @@ enum RemoteKiroConversationDeletion {
         fi
         """
 
-    /// `$dir/$id.<extension>` for each of `fileExtensions`, when it is a regular file.
     static func removingLeftovers(_ fileExtensions: [String]) -> String {
         fileExtensions.map { fileExtension in
             """
@@ -29,8 +26,6 @@ enum RemoteKiroConversationDeletion {
         }.joined(separator: "\n")
     }
 
-    /// Targets the Kiro home the mirror copied from, whose `sessions/cli` is `sessionsFolder`, in `sh`; see
-    /// `RemoteToolFolders.shellPath(for:)`.
     static func command(sessionID: String, projectPath: String, sessionsFolder: String, host: String) -> String {
         let script = """
             dir=\(sessionsFolder)

@@ -1,14 +1,8 @@
 import Foundation
 
-/// The SSH logins made with Connect…, for hosts that ask for a password, a passphrase, or a code: one app-owned master
-/// connection per host. While it is open, every command, copy, and tab of the app's on that host goes through it, so
-/// nothing asks again. It stays open with nothing using it, and closes when the connection drops, as when the Mac
-/// sleeps, on Disconnect, when the host is removed, and when the app quits. Nothing typed to log in is kept.
 final class SSHLoginConnections: @unchecked Sendable {
     static let shared = SSHLoginConnections()
 
-    /// `ControlPersist`: a login has no idle limit. One left behind by an app that crashed is closed at the next
-    /// launch; see `closeLoginsOfEndedApps(socketRoot:)`.
     static let persistence = "yes"
 
     private let lock = NSLock()
@@ -46,7 +40,6 @@ final class SSHLoginConnections: @unchecked Sendable {
         return ["-o", "ControlMaster=no", "-o", "ControlPath=\(controlPath)"]
     }
 
-    /// Keeps the login whose master listens in `directory`, closing an earlier one of the host's.
     func add(_ directory: URL, for host: String) {
         let earlierDirectory = lock.withLock {
             defer { directoriesByHost[host] = directory }
@@ -55,15 +48,11 @@ final class SSHLoginConnections: @unchecked Sendable {
         if let earlierDirectory, earlierDirectory != directory { closeMasterInBackground(in: earlierDirectory, host: host) }
     }
 
-    /// Ends the host's login and the tabs going through it; their CLIs keep running in tmux. Connections made from
-    /// now on no longer use it; the master itself is closed in the background.
     func disconnect(_ host: String) {
         guard let directory = lock.withLock({ directoriesByHost.removeValue(forKey: host) }) else { return }
         closeMasterInBackground(in: directory, host: host)
     }
 
-    /// Forgets the host's login once its master has ended on its own, as when the connection dropped, and removes its
-    /// folder. A login still open is kept.
     func forgetEndedLogin(of host: String) {
         let directory: URL? = lock.withLock {
             guard let directory = directoriesByHost[host],
@@ -75,7 +64,6 @@ final class SSHLoginConnections: @unchecked Sendable {
         if let directory { try? FileManager.default.removeItem(at: directory) }
     }
 
-    /// When the app quits: waits for every master to close.
     func disconnectAll() {
         let directories = lock.withLock {
             defer { directoriesByHost.removeAll() }
@@ -84,8 +72,6 @@ final class SSHLoginConnections: @unchecked Sendable {
         for (host, directory) in directories { closeMaster(in: directory, host: host) }
     }
 
-    /// At launch: closes the logins that a copy of the app that is no longer running left open, as after a crash,
-    /// since they have no idle limit to end them.
     static func closeLoginsOfEndedApps(
         socketRoot: String = SSHConnectionSharing.socketRoot,
         close: @Sendable (_ host: String, _ controlPath: String) -> Void = SSHLoginConnections.closeMaster

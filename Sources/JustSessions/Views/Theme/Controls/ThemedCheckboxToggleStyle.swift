@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// An inline checkbox whose checked and unchecked surfaces follow the app theme.
 struct ThemedCheckboxToggleStyle: ToggleStyle {
     func makeBody(configuration: Configuration) -> some View {
         Button {

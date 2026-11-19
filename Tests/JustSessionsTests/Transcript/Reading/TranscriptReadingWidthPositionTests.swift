@@ -11,7 +11,6 @@ struct TranscriptReadingWidthPositionTests {
         let fixture = try TranscriptScrollViewFixture(width: 1600)
         defer { fixture.close() }
         let conversation = TranscriptScrollViewFixture.conversation("width-switch")
-        // Every line wraps in the readable column but not across the full width, so each switch resizes every entry.
         let longLine = String(repeating: "A long line that wraps differently at each reading width. ", count: 4)
         let transcript = TranscriptContent(
             entries: (0..<60).map { index in
@@ -35,10 +34,6 @@ struct TranscriptReadingWidthPositionTests {
         #expect(fixture.visiblePosition(in: scrollView) == readingPosition)
     }
 
-    /// Switches the setting, then waits until the entries are laid out at the new width and the reader is back at
-    /// `readingPosition`. The setting reaches the layout on later main-actor turns, which a busy main thread at the
-    /// start of a full run can hold up for far longer than a fixed settle. The expectations that follow report where
-    /// the reader is if this gives up.
     private func switchWidth(
         to width: TranscriptReadingWidth, in fixture: TranscriptScrollViewFixture, scrollView: NSScrollView,
         keeping readingPosition: TranscriptReadingPosition

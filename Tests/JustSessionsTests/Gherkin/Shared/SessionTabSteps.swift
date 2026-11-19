@@ -3,7 +3,6 @@ import XCTest
 
 @testable import JustSessions
 
-/// The steps every tab feature shares: what the tab and the sidebar show, whichever CLI the tab runs.
 @MainActor
 enum SessionTabSteps {
     static func register() {

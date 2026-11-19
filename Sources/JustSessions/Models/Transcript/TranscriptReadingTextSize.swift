@@ -1,15 +1,10 @@
 import Foundation
 
-/// The size of a conversation's text, in points, set with A− and A+ in the reading toolbar or with View → Zoom In and
-/// Zoom Out. The preview and every Read window share one size, remembered after quitting like the reading width.
-///
-/// The key is saved in settings, so it must stay the same for a saved size to survive updates.
 enum TranscriptReadingTextSize {
     static let userDefaultsKey = "transcriptReadingTextSize"
     static let range = 12.0...22.0
     static let defaultSize = 15.0
 
-    /// A saved size outside the range, which only a change outside the app can save, reads as the nearest one inside.
     static func clamped(_ size: Double) -> Double {
         size.isFinite ? min(max(size, range.lowerBound), range.upperBound) : defaultSize
     }

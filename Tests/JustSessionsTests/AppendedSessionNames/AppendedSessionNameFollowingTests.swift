@@ -16,7 +16,6 @@ struct AppendedSessionNameFollowingTests {
         gate.arm()
         let following = Task { await fixture.store.followAppendedSessionNames(readers: readers, codexDirectory: fixture.folder) }
         do {
-            // This runs on the main actor while the file reader is still blocked.
             try await expectEventually { gate.hasStarted }
             let readOnMainThread = gate.readOnMainThread
             #expect(!readOnMainThread)
@@ -125,7 +124,6 @@ private final class NameReadGate: @unchecked Sendable {
             onMainThread = Thread.isMainThread
             return true
         }
-        // Only the test releases this read; a busy main actor can take longer than a wall-clock timeout.
         if shouldWait { semaphore.wait() }
         return reader.newLines()
     }

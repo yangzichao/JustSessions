@@ -10,9 +10,9 @@ struct HostCheckReportTests {
             checkedAt: Date(timeIntervalSince1970: 0),
             thisMacSummary: "JustSessions 1.2.10 · macOS 26.0.1 · OpenSSH_10.3p1",
             findings: [
-                HostCheckFinding(id: "rsync", status: .passed, title: "rsync", summary: "Copies devbox's sessions to this Mac."),
+                HostCheckFinding(id: .rsync, status: .passed, title: "rsync", summary: "Copies devbox's sessions to this Mac."),
                 HostCheckFinding(
-                    id: "cli-opencode",
+                    id: .cli(.opencode),
                     status: .warning,
                     title: "OpenCode",
                     summary: "Found at /usr/bin/opencode, but it failed when asked for its version.",
@@ -26,7 +26,6 @@ struct HostCheckReportTests {
 
         #expect(lines[0] == "JustSessions host check: devbox")
         #expect(lines[2] == "This Mac: JustSessions 1.2.10 · macOS 26.0.1 · OpenSSH_10.3p1")
-        // The warning comes first, though it was checked last.
         #expect(
             Array(lines[4...]) == [
                 "[Warning] OpenCode: Found at /usr/bin/opencode, but it failed when asked for its version.",
@@ -46,7 +45,7 @@ struct HostCheckReportTests {
             host: "devbox",
             checkedAt: Date(timeIntervalSince1970: 0),
             thisMacSummary: "",
-            findings: [HostCheckFinding(id: "rsync", status: .passed, title: "rsync", summary: "Found.")],
+            findings: [HostCheckFinding(id: .rsync, status: .passed, title: "rsync", summary: "Found.")],
             endedTabScreen: "protocol version mismatch (client 8, server 7)\n\nConnection to devbox closed."
         )
 
@@ -61,23 +60,21 @@ struct HostCheckReportTests {
                 "    Connection to devbox closed.",
                 "",
             ])
-        // Nothing failed, but the tab's output is something to explain.
         #expect(report.hasSomethingToFix)
     }
 
-    /// A missing folder is one session's, so the host's heading doesn't warn of it.
     @Test func theHostsProblemsLeaveOutTheFolder() {
         let report = HostCheckReport(
             host: "devbox",
             checkedAt: Date(timeIntervalSince1970: 0),
             thisMacSummary: "",
             findings: [
-                HostCheckFinding(id: "folder", status: .problem, title: "Folder", summary: ""),
-                HostCheckFinding(id: "tmux", status: .problem, title: "tmux", summary: ""),
-                HostCheckFinding(id: "rsync", status: .passed, title: "rsync", summary: ""),
+                HostCheckFinding(id: .folder, status: .problem, title: "Folder", summary: ""),
+                HostCheckFinding(id: .tmux, status: .problem, title: "tmux", summary: ""),
+                HostCheckFinding(id: .rsync, status: .passed, title: "rsync", summary: ""),
             ]
         )
-        #expect(report.hostProblems.map(\.id) == ["tmux"])
+        #expect(report.hostProblems.map(\.id) == [.tmux])
         #expect(report.hasSomethingToFix)
         #expect(!HostCheckReport(host: "devbox", checkedAt: .now, thisMacSummary: "", findings: []).hasSomethingToFix)
     }
@@ -89,9 +86,9 @@ struct HostCheckReportTests {
             checkedAt: Date(timeIntervalSince1970: 0),
             thisMacSummary: "",
             findings: statuses.enumerated().map { index, status in
-                HostCheckFinding(id: "\(index)", status: status, title: "", summary: "")
+                HostCheckFinding(id: HostCheckFindingID.all[index], status: status, title: "", summary: "")
             }
         )
-        #expect(report.findingsMostImportantFirst.map(\.id) == ["3", "1", "5", "0", "2", "4"])
+        #expect(report.findingsMostImportantFirst.map(\.id) == [3, 1, 5, 0, 2, 4].map { HostCheckFindingID.all[$0] })
     }
 }

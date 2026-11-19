@@ -1,9 +1,6 @@
 import Foundation
 import SQLite3
 
-/// Reads `AntigravityTurnState` from a conversation database while its CLI writes it. Two small queries on indexed
-/// columns, so each sync reads it afresh.
-///
 /// Neither number below is documented. Both were observed in Antigravity CLI 1.3.3. In eight earlier conversations
 /// with turns, on the Mac they were checked on, the last execution ended at the last step in all but one, which an
 /// earlier CLI had left in the middle of a turn.
@@ -14,7 +11,6 @@ enum AntigravityTurnStateReader {
     /// The `steps.status` of a step that waits for you to allow it; Antigravity sets it to 3, done, once you answer.
     static let waitingForApprovalStatus: Int32 = 9
 
-    /// Nil when the database cannot be read, such as one without `executor_metadata`.
     static func turnState(ofConversationDatabase file: URL) -> AntigravityTurnState? {
         guard let database = try? AntigravityDatabase.open(file) else { return nil }
         defer { sqlite3_close(database) }
@@ -22,7 +18,6 @@ enum AntigravityTurnStateReader {
         return turnState(after: lastEndedStepIndex, in: database)
     }
 
-    /// The index of the last ended execution's last step; -1 before any execution ends.
     private static func lastEndedStepIndex(in database: OpaquePointer) -> Int64? {
         var statement: OpaquePointer?
         let query = "SELECT data FROM executor_metadata ORDER BY idx DESC LIMIT 1"

@@ -18,7 +18,6 @@ struct TranscriptAttributedTextTests {
         )
     }
 
-    /// Each run's font covers exactly its own text, after characters that take two UTF-16 units or combine.
     @Test func formatsEachRunOverItsOwnText() throws {
         let text = Self.make()
         let string = text.string as NSString
@@ -41,7 +40,6 @@ struct TranscriptAttributedTextTests {
         #expect(linkColorRange == linkRange)
     }
 
-    /// Every match gets a background, and the selected one also gets its own text color.
     @Test func highlightsMatchesAndTheSelectedOne() {
         let ranges = TranscriptTextSearch.ranges(of: "bold", in: Self.source.plainText)
         let text = Self.make(ranges: ranges, selectedRange: ranges.last)

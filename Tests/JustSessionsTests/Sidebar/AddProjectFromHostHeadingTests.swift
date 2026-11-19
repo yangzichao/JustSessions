@@ -5,7 +5,6 @@ import Testing
 
 @MainActor
 struct AddProjectFromHostHeadingTests {
-    /// The folder is listed with no sessions under the key its sessions will have, and stays across a relaunch.
     @Test func aFolderOnThisMacIsListedAsAnEmptyProjectUnderItsResolvedPath() async throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }

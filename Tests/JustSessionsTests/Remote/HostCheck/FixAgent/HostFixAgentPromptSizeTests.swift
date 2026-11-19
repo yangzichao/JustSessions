@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The prompt as the form first shows it, with every guide section, fits in the command that starts the agent on the
-/// host, whichever tab the check came from and whichever CLI the agent is; see `HostFixAgentError.promptTooLong`.
 struct HostFixAgentPromptSizeTests {
     private let report = HostCheckReport(
         host: "devbox",
@@ -12,7 +10,7 @@ struct HostFixAgentPromptSizeTests {
         thisMacSummary: "JustSessions 1.2.21 · macOS 27.0.1 · OpenSSH_10.0p2",
         findings: [
             HostCheckFinding(
-                id: "tmux",
+                id: .tmux,
                 status: .problem,
                 title: "tmux",
                 summary: "Started by another tmux version.",
@@ -20,14 +18,13 @@ struct HostFixAgentPromptSizeTests {
                 commandToRunYourself: "ssh devbox 'tmux ls'"
             ),
             HostCheckFinding(
-                id: "shell-startup",
+                id: .shellStartup,
                 status: .warning,
                 title: "Shell startup",
                 summary: "The interactive startup files start another program.",
                 commandToRunYourself: "ssh -t devbox 'env JUSTSESSIONS=1 \"$SHELL\" -lic \"echo Startup finished\"'"
             ),
         ],
-        // As long as an ended tab's lines can be, with the quotes and backslashes a CLI's error may print.
         endedTabScreen: String(
             String(repeating: #"Error: can't read '/home/me/.config' (C:\path); run `tmux kill-server`"# + "\n", count: 60)
                 .suffix(EndedTabScreenText.maximumCharacterCount)
@@ -54,7 +51,6 @@ struct HostFixAgentPromptSizeTests {
                 appVersion: "1.2.21"
             )
             for agentProvider in ConversationProvider.allCases {
-                // Found by the login shell, the CLI's start command holds its arguments twice; see `RemoteCLIInvocation`.
                 let remoteCommand = RemoteCLICommandBuilder.remoteCommand(
                     provider: agentProvider,
                     projectPath: "/home/me/project",

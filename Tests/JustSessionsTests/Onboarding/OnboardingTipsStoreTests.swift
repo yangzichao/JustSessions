@@ -26,7 +26,6 @@ struct OnboardingTipsStoreTests {
         let tipsStore = OnboardingTipsStore(userDefaults: isolatedUserDefaults.userDefaults, isFreshInstall: false)
         #expect(tipsStore.tipsToShow.isEmpty)
 
-        // Whether the install is fresh is decided once; later launches read the saved answer.
         var askedWhetherFresh = false
         let relaunchedTipsStore = OnboardingTipsStore(
             userDefaults: isolatedUserDefaults.userDefaults,
@@ -74,7 +73,6 @@ struct OnboardingTipsStoreTests {
         userDefaults.set(["keepRunning", "retiredTip", "tour"], forKey: OnboardingTipsStore.shownTipsKey)
 
         let tipsStore = OnboardingTipsStore(userDefaults: userDefaults, isFreshInstall: false)
-        // Tips added since those were saved still show.
         #expect(tipsStore.tipsToShow == Set(OnboardingTip.allCases).subtracting([.tour, .keepRunning]))
 
         tipsStore.markShown(.readingSession)

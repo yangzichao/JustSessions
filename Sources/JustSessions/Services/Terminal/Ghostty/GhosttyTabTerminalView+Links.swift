@@ -31,7 +31,6 @@ extension GhosttyTabTerminalView: TerminalSurfaceOpenURLDelegate {
         return shiftedEvent
     }
 
-    /// The link a ⌘-click where `event` happened would hand over; see `SelectableTerminalView.link(under:)`.
     func link(under event: NSEvent) -> String? {
         let ghosttyLink = ghosttyLink(under: event)
         guard let hardWrappedLink = hardWrappedLink(under: event) else { return ghosttyLink }
@@ -64,7 +63,6 @@ extension GhosttyTabTerminalView: TerminalSurfaceOpenURLDelegate {
     }
 }
 
-/// Ghostty reports the link under the pointer while ⌘ is held, and nil once it leaves it.
 extension GhosttyTabTerminalView: TerminalSurfaceHoverLinkDelegate {
     func terminalDidUpdateHoverLink(_ url: String?) {
         hoveredLink = url

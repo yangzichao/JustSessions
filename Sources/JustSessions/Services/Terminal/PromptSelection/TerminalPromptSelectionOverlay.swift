@@ -1,7 +1,5 @@
 import AppKit
 
-/// Draws a selected prompt over the terminal, in the colors the terminal draws its own selection with, each character
-/// in its cell; see `TerminalPromptSelection`. Clicks go through it to the terminal.
 final class TerminalPromptSelectionOverlay: NSView {
     struct Glyph {
         let character: Character

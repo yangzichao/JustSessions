@@ -6,15 +6,12 @@ import Foundation
 final class CodexAppServerWaitReader: @unchecked Sendable {
     let socketPath: String
     private let clientVersion: String
-    /// The longest wait for each read or write.
     private let timeout: Duration
-    /// After a failed try, how long the server is left alone, so one that does not answer slows no sync for long.
     private let retryDelay: Duration
     private let lock = NSLock()
     private var connection: CodexAppServerConnection?
     private var nextTryAfter: ContinuousClock.Instant?
 
-    /// Only the packaged app asks, so tests and `swift run` leave the server of whoever runs them alone.
     static func forThisApp() -> CodexAppServerWaitReader? {
         guard Bundle.main.bundleURL.pathExtension == "app" else { return nil }
         return CodexAppServerWaitReader(
@@ -31,8 +28,6 @@ final class CodexAppServerWaitReader: @unchecked Sendable {
         self.retryDelay = retryDelay
     }
 
-    /// Those of `threadIDs` that wait on you. The connection stays open for the next call while there are threads to
-    /// ask about, and closes once there are none.
     func threadsWaitingOnYou(among threadIDs: Set<String>) -> Set<String> {
         lock.withLock {
             guard !threadIDs.isEmpty else {

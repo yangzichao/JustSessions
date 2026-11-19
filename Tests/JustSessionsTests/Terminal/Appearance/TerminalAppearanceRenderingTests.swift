@@ -47,7 +47,6 @@ struct TerminalAppearanceRenderingTests {
 
         #expect(terminalView.font.pointSize == 22)
         #expect(terminalView.font.fontName == "Menlo-Regular")
-        // The bundled Nerd Font symbols draw icons the terminal's font lacks.
         #expect(terminalView.font.fontDescriptor.object(forKey: .cascadeList) != nil)
         #expect(terminalView.getTerminal().cols < originalColumnCount)
         terminalView.selectAll()

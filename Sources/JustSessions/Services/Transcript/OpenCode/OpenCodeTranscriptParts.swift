@@ -1,11 +1,7 @@
 import Foundation
 import SQLite3
 
-/// The rows of OpenCode's `part` table a preview reads: a message's text, tool calls, attachments, and compaction
-/// marker, in the order OpenCode shows them. The same SQL decides what an SSH host's mirror copies.
 enum OpenCodeTranscriptParts {
-    /// Reasoning, step markers, snapshots, patches, retries, subtasks, and agent mentions stay out. Malformed
-    /// data has no type, so it is left out instead of failing the query.
     static let typeFilter = """
         (CASE WHEN json_valid(data) THEN json_extract(data, '$.type') END) IN ('text', 'tool', 'file', 'compaction')
         """
@@ -22,8 +18,6 @@ enum OpenCodeTranscriptParts {
 
     static let query = "SELECT \(dataProjection) FROM part WHERE message_id = ? AND \(typeFilter) ORDER BY id"
 
-    /// The previewed parts of one message, and how many bytes of part data were read. `statement` is `query`,
-    /// prepared once for all the messages read in one go.
     static func read(messageID: String, with statement: OpaquePointer) throws -> (parts: [[String: Any]], byteCount: Int) {
         sqlite3_reset(statement)
         sqlite3_clear_bindings(statement)

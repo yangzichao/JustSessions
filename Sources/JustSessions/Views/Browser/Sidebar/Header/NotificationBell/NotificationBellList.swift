@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// What the bell opens: a row for each session waiting for you, the wait that started last first. Past a handful of
-/// rows, the list scrolls.
 struct NotificationBellList: View {
     let entries: [NotificationBellEntry]
     let onShow: (NotificationBellEntry) -> Void

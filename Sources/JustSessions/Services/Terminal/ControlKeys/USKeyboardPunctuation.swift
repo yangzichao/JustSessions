@@ -8,8 +8,6 @@ enum USKeyboardPunctuation {
         return withShift ? characters.shifted : characters.unshifted
     }
 
-    /// Punctuation an input method types in place of ASCII: General Punctuation (`——`, `‘`), the CJK Symbols and
-    /// Punctuation block (`【`, `、`, `。`), full-width forms (`，`, `；`), and the middle dot (`·`).
     static func isInputMethodPunctuation(_ scalar: Unicode.Scalar) -> Bool {
         switch scalar.value {
         case 0x00B7, 0x2000...0x206F, 0x3000...0x303F, 0xFF00...0xFFEF: true

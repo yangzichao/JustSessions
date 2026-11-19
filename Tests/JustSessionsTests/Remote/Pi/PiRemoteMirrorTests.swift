@@ -30,7 +30,7 @@ struct PiRemoteMirrorTests {
         try "private settings".write(to: remoteHome.appendingPathComponent(".pi/agent/settings.json"), atomically: true, encoding: .utf8)
         try "private auth".write(to: remoteHome.appendingPathComponent(".pi/agent/auth.json"), atomically: true, encoding: .utf8)
         try "not a session".write(to: projectFolder.appendingPathComponent("notes.txt"), atomically: true, encoding: .utf8)
-        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path)
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path))
         let discovery = RemoteSessionDiscovery(mirror: mirror)
 
         let conversations = try discovery.discover(host: "devbox")
@@ -51,7 +51,6 @@ struct PiRemoteMirrorTests {
             try FileManager.default.contentsOfDirectory(atPath: mirroredProjectFolder.deletingLastPathComponent().path)
                 == [projectFolder.lastPathComponent])
 
-        // A session deleted on the host disappears from the mirror on the next copy.
         try FileManager.default.removeItem(at: sessionFile)
         #expect(try discovery.discover(host: "devbox").isEmpty)
         #expect(!FileManager.default.fileExists(atPath: conversation.sourceFile.path))
@@ -84,7 +83,7 @@ struct PiRemoteMirrorTests {
         try "private extension output".write(to: nested, atomically: true, encoding: .utf8)
         let folders = RemoteToolFolders(claude: ".claude", codex: ".codex", kiro: ".kiro/sessions/cli", pi: "custom sessions")
         let mirror = RemoteSessionMirror(
-            cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: home.path, toolFoldersLookup: { _ in folders })
+            cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: home.path), toolFoldersLookup: { _ in folders })
 
         let found = try RemoteSessionDiscovery(mirror: mirror).discover(host: "devbox")
 

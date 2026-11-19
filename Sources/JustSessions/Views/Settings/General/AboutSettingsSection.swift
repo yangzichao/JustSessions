@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// The bottom of General: the app and macOS versions with software updates, then where to send feedback and find
-/// JustSessions online.
 struct AboutSettingsSection: View {
     let onCheckForUpdates: () -> Void
     private let environment = FeedbackEnvironment.current

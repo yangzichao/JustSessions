@@ -2,7 +2,6 @@ import Foundation
 
 enum RemoteSessionMirrorError: LocalizedError, Equatable {
     case couldNotRun(host: String)
-    /// `ssh` could not connect, or lost the connection, for the reason its output gave.
     case sshFailed(host: String, problem: SSHConnectionProblem)
     case rsyncMissingOnHost(host: String)
     case rsyncFailed(host: String, output: String)

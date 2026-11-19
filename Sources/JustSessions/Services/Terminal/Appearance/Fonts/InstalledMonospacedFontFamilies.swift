@@ -1,14 +1,8 @@
 import CoreText
 import Foundation
 
-/// The installed font families with a monospaced face, split by whether their letters fill a terminal's cells. The font
-/// picker offers the ones that do. Hidden system families, whose names start with a dot, and the symbols-only Nerd Font
-/// families are left out. CoreText is thread-safe, and listing every font takes tens of milliseconds, so call `load()`
-/// away from the main thread.
 struct InstalledMonospacedFontFamilies: Equatable {
-    /// Sorted.
     var fillingCells: [String]
-    /// Such as Osaka; see `FontFillsTerminalCells`.
     var notFillingCells: Set<String>
 
     static func load() -> Self {
@@ -34,7 +28,6 @@ struct InstalledMonospacedFontFamilies: Equatable {
         CTFontDescriptorCopyAttribute(descriptor, kCTFontFamilyNameAttribute) as? String
     }
 
-    /// Checked on the face Core Text picks for the family, its regular one. Widths scale together, so any size will do.
     private static func lettersFillCells(_ family: String) -> Bool {
         let descriptor = CTFontDescriptorCreateWithAttributes([kCTFontFamilyNameAttribute: family] as CFDictionary)
         return FontFillsTerminalCells.check(CTFontCreateWithFontDescriptor(descriptor, 13, nil))

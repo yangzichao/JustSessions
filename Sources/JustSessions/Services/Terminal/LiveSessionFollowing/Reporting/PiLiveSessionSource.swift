@@ -1,6 +1,5 @@
 import Foundation
 
-/// The session a Pi CLI is in, as the app's extension reports it; see `PiLiveSessionExtension`.
 struct PiLiveSessionSource: LiveSessionSource {
     let reporting: LiveSessionReporting
     var provider: ConversationProvider { .pi }

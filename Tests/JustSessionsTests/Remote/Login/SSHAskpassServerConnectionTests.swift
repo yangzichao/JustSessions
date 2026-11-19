@@ -5,7 +5,6 @@ import Testing
 
 @testable import JustSessions
 
-/// How the askpass server takes a helper's connection: on a busy app, with tabs starting, and after the helper has gone.
 struct SSHAskpassServerConnectionTests {
     /// A full test run keeps every one of Swift's shared threads busy for minutes. Work on a global dispatch queue
     /// then waits for them all to finish, and so did a question served there.
@@ -60,7 +59,7 @@ struct SSHAskpassServerConnectionTests {
         let server = try #require(
             SSHAskpassServer(socketPath: folder + "/askpass") { _ in
                 isAsked.update { $0 = true }
-                try? await Task.sleep(for: .seconds(600))  // Ended only by a cancel.
+                try? await Task.sleep(for: .seconds(600))
                 isWithdrawn.update { $0 = Task.isCancelled }
                 return SSHAskpassReply(answer: nil)
             })
@@ -80,7 +79,6 @@ struct SSHAskpassServerConnectionTests {
         }
         helper.close()
 
-        // Long enough for a busy run; the tab's process would hold the connection for all of its 600 seconds.
         try await expectEventually(timeout: .seconds(30)) { isWithdrawn.value }
     }
 
@@ -97,11 +95,9 @@ struct SSHAskpassServerConnectionTests {
         if helperHasGone { helper.close() }
         defer { if !helperHasGone { helper.close() } }
 
-        let connection = accept(listener, nil, nil)
-        try #require(connection >= 0)
-        defer { close(connection) }
+        let connection = try #require(SSHAskpassConnection.accept(on: listener))
 
-        #expect(SSHAskpassServer.prepare(connection) == !helperHasGone)
+        #expect(connection.prepare(requestTimeout: SSHAskpassServer.requestTimeout) == !helperHasGone)
     }
 
     private static func listeningSocket(at path: String) -> Int32? {

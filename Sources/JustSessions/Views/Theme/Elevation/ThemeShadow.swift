@@ -1,10 +1,7 @@
 import SwiftUI
 
-/// The app's shadows. Surfaces are flat; only what floats above them, or a raised control in a track, casts one.
 enum ThemeShadow {
-    /// Under a card or row that floats over the window: a tab's hover card and a dragged sidebar row.
     case floating
-    /// Under the selected segment in a segmented track.
     case raisedSegment
 
     fileprivate var color: Color {

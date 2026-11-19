@@ -1,6 +1,5 @@
 import Foundation
 
-/// Copies the colors in an iTerm2 color preset file, such as the ones collected by iTerm2-Color-Schemes.
 enum ITermColorsFileImporter {
     static func importFile(at url: URL) throws -> ImportedTerminalColors {
         guard let data = try? Data(contentsOf: url),

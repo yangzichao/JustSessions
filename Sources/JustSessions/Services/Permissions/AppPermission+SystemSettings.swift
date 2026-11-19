@@ -1,7 +1,6 @@
 import AppKit
 
 extension AppPermission {
-    /// The System Settings page where the permission is turned on or off.
     var systemSettingsURL: URL? {
         switch self {
         case .notifications:

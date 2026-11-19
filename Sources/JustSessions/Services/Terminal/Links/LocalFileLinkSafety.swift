@@ -6,7 +6,6 @@ import UniformTypeIdentifiers
 /// anything: Launch Services starts an app, a `.jar`, or an executable, and Terminal runs a `.command` or `.tool` script
 /// and the commands a `.terminal` file holds.
 enum LocalFileLinkSafety {
-    /// Whether `fileURL` names a file or folder that exists and that opening would not run.
     static func canOpen(_ fileURL: URL) -> Bool {
         let keys: Set<URLResourceKey> = [.contentTypeKey, .isRegularFileKey, .isExecutableKey]
         guard fileURL.isFileURL, let values = try? fileURL.resourceValues(forKeys: keys) else { return false }

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The commands are pasted into zsh on this Mac and read again by the host's shell, so anything either would change
-/// gets no command.
 struct RemoteHostCheckCommandsTests {
     @Test func buildsCommandsForPlainHostsAndValues() {
         #expect(RemoteHostCheckCommands.ssh("me@devbox.local", "true") == "ssh me@devbox.local 'true'")

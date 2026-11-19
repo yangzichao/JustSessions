@@ -1,37 +1,22 @@
 import Foundation
 
-/// How a deletion went: how many sessions it was asked to delete, how many left the list, and which could not be
-/// deleted and why. When some could not, `alert(titleOf:)` tells the user what happened, why, and what to do.
 struct SessionDeletionReport: Sendable {
-    /// Sessions in the deletion.
     let requestedCount: Int
-    /// Sessions that left the list: deleted, already gone, or gone despite an error.
     let deletedCount: Int
     let failures: [ConversationDeletionFailure]
-    /// Cancel stopped the deletion before every session was attempted. Those not attempted are not failures.
     var wasCanceled = false
 
-    /// Causes listed after the summary, each its own paragraph, and characters in the whole message, so the alert
-    /// fits on the screen however many sessions failed. When more causes are needed, the last one counts the
-    /// sessions left out.
     static let maximumListedCauses = 4
     static let maximumMessageLength = 1_500
-    /// Up to this many sessions that failed for a reason other than an unresponsive host get a paragraph each;
-    /// more are grouped by reason.
     static let maximumSessionsListedOneByOne = 3
-    /// The reason shown after deleting one session keeps at most this many lines and characters; a host's
-    /// output can be long.
     static let maximumOneSessionReasonLines = 6
     static let maximumOneSessionReasonLength = 300
-    /// Session titles in alert titles are cut to this many characters.
     static let maximumTitleLengthInAlertTitle = 40
 
-    /// "Couldn't delete “title”", with a long title cut.
     static func oneSessionTitle(_ sessionTitle: String) -> String {
         "Couldn't delete “\(shortened(sessionTitle, to: maximumTitleLengthInAlertTitle))”"
     }
 
-    /// Nil when every session was deleted. `titleOf` gives a session's title as the sidebar shows it.
     func alert(titleOf: (Conversation) -> String) -> StoreAlert? {
         guard !failures.isEmpty else { return nil }
         if requestedCount == 1, let failure = failures.first {
@@ -53,7 +38,6 @@ struct SessionDeletionReport: Sendable {
         )
     }
 
-    /// Sessions still listed whose host may be back later, such as after a lost connection; Try Again deletes them.
     var retryConversationIDs: Set<String> {
         Set(retriableFailures.map(\.conversation.id))
     }
@@ -66,17 +50,12 @@ struct SessionDeletionReport: Sendable {
         failures.filter(\.isStillListed).count
     }
 
-    /// What was deleted, then why the others weren't and what to do, then what Try Again does when it is offered.
-    /// When one host's problem accounts for every session not deleted, it is told within the summary; otherwise
-    /// each cause is a paragraph: each host given up on once, then a few other failures one by one, or more
-    /// grouped by reason, the most common first.
     func messageAfterDeletingSeveralSessions(titleOf: (Conversation) -> String) -> String {
         let hostCauses = Self.groupedByCount(
             failures.compactMap { failure in
                 failure.unresponsiveHost.map { ($0.host, failure) }
             }
         ).map { host, hostFailures in
-            // The first failure on the host is the one that was tried; the rest were skipped because of it.
             let unresponsiveHost = hostFailures.first?.unresponsiveHost
             let explanation = Self.sentence(unresponsiveHost?.explanation ?? "")
             let notDeletedCount = hostFailures.filter(\.isStillListed).count
@@ -130,8 +109,6 @@ struct SessionDeletionReport: Sendable {
         return paragraphs.joined(separator: "\n\n")
     }
 
-    /// "Deleted 37 of 140 sessions. The other 103 are still listed." or "None of the 140 sessions were deleted.",
-    /// with `explanation`, the one cause of the sessions not deleted, told before what is still listed.
     private func summary(telling explanation: String?) -> String {
         let stillListedCount = requestedCount - deletedCount
         let whenStopped = wasCanceled ? " before you canceled" : ""
@@ -147,8 +124,6 @@ struct SessionDeletionReport: Sendable {
         }
     }
 
-    /// What Try Again does, when it is offered: when to choose it, or which sessions it covers when that is fewer
-    /// than all those not deleted.
     private var tryAgainStep: String? {
         let retriableFailures = retriableFailures
         guard !retriableFailures.isEmpty else { return nil }
@@ -170,17 +145,13 @@ struct SessionDeletionReport: Sendable {
         return "Try Again retries \(sessions) on \(hostNames)."
     }
 
-    /// One reason some sessions were not deleted, as a paragraph of the message.
     private struct Cause {
         let text: String
-        /// A host's problem in a sentence or two, for telling it within the summary when it is the only cause.
         var explanation: String? = nil
         let sessionCount: Int
         var notDeletedCount = 0
     }
 
-    /// As many causes as fit within `maximumListedCauses` and `maximumMessageLength` besides `reservedLength`
-    /// characters, the last one counting the sessions of the causes left out.
     private static func boundedCauses(_ causes: [Cause], besides reservedLength: Int) -> [String] {
         let overflowAllowance = 60
         var kept: [String] = []
@@ -198,7 +169,6 @@ struct SessionDeletionReport: Sendable {
         return kept + ["Another \(sessionsPhrase(leftOutCount)) \(leftOutCount == 1 ? "wasn't" : "weren't") deleted."]
     }
 
-    /// "a", "a and b", or "a, b, and c".
     private static func listed(_ items: [String]) -> String {
         switch items.count {
         case 0: ""
@@ -208,7 +178,6 @@ struct SessionDeletionReport: Sendable {
         }
     }
 
-    /// Keeps the first lines and characters of a reason; a host's output can be long.
     private static func boundedOneSessionReason(_ reason: String) -> String {
         let lines = reason.split(separator: "\n", omittingEmptySubsequences: false)
         let keptLines = lines.prefix(maximumOneSessionReasonLines).joined(separator: "\n")
@@ -216,7 +185,6 @@ struct SessionDeletionReport: Sendable {
         return isCut ? keptLines.prefix(maximumOneSessionReasonLength - 1) + "…" : keptLines
     }
 
-    /// The failures grouped by key, the largest group first; equal groups keep the order they first appear in.
     private static func groupedByCount<Key: Hashable>(
         _ keyedFailures: [(Key, ConversationDeletionFailure)]
     ) -> [(key: Key, failures: [ConversationDeletionFailure])] {
@@ -239,19 +207,16 @@ struct SessionDeletionReport: Sendable {
         "\(count.formatted()) \(count == 1 ? "session" : "sessions")"
     }
 
-    /// The count, then the first two titles: "2 sessions, “a” and “b”" or "15 sessions, including “a” and “b”".
     private static func namedSessions(_ conversations: [Conversation], titleOf: (Conversation) -> String) -> String {
         let titles = conversations.prefix(2).map { "“\(shortened(titleOf($0), to: 24))”" }.joined(separator: " and ")
         return "\(sessionsPhrase(conversations.count)), \(conversations.count > 2 ? "including " : "")\(titles)"
     }
 
-    /// Ends the text with a full stop unless it already ends a sentence.
     private static func sentence(_ text: String) -> String {
         guard let last = text.last, !".!?…".contains(last) else { return text }
         return text + "."
     }
 
-    /// One line of at most `limit` characters, ending in an ellipsis when cut.
     private static func shortened(_ text: String, to limit: Int) -> String {
         let singleLine = text.split(whereSeparator: \.isNewline).joined(separator: " ")
         return singleLine.count > limit ? singleLine.prefix(limit - 1) + "…" : singleLine

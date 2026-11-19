@@ -1,12 +1,8 @@
 import SwiftUI
 
-/// Adds a folder on an SSH host as a project, from the host's heading. There is no folder picker for another machine,
-/// so the path is typed and looked up on the host. When the host reports the folder missing, the sheet offers to
-/// create it there, so a typo is never created without a second look.
 struct AddProjectOnSSHHostSheet: View {
     let store: ConversationStore
     let host: SessionHost
-    /// Called with the project's key once it is listed.
     let onAdded: (String) -> Void
 
     private enum FolderRequest {
@@ -17,7 +13,6 @@ struct AddProjectOnSSHHostSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var folder = ""
     @State private var runningFolderRequest: FolderRequest?
-    /// The folder as typed when the host reported it missing. Editing the path withdraws the offer to create it.
     @State private var missingFolder: String?
     @State private var errorMessage: String?
 

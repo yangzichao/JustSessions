@@ -3,7 +3,6 @@ import SwiftUI
 
 @testable import JustSessions
 
-/// A workspace detail view in a window, with a store of its own, whose tabs run `cat` so their terminals stay open.
 @MainActor
 final class SplitWorkspace {
     let store: ConversationStore

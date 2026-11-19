@@ -1,25 +1,15 @@
 import Foundation
 
-/// What the preview learns about one line of a Pi session before decoding it: where the line is, how its entry links
-/// into the session's tree, and whether it could show anything.
 struct PiEntryLink: Equatable {
-    /// Counts the file's non-empty lines from zero.
     let lineIndex: Int
-    /// Nil in version 1 sessions, which list entries in order without linking them.
     let id: String?
-    /// Nil for an entry that starts the tree, and in version 1 sessions.
     let parentID: String?
-    /// False for entries the preview never shows, such as model changes and tool results without an image, so they
-    /// are not decoded.
     let mightBeShown: Bool
 }
 
 extension PiEntryLink {
-    /// Enough of a line for its type, id, parent, timestamp, and message role.
     private static let headByteCount = 512
 
-    /// Nil for the session header and for lines that are not entries. `decoder` parses a line not in Pi's own
-    /// layout, so a reader going through many lines can share one.
     init?(line: Data, lineIndex: Int, decoder: JSONDecoder = JSONDecoder()) {
         if let link = Self.linkFromLineHead(line, lineIndex: lineIndex) {
             self = link

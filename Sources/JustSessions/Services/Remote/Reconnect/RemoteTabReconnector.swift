@@ -1,35 +1,21 @@
 import AppKit
 
-/// Reconnects SSH tabs whose connection dropped, as when the Mac slept with its lid closed, so they show again the
-/// CLI that kept running in tmux on the host. A dropped tab waits until its host lists the tab's tmux session, and is
-/// then reconnected in its place in every window, as Reconnect does. A tab whose session the host no longer lists
-/// stays ended, since its CLI ended too; it is never started again on its own. A host that can't be asked, or needs
-/// Connect…, is asked again as `RemoteTabReconnectSchedule` says, and at once when the Mac wakes, the app comes
-/// forward, or a login to it opens.
 @MainActor
 final class RemoteTabReconnector {
     static let shared = RemoteTabReconnector()
 
-    /// Posted by a tab whose connection dropped; its object is the tab. See `TerminalSession.hasDroppedConnectionToTmux`.
     static let connectionDroppedNotification = Notification.Name("JustSessions.RemoteTabConnectionDropped")
-    /// Posted once Connect… logs in; its object is the host.
     static let loginOpenedNotification = Notification.Name("JustSessions.SSHLoginOpened")
 
-    /// A tab this reconnected that drops again this soon is left ended, so a connection that keeps failing is not
-    /// reconnected over and over. The Mac waking, the app coming forward, or a login opening tries it again.
     static let shortestRunBeforeReconnectingAgain: TimeInterval = 60
 
     private let registry: WorkspaceWindowRegistry
-    /// The JustSessions tmux sessions running on the host, or nil when it couldn't be asked. Runs off the main actor.
     private let listTmuxSessions: @Sendable (String) -> Set<String>?
     private let currentDate: () -> Date
-    /// Whether it asks each host once due on its own; tests ask with `askDueHosts()` instead.
     private let wakesItselfUp: Bool
     private var schedule = RemoteTabReconnectSchedule()
     private var hostsBeingAsked: Set<String> = []
-    /// Tabs whose CLI the host no longer ran when asked.
     private var tabsWhoseCLIEnded: Set<UUID> = []
-    /// When this reconnected each tab it made, by the new tab's id.
     private var reconnectedAtByTab: [UUID: Date] = [:]
     private var wakeUp: Task<Void, Never>?
     private var observers: [any NSObjectProtocol] = []
@@ -71,7 +57,6 @@ final class RemoteTabReconnector {
         ]
     }
 
-    /// Whether the host is being asked now; its answer hasn't come yet.
     func isAsking(_ host: String) -> Bool {
         hostsBeingAsked.contains(host)
     }
@@ -89,8 +74,6 @@ final class RemoteTabReconnector {
         scheduleWakeUp()
     }
 
-    /// Tries every dropped tab again whose CLI wasn't found ended, also one whose tries gave up, on every host or only
-    /// on `onlyOn`.
     func tryAgain(onlyOn onlyHost: String? = nil) {
         let now = currentDate()
         let tabs = registry.stores.flatMap(\.terminalSessions)
@@ -108,8 +91,6 @@ final class RemoteTabReconnector {
         scheduleWakeUp()
     }
 
-    /// Asks each host that is due, unless it is being asked already or needs Connect…, which counts as a failure. A
-    /// host that was removed or disconnected from is given up.
     func askDueHosts() {
         pruneHostsWithoutCandidates()
         let now = currentDate()

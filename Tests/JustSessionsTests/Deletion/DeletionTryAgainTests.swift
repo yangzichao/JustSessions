@@ -3,13 +3,11 @@ import Testing
 
 @testable import JustSessions
 
-/// Try Again in the alert after a deletion lost its connection to a host.
 @MainActor
 struct DeletionTryAgainTests {
     @Test func tryAgainDeletesExactlyTheFailedSessionsStillListedAndDeletable() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
-        // Newest first, the order deletion goes in.
         let onDevbox = try (0..<6).map {
             try sandbox.savedConversation(onHost: "devbox", title: "Remote \($0)", updatedAt: Date.now.addingTimeInterval(-Double($0) * 60))
         }
@@ -20,7 +18,6 @@ struct DeletionTryAgainTests {
             refusedSessionIDs: [refused.sessionID],
             refusalReason: "Permission denied"
         )
-        // The third deletion on devbox loses the connection; later ones go through.
         let hosts = SimulatedSSHHosts { _, attempt in attempt == 3 ? SimulatedSSHHosts.connectionLost : SimulatedSSHHosts.deleted }
         let store = sandbox.makeStore(listing: onDevbox + [refused], adapters: [refusingAdapter], remoteDeletion: hosts.deletion)
 
@@ -31,7 +28,6 @@ struct DeletionTryAgainTests {
         #expect(alert.retryConversationIDs == Set(onDevbox.dropFirst(2).map(\.id)))
         #expect(hosts.attempts(on: "devbox") == 3)
 
-        // Meanwhile one of them was opened, so it can't be deleted now.
         store.tmuxSessionNamesByHost[.ssh("devbox")] = [TmuxSessionName.forConversation(onDevbox[5])]
         store.dismissError()
         store.retryDeletion(of: alert.retryConversationIDs)
@@ -43,8 +39,6 @@ struct DeletionTryAgainTests {
         #expect(store.alert == nil)
     }
 
-    /// The alert can appear while a scan of this Mac starts, as when one waited for the deletion. Try Again on
-    /// sessions on this Mac then waits for the scan.
     @Test func tryAgainDuringAScanOfThisMacRunsWhenTheScanEnds() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
@@ -63,21 +57,17 @@ struct DeletionTryAgainTests {
         #expect(store.alert == nil)
     }
 
-    /// The same after a deletion, whose waiting refresh of the host starts as the alert appears. Only a refresh
-    /// of the host the sessions are on holds the retry up.
     @Test func tryAgainDuringARefreshOfTheSSHHostRunsWhenTheRefreshEnds() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
         let session = try sandbox.savedConversation(onHost: "devbox", title: "Refactor")
         let onBuildbox = try sandbox.savedConversation(onHost: "buildbox", title: "Elsewhere")
-        // The first two tries lose the connection; the third deletes the session.
         let hosts = SimulatedSSHHosts { _, attempt in attempt <= 2 ? SimulatedSSHHosts.connectionLost : SimulatedSSHHosts.deleted }
         let store = sandbox.makeStore(listing: [session, onBuildbox], remoteDeletion: hosts.deletion)
         store.delete(session)
         try await expectEventually { !store.isDeletingSessions }
         let retryConversationIDs = try #require(store.alert?.retryConversationIDs)
 
-        // A refresh of another host does not hold the retry up.
         store.refreshRemoteHost("buildbox", discovery: try Self.discoveryThatFailsWithoutSSH(in: sandbox))
         store.dismissError()
         store.retryDeletion(of: retryConversationIDs)
@@ -85,7 +75,6 @@ struct DeletionTryAgainTests {
         try await expectEventually { !store.isDeletingSessions && store.hostRefreshStatuses[.ssh("buildbox")] != .refreshing }
         #expect(hosts.attempts(on: "devbox") == 2)
 
-        // A refresh of devbox does, until it ends.
         store.refreshRemoteHost("devbox", discovery: try Self.discoveryThatFailsWithoutSSH(in: sandbox))
         #expect(store.hostRefreshStatuses[.ssh("devbox")] == .refreshing)
         store.dismissError()
@@ -97,14 +86,11 @@ struct DeletionTryAgainTests {
         #expect(store.conversations.map(\.id) == [onBuildbox.id])
         #expect(store.queuedDeletionConversationIDs.isEmpty)
         #expect(store.alert == nil)
-        // Started once: later refreshes find nothing waiting.
         store.refreshRemoteHost("devbox", discovery: try Self.discoveryThatFailsWithoutSSH(in: sandbox))
         try await expectEventually { store.hostRefreshStatuses[.ssh("devbox")] != .refreshing }
         #expect(hosts.attempts(on: "devbox") == 3)
     }
 
-    /// Removing the host whose refresh held a retry up lets the retry of the other hosts' sessions start; that
-    /// host's refresh then ends without reporting.
     @Test func tryAgainWaitingForAHostThatIsRemovedStartsAtOnce() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
@@ -161,12 +147,12 @@ struct DeletionTryAgainTests {
         #expect(store.alert?.title == "Couldn't delete “Refactor”")
     }
 
-    /// Its mirror would go inside a regular file, so the copy fails before any `rsync` or `ssh` runs.
     private static func discoveryThatFailsWithoutSSH(in sandbox: DeletionSandbox) throws -> RemoteSessionDiscovery {
         let notAFolder = sandbox.directory.appendingPathComponent("not-a-folder")
         if !FileManager.default.fileExists(atPath: notAFolder.path) {
             try "".write(to: notAFolder, atomically: true, encoding: .utf8)
         }
-        return RemoteSessionDiscovery(mirror: RemoteSessionMirror(cacheRoot: notAFolder, sourceHomeOverride: sandbox.directory.path))
+        return RemoteSessionDiscovery(
+            mirror: RemoteSessionMirror(cacheRoot: notAFolder, hostAccess: .standIn(home: sandbox.directory.path)))
     }
 }

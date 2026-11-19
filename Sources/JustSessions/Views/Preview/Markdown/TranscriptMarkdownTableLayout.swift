@@ -1,20 +1,11 @@
 import SwiftUI
 
-/// Lays out a Markdown table's cells in the reader (RDR-04), as a browser lays out a table: each column as wide as its
-/// widest cell while the table fits `availableWidth`; otherwise the widest columns give up width first, down to
-/// `minimumColumnWidth` or, when wider, the column's longest word (`minimumWidths`), and their cells wrap. Each row is as tall as its tallest cell at its column's width, measured at
-/// that width, so a wrapped cell never runs into the row below. A table whose columns can't fit even then is wider than
-/// `availableWidth`, and its scroll view scrolls sideways.
-///
-/// The cells come row by row, `rowCellCounts` of them in each row; a short row leaves its last columns empty.
 struct TranscriptMarkdownTableLayout: Layout {
     static let minimumColumnWidth: CGFloat = 120
-    /// A word wider than this, such as a URL or a hash, may break rather than widen its column further.
     static let maximumWordWidth: CGFloat = 240
 
     let rowCellCounts: [Int]
     let availableWidth: CGFloat
-    /// Each column's longest word with its cell's padding, below which its cells would break a word.
     var minimumWidths: [CGFloat] = []
 
     struct Cache {
@@ -48,7 +39,6 @@ struct TranscriptMarkdownTableLayout: Layout {
         }
     }
 
-    /// Each cell is measured twice at most, at its ideal width and at its column's, and the text view keeps each.
     private func measure(_ subviews: Subviews, into cache: inout Cache) {
         guard !cache.isMeasured else { return }
         let columnCount = rowCellCounts.max() ?? 0
@@ -77,16 +67,12 @@ struct TranscriptMarkdownTableLayout: Layout {
         cache = Cache(columnWidths: columnWidths, rowHeights: rowHeights, isMeasured: true)
     }
 
-    /// The ideal widths while they fit; otherwise the widest are cut to one shared width, as water fills, so the columns
-    /// fill `availableWidth`, none cut below its minimum or narrower than it was. When even the minimums don't fit,
-    /// those. Whole points.
     static func columnWidths(idealWidths: [CGFloat], minimumWidths: [CGFloat], availableWidth: CGFloat) -> [CGFloat] {
         let ideal = idealWidths.map { $0.rounded(.up) }
         guard ideal.reduce(0, +) > availableWidth else { return ideal }
         let lowest = ideal.indices.map { min(ideal[$0], ($0 < minimumWidths.count ? minimumWidths[$0] : 0).rounded(.up)) }
         guard lowest.reduce(0, +) < availableWidth else { return lowest }
         func widths(cappedAt cap: CGFloat) -> [CGFloat] { ideal.indices.map { max(lowest[$0], min(ideal[$0], cap)) } }
-        // The total grows with the cap, so the cap that fills the width is found by halving.
         var low: CGFloat = 0
         var high = ideal.max() ?? 0
         for _ in 0..<48 {

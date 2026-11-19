@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// The sidebar icon that hides or shows the sidebar, with a faint fill under the pointer.
 struct SidebarToggleButton: View {
     static let width: CGFloat = 28
 

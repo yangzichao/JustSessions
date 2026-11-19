@@ -1,7 +1,5 @@
 import Foundation
 
-/// Crash reports in the shape macOS writes them, a line of JSON about the report and then the report as JSON, with
-/// made-up frames and paths.
 enum CrashReportSamples {
     static let bundleIdentifier = "dev.zichaoyang.justsessions"
 
@@ -25,8 +23,6 @@ enum CrashReportSamples {
         return json(header, options: []) + "\n" + json(body, options: [.prettyPrinted])
     }
 
-    /// A Swift runtime error off the main thread: one frame with its source file, one without a symbol, and one
-    /// whose image the report does not list.
     static func swiftRuntimeErrorBody() -> [String: Any] {
         [
             "procPath": "/Users/someone/Applications/JustSessions.app/Contents/MacOS/JustSessions",
@@ -61,7 +57,6 @@ enum CrashReportSamples {
         ]
     }
 
-    /// An Objective-C exception: the crashed thread only aborts, and the exception's own backtrace says where it was raised.
     static func objectiveCExceptionBody() -> [String: Any] {
         [
             "exception": ["type": "EXC_CRASH", "signal": "SIGABRT"],
@@ -89,8 +84,6 @@ enum CrashReportSamples {
         ]
     }
 
-    /// A crashed thread of `frameCount` frames, each with a symbol of `symbolLength` characters, and an Objective-C
-    /// exception backtrace as long.
     static func longBacktraceBody(frameCount: Int, symbolLength: Int) -> [String: Any] {
         let frames: [[String: Any]] = (0..<frameCount).map { index in
             ["imageIndex": 0, "symbol": "frame\(index)_" + String(repeating: "x", count: symbolLength)]
@@ -104,7 +97,6 @@ enum CrashReportSamples {
         ]
     }
 
-    /// One crashed frame whose symbol is `symbol`.
     static func oneFrameBody(symbol: String) -> [String: Any] {
         [
             "exception": ["type": "EXC_BAD_ACCESS", "signal": "SIGSEGV"],

@@ -1,9 +1,6 @@
 import Darwin
 import Foundation
 
-/// This test run's copy of each distinct stand-in script; see `writeExecutableScript(_:to:)`. A stand-in a test writes is
-/// a hard link to the copy of its script, which macOS checks only the first time any test runs it. The copies are kept
-/// in a folder of this process's own, and a later run removes the folders of runs that have ended.
 final class StandInScripts: @unchecked Sendable {
     static let shared = StandInScripts()
 
@@ -18,7 +15,6 @@ final class StandInScripts: @unchecked Sendable {
         folder = temporaryDirectory.appendingPathComponent(Self.folderPrefix + String(getpid()), isDirectory: true)
     }
 
-    /// Makes `file` a hard link to this run's copy of `script`, replacing what was there, as writing the file would.
     func link(_ script: String, to file: URL) throws {
         let copy = try self.copy(of: script)
         try? FileManager.default.removeItem(at: file)

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The parts of `RemoteTmuxAttachScript` a real tmux on this Mac can't show: which tmux versions get the options that
-/// keep a failed CLI's pane, how its captured output is trimmed, and a tmux that can't reach its server.
 @Suite(.oneTmuxSandboxAtATime)
 struct RemoteTmuxAttachScriptTests {
     /// `remain-on-exit failed` came in tmux 3.2; an older one would show "Bad value" in the tab.
@@ -16,7 +14,6 @@ struct RemoteTmuxAttachScriptTests {
     func keepsAFailedCLIsPaneFromTmux32(version: String, keepsPane: Bool) throws {
         let sandbox = try TmuxSandbox(tmuxDirectory: nil)
         defer { sandbox.tearDown() }
-        // Answers `-V`, records what a new session is started with, and finds no session.
         try sandbox.addProgram(
             named: "tmux",
             script: """
@@ -40,7 +37,6 @@ struct RemoteTmuxAttachScriptTests {
         #expect(arguments.contains("pane-died") == keepsPane)
     }
 
-    /// As after tmux was upgraded on the host while its old server kept running: every tmux command fails at once.
     @Test func aTmuxThatCantReachItsServerEndsTheTabWithItsStatus() throws {
         let sandbox = try TmuxSandbox(tmuxDirectory: nil)
         defer { sandbox.tearDown() }

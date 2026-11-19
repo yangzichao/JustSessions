@@ -1,12 +1,9 @@
 import Foundation
 
-/// Entries, page after page, into map blocks. Tool calls and their images merge into one run however pages fall, with
-/// no 50-summary cap (unlike TranscriptPageAssembler.swift:9-15), so blocks never depend on page sizes.
 struct ConversationOutlineBuilder {
     static let columns = 80
     static let maximumLinesPerMessage = 24
     static let maximumLinesPerToolRun = 4
-    /// Enough of a reply's head for its 80-character snippet; the rest is never parsed as Markdown.
     static let snippetSourceLength = 400
     typealias Block = ConversationOutline.Block
 
@@ -27,7 +24,7 @@ struct ConversationOutlineBuilder {
                     Block(
                         entryID: entry.id, lastRecord: record, kind: .image, timestamp: entry.timestamp,
                         snippet: "", lineWidths: [12], toolCallCount: 0))
-            case .note: continue  // left out; doesn't break a run
+            case .note: continue
             }
         }
     }
@@ -58,12 +55,6 @@ struct ConversationOutlineBuilder {
         }
     }
 
-    /// The bookmark snippet's rule (MessageBookmarkNavigation.swift:17-27): a user message's own text, a reply's first
-    /// `snippetSourceLength` characters, so a 12,000-character reply's Markdown is never parsed whole. The reader parses
-    /// the whole reply, so the two differ when Markdown crosses character 400 or the head runs out of words; a bookmark's
-    /// chip then falls back to its ID (ConversationOutline.blockIndex(for:)). A Markdown-inert
-    /// head isn't parsed at all (PERF-90): its paragraphs hold the same words with less whitespace, so they give the same
-    /// snippet unless the 320-character cut ended the head's words.
     static func snippet(of entry: TranscriptEntry) -> String {
         guard case .assistantMessage(let text) = entry.content else { return MessageBookmarkNavigation.snippet(of: entry) ?? "" }
         let head = String(text.prefix(snippetSourceLength))
@@ -86,7 +77,7 @@ struct ConversationOutlineBuilder {
             var atLineStart = true
             var leadingSpaces = 0
             var trailingSpaces = 0
-            var previous: UInt8 = 0  // the last byte but a space or LF
+            var previous: UInt8 = 0
             for byte in bytes {
                 switch byte {
                 case UInt8(ascii: "\n"):
@@ -116,8 +107,6 @@ struct ConversationOutlineBuilder {
         } ?? false
     }
 
-    /// Line lengths in map columns, counting UTF-8 lead bytes (not graphemes) over at most maximumLines × columns × 4 bytes.
-    /// Wraps at `columns`; blank lines at the ends go; a run of blank lines inside is one 0.
     static func lineWidths(of text: String, maximumLines: Int) -> [UInt8] {
         var widths: [UInt8] = []
         var column = 0
@@ -147,8 +136,6 @@ struct ConversationOutlineBuilder {
 
     static func makesBlock(_ entry: TranscriptEntry) -> Bool { Block.Kind(entry.content) != nil }
 
-    /// Where an update reads again from: the last block's first record, moved back while the block before reaches into
-    /// it (as a reply and its tool calls share a Claude record), so every kept block ends before it.
     static func resumePoint(in blocks: [Block]) -> (keptCount: Int, record: Int)? {
         guard var cut = blocks.indices.last else { return nil }
         var record = blocks[cut].record
@@ -159,8 +146,6 @@ struct ConversationOutlineBuilder {
         return (cut, record)
     }
 
-    /// The record read again still starts with the same block: its kind, and for a message the first 40 characters of
-    /// its snippet, ignoring case, as `MessageBookmarkNavigation.matches` allows a reply to grow (:29-34).
     static func startsLike(_ block: Block, _ entry: TranscriptEntry) -> Bool {
         guard TranscriptPageIdentity.record(for: entry.id) == block.record, Block.Kind(entry.content) == block.kind else { return false }
         return !block.isMessage || snippet(of: entry).lowercased().hasPrefix(block.snippet.prefix(40).lowercased())

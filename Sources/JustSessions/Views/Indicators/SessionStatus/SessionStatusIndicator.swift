@@ -1,14 +1,9 @@
 import SwiftUI
 
-/// What a session's CLI is doing, as one small glyph: a turning arc while it works, an amber mark while it needs
-/// your input, a blue dot once it finished a turn you have not seen, a green dot while it runs otherwise, a hollow
-/// circle once it ended in a tab still open, and a dotted circle on a reopened tab that has not started yet.
 struct SessionStatusIndicator: View {
     let status: SessionRunStatus
-    /// The tooltip and accessibility label; the status's own summary unless given.
     var description: String?
 
-    /// For a CLI running in tmux with no tab open, which clicking the session reattaches to.
     static func descriptionOfDetachedCLI(_ status: SessionRunStatus, on host: SessionHost) -> String {
         "\(status.summary) · in tmux on \(host.nameInSentence), no tab open; click to reattach"
     }

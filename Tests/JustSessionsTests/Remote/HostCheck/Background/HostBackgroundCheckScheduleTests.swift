@@ -26,21 +26,19 @@ struct HostBackgroundCheckScheduleTests {
         #expect(
             reason(keptCheck: passedCheck, refreshMinutesAgo: 1, tmuxServerProblem: "protocol version mismatch")
                 == .tmuxServerUnreachable)
-        // The refresh came before the check, so the check knows better.
         #expect(reason(keptCheck: passedCheck, refreshMinutesAgo: 31, tmuxServerProblem: "protocol version mismatch") == nil)
 
-        let tmuxProblemCheck = check(minutesAgo: 30, findings: [finding("tmux", .problem)])
+        let tmuxProblemCheck = check(minutesAgo: 30, findings: [finding(.tmux, .problem)])
         #expect(reason(keptCheck: tmuxProblemCheck, refreshMinutesAgo: 1) == .tmuxServerReachableAgain)
         #expect(reason(keptCheck: tmuxProblemCheck, refreshMinutesAgo: 1, tmuxServerProblem: "server exited unexpectedly") == nil)
     }
 
     @Test func aCheckThatCouldntFinishIsCheckedAgainWithinTheHourOnceARefreshWorked() {
-        let unfinishedCheck = { (minutesAgo: Double) in self.check(minutesAgo: minutesAgo, findings: [self.finding("script", .problem)]) }
+        let unfinishedCheck = { (minutesAgo: Double) in self.check(minutesAgo: minutesAgo, findings: [self.finding(.script, .problem)]) }
         #expect(reason(keptCheck: unfinishedCheck(59), refreshMinutesAgo: 1) == nil)
         #expect(reason(keptCheck: unfinishedCheck(60), refreshMinutesAgo: 1) == .refreshWorkedSinceUnfinishedCheck)
         #expect(reason(keptCheck: unfinishedCheck(60), refreshMinutesAgo: 61) == nil)
-        // A problem a refresh can't tell about waits for the day.
-        #expect(reason(keptCheck: check(minutesAgo: 60, findings: [finding("cli-claude", .problem)]), refreshMinutesAgo: 1) == nil)
+        #expect(reason(keptCheck: check(minutesAgo: 60, findings: [finding(.cli(.claude), .problem)]), refreshMinutesAgo: 1) == nil)
     }
 
     private func reason(
@@ -64,13 +62,13 @@ struct HostBackgroundCheckScheduleTests {
                 host: "devbox",
                 checkedAt: now.addingTimeInterval(-minutesAgo * 60),
                 thisMacSummary: "",
-                findings: [finding("connection", .passed)] + findings
+                findings: [finding(.connection, .passed)] + findings
             ),
             appVersion: appVersion
         )
     }
 
-    private func finding(_ id: String, _ status: HostCheckFinding.Status) -> HostCheckFinding {
-        HostCheckFinding(id: id, status: status, title: id, summary: "")
+    private func finding(_ id: HostCheckFindingID, _ status: HostCheckFinding.Status) -> HostCheckFinding {
+        HostCheckFinding(id: id, status: status, title: id.rawValue, summary: "")
     }
 }

@@ -3,11 +3,8 @@ import Testing
 
 @testable import JustSessions
 
-/// Splitting and grouping only arrange tabs: each tab keeps its own terminal, drawn by the engine it opened with, so
-/// a Ghostty tab and a SwiftTerm tab can share a split or a group.
 @MainActor
 struct TerminalEngineSplitAndGroupTests {
-    /// `engine` draws the first tab; the second opens after switching to the other engine.
     @Test(arguments: TerminalEngine.allCases)
     func joiningTabsIntoASplitKeepsEachTabsTerminalAndEngine(_ engine: TerminalEngine) throws {
         let sandbox = try TerminalEngineLaunchSandbox(engine: engine)
@@ -22,7 +19,6 @@ struct TerminalEngineSplitAndGroupTests {
         try #require(tabs.engines == [engine, engine.otherEngine])
         let (first, second) = (store.terminalSessions[0], store.terminalSessions[1])
 
-        // The tab from the other project joins the selected tab's split, and its group.
         store.selectTerminal(first.id)
         store.splitSelectedTerminal(with: second.id)
         let split = try #require(store.shownSplit)
@@ -37,8 +33,6 @@ struct TerminalEngineSplitAndGroupTests {
         tabs.expectKept(in: store)
     }
 
-    /// `engine` draws the first tab of each project; the second tab of the first project opens after switching to the
-    /// other engine, and joins its project's group.
     @Test(arguments: TerminalEngine.allCases)
     func groupingTabsKeepsEachTabsTerminalAndEngine(_ engine: TerminalEngine) throws {
         let sandbox = try TerminalEngineLaunchSandbox(engine: engine)
@@ -52,7 +46,6 @@ struct TerminalEngineSplitAndGroupTests {
         sandbox.engineStore.setEngine(engine.otherEngine)
         store.openPlainTerminal(in: sandbox.projectLocation)
         let tabs = TabTerminals(store)
-        // The new tab joined its project's tabs, before the other project's.
         try #require(tabs.engines == [engine, engine.otherEngine, engine])
         let projectGroupKey = sandbox.projectLocation.key
         #expect(store.tabGroupKeys == [projectGroupKey, projectGroupKey, otherLocation.key])
@@ -69,11 +62,9 @@ struct TerminalEngineSplitAndGroupTests {
     }
 }
 
-/// Each open tab's terminal view and engine, by tab, to compare after the tabs are arranged.
 @MainActor
 private struct TabTerminals {
     private let terminalsByTabID: [UUID: (view: any TabTerminalView, engine: TerminalEngine)]
-    /// In tab bar order when recorded.
     let engines: [TerminalEngine]
 
     init(_ store: ConversationStore) {

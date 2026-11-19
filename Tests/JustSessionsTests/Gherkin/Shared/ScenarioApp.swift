@@ -3,11 +3,8 @@ import XCTest
 
 @testable import JustSessions
 
-/// The app one scenario runs: a store whose one adapter lists the sessions the scenario gives it, with files in a
-/// temporary folder and settings in a suite of their own. Sessions are called by the title they were first listed with.
 @MainActor
 final class ScenarioApp {
-    /// As long as `expectEventually`'s, for the same stall at the start of a full run; a passing step returns at once.
     static let timeout: Duration = .seconds(120)
 
     let provider: ConversationProvider
@@ -22,10 +19,8 @@ final class ScenarioApp {
         temporaryDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("gherkin-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: temporaryDirectory, withIntermediateDirectories: true)
         adapter = ChangingConversationAdapter(provider: provider)
-        // Named by a path in the scenario's folder, as `IsolatedUserDefaults` is, so no plist is left behind.
         let suiteName = temporaryDirectory.appendingPathComponent("settings").path
         userDefaultsSuiteName = suiteName
-        // No tmux in reach, so a tab that follows its CLI never renames a session on the app's own tmux server.
         let commandResolver = NativeCLICommandResolver(
             searchDirectories: [temporaryDirectory.path],
             inheritedEnvironment: ["TMUX_TMPDIR": temporaryDirectory.path],
@@ -49,7 +44,6 @@ final class ScenarioApp {
         temporaryDirectory.appendingPathComponent("project").path
     }
 
-    /// Tabs never start their process here: no view shows them.
     var command: NativeCLICommand {
         NativeCLICommand(executablePath: "/usr/bin/true", arguments: [], workingDirectory: projectPath, environment: [])
     }
@@ -67,7 +61,6 @@ final class ScenarioApp {
         store.conversations.contains { store.title(for: $0) == title }
     }
 
-    /// A session a CLI is in that no file names yet, such as a thread Codex saves with its first prompt.
     @discardableResult
     func reserveSessionID(labeled label: String) -> String {
         let sessionID = makeSessionID()
@@ -80,7 +73,6 @@ final class ScenarioApp {
         try await refreshUntilListed(listedSessionID)
     }
 
-    /// The next refresh lists it. Without a `sessionID`, it keeps one reserved for `label`.
     @discardableResult
     func addSessionWithoutListing(labeled label: String, sessionID: String? = nil) -> String {
         let sessionID = sessionID ?? sessionIDsByLabel[label] ?? makeSessionID()
@@ -107,7 +99,6 @@ final class ScenarioApp {
         return true
     }
 
-    /// In the tool's own format; see `ConversationProvider.isValidSessionID`.
     private func makeSessionID() -> String {
         let uuid = UUID().uuidString.lowercased()
         return provider == .opencode ? "ses_" + uuid.replacingOccurrences(of: "-", with: "").prefix(26) : uuid

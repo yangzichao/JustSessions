@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// When the store checks an SSH host's shell startup, and what it does with the result; see
-/// `ConversationStore+RemoteShellStartup`. Each test has a host of its own, since the startups are the app's.
 @MainActor
 struct RemoteShellStartupStoreTests {
     private static let marker = "__JUSTSESSIONS_SHELL_STARTUP_OK__\r\n"
@@ -22,7 +20,6 @@ struct RemoteShellStartupStoreTests {
         #expect(store.shellStartupCheck(on: host) == expected)
         #expect(RemoteShellStartupChecks.load(from: settings.userDefaults).result(for: host) == expected)
         #expect(RemoteHostShellStartups.shared.startup(on: host) == .loginOnly)
-        // The new startup refreshes the host, which fails here and checks it again; that check finds nothing new.
         try await expectEventually { !store.hostsCheckingShellStartup.contains(host) }
         #expect(store.shellStartupCheck(on: host) == expected)
     }
@@ -42,7 +39,6 @@ struct RemoteShellStartupStoreTests {
         #expect(runs.count == 2)
     }
 
-    /// Check this host… checks it again; see `HostCheckStoreTests`.
     @Test func aBlockedHostIsNotCheckedAgainOnARefresh() async throws {
         let runs = CheckRuns([(0, Self.marker)])
         let (store, settings, host) = try makeStore(saved: .blocked, check: runs.check)
@@ -77,7 +73,6 @@ struct RemoteShellStartupStoreTests {
         #expect(RemoteShellStartupChecks.load(from: settings.userDefaults).result(for: host) == nil)
     }
 
-    /// Such a startup can make the refresh itself fail, as when it starts tmux in the shell an OpenCode snapshot runs in.
     @Test func aRefreshThatFailsChecksTheHost() async throws {
         let runs = CheckRuns([(nil, Self.takeover), (0, Self.marker)])
         let (store, settings, host) = try makeStore(check: runs.check)
@@ -105,7 +100,6 @@ struct RemoteShellStartupStoreTests {
         #expect(store.shellStartupCheck(on: host) == nil)
     }
 
-    /// Windows' shell runs none of the check's commands, so a check would only blame the host's startup.
     @Test func aWindowsHostSaysSoAndIsNotChecked() async throws {
         let runs = CheckRuns([(1, "'exec' is not recognized as an internal or external command,\r\n")])
         let (store, settings, host) = try makeStore(check: runs.check)
@@ -115,7 +109,7 @@ struct RemoteShellStartupStoreTests {
         let windows = RemoteSessionDiscovery(
             mirror: RemoteSessionMirror(
                 cacheRoot: cacheRoot,
-                sourceHomeOverride: cacheRoot.path,
+                hostAccess: .standIn(home: cacheRoot.path),
                 toolFoldersLookup: { host in throw RemoteSessionMirrorError.sshFailed(host: host, problem: .windowsHost) }
             ))
 
@@ -127,14 +121,13 @@ struct RemoteShellStartupStoreTests {
         #expect(runs.count == 0)
     }
 
-    /// Its copy's folder is a file, so the refresh fails before it would run `ssh`.
     private static func discoveryThatFailsWithoutSSH() throws -> RemoteSessionDiscovery {
         let notAFolder = FileManager.default.temporaryDirectory.appendingPathComponent("not-a-folder-\(UUID().uuidString.prefix(8))")
         try "".write(to: notAFolder, atomically: true, encoding: .utf8)
         return RemoteSessionDiscovery(
             mirror: RemoteSessionMirror(
                 cacheRoot: notAFolder,
-                sourceHomeOverride: FileManager.default.temporaryDirectory.path
+                hostAccess: .standIn(home: FileManager.default.temporaryDirectory.path)
             ))
     }
 
@@ -164,7 +157,6 @@ struct RemoteShellStartupStoreTests {
     }
 }
 
-/// A check whose runs answer with the recorded results, in order, and that counts them.
 private final class CheckRuns: @unchecked Sendable {
     private let lock = NSLock()
     private var results: [(exitStatus: Int32?, output: String)]

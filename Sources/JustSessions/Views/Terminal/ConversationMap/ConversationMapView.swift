@@ -1,18 +1,13 @@
 import SwiftUI
 
-/// A shown CLI tab's map: follows its session while its window is on screen, draws it in one Canvas, and opens the
-/// reading window where clicked. Reads its tab's outline, the session's bookmarks, and its window's visibility, never
-/// the selected tab (performance.md item 25).
 struct ConversationMapView: View {
     let model: ConversationOutlineModel
     let conversation: Conversation?
     let provider: ConversationProvider
     let store: ConversationStore
     let hover: ConversationMapHover
-    /// Opens Edit Bookmark… from a letter's right-click menu; nil leaves the menu out, as in tests.
     var editor: MessageBookmarkEditorRequests? = nil
     @State private var isWindowVisible = false
-    /// How far a long conversation is scrolled (TAB-10); nil follows the newest rows.
     @State private var offsetFromTop: CGFloat?
     @Environment(\.tabBarTerminalPalette) private var terminalPalette
     @Environment(\.displayScale) private var displayScale
@@ -23,7 +18,6 @@ struct ConversationMapView: View {
         let isOnScreen: Bool
     }
 
-    /// The reader's key (TranscriptPagingModel), so a relink (/clear) follows the new session.
     private var followKey: FollowKey {
         FollowKey(source: conversation.map { $0.id + "|" + $0.sourceFile.path }, isOnScreen: isWindowVisible)
     }
@@ -33,7 +27,6 @@ struct ConversationMapView: View {
     var body: some View {
         let colors = ConversationMapColors(palette: terminalPalette, provider: provider)
         let bookmarks = conversation.map { store.messageBookmarks.bookmarks(forConversationID: $0.id) } ?? []
-        // A ZStack, not a Group: while the first read runs it shows nothing else, and the reader and task still need a view.
         ZStack(alignment: .top) {
             WindowVisibilityReader { isWindowVisible = $0 }
                 .accessibilityHidden(true)
@@ -46,10 +39,8 @@ struct ConversationMapView: View {
             } else if model.couldNotRead {
                 ConversationMapEmptyState(text: "Could not read this session", color: colors.caption)
             }
-            // Otherwise the first read is running: the background only, no spinner (performance.md item 19).
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        // Another session starts at its newest rows.
         .onChange(of: conversation?.id) { offsetFromTop = nil }
         .task(id: followKey, priority: .utility) {
             guard followKey.isOnScreen, let conversation else { return }
@@ -75,7 +66,6 @@ struct ConversationMapView: View {
                 titles: ConversationMapChipTitles.titles(for: bookmarks, side: chipSide, factor: factor))
             ZStack(alignment: .topLeading) {
                 ConversationMapScrollReader(isScrollable: layout.isScrollable) { distance in
-                    // From the state, not this layout, so scroll events between two redraws all count.
                     let current = ConversationMapLayout(
                         rowCount: outline.rowCount, height: geometry.size.height,
                         naturalPitch: ConversationMapMetrics.naturalRowPitch,
@@ -113,7 +103,6 @@ struct ConversationMapView: View {
                     hover.hide()
                 }
             }
-            // A growing, squeezed, or scrolled outline moves the blocks under a still pointer: rebuild its card where it points.
             .onChange(of: outline.revision) {
                 if let point = hover.point {
                     showCard(at: point, outline: outline, layout: layout, chips: chips, bookmarks: bookmarks, size: geometry.size)
@@ -158,13 +147,11 @@ struct ConversationMapView: View {
         .accessibilityIdentifier("terminal.conversation-map")
     }
 
-    /// Opens the session's reading window, or moves the one open, without selecting anything (RDR-45, RDR-50).
     private func open(_ navigation: SessionReadingNavigation?, _ conversation: Conversation) {
         SessionReadingWindowManager.shared.open(
             store.conversation(withID: conversation.id) ?? conversation, store: store, navigation: navigation)
     }
 
-    /// The card for the block under the pointer, or under the chip there. Rebuilt only when that block or the outline changes.
     private func showCard(
         at point: CGPoint, outline: ConversationOutline, layout: ConversationMapLayout,
         chips: [ConversationMapLayout.Chip], bookmarks: [MessageBookmark], size: CGSize
@@ -202,7 +189,6 @@ struct ConversationMapView: View {
                 letter: bookmark?.letter,
                 label: bookmark?.label,
                 tags: bookmark?.tags ?? [],
-                // Room for the card's height: more with a label or tags.
                 top: min(
                     max(0, rowY - 8),
                     max(0, size.height - InterfaceScale.points(bookmark?.label != nil || bookmark?.tags.isEmpty == false ? 170 : 110))),
@@ -213,8 +199,6 @@ struct ConversationMapView: View {
     }
 }
 
-/// The map's one Canvas: no view per block, no TimelineView, no animation. Equal by outline revision, layout, chips,
-/// colors, and pixel, so a parent update or a hover never redraws it.
 struct ConversationMapCanvas: View, Equatable {
     let outline: ConversationOutline
     let layout: ConversationMapLayout
@@ -239,12 +223,10 @@ struct ConversationMapCanvas: View, Equatable {
             let chipX = size.width - ConversationMapMetrics.chipGap - chipSide
             let barsWidth = max(0, chipX - ConversationMapMetrics.chipGap - barsMinX)
             context.fill(Path(CGRect(x: 0, y: 0, width: pixel, height: size.height)), with: .color(Color(hexValue: colors.hairline)))
-            // Where the rows in view are among all of them, in the faint marks' color, while they scroll.
             if let thumb = layout.scrollThumb(minimumLength: scrollThumbMinimumLength) {
                 let rect = CGRect(x: pixel + 1, y: thumb.minY, width: scrollThumbWidth, height: thumb.height)
                 context.fill(Capsule().path(in: rect), with: .color(Color(hexValue: colors.hex(for: .toolRun))))
             }
-            // One path and one fill per ink.
             var paths: [ConversationMapLayout.Ink: Path] = [:]
             for bar in layout.bars(for: outline, pixel: pixel) {
                 paths[bar.ink, default: Path()].addRect(
@@ -258,7 +240,6 @@ struct ConversationMapCanvas: View, Equatable {
             let chipColor = Color(hexValue: colors.chip)
             for chip in chips {
                 let minX = ConversationMapLayout.chipMinX(of: chip, width: size.width)
-                // The tick, while its message's first row is in view.
                 if chip.rowY >= 0, chip.rowY <= size.height {
                     context.fill(
                         Path(CGRect(x: barsMinX, y: chip.rowY, width: max(0, minX - barsMinX), height: pixel)),
@@ -275,9 +256,6 @@ struct ConversationMapCanvas: View, Equatable {
     }
 }
 
-/// A right-click on a bookmark's letter offers Edit bookmark… and Remove bookmark (TAB-10). One clear square per chip,
-/// in drawing order, so where letters overlap the one on top takes it, as a click does (`ConversationMapLayout.bookmark(at:)`).
-/// A click on one opens its bookmark, as a click on the map there would, so it never depends on the map's own gesture.
 struct ConversationMapChipMenus: View {
     let chips: [ConversationMapLayout.Chip]
     let bookmarks: [MessageBookmark]
@@ -299,13 +277,12 @@ struct ConversationMapChipMenus: View {
                         Button("Remove bookmark \(bookmark.letter)") { onRemove(bookmark) }
                     }
                     .offset(x: ConversationMapLayout.chipMinX(of: chip, width: width), y: chip.chipY)
-                    .accessibilityHidden(true)  // the map's own element has these actions
+                    .accessibilityHidden(true)
             }
         }
     }
 }
 
-/// What the column says in place of a drawing, in the contrast-checked caption color.
 struct ConversationMapEmptyState: View {
     let text: LocalizedStringKey
     let color: UInt32
@@ -323,7 +300,6 @@ struct ConversationMapEmptyState: View {
 }
 
 enum ConversationMapAccessibility {
-    /// "N messages, M bookmarks", for VoiceOver.
     @MainActor static func value(messageCount: Int, bookmarkCount: Int, language: AppInterfaceLanguage?) -> String {
         let messages =
             messageCount == 1
@@ -338,7 +314,6 @@ enum ConversationMapAccessibility {
 }
 
 extension Color {
-    /// The map's opaque colors, worked out as 0xRRGGBB values from the terminal's palette (`ConversationMapColors`).
     init(hexValue: UInt32) {
         self.init(nsColor: NSColor(hexValue: hexValue))
     }

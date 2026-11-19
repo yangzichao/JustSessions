@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The CLI activity sync posting notifications, and clicks on them showing their session.
 @MainActor
 struct SessionNotificationSyncTests {
     @Test func aTabsCLIThatFinishesItsTurnNotifiesUnlessItsTabIsInView() async throws {
@@ -22,7 +21,6 @@ struct SessionNotificationSyncTests {
         await store.synchronizeCLIActivity(claudeRegistry: registry)
         #expect(tab.cliActivity == .working)
 
-        // The app is in front with the tab selected, so you see the turn end.
         notifier.isApplicationActive = true
         try CodexRolloutLines.append(CodexRolloutLines.text([CodexRolloutLines.turnCompleted()]), to: rolloutFile)
         await store.synchronizeCLIActivity(claudeRegistry: registry)
@@ -72,13 +70,11 @@ struct SessionNotificationSyncTests {
         await store.synchronizeCLIActivity(claudeRegistry: registry)
         #expect(tab.cliActivity == .working)
 
-        // The tab is not selected, but its terminal shows beside the selected one, so you see the turn end.
         try CodexRolloutLines.append(CodexRolloutLines.text([CodexRolloutLines.turnCompleted()]), to: rolloutFile)
         await store.synchronizeCLIActivity(claudeRegistry: registry)
         #expect(tab.cliActivity == .idle)
         #expect(notifier.notifications.isEmpty)
 
-        // Once the split ends, the tab is out of view and the next turn's end notifies.
         store.separateSplit(try #require(store.shownSplit).id)
         try CodexRolloutLines.append(CodexRolloutLines.text([CodexRolloutLines.turnStarted(at: cliStartedAt + 2)]), to: rolloutFile)
         await store.synchronizeCLIActivity(claudeRegistry: registry)
@@ -94,7 +90,6 @@ struct SessionNotificationSyncTests {
         let notifier = RecordingSessionNotifier()
         notifier.isApplicationActive = true
         let store = Self.makeStore(listing: [conversation], searching: directory, notifier: notifier)
-        // Stands in for the CLI in a tmux session whose tab closed.
         let cli = Process()
         cli.executableURL = URL(fileURLWithPath: StandInCLI.executablePath)
         cli.arguments = StandInCLI.arguments
@@ -137,14 +132,12 @@ struct SessionNotificationSyncTests {
 
         #expect(store.showTab(notifiedAbout: .tab(id: firstTab.id, conversationID: first.id)))
         #expect(store.selectedTerminalID == firstTab.id)
-        // The CLI ran in tmux with no tab when it notified; a tab opened on it since.
         #expect(store.showTab(notifiedAbout: .detachedTmux(conversationID: second.id)))
         #expect(store.selectedTerminalID == secondTab.id)
         #expect(!store.showTab(notifiedAbout: .detachedTmux(conversationID: "gone")))
         #expect(store.selectedTerminalID == secondTab.id)
     }
 
-    /// Finds no tmux, so the app's own tmux server is never asked.
     private static func makeStore(
         listing conversations: [Conversation],
         searching directory: URL,

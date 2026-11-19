@@ -32,7 +32,6 @@ struct TranscriptSearchStateRevealTests {
         #expect(state.selectedMatch == match(record: 7))
     }
 
-    /// The pages shown before can be searched before the pages around the entry arrive.
     @Test func theRevealedEntryIsPreferredUntilItsPagesAreSearched() {
         let state = TranscriptSearchState()
         state.reveal("cache", at: TranscriptPageIdentity.entryID(record: 50, part: 0))

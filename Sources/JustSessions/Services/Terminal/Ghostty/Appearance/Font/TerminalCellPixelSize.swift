@@ -1,9 +1,6 @@
 import AppKit
 import CoreText
 
-/// A terminal cell's size in pixels on a screen of `backingScaleFactor`, as SwiftTerm or Ghostty works it out for a
-/// font. The two measure and round differently, so the same font can give Ghostty cells a pixel narrower or wider and
-/// shorter; Ghostty's `adjust-cell-width` and `adjust-cell-height` take the difference.
 struct TerminalCellPixelSize: Equatable {
     var width: Int
     var height: Int

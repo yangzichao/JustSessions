@@ -28,7 +28,6 @@ struct TranscriptScrollRestorationTests {
         }
     }
 
-    /// A scroll view with one tall entry, 300 points high, starting 1,000 points down.
     @MainActor
     private struct Fixture {
         let controller: TranscriptScrollPositionController
@@ -40,7 +39,6 @@ struct TranscriptScrollRestorationTests {
             controller = TranscriptScrollPositionController(
                 conversationID: "conversation", positionStore: TranscriptReadingPositionStore(), initialPosition: .bottom
             )
-            // These tests exercise pending restoration and explicit handover, not elapsed-time settling.
             controller.settlingDuration = .infinity
             let scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 400, height: 300))
             scrollView.documentView = FlippedView(frame: NSRect(x: 0, y: 0, width: 400, height: 5_000))
@@ -90,8 +88,6 @@ struct TranscriptScrollRestorationTests {
         #expect(container.hitTest(point) === targetBeforeObserver)
     }
 
-    /// A page that loads above the entry moves it down; the restoration applies in the layout pass that moves it, so the
-    /// window never draws the content in between.
     @Test func aRestorationAroundAnEntryOnScreenAppliesDuringTheNextLayout() async throws {
         let fixture = Fixture()
         defer { fixture.close() }

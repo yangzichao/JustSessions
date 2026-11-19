@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// ⌘←, ⌘→, ⌘Delete, and ⌘Z reach the program as Ctrl-A, Ctrl-E, Ctrl-U, and Ctrl-_, from either engine.
 @MainActor
 @Suite(.serialized)
 struct TerminalEditingKeyTests {
@@ -53,8 +52,6 @@ struct TerminalEditingKeyTests {
         }
     }
 
-    /// ⌘D, ⌘', and ⇧⌘' are the Bookmarks menu's in a tab too (TRM-74): SwiftTerm hands every key it doesn't take to
-    /// `super` (SelectableTerminalView+EditingKeys.swift), so the menu gets them and the CLI never does.
     @Test func aSwiftTermTerminalLeavesTheBookmarkShortcutsToTheMenu() async throws {
         let fixture = try KeyRecordingTerminalFixture(engine: .swiftTerm)
         defer { fixture.tearDown() }
@@ -78,7 +75,6 @@ struct TerminalEditingKeyTests {
             Self.commandKeys(windowNumber: 0).map(TerminalEditingKey.init) == [
                 .moveToLineStart, .moveToLineEnd, .deleteToLineStart, .undo,
             ])
-        // ⇧⌘Z is Redo, ⌥⌘← and ⌃⌘← are other keys, and ← alone moves a character.
         #expect(TerminalEditingKey(Self.key(kVK_ANSI_Z, "z", modifiers: [.command, .shift], windowNumber: 0)) == nil)
         for modifiers: NSEvent.ModifierFlags in [[.command, .option], [.command, .control], []] {
             #expect(TerminalEditingKey(Self.leftArrow(modifiers: modifiers.union(.function), windowNumber: 0)) == nil)

@@ -3,10 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Pi and OpenCode tell what they do through the extension the app starts them with, and their sessions then get the
-/// same dot, Waiting for you, and notifications as Claude Code's and Codex's. Each test runs the app's own launch,
-/// tmux, activity sync, and sidebar filtering against stand-ins that report only when started with the extension;
-/// see `UnseenTurnSandboxApp`.
 @MainActor
 struct PiAndOpenCodeActivityEndToEndTests {
     @Test func aPiTurnThatFinishesInATabYouAreNotLookingAtKeepsADotUntilYouSelectTheTab() async throws {
@@ -69,7 +65,6 @@ struct PiAndOpenCodeActivityEndToEndTests {
         try app.select("Port the parser")
         try await app.sendPrompt("Allow once", in: "Port the parser")
         try await app.finishTurn(of: "Port the parser")
-        // You watched it finish.
         #expect(try app.rowStatus(of: "Port the parser") == .running(.idle))
         #expect(app.waitingForYou.titles.isEmpty)
     }

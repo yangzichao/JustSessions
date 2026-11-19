@@ -4,7 +4,6 @@ import Foundation
 /// is no such evidence: Antigravity closes it once the conversation is idle, and keeps two open for a while after
 /// `/resume` or `/fork`. Each CLI's log is found once, with `lsof`, and then read as it grows.
 final class AntigravityLiveConversationSource: LiveSessionSource, @unchecked Sendable {
-    /// A CLI whose log was not found yet, such as one that just started, is looked up again after this long.
     static let logLookupRetryInterval: TimeInterval = 10
 
     let configurationDirectory: URL
@@ -52,8 +51,6 @@ final class AntigravityLiveConversationSource: LiveSessionSource, @unchecked Sen
         session.file.flatMap(AntigravitySQLiteReader.localSession(at:))?.sessionID == session.sessionID
     }
 
-    /// The process's log as last read, or a new lookup for a process seen for the first time, one that reuses an
-    /// earlier process's id, or one whose log was not found a while ago.
     private func cliLog(ofProcessID processID: Int32) -> CLILog {
         let processStartDate = RunningProcessInfo.startDate(of: processID)
         if let cliLog = lock.withLock({ cliLogs[processID] }), cliLog.processStartDate == processStartDate,

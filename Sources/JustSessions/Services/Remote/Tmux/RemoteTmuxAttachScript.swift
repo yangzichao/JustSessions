@@ -11,8 +11,6 @@ import Foundation
 /// `sh` runs it, as the login shell may be fish. tmux before 3.2 has no `remain-on-exit failed` and would show
 /// "Bad value" in the tab, so there the session gets neither, and a failed CLI's output is lost as before.
 enum RemoteTmuxAttachScript {
-    /// `exec sh -c <script> sh <session name> <pane command>`, for the host's login shell. tmux runs `paneCommand` in
-    /// the session's pane; `sessionOptions` are tmux commands run on every attach, such as `set-option status off`.
     static func command(sessionName: String, paneCommand: String, sessionOptions: [String]) -> String {
         "exec sh -c \(ShellQuoting.quoted(script(sessionOptions: sessionOptions))) sh "
             + "\(ShellQuoting.quoted(sessionName)) \(ShellQuoting.quoted(paneCommand))"

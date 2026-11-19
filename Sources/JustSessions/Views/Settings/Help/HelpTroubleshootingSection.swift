@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Help in Settings: what to check when a session or CLI doesn't show, as the user guide's troubleshooting does.
 struct HelpTroubleshootingSection: View {
     var body: some View {
         HelpSection(title: "If a session is missing") {

@@ -1,14 +1,11 @@
 import SwiftUI
 
-/// Lists one host's archived projects so they can come back. Archiving only hides a project from the sidebar: its
-/// folder, session files, names, and pins all stay, and restoring it lists them again.
 struct ArchivedProjectsSheet: View {
     let store: ConversationStore
     let host: SessionHost
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        // Sorted once a render, not on each read: the rows' dividers read it once per row.
         let archivedProjectPaths = store.archivedProjectPaths(on: host)
         ThemeSheetLayout(
             title: Text("Archived projects on \(host.nameInSentence)"),
@@ -27,7 +24,6 @@ struct ArchivedProjectsSheet: View {
                     .foregroundStyle(ThemePalette.secondaryText)
                     .frame(maxWidth: .infinity, minHeight: 60)
             } else {
-                // A short list keeps the sheet tight; a long one scrolls instead of growing past the window.
                 Group {
                     if archivedProjectPaths.count > 7 {
                         ScrollView { rows(archivedProjectPaths) }.frame(height: 300)

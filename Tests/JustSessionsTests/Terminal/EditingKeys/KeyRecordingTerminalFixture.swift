@@ -5,18 +5,14 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab's terminal, drawn by either engine, in a window that is never shown, with the keyboard, running a process that
-/// records every byte the terminal sends it.
 @MainActor
 final class KeyRecordingTerminalFixture {
     let terminalView: any TabTerminalView
     let window: NSWindow
     private let folder: URL
     private let settings: IsolatedUserDefaults
-    /// Held here, since a Ghostty controller holds the store weakly.
     private let optionKeyStore: TerminalOptionKeyStore
 
-    /// `optionIsMeta` is the terminal's Option key choice, kept in the fixture's own settings.
     init(engine: TerminalEngine, optionIsMeta: Bool = TerminalOptionKeyStore.defaultOptionIsMeta) throws {
         _ = NSApplication.shared
         settings = try IsolatedUserDefaults()
@@ -49,7 +45,6 @@ final class KeyRecordingTerminalFixture {
         try await expectEventually { screenText(of: terminalView).contains("KEY_RECORDER_READY") }
     }
 
-    /// Every byte the terminal sent the process so far.
     var receivedInput: String {
         String(decoding: (try? Data(contentsOf: folder.appendingPathComponent("input"))) ?? Data(), as: UTF8.self)
     }

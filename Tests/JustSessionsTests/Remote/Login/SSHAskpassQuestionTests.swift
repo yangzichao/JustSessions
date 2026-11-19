@@ -2,7 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// What `ssh` asks while Connect… logs in, as the sheet shows it, and what `ssh` gets back.
 struct SSHAskpassQuestionTests {
     @Test func aPromptWithoutAHintIsTypedOutOfSight() {
         let question = SSHAskpassQuestion(

@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// A view's one primary action, filled with the theme's ink: a sheet's default action, the primary action in Settings
-/// and on the onboarding tour's cards, and Check host above a tab its host likely ended. An action that starts a CLI
-/// takes `ProviderProminentButtonStyle`. A small or mini control is as tall as a small `QuietBorderedButtonStyle`.
 struct ThemeProminentButtonStyle: ButtonStyle {
     @Environment(\.controlSize) private var controlSize
 

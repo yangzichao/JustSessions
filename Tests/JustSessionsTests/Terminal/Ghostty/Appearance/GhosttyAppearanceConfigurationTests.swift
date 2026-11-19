@@ -85,8 +85,6 @@ struct GhosttyAppearanceConfigurationTests {
         Self.expectColors(of: TerminalPalette.dracula, in: controller)
     }
 
-    /// Tokyo Night Day's own selection colors are 3.3 apart, too little for selected text; see
-    /// `TerminalColorScheme.readableSelectionForeground`.
     @Test func selectedTextTakesTheReadableSelectionColor() throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
@@ -168,8 +166,6 @@ struct GhosttyAppearanceConfigurationTests {
         #expect(Self.lines(of: controller).contains("minimum-contrast = 4.5"))
     }
 
-    /// Everything apart from the font and the colors, each set to behave as a SwiftTerm terminal does. Neither
-    /// libghostty-spm's default configuration nor its default theme applies.
     @Test func theOtherKeysMatchSwiftTermsBehavior() throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
@@ -248,14 +244,11 @@ struct GhosttyAppearanceConfigurationTests {
         stores.appearance.setColorChoice(.preset(.nord))
         Self.expectColors(of: TerminalPalette.nord, in: controller)
 
-        // The terminal view picks light or dark from the appearance this setting gives it, not the controller.
         let configuration = controller.renderedConfig
         stores.appearance.setMode(.light)
         #expect(controller.renderedConfig == configuration)
     }
 
-    /// Option types the keyboard layout's characters once it stops being Meta, in terminals already open, and is Meta
-    /// again when turned back on.
     @Test func theOptionKeyChoiceReconfiguresTheControllerLive() throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
@@ -265,7 +258,6 @@ struct GhosttyAppearanceConfigurationTests {
 
         #expect(controller.lastConfigurationIssue == nil)
         #expect(Self.lines(of: controller).contains("macos-option-as-alt = false"))
-        // Option-Left and Option-Right still move a word.
         #expect(Self.lines(of: controller).contains("keybind = alt+arrow_left=esc:b"))
 
         stores.optionKey.setOptionIsMeta(true)
@@ -285,15 +277,12 @@ struct GhosttyAppearanceConfigurationTests {
         #expect(Self.lines(of: controller).contains("macos-option-as-alt = false"))
     }
 
-    /// A theme color changed in Appearance settings reaches Ghostty's terminals once color picking pauses, as it
-    /// reaches SwiftTerm's.
     @Test func aCustomizedThemeBackgroundReachesTheController() async throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
         let appearanceStore = TerminalAppearanceStore(userDefaults: settings.userDefaults)
         let themeStore = AppThemeStore(userDefaults: settings.userDefaults, terminalThemeDelay: .milliseconds(50))
         let controller = GhosttyTerminalControllers.shared.controller(appearanceStore: appearanceStore, themeStore: themeStore)
-        // The dark version shows, as in a dark terminal.
         controller.setColorScheme(.dark)
 
         #expect(themeStore.setColor(0x000000, for: .contentSurface, isDark: true))
@@ -302,7 +291,6 @@ struct GhosttyAppearanceConfigurationTests {
         #expect(controller.lastConfigurationIssue == nil)
     }
 
-    /// **Color intensity** reaches Ghostty's ANSI colors once dragging pauses, as it reaches SwiftTerm's.
     @Test func aColorIntensityReachesTheController() async throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
@@ -381,7 +369,6 @@ struct GhosttyAppearanceConfigurationTests {
             "cursor-color = \(hex(scheme.foreground))",
             "cursor-text = \(hex(palette.background))",
         ]
-        // The ANSI colors SwiftTerm draws with too, each kept apart from the background.
         expected += palette.distinguishableANSIHexColors.enumerated().map { "palette = \($0.offset)=\(hex($0.element))" }
         let lines = lines(of: controller)
         #expect(controller.lastConfigurationIssue == nil, sourceLocation: sourceLocation)

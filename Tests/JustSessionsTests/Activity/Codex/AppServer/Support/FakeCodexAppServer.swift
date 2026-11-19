@@ -3,10 +3,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// Codex's background server as the app talks to it: JSON-RPC in WebSocket text messages over a Unix socket. It
-/// answers `initialize`, `thread/loaded/list`, and `thread/read` from the statuses a test sets, and, as the real one
-/// does now and then, sends notifications between them. Each connection is pinged once, and each response's thread
-/// carries a preview long enough to need a longer frame header.
 final class FakeCodexAppServer: @unchecked Sendable {
     static var waitingOnApproval: [String: Any] { ["type": "active", "activeFlags": ["waitingOnApproval"]] }
     static var waitingOnUserInput: [String: Any] { ["type": "active", "activeFlags": ["waitingOnUserInput"]] }
@@ -53,12 +49,10 @@ final class FakeCodexAppServer: @unchecked Sendable {
         stop()
     }
 
-    /// Loads the thread with `status`, or unloads it with nil.
     func setStatus(_ status: [String: Any]?, ofThread threadID: String) {
         lock.withLock { statusesByLoadedThreadID[threadID] = status }
     }
 
-    /// Stops answering requests, as a server that hangs does, or answers again.
     func setAnswering(_ isAnswering: Bool) {
         lock.withLock { self.isAnswering = isAnswering }
     }
@@ -172,11 +166,9 @@ final class FakeCodexAppServer: @unchecked Sendable {
         return frame + payload
     }
 
-    /// Nil once the client closed the connection or the server stopped.
     private func read(_ client: Int32) -> Data? {
         while !stopped {
             guard waitUntilReadable(client) else { continue }
-            // A stopped server answers nothing more, even what arrived while it waited.
             guard !stopped else { return nil }
             var buffer = [UInt8](repeating: 0, count: 64 << 10)
             let count = recv(client, &buffer, buffer.count, 0)
@@ -189,7 +181,6 @@ final class FakeCodexAppServer: @unchecked Sendable {
         data.withUnsafeBytes { _ = Darwin.send(client, $0.baseAddress!, data.count, 0) }
     }
 
-    /// Waits up to a tenth of a second, so a stopped server's threads end soon.
     private func waitUntilReadable(_ descriptor: Int32) -> Bool {
         var request = pollfd(fd: descriptor, events: Int16(POLLIN), revents: 0)
         return poll(&request, 1, 100) > 0

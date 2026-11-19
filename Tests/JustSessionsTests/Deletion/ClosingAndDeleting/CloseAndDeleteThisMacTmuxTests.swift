@@ -4,11 +4,8 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct CloseAndDeleteThisMacTmuxTests {
-    /// The CLI writes to its session file a second after its terminal hangs up, as a CLI saving on exit might.
-    /// Deleted before then, the file would come back.
     @Test func theSessionIsDeletedOnlyOnceItsCLIHasExited() async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }

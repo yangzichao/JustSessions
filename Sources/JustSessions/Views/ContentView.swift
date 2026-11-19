@@ -19,7 +19,6 @@ struct ContentView: View {
     @State private var archiveFilter: SessionArchiveFilter = .hideArchived
     @State private var renamingConversation: Conversation?
     @State private var renamingProject: ProjectConversationGroup?
-    /// How many times a Rename dialog opened; see `RenameDialogs.openCount`.
     @State private var renameDialogOpenCount = 0
     @State private var deletionRequest: SessionDeletionRequest?
     @State private var hasStartedScan = false
@@ -50,7 +49,6 @@ struct ContentView: View {
             if !hasStartedScan {
                 hasStartedScan = true
                 store.reopenTabsFromLastQuit()
-                // Each host loads independently when the workspace first opens.
                 for host in store.hosts { store.refresh(host) }
             }
         }
@@ -75,7 +73,6 @@ struct ContentView: View {
     }
 }
 
-/// The window's store, held by `@StateObject` so it is created once; see `ContentView.storeHolder`.
 private final class StoreHolder: ObservableObject {
     let store: ConversationStore
 

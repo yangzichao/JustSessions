@@ -1,6 +1,5 @@
 import AppKit
 
-/// A menu item that runs a closure, for a menu built in AppKit whose actions belong to the views around it.
 final class ActionMenuItem: NSMenuItem {
     private let handler: () -> Void
 

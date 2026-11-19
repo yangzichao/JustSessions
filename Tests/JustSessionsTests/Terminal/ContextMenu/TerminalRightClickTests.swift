@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A right-click on a terminal or its margin selects its tab, as a click does, then shows the terminal's menu.
 @MainActor
 struct TerminalRightClickTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -35,7 +34,6 @@ struct TerminalRightClickTests {
         #expect(TerminalContextMenuFixture.titles(of: menu) == TerminalContextMenuFixture.titles(of: fixture.menu(for: tab)))
     }
 
-    /// As `WorkspaceDetailView` sets each tab's terminal up.
     private func wireUp(_ tab: TerminalSession, in fixture: TerminalContextMenuFixture) {
         tab.terminalView.onFocus = { [store = fixture.store] in store.selectTerminal(tab.id) }
         tab.terminalView.makeContextMenu = { _ in fixture.menu(for: tab) }

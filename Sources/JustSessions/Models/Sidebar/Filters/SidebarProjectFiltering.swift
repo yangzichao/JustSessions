@@ -1,10 +1,6 @@
 import Foundation
 
 enum SidebarProjectFiltering {
-    /// Truly empty projects remain available for new sessions, except while only sessions whose CLI runs or waits on
-    /// you are listed. A populated project hidden by session filters must not be mistaken for an empty project. A
-    /// project whose every session is archived counts as empty while archived sessions are hidden, as it would after
-    /// deleting them, so archiving sessions never hides their project.
     static func projects(
         _ projects: [ProjectConversationGroup],
         providerFilter: ConversationProviderFilter,
@@ -49,8 +45,6 @@ enum SidebarProjectFiltering {
         return ProjectConversationGroup.orderedForSidebar(filteredProjects)
     }
 
-    /// A project whose name or path matches keeps all its sessions. Otherwise only sessions whose title or session
-    /// ID match stay, along with those in `messageMatchConversationIDs`, and projects left with none are dropped.
     static func projects(
         _ projects: [ProjectConversationGroup],
         matching rawQuery: String,

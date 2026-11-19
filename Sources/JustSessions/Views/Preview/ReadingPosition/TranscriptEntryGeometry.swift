@@ -6,8 +6,6 @@ struct TranscriptEntryGeometry: Equatable {
     let frame: CGRect
 }
 
-/// The entries' layout records all row frames at once. Unlike a geometry preference on every row, it does no work when
-/// scrolling, and unlike the former markers it adds no AppKit view per entry.
 struct TranscriptEntryGeometryLayout: Layout {
     let entryIndices: [Int]
     let controller: TranscriptScrollPositionController
@@ -48,7 +46,6 @@ struct TranscriptEntryGeometryLayout: Layout {
     }
 }
 
-/// One view connects stack-local geometry to AppKit's scroll coordinates and observes layout for same-pass restoration.
 struct TranscriptEntryGeometryObserver: NSViewRepresentable {
     let controller: TranscriptScrollPositionController
 

@@ -1,14 +1,9 @@
 import Foundation
 
-/// The Claude registry record and latest custom-title line relayed from the host, base64-encoded independently so
-/// quotes, Unicode, terminal escapes, and tmux format expressions in a name stay data. Activity remains in its own
-/// option too, for the no-tab reader and sessions started by an older app. No registry file on this Mac is read for an
-/// SSH tab.
 enum RemoteClaudeSessionTitle {
     static let optionName = "@justsessions-claude-session"
     static let titlePrefix = "justsessions-claude:"
     static let titleFormat = "#{?\(optionName),\(titlePrefix)#{\(optionName)},\(RemoteCLIActivityTitle.titleFormat)}"
-    /// A malformed or unexpectedly large host record tells nothing, rather than turning the title into a transcript.
     static let maximumPayloadLength = 32768
 
     static func record(inTerminalTitle title: String) -> ClaudeLiveSessionRecord? {

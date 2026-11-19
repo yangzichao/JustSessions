@@ -1,11 +1,7 @@
 import Foundation
 
-/// The onboarding tips shown so far. An install that was fresh when this was first read shows each tip once, those
-/// added in later versions too. One that already had saved settings had been used, so it shows none until Help's
-/// Take the tour shows them all again.
 @MainActor
 final class OnboardingTipsStore {
-    /// Created at launch, before anything else saves a setting, so a fresh install still looks like one.
     static let shared = OnboardingTipsStore(
         userDefaults: .standard,
         isFreshInstall: UserDefaults.standard.persistentDomain(forName: AppIdentity.currentBundleIdentifier)?.isEmpty ?? true
@@ -34,7 +30,6 @@ final class OnboardingTipsStore {
         showsTips && !shownTips.contains(tip)
     }
 
-    /// Shows every tip once more, the tour's too, also on an install that showed none.
     func showEveryTipAgain() {
         showsTips = true
         shownTips = []

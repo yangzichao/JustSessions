@@ -1,18 +1,12 @@
 import Foundation
 
-/// Stand-ins for Pi and OpenCode that run the app's real extension in `node`, as the CLIs run it, and drive it as the
-/// CLI would: Pi through the events it fires, OpenCode through the state its TUI shows. Each takes the next step from
-/// a file in the home folder that the test rewrites, one step a line, and runs the lines it has not run yet.
 enum ExtensionHostStandIns {
-    /// An installed `node`, or nil where none is, and tests that need one are skipped.
     static var installedNodePath: String? {
         ["/opt/homebrew/bin/node", "/usr/local/bin/node", "/usr/bin/node"].first(where: FileManager.default.isExecutableFile(atPath:))
     }
 
-    /// The file a stand-in reads its steps from.
     static let stepsFileName = "cli-steps"
 
-    /// `pi --extension <file>`. A step is an event's name, and for a prompt a tab and its title.
     static let pi = #"""
         import { copyFileSync, readFileSync } from "node:fs";
         import { join } from "node:path";

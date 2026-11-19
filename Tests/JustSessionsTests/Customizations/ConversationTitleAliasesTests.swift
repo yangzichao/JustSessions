@@ -40,9 +40,6 @@ struct ConversationTitleAliasesTests {
         #expect(ConversationTitleAliases.load(from: isolatedUserDefaults.userDefaults) == ConversationTitleAliases())
     }
 
-    /// Random renames and removals over a few conversations. After each step the renamed conversation shows the
-    /// trimmed title (or its suggested one), no other conversation's title changes, and no stored title is blank,
-    /// padded, or just the suggested title.
     @Test func randomRenamesKeepEveryTitleConsistent() {
         var generator = SeededRandomNumberGenerator(seed: 0xA11A5)
         let conversations = (0..<5).map { Conversation.fixture(title: "Suggested \($0)") }

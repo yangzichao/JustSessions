@@ -2,12 +2,9 @@ import Foundation
 
 @testable import JustSessions
 
-/// The SSH host the opt-in live tmux key tests run against, named in `JUSTSESSIONS_LIVE_SSH_HOST` as `ssh` takes it,
-/// such as `justsessions-test` or `rctest@justsessions-test`, and how they run commands there.
 enum LiveSSHTmuxHost {
     static let host = ProcessInfo.processInfo.environment["JUSTSESSIONS_LIVE_SSH_HOST"].flatMap { $0.isEmpty ? nil : $0 }
 
-    /// Up to 20 seconds, polling every 250 ms without blocking the main thread, where the tab reads its output.
     @MainActor
     static func waitUntil(_ condition: () -> Bool) async -> Bool {
         for _ in 0..<80 {

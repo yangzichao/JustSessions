@@ -1,19 +1,12 @@
 import Foundation
 
-/// How a sign-in ended.
 enum RemoteSignInOutcome: Equatable, Sendable {
     case signedIn
     case cancelled
-    /// Why, in the command's or `ssh`'s own words where it said any.
     case failed(String)
 }
 
-/// Runs a host's sign-in command once, with a terminal on the host, so it asks as it would if you typed it there.
-/// Whenever the command stops printing, its last line is taken as a question and asked in a dialog; the answer goes to
-/// the command, and nothing typed is kept. Output that comes while a question shows takes it back, so a command that
-/// pauses mid-way doesn't leave a question that was never asked.
 struct RemoteSignInSession: Sendable {
-    /// Starts the command; tests start a local script instead of `ssh`.
     struct Launcher: Sendable {
         let makeProcess: @Sendable (_ host: String, _ command: String) -> Process
 
@@ -34,13 +27,9 @@ struct RemoteSignInSession: Sendable {
     }
 
     struct Timing: Sendable {
-        /// How long a line left without its newline must stand before it's asked, as `PIN: ` is.
         var promptPause: Duration = .milliseconds(400)
-        /// How long the command must be quiet after a whole line before that line is asked.
         var linePause: Duration = .milliseconds(1500)
-        /// How often the output and the command are looked at.
         var pollInterval: Duration = .milliseconds(100)
-        /// A sign-in that takes longer is stopped.
         var timeLimit: Duration = .seconds(300)
     }
 
@@ -107,12 +96,11 @@ struct RemoteSignInSession: Sendable {
             let snapshot = state.snapshot()
             if let question = shownQuestion {
                 if snapshot.outputVersion != question.outputVersion {
-                    // The command went on printing, so it wasn't waiting for this.
                     question.task.cancel()
                     shownQuestion = nil
-                } else if let answer = question.answer.value {
+                } else if let reply = question.answer.reply {
                     shownQuestion = nil
-                    guard let answer else {
+                    guard case .answered(let answer) = reply else {
                         stop()
                         return .cancelled
                     }
@@ -130,7 +118,7 @@ struct RemoteSignInSession: Sendable {
                     previousPrompt: lastAskedPrompt
                 )
                 let answer = AnswerBox()
-                let task = Task { answer.set(await ask(signInQuestion)) }
+                let task = Task { answer.set(await ask(signInQuestion).map(QuestionReply.answered) ?? .cancelled) }
                 shownQuestion = (task, answer, snapshot.outputVersion, prompt)
             }
             try? await Task.sleep(for: timing.pollInterval)
@@ -157,7 +145,6 @@ struct RemoteSignInSession: Sendable {
     }
 }
 
-/// What the running command printed and whether it ended, shared between the pipes' handlers and the session.
 private final class RunState: @unchecked Sendable {
     struct Snapshot {
         let output: RemoteSignInOutput
@@ -186,7 +173,6 @@ private final class RunState: @unchecked Sendable {
             }
             let hadText = output.text
             output.append(data)
-            // Swallowed echo or escape sequences alone aren't new output.
             if output.text != hadText { outputVersion += 1 }
             lastOutputAt = .now
         }
@@ -215,14 +201,18 @@ private final class RunState: @unchecked Sendable {
     }
 }
 
-/// A question's answer once it has one; `.some(nil)` is Cancel.
+private enum QuestionReply: Sendable {
+    case answered(String)
+    case cancelled
+}
+
 private final class AnswerBox: @unchecked Sendable {
     private let lock = NSLock()
-    private var answer: String??
+    private var storedReply: QuestionReply?
 
-    var value: String?? { lock.withLock { answer } }
+    var reply: QuestionReply? { lock.withLock { storedReply } }
 
-    func set(_ answer: String?) {
-        lock.withLock { self.answer = .some(answer) }
+    func set(_ reply: QuestionReply) {
+        lock.withLock { storedReply = reply }
     }
 }

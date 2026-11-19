@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The CLI activity sync marking a Codex tab whose turn finished off screen, and looking at the tab clearing it. The
-/// sync finds the tab's CLI by its process, whichever engine draws the tab.
 @MainActor
 struct UnseenFinishedTurnSyncTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -12,7 +10,6 @@ struct UnseenFinishedTurnSyncTests {
         let fixture = try Fixture(isApplicationActive: true, engine: engine)
         defer { fixture.tearDown() }
         let store = fixture.store
-        // A second tab opens in front, so the Codex tab is off screen.
         store.openTerminal(Fixture.makeTab(for: fixture.otherConversation, engine: engine))
         #expect(store.selectedTerminalID != fixture.tab.id)
 
@@ -31,7 +28,6 @@ struct UnseenFinishedTurnSyncTests {
         await fixture.synchronize()
         #expect(fixture.tab.hasUnseenFinishedTurn)
 
-        // Seen as soon as it is selected, without waiting for the next sync.
         store.selectTerminal(fixture.tab.id)
         #expect(!fixture.tab.hasUnseenFinishedTurn)
         #expect(fixture.tab.runStatus == .running(.idle))
@@ -78,8 +74,6 @@ struct UnseenFinishedTurnSyncTests {
         #expect(!fixture.isWaitingForYou)
     }
 
-    /// A store with a running Codex tab, selected, whose turns come from the rollout file the test writes.
-    /// Finds no tmux, so the app's own tmux server is never asked.
     @MainActor
     private struct Fixture {
         let directory: URL
@@ -116,7 +110,6 @@ struct UnseenFinishedTurnSyncTests {
             try? FileManager.default.removeItem(at: directory)
         }
 
-        /// The Codex tab's session is among those the Waiting for you filter keeps.
         var isWaitingForYou: Bool {
             store.sessionsWaitingForYou.conversationIDs.contains(conversation.id)
         }

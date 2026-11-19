@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The store opens each new tab with the engine chosen in Settings at that moment.
 @MainActor
 struct TerminalEngineLaunchTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -64,7 +63,6 @@ struct TerminalEngineLaunchTests {
         #expect(store.terminalSessions.first?.terminalView is SelectableTerminalView)
     }
 
-    /// Reconnecting replaces the tab's terminal in its place in the tab bar, but the tab is the same one.
     @Test func aReconnectedSSHTabKeepsTheEngineItOpenedWith() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
@@ -78,7 +76,6 @@ struct TerminalEngineLaunchTests {
             startsBackgroundPolling: false
         )
         defer { store.closeAllTerminals() }
-        // The tab never starts, so nothing connects to the host.
         store.openPlainTerminal(in: ProjectLocation(host: .ssh("devbox"), path: "/home/me/paper"))
         let ended = try #require(store.terminalSessions.last)
         ended.processFinished(exitCode: 255)

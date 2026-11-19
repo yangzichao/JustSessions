@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Antigravity tells what it does in its conversation database, and its sessions then get the same dot, Waiting for
-/// you, and notifications as Claude Code's. Each test runs the app's own launch, tmux, activity sync, and sidebar
-/// filtering against a stand-in that writes the database as Antigravity CLI does; see `UnseenTurnSandboxApp`.
 @MainActor
 struct AntigravityActivityEndToEndTests {
     @Test func anAntigravityTurnThatFinishesInATabYouAreNotLookingAtKeepsADotUntilYouSelectTheTab() async throws {
@@ -49,7 +46,6 @@ struct AntigravityActivityEndToEndTests {
         #expect(try app.rowStatus(of: "Clean the build") == .running(.working))
         #expect(app.waitingForYou.titles.isEmpty)
         try await app.finishTurn(of: "Clean the build")
-        // You watched it finish.
         #expect(try app.rowStatus(of: "Clean the build") == .running(.idle))
     }
 }

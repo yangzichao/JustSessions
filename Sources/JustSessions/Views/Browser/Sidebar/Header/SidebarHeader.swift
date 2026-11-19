@@ -1,10 +1,6 @@
 import SwiftUI
 
-/// One short line for the app mark and name, then search, the notification bell, and new session as icons, so the
-/// session list gets the height. Search opens into a field across the whole line, and goes back to its icon when
-/// closed, or once it is empty and loses focus.
 struct SidebarHeader: View {
-    /// The window's store, for the bell's list.
     let store: ConversationStore
     @Binding var searchText: String
     var contentMode: SidebarContentMode = .projects
@@ -12,7 +8,6 @@ struct SidebarHeader: View {
 
     @State private var isSearchOpen = false
 
-    /// A search with text stays open, so the list is never narrowed by a field out of sight.
     private var isSearchShown: Bool {
         isSearchOpen || !searchText.isEmpty
     }
@@ -38,7 +33,6 @@ struct SidebarHeader: View {
 
     private var markAndActions: some View {
         HStack(spacing: 8) {
-            // A sidebar too narrow for the whole name beside the icons shows the mark alone, not a cut-off name.
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
                     appMark
@@ -80,8 +74,6 @@ struct SidebarHeader: View {
         .onboardingTourStop(searchTourStop)
     }
 
-    /// Search's tip is about projects and sessions, so it waits while search looks through open tabs. It moves to the
-    /// field when the field opens.
     private var searchTourStop: OnboardingTourStop? {
         contentMode == .projects ? .searchSessions : nil
     }

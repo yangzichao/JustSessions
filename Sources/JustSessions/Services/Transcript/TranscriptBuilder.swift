@@ -1,6 +1,5 @@
 import Foundation
 
-/// Collects entries while a session file is read, then numbers them and marks where each turn starts.
 struct TranscriptBuilder {
     enum EntryKind {
         case userMessage
@@ -31,8 +30,6 @@ struct TranscriptBuilder {
 
     let maximumEntryCount: Int
     let maximumTextLength: Int
-    /// False when a session is read only for its text, as message search reads it. Each image still gets its entry,
-    /// so later entries keep their IDs, but holds `TranscriptImage.undecoded` instead of its decoded bytes.
     var decodesImages = true
     private var pendingEntries: [PendingEntry] = []
 
@@ -67,22 +64,18 @@ struct TranscriptBuilder {
         }
     }
 
-    /// Decodes `image` only when `decodesImages` is on.
     mutating func appendUserImage(_ image: @autoclosure () -> TranscriptImage, timestamp: Date?) {
         pendingEntries.append(PendingEntry(content: .userImage(decodesImages ? image() : .undecoded), timestamp: timestamp))
     }
 
-    /// Decodes `image` only when `decodesImages` is on.
     mutating func appendToolResultImage(_ image: @autoclosure () -> TranscriptImage, timestamp: Date?) {
         pendingEntries.append(PendingEntry(content: .toolResultImage(decodesImages ? image() : .undecoded), timestamp: timestamp))
     }
 
-    /// Marks where the CLI summarized older messages to free up its context window.
     mutating func appendCompactionNote(timestamp: Date?) {
         append(.note, text: Self.compactionNoteText, timestamp: timestamp)
     }
 
-    /// Keeps the newest entries when the session is longer than `maximumEntryCount`.
     func build() -> TranscriptContent {
         let omittedEntryCount = max(0, pendingEntries.count - maximumEntryCount)
         var entries: [TranscriptEntry] = []

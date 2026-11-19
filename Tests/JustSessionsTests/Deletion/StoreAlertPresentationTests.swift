@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The store's alert as the main window shows it, in a window on screen: clicking its buttons, and a new alert
-/// set while the previous one is still closing, as when Try Again fails at once.
 @MainActor
 @Suite(.serialized)
 struct StoreAlertPresentationTests {
@@ -45,7 +43,6 @@ struct StoreAlertPresentationTests {
         scenario.store.delete(scenario.session)
         let firstAlert = try await scenario.alertOnScreen(showing: StoreAlertScenario.notFoundMessage)
         try await scenario.click("OK", in: firstAlert)
-        // Before the first alert has finished closing.
         scenario.store.delete(scenario.session)
 
         let secondAlert = try await scenario.alertOnScreen(showing: StoreAlertScenario.connectionLostMessage)
@@ -54,7 +51,6 @@ struct StoreAlertPresentationTests {
         try await scenario.expectNoAlert()
     }
 
-    /// The tightest timing: a new alert set in the same turn as the click that closes the old one.
     @Test func anAlertSetInTheSameTurnAsOKIsShown() async throws {
         let scenario = try StoreAlertScenario()
         defer { scenario.remove() }
@@ -70,8 +66,6 @@ struct StoreAlertPresentationTests {
         try await scenario.expectNoAlert()
     }
 
-    /// An alert that comes while another is on screen, as when a long deletion ends while an unrelated error is
-    /// shown, waits until that one is dismissed rather than replacing it unseen.
     @Test func anAlertThatComesWhileAnotherIsShownWaitsForIt() async throws {
         let scenario = try StoreAlertScenario()
         defer { scenario.remove() }
@@ -128,9 +122,6 @@ struct StoreAlertPresentationTests {
     }
 }
 
-/// One session on devbox in a store whose deletions there fail at once: the first because the host can't be
-/// found, later ones because the connection was lost, so each alert can be told apart. The store's alert, and
-/// with `confirming` the deletion dialog asking to delete the session, are shown on a window on screen.
 @MainActor
 private final class StoreAlertScenario {
     static let notFoundMessage = "devbox couldn't be found. Check the host name and your network or VPN."
@@ -163,7 +154,6 @@ private final class StoreAlertScenario {
         window.orderFrontRegardless()
     }
 
-    /// Waits until the window's sheet is an alert showing `message`, and returns it.
     func alertOnScreen(showing message: String) async throws -> NSWindow {
         try await sheetOnScreen { sheet in Self.texts(in: sheet).contains(message) }
     }
@@ -172,17 +162,11 @@ private final class StoreAlertScenario {
         try await sheetOnScreen { sheet in Self.button(titled: title, in: sheet) != nil }
     }
 
-    /// Clicks a button of the store's alert. The alert's own action dismisses it from the store, so a click that
-    /// took effect is never repeated; see `click(_:in:until:)`.
     func click(_ title: String, in sheet: NSWindow) async throws {
         let clickedAlertID = store.alert?.id
         try await click(title, in: sheet) { self.store.alert?.id != clickedAlertID }
     }
 
-    /// Clicks the button, then again every 2 seconds while `tookEffect` stays false, for up to 120 seconds: on a busy
-    /// machine a click can come while the sheet is still appearing and be ignored, and the start of a full run can
-    /// keep the sheet appearing for tens of seconds. It checks right after each click, so a click that took effect
-    /// returns in the same turn.
     func click(_ title: String, in sheet: NSWindow, until tookEffect: () -> Bool) async throws {
         let clock = ContinuousClock()
         let giveUpAt = clock.now + .seconds(120)
@@ -199,7 +183,6 @@ private final class StoreAlertScenario {
         Issue.record("Clicking “\(title)” had no effect after \(tries) tries")
     }
 
-    /// Clicks the window's content beside its sheet, which AppKit alone would only answer with a beep.
     func clickBesideTheSheet() throws {
         NSApp.sendEvent(
             try #require(
@@ -210,7 +193,6 @@ private final class StoreAlertScenario {
                 )))
     }
 
-    /// Lets any closing finish, then expects neither an alert on screen nor one in the store.
     func expectNoAlert() async throws {
         try await expectEventually { window.attachedSheet == nil }
         try await Task.sleep(for: .milliseconds(300))
@@ -227,9 +209,6 @@ private final class StoreAlertScenario {
 
     private func sheetOnScreen(where matches: (NSWindow) -> Bool) async throws -> NSWindow {
         let clock = ContinuousClock()
-        // At the start of a full run, when every suite starts at once, a shared CI runner can take longer than
-        // `expectEventually`'s default 30 seconds to show a sheet: the v1.0.9 release run took 28 seconds here, and
-        // v1.0.10's first ran out. Passing runs still return as soon as the sheet shows.
         let deadline = clock.now + .seconds(120)
         while clock.now < deadline {
             if let sheet = window.attachedSheet, sheet.isVisible, matches(sheet) { return sheet }
@@ -254,7 +233,6 @@ private final class StoreAlertScenario {
     }
 }
 
-/// The main window's alert and deletion dialog, as ContentView applies them.
 private struct StoreAlertHost: View {
     let store: ConversationStore
     @State var deletionRequest: SessionDeletionRequest?

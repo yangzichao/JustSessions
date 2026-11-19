@@ -53,7 +53,7 @@ struct AntigravityTranscriptReader {
                     builder.append(.toolCall, text: ToolCallSummary.summary(toolName: name, arguments: arguments), timestamp: timestamp)
                 }
             }
-        default: break  // Tool results, thinking and internal bookkeeping remain hidden.
+        default: break
         }
     }
 }

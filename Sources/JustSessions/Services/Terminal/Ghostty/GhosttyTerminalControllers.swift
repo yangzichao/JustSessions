@@ -12,7 +12,6 @@ final class GhosttyTerminalControllers {
 
     private var followers: [AppearanceFollower] = []
 
-    /// The controller whose configuration follows these stores' terminal appearance, app theme, and Option key choice.
     func controller(
         appearanceStore: TerminalAppearanceStore,
         themeStore: AppThemeStore,
@@ -30,8 +29,6 @@ final class GhosttyTerminalControllers {
     }
 }
 
-/// A controller that takes on the stores' appearance settings and Option key choice now and whenever they change. It holds the stores weakly,
-/// so the controllers of stores that are gone can be let go.
 @MainActor
 private final class AppearanceFollower {
     weak var appearanceStore: TerminalAppearanceStore?
@@ -56,7 +53,6 @@ private final class AppearanceFollower {
             theme: configuration.theme,
             terminalConfiguration: configuration.terminalConfiguration
         )
-        // The cells are sized for the sharpest screen, which changes as screens connect and disconnect.
         let backingScaleFactors = NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
             .map { _ in GhosttyFontConfiguration.screensBackingScaleFactor }
             .prepend(GhosttyFontConfiguration.screensBackingScaleFactor)
@@ -66,7 +62,6 @@ private final class AppearanceFollower {
             .combineLatest(themeStore.$terminalTheme, optionKeyStore.$optionIsMeta, backingScaleFactors)
             .dropFirst()
             .sink { [controller] preferences, appTheme, optionIsMeta, backingScaleFactor in
-                // Each reloads and redraws every terminal on the controller, and does nothing for an unchanged value.
                 let configuration = GhosttyAppearanceConfiguration(
                     preferences: preferences, appTheme: appTheme, optionIsMeta: optionIsMeta,
                     backingScaleFactor: backingScaleFactor

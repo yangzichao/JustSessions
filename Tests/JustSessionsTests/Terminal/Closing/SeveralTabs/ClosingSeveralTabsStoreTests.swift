@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Close all tabs in group…, or closing the tabs selected in Open tabs, closes only those tabs, and a tab left open
-/// shows next.
 @MainActor
 struct ClosingSeveralTabsStoreTests {
     @MainActor
@@ -24,7 +22,6 @@ struct ClosingSeveralTabsStoreTests {
             return tab
         }
 
-        /// A tab whose CLI tmux can keep running on `host`. Nothing starts, since no terminal is shown.
         func openTmuxTab(_ title: String, on host: SessionHost) -> TerminalSession {
             let tab = TerminalSession(
                 engine: .swiftTerm,
@@ -41,7 +38,6 @@ struct ClosingSeveralTabsStoreTests {
             return tab
         }
 
-        /// A tab reopened at launch and not selected yet, which has started nothing.
         func reopenTabWaitingToBeShown(_ title: String, in projectPath: String) -> TerminalSession {
             let tab = makeTab(title, in: projectPath, startsOnceShown: true)
             store.insertReopenedTerminal(tab, at: store.terminalSessions.count, selecting: false)
@@ -97,7 +93,6 @@ struct ClosingSeveralTabsStoreTests {
         #expect(store.selectedTerminalID == other.id)
     }
 
-    /// Tabs selected in Open tabs can come from several groups; only they close, and the shown one closes last.
     @Test func closingTabsSelectedAcrossGroupsShowsATabLeftOpen() throws {
         let fixture = try Fixture()
         defer { fixture.tearDown() }
@@ -114,7 +109,6 @@ struct ClosingSeveralTabsStoreTests {
         #expect(store.selectedTerminalID == secondApp.id)
     }
 
-    /// Tabs not yet shown have started nothing, so closing them asks nothing.
     @Test func tabsNotYetShownCloseWithoutAsking() throws {
         let fixture = try Fixture()
         defer { fixture.tearDown() }
@@ -130,7 +124,6 @@ struct ClosingSeveralTabsStoreTests {
         #expect(question == .closeWithoutAsking)
     }
 
-    /// Each tab's CLI in tmux reads the choice saved for its own host.
     @Test func eachTabReadsItsOwnHostsChoice() throws {
         let fixture = try Fixture()
         defer { fixture.tearDown() }

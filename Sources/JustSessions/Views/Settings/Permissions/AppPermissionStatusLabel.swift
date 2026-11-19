@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A permission's status as a colored symbol and a word. One that is off stands out only when something depends on it.
 struct AppPermissionStatusLabel: View {
     let status: AppPermissionStatus
     let isOptional: Bool

@@ -4,12 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Measures how long one move of the pointer takes while a tab, or a group by its label, is dragged along a tab bar of
-/// 18 tabs in 3 groups, narrowed to fit: the mouse event, and the layout and drawing it forces. Reports
-/// `TabBarDragPerf | …` lines. Each drag passes other tabs or groups, and fails the test if it moved nothing.
-///
-/// The suite records nothing unless `JUSTSESSIONS_PERF` is set:
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter TabBarDragMeasurements
 @MainActor
 @Suite(.serialized)
 struct TabBarDragMeasurements {
@@ -57,7 +51,6 @@ struct TabBarDragMeasurements {
         perfReport("TabBarDragPerf", "\(scenario): longest move", Self.milliseconds(sorted[sorted.count - 1]))
     }
 
-    /// To a hundredth of a millisecond, as a move along the bar can take well under a tenth.
     private static func milliseconds(_ duration: Duration) -> String {
         let milliseconds = Double(duration.components.seconds) * 1_000 + Double(duration.components.attoseconds) / 1e15
         return String(format: "%.2f ms", milliseconds)

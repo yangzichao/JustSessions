@@ -1,13 +1,10 @@
 import SwiftUI
 
 extension View {
-    /// Shows the window's tour tip on this view while the tour is at `stop`. Nil makes it no stop, so one row of a
-    /// list can be the stop without the others changing.
     func onboardingTourStop(_ stop: OnboardingTourStop?) -> some View {
         modifier(OnboardingTourStopModifier(stop: stop))
     }
 
-    /// Calls `onShowStop` each time the window's tour moves to a stop, so a view can bring that stop into sight.
     func onOnboardingTourStop(_ onShowStop: @escaping (OnboardingTourStop) -> Void) -> some View {
         modifier(OnboardingTourStopObserver(onShowStop: onShowStop))
     }
@@ -26,8 +23,6 @@ private struct OnboardingTourStopModifier: ViewModifier {
     }
 }
 
-/// The tip while the tour is at `stop`. The sidebar list hidden behind Open tabs is disabled, so a tip in it waits
-/// until the list shows again.
 private struct OnboardingTourStopTip: View {
     let stop: OnboardingTourStop
     @ObservedObject var tour: OnboardingTour

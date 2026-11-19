@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A host that asks for a password or a code offers Connect… on its heading, and a login opened from any window
-/// refreshes the host in every window.
 struct SSHLoginStoreTests {
     @Test @MainActor func aRefusedLoginOffersConnect() {
         let store = ConversationStore(adapters: [], startsBackgroundPolling: false)
@@ -25,7 +23,6 @@ struct SSHLoginStoreTests {
         #expect(store.sshHostsNeedingLogIn.isEmpty)
     }
 
-    /// The master closed on its own, as when the Mac slept, so the ⋯ menu offers Connect… again.
     @Test @MainActor func aRefreshNoticesALoginThatClosed() {
         let store = ConversationStore(adapters: [], startsBackgroundPolling: false)
         store.sshHostsLoggedIn = ["devbox"]

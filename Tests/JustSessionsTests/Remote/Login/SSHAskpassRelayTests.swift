@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The askpass helper hands `ssh`'s question to the running app over the login's socket, and prints the answer.
 struct SSHAskpassRelayTests {
     @Test func theAppStartsAsItselfWithoutTheLoginsSocket() {
         #expect(SSHAskpassRelay.exitStatusIfStartedAsAskpass(arguments: ["JustSessions"], environment: [:]) == nil)
@@ -52,7 +51,7 @@ struct SSHAskpassRelayTests {
         let server = try #require(
             SSHAskpassServer(socketPath: folder + "/askpass") { _ in
                 isAsked.update { $0 = true }
-                try? await Task.sleep(for: .seconds(600))  // Ended only by a cancel, however busy the test run.
+                try? await Task.sleep(for: .seconds(600))
                 wasWithdrawn.update { $0 = Task.isCancelled }
                 return SSHAskpassReply(answer: nil)
             })
@@ -64,7 +63,6 @@ struct SSHAskpassRelayTests {
                 SSHAskpassMessageLine.encoded(
                     SSHAskpassRequest(prompt: "Confirm user presence for key ED25519-SK", hint: "none")
                 )))
-        // A helper that goes before its question is read asks nothing, so it waits for the question first.
         try await expectEventually { isAsked.value }
         helper.close()
 
@@ -79,7 +77,7 @@ struct SSHAskpassRelayTests {
         let server = try #require(
             SSHAskpassServer(socketPath: folder + "/askpass") { _ in
                 isAsking.update { $0 = true }
-                try? await Task.sleep(for: .seconds(600))  // Ended only by a cancel, however busy the test run.
+                try? await Task.sleep(for: .seconds(600))
                 return SSHAskpassReply(answer: Task.isCancelled ? nil : "late")
             })
 

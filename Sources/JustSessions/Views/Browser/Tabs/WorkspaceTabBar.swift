@@ -1,47 +1,23 @@
 import SwiftUI
 
-/// The open tabs, grouped by project like tab groups in a browser: each project's tabs sit together behind a label
-/// in the project's color, which collapses or expands the group. Selecting a tab of a collapsed group, by shortcut or
-/// from the sidebar, expands it, as does the selected tab moving into a collapsed group, such as when it leaves a
-/// split across projects. Such a split sits among the groups as a unit of its own, with no label, each of its tabs in
-/// its project's color, see `TerminalSplitAcrossProjectsSection`; a split of one project's tabs sits in that
-/// project's group. The bar sits in the title bar, in the sidebar's color, like a browser's tab strip: the selected
-/// tab takes its terminal's color and runs down into it, through the bar's bottom line. As in Chrome, tabs narrow
-/// together to fit the bar as more open, and the bar scrolls once they are as narrow as they get; a split's two tabs
-/// share one tab's width. Dragging a group's label moves the whole group among the others, as dragging either tab of
-/// a split across projects moves the split; tabs drag within their group, see `TerminalTabGroupSection`, and tabs or
-/// whole groups between windows, see `TabDragBetweenWindows`, which also draws tabs dragged in from another window as
-/// their own group among the others. Dragging the bar's space around and past them moves the window, and a right-click there offers a new
-/// session and collapsing or expanding every group; see `TabGroupsBackgroundMenuItems`.
 struct WorkspaceTabBar: View {
     let store: ConversationStore
-    /// Width at the leading edge that tabs never enter, even when scrolled, so the window buttons and sidebar toggle
-    /// stay clear of them.
     let leadingClearance: CGFloat
     let onRenameConversation: (Conversation) -> Void
-    /// Opens the New session sheet, as ⌘N does.
     let onNewSession: () -> Void
     let onCloseTerminal: (UUID) -> Void
-    /// Asks to delete a tab's session.
     let onDeleteConversation: (Conversation) -> Void
-    /// Closes a group's tabs, asking once for them all.
     let onCloseTabGroup: ([UUID], _ projectName: String) -> Void
     @State private var collapsedProjectKeys: Set<String> = []
-    /// The bar's visible width, past the leading clearance. Until measured, tabs take their full width.
     @State private var barWidth: CGFloat = .infinity
     @State private var groupLabelWidthsByProjectKey: [String: CGFloat] = [:]
-    /// Each group's full width, its label's and its tabs', which a group drag works out its places from.
     @State private var groupWidthsByProjectKey: [String: CGFloat] = [:]
-    /// The group being dragged by its label, named by its project key.
     @State private var groupDrag = TabBarDragDisplay<String>()
 
     var body: some View {
         let groups = TerminalTabGroup.groups(of: store.terminalSessions, projectDirectoryKey: store.tabGroupKey(of:))
         let groupKeys = groups.map(\.projectDirectoryKey)
-        // Every open tab's project has a color, also one whose only tab is in a split across projects.
         let colorsByProjectKey = TabGroupPalette.colorsByProjectKey(store.tabProjectKeysInOrder)
-        // A drag begun before a group appeared or went away is no longer drawn, and is let go once the bar catches up.
-        // Tabs dragged in from another window as a group of their own move as one.
         let dragDisplays = TabDragBetweenWindows.shared.dragDisplays(in: store)
         let groupDragsInBar = [groupDrag, dragDisplays.amongGroups]
         let shownGroupDrag = groupDragsInBar.first { $0.placement?.itemIDs == groupKeys }
@@ -49,12 +25,9 @@ struct WorkspaceTabBar: View {
             groups
             .filter { !collapsedProjectKeys.contains($0.projectDirectoryKey) }
             .flatMap(\.tabs)
-        // A split's two tabs, always in one group, take one tab's place.
         let shownSplitCount = store.terminalSplits.filter { split in shownTabs.contains { split.contains($0.id) } }.count
         let shownTabCount = shownTabs.count - shownSplitCount
-        // A tab and its split chooser's half take one tab's place too, as a split does.
         let shownSplitChooserCount = store.terminalSplitChoosers.filter { chooser in shownTabs.contains { $0.id == chooser.tabID } }.count
-        // A split across projects has no label, but its container takes room besides its tabs.
         let groupLabelsWidth = groups.reduce(CGFloat(0)) { width, group in
             TerminalSplit.isGroupKeyOfSplitAcrossProjects(group.projectDirectoryKey)
                 ? width + TerminalSplitAcrossProjectsSection.widthBesidesTabs
@@ -109,23 +82,17 @@ struct WorkspaceTabBar: View {
                         }
                         .onGeometryChange(for: CGFloat.self, of: \.size.width) { groupWidthsByProjectKey[group.projectDirectoryKey] = $0 }
                         .tabBarDragShift(of: group.projectDirectoryKey, in: shownGroupDrag)
-                        // A whole group, or a split across projects, leaving for a window of its own hides until it goes.
                         .opacity(group.tabs.allSatisfy { dragDisplays.leavingTabIDs.contains($0.id) } ? 0 : 1)
                         .reportsTabBarGroupSpan(group.projectDirectoryKey, in: store)
                     }
                 }
                 .padding(.horizontal, WorkspaceTabMetrics.horizontalInset)
                 .padding(.top, WorkspaceTabMetrics.topInset)
-                // Tabs narrow or widen smoothly as others open or close; resizing the window moves them directly.
                 .animation(ThemeMotion.slide, value: shownTabCount)
             }
-            // As in Chrome, the bar shows no scroller, which would lie over the tab titles; selecting a tab, from the
-            // sidebar or by shortcut, scrolls it into sight.
             .scrollIndicators(.never)
-            // Tabs and group labels have menus of their own, which a right-click on them shows instead.
             .contextMenu { TabGroupsBackgroundMenuItems(onNewSession: onNewSession, allGroups: allGroups) }
             .onGeometryChange(for: CGFloat.self, of: \.size.width) { barWidth = $0 }
-            // Past the leading clearance, which the window buttons and sidebar toggle can lie over.
             .windowMoveZone()
             .onChange(of: store.selectedTerminalID) { revealSelectedTab(scrollProxy) }
             .onChange(of: store.selectedTerminal.map(store.tabGroupKey(of:))) { revealSelectedTab(scrollProxy) }
@@ -139,7 +106,6 @@ struct WorkspaceTabBar: View {
         }
         .tabBarTerminalPalette(from: .shared, themeStore: .shared)
         .onChange(of: groups.map(\.projectDirectoryKey)) { _, openProjectKeys in
-            // A project whose last tab closed opens expanded next time.
             collapsedProjectKeys.formIntersection(openProjectKeys)
             groupLabelWidthsByProjectKey = groupLabelWidthsByProjectKey.filter { openProjectKeys.contains($0.key) }
             groupWidthsByProjectKey = groupWidthsByProjectKey.filter { openProjectKeys.contains($0.key) }
@@ -147,7 +113,6 @@ struct WorkspaceTabBar: View {
         }
     }
 
-    /// Starts dragging the group among the groups as they are now, or follows the pointer once it has started.
     private func dragGroup(_ projectKey: String, by translation: CGFloat, among groupKeys: [String]) {
         var drag = groupDrag.drag
         if drag?.draggedID != projectKey {
@@ -162,7 +127,6 @@ struct WorkspaceTabBar: View {
         groupDrag.show(drag)
     }
 
-    /// Moves the dragged group to where it was let go, unless a group appeared or went away meanwhile.
     private func dropDraggedGroup() {
         guard let drag = groupDrag.drag else { return }
         let stillMatches = drag.itemIDs == store.tabStrip.groupKeysInOrder
@@ -177,15 +141,12 @@ struct WorkspaceTabBar: View {
             expandGroup(projectKey)
             return
         }
-        // Show another tab first, so the group's selected tab does not hide while its terminal stays in front.
         selectTabInSight(insteadOfTabsIn: projectKey)
         withAnimation(ThemeMotion.slide) {
             _ = collapsedProjectKeys.insert(projectKey)
         }
     }
 
-    /// A split across projects has no label, so it never collapses. Collapsing every group leaves the selected tab
-    /// showing behind its collapsed label rather than switching to a tab still in sight.
     private func allGroupsCollapsing(_ groupKeys: [String]) -> AllTabGroupsCollapsing {
         let collapsibleKeys = groupKeys.filter { !TerminalSplit.isGroupKeyOfSplitAcrossProjects($0) }
         return AllTabGroupsCollapsing(
@@ -196,7 +157,6 @@ struct WorkspaceTabBar: View {
         )
     }
 
-    /// Expands the selected tab's group if it is collapsed, and scrolls the tab into sight.
     private func revealSelectedTab(_ scrollProxy: ScrollViewProxy) {
         guard let selectedTerminal = store.selectedTerminal else { return }
         let groupKey = store.tabGroupKey(of: selectedTerminal)
@@ -212,7 +172,6 @@ struct WorkspaceTabBar: View {
         }
     }
 
-    /// With every other tab in a collapsed group too, the selected tab keeps showing behind its collapsed label.
     private func selectTabInSight(insteadOfTabsIn projectKey: String) {
         let tabProjectKeys = store.tabGroupKeys
         guard let selectedIndex = store.terminalSessions.firstIndex(where: { $0.id == store.selectedTerminalID }),

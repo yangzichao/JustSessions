@@ -1,10 +1,6 @@
 import AppKit
 
-/// Renaming the tab's session, then copying, exporting, or finding it, as the tab's menu in the tab bar offers them;
-/// see `TerminalTabMenuItems`.
 extension TerminalContextMenu {
-    /// Rename, then, once the tab knows its session, the session's other items, each group followed by a separator, as
-    /// in the tab bar.
     var conversationItems: [NSMenuItem] {
         let renameItem = ActionMenuItem(title: localized("Rename"), systemImage: "pencil", isEnabled: tab.conversation != nil) {
             if let conversation = store.conversationToRename(fromTab: tab) { onRename(conversation) }
@@ -16,7 +12,6 @@ extension TerminalContextMenu {
             + [.separator()]
     }
 
-    /// Reveal is only for a session on this Mac, whose file the Finder can show.
     private func locationItems(for conversation: Conversation) -> [NSMenuItem] {
         let copyIDItem = ActionMenuItem(title: localized("Copy session ID"), systemImage: "doc.on.doc") {
             SessionLocationActions.copySessionID(conversation)

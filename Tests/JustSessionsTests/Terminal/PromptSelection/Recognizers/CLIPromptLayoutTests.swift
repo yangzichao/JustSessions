@@ -2,8 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// ⌘A finds each CLI's prompt on its screen and reads back the text typed in it; see `CLIPromptLayout`. The screens
-/// are the CLIs' own, captured in tmux.
 struct CLIPromptLayoutTests {
     @Test(arguments: ClaudeCodePromptScreens.all)
     func claudeCodePrompt(_ fixture: PromptScreenFixture) {
@@ -30,8 +28,6 @@ struct CLIPromptLayoutTests {
         expectPrompt(of: .antigravity, on: fixture)
     }
 
-    /// A layout with a marker or a box finds no prompt on another CLI's screen. Pi's prompt has neither, so its layout
-    /// would read another CLI's prompt between rules, but each tab uses its own CLI's layout.
     @Test func layoutsFindNoPromptOnAnotherCLIsScreen() {
         let fixturesByLayout: [(CLIPromptLayout, [PromptScreenFixture])] = [
             (.claudeCode, ClaudeCodePromptScreens.all),
@@ -61,7 +57,6 @@ struct CLIPromptLayoutTests {
         #expect(CLIPromptLayout.claudeCode.prompt(on: screen) == nil)
     }
 
-    /// An empty prompt holds no text, and one showing the CLI's placeholder holds none either.
     private func expectPrompt(of layout: CLIPromptLayout, on fixture: PromptScreenFixture) {
         let prompt = layout.prompt(on: fixture.screen)
         if fixture.typedText.isEmpty {

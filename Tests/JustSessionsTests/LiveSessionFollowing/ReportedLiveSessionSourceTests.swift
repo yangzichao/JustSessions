@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The Pi and OpenCode sources read what their extension reported; see `LiveSessionReporting`.
 struct ReportedLiveSessionSourceTests {
     @Test func aPiSessionIsSavedOnceItsFileExists() throws {
         let directory = try makeTemporaryDirectory()

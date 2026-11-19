@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// What a CLI on an SSH host does while no tab shows its tmux session, as the app reads it from the host; see
-/// `RemoteTmuxPanes` and `RemoteDetachedActivityReader`.
 @MainActor
 struct RemoteDetachedActivityTests {
     private static let claudeID = "11111111-2222-4333-8444-555555555555"
@@ -15,8 +13,6 @@ struct RemoteDetachedActivityTests {
     private static func line(_ name: String, _ option: String, _ title: String) -> String {
         [name, option, title].joined(separator: RemoteTmuxPanes.separator)
     }
-
-    // MARK: Reading a listing
 
     @Test func readsEachSessionsPaneAndLeavesOutWhatIsNotTheApps() throws {
         let output = [
@@ -52,7 +48,6 @@ struct RemoteDetachedActivityTests {
         #expect(try activity(.kiro, option: "busy:", title: "Kiro") == nil)
     }
 
-    /// No server is no session; a cut-off answer, or a server that tmux can't reach, says nothing about them.
     @Test func onlyAFinishedListingFromAReachableServerCounts() {
         #expect(
             RemoteTmuxPanes.panes(inOutput: "no server running on /tmp/tmux-1000/default\n\(RemoteTmuxPanes.endMarker)")?.panesBySessionName
@@ -62,7 +57,6 @@ struct RemoteDetachedActivityTests {
         #expect(RemoteTmuxPanes.panes(inOutput: "protocol version mismatch (client 8, server 7)\n\(RemoteTmuxPanes.endMarker)") == nil)
     }
 
-    /// The command against a real tmux on this Mac, through a stand-in login shell.
     @Test func theCommandListsTheAppsSessionsWithWhatTheirCLIsSay() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
@@ -82,8 +76,6 @@ struct RemoteDetachedActivityTests {
         #expect(panes.activity(of: .codex, inSession: Self.codexName) == .idle)
     }
 
-    // MARK: Asking hosts
-
     @Test func asksAHostAtMostEveryFewSecondsAndLaterAfterItFails() async {
         let calls = CallCounter()
         var now = Date(timeIntervalSince1970: 1_000)
@@ -95,7 +87,7 @@ struct RemoteDetachedActivityTests {
                 return answer.next()
             }, currentDate: { now })
 
-        await reader.ask("devbox")
+        await reader.askIfDue("devbox")?.value
         #expect(reader.listing(of: "devbox")?.askedAt == now)
         #expect(reader.listing(of: "devbox")?.answeredAt == now)
         reader.askIfDue("devbox")
@@ -103,9 +95,8 @@ struct RemoteDetachedActivityTests {
 
         now += RemoteDetachedActivityReader.interval
         answer.set(answers.removeFirst())
-        await reader.ask("devbox")
+        await reader.askIfDue("devbox")?.value
         #expect(calls.count == 2)
-        // A failure keeps the last listing while it is new enough, and waits before asking again.
         now += RemoteDetachedActivityReader.interval
         reader.askIfDue("devbox")
         #expect(calls.count == 2)
@@ -114,14 +105,12 @@ struct RemoteDetachedActivityTests {
         now += RemoteDetachedActivityReader.retryAfterFailure
         answer.set(answers.removeFirst())
         reader.askIfDue("devbox")
-        // It asks in the background, which can take a while when the whole suite runs.
         let deadline = ContinuousClock.now + .seconds(120)
         while reader.listing(of: "devbox") == nil, ContinuousClock.now < deadline { try? await Task.sleep(for: .milliseconds(50)) }
         #expect(calls.count == 3)
         #expect(reader.listing(of: "devbox") != nil)
     }
 
-    /// While the app is busy, an answer can come long after the host was asked; it is as new as its answer.
     @Test(.oneHeldThreadAtATime) func aListingIsAsNewAsItsAnswer() async {
         var now = Date(timeIntervalSince1970: 1_000)
         let asked = CallCounter()
@@ -132,7 +121,7 @@ struct RemoteDetachedActivityTests {
                 answer.wait()
                 return RemoteTmuxPanes(panesBySessionName: [:])
             }, currentDate: { now })
-        let asking = Task { await reader.ask("devbox") }
+        let asking = Task { await reader.askIfDue("devbox")?.value }
         while asked.count == 0 { try? await Task.sleep(for: .milliseconds(10)) }
         now += RemoteDetachedActivityReader.longestUseOfAListing + 5
         answer.signal()
@@ -140,8 +129,6 @@ struct RemoteDetachedActivityTests {
         #expect(reader.listing(of: "devbox") != nil)
         #expect(reader.listing(of: "devbox")?.askedAt == Date(timeIntervalSince1970: 1_000))
     }
-
-    // MARK: The activity sync
 
     @Test func aSessionWithNoTabOnAHostShowsWhatItsCLIDoesAndNotifies() async throws {
         let directory = try makeTemporaryDirectory()
@@ -153,15 +140,13 @@ struct RemoteDetachedActivityTests {
         store.replaceConversations(on: .ssh("devbox"), with: [conversation])
         store.tmuxSessionNamesByHost[.ssh("devbox")] = [Self.claudeName]
         let host = StandInHost()
-        // A clock of the test's own, a second on each step, so how long the busy suite holds the test up doesn't age
-        // the listings.
         var now = Date(timeIntervalSince1970: 1_000)
         store.remoteDetachedActivityReader = RemoteDetachedActivityReader(listPanes: { _ in host.panes() }, currentDate: { now })
         let registry = ClaudeLiveSessionRegistry(configurationDirectory: directory.appendingPathComponent("claude"))
         func sync(option: String?) async {
             host.set(option.map { [Self.claudeName: .init(activityOption: $0, title: "✳ Fix login")] } ?? [:])
-            now += 1
-            await store.remoteDetachedActivityReader.ask("devbox")
+            now += RemoteDetachedActivityReader.interval
+            await store.remoteDetachedActivityReader.askIfDue("devbox")?.value
             await store.synchronizeCLIActivity(claudeRegistry: registry, liveSessionReporting: nil)
         }
 
@@ -177,13 +162,11 @@ struct RemoteDetachedActivityTests {
         #expect(notifier.notifications.map(\.reason) == [.needsInput(reason: "permission prompt"), .finishedTurn])
         #expect(notifier.notifications.allSatisfy { $0.source == .detachedTmux(conversationID: conversation.id) })
 
-        // The host no longer lists it: its CLI ended.
         await sync(option: nil)
         #expect(!store.isRunningInTmux(conversation))
         #expect(store.detachedCLIActivities.isEmpty)
     }
 
-    /// A listing asked for before the session ran with no tab may leave it out, as one that came before it started.
     @Test func onlyALaterListingSaysTheCLIEnded() async throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -194,7 +177,7 @@ struct RemoteDetachedActivityTests {
         var now = Date(timeIntervalSince1970: 1_000)
         store.remoteDetachedActivityReader = RemoteDetachedActivityReader(listPanes: { _ in host.panes() }, currentDate: { now })
         let registry = ClaudeLiveSessionRegistry(configurationDirectory: directory.appendingPathComponent("claude"))
-        await store.remoteDetachedActivityReader.ask("devbox")
+        await store.remoteDetachedActivityReader.askIfDue("devbox")?.value
 
         now += 1
         store.tmuxSessionNamesByHost[.ssh("devbox")] = [Self.codexName]
@@ -238,7 +221,6 @@ struct RemoteDetachedActivityTests {
         #expect(askedHosts.hosts.isEmpty)
     }
 
-    /// You disconnected from the host, so it is left alone; see `ConversationStore+RemoteHostDisconnect`.
     @Test func aHostYouDisconnectedFromIsNotAsked() async throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -263,7 +245,6 @@ struct RemoteDetachedActivityTests {
     }
 }
 
-/// A host's tmux sessions as a test sets them.
 private final class StandInHost: @unchecked Sendable {
     private let lock = NSLock()
     private var current: [String: RemoteTmuxPanes.Pane] = [:]

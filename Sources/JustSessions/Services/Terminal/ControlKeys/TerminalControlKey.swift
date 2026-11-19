@@ -1,16 +1,13 @@
 import AppKit
 import Carbon.HIToolbox
 
-/// A key with Control, and Shift at most, whose legacy byte also stands for another key, or that an engine sends
-/// nothing for. Ctrl-/, Ctrl-7, and Ctrl-_ all send 0x1f, which tmux names Ctrl-_ and re-encodes as `CSI 95;5u` for a
-/// CLI that asks for modifyOtherKeys, such as Codex; SwiftTerm sends nothing for Ctrl-/ or Ctrl-Return at all.
-/// Letters, Space, and Tab keep each engine's own bytes, which tmux names correctly.
+/// Ctrl-/, Ctrl-7, and Ctrl-_ all send 0x1f, which tmux names Ctrl-_ and re-encodes as `CSI 95;5u` for a CLI that asks
+/// for modifyOtherKeys, such as Codex; SwiftTerm sends nothing for Ctrl-/ or Ctrl-Return at all. Letters, Space, and
+/// Tab keep each engine's own bytes, which tmux names correctly.
 enum TerminalControlKey: Equatable {
-    /// Control with `/ - = . , ; ' `` ` or a digit.
     case punctuationOrDigit(Character)
     /// Control with `[`, `]`, or `\`, whose legacy bytes, Esc, GS, and FS, every terminal and tmux agree on.
     case bracketOrBackslash(Character)
-    /// Control and Shift with `-`.
     case underscore
     case returnKey(withShift: Bool)
     case backspace
@@ -43,9 +40,8 @@ enum TerminalControlKey: Equatable {
         }
     }
 
-    /// What a tab whose CLI runs in tmux, on this Mac or an SSH host, sends. tmux passes `CSI u` on to a CLI that asks
-    /// for modifyOtherKeys and gives any other CLI the key's legacy byte where it has one; see
-    /// `ThisMacTmuxServer.globalOptions` and `RemoteCLICommandBuilder`.
+    /// tmux passes `CSI u` on to a CLI that asks for modifyOtherKeys and gives any other CLI the key's legacy byte where
+    /// it has one.
     var bytesForTmux: String {
         switch self {
         case .punctuationOrDigit(let character): Self.csiU(codepoint: character.asciiValue.map(Int.init) ?? 0, withShift: false)
@@ -57,7 +53,7 @@ enum TerminalControlKey: Equatable {
     }
 
     /// What a terminal without tmux in between sends, as kitty and Ghostty do, for a SwiftTerm tab, which sends
-    /// nothing for most of these. Nil where legacy encoding has no byte for the key.
+    /// nothing for most of these.
     var legacyBytes: String? {
         switch self {
         case .punctuationOrDigit(let character): Self.legacyBytesForPunctuationAndDigits[character]
@@ -77,7 +73,6 @@ enum TerminalControlKey: Equatable {
         "8": "\u{7F}",
     ]
 
-    /// `[`, `\`, and `]` with Control clear the character's 0x40 bit.
     private static func legacyControlCharacter(for character: Character) -> String {
         String(UnicodeScalar((character.asciiValue ?? 0) & 0x1F))
     }
@@ -86,8 +81,8 @@ enum TerminalControlKey: Equatable {
         "\u{1B}[\(codepoint);\(withShift ? 6 : 5)u"
     }
 
-    /// The character the key types on the keyboard's layout, with Shift if held. An input method such as Pinyin types
-    /// full-width punctuation, `【` for `[`, so for those the key's character on a US keyboard stands in.
+    /// An input method such as Pinyin types full-width punctuation, `【` for `[`, so for those the key's character on a
+    /// US keyboard stands in.
     private static func character(of event: NSEvent, withShift: Bool) -> Character? {
         guard let typed = event.charactersIgnoringModifiers, !typed.isEmpty else { return nil }
         if typed.unicodeScalars.count == 1, let scalar = typed.unicodeScalars.first, scalar.isASCII {

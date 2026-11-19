@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// A secondary button: a raised surface with a hairline. Every text button that is not its view's one primary action
-/// takes it, including Cancel in a sheet. A destructive button's label is in the theme's error color.
 struct QuietBorderedButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.controlSize) private var controlSize

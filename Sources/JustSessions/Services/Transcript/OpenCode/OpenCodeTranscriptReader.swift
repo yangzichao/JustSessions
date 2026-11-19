@@ -1,18 +1,14 @@
 import Foundation
 import SQLite3
 
-/// Reads one session's visible conversation from OpenCode's database, which holds every session. It shows what
-/// OpenCode's own session view shows: prompts without the text OpenCode adds to them, replies, and tool calls.
 struct OpenCodeTranscriptReader {
     var maximumEntryCount = 2_000
     var maximumTextLength = 12_000
-    /// Stands in for the messages OpenCode hides after `/undo`.
     static let undoneMessagesNoteText = "Later messages were undone; /redo in OpenCode restores them"
 
     func read(_ databaseFile: URL, sessionID: String) throws -> TranscriptContent {
         let database = try OpenCodeDatabase.open(databaseFile)
         defer { sqlite3_close(database) }
-        // One read transaction, so messages OpenCode adds meanwhile cannot appear without their parts.
         try OpenCodeDatabase.execute("BEGIN", in: database)
         defer { try? OpenCodeDatabase.execute("ROLLBACK", in: database) }
         let index = try OpenCodeTranscriptIndex.read(sessionID: sessionID, in: database)
@@ -42,7 +38,6 @@ struct OpenCodeTranscriptReader {
                 builder.appendCompactionNote(timestamp: message.timestamp)
             }
         case .assistant:
-            // A compaction's summary replaces the older messages for the model; the note above marks it instead.
             if !message.isCompactionSummary {
                 for part in parts { appendAssistantPart(part, timestamp: message.timestamp, to: &builder) }
             }

@@ -5,7 +5,6 @@ enum TranscriptBookmarkNotice: Equatable {
     case noBookmarks, allLettersInUse, nothingToBookmark
     case missing(MessageBookmark)
 
-    /// A hint goes by itself; a missing message's notice waits, since it offers Remove bookmark.
     var hidesByItself: Bool { if case .missing = self { false } else { true } }
 
     func text(language: AppInterfaceLanguage?) -> String {
@@ -22,29 +21,17 @@ enum TranscriptBookmarkNotice: Equatable {
     }
 }
 
-/// One reader's bookmark state that outlives its scroll view, which an empty page removes: a jump whose page is
-/// loading, and the notice shown. `TranscriptView` owns it, as it owns Find's state.
 @MainActor
 @Observable
 final class TranscriptBookmarkState {
     nonisolated static let hintDuration: Duration = .seconds(4)
 
-    /// A jump whose page is loading. `TranscriptView.refresh()` asks for it rather than for the place the pages shown still
-    /// record, as it does a match reveal. The next page to arrive is this jump's: First, Latest, and a new match reveal end
-    /// it first, a reveal from before it no longer asks for its own page (`loadingJumpCount`), and Load earlier or later
-    /// never starts while a page loads (TranscriptPagingModel `earlier`/`later`).
     @ObservationIgnored private(set) var loadingJump: MessageBookmark?
-    /// How many jumps have asked for a page. A match reveal still loading from before the latest one has lost its page to
-    /// it, and `TranscriptView` drops it, as a newer reveal ends a loading jump.
     @ObservationIgnored private(set) var loadingJumpCount = 0
-    /// A map entry jump whose page is loading (RDR-50); `TranscriptView.refresh()` asks for it, as for `loadingJump`.
     @ObservationIgnored private(set) var loadingEntryJump: Int?
     private(set) var notice: TranscriptBookmarkNotice?
-    /// Edit Bookmark… in this reader (RDR-51); `MessageBookmarkEditorPresenter` reads its request.
     @ObservationIgnored let editor = MessageBookmarkEditorRequests()
-    /// The card a labelled or tagged letter shows under the pointer (RDR-51).
     @ObservationIgnored let hover = TranscriptBookmarkHover()
-    /// The message ⌘D would bookmark, highlighted beside it (RDR-48).
     @ObservationIgnored let target = TranscriptBookmarkTarget()
     @ObservationIgnored private var noticeHidingTask: Task<Void, Never>?
     @ObservationIgnored private var carriedSeekTarget: Int?
@@ -59,7 +46,6 @@ final class TranscriptBookmarkState {
         loadingEntryJump = entryID
         loadingJumpCount += 1
     }
-    /// First, Latest, and a match reveal end either kind of jump.
     func cancelLoadingJump() {
         loadingJump = nil
         loadingEntryJump = nil
@@ -96,7 +82,6 @@ final class TranscriptBookmarkState {
     /// VoiceOver doesn't follow the reader's scroll, so a jump and each notice are spoken.
     func announce(_ text: String) { Self.announce(text) }
 
-    /// Also for a tab's notices (TerminalBookmarkNoticeState), which no reader shows.
     static func announce(_ text: String) {
         guard let application = NSApp else { return }
         NSAccessibility.post(
@@ -104,7 +89,6 @@ final class TranscriptBookmarkState {
             userInfo: [.announcement: text, .priority: NSAccessibilityPriorityLevel.high.rawValue])
     }
 
-    /// The missing bookmark an empty page left the reader past, for the reader that replaces it (see `TranscriptView`).
     func carrySeekTarget(_ entryID: Int) { carriedSeekTarget = entryID }
     func takeCarriedSeekTarget() -> Int? {
         defer { carriedSeekTarget = nil }

@@ -5,10 +5,7 @@ import Testing
 @testable import JustSessions
 
 struct NewSessionFileFinderTests {
-    /// Larger than any macOS process id, so it stands for a wrapper process that no longer matters.
     private static let wrapperProcessID: Int32 = 999_999
-    // Shared CI runners can deschedule discovery for longer than 30 seconds. Cleanup ends these processes;
-    // this upper bound only prevents an abandoned fixture from living indefinitely.
     private static let fixtureProcessLifetime = "300"
 
     @Test func findsThePreassignedClaudeTranscriptEvenAfterTheCLIExited() throws {
@@ -57,7 +54,6 @@ struct NewSessionFileFinderTests {
         try FileManager.default.createDirectory(at: dayDirectory, withIntermediateDirectories: true)
         let rollout = dayDirectory.appendingPathComponent("rollout-2026-09-25T00-00-00-\(sessionID).jsonl")
         try "{}\n".write(to: rollout, atomically: true, encoding: .utf8)
-        // The wrapper never opens the rollout; only the child it starts, standing in for the real CLI, does.
         let wrapper = Process()
         wrapper.executableURL = URL(fileURLWithPath: "/bin/sh")
         wrapper.arguments = ["-c", #"sleep "$1" 3<"$0" & echo $!; wait"#, rollout.path, Self.fixtureProcessLifetime]
@@ -80,7 +76,6 @@ struct NewSessionFileFinderTests {
         )
         let finder = finder(claudeConfigurationDirectory: root)
 
-        // The child opens the file right after it starts, so give it a moment; a loaded machine can make that long.
         var sessionFile: NewSessionFile?
         let deadline = ContinuousClock.now + .seconds(120)
         while sessionFile == nil, ContinuousClock.now < deadline {
@@ -119,7 +114,6 @@ struct NewSessionFileFinderTests {
         let forkSessionID = UUID().uuidString.lowercased()
         let forkedRollout = try writeCodexRollout(sessionID: forkedSessionID, under: root)
         let forkRollout = try writeCodexRollout(sessionID: forkSessionID, under: root)
-        // Stands in for `codex fork`, holding the rollout it forked open ahead of its own.
         let cli = Process()
         cli.executableURL = URL(fileURLWithPath: "/bin/sh")
         cli.arguments = ["-c", #"exec sleep "$2" 3<"$0" 4<"$1""#, forkedRollout.path, forkRollout.path, Self.fixtureProcessLifetime]
@@ -131,7 +125,6 @@ struct NewSessionFileFinderTests {
         let tab = branchTab(provider: .codex, processID: cli.processIdentifier, branchedFromSessionID: forkedSessionID)
         let finder = finder(claudeConfigurationDirectory: root)
 
-        // The shell opens both files and then becomes `sleep`, so give it a moment; a loaded machine can make that long.
         var sessionFile: NewSessionFile?
         let deadline = ContinuousClock.now + .seconds(120)
         while sessionFile == nil, ContinuousClock.now < deadline {
@@ -146,7 +139,6 @@ struct NewSessionFileFinderTests {
     @Test func findsNothingBeforeTheCLIWritesItsSession() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
-        // A process of its own: tests running in parallel may hold session files open in this one.
         let idleCLI = Process()
         idleCLI.executableURL = URL(fileURLWithPath: "/bin/sleep")
         idleCLI.arguments = [Self.fixtureProcessLifetime]

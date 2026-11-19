@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Clicking a session in the sidebar shows its running CLI when there is one, and otherwise leaves it to the preview.
 @MainActor
 struct RunningCLISelectionTests {
     @Test func aSessionWhoseTabRunsShowsThatTabWithoutOpeningAnother() throws {
@@ -48,8 +47,6 @@ struct RunningCLISelectionTests {
         #expect(store.terminalSessions.count == 1)
     }
 
-    /// As when an SSH host's connection drops, or the CLI quits: resuming starts the session again in its ended tab,
-    /// in that tab's place, instead of opening a second tab of the session beside it.
     @Test func resumingASessionWhoseTabEndedStartsItAgainInThatTab() throws {
         let sandbox = try LaunchSandbox()
         defer { sandbox.tearDown() }
@@ -113,7 +110,6 @@ struct RunningCLISelectionTests {
         #expect(store.selectedTerminalID == store.terminalSessions.first?.id)
     }
 
-    /// A branch runs a new session of its own, so it still gets a tab of its own.
     @Test func branchingASessionWhoseTabEndedOpensANewTab() throws {
         let sandbox = try LaunchSandbox()
         defer { sandbox.tearDown() }
@@ -142,7 +138,6 @@ struct RunningCLISelectionTests {
         #expect(tab.conversation?.id == sandbox.conversation.id)
         #expect(store.selectedTerminalID == tab.id)
 
-        // Clicking it again shows the same tab.
         store.selectTerminal(nil)
         #expect(store.showRunningCLI(for: sandbox.conversation))
         #expect(store.selectedTerminalID == tab.id)
@@ -162,7 +157,6 @@ struct RunningCLISelectionTests {
     }
 }
 
-/// A project folder, a stand-in `claude` that exits right away, a session in the folder, and settings of its own.
 @MainActor
 private struct LaunchSandbox {
     let root: URL
@@ -198,7 +192,6 @@ private struct LaunchSandbox {
         )
     }
 
-    /// A plain terminal tab in the session's project, which starts nothing until it is shown.
     @discardableResult
     func openPlainTab(in store: ConversationStore) -> TerminalSession {
         let tab = TerminalSession(

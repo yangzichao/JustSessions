@@ -1,8 +1,6 @@
 import AppKit
 
-/// An image on the clipboard with no text, as a screenshot copied with ⌃⇧⌘4 or an image copied in a browser leaves it:
-/// what a tab's Paste takes as an image; see `TerminalImagePaste`. A clipboard with text pastes the text, so a file
-/// copied in Finder, which puts its name there as text, is not one.
+/// A clipboard with text pastes the text, so a file copied in Finder, which puts its name there as text, is not one.
 struct TerminalClipboardImage: Equatable {
     /// PNG or JPEG, which Claude Code and Codex read. A TIFF, as some apps copy, is converted to PNG.
     let data: Data
@@ -11,12 +9,10 @@ struct TerminalClipboardImage: Equatable {
     private static let jpeg = NSPasteboard.PasteboardType("public.jpeg")
     private static let imageTypes: [NSPasteboard.PasteboardType] = [.png, jpeg, .tiff]
 
-    /// Whether `pasteboard` holds an image and no text, asked of its types without reading them.
     static func isOnly(on pasteboard: NSPasteboard) -> Bool {
         pasteboard.availableType(from: [.string]) == nil && pasteboard.availableType(from: imageTypes) != nil
     }
 
-    /// The image on `pasteboard`, or nil when it holds text, no image, or an image that can't be read.
     init?(pasteboard: NSPasteboard) {
         guard Self.isOnly(on: pasteboard) else { return nil }
         if let png = pasteboard.data(forType: .png) {

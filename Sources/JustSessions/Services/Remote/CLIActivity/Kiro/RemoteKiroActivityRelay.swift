@@ -13,7 +13,6 @@ import Foundation
 /// while a marker exists, one `ps` of every process, read by `awk` up each marker's parents; `ps -A -o pid= -o ppid=`
 /// lists them on Linux, macOS, and BusyBox.
 enum RemoteKiroActivityRelay {
-    /// Starts the relay in the background and returns at once, so the CLI starts as before.
     static let launchCommand = "sh -c \(ShellQuoting.quoted("(\n\(script)\n) </dev/null >/dev/null 2>&1 &"))"
 
     static let script = #"""

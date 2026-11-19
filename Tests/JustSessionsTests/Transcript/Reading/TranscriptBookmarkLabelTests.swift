@@ -4,9 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A labelled bookmark's label above its message in the reader (RDR-51): on the speaker's line where the message starts
-/// a turn, so the message keeps its height, else on a line of its own; a bookmark without a label, or none, changes
-/// nothing.
 @MainActor
 struct TranscriptBookmarkLabelTests {
     private static func height(of entry: TranscriptEntry, bookmark: MessageBookmark?) -> CGFloat {

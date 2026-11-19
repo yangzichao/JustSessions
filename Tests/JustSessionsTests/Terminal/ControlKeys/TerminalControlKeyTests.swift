@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Which keys with Control a tab sends itself, and what a SwiftTerm terminal without tmux sends for them; see
-/// `ThisMacTmuxControlKeyTests` for a CLI in this Mac's tmux.
 @MainActor
 @Suite(.serialized)
 struct TerminalControlKeyTests {
@@ -20,8 +18,6 @@ struct TerminalControlKeyTests {
     }
 
     @Test func keysEachEngineAlreadySendsRightAreLeftToIt() {
-        // Letters, Space, and Tab keep the engine's bytes, as do keys with Option or Command, Ctrl-Shift with
-        // anything but - and Return, and a layout's letter that is not ASCII.
         #expect(TerminalControlKey(Self.key(kVK_Space, " ", modifiers: .control)) == nil)
         #expect(TerminalControlKey(Self.key(kVK_Tab, "\t", modifiers: .control)) == nil)
         #expect(TerminalControlKey(Self.key(kVK_ANSI_Slash, "/", modifiers: [.control, .option])) == nil)
@@ -93,7 +89,6 @@ struct TerminalControlKeyTests {
         #expect(!terminalView.performKeyEquivalent(with: ControlKeyPress.slash.event(windowNumber: fixture.window.windowNumber)))
     }
 
-    /// Outside tmux, Ghostty's own bytes stay.
     @Test func aGhosttyTerminalSendsControlKeysItselfOnlyInTmux() async throws {
         let fixture = try KeyRecordingTerminalFixture(engine: .ghostty)
         defer { fixture.tearDown() }

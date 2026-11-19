@@ -1,15 +1,12 @@
 import Foundation
 
-/// Lines of a Codex session ("rollout") file, in the shape Codex 0.158 writes them, trimmed to a few fields.
 enum CodexRolloutLines {
     static let sessionMeta =
         #"{"timestamp":"2026-09-23T16:03:38.000Z","type":"session_meta","payload":{"id":"01a0cf02-2025-7990-8bb2-80feff2349d4","cwd":"/tmp/project"}}"#
     static let agentMessage =
         #"{"timestamp":"2026-09-23T16:04:00.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Working on it"}}"#
-    /// A command's output that mentions a turn event. Inside a JSON string its quotes are escaped.
     static let outputMentioningATurnEvent =
         #"{"timestamp":"2026-09-23T16:04:10.000Z","type":"response_item","payload":{"type":"function_call_output","output":"{\"type\":\"task_complete\"}"}}"#
-    /// Not an `event_msg`, though its payload's type reads like a turn event.
     static let otherLineWithATurnEventType =
         #"{"timestamp":"2026-09-23T16:04:20.000Z","type":"turn_context","payload":{"type":"task_complete"}}"#
 
@@ -25,7 +22,6 @@ enum CodexRolloutLines {
         #"{"timestamp":"\#(timestamp(date))","type":"event_msg","payload":{"type":"turn_aborted","reason":"interrupted"}}"#
     }
 
-    /// Each line followed by a newline, as Codex writes them.
     static func text(_ lines: [String]) -> Data {
         Data(lines.map { $0 + "\n" }.joined().utf8)
     }

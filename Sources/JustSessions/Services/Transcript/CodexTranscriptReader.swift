@@ -1,6 +1,5 @@
 import Foundation
 
-/// Reads the visible conversation from a Codex rollout file (`~/.codex/sessions/**/rollout-*.jsonl`).
 struct CodexTranscriptReader {
     var maximumEntryCount = 2_000
     var maximumTextLength = 12_000
@@ -23,8 +22,6 @@ struct CodexTranscriptReader {
     /// (Codex puts an `ordinal` number between). Any other line is parsed.
     static func mightContainTranscriptItem(_ line: Data) -> Bool {
         let head = String(decoding: line.prefix(512), as: UTF8.self)
-        // A quote right after a comma cannot be inside a string, and with no `{` or `[` before it, this `type` is
-        // the record's own rather than one inside the payload.
         guard head.hasPrefix("{\"timestamp\":"),
             let recordTypeMarker = head.range(of: ",\"type\":\""),
             !head[..<recordTypeMarker.lowerBound].dropFirst().contains(where: { $0 == "{" || $0 == "[" }),
@@ -44,8 +41,6 @@ struct CodexTranscriptReader {
         return transcriptPayloadTypes.contains(payloadType.value)
     }
 
-    /// The string value starting at `start` and the index after its closing quote. Nil when the value is cut off
-    /// or holds an escape, which could spell a type differently, so the line is parsed instead.
     private static func plainStringValue(startingAt start: String.Index, in text: String) -> (value: String, end: String.Index)? {
         guard let closingQuote = text[start...].firstIndex(of: "\""),
             !text[start..<closingQuote].contains("\\")
@@ -79,7 +74,7 @@ struct CodexTranscriptReader {
                     .joined(separator: "\n\n")
                 builder.append(.assistantMessage, text: text, timestamp: timestamp)
             default:
-                return  // Developer messages are instructions, not conversation.
+                return
             }
         case "function_call":
             let arguments =
@@ -104,7 +99,6 @@ struct CodexTranscriptReader {
         }
     }
 
-    /// The text of a user message; its images follow it as entries of their own.
     private func userText(from content: [[String: Any]]) -> String {
         content.compactMap { part -> String? in
             guard part["type"] as? String == "input_text" else { return nil }
@@ -114,7 +108,6 @@ struct CodexTranscriptReader {
         }.joined(separator: "\n\n")
     }
 
-    /// The base64 of an `input_image` part, whose `image_url` is a data URL: `data:image/png;base64,…`.
     private static func imageBase64(from part: [String: Any]) -> Substring? {
         guard part["type"] as? String == "input_image",
             let url = part["image_url"] as? String, url.hasPrefix("data:"),

@@ -3,11 +3,8 @@ import Testing
 
 @testable import JustSessions
 
-/// A Codex session read after an append resumes from its saved final page, and must give exactly the text a clean
-/// full read gives: the same entries, IDs, and segments.
 @Suite(.serialized)
 struct CodexSessionTextResumerTests {
-    /// Small pages, so a few records make several pages and the final page moves as records are appended.
     static let smallPages = TranscriptPageLimits(targetEntryCount: 3, maximumRecordCount: 6, targetByteCount: 1 << 20)
 
     static func assistant(_ text: String) -> String {
@@ -49,7 +46,6 @@ struct CodexSessionTextResumerTests {
             try append(SampleTranscriptLines.fileContents(lines))
         }
 
-        /// Rewrites the file in place, keeping its inode.
         func rewrite(_ data: Data) throws {
             let handle = try FileHandle(forUpdating: file)
             defer { try? handle.close() }
@@ -60,15 +56,12 @@ struct CodexSessionTextResumerTests {
         func remove() { try? FileManager.default.removeItem(at: directory) }
     }
 
-    /// A full read that keeps a resume state, as for a session seen changing.
     private func savedRead(of session: Session, limits: TranscriptPageLimits) async throws -> SessionMessageTextCache.ResumableText {
         let read = try await SessionMessageTextReader.readChanged(session.conversation, resuming: nil, limits: limits)
         #expect(!read.resumed)
         return SessionMessageTextCache.ResumableText(text: read.text, state: try #require(read.resumeState))
     }
 
-    /// Reads `session` resuming from `saved`, checks the text is exactly a clean full read's, and returns what to resume
-    /// from next.
     @discardableResult
     private func expectCleanReadText(
         _ session: Session, resuming saved: SessionMessageTextCache.ResumableText, limits: TranscriptPageLimits,
@@ -249,7 +242,6 @@ struct CodexSessionTextResumerTests {
         #expect(read.text.entries.flatMap(\.segments) == ["Original", "Grown"])
     }
 
-    /// Where pages end decides which tool calls merge, so text read with other page limits is read again in full.
     @Test func textReadWithOtherPageLimitsIsReadInFull() async throws {
         let session = try Session((0..<12).map { $0.isMultiple(of: 2) ? Self.toolCall("patch \($0)") : Self.event() })
         defer { session.remove() }
@@ -261,8 +253,6 @@ struct CodexSessionTextResumerTests {
         )
     }
 
-    /// A full read keeps a resume state only for the bytes it read: any change to the file after it was indexed, even
-    /// one of the same size, keeps none, as the text may come from other bytes than those hashed.
     @Test func aFullReadKeepsNoStateWhenTheFileChangedAfterItWasIndexed() async throws {
         let session = try Session([Self.assistant("Original")])
         defer { session.remove() }

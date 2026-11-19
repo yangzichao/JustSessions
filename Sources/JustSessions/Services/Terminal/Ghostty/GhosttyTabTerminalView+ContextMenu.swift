@@ -1,10 +1,6 @@
 import AppKit
 
-/// A right-click on a Ghostty terminal shows the app's menu, as on a SwiftTerm one; see `TerminalContextMenu`. Ghostty's
-/// own menu, which offers only Copy and only over a selection, never shows while the app gives the terminal a menu.
 extension GhosttyTabTerminalView {
-    /// See `SelectableTerminalView.menu(for:)`: the terminal takes the keyboard first, so what the menu pastes and what
-    /// is typed next both go to it.
     override func menu(for event: NSEvent) -> NSMenu? {
         guard let makeContextMenu else { return super.menu(for: event) }
         onFocus?()
@@ -23,7 +19,6 @@ extension GhosttyTabTerminalView {
         popUpContextMenu(menu, event, self)
     }
 
-    /// The release of a right-click that showed the app's menu doesn't go to Ghostty either.
     override func rightMouseUp(with event: NSEvent) {
         guard makeContextMenu == nil else { return }
         super.rightMouseUp(with: event)
@@ -31,14 +26,10 @@ extension GhosttyTabTerminalView {
 
     var selectionActive: Bool { terminalSurface?.hasSelection() == true }
 
-    /// The menu's Copy, as the Edit menu's: Ghostty puts the selection on the general pasteboard, or the tab puts the
-    /// selected prompt there; see `GhosttyTabTerminalView+PromptSelection`.
     func copy(_ sender: Any) {
         copy(sender as Any?)
     }
 
-    /// The menu's Paste, as the Edit menu's (`GhosttyTabTerminalView+ImagePaste`). It replaces a selected prompt, as
-    /// the Edit menu's does; see `TerminalPromptSelection`.
     func paste(_ sender: Any) {
         promptSelection.deleteSelectedPromptForPaste()
         paste(sender as Any?)

@@ -1,7 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Tells `TranscriptBookmarkTargetRegistry` which reader a window shows and whether it is visible.
 struct TranscriptBookmarkTargetReporter: NSViewRepresentable {
     let target: TranscriptBookmarkCommandTarget?
     let isActive: Bool
@@ -24,6 +23,5 @@ final class TranscriptBookmarkTargetReportingView: NSView {
         if window != nil { registry.register(self) }
     }
 
-    /// Clicks go to the reader.
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
 }

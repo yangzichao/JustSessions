@@ -3,14 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Port forwarding on demand: a host's forwards share one connection the app opens for them, or the host's Connect…
-/// login, and are added to it one by one; it closes with its last forward, and is made again when it drops. A script
-/// stands in for `ssh`: as the connection it makes its control socket's file and runs until stopped; as `-O forward`,
-/// `-O cancel`, and the `-W` probe it notes the request, failing as the files beside it say, and prints what the
-/// connection would print to the connection's output file.
-///
-/// Its tests run one at a time: each starts several `ssh` stand-ins, and all of them at once slowed other suites'
-/// shell scripts by about 2 seconds, enough for `RemoteHostCheckScriptTests`' 10-second limit to fail in a full run.
 @MainActor
 @Suite(.serialized)
 struct SSHPortForwardsTests {
@@ -89,8 +81,12 @@ struct SSHPortForwardsTests {
                 loginConnections: loginConnections,
                 isLocalPortFree: { !busyLocalPorts.value.contains($0) },
                 currentDate: { clock.value },
-                wakesItselfUp: false
+                sleepUntilWakeUp: Self.sleepUntilCancelled
             )
+        }
+
+        nonisolated private static func sleepUntilCancelled(_: Duration) async throws {
+            while true { try await Task.sleep(for: .seconds(60)) }
         }
 
         func remove() {
@@ -119,7 +115,6 @@ struct SSHPortForwardsTests {
             ((try? FileManager.default.contentsOfDirectory(atPath: socketRoot)) ?? []).filter { $0.hasPrefix("forward-") }
         }
 
-        /// The process ID of the connection started last.
         var connectionProcessID: pid_t? {
             (try? String(contentsOf: scripts.appendingPathComponent("connection-pid"), encoding: .utf8))
                 .flatMap { pid_t($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
@@ -133,8 +128,6 @@ struct SSHPortForwardsTests {
             forwards.entries(on: host).map(\.state)
         }
     }
-
-    // MARK: - Commands
 
     @Test func theConnectionCarriesNoForwardsOfTheUsersConfigAndRunsNothing() {
         let arguments = SSHPortForwardCommands.connectionArguments(host: "devbox", controlPath: "/tmp/s/master")
@@ -174,8 +167,6 @@ struct SSHPortForwardsTests {
         #expect(SSHPortForwards.refusal(in: "channel 2: open failed: connect failed: Connection refused") == nil)
         #expect(SSHPortForwards.refusal(in: "Stdio forwarding request failed: Session open refused by peer") == nil)
     }
-
-    // MARK: - Forwarding and stopping
 
     @Test func aHostsForwardsShareOneConnection() async throws {
         let fixture = try Fixture()
@@ -300,8 +291,6 @@ struct SSHPortForwardsTests {
         #expect(fixture.connectionFolders.isEmpty)
     }
 
-    // MARK: - Connect… logins
-
     @Test func aLoggedInHostsForwardsGoThroughTheLoginAndEndOnDisconnect() async throws {
         let fixture = try Fixture()
         defer { fixture.remove() }
@@ -333,8 +322,6 @@ struct SSHPortForwardsTests {
 
         #expect(fixture.states() == [.reconnecting])
     }
-
-    // MARK: - Reconnecting
 
     @Test func aDroppedConnectionIsMadeAgainWithItsForwards() async throws {
         let fixture = try Fixture()
@@ -409,8 +396,6 @@ struct SSHPortForwardsTests {
         )
         try await expectEventually { fixture.states() == [.failed(failure.message)] }
     }
-
-    // MARK: - Ending
 
     @Test func removingAHostEndsItsForwardsOnly() async throws {
         let fixture = try Fixture()

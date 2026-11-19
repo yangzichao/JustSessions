@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Each window's bell lists the tabs waiting for you in every window, except one whose terminal shows in its own
-/// window, and a click shows the session where it is, or reattaches to its CLI in the bell's window.
 @MainActor
 struct NotificationBellAcrossWindowsTests {
     @Test func listsTabsOfEveryWindowExceptOneShowingInItsWindow() throws {
@@ -25,8 +23,6 @@ struct NotificationBellAcrossWindowsTests {
             firstWindowChanges.cancel()
         }
         sandbox.second.selectTerminal(tab.id)
-        // The first window's bell looks again, as it reads which terminals the second window shows, while nothing else
-        // in the first window changes, so its sidebar does not redraw.
         #expect(firstWindowBell.count > 0)
         #expect(firstWindowChanges.count == 0)
         #expect(sandbox.first.notificationBellEntries.isEmpty)
@@ -72,7 +68,6 @@ struct NotificationBellAcrossWindowsTests {
         sandbox.first.detachedCLIActivities = [sandbox.conversation.id: .needsInput(reason: nil)]
         #expect(sandbox.first.notificationBellEntries.map(\.source) == [.detachedTmux(conversationID: sandbox.conversation.id)])
 
-        // Before this window's next activity sync, which stops following the CLI here.
         let tab = try #require(sandbox.openTab(of: sandbox.conversation, in: sandbox.second))
         #expect(sandbox.first.notificationBellEntries.isEmpty)
         tab.updateCLIActivity(.needsInput(reason: nil))

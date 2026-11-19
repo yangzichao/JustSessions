@@ -1,11 +1,8 @@
 import Darwin
 
-/// Parent links of the running processes. A tab's own process is not always the CLI itself: an install
-/// can be a wrapper script that starts the real CLI as a child, so lookups by process id walk the tree.
 struct ProcessTree: Sendable {
     let parentProcessIDs: [Int32: Int32]
 
-    /// `rootProcessID` first, then its children, grandchildren, and so on.
     func processIDs(rootedAt rootProcessID: Int32) -> [Int32] {
         var childProcessIDs: [Int32: [Int32]] = [:]
         for (processID, parentProcessID) in parentProcessIDs where processID != parentProcessID {
@@ -24,8 +21,6 @@ struct ProcessTree: Sendable {
         return orderedProcessIDs
     }
 
-    /// Reads every process in one `sysctl` call. An unreadable table gives an empty tree, which still
-    /// answers lookups with just the root process.
     static func ofRunningProcesses() -> ProcessTree {
         var request: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_ALL]
         let entrySize = MemoryLayout<kinfo_proc>.stride

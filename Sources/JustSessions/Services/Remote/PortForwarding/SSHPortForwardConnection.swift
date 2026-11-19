@@ -1,12 +1,8 @@
 import Foundation
 
-/// The connection that carries an SSH host's port forwards when no Connect… login does: an `ssh -N` master the app
-/// keeps as a child process, without a login's questions (`BatchMode=yes`). What it prints goes to a file in its
-/// private folder, since a forward that fails is explained only there. The folder's name carries the app's process ID,
-/// so a later launch closes a connection left by an app that crashed; see `closeConnectionsOfEndedApps`.
 final class SSHPortForwardConnection: @unchecked Sendable {
-    /// A host that doesn't answer fails within `ConnectTimeout` (10 seconds); this covers a slow login on top.
-    static let defaultStartTimeout: TimeInterval = 30
+    static let defaultStartTimeout = SSHConnectTimeout.plus(slowLoginAllowance)
+    private static let slowLoginAllowance: TimeInterval = 20
 
     enum StartOutcome {
         case started(SSHPortForwardConnection)
@@ -36,9 +32,6 @@ final class SSHPortForwardConnection: @unchecked Sendable {
         process.isRunning && FileManager.default.fileExists(atPath: controlPath)
     }
 
-    /// Connects, and returns once the master listens for forwards, or with why it couldn't. Blocks; call it off the
-    /// main thread. `onEndOnItsOwn` is called, on any thread, when the connection ends other than by `end()`, as when
-    /// the network drops.
     static func start(
         to host: String,
         sshExecutable: String = "/usr/bin/ssh",
@@ -81,7 +74,6 @@ final class SSHPortForwardConnection: @unchecked Sendable {
         return .failed(timedOut ? .noAnswer : SSHConnectionProblem(sshOutput: printed))
     }
 
-    /// False when the connection already ended, so nothing would call `onEndOnItsOwn`.
     private func watchForEndOnItsOwn(_ onEndOnItsOwn: @escaping @Sendable (SSHPortForwardConnection) -> Void) -> Bool {
         lock.withLock {
             guard !hasEnded else { return false }
@@ -90,7 +82,6 @@ final class SSHPortForwardConnection: @unchecked Sendable {
         }
     }
 
-    /// Closes the connection, which ends its forwards, and removes its folder. Waits up to 2 seconds for `ssh` to exit.
     func end() {
         lock.withLock {
             isEnding = true
@@ -113,8 +104,6 @@ final class SSHPortForwardConnection: @unchecked Sendable {
         onEndOnItsOwn(self)
     }
 
-    /// At launch: closes the connections that a copy of the app that is no longer running left open, as after a crash;
-    /// `ssh -N` runs on after its app, holding its ports on this Mac.
     static func closeConnectionsOfEndedApps(
         socketRoot: String = SSHConnectionSharing.socketRoot,
         close: @Sendable (_ host: String, _ controlPath: String) -> Void = SSHLoginConnections.closeMaster

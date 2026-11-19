@@ -1,8 +1,6 @@
 import Combine
 import Foundation
 
-/// The saved choice of what ⌘-clicking a link to a file on this Mac does; see `FileLinkClickChoice`. Opens it in its
-/// default app until you pick something else in Settings.
 @MainActor
 final class FileLinkClickSettingsStore: ObservableObject {
     static let shared = FileLinkClickSettingsStore()

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// App-wide settings stay available even when no terminal tab is open.
 struct SidebarSettingsButton: View {
     @Environment(\.showAppWideSheet) private var showAppWideSheet
 

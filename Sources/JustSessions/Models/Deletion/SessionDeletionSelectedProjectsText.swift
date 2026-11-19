@@ -1,6 +1,5 @@
 import Foundation
 
-/// The wording of the dialog that confirms archiving the projects selected in the sidebar and deleting their sessions.
 extension SessionDeletionConfirmationText {
     static func selectedProjectsRemovalButtonTitle(
         projectCount: Int,

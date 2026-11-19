@@ -1,6 +1,5 @@
 import Foundation
 
-/// Owned by one deletion worker. Only successfully trashed sessions enter a batch; cancellation flushes it too.
 final class ClaudeDeletionIndexBatch {
     static let maximumSessionCount = 32
     private var conversationsByProject: [URL: [Conversation]] = [:]
@@ -23,7 +22,6 @@ final class ClaudeDeletionIndexBatch {
         var failures: [ConversationDeletionFailure] = []
         for (project, conversations) in pending {
             do {
-                // Read afresh so sessions added by the CLI between batches remain in the index.
                 try updateIndex(Set(conversations.map(\.sessionID)), project)
             } catch {
                 failures += conversations.map {

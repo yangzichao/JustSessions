@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The hover card waits for the pointer to rest before the first card, then follows it from tab to tab at once, as in
-/// Chrome; a press, key, or scroll hides it until the pointer moves on.
 struct TabHoverCardTimingTests {
     private let firstTab = TabHoverCardTarget.tab(UUID())
     private let secondTab = TabHoverCardTarget.tab(UUID())

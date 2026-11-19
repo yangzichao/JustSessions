@@ -1,15 +1,10 @@
 import SwiftUI
 
-/// Fix with agent…'s page of the host check sheet: where the agent runs, which CLI, the prompt to edit, and the
-/// guide sections it ends with. The sheet's footer starts it; see `ConversationStore+HostFixAgent`.
 struct HostFixAgentForm: View {
     @Binding var draft: HostFixAgentDraft
     let host: String
-    /// The tools the agent can be on each machine.
     let providers: (HostFixAgentMachine) -> [ConversationProvider]
-    /// The tool to pick when the machine changes.
     let preferredProvider: ([ConversationProvider]) -> ConversationProvider?
-    /// Where the agent starts on each machine, as typed in the New session sheet.
     let folder: (HostFixAgentMachine) -> String
     let errorMessage: String?
 

@@ -6,7 +6,7 @@ enum RemoteOpenCodeConversationDeletion {
     /// subagent sessions. OpenCode's error for an unknown session means it is already gone.
     static func command(sessionID: String, host: String) -> String {
         let script =
-            OpenCodeRemoteDatabaseLocation.shellAssignment + """
+            OpenCodeRemoteDatabaseLocation.shellAssignment(to: "db") + """
 
                 id=\(ShellQuoting.quoted(sessionID))
                 [ -f "$db" ] || exit \(RemoteConversationDeletion.missingTranscriptExitStatus)
@@ -25,7 +25,6 @@ enum RemoteOpenCodeConversationDeletion {
         return RemoteCLICommandBuilder.loginShellCommand("sh -c \(ShellQuoting.quoted(script))", on: host)
     }
 
-    /// The host's mirror database, when `conversation` is one of its sessions.
     static func validatedMirrorDatabase(for conversation: Conversation, mirror: RemoteSessionMirror, host: String) throws -> URL {
         let databaseFile = mirror.mirrorDirectory(host: host, provider: .opencode).appendingPathComponent("opencode.db")
         guard conversation.sourceFile.standardizedFileURL.path == databaseFile.standardizedFileURL.path,
@@ -34,7 +33,6 @@ enum RemoteOpenCodeConversationDeletion {
         return databaseFile
     }
 
-    /// The mirror holds every session of the host, so only the deleted session's rows leave it.
     static func removeMirrorRows(of sessionID: String, from databaseFile: URL) {
         guard let database = try? OpenCodeDatabase.open(databaseFile, writable: true) else { return }
         defer { sqlite3_close(database) }

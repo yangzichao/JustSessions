@@ -4,9 +4,7 @@ import Foundation
 /// such as `{"timestamp":"…","type":"event_msg","payload":{"type":"task_started",…}}` and ends with
 /// `task_complete`, or with `turn_aborted` when you interrupt it.
 enum CodexTurnState: Equatable, Sendable {
-    /// A turn started, at the time its line was written when known, and has not ended.
     case inTurn(startedAt: Date?)
-    /// The last turn ended, or none has started.
     case betweenTurns
 
     /// Looked for before a line is parsed. Text that only mentions one, such as a command's output, holds it inside
@@ -16,7 +14,6 @@ enum CodexTurnState: Equatable, Sendable {
 
     private static let newline = UInt8(ascii: "\n")
 
-    /// The state a turn event leaves the session in; nil for any other line.
     init?(turnEventLine line: Data) {
         guard let object = ConversationMetadata.object(from: line),
             object["type"] as? String == "event_msg",
@@ -29,7 +26,6 @@ enum CodexTurnState: Equatable, Sendable {
         }
     }
 
-    /// The state after the last turn event in `text`, which holds whole lines; nil when it has none.
     static func afterLastTurnEvent(in text: Data) -> CodexTurnState? {
         var searchEnd = text.endIndex
         while searchEnd > text.startIndex {

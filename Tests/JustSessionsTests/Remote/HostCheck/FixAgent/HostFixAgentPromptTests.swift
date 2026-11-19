@@ -10,7 +10,7 @@ struct HostFixAgentPromptTests {
         thisMacSummary: "JustSessions 1.2.11",
         findings: [
             HostCheckFinding(
-                id: "tmux",
+                id: .tmux,
                 status: .problem,
                 title: "tmux",
                 summary: "Started by another tmux version.",
@@ -41,7 +41,6 @@ struct HostFixAgentPromptTests {
         #expect(task.hasPrefix("Fix what JustSessions' host check found on devbox.\n"))
         #expect(task.contains(report.plainText.trimmingCharacters(in: .newlines)))
         #expect(task.contains("exec /usr/bin/env JUSTSESSIONS=1 \"$SHELL\" -lic '<command>'"))
-        // The parts of the tab command the app really runs, for the tab the check came from.
         #expect(task.contains(RemoteCLICommandBuilder.remoteCommand(provider: .codex, projectPath: "/srv/project", arguments: [])))
         #expect(task.contains("`tmux new-session -A -s justsessions-codex-<session id> '<pane command>'`"))
         for option in RemoteTmuxSessionOptions.setOptionCommands(for: .codex, usingHostPrefix: false) {
@@ -84,7 +83,6 @@ struct HostFixAgentPromptTests {
                 What to do.
 
                 """))
-        // A section the app can't read is left out.
         #expect(!message.contains("Terminal persistence"))
     }
 

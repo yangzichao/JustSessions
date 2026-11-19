@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Copies from a local folder standing in for the remote home, with the same rsync filters used over SSH.
 struct RemoteSessionMirrorTests {
     @Test func mirrorsOnlySessionFilesAndListsThemAsRemote() throws {
         let root = try makeTemporaryDirectory()
@@ -25,7 +24,7 @@ struct RemoteSessionMirrorTests {
             .appending("\n")
             .write(to: codexDay.appendingPathComponent("rollout-2026-09-24T10-00-00-\(codexID).jsonl"), atomically: true, encoding: .utf8)
 
-        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path)
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path))
         let discovery = RemoteSessionDiscovery(mirror: mirror)
         let conversations = try discovery.discover(host: "devbox")
 
@@ -38,7 +37,6 @@ struct RemoteSessionMirrorTests {
         #expect(!FileManager.default.fileExists(atPath: claudeMirror.appendingPathComponent("settings.json").path))
         #expect(!FileManager.default.fileExists(atPath: claudeMirror.appendingPathComponent("projects/-home-me-paper/subagents").path))
 
-        // A session deleted on the host disappears from the mirror on the next copy.
         try FileManager.default.removeItem(at: claudeProject.appendingPathComponent("\(claudeID).jsonl"))
         #expect(try discovery.discover(host: "devbox").map(\.sessionID) == [codexID])
     }
@@ -49,7 +47,7 @@ struct RemoteSessionMirrorTests {
         let remoteHome = root.appendingPathComponent("remote-home")
         try FileManager.default.createDirectory(at: remoteHome, withIntermediateDirectories: true)
 
-        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path)
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path))
         #expect(try RemoteSessionDiscovery(mirror: mirror).discover(host: "devbox").isEmpty)
     }
 

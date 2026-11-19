@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// What each key does while a CLI's prompt is selected, as in a text field with all its text selected.
 struct PromptSelectionKeyActionTests {
     typealias Key = PromptSelectionTestKey
 
@@ -29,7 +28,6 @@ struct PromptSelectionKeyActionTests {
         #expect(PromptSelectionKeyAction(Key.typing("K", modifiers: .shift)) == .replace)
         #expect(PromptSelectionKeyAction(Key.typing(" ", keyCode: kVK_Space)) == .replace)
         #expect(PromptSelectionKeyAction(Key.typing("你")) == .replace)
-        // Option may send Meta, which a CLI reads as a command, not text.
         #expect(PromptSelectionKeyAction(Key.typing("˚", modifiers: .option)) == .passThrough)
     }
 

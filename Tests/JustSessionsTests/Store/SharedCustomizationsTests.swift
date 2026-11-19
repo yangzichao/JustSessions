@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Names, pins, archiving, and bookmarks belong to the app, so every workspace window shows each change, and a change in one
-/// window never loses another's. Each window used to save its own copy, loaded when it opened, over the others'.
 @MainActor
 struct SharedCustomizationsTests {
     @Test func aRenameShowsInEveryWindowAndKeepsTheOtherWindowsRenames() throws {
@@ -27,7 +25,6 @@ struct SharedCustomizationsTests {
         #expect(relaunched.title(for: second) == "Renamed in the second window")
     }
 
-    /// A store that never heard of the change, such as one opened before it in another registry, still keeps it.
     @Test func aChangeStartsFromWhatIsSavedNotFromTheWindowsOwnCopy() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
@@ -88,7 +85,6 @@ struct SharedCustomizationsTests {
         #expect(firstWindow.messageBookmarks.bookmarks(forConversationID: conversation.id).isEmpty)
     }
 
-    /// The letter comes from what is saved, so a window that missed the other's bookmark still takes the next one.
     @Test func twoWindowsNeverHandOutTheSameLetter() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
@@ -108,8 +104,6 @@ struct SharedCustomizationsTests {
         #expect(relaunched.messageBookmarks.bookmarks(forConversationID: conversation.id).map(\.letter) == ["a", "b"])
     }
 
-    /// A reading window whose workspace window closed hears of no other window's bookmarks. ⌘D there acts on what it
-    /// shows: on a message it shows without one, it keeps the bookmark another window added rather than removing it.
     @Test func aWindowThatMissedABookmarkKeepsItRatherThanRemovingIt() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }
@@ -126,7 +120,6 @@ struct SharedCustomizationsTests {
         #expect(unaware.messageBookmarks.bookmarks(forConversationID: conversation.id).map(\.letter) == ["a"])
     }
 
-    /// And on a message it still shows with a bookmark another window removed, it doesn't bookmark the message again.
     @Test func aWindowThatMissedARemovalDoesNotBookmarkTheMessageAgain() throws {
         let isolatedUserDefaults = try IsolatedUserDefaults()
         defer { isolatedUserDefaults.removeSuite() }

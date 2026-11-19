@@ -1,6 +1,5 @@
 import AppKit
 
-/// OpenCode's icon: a tall block "O", after the ring in OpenCode's own mark.
 enum OpenCodeBlockRingIcon {
     static func image(size: CGFloat) -> NSImage {
         let image = NSImage(size: NSSize(width: size, height: size), flipped: true) { bounds in

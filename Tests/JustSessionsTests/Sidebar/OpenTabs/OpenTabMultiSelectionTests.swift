@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Rows of Open tabs selected with ⌘- and Shift-clicks to close together, as `SidebarOpenTabsView+Selection` picks them.
 struct OpenTabMultiSelectionTests {
     private let tabIDs = (0..<5).map { _ in UUID() }
 
@@ -25,7 +24,6 @@ struct OpenTabMultiSelectionTests {
         selection.selectRange(to: tabIDs[3], in: tabIDs)
         #expect(selection.selectedTabIDs == Set(tabIDs[1...3]))
 
-        // A second Shift-click replaces the range but keeps the anchor.
         selection.selectRange(to: tabIDs[0], in: tabIDs)
         #expect(selection.selectedTabIDs == Set(tabIDs[0...1]))
         #expect(selection.anchorTabID == tabIDs[1])
@@ -36,7 +34,6 @@ struct OpenTabMultiSelectionTests {
         selection.selectRange(to: tabIDs[2], in: tabIDs)
         #expect(selection.selectedTabIDs == [tabIDs[2]])
 
-        // The anchor's group was collapsed since, so its row is out of sight.
         selection.selectRange(to: tabIDs[4], in: Array(tabIDs[3...]))
         #expect(selection.selectedTabIDs == [tabIDs[4]])
         #expect(selection.anchorTabID == tabIDs[4])

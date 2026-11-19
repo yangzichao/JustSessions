@@ -1,15 +1,10 @@
 import Foundation
 
-/// When `HostAutoRefresher` refreshes each host on its own. This Mac is due a minute after its last refresh started;
-/// an SSH host five minutes after its last copy. An SSH host whose refresh failed is tried five minutes after the
-/// failure was seen, then twice as long after each failure in a row, up to an hour; one that waits for Connect… is
-/// left alone. A host that has not had its first refresh is left to its window, which starts it.
 struct HostAutoRefreshSchedule {
     static let thisMacInterval: TimeInterval = 60
     static let sshHostInterval: TimeInterval = 5 * 60
     static let longestSSHHostWait: TimeInterval = 60 * 60
 
-    /// When each failing SSH host was last tried, or its failure first seen.
     private var lastTryByFailingHost: [String: Date] = [:]
     private var failuresInARowByHost: [String: Int] = [:]
 
@@ -29,7 +24,6 @@ struct HostAutoRefreshSchedule {
         case .failed?:
             guard !needsLogIn else { return false }
             guard let lastTry = lastTryByFailingHost[host] else {
-                // A failure this schedule didn't start, such as the first refresh's, counts from when it is seen.
                 lastTryByFailingHost[host] = now
                 failuresInARowByHost[host] = 1
                 return false
@@ -42,7 +36,6 @@ struct HostAutoRefreshSchedule {
         lastTryByFailingHost[host] = date
     }
 
-    /// After a refresh this schedule started, with the host's status once it ended.
     mutating func noteResult(on host: String, status: HostRefreshStatus?) {
         if case .failed? = status {
             failuresInARowByHost[host, default: 0] += 1
@@ -52,7 +45,6 @@ struct HostAutoRefreshSchedule {
         }
     }
 
-    /// Five minutes after one failure, ten after two, and so on, up to an hour.
     static func wait(afterFailuresInARow failures: Int) -> TimeInterval {
         min(sshHostInterval * pow(2, Double(min(max(failures - 1, 0), 10))), longestSSHHostWait)
     }

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the remote tab's command and the command a new choice sends against a real tmux on this Mac, whose
-/// `~/.tmux.conf` sets both prefix keys. Skipped where tmux is not installed.
 @Suite(.oneTmuxSandboxAtATime)
 struct RemoteTmuxPrefixKeysTests {
     @Test func sessionHasNoPrefixKeysUntilTheHostUsesItsOwnAndEachAttachSetsTheChoiceAgain() throws {
@@ -31,11 +29,9 @@ struct RemoteTmuxPrefixKeysTests {
         #expect(sandbox.waitUntil { sandbox.launchCount == 1 })
         #expect(prefixKeys(of: tmuxName) == ["None", "None"])
 
-        // Choosing the host's prefix reaches the attached session at once.
         _ = sandbox.run(RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: true, on: "devbox"))
         #expect(prefixKeys(of: tmuxName) == ["C-a", "C-q"])
 
-        // Reattaching with the new choice keeps it, and does not start the CLI again.
         firstClient.terminate()
         firstClient.waitUntilExit()
         let secondClient = try sandbox.startClient(tabCommand(usingHostPrefix: true))
@@ -43,7 +39,6 @@ struct RemoteTmuxPrefixKeysTests {
         #expect(sandbox.launchCount == 1)
         #expect(prefixKeys(of: tmuxName) == ["C-a", "C-q"])
 
-        // Going back to no prefix leaves the host's own tmux sessions alone.
         _ = sandbox.run("tmux new-session -d -s mine 'sleep 600'")
         _ = sandbox.run(RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: false, on: "devbox"))
         #expect(prefixKeys(of: tmuxName) == ["None", "None"])

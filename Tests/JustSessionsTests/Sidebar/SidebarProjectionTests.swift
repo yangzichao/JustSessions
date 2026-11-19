@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The store keeps the sidebar's projects between store changes; each change they come from must still show.
 @MainActor
 struct SidebarProjectionTests {
     @Test func theSidebarFollowsEveryChangeAfterItWasWorkedOut() throws {

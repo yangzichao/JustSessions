@@ -10,7 +10,6 @@
 /// Codex shows `Ask Codex to do anything` or `Ask a follow-up question` while the prompt is empty.
 enum CodexPromptRecognizer {
     static let textStartColumn = 2
-    /// The cells a row keeps free of text, measured at 80 columns.
     static let columnsWithoutText = 3
     static let placeholders: Set<String> = ["Ask Codex to do anything", "Ask a follow-up question"]
 
@@ -33,7 +32,6 @@ enum CodexPromptRecognizer {
         row.characters.count >= 2 && row.characters[0] == "›" && TerminalScreenRow.isBlank(row.characters[1])
     }
 
-    /// The row above the empty row that sits above the footer, the last rows with text.
     private static func lastPromptRow(in rows: [TerminalScreenRow]) -> Int? {
         guard let lastRowWithText = rows.lastIndex(where: { $0.firstTextIndex != nil }),
             let separator = rows[...lastRowWithText].lastIndex(where: { $0.firstTextIndex == nil }),

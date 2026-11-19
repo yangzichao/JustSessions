@@ -1,6 +1,5 @@
 import Foundation
 
-/// Short ages for sidebar rows: "now", "5m", "3h", and "2d" within a week, then a short date such as "Sep 3".
 enum CompactRelativeTimeFormatter {
     static func string(
         for date: Date,
@@ -13,7 +12,6 @@ enum CompactRelativeTimeFormatter {
         let secondsPerHour = 60 * secondsPerMinute
         let secondsPerDay = 24 * secondsPerHour
 
-        // A file stamped slightly in the future (clock skew) also reads as "now".
         if elapsedSeconds < secondsPerMinute { return "now" }
         if elapsedSeconds < secondsPerHour { return "\(Int(elapsedSeconds / secondsPerMinute))m" }
         if elapsedSeconds < secondsPerDay { return "\(Int(elapsedSeconds / secondsPerHour))h" }

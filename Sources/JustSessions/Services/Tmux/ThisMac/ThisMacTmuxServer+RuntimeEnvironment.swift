@@ -1,8 +1,6 @@
 import Foundation
 
 extension ThisMacTmuxServer {
-    /// Keep the bundled terminal database available to the tmux client, server, and the CLIs inside its panes, and
-    /// Ghostty's variables out of them; see `GhosttyAppEnvironment`.
     func runtimeEnvironment(from original: [String: String]) -> [String: String] {
         var result = GhosttyAppEnvironment.removingGhosttyVariables(from: original)
         guard let terminfoDirectory else { return result }

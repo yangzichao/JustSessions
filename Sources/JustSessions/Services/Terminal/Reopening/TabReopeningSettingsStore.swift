@@ -1,7 +1,6 @@
 import Combine
 import Foundation
 
-/// The saved choice of whether the app reopens the tabs of the last quit at launch. On until turned off in Settings.
 @MainActor
 final class TabReopeningSettingsStore: ObservableObject {
     static let shared = TabReopeningSettingsStore()

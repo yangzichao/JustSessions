@@ -8,27 +8,13 @@ import Testing
 
 @testable import JustSessions
 
-/// How long a keystroke takes to show in a quiet SwiftTerm tab while other tabs flood output, on the real
-/// pseudo-terminal path: the quiet tab runs `cat`, which echoes what is typed, and each flooding tab runs a script
-/// that prints lines as fast as it can, or at a set rate: 25,000 lines a second is about a 2 MB/s build log. Visible
-/// flooders draw; hidden ones are batched as the workspace batches them.
-/// Reports `Perf | <scenario> | <metric> | <value>` lines for each keystroke's time until its bytes reach the quiet
-/// terminal (`dataReceived`) and until the quiet view next draws, as p50, p95, and worst; plus the flooders' throughput
-/// and the main thread's longest gap. With maps following growing sessions, that many conversation-map columns show
-/// beside the terminals (PERF-89, PERF-90), each following a Codex file that grows by a 1 KB record every 100 ms.
-/// See docs/development/performance.md.
-///
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter TerminalFairnessMeasurements
 @MainActor
 @Suite(.serialized)
 struct TerminalFairnessMeasurements {
     struct Scenario: CustomStringConvertible {
         let visibleFlooders: Int
         let hiddenFlooders: Int
-        /// Lines a second each flooder prints; nil for as fast as it can, about 50 MB/s. A fast build log is about
-        /// 2 MB/s: 25,000 of these 76-byte lines a second.
         var linesPerSecond: Int? = nil
-        /// Conversation-map columns shown with the map on, each following its own growing session file.
         var mapsFollowingGrowingSessions = 0
         var description: String {
             let rate = linesPerSecond.map { " at \($0.formatted()) lines/s each" } ?? " as fast as they can"
@@ -66,12 +52,11 @@ struct TerminalFairnessMeasurements {
             perfReport(label, "process CPU % of one core", String(format: "%.0f", result.cpuPercent))
             if scenario.mapsFollowingGrowingSessions > 0 {
                 perfReport(label, "map outline reads", result.mapReadCounts.map(String.init).joined(separator: ", "))
-                // A map that never read measured nothing.
                 #expect(result.mapReadCounts.allSatisfy { $0 > 0 }, "\(label): a map never read its session")
             }
             try await Task.sleep(for: .milliseconds(500))
         }
-        #expect(!Self.scenarios.isEmpty)  // Record-only: the numbers above are the result.
+        #expect(!Self.scenarios.isEmpty)
     }
 }
 
@@ -123,9 +108,7 @@ private final class FairnessBench {
         window.isReleasedWhenClosed = false
         window.contentView = NSView(frame: Self.frame)
         window.orderFrontRegardless()
-        // Visible tabs share the window side by side, as split panes do.
         let visibleCount = 1 + scenario.visibleFlooders
-        // The maps take the window's right, as each column takes its tab's.
         let mapsWidth = CGFloat(scenario.mapsFollowingGrowingSessions) * ConversationMapMetrics.columnWidth
         let paneWidth = (Self.frame.width - mapsWidth) / CGFloat(visibleCount)
         func pane(_ index: Int) -> NSRect { NSRect(x: paneWidth * CGFloat(index), y: 0, width: paneWidth, height: Self.frame.height) }
@@ -146,7 +129,6 @@ private final class FairnessBench {
         if scenario.mapsFollowingGrowingSessions > 0 { try addMaps(width: mapsWidth) }
     }
 
-    /// Columns as `TerminalWorkspaceView` shows them, with the map on, each linked to a Codex file of 200 messages.
     private func addMaps(width: CGFloat) throws {
         settings.userDefaults.set(true, forKey: ConversationMapVisibility.userDefaultsKey)
         let store = ConversationStore(adapters: [], userDefaults: settings.userDefaults, startsBackgroundPolling: false)
@@ -173,7 +155,6 @@ private final class FairnessBench {
         window.contentView?.addSubview(host)
     }
 
-    /// Appends a 1 KB Codex reply to each map's file every 100 ms, off the main thread.
     private func growMapSessions() {
         let files = mapFiles
         guard !files.isEmpty else { return }
@@ -206,7 +187,6 @@ private final class FairnessBench {
     func run(keystrokes: Int, interval: Duration) async throws -> FairnessResult {
         start(quiet, command: "exec /bin/cat")
         let floodScript = folder.appendingPathComponent("flood.pl")
-        // With a rate, prints in bursts of a hundredth of a second's worth, then sleeps the rest of the hundredth.
         let perSecond = scenario.linesPerSecond ?? 0
         try #"""
         use Time::HiRes qw(sleep time);
@@ -233,7 +213,6 @@ private final class FairnessBench {
         let floodCounter = FloodLineCounter(views: flooders)
         for flooder in flooders { start(flooder, command: "exec /usr/bin/perl flood.pl") }
         growMapSessions()
-        // Let the flood get going before typing.
         try await Task.sleep(for: .milliseconds(700))
 
         let heartbeat = MainThreadPerfHeartbeat()
@@ -244,12 +223,10 @@ private final class FairnessBench {
         for index in 0..<keystrokes {
             let marker = String(format: "k%03d", index)
             probe.expect(marker)
-            // One marker a line, so none straddles a wrap at the pane's width.
             quiet.send(txt: marker + "\r\n")
             sent += 1
             try await Task.sleep(for: interval)
         }
-        // Give the last keystrokes time to show.
         try await Task.sleep(for: .seconds(1))
         let elapsed = ContinuousClock.now - start
         heartbeat.stop()
@@ -291,10 +268,6 @@ private final class FairnessBench {
     }
 }
 
-/// Times each marker typed into the quiet terminal: when it shows on the terminal's screen, read every 2 ms from the
-/// main queue, and when the view next draws after that. The 2 ms reads run on the main thread, so a stall there delays
-/// them as it delays the display; that is the delay a person would see. `draw(_:)` is hooked on SwiftTerm's view class
-/// for every view, keeping only the quiet view's draws.
 @MainActor
 private final class QuietTerminalProbe {
     private let view: SelectableTerminalView
@@ -313,7 +286,6 @@ private final class QuietTerminalProbe {
 
     func results() -> (Latencies, Latencies, Int) { (received, drawn, echoed) }
 
-    /// The quiet terminal's screen, where `cat` echoes what was typed.
     private var screenText: String {
         let terminal = view.getTerminal()
         return (0..<terminal.rows).compactMap { terminal.getLine(row: $0)?.translateToString(trimRight: true) }.joined(separator: "\n")
@@ -374,14 +346,10 @@ private final class QuietTerminalProbe {
     }
 }
 
-/// How many lines the flooding terminals got through: each flooder prints a running line number, and the largest one
-/// on a flooder's screen at the end is how far it got. Lines a flooder printed but the terminal hadn't parsed yet
-/// aren't counted, which is the point: this is what reached the screen.
 @MainActor
 private final class FloodLineCounter {
     private let views: [SelectableTerminalView]
     init(views: [SelectableTerminalView]) { self.views = views }
-    /// Lines parsed across every flooder, from the largest line number on each screen.
     var lines: Int {
         views.reduce(0) { total, view in
             let terminal = view.getTerminal()

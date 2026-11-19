@@ -5,7 +5,6 @@ import Testing
 
 @MainActor
 struct GhosttyTabTerminalViewTests {
-    /// The margin around a Ghostty terminal takes on the background a SwiftTerm terminal draws with the same settings.
     @Test func theMarginFollowsTheTerminalBackgroundThroughThemeModeAndAppAppearanceChanges() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
@@ -65,7 +64,6 @@ struct GhosttyTabTerminalViewTests {
         #expect(ghosttyView.frame.height == swiftTermView.frame.height)
     }
 
-    /// A click on a split pane's terminal selects its tab, then gives the terminal the keyboard.
     @Test(arguments: TerminalEngine.allCases)
     func clickingTheTerminalSelectsItsTabAndTakesTheKeyboard(_ engine: TerminalEngine) throws {
         _ = NSApplication.shared

@@ -7,7 +7,6 @@ final class PromptSelectionEventMonitor {
     private let monitor: Any?
     private let menuActionObserver: NSObjectProtocol
 
-    /// `handleEvent` returns whether the event goes on as usual. `handleMenuAction` gets the action's selector name.
     @MainActor
     init(
         matching mask: NSEvent.EventTypeMask,

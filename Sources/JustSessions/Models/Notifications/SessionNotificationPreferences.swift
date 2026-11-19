@@ -1,6 +1,5 @@
 import Foundation
 
-/// Which moments post a macOS notification. Both are on until turned off in Settings.
 struct SessionNotificationPreferences: Codable, Equatable {
     static let userDefaultsKey = "sessionNotifications"
 
@@ -28,7 +27,6 @@ struct SessionNotificationPreferences: Codable, Equatable {
 }
 
 extension SessionNotificationPreferences {
-    /// Reads each setting on its own, so a missing value, or one this version does not know, resets only that setting.
     init(from decoder: any Decoder) throws {
         self.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)

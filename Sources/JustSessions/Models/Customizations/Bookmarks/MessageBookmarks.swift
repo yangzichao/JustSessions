@@ -1,7 +1,5 @@
 import Foundation
 
-/// Each session's bookmarks, keyed by `Conversation.id`, each list in conversation order with one bookmark per letter
-/// and per message.
 struct MessageBookmarks: Equatable {
     static let userDefaultsKey = "messageBookmarks"
     static let letters = "abcdefghijklmnopqrstuvwxyz".map(String.init)
@@ -28,7 +26,6 @@ struct MessageBookmarks: Equatable {
         bookmarksByConversationID[conversationID] ?? []
     }
 
-    /// Removes the message's bookmark, or adds one with the lowest free letter.
     mutating func toggle(entryID: Int, kind: MessageBookmark.Kind, snippet: String, conversationID: String) -> MessageBookmarkToggle {
         var bookmarks = bookmarks(forConversationID: conversationID)
         if let index = bookmarks.firstIndex(where: { $0.entryID == entryID }) {
@@ -44,19 +41,16 @@ struct MessageBookmarks: Equatable {
         return .added(added)
     }
 
-    /// The message's bookmark, adding one with the lowest free letter when it has none; never removes one (⇧⌘D).
     mutating func ensure(entryID: Int, kind: MessageBookmark.Kind, snippet: String, conversationID: String) -> MessageBookmarkEnsuring {
         if let existing = bookmarks(forConversationID: conversationID).first(where: { $0.entryID == entryID }) {
             return .existing(existing)
         }
         switch toggle(entryID: entryID, kind: kind, snippet: snippet, conversationID: conversationID) {
         case .added(let added): return .added(added)
-        case .removed, .allLettersInUse: return .allLettersInUse  // .removed is not reached: the message had none
+        case .removed, .allLettersInUse: return .allLettersInUse
         }
     }
 
-    /// Sets the label and tags of the bookmark with this letter on this message, kept to `MessageBookmarkDetails`' rules.
-    /// Nil, changing nothing, when another window removed it meanwhile.
     @discardableResult
     mutating func setDetails(of bookmark: MessageBookmark, label: String?, tags: [String], conversationID: String) -> MessageBookmark? {
         var bookmarks = bookmarks(forConversationID: conversationID)
@@ -69,7 +63,6 @@ struct MessageBookmarks: Equatable {
         return bookmarks[index]
     }
 
-    /// Every tag in use, in any session, the most used first, then by name; each once whatever its case.
     var allTags: [String] {
         var counts: [String: (tag: String, count: Int)] = [:]
         for bookmark in bookmarksByConversationID.values.joined() {
@@ -83,7 +76,6 @@ struct MessageBookmarks: Equatable {
         }.map(\.tag)
     }
 
-    /// Each session's bookmarks that `query` finds, in conversation order; sessions with none are left out.
     func matches(for query: MessageBookmarkQuery, includingSnippets: Bool) -> [String: [MessageBookmark]] {
         bookmarksByConversationID.compactMapValues { bookmarks in
             let found = bookmarks.filter { query.matches($0, includingSnippet: includingSnippets) }
@@ -91,7 +83,6 @@ struct MessageBookmarks: Equatable {
         }
     }
 
-    /// Only the bookmark with this letter on this message, never one that took the letter since.
     mutating func remove(_ bookmark: MessageBookmark, conversationID: String) {
         set(
             bookmarks(forConversationID: conversationID).filter { $0.letter != bookmark.letter || $0.entryID != bookmark.entryID },
@@ -102,8 +93,6 @@ struct MessageBookmarks: Equatable {
         for conversationID in conversationIDs { bookmarksByConversationID[conversationID] = nil }
     }
 
-    /// After a jump found the message at another part of its record, or with more of its text. If another bookmark
-    /// already marks that message, the moved one goes. A moved bookmark keeps its label and tags.
     mutating func update(_ bookmark: MessageBookmark, entryID: Int, snippet: String, conversationID: String) {
         var bookmarks = bookmarks(forConversationID: conversationID)
         guard let index = bookmarks.firstIndex(where: { $0.letter == bookmark.letter && $0.entryID == bookmark.entryID }) else { return }
@@ -120,7 +109,6 @@ struct MessageBookmarks: Equatable {
         bookmarksByConversationID[conversationID] = Self.normalized(bookmarks)
     }
 
-    /// Sorted by entry ID; only letters a–z; one bookmark per letter and per message; nil, dropping the key, when empty.
     private static func normalized(_ bookmarks: [MessageBookmark]) -> [MessageBookmark]? {
         var usedLetters = Set<String>()
         var markedEntryIDs = Set<Int>()

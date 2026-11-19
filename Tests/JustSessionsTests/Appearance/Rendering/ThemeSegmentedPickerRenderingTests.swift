@@ -6,8 +6,6 @@ import Testing
 
 @MainActor
 struct ThemeSegmentedPickerRenderingTests {
-    /// The system segmented control's selected segment differed from its track by about 1.1:1 on Atom One Dark's
-    /// Settings surface. A selected segment is a control's state, so it needs the 3:1 of WCAG's non-text contrast.
     @Test func selectedSegmentStandsOutFromTheTrackInEveryTheme() async throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
@@ -41,7 +39,6 @@ struct ThemeSegmentedPickerRenderingTests {
                         ))
                     return hexValue(of: pixel)
                 }
-                // Just inside each end of the control, clear of its rounded corners and centered titles.
                 let selectedFill = try color(atPoint: pickerFrame.minX + 6)
                 let track = try color(atPoint: pickerFrame.maxX - 6)
                 let contrast = ThemeColorContrast.ratio(selectedFill, track)

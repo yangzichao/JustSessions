@@ -8,8 +8,7 @@ enum ClosedTabProcessReaper {
         // waitpid(0) or waitpid(-1) would reap another tab's process out from under SwiftTerm.
         guard processID > 0 else { return }
         let exitSource = DispatchSource.makeProcessSource(identifier: processID, eventMask: .exit, queue: .global(qos: .utility))
-        // The handler keeps the source alive until it has reaped the process. A process that exited before the
-        // source was set up still reports its exit.
+        // A process that exited before the source was set up still reports its exit.
         exitSource.setEventHandler {
             // macOS can report the exit of a shell that led its terminal's session before the shell can be waited
             // for, so this waits rather than checks. It returns at once for a process that is not the app's child.

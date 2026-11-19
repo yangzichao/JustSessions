@@ -5,9 +5,6 @@ import GhosttyTerminal
 
 @testable import JustSessions
 
-/// A Ghostty tab's terminal in a window that is never shown, running a process that records every byte the terminal
-/// sends it, while a script of its own prints output. The script can wait for the test with `wait_for <name>`, which
-/// returns once the test calls `signal(_:)` with that name.
 @MainActor
 final class GhosttyTabFixture {
     let view: GhosttyTabTerminalView
@@ -43,8 +40,6 @@ final class GhosttyTabFixture {
         window.makeFirstResponder(view)
     }
 
-    /// Starts the process: `script` runs in the background, printing to the terminal, while the input is recorded.
-    /// The script starts once Ghostty has laid the terminal out, so its output isn't laid out again.
     func start(printing script: String) async throws {
         let commands = """
             stty raw -echo
@@ -85,7 +80,6 @@ final class GhosttyTabFixture {
         FileManager.default.createFile(atPath: folder.appendingPathComponent(name).path, contents: nil)
     }
 
-    /// Every byte the terminal sent the process so far.
     var receivedInput: String {
         String(decoding: (try? Data(contentsOf: folder.appendingPathComponent("input"))) ?? Data(), as: UTF8.self)
     }
@@ -94,7 +88,6 @@ final class GhosttyTabFixture {
         view.inMemorySession.readViewportText() ?? ""
     }
 
-    /// Selects everything, scrollback included, and reads it back.
     func selectAllText() -> String? {
         view.selectAll(nil)
         return view.terminalSurface?.readSelection()
@@ -112,7 +105,6 @@ final class GhosttyTabFixture {
     }
 }
 
-/// `keyDown` events as a US keyboard sends them.
 @MainActor
 enum SyntheticKey {
     static func event(keyCode: Int, characters: String, modifiers: NSEvent.ModifierFlags = [], window: NSWindow) -> NSEvent {

@@ -1,7 +1,6 @@
 import SwiftUI
 
 extension ConversationProvider {
-    /// Template images inherit the foreground color, including the custom Codex, Kiro, and OpenCode icons.
     func iconImage(size: CGFloat = 13) -> Image {
         switch self {
         case .claude: Image(systemName: "asterisk")
@@ -13,8 +12,6 @@ extension ConversationProvider {
         }
     }
 
-    /// The same icon for an AppKit menu item, such as the terminal's Split right and Split down entries, so they match
-    /// the tab bar's (TRM-62).
     func menuItemImage(size: CGFloat = 13) -> NSImage? {
         switch self {
         case .claude: NSImage(systemSymbolName: "asterisk", accessibilityDescription: nil)

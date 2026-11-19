@@ -58,10 +58,6 @@ struct TranscriptReadingWidthLayoutTests {
         }
     }
 
-    /// Waits until the visible entries are laid out as `isLaidOut` expects, given the visible width. The setting reaches
-    /// the layout on later main-actor turns, which a busy main thread at the start of a full run can hold up for far
-    /// longer than a fixed settle: one release run still saw full-width entries after it. The expectations that follow
-    /// report what the transcript shows if this gives up.
     private func waitForEntryFrames(
         in scrollView: NSScrollView, of fixture: TranscriptScrollViewFixture, _ isLaidOut: (CGRect, CGFloat) -> Bool
     ) async throws {

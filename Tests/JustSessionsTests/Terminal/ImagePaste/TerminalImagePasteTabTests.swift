@@ -4,13 +4,10 @@ import Testing
 
 @testable import JustSessions
 
-/// An image pasted on a tab, from either menu's Paste to what the tab's CLI receives; ⌘V chooses the Edit menu's. Each
-/// tab reads a pasteboard of its own in place of the clipboard, and its process records what it is sent.
 @MainActor
 struct TerminalImagePasteTabTests {
     enum Trigger: CaseIterable {
         case rightClickMenuPaste
-        /// The action the Edit menu's Paste sends, as ⌘V chooses it.
         case editMenuPaste
 
         @MainActor
@@ -119,7 +116,6 @@ struct TerminalImagePasteTabTests {
         #expect(fixture.receivedInput == "x")
     }
 
-    /// Text on the clipboard, an image's beside it included, is Ghostty's own paste.
     @Test func aClipboardWithTextIsLeftToTheEngine() throws {
         let fixture = try GhosttyTabFixture()
         let pasteboard = NSPasteboard.holding([.png: makePNGData(), .string: Data("shot.png".utf8)])

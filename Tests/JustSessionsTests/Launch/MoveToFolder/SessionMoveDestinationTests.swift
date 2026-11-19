@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Move to lists the other projects on the session's host whose folder a session can start in, in the sidebar's order.
 struct SessionMoveDestinationTests {
     @Test func listsTheOtherProjectsOnTheSessionsHostInSidebarOrder() {
         let session = Conversation.fixture(projectPath: "/home/me/api", updatedAt: .now, host: .ssh("devbox"))
@@ -44,7 +43,6 @@ struct SessionMoveDestinationTests {
         #expect(destinations.first?.menuTitle == "app — \(Self.parentLabel(of: workApp))")
     }
 
-    /// Project keys on this Mac resolve symbolic links, such as `/var` to `/private/var`.
     private static func resolved(_ path: String) -> String {
         URL(fileURLWithPath: path).resolvingSymlinksInPath().path
     }

@@ -3,11 +3,8 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the commands against a real tmux on this Mac, with a private tmux server and home folder, and stand-ins for
-/// the host's login shell and CLI; see `TmuxSandbox`. Skipped where tmux is not installed.
 @Suite(.oneTmuxSandboxAtATime)
 struct RemoteTmuxEndingBeforeDeletionTests {
-    /// The CLI takes a second to exit after its terminal hangs up, as a CLI saving on exit might.
     @Test func endingTheSessionReturnsOnceItsCLIHasExited() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
@@ -35,7 +32,6 @@ struct RemoteTmuxEndingBeforeDeletionTests {
         #expect(!sandbox.hasTmuxSession(tmuxName))
     }
 
-    /// The login shell runs a function, so the CLI is the pane's child. Both hang up; the shell exits at once.
     @Test func endingWaitsForACLIAFunctionStartedInTheLoginShell() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory else { return }
         let sandbox = try TmuxSandbox(
@@ -92,7 +88,6 @@ struct RemoteTmuxEndingBeforeDeletionTests {
 
         _ = sandbox.run(RemoteTmuxCommands.killSessionWaitingForCLIExitCommand(tmuxName, on: "devbox", timeoutSeconds: 2), timeout: 300)
 
-        // The CLI never exits, so returning well before `run`'s 300-second limit means the command gave up on it.
         let elapsed = Date().timeIntervalSince(startedAt)
         #expect(elapsed >= 1 && elapsed < 120, "waited \(elapsed) seconds")
         #expect(kill(cliProcessID, 0) == 0)

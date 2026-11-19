@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// What ⌘-clicking a link in a tab does, with the tab's host and project folder and the choice in Settings → General →
-/// Tabs; see `TerminalLinkActions+Click`. Both engines hand over the same link (`TerminalLinkClickTests`).
 @MainActor
 @Suite(.serialized)
 struct TerminalTabLinkOpeningTests {
@@ -50,7 +48,6 @@ struct TerminalTabLinkOpeningTests {
         #expect(scenario.openedURLs.isEmpty)
     }
 
-    /// An editor isn't for an image, and a folder opens in the Finder.
     @Test func withAnEditorChosenAnImageStillOpensInItsDefaultAppAndAFolderInTheFinder() throws {
         let scenario = try Scenario(files: ["screenshot.png", "Sources/main.swift"], choice: .editor(name: "Zed"))
         defer { scenario.tearDown() }
@@ -87,7 +84,6 @@ struct TerminalTabLinkOpeningTests {
         #expect(scenario.fixture.store.alert?.message == "Could not open plan.md in Zed: No window to open it in")
     }
 
-    /// The menu has the right-click menu's link items alone, and nothing opens until one is chosen.
     @Test func askingEachTimeShowsTheLinksItemsOverTheTerminal() throws {
         let scenario = try Scenario(files: ["plan.md", "screenshot.png"], choice: .askEachTime)
         defer { scenario.tearDown() }
@@ -107,7 +103,6 @@ struct TerminalTabLinkOpeningTests {
         #expect(scenario.openedURLs == [scenario.url("plan.md")])
     }
 
-    /// Only a file asks; a web page or a folder opens at once.
     @Test func askingEachTimeLeavesWebPagesAndFoldersAsTheyWere() throws {
         let scenario = try Scenario(files: ["Sources/main.swift"], choice: .askEachTime)
         defer { scenario.tearDown() }
@@ -119,7 +114,6 @@ struct TerminalTabLinkOpeningTests {
         #expect(scenario.shownMenus.isEmpty)
     }
 
-    /// The tab's view in its window hands the terminal's ⌘-clicked links to the window.
     @Test func aTabShownInItsWindowHandsItsClickedLinksOver() throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
@@ -144,8 +138,6 @@ struct TerminalTabLinkOpeningTests {
     }
 }
 
-/// A tab in a store, its project folder with empty files at the given relative paths, Zed and VS Code installed, a
-/// choice for file links, and what clicking did in place of opening or showing anything.
 @MainActor
 private final class Scenario {
     let fixture: TerminalContextMenuFixture

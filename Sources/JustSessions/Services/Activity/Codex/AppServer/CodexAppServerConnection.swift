@@ -1,7 +1,5 @@
 import Foundation
 
-/// JSON-RPC with Codex's background server, in WebSocket text messages over its Unix socket. Requests go one after
-/// another; notifications the server sends meanwhile are skipped.
 final class CodexAppServerConnection {
     enum ConnectionError: Error {
         case upgradeRefused
@@ -20,7 +18,6 @@ final class CodexAppServerConnection {
         var head = Data()
         let headEnd = Data("\r\n\r\n".utf8)
         while head.range(of: headEnd) == nil {
-            // A response head is a few short lines; anything longer is no upgrade.
             guard head.count < 16 << 10 else { throw ConnectionError.upgradeRefused }
             head.append(try socket.read())
         }
@@ -32,14 +29,12 @@ final class CodexAppServerConnection {
         try send(["jsonrpc": "2.0", "method": "initialized"])
     }
 
-    /// The `result` of the server's response, or nil when it responds with an error.
     func request(_ method: String, params: [String: Any]) throws -> [String: Any]? {
         nextRequestID += 1
         let requestID = nextRequestID
         try send(["jsonrpc": "2.0", "id": requestID, "method": method, "params": params])
         while true {
             let message = try nextMessage()
-            // A notification has a method; a request from the server has both; a response has neither.
             guard message["method"] == nil, (message["id"] as? Int) == requestID else { continue }
             return message["result"] as? [String: Any]
         }

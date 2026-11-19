@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A session runs in at most one tab across the app's windows: opening it where another window has its tab shows that
-/// tab instead of a second tab on the same CLI.
 @MainActor
 struct SessionTabAcrossWindowsTests {
     @Test func resumingASessionWhoseTabIsInAnotherWindowShowsThatTab() throws {
@@ -19,7 +17,6 @@ struct SessionTabAcrossWindowsTests {
         #expect(sandbox.first.selectedTerminalID == tab.id)
     }
 
-    /// Even with the CLI listed in tmux, which a click would otherwise reattach to in a new tab.
     @Test func clickingASessionWhoseTabIsInAnotherWindowLeavesItToThePreview() throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
@@ -29,7 +26,6 @@ struct SessionTabAcrossWindowsTests {
         #expect(!sandbox.second.showRunningCLI(for: sandbox.conversation))
 
         #expect(sandbox.second.terminalSessions.isEmpty)
-        // A click only looks; the other window stays as it was.
         #expect(sandbox.first.selectedTerminalID == nil)
     }
 
@@ -81,8 +77,6 @@ struct SessionTabAcrossWindowsTests {
         #expect(sandbox.first.selectedTerminalID == last.id)
     }
 
-    /// Reopening the tabs from the last quit waits for the host's sessions. A session opened meanwhile in another
-    /// window keeps its tab there.
     @Test func aTabFromTheLastQuitStaysClosedWhileAnotherWindowHasItsSession() throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }

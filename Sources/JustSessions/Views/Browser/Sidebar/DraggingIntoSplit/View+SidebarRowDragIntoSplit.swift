@@ -1,11 +1,6 @@
 import SwiftUI
 
 extension View {
-    /// Lets the row be dragged onto its window's terminals, to show `row` there as a tab dragged from the tab bar would;
-    /// see `SidebarRowDragIntoSplit`. It drags alongside the row's other drags, such as among the pinned rows, which
-    /// land nowhere once the pointer leaves the list. The highlight over the terminals names it `title`. The row fades
-    /// while dragged when `fadesWhileDragged`, for a row with no other drag to fade it. `onDropped` comes once the row
-    /// shows there.
     func sidebarRowDragIntoSplit(
         _ row: SidebarDraggedRow,
         titled title: String,

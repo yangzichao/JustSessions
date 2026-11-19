@@ -67,7 +67,6 @@ struct ArchivedSessionsTests {
         #expect(store.pinnedItems.isPinned(conversationID: archivedConversation.id))
         #expect(store.title(for: archivedConversation) == "Custom name")
 
-        // The tool filter narrows the archived count too.
         let codexOnly = store.filteredSidebarProjection(providerFilter: .only(.codex), recencyFilter: .all, searchText: "")
         #expect(codexOnly.archivedSessionCount == 0)
     }

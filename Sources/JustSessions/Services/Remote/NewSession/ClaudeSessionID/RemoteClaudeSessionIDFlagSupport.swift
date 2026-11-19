@@ -1,10 +1,5 @@
 import Foundation
 
-/// Whether an SSH host's `claude` accepts `--session-id <uuid>`, as `ClaudeSessionIDFlagSupport` asks on this Mac.
-/// With the flag, a new tab knows its session before the CLI writes it, so it is never linked to another tab's
-/// session or to one started outside the app; see `linkWaitingTabsToPreassignedSessions`. The host's `claude --help`
-/// runs in its login shell, after a refresh found the CLI; a launch never waits for it and goes without the flag
-/// until the answer is in. A start command of your own is checked on its own, since it can run another CLI.
 final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
     static let shared = RemoteClaudeSessionIDFlagSupport()
 
@@ -19,7 +14,6 @@ final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
         self.helpTimeout = helpTimeout
     }
 
-    /// A new session id when the host's CLI is known to accept the flag, and nil otherwise. Checks nothing.
     func preassignedSessionID(host: String, startCommand: String?) -> String? {
         guard lock.withLock({ answersByCheck[Self.key(host: host, startCommand: startCommand)] }) == true else { return nil }
         // Claude Code's own ids are lowercase, and it names the transcript by the id exactly as given.
@@ -36,8 +30,6 @@ final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
         return Task.detached(priority: .utility) { [self] in _ = check(host: host, startCommand: startCommand) }
     }
 
-    /// Runs the CLI's `--help` on the host and records whether it lists the flag. Returns nil when it could not
-    /// tell, as when the host is offline or the CLI fails, so a later refresh tries again.
     @discardableResult
     func check(host: String, startCommand: String?) -> Bool? {
         let result = runner.run(host, Self.helpCommand(startCommand: startCommand, host: host), helpTimeout)
@@ -50,7 +42,6 @@ final class RemoteClaudeSessionIDFlagSupport: @unchecked Sendable {
         return answer
     }
 
-    /// What a new session's tab would start, with `--help` in place of the app's arguments.
     static func helpCommand(
         startCommand: String?,
         host: String,

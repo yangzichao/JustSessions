@@ -23,7 +23,6 @@ struct SSHConnectionSharingTests {
         #expect(SSHConnectionSharing.socketRoot == "/tmp/justsessions-ssh-\(getuid())")
     }
 
-    /// A host logged in to with Connect… refreshes through that login, and the refresh leaves it open.
     @Test func aRefreshGoesThroughTheHostsLogin() throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }

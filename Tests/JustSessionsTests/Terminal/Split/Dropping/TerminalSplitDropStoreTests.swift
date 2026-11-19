@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab dropped on a side of the terminals shows there in a split view, selected: beside the selected tab in a new
-/// split, or in place of the shown split's tab on that side. Dropped in the middle, it shows on its own, selected. Only
-/// one tab in no split, other than the selected one, can drop there.
 @MainActor
 struct TerminalSplitDropStoreTests {
     @Test func aTabDroppedOnTheRightShowsBesideTheSelectedTabOnTheRight() throws {
@@ -109,7 +106,6 @@ struct TerminalSplitDropStoreTests {
         store.selectTerminal(third.id)
 
         #expect(store.canShowDroppedTabs([fourth.id]))
-        // The selected tab itself, a split's tab, and a split's two tabs together.
         #expect(!store.canShowDroppedTabs([third.id]))
         #expect(!store.canShowDroppedTabs([first.id]))
         #expect(!store.canShowDroppedTabs([first.id, second.id]))
@@ -132,8 +128,6 @@ struct TerminalSplitDropStoreTests {
 
         #expect(!store.canShowDroppedTabs([first.id]))
     }
-
-    // MARK: - Helpers
 
     private func makeStore() throws -> (ConversationStore, () -> Void) {
         let isolatedUserDefaults = try IsolatedUserDefaults()

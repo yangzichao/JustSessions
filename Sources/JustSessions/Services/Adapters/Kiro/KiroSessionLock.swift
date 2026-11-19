@@ -8,20 +8,17 @@ import Foundation
 /// session's folder that the running CLI then writes again from its next turn (Kiro CLI 2.34.0).
 struct KiroSessionLock: Equatable, Sendable {
     static let maximumByteCount = 4_096
-    /// `started_at` is written after the process starts; this allows for a clock read just before it.
     static let startSlack: TimeInterval = 5
 
     let processID: Int32
     let startedAt: Date?
 
-    /// The lock of the session whose transcript is `sourceFile`.
     static func file(forSessionFile sourceFile: URL) -> URL {
         KiroV3Session.isMessagesFile(sourceFile)
             ? sourceFile.deletingLastPathComponent().appendingPathComponent(".lock")
             : sourceFile.deletingPathExtension().appendingPathExtension("lock")
     }
 
-    /// The session's lock when a running process holds it; nil when it has none, or its CLI has ended.
     static func heldLock(forSessionFile sourceFile: URL) -> KiroSessionLock? {
         guard let lock = KiroSessionLock(file: file(forSessionFile: sourceFile)), lock.isHeld else { return nil }
         return lock
@@ -32,7 +29,6 @@ struct KiroSessionLock: Equatable, Sendable {
         self.startedAt = startedAt
     }
 
-    /// Nil for a missing, unreadable, or oversized file, or one without a process id.
     init?(file: URL) {
         guard (try? file.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
             let handle = try? FileHandle(forReadingFrom: file)
@@ -45,8 +41,6 @@ struct KiroSessionLock: Equatable, Sendable {
         self.init(processID: processID, startedAt: (object["started_at"] as? String).flatMap(Self.date(from:)))
     }
 
-    /// Its process still runs, and started before the lock was written: a crashed CLI's process id, taken since by
-    /// a newer process, doesn't hold it.
     var isHeld: Bool {
         guard RunningProcessInfo.isRunning(processID) else { return false }
         guard let startedAt, let processStart = RunningProcessInfo.startDate(of: processID) else { return true }

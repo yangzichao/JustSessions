@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A login made with Connect… has no idle limit, so one left by an app that crashed is closed at the next launch.
-/// Logins of an app still running, this one or another copy, and refreshes' connections are left alone.
 struct SSHLoginsOfEndedAppsTests {
     @Test func onlyLoginsOfAppsNoLongerRunningAreClosed() throws {
         let root = makeShortSocketFolder()
@@ -31,7 +29,6 @@ struct SSHLoginsOfEndedAppsTests {
         }
     }
 
-    /// A UUID whose first part is all digits reads like a process ID; without a UUID after it, the folder is kept.
     @Test func aFolderNamedOtherwiseIsLeftAlone() throws {
         let root = makeShortSocketFolder()
         defer { try? FileManager.default.removeItem(atPath: root) }

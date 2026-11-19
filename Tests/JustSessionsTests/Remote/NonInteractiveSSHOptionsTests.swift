@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Commands and copies over SSH without a terminal notice a host that stops answering, as after the Mac sleeps, and
-/// leave out the `~/.ssh/config` settings meant for logging in by hand.
 struct NonInteractiveSSHOptionsTests {
     static let expectedOptions = [
         "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "-o", "ServerAliveInterval=10", "-o", "ServerAliveCountMax=3",
@@ -32,14 +30,12 @@ struct NonInteractiveSSHOptionsTests {
                 + " -o ControlMaster=auto -o ControlPath=/tmp/justsessions-ssh-501/refresh-id/master -o ControlPersist=60")
     }
 
-    /// It runs the host's shell in a terminal, as a tab does.
     @Test func theShellStartupCheckKeepsItsTerminal() {
         #expect(
             RemoteShellStartupCheck.sshArguments(host: "devbox", command: "true", connectionSharingOptions: Self.sharingOptions)
                 == ["-tt"] + Self.expectedOptions + Self.sharingOptions + ["devbox", "true"])
     }
 
-    /// Each tab keeps a connection of its own, so ending one never ends the others' CLIs.
     @Test func tabsDoNotShareAConnection() {
         let tab = RemoteCLICommandBuilder(inheritedEnvironment: [:], loginConnections: SSHLoginConnections(close: { _, _ in }))
             .sshCommand(host: "devbox", remoteCommand: "true")
@@ -47,7 +43,6 @@ struct NonInteractiveSSHOptionsTests {
         #expect(!tab.arguments.contains { $0.hasPrefix("Control") })
     }
 
-    /// A host logged in to with Connect… would ask each tab for the password or code again.
     @Test func aTabGoesThroughTheHostsLogin() throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -63,7 +58,6 @@ struct NonInteractiveSSHOptionsTests {
         #expect(Array(tab.arguments.suffix(2)) == ["devbox", "true"])
     }
 
-    /// The login a tab went through may have closed, and another opened, by the time it reconnects.
     @Test func aReconnectingTabGoesThroughTheLoginOpenNow() throws {
         let earlier = try makeTemporaryDirectory()
         let current = try makeTemporaryDirectory()

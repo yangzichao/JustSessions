@@ -40,7 +40,6 @@ struct ClaudeSessionIDFlagSupportTests {
         #expect(support.preassigningSessionID(to: command) == nil)
     }
 
-    /// A start command of your own can pick another CLI with its arguments, so it gets an answer of its own.
     @Test func aStartCommandIsCheckedWithItsOwnArguments() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -71,7 +70,6 @@ struct ClaudeSessionIDFlagSupportTests {
 
         let startedAt = Date()
         #expect(support.check(command) == nil)
-        // Well short of the stand-in's 600 seconds, so the time limit, not `--help` ending, gave the answer.
         #expect(Date().timeIntervalSince(startedAt) < 120)
     }
 
@@ -82,7 +80,6 @@ struct ClaudeSessionIDFlagSupportTests {
         let support = ClaudeSessionIDFlagSupport(helpTimeout: 60)
 
         #expect(support.preassigningSessionID(to: command) == nil)
-        // The check runs in a utility-priority task, which a full run's start can hold up for well over 5 seconds.
         try await expectEventually { support.preassigningSessionID(to: command) != nil }
     }
 

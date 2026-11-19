@@ -32,7 +32,6 @@ struct ThisMacTmuxServerTests {
                 "-e", "COLORTERM=truecolor", "-e", "PATH=/usr/bin:/bin",
                 "--", "/Users/me/.local/bin/claude", "--resume", "abc",
             ])
-        // The client starts in the project, so the session does too; it keeps the tab's terminal type.
         #expect(command.workingDirectory == "/Users/me/paper")
         #expect(command.environment == ["COLORTERM=truecolor", "PATH=/usr/bin:/bin", "TERM=xterm-256color"])
     }
@@ -89,7 +88,6 @@ struct ThisMacTmuxServerTests {
         #expect(!ThisMacTmuxVersionCheck.isSupported(versionOutput: ""))
     }
 
-    /// A failed CLI's dead pane, kept while a tab shows it, runs no CLI.
     @Test func paneListingMapsEachSessionToItsCLIProcessLeavingOutDeadPanes() {
         let output =
             "justsessions-claude-abc 4242 0\njustsessions-codex-new-1a2b3c4d 77 0\njustsessions-pi-dead 91 1\nbroken line here now\nno-pid\n"

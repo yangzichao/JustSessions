@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// `mightContainTranscriptItem` skips most of a rollout without parsing it. Skipping must never lose anything:
-/// no line it rejects would have added to the transcript.
 struct CodexLineFilterPropertyTests {
     private static let recordTypes = ["response_item", "response_item", "event_msg", "compacted", "turn_context", "session_meta"]
     private static let payloadTypes = [
@@ -36,7 +34,6 @@ struct CodexLineFilterPropertyTests {
             if addsToTranscript { shownLineCount += 1 }
         }
 
-        // Both kinds of line came up, so the check above was not vacuous.
         #expect(skippedLineCount > 100)
         #expect(shownLineCount > 100)
     }
@@ -60,8 +57,6 @@ struct CodexLineFilterPropertyTests {
         #expect(!CodexTranscriptReader.mightContainTranscriptItem(Data(line.utf8)))
     }
 
-    /// A payload with its fields in random order, in Codex's layouts or in others a line could have: keys in
-    /// another order, spaces, something nested before the record's type, or an escaped type.
     private static func randomLine(using generator: inout SeededRandomNumberGenerator) -> String {
         let payloadType = payloadTypes.randomElement(using: &generator)!
         var fields = payloadFields.shuffled(using: &generator).prefix(Int.random(in: 0...4, using: &generator)).map { $0 }

@@ -1,8 +1,6 @@
 import Combine
 import Foundation
 
-/// Read-heavy workspace state shared by every window. Window presentation and terminal state stay in each
-/// `ConversationStore`; session discovery and message text do not need a copy per window.
 @MainActor
 final class WorkspaceReadService: ObservableObject {
     struct ThisMacDiscovery: Sendable {
@@ -29,14 +27,10 @@ final class WorkspaceReadService: ObservableObject {
         self.messageIndexer = messageIndexer
     }
 
-    /// Joins a scan already in flight. Each caller is a waiter; when the final waiter cancels, that producer is
-    /// evicted so a later window starts fresh.
     func discoverThisMac(coordinatingWith hostWork: HostSessionWorkCoordinator? = nil) async throws -> ThisMacDiscovery {
         try await discovery.discover(adapters: adapters, commandResolver: commandResolver, hostWork: hostWork)
     }
 
-    /// How many windows wait on the scan in flight. A window's refresh joins from a task of its own, so this tells a
-    /// test when it has.
     func thisMacDiscoveryWaiterCount() async -> Int {
         await discovery.waiterCount
     }
@@ -86,7 +80,6 @@ private actor ThisMacDiscoveryCoordinator {
                 )
             }
         } onCancel: {
-            // This mark is synchronous and visible to `addWaiter`, even before the actor processes cleanup.
             cancellation.cancel()
             Task { await self.cancelWaiter(waiterID) }
         }
@@ -139,7 +132,6 @@ private actor ThisMacDiscoveryCoordinator {
         removeCancelledWaiters()
     }
 
-    /// Removes synchronously marked waiters before a new caller can join their producer.
     private func removeCancelledWaiters() {
         guard var inFlight else { return }
         let cancelledIDs = inFlight.waiters.compactMap { id, waiter in
@@ -186,8 +178,6 @@ private actor ThisMacDiscoveryCoordinator {
                 cancellation: cancellation
             )
             try cancellation.checkCancellation()
-            // Version and tmux-server process probes have finite timeouts. Probing does not change the selected
-            // server; only `producerFinished` may commit, after checking this discovery generation is still current.
             let tmuxServer = commandResolver.probeThisMacTmuxServer()
             try cancellation.checkCancellation()
             let tmuxPaneProcessIDs = tmuxServer?.appSessionPaneProcessIDs() ?? [:]

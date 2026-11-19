@@ -4,18 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Measures reading a tab's conversation-map outline (PERF-90), as `ConversationOutlineReader` does off the main
-/// thread: a cold read, a read after a one-record append, a read after the file is replaced by a copy with one more
-/// record (as rsync leaves an SSH mirror), a change check, ⌘D's newest message cold and warm, and the outline's size
-/// a block and a message; and drawing a 10,000-block map in its one Canvas (PERF-89). Reports `Perf | <scenario> | <metric> | <value>` lines, medians of `runCount`.
-///
-/// Fixtures: the 27 MiB realistic and 100 MiB synthetic Codex logs of `IncrementalMessageSearchMeasurements`, a
-/// generated Pi file of about 95 MiB in `SampleTranscriptLines.pi`'s shape, and a 10,000-message OpenCode session as
-/// `OpenCodeTranscriptPagingMeasurements` builds it.
-///
-/// The suite records nothing unless `JUSTSESSIONS_PERF` is set:
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter ConversationOutlineMeasurements
-/// `JUSTSESSIONS_PERF_FIXTURES` picks fixtures, such as `codex27,pi95`; all four run by default.
 @Suite(.serialized)
 struct ConversationOutlineMeasurements {
     static let runCount = 5
@@ -46,7 +34,6 @@ struct ConversationOutlineMeasurements {
         let blocks = try #require(outline).blocks
         perfReport(scenario, "blocks, messages", "\(blocks.count), \(outline!.messageCount)")
         perfReport(scenario, "outline bytes a block", Self.footprint(of: blocks) / max(1, blocks.count))
-        // PERF-90 states it a message: tool runs' blocks are counted in.
         perfReport(scenario, "outline bytes a message", Self.footprint(of: blocks) / max(1, outline!.messageCount))
 
         let reader = ConversationOutlineReader(fixture.conversation)
@@ -88,7 +75,7 @@ struct ConversationOutlineMeasurements {
             try await Self.median {
                 _ = try await warm.latestMessage()
             })
-        #expect(!blocks.isEmpty)  // Record-only: the numbers above are the result.
+        #expect(!blocks.isEmpty)
     }
 
     private static func tenThousandBlocks() -> [ConversationOutline.Block] {
@@ -103,8 +90,6 @@ struct ConversationOutlineMeasurements {
         }
     }
 
-    /// The "Canvas draws" row: `ConversationMapCanvas` in a 110 × 800 column at 2× with 10,000 blocks, squeezed to one bar
-    /// a pixel row, and 26 bookmarks with their letters, rendered `renderCount` times. Runs on `main` too, to compare.
     @MainActor
     @Test func drawingAMapOfTenThousandBlocks() {
         guard SidebarInteractionMeasurements.isEnabled else { return }
@@ -135,8 +120,6 @@ struct ConversationOutlineMeasurements {
         perfReport("map canvas, 10,000 blocks in 110 × 800 at 2×", "render p50", times.sorted()[times.count / 2])
     }
 
-    /// Scrolling that map at its minimum pitch with 26 labelled bookmarks, as the map does each scroll step: the layout at
-    /// the new offset, the chips and their (kept) labels, then the render. 40 steps of 120 points from the top.
     @MainActor
     @Test func scrollingAMapOfTenThousandBlocksWithLabels() {
         guard SidebarInteractionMeasurements.isEnabled else { return }
@@ -190,8 +173,6 @@ struct ConversationOutlineMeasurements {
         return times.sorted()[times.count / 2]
     }
 
-    /// The blocks' own storage, their snippets' beyond the 15 bytes a `String` keeps inline, and their line widths'
-    /// arrays with a 32-byte header each.
     static func footprint(of blocks: [ConversationOutline.Block]) -> Int {
         blocks.reduce(MemoryLayout<ConversationOutline.Block>.stride * blocks.count + MemoryLayout<Int>.stride * blocks.count) {
             total, block in
@@ -206,7 +187,6 @@ struct ConversationOutlineMeasurements {
         let isFile: Bool
         private let name: String
         private let database: OpenCodeDatabaseFixture?
-        /// The Pi file's last line, which the first appended prompt continues.
         private let piLastID: String?
 
         init(_ name: String, in directory: URL) throws {
@@ -258,7 +238,6 @@ struct ConversationOutlineMeasurements {
             try handle.write(contentsOf: Data((appendedLine(number) + "\n").utf8))
         }
 
-        /// A new file with one more record, renamed over the session's, so its inode changes.
         func replaceWithCopy(appending number: Int, in directory: URL) throws {
             let copy = directory.appendingPathComponent("copy.jsonl")
             try FileManager.default.copyItem(at: conversation.sourceFile, to: copy)
@@ -278,12 +257,9 @@ struct ConversationOutlineMeasurements {
         }
     }
 
-    /// Turns of `SampleTranscriptLines.pi`'s shape, chained by `id` and `parentId`: a prompt, a reply with a tool call,
-    /// the tool's result with about 6 KB of output, and a closing reply.
     enum PiFixture {
         static let turnLineCount = 4
 
-        /// Returns the last line's `id`.
         static func write(sizeMiB: Int, to file: URL) throws -> String {
             FileManager.default.createFile(atPath: file.path, contents: nil)
             let handle = try FileHandle(forWritingTo: file)
@@ -314,7 +290,6 @@ struct ConversationOutlineMeasurements {
             ]
         }
 
-        /// A prompt continuing the line before it, so the active branch keeps every earlier line. Numbers run from 0 up.
         static func appendedLine(_ number: Int, after lastID: String) -> String {
             let parent = number == 0 ? lastID : "a\(number - 1)"
             return

@@ -4,7 +4,6 @@ import Testing
 
 @MainActor
 struct PlainTerminalFinderTests {
-    /// The shell runs in tmux, which the terminal shows on its alternate screen.
     @Test func searchesTmuxsHistoryWhileTheTerminalShowsTmux() async throws {
         let terminal = TerminalFinderStandIn()
         let tmux = ScriptedTmuxHistory(countOutputs: [ScriptedTmuxHistory.countLine(5)])
@@ -19,7 +18,6 @@ struct PlainTerminalFinderTests {
         #expect(terminal.calls.isEmpty)
     }
 
-    /// As on an SSH host without tmux, where the shell runs right in the terminal.
     @Test func searchesTheTerminalsScrollbackOtherwise() {
         let terminal = TerminalFinderStandIn()
         let tmux = ScriptedTmuxHistory(countOutputs: [])
@@ -36,8 +34,6 @@ struct PlainTerminalFinderTests {
         #expect(tmux.commands.isEmpty)
     }
 
-    /// A program on the alternate screen, such as vim, would otherwise move a search between finders as it starts
-    /// or quits.
     @Test func aSearchKeepsItsFinderUntilItEnds() async throws {
         let terminal = TerminalFinderStandIn()
         let tmux = ScriptedTmuxHistory(countOutputs: [ScriptedTmuxHistory.countLine(2)])
@@ -55,7 +51,6 @@ struct PlainTerminalFinderTests {
         #expect(terminal.calls.last == .end)
     }
 
-    /// As on an SSH host whose tmux went away since the tab opened.
     @Test func aSearchTmuxCouldNotRunGoesOnInTheTerminal() async throws {
         let terminal = TerminalFinderStandIn()
         let tmux = ScriptedTmuxHistory(countOutputs: [nil])
@@ -104,7 +99,6 @@ struct PlainTerminalFinderTests {
     }
 }
 
-/// The tab terminal's own find, which counts at once.
 @MainActor
 final class TerminalFinderStandIn: TerminalTextFinding {
     enum Call: Equatable {

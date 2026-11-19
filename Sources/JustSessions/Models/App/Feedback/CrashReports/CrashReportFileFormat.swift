@@ -1,7 +1,5 @@
 import Foundation
 
-/// The parts of a macOS crash report (`.ips`) the summary reads. The file is one line of JSON about the report, then
-/// the report itself as JSON. Every field is optional, so a field macOS drops or renames leaves only that part out.
 enum CrashReportFileFormat {
     /// `bug_type` 309 is a crash; macOS writes hangs and other reports in the same format under other types.
     static let crashBugType = "309"
@@ -24,7 +22,6 @@ enum CrashReportFileFormat {
 
     struct Body: Decodable {
         let exception: Exception?
-        /// Messages the crashing libraries left, by library, such as `abort() called` or a Swift runtime error.
         let applicationSpecificInformation: [String: [String]]?
         let faultingThread: Int?
         let threads: [Thread]?

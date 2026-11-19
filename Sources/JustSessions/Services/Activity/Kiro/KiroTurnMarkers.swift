@@ -10,7 +10,6 @@ import Foundation
 /// The folder is undocumented: Kiro CLI 2.31.1 keeps it, and 2.16.2 doesn't. A Kiro too old to keep one tells
 /// nothing, rather than seeming idle. Kiro marks nothing while it asks for permission, so that reads as working.
 struct KiroTurnMarkers: Sendable {
-    /// What the relay on an SSH host keeps in the tab's window option; see `RemoteKiroActivityRelay`.
     static let workingName = "working"
     static let idleName = "idle"
 
@@ -25,24 +24,20 @@ struct KiroTurnMarkers: Sendable {
             .appendingPathComponent("Library/Application Support/kiro-cli/run/turn-markers", isDirectory: true)
     }
 
-    /// The processes with a turn under way, from the markers' names; nil without the folder.
     func processIDsWithATurn() -> Set<Int32>? {
         guard let names = try? FileManager.default.contentsOfDirectory(atPath: directory.path) else { return nil }
         return Set(names.compactMap(Self.processID(inMarkerName:)))
     }
 
-    /// `1416` from `1416-1792101078428.json`.
     static func processID(inMarkerName name: String) -> Int32? {
         guard name.hasSuffix(".json"), let dash = name.firstIndex(of: "-") else { return nil }
         return Int32(name[..<dash])
     }
 
-    /// Working while one of the CLI's processes has a turn under way; idle otherwise.
     static func activity(processIDsWithATurn: Set<Int32>, cliProcessIDs: [Int32]) -> CLIActivity {
         cliProcessIDs.contains(where: processIDsWithATurn.contains) ? .working : .idle
     }
 
-    /// What a name the relay keeps means; nil for any other.
     static func activity(named name: String) -> CLIActivity? {
         switch name {
         case workingName: .working

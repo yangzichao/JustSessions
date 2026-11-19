@@ -1,8 +1,6 @@
 import Foundation
 
-/// Dragging tabs and groups in the tab bar; see `TerminalTabStrip` for how they may move. The selection stays.
 extension ConversationStore {
-    /// Moves the tab, with the other tab of its split, to `place` among its group's tabs and splits.
     func moveTab(_ tabID: UUID, toPlaceInGroup place: Int) {
         var strip = tabStrip
         strip.moveTab(tabID, toPlaceInGroup: place)
@@ -11,7 +9,6 @@ extension ConversationStore {
         apply(strip)
     }
 
-    /// Moves the tabs, whole moving units of one group, together to `place` among their group's other tabs and splits.
     func moveTabs(_ tabIDs: [UUID], toPlaceInGroup place: Int) {
         var strip = tabStrip
         strip.moveTabs(tabIDs, toPlaceInGroup: place)
@@ -20,7 +17,6 @@ extension ConversationStore {
         apply(strip)
     }
 
-    /// Moves the group's tabs, in their order, to `place` among the groups.
     func moveTabGroup(_ groupKey: String, toPlace place: Int) {
         var strip = tabStrip
         strip.moveGroup(groupKey, toPlace: place)

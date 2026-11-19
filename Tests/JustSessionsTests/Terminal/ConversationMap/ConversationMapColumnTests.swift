@@ -4,9 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The conversation map's column beside a tab's terminal (TAB-09, PERF-89), with the tab's view in a window as the app
-/// shows it: the terminal narrows only while the map is on and only for a CLI tab, never when the tab links, and a hidden
-/// tab's map, or one in a minimized window, does no outline work.
 @MainActor
 @Suite(.serialized)
 struct ConversationMapColumnTests {
@@ -54,7 +51,6 @@ struct ConversationMapColumnTests {
             window.contentView?.layoutSubtreeIfNeeded()
         }
 
-        /// The terminal's width with no column: the window's less the 16-point leading inset and the engine's own band.
         var fullTerminalWidth: CGFloat {
             Self.windowWidth - TerminalInsetView.insets.left - TerminalInsetView.insets.right - tab.terminalView.trailingMarginWidth
         }
@@ -178,7 +174,6 @@ struct ConversationMapColumnTests {
         try await expectEventually { fixture.tab.conversationOutline.outline == nil }
     }
 
-    /// PERF-89: the map never becomes an input of the terminal's own views, so drawing it can't redraw or resize them.
     @Test func theTerminalViewsTakeNoMapInput() throws {
         for path in [
             "Sources/JustSessions/Views/Terminal/EmbeddedTerminalView.swift", "Sources/JustSessions/Views/Terminal/TerminalInsetView.swift",

@@ -1,11 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Where the sidebar's edge is grabbed to resize it: the divider and a few points of the detail past it. It draws
-/// nothing until the pointer is over it, so the detail shows through.
 struct SidebarResizeHandle: View {
-    /// Narrower than the tab bar's and the terminal's leading margins, so it stays off the first tab and the
-    /// terminal's text.
     private static let grabAreaWidth: CGFloat = 8
 
     let width: CGFloat
@@ -28,9 +24,6 @@ struct SidebarResizeHandle: View {
             .columnResizeCursor(canShrink: width > minimumWidth, canGrow: width < maximumWidth)
             .onHover { isHovering = $0 }
             .gesture(
-                // Global coordinates, because the handle itself moves with the width it changes: a translation in
-                // the handle's own space would shrink as the handle slides under the cursor, pulling the width
-                // back each event and shaking both sides of the divider.
                 DragGesture(minimumDistance: 1, coordinateSpace: .global)
                     .onChanged { gesture in
                         let startingWidth = dragStartWidth ?? width
@@ -54,9 +47,6 @@ struct SidebarResizeHandle: View {
             }
     }
 
-    /// Whole points, like a native split view divider: a drag's fractional positions would land the hairline and
-    /// every row's text on sub-pixel offsets, shimmering on each mouse movement, and relayout the sidebar for
-    /// width changes too small to see.
     private func clamped(_ proposedWidth: CGFloat) -> CGFloat {
         min(max(proposedWidth.rounded(), minimumWidth), maximumWidth)
     }

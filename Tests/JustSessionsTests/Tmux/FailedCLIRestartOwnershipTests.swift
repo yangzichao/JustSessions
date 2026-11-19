@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A private tmux server and a CLI that fails once, then stays running. Delayed commands reproduce a second Resume
-/// reaching the app before cleanup of the first failed pane finished, without touching the app's tmux server.
 @MainActor
 @Suite(.serialized)
 struct FailedCLIRestartOwnershipTests {

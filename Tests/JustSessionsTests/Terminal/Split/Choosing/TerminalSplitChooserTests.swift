@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The tabs a split chooser lists, in Chrome's order: the one selected last first, then those never selected, in tab
-/// bar order, leaving out any it can't show.
 struct TerminalSplitChooserTests {
     private let a = UUID(), b = UUID(), c = UUID(), d = UUID()
 

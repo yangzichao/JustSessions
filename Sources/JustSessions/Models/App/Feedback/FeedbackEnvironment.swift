@@ -1,6 +1,5 @@
 import Foundation
 
-/// The versions a feedback report starts with, so a problem can be matched to the app and macOS it happened on.
 struct FeedbackEnvironment: Equatable, Sendable {
     let appVersion: String
     let macOSVersion: String
@@ -18,7 +17,6 @@ struct FeedbackEnvironment: Equatable, Sendable {
         return FeedbackEnvironment(appVersion: appVersion, macOSVersion: macOSVersion)
     }
 
-    /// Such as "0.45.0 (45)", or the version alone when the build number is the same or missing.
     static func appVersion(shortVersion: String?, buildNumber: String?) -> String {
         let shortVersion = shortVersion.flatMap { $0.isEmpty ? nil : $0 }
         let buildNumber = buildNumber.flatMap { $0.isEmpty ? nil : $0 }
@@ -29,7 +27,6 @@ struct FeedbackEnvironment: Equatable, Sendable {
         }
     }
 
-    /// Such as "JustSessions 0.45.0 (45) · macOS 26.0.1". Product names and versions read the same in every language.
     var summary: String {
         "JustSessions \(appVersion) · macOS \(macOSVersion)"
     }
