@@ -26,7 +26,7 @@ struct PiRemoteDeletionTests {
             provider: .pi, sessionID: id, projectPath: "/srv/project", sourceFile: mirrored, host: .ssh("devbox"))
         #expect(
             try RemotePiConversationDeletion.hostFileNames(of: conversation, piMirrorDirectory: mirrored.deletingLastPathComponent())
-                .projectFolderName == nil)
+                .folder == .sessionsRoot)
 
         try fixture.deletion().delete(conversation)
 
@@ -294,7 +294,7 @@ struct PiRemoteDeletionTests {
             let result = fixture.runOnHost(
                 RemotePiConversationDeletion.command(
                     sessionsFolder: RemoteToolFolders.standard.pi,
-                    projectFolderName: scriptCase.project,
+                    folder: .project(scriptCase.project),
                     fileName: scriptCase.file,
                     sessionID: id
                 ))
@@ -317,7 +317,7 @@ struct PiRemoteDeletionTests {
         let result = fixture.runOnHost(
             RemotePiConversationDeletion.command(
                 sessionsFolder: RemoteToolFolders.standard.pi,
-                projectFolderName: "--home-me-gone--",
+                folder: .project("--home-me-gone--"),
                 fileName: fixture.hostSessionFile.lastPathComponent,
                 sessionID: fixture.conversation.sessionID
             ))

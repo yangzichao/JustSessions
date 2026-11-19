@@ -8,7 +8,7 @@ final class HostAutoRefresher {
 
     private let registry: WorkspaceWindowRegistry
     private let isAnyWindowOnScreen: () -> Bool
-    private let refreshSSHHost: (ConversationStore, String) -> Task<Void, Never>?
+    private let refreshSSHHost: (ConversationStore, String) -> RemoteHostRefreshStart
     private let backgroundChecker: HostBackgroundChecker?
     private let signIns: RemoteSignIns?
     private var schedule = HostAutoRefreshSchedule()
@@ -19,7 +19,7 @@ final class HostAutoRefresher {
     init(
         registry: WorkspaceWindowRegistry = .shared,
         isAnyWindowOnScreen: (() -> Bool)? = nil,
-        refreshSSHHost: @escaping (ConversationStore, String) -> Task<Void, Never>? = { $0.refreshRemoteHost($1) },
+        refreshSSHHost: @escaping (ConversationStore, String) -> RemoteHostRefreshStart = { $0.refreshRemoteHost($1) },
         backgroundChecker: HostBackgroundChecker? = nil,
         signIns: RemoteSignIns? = nil
     ) {
@@ -75,7 +75,7 @@ final class HostAutoRefresher {
                 now: now
             )
         {
-            guard let refresh = refreshSSHHost(oldestStore, host) else { continue }
+            guard case .started(let refresh) = refreshSSHHost(oldestStore, host) else { continue }
             schedule.noteTry(on: host, at: now)
             Task { [weak self, weak oldestStore] in
                 await refresh.value

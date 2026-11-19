@@ -17,7 +17,7 @@ struct RemoteNewSessionTests {
         let matches = AppearingSessionMatcher.matches(
             for: [second, first],
             in: [known, otherProject, otherTool, otherHost, newest, newer],
-            alreadyLinkedConversationIDs: []
+            takenConversationIDs: []
         )
 
         #expect(matches[first.terminalID]?.id == newer.id)
@@ -34,7 +34,7 @@ struct RemoteNewSessionTests {
             launchedAt: .now,
             sessionIDsKnownAtLaunch: []
         )
-        let matches = AppearingSessionMatcher.matches(for: [tab], in: [linked], alreadyLinkedConversationIDs: [linked.id])
+        let matches = AppearingSessionMatcher.matches(for: [tab], in: [linked], takenConversationIDs: [linked.id])
         #expect(matches.isEmpty)
     }
 
@@ -78,7 +78,7 @@ struct RemoteNewSessionTests {
         let matches = AppearingSessionMatcher.matches(
             for: [try #require(tab.waitingTabForAppearingSession)],
             in: [forked, fork],
-            alreadyLinkedConversationIDs: []
+            takenConversationIDs: []
         )
         #expect(matches[tab.id]?.id == fork.id)
         store.closeAllTerminals()

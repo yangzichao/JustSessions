@@ -88,10 +88,10 @@ struct HostAutoRefresherTests {
 private final class SSHHostCopies {
     private(set) var started: [(store: ConversationStore, host: String)] = []
 
-    func start(_ store: ConversationStore, _ host: String) -> Task<Void, Never>? {
-        guard store.hostRefreshStatuses[.ssh(host)] != .refreshing else { return nil }
+    func start(_ store: ConversationStore, _ host: String) -> RemoteHostRefreshStart {
+        guard store.hostRefreshStatuses[.ssh(host)] != .refreshing else { return .refused(.alreadyRefreshing) }
         store.hostRefreshStatuses[.ssh(host)] = .refreshing
         started.append((store, host))
-        return Task {}
+        return .started(Task {})
     }
 }

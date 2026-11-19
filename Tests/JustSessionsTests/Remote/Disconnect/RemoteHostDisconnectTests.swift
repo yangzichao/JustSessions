@@ -88,7 +88,7 @@ struct RemoteHostDisconnectTests {
         store.disconnectedRemoteHosts.setDisconnected(true, for: "devbox")
         store.remoteSessionDiscovery = RemoteSessionDiscovery(mirror: mirror)
 
-        #expect(store.refreshRemoteHost("devbox") == nil)
+        #expect(store.refreshRemoteHost("devbox") == .refused(.hostDisconnected))
         store.refresh(.ssh("devbox"))
 
         try await expectEventually { store.conversations.contains { $0.sessionID == sessionID && $0.host == .ssh("devbox") } }

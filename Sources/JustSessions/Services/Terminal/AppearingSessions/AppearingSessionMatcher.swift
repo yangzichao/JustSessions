@@ -4,9 +4,9 @@ enum AppearingSessionMatcher {
     static func matches(
         for waitingTabs: [WaitingTabForAppearingSession],
         in conversations: [Conversation],
-        alreadyLinkedConversationIDs: Set<String>
+        takenConversationIDs: Set<String>
     ) -> [UUID: Conversation] {
-        var takenConversationIDs = alreadyLinkedConversationIDs
+        var takenConversationIDs = takenConversationIDs
         var matches: [UUID: Conversation] = [:]
         for tab in waitingTabs.sorted(by: { $0.launchedAt < $1.launchedAt }) {
             let candidate =

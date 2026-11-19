@@ -26,7 +26,7 @@ extension ConversationStore {
     private func startReadingRemoteHostCopy(
         _ host: String, refreshedAt: Date, status: RemoteHostStatus?, discovery: RemoteSessionDiscovery
     ) {
-        guard canListRemoteHostCopy(host), let token = remoteHostWork.beginRead(on: host, copiedAt: refreshedAt) else { return }
+        guard canListRemoteHostCopy(host), let token = remoteHostWork.beginReadIfNewestCopy(on: host, copiedAt: refreshedAt) else { return }
         let coordinator = windowRegistry.hostSessionWork
         Task.detached(priority: .userInitiated) { [weak self] in
             try? await coordinator.withAccess(to: [.ssh(host)]) { [weak self] in

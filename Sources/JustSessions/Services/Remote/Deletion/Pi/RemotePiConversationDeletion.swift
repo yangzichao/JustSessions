@@ -4,7 +4,7 @@ enum RemotePiConversationDeletion {
     static func hostFileNames(
         of conversation: Conversation,
         piMirrorDirectory: URL
-    ) throws -> (projectFolderName: String?, fileName: String) {
+    ) throws -> (folder: RemotePiSessionFolder, fileName: String) {
         let sourceFile = conversation.sourceFile.standardizedFileURL
         let projectFolder = sourceFile.deletingLastPathComponent()
         let mirrorPath = piMirrorDirectory.standardizedFileURL.resolvingSymlinksInPath().path
@@ -17,11 +17,11 @@ enum RemotePiConversationDeletion {
             RemoteConversationDeletion.isSafeFolderName(sourceFile.lastPathComponent),
             sourceFile.lastPathComponent.hasSuffix("_\(conversation.sessionID).jsonl")
         else { throw ConversationDeletionError.invalidSource }
-        return (isInRoot ? nil : projectFolder.lastPathComponent, sourceFile.lastPathComponent)
+        return (isInRoot ? .sessionsRoot : .project(projectFolder.lastPathComponent), sourceFile.lastPathComponent)
     }
 
     /// The header is checked as text, not parsed: Pi writes it as flat, compact JSON whose first key is `type`.
-    static func command(sessionsFolder: String, projectFolderName: String?, fileName: String, sessionID: String) -> String {
+    static func command(sessionsFolder: String, folder: RemotePiSessionFolder, fileName: String, sessionID: String) -> String {
         let script = #"""
             project=$1 file=$2 id=$3
             case $4 in
@@ -60,6 +60,6 @@ enum RemotePiConversationDeletion {
             rm -f "$path" || exit 1
             """#
         return "sh -c \(ShellQuoting.quoted(script)) sh "
-            + [projectFolderName ?? "", fileName, sessionID, sessionsFolder].map(ShellQuoting.quoted).joined(separator: " ")
+            + [folder.projectFolderArgument, fileName, sessionID, sessionsFolder].map(ShellQuoting.quoted).joined(separator: " ")
     }
 }

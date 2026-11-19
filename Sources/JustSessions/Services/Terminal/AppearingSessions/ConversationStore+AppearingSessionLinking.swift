@@ -12,7 +12,7 @@ extension ConversationStore {
         let matches = AppearingSessionMatcher.matches(
             for: waitingSessions.compactMap(\.waitingTabForAppearingSession),
             in: conversations,
-            alreadyLinkedConversationIDs: Set(terminalSessions.compactMap { $0.conversation?.id })
+            takenConversationIDs: conversationIDsTakenByTabs
         )
         guard !matches.isEmpty else { return }
         for session in waitingSessions {
@@ -24,5 +24,16 @@ extension ConversationStore {
         }
         persistOpenTabs()
         noteTabStateChanged()
+    }
+
+    private var conversationIDsTakenByTabs: Set<String> {
+        var taken = Set(terminalSessions.compactMap { $0.conversation?.id })
+        for tab in terminalSessions where tab.isNewSessionAwaitingConversation {
+            guard let sessionID = tab.preassignedSessionID,
+                let preassigned = conversations.first(where: { $0.provider == tab.provider && $0.sessionID == sessionID })
+            else { continue }
+            taken.insert(preassigned.id)
+        }
+        return taken
     }
 }

@@ -68,13 +68,15 @@ final class RemoteHostWork {
         return task
     }
 
-    func beginRead(on host: String, copiedAt: Date? = nil) -> Token? {
-        if let copiedAt {
-            guard copiedAt >= latestCopies[host, default: .distantPast] else { return nil }
-            latestCopies[host] = copiedAt
-        }
+    func beginRead(on host: String) -> Token {
         reads[host, default: 0] &+= 1
         return token(on: host)
+    }
+
+    func beginReadIfNewestCopy(on host: String, copiedAt: Date) -> Token? {
+        guard copiedAt >= latestCopies[host, default: .distantPast] else { return nil }
+        latestCopies[host] = copiedAt
+        return beginRead(on: host)
     }
 
     func isCurrent(_ token: Token, on host: String) -> Bool {

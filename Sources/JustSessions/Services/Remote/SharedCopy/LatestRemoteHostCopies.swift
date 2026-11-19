@@ -7,8 +7,14 @@ final class LatestRemoteHostCopies {
         case failed(any Error)
     }
 
+    struct Moment: Comparable, Sendable {
+        fileprivate let tick: UInt64
+
+        static func < (earlier: Moment, later: Moment) -> Bool { earlier.tick < later.tick }
+    }
+
     enum Turn: Sendable {
-        case copy(number: UInt64)
+        case copy(startedAt: Moment)
         case take(Outcome)
     }
 
@@ -25,36 +31,36 @@ final class LatestRemoteHostCopies {
     }
 
     private struct EndedCopy {
-        let number: UInt64
+        let startedAt: Moment
         let outcome: Outcome
     }
 
-    private var lastNumber: UInt64 = 0
+    private var lastMoment = Moment(tick: 0)
     private var endedCopies: [CopyPlace: EndedCopy] = [:]
 
-    func noteRefreshAsked() -> UInt64 {
-        nextNumber()
+    func noteRefreshAsked() -> Moment {
+        nextMoment()
     }
 
-    func turn(on host: String, into mirror: RemoteSessionMirror, askedAt requestNumber: UInt64) -> Turn {
-        if let ended = endedCopies[CopyPlace(host: host, mirror: mirror)], ended.number > requestNumber {
+    func turn(on host: String, into mirror: RemoteSessionMirror, askedAt refreshAskedAt: Moment) -> Turn {
+        if let ended = endedCopies[CopyPlace(host: host, mirror: mirror)], ended.startedAt > refreshAskedAt {
             return .take(ended.outcome)
         }
-        return .copy(number: nextNumber())
+        return .copy(startedAt: nextMoment())
     }
 
-    func noteCopyEnded(on host: String, into mirror: RemoteSessionMirror, number: UInt64, outcome: Outcome) {
+    func noteCopyEnded(on host: String, into mirror: RemoteSessionMirror, startedAt: Moment, outcome: Outcome) {
         let place = CopyPlace(host: host, mirror: mirror)
-        if let ended = endedCopies[place], ended.number > number { return }
-        endedCopies[place] = EndedCopy(number: number, outcome: outcome)
+        if let ended = endedCopies[place], ended.startedAt > startedAt { return }
+        endedCopies[place] = EndedCopy(startedAt: startedAt, outcome: outcome)
     }
 
     func forget(_ host: String) {
         endedCopies = endedCopies.filter { $0.key.host != host }
     }
 
-    private func nextNumber() -> UInt64 {
-        lastNumber &+= 1
-        return lastNumber
+    private func nextMoment() -> Moment {
+        lastMoment = Moment(tick: lastMoment.tick &+ 1)
+        return lastMoment
     }
 }

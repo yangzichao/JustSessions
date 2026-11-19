@@ -78,7 +78,7 @@ struct RemoteConversationDeletion: Sendable {
             )
             command = RemotePiConversationDeletion.command(
                 sessionsFolder: folders.path(for: .pi),
-                projectFolderName: names.projectFolderName,
+                folder: names.folder,
                 fileName: names.fileName,
                 sessionID: conversation.sessionID
             )

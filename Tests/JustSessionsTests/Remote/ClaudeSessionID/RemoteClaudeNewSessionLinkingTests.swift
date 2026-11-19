@@ -80,6 +80,24 @@ struct RemoteClaudeNewSessionLinkingTests {
         #expect(waitingForAny.conversation == nil)
     }
 
+    @Test func linkingByAppearanceBeforeTheTabStartedWithAnIDIsLinkedLeavesItsSessionAlone() throws {
+        let support = RemoteClaudeSessionIDFlagSupport(
+            runner: RemoteCommandRecorder().runner(
+                answering: (0, RemoteClaudeSessionIDFlagSupportTests.helpWithFlag)
+            ))
+        let (store, settings) = try makeStore(support: support)
+        defer { tearDown(store, settings) }
+        let waitingForAny = try openNewClaudeTab(in: store)
+        #expect(support.check(host: Self.host, startCommand: nil) == true)
+        let startedWithID = try openNewClaudeTab(in: store)
+
+        store.replaceConversations(
+            on: .ssh(Self.host), with: [conversation(sessionID: try #require(startedWithID.preassignedSessionID))])
+        store.linkWaitingTabsByAppearance(on: .ssh(Self.host))
+
+        #expect(waitingForAny.conversation == nil)
+    }
+
     @Test func aHostWithoutAnAnswerStartsTheCLIWithoutAnID() throws {
         let (store, settings) = try makeStore(hostTakesSessionIDs: false)
         defer { tearDown(store, settings) }
