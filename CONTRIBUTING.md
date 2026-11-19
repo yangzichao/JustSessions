@@ -18,7 +18,8 @@ Use macOS 14 or later on Apple Silicon and a Swift 6 toolchain from Xcode or the
 git clone https://github.com/yangzichao/JustSessions.git
 cd JustSessions
 git switch -c your-change
-make check  # Compile the development build
+make format # Format Swift files with swift format
+make check  # Lint and compile the development build
 make test   # Test against the bundled tmux runtime
 make dev    # Package and open dist/JustSessions.app
 ```

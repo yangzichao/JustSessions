@@ -5,24 +5,33 @@
 
 APP_BUNDLE_PATH ?= dist/JustSessions.app
 INSTALLER_PATH ?= dist/JustSessions.dmg
+# swift format reads .swift-format and only touches .swift files under these paths.
+SWIFT_FORMAT_PATHS := Package.swift Sources Tests Scripts
 
-.PHONY: build dev run check test verify tracked-files-check release-notes-check release-check dmg website website-check website-traffic-test website-traffic-deploy website-traffic feedback-test feedback-deploy feedback localization localization-check update-feed-test update-feed-deploy update-checks help
+.PHONY: build dev run check test verify format lint tracked-files-check release-notes-check release-check dmg website website-check website-traffic-test website-traffic-deploy website-traffic feedback-test feedback-deploy feedback localization localization-check update-feed-test update-feed-deploy update-checks help
 
-build:
+build: lint
 	./Scripts/build-app.sh "$(APP_BUNDLE_PATH)"
 
 dev run: build
 	./Scripts/open-dev-app.sh "$(APP_BUNDLE_PATH)"
 
-check:
+check: lint
 	swift build
+
+format:
+	swift format format --recursive --parallel --in-place $(SWIFT_FORMAT_PATHS)
+
+lint:
+	@swift format lint --strict --recursive --parallel $(SWIFT_FORMAT_PATHS) || \
+		{ echo 'Swift formatting or lint failed. Run make format, then fix what it cannot.' >&2; exit 1; }
 
 test:
 	@runtime_directory="$$(./Scripts/Tmux/build-runtime.sh)" && \
 	JUSTSESSIONS_TEST_TMUX_RUNTIME="$$runtime_directory" swift test
 
 # Website deployment checks do not replace local app verification before delivering or tagging.
-verify: tracked-files-check release-notes-check website-check update-feed-test test localization-check build
+verify: tracked-files-check lint release-notes-check website-check update-feed-test test localization-check build
 	./Scripts/Release/check-app-launches.sh "$(APP_BUNDLE_PATH)"
 
 tracked-files-check:
@@ -87,7 +96,9 @@ help:
 		'make           Build dist/JustSessions.app with bundled tmux' \
 		'make dev       Build the app, quit its running copy, and open it' \
 		'make run       Alias for make dev' \
-		'make check     Compile the Swift development build' \
+		'make check     Lint and compile the Swift development build' \
+		'make format    Format all Swift files in place with swift format' \
+		'make lint      Fail on Swift that is not formatted or breaks a lint rule' \
 		'make test      Build bundled tmux and run the Swift tests' \
 		'make verify    Check the website, tests, localization, and packaged app launch' \
 		'make tracked-files-check  Fail if git tracks agent skills or machine-local files' \
