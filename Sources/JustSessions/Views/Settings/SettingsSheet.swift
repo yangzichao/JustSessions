@@ -25,6 +25,7 @@ struct SettingsSheet: View {
                 appThemeStore: .shared,
                 terminalAppearanceStore: .shared,
                 terminalEngineStore: .shared,
+                terminalOptionKeyStore: .shared,
                 notificationSettingsStore: .shared,
                 onCheckForUpdates: onCheckForUpdates
             )

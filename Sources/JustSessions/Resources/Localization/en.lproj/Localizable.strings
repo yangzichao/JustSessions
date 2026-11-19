@@ -1166,6 +1166,10 @@
 	<string>Open the feedback form on the website</string>
 	<key>Open the source code on GitHub</key>
 	<string>Open the source code on GitHub</string>
+	<key>Option key</key>
+	<string>Option key</string>
+	<key>Option with a key sends Esc and that key, which shells and CLIs read as Alt shortcuts. Turn it off to type the characters your keyboard layout keeps behind Option, such as brackets, braces, or the pipe. Open tabs follow the change.</key>
+	<string>Option with a key sends Esc and that key, which shells and CLIs read as Alt shortcuts. Turn it off to type the characters your keyboard layout keeps behind Option, such as brackets, braces, or the pipe. Open tabs follow the change.</string>
 	<key>Optional</key>
 	<string>Optional</string>
 	<key>Optional. Lets CLIs in terminals control apps, such as clicking a menu or typing keys through System Events with osascript. Every CLI in a terminal gets it, so allow it only if you want them to.</key>
@@ -1758,6 +1762,8 @@
 	<string>Unpin project</string>
 	<key>Unpin session</key>
 	<string>Unpin session</string>
+	<key>Use Option as Meta</key>
+	<string>Use Option as Meta</string>
 	<key>Use a readable width</key>
 	<string>Use a readable width</string>
 	<key>Use default</key>

@@ -15,6 +15,7 @@ struct TerminalAppearancePreviewEngineTests {
             TerminalAppearanceSection(
                 appearanceStore: TerminalAppearanceStore(userDefaults: settings.userDefaults),
                 engineStore: engineStore,
+                optionKeyStore: TerminalOptionKeyStore(userDefaults: settings.userDefaults),
                 themeStore: AppThemeStore(userDefaults: settings.userDefaults)
             )
         })

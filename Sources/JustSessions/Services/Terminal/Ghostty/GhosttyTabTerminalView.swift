@@ -87,6 +87,7 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         frame: NSRect,
         appearanceStore: TerminalAppearanceStore,
         themeStore: AppThemeStore,
+        optionKeyStore: TerminalOptionKeyStore = .shared,
         outputHighWaterByteCount: Int = GhosttyOutputBackpressure.defaultHighWaterByteCount,
         outputLowWaterByteCount: Int = GhosttyOutputBackpressure.defaultLowWaterByteCount
     ) {
@@ -111,7 +112,9 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         processDelegate.view = self
         delegate = self
         configuration = TerminalSurfaceOptions(backend: .inMemory(inMemorySession))
-        controller = GhosttyTerminalControllers.shared.controller(appearanceStore: appearanceStore, themeStore: themeStore)
+        controller = GhosttyTerminalControllers.shared.controller(
+            appearanceStore: appearanceStore, themeStore: themeStore, optionKeyStore: optionKeyStore
+        )
         observeAppearance(in: appearanceStore, themeStore: themeStore)
     }
 

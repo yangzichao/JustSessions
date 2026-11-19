@@ -249,6 +249,37 @@ struct GhosttyAppearanceConfigurationTests {
         #expect(controller.renderedConfig == configuration)
     }
 
+    /// Option types the keyboard layout's characters once it stops being Meta, in terminals already open, and is Meta
+    /// again when turned back on.
+    @Test func theOptionKeyChoiceReconfiguresTheControllerLive() throws {
+        let stores = try IsolatedAppearanceStores()
+        defer { stores.remove() }
+        let controller = stores.controller()
+
+        stores.optionKey.setOptionIsMeta(false)
+
+        #expect(controller.lastConfigurationIssue == nil)
+        #expect(Self.lines(of: controller).contains("macos-option-as-alt = false"))
+        // Option-Left and Option-Right still move a word.
+        #expect(Self.lines(of: controller).contains("keybind = alt+arrow_left=esc:b"))
+
+        stores.optionKey.setOptionIsMeta(true)
+
+        #expect(controller.lastConfigurationIssue == nil)
+        #expect(Self.lines(of: controller).contains("macos-option-as-alt = true"))
+    }
+
+    @Test func aControllerStartsWithTheSavedOptionKeyChoice() throws {
+        let stores = try IsolatedAppearanceStores()
+        defer { stores.remove() }
+        stores.optionKey.setOptionIsMeta(false)
+
+        let controller = stores.controller()
+
+        #expect(controller.lastConfigurationIssue == nil)
+        #expect(Self.lines(of: controller).contains("macos-option-as-alt = false"))
+    }
+
     /// A theme color changed in Appearance settings reaches Ghostty's terminals once color picking pauses, as it
     /// reaches SwiftTerm's.
     @Test func aCustomizedThemeBackgroundReachesTheController() async throws {

@@ -6471,6 +6471,26 @@
         }
       }
     },
+    "Option key": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option 键"
+          }
+        }
+      }
+    },
+    "Option with a key sends Esc and that key, which shells and CLIs read as Alt shortcuts. Turn it off to type the characters your keyboard layout keeps behind Option, such as brackets, braces, or the pipe. Open tabs follow the change.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option 加按键会发送 Esc 和该按键，Shell 和 CLI 会将其识别为 Alt 快捷键。关闭后可输入键盘布局中需按住 Option 才能输入的字符，例如方括号、花括号或竖线。已打开的标签页也会随之更改。"
+          }
+        }
+      }
+    },
     "Optional": {
       "localizations": {
         "zh-Hans": {
@@ -9623,6 +9643,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "取消置顶会话"
+          }
+        }
+      }
+    },
+    "Use Option as Meta": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将 Option 用作 Meta 键"
           }
         }
       }
