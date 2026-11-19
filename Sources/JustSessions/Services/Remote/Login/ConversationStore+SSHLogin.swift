@@ -35,14 +35,21 @@ extension ConversationStore {
     }
 
     func noteLoginState(on host: String, refreshProblem: SSHConnectionProblem?, connections: SSHLoginConnections = .shared) {
-        let needsLogIn = refreshProblem?.isFixedByLoggingIn == true
-        if needsLogIn != sshHostsNeedingLogIn.contains(host) {
-            if needsLogIn { sshHostsNeedingLogIn.insert(host) } else { sshHostsNeedingLogIn.remove(host) }
-        }
+        setMembershipPublishingOnlyChanges(
+            of: host, in: \.sshHostsNeedingLogIn, to: refreshProblem?.isFixedByLoggingIn == true)
         if !connections.isLoggedIn(host) {
-            if sshHostsLoggedIn.contains(host) { sshHostsLoggedIn.remove(host) }
+            setMembershipPublishingOnlyChanges(of: host, in: \.sshHostsLoggedIn, to: false)
             connections.forgetEndedLogin(of: host)
         }
+    }
+
+    private func setMembershipPublishingOnlyChanges(
+        of host: String,
+        in hosts: ReferenceWritableKeyPath<ConversationStore, Set<String>>,
+        to isMember: Bool
+    ) {
+        guard self[keyPath: hosts].contains(host) != isMember else { return }
+        if isMember { self[keyPath: hosts].insert(host) } else { self[keyPath: hosts].remove(host) }
     }
 
     func forgetLoginState(on host: String) {
@@ -63,7 +70,6 @@ extension ConversationStore {
     }
 
     var storesOfEveryWindow: [ConversationStore] {
-        let stores = windowRegistry.stores
-        return stores.contains { $0 === self } ? stores : stores + [self]
+        windowRegistry.stores
     }
 }

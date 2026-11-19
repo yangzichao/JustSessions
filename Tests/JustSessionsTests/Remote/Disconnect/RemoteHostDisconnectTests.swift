@@ -163,7 +163,7 @@ struct RemoteHostDisconnectTests {
         return RemoteSessionDiscovery(
             mirror: RemoteSessionMirror(
                 cacheRoot: notAFolder,
-                sourceHomeOverride: FileManager.default.temporaryDirectory.path
+                hostAccess: .standIn(home: FileManager.default.temporaryDirectory.path)
             ))
     }
 }

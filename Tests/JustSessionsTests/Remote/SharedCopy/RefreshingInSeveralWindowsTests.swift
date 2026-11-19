@@ -105,7 +105,7 @@ struct RefreshingInSeveralWindowsTests {
             RemoteSessionDiscovery(
                 mirror: RemoteSessionMirror(
                     cacheRoot: sandbox.root.appendingPathComponent("cache"),
-                    sourceHomeOverride: home.path,
+                    hostAccess: .standIn(home: home.path),
                     toolFoldersLookup: { _ in try gate.startCopy() }
                 ),
                 status: { _ in RemoteHostStatus(tmuxSessionNames: ["justsessions-claude-1"], cliLocations: [:]) }

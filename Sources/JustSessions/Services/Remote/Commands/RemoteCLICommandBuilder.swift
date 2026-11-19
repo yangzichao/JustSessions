@@ -43,10 +43,8 @@ struct RemoteCLICommandBuilder {
         NativeCLICommand(
             sshTab: SSHTabArguments(
                 loginOptions: loginConnections.connectionOptions(for: host),
-                optionsAndRemoteCommand: [
-                    "-o", "ConnectTimeout=10",
-                    "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4",
-                ]
+                optionsAndRemoteCommand: SSHConnectTimeout.options
+                    + ["-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4"]
                     + keystrokeTimingOptions
                     + [
                         // With a `RemoteCommand` in `~/.ssh/config`, `ssh` would refuse to run the tab's command.

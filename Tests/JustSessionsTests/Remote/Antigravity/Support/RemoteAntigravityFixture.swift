@@ -15,7 +15,8 @@ struct RemoteAntigravityFixture {
         session = try AntigravitySessionFixture(configurationDirectory: home.appendingPathComponent(".gemini/antigravity-cli"))
         try session.writeIndex()
         let mirror = root.appendingPathComponent("mirror/antigravity")
-        try AntigravitySQLiteSnapshot.copySessionStore(at: session.configurationDirectory, to: mirror)
+        try FileManager.default.createDirectory(at: mirror.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.copyItem(at: session.configurationDirectory, to: mirror)
         conversation = .fixture(
             provider: .antigravity, sessionID: session.sessionID, projectPath: session.projectPath,
             sourceFile: mirror.appendingPathComponent("conversations/\(session.sessionID).db"), host: .ssh("devbox"))

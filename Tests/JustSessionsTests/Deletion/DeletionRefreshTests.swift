@@ -38,6 +38,7 @@ struct DeletionRefreshTests {
     private static func discoveryThatFailsWithoutSSH(in sandbox: DeletionSandbox) throws -> RemoteSessionDiscovery {
         let notAFolder = sandbox.directory.appendingPathComponent("not-a-folder")
         try "".write(to: notAFolder, atomically: true, encoding: .utf8)
-        return RemoteSessionDiscovery(mirror: RemoteSessionMirror(cacheRoot: notAFolder, sourceHomeOverride: sandbox.directory.path))
+        return RemoteSessionDiscovery(
+            mirror: RemoteSessionMirror(cacheRoot: notAFolder, hostAccess: .standIn(home: sandbox.directory.path)))
     }
 }

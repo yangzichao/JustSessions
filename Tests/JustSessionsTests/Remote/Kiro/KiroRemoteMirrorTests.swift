@@ -23,7 +23,7 @@ struct KiroRemoteMirrorTests {
         try FileManager.default.createDirectory(at: subagentDirectory, withIntermediateDirectories: true)
         try "{}".write(to: subagentDirectory.appendingPathComponent("child.jsonl"), atomically: true, encoding: .utf8)
         try "private settings".write(to: remoteHome.appendingPathComponent(".kiro/settings.json"), atomically: true, encoding: .utf8)
-        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path)
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path))
         let discovery = RemoteSessionDiscovery(mirror: mirror)
 
         let conversations = try discovery.discover(host: "devbox")

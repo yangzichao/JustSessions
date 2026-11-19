@@ -18,7 +18,7 @@ struct TabMovingAcrossWindowsCancellationTests {
         for store in [sandbox.first, sandbox.second] {
             store.remoteSessionDiscovery = RemoteSessionDiscovery(
                 mirror: RemoteSessionMirror(
-                    cacheRoot: notAFolder, sourceHomeOverride: sandbox.root.path
+                    cacheRoot: notAFolder, hostAccess: .standIn(home: sandbox.root.path)
                 ))
         }
         let source = try #require(sandbox.openTab(of: conversation, in: sandbox.first))

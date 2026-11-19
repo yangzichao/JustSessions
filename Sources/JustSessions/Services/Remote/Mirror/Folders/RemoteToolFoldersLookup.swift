@@ -54,16 +54,23 @@ enum RemoteToolFoldersLookup {
         guard let home = values["HOME"], home.hasPrefix("/"), home.count > 1 else { return .standard }
         let environment = values.filter { variableNames.contains($0.key) && $0.value.hasPrefix("/") }
         let piSettings = piSettingsText(in: lines).map { Data($0.utf8) }
-
-        let piPath = PiSessionsDirectory.standardPath(environment: environment, homeDirectory: home, settingsData: { _ in piSettings })
         return RemoteToolFolders(
             claude: ClaudeAdapter.standardConfigurationDirectory(environment: environment, homeDirectory: home).path,
             codex: CodexAdapter.standardCodexDirectory(environment: environment, homeDirectory: home).path,
             kiro: KiroAdapter.standardSessionsDirectory(environment: environment, homeDirectory: home).path,
-            pi: piPath.hasPrefix("/")
-                ? piPath
-                : PiSessionsDirectory.standardPath(environment: environment, homeDirectory: home, settingsData: { _ in nil })
+            pi: piSessionsPathIgnoringRelativeSessionDir(environment: environment, homeDirectory: home, settings: piSettings)
         )
+    }
+
+    private static func piSessionsPathIgnoringRelativeSessionDir(
+        environment: [String: String],
+        homeDirectory home: String,
+        settings: Data?
+    ) -> String {
+        let followingSettings = PiSessionsDirectory.standardPath(
+            environment: environment, homeDirectory: home, settingsData: { _ in settings })
+        guard !followingSettings.hasPrefix("/") else { return followingSettings }
+        return PiSessionsDirectory.standardPath(environment: environment, homeDirectory: home, settingsData: { _ in nil })
     }
 
     private static func piSettingsText(in lines: [String]) -> String? {

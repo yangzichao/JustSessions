@@ -65,25 +65,23 @@ final class SSHAskpassServer: @unchecked Sendable {
     }
 
     private func acceptConnection(on listeningDescriptor: Int32) {
-        let descriptor = accept(listeningDescriptor, nil, nil)
-        guard descriptor >= 0 else { return }
-        CloseOnExecDescriptor.mark(descriptor)
+        guard let connection = SSHAskpassConnection.accept(on: listeningDescriptor) else { return }
         let connectionQueue = DispatchQueue(label: "SSHAskpassServer.connection", qos: .userInitiated)
-        connectionQueue.async { [self] in serve(descriptor, on: connectionQueue) }
+        connectionQueue.async { [self] in serve(connection, on: connectionQueue) }
     }
 
-    private func serve(_ descriptor: Int32, on connectionQueue: DispatchQueue) {
-        guard Self.prepare(descriptor), let request = Self.readRequest(from: descriptor) else {
-            Darwin.close(descriptor)
+    private func serve(_ connection: SSHAskpassConnection, on connectionQueue: DispatchQueue) {
+        guard connection.prepare(requestTimeout: Self.requestTimeout), let request = connection.readRequest() else {
+            connection.close()
             return
         }
         let id = UUID()
-        let hangUpWatch = HangUpWatch(copying: descriptor, queue: connectionQueue)
+        let hangUpWatch = connection.watchForHangUp(on: connectionQueue)
         let task = Task { [ask] in
             let reply = await ask(request)
-            if let message = SSHAskpassMessageLine.encoded(reply) { Self.send(message, to: descriptor) }
+            if let message = SSHAskpassMessageLine.encoded(reply) { connection.send(message) }
             hangUpWatch?.stop()
-            Darwin.close(descriptor)
+            connection.close()
         }
         let isStopped = lock.withLock {
             if !self.isStopped { questionTasks[id] = task }
@@ -94,72 +92,6 @@ final class SSHAskpassServer: @unchecked Sendable {
         Task { [weak self] in
             await task.value
             _ = self?.lock.withLock { self?.questionTasks.removeValue(forKey: id) }
-        }
-    }
-
-    /// Blocking, with a time limit for the question; false for a connection from another user, or one whose helper has
-    /// already gone. macOS refuses `SO_NOSIGPIPE` on a socket closed at both ends, and a reply sent there without it
-    /// would end the app with `SIGPIPE`.
-    static func prepare(_ descriptor: Int32) -> Bool {
-        var userID: uid_t = 0
-        var groupID: gid_t = 0
-        guard getpeereid(descriptor, &userID, &groupID) == 0, userID == getuid() else { return false }
-        let flags = fcntl(descriptor, F_GETFL)
-        guard flags >= 0, fcntl(descriptor, F_SETFL, flags & ~O_NONBLOCK) == 0 else { return false }
-        var isOn: Int32 = 1
-        guard setsockopt(descriptor, SOL_SOCKET, SO_NOSIGPIPE, &isOn, socklen_t(MemoryLayout<Int32>.size)) == 0 else { return false }
-        var timeout = timeval(tv_sec: Int(requestTimeout), tv_usec: 0)
-        setsockopt(descriptor, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
-        return true
-    }
-
-    private static func readRequest(from descriptor: Int32) -> SSHAskpassRequest? {
-        var received = Data()
-        var buffer = [UInt8](repeating: 0, count: 4096)
-        while !received.contains(UInt8(ascii: "\n")) {
-            guard received.count < SSHAskpassMessageLine.maximumLength else { return nil }
-            let count = recv(descriptor, &buffer, buffer.count, 0)
-            guard count > 0 else { return nil }
-            received.append(contentsOf: buffer[..<count])
-        }
-        return SSHAskpassMessageLine.decoded(SSHAskpassRequest.self, from: received)
-    }
-
-    private static func send(_ data: Data, to descriptor: Int32) {
-        var sentCount = 0
-        while sentCount < data.count {
-            let count = data.withUnsafeBytes { Darwin.send(descriptor, $0.baseAddress! + sentCount, data.count - sentCount, 0) }
-            guard count > 0 else { return }
-            sentCount += count
-        }
-    }
-
-    private final class HangUpWatch: @unchecked Sendable {
-        private let source: DispatchSourceRead
-        private let lock = NSLock()
-        private var isStopped = false
-
-        init?(copying descriptor: Int32, queue: DispatchQueue) {
-            let copy = CloseOnExecDescriptor.duplicate(descriptor)
-            guard copy >= 0 else { return nil }
-            source = DispatchSource.makeReadSource(fileDescriptor: copy, queue: queue)
-            source.setCancelHandler { Darwin.close(copy) }
-        }
-
-        func start(onHangUp: @escaping @Sendable () -> Void) {
-            source.setEventHandler { [weak self] in
-                self?.stop()
-                onHangUp()
-            }
-            source.resume()
-        }
-
-        func stop() {
-            let wasStopped = lock.withLock {
-                defer { isStopped = true }
-                return isStopped
-            }
-            if !wasStopped { source.cancel() }
         }
     }
 }

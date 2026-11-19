@@ -31,9 +31,9 @@ extension ConversationStore {
 
     private func reconnectCommand(for ended: TerminalSession) -> NativeCLICommand {
         guard let host = ended.host.sshDestination else { return ended.command }
-        guard let conversation = ended.conversation,
+        guard ended.hasTakenOverItsSessionsTmuxName,
+            let conversation = ended.conversation,
             let tmuxName = ended.tmuxSessionName,
-            tmuxName == TmuxSessionName.forConversation(conversation),
             let adapter = adapter(for: conversation.provider)
         else {
             return RemoteCLICommandBuilder().withCurrentLogin(ended.command, host: host)
@@ -47,5 +47,12 @@ extension ConversationStore {
             usesHostTmuxPrefix: usesTmuxPrefix(on: ended.host),
             startCommand: customStartCommand(for: conversation.provider, on: ended.host)
         )
+    }
+}
+
+extension TerminalSession {
+    fileprivate var hasTakenOverItsSessionsTmuxName: Bool {
+        guard let conversation, let tmuxSessionName else { return false }
+        return tmuxSessionName == TmuxSessionName.forConversation(conversation)
     }
 }

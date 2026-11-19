@@ -39,13 +39,13 @@ struct RemoteHostCommandRunner: Sendable {
     /// `ExitOnForwardFailure` is set.
     static let nonInteractiveSSHOptions = ["-o", "BatchMode=yes"] + connectionSettingOptions
 
-    static let connectionSettingOptions = [
-        "-o", "ConnectTimeout=10",
-        "-o", "ServerAliveInterval=10",
-        "-o", "ServerAliveCountMax=3",
-        "-o", "RemoteCommand=none",
-        "-o", "ClearAllForwardings=yes",
-    ]
+    static let connectionSettingOptions =
+        SSHConnectTimeout.options + [
+            "-o", "ServerAliveInterval=10",
+            "-o", "ServerAliveCountMax=3",
+            "-o", "RemoteCommand=none",
+            "-o", "ClearAllForwardings=yes",
+        ]
 
     /// `-T` keeps a `RequestTTY force` in `~/.ssh/config` from giving the command a terminal, which would change
     /// what passes through it, such as `rsync`'s transfer.

@@ -167,6 +167,7 @@ struct DeletionTryAgainTests {
         if !FileManager.default.fileExists(atPath: notAFolder.path) {
             try "".write(to: notAFolder, atomically: true, encoding: .utf8)
         }
-        return RemoteSessionDiscovery(mirror: RemoteSessionMirror(cacheRoot: notAFolder, sourceHomeOverride: sandbox.directory.path))
+        return RemoteSessionDiscovery(
+            mirror: RemoteSessionMirror(cacheRoot: notAFolder, hostAccess: .standIn(home: sandbox.directory.path)))
     }
 }

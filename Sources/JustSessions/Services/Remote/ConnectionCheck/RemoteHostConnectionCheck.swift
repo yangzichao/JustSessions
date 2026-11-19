@@ -7,7 +7,8 @@ struct RemoteHostConnectionCheck: Sendable {
         self.runner = runner
     }
 
-    static let timeout: TimeInterval = 20
+    static let timeout = SSHConnectTimeout.plus(slowLoginAllowance)
+    private static let slowLoginAllowance: TimeInterval = 10
 
     func problem(connectingTo host: String) -> SSHConnectionProblem? {
         guard let result = runner.run(host, WindowsHostProbe.command, Self.timeout) else { return .noAnswer }

@@ -34,7 +34,7 @@ struct RemoteOpenCodeFixture {
 
     /// Copies from the stand-in home as the host's snapshot would.
     var discovery: RemoteSessionDiscovery {
-        RemoteSessionDiscovery(mirror: RemoteSessionMirror(cacheRoot: cacheRoot, sourceHomeOverride: home.path))
+        RemoteSessionDiscovery(mirror: RemoteSessionMirror(cacheRoot: cacheRoot, hostAccess: .standIn(home: home.path)))
     }
 
     var mirrorDatabase: URL {

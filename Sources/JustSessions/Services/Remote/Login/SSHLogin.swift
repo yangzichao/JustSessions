@@ -59,9 +59,9 @@ struct SSHLogin: Sendable {
                         context: output.newText(),
                         previousPrompt: run.notePrompt(request.prompt.trimmingCharacters(in: .whitespacesAndNewlines))
                     )
-                    let answer = await ask(question)
-                    if answer == nil, !Task.isCancelled { run.cancel() }
-                    return SSHAskpassReply(answer: answer)
+                    let answer = SSHLoginAnswer(asked: await ask(question), questionWasWithdrawn: Task.isCancelled)
+                    if answer == .cancelledByUser { run.cancel() }
+                    return SSHAskpassReply(answer: answer.textForSSH)
                 })
         else {
             try? FileManager.default.removeItem(at: directory)

@@ -7,7 +7,7 @@ enum OpenCodeRemoteSnapshotCommand {
 
     static func create(on host: String) -> String {
         let script =
-            OpenCodeRemoteDatabaseLocation.shellAssignment + """
+            OpenCodeRemoteDatabaseLocation.shellAssignment(to: "db") + """
 
                 [ -f "$db" ] || exit \(noDatabaseExitStatus)
                 exec python3 -c \(ShellQuoting.quoted(pythonScript)) "$db"
@@ -37,13 +37,12 @@ enum OpenCodeRemoteSnapshotCommand {
             copy = sqlite3.connect(str(target), uri=True, timeout=5, isolation_level=None)
             copy.execute('ATTACH DATABASE ? AS source', (source.as_uri() + '?mode=ro',))
             copy.execute('BEGIN')
-            for alternatives in steps:
-                for index, statement in enumerate(alternatives):
-                    try:
-                        copy.execute(statement)
-                        break
-                    except sqlite3.OperationalError as error:
-                        if index == len(alternatives) - 1 or 'no such' not in str(error): raise
+            for step in steps:
+                try:
+                    copy.execute(step['statement'])
+                except sqlite3.OperationalError as error:
+                    if 'fallbackWhenSomethingIsMissing' not in step or 'no such' not in str(error): raise
+                    copy.execute(step['fallbackWhenSomethingIsMissing'])
             copy.execute('COMMIT')
             copy.execute('DETACH DATABASE source')
             copy.close()

@@ -21,7 +21,7 @@ struct RemoteSessionToolByToolDiscoveryTests {
         try #"{"type":"session_meta","payload":{"id":"\#(codexID)","cwd":"/home/me/api"}}"#
             .appending("\n")
             .write(to: codexDay.appendingPathComponent("rollout-2026-09-24T10-00-00-\(codexID).jsonl"), atomically: true, encoding: .utf8)
-        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), sourceHomeOverride: remoteHome.path)
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: .standIn(home: remoteHome.path))
         let codexMirror = mirror.mirrorDirectory(host: "devbox", provider: .codex)
         let log = CopyLog()
 
@@ -61,11 +61,9 @@ struct RemoteSessionToolByToolDiscoveryTests {
         let sharing = SSHConnectionSharing(host: "devbox", directory: socketDirectory, controlPath: controlPath) { _, _ in
             closeCount.increment()
         }
-        let mirror = RemoteSessionMirror(
-            cacheRoot: root.appendingPathComponent("cache"),
-            sourceHomeOverride: remoteHome.path,
-            connectionSharing: { _ in sharing }
-        )
+        var hostAccess = RemoteMirrorHostAccess.standIn(home: remoteHome.path)
+        hostAccess.connectionSharing = { _ in sharing }
+        let mirror = RemoteSessionMirror(cacheRoot: root.appendingPathComponent("cache"), hostAccess: hostAccess)
         let copiedCount = LockedCounter()
 
         let task = Task {
