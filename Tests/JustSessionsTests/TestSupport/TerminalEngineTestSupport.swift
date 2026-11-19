@@ -33,12 +33,20 @@ extension TerminalEngine {
         }
     }
 
-    /// A tab's terminal drawn by this engine, with the appearance settings of a test's own.
+    /// A tab's terminal drawn by this engine, with the appearance settings, and the Option key choice when given, of a
+    /// test's own.
     @MainActor
-    func makeTabTerminalView(frame: NSRect, appearanceStore: TerminalAppearanceStore, themeStore: AppThemeStore) -> any TabTerminalView {
+    func makeTabTerminalView(
+        frame: NSRect,
+        appearanceStore: TerminalAppearanceStore,
+        themeStore: AppThemeStore,
+        optionKeyStore: TerminalOptionKeyStore = .shared
+    ) -> any TabTerminalView {
         switch self {
-        case .ghostty: GhosttyTabTerminalView(frame: frame, appearanceStore: appearanceStore, themeStore: themeStore)
-        case .swiftTerm: SelectableTerminalView(frame: frame, appearanceStore: appearanceStore, themeStore: themeStore)
+        case .ghostty:
+            GhosttyTabTerminalView(frame: frame, appearanceStore: appearanceStore, themeStore: themeStore, optionKeyStore: optionKeyStore)
+        case .swiftTerm:
+            SelectableTerminalView(frame: frame, appearanceStore: appearanceStore, themeStore: themeStore, optionKeyStore: optionKeyStore)
         }
     }
 }

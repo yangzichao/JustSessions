@@ -1,5 +1,33 @@
 [
   {
+    "version": "1.4.2",
+    "publishedOn": "2026-11-19",
+    "title": {
+      "en": "Option key setting",
+      "zh-Hans": "Option 键设置"
+    },
+    "sections": [
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Turn off Use Option as Meta to type your keyboard layout's Option characters, such as brackets, in terminals.",
+            "zh-Hans": "关闭「将 Option 用作 Meta 键」后，可在终端中输入键盘布局里需按住 Option 的字符，例如方括号。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Fixed Claude Code sessions in a git worktree showing under the worktree's folder instead of their repository.",
+            "zh-Hans": "修复了 git worktree 中的 Claude Code 会话没有列在所属仓库下的问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.4.1",
     "publishedOn": "2026-11-17",
     "title": {
