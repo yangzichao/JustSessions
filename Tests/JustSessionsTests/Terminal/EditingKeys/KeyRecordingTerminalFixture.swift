@@ -12,16 +12,22 @@ final class KeyRecordingTerminalFixture {
     let window: NSWindow
     private let folder: URL
     private let settings: IsolatedUserDefaults
+    /// Held here, since a Ghostty controller holds the store weakly.
+    private let optionKeyStore: TerminalOptionKeyStore
 
-    init(engine: TerminalEngine) throws {
+    /// `optionIsMeta` is the terminal's Option key choice, kept in the fixture's own settings.
+    init(engine: TerminalEngine, optionIsMeta: Bool = TerminalOptionKeyStore.defaultOptionIsMeta) throws {
         _ = NSApplication.shared
         settings = try IsolatedUserDefaults()
         folder = try makeTemporaryDirectory()
         let frame = NSRect(x: 0, y: 0, width: 640, height: 400)
+        optionKeyStore = TerminalOptionKeyStore(userDefaults: settings.userDefaults)
+        optionKeyStore.setOptionIsMeta(optionIsMeta)
         terminalView = engine.makeTabTerminalView(
             frame: frame,
             appearanceStore: TerminalAppearanceStore(userDefaults: settings.userDefaults),
-            themeStore: AppThemeStore(userDefaults: settings.userDefaults)
+            themeStore: AppThemeStore(userDefaults: settings.userDefaults),
+            optionKeyStore: optionKeyStore
         )
         window = NSWindow(contentRect: frame, styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
