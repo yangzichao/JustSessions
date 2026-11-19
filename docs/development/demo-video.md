@@ -6,7 +6,7 @@ The homepage's narrated demo, `website/media/justsessions-demo.mp4`, is recorded
 Scripts/DemoVideo/demo-video help
 ```
 
-[Media provenance](../../website/media/README.md) says what the published video shows and how it was made. Coding agents can follow the `demo-video` skill in `.claude/skills/`, which adds the judgment calls this page leaves out.
+[Media provenance](../../website/media/README.md) says what the published video shows and how it was made.
 
 ## What it needs
 
