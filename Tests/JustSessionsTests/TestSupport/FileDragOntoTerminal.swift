@@ -1,6 +1,5 @@
 import AppKit
 
-/// A drag of files onto the terminal, on a pasteboard of its own, which goes with it.
 final class FileDragOntoTerminal: NSObject, NSDraggingInfo {
     let draggingPasteboard: NSPasteboard
 

@@ -122,7 +122,6 @@ struct PiTranscriptReaderTests {
         #expect(transcript.entries.map(\.startsTurn) == [true, false, false, false, false, false])
     }
 
-    /// A tool's screenshot shows after the call that produced it, in the assistant's turn; its text does not.
     @Test func showsAToolResultsImagesAfterTheToolCallThatProducedThem() throws {
         let transcript = try read([
             Self.user("u1", parent: nil, "Render the scene"),
@@ -168,8 +167,6 @@ struct PiTranscriptReaderTests {
         #expect(transcript.entries.map(\.content) == [.userMessage("Hello"), .note("429 rate limited")])
     }
 
-    /// A field of an unexpected type reads as missing, as it would in a JSON dictionary, and the rest of the entry
-    /// is still shown.
     @Test func fieldsOfAnotherTypeDoNotHideTheirEntry() throws {
         let transcript = try read([
             #"{"type":"message","id":"u1","parentId":null,"timestamp":17,"message":{"role":"user","content":"Untimed"}}"#,
@@ -336,13 +333,10 @@ struct PiTranscriptReaderTests {
         #expect(transcript.entries.map(\.content) == [.userMessage("Hello Pi")])
     }
 
-    // MARK: - Session lines in Pi's own key order
-
     private static let timestamp = "2026-09-30T10:00:00.000Z"
     private static let header =
         #"{"type":"session","version":3,"id":"019a0000-0000-7000-8000-000000000000","timestamp":"2026-09-30T10:00:00.000Z","cwd":"/tmp"}"#
 
-    /// Writes the lines after a session header and reads them as the preview does.
     private func read(_ lines: [String]) throws -> TranscriptContent {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }

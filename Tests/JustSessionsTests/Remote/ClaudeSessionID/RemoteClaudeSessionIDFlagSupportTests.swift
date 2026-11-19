@@ -44,7 +44,6 @@ struct RemoteClaudeSessionIDFlagSupportTests {
         #expect(support.preassignedSessionID(host: "devbox", startCommand: nil) == nil)
     }
 
-    /// An offline host, a timeout, or a CLI that fails says nothing about the flag, so a later refresh asks again.
     @Test(arguments: [(Int32(255), ""), (Int32(127), "bash: claude: command not found"), (Int32(1), Self.helpWithFlag)])
     func anAnswerTheHostCouldNotGiveIsAskedAgain(exitStatus: Int32, output: String) async throws {
         let recorder = RemoteCommandRecorder()
@@ -75,7 +74,6 @@ struct RemoteClaudeSessionIDFlagSupportTests {
         #expect(recorder.commands.count == 1)
     }
 
-    /// A start command of your own can run another CLI, so it gets an answer of its own.
     @Test func aStartCommandHasAnAnswerOfItsOwn() {
         let support = RemoteClaudeSessionIDFlagSupport(
             runner: RemoteHostCommandRunner { _, command, _ in

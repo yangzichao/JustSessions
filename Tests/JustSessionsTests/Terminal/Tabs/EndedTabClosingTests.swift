@@ -2,8 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab whose CLI or shell already ended closes without asking, since closing it stops nothing. An SSH tab in tmux
-/// still asks: its connection ending doesn't mean its CLI did.
 @MainActor
 struct EndedTabClosingTests {
     @Test(arguments: [

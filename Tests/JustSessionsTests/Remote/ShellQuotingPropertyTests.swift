@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Paths, session ids, and scripts reach SSH hosts inside quoted shell words. Whatever a value holds, the command
-/// it is passed to receives exactly that value.
 struct ShellQuotingPropertyTests {
     struct Shell: Sendable, CustomTestStringConvertible {
         let executablePath: String
@@ -31,7 +29,6 @@ struct ShellQuotingPropertyTests {
         #expect(Self.nulTerminatedValues(output) == values)
     }
 
-    /// Like the command a tab runs on an SSH host: a script quoted once more and handed to another shell.
     @Test func valuesQuotedTwiceSurviveAShellInsideAShell() throws {
         var generator = SeededRandomNumberGenerator(seed: 0xD0B1E)
         let values = (0..<100).map { _ in generator.string(of: Self.awkwardCharacters, lengthIn: 1...8) }
@@ -90,8 +87,6 @@ struct ShellQuotingPropertyTests {
         )
     }
 
-    /// Splits at the NUL bytes `printf '%s\0'` writes after each value; split as bytes, since a `\r` at the end of
-    /// one value would otherwise join the next separator into one `Character`.
     private static func nulTerminatedValues(_ output: String) -> [String] {
         var values = Data(output.utf8).split(separator: 0, omittingEmptySubsequences: false).map { String(decoding: $0, as: UTF8.self) }
         values.removeLast()

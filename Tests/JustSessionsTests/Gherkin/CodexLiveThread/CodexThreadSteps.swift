@@ -1,7 +1,6 @@
 import CucumberSwift
 import XCTest
 
-/// The Codex steps of `Features/CodexLiveThread/FollowCodexThread.feature`; the rest are `SessionTabSteps`.
 @MainActor
 enum CodexThreadSteps {
     static func register() {

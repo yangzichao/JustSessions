@@ -41,8 +41,6 @@ struct SessionMessageTextReaderTests {
         #expect(text.entries == expectedEntries)
     }
 
-    /// Search leaves images undecoded, but every entry keeps the ID and turn the reader gives it, so a match opens
-    /// where it is.
     @Test(arguments: imageSamples)
     func leavesImagesUndecodedWithoutMovingAnyEntry(provider: ConversationProvider, lines: [String]) async throws {
         let directory = try makeTemporaryDirectory()

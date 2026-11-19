@@ -17,7 +17,6 @@ struct TmuxHistoryFinderTests {
         #expect(tmux.commands == [TmuxHistorySearchCommands.startingSearch(for: "needle", inSession: tmux.sessionName)])
     }
 
-    /// Matches are numbered from the newest, and both directions wrap around.
     @Test func movesNumberTheSelectedMatchAndWrapAround() async throws {
         let tmux = ScriptedTmuxHistory(countOutputs: Array(repeating: ScriptedTmuxHistory.countLine(3), count: 5))
         let finder = TmuxHistoryFinder(history: tmux.history)
@@ -76,7 +75,6 @@ struct TmuxHistoryFinderTests {
         #expect(outcomes == [.searched(TerminalFindMatchCount.none), .searched(TerminalFindMatchCount.none)])
     }
 
-    /// Showing no matches would turn off the moves, though tmux moves between them.
     @Test func aSearchThatFoundSomeInATmuxThatDoesntCountShowsNoCount() async throws {
         let tmux = ScriptedTmuxHistory(countOutputs: Array(repeating: ScriptedTmuxHistory.countLine(nil, foundAny: true), count: 2))
         let finder = TmuxHistoryFinder(history: tmux.history)
@@ -102,7 +100,6 @@ struct TmuxHistoryFinderTests {
         #expect(outcomes == [.searched(TerminalFindMatchCount(total: 1000, selectedNumber: nil, exceedsCountLimit: true))])
     }
 
-    /// As on an SSH host without tmux, or with the session gone.
     @Test func aSearchTmuxCouldNotRunReportsNoCount() async throws {
         let tmux = ScriptedTmuxHistory(countOutputs: [nil])
         let finder = TmuxHistoryFinder(history: tmux.history)
@@ -115,7 +112,6 @@ struct TmuxHistoryFinderTests {
         #expect(outcomes == [.couldNotSearch])
     }
 
-    /// Typing faster than a slow host answers runs the search being typed now, and skips the ones it replaced.
     @Test func aSearchTypedWhileTmuxWasBusySkipsTheSearchesItReplaced() async throws {
         let tmux = ScriptedTmuxHistory(
             countOutputs: [ScriptedTmuxHistory.countLine(9), ScriptedTmuxHistory.countLine(2)],
@@ -154,7 +150,6 @@ struct TmuxHistoryFinderTests {
         #expect(outcomes.count == 1)
     }
 
-    /// A move before any search starts one.
     @Test func aMoveBeforeASearchStartsOne() async throws {
         let tmux = ScriptedTmuxHistory(countOutputs: [ScriptedTmuxHistory.countLine(2)])
         let finder = TmuxHistoryFinder(history: tmux.history)

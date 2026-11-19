@@ -4,8 +4,6 @@ import Foundation
 @testable import JustSessions
 
 extension TerminalEngineStore {
-    /// A store whose tabs open with `engine`, for a test that uses one engine's own API. Its settings suite is gone
-    /// once the choice is made; the store keeps the choice.
     @MainActor
     static func pinned(to engine: TerminalEngine) throws -> TerminalEngineStore {
         let settings = try IsolatedUserDefaults()
@@ -17,7 +15,6 @@ extension TerminalEngineStore {
 }
 
 extension TerminalEngine {
-    /// The engine a test switches to, to show that a tab keeps the engine it had, or takes the one chosen now.
     var otherEngine: TerminalEngine {
         switch self {
         case .ghostty: .swiftTerm
@@ -25,7 +22,6 @@ extension TerminalEngine {
         }
     }
 
-    /// Whether the terminal is this engine's own view.
     @MainActor
     func draws(_ terminalView: any TabTerminalView) -> Bool {
         switch self {
@@ -34,8 +30,6 @@ extension TerminalEngine {
         }
     }
 
-    /// A tab's terminal drawn by this engine, with the appearance settings, and the Option key choice when given, of a
-    /// test's own.
     @MainActor
     func makeTabTerminalView(
         frame: NSRect,
@@ -52,8 +46,6 @@ extension TerminalEngine {
     }
 }
 
-/// What a tab's terminal shows: SwiftTerm's whole buffer, or the rows of Ghostty's screen, which it fills only in a
-/// window.
 @MainActor
 func screenText(of terminalView: any TabTerminalView) -> String {
     switch terminalView {
@@ -66,7 +58,6 @@ func screenText(of terminalView: any TabTerminalView) -> String {
     }
 }
 
-/// Hands `text` to the terminal as a process's output and waits until the terminal has read it.
 @MainActor
 func feedOutput(_ text: String, to terminalView: any TabTerminalView) {
     switch terminalView {

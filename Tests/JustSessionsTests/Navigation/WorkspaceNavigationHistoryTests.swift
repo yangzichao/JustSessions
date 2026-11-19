@@ -17,7 +17,6 @@ struct WorkspaceNavigationHistoryTests {
         #expect(history.forwardEntryIndices(shown: tabB, canShow: canShowAll).isEmpty)
 
         history.move(to: 1)
-        // The window then shows the place, which records nothing new.
         history.record(sessionC)
         #expect(history.entries == [tabA, sessionC, tabB])
         #expect(history.backEntryIndices(shown: sessionC, canShow: canShowAll) == [0])
@@ -41,7 +40,6 @@ struct WorkspaceNavigationHistoryTests {
         var history = WorkspaceNavigationHistory()
         for location in [tabA, tabB, tabA] { history.record(location) }
         #expect(history.entries == [tabA, tabB, tabA])
-        // Showing the current place again, as when a click lands on the tab already selected, adds nothing.
         history.record(tabA)
         #expect(history.entries == [tabA, tabB, tabA])
     }
@@ -69,7 +67,6 @@ struct WorkspaceNavigationHistoryTests {
 
         history.move(to: 2)
         history.record(tabA)
-        // Back from the second tabA has only the closed tab and tabA itself before it.
         #expect(history.backEntryIndices(shown: tabA, canShow: tabBClosed).isEmpty)
         #expect(history.forwardEntryIndices(shown: tabA, canShow: tabBClosed) == [3])
     }

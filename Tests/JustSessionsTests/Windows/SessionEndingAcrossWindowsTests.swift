@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// End session, from a session's row, stops its CLI wherever it runs: in a tab of either window, or in tmux with no
-/// tab open.
 @MainActor
 struct SessionEndingAcrossWindowsTests {
     @Test func endingASessionClosesItsTabInAnotherWindow() throws {
@@ -20,7 +18,6 @@ struct SessionEndingAcrossWindowsTests {
         #expect(!sandbox.second.canEndSession(sandbox.conversation))
     }
 
-    /// Both windows list the tmux session, and neither does once it has ended.
     @Test func endingASessionRunningInTmuxWithoutATabForgetsItInEveryWindow() throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
@@ -34,7 +31,6 @@ struct SessionEndingAcrossWindowsTests {
         #expect(!sandbox.second.isRunningInTmux(sandbox.conversation))
     }
 
-    /// Ending a multi-selection ends the sessions that run, in a tab of either window or in tmux, and skips the rest.
     @Test func endingSelectedSessionsEndsEachOneThatRuns() throws {
         let sandbox = try TwoWindowSandbox(sessionCount: 4)
         let (inFirstWindow, inSecondWindow, inTmux, notRunning) =

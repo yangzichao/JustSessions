@@ -2,8 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Closing a plain terminal ends its shell, so it asks first wherever a shell may still run, even in a tab that waits to
-/// be shown or lost its connection: its shell may run on in tmux on the SSH host.
 @MainActor
 struct PlainTerminalClosingNeedTests {
     @Test func aWaitingSSHPlainTerminalInTmuxAsksAsItsShellMayStillRun() {
@@ -13,7 +11,6 @@ struct PlainTerminalClosingNeedTests {
         #expect(!tab.closingStopsNothing)
     }
 
-    /// On this Mac one whose shell still runs reattached at once, and over SSH one without tmux has no shell to run on.
     @Test(arguments: [
         (SessionHost.thisMac, String?.some("justsessions-terminal-a1b2c3d4")),
         (SessionHost.ssh("devbox"), String?.none),

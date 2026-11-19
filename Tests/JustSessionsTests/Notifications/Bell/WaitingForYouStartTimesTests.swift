@@ -10,7 +10,6 @@ struct WaitingForYouStartTimesTests {
         start.addingTimeInterval(seconds)
     }
 
-    /// The marks `UnseenFinishedTurns` leaves after `source` finished a turn out of view.
     private static func unseen(_ source: SessionAttentionSource) -> UnseenFinishedTurns {
         var unseen = UnseenFinishedTurns()
         unseen.update(
@@ -33,7 +32,6 @@ struct WaitingForYouStartTimesTests {
             at: Self.at(1)
         )
         #expect(startTimes.startTime(of: source) == Self.at(1))
-        // The CLI words what it waits for differently, and still waits.
         startTimes.update(
             after: [.init(source: source, activity: .needsInput(reason: "permission prompt"))],
             unseenFinishedTurns: .init(),

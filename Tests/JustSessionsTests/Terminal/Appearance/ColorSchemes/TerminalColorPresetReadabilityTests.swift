@@ -2,7 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Guards against a mistyped preset color leaving terminal text unreadable. The limits are WCAG contrast ratios.
 struct TerminalColorPresetReadabilityTests {
     @Test func everyPresetKeepsTextReadableInEachVersion() {
         for preset in TerminalColorPreset.allCases {
@@ -18,7 +17,6 @@ struct TerminalColorPresetReadabilityTests {
                 #expect(ThemeColorContrast.ratio(scheme.foreground, palette.background) >= 4, "\(variant) text")
                 #expect(
                     ThemeColorContrast.ratio(scheme.readableSelectionForeground, scheme.selectionBackground) >= 4.5, "\(variant) selection")
-                // Bright black carries hints and dim text in many CLIs, so it must not vanish into the background.
                 #expect(ThemeColorContrast.ratio(scheme.ansiHexColors[8], palette.background) >= 1.5, "\(variant) bright black")
             }
         }

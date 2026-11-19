@@ -3,14 +3,9 @@ import Testing
 
 @testable import JustSessions
 
-/// A Claude Code tab on this Mac whose CLI moved to a session no refresh has listed keeps asking for scans until one
-/// that started after the move lists it, and meanwhile shows the name the CLI gave it on the tab alone (LIV-01,
-/// LIV-07). On SSH hosts, see `RemoteClaudeLiveNameTests`.
 @Suite(.oneHeldThreadAtATime)
 @MainActor
 struct ClaudeSessionSwitchFollowTests {
-    /// Every window's refresh of this Mac joins the scan in flight, which here read the folders before `/branch`
-    /// wrote the branch. The tab's window waits for that scan to end and then asks for its own.
     @Test func aBranchMadeWhileAnotherWindowScansIsFollowedOnceThatScanEnds() async throws {
         let fixture = try Fixture()
         defer { fixture.remove() }
@@ -25,7 +20,6 @@ struct ClaudeSessionSwitchFollowTests {
         try fixture.transcripts.branch()
         fixture.synchronize()
         if fixture.store.isScanningThisMac {
-            // A refresh asked for now joins that scan from a task of its own, as it does in the app.
             let joinDeadline = ContinuousClock.now + .seconds(120)
             while await fixture.readService.thisMacDiscoveryWaiterCount() < 2, ContinuousClock.now < joinDeadline {
                 try await Task.sleep(for: .milliseconds(10))
@@ -42,8 +36,6 @@ struct ClaudeSessionSwitchFollowTests {
         #expect(fixture.title(of: ClaudeBranchCommandTranscripts.parentID) == ClaudeBranchCommandTranscripts.parentTitle)
     }
 
-    /// Until a scan lists the branch, `/rename` there names the tab, and never the row of the session it branched
-    /// from, which the tab is still linked to. Once listed, a name given in the app to the branch wins.
     @Test func aRenameWhileTheTabWaitsForTheBranchShowsOnTheTabAlone() async throws {
         let fixture = try Fixture()
         defer { fixture.remove() }
@@ -55,7 +47,6 @@ struct ClaudeSessionSwitchFollowTests {
         #expect(tab.conversation?.id == parent.id)
         #expect(tab.displayTitle == "after-branch")
         #expect(fixture.title(of: ClaudeBranchCommandTranscripts.parentID) == ClaudeBranchCommandTranscripts.parentTitle)
-        // A listing of this Mac that hasn't reached the branch keeps the name on the tab.
         fixture.store.replaceConversations(on: .thisMac, with: fixture.store.conversations)
         #expect(tab.displayTitle == "after-branch")
 
@@ -71,9 +62,6 @@ struct ClaudeSessionSwitchFollowTests {
         #expect(fixture.title(of: ClaudeBranchCommandTranscripts.branchID) == "Named in the app")
     }
 
-    /// The tab's Rename, from its menu in the tab bar or its terminal's, opens on the name the tab shows while it waits
-    /// (LIV-08) and names the branch the tab shows: at once on the tab, on the branch's row once listed, and never the
-    /// row of the session it branched from, which the tab is still linked to.
     @Test func renamingTheTabWhileItWaitsForTheBranchNamesTheBranch() async throws {
         let fixture = try Fixture()
         defer { fixture.remove() }
@@ -104,8 +92,6 @@ struct ClaudeSessionSwitchFollowTests {
         #expect(fixture.store.title(for: linked) == "Mine")
     }
 
-    /// ⌘D while the tab waits for the branch bookmarks the session the tab is still linked to, though the tab shows the
-    /// branch's name (TRM-74); the branch's own bookmarks start once a scan lists it.
     @Test func commandDWhileTheTabWaitsForTheBranchBookmarksTheSessionItIsLinkedTo() async throws {
         let fixture = try Fixture()
         defer { fixture.remove() }
@@ -136,7 +122,6 @@ struct ClaudeSessionSwitchFollowTests {
         let fixture = try Fixture()
         defer { fixture.remove() }
         let (tab, parent) = try await fixture.openTabOnTheSessionToBranch()
-        // `/rename kept-name` before `/clear`.
         try fixture.transcripts.append(
             to: parent.sessionID,
             [
@@ -172,8 +157,6 @@ struct ClaudeSessionSwitchFollowTests {
         #expect(fixture.title(of: ClaudeBranchCommandTranscripts.parentID) == "kept-name")
     }
 
-    /// A CLI that ends while its tab waits for the branch is followed nowhere: the tab names the session it is linked
-    /// to again, which Resume reopens, without waiting for a scan, and never the branch.
     @Test func aTabWhoseCLIEndsWhileItWaitsNamesTheSessionItIsLinkedTo() async throws {
         let fixture = try Fixture()
         defer { fixture.remove() }
@@ -196,7 +179,6 @@ struct ClaudeSessionSwitchFollowTests {
         #expect(tab.displayTitle == ClaudeBranchCommandTranscripts.parentTitle)
     }
 
-    /// A tab whose CLI stays in its session asks for no scan, and its `/rename` names the tab and the row.
     @Test func aResumedTabWhoseCLIStaysInItsSessionAsksForNoScan() async throws {
         let fixture = try Fixture()
         defer { fixture.remove() }
@@ -217,8 +199,6 @@ struct ClaudeSessionSwitchFollowTests {
         #"{"pid":\#(ClaudeBranchCommandTranscripts.processID),"sessionId":"\#(sessionID)","kind":"interactive","name":"\#(name)","nameSource":"user","status":"idle"}"#
     }
 
-    /// A window's store over the real 2.1.306 `/branch` transcripts, with Claude Code's live registry beside them.
-    /// Each window made with `makeStore()` shares its scans of this Mac, as the app's windows do.
     @MainActor
     private struct Fixture {
         let transcripts: ClaudeBranchCommandTranscripts
@@ -228,14 +208,12 @@ struct ClaudeSessionSwitchFollowTests {
         let windows = WorkspaceWindowRegistry()
         let registry: ClaudeLiveSessionRegistry
         let store: ConversationStore
-        /// The time the live name sync goes by; it starts at the real time, so the transcripts' later writes are later.
         let clock = StandInClock()
 
         init() throws {
             transcripts = try ClaudeBranchCommandTranscripts()
             settings = try IsolatedUserDefaults()
             scans = HoldableClaudeScans(configurationDirectory: transcripts.configurationDirectory)
-            // No tmux in reach, so following never renames a session on the app's own tmux server.
             readService = WorkspaceReadService(
                 adapters: [scans],
                 commandResolver: NativeCLICommandResolver(
@@ -276,7 +254,6 @@ struct ClaudeSessionSwitchFollowTests {
             try await expectEventually { !store.isScanningThisMac }
         }
 
-        /// A tab on the session `/branch` is typed in, listed by a scan; the registry names it.
         func openTabOnTheSessionToBranch() async throws -> (TerminalSession, Conversation) {
             try await scan(with: store)
             let parent = try #require(store.conversations.first { $0.sessionID == ClaudeBranchCommandTranscripts.parentID })
@@ -294,12 +271,10 @@ struct ClaudeSessionSwitchFollowTests {
             return (tab, parent)
         }
 
-        /// One beat of the tab's window's live name sync.
         func synchronize() {
             store.synchronizeClaudeLiveNames(registry: registry, now: clock.now)
         }
 
-        /// One beat of the live name sync, which may ask for a scan, and the next once it ends.
         func followTheCLI() async throws {
             synchronize()
             try await expectEventually { !store.isScanningThisMac }

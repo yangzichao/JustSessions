@@ -58,7 +58,6 @@ struct OpenCodeConversationDeletionTests {
 
         #expect(throws: OpenCodeConversationDeletionError.didNotFinish) { try deletion.delete(try fixture.selectedConversation()) }
 
-        // Well short of the stand-in's 600 seconds, so the time limit, not the CLI ending, stopped the wait.
         #expect(clock.now - startedAt < .seconds(120))
         #expect(try fixture.database.count("SELECT count(*) FROM session") == 3)
     }
@@ -86,7 +85,6 @@ struct OpenCodeConversationDeletionTests {
         #expect(throws: ConversationDeletionError.invalidSource) { try adapter.delete(copy(host: .ssh("devbox"))) }
         #expect(throws: ConversationDeletionError.missingSource) { try adapter.delete(copy(sessionID: "ses_alreadygone01")) }
         #expect(throws: ConversationDeletionError.sourceMismatch) { try adapter.delete(copy(projectPath: "/Users/me/elsewhere")) }
-        // Subagent sessions are never listed; deleting their parent deletes them.
         #expect(throws: ConversationDeletionError.sourceMismatch) {
             try adapter.delete(copy(sessionID: OpenCodeDeletionFixture.subagentSessionID))
         }

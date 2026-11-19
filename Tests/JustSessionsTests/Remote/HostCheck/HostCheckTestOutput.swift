@@ -2,7 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// Output as `RemoteHostCheckScript` prints it, each answer under its marker line, after a shell profile's greeting.
 func hostCheckScriptOutput(_ answers: KeyValuePairs<String, String>) -> String {
     "Welcome to devbox\n"
         + answers.map { key, answer in

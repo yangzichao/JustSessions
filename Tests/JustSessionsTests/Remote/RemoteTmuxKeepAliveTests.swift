@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the remote tab's command against a real tmux on this Mac, with a private tmux server and home folder,
-/// and stand-ins for the host's login shell and CLI. Skipped where tmux is not installed.
 @Suite(.oneTmuxSandboxAtATime)
 struct RemoteTmuxKeepAliveTests {
     @Test func cliKeepsRunningAfterDisconnectAndReopeningReattaches() throws {
@@ -28,7 +26,6 @@ struct RemoteTmuxKeepAliveTests {
         #expect(sandbox.hasTmuxSession(tmuxName))
         let options = sandbox.run("tmux show-options -t \(ShellQuoting.quoted(tmuxName))")
         #expect(options.contains("status off"))
-        // The title carries Claude's session/name record, falling back to activity before that record is available.
         #expect(options.contains("set-titles on"))
         #expect(options.contains("set-titles-string \"\(RemoteClaudeSessionTitle.titleFormat)\""))
         #expect(options.contains("mouse on"))
@@ -43,7 +40,6 @@ struct RemoteTmuxKeepAliveTests {
         // tmux asks the tab for focus changes and passes them to the CLI, as this Mac's tmux does (SSH-103).
         #expect(serverOptions.contains("focus-events on"))
 
-        // The connection drops: the client goes away, the CLI stays.
         firstClient.terminate()
         firstClient.waitUntilExit()
         #expect(sandbox.hasTmuxSession(tmuxName))

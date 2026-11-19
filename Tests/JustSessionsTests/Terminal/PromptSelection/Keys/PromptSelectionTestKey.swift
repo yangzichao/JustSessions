@@ -1,7 +1,6 @@
 import AppKit
 import Carbon.HIToolbox
 
-/// Key presses as a US keyboard sends them, for the prompt selection's tests.
 enum PromptSelectionTestKey {
     static func command(_ letter: String, windowNumber: Int = 0) -> NSEvent {
         let keyCodes = ["a": kVK_ANSI_A, "c": kVK_ANSI_C, "v": kVK_ANSI_V, "x": kVK_ANSI_X, "z": kVK_ANSI_Z]

@@ -2,8 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// A project folder on this Mac, a stand-in `claude` that keeps running until its tab closes, the SSH hosts given, and
-/// settings of its own.
 @MainActor
 struct TabReopeningSandbox {
     let root: URL
@@ -25,7 +23,6 @@ struct TabReopeningSandbox {
     var userDefaults: UserDefaults { isolatedUserDefaults.userDefaults }
     var projectLocation: ProjectLocation { ProjectLocation(host: .thisMac, path: project.path) }
 
-    /// A Claude Code session in the project folder on this Mac, or at `remoteProjectPath` on an SSH host.
     func conversation(title: String = "Session", host: SessionHost = .thisMac, remoteProjectPath: String = "/srv/app") -> Conversation {
         Conversation.fixture(projectPath: host == .thisMac ? project.path : remoteProjectPath, title: title, host: host)
     }

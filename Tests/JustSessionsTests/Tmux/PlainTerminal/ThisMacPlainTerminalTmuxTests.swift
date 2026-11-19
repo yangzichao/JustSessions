@@ -4,9 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A plain terminal's shell on this Mac runs in a tmux session of its tab's own: it outlives a quit, and ends with its
-/// tab, with one of several windows, or with a quit that reopens no tabs. Runs the installed tmux in a sandbox server
-/// with your login shell; see `ThisMacTmuxSandbox`.
 @MainActor
 struct ThisMacPlainTerminalTmuxTests {
     @Test func theShellRunsInATmuxSessionThatKeepsMoreHistoryAndEndsWithItsTab() async throws {
@@ -19,7 +16,6 @@ struct ThisMacPlainTerminalTmuxTests {
 
         #expect(TmuxSessionName.isPlainTerminal(named: tmuxSessionName))
         #expect(fixture.paneValue("#{history_limit}", of: tmuxSessionName) == "\(PlainTerminalTmuxHistoryLimit.lineCount)")
-        // A CLI's session started later keeps tmux's default.
         #expect(
             fixture.sandbox.tmuxOutput(["show-options", "-gv", "history-limit"])
                 == "\(PlainTerminalTmuxHistoryLimit.tmuxDefaultLineCount)\n")
@@ -53,8 +49,6 @@ struct ThisMacPlainTerminalTmuxTests {
         #expect(fixture.paneValue("#{pane_pid}", of: tmuxSessionName) == "\(shellProcessID)")
     }
 
-    /// Nothing will reopen the tab, so nothing would attach to the shell again. A CLI keeps running, as its session
-    /// can be resumed from the list.
     @Test func quittingWithReopenTabsOffEndsTheShellsButNotTheCLIs() async throws {
         guard let fixture = try PlainTerminalTmuxFixture.make() else { return }
         defer { fixture.tearDown() }
@@ -103,7 +97,6 @@ struct ThisMacPlainTerminalTmuxTests {
     }
 }
 
-/// A tmux sandbox with settings of its own, so tabs saved at a quit reopen in the next store it makes.
 @MainActor
 private struct PlainTerminalTmuxFixture {
     let sandbox: ThisMacTmuxSandbox
@@ -118,7 +111,6 @@ private struct PlainTerminalTmuxFixture {
 
     var projectLocation: ProjectLocation { ProjectLocation(host: .thisMac, path: sandbox.project.path) }
 
-    /// A window's store after its first refresh, with the tabs the last quit saved reopened.
     func makeStore(windowRegistry: WorkspaceWindowRegistry = WorkspaceWindowRegistry()) async -> ConversationStore {
         let store = ConversationStore(
             adapters: [],

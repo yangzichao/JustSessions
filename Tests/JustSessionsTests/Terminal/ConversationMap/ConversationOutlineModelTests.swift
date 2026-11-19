@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// How a tab's outline follows its session while the map shows (PERF-89): a read only after a change, spaced by the
-/// minimum interval, one watch at a time, and nothing through the store.
 @MainActor
 @Suite(.serialized)
 struct ConversationOutlineModelTests {
@@ -12,7 +10,6 @@ struct ConversationOutlineModelTests {
         ConversationOutlineModel(checkInterval: .milliseconds(20), minimumReadInterval: minimumReadInterval)
     }
 
-    /// The cadence PERF-89, SSH-104, and the budgets' Method line state; the other tests shorten it to run quickly.
     @Test func theCadenceIsTheBudgets() {
         #expect(ConversationOutlineModel.checkInterval(on: .thisMac) == .seconds(1))
         #expect(ConversationOutlineModel.checkInterval(on: .ssh("host")) == .seconds(5))
@@ -36,9 +33,6 @@ struct ConversationOutlineModelTests {
         #expect(model.readCount == 2)
     }
 
-    /// Appends every 20 ms for at least a second and until a second read, since a slow first read under load can put
-    /// the next past the minimum (the model waits `readCostMultiple` times the last read, up to `maximumReadInterval`).
-    /// Reads are then bounded by the time spent: one every 200 ms at most, plus the first and one at the edge.
     @Test func readsWaitTheMinimumInterval() async throws {
         let fixture = try TranscriptPagingFixture(count: 20)
         defer { fixture.remove() }
@@ -126,8 +120,6 @@ struct ConversationOutlineModelTests {
         #expect(latest?.id == TranscriptPageIdentity.entryID(record: 9, part: 0))
     }
 
-    /// Hiding the map mid-read (switching tabs) cancels the read; showing it again reads at once instead of waiting
-    /// `readCostMultiple` times as long as the cancelled read ran (PERF-89 counts only reads that finished).
     @Test func aCancelledReadDoesNotDelayTheNext() async throws {
         let fixture = try TranscriptPagingFixture(count: 200_000)
         defer { fixture.remove() }
@@ -143,11 +135,6 @@ struct ConversationOutlineModelTests {
         try await expectEventually(timeout: .seconds(1)) { model.readCount == 2 }
     }
 
-    /// A relink while a read runs: the old session's read unwinds after the new session's watch started, and must not
-    /// put off the new session's first read. Had it spaced reads, the new one would wait `readCostMultiple` times as
-    /// long as the old one ran, at least four times its half second, from when it unwound, which is after the cancel. The
-    /// new outline must show before then, a limit that grows with the machine's load as the old read's time does; a
-    /// fixed second ran out on v1.3.0's release run.
     @Test func aReadUnwindingAfterARelinkDoesNotDelayTheNewSession() async throws {
         let large = try TranscriptPagingFixture(count: 200_000)
         let small = try TranscriptPagingFixture(count: 10)
@@ -171,10 +158,6 @@ struct ConversationOutlineModelTests {
         #expect(clock.now - cancelled < spacingTheOldReadWouldHaveCaused)
     }
 
-    /// A relink while a read runs, before the old session's watch is cancelled: the new session's reader reads at once,
-    /// not after the old session's read finishes. The old read still running when the new outline shows is the proof, so
-    /// the wait has no limit of its own: a v1.2.18 release run gave the 10-message read 1 second beside the
-    /// 200,000-message one on the runner's 3 shared threads, and it took longer.
     @Test func aRelinkReadsTheNewSessionWhileTheOldReadRuns() async throws {
         let large = try TranscriptPagingFixture(count: 200_000)
         let small = try TranscriptPagingFixture(count: 10)
@@ -197,8 +180,6 @@ struct ConversationOutlineModelTests {
         #expect(model.outline?.blocks.count == 10)
     }
 
-    /// A read of a reader no longer installed that finishes without being cancelled, as in its last page when the tab
-    /// relinks, or when another watch takes over for a new session: its result is thrown away, and so is its cost.
     @Test func aDiscardedReadDoesNotDelayTheNewSession() async throws {
         let large = try TranscriptPagingFixture(count: 30_000)
         let small = try TranscriptPagingFixture(count: 10)
@@ -220,8 +201,6 @@ struct ConversationOutlineModelTests {
         try await expectEventually(timeout: .seconds(1)) { model.outline?.blocks.count == 10 }
     }
 
-    /// A ⌘D queued before a relink runs for the session the tab left (TRM-74). It reads that session without taking
-    /// the reader from the map's watch of the session it now shows, whose updates keep showing.
     @Test func aBookmarkForTheSessionLeftLeavesTheMapFollowing() async throws {
         let left = try TranscriptPagingFixture(count: 10)
         let shown = try TranscriptPagingFixture(count: 5)
@@ -260,14 +239,12 @@ struct ConversationOutlineModelTests {
         #expect(changes.count == 0)
     }
 
-    /// The fixture's record `number`, a line of its own.
     static func record(_ number: Int) -> Data {
         let lines = String(decoding: TranscriptPagingFixture.data(count: number + 1), as: UTF8.self).split(separator: "\n")
         return Data((lines[number] + "\n").utf8)
     }
 }
 
-/// A model's watch in a task, which notes when the watch returns, so a test waits for that with a time limit.
 @MainActor
 final class OutlineWatch {
     private(set) var hasEnded = false

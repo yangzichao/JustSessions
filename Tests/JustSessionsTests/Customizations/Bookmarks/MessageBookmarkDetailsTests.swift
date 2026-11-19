@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A bookmark's label and tags (RDR-51), and finding bookmarks by them (SBF-05, RDR-52).
 struct MessageBookmarkDetailsTests {
     private let conversationID = "Codex:session@devbox"
 
@@ -73,7 +72,7 @@ struct MessageBookmarkDetailsTests {
         #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "") == used)
         #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "#DB ") == ["todo", "deploy", "Today"])
         #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "#db #to") == ["todo", "Today"])
-        #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "#todo").isEmpty)  // "today" doesn't start with it
+        #expect(MessageBookmarkTagTyping.suggestions(from: used, typed: "#todo").isEmpty)
         #expect(
             MessageBookmarkTagTyping.suggestions(from: (1...20).map { "t\($0)" }, typed: "").count
                 == MessageBookmarkTagTyping.maximumSuggestionCount)
@@ -82,7 +81,7 @@ struct MessageBookmarkDetailsTests {
     @Test func choosingASuggestionReplacesTheTagBeingTypedOrFollowsTheOthers() {
         #expect(MessageBookmarkTagTyping.adding("todo", to: "") == "#todo ")
         #expect(MessageBookmarkTagTyping.adding("todo", to: "#db ") == "#db #todo ")
-        #expect(MessageBookmarkTagTyping.adding("todo", to: "#db") == "#todo ")  // "db" is being typed
+        #expect(MessageBookmarkTagTyping.adding("todo", to: "#db") == "#todo ")
         #expect(MessageBookmarkTagTyping.adding("todo", to: "#db #to") == "#db #todo ")
         #expect(MessageBookmarkTagTyping.adding("todo", to: "#db, to") == "#db, #todo ")
         #expect(MessageBookmarkTagTyping.adding("todo", to: "#db #") == "#db #todo ")
@@ -179,7 +178,7 @@ struct MessageBookmarkDetailsTests {
 
         let tagPrefix = try #require(MessageBookmarkQuery(" #De "))
         #expect(tagPrefix.matches(labelled, includingSnippet: false))
-        #expect(!tagPrefix.matches(plain, includingSnippet: true))  // a tag search never reads the message
+        #expect(!tagPrefix.matches(plain, includingSnippet: true))
         #expect(try #require(MessageBookmarkQuery("#b")).matches(labelled, includingSnippet: false) == false)
 
         #expect(MessageBookmarkQuery("  ") == nil)

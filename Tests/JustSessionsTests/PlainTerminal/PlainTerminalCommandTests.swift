@@ -45,8 +45,6 @@ struct PlainTerminalCommandTests {
         #expect(command.arguments.last == #"cd '/home/me/api' && exec "$SHELL" -l"#)
     }
 
-    /// Runs the remote command the way the host's shell would, with a stand-in login shell that reports where it
-    /// started and with which flags.
     @Test func remoteCommandStartsTheLoginShellInTheProjectFolder() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }

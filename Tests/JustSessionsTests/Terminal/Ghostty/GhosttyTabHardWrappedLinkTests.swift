@@ -34,9 +34,6 @@ struct GhosttyTabHardWrappedLinkTests {
         #expect(openedLinks == [url])
     }
 
-    /// The bundled tmux, which `make test` hands the tests, draws a program's lines in the tab, with mouse reporting
-    /// on as in every CLI tab on this Mac. tmux is the tab's process, so it reads Ghostty's answers to its queries as
-    /// in the app. Skipped without the bundled tmux.
     @Test(arguments: [0, 1])
     func aCommandClickOnEitherRowOfALineTmuxDrewOpensTheWholeURL(row: Int) async throws {
         guard let runtime = ProcessInfo.processInfo.environment["JUSTSESSIONS_TEST_TMUX_RUNTIME"] else { return }
@@ -76,7 +73,6 @@ struct GhosttyTabHardWrappedLinkTests {
         #expect(openedLinks == [url])
     }
 
-    /// Longer than a row, so it has to be broken.
     private static func longURL(for grid: TerminalTestGrid) -> String {
         "https://example.com/" + String(repeating: "x", count: grid.columns) + "/end"
     }

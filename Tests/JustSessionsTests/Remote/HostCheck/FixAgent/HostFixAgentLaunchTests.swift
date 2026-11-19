@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The agent that fixes what a host check found starts as a new session whose first message is its prompt, outside
-/// tmux, which may be what is broken; see `ConversationStore+HostFixAgent`.
 @MainActor
 struct HostFixAgentLaunchTests {
     @Test func onThisMacTheCLIGetsThePromptLastAndRunsWithoutTmux() throws {
@@ -21,7 +19,6 @@ struct HostFixAgentLaunchTests {
         #expect(tab.command.arguments.last == "Fix devbox")
     }
 
-    /// The tab never starts, so nothing connects to the host.
     @Test func onAnSSHHostTheCLIRunsInTheLoginShellWithoutTmux() throws {
         let sandbox = try TerminalEngineLaunchSandbox(engine: .swiftTerm)
         defer { sandbox.tearDown() }
@@ -39,8 +36,6 @@ struct HostFixAgentLaunchTests {
         #expect(tmuxTab.command.arguments.last?.contains("tmux") == true)
     }
 
-    /// The prompt is quoted twice, for the host's shell and for the login shell it starts, and reaches the CLI as it
-    /// was, over several lines and with every character a shell treats specially.
     @Test func thePromptReachesTheHostsCLIAsItWas() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -49,9 +44,7 @@ struct HostFixAgentLaunchTests {
         let received = root.appendingPathComponent("received")
         try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: project, withIntermediateDirectories: true)
-        // A login shell that runs the command it is given, as `$SHELL -lic '<command>'` would.
         try writeExecutableScript("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
-        // The prompt comes last, after the arguments that ask Codex for its title; see `CodexThreadTitle`.
         try writeExecutableScript(
             "#!/bin/sh\nfor argument; do last=$argument; done\nprintf '%s' \"$last\" > \(ShellQuoting.quoted(received.path))\n",
             to: bin.appendingPathComponent("codex")

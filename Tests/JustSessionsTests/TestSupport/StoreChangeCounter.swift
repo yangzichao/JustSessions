@@ -3,9 +3,6 @@ import Observation
 
 @testable import JustSessions
 
-/// Counts changes to the store's observed properties, as `objectWillChange` events counted them before the store was
-/// `@Observable`. Each change is counted when it happens; changes made before the counter looks again, within the same
-/// main-actor turn, count once, as a view would re-run once for them.
 @MainActor
 final class StoreChangeCounter {
     private(set) var count = 0
@@ -13,12 +10,10 @@ final class StoreChangeCounter {
     private let read: (ConversationStore) -> Void
     private var isCounting = true
 
-    /// Counts changes to every property views observe.
     convenience init(_ store: ConversationStore) {
         self.init(store, reading: Self.readObservedProperties(of:))
     }
 
-    /// Counts changes to the properties `read` reads, as a `$property` publisher counted its values after the first.
     init(_ store: ConversationStore, reading read: @escaping (ConversationStore) -> Void) {
         self.store = store
         self.read = read
@@ -42,7 +37,6 @@ final class StoreChangeCounter {
         }
     }
 
-    /// Every property views observe, the former `@Published` ones and the tabs' revision.
     private static func readObservedProperties(of store: ConversationStore) {
         _ = store.conversations
         _ = store.subagentConversations

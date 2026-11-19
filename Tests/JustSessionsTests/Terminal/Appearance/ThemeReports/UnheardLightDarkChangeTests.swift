@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A terminal tells its tab when its colors turn light or dark and no program in it subscribes to hear about it. See
-/// `GhosttyTabBackgroundQueryReportTests` for a program that subscribes in a Ghostty tab.
 @MainActor
 struct UnheardLightDarkChangeTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -22,7 +20,6 @@ struct UnheardLightDarkChangeTests {
 
         appearanceStore.setMode(.dark)
         #expect(changeCount == 1)
-        // Another dark theme leaves the terminal dark.
         themeStore.setTheme(.tokyoNight)
         #expect(changeCount == 1)
         appearanceStore.setMode(.light)

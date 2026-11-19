@@ -7,10 +7,8 @@ import Testing
 
 @MainActor
 struct TerminalFontFamilyTests {
-    /// A Powerline separator, a folder icon, and a Material Design icon from the supplementary Private Use Area.
     private static let icons = "\u{E0B0}\u{F07B}\u{F0001}"
 
-    /// The PostScript names of the fonts CoreText draws `text` with, run by run.
     private static func drawingFonts(of text: String, in font: NSFont) -> Set<String> {
         let line = CTLineCreateWithAttributedString(NSAttributedString(string: text, attributes: [.font: font]))
         return Set(
@@ -45,8 +43,6 @@ struct TerminalFontFamilyTests {
         #expect(TerminalFontFamily.named("Menlo").font(size: 13) == TerminalFontFamily.named("Menlo").font(size: 13))
     }
 
-    /// The app ships the symbols font, so icons draw on Macs without a Nerd Font installed, in regular and bold text.
-    /// Letters keep the chosen font, and symbols outside the Private Use Areas keep the system's usual fallback.
     @Test(arguments: [TerminalFontFamily.named("Menlo"), .named("Monaco")])
     func nerdFontIconsDrawWithTheBundledSymbolsWithAnyFont(_ family: TerminalFontFamily) throws {
         let bundledFont = try #require(
@@ -79,7 +75,6 @@ struct TerminalFontFamilyTests {
         #expect(font.fontDescriptor.object(forKey: .cascadeList) == nil)
     }
 
-    /// Hiragino Sans's and Helvetica's letters have different widths, as Osaka's and Lantinghei TC's.
     @Test func lettersFillTheCellsOnlyInFontsWhoseLettersAreAllAsWideAsW() throws {
         for family in ["Menlo", "Monaco", "Courier New", "PT Mono"] {
             let font = try #require(NSFontManager.shared.font(withFamily: family, traits: [], weight: 5, size: 13))

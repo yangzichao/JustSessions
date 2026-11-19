@@ -5,7 +5,6 @@ import Testing
 
 @MainActor
 struct LaunchCrashReportOfferTests {
-    /// Collects the reports the offer shows.
     private final class ShownReports {
         var reports: [FoundCrashReport] = []
     }

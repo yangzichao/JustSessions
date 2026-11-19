@@ -4,11 +4,8 @@ import Testing
 
 @testable import JustSessions
 
-/// Every kind of session tab opens with the engine chosen in Settings at that moment, drawn by that engine's own
-/// terminal: resuming, a new session, and a branch, on this Mac with and without tmux and on an SSH host.
 @MainActor
 struct TerminalEngineSessionTabTests {
-    /// No refresh has checked the tmux version, so the CLI runs directly in the tab.
     @Test(arguments: TerminalEngine.allCases)
     func resumingASessionOnThisMacWithoutTmuxOpensWithTheChosenEngine(_ engine: TerminalEngine) throws {
         let sandbox = try TerminalEngineLaunchSandbox(engine: engine)
@@ -24,8 +21,6 @@ struct TerminalEngineSessionTabTests {
         #expect(engine.draws(tab.terminalView))
     }
 
-    /// As when an SSH host's connection drops: resuming starts the session again in its ended tab, which is the same tab
-    /// to you, so it keeps the engine it opened with.
     @Test(arguments: TerminalEngine.allCases)
     func resumingASessionWhoseTabEndedKeepsThatTabsEngine(_ engine: TerminalEngine) throws {
         let sandbox = try TerminalEngineLaunchSandbox(engine: engine)
@@ -52,7 +47,6 @@ struct TerminalEngineSessionTabTests {
         defer { sandbox.tearDown() }
         let store = sandbox.makeStore()
 
-        // Codex, since a new Claude Code session first asks the installed `claude` whether it takes a session id.
         try store.launchNewSession(provider: .codex, in: sandbox.projectLocation)
 
         let tab = try #require(store.terminalSessions.last)
@@ -77,14 +71,12 @@ struct TerminalEngineSessionTabTests {
         #expect(engine.draws(tab.terminalView))
     }
 
-    /// The tab never starts, so nothing connects to the host.
     @Test(arguments: TerminalEngine.allCases)
     func aNewSessionOnAnSSHHostOpensWithTheChosenEngine(_ engine: TerminalEngine) throws {
         let sandbox = try TerminalEngineLaunchSandbox(engine: engine)
         defer { sandbox.tearDown() }
         let store = sandbox.makeStore()
 
-        // Codex, since a new Claude Code session first asks the host's `claude` whether it takes a session id.
         try store.launchNewSession(provider: .codex, in: ProjectLocation(host: .ssh("devbox"), path: "/srv/project"))
 
         let tab = try #require(store.terminalSessions.last)
@@ -94,7 +86,6 @@ struct TerminalEngineSessionTabTests {
         #expect(engine.draws(tab.terminalView))
     }
 
-    /// The tab never starts, so nothing connects to the host.
     @Test(arguments: TerminalEngine.allCases)
     func resumingASessionOnAnSSHHostOpensWithTheChosenEngine(_ engine: TerminalEngine) throws {
         let sandbox = try TerminalEngineLaunchSandbox(engine: engine)
@@ -111,8 +102,6 @@ struct TerminalEngineSessionTabTests {
         #expect(engine.draws(tab.terminalView))
     }
 
-    /// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`. The tab starts, in a window, and its
-    /// tmux client runs the session's CLI there.
     @Test(arguments: TerminalEngine.allCases)
     func resumingASessionInTmuxOnThisMacOpensWithTheChosenEngine(_ engine: TerminalEngine) async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
@@ -130,7 +119,6 @@ struct TerminalEngineSessionTabTests {
             startsBackgroundPolling: false
         )
         defer { store.closeAllTerminals() }
-        // Tabs run the CLI directly until a refresh has checked the tmux version.
         store.refreshThisMac()
         #expect(await sandbox.waitUntil { !store.isScanningThisMac })
         let tmuxSessionName = TmuxSessionName.forConversation(conversation)

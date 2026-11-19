@@ -5,8 +5,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The map's hover card (TAB-10) over a map in a window: it follows the outline under a still pointer and goes when
-/// the drawing does, as after a relink, so it never stays over the terminal with another session's text.
 @MainActor
 @Suite(.serialized)
 struct ConversationMapHoverTests {
@@ -52,7 +50,6 @@ struct ConversationMapHoverTests {
             window.makeKeyAndOrderFront(nil)
         }
 
-        /// A card as the pointer at the last block would build it, from the outline shown.
         func pointAtTheLastBlock() throws {
             let outline = try #require(model.outline)
             let index = outline.blocks.count - 1
@@ -102,7 +99,6 @@ struct ConversationMapHoverTests {
         try await expectEventually { fixture.model.outline?.blocks.count == 5 }
         try fixture.pointAtTheLastBlock()
 
-        // As after /clear: the tab links to a session with no messages yet.
         fixture.link.conversation = empty.conversation
 
         try await expectEventually { fixture.model.outline?.rowCount == 0 }

@@ -53,7 +53,6 @@ struct RandomTipRotationTests {
         let currentTip = try #require(RandomTip.allCases.last)
         var rotation = RandomTipRotation(shownTips: Set(RandomTip.allCases.dropFirst().dropLast()))
 
-        // Only the first tip and the one showing are unshown; the one showing is never offered.
         let nextTip = rotation.nextTip(
             after: currentTip,
             randomIndex: { count in

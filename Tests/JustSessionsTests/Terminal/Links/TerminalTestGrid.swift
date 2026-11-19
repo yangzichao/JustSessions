@@ -4,10 +4,8 @@ import Testing
 
 @testable import JustSessions
 
-/// The grid a terminal lays its text out at, for a test that clicks a given cell.
 struct TerminalTestGrid {
     let columns: Int
-    /// A cell's size in the view's points.
     let cellSize: CGSize
 
     init(columns: Int, cellSize: CGSize) {
@@ -15,7 +13,6 @@ struct TerminalTestGrid {
         self.cellSize = cellSize
     }
 
-    /// The grid Ghostty reported, whose cells are measured in pixels at the window's `scale`.
     init(_ gridMetrics: TerminalGridMetrics, scale: CGFloat) {
         columns = Int(gridMetrics.columns)
         cellSize = CGSize(
@@ -23,7 +20,6 @@ struct TerminalTestGrid {
         )
     }
 
-    /// The middle of a cell, in the view's own coordinates, whose origin is at the bottom left.
     func location(ofColumn column: Int, row: Int, in view: NSView) -> CGPoint {
         CGPoint(
             x: (CGFloat(column) + 0.5) * cellSize.width,

@@ -2,9 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// A project folder on this Mac with stand-in `claude` and `codex` CLIs that exit at once, settings of its own, and one
-/// engine store that every window's store here shares, as the app's windows share theirs. No tmux is found, and a tab
-/// runs nothing until a test starts it, so nothing connects to an SSH host.
 @MainActor
 final class TerminalEngineLaunchSandbox {
     let root: URL
@@ -32,12 +29,10 @@ final class TerminalEngineLaunchSandbox {
     var userDefaults: UserDefaults { settings.userDefaults }
     var projectLocation: ProjectLocation { ProjectLocation(host: .thisMac, path: project.path) }
 
-    /// A Claude Code session in the project folder on this Mac, or at `/srv/project` on an SSH host.
     func conversation(host: SessionHost = .thisMac) -> Conversation {
         Conversation.fixture(projectPath: host == .thisMac ? project.path : "/srv/project", host: host)
     }
 
-    /// A window's store, listing `conversations` on their hosts.
     func makeStore(listing conversations: [Conversation] = []) -> ConversationStore {
         let store = ConversationStore(
             adapters: [StaticConversationAdapter(discoveredConversations: conversations)],

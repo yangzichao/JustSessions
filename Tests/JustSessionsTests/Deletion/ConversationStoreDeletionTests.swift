@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Deleting from the store: what leaves the list, what stays, and what the user is told.
 @MainActor
 struct ConversationStoreDeletionTests {
     @Test func deletingASessionForgetsItsCustomTitlePinAndArchiving() async throws {
@@ -49,11 +48,9 @@ struct ConversationStoreDeletionTests {
         #expect(store.conversations.map(\.id) == [kept.id])
         #expect(Set(MessageBookmarks.load(from: sandbox.userDefaults).bookmarksByConversationID.keys) == [kept.id])
         #expect(Set(store.messageBookmarks.bookmarksByConversationID.keys) == [kept.id])
-        // Off the list at once, so a reading window left open on the subagent's session keeps no bookmarks.
         #expect(store.conversation(withID: subagent.id) == nil)
     }
 
-    /// Antigravity leaves a session's subagents on disk as conversations of their own, so their bookmarks stay.
     @Test func deletingAnAntigravitySessionKeepsItsSubagentsBookmarks() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
@@ -121,7 +118,6 @@ struct ConversationStoreDeletionTests {
         #expect(store.conversations.map(\.id) == [refused.id])
     }
 
-    /// A tool can remove the file and then fail, say, to update its index. The session is gone either way.
     @Test func aSessionWhoseFileIsGoneLeavesTheListEvenWhenItsToolReportsAnError() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
@@ -142,7 +138,6 @@ struct ConversationStoreDeletionTests {
         #expect(store.errorMessage == "The index could not be updated.")
     }
 
-    /// The alert names the session as the sidebar did, even though deleting it forgot its custom title.
     @Test func aSessionGoneDespiteAnErrorKeepsItsCustomTitleInTheAlert() async throws {
         let sandbox = try DeletionSandbox()
         defer { sandbox.remove() }
@@ -205,7 +200,6 @@ struct ConversationStoreDeletionTests {
         store.delete(second)
         #expect(store.isDeletionPending(for: second))
         #expect(store.deletionProgress.totalCount == 2)
-        // Asked for again, it is not deleted twice.
         store.deleteConversations([first, second])
         #expect(store.deletionProgress.totalCount == 2)
         try await expectEventually { !store.isDeletingSessions }

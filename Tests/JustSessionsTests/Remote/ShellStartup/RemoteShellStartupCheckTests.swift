@@ -66,7 +66,6 @@ struct RemoteShellStartupCheckTests {
                 .check(host: "max2") == nil)
         #expect(RemoteShellStartupCheck(run: RecordedRuns([(nil, " \r\n")]).run).check(host: "max2") == nil)
         #expect(RemoteShellStartupCheck(run: RecordedRuns([nil]).run).check(host: "max2") == nil)
-        // The login shell's run is needed to tell what to do.
         #expect(RemoteShellStartupCheck(run: RecordedRuns([(nil, Self.tmuxTakeover), (255, "")]).run).check(host: "max2") == nil)
     }
 
@@ -74,8 +73,6 @@ struct RemoteShellStartupCheckTests {
         for command in [RemoteShellStartupCheck.tracedInteractiveCommand, RemoteShellStartupCheck.loginOnlyCommand] {
             #expect(!command.contains(RemoteShellStartupCheck.marker))
         }
-        // A trace or an echo of the marker command doesn't count; what the terminal printed before the marker doesn't
-        // hide it.
         #expect(!RemoteShellStartupCheck.printedMarker("+JUSTSESSIONS zsh:1: printf '%s%s\\n' __JUSTSESSIONS_SHELL_ STARTUP_OK__"))
         #expect(RemoteShellStartupCheck.printedMarker("\u{1B}[0m__JUSTSESSIONS_SHELL_STARTUP_OK__\r"))
         #expect(RemoteShellStartupCheck.printedMarker("^D\u{08}\u{08}__JUSTSESSIONS_SHELL_STARTUP_OK__\r"))
@@ -90,7 +87,6 @@ struct RemoteShellStartupCheckTests {
     }
 }
 
-/// Answers each run with the next recorded result, and records the commands.
 private final class RecordedRuns: @unchecked Sendable {
     private let lock = NSLock()
     private var results: [(exitStatus: Int32?, output: String)?]

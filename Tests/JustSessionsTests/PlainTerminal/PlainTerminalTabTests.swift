@@ -3,10 +3,8 @@ import Testing
 
 @testable import JustSessions
 
-/// A plain terminal is a tab, not a session: nothing waits for it to save one, watches it, or counts it as running.
 @MainActor
 struct PlainTerminalTabTests {
-    /// The store finds no tmux, so the shell runs directly in the tab; `ThisMacPlainTerminalTmuxTests` covers tmux.
     @Test func opensASelectedTabThatIsNoSession() throws {
         let projectDirectory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: projectDirectory) }

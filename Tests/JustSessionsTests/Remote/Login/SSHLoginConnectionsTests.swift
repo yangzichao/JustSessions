@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A login made with Connect… is shared by the app's connections to its host until it closes.
 struct SSHLoginConnectionsTests {
     @Test func aHostWithoutALoginConnectsAsBefore() {
         #expect(SSHLoginConnections(close: { _, _ in }).connectionOptions(for: "devbox").isEmpty)

@@ -2,9 +2,7 @@ import Foundation
 
 @testable import JustSessions
 
-/// A Pi sessions folder in a temporary folder, deleted into a stand-in Trash beside it.
 struct PiDeletionSandbox {
-    /// What a stand-in Trash throws when told to refuse an item.
     struct MoveRefused: Error, Equatable {}
 
     let root: URL
@@ -21,7 +19,6 @@ struct PiDeletionSandbox {
         deletion = Self.deletion(of: folder.sessionsDirectory, into: trashDirectory) { _ in false }
     }
 
-    /// A deletion into the stand-in Trash that throws `MoveRefused` instead of moving the items `refuses` picks.
     func deletion(refusing refuses: @escaping (URL) -> Bool) -> PiConversationDeletion {
         Self.deletion(of: folder.sessionsDirectory, into: trashDirectory, refusing: refuses)
     }

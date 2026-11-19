@@ -1,7 +1,5 @@
 import AppKit
 
-/// The lines of text in a terminal's snapshot: the bands of pixel rows that differ from the background, which is the
-/// most common gray. Light text on a dark background measures as dark text on a light one does.
 struct DrawnTextLines {
     private let contrast: [[Double]]
     let lines: [Range<Int>]
@@ -31,7 +29,6 @@ struct DrawnTextLines {
         self.lines = lines
     }
 
-    /// How much the line's pixels differ from the background in all: more for thicker or larger text.
     func ink(ofLine index: Int) -> Double {
         lines[index].reduce(0) { sum, y in sum + contrast[y].filter { $0 > 0.1 }.reduce(0, +) }
     }

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// This Mac is refreshed a minute after its last refresh, an SSH host five minutes after its last copy, and a failing
-/// host less often each time it fails again. `isSSHHostDue` notes what it sees, so its result is read before `#expect`.
 struct HostAutoRefreshScheduleTests {
     private let start = Date(timeIntervalSinceReferenceDate: 800_000_000)
     private let failed = HostRefreshStatus.failed("Connection timed out")
@@ -16,7 +14,6 @@ struct HostAutoRefreshScheduleTests {
         #expect(!schedule.isThisMacDue(lastRefreshStartedAt: start, status: .refreshing, now: start + 600))
     }
 
-    /// The window's own first refresh comes when it opens, so the schedule doesn't start one alongside it.
     @Test func aHostWithoutItsFirstRefreshIsLeftToItsWindow() {
         var schedule = HostAutoRefreshSchedule()
         #expect(!schedule.isThisMacDue(lastRefreshStartedAt: nil, status: nil, now: start))
@@ -36,7 +33,6 @@ struct HostAutoRefreshScheduleTests {
 
     @Test func aFailingHostWaitsTwiceAsLongAfterEachFailureUpToAnHour() {
         var schedule = HostAutoRefreshSchedule()
-        // The first refresh failed: the failure counts from when the schedule sees it.
         let isDueWhenFirstSeen = schedule.isSSHHostDue("devbox", status: failed, needsLogIn: false, now: start)
         #expect(!isDueWhenFirstSeen)
         var lastTry = start
@@ -63,13 +59,11 @@ struct HostAutoRefreshScheduleTests {
         let isDueAfterCopy = schedule.isSSHHostDue("devbox", status: .refreshed(copiedAt), needsLogIn: false, now: copiedAt + 300)
         #expect(isDueAfterCopy)
 
-        // A later failure waits five minutes again.
         _ = schedule.isSSHHostDue("devbox", status: failed, needsLogIn: false, now: copiedAt + 400)
         let isDueAfterNewFailure = schedule.isSSHHostDue("devbox", status: failed, needsLogIn: false, now: copiedAt + 700)
         #expect(isDueAfterNewFailure)
     }
 
-    /// Refreshing without a login only fails again; the host waits for Connect….
     @Test func aHostWaitingForConnectIsLeftAlone() {
         var schedule = HostAutoRefreshSchedule()
         _ = schedule.isSSHHostDue("devbox", status: failed, needsLogIn: true, now: start)

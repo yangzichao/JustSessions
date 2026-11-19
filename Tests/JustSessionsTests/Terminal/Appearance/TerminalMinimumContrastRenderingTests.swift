@@ -4,21 +4,17 @@ import Testing
 
 @testable import JustSessions
 
-/// A CLI picks its colors for a light or a dark background and keeps them after the theme changes. These render a
-/// terminal to check that such text is drawn readable while block characters, which draw shapes, keep their color.
 @MainActor
 struct TerminalMinimumContrastRenderingTests {
     private static let hideCursor = "\u{1B}[?25l"
     /// Near-white, as Claude Code's dark theme draws code: almost invisible on a light theme as sent.
     private static let nearWhiteText = "\u{1B}[1;38;2;250;250;250mMMMM\u{1B}[0m"
-    /// Pale lavender block elements, as a CLI draws pixel art meant to blend into the background.
     private static let paleBlocks = "\u{1B}[38;2;225;225;250m\u{2588}\u{2588}\u{2588}\u{2588}\u{1B}[0m"
 
     @Test func textColoredForADarkBackgroundIsDrawnReadableOnALightTheme() throws {
         let colors = try renderedColors(isDark: false, output: Self.hideCursor + Self.nearWhiteText)
         let background = AppThemeColors.justSessionsLight.contentSurface
         let mostContrast = colors.map { ThemeColorContrast.ratio($0, background) }.max() ?? 0
-        // Antialiasing softens glyph edges, but the strokes' cores are drawn in the adjusted color.
         #expect(mostContrast >= 4.4)
         #expect(mostContrast < 6, "The text should darken only as far as the minimum, not to black")
     }
@@ -31,7 +27,6 @@ struct TerminalMinimumContrastRenderingTests {
         #expect(mostContrast >= 4.4)
     }
 
-    /// The terminal draws all selected text in one color, which Tokyo Night Day sets at 3.3 on its selection.
     @Test func selectedTextIsDrawnReadableOnTheSelection() throws {
         let colors = try renderedColors(isDark: false, theme: .tokyoNight, output: Self.hideCursor + "MMMM", selectsAll: true)
         let selection = AppThemeColors.tokyoNightDay.terminal.selectionBackground

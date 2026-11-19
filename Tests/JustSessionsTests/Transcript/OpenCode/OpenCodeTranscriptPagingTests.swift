@@ -36,8 +36,6 @@ struct OpenCodeTranscriptPagingTests {
         #expect(pages.last?.hasLater == false)
     }
 
-    /// Each message is a record, so an unreadable one keeps its place with no entries, and the pages still show what
-    /// the full read shows.
     @Test func unreadableMessagesKeepTheirRecordsWithoutEntries() async throws {
         let fixture = try OpenCodeTranscriptReaderFixture()
         defer { fixture.remove() }

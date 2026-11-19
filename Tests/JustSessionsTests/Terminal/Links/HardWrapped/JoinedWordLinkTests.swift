@@ -2,7 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The URL or path in a word joined from rows; see `JoinedWordLink`.
 struct JoinedWordLinkTests {
     @Test func aURLInBracketsLeavesThemOut() {
         #expect(link(in: "(https://example.com/x)", holding: 5) == "https://example.com/x")

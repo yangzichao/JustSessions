@@ -23,7 +23,6 @@ struct SSHHostReachabilityTests {
         #expect(reachability.recentFailureOutput(on: "other-host") == nil)
     }
 
-    /// The host answered, so the next command may get through.
     @Test(arguments: [
         (Int32(255), "me@host: Permission denied (publickey,password)."),
         (255, "Host key verification failed."),
@@ -64,8 +63,6 @@ struct SSHHostReachabilityTests {
         #expect(reachability.recentFailureOutput(on: "second-host") == nil)
     }
 
-    /// Every command that goes through the runner, such as a refresh's, a folder lookup's, or Reconnect's, fails at
-    /// once the way the last one did.
     @Test func aBackgroundCommandToAHostOutOfReachFailsWithoutConnecting() throws {
         let reachability = SSHHostReachability()
         reachability.noteResult(exitStatus: 255, output: Self.noAnswer, on: Self.host)

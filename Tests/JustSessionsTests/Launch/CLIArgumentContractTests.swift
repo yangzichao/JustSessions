@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The arguments each CLI starts with. They are the tools' own command-line interfaces, so a change here has to
-/// follow a change in the tool.
 struct CLIArgumentContractTests {
     struct ArgumentCase: Sendable, CustomTestStringConvertible {
         let provider: ConversationProvider

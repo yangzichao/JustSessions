@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A right-click on a link starts the terminal's menu with what to do with it; see `TerminalLinkActions`. Both
-/// engines hand the menu the same link (`TerminalLinkRightClickTests`), so these build the menu with it directly.
 @MainActor
 @Suite(.serialized)
 struct TerminalContextMenuLinkTests {
@@ -104,7 +102,6 @@ struct TerminalContextMenuLinkTests {
         #expect(fixture.store.alert?.message == "Could not open plan.md in Zed: No window to open it in")
     }
 
-    /// Opening would run it; an editor or the Finder only shows it.
     @Test func aFileThatOpeningWouldRunDoesNotOpen() throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
@@ -144,7 +141,6 @@ struct TerminalContextMenuLinkTests {
                 == ["Open", "Reveal in Finder", "Copy Path", "—"] + Self.textAndTabItems)
     }
 
-    /// The file is on the host, so only its path can be copied.
     @Test func aPathInATabOnAnSSHHostCanOnlyBeCopied() throws {
         let fixture = try TerminalContextMenuFixture()
         defer { fixture.tearDown() }
@@ -188,7 +184,6 @@ struct TerminalContextMenuLinkTests {
     }
 }
 
-/// Records what a tab's link items did, in place of opening, showing, or copying anything.
 @MainActor
 private final class LinkActionRecorder {
     private(set) var openedURLs: [URL] = []
@@ -204,7 +199,6 @@ private final class LinkActionRecorder {
     }
 }
 
-/// A project folder with empty files at the given relative paths.
 private struct TemporaryProject {
     let folder: URL
 

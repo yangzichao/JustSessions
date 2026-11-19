@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct DetachedCLIActivityTmuxTests {
     @Test func aCLILeftRunningInTmuxShowsWhatItDoesUntilItEnds() async throws {
@@ -38,7 +37,6 @@ struct DetachedCLIActivityTmuxTests {
         try #require(await sandbox.waitForPaneProcess(in: store, for: tab))
         let cliProcessID = try #require(tab.tmuxPaneProcessID)
         try #require(cliProcessID > 0)
-        // Claude Code's live registry entry for the CLI in tmux.
         let claudeRegistry = ClaudeLiveSessionRegistry(configurationDirectory: sandbox.root.appendingPathComponent("claude"))
         try FileManager.default.createDirectory(at: claudeRegistry.sessionsDirectory, withIntermediateDirectories: true)
         try #"{"sessionId":"\#(conversation.sessionID)","status":"busy"}"#
@@ -51,7 +49,6 @@ struct DetachedCLIActivityTmuxTests {
         await store.synchronizeCLIActivity(claudeRegistry: claudeRegistry)
         #expect(store.detachedCLIActivities == [conversation.id: .working])
 
-        // The CLI ends on its own, and tmux ends its session with it.
         kill(cliProcessID, SIGTERM)
         #expect(await sandbox.waitUntil { sandbox.server.sessionNames().isEmpty && kill(cliProcessID, 0) != 0 })
         #expect(store.isRunningInTmux(conversation))

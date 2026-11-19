@@ -23,7 +23,6 @@ struct TranscriptBookmarkTargetClickTests {
         override var isFlipped: Bool { true }
     }
 
-    /// The slot is 16 points square at x 4 (24 - 16 - 4), from the message's first line at y 112.
     @Test func theSlotTakesClicksAndRightClicksButNotThePointersMoves() {
         let (_, marks) = Self.marks(letters: [])
         let slot = NSPoint(x: 12, y: 118)
@@ -37,11 +36,10 @@ struct TranscriptBookmarkTargetClickTests {
         #expect(marks.clickTarget(at: slot, for: .rightMouseDown) === hit)
         #expect(marks.clickTarget(at: slot, for: .mouseMoved) == nil)
         #expect(marks.clickTarget(at: slot, for: nil) == nil)
-        #expect(marks.clickTarget(at: NSPoint(x: 12, y: 160), for: .leftMouseDown) == nil)  // the line down the message
+        #expect(marks.clickTarget(at: NSPoint(x: 12, y: 160), for: .leftMouseDown) == nil)
         #expect(marks.clickTarget(at: NSPoint(x: 12, y: 60), for: .leftMouseDown) == nil)
     }
 
-    /// A click there again removes the bookmark; the pointer still reaches the letter for its card.
     @Test func aMessageWithALetterTakesTheClickToRemoveIt() {
         let bookmark = MessageBookmark(letter: "a", entryID: 4, kind: .assistant, snippet: "")
         let (_, marks) = Self.marks(letters: [bookmark])

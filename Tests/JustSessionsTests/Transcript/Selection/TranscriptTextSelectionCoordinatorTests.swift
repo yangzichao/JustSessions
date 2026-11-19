@@ -106,8 +106,6 @@ struct TranscriptTextSelectionCoordinatorTests {
         #expect(fixture.selectedTexts == blocks.map(\.string))
     }
 
-    /// A double or triple click is left to the text view, which selects a word or a line inside its block; the reader
-    /// then takes that as its selection, clearing the other blocks.
     @Test
     func selectionInsideOneBlockReplacesASelectionAcrossBlocks() async throws {
         let fixture = try await TranscriptTextSelectionFixture()
@@ -150,7 +148,6 @@ struct TranscriptTextSelectionCoordinatorTests {
 
         try fixture.drag(
             from: fixture.point(in: blocks[8], atCharacter: 4), to: fixture.point(in: lastReply, atCharacter: 4), in: blocks[8])
-        // A block that only holds the end of the selection still enables Copy for it.
         #expect(lastReply.validateMenuItem(copyItem))
         lastReply.copy(nil)
 
@@ -200,7 +197,6 @@ struct TranscriptTextSelectionCoordinatorTests {
         #expect(!unfocusedColor.isClose(to: focusedColor))
     }
 
-    /// The color drawn behind the first space in `view`, which shows the selection's background and no text.
     private static func colorBehindFirstSpace(in view: TranscriptTextView) throws -> NSColor {
         let offset = (view.string as NSString).range(of: " ").location
         try #require(offset != NSNotFound)

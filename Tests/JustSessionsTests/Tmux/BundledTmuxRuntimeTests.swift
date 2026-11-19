@@ -25,7 +25,6 @@ struct BundledTmuxRuntimeTests {
         #expect(resolver.refreshThisMacTmuxServer()?.executablePath == installed.path)
         #expect(resolver.thisMacTmuxServer()?.executablePath == installed.path)
 
-        // Once the old server exits, new work uses the bundled runtime. Probing never kills or restarts it.
         try fixture.writeTmux(in: fixture.installedDirectory, version: "3.6a")
         #expect(resolver.refreshThisMacTmuxServer()?.executablePath == fixture.runtime.appendingPathComponent("bin/tmux").path)
     }
@@ -54,7 +53,6 @@ struct BundledTmuxRuntimeTests {
         #expect(command.arguments.contains("TERMINFO_DIRS=/App/Tmux/share/terminfo:/custom/terminfo:/usr/share/terminfo"))
     }
 
-    /// GhosttyTerminal sets it in the app's own environment; see `GhosttyAppEnvironment`.
     @Test(arguments: [nil, "/App/Tmux/share/terminfo"])
     func ghosttysResourcesDirectoryReachesNeitherTheTmuxServerNorItsPanes(terminfoDirectory: String?) {
         let server = ThisMacTmuxServer(executablePath: "/App/Tmux/bin/tmux", environment: [:], terminfoDirectory: terminfoDirectory)

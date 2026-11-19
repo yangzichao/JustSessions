@@ -1,7 +1,6 @@
 import Foundation
 import Testing
 
-/// A test's settings live in a folder of its own and go with it, leaving nothing in `~/Library/Preferences`.
 struct IsolatedUserDefaultsTests {
     private var preferencesDirectory: URL {
         FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0].appendingPathComponent("Preferences")

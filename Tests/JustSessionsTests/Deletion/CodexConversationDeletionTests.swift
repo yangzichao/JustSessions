@@ -33,7 +33,6 @@ struct CodexConversationDeletionTests {
         #expect(throws: ConversationDeletionError.codexDidNotFinish) {
             try fixture.delete(runningScript: "#!/bin/sh\nexec /bin/sleep 600\n", timeout: 0.5)
         }
-        // Well short of the stand-in's 600 seconds, so the time limit, not `codex` ending, stopped the wait.
         #expect(clock.now - startedAt < .seconds(120))
         #expect(fixture.sessionFileExists)
     }

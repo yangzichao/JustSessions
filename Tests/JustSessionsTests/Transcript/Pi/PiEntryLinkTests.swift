@@ -33,7 +33,6 @@ struct PiEntryLinkTests {
         #expect(Self.link(reorderedAssistant) == PiEntryLink(lineIndex: 7, id: "f6", parentID: "e5", mightBeShown: true))
     }
 
-    /// A tool result is shown only for its images, which are found from the line's bytes in either layout.
     @Test func aToolResultWithAnImageMightBeShownInEitherLayout() {
         let imagePart = #"{"type":"image","data":"AAAA","mimeType":"image/png"}"#
         let pisLayout =
@@ -47,7 +46,6 @@ struct PiEntryLinkTests {
         #expect(Self.link(reorderedTextOnly) == PiEntryLink(lineIndex: 7, id: "b4", parentID: "a1", mightBeShown: false))
     }
 
-    /// Only the first 512 bytes are read without parsing; a value that runs past them is found by parsing the line.
     @Test func anIDOrParentPastTheStartOfTheLineIsFoundByParsingIt() {
         let longID = String(repeating: "a", count: 600)
         let longParent = String(repeating: "b", count: 600)
@@ -63,7 +61,6 @@ struct PiEntryLinkTests {
         #expect(Self.link(longTypeLine) == PiEntryLink(lineIndex: 7, id: "a2", parentID: "a1", mightBeShown: false))
     }
 
-    /// Lines are slices of the reader's buffer, so a line's bytes need not start at index zero.
     @Test func readsALineSlicedFromALargerBuffer() {
         let user =
             #"{"type":"message","id":"a1","parentId":"p0","timestamp":"2026-09-30T10:00:00.000Z","message":{"role":"user","content":"Hi"}}"#

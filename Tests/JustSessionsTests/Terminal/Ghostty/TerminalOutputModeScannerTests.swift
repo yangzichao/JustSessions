@@ -3,8 +3,6 @@ import Testing
 @testable import JustSessions
 
 struct TerminalOutputModeScannerTests {
-    // MARK: Alternate screen
-
     @Test(arguments: [1049, 1047, 47])
     func eachAlternateScreenModeSwitchesToItAndBack(mode: Int) {
         var scanner = TerminalOutputModeScanner()
@@ -53,8 +51,6 @@ struct TerminalOutputModeScannerTests {
         }
     }
 
-    // MARK: Kitty keyboard flags
-
     @Test func pushingFlagsTurnsTheProtocolOnAndPoppingThemTurnsItOff() {
         var scanner = TerminalOutputModeScanner()
         #expect(!scanner.hasKittyKeyboardFlags)
@@ -66,7 +62,6 @@ struct TerminalOutputModeScannerTests {
         #expect(!scanner.hasKittyKeyboardFlags)
     }
 
-    /// Each pop goes back to the flags before the push it undoes.
     @Test func popsUndoPushesInTurn() {
         var scanner = TerminalOutputModeScanner()
         scanner.scan(bytes("\u{1B}[>1u\u{1B}[>0u"))
@@ -172,7 +167,6 @@ struct TerminalOutputModeScannerTests {
         #expect(!scanner.hasKittyKeyboardFlags)
     }
 
-    /// Other `u` sequences, a flags query, and modifyOtherKeys leave the flags as they are.
     @Test func otherSequencesLeaveTheFlags() {
         var scanner = TerminalOutputModeScanner()
         for other in ["\u{1B}[u", "\u{1B}[1u", "\u{1B}[?u", "\u{1B}[?1u", "\u{1B}[>4;1m", "\u{1B}[>1c", ">1u", "\u{1B}>1u"] {
@@ -180,8 +174,6 @@ struct TerminalOutputModeScannerTests {
             #expect(!scanner.hasKittyKeyboardFlags, "\(Array(other.utf8))")
         }
     }
-
-    // MARK: Bracketed paste
 
     @Test func bracketedPasteTurnsOnAndOff() {
         var scanner = TerminalOutputModeScanner()

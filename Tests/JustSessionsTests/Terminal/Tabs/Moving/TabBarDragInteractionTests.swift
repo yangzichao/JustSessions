@@ -3,10 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Mouse events on the tab bar itself: a drag moves a tab within its group, a split's two tabs together, or a whole
-/// group by its label, while a click still selects a tab, closes it from its ×, or collapses a group. The bar's space
-/// around and past them moves the window instead. Serialized: each test's events go through the shared
-/// `WindowMoveZoneMonitor` and SwiftUI's gesture state, and from Swift 6.4 tests running alongside interleave theirs.
 @MainActor
 @Suite(.serialized)
 struct TabBarDragInteractionTests {
@@ -72,7 +68,6 @@ struct TabBarDragInteractionTests {
         #expect(fixture.isWindowMovable)
     }
 
-    /// The pointer can be over the bar without having entered it, as when the window opens under it.
     @Test func aPressOnATabHoldsTheWindowStillUntilLetGoOffTheBar() async throws {
         let fixture = try TabBarWindowFixture()
         defer { fixture.close() }
@@ -87,8 +82,6 @@ struct TabBarDragInteractionTests {
         #expect(fixture.isWindowMovable)
     }
 
-    /// Where the tab cannot leave for another window, as here, where the bar's window is no workspace window, the
-    /// pointer can leave the bar and the tab still follows it along the bar.
     @Test func aTabDraggedOutOfTheBarStillMovesAlongIt() async throws {
         let fixture = try TabBarWindowFixture()
         defer { fixture.close() }
@@ -115,7 +108,6 @@ struct TabBarDragInteractionTests {
         try await fixture.click(atX: fixture.middle(ofTab: second.id))
         #expect(fixture.store.selectedTerminalID == second.id)
 
-        // More than half a tab, less than one and a half: past the second tab only.
         try await fixture.drag(fromX: fixture.middle(ofTab: first.id), by: WorkspaceTabMetrics.maximumWidth * 1.3)
 
         #expect(fixture.store.terminalSessions.map(\.id) == [second.id, first.id, third.id])
@@ -164,7 +156,6 @@ struct TabBarDragInteractionTests {
         try await fixture.drag(fromX: fixture.middle(ofGroupLabel: "/tmp/tools"), by: -700)
 
         #expect(fixture.store.terminalSessions.map(\.id) == [tools.id, first.id, second.id])
-        // Letting go did not also collapse the group, which would have shown a tab still in sight instead.
         #expect(fixture.store.selectedTerminalID == tools.id)
     }
 
@@ -182,7 +173,6 @@ struct TabBarDragInteractionTests {
         #expect(fixture.closeRequests == [first.id])
     }
 
-    /// A tab started from a collapsed group's menu is selected, so its group expands to show it.
     @Test func aTabStartedFromAGroupsMenuExpandsItsCollapsedGroup() async throws {
         let project = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: project) }
@@ -201,12 +191,10 @@ struct TabBarDragInteractionTests {
         #expect(fixture.store.tabGroupKey(of: newTab) == app.projectDirectoryKey)
         #expect(fixture.store.selectedTerminalID == newTab.id)
 
-        // Where the app tab sits only while its group is expanded.
         try await fixture.click(atX: fixture.middle(ofTab: app.id))
         #expect(fixture.store.selectedTerminalID == app.id)
     }
 
-    /// Collapsing the selected tab's group shows the nearest tab still in sight.
     @Test func aClickOnAGroupLabelStillCollapsesTheGroup() async throws {
         let fixture = try TabBarWindowFixture()
         defer { fixture.close() }

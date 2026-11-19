@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// What a Claude Code, Pi, or OpenCode on an SSH host does, as the tab's tmux session puts it in the tab's title; see
-/// `RemoteCLIActivityTitle`. `RemoteClaudeActivityRelayTests` and `RemoteLiveSessionReportingTests` check that tmux
-/// gives the tab these titles.
 @MainActor
 struct RemoteCLIActivityTitleTests {
     private static let prefix = RemoteCLIActivityTitle.titlePrefix
@@ -18,7 +15,6 @@ struct RemoteCLIActivityTitleTests {
             ("waiting:", .needsInput(reason: nil)),
             ("idle:", .idle),
             ("shell:", .idle),
-            // What it waited for, left in the record, is no wait.
             ("idle:input needed", .idle),
         ]
         for (record, activity) in records {
@@ -40,7 +36,6 @@ struct RemoteCLIActivityTitleTests {
                 let title = Self.prefix + report
                 #expect(RemoteCLIActivityTitle.activity(inTerminalTitle: title, of: provider) == activity, "\(provider) \(report)")
             }
-            // Claude Code's words aren't the extension's.
             #expect(RemoteCLIActivityTitle.activity(inTerminalTitle: Self.prefix + "busy:", of: provider) == nil)
         }
         #expect(RemoteCLIActivityTitle.activity(inTerminalTitle: Self.prefix + "working:", of: .claude) == nil)
@@ -82,7 +77,6 @@ struct RemoteCLIActivityTitleTests {
         let store = ConversationStore(adapters: [], sessionNotifier: notifier)
         store.replaceConversations(on: .ssh("devbox"), with: [conversation])
         defer { store.closeAllTerminals() }
-        // Stands in for the tab's `ssh`.
         let tab = Self.makeTab(for: conversation)
         tab.startIfNeeded()
         store.openTerminal(tab)
@@ -106,7 +100,6 @@ struct RemoteCLIActivityTitleTests {
 
         #expect(notifier.notifications.map(\.reason) == [.needsInput(reason: "input needed"), .finishedTurn])
         #expect(notifier.notifications.allSatisfy { $0.source == .tab(id: tab.id, conversationID: conversation.id) })
-        // The app is in the background, so the finished turn is unseen: the blue dot.
         #expect(tab.hasUnseenFinishedTurn)
         #expect(tab.runStatus == .finishedUnseen)
         #expect(isWaitingForYou)

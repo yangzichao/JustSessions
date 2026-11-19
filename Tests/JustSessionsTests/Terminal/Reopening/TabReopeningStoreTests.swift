@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The tabs open when the app quit open again at launch, as each host lists its sessions, in their saved order.
 @MainActor
 struct TabReopeningStoreTests {
     @Test func savesSessionTabsAndPlainTerminalsButNotNewSessionsWhoseSessionIsUnknown() throws {
@@ -52,7 +51,6 @@ struct TabReopeningStoreTests {
             .plainTerminal(in: sandbox.projectLocation),
             .session(last, wasSelected: true),
         ])
-        // An SSH host's plain terminal needs no listing; this Mac's waits for it to tell whether its shell still runs.
         #expect(store.terminalSessions.map(\.projectDirectoryKey) == [remoteFolder.key])
         #expect(store.terminalSessions.first?.tmuxSessionName == "justsessions-terminal-a1b2c3d4")
 

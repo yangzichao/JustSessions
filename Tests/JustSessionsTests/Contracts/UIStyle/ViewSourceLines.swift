@@ -1,10 +1,8 @@
 import Foundation
 import Testing
 
-/// The lines of the app's view code, for the contract tests that hold views to docs/development/ui-style.md.
 struct ViewSourceLines {
     struct Line {
-        /// The file's path under `Sources/JustSessions/Views/`, such as `Theme/Colors/ThemePalette.swift`.
         let path: String
         let number: Int
         let text: Substring
@@ -14,10 +12,7 @@ struct ViewSourceLines {
         }
     }
 
-    /// Where the style's own values are defined, which every rule lets set them.
     static let themeFolder = "Theme/"
-    /// Miniature drawings, which scale the window down rather than follow the spec: the theme thumbnails in Settings
-    /// and the app mark.
     static let drawingFolders = ["Settings/Appearance/App/Sketch/", "Branding/"]
 
     let files: [(path: String, lines: [Substring])]
@@ -34,7 +29,6 @@ struct ViewSourceLines {
         self.files = files.sorted { $0.0 < $1.0 }
     }
 
-    /// Lines matching `pattern` outside the theme's own folder and the drawings.
     func lines(matching pattern: Regex<AnyRegexOutput>) -> [String] {
         let exemptFolders = [Self.themeFolder] + Self.drawingFolders
         return

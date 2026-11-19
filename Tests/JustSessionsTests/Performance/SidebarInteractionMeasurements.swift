@@ -6,18 +6,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Measures what a user feels in the sidebar, one interaction at a time, with the real sidebar and detail views
-/// hosted in a visible 1400×900 window. Each scenario runs 3 times in-process and the median run (by total time)
-/// is reported, as `Perf | <scenario> | <metric> | <value>` lines. With `JUSTSESSIONS_PERF_LOG_DIR` set, the
-/// lines are also appended to `interactions.log` in that directory.
-///
-/// The suite records nothing unless `JUSTSESSIONS_PERF` is set, so a plain `swift test` stays fast:
-///     JUSTSESSIONS_PERF=1 swift test --filter SidebarInteractionMeasurements
-///
-/// Soak mode repeats one scenario at N=2,000 for about 15 s so `/usr/bin/sample` can catch its hot stacks:
-///     JUSTSESSIONS_PERF=1 JUSTSESSIONS_PERF_SOAK=<scenario> swift test --filter SidebarInteractionMeasurements/soak
-/// The soaking process prints its pid and, with `JUSTSESSIONS_PERF_LOG_DIR` set, writes it to `soak.pid` there
-/// before looping, so a script can attach the sampler.
 @MainActor
 @Suite(.serialized)
 struct SidebarInteractionMeasurements {
@@ -25,38 +13,31 @@ struct SidebarInteractionMeasurements {
         ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF"] != nil
     }
 
-    /// The launch scan's apply: `replaceConversations(on: .thisMac, with: all)` into the shown, empty window.
     @Test(arguments: [300, 2_000])
     func populate(sessionCount: Int) async throws {
         try await measureScenario(.populate, sessionCount: sessionCount)
     }
 
-    /// "session 1" typed one character at a time through the real search-text binding, then cleared.
     @Test(arguments: [300, 2_000])
     func typingInSearch(sessionCount: Int) async throws {
         try await measureScenario(.typing, sessionCount: sessionCount)
     }
 
-    /// Recency All -> Recent -> All, then a provider filter on -> off, through the real bindings.
     @Test(arguments: [300, 2_000])
     func filterToggles(sessionCount: Int) async throws {
         try await measureScenario(.filters, sessionCount: sessionCount)
     }
 
-    /// Click the first visible session, Shift-click the last visible one (the real SessionMultiSelection range
-    /// logic over the sidebar's visible order), then clear.
     @Test(arguments: [300, 2_000])
     func selection(sessionCount: Int) async throws {
         try await measureScenario(.selection, sessionCount: sessionCount)
     }
 
-    /// With every project expanded, the sidebar's scroll view scrolled top to bottom in 20 steps.
     @Test(arguments: [300, 2_000])
     func scrolling(sessionCount: Int) async throws {
         try await measureScenario(.scroll, sessionCount: sessionCount)
     }
 
-    /// One 1 Hz poll tick that changed something: `store.detachedCLIActivities[<one listed id>] = .working`.
     @Test(arguments: [300, 2_000])
     func oneSmallStoreChange(sessionCount: Int) async throws {
         try await measureScenario(.storeChange, sessionCount: sessionCount)
@@ -70,14 +51,11 @@ struct SidebarInteractionMeasurements {
         try await measureScenario(.storeChange, sessionCount: sessionCount, listedOn: .ssh(SidebarPerfHarness.sshHostName))
     }
 
-    /// Selecting one session row the way the sidebar's click handler does, with a small real transcript file.
-    /// Only the synchronous turn is measured; the transcript itself loads asynchronously afterwards.
     @Test(arguments: [300, 2_000])
     func openPreview(sessionCount: Int) async throws {
         try await measureScenario(.preview, sessionCount: sessionCount)
     }
 
-    /// Repeats `JUSTSESSIONS_PERF_SOAK`'s scenario at N=2,000 for about 15 s so sample(1) can watch it.
     @Test func soak() async throws {
         guard Self.isEnabled,
             let scenarioName = ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF_SOAK"],
@@ -124,11 +102,9 @@ struct SidebarInteractionMeasurements {
         perfReport(label, "store changes observed", median.storeChanges)
         for (name, value) in median.extras { perfReport(label, name, value) }
         perfReport(label, "all 3 totals", runs.map { perfMilliseconds($0.total) }.joined(separator: ", "))
-        #expect(runs.count == 3)  // Record-only: the numbers above are the result.
+        #expect(runs.count == 3)
     }
 }
-
-// MARK: - Scenarios
 
 enum SidebarPerfScenario: String {
     case populate
@@ -148,18 +124,11 @@ struct SidebarInteractionMetrics {
     var extras: [(String, String)]
 }
 
-// MARK: - Harness
-
-/// `sessionCount` Claude Code sessions with real transcript files spread over 50 real project folders, listed by
-/// a store with isolated settings and no background polling, shown in the real sidebar + detail layout. Listed on an
-/// SSH host, the folders are `/home` paths on it instead, two to each folder name.
 @MainActor
 final class SidebarPerfHarness {
     nonisolated static let projectFolderPrefix = "perfproj-"
     nonisolated static let projectCount = 50
-    /// Never a real host: the store doesn't poll, and nothing here connects.
     nonisolated static let sshHostName = "sidebar-perf-host.invalid"
-    /// Spread over 14 days so the Recent filter keeps about half of the sessions.
     nonisolated static let updatedAtSpread: TimeInterval = 14 * 24 * 60 * 60
 
     let sandbox: DeletionSandbox
@@ -170,7 +139,6 @@ final class SidebarPerfHarness {
     private let window: NSWindow
     private let hostingView: NSHostingView<AnyView>
 
-    /// The AppKit views under the hosted browser, for a test to count what SwiftUI mounted.
     var hostedViews: [NSView] {
         var views: [NSView] = []
         func collect(_ view: NSView) {
@@ -199,7 +167,6 @@ final class SidebarPerfHarness {
         if let destination = listedHost.sshDestination {
             RemoteHostList(hosts: [destination]).save(to: sandbox.userDefaults)
         }
-        // A small real Claude-style transcript, so the preview path reads real content.
         let transcript = """
             {"type":"user","message":{"role":"user","content":"Tidy up the sidebar rendering"},"timestamp":"2025-01-01T12:00:00Z"}
             {"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Done. The sidebar now renders from the cached projection."}]},"timestamp":"2025-01-01T12:00:05Z"}
@@ -230,7 +197,6 @@ final class SidebarPerfHarness {
         )
         self.store = store
         store.replaceConversations(on: listedHost, with: conversations)
-        // Custom titles on one session in ten, so title lookups go through the alias list as they do in use.
         for conversation in conversations.enumerated().filter({ $0.offset % 10 == 0 }).map(\.element) {
             store.rename(conversation, to: "Renamed \(conversation.suggestedTitle)")
         }
@@ -251,9 +217,6 @@ final class SidebarPerfHarness {
         window.isReleasedWhenClosed = false
         window.contentView = hostingView
         window.center()
-        // Clear of the pointer, which stays where the person running the tests left it: a row under it would mount
-        // its hover menus, which the at-rest view counts and the scenarios don't expect. On a screen not much wider
-        // than the window, that takes it partly off screen; see `PointerClearWindow`.
         let pointer = NSEvent.mouseLocation
         if window.frame.contains(pointer) {
             window.setFrameOrigin(NSPoint(x: pointer.x + 1, y: window.frame.minY))
@@ -269,9 +232,6 @@ final class SidebarPerfHarness {
         sandbox.remove()
     }
 
-    // MARK: Preparing and measuring
-
-    /// Puts the window in the scenario's starting state, which also undoes the previous run of the same scenario.
     func prepare(for scenario: SidebarPerfScenario) async throws {
         store.detachedCLIActivities = [:]
         controls.sessionSelection.clear()
@@ -284,8 +244,6 @@ final class SidebarPerfHarness {
         case .typing, .filters, .preview:
             controls.searchText = ""
         case .selection, .storeChange:
-            // Searching for the shared project prefix matches every project and expands them all, the only way
-            // to expand every project from outside the sidebar's private expansion state.
             controls.searchText = Self.projectFolderPrefix
         case .scroll:
             controls.searchText = Self.projectFolderPrefix
@@ -316,7 +274,6 @@ final class SidebarPerfHarness {
         )
     }
 
-    /// One scenario, from its prepared state. Returns scenario-specific extra report lines.
     func run(_ scenario: SidebarPerfScenario) async throws -> [(String, String)] {
         switch scenario {
         case .populate: try await runPopulate()
@@ -378,14 +335,11 @@ final class SidebarPerfHarness {
         guard let first = orderedIDs.first, let last = orderedIDs.last else {
             return [("visible session rows", "none; selection skipped")]
         }
-        // A plain click on the first row: the sidebar's click handler calls onSelectConversation, which the
-        // browser answers with selectOnly and clearing the tab selection.
         let click = turn {
             controls.sessionSelection.selectOnly(first)
             store.selectTerminal(nil)
         }
         try await oneRunloopTurn()
-        // Shift-click on the last row: the handler's range branch over the visible order.
         let shiftClick = turn { controls.sessionSelection.selectRange(to: last, in: orderedIDs) }
         try await oneRunloopTurn()
         let clear = turn { controls.sessionSelection.clear() }
@@ -428,7 +382,6 @@ final class SidebarPerfHarness {
         }
         let expanded = turn { store.detachedCLIActivities[listedID] = .working }
         try await pumpTurns(1)
-        // The same tick with no search and every project collapsed, the state the app launches in.
         store.detachedCLIActivities = [:]
         controls.searchText = ""
         try await pumpTurns(3)
@@ -441,8 +394,6 @@ final class SidebarPerfHarness {
     }
 
     private func runPreview() -> [(String, String)] {
-        // The sidebar's plain-click path: no CLI runs this session, so the browser's onSelectConversation
-        // selects only this row and clears the tab selection; the preview pane renders this turn.
         let conversation = conversations[0]
         let click = turn {
             if store.showRunningCLI(for: conversation) {
@@ -452,13 +403,9 @@ final class SidebarPerfHarness {
                 store.selectTerminal(nil)
             }
         }
-        // No pump turns: the transcript loads asynchronously and is excluded from this measurement.
         return [("click-to-preview turn", perfMilliseconds(click))]
     }
 
-    // MARK: Window plumbing
-
-    /// One user-visible turn: the change, then the layout and display it forces, synchronously.
     private func turn(_ change: () -> Void) -> Duration {
         ContinuousClock().measure {
             change()
@@ -487,7 +434,6 @@ final class SidebarPerfHarness {
         }
     }
 
-    /// Session rows in the order the sidebar lists them with the current filters, all projects expanded.
     private func visibleConversationIDs() -> [String] {
         let filteredProjection = store.filteredSidebarProjection(
             providerFilter: controls.providerFilter,
@@ -499,7 +445,6 @@ final class SidebarPerfHarness {
             .flatMap { $0.conversations.map(\.id) }
     }
 
-    /// The sidebar's backing NSScrollView: the leftmost scroll view in the window.
     private func sidebarScrollView() -> NSScrollView? {
         Self.descendants(ofType: NSScrollView.self, in: window.contentView)
             .min { first, second in
@@ -513,10 +458,6 @@ final class SidebarPerfHarness {
     }
 }
 
-// MARK: - The hosted browser
-
-/// The state ContentView and ConversationBrowserView keep in @State/@Binding, held where the test can drive it
-/// through the same bindings the real views use.
 @MainActor
 final class SidebarPerfControls: ObservableObject {
     @Published var searchText = ""
@@ -525,8 +466,6 @@ final class SidebarPerfControls: ObservableObject {
     @Published var sessionSelection = SessionMultiSelection()
 }
 
-/// ConversationBrowserView's layout and wiring without its Sparkle updater, which would check for updates inside
-/// the test process. The projects are filtered exactly as ConversationBrowserView filters them.
 private struct SidebarPerfBrowserHarness: View {
     let store: ConversationStore
     @ObservedObject var controls: SidebarPerfControls
@@ -584,10 +523,6 @@ private struct SidebarPerfBrowserHarness: View {
     }
 }
 
-// MARK: - Heartbeat
-
-/// Ticks on the main queue every 20 ms and records how late each tick came: a late tick is time the main thread
-/// spent on something else, which the user sees as a frozen window.
 @MainActor
 final class MainThreadPerfHeartbeat {
     let interval: Duration = .milliseconds(20)
@@ -626,8 +561,6 @@ final class MainThreadPerfHeartbeat {
     }
 }
 
-// MARK: - Reporting
-
 func perfMilliseconds(_ value: Duration) -> String {
     let milliseconds = Double(value.components.seconds) * 1_000 + Double(value.components.attoseconds) / 1e15
     return String(format: "%.1f ms", milliseconds)
@@ -643,7 +576,6 @@ func perfReport(_ scenario: String, _ name: String, _ value: some CustomStringCo
     appendToPerfLog(line)
 }
 
-/// Where `JUSTSESSIONS_PERF_LOG_DIR` asks for the log and pid files; nil leaves the output on stdout alone.
 private func perfLogDirectory() -> URL? {
     ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF_LOG_DIR"].map { URL(fileURLWithPath: $0, isDirectory: true) }
 }

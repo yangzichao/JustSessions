@@ -2,9 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The conversation map's colors keep their contrast on the terminal's own background, which can be dark in a light
-/// window (TAB-10): your messages, the CLI's replies, and chips 3:1, letters and captions 4.5:1, and tool runs faint but
-/// at least 1.6:1.
 struct ConversationMapColorsTests {
     private static func expectReadable(
         _ colors: ConversationMapColors, _ context: String, sourceLocation: SourceLocation = #_sourceLocation
@@ -14,7 +11,6 @@ struct ConversationMapColorsTests {
         #expect(ratio(colors.user, background) >= 3, "user, \(context)", sourceLocation: sourceLocation)
         #expect(ratio(colors.reply, background) >= 3, "reply, \(context)", sourceLocation: sourceLocation)
         #expect(ratio(colors.chip, background) >= 3, "chip, \(context)", sourceLocation: sourceLocation)
-        // Tool runs stay faint, under your messages and the CLI's replies, but never fade into the background.
         #expect(ratio(colors.tool, background) >= 1.6, "tool, \(context)", sourceLocation: sourceLocation)
         #expect(
             ratio(colors.tool, background) < min(ratio(colors.user, background), ratio(colors.reply, background)),

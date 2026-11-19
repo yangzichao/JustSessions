@@ -1,12 +1,6 @@
 import Foundation
 
-/// Stand-ins for Claude Code and Codex that run in tmux and tell what they are doing the way the real CLIs do, so the
-/// app reads them through its own paths. Each takes the session id the app starts it with. A line typed in its
-/// terminal starts a turn, which lasts until the test writes how it ends to `$HOME/turn-ends/<session id>`; typing
-/// `/exit` quits.
 enum StandInActivityCLI {
-    /// Keeps its entry in Claude Code's live registry, named by its own process as Claude Code's is: "busy" during a
-    /// turn, then "idle", or "waiting" when the turn ends with "waiting", as at a permission prompt.
     static let claude = #"""
         #!/bin/sh
         # The tab starts the CLI with only its own folder on PATH.
@@ -32,7 +26,6 @@ enum StandInActivityCLI {
         done
         """#
 
-    /// Appends each turn's `task_started` and `task_complete` to its session's rollout file, as Codex does.
     static let codex = #"""
         #!/bin/sh
         # The tab starts the CLI with only its own folder on PATH.

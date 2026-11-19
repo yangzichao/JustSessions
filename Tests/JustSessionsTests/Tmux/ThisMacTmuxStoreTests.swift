@@ -4,10 +4,8 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct ThisMacTmuxStoreTests {
-    /// The CLI's process is found from the tmux server, whichever engine draws the tab.
     @Test(arguments: TerminalEngine.allCases)
     func aResumedSessionKeepsRunningInTmuxAfterItsTabClosesUntilEnded(_ engine: TerminalEngine) async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
@@ -30,7 +28,6 @@ struct ThisMacTmuxStoreTests {
         defer { store.closeAllTerminals() }
         let tmuxSessionName = TmuxSessionName.forConversation(conversation)
 
-        // Tabs run the CLI directly until a refresh has checked the tmux version.
         #expect(store.commandResolver.thisMacTmuxServer() == nil)
         store.refreshThisMac()
         #expect(await sandbox.waitUntil { !store.isScanningThisMac })

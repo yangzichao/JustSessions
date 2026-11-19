@@ -3,15 +3,11 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs a tab's command as the host would, with this Mac's bash and zsh as the login shell, a home folder of the test's
-/// own, and a `claude` stand-in that records its arguments and the program that started it. fish and dash are
-/// checked on the SSH test host; see docs/development/ssh-testing.md.
 struct RemoteCLIInvocationTests {
     enum LoginShell: String, CaseIterable {
         case bash = "/bin/bash"
         case zsh = "/bin/zsh"
 
-        /// The startup file `-lic` reads in the test's home folder.
         var startupFileName: String {
             switch self {
             case .bash: ".bash_profile"
@@ -22,10 +18,7 @@ struct RemoteCLIInvocationTests {
 
     struct Launch {
         let arguments: [String]
-        /// The command of the CLI's parent process: the login shell when it ran an alias or function, or whatever
-        /// started the tab's command once the CLI took the shell's place.
         let parentCommand: String
-        /// Which of the programs put beside the CLI ran.
         let programsRunBesideTheCLI: [String]
     }
 
@@ -51,7 +44,6 @@ struct RemoteCLIInvocationTests {
         #expect(launch.arguments == ["--from-function", "--resume", "id with space"])
     }
 
-    /// An alias that adds arguments to the program of the same name, as for `--dangerously-skip-permissions`.
     @Test(arguments: LoginShell.allCases)
     func anAliasInFrontOfTheProgramStillRuns(shell: LoginShell) throws {
         let launch = try launch(in: shell, startup: { _ in "alias claude='claude --from-alias'" }, cliOnPath: true)

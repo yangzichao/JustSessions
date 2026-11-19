@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Find in a SwiftTerm tab; see `GhosttyTerminalFindTests` for Ghostty's.
 @MainActor
 struct SwiftTermTerminalFindTests {
     private func makeTerminalWithThreeMatches() -> SelectableTerminalView {
@@ -12,7 +11,6 @@ struct SwiftTermTerminalFindTests {
         return terminalView
     }
 
-    /// Whether a buffer row is in view. Row 199 is line 200, as long as no line has left the buffer.
     private func isShown(row: Int, in terminalView: SelectableTerminalView) -> Bool {
         let terminal = terminalView.getTerminal()
         let topRow = terminal.getTopVisibleRow()
@@ -71,7 +69,6 @@ struct SwiftTermTerminalFindTests {
     }
 }
 
-/// 300 numbered lines, three of them with "needle": the oldest on line 10, then 150, and the newest on 200.
 enum TerminalFindFixtureOutput {
     static let linesWithThreeNeedles: [String] = {
         var lines = (1...300).map { String(format: "line-%04d", $0) }

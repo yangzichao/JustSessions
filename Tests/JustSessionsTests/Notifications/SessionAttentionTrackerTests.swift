@@ -33,7 +33,6 @@ struct SessionAttentionTrackerTests {
 
         _ = tracker.events(after: [.init(source: source, activity: .working)])
         _ = tracker.events(after: [])
-        // A later CLI of the same session starts out between turns; the earlier CLI's turn did not end.
         #expect(tracker.events(after: [.init(source: source, activity: .idle)]).isEmpty)
     }
 

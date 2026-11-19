@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The terminal preview in Settings is drawn by the engine chosen there, and changes with it.
 @MainActor
 struct TerminalAppearancePreviewEngineTests {
     @Test func choosingAnotherEngineRedrawsThePreviewWithIt() async throws {

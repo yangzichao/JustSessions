@@ -44,7 +44,6 @@ struct TerminalThemeChangeInTmuxTests {
         )
         let lightBackground = Self.reply(for: AppThemeColors.justSessionsLight.contentSurface)
         let darkBackground = Self.reply(for: AppThemeColors.justSessionsDark.contentSurface)
-        // tmux and the probe can take a while to start while the other tests run: over 30 seconds on a release runner.
         let sawLightBackground = await Self.waitUntil(timeout: .seconds(120)) { Self.lastReply(in: replyLog) == lightBackground }
         #expect(sawLightBackground, "\(Self.diagnostics(replyLog: replyLog, terminalView: terminalView))")
         guard sawLightBackground else { return }
@@ -56,7 +55,6 @@ struct TerminalThemeChangeInTmuxTests {
         #expect(terminalView.marginColor == NSColor(hexValue: AppThemeColors.justSessionsDark.contentSurface))
     }
 
-    /// Waits without blocking the main thread, where the terminal reads tmux's output.
     private static func waitUntil(timeout: Duration, _ condition: () -> Bool) async -> Bool {
         let deadline = ContinuousClock.now + timeout
         while ContinuousClock.now < deadline {
@@ -72,7 +70,6 @@ struct TerminalThemeChangeInTmuxTests {
         return "last replies: \(replies); terminal: \(screen.trimmingCharacters(in: .whitespacesAndNewlines))"
     }
 
-    /// Asks for the background every 200 ms and writes each reply on a line of its own.
     private static let backgroundProbeScript = #"""
         #!/usr/bin/perl
         use strict;

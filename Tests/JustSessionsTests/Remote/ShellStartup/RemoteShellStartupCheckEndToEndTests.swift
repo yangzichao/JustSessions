@@ -62,7 +62,6 @@ struct RemoteShellStartupCheckEndToEndTests {
     }
 }
 
-/// A home folder with the given startup files, removed when the test ends.
 private final class TemporaryHome {
     let url: URL
 

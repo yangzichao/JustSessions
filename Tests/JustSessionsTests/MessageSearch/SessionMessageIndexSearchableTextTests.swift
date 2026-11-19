@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// `SessionMessageIndex.searchableText`: when it keeps a resume state with a session's saved text, and that what it
-/// saves always matches a clean read.
 @Suite(.serialized)
 struct SessionMessageIndexSearchableTextTests {
     private struct Session {
@@ -33,7 +31,6 @@ struct SessionMessageIndexSearchableTextTests {
             await SessionMessageIndex.searchableText(of: conversation, fingerprint: fingerprint, cache: cache)
         }
 
-        /// The resume state saved with the session's text, looked up as after a change.
         func savedResumeState() throws -> SessionMessageTextResumeState? {
             let changed = SessionMessageTextFingerprint(
                 .fixture(provider: conversation.provider, updatedAt: .distantPast, sourceFile: conversation.sourceFile)
@@ -89,7 +86,6 @@ struct SessionMessageIndexSearchableTextTests {
         }
     }
 
-    /// A mirrored session's file is replaced at every copy, so a resume state would only cost a hash at each change.
     @Test func aCodexSessionOnAnSSHHostNeverKeepsAResumeState() async throws {
         let session = try Session(host: .ssh("devbox"), lines: [Self.assistant("First")])
         defer { session.remove() }

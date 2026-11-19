@@ -54,8 +54,6 @@ struct TranscriptPagingScrollTests {
         try await expectEventually { !model.isLoading }
         fixture.positionStore.record(anchor, for: files.conversation.id)
         let scrollView = try await fixture.show(files.conversation, transcript: try #require(model.transcript), paging: model)
-        // Restoring near the first loaded message can immediately prefetch an earlier page. Wait for that
-        // asynchronous layout too, instead of assuming the fixture's initial layout delay covers both.
         try await expectEventually { !model.isLoading && fixture.visiblePosition(in: scrollView) == anchor }
         try TranscriptPagingFixture.data(count: 520, lineCount: 18).write(to: files.file)
         model.refresh(files.conversation, position: fixture.positionStore.position(for: files.conversation.id))

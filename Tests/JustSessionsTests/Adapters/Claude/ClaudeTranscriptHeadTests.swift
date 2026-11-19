@@ -19,7 +19,6 @@ struct ClaudeTranscriptHeadTests {
         #expect(!head.isSidechain)
     }
 
-    /// A prompt sent with a screenshot has its text and the image as parts, and the text is what was typed.
     @Test func aPromptSentWithImagesIsItsTextPart() {
         let head = ClaudeTranscriptHead(
             lines: jsonLines([
@@ -59,8 +58,6 @@ struct ClaudeTranscriptHeadTests {
         #expect(head.isSidechain)
     }
 
-    /// A session that opens with slash commands has its first prompt after the line limit. Reading goes on for the
-    /// prompt alone, and stops once it is found.
     @Test func pastTheLineLimitOnlyTheFirstPromptIsLookedFor() {
         let filler = Array(repeating: #"{"type":"assistant"}"#, count: ClaudeTranscriptHead.maximumLineCount + 10)
         let prompt = #"{"type":"user","cwd":"/Users/me/app","message":{"content":"Fix the build"}}"#

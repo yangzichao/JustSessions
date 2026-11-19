@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Recovery projection and appended-name following at many-tab scale, without opening terminals or starting CLIs.
-/// JUSTSESSIONS_PERF=1 swift test -c release --no-parallel --filter TerminalScalingMeasurements
 @MainActor
 @Suite(.serialized)
 struct TerminalScalingMeasurements {
@@ -36,8 +34,6 @@ struct TerminalScalingMeasurements {
         }
     }
 
-    /// Both paths read the same append through the production reader and name extractor. This isolates the work
-    /// moved off main; it excludes the store's snapshots and applying actual name changes to the sidebar.
     @Test func appendedPiNamesWhileTheMainActorRemainsAvailable() async throws {
         guard ProcessInfo.processInfo.environment["JUSTSESSIONS_PERF"] != nil else { return }
         let folder = try makeTemporaryDirectory()

@@ -4,14 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// `ThisMacTmuxModifiedNavigationKeyTests` on a real SSH host: a tab opened with the app's own `ssh` command runs the
-/// key reader in the host's tmux, with the session options every tab sets there, and the reader records what reaches
-/// it. Option-Left and Option-Right alone are left out: they stay Esc b and Esc f, which the host's own
-/// `extended-keys` setting decides how to pass on. Opt-in, since it needs a host:
-///
-///     JUSTSESSIONS_LIVE_SSH_HOST=justsessions-test swift test --filter LiveSSHTmuxModifiedNavigationKeyTests
-///
-/// The reader's folder on the host and its tmux session are removed afterwards.
 @MainActor
 struct LiveSSHTmuxModifiedNavigationKeyTests {
     @Test(

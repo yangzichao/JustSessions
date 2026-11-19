@@ -15,7 +15,6 @@ struct SheetClickOutsideMonitorTests {
         windows.presentSheet()
 
         #expect(SheetClickOutsideMonitor.isClickOutsideSheet(try windows.click(at: contentPoint, in: windows.parent), in: windows.parent))
-        // The tab bar sits in the title bar.
         #expect(SheetClickOutsideMonitor.isClickOutsideSheet(try windows.click(at: titleBarPoint, in: windows.parent), in: windows.parent))
         #expect(!SheetClickOutsideMonitor.isClickOutsideSheet(try windows.click(at: contentPoint, in: windows.sheet), in: windows.parent))
     }

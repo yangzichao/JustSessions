@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A selected tab's terminal takes the keyboard even when SwiftUI adds its view to the window only after the tab was
-/// given the keyboard, as it can when the app is busy; see `TerminalInsetView.takeKeyboard()`.
 @MainActor
 struct TerminalInsetViewKeyboardTests {
     @Test func aTerminalGivenTheKeyboardBeforeItIsInAWindowTakesItThere() {
@@ -29,7 +27,6 @@ struct TerminalInsetViewKeyboardTests {
         #expect(window.firstResponder === terminal)
     }
 
-    /// A tab deselected before its view reaches the window leaves the keyboard where it is.
     @Test func aTerminalNoLongerOwedTheKeyboardLeavesItAlone() {
         let (window, insetView, terminal) = makeTerminal()
         defer { window.close() }

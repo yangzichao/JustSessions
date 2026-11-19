@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Move to resumes a Claude Code session with `/cd <folder>` as its first message, so Claude Code moves it.
 @MainActor
 struct SessionMoveToFolderTests {
     private static let host = SessionHost.ssh("devbox")
@@ -20,7 +19,6 @@ struct SessionMoveToFolderTests {
 
         let tab = try #require(store.terminalSessions.only)
         #expect(tab.conversation?.id == session.id)
-        // The remote command is quoted again for tmux, so only the words are checked.
         let remoteCommand = try #require(tab.command.arguments.last)
         #expect(remoteCommand.contains("--resume") && remoteCommand.contains(session.sessionID))
         #expect(remoteCommand.contains("/cd /home/me/web app"))

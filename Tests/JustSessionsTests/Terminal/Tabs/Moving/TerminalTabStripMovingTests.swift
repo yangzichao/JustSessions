@@ -3,11 +3,7 @@ import Testing
 
 @testable import JustSessions
 
-/// Dragging tabs in the tab bar keeps the order's rules: a tab moves only among its group's tabs, a split's two tabs
-/// move together, and a group moves whole. Tabs are named by their project's letter and a number, such as `a1`.
 struct TerminalTabStripMovingTests {
-    // MARK: - Tabs
-
     @Test func aTabMovesAmongItsGroupsTabs() {
         var strip = makeStrip("a1", "a2", "a3", "b1")
 
@@ -76,8 +72,6 @@ struct TerminalTabStripMovingTests {
         expectSplitRules(strip)
     }
 
-    // MARK: - Groups
-
     @Test func aGroupMovesWholeAmongTheGroups() {
         var strip = makeStrip("a1", "a2", "b1", "c1")
 
@@ -125,8 +119,6 @@ struct TerminalTabStripMovingTests {
 
         #expect(strip == before)
     }
-
-    // MARK: - Helpers
 
     private let tabIDsByName: [String: UUID] = Dictionary(
         uniqueKeysWithValues: ["a", "b", "c"].flatMap { project in (1...4).map { ("\(project)\($0)", UUID()) } }

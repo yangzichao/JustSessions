@@ -3,12 +3,7 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab, or a whole group dragged by its label, dragged to another window leaves its tab bar as closed tabs do, though
-/// a split goes whole, and joins the other bar among its group's tabs, or as a new group. Tabs are named by their
-/// project's letter and a number, such as `a1`.
 struct TerminalTabStripBetweenWindowsTests {
-    // MARK: - Taking out
-
     @Test func aTabLeavesItsTabBarAsWhenItCloses() throws {
         var strip = makeStrip("a1", "a2", "b1")
 
@@ -37,7 +32,6 @@ struct TerminalTabStripBetweenWindowsTests {
         #expect(strip.splits.isEmpty)
         #expect(unit.tabs.map(\.id) == [id("a1"), id("b1")])
         #expect(unit.splits == [split])
-        // A split across projects goes as the group of its own it shows as.
         #expect(unit.groupKey == split.groupKey)
         expectSplitRules(strip)
     }
@@ -117,8 +111,6 @@ struct TerminalTabStripBetweenWindowsTests {
         #expect(takenOut == nil)
         #expect(strip == before)
     }
-
-    // MARK: - Bringing in
 
     @Test func aTabJoinsItsGroupAtThePlaceItIsDroppedAt() throws {
         var source = makeStrip("a1", "b1")
@@ -201,7 +193,6 @@ struct TerminalTabStripBetweenWindowsTests {
         expectSplitRules(target)
     }
 
-    /// Where the other window has tabs of its project, the group's tabs join them, together and keeping their split.
     @Test func aWholeGroupJoinsItsProjectsTabsTogetherKeepingItsSplit() throws {
         var source = makeStrip("a1", "a2", "a3", "b1")
         let added = source.addSplit(joining: id("a2"), beside: id("a1"))
@@ -222,7 +213,6 @@ struct TerminalTabStripBetweenWindowsTests {
         expectSplitRules(target)
     }
 
-    /// Dragged on along the other bar, and off it again, the group's tabs stay together.
     @Test func aGroupJoinedWithItsProjectsTabsMovesAndLeavesTogether() throws {
         var source = makeStrip("a1", "a2", "b1")
         var target = makeStrip("a3", "a4", "c1")
@@ -238,8 +228,6 @@ struct TerminalTabStripBetweenWindowsTests {
         #expect(takenOutAgain?.tabs.map(\.id) == [id("a1"), id("a2")])
         #expect(names(target) == ["a3", "a4", "c1"])
     }
-
-    // MARK: - Helpers
 
     private let tabIDsByName: [String: UUID] = Dictionary(
         uniqueKeysWithValues: ["a", "b", "c"].flatMap { project in (1...4).map { ("\(project)\($0)", UUID()) } }

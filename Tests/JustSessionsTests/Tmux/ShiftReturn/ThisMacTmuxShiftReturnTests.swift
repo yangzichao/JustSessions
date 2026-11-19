@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`. Either engine sends the same bytes.
 @MainActor
 struct ThisMacTmuxShiftReturnTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -39,15 +38,12 @@ struct ThisMacTmuxShiftReturnTests {
         }
 
         tab.startIfNeeded()
-        // A file can appear before tmux's initial screen reaches the terminal. Wait for rendered output too,
-        // so key events are sent through an attached, initialized terminal rather than during its handshake.
         try #require(
             await sandbox.waitUntil {
                 FileManager.default.fileExists(atPath: readyMarker.path)
                     && sandbox.tmuxOutput(["list-clients", "-F", "#{session_name}"]) == "\(tmuxSessionName)\n"
                     && screenText(of: tab.terminalView).contains("KEY_READER_READY")
             }, "\(sandbox.launchDiagnostics(for: tab))")
-        // Reproduce a late initialization reply deterministically, rather than relying on CI timing.
         _ = sandbox.tmuxOutput(["send-keys", "-t", "=\(tmuxSessionName):", "-l", "\u{1b}[?65;4;6;18;22c"])
         tab.terminalView.keyDown(with: returnKeyEvent(modifiers: .shift, windowNumber: window.windowNumber))
         tab.terminalView.keyDown(with: returnKeyEvent(modifiers: [], windowNumber: window.windowNumber))
@@ -76,7 +72,6 @@ struct ThisMacTmuxShiftReturnTests {
 
         #expect(tab(host: .thisMac, tmuxSessionName: "justsessions-claude-abc").terminalView.cliRunsInTmux)
         #expect(!tab(host: .thisMac, tmuxSessionName: nil).terminalView.cliRunsInTmux)
-        // The tab's tmux on an SSH host gets the key settings it needs on every attach; see `RemoteCLICommandBuilder`.
         #expect(tab(host: .ssh("devbox"), tmuxSessionName: "justsessions-claude-abc").terminalView.cliRunsInTmux)
         #expect(!tab(host: .ssh("devbox"), tmuxSessionName: nil).terminalView.cliRunsInTmux)
     }

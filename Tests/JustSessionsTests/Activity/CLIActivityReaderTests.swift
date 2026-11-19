@@ -11,9 +11,7 @@ struct CLIActivityReaderTests {
         #expect(CLIActivityReader.codexActivity(turnState: nil, cliStartedAt: cliStartedAt) == nil)
         #expect(CLIActivityReader.codexActivity(turnState: .betweenTurns, cliStartedAt: cliStartedAt) == .idle)
         #expect(CLIActivityReader.codexActivity(turnState: .inTurn(startedAt: cliStartedAt + 5), cliStartedAt: cliStartedAt) == .working)
-        // An earlier CLI ended in the middle of this turn.
         #expect(CLIActivityReader.codexActivity(turnState: .inTurn(startedAt: cliStartedAt - 5), cliStartedAt: cliStartedAt) == .idle)
-        // Without both times, a turn under way is taken at its word.
         #expect(CLIActivityReader.codexActivity(turnState: .inTurn(startedAt: nil), cliStartedAt: cliStartedAt) == .working)
         #expect(CLIActivityReader.codexActivity(turnState: .inTurn(startedAt: cliStartedAt - 5), cliStartedAt: nil) == .working)
     }
@@ -25,7 +23,6 @@ struct CLIActivityReaderTests {
         }
 
         #expect(activity(.inTurn(startedAt: cliStartedAt + 5)) == .needsInput(reason: nil))
-        // The background server may still hold the thread of an earlier CLI that ended while it waited.
         #expect(activity(.inTurn(startedAt: cliStartedAt - 5)) == .idle)
         #expect(activity(.betweenTurns) == .idle)
         #expect(activity(nil) == nil)
@@ -79,7 +76,6 @@ struct CLIActivityReaderTests {
         #expect(activity(.betweenTurns) == .idle)
         #expect(activity(.inTurn(startedAt: cliStartedAt + 5, isWaitingForApproval: false)) == .working)
         #expect(activity(.inTurn(startedAt: cliStartedAt + 5, isWaitingForApproval: true)) == .needsInput(reason: nil))
-        // An earlier CLI ended in the middle of this turn, even one that waited for approval then.
         #expect(activity(.inTurn(startedAt: cliStartedAt - 5, isWaitingForApproval: true)) == .idle)
         #expect(activity(.inTurn(startedAt: nil, isWaitingForApproval: false)) == .working)
     }
@@ -91,7 +87,6 @@ struct CLIActivityReaderTests {
         try FileManager.default.createDirectory(at: sessionsDirectory, withIntermediateDirectories: true)
         try #"{"sessionId":"70b71200-8814-4822-a2e5-24abf31f7cbd","status":"busy"}"#
             .write(to: sessionsDirectory.appendingPathComponent("4242.json"), atomically: true, encoding: .utf8)
-        // This test's own process stands in for the Codex CLI.
         let cliProcessID = getpid()
         let cliStartedAt = try #require(RunningProcessInfo.startDate(of: cliProcessID))
         let currentTurnFile = directory.appendingPathComponent("current.jsonl")

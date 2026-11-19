@@ -4,18 +4,11 @@ import Testing
 
 @testable import JustSessions
 
-/// Reads generated sessions page by page, as `SessionMessageTextReader` reads one for message search, once decoding
-/// their images and once leaving them undecoded, as `Perf | <scenario> | <metric> | <value>` lines.
-///
-/// The suite records nothing unless `JUSTSESSIONS_PERF` is set:
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter MessageSearchReadingMeasurements
 @Suite(.serialized)
 struct MessageSearchReadingMeasurements {
     static let messageCount = 100
     static let runCount = 5
 
-    /// 0 is the text-only control. 160 KiB and 745 KiB are the median and 90th percentile base64 length of 6,619
-    /// images in one contributor's Codex sessions, October 2026.
     @Test(arguments: [0, 160 << 10, 745 << 10])
     func readingForSearch(imageBase64Length: Int) async throws {
         guard SidebarInteractionMeasurements.isEnabled else { return }
@@ -29,7 +22,7 @@ struct MessageSearchReadingMeasurements {
             let images = imageBase64.map { "\(Self.messageCount) images of \($0.count >> 10) KiB base64" } ?? "no images"
             let label = "search read, \(provider.rawValue), \(images)"
             for decodesImages in [true, false] {
-                _ = try await read(file, provider: provider, decodesImages: decodesImages)  // Warms the file cache.
+                _ = try await read(file, provider: provider, decodesImages: decodesImages)
                 var wallTimes: [Duration] = []
                 var cpuTimes: [Duration] = []
                 var largestPageImageBytes = 0
@@ -48,7 +41,6 @@ struct MessageSearchReadingMeasurements {
         }
     }
 
-    /// Reads every page and returns the most decoded image bytes one page held.
     private func read(_ file: URL, provider: ConversationProvider, decodesImages: Bool) async throws -> Int {
         let source = TranscriptPageSource(
             file: file, provider: provider, limits: SessionMessageTextReader.wholeSessionLimits(for: provider), decodesImages: decodesImages

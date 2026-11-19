@@ -12,16 +12,10 @@ import Testing
 @Suite(.serialized)
 struct GhosttySymbolsFallbackTests {
     private static let symbolsFamily = TerminalSymbolsFont.familyName
-    /// Powerline's branch icon, the Bulma Devicon, the relative-path Octicon, and the folder icon.
     private static let icons: [Unicode.Scalar] = ["\u{E0A0}", "\u{E76C}", "\u{F506}", "\u{F07B}"]
-    /// Characters the symbols font has outside the Private Use Areas: power, menu, and heart symbols, and an angle
-    /// bracket.
     private static let symbolsOutsideThePrivateUseAreas: [Unicode.Scalar] = ["\u{23FB}", "\u{23FE}", "\u{2630}", "\u{2665}", "\u{276F}"]
-    /// See `TestMachine.isVirtual`.
     private static let drawnTextNeedsAMac: Comment = "Compares drawn text, which a virtual machine's GPU draws in other colors"
 
-    /// Other characters keep the family that drew them before the symbols font joined the fallback families, as in
-    /// SwiftTerm, which gives the symbols font only the Private Use Areas.
     @Test(arguments: [TerminalFontFamily.system, .named("Menlo"), .named("PT Mono")])
     func iconsTheFontLacksComeFromTheSymbolsFontAndOtherCharactersFromTheirFamilies(_ fontFamily: TerminalFontFamily) {
         let swiftTermFont = fontFamily.font(size: 13)
@@ -44,7 +38,6 @@ struct GhosttySymbolsFallbackTests {
         }
     }
 
-    /// PT Mono has glyphs of its own at some Octicons' codepoints, which it keeps, as in SwiftTerm.
     @Test func iconsTheFontHasKeepItsGlyphs() {
         let lines = Self.lines(of: TerminalAppearancePreferences(fontFamily: .named("PT Mono")))
         let families = GhosttyFontConfigurationTests.values(of: "font-family", in: lines)
@@ -72,7 +65,6 @@ struct GhosttySymbolsFallbackTests {
         #expect(drawn == drawnWithOnlySymbols)
     }
 
-    /// `lines` with the symbols font as the only regular fallback family and no `font-codepoint-map`.
     private static func withOnlyTheSymbolsFontAsFallback(_ lines: [String]) -> [String] {
         let familyKey = "font-family = "
         return lines.filter { !$0.hasPrefix("font-codepoint-map = ") }.reduce(into: [String]()) { kept, line in
@@ -115,7 +107,6 @@ struct GhosttySymbolsFallbackTests {
         return GhosttyAppearanceConfigurationTests.lines(of: configuration.terminalConfiguration)
     }
 
-    /// A configuration with the keys and values of `lines`, such as `font-size = 13`.
     private static func configuration(_ lines: [String]) -> TerminalConfiguration {
         TerminalConfiguration { builder in
             for line in lines {
@@ -125,7 +116,6 @@ struct GhosttySymbolsFallbackTests {
         }
     }
 
-    /// The pixels of a light terminal showing `output` on one line.
     private static func drawnPixels(of output: String, configuration: TerminalConfiguration, theme: TerminalTheme) async throws -> Data {
         let controller = TerminalController(
             configSource: .generated("# JustSessions test"), theme: theme, terminalConfiguration: configuration)

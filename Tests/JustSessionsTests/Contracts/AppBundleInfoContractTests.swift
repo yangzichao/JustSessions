@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// `Scripts/build-app.sh` writes the app's Info.plist from a template. These hold the template to what the code,
-/// the package manifest, and Sparkle's update checks expect.
 struct AppBundleInfoContractTests {
     @Test func bundleIdentifierIsTheOneTheCodeUses() throws {
         #expect(try Self.infoPlistTemplate()["CFBundleIdentifier"] as? String == AppIdentity.bundleIdentifier)
@@ -43,7 +41,6 @@ struct AppBundleInfoContractTests {
         #expect(infoPlist["SUVerifyUpdateBeforeExtraction"] as? Bool == true)
     }
 
-    /// The feed is the Worker in `Cloudflare/UpdateFeed/`, which counts the check and redirects to the appcast on GitHub.
     @Test func updatesAreCheckedThroughTheCountingWorker() throws {
         let feedURL = try #require((try Self.infoPlistTemplate()["SUFeedURL"] as? String).flatMap(URL.init(string:)))
         let workerConfiguration = try RepositoryFiles.contents(of: "Cloudflare/UpdateFeed/wrangler.jsonc")
@@ -73,9 +70,6 @@ struct AppBundleInfoContractTests {
                 .contains("--entitlements \"$project_directory/Scripts/JustSessions.entitlements\""))
     }
 
-    /// The interface is in English and Simplified Chinese (PRD-07), so macOS's microphone prompt is too. The
-    /// template holds the English; `build-app.sh` copies `Localization/InfoPlist` into the app's `zh-Hans.lproj`,
-    /// where macOS reads it.
     @Test func theMicrophonePromptIsInSimplifiedChinese() throws {
         let translations = try #require(
             try PropertyListSerialization.propertyList(
@@ -92,7 +86,6 @@ struct AppBundleInfoContractTests {
         #expect(try RepositoryFiles.contents(of: "Scripts/build-app.sh").contains("Localization/InfoPlist/*.lproj/InfoPlist.strings"))
     }
 
-    /// `plutil -replace` fills in the version at build time; each key it replaces is in the template.
     @Test func everyKeyTheScriptFillsInIsInTheTemplate() throws {
         let script = try RepositoryFiles.contents(of: "Scripts/build-app.sh")
         let replacedKeys = script.matches(of: try Regex(#"plutil -replace (\w+)"#)).compactMap { $0.output[1].substring }
@@ -104,7 +97,6 @@ struct AppBundleInfoContractTests {
         }
     }
 
-    /// The property list between `<<'PLIST'` and `PLIST` in the build script.
     private static func infoPlistTemplate() throws -> [String: Any] {
         let script = try RepositoryFiles.contents(of: "Scripts/build-app.sh")
         let templateStart = try #require(script.range(of: "<<'PLIST'\n"))

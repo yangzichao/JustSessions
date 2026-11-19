@@ -4,8 +4,6 @@ import Testing
 
 @MainActor
 struct TranscriptEntriesStackTests {
-    /// The reader's view updates with the same transcript, as when Find opens or the text size changes, so the stack
-    /// compares equal and SwiftUI leaves every entry's layout alone. A new page, provider, or reader must update it.
     @Test func comparesItsInputs() {
         let controller = TranscriptScrollPositionController(
             conversationID: "entries-stack", positionStore: TranscriptReadingPositionStore(), initialPosition: .bottom

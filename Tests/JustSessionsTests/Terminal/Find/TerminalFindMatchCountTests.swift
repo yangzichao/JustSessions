@@ -21,7 +21,6 @@ struct TerminalFindMatchCountTests {
         #expect(TerminalFindMatchCount(countedFromOldest: 0, selectedIndexFromOldest: 0) == .none)
     }
 
-    /// The newest matches lie past a count stopped at the limit, so the selected one can't be numbered from them.
     @Test func aCountStoppedAtTheLimitNumbersNoMatch() {
         let limit = TerminalFindMatchCount.countLimit
         let count = TerminalFindMatchCount(countedFromOldest: limit, selectedIndexFromOldest: 12)

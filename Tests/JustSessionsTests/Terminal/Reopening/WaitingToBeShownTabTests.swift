@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A reopened tab whose CLI no longer ran starts nothing until you select it, and until then counts as nothing running.
 @MainActor
 struct WaitingToBeShownTabTests {
     @Test func runsNothingAndCountsAsNotRunningUntilSelected() throws {
@@ -24,7 +23,6 @@ struct WaitingToBeShownTabTests {
         #expect(tab.runStatus == .waitingToBeShown)
         #expect(tab.cliActivity == nil)
         #expect(store.activitySummary(forProjectDirectoryKey: conversation.projectDirectoryKey).runningCount == 0)
-        // Clicking its session shows the tab instead of opening another.
         #expect(store.runningTerminal(for: conversation)?.id == tab.id)
     }
 

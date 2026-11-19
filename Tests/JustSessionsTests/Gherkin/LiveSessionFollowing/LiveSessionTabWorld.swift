@@ -3,7 +3,6 @@ import XCTest
 
 @testable import JustSessions
 
-/// One Antigravity, Pi, or OpenCode tab. Its CLI is a `ScenarioCLI`, whose process id the tab knows as a tmux pane's.
 @MainActor
 final class LiveSessionTabWorld: SessionTabWorld {
     static let cliProcessID: Int32 = 4242
@@ -71,7 +70,6 @@ final class LiveSessionTabWorld: SessionTabWorld {
             ))
     }
 
-    /// The tool saves the session where a refresh finds it, and the next refresh lists it.
     func saveSession(labeled label: String) throws {
         let sessionID = app.addSessionWithoutListing(labeled: label)
         try cli.saves(session: sessionID, projectPath: app.projectPath)

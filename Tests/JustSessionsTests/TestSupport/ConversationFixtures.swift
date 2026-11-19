@@ -3,7 +3,6 @@ import Foundation
 @testable import JustSessions
 
 extension Conversation {
-    /// A conversation with plain defaults, so a test spells out only what it checks.
     static func fixture(
         provider: ConversationProvider = .claude,
         sessionID: String = UUID().uuidString.lowercased(),

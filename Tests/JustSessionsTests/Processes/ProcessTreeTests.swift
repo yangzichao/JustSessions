@@ -19,7 +19,6 @@ struct ProcessTreeTests {
     }
 
     @Test func findsTheChildThatARunningWrapperStarted() throws {
-        // `sh` stands in for a wrapper script that starts the real CLI as a child process.
         let wrapper = Process()
         wrapper.executableURL = URL(fileURLWithPath: "/bin/sh")
         wrapper.arguments = ["-c", "sleep 30 & echo $!; wait"]

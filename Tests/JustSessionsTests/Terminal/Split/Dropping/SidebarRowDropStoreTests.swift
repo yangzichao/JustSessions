@@ -3,10 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A session or open tab dragged from the sidebar onto the terminals shows there as a tab dragged from the tab bar
-/// does, beside the selected tab or in place of the shown split's pane on that side, or, let go in the middle, on its
-/// own; a session with no tab open resumes in a new tab to do so. With no tab selected, it fills the terminals wherever
-/// it is let go: the session resumes, or the tab is selected.
 @MainActor
 struct SidebarRowDropStoreTests {
     @Test func aSessionWithNoTabResumesBesideTheSelectedTab() throws {
@@ -28,7 +24,6 @@ struct SidebarRowDropStoreTests {
         expectSplitRules(store)
     }
 
-    /// As its row's Open in split below does.
     @Test func aSessionWithNoTabResumesBelowTheSelectedTab() throws {
         let sandbox = try TerminalEngineLaunchSandbox(engine: .swiftTerm)
         defer { sandbox.tearDown() }
@@ -76,7 +71,6 @@ struct SidebarRowDropStoreTests {
         let store = sandbox.makeStore(listing: [conversation])
         let row = SidebarDraggedRow.session(conversation)
 
-        // No tabs open at all, then a tab open but the preview shown.
         #expect(store.dropPlace(for: row, at: .split(.right, .sideBySide)) == .wholeArea)
         let other = open(store, makePlainTab(in: sandbox))
         store.selectTerminal(nil)
@@ -137,7 +131,6 @@ struct SidebarRowDropStoreTests {
         try #require(otherWindow.runningTerminal(for: elsewhere) != nil)
         store.launch(here, action: .resume)
 
-        // Its tab is the selected one; another window's tab runs it; a subagent's session is only read.
         #expect(store.dropPlace(for: .session(here), at: .split(.left, .sideBySide)) == nil)
         #expect(store.dropPlace(for: .session(elsewhere), at: .split(.left, .sideBySide)) == nil)
         #expect(store.dropPlace(for: .session(subagent), at: .split(.left, .sideBySide)) == nil)
@@ -179,7 +172,6 @@ struct SidebarRowDropStoreTests {
         let first = open(store, makePlainTab(in: sandbox))
         let second = open(store, makePlainTab(in: sandbox))
 
-        // The selected tab itself shows already.
         #expect(store.dropPlace(for: .openTab(second.id), at: .wholeArea) == nil)
         #expect(store.dropPlace(for: .openTab(first.id), at: .wholeArea) == .wholeArea)
         store.showDroppedRow(.openTab(first.id), at: .wholeArea)
@@ -189,14 +181,11 @@ struct SidebarRowDropStoreTests {
         #expect(store.terminalSplits.isEmpty)
     }
 
-    // MARK: - Helpers
-
     private func open(_ store: ConversationStore, _ tab: TerminalSession) -> TerminalSession {
         store.openTerminal(tab)
         return tab
     }
 
-    /// A terminal tab in the sandbox's project, which runs nothing.
     private func makePlainTab(in sandbox: TerminalEngineLaunchSandbox) -> TerminalSession {
         TerminalSession(
             engine: .swiftTerm,

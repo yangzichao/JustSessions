@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The New session items an AppKit menu lists, such as a terminal's Split right and Split down: as the SwiftUI menus
-/// list them, one per CLI found, with its icon, or a line saying none was found.
 @MainActor
 struct NewSessionProviderMenuItemsTests {
     @Test func eachCLIFoundIsAnItemWithItsIconThatStartsIt() throws {

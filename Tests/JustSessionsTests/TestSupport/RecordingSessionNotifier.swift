@@ -2,7 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// Stands in for macOS notifications: keeps what the store would post.
 @MainActor
 final class RecordingSessionNotifier: SessionNotifying {
     var isApplicationActive = false

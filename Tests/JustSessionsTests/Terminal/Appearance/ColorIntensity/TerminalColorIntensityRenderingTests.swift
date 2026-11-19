@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A SwiftTerm terminal draws the ANSI colors at the chosen **Color intensity**.
 @MainActor
 struct TerminalColorIntensityRenderingTests {
     private static let hideCursor = "\u{1B}[?25l"

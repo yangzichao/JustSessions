@@ -10,7 +10,6 @@ struct OpenCodeConversationOutlineTests {
         let database = fixture.database
         let sessionID = "ses_prefix_proof"
         try database.addSession(sessionID)
-        // Cross the digest staging-buffer boundary and include a column larger than that buffer.
         try database.addUserPrompts(
             (0..<600).map {
                 $0 == 100 ? String(repeating: "Café 🧪 ", count: 20_000) : "Original message \($0)"
@@ -31,7 +30,6 @@ struct OpenCodeConversationOutlineTests {
         #expect(streamed.decodedRecordCount == 1)
         #expect(streamed.outline.blocks.last?.snippet == "Completely rewritten final reply")
 
-        // Keep timestamps and the final anchor unchanged: only hashing the retained visible columns detects this.
         try database.execute(
             "UPDATE part SET data = ? WHERE message_id = ?", [#"{"type":"text","text":"Rewritten earlier message"}"#, "msg_000050"])
         let rewritten = try OpenCodeConversationOutline.read(conversation, extending: streamed.outline, prefix: streamed.prefix)

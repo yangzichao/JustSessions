@@ -1,9 +1,5 @@
 import Foundation
 
-/// A stand-in for Antigravity CLI, which tells what it does only in its conversation database; see
-/// `AntigravityTurnStateReader`. It takes the conversation id after `--conversation`, and otherwise behaves as
-/// `StandInActivityCLI`: a line typed in its terminal adds a prompt step, and the turn's end the test writes adds a
-/// response and the ended execution's row, or a command step waiting for approval. The next line typed allows it.
 extension StandInActivityCLI {
     static let antigravity = #"""
         #!/bin/sh

@@ -3,8 +3,6 @@ import XCTest
 
 @testable import JustSessions
 
-/// One Claude Code, Pi, or Codex tab whose CLI appends names to a file in the app's temporary folder, as the tool does:
-/// the session's own file, or Codex's `session_index.jsonl`.
 @MainActor
 final class AppendedSessionNameWorld: SessionTabWorld {
     let app: ScenarioApp
@@ -26,7 +24,6 @@ final class AppendedSessionNameWorld: SessionTabWorld {
         await app.store.followAppendedSessionNames(readers: readers, codexDirectory: codexDirectory)
     }
 
-    /// The tab opens on a listed session whose file exists, and the app takes its first look at that file.
     func openTab(on label: String) async throws {
         try await app.listSession(labeled: label)
         let conversation = try app.listedConversation(labeled: label)
@@ -52,7 +49,6 @@ final class AppendedSessionNameWorld: SessionTabWorld {
         app.store.rename(conversation, to: name)
     }
 
-    /// Appends the line the tool writes for `name`, for the tab's session or `sessionID`, then follows once.
     func cliAppendsName(_ name: String, forSessionID sessionID: String? = nil) async throws {
         let conversation = try XCTUnwrap(tab?.conversation)
         let record: [String: Any] =

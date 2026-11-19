@@ -59,7 +59,6 @@ struct KiroConversationDeletionTests {
             try fixture.delete(runningScript: "#!/bin/sh\nexec /bin/sleep 600\n", timeout: 0.5)
         }
 
-        // Well short of the stand-in's 600 seconds, so the time limit, not the CLI ending, stopped the wait.
         #expect(clock.now - startedAt < .seconds(120))
         #expect(FileManager.default.fileExists(atPath: fixture.conversation.sourceFile.path))
         #expect(FileManager.default.fileExists(atPath: fixture.metadataFile.path))
@@ -106,7 +105,6 @@ struct KiroConversationDeletionTests {
                     .appendingPathComponent("\(fixture.conversation.sessionID).\(retainedExtension)").path))
     }
 
-    /// Kiro CLI 2.34.0 keeps a session a running CLI holds and says it deleted it, so the app doesn't ask it.
     @Test func aSessionARunningCLIHoldsIsNotHandedToKiro() throws {
         let fixture = try KiroHomeFixture()
         defer { fixture.remove() }
@@ -123,7 +121,6 @@ struct KiroConversationDeletionTests {
         #expect(FileManager.default.fileExists(atPath: fixture.metadataFile.path))
     }
 
-    /// A CLI that ended without removing its lock, as after a crash, doesn't stop the deletion, and its lock goes too.
     @Test func theLockOfACLIThatEndedDoesNotStopTheDeletionAndGoesWithIt() throws {
         let fixture = try KiroHomeFixture()
         defer { fixture.remove() }
@@ -136,7 +133,6 @@ struct KiroConversationDeletionTests {
         #expect(!FileManager.default.fileExists(atPath: lockFile.path))
     }
 
-    /// Kiro leaves `<id>.history`, the prompts typed in the session; it goes with the session, and another's stays.
     @Test func thePromptsKiroLeavesGoWithTheSession() throws {
         let fixture = try KiroHomeFixture()
         defer { fixture.remove() }

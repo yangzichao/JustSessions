@@ -2,11 +2,6 @@ import Dispatch
 
 @testable import JustSessions
 
-/// A tmux session's history whose tmux answers each search step with the next of `countOutputs`, and each other
-/// command with nothing. It records every command it was given; `holdsFirstCommand` keeps the first one waiting until
-/// `releaseFirstCommand()`, as a slow SSH host would. It waits with no timer: the release runner's main actor can stall
-/// for over 30 seconds, and a hold that ran out then answered before the test had typed the searches that replace it.
-/// A test that holds releases in a `defer`, so a failing one doesn't leave the command's thread waiting.
 final class ScriptedTmuxHistory: @unchecked Sendable {
     let sessionName = "justsessions-terminal-a1b2c3d4"
     private let countOutputs: LockedValue<[String?]>
@@ -21,7 +16,6 @@ final class ScriptedTmuxHistory: @unchecked Sendable {
 
     var commands: [[String]] { recordedCommands.value }
 
-    /// The text each search step looked for, in the order tmux ran them.
     var searchedTexts: [String] {
         commands.compactMap { command in
             command.firstIndex(of: "search-backward-text").map { command[$0 + 1] }
@@ -36,8 +30,6 @@ final class ScriptedTmuxHistory: @unchecked Sendable {
         firstCommandRelease.signal()
     }
 
-    /// A count line as tmux prints it, with nothing for a count it didn't keep. `foundAny` is whether the search found
-    /// any, by default whether it counted any.
     static func countLine(_ total: Int?, partial: Bool = false, foundAny: Bool? = nil) -> String {
         let found = (foundAny ?? total.map { $0 > 0 }).map { $0 ? "1" : "0" } ?? ""
         return

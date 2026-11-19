@@ -15,7 +15,6 @@ struct PiSessionNameScanTests {
         try handle.write(contentsOf: Data(text.utf8))
     }
 
-    /// Prompts that add up to well past the 256 KB a session's end was read for its name.
     private var manyPrompts: [String] {
         (0..<2_000).map { PiSessionFolderFixture.userMessage("Prompt \($0) " + String(repeating: "x", count: 150)) }
     }
@@ -39,7 +38,6 @@ struct PiSessionNameScanTests {
         let file = directory.appendingPathComponent("session.jsonl")
         try writeLines([PiSessionFolderFixture.sessionName("Written before"), PiSessionFolderFixture.userMessage("Hi")], to: file)
         let firstScan = try #require(PiSessionNameScan.scan(file, continuing: nil))
-        // A name only the kept scan has shows that the lines it covered were not read again.
         let kept = PiSessionNameScan(latestName: "Kept", scannedByteCount: firstScan.scannedByteCount, endingBytes: firstScan.endingBytes)
 
         #expect(PiSessionNameScan.scan(file, continuing: kept)?.latestName == "Kept")

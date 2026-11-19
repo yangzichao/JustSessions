@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Hosts list their sessions at different times; each reopened tab still lands in its saved place.
 struct PendingTabReopeningTests {
     private func tabs(_ count: Int) -> [ReopenableTerminalTab] {
         (0..<count).map { ReopenableTerminalTab(conversationID: "claude:\($0)", projectDirectoryKey: "/p", wasSelected: false) }

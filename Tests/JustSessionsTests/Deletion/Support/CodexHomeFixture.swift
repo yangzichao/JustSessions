@@ -2,7 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// A Codex home folder with one saved session, deleted by a stand-in `codex` whose script the test writes.
 struct CodexHomeFixture {
     let root: URL
     let codexDirectory: URL
@@ -29,7 +28,6 @@ struct CodexHomeFixture {
         FileManager.default.fileExists(atPath: conversation.sourceFile.path)
     }
 
-    /// Installs `script` as `codex` and deletes `conversation`, or the fixture's own session, with it.
     func delete(_ conversation: Conversation? = nil, runningScript script: String, timeout: TimeInterval = 60) throws {
         let fakeCodex = try writeExecutableScript(script, to: root.appendingPathComponent("codex"))
         try CodexConversationDeletion(codexDirectory: codexDirectory, executableURL: fakeCodex, timeout: timeout)

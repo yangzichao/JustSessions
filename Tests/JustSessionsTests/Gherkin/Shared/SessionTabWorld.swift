@@ -3,18 +3,14 @@ import XCTest
 
 @testable import JustSessions
 
-/// One scenario's app and the one tab whose CLI the scenario drives. Each tool's steps keep their own world; the steps
-/// every tab feature shares reach it through `CurrentSessionTabWorld`.
 @MainActor
 protocol SessionTabWorld: AnyObject {
     var app: ScenarioApp { get }
     var tab: TerminalSession? { get }
-    /// What the app does every second to keep the tab with the session its CLI is in.
     func followTheCLIOnce() async
 }
 
 extension SessionTabWorld {
-    /// Follows the CLI as the app does every second, until `condition` holds or time runs out.
     func keepFollowingTheCLI(until condition: () -> Bool) async throws -> Bool {
         let clock = ContinuousClock()
         let deadline = clock.now + ScenarioApp.timeout
@@ -27,7 +23,6 @@ extension SessionTabWorld {
     }
 }
 
-/// The world of the scenario that runs, made by the first step that needs it and torn down after the scenario.
 @MainActor
 enum CurrentSessionTabWorld {
     private static var world: (any SessionTabWorld)?

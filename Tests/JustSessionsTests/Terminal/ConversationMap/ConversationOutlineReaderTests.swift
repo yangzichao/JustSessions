@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab's outline as its file changes (TAB-10, PERF-89): extended from the last block's record when the file grew, read
-/// in full when it was cut, rewritten, or left its Pi branch; and ⌘D's newest message (TRM-74).
 struct ConversationOutlineReaderTests {
     @Test func anEarlierAntigravityStepRewriteRebuildsTheOutline() async throws {
         let directory = try makeTemporaryDirectory()
@@ -29,7 +27,6 @@ struct ConversationOutlineReaderTests {
         let original = String(decoding: try Data(contentsOf: fixture.file), as: UTF8.self)
         let replacement = Data(original.replacingOccurrences(of: "Message 0,", with: "Rewritten first message 0,").utf8)
         try replacement.write(to: fixture.file, options: atomic ? .atomic : [])
-        // ⌘D shares the source but must not consume the outline's rewrite detection.
         #expect(try await reader.latestMessage()?.id == TranscriptPageIdentity.entryID(record: 599, part: 0))
         let updated = try #require(try await reader.update())
         #expect(updated.blocks.first?.snippet.hasPrefix("Rewritten first message 0") == true)
@@ -146,7 +143,6 @@ struct ConversationOutlineReaderTests {
         #expect(sameLength.blocks.last?.snippet.hasPrefix("Rewrote 599") == true)
         #expect(sameLength == (try await Self.fullRead(fixture.conversation)))
 
-        // Every record rewritten, one longer: the record read again no longer starts as its block did.
         try Data(
             original.replacingOccurrences(of: "Message ", with: "Edited ").replacingOccurrences(
                 of: "Edited 599", with: "Edited 599, longer"
@@ -275,7 +271,6 @@ struct ConversationOutlineReaderTests {
 }
 
 extension TranscriptPagingFixture {
-    /// Appends to the file in place, keeping its inode, as a CLI writes its log.
     func append(_ data: Data) throws {
         let handle = try FileHandle(forWritingTo: file)
         defer { try? handle.close() }

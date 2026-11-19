@@ -32,8 +32,6 @@ struct PiSessionsDirectoryTests {
         #expect(fromEnvironment.path == "/srv/pi")
     }
 
-    /// A mirrored SSH host can hold links and pipes named like sessions. Listing never opens a file, so a pipe that
-    /// slipped through would only show up here, not hang the test.
     @Test func listsOnlyPlainSessionFiles() throws {
         let sessionsDirectory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: sessionsDirectory) }

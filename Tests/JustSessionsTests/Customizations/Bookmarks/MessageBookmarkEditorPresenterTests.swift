@@ -46,7 +46,6 @@ struct MessageBookmarkEditorPresenterTests {
         try await expectEventually { window.attachedSheet == nil }
     }
 
-    /// The click-outside watcher is added only while the editor is asked for (performance.md item 34), and still closes it.
     @Test func aClickOnTheWindowAroundTheEditorClosesIt() async throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

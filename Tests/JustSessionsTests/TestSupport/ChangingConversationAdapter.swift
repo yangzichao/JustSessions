@@ -2,7 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// Sessions of one tool that a test can add to between refreshes, as a running CLI writes new ones.
 final class ChangingConversationAdapter: ConversationAdapter, @unchecked Sendable {
     let provider: ConversationProvider
     private let lock = NSLock()

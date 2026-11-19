@@ -4,16 +4,10 @@ import Testing
 
 @testable import JustSessions
 
-/// Readers showing the same image share one decode and its result, a view that goes away stops waiting without
-/// stopping the others, and an image that can't be decoded is tried again next time.
 struct TranscriptImageDecoderTests {
-    /// The decode holds until both views wait on it, so the second view can only have joined the decode under way,
-    /// however busy the machine is. The images are kept where nothing lets them go, as `NSCache` may when memory runs
-    /// low, so reopening can only find the stored result.
     @Test(.oneHeldThreadAtATime) func viewsAskingForTheSameBytesShareOneDecodeAndItsResult() async throws {
         let counter = DecodeCounter(delay: .zero, holdsUntilReleased: true)
         let decoder = TranscriptImageDecoder(storage: ImagesKeptUntilRemoved(), decode: counter.decode)
-        // Two readers read the image into their own `Data`.
         let first = TranscriptImage(base64Encoded: SampleTranscriptImage.base64)
         let second = TranscriptImage(base64Encoded: SampleTranscriptImage.base64)
 
@@ -40,8 +34,6 @@ struct TranscriptImageDecoderTests {
         #expect(counter.count == 2)
     }
 
-    /// The decode holds until the test lets it go, so the view leaves while the decode is under way, however busy
-    /// the machine is.
     @Test(.oneHeldThreadAtATime) func aViewThatGoesAwayStopsWaitingAndTheOthersStillGetTheImage() async throws {
         let counter = DecodeCounter(delay: .zero, holdsUntilReleased: true)
         let decoder = TranscriptImageDecoder(cacheByteLimit: 1 << 20, decode: counter.decode)
@@ -51,7 +43,6 @@ struct TranscriptImageDecoderTests {
         let staying = Task { await decoder.image(for: image, maximumPixelSize: 1_600) }
         try await expectEventually { counter.count == 1 }
         leaving.cancel()
-        // If the view kept waiting, releasing the decode after a while makes the test fail instead of hang.
         let releaseAnyway = Task {
             try await Task.sleep(for: .seconds(5))
             counter.release()
@@ -91,8 +82,6 @@ private final class ImagesKeptUntilRemoved: TranscriptImageStorage {
     func removeAll() { images.removeAll() }
 }
 
-/// Stands in for ImageIO: counts decodes and makes a new image for each, after `delay`, or once `release()` is called
-/// with `holdsUntilReleased`.
 private final class DecodeCounter: @unchecked Sendable {
     private let lock = NSLock()
     private var decodeCount = 0

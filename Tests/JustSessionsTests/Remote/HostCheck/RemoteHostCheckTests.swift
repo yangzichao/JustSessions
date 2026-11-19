@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The check's steps, with `ssh` stood in for: the login, the shell startup, then the script.
 struct RemoteHostCheckTests {
     static let shellStartupWorks = "__JUSTSESSIONS_SHELL_STARTUP_OK__\r\n"
 
@@ -79,7 +78,6 @@ struct RemoteHostCheckTests {
         #expect(scriptCommand.contains("\"$SHELL\" -lc "))
     }
 
-    /// For the sheet, which shows the step that runs.
     @Test func tellsOfEachStepAsItStarts() {
         let recorder = RemoteCommandRecorder()
         var steps: [HostCheckStep] = []
@@ -103,12 +101,10 @@ struct RemoteHostCheckTests {
         )
 
         #expect(steps == [.logIn, .shellStartup, .cliLookup, .hostCommand])
-        // Each step is told of before its command runs: the login's, the lookup's, then the script's.
         #expect(commandCountByStep == [.logIn: 0, .shellStartup: 1, .cliLookup: 1, .hostCommand: 2])
         #expect(recorder.commands.count == 3)
     }
 
-    /// A check the app runs on its own takes the kept shell startup result, so it has no such step.
     @Test func aCheckThatTakesTheKeptShellStartupSkipsItsStep() {
         let recorder = RemoteCommandRecorder()
         var steps: [HostCheckStep] = []
@@ -150,7 +146,6 @@ struct RemoteHostCheckTests {
         #expect(outcome.shellStartupResult?.outcome == .interactiveStartupWorks)
     }
 
-    /// The check looks up the CLIs as a refresh does, checks each where tabs start it, and hands the store what it found.
     @Test func checksEachCLIWhereTheLookupFoundIt() throws {
         let recorder = RemoteCommandRecorder()
         let installedClaude = "/home/me/.claude/local/claude"

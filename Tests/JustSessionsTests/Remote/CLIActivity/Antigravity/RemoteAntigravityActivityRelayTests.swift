@@ -35,7 +35,6 @@ struct RemoteAntigravityActivityRelayTests {
         }
     }
 
-    /// A turn whose first step came before the CLI started was left open by an earlier CLI, as on this Mac.
     @Test func aTurnAnEarlierCLILeftOpenIsIdle() throws {
         guard let sandbox = try Self.sandboxWithAntigravity() else { return }
         defer { sandbox.tearDown() }
@@ -129,7 +128,6 @@ struct RemoteAntigravityActivityRelayTests {
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
         try agyStandIn.write(to: sandbox.root.appendingPathComponent("agy-stand-in.py"), atomically: true, encoding: .utf8)
         try sandbox.addProgram(named: "agy", script: #"exec python3 "$HOME/agy-stand-in.py""#)
-        // The stand-in's own state starts the relay's first reads at idle, as a conversation that just resumed.
         try setState("idle", in: sandbox)
         return sandbox
     }

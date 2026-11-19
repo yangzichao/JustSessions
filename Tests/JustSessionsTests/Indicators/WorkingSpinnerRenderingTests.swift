@@ -5,18 +5,13 @@ import Testing
 
 @testable import JustSessions
 
-/// The working spinner draws its arc in the live status color of each appearance, from a Core Animation layer: the
-/// hosting view renders it once, and the turning costs SwiftUI nothing. Held still, the arc covers the same pixels
-/// the SwiftUI arc it replaced did. Set `JUSTSESSIONS_THEME_SCREENSHOTS` to a directory to keep the renderings.
 @MainActor
 struct WorkingSpinnerRenderingTests {
-    /// The indicator's 10 points and 7 points of padding above and below; the width fits the content.
     private static let size = CGSize(width: 40, height: 24)
     private static let swatchSide: CGFloat = 8
 
     @Test(arguments: [ColorScheme.light, .dark])
     func theArcDrawsInTheLiveColorOfTheAppearance(colorScheme: ColorScheme) async throws {
-        // A swatch of the live color beside the spinner, captured the same way, gives the color to look for.
         let fixture = ThemeSurfaceRenderingFixture(
             content: AnyView(
                 HStack(spacing: 8) {
@@ -35,7 +30,6 @@ struct WorkingSpinnerRenderingTests {
         let bitmap = try await fixture.capture(named: "working-spinner-\(schemeName)")
 
         let scale = Double(bitmap.pixelsHigh) / Self.size.height
-        // The swatch's center: past the padding, the indicator, and the spacing, then half the swatch.
         let swatchCenter = try #require(bitmap.colorAt(x: Int(29 * scale), y: Int(12 * scale))).sRGBHexValue
         let liveHexValue = try #require(swatchCenter)
         let corner = try #require(bitmap.colorAt(x: 0, y: 0)).sRGBHexValue
@@ -51,15 +45,10 @@ struct WorkingSpinnerRenderingTests {
         }
         let swatchPixels = Self.swatchSide * Self.swatchSide * scale * scale
         #expect(Double(livePixels) > swatchPixels, "\(schemeName): the arc is drawn in the live color")
-        // A 1.6-point stroke covers few pixels whole on a 1x screen, as GitHub's runners have, so the arc is measured
-        // by how much of each pixel the live color covers. An 8-point ring 1.6 points thick is about 40 square points;
-        // the arc is 72 % of it.
         let arcArea = (liveCoverage - swatchPixels) / (scale * scale)
         #expect(arcArea > 20 && arcArea < 38, "\(schemeName): only the arc is drawn (\(arcArea) square points)")
     }
 
-    /// Held still, as with Reduce Motion, the layer's arc covers the pixels the SwiftUI arc it replaced covered: the
-    /// same trim, stroke, and starting point, so the gap sits in the same place.
     @Test func theStillArcCoversThePixelsTheSwiftUIArcDid() async throws {
         let side: CGFloat = 24
         func render(_ content: AnyView, named name: String) async throws -> NSBitmapImageRep {
@@ -95,12 +84,10 @@ struct WorkingSpinnerRenderingTests {
                 if expectedInk != actualInk { mismatches += 1 }
             }
         }
-        // Antialiasing differs along the edges between the two renderers; the arc's body and gap must not.
         #expect(inkPixels > 0)
         #expect(mismatches <= inkPixels / 4, "\(mismatches) of \(inkPixels) arc pixels differ from the SwiftUI arc")
     }
 
-    /// No view animates with a per-frame `TimelineView`: every tick would re-render the window's whole hosting view.
     @Test func noViewTicksATimelineEveryFrame() throws {
         let perFrameTimeline = try Regex(#"TimelineView\s*\(\s*\.animation"#)
         let offendingFiles = try ViewSourceLines().files
@@ -110,12 +97,10 @@ struct WorkingSpinnerRenderingTests {
         #expect(offendingFiles.isEmpty, "Animate in a Core Animation layer instead; see WorkingSpinner: \(offendingFiles)")
     }
 
-    /// Within rounding of a channel, as antialiasing and color management round the solid stroke.
     private func matches(_ color: UInt32, _ reference: UInt32) -> Bool {
         [16, 8, 0].allSatisfy { shift in abs(Int((color >> shift) & 0xFF) - Int((reference >> shift) & 0xFF)) <= 6 }
     }
 
-    /// How much of `color` is `reference` laid over `background`, from 0 to 1, as antialiasing blends an edge pixel.
     private func share(of reference: UInt32, over background: UInt32, in color: UInt32) -> Double {
         func channels(_ value: UInt32) -> [Double] { [16, 8, 0].map { shift in Double((value >> shift) & 0xFF) } }
         let towardReference = zip(channels(reference), channels(background)).map { $0 - $1 }

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A CLI unticked under **Show sessions from** in Settings → General is treated as not installed: its sessions leave
-/// the sidebar, its counts, search, and filter menu, and New session stops offering it, in every window.
 @MainActor
 struct HiddenConversationProvidersTests {
     @Test func aHiddenCLIsSessionsLeaveTheSidebarAndComeBackWhenShownAgain() throws {
@@ -20,14 +18,12 @@ struct HiddenConversationProvidersTests {
         store.setHidden(true, provider: .kiro)
 
         #expect(store.sidebarConversations.map(\.id) == [claudeSession.id])
-        // The project only Kiro CLI worked in leaves too, rather than staying as an empty project.
         #expect(store.sidebarProjectGroups.map(\.projectPath) == ["/work/app"])
         #expect(store.sidebarProjectGroups.first?.conversations.map(\.id) == [claudeSession.id])
         let filtered = store.filteredSidebarProjection(providerFilter: .all, recencyFilter: .all, searchText: "")
         #expect(filtered.allSessionCount == 1)
         #expect(filtered.listedConversationIDs == [claudeSession.id])
         #expect(!store.filterableProviders.contains(.kiro))
-        // The session itself is still known, so an open tab on it keeps its title and link.
         #expect(store.conversation(withID: kiroSession.id)?.id == kiroSession.id)
 
         store.setHidden(false, provider: .kiro)

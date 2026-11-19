@@ -99,7 +99,6 @@ struct OpenCodeRemoteMirrorTests {
         try FileManager.default.removeItem(at: fixture.hostDatabase.file)
         let destination = fixture.mirrorDatabase.deletingLastPathComponent()
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
-        // No python3 on this PATH: the command must stop before needing it.
         let runner = fixture.runner(environment: ["PATH": fixture.binaryDirectory.path + ":/bin"])
 
         let result = try #require(runner.run("devbox", OpenCodeRemoteSnapshotCommand.create(on: "devbox"), 30))
@@ -123,7 +122,6 @@ struct OpenCodeRemoteMirrorTests {
             try OpenCodeRemoteSessionMirror(runner: recorder.runner(answering: (0, "JUSTSESSIONS_OPENCODE_SNAPSHOT=/etc")))
                 .synchronize(host: "devbox", destination: destination)
         }
-        // Neither attempt reached rsync or removed anything on the host.
         #expect(recorder.commands.count == 2)
     }
 

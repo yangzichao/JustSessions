@@ -20,8 +20,6 @@ struct TranscriptImageTests {
         #expect(decoded?.height == 1)
     }
 
-    /// Session files hold base64 the CLI wrote; text that is not an image still reads as an entry, shown as
-    /// unavailable rather than hiding that something was there.
     @Test func dataThatIsNotAnImageHasNoSizeAndDoesNotDecode() {
         let notAnImage = TranscriptImage(base64Encoded: "AAAA")
         let notBase64 = TranscriptImage(base64Encoded: "not base64!")

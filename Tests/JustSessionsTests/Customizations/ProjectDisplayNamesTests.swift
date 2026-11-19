@@ -63,7 +63,6 @@ struct ProjectDisplayNamesTests {
         #expect(groups.map(\.folderName) == ["example-project"])
     }
 
-    /// The folder name comes from the key's text: an SSH key isn't a path on this Mac.
     @Test(arguments: [
         ("ssh://devbox/home/me/api", "api"),
         ("ssh://devbox/home/me/api/", "api"),

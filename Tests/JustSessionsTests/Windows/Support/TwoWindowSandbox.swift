@@ -2,9 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// Two workspace windows' stores sharing one window registry, both listing the same Claude Code sessions of one
-/// project on this Mac. Neither finds tmux. A tab a test opens runs nothing until it is started, so its CLI counts as
-/// running until the test ends it.
 @MainActor
 struct TwoWindowSandbox {
     let root: URL
@@ -15,8 +12,6 @@ struct TwoWindowSandbox {
     let second: ConversationStore
     private let isolatedUserDefaults: IsolatedUserDefaults
 
-    /// A test whose refresh of an SSH host fails passes a `remoteShellStartupCheck` that runs nothing, as the failed
-    /// refresh checks how the host's shell starts.
     init(sessionCount: Int = 1, remoteShellStartupCheck: RemoteShellStartupCheck = RemoteShellStartupCheck()) throws {
         root = try makeTemporaryDirectory()
         project = root.appendingPathComponent("project")
@@ -56,8 +51,6 @@ struct TwoWindowSandbox {
 
     var conversation: Conversation { conversations[0] }
 
-    /// A Claude Code session on the SSH host `devbox`, listed in both windows. Its tabs name a tmux session, as tabs
-    /// on any SSH host do.
     func listSSHSession() -> Conversation {
         let conversation = Conversation.fixture(projectPath: "/srv/project", host: .ssh("devbox"))
         for store in [first, second] {
@@ -67,8 +60,6 @@ struct TwoWindowSandbox {
         return conversation
     }
 
-    /// Resumes the session in `store`'s window and returns its tab, leaving no tab selected there, as when another
-    /// tab or a preview shows.
     func openTab(of conversation: Conversation, in store: ConversationStore) -> TerminalSession? {
         store.launch(conversation, action: .resume)
         let tab = store.runningTerminal(for: conversation)

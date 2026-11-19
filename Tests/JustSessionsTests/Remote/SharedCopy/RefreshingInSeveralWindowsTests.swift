@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Windows refreshing an SSH host at once, as Connect has them do, copy it once: the windows whose refresh was asked
-/// for before the copy started list it, or show its failure, instead of copying the host again (PERF-26).
 @MainActor
 @Suite(.oneHeldThreadAtATime)
 struct RefreshingInSeveralWindowsTests {
@@ -26,7 +24,6 @@ struct RefreshingInSeveralWindowsTests {
         }
     }
 
-    /// The host may have changed since the copy started.
     @Test func aRefreshAskedForWhileAnotherWindowCopiesCopiesAgainAfterIt() async throws {
         let sandbox = try TwoWindowSandbox(remoteShellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in nil }))
         defer { sandbox.tearDown() }
@@ -60,7 +57,6 @@ struct RefreshingInSeveralWindowsTests {
         #expect(sandbox.first.hostRefreshStatuses[.ssh("devbox")] == sandbox.second.hostRefreshStatuses[.ssh("devbox")])
     }
 
-    /// The copying window's refresh no longer counts, as when its window closes, so its copy stands for nothing.
     @Test func aCanceledCopyLeavesTheWaitingRefreshToCopy() async throws {
         let sandbox = try TwoWindowSandbox(remoteShellStartupCheck: RemoteShellStartupCheck(run: { _, _, _ in nil }))
         defer { sandbox.tearDown() }
@@ -86,8 +82,6 @@ struct RefreshingInSeveralWindowsTests {
         #expect(waitingWindowCopies.count == 1)
     }
 
-    /// Both windows list `devbox`, disconnected unless told otherwise, whose home holds one Claude Code session. Its
-    /// copies go through `copies`, or the second window's through `secondWindowCopies`. Returns the session's ID.
     private static func listDisconnectedHost(
         in sandbox: TwoWindowSandbox,
         copies: HostCopyGate,
@@ -126,8 +120,6 @@ extension ConversationStore {
     }
 }
 
-/// Counts the copies of the host, as each starts by looking up its tools' folders; can hold them until released, or
-/// fail them.
 private final class HostCopyGate: @unchecked Sendable {
     private let lock = NSLock()
     private let opened = DispatchSemaphore(value: 0)
@@ -148,7 +140,6 @@ private final class HostCopyGate: @unchecked Sendable {
             return !isOpen
         }
         if mustWait {
-            // Only the test opens the gate; parallel UI tests can delay its main-actor turn beyond a timeout.
             opened.wait()
             opened.signal()
         }
@@ -156,7 +147,6 @@ private final class HostCopyGate: @unchecked Sendable {
         return .standard
     }
 
-    /// Lets every held copy, and the later ones, go on.
     func release() {
         let wasOpen = lock.withLock {
             defer { isOpen = true }

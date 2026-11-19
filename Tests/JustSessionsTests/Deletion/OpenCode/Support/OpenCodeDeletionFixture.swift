@@ -2,14 +2,11 @@ import Foundation
 
 @testable import JustSessions
 
-/// An OpenCode data folder with one session to delete and one to keep, and a stand-in `opencode` CLI.
 struct OpenCodeDeletionFixture {
     static let selectedSessionID = "ses_selected00001"
     static let retainedSessionID = "ses_retained00001"
     static let subagentSessionID = "ses_subagent00001"
 
-    /// Deletes a session and its subagent sessions from `OPENCODE_DB` as `opencode session delete` does, and
-    /// reports an unknown session in color as OpenCode does.
     static let deletingScript = """
         #!/bin/sh
         [ "$1" = session ] && [ "$2" = delete ] || exit 2
@@ -42,7 +39,6 @@ struct OpenCodeDeletionFixture {
         try database.addUserPrompt("msg_retained", session: Self.retainedSessionID, createdAt: 1, text: "Keep me")
     }
 
-    /// The stand-in CLI; it first records its arguments, `OPENCODE_DB`, and working directory.
     func executable(running script: String = deletingScript) throws -> URL {
         let reporting = script.replacingOccurrences(
             of: "#!/bin/sh\n",

@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Pinned projects and sessions stay in the order you put them, through activity and a relaunch.
 @MainActor
 struct PinnedOrderInSidebarTests {
     @Test func activityDoesNotReorderPinnedProjectsButADragDoes() throws {

@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Copies from a local folder standing in for the remote home, with the same rsync filters used over SSH.
 struct RemoteSessionMirrorTests {
     @Test func mirrorsOnlySessionFilesAndListsThemAsRemote() throws {
         let root = try makeTemporaryDirectory()
@@ -38,7 +37,6 @@ struct RemoteSessionMirrorTests {
         #expect(!FileManager.default.fileExists(atPath: claudeMirror.appendingPathComponent("settings.json").path))
         #expect(!FileManager.default.fileExists(atPath: claudeMirror.appendingPathComponent("projects/-home-me-paper/subagents").path))
 
-        // A session deleted on the host disappears from the mirror on the next copy.
         try FileManager.default.removeItem(at: claudeProject.appendingPathComponent("\(claudeID).jsonl"))
         #expect(try discovery.discover(host: "devbox").map(\.sessionID) == [codexID])
     }

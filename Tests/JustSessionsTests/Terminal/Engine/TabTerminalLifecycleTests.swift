@@ -5,8 +5,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab's process runs the same way whichever engine draws its terminal: on a pseudo-terminal of the app's, as the
-/// app's child, with its output on screen, its terminal's size, its title on the tab, and its exit status.
 @MainActor
 struct TabTerminalLifecycleTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -22,7 +20,6 @@ struct TabTerminalLifecycleTests {
 
     @Test(arguments: TerminalEngine.allCases)
     func resizingTheTerminalResizesTheProcesssPseudoTerminal(_ engine: TerminalEngine) async throws {
-        // Reports its terminal's size as `SIZE:<rows> <columns>;` at the start and on each SIGWINCH.
         let fixture = try TabTerminalFixture(
             engine: engine,
             script: """
@@ -52,8 +49,6 @@ struct TabTerminalLifecycleTests {
 
         try await expectEventually { fixture.tab.hasExited }
         #expect(fixture.tab.exitCode == 3)
-        // Not whether it ended soon after starting: the tab counts from when the exit reaches the main thread, which
-        // took over 30 seconds on the release runner. `RemoteTabReconnectorTests` ends a tab itself to check that.
     }
 
     @Test(arguments: TerminalEngine.allCases)
@@ -140,7 +135,6 @@ private final class TabTerminalFixture {
         return TerminalGridSize(rows: rows, columns: columns)
     }
 
-    /// The grid the terminal lays its text out at: SwiftTerm's, or the viewport Ghostty last reported.
     var terminalSize: TerminalGridSize? {
         switch tab.terminalView {
         case let swiftTermView as SelectableTerminalView:

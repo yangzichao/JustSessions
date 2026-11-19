@@ -20,7 +20,6 @@ struct ConversationProviderInitialPromptTests {
         #expect(ConversationProvider.pi.initialPromptArguments("@notes.md") == [" @notes.md"])
     }
 
-    /// A start command of your own stands in for `kiro-cli chat`.
     @Test func kirosSubcommandIsLeftToAStartCommandOfYourOwn() {
         let arguments = ConversationProvider.kiro.initialPromptArguments("Fix it")
         #expect(ConversationProvider.kiro.argumentsAfterCustomStartCommand(arguments) == ["Fix it"])

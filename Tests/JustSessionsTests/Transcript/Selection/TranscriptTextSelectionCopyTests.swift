@@ -12,8 +12,6 @@ struct TranscriptTextSelectionCopyTests {
         )
     }
 
-    /// Paragraphs and messages are a blank line apart; list items and tool calls one per line; table cells a tab apart
-    /// in a row and a line apart between rows. A code block's final line break does not add to the blank line after it.
     @Test func joinsBlocksAsTheyRead() {
         let text = TranscriptTextSelectionCopy.text(of: [
             Self.piece(0, 0, .paragraph, "tail of the question", startsAtBlockStart: false),
@@ -48,7 +46,6 @@ struct TranscriptTextSelectionCopyTests {
                 """)
     }
 
-    /// A list item selected from partway through has no marker, and blocks with nothing selected add no separator.
     @Test func skipsMarkersOfPartialItemsAndEmptyPieces() {
         let text = TranscriptTextSelectionCopy.text(of: [
             Self.piece(0, 0, .paragraph, ""),

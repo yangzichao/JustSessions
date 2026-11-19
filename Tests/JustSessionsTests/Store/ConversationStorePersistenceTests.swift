@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// What the store keeps in settings comes back in the next store, as it would after relaunching the app.
 @MainActor
 struct ConversationStorePersistenceTests {
     @Test func customTitleSurvivesARelaunch() throws {

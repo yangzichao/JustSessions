@@ -29,7 +29,6 @@ struct SessionDeletionConfirmationTextTests {
         #expect(SessionDeletionConfirmationText.subagentSentences(for: plan) == expectedSentences)
     }
 
-    /// A session's subagent sessions are listed only under it, so every deletion message says they go with it.
     @Test func everyDeletionMessageNamesTheSubagentSessionsBeforeTheSkippedOnes() {
         let plan = SessionDeletionPlan(deletableConversations: [.fixture()], openTerminalCount: 1, deletedSubagentCount: 118)
         let subagents = "This also deletes 118 subagent sessions."
@@ -55,7 +54,6 @@ struct SessionDeletionConfirmationTextTests {
         #expect(SessionDeletionConfirmationText.buttonTitle(for: plan) == expectedTitle)
     }
 
-    /// A selection or project whose running sessions are closed and deleted says so in its button and message.
     @Test(
         arguments: [
             (1, 1, "Close and delete 1 session", "1 session is still running: its tab closes and its CLI ends first."),
@@ -181,8 +179,6 @@ struct SessionDeletionConfirmationTextTests {
                 == "Archive 2 projects and delete 1 session")
     }
 
-    /// The dialog used to say "Delete 1 sessions" and "0 with open terminals will be skipped." Every count is
-    /// checked for zeros and for stray spaces.
     @Test func noMessageMentionsZeroSessionsOrHasStraySpaces() {
         let locations = [ProjectLocation(host: .thisMac, path: "/p"), ProjectLocation(host: .ssh("devbox"), path: "/p")]
         for openTerminalCount in 0...3 {

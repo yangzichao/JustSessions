@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The Bookmarks menu and a message's right-click menu act on the reader the key window shows, and on nothing else.
 @MainActor
 struct TranscriptBookmarkTargetRegistryTests {
     private let registry = TranscriptBookmarkTargetRegistry()
@@ -27,7 +26,6 @@ struct TranscriptBookmarkTargetRegistryTests {
         #expect(registry.target(keyWindow: readerWindow) == nil)
     }
 
-    /// A sheet or dialog that has the keyboard, such as Remove all bookmarks?, gets nothing from the window behind it.
     @Test func aSheetOrOtherKeyWindowFindsNothing() {
         let readerWindow = window(showing: target())
         #expect(registry.target(keyWindow: readerWindow) != nil)
@@ -52,7 +50,6 @@ struct TranscriptBookmarkTargetRegistryTests {
         #expect(registry.target(for: NSView()) == nil)
     }
 
-    /// A workspace window holds the preview's reporter and the selected tab's (TRM-74); only one is active at a time.
     @Test func aSelectedTabAnswersAndThePreviewBehindItDoesNot() {
         var answered: [String] = []
         let workspaceWindow = plainWindow()

@@ -2,7 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Random sequences of appends. Whatever the sequence, the built transcript keeps the rules the preview relies on.
 struct TranscriptBuilderPropertyTests {
     private enum Step {
         case append(TranscriptBuilder.EntryKind, String)

@@ -47,7 +47,6 @@ struct ProjectParentLabelsTests {
         #expect(ProjectParentLabels.parentLabel(forFolderPath: "/app") == "/")
     }
 
-    /// Each labelled project's label, keyed by its folder path on its host.
     private func labelsByFolderPath(_ projects: [ProjectConversationGroup]) -> [String: String] {
         let labels = ProjectParentLabels(projectsOnOneHost: projects)
         return projects.reduce(into: [:]) { labelsByFolderPath, project in

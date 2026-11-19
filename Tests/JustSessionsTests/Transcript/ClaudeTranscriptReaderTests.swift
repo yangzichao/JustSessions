@@ -60,8 +60,6 @@ struct ClaudeTranscriptReaderTests {
         #expect(transcript.entries.first?.timestamp != nil)
     }
 
-    /// A pasted image follows the user's text in their turn; a tool's screenshot follows the call that produced
-    /// it in the assistant's turn.
     @Test func showsImagesFromUserMessagesAndToolResults() throws {
         let source: [String: Any] = ["type": "base64", "media_type": "image/png", "data": SampleTranscriptImage.base64]
         let file = try TranscriptTestFiles.write([

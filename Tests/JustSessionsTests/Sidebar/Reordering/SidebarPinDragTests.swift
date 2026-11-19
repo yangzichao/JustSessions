@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Rows 30 points tall, 1 apart, so row n spans 31n to 31n + 30 and its middle is at 31n + 15.
 struct SidebarPinDragTests {
     private let scope = SidebarPinDrag.Scope.projects(on: .thisMac)
 
@@ -80,7 +79,6 @@ struct SidebarPinDragTests {
 
     @Test func rowsOutOfSightStillCountAmongTheGaps() throws {
         let rows = rows(pinned: ["a", "b", "c", "d"], unpinned: [])
-        // "a" and "b" are scrolled out of sight above.
         let frames = frames(for: ["a", "b", "c", "d"]).filter { $0.key != "a" && $0.key != "b" }
         let drag = try #require(SidebarPinDrag(scope: scope, dragging: "d", rows: rows, rowFrames: frames, pointerY: 64))
 
@@ -103,7 +101,6 @@ struct SidebarPinDragTests {
         #expect(drag.translation == 42)
     }
 
-    /// As when dragged onto the terminals, which take the row instead.
     @Test func offTheListToEitherSideNothingLands() throws {
         var drag = try #require(makeDrag(of: "a", pinned: ["a", "b", "c"], unpinned: [], pointerY: 10))
 

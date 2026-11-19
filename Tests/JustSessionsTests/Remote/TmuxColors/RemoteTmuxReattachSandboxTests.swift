@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the reattach command against a real tmux on this Mac, with a private tmux server and home folder, and
-/// stand-ins for the host's login shell and CLI. Skipped where tmux is not installed.
 @Suite(.oneTmuxSandboxAtATime)
 struct RemoteTmuxReattachSandboxTests {
     @Test func theClientAttachesAgainAndTheCLIRunsOn() throws {

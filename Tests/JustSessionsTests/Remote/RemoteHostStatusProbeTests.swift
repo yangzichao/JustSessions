@@ -24,7 +24,6 @@ struct RemoteHostStatusProbeTests {
         #expect(status.installedProviders == [.codex, .opencode, .pi])
     }
 
-    /// A shell profile's lines come before the tmux heading, so a name it prints isn't taken for a session.
     @Test func readsTmuxSessionsBetweenTheirHeadingAndTheCLIs() {
         let output = """
             justsessions-codex-new-1a2b3c4d
@@ -41,7 +40,6 @@ struct RemoteHostStatusProbeTests {
         #expect(status.tmuxServerProblem == nil)
     }
 
-    /// As after tmux on the host was upgraded while sessions ran.
     @Test func keepsWhatTmuxPrintedWhenItCantReachItsServer() {
         let output = """
             \(RemoteHostStatusProbe.tmuxSessionsHeading)
@@ -69,7 +67,6 @@ struct RemoteHostStatusProbeTests {
         #expect(RemoteHostStatusProbe.status(inOutput: output).tmuxServerProblem == nil)
     }
 
-    /// A profile that prints the message before the heading isn't tmux's answer.
     @Test func aProfileLineBeforeTheTmuxHeadingIsNoProblem() {
         let output = """
             server exited unexpectedly
@@ -191,14 +188,12 @@ struct RemoteHostStatusProbeTests {
             timeout: 10
         )
 
-        // Other folders, such as `/opt/homebrew/bin`, may have this Mac's own CLIs.
         let probeOutput = try #require(output)
         let cliLocations = try #require(RemoteHostStatusProbe.status(inOutput: probeOutput).cliLocations)
         #expect(cliLocations[.codex] == .loginShell)
         #expect(cliLocations[.claude] == .installed(path: installFolder.appendingPathComponent("claude").path))
     }
 
-    /// With this Mac's bash as the login shell, whose startup file defines them, as a host's might.
     @Test func probeFindsAliasesAndFunctionsOfTheLoginShell() throws {
         let home = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: home) }

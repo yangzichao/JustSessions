@@ -4,14 +4,11 @@ import Testing
 
 @testable import JustSessions
 
-/// The same output in a Ghostty and a SwiftTerm terminal with the same appearance settings: cells of the same size, and
-/// text as large and as thick.
 @MainActor
 @Suite(.serialized)
 struct GhosttyTextMatchesSwiftTermTests {
     private static let frame = NSRect(x: 0, y: 0, width: 600, height: 120)
     private static let hideCursor = "\u{1B}[?25l"
-    /// See `TestMachine.isVirtual`.
     private static let drawnTextNeedsAMac: Comment = "Compares drawn text, which a virtual machine's GPU draws in other colors"
 
     @Test(arguments: [TerminalFontFamily.system, .named("Menlo"), .named("Courier New"), .named("PT Mono")], [10.0, 13, 17.5, 24])
@@ -81,14 +78,12 @@ struct GhosttyTextMatchesSwiftTermTests {
         }
     }
 
-    /// Regular, bold, italic, and bold italic.
     private static let styledLines =
         hideCursor
         + ["", "1", "3", "1;3"]
         .map { "\u{1B}[\($0)mHello, world: abcdefghij 0123456789 {}[]\u{1B}[0m" }
         .joined(separator: "\r\n")
 
-    /// Within 5%: without the matching, Ghostty's text was 13% lighter and its Chinese 14% heavier.
     private static func expectInk(
         of ghostty: DrawnTextLines, line: Int, near swiftTerm: DrawnTextLines, sourceLocation: SourceLocation = #_sourceLocation
     ) {
@@ -119,8 +114,6 @@ struct GhosttyTextMatchesSwiftTermTests {
         return (swiftTermLines, try #require(ghosttyLines))
     }
 
-    /// A terminal whose cells are sized for its window's screen. The shared controllers size them for the sharpest
-    /// screen, which the window may not be on.
     private static func ghosttyTerminal(
         stores: IsolatedAppearanceStores, backingScaleFactor: CGFloat, mode: TerminalAppearanceMode = .light
     ) -> GhosttyTestTerminal {

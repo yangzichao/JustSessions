@@ -7,23 +7,9 @@ import Testing
 @_silgen_name("proc_reset_footprint_interval")
 private func resetProcessFootprintInterval(_: pid_t) -> Int32
 
-/// Measures message search's text for a growing Codex session (issue #56): the baseline, which reads the session in
-/// full on every change in 5,000-entry pages and saves the first cache format, against resuming from the saved final
-/// page, as `Perf | <scenario> | <operation>, <path>: <metric> | <value>` lines. Both paths run in this build on two
-/// copies of the same log, alternating, three runs each, and each run of the new path is checked against a clean full
-/// read: entry IDs, segments, and the first match of several queries.
-///
-/// The steps mirror `SessionMessageIndex.searchableText`: look the session up in the cache, read it, save it, and fold
-/// it for searching. Memory is how far the physical footprint rose above where it started during the operation, from the
-/// kernel's footprint high-water mark, reset before it.
-///
-/// The suite records nothing unless `JUSTSESSIONS_PERF` is set:
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter IncrementalMessageSearchMeasurements
-/// `JUSTSESSIONS_PERF_FIXTURES` picks fixtures, such as `10,realistic`; all four run by default.
 @Suite(.serialized)
 struct IncrementalMessageSearchMeasurements {
     static let runCount = 3
-    /// Codex's limits before issue #56, which other providers keep.
     static let baselineLimits = SessionMessageTextReader.wholeSessionLimits
     static let queries = ["First Café", "first cafe", "中文", "🧪", "Appended", "bold words", "naïve"]
 
@@ -47,7 +33,6 @@ struct IncrementalMessageSearchMeasurements {
         let scenario = fixture == "realistic" ? "issue 56, realistic Codex log" : "issue 56, \(fixture) MiB synthetic Codex log"
         perfReport(scenario, "file", "\(size) bytes, \(records) records")
 
-        // Cold: nothing saved.
         var samples: [Path: [Sample]] = [:]
         for _ in 0..<Self.runCount {
             for session in sessions {
@@ -67,7 +52,6 @@ struct IncrementalMessageSearchMeasurements {
         }
         report(samples, scenario: scenario, operation: "unchanged hit")
 
-        // A session saved by a first read, without a resume state, that changes.
         samples = [:]
         var appended = 0
         for _ in 0..<Self.runCount {
@@ -121,7 +105,6 @@ struct IncrementalMessageSearchMeasurements {
         report(samples, scenario: scenario, operation: "amendment rebuild")
     }
 
-    /// Each session's search text is exactly a clean full read's, and its first matches are the same.
     private func check(_ sessions: [MeasuredSession], scenario: String) async throws {
         for session in sessions {
             let clean = try await SessionMessageTextReader.read(
@@ -182,7 +165,6 @@ struct IncrementalMessageSearchMeasurements {
             self.resumed = resumed
         }
 
-        /// The total of `samples`, and their highest memory.
         init(adding samples: [Sample]) {
             self.init(
                 wall: samples.map(\.wall).reduce(.zero, +), cpu: samples.map(\.cpu).reduce(.zero, +),
@@ -211,7 +193,6 @@ struct IncrementalMessageSearchMeasurements {
 
         func clearCache() { try? FileManager.default.removeItem(at: cacheDirectory) }
 
-        /// Gets the session's search text as this path does, timed.
         func measure() async throws -> Sample {
             _ = resetProcessFootprintInterval(getpid())
             let startFootprint = Self.footprint().current
@@ -229,7 +210,6 @@ struct IncrementalMessageSearchMeasurements {
             )
         }
 
-        /// `SessionMessageIndex.searchableText` before issue #56.
         private func baselineText() async throws -> (SearchableSessionText, SessionMessageTextRead?, Bool) {
             let fingerprint = SessionMessageTextFingerprint(conversation)
             if let saved = BaselineCache.text(at: cacheFile, for: conversation.id, fingerprint: fingerprint) {
@@ -242,7 +222,6 @@ struct IncrementalMessageSearchMeasurements {
             return (SearchableSessionText(read.text), read, true)
         }
 
-        /// The steps of `SessionMessageIndex.searchableText`, keeping what the read took.
         private func resumableText() async throws -> (SearchableSessionText, SessionMessageTextRead?, Bool) {
             let fingerprint = SessionMessageTextFingerprint(conversation)
             let read: SessionMessageTextRead
@@ -275,7 +254,6 @@ struct IncrementalMessageSearchMeasurements {
             try handle.write(contentsOf: Data((line + "\n").utf8))
         }
 
-        /// Changes one byte of the first record, keeping the file's size and inode.
         func amendFirstMarker(to replacement: Character) throws {
             let handle = try FileHandle(forUpdating: file)
             defer { try? handle.close() }
@@ -303,7 +281,6 @@ struct IncrementalMessageSearchMeasurements {
         }
     }
 
-    /// The cache format before issue #56: the whole file is one JSON value, decoded to check its fingerprint.
     enum BaselineCache {
         private struct SavedText: Codable {
             let version: Int
@@ -328,7 +305,6 @@ struct IncrementalMessageSearchMeasurements {
         }
     }
 
-    /// The prototype's sparse log: one message, then groups of one message and 128 hidden 3.9 KB events.
     enum SyntheticFixture {
         static func write(sizeMiB: Int, to file: URL) throws {
             FileManager.default.createFile(atPath: file.path, contents: nil)
@@ -360,9 +336,6 @@ struct IncrementalMessageSearchMeasurements {
         }
     }
 
-    /// Shaped like a real 27 MiB Codex rollout: mostly tool calls, their outputs, and events, about 2.7 KiB a record on
-    /// average, and about 1,600 entries. Each turn is an assistant message, every fourth after a user message, then three
-    /// tool calls, each followed by its output and events, then token usage and reasoning.
     enum RealisticFixture {
         static let targetByteCount = 27 << 20
 
@@ -402,7 +375,6 @@ struct IncrementalMessageSearchMeasurements {
             return lines
         }
 
-        /// A message every fifth append, and a tool call, its output, or an event otherwise.
         static func appendedLine(_ number: Int) -> String {
             switch number % 5 {
             case 0: SyntheticFixture.message("Appended \(number) Café 中文 🧪")

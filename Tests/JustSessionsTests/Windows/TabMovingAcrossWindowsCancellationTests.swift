@@ -41,7 +41,6 @@ struct TabMovingAcrossWindowsCancellationTests {
         }
         gate.release()
         try await expectEventually { gate.hasReturned }
-        // The confirmation schedules its result on the main actor after the injected runner returns.
         for _ in 0..<10 { await Task.yield() }
         try await Task.sleep(for: .milliseconds(100))
 

@@ -5,7 +5,6 @@ import Testing
 
 struct TerminalLinkTargetTests {
     private let projectFolder = "/Users/me/paper"
-    /// What is on this Mac, in place of the file system.
     private let itemsOnThisMac: [String: TerminalLinkLocalItem.Kind] = [
         "/Users/me/paper/Sources/App/main.swift": .file,
         "/Users/me/paper/Sources": .folder,
@@ -87,7 +86,6 @@ struct TerminalLinkTargetTests {
         #expect(target(link, host: .thisMac) == nil)
     }
 
-    /// The file is on the host, which this Mac doesn't look at.
     @Test(arguments: [
         ("Sources/App/main.swift", "Sources/App/main.swift"),
         ("Sources/App/main.swift:42:7", "Sources/App/main.swift"),

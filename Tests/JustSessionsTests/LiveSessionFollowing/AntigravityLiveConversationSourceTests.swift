@@ -35,7 +35,6 @@ struct AntigravityLiveConversationSourceTests {
         #expect(source.isSaved(session))
     }
 
-    /// The log a running CLI holds open, as `lsof` lists it.
     @Test func findsTheLogTheCLIHoldsOpen() async throws {
         let configurationDirectory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: configurationDirectory) }
@@ -43,7 +42,6 @@ struct AntigravityLiveConversationSourceTests {
             AntigravityCLILogTests.streamLine(for: AntigravityCLILogTests.secondConversationID), in: configurationDirectory)
         let cli = Process()
         cli.executableURL = URL(fileURLWithPath: "/bin/sh")
-        // Long enough that a stall can't let the CLI end before it is looked up; the test ends it.
         cli.arguments = ["-c", #"exec 3>>"$1"; exec sleep 600"#, "agy", logFile.path]
         try cli.run()
         defer { cli.terminate() }

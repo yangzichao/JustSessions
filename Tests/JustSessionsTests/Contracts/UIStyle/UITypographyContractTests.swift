@@ -1,8 +1,6 @@
 import Foundation
 import Testing
 
-/// Views set text in `ThemeFont`'s type scale and symbols at `ThemeGlyphSize`'s sizes, so the same kind of text looks
-/// the same everywhere. Only conversation text sets a size of its own, from the reading text size.
 struct UITypographyContractTests {
     @Test func viewsNameNoFontSizeOfTheirOwn() throws {
         let literalSize = try Regex(#"\.system\(size: *[0-9]"#)

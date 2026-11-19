@@ -5,15 +5,6 @@ import Testing
 
 @testable import JustSessions
 
-/// `ThisMacTmuxShiftReturnTests` and `ThisMacTmuxControlKeyTests` on a real SSH host: a tab opened with the app's own
-/// `ssh` command runs the key reader in the host's tmux, with the session options every tab sets there, and the reader,
-/// asking for modifyOtherKeys 2 as Claude Code, Codex, and Pi do, records what reaches it. tmux 3.4 passes the keys on
-/// as CSI u with no option set; tmux 3.5 and later only with the `extended-keys` the tab sets (SSH-102). Opt-in, since
-/// it needs a host; `rctest@justsessions-test` runs tmux 3.7c, the VM's other users its 3.4:
-///
-///     JUSTSESSIONS_LIVE_SSH_HOST=justsessions-test swift test --filter LiveSSHTmuxShiftReturnTests
-///
-/// The reader's folder on the host and its tmux session are removed afterwards.
 @MainActor
 struct LiveSSHTmuxShiftReturnTests {
     @Test(
@@ -105,7 +96,6 @@ struct LiveSSHTmuxShiftReturnTests {
         )
     }
 
-    /// What the tab sends for the key; for Ctrl-A, which it leaves to the engine, the engine's own byte.
     private static func bytesTheTabSends(for press: ControlKeyPress) -> String {
         TerminalControlKey(press.event(windowNumber: 0))?.bytesForTmux ?? press.bytesForLegacyCLI
     }

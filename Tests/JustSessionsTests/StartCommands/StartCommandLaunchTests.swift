@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A start command saved in the New session sheet is kept for the tool on the host, so new sessions and resumes
-/// there start the same way.
 @MainActor
 struct StartCommandLaunchTests {
     private static let startCommand = #"~/.toolbox/bin/claude --aws-profile "dev""#
@@ -28,7 +26,6 @@ struct StartCommandLaunchTests {
         let newSessionCommand = try #require(store.terminalSessions.first?.command.arguments.last)
         let resumeCommand = try #require(store.terminalSessions.last?.command.arguments.last)
         #expect(store.terminalSessions.count == 2)
-        // The remote command is quoted again for tmux, so only the start command's own text is checked as typed.
         #expect(newSessionCommand.contains("exec env \(Self.startCommand)"))
         #expect(resumeCommand.contains("exec env \(Self.startCommand) "))
         #expect(resumeCommand.contains("--resume") && resumeCommand.contains(saved.sessionID))

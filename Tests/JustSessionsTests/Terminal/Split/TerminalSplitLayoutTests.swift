@@ -3,11 +3,8 @@ import Testing
 
 @testable import JustSessions
 
-/// The panes sit inside the split area's insets, around the resize area; each pane keeps a workable minimum while the
-/// window has room.
 struct TerminalSplitLayoutTests {
     @Test func anEvenFractionPartsTheAvailableWidthEvenly() {
-        // 1026 minus two 8-point insets and the 10-point resize area leaves 1000.
         let widths = TerminalSplitLayout.paneLengths(fraction: 0.5, totalLength: 1026, orientation: .sideBySide)
         #expect(widths.leading == 500)
         #expect(widths.trailing == 500)
@@ -52,7 +49,6 @@ struct TerminalSplitLayoutTests {
     }
 
     @Test func aDragEndingNearTheMiddleSnapsThePanesEven() {
-        // 1026 leaves 1000 for the panes, so a left pane from 486 to 514 points wide snaps to 500.
         let fromTheLeft = TerminalSplitLayout.fraction(startingAt: 0.3, draggedBy: 190, totalLength: 1026, orientation: .sideBySide)
         #expect(fromTheLeft == TerminalSplitLayout.evenFraction)
         let fromTheRight = TerminalSplitLayout.fraction(startingAt: 0.7, draggedBy: -186, totalLength: 1026, orientation: .sideBySide)
@@ -69,7 +65,6 @@ struct TerminalSplitLayoutTests {
     }
 
     @Test func stackedPanesRunTheWidthWithTheResizeAreaAcrossBetweenThem() {
-        // 600 minus two 8-point insets and the 10-point resize area leaves 574.
         let frames = TerminalSplitLayout.frames(fraction: 0.5, size: CGSize(width: 1026, height: 600), orientation: .stacked)
         #expect(frames.left == CGRect(x: 8, y: 8, width: 1010, height: 287))
         #expect(frames.resizeArea == CGRect(x: 8, y: 295, width: 1010, height: 10))
@@ -86,7 +81,6 @@ struct TerminalSplitLayoutTests {
     }
 
     @Test func draggingAStackedResizeAreaSnapsAndStopsAsASideBySideOneDoes() {
-        // 600 leaves 574 for the panes, so a top pane from 273 to 301 points tall snaps to 287.
         let nearTheMiddle = TerminalSplitLayout.fraction(startingAt: 0.5, draggedBy: 10, totalLength: 600, orientation: .stacked)
         #expect(nearTheMiddle == TerminalSplitLayout.evenFraction)
 

@@ -36,8 +36,6 @@ struct TranscriptBuilderTests {
         #expect(transcript.entries.map(\.startsTurn) == [true, false, true])
     }
 
-    /// A user's image stays in their turn, and a tool's image stays in the assistant's, so neither repeats the
-    /// speaker. An image between tool calls keeps them apart, so it shows after the call that produced it.
     @Test func imagesContinueTheirSpeakersTurnAndSeparateToolCalls() {
         var builder = TranscriptBuilder()
         builder.append(.userMessage, text: "Look", timestamp: nil)
@@ -61,7 +59,6 @@ struct TranscriptBuilderTests {
         #expect(transcript.entries.map(\.startsTurn) == [true, false, true, false, false, true])
     }
 
-    /// Message search reads only text: each image keeps its entry, and so its place in the turn, without being decoded.
     @Test func withoutDecodingImagesKeepsTheirEntriesButNeverDecodesThem() {
         var decodedImageCount = 0
         func decodedImage() -> TranscriptImage {

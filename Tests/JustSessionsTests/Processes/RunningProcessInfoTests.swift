@@ -16,7 +16,6 @@ struct RunningProcessInfoTests {
     }
 
     @Test func countsAProcessThisAppMayNotSignal() {
-        // launchd belongs to root.
         #expect(RunningProcessInfo.isRunning(1))
     }
 

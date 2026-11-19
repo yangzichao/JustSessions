@@ -4,7 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct ClaudeSessionIDFlagSupportConcurrencyTests {
-    /// Many tabs opening at once share one `--help` check, and once it answers each launch gets an id of its own.
     @Test func launchesAtTheSameTimeShareOneHelpCheck() async throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -29,8 +28,6 @@ struct ClaudeSessionIDFlagSupportConcurrencyTests {
                 group.addTask { _ = support.preassigningSessionID(to: command) }
             }
         }
-        // The check runs in a utility-priority task, which a full run's start can hold up for well over the
-        // 5 seconds this once waited, before the stand-in ever ran.
         try await expectEventually { support.preassigningSessionID(to: command) != nil }
         let sessionIDs = (0..<20).compactMap { _ in support.preassigningSessionID(to: command)?.sessionID }
 

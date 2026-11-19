@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// ⌘F in a plain terminal's tmux session against the installed tmux, in a sandbox server; see `ThisMacTmuxSandbox`.
 /// A host's own tmux may use vi keys in copy mode, so both kinds run.
 @MainActor
 struct TmuxHistoryFindSandboxTests {
@@ -44,8 +43,6 @@ struct TmuxHistoryFindSandboxTests {
         #expect(await session.sandbox.waitUntil { session.paneValue("#{pane_in_mode}") == "0" })
     }
 
-    /// A new search while one runs counts again, rather than keeping the old count. Case counts only for letters
-    /// beyond A to Z.
     @Test func aNewSearchCountsAgainAndLettersBeyondAToZMatchAsTyped() async throws {
         guard let session = try await FindSandboxSession.start(modeKeys: "emacs") else { return }
         defer { session.sandbox.tearDown() }
@@ -63,7 +60,6 @@ struct TmuxHistoryFindSandboxTests {
     }
 }
 
-/// A detached tmux session whose output put two of its three matches above the screen, in the history only.
 @MainActor
 private struct FindSandboxSession {
     let sandbox: ThisMacTmuxSandbox

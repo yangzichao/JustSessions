@@ -51,7 +51,6 @@ struct PiRemoteMirrorTests {
             try FileManager.default.contentsOfDirectory(atPath: mirroredProjectFolder.deletingLastPathComponent().path)
                 == [projectFolder.lastPathComponent])
 
-        // A session deleted on the host disappears from the mirror on the next copy.
         try FileManager.default.removeItem(at: sessionFile)
         #expect(try discovery.discover(host: "devbox").isEmpty)
         #expect(!FileManager.default.fileExists(atPath: conversation.sourceFile.path))

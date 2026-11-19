@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Which host `HostBackgroundChecker` checks, one at a time; the checks themselves are faked.
 @MainActor
 struct HostBackgroundCheckerTests {
     @Test func checksADueHostOnceAtATime() async throws {
@@ -25,7 +24,6 @@ struct HostBackgroundCheckerTests {
         #expect(checker.hostBeingChecked == "devbox")
         await gate.open()
         try await expectEventually { checker.hostBeingChecked == nil }
-        // Its fake check kept no report, so it is still due; the other host's turn comes after it.
         checker.checkDueHost(in: [store])
         #expect(checkedHosts == ["devbox", "devbox"])
     }

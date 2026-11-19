@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A new reading window's size (RDR-53): the last one's, or at first 1000 points wide and nearly as tall as the screen;
-/// within it, centered.
 @MainActor
 struct SessionReadingWindowSizeTests {
     /// A 14-inch MacBook Pro at its default resolution, menu bar and Dock taken off the visible area.
@@ -17,7 +15,6 @@ struct SessionReadingWindowSizeTests {
         #expect(frame.origin == CGPoint(x: 256, y: 90))
     }
 
-    /// A display beside the main one, whose visible area doesn't start at the origin.
     @Test func onALargeDisplayItKeepsItsWidthAndTakesTheHeight() {
         let visible = CGRect(x: 1512, y: -400, width: 2560, height: 1385)
 
@@ -40,7 +37,6 @@ struct SessionReadingWindowSizeTests {
         let laptop = CGRect(x: 0, y: 70, width: 1512, height: 846)
 
         let saved = SessionReadingWindowController.initialFrame(in: laptop, savedSize: CGSize(width: 1200, height: 700))
-        // Left on a larger display, then opened on the laptop.
         let tooLarge = SessionReadingWindowController.initialFrame(in: laptop, savedSize: CGSize(width: 2400, height: 1300))
 
         #expect(saved.size == CGSize(width: 1200, height: 700))

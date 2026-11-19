@@ -10,7 +10,6 @@ import Testing
 @MainActor
 @Suite(.serialized)
 struct TerminalHardWrappedLinkClickTests {
-    /// tmux turns mouse reporting on in every CLI tab on this Mac (`ThisMacTmuxServer.globalOptions`).
     private static let mouseReportingOn = "\u{1B}[?1000h\u{1B}[?1006h"
     private static let firstRowLead = "See "
     nonisolated private static let cases: [(TerminalEngine, Int)] = TerminalEngine.allCases.flatMap { [($0, 0), ($0, 1)] }
@@ -66,7 +65,6 @@ struct TerminalHardWrappedLinkClickTests {
         #expect(terminal.view.link(under: rightClick) == url)
     }
 
-    /// Longer than a row, so it has to be broken.
     private static func longURL(for grid: TerminalTestGrid) -> String {
         "https://example.com/" + String(repeating: "x", count: grid.columns) + "/end"
     }

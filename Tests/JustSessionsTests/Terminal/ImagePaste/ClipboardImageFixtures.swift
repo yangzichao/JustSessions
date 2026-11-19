@@ -2,7 +2,6 @@ import AppKit
 
 @testable import JustSessions
 
-/// A small PNG whose pixels aren't all the same.
 func makePNGData(width: Int = 6, height: Int = 4) -> Data {
     let bitmap = NSBitmapImageRep(
         bitmapDataPlanes: nil, pixelsWide: width, pixelsHigh: height, bitsPerSample: 8, samplesPerPixel: 4,
@@ -18,7 +17,6 @@ func makePNGData(width: Int = 6, height: Int = 4) -> Data {
 }
 
 extension NSPasteboard {
-    /// A pasteboard of its own holding one item with `representations`, as a screenshot copied to the clipboard does.
     static func holding(_ representations: [NSPasteboard.PasteboardType: Data]) -> NSPasteboard {
         let pasteboard = NSPasteboard.withUniqueName()
         let item = NSPasteboardItem()

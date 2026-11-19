@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The host heading's Use this host's tmux prefix: saved per SSH host, sent to the host's sessions at once, and used
-/// by every tab opened there afterwards.
 @MainActor
 struct RemoteTmuxPrefixChoiceTests {
     @Test func choiceIsSavedPerHostAndSentToTheHostsSessionsAtOnce() async throws {
@@ -23,7 +21,6 @@ struct RemoteTmuxPrefixChoiceTests {
         #expect(recorder.commands.first?.host == "devbox")
         #expect(recorder.commands.first?.command == RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: true, on: "devbox"))
 
-        // Choosing what the host already uses sends nothing.
         store.setUsesTmuxPrefix(true, on: "devbox", remoteRunner: recorder.runner(answering: (0, "")))
         store.setUsesTmuxPrefix(false, on: "buildbox", remoteRunner: recorder.runner(answering: (0, "")))
         store.setUsesTmuxPrefix(false, on: "devbox", remoteRunner: recorder.runner(answering: (0, "")))
@@ -61,7 +58,6 @@ struct RemoteTmuxPrefixChoiceTests {
         defer { store.closeAllTerminals() }
         let conversation = Conversation.fixture(provider: .pi, projectPath: "/srv/app", host: .ssh("devbox"))
         store.replaceConversations(on: .ssh("devbox"), with: [conversation])
-        // Drawn by the engine not chosen now, as after the engine setting changed since the tab reopened.
         let engine = store.terminalEngineStore.engine.otherEngine
         let waitingTab = try #require(try store.makeTerminal(for: conversation, action: .resume, startsOnceShown: true, engine: engine))
         store.insertReopenedTerminal(waitingTab, at: 0, selecting: false)

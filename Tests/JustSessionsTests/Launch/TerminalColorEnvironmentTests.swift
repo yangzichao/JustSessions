@@ -45,7 +45,6 @@ struct TerminalColorEnvironmentTests {
         #expect(command.environment.contains("COLORTERM=truecolor"))
     }
 
-    /// GhosttyTerminal sets it in the app's own environment; see `GhosttyAppEnvironment`.
     @Test func aCLIDoesNotInheritGhosttysResourcesDirectory() {
         let environment = TerminalColorEnvironment.embeddedTerminalEnvironment(from: [
             "GHOSTTY_RESOURCES_DIR": "/Applications/JustSessions.app/Contents/Resources/Ghostty",
@@ -56,8 +55,6 @@ struct TerminalColorEnvironmentTests {
         #expect(environment["HOME"] == "/Users/example")
     }
 
-    /// An app opened from a shell inside a Claude Code session inherits that session's variables; a Claude Code it starts
-    /// would take itself for that session's child and save no transcript (`ClaudeCodeSessionEnvironment`).
     @Test func aCLIDoesNotInheritAClaudeCodeSessionTheAppWasOpenedFrom() {
         let parentSession = Dictionary(uniqueKeysWithValues: ClaudeCodeSessionEnvironment.variableNames.map { ($0, "parent") })
         let settings = [
@@ -72,8 +69,6 @@ struct TerminalColorEnvironmentTests {
         #expect(ClaudeCodeSessionEnvironment.variableNames.contains("CLAUDE_CODE_CHILD_SESSION"))
     }
 
-    /// The tmux session a CLI starts in takes its variables from the tab's command (`ThisMacTmuxServer`), so a Claude Code
-    /// started there doesn't see the marker either.
     @Test func aCLIStartedInThisMacsTmuxDoesNotSeeTheChildSessionMarker() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }

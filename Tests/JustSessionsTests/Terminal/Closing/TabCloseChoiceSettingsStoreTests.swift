@@ -22,7 +22,6 @@ struct TabCloseChoiceSettingsStoreTests {
         #expect(TabCloseChoiceSettingsStore(userDefaults: settings.userDefaults).choice(for: .thisMac).endsTmuxSessionWithoutAsking == true)
     }
 
-    /// Each host keeps its own choice, so This Mac can end sessions while an SSH host keeps them running.
     @Test func eachHostKeepsItsOwnChoice() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A refresh that read a host before one of its sessions was deleted would list that session again, so deleting
-/// from a host and refreshing it never overlap.
 @MainActor
 struct DeletionDuringRefreshTests {
     @Test func aSessionWaitsForItsOwnHostsRefreshOnly() async throws {
@@ -24,7 +22,6 @@ struct DeletionDuringRefreshTests {
         #expect(store.pendingDeletionConversationIDs == [local.id])
         try await expectEventually { !store.isDeletingSessions }
 
-        // The deletion's end did not start the session still waiting for devbox's refresh.
         #expect(!sandbox.fileExists(for: local))
         #expect(store.queuedDeletionConversationIDs == [remote.id])
         #expect(store.conversations.map(\.id) == [remote.id])

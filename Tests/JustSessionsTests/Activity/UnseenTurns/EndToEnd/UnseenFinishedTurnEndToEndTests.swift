@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A session whose CLI finished its turn while you were not looking keeps a dot until you look, and Waiting for you
-/// lists it meanwhile. Each test runs the app's own launch, tmux, activity sync, and sidebar filtering against CLIs
-/// that report what they do as Claude Code and Codex do; see `UnseenTurnSandboxApp`.
 @MainActor
 struct UnseenFinishedTurnEndToEndTests {
     @Test func aTurnThatFinishesInATabYouAreNotLookingAtKeepsADotUntilYouSelectTheTab() async throws {
@@ -28,7 +25,6 @@ struct UnseenFinishedTurnEndToEndTests {
         #expect(app.notifications.map(\.title) == ["Revise the abstract"])
         #expect(app.notifications.map(\.reason) == [.finishedTurn])
 
-        // The dot outlasts the notification, for as long as you don't look.
         await app.followCLIsOnce()
         await app.followCLIsOnce()
         #expect(try app.rowStatus(of: "Revise the abstract") == .finishedUnseen)
@@ -84,13 +80,11 @@ struct UnseenFinishedTurnEndToEndTests {
 
         try await app.stopForAnswer(in: "Revise the abstract")
         #expect(try app.rowStatus(of: "Revise the abstract") == .running(.needsInput(reason: "permission prompt")))
-        // A project sums up its CLIs, so it shows no one CLI's reason.
         #expect(try app.projectStatus(of: "Revise the abstract") == .running(.needsInput(reason: nil)))
         #expect(app.waitingForYou.titles == ["Revise the abstract"])
         #expect(app.notifications.map(\.reason) == [.needsInput(reason: "permission prompt")])
 
         try app.select("Revise the abstract")
-        // Looking at it does not answer it.
         #expect(app.waitingForYou.titles == ["Revise the abstract"])
         try await app.sendPrompt("Yes", in: "Revise the abstract")
         #expect(try app.rowStatus(of: "Revise the abstract") == .running(.working))

@@ -2,8 +2,6 @@ import Foundation
 import Testing
 
 struct TemporaryFilesTests {
-    /// The run `writeTimedStandIn` makes first, so macOS has checked the file, ends before anything the script does,
-    /// which a test may count.
     @Test func aStandInDoesNothingUntilATestRunsIt() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -21,7 +19,6 @@ struct TemporaryFilesTests {
         #expect(try String(contentsOf: runsLog, encoding: .utf8) == "run\n")
     }
 
-    /// Stand-ins with the same script are one file, which macOS checks once; writing one again leaves the other as it was.
     @Test func standInsWithTheSameScriptShareOneFileThatRewritingOneLeavesAlone() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -63,7 +60,6 @@ struct TemporaryFilesTests {
     }
 }
 
-/// What a stand-in prints when a test runs it the ordinary way.
 private enum BoundedProcessRunnerOutput {
     static func run(_ executable: URL, arguments: [String]) -> String? {
         let process = Process()

@@ -26,7 +26,6 @@ struct HostBackgroundCheckScheduleTests {
         #expect(
             reason(keptCheck: passedCheck, refreshMinutesAgo: 1, tmuxServerProblem: "protocol version mismatch")
                 == .tmuxServerUnreachable)
-        // The refresh came before the check, so the check knows better.
         #expect(reason(keptCheck: passedCheck, refreshMinutesAgo: 31, tmuxServerProblem: "protocol version mismatch") == nil)
 
         let tmuxProblemCheck = check(minutesAgo: 30, findings: [finding(.tmux, .problem)])
@@ -39,7 +38,6 @@ struct HostBackgroundCheckScheduleTests {
         #expect(reason(keptCheck: unfinishedCheck(59), refreshMinutesAgo: 1) == nil)
         #expect(reason(keptCheck: unfinishedCheck(60), refreshMinutesAgo: 1) == .refreshWorkedSinceUnfinishedCheck)
         #expect(reason(keptCheck: unfinishedCheck(60), refreshMinutesAgo: 61) == nil)
-        // A problem a refresh can't tell about waits for the day.
         #expect(reason(keptCheck: check(minutesAgo: 60, findings: [finding(.cli(.claude), .problem)]), refreshMinutesAgo: 1) == nil)
     }
 

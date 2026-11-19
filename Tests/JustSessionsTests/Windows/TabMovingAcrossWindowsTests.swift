@@ -3,11 +3,8 @@ import Testing
 
 @testable import JustSessions
 
-/// Moving a session's tab to this window closes the other window's tab and opens the session here, only when that
-/// leaves its CLI running.
 @MainActor
 struct TabMovingAcrossWindowsTests {
-    /// The sandbox finds no tmux, so the CLI would end with its tab.
     @Test func aTabWhoseCLIRunsWithoutTmuxStaysInItsWindow() throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
@@ -25,7 +22,6 @@ struct TabMovingAcrossWindowsTests {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
         let waitingTab = try #require(try sandbox.first.makeTerminal(for: sandbox.conversation, action: .resume, startsOnceShown: true))
-        // As a tab from the last quit that was not selected; selecting it would start it.
         sandbox.first.insertReopenedTerminal(waitingTab, at: 0, selecting: false)
         #expect(waitingTab.isWaitingToBeShown)
 
@@ -53,7 +49,6 @@ struct TabMovingAcrossWindowsTests {
 
         try await expectEventually { sandbox.second.runningTerminal(for: conversation) != nil }
         #expect(sandbox.first.terminalSessions.isEmpty)
-        // Closed there the way Keep running closes a tab.
         #expect(sandbox.first.isRunningInTmux(conversation))
         #expect(recorder.commands.map(\.host) == ["devbox"])
         #expect(recorder.commands.first?.command == RemoteTmuxCommands.hasSessionCommand(tmuxSessionName, on: "devbox"))
@@ -62,7 +57,6 @@ struct TabMovingAcrossWindowsTests {
         #expect(sandbox.second.selectedTerminalID == movedTab.id)
     }
 
-    /// The host may lack tmux, where an SSH tab's CLI runs directly, or may not answer.
     @Test func anSSHTabStaysInItsWindowWhenTheHostDoesNotConfirmTmux() async throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }

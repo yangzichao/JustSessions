@@ -28,8 +28,6 @@ struct SessionReadingWindowTests {
         #expect(store.terminalSessions.isEmpty)
     }
 
-    /// ⌘F in a tab linked to the session opens its reading window with Find, and in a window already open asks Find
-    /// again, which puts the keyboard back in its field. Opening the window otherwise asks nothing.
     @Test func openingForFindAsksTheReaderToShowFind() throws {
         _ = NSApplication.shared
         WindowAnimations.disable()
@@ -76,7 +74,6 @@ struct SessionReadingWindowTests {
         #expect(requests.takeNavigation() == .adjacentBookmark(forward: false))
     }
 
-    /// ⌘' pressed again before the reader took the first press goes on from the bookmark that press asked for.
     @Test func pressesBeforeTheReaderTakesARequestAddUp() {
         let bookmarks = ["a", "b", "c"].enumerated().map { index, letter in
             MessageBookmark(
@@ -96,7 +93,6 @@ struct SessionReadingWindowTests {
         requests.requestAdjacentBookmark(forward: false, in: bookmarks, from: nil)
         #expect(requests.pendingNavigation == .bookmark(bookmarks[2]))
 
-        // With nothing waiting, from where the window was left; the bottom is the conversation's end.
         _ = requests.takeNavigation()
         requests.requestAdjacentBookmark(forward: true, in: bookmarks, from: .entry(index: bookmarks[0].entryID + 1, offset: -6))
         #expect(requests.pendingNavigation == .bookmark(bookmarks[1]))
@@ -104,7 +100,6 @@ struct SessionReadingWindowTests {
         requests.requestAdjacentBookmark(forward: false, in: bookmarks, from: .bottom)
         #expect(requests.pendingNavigation == .bookmark(bookmarks[2]))
 
-        // With no bookmarks, the reader says so.
         _ = requests.takeNavigation()
         requests.requestAdjacentBookmark(forward: true, in: [], from: nil)
         #expect(requests.pendingNavigation == .adjacentBookmark(forward: true))
@@ -119,7 +114,6 @@ struct SessionReadingWindowTests {
         let conversation = TranscriptScrollViewFixture.conversation("map-click")
         let manager = SessionReadingWindowManager()
         let entryID = TranscriptPageIdentity.entryID(record: 120, part: 0)
-        // The map's tab, selected, as the click leaves it.
         let tab = TerminalSession(
             engine: .swiftTerm, conversation: conversation, provider: .codex, projectPath: "/tmp/map-click", action: .resume,
             displayTitle: "Map click",
@@ -137,7 +131,6 @@ struct SessionReadingWindowTests {
         #expect(store.selectedTerminalID == tab.id)
     }
 
-    /// Deleting the session forgot its bookmarks; a reading window left open on it offers none, so none are saved again.
     @Test func aReadingWindowOnASessionNoLongerListedKeepsNoBookmarks() async throws {
         _ = NSApplication.shared
         WindowAnimations.disable()

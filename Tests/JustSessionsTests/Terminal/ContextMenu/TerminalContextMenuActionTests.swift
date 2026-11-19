@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The items of a terminal's right-click menu do what the same items of its tab's menu in the tab bar do.
 @MainActor
 struct TerminalContextMenuActionTests {
     @Test(arguments: TerminalEngine.allCases)
@@ -21,7 +20,6 @@ struct TerminalContextMenuActionTests {
         #expect(fixture.tabsAskedToClose == [tab.id])
     }
 
-    /// Close and end session closes the tab at once, without the close request's question.
     @Test(arguments: TerminalEngine.allCases)
     func closeAndEndSessionClosesTheTabWithoutAsking(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
@@ -35,9 +33,6 @@ struct TerminalContextMenuActionTests {
         #expect(fixture.tabsAskedToClose.isEmpty)
     }
 
-    /// A session started with Delete the session when its tab closes offers Keep session and Close and delete session
-    /// in place of the other closing items. Close and delete session asks to close the tab, as its × does, which
-    /// deletes the session without asking; Keep session takes the choice back.
     @Test(arguments: TerminalEngine.allCases)
     func aTabWhoseSessionGoesWithItOffersKeepSessionAndCloseAndDelete(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
@@ -59,8 +54,6 @@ struct TerminalContextMenuActionTests {
             ])
     }
 
-    /// Close and delete session… asks the window to delete the tab's session, whose dialog confirms first; the tab
-    /// stays open until then.
     @Test(arguments: TerminalEngine.allCases)
     func closeAndDeleteSessionAsksTheWindowToDeleteTheTabsSession(engine: TerminalEngine) throws {
         let fixture = try TerminalContextMenuFixture()
@@ -140,7 +133,6 @@ struct TerminalContextMenuActionTests {
         try TerminalContextMenuFixture.choose(arrangeItem("Place views side by side"))
         #expect(fixture.store.orientation(ofSplitView: split.id) == .sideBySide)
 
-        // Closing a view goes through the close request, which asks what to do with its CLI.
         try TerminalContextMenuFixture.choose(arrangeItem("Close left view"))
         #expect(fixture.tabsAskedToClose == [right.id])
 

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Tabs that go because their session is deleted, they move to another window, or their host disconnects were not
-/// closed by you, so Reopen Closed Tab doesn't bring them back.
 @MainActor
 struct TabsGoneWithoutClosingTests {
     @Test func aTabClosedToDeleteItsSessionIsNotKept() throws {

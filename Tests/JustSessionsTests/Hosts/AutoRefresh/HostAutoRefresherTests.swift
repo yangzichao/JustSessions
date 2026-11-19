@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The periodic check refreshes the hosts only while a window shows; coming forward refreshes them anyway. This Mac
-/// refreshes in every window, sharing one scan; an SSH host is copied by the oldest window alone.
 @MainActor
 struct HostAutoRefresherTests {
     @Test func theCheckRefreshesNothingWhileNoWindowShows() async throws {
@@ -48,7 +46,6 @@ struct HostAutoRefresherTests {
             store.hostRefreshStatuses[.ssh("buildbox")] = .refreshed(.now)
         }
         let copies = SSHHostCopies()
-        // As when the app comes forward before its window counts as on screen.
         let refresher = HostAutoRefresher(registry: sandbox.windowRegistry, isAnyWindowOnScreen: { false }, refreshSSHHost: copies.start)
 
         refresher.refreshDueHosts(now: .now)
@@ -59,7 +56,6 @@ struct HostAutoRefresherTests {
         #expect(copies.started.first?.host == "devbox")
     }
 
-    /// You disconnected from the host, so it is left alone until you connect; see `ConversationStore+RemoteHostDisconnect`.
     @Test func aDisconnectedHostIsLeftAlone() async throws {
         let sandbox = try TwoWindowSandbox()
         defer { sandbox.tearDown() }
@@ -83,7 +79,6 @@ struct HostAutoRefresherTests {
     }
 }
 
-/// Stands in for `refreshRemoteHost(_:)`: marks the host refreshing, as it does, and records which window started it.
 @MainActor
 private final class SSHHostCopies {
     private(set) var started: [(store: ConversationStore, host: String)] = []

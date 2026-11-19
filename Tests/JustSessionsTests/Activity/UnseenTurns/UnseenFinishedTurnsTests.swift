@@ -61,7 +61,6 @@ struct UnseenFinishedTurnsTests {
 
         unseen.update(after: [.init(source: source, activity: .idle)], events: [Self.finished(source)], isInView: { _ in false })
         unseen.update(after: [], events: [], isInView: { _ in false })
-        // A later CLI of the same session starts seen.
         unseen.update(after: [.init(source: source, activity: .idle)], events: [], isInView: { _ in false })
         #expect(!unseen.contains(source))
     }

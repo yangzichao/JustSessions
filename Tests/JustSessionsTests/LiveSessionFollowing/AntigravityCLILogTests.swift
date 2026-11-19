@@ -7,7 +7,6 @@ struct AntigravityCLILogTests {
     static let firstConversationID = "a24e0f54-5565-4110-9abb-5069fc113862"
     static let secondConversationID = "cc11d3bc-b1fb-4099-a72a-5436dece254d"
 
-    /// A line as Antigravity CLI 1.2.16 logs it.
     static func streamLine(for conversationID: String) -> String {
         "I1004 15:55:03.777079     316 server.go:1272] Starting conversation update stream for \(conversationID)\n"
     }

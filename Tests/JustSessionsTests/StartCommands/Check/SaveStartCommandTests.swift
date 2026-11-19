@@ -3,12 +3,10 @@ import Testing
 
 @testable import JustSessions
 
-/// Saving a start command from the New session sheet keeps it only once it checks out.
 @MainActor
 struct SaveStartCommandTests {
     private static let keptCommand = "claude --dangerously-skip-permissions"
 
-    /// Any program lookup on the host fails.
     private static let checkWithNothingInstalled = StartCommandCheck(
         resolver: NativeCLICommandResolver(searchDirectories: [], liveSessionReporting: nil),
         remoteRunner: RemoteHostCommandRunner { _, _, _ in (1, "") }

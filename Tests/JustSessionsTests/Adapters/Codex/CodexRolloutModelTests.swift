@@ -47,7 +47,6 @@ struct CodexRolloutModelTests {
     }
 
     @Test func aTurnContextCutByAChunkBoundaryIsFound() throws {
-        // The marker straddles the boundary one chunk from the end, whatever the line before it holds.
         for shift in [-30, -15, -5, 0, 5] {
             let marker = #""type":"turn_context""#
             let line = Self.turnContext(model: "gpt-5.5")
@@ -55,7 +54,6 @@ struct CodexRolloutModelTests {
             let trailing = Self.output(CodexRolloutModel.chunkByteCount - 200)
             let trailingByteCount = trailing.utf8.count + 1
             let lineEndToMarker = line.utf8.count + 1 - markerOffset
-            // Puts the marker `shift` bytes from the chunk boundary counted from the end.
             let padding = max(0, CodexRolloutModel.chunkByteCount - trailingByteCount - lineEndToMarker + shift)
             let (file, remove) = try write([Self.output(1_000), Self.turnContext(model: "gpt-5.5", padding: padding), trailing])
             defer { remove() }

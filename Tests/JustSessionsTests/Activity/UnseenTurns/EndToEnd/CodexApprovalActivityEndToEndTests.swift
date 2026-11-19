@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A Codex session waiting for your approval gets the same waiting mark, Waiting for you, and notification as Claude
-/// Code's. Each test runs the app's own launch, tmux, activity sync, and sidebar filtering against a stand-in Codex
-/// and a stand-in of its background server; see `UnseenTurnSandboxApp`.
 @MainActor
 struct CodexApprovalActivityEndToEndTests {
     @Test func aCodexCommandWaitingForApprovalWaitsForYouUntilYouAllowIt() async throws {
@@ -29,7 +26,6 @@ struct CodexApprovalActivityEndToEndTests {
         #expect(try app.rowStatus(of: "Clean the build") == .running(.working))
         #expect(app.waitingForYou.titles.isEmpty)
         try await app.finishTurn(of: "Clean the build")
-        // You watched it finish.
         #expect(try app.rowStatus(of: "Clean the build") == .running(.idle))
     }
 
@@ -40,7 +36,6 @@ struct CodexApprovalActivityEndToEndTests {
         try await app.saveSession("Clean the build", of: .codex)
         try await app.resume("Clean the build")
         try await app.sendPrompt("Remove the build folder", in: "Clean the build")
-        // Started with --no-daemon, Codex runs this thread itself; the server holds another one.
         server.setStatus(FakeCodexAppServer.waitingOnApproval, ofThread: UUID().uuidString.lowercased())
 
         await app.followCLIsOnce()

@@ -2,7 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// A custom Kiro home and project, deleted by a stand-in CLI without touching the user's history.
 struct KiroHomeFixture {
     let root: URL
     let kiroDirectory: URL

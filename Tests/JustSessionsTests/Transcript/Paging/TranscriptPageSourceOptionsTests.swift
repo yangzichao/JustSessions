@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The per-call options the conversation map reads with (PERF-89): no Markdown, and its own page sizes, with the
-/// reader's entries and IDs.
 struct TranscriptPageSourceOptionsTests {
     @Test func skippingMarkdownKeepsEntriesAndIDs() async throws {
         let fixture = try TranscriptPagingFixture(count: 120)

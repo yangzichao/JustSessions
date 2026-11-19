@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// One window restores the snapshot, and live updates merge every window without appending duplicates.
 @MainActor
 struct OpenTabPersistenceTests {
     private let first = ReopenableTerminalTab(conversationID: "claude:a", projectDirectoryKey: "/a", wasSelected: true)
@@ -53,7 +52,6 @@ struct OpenTabPersistenceTests {
         #expect(persistence.take(from: settings.userDefaults).isEmpty)
     }
 
-    /// A plain terminal that ran without tmux saves no tmux session, and reopens with a new shell.
     @Test func savesEachPlainTerminalsTmuxSession() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

@@ -21,11 +21,8 @@ struct CodexThreadTitleTests {
             "增强按钮点击反馈 | JustSessions",
             "Zichaos-MacBook-Pro.local",
             "01a10846-4c77-75e2-bec8-ab638... | JustSessions",
-            // Too short to name one thread.
             "01a10846-4c77-75e2...",
-            // Neither cut nor whole.
             "01a10846-4c77-75e2-bec8-ab638",
-            // Not shaped like an id.
             "01a10846x4c77-75e2-bec8-ab638...",
             "01a10846-4c77-75e2-bec8-zz638...",
         ] {

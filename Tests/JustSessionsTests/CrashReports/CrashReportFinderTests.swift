@@ -27,7 +27,6 @@ struct CrashReportFinderTests {
         try writeReport(
             CrashReportSamples.reportText(appVersion: "1.0.5"), named: "JustSessions-2026-10-05-100000.ips",
             writtenAt: now.addingTimeInterval(-60), in: directory)
-        // Newer, but not a crash of this app: a hang, another build's crash, another app's, and another kind of file.
         try writeReport(
             CrashReportSamples.reportText(bugType: "298"), named: "JustSessions-2026-10-05-100100.ips",
             writtenAt: now.addingTimeInterval(-50), in: directory)

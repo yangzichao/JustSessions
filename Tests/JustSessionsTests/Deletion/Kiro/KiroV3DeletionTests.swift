@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Deleting a Kiro CLI V3 session runs `kiro-cli chat --delete-session <sess_ id>`, which removes its folder (Kiro CLI
-/// 2.16.2), with the same checks as a V2 session's.
 struct KiroV3DeletionTests {
     private struct Home {
         let root: URL
@@ -30,7 +28,6 @@ struct KiroV3DeletionTests {
         func remove() { try? FileManager.default.removeItem(at: root) }
     }
 
-    /// Deletes the folder named for its session in any workspace, as Kiro does.
     static let successfulDeletionScript = """
         #!/bin/sh
         [ "$1" = chat ] && [ "$2" = --delete-session ] && [ "$#" -eq 3 ] || exit 9
@@ -71,8 +68,6 @@ struct KiroV3DeletionTests {
         #expect(FileManager.default.fileExists(atPath: selected.messagesFile.path))
     }
 
-    /// A session whose file isn't where its folder says, or whose metadata names another session or folder, isn't
-    /// handed to Kiro.
     @Test func aSessionOutsideItsWorkspaceFolderOrNamingAnotherIsRefused() throws {
         let home = try Home()
         defer { home.remove() }
@@ -103,7 +98,6 @@ struct KiroV3DeletionTests {
         #expect(FileManager.default.fileExists(atPath: written.messagesFile.path))
     }
 
-    /// Kiro CLI 2.34.0 deletes a V3 session a running CLI holds, whose next turn writes its folder again.
     @Test func aSessionARunningCLIHoldsIsNotHandedToKiro() throws {
         let home = try Home()
         defer { home.remove() }
@@ -118,7 +112,6 @@ struct KiroV3DeletionTests {
         #expect(FileManager.default.fileExists(atPath: selected.messagesFile.path))
     }
 
-    /// The prompts Kiro keeps for a V3 session sit in `sessions/cli`, named for its `sess_` id.
     @Test func thePromptsKiroLeavesInTheClassicFolderGoWithTheSession() throws {
         let home = try Home()
         defer { home.remove() }

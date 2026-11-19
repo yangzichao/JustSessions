@@ -84,7 +84,6 @@ struct RemoteListeningPortsTests {
                 == .listed([
                     Self.port(18765), Self.port(18766), Self.port(18767), Self.port(18768),
                 ]))
-        // lsof names the user's own programs, and adds a port /proc missed.
         let lsofOfSSHDAndOneServer = Self.linuxLsof.split(separator: "\n").prefix(4).joined(separator: "\n")
         #expect(
             RemoteListeningPorts.listing(
@@ -143,13 +142,11 @@ struct RemoteListeningPortsTests {
         }
     }
 
-    /// The script quotes nothing a fish login shell would read otherwise (SSH-54).
     @Test func theScriptHasNoSingleQuoteOrBackslash() {
         #expect(!RemoteListeningPorts.script.contains("'"))
         #expect(!RemoteListeningPorts.script.contains("\\"))
     }
 
-    /// This Mac runs the script as a macOS host would: `netstat`, then `lsof` for the names.
     @Test func theScriptListsAPortThisMacListensOn() throws {
         let listener = socket(AF_INET, SOCK_STREAM, 0)
         try #require(listener >= 0)

@@ -3,18 +3,12 @@ import Testing
 
 @testable import JustSessions
 
-/// An SSH plain terminal's command against a real tmux on this Mac, with a private tmux server and home folder for the
-/// host's, and a stand-in login shell; see `TmuxSandbox`. Skipped where tmux is not installed.
 @Suite(.oneTmuxSandboxAtATime)
 struct RemotePlainTerminalTmuxTests {
-    /// As when the connection drops: the tab's client ends, and the shell runs on in the tab's tmux session until the
-    /// reconnected tab attaches to it again.
     @Test func theShellRunsOnInTheTabsTmuxSessionAndTheNextClientAttachesToIt() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
         defer { sandbox.tearDown() }
-        // Given a command, it runs it, as `$SHELL -lc` does; given only `-l`, it stays open as your shell would, after
-        // noting where it started and with which environment.
         try sandbox.addProgram(
             named: "login-shell",
             script: """
@@ -38,13 +32,11 @@ struct RemotePlainTerminalTmuxTests {
         let firstClient = try sandbox.startClient(tabCommand)
         #expect(sandbox.waitUntil { startedFolders().count == 1 && clientCount() == 1 })
         #expect(startedFolders().first?.hasSuffix("/Bob's paper") == true)
-        // Startup files see a shell of yours, not a command of the app's (SSH-24).
         let shellEnvironment = try String(contentsOf: sandbox.root.appendingPathComponent("shell.environment"), encoding: .utf8)
         #expect(!shellEnvironment.contains("\(RemoteShellStartup.environmentVariable)="))
         #expect(
             sandbox.run("tmux show-options -v -t \(ShellQuoting.quoted("=" + tmuxSessionName + ":")) history-limit")
                 == "\(PlainTerminalTmuxHistoryLimit.lineCount)\n")
-        // The host's own sessions keep its limit.
         #expect(sandbox.run("tmux show-options -gv history-limit") == "\(PlainTerminalTmuxHistoryLimit.tmuxDefaultLineCount)\n")
 
         firstClient.terminate()

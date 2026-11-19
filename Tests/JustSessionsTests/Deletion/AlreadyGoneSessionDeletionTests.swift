@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A session already gone, for example deleted just before a dropped connection hid the result, counts as deleted.
 @MainActor
 struct AlreadyGoneSessionDeletionTests {
     @Test func aSessionAlreadyGoneFromAnSSHHostLeavesTheListWithoutAnError() async throws {
@@ -35,7 +34,6 @@ struct AlreadyGoneSessionDeletionTests {
         #expect(store.alert == nil)
     }
 
-    /// Reports every session as no longer present, as the real adapters do for a file that is gone.
     private struct AlreadyGoneAdapter: ConversationAdapter {
         let provider = ConversationProvider.claude
         func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {

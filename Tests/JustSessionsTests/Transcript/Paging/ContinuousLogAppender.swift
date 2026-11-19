@@ -1,13 +1,11 @@
 import Foundation
 
-/// Appends JSONL lines from another thread until stopped, as a running CLI writes its log while the reader scans it.
 final class ContinuousLogAppender: @unchecked Sendable {
     private let handle: FileHandle
     private let lock = NSLock()
     private var isStopped = false
     private let firstLineWritten = DispatchSemaphore(value: 0)
     private let finished = DispatchSemaphore(value: 0)
-    /// Read only after `stop()`, which waits for the writing thread to finish.
     private(set) var appendedLineCount = 0
 
     init(file: URL) throws {
@@ -15,7 +13,6 @@ final class ContinuousLogAppender: @unchecked Sendable {
         try handle.seekToEnd()
     }
 
-    /// Returns once the first line is written, so whatever runs next overlaps the writes.
     func start() {
         Thread.detachNewThread { [self] in
             let line = Data("{\"type\":\"event\"}\n".utf8)

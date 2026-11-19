@@ -26,7 +26,6 @@ struct RemoteCLIInstallFoldersTests {
         ] {
             try writeExecutable(at: home.appendingPathComponent(path))
         }
-        // Neither a folder nor a file that can't run is a CLI.
         try FileManager.default.createDirectory(at: home.appendingPathComponent(".local/bin/pi"), withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: home.appendingPathComponent(".bun/bin"), withIntermediateDirectories: true)
         try "".write(to: home.appendingPathComponent(".bun/bin/agy"), atomically: true, encoding: .utf8)
@@ -40,7 +39,6 @@ struct RemoteCLIInstallFoldersTests {
                 timeout: 10
             ))
 
-        // Folders outside the home folder, such as `/opt/homebrew/bin`, may have this Mac's own CLIs.
         let foundInHome = output.split(separator: "\n").map(String.init).filter { $0.contains(home.path) }
         #expect(
             foundInHome == [

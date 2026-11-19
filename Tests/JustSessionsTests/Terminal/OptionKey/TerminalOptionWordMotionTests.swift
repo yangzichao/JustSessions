@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// ⌥← and ⌥→ alone reach the program as Esc b and Esc f, a word back and forward in a shell, from either engine,
-/// whether or not Option is Meta (TRM-66, TRM-75). With Option off, a SwiftTerm tab sent `CSI 1;3D` and `CSI 1;3C`,
-/// which zsh and bash typed into the line as `3D`.
 @MainActor
 @Suite(.serialized)
 struct TerminalOptionWordMotionTests {

@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Session files are written by other programs, often while the preview reads them. Damaged or unexpected
-/// lines are skipped; they never hide the lines around them or stop the file from being read.
 struct MalformedTranscriptTests {
     @Test(arguments: TranscriptFileReader.all)
     func samplesShowTheirConversation(_ reader: TranscriptFileReader) throws {
@@ -49,8 +47,6 @@ struct MalformedTranscriptTests {
         #expect(try reader.read(SampleTranscriptLines.fileContents(lines), in: directory) == cleanTranscript)
     }
 
-    /// A file cut off at any byte, as when the CLI is still writing it, shows the start of the full conversation.
-    /// Only the last entry may differ: a run of tool calls that the rest of the file adds to.
     @Test(arguments: TranscriptFileReader.all)
     func aFileCutOffAnywhereShowsTheStartOfTheConversation(_ reader: TranscriptFileReader) throws {
         let directory = try makeTemporaryDirectory()

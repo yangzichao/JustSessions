@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Kiro CLI, OpenCode, and Pi say nothing about the session a new tab starts, so on this Mac its tab takes the first
-/// session that appears in its project after it started.
 @MainActor
 struct ThisMacAppearingSessionTests {
     @Test(arguments: [ConversationProvider.kiro, .opencode, .pi])

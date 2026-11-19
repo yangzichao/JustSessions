@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A store with open tabs, the menu a right-click in a tab's terminal shows, and what its items asked the window for.
 @MainActor
 final class TerminalContextMenuFixture {
     static let projectPath = "/tmp/justsessions-tests/app"
@@ -29,7 +28,6 @@ final class TerminalContextMenuFixture {
         isolatedUserDefaults.removeSuite()
     }
 
-    /// Opens and selects a tab, as a new tab is.
     @discardableResult
     func openTab(
         engine: TerminalEngine, title: String = "Fix the build", conversation: Conversation? = nil, isPlainTerminal: Bool = false,
@@ -60,7 +58,6 @@ final class TerminalContextMenuFixture {
         windows.append(window)
     }
 
-    /// The menu a right-click on `linkUnderPointer` shows, or off any link, with `editorStore`'s editors.
     func menu(
         for tab: TerminalSession, language: String = "en", linkUnderPointer: String? = nil,
         editorStore: ExternalEditorStore = ExternalEditorStore { _ in nil }
@@ -77,7 +74,6 @@ final class TerminalContextMenuFixture {
         ).makeMenu()
     }
 
-    /// The menu's titles, with "—" for each separator.
     static func titles(of menu: NSMenu) -> [String] {
         menu.items.map { $0.isSeparatorItem ? "—" : $0.title }
     }
@@ -86,7 +82,6 @@ final class TerminalContextMenuFixture {
         try #require(menu.items.first { $0.title == title })
     }
 
-    /// Chooses the item, as a click on it does.
     static func choose(_ item: NSMenuItem) throws {
         let action = try #require(item.action)
         #expect(item.isEnabled)

@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A Windows host prints its `OS` variable; a POSIX shell prints the command's words.
 struct WindowsHostProbeTests {
     /// What `cmd.exe`, and PowerShell, print for the probe.
     @Test(arguments: ["Windows_NT $env:OS\r\n", "%OS%\r\nWindows_NT\r\n"])

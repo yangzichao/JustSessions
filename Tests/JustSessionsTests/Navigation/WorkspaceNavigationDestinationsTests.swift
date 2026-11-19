@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Back and Forward go only to tabs still open in the window and sessions the sidebar lists, named by their titles.
-/// Unstarted terminals and private settings; no CLI processes or real sessions are touched.
 @MainActor
 struct WorkspaceNavigationDestinationsTests {
     @Test func backPassesOverClosedTabsAndSessionsTheSearchHides() throws {

@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The rules every change to the tab order keeps: the tabs of one group sit together, a split's two tabs are both
-/// open and side by side, no tab is in two splits, a split of one project's tabs shows in that project's group, and
-/// a split across projects shows in a group of its own that holds only its two tabs.
 func expectSplitRules(_ strip: TerminalTabStrip, sourceLocation: SourceLocation = #_sourceLocation) {
     #expect(keepsGroupsTogether(strip.groupKeys), "groups together: \(strip.groupKeys)", sourceLocation: sourceLocation)
     let tabIDs = strip.tabIDs
@@ -35,7 +32,6 @@ func expectSplitRules(_ store: ConversationStore, sourceLocation: SourceLocation
     #expect(store.tabGroupKeys == store.tabStrip.groupKeys, sourceLocation: sourceLocation)
 }
 
-/// Each key's tabs sit side by side, with no other key's tab between them.
 func keepsGroupsTogether(_ tabGroupKeys: [String]) -> Bool {
     var finishedKeys: Set<String> = []
     for (index, groupKey) in tabGroupKeys.enumerated() where index > 0 && tabGroupKeys[index - 1] != groupKey {
@@ -45,13 +41,11 @@ func keepsGroupsTogether(_ tabGroupKeys: [String]) -> Bool {
     return true
 }
 
-/// A split across projects between the two tabs, in its own group, as `TerminalTabStrip.addSplit` makes one.
 func splitAcrossProjects(_ tabIDs: (UUID, UUID)) -> TerminalSplit {
     let id = UUID()
     return TerminalSplit(id: id, tabIDs: tabIDs, groupKey: TerminalSplit.groupKey(ofSplitAcrossProjects: id))
 }
 
-/// The rule check itself catches a key that comes back after another.
 struct TerminalSplitRulesTests {
     @Test func groupsStayTogetherWhileNoKeyComesBackAfterAnother() {
         #expect(keepsGroupsTogether([]))

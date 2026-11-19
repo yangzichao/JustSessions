@@ -1,18 +1,12 @@
 import Foundation
 
-/// Stand-ins for Pi and OpenCode, which tell what they do only through the extension the app starts them with; see
-/// `LiveSessionReporting`. Each writes `reports/<its pid>.json` as the extension does, and only when the app started it
-/// with the extension: Pi with `--extension <file>`, OpenCode with `OPENCODE_TUI_CONFIG` naming the TUI configuration
-/// that loads the plugin. Each takes the session id after `--session`; otherwise they behave as `StandInActivityCLI`.
 extension StandInActivityCLI {
-    /// Pi's extension reports the title of the prompt a run waits on.
     static let pi = reportingThroughTheAppsExtension(
         startedWithTheExtension: #"[ -f "$extension" ]"#,
         waitingFor: piPromptTitle
     )
     static let piPromptTitle = "Allow rm -rf build?"
 
-    /// OpenCode's plugin reports whether a permission or a question waits.
     static let opencode = reportingThroughTheAppsExtension(
         startedWithTheExtension: #"[ -f "$OPENCODE_TUI_CONFIG" ]"#,
         waitingFor: "permission"

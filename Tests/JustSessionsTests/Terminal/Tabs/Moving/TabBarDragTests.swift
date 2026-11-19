@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Where a dragged tab or group lands as the pointer moves: past a neighbor once it covers half of it, never past
-/// either end of the row, with each neighbor it passes slid over by its width.
 struct TabBarDragTests {
     @Test func aDragThatHasNotCoveredHalfANeighborLeavesEveryItemInPlace() throws {
         var drag = try #require(TabBarDrag(dragging: "a", among: ["a", "b", "c"], widths: [100, 100, 100], spacing: 0))
@@ -55,7 +53,6 @@ struct TabBarDragTests {
         #expect(drag.targetIndex == 0)
     }
 
-    /// A group much wider than the last one still passes it before the row ends.
     @Test func aWideItemPassesANarrowNeighborAtTheEndOfTheRow() throws {
         var drag = try #require(TabBarDrag(dragging: "wide", among: ["wide", "narrow"], widths: [300, 40], spacing: 14))
 

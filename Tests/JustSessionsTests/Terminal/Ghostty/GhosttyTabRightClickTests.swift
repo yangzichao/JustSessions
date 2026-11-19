@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A right-click on a Ghostty tab's terminal shows the app's menu, as on a SwiftTerm one, never Ghostty's own, and the
-/// program gets no click; see `TerminalRightClickTests` for the menu on both engines.
 @MainActor
 @Suite(.serialized)
 struct GhosttyTabRightClickTests {
@@ -47,7 +45,6 @@ struct GhosttyTabRightClickTests {
         #expect(fixture.receivedInput.isEmpty)
     }
 
-    /// Without the app's menu, as in the Settings preview, Ghostty handles the click itself.
     @Test func withoutTheAppsMenuGhosttyTakesTheClick() async throws {
         let fixture = try GhosttyTabFixture()
         defer { fixture.tearDown() }

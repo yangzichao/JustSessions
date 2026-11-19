@@ -1,7 +1,6 @@
 import CucumberSwift
 import XCTest
 
-/// The steps of `Features/AppendedSessionNames/RenameFromSessionFiles.feature`; the rest are `SessionTabSteps`.
 @MainActor
 enum AppendedSessionNameSteps {
     static func register() {

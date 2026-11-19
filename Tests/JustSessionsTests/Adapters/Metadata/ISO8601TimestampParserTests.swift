@@ -4,7 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct ISO8601TimestampParserTests {
-    /// Formats the CLIs write, and ones they do not, which must stay unparsed.
     static let timestamps = [
         "2026-09-24T10:00:00Z",
         "2026-09-24T10:00:00.1Z",
@@ -20,8 +19,6 @@ struct ISO8601TimestampParserTests {
         "",
     ]
 
-    /// The parser accepts and rejects what `ISO8601DateFormatter`, which the app used before, does, and gives the same
-    /// instants to the millisecond that formatter kept.
     @Test(arguments: timestamps)
     func parsesTheSameInstantsAsISO8601DateFormatter(_ text: String) {
         let fractionalSecondsFormatter = ISO8601DateFormatter()

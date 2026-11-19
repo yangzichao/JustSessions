@@ -1,7 +1,6 @@
 import Foundation
 import Testing
 
-/// A third language supplied solely by resource files, like a future translation contribution.
 struct LocalizationBundleFixture {
     let directory: URL
     let bundle: Bundle

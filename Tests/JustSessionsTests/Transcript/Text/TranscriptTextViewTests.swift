@@ -16,8 +16,6 @@ struct TranscriptTextViewTests {
         #expect(view.measuredSize(width: 200).height > 0)
     }
 
-    /// The reader's own text views assemble TextKit 1 themselves, with the layout manager that draws a selection across
-    /// blocks, and keep the text system alive.
     @Test func assemblesTextKitOne() throws {
         let view = TranscriptTextView()
         view.setContent(Self.content("Read me"))
@@ -29,8 +27,6 @@ struct TranscriptTextViewTests {
         #expect(view.textLayoutManager == nil)
     }
 
-    /// Prose wraps at the width it is offered; code, measured without a width, keeps each line whole. Either is only as
-    /// wide as its longest line.
     @Test func measuresAtTheOfferedWidthOrOnOneLine() {
         let view = TranscriptTextView()
         view.setContent(Self.content(String(repeating: "word ", count: 60)))
@@ -43,7 +39,6 @@ struct TranscriptTextViewTests {
         #expect(unbounded.width > 200)
     }
 
-    /// Short text offered more room than it needs keeps its own width, so a table cell does not widen its column.
     @Test func shortTextKeepsItsOwnWidth() {
         let view = TranscriptTextView()
         view.setContent(Self.content("Value"))
@@ -52,7 +47,6 @@ struct TranscriptTextViewTests {
         #expect(view.measuredSize(width: nil).width < 60)
     }
 
-    /// Placing the view at a width other than the one it last measured lays the text out again at that width.
     @Test func laysOutAtThePlacedWidth() throws {
         let view = TranscriptTextView()
         view.setContent(Self.content(String(repeating: "word ", count: 60)))

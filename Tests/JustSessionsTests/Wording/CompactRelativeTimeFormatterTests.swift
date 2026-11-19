@@ -10,7 +10,6 @@ struct CompactRelativeTimeFormatterTests {
         return calendar
     }()
     private let locale = Locale(identifier: "en_US")
-    /// 2026-09-25 12:00:00 UTC.
     private let now = Date(timeIntervalSince1970: 1_790_337_600)
 
     private func age(secondsAgo: TimeInterval) -> String {

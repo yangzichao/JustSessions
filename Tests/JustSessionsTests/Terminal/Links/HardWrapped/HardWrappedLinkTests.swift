@@ -2,8 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A link a CLI broke over rows, found from the screen's text; see `HardWrappedLink`. Unless a test says otherwise,
-/// the screen is as wide as its first row.
 struct HardWrappedLinkTests {
     /// As Claude Code shows a URL in a reply: to the last column, then on after a two-space indent.
     private static let replyRows = [
@@ -63,7 +61,6 @@ struct HardWrappedLinkTests {
         #expect(link(in: Self.replyRows, row: 0, column: 3) == nil)
     }
 
-    /// Chinese characters take two cells each, so the row reaches the edge with fewer characters than columns.
     @Test func wideCharactersBeforeTheURLCountTwoCells() {
         let rows = [
             "说明：https://example.com/docs/get",
@@ -73,7 +70,6 @@ struct HardWrappedLinkTests {
         #expect(link(in: rows, columns: 34, row: 0, column: 10) == "https://example.com/docs/getting-started")
     }
 
-    /// As Claude Code shows a path in a tool's output.
     @Test func aBrokenPathIsFoundWithItsLineNumber() {
         let rows = [
             "Edited Sources/JustSessions/Services/Ter",

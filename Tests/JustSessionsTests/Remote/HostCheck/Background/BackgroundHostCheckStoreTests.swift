@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A check the app runs on its own keeps its report as the host's last check, which the host's heading warns of and
-/// its warning shows; see `ConversationStore+BackgroundHostCheck`. Each test has a host of its own, since shell
-/// startups are the app's.
 @MainActor
 struct BackgroundHostCheckStoreTests {
     @Test func keepsTheReportWithoutRunningTheShellStartupTraceAgain() async throws {
@@ -22,7 +19,6 @@ struct BackgroundHostCheckStoreTests {
         #expect(keptCheck.report.findings.contains { $0.id == .tmux && $0.status == .problem })
         #expect(KeptHostChecks.load(from: settings.userDefaults) == store.keptHostChecks)
         #expect(tracedStartups.count == 0)
-        // No sheet opens for it.
         #expect(store.hostCheck == nil)
         let warning = try #require(store.hostCheckProblemMessage(on: host))
         #expect(warning.hasPrefix("tmux: "))
@@ -35,7 +31,6 @@ struct BackgroundHostCheckStoreTests {
         let keptReport = try #require(store.keptHostChecks.check(for: host)?.report)
         #expect(store.hostCheckProblemMessage(on: host) == nil)
 
-        // The kept report found nothing wrong with tmux, so the warning shows it.
         store.showHostCheck(host)
         #expect(store.hostCheck?.report == keptReport)
 
@@ -46,7 +41,6 @@ struct BackgroundHostCheckStoreTests {
                 == AppLocalization.string(
                     "tmux on \(host) can't reach the tmux server running there, so its sessions can't be opened: protocol version mismatch (client 8, server 7)"
                 ))
-        // The kept report doesn't know of it, so the warning checks the host again.
         store.showHostCheck(host)
         #expect(store.hostCheck?.isChecking == true)
         store.hostCheck = nil

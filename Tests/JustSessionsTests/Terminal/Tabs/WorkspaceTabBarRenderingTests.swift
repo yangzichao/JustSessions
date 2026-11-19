@@ -5,9 +5,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The tab bar drawn with a split of one project's tabs in its group and a split across projects as a unit of its own
-/// between the groups: the latter is underlined half in each of its tabs' project color, the colors the groups of
-/// those projects have. Set `JUSTSESSIONS_THEME_SCREENSHOTS` to a directory to keep the renderings.
 @MainActor
 struct WorkspaceTabBarRenderingTests {
     private static let barWidth: CGFloat = 760
@@ -35,12 +32,9 @@ struct WorkspaceTabBarRenderingTests {
             ])
         let schemeName = colorScheme == .dark ? "dark" : "light"
 
-        // The split across projects shows, both its tabs active.
         let shownFixture = makeFixture(store: store, colorScheme: colorScheme)
         _ = try await shownFixture.capture(named: "tab-bar-split-across-projects-shown-\(schemeName)")
 
-        // The split of one project's tabs shows; the split across projects sits between the groups, inactive, so its
-        // underline is in sight under both its tabs.
         store.selectTerminal(secondApp.id)
         let fixture = makeFixture(store: store, colorScheme: colorScheme)
         let bitmap = try await fixture.capture(named: "tab-bar-split-across-projects-\(schemeName)")
@@ -59,7 +53,6 @@ struct WorkspaceTabBarRenderingTests {
         func underlineColor(atX x: CGFloat) throws -> UInt32 {
             hexValue(of: try #require(bitmap.colorAt(x: Int(x * scale), y: underlineRow)))
         }
-        // Under the app group's label and the tools tab, where no active tab covers the line.
         let appColor = try underlineColor(atX: appSpan.minX + 8)
         let toolsColor = try underlineColor(atX: toolsSpan.midX)
         let leftHalfColor = try underlineColor(atX: splitSpan.minX + splitSpan.width / 4)
@@ -69,8 +62,6 @@ struct WorkspaceTabBarRenderingTests {
         #expect(matches(leftHalfColor, appColor), "\(schemeName): the left tab's half is in its project's color")
         #expect(matches(rightHalfColor, toolsColor), "\(schemeName): the right tab's half is in its project's color")
     }
-
-    // MARK: - Helpers
 
     private func makeFixture(store: ConversationStore, colorScheme: ColorScheme) -> ThemeSurfaceRenderingFixture {
         let bar = WorkspaceTabBar(
@@ -85,7 +76,6 @@ struct WorkspaceTabBarRenderingTests {
         )
     }
 
-    /// Within rounding of a channel, as rasterization may round the solid underline differently from the swatch.
     private func matches(_ color: UInt32, _ reference: UInt32) -> Bool {
         [16, 8, 0].allSatisfy { shift in abs(Int((color >> shift) & 0xFF) - Int((reference >> shift) & 0xFF)) <= 2 }
     }

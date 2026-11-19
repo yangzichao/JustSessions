@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A message's right-click menu: AppKit's own items, with Add bookmark or Remove bookmark first.
 @MainActor
 @Suite(.serialized)
 struct TranscriptTextViewBookmarkMenuTests {
@@ -16,7 +15,6 @@ struct TranscriptTextViewBookmarkMenuTests {
 
     private func id(_ record: Int) -> Int { TranscriptPageIdentity.entryID(record: record, part: 0) }
 
-    /// Shows the transcript in a reader that keeps bookmarks, its pages not loaded, as a jump never needs here.
     private func show(
         in fixture: TranscriptScrollViewFixture, saving bookmarks: [MessageBookmark] = [],
         bookmarkState: TranscriptBookmarkState = TranscriptBookmarkState()
@@ -30,7 +28,6 @@ struct TranscriptTextViewBookmarkMenuTests {
         return store
     }
 
-    /// What AppKit shows for a right click in the text of the entry `entryID`.
     private func menu(forEntry entryID: Int, in fixture: TranscriptScrollViewFixture) throws -> NSMenu {
         let textView = try #require(fixture.textViews.first { $0.selectionKey?.entryIndex == entryID })
         let point = textView.convert(NSPoint(x: 4, y: 4), to: nil)
@@ -87,7 +84,7 @@ struct TranscriptTextViewBookmarkMenuTests {
         menu.performActionForItem(at: 1)
         #expect(bookmarkState.editor.request?.bookmark == bookmark)
         #expect(bookmarkState.editor.request?.conversation.id == conversation.id)
-        #expect(store.messageBookmarks.bookmarks(forConversationID: conversation.id) == [bookmark])  // editing adds nothing
+        #expect(store.messageBookmarks.bookmarks(forConversationID: conversation.id) == [bookmark])
     }
 
     @Test func aNotesMenuHasNoBookmarkItem() async throws {

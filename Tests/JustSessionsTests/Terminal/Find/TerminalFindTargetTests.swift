@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// What ⌘F searches in a tab: the conversation of a tab linked to a session, the terminal otherwise.
 @MainActor
 struct TerminalFindTargetTests {
     private func makeTab(provider: ConversationProvider?, conversation: Conversation?) -> TerminalSession {
@@ -27,7 +26,6 @@ struct TerminalFindTargetTests {
         #expect(TerminalFindTarget(tab: makeTab(provider: nil, conversation: nil)) == .terminal)
     }
 
-    /// A new session's tab finds its session once the CLI writes it; until then only the terminal has its output.
     @Test func aCLITabNotLinkedYetFindsInTheTerminal() {
         #expect(TerminalFindTarget(tab: makeTab(provider: .claude, conversation: nil)) == .terminal)
     }

@@ -3,14 +3,11 @@ import Testing
 
 @testable import JustSessions
 
-/// The session runs a local `sh` script in place of `ssh`: it reads its answers from a pipe, as the command on the
-/// host reads them from its terminal, and `echo` stands in for a terminal echoing what's typed.
 struct RemoteSignInSessionTests {
     private static let fastTiming = RemoteSignInSession.Timing(
         promptPause: .milliseconds(100),
         linePause: .milliseconds(300),
         pollInterval: .milliseconds(20),
-        // Well past the stall at the start of a full run, when the whole test process can wait half a minute.
         timeLimit: .seconds(120)
     )
 
@@ -28,7 +25,6 @@ struct RemoteSignInSessionTests {
         )
     }
 
-    /// Records each question and answers from `answers` by prompt.
     private final class Asker: @unchecked Sendable {
         private let lock = NSLock()
         private let answers: [String: String]
@@ -46,7 +42,6 @@ struct RemoteSignInSessionTests {
             lock.withLock { questions.append(question) }
             onAsked(question)
             guard let answer = answers[question.prompt] else {
-                // Waits to be taken back, as a question shown in the dialog does.
                 while !Task.isCancelled { try? await Task.sleep(for: .milliseconds(10)) }
                 return nil
             }
@@ -114,8 +109,6 @@ struct RemoteSignInSessionTests {
         #expect(asker.asked.map(\.prompt) == ["Press your key to type its code"])
     }
 
-    /// The command goes on printing only once its first line has been asked, as a slow step's would, so the order
-    /// never depends on how quickly the session looks.
     @Test func aPauseWhileTheCommandStillWorksTakesItsQuestionBack() async throws {
         let directory = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -146,7 +139,6 @@ struct RemoteSignInSessionTests {
 
         let outcome = await session(running: "printf 'PIN: '; read pin; sleep 600").run { _ in nil }
 
-        // Stopped, not waited for: well short of the command's 10 minutes, even at a full run's slow start.
         #expect(outcome == .cancelled)
         #expect(ContinuousClock.now - started < .seconds(300))
     }
@@ -162,8 +154,6 @@ struct RemoteSignInSessionTests {
         #expect(message.contains("Your account is locked"))
     }
 
-    /// The command outlives any stall of a full run, so only the time limit can end it: in the v1.2.14 release run a
-    /// 30-second one ended by itself before the session looked, and signed in.
     @Test func aCommandThatNeverEndsIsStoppedAtTheTimeLimit() async {
         var timing = Self.fastTiming
         timing.timeLimit = .seconds(1)

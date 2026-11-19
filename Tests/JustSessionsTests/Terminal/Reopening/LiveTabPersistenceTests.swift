@@ -22,7 +22,6 @@ struct LiveTabPersistenceTests {
 
         store.closeTerminal(try #require(store.terminalSessions.last?.id))
         #expect(savedTabs(in: sandbox) == [.session(first, wasSelected: true)])
-        // A new launch reads the snapshot without any save-at-quit callback from the previous process.
         let restarted = sandbox.makeStore()
         defer { restarted.closeAllTerminals() }
         restarted.reopenTabsFromLastQuit(from: OpenTabPersistence(), isEnabled: true)
@@ -87,7 +86,6 @@ struct LiveTabPersistenceTests {
         #expect(closedWindow.terminalSessions.isEmpty)
         #expect(savedTabs(in: sandbox) == snapshot)
 
-        // Clicking the Dock icon opens a new window in the same launch.
         let reopenedWindow = sandbox.makeStore()
         defer { reopenedWindow.closeAllTerminals() }
         reopenedWindow.reopenTabsFromLastQuit(from: persistence, isEnabled: true)

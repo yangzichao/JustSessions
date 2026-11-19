@@ -3,15 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Measures paging through a long OpenCode session in its database, as the reader and message search do: the latest
-/// page, five pages back from it, a page in the middle, and the whole session read for search. Each reader keeps one
-/// page source, as the reader does. Reports `Perf | <scenario> | <metric> | <value>` lines, medians of five.
-///
-/// Messages carry what OpenCode stores: an assistant reply's model, token counts, cost, and paths, and on every fifth
-/// prompt a summary with file diffs, which hold whole files.
-///
-/// The suite records nothing unless `JUSTSESSIONS_PERF` is set:
-///     JUSTSESSIONS_PERF=1 swift test -c release --filter OpenCodeTranscriptPagingMeasurements
 @Suite(.serialized)
 struct OpenCodeTranscriptPagingMeasurements {
     static let sessionID = "ses_long"
@@ -49,7 +40,7 @@ struct OpenCodeTranscriptPagingMeasurements {
             try await Self.median {
                 _ = try await SessionMessageTextReader.read(conversation)
             })
-        #expect(messageCount > 0)  // Record-only: the numbers above are the result.
+        #expect(messageCount > 0)
     }
 
     private static func source(_ database: OpenCodeDatabaseFixture) -> TranscriptPageSource {
@@ -66,7 +57,6 @@ struct OpenCodeTranscriptPagingMeasurements {
         return times.sorted()[2]
     }
 
-    /// Also builds `ConversationOutlineMeasurements`' OpenCode session.
     static func addSession(to database: OpenCodeDatabaseFixture, messageCount: Int) throws {
         try database.addSession(sessionID)
         let diff =

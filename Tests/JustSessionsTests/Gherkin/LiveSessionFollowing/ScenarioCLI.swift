@@ -2,17 +2,12 @@ import Foundation
 
 @testable import JustSessions
 
-/// Stands in for an Antigravity, Pi, or OpenCode CLI: it writes what the app's `LiveSessionSource` for the tool reads,
-/// in the scenario's temporary folder.
 protocol ScenarioCLI {
     var source: any LiveSessionSource { get }
-    /// The CLI is in the session now, as with `/new`, `/clear`, `/resume`, or a new session's first prompt.
     func moves(toSession sessionID: String) throws
-    /// The tool saves the session where a refresh would find it.
     func saves(session sessionID: String, projectPath: String) throws
 }
 
-/// Antigravity names the conversation it streams in its log; see `AntigravityCLILog`.
 struct ScenarioAntigravityCLI: ScenarioCLI {
     let configurationDirectory: URL
     let source: any LiveSessionSource
@@ -42,7 +37,6 @@ struct ScenarioAntigravityCLI: ScenarioCLI {
     }
 }
 
-/// Pi reports its session through the app's extension, with the file it saves the session in after the first prompt.
 struct ScenarioPiCLI: ScenarioCLI {
     let reporting: LiveSessionReporting
     let processID: Int32
@@ -65,7 +59,6 @@ struct ScenarioPiCLI: ScenarioCLI {
     }
 }
 
-/// OpenCode reports the session it shows through the app's plugin, and none on its home screen.
 struct ScenarioOpenCodeCLI: ScenarioCLI {
     let reporting: LiveSessionReporting
     let processID: Int32

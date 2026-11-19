@@ -36,7 +36,6 @@ struct ClosedTabReleaseTests {
     }
 }
 
-/// A workspace detail view in a window, with a store of its own, whose tabs run `cat` so their terminals stay open.
 @MainActor
 private final class ShownWorkspace {
     let store: ConversationStore
@@ -92,7 +91,6 @@ private final class ShownWorkspace {
         }
     }
 
-    /// What closing the window does to the workspace's views.
     func removeWorkspace() {
         hostingView.rootView = AnyView(EmptyView())
     }

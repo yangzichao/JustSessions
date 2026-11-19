@@ -7,10 +7,8 @@ import Testing
 @MainActor
 final class TranscriptScrollViewFixture {
     let positionStore = TranscriptReadingPositionStore()
-    /// The transcript's saved settings, such as its reading width, live here instead of in the app's own settings.
     let settings: IsolatedUserDefaults
     let hostingView: NSHostingView<AnyView>
-    /// The window the reader is in, which the bookmark commands find it by.
     let window: NSWindow
 
     init(width: CGFloat = 780, height: CGFloat = 480) throws {
@@ -37,8 +35,6 @@ final class TranscriptScrollViewFixture {
         return try #require(descendant(ofType: NSScrollView.self, in: hostingView))
     }
 
-    /// Hosts the whole reader, which loads its own pages, as the preview does, or as a reading window does with
-    /// `readingRequests`.
     func showReader(
         _ conversation: Conversation, matchReveal: TranscriptMatchReveal? = nil, store: ConversationStore? = nil,
         readingRequests: SessionReadingRequests? = nil
@@ -50,17 +46,14 @@ final class TranscriptScrollViewFixture {
             ).defaultAppStorage(settings.userDefaults))
     }
 
-    /// The reader's scroll view, once its first page has loaded.
     var readerScrollView: NSScrollView? {
         descendant(ofType: NSScrollView.self, in: hostingView)
     }
 
-    /// What the text fields show, such as Find's query.
     var textFieldValues: [String] {
         descendants(ofType: NSTextField.self, in: hostingView).filter(\.isEditable).map(\.stringValue)
     }
 
-    /// The transcript's text blocks, each with the entry it shows in its `selectionKey`.
     var textViews: [TranscriptTextView] {
         descendants(ofType: TranscriptTextView.self, in: hostingView)
     }
@@ -72,13 +65,6 @@ final class TranscriptScrollViewFixture {
         }
     }
 
-    /// Lays out until the condition has held for `stableDuration`, so a step that takes several layout passes, such as
-    /// restoring a reading position, has finished rather than passed through. A slow machine, such as a CI runner, can
-    /// outlast `settleLayout()`'s fixed wait. Gives up after `timeout`, leaving the expectations that follow to report
-    /// what the transcript shows. The timeout is generous because a reader that loads in under a second on its own can
-    /// take far longer at the start of a full run, when every suite starts at once: on a CI runner, the first match
-    /// reveal test once spent its whole 10 seconds waiting for its first page, and in v1.2.13's runs its whole 60.
-    /// It now waits as long as `expectEventually`.
     func waitUntil(
         stableFor stableDuration: Duration = .milliseconds(150), timeout: Duration = .seconds(120),
         _ condition: () -> Bool
@@ -110,12 +96,6 @@ final class TranscriptScrollViewFixture {
     /// builds those elements while an assistive app has turned on the app's enhanced user interface, so the press turns
     /// it on, then restores its earlier value afterward. The attribute accessors exist only in the deprecated informal
     /// accessibility API; calling them by selector keeps the build free of deprecation warnings.
-    ///
-    /// The enhanced user interface is app-wide, and other main-actor tests can run while the press waits for layout.
-    /// They only see SwiftUI build its accessibility elements. Presses and searches in other suites may overlap: the
-    /// setting stays on until the last of them ends (`enhancedUserInterfaceUsers`).
-    ///
-    /// The button is pressed straight after `action` runs, before anything it starts can finish, such as a page load.
     func pressButton(labeled label: String, rightAfter action: () -> Void = {}) async throws {
         turnOnEnhancedUserInterface()
         defer { restoreEnhancedUserInterface() }
@@ -150,13 +130,10 @@ final class TranscriptScrollViewFixture {
         descendant(ofType: TranscriptEntryGeometryView.self, in: hostingView)?.controller.currentReadingPosition()
     }
 
-    /// The shown reader's position controller, which keeps its reading position and a bookmark jump's seek target.
     var positionController: TranscriptScrollPositionController? {
         descendant(ofType: TranscriptEntryGeometryView.self, in: hostingView)?.controller
     }
 
-    /// The frames of the entries on screen, in the scroll view's visible area. Entries fill the transcript column's
-    /// width; entries scrolled out of sight can keep an earlier layout, so they are left out.
     // periphery:ignore:parameters scrollView - callers pass the reader's scroll view to read it only when it exists.
     func visibleEntryFrames(in scrollView: NSScrollView) -> [CGRect] {
         descendant(ofType: TranscriptEntryGeometryView.self, in: hostingView)?.controller.visibleEntryFrames() ?? []
@@ -195,8 +172,6 @@ final class TranscriptScrollViewFixture {
             }, omittedEntryCount: omittedEntryCount)
     }
 
-    /// A transcript as a paged reader shows it: each entry's ID is its record's (`TranscriptPageIdentity`), and positions
-    /// use those IDs.
     static func pagedTranscript(_ contents: [TranscriptEntry.Content]) -> TranscriptContent {
         TranscriptContent(
             entries: contents.indices.map { index in
@@ -205,11 +180,9 @@ final class TranscriptScrollViewFixture {
             }, omittedEntryCount: 0, usesEntryIDsForPositions: true)
     }
 
-    /// How many presses and searches have the enhanced user interface on, across fixtures, and its value before the first.
     private static var enhancedUserInterfaceUsers = 0
     private static var enhancedUserInterfaceBeforeUse: NSNumber?
 
-    /// Turns on the setting an assistive app turns on; see `pressButton(labeled:)`.
     private func turnOnEnhancedUserInterface() {
         if Self.enhancedUserInterfaceUsers == 0 {
             Self.enhancedUserInterfaceBeforeUse =
@@ -221,7 +194,6 @@ final class TranscriptScrollViewFixture {
         Self.enhancedUserInterfaceUsers += 1
     }
 
-    /// Puts back the earlier value once the last press or search that turned the setting on has ended.
     private func restoreEnhancedUserInterface() {
         Self.enhancedUserInterfaceUsers -= 1
         guard Self.enhancedUserInterfaceUsers == 0 else { return }

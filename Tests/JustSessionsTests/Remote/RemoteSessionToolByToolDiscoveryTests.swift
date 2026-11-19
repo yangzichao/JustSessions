@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A host's sessions are copied one tool after another, and each tool's are listed before the next copy starts.
 struct RemoteSessionToolByToolDiscoveryTests {
     @Test func listsEachToolsSessionsBeforeCopyingTheNext() async throws {
         let root = try makeTemporaryDirectory()

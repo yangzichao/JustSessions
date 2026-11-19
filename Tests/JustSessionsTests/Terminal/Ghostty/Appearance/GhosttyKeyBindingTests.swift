@@ -3,14 +3,9 @@ import Testing
 
 @testable import JustSessions
 
-/// The keys of a Ghostty terminal drawn with a controller from `GhosttyTerminalControllers`, whose configuration clears
-/// Ghostty's own shortcuts and binds some keys as SwiftTerm sends them.
 @MainActor
 @Suite(.serialized)
 struct GhosttyKeyBindingTests {
-    /// What a SwiftTerm terminal sends for each key with the US layout, outside the kitty keyboard protocol:
-    /// `TerminalEditingKey`'s control keys, then its `keyDown`, then the commands macOS's standard key bindings give
-    /// `doCommand(by:)`. Option-Delete, Home, and End already send the same in Ghostty, and are here to keep it that way.
     @Test func keysSendWhatSwiftTermSends() async throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
@@ -36,8 +31,6 @@ struct GhosttyKeyBindingTests {
         }
     }
 
-    /// Option with a key sends Esc and the key while Option is Meta. Turned off, a terminal already open sends what the
-    /// keyboard layout types for the key instead, and Option-Left still moves a word back.
     @Test func optionIsMetaUntilTurnedOffInAnOpenTerminal() async throws {
         let stores = try IsolatedAppearanceStores()
         defer { stores.remove() }
@@ -71,7 +64,6 @@ struct GhosttyKeyBindingTests {
         let command = NSEvent.ModifierFlags.command
         let shortcuts: [USKey] =
             [
-                // WorkspaceTabCommands
                 USKey(description: "Command-N", keyCode: 45, characters: "n", modifierFlags: command),
                 USKey(description: "Command-T", keyCode: 17, characters: "t", modifierFlags: command),
                 USKey(description: "Shift-Command-N", keyCode: 45, characters: "N", modifierFlags: [.command, .shift]),
@@ -82,20 +74,16 @@ struct GhosttyKeyBindingTests {
             + zip(1...9, [18, 19, 20, 21, 23, 22, 26, 28, 25]).map { number, keyCode in
                 USKey(description: "Command-\(number)", keyCode: UInt16(keyCode), characters: "\(number)", modifierFlags: command)
             } + [
-                // SidebarToggleCommands and AppWideSheetCommands
                 USKey(description: "Command-B", keyCode: 11, characters: "b", modifierFlags: command),
                 USKey(description: "Command-,", keyCode: 43, characters: ",", modifierFlags: command),
-                // The Edit menu
                 USKey(description: "Shift-Command-Z", keyCode: 6, characters: "Z", modifierFlags: [.command, .shift]),
                 USKey(description: "Command-X", keyCode: 7, characters: "x", modifierFlags: command),
                 USKey(description: "Command-C", keyCode: 8, characters: "c", modifierFlags: command),
                 USKey(description: "Command-V", keyCode: 9, characters: "v", modifierFlags: command),
                 USKey(description: "Command-A", keyCode: 0, characters: "a", modifierFlags: command),
-                // The app and window menus
                 USKey(description: "Command-Q", keyCode: 12, characters: "q", modifierFlags: command),
                 USKey(description: "Command-H", keyCode: 4, characters: "h", modifierFlags: command),
                 USKey(description: "Command-M", keyCode: 46, characters: "m", modifierFlags: command),
-                // TextZoomCommands: Actual Size, Zoom In (also Command-=), and Zoom Out, which size the terminals' font
                 USKey(description: "Command-0", keyCode: 29, characters: "0", modifierFlags: command),
                 USKey(description: "Shift-Command-=", keyCode: 24, characters: "+", modifierFlags: [.command, .shift]),
                 USKey(description: "Command-=", keyCode: 24, characters: "=", modifierFlags: command),

@@ -39,7 +39,6 @@ struct TerminalSplitFocusTests {
         try await workspace.settleLayout()
         #expect(workspace.window.firstResponder === first.terminalView, "after separating")
 
-        // No terminal was taken out of its views and put in new ones.
         #expect(workspace.terminalHosts(of: [first, second, third]) == hostsBefore)
     }
 }

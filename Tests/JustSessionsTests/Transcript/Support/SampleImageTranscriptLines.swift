@@ -1,6 +1,5 @@
 import Foundation
 
-/// Session files with a user's image and a tool's image, each followed by text, as the CLIs write them.
 enum SampleImageTranscriptLines {
     static let claude = [
         #"{"type":"user","timestamp":"2026-09-24T10:00:00.000Z","message":{"role":"user","content":[{"type":"text","text":"What is in this screenshot?"},{"type":"image","source":{"type":"base64","media_type":"image/png","data":"\#(SampleTranscriptImage.base64)"}}]}}"#,

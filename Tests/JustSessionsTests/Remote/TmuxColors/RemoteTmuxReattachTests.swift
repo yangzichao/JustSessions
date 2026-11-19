@@ -22,8 +22,6 @@ struct RemoteTmuxReattachTests {
         #expect(tab.terminalView.reportsThemeAfterNextBackgroundQuery)
     }
 
-    /// Without tmux or its session on the host, no client asks for the colors, and a report owed until a later attach
-    /// would arrive unasked.
     @Test(arguments: TerminalEngine.allCases)
     func aFailedReattachOwesNoReport(engine: TerminalEngine) async throws {
         let recorder = RemoteReattachRecorder(exitStatus: 1)
@@ -85,7 +83,6 @@ struct RemoteTmuxReattachTests {
     }
 }
 
-/// Stands in for `ssh`, recording each command and answering with one exit status.
 private final class RemoteReattachRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var recordedCalls: [(host: String, command: String)] = []

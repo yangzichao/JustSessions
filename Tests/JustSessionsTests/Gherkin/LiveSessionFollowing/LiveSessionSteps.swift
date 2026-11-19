@@ -1,7 +1,6 @@
 import CucumberSwift
 import XCTest
 
-/// The steps of `Features/LiveSessionFollowing/FollowLiveSession.feature`; the rest are `SessionTabSteps`.
 @MainActor
 enum LiveSessionSteps {
     static func register() {

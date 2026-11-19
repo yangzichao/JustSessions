@@ -5,8 +5,6 @@ import Testing
 
 @MainActor
 struct RemoteTmuxCommandOrderTests {
-    /// A slow rename must not let the kill that follows it run first: the kill targets the new name, so it would find
-    /// nothing, and the rename would then leave the CLI running under that name.
     @Test func endingASessionRightAfterItTookItsNameKillsItAfterTheRename() async throws {
         let recorder = RemoteCommandOrderRecorder()
         let runner = recorder.runner(delayingCommandsContaining: "rename-session", by: 0.3)
@@ -33,7 +31,6 @@ struct RemoteTmuxCommandOrderTests {
     }
 }
 
-/// Stands in for `ssh`, recording each command when it finishes.
 private final class RemoteCommandOrderRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var finishedCommands: [String] = []

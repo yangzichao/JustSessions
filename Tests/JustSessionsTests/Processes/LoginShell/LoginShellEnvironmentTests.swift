@@ -13,7 +13,6 @@ struct LoginShellEnvironmentTests {
     @Test func readsWhatTheRcFilesSetUp() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
-        // Stands in for zsh: exports what an rc file would, then runs the `-c` command ($4).
         let fakeShell = try writeExecutableScript(
             """
             #!/bin/sh
@@ -47,7 +46,6 @@ struct LoginShellEnvironmentTests {
         let variables = LoginShellEnvironment.readVariables(shellPath: hungShell.path, timeout: 0.5)
 
         #expect(variables.isEmpty)
-        // Well short of the stand-in's 600 seconds, so the time limit, not the shell ending, stopped the wait.
         #expect(Date().timeIntervalSince(startedAt) < 120)
     }
 

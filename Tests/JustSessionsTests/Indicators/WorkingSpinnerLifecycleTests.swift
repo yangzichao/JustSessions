@@ -4,9 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// The spinner's rotation runs only while the arc can be seen, and comes back once it can be again: a spinner the
-/// app keeps mounted at zero opacity, in a hidden view, or in a minimized window would otherwise keep the render
-/// server turning it.
 @MainActor
 struct WorkingSpinnerLifecycleTests {
     @MainActor private final class Visibility: ObservableObject {
@@ -93,7 +90,6 @@ struct WorkingSpinnerLifecycleTests {
         #expect(arc.isTurning)
 
         NotificationCenter.default.post(name: NSWindow.didMiniaturizeNotification, object: window)
-        // Not miniaturized for real, so the arc still can be seen and the handler left a visible arc turning.
         #expect(arc.canBeSeen)
         #expect(arc.isTurning)
         NotificationCenter.default.post(name: NSWindow.didDeminiaturizeNotification, object: window)
@@ -116,8 +112,6 @@ struct WorkingSpinnerLifecycleTests {
         let arc = try #require(findArc(in: hostingView))
         try #require(arc.canBeSeen && arc.isTurning)
 
-        // Both ways are animated by the window server, which posts the window's notification once done; the arc's
-        // own state is what is waited for.
         window.miniaturize(nil)
         try await waitUntil { !arc.isTurning }
         guard window.isMiniaturized else {
@@ -134,8 +128,6 @@ struct WorkingSpinnerLifecycleTests {
         #expect(arc.isTurning)
     }
 
-    // MARK: - Helpers
-
     private func makeWindow() async throws -> (NSWindow, NSHostingView<SpinnerUnderTest>, Visibility) {
         _ = NSApplication.shared
         let visibility = Visibility()
@@ -149,8 +141,6 @@ struct WorkingSpinnerLifecycleTests {
         return (window, hostingView, visibility)
     }
 
-    /// Up to 120 seconds, polling, for the window server's animations, which the start of a full run can hold up for
-    /// tens of seconds; the expectations after it check the result.
     private func waitUntil(_ condition: () -> Bool) async throws {
         let deadline = ContinuousClock.now + .seconds(120)
         while !condition(), ContinuousClock.now < deadline {

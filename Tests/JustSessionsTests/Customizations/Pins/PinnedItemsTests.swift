@@ -19,7 +19,6 @@ struct PinnedItemsTests {
         #expect(groups.map(\.projectPath) == [quietOldest.projectDirectoryKey, busyNewest.projectDirectoryKey])
         #expect(groups.map(\.isPinned) == [true, false])
         #expect(groups[0].conversations.map(\.id) == [quietOldest.id, quietNewest.id])
-        // Activity still comes from the newest session, not the pinned one listed first.
         #expect(groups[0].latestActivity == quietNewest.updatedAt)
     }
 

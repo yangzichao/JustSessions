@@ -2,8 +2,6 @@ import Foundation
 
 @testable import JustSessions
 
-/// A folder on this Mac stands in for an SSH host's home: commands run in a local `sh` with that home and a fake
-/// login shell, and `rsync` reaches it through a fake `ssh` that runs rsync's other end here, in the home.
 extension RemoteMirrorHostAccess {
     static func standIn(home: String) -> RemoteMirrorHostAccess {
         let scripts = StandInHostScripts.directory

@@ -47,7 +47,6 @@ struct RemoteClaudeActivityRelayTests {
         #expect(FileManager.default.fileExists(atPath: sandbox.root.appendingPathComponent("Claude config/sessions").path))
     }
 
-    /// As after the tab closed with Keep running, or its connection dropped.
     @Test func itGoesOnWithNoTabAndAReattachStartsNoSecondOne() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
@@ -63,7 +62,6 @@ struct RemoteClaudeActivityRelayTests {
         try Self.setRecord(#""status":"idle""#, in: sandbox)
         #expect(sandbox.waitUntil { Self.relayedRecord(of: tmuxName, in: sandbox) == "idle:" })
 
-        // The relay sets the option only when the record changes, and a new one would set it at once.
         let target = ShellQuoting.quoted("=" + tmuxName + ":")
         _ = sandbox.run("tmux set-option -w -t \(target) \(RemoteCLIActivityTitle.optionName) left-alone")
         let secondClient = try sandbox.startClient(tabCommand(sandbox, tmuxName: tmuxName))
@@ -117,7 +115,6 @@ struct RemoteClaudeActivityRelayTests {
         #expect(sandbox.waitUntil { Self.lastSession(in: output)?.sessionID == newID })
         #expect(Self.lastSession(in: output)?.userChosenName == name)
 
-        // Metadata too large to relay must not leave the old idle record hiding a new busy state.
         let huge = #""status":"busy","name":"\#(String(repeating: "x", count: 9000))","nameSource":"user""#
         try Self.setRecord(huge, in: sandbox)
         #expect(sandbox.waitUntil { TerminalTitlesSent.lastActivity(inOutputFile: output, of: .claude) == .working })
@@ -141,7 +138,6 @@ struct RemoteClaudeActivityRelayTests {
             .write(to: transcript, atomically: true, encoding: .utf8)
         #expect(sandbox.waitUntil { Self.lastSession(in: output)?.userChosenName == "Transcript ✓" })
 
-        // A large turn moves the title out of the tail. Its last name stays, but not after /clear.
         try String(repeating: "x", count: 70000).write(to: transcript, atomically: true, encoding: .utf8)
         Thread.sleep(forTimeInterval: 1.5)
         #expect(Self.lastSession(in: output)?.userChosenName == "Transcript ✓")

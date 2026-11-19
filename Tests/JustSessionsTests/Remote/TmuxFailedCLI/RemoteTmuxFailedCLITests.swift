@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A remote tab's CLI that fails in tmux leaves what it printed in the tab, and its status; see
-/// `RemoteTmuxAttachScript`. Runs the tab's command against a real tmux on this Mac, with a private tmux server and
-/// home folder, and stand-ins for the host's login shell and CLI. Skipped where tmux is not installed.
 @Suite(.oneTmuxSandboxAtATime)
 struct RemoteTmuxFailedCLITests {
     @Test func aCLIThatFailsAtOnceLeavesWhatItPrintedAndItsStatus() throws {
@@ -58,7 +55,6 @@ struct RemoteTmuxFailedCLITests {
         #expect(sandbox.hasTmuxSession(tmuxName))
     }
 
-    /// As when the host's tmux server crashed or was ended: nothing is left to reattach, and the tab says it failed.
     @Test func aClientWhoseServerEndsEndsTheTabWithTmuxsStatus() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
@@ -74,7 +70,6 @@ struct RemoteTmuxFailedCLITests {
         #expect(client.terminationStatus == 1)
     }
 
-    /// As after the tab closed with Keep running: no tab shows the dead pane, so nothing keeps the session.
     @Test func aCLIThatFailsWithNoClientAttachedEndsItsSession() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
@@ -92,7 +87,6 @@ struct RemoteTmuxFailedCLITests {
         #expect(sandbox.waitUntil { !sandbox.hasTmuxSession(tmuxName) })
     }
 
-    /// As when the connection dropped after the CLI failed, before the script ended its session.
     @Test func aDeadSessionLeftBehindEndsAndTheCLIStartsAgain() throws {
         guard let tmuxDirectory = TmuxSandbox.installedTmuxDirectory else { return }
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)

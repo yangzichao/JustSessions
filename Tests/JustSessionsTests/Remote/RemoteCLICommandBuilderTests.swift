@@ -21,8 +21,6 @@ struct RemoteCLICommandBuilderTests {
         #expect(!command.environment.contains { $0.hasPrefix("NO_COLOR=") })
     }
 
-    /// Runs the remote command the way the host's shell would, with stand-ins for the login shell and the CLI,
-    /// to check that a folder name with a space and a quote survives both levels of quoting.
     @Test func remoteCommandReachesTheCLIInTheProjectFolder() throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -30,7 +28,6 @@ struct RemoteCLICommandBuilderTests {
         let bin = root.appendingPathComponent("bin")
         try FileManager.default.createDirectory(at: project, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
-        // `$SHELL -lic <command>`: drop the flags and run the command.
         try writeExecutableScript("#!/bin/sh\nshift\nexec /bin/sh -c \"$1\"\n", to: bin.appendingPathComponent("login-shell"))
         try writeExecutableScript("#!/bin/sh\npwd -P\nprintf '%s\\n' \"$@\"\n", to: bin.appendingPathComponent("claude"))
 
@@ -53,8 +50,6 @@ struct RemoteCLICommandBuilderTests {
         #expect(Array(lines.dropFirst()) == ["--resume", "id with space"])
     }
 
-    /// As on this Mac, Codex is asked to say in its terminal title what it does, which tmux on the host passes to the
-    /// tab; see `CodexTitleActivity`. A start command of your own gets the same, and other CLIs get nothing.
     @Test(arguments: [nil, "codex --full-auto"])
     func codexOnTheHostIsAskedForItsTitle(startCommand: String?) throws {
         let root = try makeTemporaryDirectory()
@@ -103,8 +98,6 @@ struct RemoteCLICommandBuilderTests {
         #expect(inTmux.contains(RemoteClaudeSessionTitle.titleFormat) == (provider == .claude))
     }
 
-    /// Pi and OpenCode tell what they do through the app's extension, which their tmux session writes to the host;
-    /// see `RemoteLiveSessionReporting`. A host without tmux, which passes no title, gets no extension.
     @Test(arguments: ConversationProvider.allCases)
     func onlyPiAndOpenCodesTmuxSessionsWriteTheExtension(provider: ConversationProvider) {
         let inTmux = RemoteCLICommandBuilder.remoteCommand(

@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A reader in a window, with a question, a reply with a paragraph, a list, a table, and code, and a short reply after
-/// it, for selecting across its text blocks with real mouse events.
 @MainActor
 final class TranscriptTextSelectionFixture {
     /// A window that counts as the key window without the app being active, as the test runner never is.
@@ -30,7 +28,6 @@ final class TranscriptTextSelectionFixture {
         """
     static let lastReply = "Last reply."
 
-    /// The events a drag reads after its mouse-down, in place of the window's queue.
     private final class EventReplay {
         var events: [NSEvent] = []
     }
@@ -89,7 +86,6 @@ final class TranscriptTextSelectionFixture {
         get throws { try #require(textViews.first?.selectionCoordinator) }
     }
 
-    /// Each block's selected text, in reading order, leaving out blocks with nothing selected.
     var selectedTexts: [String] {
         textViews.sorted {
             ($0.selectionKey ?? .init(entryIndex: 0, segmentIndex: 0)) < ($1.selectionKey ?? .init(entryIndex: 0, segmentIndex: 0))
@@ -98,7 +94,6 @@ final class TranscriptTextSelectionFixture {
         .filter { !$0.isEmpty }
     }
 
-    /// The middle of the character at `offset` in `view`, in window coordinates.
     func point(in view: TranscriptTextView, atCharacter offset: Int) throws -> NSPoint {
         let layoutManager = try #require(view.layoutManager)
         let textContainer = try #require(view.textContainer)
@@ -106,11 +101,9 @@ final class TranscriptTextSelectionFixture {
         var rect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
         rect.origin.x += view.textContainerOrigin.x
         rect.origin.y += view.textContainerOrigin.y
-        // Just before the character's middle, so a click there puts the selection's end before it.
         return view.convert(NSPoint(x: rect.minX + rect.width * 0.3, y: rect.midY), to: nil)
     }
 
-    /// Presses the mouse at `start` over `view`, drags to `end`, and releases it there.
     func drag(from start: NSPoint, to end: NSPoint, in view: TranscriptTextView, modifiers: NSEvent.ModifierFlags = []) throws {
         replay.events = [
             try mouseEvent(.leftMouseDragged, at: end, modifiers: modifiers), try mouseEvent(.leftMouseUp, at: end, modifiers: modifiers),
@@ -118,7 +111,6 @@ final class TranscriptTextSelectionFixture {
         view.mouseDown(with: try mouseEvent(.leftMouseDown, at: start, modifiers: modifiers))
     }
 
-    /// A press and release at `point` without moving.
     func click(at point: NSPoint, in view: TranscriptTextView, modifiers: NSEvent.ModifierFlags = []) throws {
         replay.events = [try mouseEvent(.leftMouseUp, at: point, modifiers: modifiers)]
         view.mouseDown(with: try mouseEvent(.leftMouseDown, at: point, modifiers: modifiers))

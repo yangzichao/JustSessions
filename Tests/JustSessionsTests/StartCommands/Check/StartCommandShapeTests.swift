@@ -2,7 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A start command is read as the shell reads it, without running it, to find the program it starts.
 struct StartCommandShapeTests {
     struct ShapeCase: Sendable, CustomTestStringConvertible {
         let command: String
@@ -20,7 +19,6 @@ struct StartCommandShapeTests {
         ShapeCase(command: #""/Applications/My Tools/claude" --verbose"#, shape: .program("/Applications/My Tools/claude")),
         ShapeCase(command: #"my\ claude"#, shape: .program("my claude")),
         ShapeCase(command: "'kiro-cli' chat --trust-all-tools", shape: .program("kiro-cli")),
-        // Separators and expansions in the arguments do not change the program.
         ShapeCase(command: #"claude --append-system-prompt "a; b | c""#, shape: .program("claude")),
         ShapeCase(command: "claude --tag=a#b", shape: .program("claude")),
         ShapeCase(command: "claude --model $(cat ~/.model; echo)", shape: .program("claude")),
@@ -38,7 +36,6 @@ struct StartCommandShapeTests {
         ShapeCase(command: "cd ~/api && claude", shape: .shellOperator("&")),
         ShapeCase(command: "claude | tee log", shape: .shellOperator("|")),
         ShapeCase(command: "claude > log", shape: .shellOperator(">")),
-        // The app's arguments would land in the comment.
         ShapeCase(command: "claude # mine", shape: .shellOperator("#")),
     ]
 

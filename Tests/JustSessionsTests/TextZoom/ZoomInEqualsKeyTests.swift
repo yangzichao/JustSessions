@@ -15,7 +15,6 @@ struct ZoomInEqualsKeyTests {
         #expect(ZoomInEqualsKey.zoomInEvent(for: equalsKey(modifiers: .command, type: .keyUp)) == nil)
     }
 
-    /// A menu item takes one key equivalent: Zoom In's ⌘+ misses ⌘=, and catches the ⌘+ that ⌘= is handed on as.
     @Test func theHandedOnEventChoosesTheCommandPlusMenuItem() throws {
         _ = NSApplication.shared
         let menu = NSMenu()

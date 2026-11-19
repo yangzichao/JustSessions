@@ -1,6 +1,5 @@
 import Foundation
 
-/// A value that tests change from other threads, such as a fake server's, and read from the test.
 final class LockedValue<Value>: @unchecked Sendable {
     private let lock = NSLock()
     private var storedValue: Value

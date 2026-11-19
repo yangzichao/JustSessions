@@ -3,10 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A Pi or OpenCode tab's tmux session on an SSH host writes the app's extension to the host and starts the CLI with
-/// it, and the extension puts what the CLI does in the tab's title; see `RemoteLiveSessionReporting`. Runs the tab's
-/// command against a real tmux on this Mac, with a private tmux server and home folder. Skipped where tmux is not
-/// installed, and the tests that run the extension where `node` is not.
 @Suite(.oneTmuxSandboxAtATime)
 struct RemoteLiveSessionReportingTests {
     @Test func piStartsWithTheExtensionTheTabWroteToTheHost() throws {
@@ -51,7 +47,6 @@ struct RemoteLiveSessionReportingTests {
         let sandbox = try TmuxSandbox(tmuxDirectory: tmuxDirectory)
         defer { sandbox.tearDown() }
         try sandbox.addProgram(named: provider.executableName, script: Self.recordingLaunch)
-        // A file where the folder would go.
         try "".write(to: sandbox.root.appendingPathComponent(".cache"), atomically: true, encoding: .utf8)
         let client = try sandbox.startClient(Self.tabCommand(provider, in: sandbox))
         defer { client.terminate() }
@@ -110,7 +105,6 @@ struct RemoteLiveSessionReportingTests {
             #expect(sandbox.waitUntil { TerminalTitlesSent.lastActivity(inOutputFile: output, of: .opencode) == activity }, "\(activity)")
         }
 
-        // Its home screen shows no session, and the tab's title is the CLI's own again.
         try Self.setSteps(steps.map(\.0) + [#"{"session":null,"status":"idle","permissions":0}"#], in: sandbox)
         #expect(
             sandbox.waitUntil {
@@ -119,7 +113,6 @@ struct RemoteLiveSessionReportingTests {
             })
     }
 
-    /// Records its arguments, and the two variables a tab's login shell may set for the extension, then waits.
     private static let recordingLaunch = #"""
         {
           printf '%s\n' "$@"

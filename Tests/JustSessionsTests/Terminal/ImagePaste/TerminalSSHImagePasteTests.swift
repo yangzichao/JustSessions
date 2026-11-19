@@ -4,8 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// An image pasted on a tab on an SSH host is saved on this Mac, copied there as a dropped file is, and its host path
-/// typed; a local shell stands in for `ssh` and the host.
 @MainActor
 struct TerminalSSHImagePasteTests {
     @Test func aPastedImageReachesTheHostAndLeavesNothingOnThisMac() async throws {
@@ -26,7 +24,6 @@ struct TerminalSSHImagePasteTests {
         #expect(fileDrop.status == nil)
     }
 
-    /// Two images of the same name each go into a private folder of their own on the host.
     @Test func imagesPastedWhileADropCopiesJoinItInTurn() async throws {
         let folder = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: folder) }
@@ -42,8 +39,6 @@ struct TerminalSSHImagePasteTests {
         fileDrop.take(try image(first))
         fileDrop.take(try image(second))
 
-        // Each copy waits for the main actor and for one of Swift's shared threads, both of which a full run holds up:
-        // a release run passed here after 135 seconds, and two runs failed at the 120-second default.
         try await expectEventually(timeout: .seconds(300)) { !typedPaths.isEmpty }
         let hostPaths = try #require(typedPaths.first)
         #expect(typedPaths.count == 1)
@@ -90,7 +85,6 @@ struct TerminalSSHImagePasteTests {
         let folder = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: folder) }
         let fileDrop = try makeFileDrop(in: folder, copier: .local(home: folder))
-        // A file where the folder should be.
         fileDrop.pastedImagesFolder = try makeDroppedFile(named: "not-a-folder", byteCount: 1, in: folder)
 
         fileDrop.take(try image(makePNGData()))
@@ -114,7 +108,6 @@ struct TerminalSSHImagePasteTests {
         return try #require(TerminalClipboardImage(pasteboard: pasteboard))
     }
 
-    /// The images saved for copies that haven't ended.
     private func savedImages(in fileDrop: TerminalSSHFileDrop) throws -> [String] {
         guard FileManager.default.fileExists(atPath: fileDrop.pastedImagesFolder.path) else { return [] }
         return try FileManager.default.contentsOfDirectory(atPath: fileDrop.pastedImagesFolder.path)

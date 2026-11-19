@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Session files as the CLIs write them, one JSON object per line, for tests that damage or interleave them.
 enum SampleTranscriptLines {
     static let claude = [
         #"{"type":"user","timestamp":"2026-09-24T10:00:00.000Z","message":{"role":"user","content":"Fix the build"}}"#,
@@ -39,7 +38,6 @@ enum SampleTranscriptLines {
         #"{"type":"message","id":"a8","parentId":"a7","timestamp":"2026-09-24T10:00:08.000Z","message":{"role":"user","content":"Thanks","timestamp":1758708008000}}"#,
     ]
 
-    /// Lines no reader shows anything for: not JSON, not an object, or an object of an unexpected shape.
     static let unusable: [Data] =
         [
             "not json", "{", "}", "[1,2,3]", "null", "\"just a string\"", "{\"type\":",
@@ -60,7 +58,6 @@ enum SampleTranscriptLines {
     }
 }
 
-/// Reads a session file the way the preview does, for one tool.
 struct TranscriptFileReader: Sendable, CustomTestStringConvertible {
     let testDescription: String
     let sampleLines: [String]

@@ -3,8 +3,6 @@ import XCTest
 
 @testable import JustSessions
 
-/// One Claude Code tab whose CLI runs in tmux, and Claude Code's live registry in the app's temporary folder, which
-/// the scenario writes as the CLI would.
 @MainActor
 final class ClaudeCodeTabWorld: SessionTabWorld {
     static let cliProcessID: Int32 = 4242
@@ -12,7 +10,6 @@ final class ClaudeCodeTabWorld: SessionTabWorld {
     let app: ScenarioApp
     private(set) var tab: TerminalSession?
     private let registry: ClaudeLiveSessionRegistry
-    /// What the live registry says about the tab's CLI: the session it is in, and the name it carries.
     private var cliSessionID = UUID().uuidString.lowercased()
     private var cliName: String?
     private var cliNameSource: String?
@@ -30,7 +27,6 @@ final class ClaudeCodeTabWorld: SessionTabWorld {
         app.store.synchronizeClaudeLiveNames(registry: registry)
     }
 
-    /// Lists the session the new tab's CLI is in under `title`, as its first prompt would.
     func listNewSession(as title: String) async throws {
         try await app.listSession(labeled: title, sessionID: cliSessionID)
     }
@@ -71,7 +67,6 @@ final class ClaudeCodeTabWorld: SessionTabWorld {
         try writeRegistryRecordAndSynchronize()
     }
 
-    /// `/clear` moves the CLI to another session and keeps its name, as Claude Code does.
     func cliMoves(toSessionLabeled label: String) throws {
         cliSessionID = try app.sessionID(labeled: label)
         try writeRegistryRecordAndSynchronize()

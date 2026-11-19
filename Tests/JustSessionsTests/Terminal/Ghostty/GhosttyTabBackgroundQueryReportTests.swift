@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A Ghostty tab owed a theme report after the next background query, as `ConversationStore+RemoteTmuxColors` makes it
-/// for tmux before 3.6, sends it right after Ghostty's own answer to that query, as a SwiftTerm tab does: the program
-/// gets the answer first, then the report. See `ThemeReportAfterBackgroundQueryTests` for the reporting itself.
 @MainActor
 @Suite(.serialized)
 struct GhosttyTabBackgroundQueryReportTests {
@@ -49,8 +46,6 @@ struct GhosttyTabBackgroundQueryReportTests {
         #expect(fixture.receivedInput == answer)
     }
 
-    /// A program that subscribed to theme changes hears of a light/dark change itself, so only an unsubscribed one
-    /// needs the tab to pass it on; see `UnheardLightDarkChangeTests` for a terminal that runs nothing.
     @Test func aSubscribedProgramHearsTheLightDarkChangeItself() async throws {
         let fixture = try GhosttyTabFixture(mode: .light)
         defer { fixture.tearDown() }

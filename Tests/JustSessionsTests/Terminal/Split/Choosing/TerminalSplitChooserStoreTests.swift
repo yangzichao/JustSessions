@@ -3,15 +3,8 @@ import Testing
 
 @testable import JustSessions
 
-/// Add Tab to New Split View (⌘⌥N) as Chrome's NewSplitTab and split view new tab page: the selected tab shows on the
-/// left beside a chooser, which has the keyboard and lists the window's other tabs off screen and in no split, the one
-/// selected last first. The tab chosen there makes a split with it on the chooser's side and is selected. The chooser
-/// counts as a split's other view: the split entries arrange and close it, a tab moved or dropped on its side takes its
-/// place, and its tab joins no other split.
 @MainActor
 struct TerminalSplitChooserStoreTests {
-    // MARK: - Opening
-
     @Test func aChooserShowsBesideTheSelectedTabAndTakesTheKeyboard() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -55,8 +48,6 @@ struct TerminalSplitChooserStoreTests {
         expectChooserRules(store)
     }
 
-    // MARK: - The list
-
     @Test func theChooserListsTabsOffScreenInNoSplitTheOneSelectedLastFirst() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -71,10 +62,8 @@ struct TerminalSplitChooserStoreTests {
         store.selectTerminal(a.id)
         store.openSplitChooser()
 
-        // a shows, c and d are in a split; b was selected after e.
         #expect(store.splitChooserCandidates.map(\.id) == [b.id, e.id])
 
-        // A tab reopened without being shown was never selected, so it comes last.
         let reopened = makeTab()
         store.insertReopenedTerminal(reopened, at: 0, selecting: false)
         #expect(store.splitChooserCandidates.map(\.id) == [b.id, e.id, reopened.id])
@@ -96,8 +85,6 @@ struct TerminalSplitChooserStoreTests {
         #expect(store.splitChooserCandidates.isEmpty)
     }
 
-    // MARK: - Choosing
-
     @Test func choosingATabSplitsItOnTheChoosersSideAndSelectsIt() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -111,7 +98,6 @@ struct TerminalSplitChooserStoreTests {
         store.chooseTab(c.id, inSplitChooser: chooser.id)
 
         let split = try #require(store.shownSplit)
-        // The split keeps the chooser's id, so its panes keep their widths.
         #expect(split.id == chooser.id)
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: a.id, right: c.id))
         #expect(ids(store) == [a.id, c.id, b.id])
@@ -177,8 +163,6 @@ struct TerminalSplitChooserStoreTests {
         expectChooserRules(store)
     }
 
-    // MARK: - Closing, reversing, and selecting
-
     @Test func closingTheChooserLeavesItsTabFullWidthWithTheKeyboard() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -230,7 +214,6 @@ struct TerminalSplitChooserStoreTests {
         #expect(store.terminalSplitChoosers == [chooser])
         #expect(!store.selectsShownSplitChooser)
 
-        // Coming back to its tab shows it, with the keyboard in the tab.
         store.selectTerminal(a.id)
         #expect(store.shownSplitChooser == chooser)
         #expect(!store.selectsShownSplitChooser)
@@ -238,7 +221,6 @@ struct TerminalSplitChooserStoreTests {
         store.selectSplitChooser(beside: a.id)
         #expect(store.selectsShownSplitChooser)
 
-        // A click in the tab's terminal takes the keyboard back.
         store.selectTerminal(a.id)
         #expect(!store.selectsShownSplitChooser)
     }
@@ -289,8 +271,6 @@ struct TerminalSplitChooserStoreTests {
         #expect(!store.selectsShownSplitChooser)
     }
 
-    // MARK: - Split entries
-
     @Test func theSplitEntriesArrangeTheChooser() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -315,7 +295,6 @@ struct TerminalSplitChooserStoreTests {
         perform(.reverseViews)
         #expect(store.shownSplitChooser?.side == .left)
 
-        // The chooser's own view closes at once; the tab's view closes as its × does.
         perform(.closeView(.right))
         #expect(closedTabIDs == [a.id])
         #expect(store.shownSplitChooser != nil)
@@ -348,7 +327,6 @@ struct TerminalSplitChooserStoreTests {
         #expect(store.terminalSplits.isEmpty)
         #expect(!store.canShowDroppedTabs([a.id]))
 
-        // Nor can it swap into a split.
         store.splitSelectedTerminal(with: c.id)
         store.moveIntoShownSplit(a.id, swappingWith: .left)
         #expect(store.split(containing: a.id) == nil)
@@ -392,8 +370,6 @@ struct TerminalSplitChooserStoreTests {
         expectChooserRules(store)
     }
 
-    // MARK: - Dropping
-
     @Test func aTabDroppedOnTheChoosersSideIsChosenAndOnTheOtherTakesTheChooser() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -416,8 +392,6 @@ struct TerminalSplitChooserStoreTests {
         expectChooserRules(store)
     }
 
-    // MARK: - New Session…
-
     @Test func aTabStartedFromTheChoosersNewSessionTakesItsPlace() throws {
         let (store, cleanUp) = try makeStore()
         defer { cleanUp() }
@@ -434,7 +408,6 @@ struct TerminalSplitChooserStoreTests {
         #expect(store.sides(of: split) == TerminalSplit.Sides(left: a.id, right: started.id))
         #expect(store.selectedTerminalID == started.id)
 
-        // Only that one tab.
         let next = open(store, makeTab())
         #expect(store.split(containing: next.id) == nil)
         expectSplitRules(store)
@@ -456,9 +429,6 @@ struct TerminalSplitChooserStoreTests {
         #expect(store.splitChooser(beside: a.id) == chooser)
     }
 
-    // MARK: - Helpers
-
-    /// Every chooser is beside an open tab in no split, with at most one beside a tab.
     private func expectChooserRules(_ store: ConversationStore, sourceLocation: SourceLocation = #_sourceLocation) {
         let openTabIDs = Set(store.terminalSessions.map(\.id))
         let chooserTabIDs = store.terminalSplitChoosers.map(\.tabID)

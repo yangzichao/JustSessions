@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A split keeps its own layout through the tab strip's rules, which rebuild it as they swap or regroup its tabs
-/// (SPL-18). Tabs are named by their project's letter and a number, such as `a1`.
 struct TerminalTabStripOrientationTests {
     @Test func aSplitOpensInTheLayoutAskedFor() throws {
         var strip = makeStrip("a1", "a2")
@@ -70,8 +68,6 @@ struct TerminalTabStripOrientationTests {
         #expect(regrouped.orientation == .stacked)
         expectSplitRules(strip)
     }
-
-    // MARK: - Helpers
 
     private let tabIDsByName: [String: UUID] = Dictionary(
         uniqueKeysWithValues: ["a", "b"].flatMap { project in (1...3).map { ("\(project)\($0)", UUID()) } }

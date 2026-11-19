@@ -2,8 +2,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Views that read tabs through the store follow a tab's own state through `tabStateRevision`: every open tab's own
-/// change counts, a closed tab's no longer does, and selecting a tab changes nothing there.
 @MainActor
 struct TabStateRevisionTests {
     @Test func aTabsOwnChangesCountButSelectingATabDoesNot() async throws {
@@ -36,7 +34,6 @@ struct TabStateRevisionTests {
         #expect(revisions.count == countAfterClosing)
     }
 
-    /// Lets the counter look again, as it does on the main actor's next turn.
     private func settle() async {
         for _ in 0..<5 { await Task.yield() }
     }

@@ -21,7 +21,6 @@ struct GhosttyThemeReportFilterTests {
         }
     }
 
-    /// A report split across writes stays as it is, rather than holding back an Escape key for the next write.
     @Test func partOfAReportIsNeverHeldBack() {
         #expect(filtered("\u{1B}") == "\u{1B}")
         #expect(filtered("\u{1B}[?997;") == "\u{1B}[?997;")

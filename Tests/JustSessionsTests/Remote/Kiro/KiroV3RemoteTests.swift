@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Kiro CLI V3 sessions on an SSH host: copied beside V2's, with only their metadata and log, and deleted there.
 struct KiroV3RemoteTests {
     private struct Host {
         let root: URL
@@ -136,7 +135,6 @@ struct KiroV3RemoteTests {
         #expect(!FileManager.default.fileExists(atPath: history.path))
     }
 
-    /// Runs the host's command in `sh` with the stand-in home and a stand-in `kiro-cli` running `script`.
     private static func runner(host: Host, script: String) throws -> RemoteHostCommandRunner {
         let binaryDirectory = host.root.appendingPathComponent("bin")
         try FileManager.default.createDirectory(at: binaryDirectory, withIntermediateDirectories: true)

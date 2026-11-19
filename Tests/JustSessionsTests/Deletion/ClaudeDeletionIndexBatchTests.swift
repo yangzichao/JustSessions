@@ -23,7 +23,6 @@ struct ClaudeDeletionIndexBatchTests {
             moveToTrash: { try FileManager.default.removeItem(at: $0) }, indexBatch: batch)
         for session in sessions.prefix(2) { try deletion.delete(session) }
         #expect(batch.pendingCount == 2)
-        // The deletion worker performs this flush when Cancel stops it between sessions.
         #expect(batch.flush().isEmpty)
         let object = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: index)) as? [String: Any])
         #expect((object["entries"] as? [[String: String]]) == [["sessionId": sessions[2].sessionID]])

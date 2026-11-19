@@ -7,18 +7,12 @@ import Testing
 
 @testable import JustSessions
 
-/// A Ghostty tab that goes away while the reading of its process's output waits for Ghostty to catch up.
 @MainActor
 @Suite(.serialized)
 struct GhosttyTabTeardownTests {
-    /// Small, so a fast process reaches them at once.
     private static let highWaterByteCount = 64 << 10
     private static let lowWaterByteCount = 16 << 10
 
-    /// The paused read waits until Ghostty has parsed what it read, so closing the tab, which waits for anything the
-    /// read is doing, must end that wait first or wait forever. The read waits here for a Ghostty that has not parsed
-    /// the output, as Ghostty can't before the view is in a window, so the main thread stays free until `terminate()`.
-    /// A test that held the main thread instead, until the reading paused, could hang a busy machine's whole run.
     @Test func terminatingAPausedTabReturnsAndEndsItsProcess() async throws {
         let settings = try IsolatedUserDefaults()
         let folder = try makeTemporaryDirectory()
@@ -43,8 +37,6 @@ struct GhosttyTabTeardownTests {
         let processID = view.processID
         try #require(processID > 0)
         try #require(await Self.waitUntilReadingPauses(view.outputBackpressure))
-        // Without it a broken `terminate()` would wait forever, and the test with it. Long enough that a busy machine,
-        // such as the release workflow's, never needs it when `terminate()` works.
         let rescue = PausedReadRescue(view.outputBackpressure, after: .seconds(60))
 
         let elapsed = ContinuousClock().measure { view.terminate() }
@@ -100,7 +92,6 @@ struct GhosttyTabTeardownTests {
 
         try await expectEventually { freeing.wasFreed }
         try await expectEventually { backpressure.unparsedByteCount > unparsedWhilePaused }
-        // A view the paused read held on to would go once Ghostty parsed the output; this parses it.
         try await Self.parseOutput(of: session, settings: settings)
         try await expectEventually { freeing.wasFreed }
         #expect(freeing.wasFreedOnMainThread == true)
@@ -123,8 +114,6 @@ struct GhosttyTabTeardownTests {
         ["HOME=\(folder.path)", "PATH=/usr/bin:/bin", "TERM=xterm-256color", "LANG=en_US.UTF-8"]
     }
 
-    /// Waits, with the main thread free to pass output on, until the output read stops growing at the high-water
-    /// mark: the reading waits for room. Returns whether it did within 120 seconds.
     private static func waitUntilReadingPauses(_ backpressure: GhosttyOutputBackpressure) async throws -> Bool {
         let deadline = ContinuousClock.now + .seconds(120)
         var unparsed = backpressure.unparsedByteCount
@@ -142,7 +131,6 @@ struct GhosttyTabTeardownTests {
         return false
     }
 
-    /// Gives the session a Ghostty surface, in a window of its own, until it has parsed its output.
     private static func parseOutput(of session: InMemoryTerminalSession, settings: IsolatedUserDefaults) async throws {
         let view = AppTerminalView(frame: NSRect(x: 0, y: 0, width: 400, height: 200))
         view.configuration = TerminalSurfaceOptions(backend: .inMemory(session))
@@ -161,8 +149,6 @@ struct GhosttyTabTeardownTests {
     }
 }
 
-/// Ends the wait of a paused read from another thread if the test's main thread is still busy after a while, so a
-/// test of a deadlock fails rather than hangs.
 private final class PausedReadRescue: @unchecked Sendable {
     private let lock = NSLock()
     private var isFinished = false
@@ -178,7 +164,6 @@ private final class PausedReadRescue: @unchecked Sendable {
         }
     }
 
-    /// Returns whether the rescue had to end the wait.
     func finish() -> Bool {
         lock.withLock {
             isFinished = true
@@ -187,7 +172,6 @@ private final class PausedReadRescue: @unchecked Sendable {
     }
 }
 
-/// Records the thread an object is freed on, through an object attached to it, which is freed along with it.
 private final class FreeingRecord: @unchecked Sendable {
     nonisolated(unsafe) private static var attachmentKey: UInt8 = 0
     private let lock = NSLock()

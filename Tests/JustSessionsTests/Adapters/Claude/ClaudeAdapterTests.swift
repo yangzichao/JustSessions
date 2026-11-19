@@ -35,8 +35,6 @@ struct ClaudeAdapterTests {
         #expect(adapter.arguments(for: conversations[0], action: .branch).last == "--fork-session")
     }
 
-    /// The session this fixes was started from a New session tab with a screenshot pasted into its first prompt:
-    /// unlisted, its tab stayed a New session row for good.
     @Test func aSessionWhoseFirstPromptCarriesAScreenshotIsListedWithItsFolderAndText() throws {
         let folder = try ClaudeProjectFolderFixture()
         defer { folder.remove() }
@@ -285,8 +283,6 @@ struct ClaudeAdapterTests {
             ])
     }
 
-    /// Only the start and end of a long transcript are read, so a custom title set near its start is not the latest
-    /// one found. It still beats the index's prompt, but not the index's name.
     @Test func aCustomTitleNearTheStartOfALongTranscriptComesAfterTheIndexsName() throws {
         let folder = try ClaudeProjectFolderFixture()
         defer { folder.remove() }

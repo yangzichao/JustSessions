@@ -3,10 +3,7 @@ import Testing
 
 @testable import JustSessions
 
-/// **Color intensity** scales each ANSI color's OKLab chroma and keeps its lightness and hue, so colored text stays as
-/// light or dark against the background as the scheme made it.
 struct TerminalColorIntensityTests {
-    /// Black, red, green, yellow, blue, magenta, and cyan, normal and bright; white and gray are left out.
     private static let chromaticIndices = [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14]
     private static let softestScheme = AppThemeColors.justSessionsDark.terminal
 
@@ -40,8 +37,6 @@ struct TerminalColorIntensityTests {
         }
     }
 
-    /// Light colors can't grow much more vivid inside sRGB: bright red and bright blue reach its edge at 1.27 times
-    /// their chroma, and stop there.
     @Test func moreIntensityMakesColorsMoreVividAtTheSameLightnessAndHue() {
         for index in Self.chromaticIndices {
             let color = Self.softestScheme.ansiHexColors[index]
@@ -65,7 +60,6 @@ struct TerminalColorIntensityTests {
         }
     }
 
-    /// sRGB's red can't grow more vivid at its lightness, so it stays as it is rather than turning another hue.
     @Test func aColorAsVividAsSRGBShowsStaysAsItIs() {
         let adjusted = TerminalColorIntensity.adjusted(0xFF0000, percent: 200)
         let original = OKLabColor(hexValue: 0xFF0000)
@@ -95,7 +89,6 @@ struct TerminalColorIntensityTests {
     private static func expectSameLightnessAndHue(
         _ adjusted: OKLabColor, _ original: OKLabColor, _ comment: Comment, sourceLocation: SourceLocation = #_sourceLocation
     ) {
-        // Rounding to 8-bit channels moves both a little, more for a color with little chroma.
         #expect(abs(adjusted.lightness - original.lightness) < 0.01, comment, sourceLocation: sourceLocation)
         let hueDifference = abs(atan2(adjusted.blueYellow, adjusted.greenRed) - atan2(original.blueYellow, original.greenRed))
         #expect(min(hueDifference, 2 * .pi - hueDifference) < 0.06, comment, sourceLocation: sourceLocation)

@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Runs the installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct TabMovingAcrossWindowsTmuxTests {
     @Test func aMovedTabReattachesToTheSameCLIInItsNewWindow() async throws {
@@ -35,7 +34,6 @@ struct TabMovingAcrossWindowsTmuxTests {
             first.closeAllTerminals()
             second.closeAllTerminals()
         }
-        // Tabs run the CLI directly until a refresh has checked the tmux version.
         for store in [first, second] {
             store.refreshThisMac()
             #expect(await sandbox.waitUntil { !store.isScanningThisMac })
@@ -57,7 +55,6 @@ struct TabMovingAcrossWindowsTmuxTests {
         let movedTab = try #require(second.runningTerminal(for: conversation))
         #expect(second.selectedTerminalID == movedTab.id)
         movedTab.startIfNeeded()
-        // The first window's client has gone, and the moved tab's is the only one attached.
         #expect(
             await sandbox.waitUntil {
                 sandbox.tmuxOutput(["list-clients", "-F", "#{client_pid}"]).trimmingCharacters(in: .whitespacesAndNewlines)

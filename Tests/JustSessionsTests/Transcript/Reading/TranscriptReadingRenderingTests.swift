@@ -56,8 +56,6 @@ struct TranscriptReadingRenderingTests {
         #expect(store.terminalSessions.isEmpty)
     }
 
-    /// The sample image is solid red, so red pixels in the capture show it was decoded and drawn; an image that
-    /// cannot be decoded shows its placeholder without failing the layout.
     @Test func imagesAreDrawnInTheReadingLayout() async throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }

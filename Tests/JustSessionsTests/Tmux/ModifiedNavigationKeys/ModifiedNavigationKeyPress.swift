@@ -13,7 +13,6 @@ struct ModifiedNavigationKeyPress {
     let key: Key
     let modifiers: NSEvent.ModifierFlags
 
-    /// Every key with every combination of Shift, Option, and Control.
     static let all: [ModifiedNavigationKeyPress] = {
         let combinations: [NSEvent.ModifierFlags] = [
             [.shift], [.option], [.shift, .option], [.control],

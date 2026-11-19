@@ -3,13 +3,9 @@ import Testing
 
 @testable import JustSessions
 
-/// A ⌘-click on a link reaches the tab the same way whichever engine draws its terminal: as the link's text, which
-/// `TerminalLinkActions+Click` then acts on.
 @MainActor
 @Suite(.serialized)
 struct TerminalLinkClickTests {
-    /// tmux turns mouse reporting on in every CLI tab on this Mac (`ThisMacTmuxServer.globalOptions`); a plain
-    /// terminal leaves it off.
     nonisolated static let mouseReportingCases: [(TerminalEngine, Bool)] = TerminalEngine.allCases.flatMap { [($0, false), ($0, true)] }
     private static let mouseReportingOn = "\u{1B}[?1000h\u{1B}[?1006h"
 

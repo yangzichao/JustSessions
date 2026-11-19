@@ -3,9 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Where the conversation map draws (TAB-10): at its natural pitch from the top while a conversation fits, squeezed to
-/// the column's height once it doesn't, one bar per pixel row in the strongest ink, and bookmark chips that never overlap.
-/// Scrolling past the minimum pitch is in `ConversationMapScrollingTests`.
 @MainActor
 struct ConversationMapLayoutTests {
     private static func block(
@@ -34,7 +31,6 @@ struct ConversationMapLayoutTests {
         #expect(layout.pitch == 3)
         #expect(bars.first?.minY == 6)
         #expect(bars.first?.height == 2)
-        // The speaker's change leaves one blank row: user rows 0 and 1, then the reply at row 3.
         #expect(bars.map(\.minY) == [6, 9, 15])
         #expect(bars.map(\.widthFraction) == [0.125, 0.25, 1])
     }
@@ -53,7 +49,6 @@ struct ConversationMapLayoutTests {
     }
 
     @Test func aSharedPixelRowShowsYourMessage() {
-        // A tool run's row, the blank row, and your message's row, all in one pixel row.
         let outline = ConversationOutline(blocks: [Self.block(0, .toolRun, widths: [80], toolCalls: 1), Self.block(1, .user, widths: [8])])
         let layout = ConversationMapLayout(rowCount: outline.rowCount, height: 12.3, naturalPitch: 3, verticalInset: 6)
 
@@ -74,7 +69,6 @@ struct ConversationMapLayoutTests {
         #expect(outline.rowStarts == [0, 3])
         #expect(block(atY: 0) == 0)
         #expect(block(atY: 6 + 3 * 1 + 1) == 0)
-        // The blank row between them belongs to the block before it.
         #expect(block(atY: 6 + 3 * 2 + 1) == 0)
         #expect(block(atY: 6 + 3 * 3 + 1) == 1)
         #expect(block(atY: 1_000) == 1)
@@ -110,8 +104,6 @@ struct ConversationMapLayoutTests {
         #expect(chips.allSatisfy { $0.chipY >= 0 && $0.chipY <= height - side })
     }
 
-    /// At 150% (21-point chips) in a column shorter than 26 chips, as in a window near its minimum height, they can't all
-    /// sit apart: they overlap evenly, all inside, and a click on the top of each, the part that shows, finds its bookmark.
     @Test(arguments: [false, true])
     func chipsInAShortColumnOverlapButStayInside(atTheEnd: Bool) {
         let side: CGFloat = 21

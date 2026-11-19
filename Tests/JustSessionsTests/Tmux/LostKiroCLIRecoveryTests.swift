@@ -4,16 +4,12 @@ import Testing
 
 @testable import JustSessions
 
-/// A Kiro CLI a tab left running in tmux under its temporary name, as every Kiro tab closed before Kiro CLI 2.16's
-/// sessions were listed did, is found by Kiro's lock on its session; see `ConversationStore+LostKiroCLIs`. Runs the
-/// installed tmux in a sandbox server; see `ThisMacTmuxSandbox`.
 @MainActor
 struct LostKiroCLIRecoveryTests {
     @Test func theCLIsTmuxSessionTakesTheSessionsNameAndCloseAndDeleteEndsItThenDeletes() async throws {
         guard let sandbox = try ThisMacTmuxSandbox.make() else { return }
         defer { sandbox.tearDown() }
         let sessionsDirectory = sandbox.root.appendingPathComponent("kiro home/sessions/cli")
-        // Known before the tab starts, so the tab never links to it, as the app couldn't before DSC-08's fix.
         let sessionID = UUID().uuidString.lowercased()
         try KiroSessionFolderFixture(sessionsDirectory: sessionsDirectory).writeSession(
             id: sessionID, projectPath: sandbox.project.path, title: "hi", messageLines: [KiroSessionFolderFixture.prompt("hi")]
@@ -51,7 +47,6 @@ struct LostKiroCLIRecoveryTests {
             "\(sandbox.launchDiagnostics(for: tab))")
         let chatProcessID = try #require(KiroSessionLock(file: lockFile)?.processID)
         defer { kill(chatProcessID, SIGKILL) }
-        // While the tab shows it, its CLI isn't anyone's to take.
         store.refreshThisMac()
         #expect(await sandbox.waitUntil { !store.isScanningThisMac })
         #expect(sandbox.server.sessionNames() == [temporaryName])

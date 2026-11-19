@@ -4,12 +4,7 @@ import Testing
 
 @testable import JustSessions
 
-/// Where a tab dragged between windows joins or leaves a tab bar, where it goes in the bar, and where the window
-/// carrying it goes, worked out from the windows' frames and the bars' layouts in screen and window coordinates.
 struct TabDragBetweenWindowsGeometryTests {
-    // MARK: - The tab bar's band
-
-    /// A window 800 points wide and 600 high, its top edge at 1000.
     private let band = TabBarBand(windowFrame: CGRect(x: 100, y: 400, width: 800, height: 600))
 
     @Test func aTabJoinsTheBarOnlyOverIt() {
@@ -20,7 +15,6 @@ struct TabDragBetweenWindowsGeometryTests {
         #expect(!band.takesTab(at: CGPoint(x: 99, y: 990)))
     }
 
-    /// As Chrome's tab strip holds a dragged tab within `kVerticalDetachMagnetism` of it.
     @Test func aTabInTheBarStaysUntilDraggedWellAboveOrBelowItOrPastTheWindowsSides() {
         let barBottom = 1000 - TabBarBand.height
         #expect(band.holdsTab(at: CGPoint(x: 500, y: barBottom - TabBarBand.detachDistance)))
@@ -30,8 +24,6 @@ struct TabDragBetweenWindowsGeometryTests {
         #expect(band.holdsTab(at: CGPoint(x: 900, y: 990)))
         #expect(!band.holdsTab(at: CGPoint(x: 901, y: 990)))
     }
-
-    // MARK: - The tab bar's layout
 
     @Test func tabsSpanFromTheirGroupsLeadingEdge() throws {
         let layout = makeLayout()
@@ -49,8 +41,6 @@ struct TabDragBetweenWindowsGeometryTests {
         #expect(layout.span(ofTabs: [tabID(3)], inGroup: "/c") == nil)
     }
 
-    /// The tabs go past each unit whose middle is before their leading edge, or as a new group, past each group whose
-    /// middle is before the new group's leading edge, its label 40 points before the tabs'.
     @Test func droppedTabsGoBetweenTheTabsOrGroupsAroundTheirLeadingEdge() {
         let layout = makeLayout()
         let strip = makeStrip()
@@ -63,7 +53,6 @@ struct TabDragBetweenWindowsGeometryTests {
         #expect(placement(of: "/c", at: 760, in: layout, strip) == .asNewGroup(2))
     }
 
-    /// Placed where the bar's drag then keeps it, a tab arriving among its group's tabs slides none of them aside.
     @Test func anArrivingTabStaysWhereTheBarsDragWouldPutIt() throws {
         let layout = makeLayout()
         let strip = makeStrip()
@@ -88,8 +77,6 @@ struct TabDragBetweenWindowsGeometryTests {
         }
     }
 
-    // MARK: - Holding the tabs under the pointer
-
     @Test func theTabsStayUnderThePointerWhereTheyWereGrabbed() {
         let grab = TabDragGrab(distanceFromTabsLeadingEdge: 30, depthBelowWindowTop: 18)
 
@@ -98,13 +85,10 @@ struct TabDragBetweenWindowsGeometryTests {
         #expect(origin == CGPoint(x: 390, y: 318))
     }
 
-    // MARK: - Helpers
-
     private static let tabIDs = (0..<5).map { _ in UUID() }
 
     private func tabID(_ index: Int) -> UUID { Self.tabIDs[index] }
 
-    /// Tab 0 in group `/a`, then tabs 1 and 2 in a split; tab 3 in group `/b`.
     private func makeStrip() -> TerminalTabStrip {
         TerminalTabStrip(
             tabs: [
@@ -115,7 +99,6 @@ struct TabDragBetweenWindowsGeometryTests {
             ], splits: [TerminalSplit(tabIDs: (tabID(1), tabID(2)), groupKey: "/a")])
     }
 
-    /// For tabs whose group's label is 40 points wide.
     private func placement(
         of groupKey: String,
         at tabsLeadingEdge: CGFloat,
@@ -125,8 +108,6 @@ struct TabDragBetweenWindowsGeometryTests {
         layout.placement(forTabsOfGroup: groupKey, leadingEdgeAt: tabsLeadingEdge, tabsDistanceFromGroupLeadingEdge: 40, in: strip)
     }
 
-    /// Group `/a` from 200, its label 40 wide, then a 100-point tab and a split of two 100-point tabs; group `/b` 14
-    /// points after it, from 554, its label 40 wide, then one 200-point tab.
     private func makeLayout() -> TabBarLayout {
         TabBarLayout(
             groupSpans: [

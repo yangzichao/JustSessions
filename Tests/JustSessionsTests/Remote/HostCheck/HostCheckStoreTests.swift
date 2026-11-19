@@ -3,8 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// How a window's store runs Check this host… and shows its report; see `ConversationStore+HostCheck`. Each test has a
-/// host of its own, since shell startups are the app's.
 @Suite(.oneHeldThreadAtATime)
 @MainActor
 struct HostCheckStoreTests {
@@ -128,8 +126,6 @@ struct HostCheckStoreTests {
     }
 }
 
-/// Holds each host check at its login, or at its script, until opened, and counts the checks it held and the store's
-/// own shell startup checks.
 private final class CheckGate: @unchecked Sendable {
     private let condition = NSCondition()
     private var isOpen = false

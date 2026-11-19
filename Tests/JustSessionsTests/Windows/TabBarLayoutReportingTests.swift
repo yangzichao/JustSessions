@@ -4,9 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// A tab that moves to another section of the tab bar, as a split across projects becomes a split of one project's
-/// tabs, keeps the span its new place reports: the view it leaves takes out only what it reported itself. Without its
-/// span, the tab could no longer be dragged off the bar.
 @MainActor
 struct TabBarLayoutReportingTests {
     private static let barWidth: CGFloat = 900
@@ -25,8 +22,6 @@ struct TabBarLayoutReportingTests {
         defer { fixture.close() }
         _ = try await fixture.capture(named: "tab-bar-before-split-joins-one-project")
 
-        // The second app tab takes the tools tab's place, so the split holds one project's tabs: both of its tabs
-        // and the tools tab now show in their projects' groups.
         let toolsSide = try #require(store.sides(of: splitAcrossProjects)?.side(of: tools.id))
         store.moveIntoShownSplit(second.id, swappingWith: toolsSide)
         let split = try #require(store.shownSplit)
@@ -38,8 +33,6 @@ struct TabBarLayoutReportingTests {
         #expect(layout.span(ofTabs: [first.id, second.id], inGroup: first.projectDirectoryKey) != nil)
         #expect(layout.groupSpans[splitAcrossProjects.groupKey] == nil)
     }
-
-    // MARK: - Helpers
 
     private func makeFixture(store: ConversationStore) -> ThemeSurfaceRenderingFixture {
         let bar = WorkspaceTabBar(

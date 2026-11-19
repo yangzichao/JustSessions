@@ -3,26 +3,21 @@ import Testing
 
 @testable import JustSessions
 
-/// A reading window asked from a tab or the conversation map to go somewhere (RDR-50), in a hosted reader that loads
-/// its own pages, as a reading window's does.
 @MainActor
 @Suite(.serialized)
 struct TranscriptReadingRequestTests {
-    /// A reader of a 600-message session that keeps bookmarks and takes requests.
     @MainActor
     private struct Reader {
         let files: TranscriptPagingFixture
         let fixture: TranscriptScrollViewFixture
         let store: ConversationStore
         let requests: SessionReadingRequests
-        /// One value, so showing the reader again doesn't look like a file change unless asked.
         let conversation: Conversation
 
         func show(_ conversation: Conversation? = nil) {
             fixture.showReader(conversation ?? self.conversation, store: store, readingRequests: requests)
         }
 
-        /// Whether the entry's top is 6 points below the reader's, where a jump puts it, with nothing left to restore.
         func showsAtTop(_ entryID: Int) -> Bool {
             guard let scrollView = fixture.readerScrollView, let controller = fixture.positionController, !controller.isRestoring,
                 let frame = controller.entryFrameInClipView(at: entryID)
@@ -32,7 +27,6 @@ struct TranscriptReadingRequestTests {
 
         var visiblePosition: TranscriptReadingPosition? { fixture.readerScrollView.flatMap(fixture.visiblePosition(in:)) }
 
-        /// Until the reader says "No messages yet", which shows no scroll view.
         func waitUntilEmpty() async throws {
             for _ in 0..<200 {
                 if fixture.readerScrollView == nil, try await fixture.hasAccessibilityElement(labeled: "No messages yet") { return }
@@ -53,7 +47,6 @@ struct TranscriptReadingRequestTests {
         MessageBookmark(letter: letter, entryID: id(record), kind: .assistant, snippet: "Message \(record), line 0:")
     }
 
-    /// Records 600 to 604, the last two long enough that 603 can be scrolled to the top.
     private static let fiveMoreRecords = Data(
         TranscriptPagingFixture.data(count: 605, lineCounts: [603: 60, 604: 60]).dropFirst(TranscriptPagingFixture.data(count: 600).count)
     )
@@ -75,7 +68,6 @@ struct TranscriptReadingRequestTests {
         return reader
     }
 
-    /// Messages of 4 lines, so the page read around record 500 can put 570 at the top.
     @Test func anAdjacentRequestGoesOnFromTheReadersOrigin() async throws {
         let reader = try await makeReader(
             bookmarks: [bookmark("a", at: 540), bookmark("b", at: 570)],
@@ -105,7 +97,6 @@ struct TranscriptReadingRequestTests {
         #expect(reader.fixture.positionController?.seekTarget == id(560))
     }
 
-    /// A new page would select Find's first match, so loading one closes Find.
     @Test func anEntryRequestForAnUnloadedMessageLoadsItsPage() async throws {
         let reader = try await makeReader()
         defer { reader.close() }
@@ -122,7 +113,6 @@ struct TranscriptReadingRequestTests {
         #expect(reader.fixture.textFieldValues.isEmpty)
     }
 
-    /// An open window's pages are older than the file: a message written since lies past them, without `hasLater`.
     @Test func anEntryRequestPastTheLoadedPagesReadsTheFileAgain() async throws {
         let reader = try await makeReader()
         defer { reader.close() }
@@ -136,7 +126,6 @@ struct TranscriptReadingRequestTests {
         #expect(reader.fixture.positionController?.seekTarget == id(603))
     }
 
-    /// As a tab's ⌘D leaves it: the bookmark is past the reader's pages, which end at the old end of the file.
     @Test func aBookmarkAddedPastTheLoadedPagesIsFoundNotMissing() async throws {
         let reader = try await makeReader()
         defer { reader.close() }
@@ -157,7 +146,6 @@ struct TranscriptReadingRequestTests {
             ))
     }
 
-    /// The file-change refresh asks for the entry jump's page, not the place the pages shown still record.
     @Test func aFileChangeDuringAnEntryJumpStillLands() async throws {
         let reader = try await makeReader()
         defer { reader.close() }
@@ -166,7 +154,6 @@ struct TranscriptReadingRequestTests {
         reader.requests.request(.entry(id(50)))
         reader.fixture.hostingView.layoutSubtreeIfNeeded()
         #expect(reader.requests.pendingNavigation == nil)
-        // A new `updatedAt`, as a session whose file changed has.
         reader.show(reader.files.conversation)
         reader.fixture.hostingView.layoutSubtreeIfNeeded()
 
@@ -175,7 +162,6 @@ struct TranscriptReadingRequestTests {
         #expect(reader.fixture.positionController?.seekTarget == id(50))
     }
 
-    /// The scroll view that comes back after an empty page takes no request it has already taken.
     @Test func aRequestIsNotReplayedByARebuiltReader() async throws {
         let reader = try await makeReader()
         defer { reader.close() }
@@ -199,7 +185,6 @@ struct TranscriptReadingRequestTests {
         #expect(reader.fixture.positionController?.seekTarget == nil)
     }
 
-    /// Before the first page shows, the window's reader has no scroll view; ⌘' then adds to the request waiting.
     @Test func pressesWhileTheFirstPageLoadsAddUp() async throws {
         let bookmarks = [bookmark("a", at: 300), bookmark("b", at: 320)]
         let reader = try await makeReader(
@@ -217,8 +202,6 @@ struct TranscriptReadingRequestTests {
         #expect(reader.fixture.positionController?.seekTarget == id(320))
     }
 
-    /// A window opened from the preview in the middle of the conversation, then ⌘' twice before its first page shows: the
-    /// presses go on from where it opened and add up, rather than starting from the first bookmark.
     @Test func pressesWhileTheFirstPageLoadsGoOnFromWhereTheWindowOpened() async throws {
         let reader = try await makeReader(
             bookmarks: [bookmark("a", at: 100), bookmark("b", at: 540), bookmark("c", at: 570)],
@@ -236,8 +219,6 @@ struct TranscriptReadingRequestTests {
         #expect(reader.fixture.positionController?.seekTarget == id(570))
     }
 
-    /// A bookmark past the end of a rewritten file that ends in records the reader hides, as Claude files often do: the
-    /// window opened at it shows the latest messages and says the message is gone, instead of "No messages yet" (RDR-49).
     @Test func aWindowOpenedAtAGoneBookmarkShowsTheLatestMessages() async throws {
         let gone = bookmark("a", at: 700)
         let reader = try await makeReader(
@@ -265,7 +246,6 @@ struct TranscriptReadingRequestTests {
         reader.show()
         try await reader.waitUntilEmpty()
 
-        // The same `updatedAt`: only the request reads the file again.
         try content.write(to: reader.files.file)
         reader.requests.request(.entry(id(50)))
 

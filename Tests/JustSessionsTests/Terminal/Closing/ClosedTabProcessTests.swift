@@ -4,7 +4,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Closing a tab ends what it ran, as closing a terminal window does, and leaves nothing in the process table.
 /// `kill(pid, 0)` still succeeds for a zombie, so it fails only once the process has ended and been reaped.
 @MainActor
 struct ClosedTabProcessTests {

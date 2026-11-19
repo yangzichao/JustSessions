@@ -3,7 +3,6 @@ import Testing
 
 @testable import JustSessions
 
-/// Resuming an archived session brings it back from the archive; showing a running session's tab does not.
 @MainActor
 struct ResumingArchivedSessionsTests {
     @Test func resumingAnArchivedSessionUnarchivesIt() throws {
@@ -85,12 +84,10 @@ struct ResumingArchivedSessionsTests {
         let store = sandbox.makeStore(listing: [resumedWhole, shownInSplit])
         store.setArchived(true, conversations: [resumedWhole, shownInSplit])
 
-        // With no tab selected, it fills the terminals and resumes.
         store.showDroppedRow(.session(resumedWhole), at: .wholeArea)
         #expect(store.runningTerminal(for: resumedWhole) != nil)
         #expect(!store.archivedSessions.isArchived(conversationID: resumedWhole.id))
 
-        // Beside the selected tab, also when its own tab is already open.
         store.launch(shownInSplit, action: .resume)
         let resumedWholeTab = try #require(store.runningTerminal(for: resumedWhole))
         store.selectTerminal(resumedWholeTab.id)

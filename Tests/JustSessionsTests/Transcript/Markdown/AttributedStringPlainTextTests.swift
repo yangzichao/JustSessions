@@ -4,8 +4,6 @@ import Testing
 @testable import JustSessions
 
 struct AttributedStringPlainTextTests {
-    /// The same text as `String(text.characters)`, for a whole string and part of one, across several runs, emoji, and
-    /// combining marks.
     @Test func givesTheSameTextAsItsCharacters() throws {
         let text = try AttributedString(
             markdown: "😀 **bold 👩‍👩‍👧** cafe\u{301} *e\u{301}tude* 東京 `code`",
