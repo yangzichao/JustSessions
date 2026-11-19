@@ -18,7 +18,7 @@ make dev    # Build the app, quit its running copy, and open it
 
 ### Formatting and lint
 
-Swift code is formatted by `swift format`, which ships with the Swift toolchain, using the rules in `.swift-format` (4-space indentation, 140 columns). `make lint` runs `swift format lint --strict` over `Package.swift`, `Sources`, `Tests`, and the Swift under `Scripts`. `make check`, `make`, `make dev`, and `make verify` run it first and stop on any finding. Run `make format` to fix layout; it cannot fix a few rules, such as a `forEach` that should be a `for` loop, so change those by hand. Silence a rule for one declaration only when the code needs it, with `// swift-format-ignore: RuleName` and a comment saying why.
+Swift code is formatted by `swift format`, which ships with the Swift toolchain, using the rules in `.swift-format` (4-space indentation, 140 columns). `make lint` runs `swift format lint --strict` over `Package.swift`, `Sources`, `Tests`, and the Swift under `Scripts`. `make check`, `make`, `make dev`, and `make verify` run it first and stop on any finding. Run `make format` to fix layout; it cannot fix a few rules, such as a `forEach` that should be a `for` loop, so change those by hand. Silence a rule for one declaration, with `// swift-format-ignore: RuleName`, only when the rule is wrong for that code.
 
 The repository was formatted with the `swift format` in Swift 6.4. Other toolchain versions can lay out a few lines differently; use Swift 6.4 or later when `make lint` disagrees with `make format`. The release workflow calls `Scripts/build-app.sh` directly and does not lint, so its older Swift cannot block a release.
 

@@ -147,4 +147,4 @@ Sheet margins and section spacing come from `ThemeSheetMetrics`. Settings pages 
 
 ## Adding to the spec
 
-If a view needs a value the tokens do not have, add a case to the token in `Theme/`, with a comment naming where it is used. Then use the new case from the view. Do not exempt the view in the test. A value should be added to the theme only when it describes a kind of UI element, not a one-off.
+If a view needs a value the tokens do not have, add a case to the token in `Theme/`, named for the kind of element it is for. Then use the new case from the view. Do not exempt the view in the test. A value should be added to the theme only when it describes a kind of UI element, not a one-off.

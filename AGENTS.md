@@ -10,6 +10,17 @@ Contributors develop and run JustSessions on macOS. Use a disposable local Ubunt
 
 For SSH behavior changes, run the relevant checklist with disposable sessions and record the host OS, CLI versions, and results. Also test a macOS target when changing remote shell commands, paths, or platform-dependent tools. To test SSH to a Mac, install [Tart](https://tart.run) and use a disposable macOS VM with the `justsessions-test-macos` alias, as [macOS target coverage](docs/development/ssh-testing.md#macos-target-coverage) describes; a separate macOS account or another Mac also works. Simulated tests and `make verify` do not establish live SSH coverage; explicitly report any untested host or provider. SSH to your everyday Mac account accesses real session files, so use the isolated target for deletion tests.
 
+## Comments
+
+Code says what it does and why through its names, types, and structure. Don't narrate it in comments. A comment stays only for:
+
+- a license header;
+- non-obvious behavior an outside tool forces and we can't change (ssh, tmux, a shell, macOS, a CLI's file format), checked and said in a line or two;
+- a lint suppression whose rule is wrong for that line;
+- an issue link for a constraint the code can't express.
+
+When code needs a comment to be understood, rename, extract, or retype it instead. No `// MARK:` banners, commented-out code, or internal tracking numbers such as `PERF-88` in code; those belong in [Performance](docs/development/performance.md) and the requirements.
+
 ## Checks before you push
 
 App release Actions run when a version tag is pushed. Website changes pushed to `main` run the independent website tests, build, and deployment; the website can also be deployed manually from `main`. Pull requests and other branch pushes do not run CI, and website Actions do not replace the required local app checks. Developers and coding agents must complete the checks locally:
