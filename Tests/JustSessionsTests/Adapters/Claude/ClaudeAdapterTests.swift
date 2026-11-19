@@ -168,6 +168,25 @@ struct ClaudeAdapterTests {
         #expect(moved.suggestedTitle == "Moving session")
     }
 
+    /// Claude Code keeps a session that entered a git worktree in the worktree folder's project directory, and lists
+    /// it with `/resume` in the repository it entered the worktree from.
+    @Test func listsASessionInAWorktreeUnderTheRepositoryItEnteredItFrom() throws {
+        let folder = try ClaudeProjectFolderFixture()
+        defer { folder.remove() }
+        let sessionID = UUID().uuidString
+        let worktreeProjectDirectory = folder.configurationDirectory
+            .appendingPathComponent("projects/-Users-me-app--claude-worktrees-fix")
+        try FileManager.default.createDirectory(at: worktreeProjectDirectory, withIntermediateDirectories: true)
+        try [
+            #"{"type":"user","cwd":"/Users/me/app","timestamp":"2026-10-15T10:00:00Z","message":{"content":"Fix it in a worktree"}}"#,
+            #"{"type":"relocated","sessionId":"\#(sessionID)","relocatedCwd":"/Users/me/app/.claude/worktrees/fix"}"#,
+            #"{"type":"worktree-state","worktreeSession":{"originalCwd":"/Users/me/app","worktreePath":"/Users/me/app/.claude/worktrees/fix","worktreeName":"fix"},"sessionId":"\#(sessionID)"}"#,
+            #"{"type":"assistant","cwd":"/Users/me/app/.claude/worktrees/fix","timestamp":"2026-10-15T10:05:00Z","message":{"content":"Fixed"}}"#,
+        ].joined(separator: "\n").write(to: worktreeProjectDirectory.appendingPathComponent("\(sessionID).jsonl"), atomically: true, encoding: .utf8)
+
+        #expect(try folder.discoveredConversationsBySessionID()[sessionID]?.projectPath == "/Users/me/app")
+    }
+
     /// Each line's `cwd` follows Claude's shell, which changes directory as it works. Only `/cd` moves the session.
     @Test func aShellThatChangesDirectoryLeavesTheSessionInItsFolder() throws {
         let folder = try ClaudeProjectFolderFixture()
