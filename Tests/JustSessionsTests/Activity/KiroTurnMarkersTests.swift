@@ -80,7 +80,7 @@ struct KiroTurnMarkersTests {
     private static func waitForChild(of processID: Int32) -> Int32? {
         let deadline = Date(timeIntervalSinceNow: 120)
         while Date() < deadline {
-            if let child = ProcessTree.ofRunningProcesses().processIDs(rootedAt: processID).dropFirst().first { return child }
+            if let child = ProcessTree.ofRunningProcesses().breadthFirstProcessIDs(rootedAt: processID).dropFirst().first { return child }
             Thread.sleep(forTimeInterval: 0.05)
         }
         return nil

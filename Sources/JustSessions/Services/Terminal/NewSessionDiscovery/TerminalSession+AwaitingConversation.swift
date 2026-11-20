@@ -10,10 +10,9 @@ extension TerminalSession {
         return WaitingNewSessionTab(
             terminalID: id,
             provider: provider,
-            processID: cliProcessID,
+            runningCLIProcessID: !hasExited && cliProcessID > 0 ? cliProcessID : nil,
             preassignedSessionID: preassignedSessionID,
-            branchedFromSessionID: branchedFromSessionID,
-            isRunning: !hasExited
+            branchedFromSessionID: branchedFromSessionID
         )
     }
 

@@ -15,8 +15,8 @@ struct NewSessionFileFinder: Sendable {
                 sessionFiles[tab.terminalID] = Self.sessionFile(preassignedSessionID, at: transcript)
                 continue
             }
-            guard tab.isRunning, tab.processID > 0 else { continue }
-            let processIDs = processTree.processIDs(rootedAt: tab.processID)
+            guard let cliProcessID = tab.runningCLIProcessID else { continue }
+            let processIDs = processTree.breadthFirstProcessIDs(rootedAt: cliProcessID)
             switch tab.provider {
             case .claude:
                 if let record = claudeRegistry.firstRecord(amongProcessIDs: processIDs),

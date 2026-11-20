@@ -14,8 +14,8 @@ struct ProcessTreeTests {
             400: 1,
         ])
 
-        #expect(tree.processIDs(rootedAt: 100) == [100, 200, 201, 300])
-        #expect(tree.processIDs(rootedAt: 12_345) == [12_345])
+        #expect(tree.breadthFirstProcessIDs(rootedAt: 100) == [100, 200, 201, 300])
+        #expect(tree.breadthFirstProcessIDs(rootedAt: 12_345) == [12_345])
     }
 
     @Test func findsTheChildThatARunningWrapperStarted() throws {
@@ -32,7 +32,7 @@ struct ProcessTreeTests {
             wrapper.waitUntilExit()
         }
 
-        let processIDs = ProcessTree.ofRunningProcesses().processIDs(rootedAt: wrapper.processIdentifier)
+        let processIDs = ProcessTree.ofRunningProcesses().breadthFirstProcessIDs(rootedAt: wrapper.processIdentifier)
 
         #expect(processIDs.first == wrapper.processIdentifier)
         #expect(processIDs.contains(childProcessID))
