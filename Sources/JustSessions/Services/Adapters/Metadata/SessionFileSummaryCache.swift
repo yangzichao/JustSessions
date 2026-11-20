@@ -61,16 +61,16 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
     }
 
     func summary(ofGrowingFile file: URL, read: (URL, Summary?) -> Summary?) -> Summary? {
-        guard let fingerprint = Fingerprint(file: file) else { return read(file, nil) }
+        guard let fingerprintBeforeReading = Fingerprint(file: file) else { return read(file, nil) }
         let path = file.path
         let entry = lock.withLock {
             loadSnapshotIfNeeded()
             return entriesByPath[path]
         }
-        if let entry, entry.fingerprint == fingerprint { return entry.summary }
+        if let entry, entry.fingerprint == fingerprintBeforeReading { return entry.summary }
         let summary = read(file, entry?.summary)
         lock.withLock {
-            entriesByPath[path] = Entry(fingerprint: fingerprint, summary: summary)
+            entriesByPath[path] = Entry(fingerprint: fingerprintBeforeReading, summary: summary)
             needsSaving = true
         }
         return summary
