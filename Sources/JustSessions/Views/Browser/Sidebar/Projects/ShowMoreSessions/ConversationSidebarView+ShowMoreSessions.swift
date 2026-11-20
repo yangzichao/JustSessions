@@ -1,6 +1,8 @@
 import SwiftUI
 
 extension ConversationSidebarView {
+    private static let mostSubagentParentStepsWalkedInCaseTheParentsLoop = 8
+
     struct HiddenShownSession: Equatable {
         let projectID: String
         let place: Int
@@ -51,7 +53,7 @@ extension ConversationSidebarView {
 
     private func topLevelConversation(of conversationID: String) -> Conversation? {
         var conversation = store.conversation(withID: conversationID)
-        for _ in 0..<8 {
+        for _ in 0..<Self.mostSubagentParentStepsWalkedInCaseTheParentsLoop {
             guard let parentID = conversation?.parentID else { return conversation }
             conversation = store.conversation(withID: parentID)
         }
