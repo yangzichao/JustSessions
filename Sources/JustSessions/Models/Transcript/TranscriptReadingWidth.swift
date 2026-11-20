@@ -1,8 +1,8 @@
 import CoreGraphics
 
 enum TranscriptReadingWidth: String, CaseIterable {
-    case readable
-    case full
+    case readable = "readable"
+    case full = "full"
 
     static let userDefaultsKey = "transcriptReadingWidth"
 
