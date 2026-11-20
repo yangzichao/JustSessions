@@ -69,7 +69,7 @@ final class ClaudeHostStandIn: Sendable {
                     }
                     let (holds, failure) = refreshes.start()
                     if failure == .outOfReach {
-                        Self.noteOutOfReach(host)
+                        Self.rememberOutOfReachInSharedReachability(host)
                         throw RemoteSessionMirrorError.sshFailed(
                             host: host, problem: SSHConnectionProblem(sshOutput: Self.outOfReachOutput)
                         )
@@ -82,8 +82,8 @@ final class ClaudeHostStandIn: Sendable {
                         throw RemoteSessionMirrorError.rsyncFailed(host: host, output: "Connection reset by peer")
                     }
                     if holds { refreshes.waitWhileHeld() }
-                    Self.noteOutOfReach(host)
-                    refreshes.noteStatusLookupFailure()
+                    Self.rememberOutOfReachInSharedReachability(host)
+                    refreshes.noteOutOfReachThatSkipsTheStatusLookup()
                     var folders = RemoteToolFolders.standard
                     folders.claude = reading.path
                     return folders
@@ -98,16 +98,16 @@ final class ClaudeHostStandIn: Sendable {
     func releaseHeldRefresh() { refreshes.release() }
     func failNextRefreshes(_ count: Int = 1, as failure: Failure = .copy) { refreshes.failNext(count, as: failure) }
 
-    func forgetStatusLookupFailure() {
-        if refreshes.takeStatusLookupFailure() { SSHHostReachability.shared.forget(host) }
+    func forgetSharedReachabilityOutOfReachThatSkippedTheStatusLookup() {
+        if refreshes.takeOutOfReachThatSkipsTheStatusLookup() { SSHHostReachability.shared.forget(host) }
     }
 
-    func remove() {
+    func releaseAndForgetInSharedReachability() {
         refreshes.release()
         SSHHostReachability.shared.forget(host)
     }
 
-    private static func noteOutOfReach(_ host: String) {
+    private static func rememberOutOfReachInSharedReachability(_ host: String) {
         SSHHostReachability.shared.noteResult(
             exitStatus: RemoteHostCommandRunner.connectionFailureExitStatus,
             output: outOfReachOutput,
@@ -123,7 +123,7 @@ final class ClaudeHostStandIn: Sendable {
         private var isHolding = false
         private var failuresToCome = 0
         private var nextFailure = Failure.copy
-        private var leftStatusLookupFailure = false
+        private var isRememberedOutOfReachToSkipTheStatusLookup = false
 
         var count: Int { lock.withLock { read } }
         var failuresWithoutConnecting: Int { lock.withLock { withoutConnecting } }
@@ -150,12 +150,12 @@ final class ClaudeHostStandIn: Sendable {
 
         func noteRead() { lock.withLock { read += 1 } }
         func noteFailureWithoutConnecting() { lock.withLock { withoutConnecting += 1 } }
-        func noteStatusLookupFailure() { lock.withLock { leftStatusLookupFailure = true } }
+        func noteOutOfReachThatSkipsTheStatusLookup() { lock.withLock { isRememberedOutOfReachToSkipTheStatusLookup = true } }
 
-        func takeStatusLookupFailure() -> Bool {
+        func takeOutOfReachThatSkipsTheStatusLookup() -> Bool {
             lock.withLock {
-                defer { leftStatusLookupFailure = false }
-                return leftStatusLookupFailure
+                defer { isRememberedOutOfReachToSkipTheStatusLookup = false }
+                return isRememberedOutOfReachToSkipTheStatusLookup
             }
         }
 
@@ -168,7 +168,9 @@ final class ClaudeHostStandIn: Sendable {
 
 final class StandInClock: @unchecked Sendable {
     private let lock = NSLock()
-    private var current = Date.now
+    private var current: Date
+
+    init(startingAt start: Date) { current = start }
 
     var now: Date { lock.withLock { current } }
 

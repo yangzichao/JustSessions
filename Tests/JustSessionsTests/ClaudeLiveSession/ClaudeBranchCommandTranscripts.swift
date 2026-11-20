@@ -15,6 +15,7 @@ struct ClaudeBranchCommandTranscripts {
     /// The title Claude Code generated for the session branched from, which names it: it has no name of its own.
     static let parentTitle = "Single word OK reply"
     static let branchTitle = "Reply with the single word OK. (Branch)"
+    private static let relayTranscriptTailByteCount = 65_536
 
     enum Step {
         case beforeBranch, branched, renamed
@@ -96,7 +97,8 @@ struct ClaudeBranchCommandTranscripts {
     }
 
     func relayTitle(at step: Step) throws -> String {
-        let transcript = try String(contentsOf: file(of: step.sessionID), encoding: .utf8)
+        let transcriptTheRelayReads = try Data(contentsOf: file(of: step.sessionID)).suffix(Self.relayTranscriptTailByteCount)
+        let transcript = String(decoding: transcriptTheRelayReads, as: UTF8.self)
         let titleLine = transcript.split(separator: "\n").last { $0.contains(#""type":"custom-title""#) }.map(String.init) ?? ""
         return RemoteClaudeSessionTitle.titlePrefix + Data(step.record.utf8).base64EncodedString() + ":"
             + Data(titleLine.utf8).base64EncodedString()

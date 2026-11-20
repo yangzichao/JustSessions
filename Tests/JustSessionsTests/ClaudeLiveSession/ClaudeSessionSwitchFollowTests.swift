@@ -145,10 +145,10 @@ struct ClaudeSessionSwitchFollowTests {
                 #"{"type":"custom-title","customTitle":"kept-name","sessionId":"\#(clearedID)"}"#,
                 #"{"parentUuid":null,"type":"user","message":{"role":"user","content":"After clear"},"uuid":"\#(UUID().uuidString.lowercased())","timestamp":"2026-10-21T20:00:00.000Z","cwd":"/Users/me/project","sessionId":"\#(clearedID)","version":"2.1.306"}"#,
             ])
-        fixture.clock.advance(by: ConversationStore.refreshIntervalWhileWaitingForAppearingSession - 1)
+        fixture.liveNameSyncClock.advance(by: ConversationStore.refreshIntervalWhileWaitingForAppearingSession - 1)
         fixture.synchronize()
         #expect(!fixture.store.isScanningThisMac && fixture.scans.scanCount == 2, "No sooner than a new session's tab")
-        fixture.clock.advance(by: 1)
+        fixture.liveNameSyncClock.advance(by: 1)
         try await fixture.followTheCLI()
 
         #expect(tab.conversation?.sessionID == clearedID)
@@ -208,7 +208,7 @@ struct ClaudeSessionSwitchFollowTests {
         let windows = WorkspaceWindowRegistry()
         let registry: ClaudeLiveSessionRegistry
         let store: ConversationStore
-        let clock = StandInClock()
+        let liveNameSyncClock = StandInClock(startingAt: .now)
 
         init() throws {
             transcripts = try ClaudeBranchCommandTranscripts()
@@ -272,7 +272,7 @@ struct ClaudeSessionSwitchFollowTests {
         }
 
         func synchronize() {
-            store.synchronizeClaudeLiveNames(registry: registry, now: clock.now)
+            store.synchronizeClaudeLiveNames(registry: registry, now: liveNameSyncClock.now)
         }
 
         func followTheCLI() async throws {
