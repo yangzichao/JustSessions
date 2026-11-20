@@ -32,7 +32,7 @@ struct SidebarProjectSection: View {
 
     private var projectScope: SidebarPinDrag.Scope { .projects(on: project.host) }
     private var sessionScope: SidebarPinDrag.Scope { .sessions(inProject: project.id) }
-    private var projectRowID: String { SidebarPinDrag.Row.projectRowID(project.projectPath) }
+    private var projectRowID: SidebarRowID { .project(path: project.projectPath) }
 
     private var landingLineLeadingInset: CGFloat {
         pinDragging.drag?.scope.landingLineLeadingInset ?? 0
@@ -63,7 +63,7 @@ struct SidebarProjectSection: View {
                     .padding(.leading, 40)
                     .padding(.vertical, 5)
                     .sidebarIndentGuide(isFirstRow: true, isLastRow: true)
-                    .reportsSidebarRowFrame("empty:\(project.id)", inProject: project.id, to: pinDragging.rowFrames)
+                    .reportsSidebarRowFrame(.emptyProject(path: project.id), inProject: project.id, to: pinDragging.rowFrames)
             }
             ForEach(rows) { row in
                 let isFirstRow = row.id == rows.first?.id
@@ -140,7 +140,7 @@ struct SidebarProjectSection: View {
     @ViewBuilder
     private func conversationRows(
         _ conversation: Conversation,
-        rowID: String,
+        rowID: SidebarRowID,
         among rows: [ProjectSessionRow],
         isFirstRow: Bool,
         isLastRow: Bool
@@ -201,7 +201,7 @@ struct SidebarProjectSection: View {
                 onToggleSubagents: { onToggleSubagents(row.conversation) }
             )
             .sidebarIndentGuide(isFirstRow: false, isLastRow: isLastRow && row.id == rowsUnder.last?.id)
-            .reportsSidebarRowFrame("subagent:\(row.id)", inProject: project.id, to: pinDragging.rowFrames)
+            .reportsSidebarRowFrame(.subagent(conversationID: row.id), inProject: project.id, to: pinDragging.rowFrames)
         }
     }
 

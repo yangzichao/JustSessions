@@ -1,4 +1,5 @@
 import CoreGraphics
+import Foundation
 import Testing
 
 @testable import JustSessions
@@ -79,18 +80,19 @@ struct SidebarPinDragTests {
 
     @Test func rowsOutOfSightStillCountAmongTheGaps() throws {
         let rows = rows(pinned: ["a", "b", "c", "d"], unpinned: [])
-        let frames = frames(for: ["a", "b", "c", "d"]).filter { $0.key != "a" && $0.key != "b" }
-        let drag = try #require(SidebarPinDrag(scope: scope, dragging: "d", rows: rows, rowFrames: frames, pointerY: 64))
+        let frames = frames(for: ["a", "b", "c", "d"]).filter { $0.key != rowID("a") && $0.key != rowID("b") }
+        let drag = try #require(SidebarPinDrag(scope: scope, dragging: rowID("d"), rows: rows, rowFrames: frames, pointerY: 64))
 
         #expect(drag.landingGap == 2)
         #expect(drag.placement == .before("c"))
     }
 
     @Test func aRowThatCantBePinnedCantBeDragged() {
-        let rows = [SidebarPinDrag.Row(rowID: "pending", pinID: nil, isPinned: false)]
+        let pendingRowID = SidebarRowID.pendingNewSession(id: UUID())
+        let rows = [SidebarPinDrag.Row(rowID: pendingRowID, pinID: nil, isPinned: false)]
 
-        #expect(SidebarPinDrag(scope: scope, dragging: "pending", rows: rows, rowFrames: [:], pointerY: 0) == nil)
-        #expect(SidebarPinDrag(scope: scope, dragging: "missing", rows: rows, rowFrames: [:], pointerY: 0) == nil)
+        #expect(SidebarPinDrag(scope: scope, dragging: pendingRowID, rows: rows, rowFrames: [:], pointerY: 0) == nil)
+        #expect(SidebarPinDrag(scope: scope, dragging: rowID("missing"), rows: rows, rowFrames: [:], pointerY: 0) == nil)
     }
 
     @Test func translationIsHowFarThePointerMoved() throws {
@@ -123,7 +125,7 @@ struct SidebarPinDragTests {
     private func makeDrag(of draggedID: String, pinned: [String], unpinned: [String], pointerY: CGFloat) -> SidebarPinDrag? {
         SidebarPinDrag(
             scope: scope,
-            dragging: draggedID,
+            dragging: rowID(draggedID),
             rows: rows(pinned: pinned, unpinned: unpinned),
             rowFrames: frames(for: pinned + unpinned),
             scopeBottom: frames(for: pinned + unpinned).values.map(\.maxY).max(),
@@ -132,14 +134,18 @@ struct SidebarPinDragTests {
     }
 
     private func rows(pinned: [String], unpinned: [String]) -> [SidebarPinDrag.Row] {
-        pinned.map { SidebarPinDrag.Row(rowID: $0, pinID: $0, isPinned: true) }
-            + unpinned.map { SidebarPinDrag.Row(rowID: $0, pinID: $0, isPinned: false) }
+        pinned.map { SidebarPinDrag.Row(rowID: rowID($0), pinID: $0, isPinned: true) }
+            + unpinned.map { SidebarPinDrag.Row(rowID: rowID($0), pinID: $0, isPinned: false) }
     }
 
-    private func frames(for rowIDs: [String]) -> [String: CGRect] {
+    private func frames(for pinIDs: [String]) -> [SidebarRowID: CGRect] {
         Dictionary(
-            uniqueKeysWithValues: rowIDs.enumerated().map { index, rowID in
-                (rowID, CGRect(x: 0, y: CGFloat(index) * 31, width: 200, height: 30))
+            uniqueKeysWithValues: pinIDs.enumerated().map { index, pinID in
+                (rowID(pinID), CGRect(x: 0, y: CGFloat(index) * 31, width: 200, height: 30))
             })
+    }
+
+    private func rowID(_ pinID: String) -> SidebarRowID {
+        .project(path: pinID)
     }
 }

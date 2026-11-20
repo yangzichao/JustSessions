@@ -4,10 +4,10 @@ enum ProjectSessionRow: Identifiable {
     case conversation(Conversation)
     case pendingNewSession(PendingNewSession)
 
-    var id: String {
+    var id: SidebarRowID {
         switch self {
-        case .conversation(let conversation): "conversation:\(conversation.id)"
-        case .pendingNewSession(let pendingNewSession): "pending:\(pendingNewSession.id.uuidString)"
+        case .conversation(let conversation): .conversation(id: conversation.id)
+        case .pendingNewSession(let pendingNewSession): .pendingNewSession(id: pendingNewSession.id)
         }
     }
 

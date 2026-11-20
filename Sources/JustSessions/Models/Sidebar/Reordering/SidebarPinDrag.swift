@@ -7,15 +7,15 @@ struct SidebarPinDrag: Equatable {
     }
 
     struct Row: Equatable {
-        let rowID: String
+        let rowID: SidebarRowID
         let pinID: String?
         let isPinned: Bool
     }
 
     let scope: Scope
-    let draggedRowID: String
+    let draggedRowID: SidebarRowID
     let rows: [Row]
-    let rowFrames: [String: CGRect]
+    let rowFrames: [SidebarRowID: CGRect]
     let scopeBottom: CGFloat?
     let startPointerY: CGFloat
     var pointerY: CGFloat
@@ -26,9 +26,9 @@ struct SidebarPinDrag: Equatable {
 
     init?(
         scope: Scope,
-        dragging draggedRowID: String,
+        dragging draggedRowID: SidebarRowID,
         rows: [Row],
-        rowFrames: [String: CGRect],
+        rowFrames: [SidebarRowID: CGRect],
         scopeBottom: CGFloat? = nil,
         pointerY: CGFloat
     ) {

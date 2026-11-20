@@ -9,13 +9,13 @@ final class SidebarRowFrames {
         let frame: CGRect
     }
 
-    private var reportedFrames: [String: ReportedFrame] = [:]
+    private var reportedFrames: [SidebarRowID: ReportedFrame] = [:]
 
-    func report(_ frame: CGRect?, ofRow rowID: String, inProject projectPath: String) {
+    func report(_ frame: CGRect?, ofRow rowID: SidebarRowID, inProject projectPath: String) {
         reportedFrames[rowID] = frame.map { ReportedFrame(projectPath: projectPath, frame: $0) }
     }
 
-    var framesByRowID: [String: CGRect] {
+    var framesByRowID: [SidebarRowID: CGRect] {
         reportedFrames.mapValues(\.frame)
     }
 
@@ -25,7 +25,7 @@ final class SidebarRowFrames {
 }
 
 extension View {
-    func reportsSidebarRowFrame(_ rowID: String, inProject projectPath: String, to rowFrames: SidebarRowFrames) -> some View {
+    func reportsSidebarRowFrame(_ rowID: SidebarRowID, inProject projectPath: String, to rowFrames: SidebarRowFrames) -> some View {
         onGeometryChange(for: CGRect.self) { proxy in
             proxy.frame(in: .named(SidebarRowFrames.coordinateSpace))
         } action: { frame in
