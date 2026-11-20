@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import os
 
 @MainActor
 final class WorkspaceReadService: ObservableObject {
@@ -80,8 +81,8 @@ private actor ThisMacDiscoveryCoordinator {
                 )
             }
         } onCancel: {
-            cancellation.cancel()
-            Task { await self.cancelWaiter(waiterID) }
+            cancellation.markCancelledWithoutWaitingForTheActor()
+            Task { await self.evictWaiterMarkedCancelled(waiterID) }
         }
     }
 
@@ -93,8 +94,8 @@ private actor ThisMacDiscoveryCoordinator {
         commandResolver: NativeCLICommandResolver,
         hostWork: HostSessionWorkCoordinator?
     ) {
-        removeCancelledWaiters()
-        guard !cancellation.isCancelled else {
+        evictWaitersMarkedCancelled()
+        guard !cancellation.isMarkedCancelled else {
             continuation.resume(throwing: CancellationError())
             return
         }
@@ -127,15 +128,15 @@ private actor ThisMacDiscoveryCoordinator {
         }
     }
 
-    private func cancelWaiter(_ waiterID: UUID) {
+    private func evictWaiterMarkedCancelled(_ waiterID: UUID) {
         guard inFlight?.waiters[waiterID] != nil else { return }
-        removeCancelledWaiters()
+        evictWaitersMarkedCancelled()
     }
 
-    private func removeCancelledWaiters() {
+    private func evictWaitersMarkedCancelled() {
         guard var inFlight else { return }
         let cancelledIDs = inFlight.waiters.compactMap { id, waiter in
-            waiter.cancellation.isCancelled ? id : nil
+            waiter.cancellation.isMarkedCancelled ? id : nil
         }
         for id in cancelledIDs {
             inFlight.waiters.removeValue(forKey: id)?.continuation.resume(throwing: CancellationError())
@@ -149,7 +150,7 @@ private actor ThisMacDiscoveryCoordinator {
     }
 
     private func producerFinished(generation: Int, result: ProducerResult) {
-        removeCancelledWaiters()
+        evictWaitersMarkedCancelled()
         guard let inFlight, inFlight.generation == generation else { return }
         _ = inFlight.commandResolver.commitThisMacTmuxServer(result.tmuxServer, generation: generation)
         self.inFlight = nil
@@ -204,10 +205,9 @@ private actor ThisMacDiscoveryCoordinator {
     }
 }
 
-private final class DiscoveryWaiterCancellation: @unchecked Sendable {
-    private let lock = NSLock()
-    private var cancelled = false
+private struct DiscoveryWaiterCancellation: Sendable {
+    private let markedCancelled = OSAllocatedUnfairLock(initialState: false)
 
-    var isCancelled: Bool { lock.withLock { cancelled } }
-    func cancel() { lock.withLock { cancelled = true } }
+    var isMarkedCancelled: Bool { markedCancelled.withLock { $0 } }
+    func markCancelledWithoutWaitingForTheActor() { markedCancelled.withLock { $0 = true } }
 }
