@@ -8,7 +8,7 @@ import Foundation
 /// session's folder that the running CLI then writes again from its next turn (Kiro CLI 2.34.0).
 struct KiroSessionLock: Equatable, Sendable {
     static let maximumByteCount = 4_096
-    static let startSlack: TimeInterval = 5
+    private static let processStartToleranceAfterStartedAt: TimeInterval = 5
 
     let processID: Int32
     let startedAt: Date?
@@ -30,7 +30,7 @@ struct KiroSessionLock: Equatable, Sendable {
     }
 
     init?(file: URL) {
-        guard (try? file.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
+        guard file.isPlainFileNotLinkOrPipe,
             let handle = try? FileHandle(forReadingFrom: file)
         else { return nil }
         defer { try? handle.close() }
@@ -42,9 +42,12 @@ struct KiroSessionLock: Equatable, Sendable {
     }
 
     var isHeld: Bool {
-        guard RunningProcessInfo.isRunning(processID) else { return false }
-        guard let startedAt, let processStart = RunningProcessInfo.startDate(of: processID) else { return true }
-        return processStart <= startedAt.addingTimeInterval(Self.startSlack)
+        RunningProcessInfo.isRunning(processID) && !processIDWasReusedByNewerProcess
+    }
+
+    private var processIDWasReusedByNewerProcess: Bool {
+        guard let startedAt, let processStart = RunningProcessInfo.startDate(of: processID) else { return false }
+        return processStart > startedAt.addingTimeInterval(Self.processStartToleranceAfterStartedAt)
     }
 
     /// `2026-10-23T21:24:39.474246Z` (V2) or `2026-10-24T22:09:20.390Z` (V3), to the second.

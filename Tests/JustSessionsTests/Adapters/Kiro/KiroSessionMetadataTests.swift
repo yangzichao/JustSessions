@@ -26,7 +26,7 @@ struct KiroSessionMetadataTests {
 
     @Test func membersBeforeSessionStateAreReadOnTheirOwn() throws {
         let head = Data(#"{"session_id":"a","cwd":"/x","title":"has \"session_state\" in it", "session_state" : {"unfinished": ["#.utf8)
-        let object = try #require(KiroSessionMetadata.objectBeforeSessionState(in: head))
+        let object = try #require(KiroSessionMetadata.objectOfMembersBeforeSessionState(in: head))
         #expect(object["session_id"] as? String == "a")
         #expect(object["title"] as? String == #"has "session_state" in it"#)
         #expect(object["session_state"] == nil)
@@ -34,7 +34,7 @@ struct KiroSessionMetadataTests {
 
     @Test func sessionStateInsideAnotherValueIsNotTheCutPoint() {
         let head = Data(#"{"nested":{"session_state":1},"session_id":"a""#.utf8)
-        #expect(KiroSessionMetadata.objectBeforeSessionState(in: head) == nil)
+        #expect(KiroSessionMetadata.objectOfMembersBeforeSessionState(in: head) == nil)
     }
 
     @Test func largeFilesAreReadFromTheirStartAndSmallOnesWhole() throws {
@@ -65,7 +65,9 @@ struct KiroSessionMetadataTests {
         let main = Data(
             #"{"session_id":"b","cwd":"/x","parent_session_id":"","session_created_reason":"subagent","session_state":{}}"#.utf8)
 
-        #expect(KiroSessionMetadata(object: try #require(KiroSessionMetadata.objectBeforeSessionState(in: child)))?.parentSessionID == "p")
-        #expect(KiroSessionMetadata(object: try #require(KiroSessionMetadata.objectBeforeSessionState(in: main)))?.parentSessionID == nil)
+        let childLeadingMembers = try #require(KiroSessionMetadata.objectOfMembersBeforeSessionState(in: child))
+        let mainLeadingMembers = try #require(KiroSessionMetadata.objectOfMembersBeforeSessionState(in: main))
+        #expect(KiroSessionMetadata(object: childLeadingMembers)?.parentSessionID == "p")
+        #expect(KiroSessionMetadata(object: mainLeadingMembers)?.parentSessionID == nil)
     }
 }

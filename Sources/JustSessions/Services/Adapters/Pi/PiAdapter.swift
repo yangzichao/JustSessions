@@ -11,9 +11,9 @@ struct PiAdapter: ConversationAdapter {
     }
 
     private static let subagentSessions = SessionFileSummaryCache<PiSubagentSession>(
-        persistenceFile: SessionSummaryCacheLocation.file(named: "pi-subagents"))
+        persistenceFile: SessionSummaryCacheLocation.file(named: "pi-subagents", summaryLayoutVersion: 1))
     private static let sessionNames = SessionFileSummaryCache<PiSessionNameScan>(
-        persistenceFile: SessionSummaryCacheLocation.file(named: "pi-session-names"))
+        persistenceFile: SessionSummaryCacheLocation.file(named: "pi-session-names", summaryLayoutVersion: 1))
 
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         try cancellation.checkCancellation()

@@ -53,8 +53,7 @@ enum ClaudeSubagentSessions {
             )
         else { return [] }
         return enumerator.compactMap { $0 as? URL }.filter { file in
-            file.pathExtension == "jsonl" && agentID(of: file) != nil
-                && (try? file.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true
+            file.pathExtension == "jsonl" && agentID(of: file) != nil && file.isPlainFileNotLinkOrPipe
         }
     }
 
