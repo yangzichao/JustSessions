@@ -9,8 +9,8 @@ struct ThemeReportAfterBackgroundQueryTests {
         var reporting = TerminalThemeReporting()
         reporting.reportAfterNextBackgroundQuery()
 
-        let firstReports = reporting.reports(answering: output("\u{1B}]10;?\u{1B}\\\u{1B}]11;?\u{1B}\\"), isDark: false)
-        let secondReports = reporting.reports(answering: output("\u{1B}]11;?\u{1B}\\"), isDark: false)
+        let firstReports = reporting.reportsToSendAfterTheTerminalReads(output("\u{1B}]10;?\u{1B}\\\u{1B}]11;?\u{1B}\\"), isDark: false)
+        let secondReports = reporting.reportsToSendAfterTheTerminalReads(output("\u{1B}]11;?\u{1B}\\"), isDark: false)
 
         #expect(firstReports == ["\u{1B}[?997;2n"])
         #expect(secondReports.isEmpty)
@@ -21,9 +21,9 @@ struct ThemeReportAfterBackgroundQueryTests {
         var reporting = TerminalThemeReporting()
         reporting.reportAfterNextBackgroundQuery()
 
-        let firstReports = reporting.reports(answering: output("text \u{1B}]1"), isDark: true)
-        let secondReports = reporting.reports(answering: output("1;?"), isDark: true)
-        let thirdReports = reporting.reports(answering: output("\u{07} more"), isDark: true)
+        let firstReports = reporting.reportsToSendAfterTheTerminalReads(output("text \u{1B}]1"), isDark: true)
+        let secondReports = reporting.reportsToSendAfterTheTerminalReads(output("1;?"), isDark: true)
+        let thirdReports = reporting.reportsToSendAfterTheTerminalReads(output("\u{07} more"), isDark: true)
 
         #expect(firstReports.isEmpty && secondReports.isEmpty)
         #expect(thirdReports == ["\u{1B}[?997;1n"])
@@ -33,8 +33,8 @@ struct ThemeReportAfterBackgroundQueryTests {
         var reporting = TerminalThemeReporting()
         reporting.reportAfterNextBackgroundQuery()
 
-        let unendedReports = reporting.reports(answering: output("\u{1B}]11;?\u{1B}"), isDark: true)
-        let endedReports = reporting.reports(answering: output("\\"), isDark: true)
+        let unendedReports = reporting.reportsToSendAfterTheTerminalReads(output("\u{1B}]11;?\u{1B}"), isDark: true)
+        let endedReports = reporting.reportsToSendAfterTheTerminalReads(output("\\"), isDark: true)
 
         #expect(unendedReports.isEmpty)
         #expect(endedReports == ["\u{1B}[?997;1n"])
@@ -44,11 +44,11 @@ struct ThemeReportAfterBackgroundQueryTests {
         var reporting = TerminalThemeReporting()
         let otherCommands = "\u{1B}]11;rgb:0000/0000/0000\u{07}\u{1B}]8;;https://example.com/11;?\u{1B}\\\u{1B}]111;?\u{07}"
 
-        let unowedReports = reporting.reports(answering: output("\u{1B}]11;?\u{1B}\\"), isDark: false)
+        let unowedReports = reporting.reportsToSendAfterTheTerminalReads(output("\u{1B}]11;?\u{1B}\\"), isDark: false)
         reporting.reportAfterNextBackgroundQuery()
-        let otherCommandReports = reporting.reports(answering: output(otherCommands), isDark: false)
+        let otherCommandReports = reporting.reportsToSendAfterTheTerminalReads(output(otherCommands), isDark: false)
         reporting.cancelReportAfterNextBackgroundQuery()
-        let cancelledReports = reporting.reports(answering: output("\u{1B}]11;?\u{1B}\\"), isDark: false)
+        let cancelledReports = reporting.reportsToSendAfterTheTerminalReads(output("\u{1B}]11;?\u{1B}\\"), isDark: false)
 
         #expect(unowedReports.isEmpty)
         #expect(otherCommandReports.isEmpty)
@@ -58,7 +58,7 @@ struct ThemeReportAfterBackgroundQueryTests {
     @Test func findsARequestThatInterruptsAnUnendedCommand() {
         var reporting = TerminalThemeReporting()
 
-        let reports = reporting.reports(answering: output("\u{1B}]0;title\u{1B}[?2031h\u{1B}[?996n"), isDark: true)
+        let reports = reporting.reportsToSendAfterTheTerminalReads(output("\u{1B}]0;title\u{1B}[?2031h\u{1B}[?996n"), isDark: true)
 
         #expect(reporting.isSubscribed)
         #expect(reports == ["\u{1B}[?997;1n"])

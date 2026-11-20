@@ -50,9 +50,10 @@ final class SelectableTerminalView: LocalProcessTerminalView {
     override func dataReceived(slice: ArraySlice<UInt8>) { outputCoalescer.receive(slice) }
 
     private func consumeOutput(_ bytes: ArraySlice<UInt8>) {
-        let themeReports = themeReporting.reports(answering: bytes, isDark: appliedPalette?.isDark ?? false)
+        let themeReportsToSendAfterFeeding = themeReporting.reportsToSendAfterTheTerminalReads(
+            bytes, isDark: appliedPalette?.isDark ?? false)
         feed(byteArray: bytes)
-        themeReports.forEach(sendTerminalReport)
+        themeReportsToSendAfterFeeding.forEach(sendTerminalReport)
         promptSelection.terminalOutputArrived()
     }
 

@@ -10,7 +10,7 @@ struct TerminalThemeReporting {
         "\u{1B}[?997;\(isDark ? 1 : 2)n"
     }
 
-    mutating func reports(answering output: ArraySlice<UInt8>, isDark: Bool) -> [String] {
+    mutating func reportsToSendAfterTheTerminalReads(_ output: ArraySlice<UInt8>, isDark: Bool) -> [String] {
         scanner.scan(output).compactMap { request in
             switch request {
             case .subscribe:

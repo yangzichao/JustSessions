@@ -207,14 +207,15 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
 
     private func consumeOutput(_ bytes: ArraySlice<UInt8>) {
         let owedReportAfterBackgroundQuery = themeReporting.reportsAfterNextBackgroundQuery
-        var themeReports = themeReporting.reports(answering: bytes, isDark: appliedPalette?.isDark ?? false)
+        var themeReportsToSendAfterFeeding = themeReporting.reportsToSendAfterTheTerminalReads(
+            bytes, isDark: appliedPalette?.isDark ?? false)
         if owedReportAfterBackgroundQuery, !themeReporting.reportsAfterNextBackgroundQuery {
-            themeReportAfterBackgroundAnswer = themeReports.popLast()
+            themeReportAfterBackgroundAnswer = themeReportsToSendAfterFeeding.popLast()
         }
         outputModeScanner.scan(bytes)
         inMemorySession.receive(Data(bytes))
         outputBackpressure.outputPassedToGhostty(byteCount: bytes.count)
-        themeReports.forEach(sendTerminalReport)
+        themeReportsToSendAfterFeeding.forEach(sendTerminalReport)
         promptSelection.terminalOutputArrived()
     }
 
