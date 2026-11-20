@@ -47,11 +47,15 @@ struct OpenCodeAdapter: ConversationAdapter {
         return conversations
     }
 
-    /// OpenCode titles a session `New session - <ISO 8601 time>` until it has written a title from the first prompt.
+    /// OpenCode titles a session `New session - <ISO 8601 time>` until it writes a title from the first prompt, and a
+    /// child session created without a title `Child session - <ISO 8601 time>`, which it never retitles.
     static func isPlaceholderTitle(_ title: String) -> Bool {
-        let prefix = "New session - "
-        return title.hasPrefix(prefix) && ConversationMetadata.date(String(title.dropFirst(prefix.count))) != nil
+        placeholderTitlePrefixes.contains { prefix in
+            title.hasPrefix(prefix) && ConversationMetadata.date(String(title.dropFirst(prefix.count))) != nil
+        }
     }
+
+    private static let placeholderTitlePrefixes = ["New session - ", "Child session - "]
 
     func arguments(for conversation: Conversation, action: ConversationAction) -> [String] {
         switch action {

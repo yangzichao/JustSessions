@@ -70,9 +70,11 @@ struct OpenCodeAdapterTests {
                 == "/Users/me/.local/share/opencode/opencode.db")
     }
 
-    @Test func onlyADatedNewSessionTitleIsAPlaceholder() {
+    @Test func onlyADatedNewOrChildSessionTitleIsAPlaceholder() {
         #expect(OpenCodeAdapter.isPlaceholderTitle("New session - 2026-09-30T10:00:00.000Z"))
+        #expect(OpenCodeAdapter.isPlaceholderTitle("Child session - 2026-09-30T10:00:00.000Z"))
         #expect(!OpenCodeAdapter.isPlaceholderTitle("New session - notes"))
+        #expect(!OpenCodeAdapter.isPlaceholderTitle("Child session - notes"))
         #expect(!OpenCodeAdapter.isPlaceholderTitle("Fix login"))
     }
 
