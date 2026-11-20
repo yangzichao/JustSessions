@@ -12,9 +12,7 @@ struct EmbeddedTerminalView: NSViewRepresentable {
 
     func makeNSView(context: Context) -> TerminalInsetView {
         let terminalView = session.terminalView
-        terminalView.onFocus = onFocus
-        terminalView.makeContextMenu = makeContextMenu
-        terminalView.onOpenLink = onOpenLink
+        giveCallbacksThatHoldTheSession(to: terminalView)
         session.startIfNeeded()
         context.coordinator.wasActive = isActive
         let insetView = TerminalInsetView(terminalView: terminalView)
@@ -25,9 +23,7 @@ struct EmbeddedTerminalView: NSViewRepresentable {
 
     func updateNSView(_ insetView: TerminalInsetView, context: Context) {
         insetView.isShown = isShown
-        insetView.terminalView.onFocus = onFocus
-        insetView.terminalView.makeContextMenu = makeContextMenu
-        insetView.terminalView.onOpenLink = onOpenLink
+        giveCallbacksThatHoldTheSession(to: insetView.terminalView)
         if isActive && !context.coordinator.wasActive {
             focus(insetView, coordinator: context.coordinator)
         }
@@ -36,10 +32,25 @@ struct EmbeddedTerminalView: NSViewRepresentable {
     }
 
     static func dismantleNSView(_ insetView: TerminalInsetView, coordinator: Coordinator) {
-        if let host = insetView.terminalView.superview, host !== insetView { return }
-        insetView.terminalView.onFocus = nil
-        insetView.terminalView.makeContextMenu = nil
-        insetView.terminalView.onOpenLink = nil
+        if anotherViewHasTakenTheTerminal(of: insetView) { return }
+        takeBackCallbacksSoAClosedTabsTerminalCanBeFreed(from: insetView.terminalView)
+    }
+
+    private func giveCallbacksThatHoldTheSession(to terminalView: any TabTerminalView) {
+        terminalView.onFocus = onFocus
+        terminalView.makeContextMenu = makeContextMenu
+        terminalView.onOpenLink = onOpenLink
+    }
+
+    private static func anotherViewHasTakenTheTerminal(of insetView: TerminalInsetView) -> Bool {
+        guard let viewHostingTheTerminal = insetView.terminalView.superview else { return false }
+        return viewHostingTheTerminal !== insetView
+    }
+
+    private static func takeBackCallbacksSoAClosedTabsTerminalCanBeFreed(from terminalView: any TabTerminalView) {
+        terminalView.onFocus = nil
+        terminalView.makeContextMenu = nil
+        terminalView.onOpenLink = nil
     }
 
     private func focus(_ insetView: TerminalInsetView, coordinator: Coordinator) {
