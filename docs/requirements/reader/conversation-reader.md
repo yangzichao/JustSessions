@@ -34,7 +34,7 @@ The preview beside the sidebar and the separate reading windows share one reader
 
 | ID | Requirement | Origin | Related tests |
 | --- | --- | --- | --- |
-| RDR-40 | Text size: A− and A+, or ⌘+ (also ⌘=), ⌘−, and ⌘0, from 12 to 22 points, default 15. | `51f3711`, `19b4af9` | `TranscriptReadingTextSizeTests`, `ZoomInEqualsKeyTests` |
+| RDR-40 | Text size: A− and A+, or ⌘+ (also ⌘=), ⌘−, and ⌘0, from 12 to 22 points, default 15. Tool call summaries and notes keep their share of it, 12 and 10 points at 15. | `51f3711`, `19b4af9` | `TranscriptReadingTextSizeTests`, `ZoomInEqualsKeyTests` |
 | RDR-41 | Width: a toolbar button switches between a readable column (`TranscriptReadingWidth.readableColumnWidth`, 760 points) and the full window width. Readable is the default. | `fdd8e43` | `TranscriptReadingWidthTests`, `TranscriptReadingWidthLayoutTests` |
 | RDR-42 | Text size and width are shared by the preview and every reading window and remembered after quitting. Changing either keeps the message being read at the same offset. | `fdd8e43`, `5fb0094`, `19b4af9` | `TranscriptReadingWidthPositionTests`, `TranscriptReadingTextSizeTests` |
 | RDR-43 | Find (⌘F or the toolbar's magnifying glass) ignores case and accents and covers message text, code, table cells, and tool summaries. Return or ⌘G goes next, Shift-Return or ⇧⌘G back, wrapping at both ends; Escape closes. The selected match is highlighted and revealed, opening a tool summary's disclosure. Each reader has its own Find. | `c6f7cd4` | `TranscriptSearchContextTests`, `TranscriptAttributedTextTests` |

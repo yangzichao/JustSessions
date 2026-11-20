@@ -9,6 +9,13 @@ struct TranscriptReadingTextSizeTests {
         #expect(TranscriptReadingTextSize.defaultSize == 15)
     }
 
+    @Test func toolCallsAndNotesKeepTheirShareOfTheReadingSize() {
+        #expect(TranscriptReadingTextSize.toolCallSummarySize(forReadingSize: 15) == 12)
+        #expect(TranscriptReadingTextSize.noteSize(forReadingSize: 15) == 10)
+        #expect(TranscriptReadingTextSize.toolCallSummarySize(forReadingSize: 22) > 17.5)
+        #expect(TranscriptReadingTextSize.noteSize(forReadingSize: 12) == 8)
+    }
+
     @Test func zoomingStopsAtTheRangeEnds() throws {
         let settings = try IsolatedUserDefaults()
         defer { settings.removeSuite() }
