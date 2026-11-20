@@ -9,25 +9,13 @@ extension GhosttyTabTerminalView {
     /// alternate screen, or while it takes the mouse, as tmux does in every CLI tab on this Mac. A shell's long line
     /// wraps at the edge by itself, and Ghostty joins that.
     func hardWrappedLink(under event: NSEvent) -> HardWrappedLink? {
-        guard isOnAlternateScreen || terminalSurface?.isMouseCaptured == true, let gridMetrics,
-            gridMetrics.cellWidthPixels > 0, gridMetrics.cellHeightPixels > 0
-        else { return nil }
+        guard isOnAlternateScreen || terminalSurface?.isMouseCaptured == true, let cellGrid else { return nil }
         let point = convert(event.locationInWindow, from: nil)
-        guard bounds.contains(point) else { return nil }
-        let scale = window?.backingScaleFactor ?? 1
-        let column = Int(point.x * scale) / Int(gridMetrics.cellWidthPixels)
-        let row = Int((bounds.height - point.y) * scale) / Int(gridMetrics.cellHeightPixels)
-        guard column < Int(gridMetrics.columns), row < Int(gridMetrics.rows),
+        guard bounds.contains(point), let cell = cellGrid.cell(containing: point),
             let screenText = inMemorySession.readViewportText()
         else { return nil }
         return HardWrappedLink(
-            rows: screenText.components(separatedBy: "\n"), columns: Int(gridMetrics.columns), row: row, column: column
+            rows: screenText.components(separatedBy: "\n"), columns: cellGrid.columns, row: cell.row, column: cell.column
         )
-    }
-}
-
-extension GhosttyTabTerminalView: TerminalSurfaceGridResizeDelegate {
-    func terminalDidResize(_ size: TerminalGridMetrics) {
-        gridMetrics = size
     }
 }
