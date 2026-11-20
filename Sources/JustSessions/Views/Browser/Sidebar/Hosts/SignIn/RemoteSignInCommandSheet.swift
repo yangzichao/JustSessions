@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct RemoteSignInCommandSheet: View {
+    private static let guessedTimeForTheSheetToCloseSoAnotherDialogCanOpen = Duration.milliseconds(300)
+
     let host: String
     let needsLogIn: Bool
     var signIns: RemoteSignIns = .shared
@@ -95,8 +97,12 @@ struct RemoteSignInCommandSheet: View {
             )
         else { return }
         dismiss()
+        saveOnceTheSheetHasGoneSoTheSignInsOwnDialogCanOpenInItsPlace(signInCommand)
+    }
+
+    private func saveOnceTheSheetHasGoneSoTheSignInsOwnDialogCanOpenInItsPlace(_ signInCommand: RemoteSignInCommand) {
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(300))
+            try? await Task.sleep(for: Self.guessedTimeForTheSheetToCloseSoAnotherDialogCanOpen)
             if signIns.command(on: host) != signInCommand {
                 signIns.setCommand(signInCommand, on: host, needsLogIn: needsLogIn)
             }
