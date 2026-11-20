@@ -21,32 +21,33 @@ final class PlainTerminalFinder: TerminalTextFindingCountingLater {
         tmuxFinder.onStepFinished = { [weak self] outcome in self?.tmuxStepFinished(outcome) }
     }
 
-    func findText(_ query: String) -> TerminalFindMatchCount? {
+    func findText(_ query: String) {
         self.query = query
         guard !query.isEmpty else {
             endTextFind()
             onMatchCount?(nil)
-            return nil
+            return
         }
         let searchesInTmux = searchesInTmux ?? terminalIsOnAlternateScreen()
         self.searchesInTmux = searchesInTmux
         if searchesInTmux {
-            _ = tmuxFinder.findText(query)
+            tmuxFinder.findText(query)
         } else {
             report(terminalFinder.findText(query))
         }
-        return nil
     }
 
-    func findTextAgain(_ query: String, direction: TerminalFindDirection) -> TerminalFindMatchCount? {
-        guard let searchesInTmux else { return findText(query) }
+    func findTextAgain(_ query: String, direction: TerminalFindDirection) {
+        guard let searchesInTmux else {
+            findText(query)
+            return
+        }
         self.query = query
         if searchesInTmux {
-            _ = tmuxFinder.findTextAgain(query, direction: direction)
+            tmuxFinder.findTextAgain(query, direction: direction)
         } else {
             report(terminalFinder.findTextAgain(query, direction: direction))
         }
-        return nil
     }
 
     func endTextFind() {

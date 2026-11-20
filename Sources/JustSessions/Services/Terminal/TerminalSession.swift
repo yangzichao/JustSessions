@@ -111,10 +111,12 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.isWaitingToBeShown = startsOnceShown
         let terminalView = engine.makeTabTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.terminalView = terminalView
-        self.findState = TerminalFindState(
-            finder: tmuxHistory.map { tmuxHistory in
-                PlainTerminalFinder(terminalFinder: terminalView, tmuxHistory: tmuxHistory) { terminalView.isOnAlternateScreen }
-            } ?? terminalView)
+        if let tmuxHistory {
+            self.findState = TerminalFindState(
+                finder: PlainTerminalFinder(terminalFinder: terminalView, tmuxHistory: tmuxHistory) { terminalView.isOnAlternateScreen })
+        } else {
+            self.findState = TerminalFindState(finder: terminalView)
+        }
         self.conversationOutline = ConversationOutlineModel()
         self.bookmarkNotices = TerminalBookmarkNoticeState()
         self.processObserver = TerminalProcessObserver()

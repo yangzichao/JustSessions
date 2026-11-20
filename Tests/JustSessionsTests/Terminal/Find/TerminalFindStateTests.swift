@@ -105,8 +105,8 @@ struct TerminalFindStateTests {
 private final class LaterCountingTerminalFinder: TerminalTextFindingCountingLater {
     var onMatchCount: ((TerminalFindMatchCount?) -> Void)?
 
-    func findText(_ query: String) -> TerminalFindMatchCount? { TerminalFindMatchCount.none }
-    func findTextAgain(_ query: String, direction: TerminalFindDirection) -> TerminalFindMatchCount? { TerminalFindMatchCount.none }
+    func findText(_ query: String) {}
+    func findTextAgain(_ query: String, direction: TerminalFindDirection) {}
     func endTextFind() {}
 }
 

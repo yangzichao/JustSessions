@@ -11,7 +11,7 @@ struct PlainTerminalFinderTests {
         var reports: [TerminalFindMatchCount?] = []
         finder.onMatchCount = { reports.append($0) }
 
-        #expect(finder.findText("needle") == nil)
+        finder.findText("needle")
 
         try await expectEventually { reports.count == 1 }
         #expect(reports == [TerminalFindMatchCount(total: 5, selectedNumber: 1, exceedsCountLimit: false)])
@@ -25,8 +25,8 @@ struct PlainTerminalFinderTests {
         var reports: [TerminalFindMatchCount?] = []
         finder.onMatchCount = { reports.append($0) }
 
-        _ = finder.findText("needle")
-        _ = finder.findTextAgain("needle", direction: .towardOlder)
+        finder.findText("needle")
+        finder.findTextAgain("needle", direction: .towardOlder)
         finder.endTextFind()
 
         #expect(terminal.calls == [.find("needle"), .findAgain("needle", .towardOlder), .end])
@@ -40,13 +40,13 @@ struct PlainTerminalFinderTests {
         var showsTmux = false
         let finder = PlainTerminalFinder(terminalFinder: terminal, tmuxHistory: tmux.history) { showsTmux }
 
-        _ = finder.findText("needle")
+        finder.findText("needle")
         showsTmux = true
-        _ = finder.findText("needles")
+        finder.findText("needles")
         #expect(terminal.calls == [.find("needle"), .find("needles")])
 
         finder.endTextFind()
-        _ = finder.findText("needle")
+        finder.findText("needle")
         try await expectEventually { tmux.commands.count == 1 }
         #expect(terminal.calls.last == .end)
     }
@@ -58,12 +58,12 @@ struct PlainTerminalFinderTests {
         var reports: [TerminalFindMatchCount?] = []
         finder.onMatchCount = { reports.append($0) }
 
-        _ = finder.findText("needle")
+        finder.findText("needle")
 
         try await expectEventually { reports.count == 1 }
         #expect(reports == [terminal.matchCount])
         #expect(terminal.calls == [.find("needle")])
-        _ = finder.findTextAgain("needle", direction: .towardNewer)
+        finder.findTextAgain("needle", direction: .towardNewer)
         #expect(terminal.calls.last == .findAgain("needle", .towardNewer))
     }
 
@@ -75,9 +75,9 @@ struct PlainTerminalFinderTests {
         var reports: [TerminalFindMatchCount?] = []
         finder.onMatchCount = { reports.append($0) }
 
-        _ = finder.findText("needle")
+        finder.findText("needle")
         try await expectEventually { reports.count == 1 }
-        _ = finder.findTextAgain("needle", direction: .towardOlder)
+        finder.findTextAgain("needle", direction: .towardOlder)
 
         try await expectEventually { reports.count == 2 }
         #expect(reports == [nil, nil])
@@ -91,8 +91,8 @@ struct PlainTerminalFinderTests {
         var reports: [TerminalFindMatchCount?] = []
         finder.onMatchCount = { reports.append($0) }
 
-        _ = finder.findText("needle")
-        _ = finder.findText("")
+        finder.findText("needle")
+        finder.findText("")
 
         #expect(terminal.calls == [.find("needle"), .end])
         #expect(reports == [terminal.matchCount, nil])

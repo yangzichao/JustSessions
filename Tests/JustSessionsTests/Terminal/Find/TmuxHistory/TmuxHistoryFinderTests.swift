@@ -10,7 +10,7 @@ struct TmuxHistoryFinderTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        #expect(finder.findText("needle") == nil)
+        finder.findText("needle")
 
         try await expectEventually { outcomes.count == 1 }
         #expect(outcomes == [.searched(TerminalFindMatchCount(total: 3, selectedNumber: 1, exceedsCountLimit: false))])
@@ -23,9 +23,9 @@ struct TmuxHistoryFinderTests {
         var selectedNumbers: [Int?] = []
         finder.onStepFinished = { selectedNumbers.append($0.count?.selectedNumber) }
 
-        _ = finder.findText("needle")
+        finder.findText("needle")
         for direction in [TerminalFindDirection.towardOlder, .towardOlder, .towardOlder, .towardNewer] {
-            _ = finder.findTextAgain("needle", direction: direction)
+            finder.findTextAgain("needle", direction: direction)
         }
 
         try await expectEventually { selectedNumbers.count == 5 }
@@ -40,8 +40,8 @@ struct TmuxHistoryFinderTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        _ = finder.findText("needle")
-        _ = finder.findTextAgain("needle", direction: .towardOlder)
+        finder.findText("needle")
+        finder.findTextAgain("needle", direction: .towardOlder)
 
         try await expectEventually { outcomes.count == 2 }
         #expect(outcomes.last == .searched(TerminalFindMatchCount(total: 4, selectedNumber: 2, exceedsCountLimit: false)))
@@ -54,8 +54,8 @@ struct TmuxHistoryFinderTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        _ = finder.findText("needle")
-        _ = finder.findTextAgain("needle", direction: .towardOlder)
+        finder.findText("needle")
+        finder.findTextAgain("needle", direction: .towardOlder)
 
         try await expectEventually { outcomes.count == 2 }
         #expect(outcomes.last == .searched(TerminalFindMatchCount(total: 6, selectedNumber: nil, exceedsCountLimit: false)))
@@ -68,8 +68,8 @@ struct TmuxHistoryFinderTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        _ = finder.findText("absent")
-        _ = finder.findTextAgain("absent", direction: .towardOlder)
+        finder.findText("absent")
+        finder.findTextAgain("absent", direction: .towardOlder)
 
         try await expectEventually { outcomes.count == 2 }
         #expect(outcomes == [.searched(TerminalFindMatchCount.none), .searched(TerminalFindMatchCount.none)])
@@ -81,8 +81,8 @@ struct TmuxHistoryFinderTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        _ = finder.findText("needle")
-        _ = finder.findTextAgain("needle", direction: .towardOlder)
+        finder.findText("needle")
+        finder.findTextAgain("needle", direction: .towardOlder)
 
         try await expectEventually { outcomes.count == 2 }
         #expect(outcomes == [.searched(nil), .searched(nil)])
@@ -94,7 +94,7 @@ struct TmuxHistoryFinderTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        _ = finder.findText("e")
+        finder.findText("e")
 
         try await expectEventually { outcomes.count == 1 }
         #expect(outcomes == [.searched(TerminalFindMatchCount(total: 1000, selectedNumber: nil, exceedsCountLimit: true))])
@@ -106,7 +106,7 @@ struct TmuxHistoryFinderTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        _ = finder.findText("needle")
+        finder.findText("needle")
 
         try await expectEventually { outcomes.count == 1 }
         #expect(outcomes == [.couldNotSearch])
@@ -122,10 +122,10 @@ struct TmuxHistoryFinderTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        _ = finder.findText("n")
+        finder.findText("n")
         try await expectEventually { tmux.commands.count == 1 }
-        _ = finder.findText("ne")
-        _ = finder.findText("nee")
+        finder.findText("ne")
+        finder.findText("nee")
         tmux.releaseFirstCommand()
 
         try await expectEventually { outcomes.count == 1 }
@@ -140,7 +140,7 @@ struct TmuxHistoryFinderTests {
         finder.onStepFinished = { outcomes.append($0) }
 
         finder.endTextFind()
-        _ = finder.findText("needle")
+        finder.findText("needle")
         try await expectEventually { outcomes.count == 1 }
         finder.endTextFind()
         finder.endTextFind()
@@ -156,7 +156,7 @@ struct TmuxHistoryFinderTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        _ = finder.findTextAgain("needle", direction: .towardOlder)
+        finder.findTextAgain("needle", direction: .towardOlder)
 
         try await expectEventually { outcomes.count == 1 }
         #expect(tmux.commands == [TmuxHistorySearchCommands.startingSearch(for: "needle", inSession: tmux.sessionName)])

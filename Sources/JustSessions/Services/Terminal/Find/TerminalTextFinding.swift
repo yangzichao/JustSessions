@@ -8,6 +8,9 @@ protocol TerminalTextFinding: AnyObject {
 }
 
 @MainActor
-protocol TerminalTextFindingCountingLater: TerminalTextFinding {
+protocol TerminalTextFindingCountingLater: AnyObject {
     var onMatchCount: ((TerminalFindMatchCount?) -> Void)? { get set }
+    func findText(_ query: String)
+    func findTextAgain(_ query: String, direction: TerminalFindDirection)
+    func endTextFind()
 }
