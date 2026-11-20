@@ -31,34 +31,47 @@ struct KiroSessionMetadata: Equatable {
         guard let handle = try? FileHandle(forReadingFrom: file) else { return nil }
         defer { try? handle.close() }
         guard let head = try? handle.read(upToCount: Self.maximumHeadByteCount) else { return nil }
-        if head.count < Self.maximumHeadByteCount {
+        let headIsWholeFile = head.count < Self.maximumHeadByteCount
+        if headIsWholeFile {
             guard let object = ConversationMetadata.object(from: head) else { return nil }
             self.init(object: object)
-        } else if let object = Self.objectBeforeSessionState(in: head),
-            ["session_id", "cwd", "title", "updated_at", "session_created_reason", "parent_session_id"]
-                .allSatisfy({ object[$0] != nil })
-        {
-            self.init(object: object)
+        } else if let leadingMembers = Self.objectOfMembersBeforeSessionState(in: head), Self.namesEveryReadMember(leadingMembers) {
+            self.init(object: leadingMembers)
         } else {
             guard let rest = try? handle.readToEnd(), let object = ConversationMetadata.object(from: head + rest) else { return nil }
             self.init(object: object)
         }
     }
 
-    static func objectBeforeSessionState(in data: Data) -> [String: Any]? {
+    private static let readMemberNames = ["session_id", "cwd", "title", "updated_at", "session_created_reason", "parent_session_id"]
+
+    private static func namesEveryReadMember(_ object: [String: Any]) -> Bool {
+        readMemberNames.allSatisfy { object[$0] != nil }
+    }
+
+    static func objectOfMembersBeforeSessionState(in data: Data) -> [String: Any]? {
         let key = Data(#""session_state""#.utf8)
         var searchStart = data.startIndex
         while let keyRange = data.range(of: key, in: searchStart..<data.endIndex) {
             searchStart = keyRange.upperBound
-            guard let previous = data[..<keyRange.lowerBound].last(where: { !isJSONWhitespace($0) }),
-                previous == UInt8(ascii: ",") || previous == UInt8(ascii: "{")
-            else { continue }
-            var members = Data(data[..<keyRange.lowerBound])
-            while let last = members.last, isJSONWhitespace(last) || last == UInt8(ascii: ",") { members.removeLast() }
-            members.append(UInt8(ascii: "}"))
-            if let object = ConversationMetadata.object(from: members) { return object }
+            guard couldStartMemberName(at: keyRange.lowerBound, in: data) else { continue }
+            if let object = ConversationMetadata.object(from: objectClosing(membersBefore: keyRange.lowerBound, in: data)) {
+                return object
+            }
         }
         return nil
+    }
+
+    private static func couldStartMemberName(at index: Data.Index, in data: Data) -> Bool {
+        let previous = data[..<index].last(where: { !isJSONWhitespace($0) })
+        return previous == UInt8(ascii: ",") || previous == UInt8(ascii: "{")
+    }
+
+    private static func objectClosing(membersBefore index: Data.Index, in data: Data) -> Data {
+        var members = Data(data[..<index])
+        while let last = members.last, isJSONWhitespace(last) || last == UInt8(ascii: ",") { members.removeLast() }
+        members.append(UInt8(ascii: "}"))
+        return members
     }
 
     private static func isJSONWhitespace(_ byte: UInt8) -> Bool {
