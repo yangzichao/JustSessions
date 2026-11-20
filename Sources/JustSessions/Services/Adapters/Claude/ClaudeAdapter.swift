@@ -20,11 +20,11 @@ struct ClaudeAdapter: ConversationAdapter {
     }
 
     private static let transcriptHeads = SessionFileSummaryCache<ClaudeTranscriptHead>(
-        persistenceFile: SessionSummaryCacheLocation.file(named: "claude-heads-2"))
+        persistenceFile: SessionSummaryCacheLocation.file(named: "claude-heads", summaryLayoutVersion: 2))
     private static let transcriptTails = SessionFileSummaryCache<ClaudeTranscriptTail>(
-        persistenceFile: SessionSummaryCacheLocation.file(named: "claude-tails-5"))
+        persistenceFile: SessionSummaryCacheLocation.file(named: "claude-tails", summaryLayoutVersion: 5))
     private static let subagentSessions = SessionFileSummaryCache<ClaudeSubagentSession>(
-        persistenceFile: SessionSummaryCacheLocation.file(named: "claude-subagents-2"))
+        persistenceFile: SessionSummaryCacheLocation.file(named: "claude-subagents", summaryLayoutVersion: 2))
 
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         try cancellation.checkCancellation()

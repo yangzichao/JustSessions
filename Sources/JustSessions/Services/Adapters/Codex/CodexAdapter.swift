@@ -22,11 +22,11 @@ struct CodexAdapter: ConversationAdapter {
     }
 
     private static let rolloutHeads = SessionFileSummaryCache<CodexRolloutHead>(
-        persistenceFile: SessionSummaryCacheLocation.file(named: "codex-heads-2"))
+        persistenceFile: SessionSummaryCacheLocation.file(named: "codex-heads", summaryLayoutVersion: 2))
     private static let firstUserPrompts = SessionFileSummaryCache<String>(
-        persistenceFile: SessionSummaryCacheLocation.file(named: "codex-prompts"))
+        persistenceFile: SessionSummaryCacheLocation.file(named: "codex-prompts", summaryLayoutVersion: 1))
     private static let models = SessionFileSummaryCache<SessionModel>(
-        persistenceFile: SessionSummaryCacheLocation.file(named: "codex-models"))
+        persistenceFile: SessionSummaryCacheLocation.file(named: "codex-models", summaryLayoutVersion: 1))
 
     func discover(cancellation: ConversationDiscoveryCancellation) throws -> [Conversation] {
         try cancellation.checkCancellation()

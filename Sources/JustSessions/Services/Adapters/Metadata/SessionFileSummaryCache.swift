@@ -29,6 +29,9 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         let entries: [String: Entry]
     }
 
+    private static var snapshotLayoutVersion: Int { 1 }
+    private static var maximumSnapshotByteCount: Int { 64 << 20 }
+
     private let lock = NSLock()
     private var entriesByPath: [String: Entry] = [:]
     private let persistenceFile: URL?
@@ -46,9 +49,9 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
         hasLoadedSnapshot = true
         guard let persistenceFile,
             let size = try? persistenceFile.resourceValues(forKeys: [.fileSizeKey]).fileSize,
-            size <= 64 << 20,
+            size <= Self.maximumSnapshotByteCount,
             let data = try? Data(contentsOf: persistenceFile),
-            let snapshot = try? JSONDecoder().decode(Snapshot.self, from: data), snapshot.version == 1
+            let snapshot = try? JSONDecoder().decode(Snapshot.self, from: data), snapshot.version == Self.snapshotLayoutVersion
         else { return }
         entriesByPath = snapshot.entries
     }
@@ -96,7 +99,9 @@ final class SessionFileSummaryCache<Summary: Sendable & Codable>: @unchecked Sen
                 || (!path.hasPrefix(temporaryPrefix) && !path.hasPrefix(temporaryURLPrefix)
                     && !path.hasPrefix("/tmp/") && !path.hasPrefix("/private/tmp/"))
         }
-        guard let data = try? JSONEncoder().encode(Snapshot(version: 1, entries: persistentEntries)), data.count <= 64 << 20 else { return }
+        guard let data = try? JSONEncoder().encode(Snapshot(version: Self.snapshotLayoutVersion, entries: persistentEntries)),
+            data.count <= Self.maximumSnapshotByteCount
+        else { return }
         do {
             try FileManager.default.createDirectory(
                 at: persistenceFile.deletingLastPathComponent(), withIntermediateDirectories: true,
