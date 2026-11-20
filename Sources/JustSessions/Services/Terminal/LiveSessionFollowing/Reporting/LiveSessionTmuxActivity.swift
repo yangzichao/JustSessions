@@ -3,6 +3,8 @@ import Foundation
 enum LiveSessionTmuxActivity {
     static let optionVariable = "JUSTSESSIONS_TMUX_ACTIVITY_OPTION"
 
+    static let importTheJavascriptNeeds = #"import { execFile } from "node:child_process";"#
+
     static let javascript = #"""
         // On an SSH host, the app reads what this CLI does from the title tmux gives its tab, which shows this option.
         const showInTmux = (() => {

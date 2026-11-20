@@ -18,7 +18,7 @@ extension ConversationStore {
 
     func synchronizeCLIActivity(
         claudeRegistry: ClaudeLiveSessionRegistry = ClaudeLiveSessionRegistry(),
-        liveSessionReporting: LiveSessionReporting? = .thisApp
+        liveSessionReporting: LiveSessionReporting? = .ofThePackagedApp
     ) async {
         let probedTabs = terminalSessions.compactMap { tab in
             tab.isRunning ? tab.cliActivityProbe.map { (tab: tab, probe: $0) } : nil

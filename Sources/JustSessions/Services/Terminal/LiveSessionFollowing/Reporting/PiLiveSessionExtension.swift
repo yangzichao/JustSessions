@@ -15,7 +15,7 @@ enum PiLiveSessionExtension {
         // JustSessions starts Pi with this extension and rewrites this file when the app changes it. It tells the app
         // which session this Pi is in, so the tab in the app follows /new, /resume, /fork, and /clone, and whether Pi
         // is working, waiting on you, or done with its turn.
-        import { execFile } from "node:child_process";
+        \#(LiveSessionTmuxActivity.importTheJavascriptNeeds)
         import { mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
         import { join } from "node:path";
 

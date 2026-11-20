@@ -22,7 +22,7 @@ enum OpenCodeLiveSessionPlugin {
         // JustSessions starts OpenCode with this TUI plugin and rewrites this file when the app changes it. It tells the
         // app which session this OpenCode shows, so the tab in the app follows /new and the sessions you open, and
         // whether OpenCode is working, waiting on you, or done with its turn.
-        import { execFile } from "node:child_process";
+        \#(LiveSessionTmuxActivity.importTheJavascriptNeeds)
         import { mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
         import { join } from "node:path";
 
