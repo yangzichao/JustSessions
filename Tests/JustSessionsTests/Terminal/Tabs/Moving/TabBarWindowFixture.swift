@@ -147,7 +147,7 @@ final class TabBarWindowFixture {
 
     func middle(ofCloseButtonOf tabID: UUID) throws -> CGFloat {
         let (leadingEdge, width) = try tabSpan(tabID)
-        return leadingEdge + width - 6 - 8
+        return leadingEdge + width - Self.closeButtonTrailingPadding - Self.closeButtonWidth / 2
     }
 
     func middle(ofGroupLabel groupKey: String) throws -> CGFloat {
@@ -172,6 +172,8 @@ final class TabBarWindowFixture {
     }
 
     private static let pointerY = barSize.height / 2 - 2
+    private static let closeButtonTrailingPadding: CGFloat = 6
+    private static let closeButtonWidth: CGFloat = 16
 
     private func send(_ type: NSEvent.EventType, atX x: CGFloat, droppedBy drop: CGFloat = 0) async throws {
         NSApp.sendEvent(try event(type, atX: x, droppedBy: drop))
