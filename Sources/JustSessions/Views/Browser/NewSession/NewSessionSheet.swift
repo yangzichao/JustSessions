@@ -189,11 +189,10 @@ struct NewSessionSheet: View {
 
     private func start() {
         let request = NewSessionRequest(
-            kind: startingKind,
+            launch: NewSessionLaunch(kind: startingKind, deletesSessionWhenClosed: deletesSessionWhenClosed),
             host: selectedHost,
             folder: trimmedProjectPath,
-            creatingMissingFolder: offersToCreateMissingFolder,
-            deletesSessionWhenClosed: startingKind != .plainTerminal && deletesSessionWhenClosed
+            creatingMissingFolder: offersToCreateMissingFolder
         )
         isStarting = true
         isCreatingMissingFolder = request.creatingMissingFolder

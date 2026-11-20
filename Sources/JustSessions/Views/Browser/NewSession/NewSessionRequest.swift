@@ -1,7 +1,6 @@
 struct NewSessionRequest {
-    let kind: NewSessionKind
+    let launch: NewSessionLaunch
     let host: SessionHost
     let folder: String
     let creatingMissingFolder: Bool
-    let deletesSessionWhenClosed: Bool
 }

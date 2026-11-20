@@ -154,14 +154,14 @@ struct ConversationBrowserView: View {
                 startCommands: store.cliStartCommands,
                 onSaveStartCommand: { try await store.saveStartCommand($0, for: $1, on: $2) }
             ) { request in
-                switch request.kind {
-                case .cli(let provider):
+                switch request.launch {
+                case .cli(let provider, let deletesSessionWhenClosed):
                     try await store.launchNewSession(
                         provider: provider,
                         host: request.host,
                         folder: request.folder,
                         creatingMissingFolder: request.creatingMissingFolder,
-                        deletesSessionWhenClosed: request.deletesSessionWhenClosed
+                        deletesSessionWhenClosed: deletesSessionWhenClosed
                     )
                 case .plainTerminal:
                     try await store.openPlainTerminal(
