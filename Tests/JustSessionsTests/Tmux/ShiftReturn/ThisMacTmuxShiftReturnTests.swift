@@ -23,9 +23,11 @@ struct ThisMacTmuxShiftReturnTests {
             displayTitle: "New claude session",
             command: sandbox.server.command(
                 attachingTo: tmuxSessionName,
-                running: sandbox.cliCommand(cli, extraEnvironment: [
-                    "KEY_LOG": keyLog.path, "READY_MARKER": readyMarker.path, "KEY_BYTE_COUNT": "15",
-                ])
+                running: sandbox.cliCommand(
+                    cli,
+                    extraEnvironment: [
+                        "KEY_LOG": keyLog.path, "READY_MARKER": readyMarker.path, "KEY_BYTE_COUNT": "15",
+                    ])
             ),
             tmuxSessionName: tmuxSessionName
         )
