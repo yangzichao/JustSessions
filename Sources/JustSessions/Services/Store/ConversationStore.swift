@@ -44,7 +44,7 @@ final class ConversationStore {
     @ObservationIgnored private var tabStateSubscriptions: [UUID: [AnyCancellable]] = [:]
     private(set) var terminalSessions: [TerminalSession] {
         get {
-            _ = tabStateRevision
+            makeTabReadersObserveEachTabsOwnState()
             return terminalSessionsStorage
         }
         set { terminalSessionsStorage = newValue }
@@ -737,6 +737,10 @@ final class ConversationStore {
 
     func noteTabStateChanged() {
         tabStateRevision &+= 1
+    }
+
+    private func makeTabReadersObserveEachTabsOwnState() {
+        _ = tabStateRevision
     }
 
     private func followTabStateChanges() {
