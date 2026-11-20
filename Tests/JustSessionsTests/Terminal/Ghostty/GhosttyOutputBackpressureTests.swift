@@ -86,7 +86,7 @@ private final class Waiter: @unchecked Sendable {
 
     init(_ backpressure: GhosttyOutputBackpressure) {
         DispatchQueue.global().async { [self] in
-            backpressure.waitForRoom()
+            backpressure.waitOffTheMainThreadUntilThereIsRoom()
             lock.withLock { returned = true }
         }
     }

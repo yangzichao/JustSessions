@@ -345,7 +345,7 @@ private final class GhosttyProcessDelegate: LocalProcessDelegate, @unchecked Sen
     }
 
     func dataReceived(slice: ArraySlice<UInt8>) {
-        outputBackpressure.waitForRoom()
+        outputBackpressure.waitOffTheMainThreadUntilThereIsRoom()
         let bytes = Array(slice)
         outputBackpressure.outputHandedToMainThread(byteCount: bytes.count)
         DispatchQueue.main.async {
