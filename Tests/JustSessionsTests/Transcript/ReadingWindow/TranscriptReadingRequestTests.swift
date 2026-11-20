@@ -71,7 +71,7 @@ struct TranscriptReadingRequestTests {
     @Test func anAdjacentRequestGoesOnFromTheReadersOrigin() async throws {
         let reader = try await makeReader(
             bookmarks: [bookmark("a", at: 540), bookmark("b", at: 570)],
-            at: .entry(index: id(500), offset: -6), lineCount: 4)
+            at: .startOfEntry(id(500)), lineCount: 4)
         defer { reader.close() }
         try await reader.fixture.waitUntil { reader.showsAtTop(id(500)) }
 
@@ -188,7 +188,7 @@ struct TranscriptReadingRequestTests {
     @Test func pressesWhileTheFirstPageLoadsAddUp() async throws {
         let bookmarks = [bookmark("a", at: 300), bookmark("b", at: 320)]
         let reader = try await makeReader(
-            bookmarks: bookmarks, at: .entry(index: id(300), offset: -6),
+            bookmarks: bookmarks, at: .startOfEntry(id(300)),
             waitingFor: .bookmark(bookmarks[0]))
         defer { reader.close() }
         reader.fixture.hostingView.layoutSubtreeIfNeeded()
@@ -205,7 +205,7 @@ struct TranscriptReadingRequestTests {
     @Test func pressesWhileTheFirstPageLoadsGoOnFromWhereTheWindowOpened() async throws {
         let reader = try await makeReader(
             bookmarks: [bookmark("a", at: 100), bookmark("b", at: 540), bookmark("c", at: 570)],
-            at: .entry(index: id(500), offset: -6), lineCount: 4)
+            at: .startOfEntry(id(500)), lineCount: 4)
         defer { reader.close() }
         reader.fixture.hostingView.layoutSubtreeIfNeeded()
         #expect(reader.fixture.readerScrollView == nil)
@@ -222,7 +222,7 @@ struct TranscriptReadingRequestTests {
     @Test func aWindowOpenedAtAGoneBookmarkShowsTheLatestMessages() async throws {
         let gone = bookmark("a", at: 700)
         let reader = try await makeReader(
-            bookmarks: [gone], at: .entry(index: gone.entryID, offset: -6), waitingFor: .bookmark(gone),
+            bookmarks: [gone], at: .startOfEntry(gone.entryID), waitingFor: .bookmark(gone),
             showing: false)
         defer { reader.close() }
         try reader.files.append(

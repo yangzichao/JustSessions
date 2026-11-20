@@ -12,7 +12,9 @@ struct TranscriptToolCallsView: View {
                 ForEach(Array(summaries.enumerated()), id: \.offset) { segmentIndex, summary in
                     TranscriptTextBlock(
                         source: AttributedString(summary), segmentIndex: segmentIndex,
-                        style: TranscriptTextStyle(fontSize: 12, isMonospaced: true, lineSpacing: 0, tone: .secondary), copyRole: .line
+                        style: TranscriptTextStyle(
+                            fontSize: ThemeFont.DefaultPointSize.callout, isMonospaced: true, lineSpacing: 0, tone: .secondary),
+                        copyRole: .line
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }

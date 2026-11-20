@@ -102,7 +102,7 @@ struct TranscriptScrollView: View {
                 .onChange(of: searchState.navigationRevision) {
                     guard let match = searchState.selectedMatch else { return }
                     positionController.clearSeekTarget()
-                    positionController.restore(.entry(index: match.entryIndex, offset: -6))
+                    positionController.restore(.startOfEntry(match.entryIndex))
                     scrollProxy.scrollTo(match.entryIndex, anchor: .top)
                 }
                 .onChange(of: isActive) {
@@ -153,8 +153,8 @@ struct TranscriptScrollView: View {
                         .overlay(alignment: .topLeading) {
                             if bookmarksAreEnabled {
                                 TranscriptBookmarkTargetMarks(target: bookmarkState.target)
-                                    .frame(width: TranscriptBookmarkTargetMarks.gutterWidth)
-                                    .offset(x: -TranscriptBookmarkTargetMarks.gutterWidth)
+                                    .frame(width: TranscriptColumnLayout.gutterWidth)
+                                    .offset(x: -TranscriptColumnLayout.gutterWidth)
                                     .accessibilityHidden(true)
                             }
                         }
@@ -168,8 +168,8 @@ struct TranscriptScrollView: View {
                 }
                 .frame(width: columnWidth(in: viewport.size.width), alignment: .leading)
                 .environment(\.transcriptColumnWidth, columnWidth(in: viewport.size.width))
-                .padding(.horizontal, 24)
-                .padding(.top, 6)
+                .padding(.horizontal, TranscriptColumnLayout.gutterWidth)
+                .padding(.top, TranscriptColumnLayout.topPadding)
                 .padding(.bottom, 36)
                 .frame(width: viewport.size.width)
             }
@@ -179,7 +179,7 @@ struct TranscriptScrollView: View {
     }
 
     private func columnWidth(in viewportWidth: CGFloat) -> CGFloat {
-        min(readingWidth.maximumColumnWidth, max(0, viewportWidth - 48))
+        min(readingWidth.maximumColumnWidth, max(0, viewportWidth - 2 * TranscriptColumnLayout.gutterWidth))
     }
 
     var displayedEntryIndices: [Int] { transcript.positionIDs }

@@ -195,7 +195,7 @@ struct TranscriptBookmarkJumpTests {
     }
 
     @Test func aJumpWhileAPageLoadsAsksForItsOwnPage() async throws {
-        let start = TranscriptReadingPosition.entry(index: id(300), offset: -6)
+        let start = TranscriptReadingPosition.startOfEntry(id(300))
         let reader = try await openReader(bookmarks: [bookmark("a", at: 340)], at: start)
         defer { reader.close() }
         reader.paging.later(preserving: start)
@@ -286,7 +286,7 @@ struct TranscriptBookmarkJumpTests {
         let gone = MessageBookmark(letter: "a", entryID: id(450), kind: .assistant, snippet: "Message 450, line 0:")
         MessageBookmarks(bookmarksByConversationID: [files.conversation.id: [gone]]).save(to: fixture.settings.userDefaults)
         let store = ConversationStore(adapters: [], userDefaults: fixture.settings.userDefaults, startsBackgroundPolling: false)
-        fixture.positionStore.record(.entry(index: id(0), offset: -6), for: files.conversation.id)
+        fixture.positionStore.record(.startOfEntry(id(0)), for: files.conversation.id)
         fixture.showReader(files.conversation, store: store)
         try await fixture.waitUntil { fixture.readerScrollView.flatMap(fixture.visiblePosition(in:))?.entryIndex == id(0) }
 

@@ -54,7 +54,7 @@ final class TranscriptPagingModel {
         request(.after(last.records.upperBound), preserving: position, currentPosition: currentPosition, keepingPages: keepingPages)
     }
 
-    func first() { request(.first, preserving: .entry(index: 0, offset: -6)) }
+    func first() { request(.first, preserving: .startOfEntry(0)) }
     func latest() { request(.latest, preserving: .bottom) }
 
     func cancel() {
@@ -112,7 +112,7 @@ final class TranscriptPagingModel {
                 let transcript = TranscriptPageAssembler.transcript(pages: self.pages)
                 self.transcript = transcript
                 if case .first = request, let first = transcript.positionIDs.first {
-                    self.restorationPosition = .entry(index: first, offset: -6)
+                    self.restorationPosition = .startOfEntry(first)
                 } else {
                     self.restorationPosition = position.resolved(in: transcript)
                 }

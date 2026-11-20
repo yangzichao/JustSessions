@@ -38,7 +38,8 @@ final class SessionReadingWindowController: NSWindowController, NSWindowDelegate
 
     static let minimumSize = NSSize(width: 400, height: 350)
     static let savedSizeKey = "readingWindowSize"
-    static let preferredWidth: CGFloat = 1000
+    private static let marginBesideReadableColumn: CGFloat = 120
+    static let preferredWidth = TranscriptReadingWidth.readableColumnWidth + 2 * marginBesideReadableColumn
     static let screenMargin: CGFloat = 20
 
     static func initialFrame(in visibleFrame: CGRect, savedSize: CGSize? = nil) -> CGRect {

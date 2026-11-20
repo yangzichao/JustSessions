@@ -132,13 +132,13 @@ struct TranscriptView: View {
             loadingMatchReveal = matchReveal
             loadingJumpCountAtMatchReveal = bookmarkState.loadingJumpCount
             bookmarkState.cancelLoadingJump()
-            readingPositionStore.record(.entry(index: matchReveal.entryID, offset: -6), for: conversation.id)
+            readingPositionStore.record(.startOfEntry(matchReveal.entryID), for: conversation.id)
         }
         dropMatchRevealABookmarkJumpReplaced()
         let position =
-            loadingMatchReveal.map { TranscriptReadingPosition.entry(index: $0.entryID, offset: -6) }
-            ?? bookmarkState.loadingJump.map { TranscriptReadingPosition.entry(index: $0.entryID, offset: -6) }
-            ?? bookmarkState.loadingEntryJump.map { TranscriptReadingPosition.entry(index: $0, offset: -6) }
+            loadingMatchReveal.map { TranscriptReadingPosition.startOfEntry($0.entryID) }
+            ?? bookmarkState.loadingJump.map { TranscriptReadingPosition.startOfEntry($0.entryID) }
+            ?? bookmarkState.loadingEntryJump.map { TranscriptReadingPosition.startOfEntry($0) }
             ?? readingPositionStore.position(for: conversation.id)
         paging.refresh(conversation, position: position)
     }
@@ -147,7 +147,7 @@ struct TranscriptView: View {
         guard isActive, !paging.isLoading, paging.transcript?.entries.isEmpty != false,
             let navigation = readingRequests?.pendingNavigation
         else { return }
-        if let entryID = navigation.entryID { readingPositionStore.record(.entry(index: entryID, offset: -6), for: conversation.id) }
+        if let entryID = navigation.entryID { readingPositionStore.record(.startOfEntry(entryID), for: conversation.id) }
         refresh()
     }
 

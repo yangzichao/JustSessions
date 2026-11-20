@@ -9,6 +9,8 @@ final class TranscriptScrollPositionController {
         let entryFrame: NSRect?
     }
 
+    private static let delayForSwiftUIToCommitRowMeasurements: TimeInterval = 0.016
+
     private let conversationID: String
     private let positionStore: TranscriptReadingPositionStore
     private var pendingRestoration: TranscriptReadingPosition?
@@ -213,7 +215,7 @@ final class TranscriptScrollPositionController {
     private func scheduleUpdate() {
         guard !hasScheduledUpdate, !isStopped else { return }
         hasScheduledUpdate = true
-        let delay = pendingRestoration == nil ? 0.0 : 0.016
+        let delay = pendingRestoration == nil ? 0.0 : Self.delayForSwiftUIToCommitRowMeasurements
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
             guard let self, !self.isStopped else { return }
             self.hasScheduledUpdate = false
@@ -308,14 +310,14 @@ final class TranscriptScrollPositionController {
 
     func seek(toEntryAt index: Int) {
         seekTargetStorage = index
-        positionStore.record(.entry(index: index, offset: -6), for: conversationID)
-        restore(.entry(index: index, offset: -6))
+        positionStore.record(.startOfEntry(index), for: conversationID)
+        restore(.startOfEntry(index))
         entrySeekingRequests.send(index)
     }
 
     func setSeekTarget(_ index: Int, recordingPosition: Bool = false) {
         seekTargetStorage = index
-        if recordingPosition { positionStore.record(.entry(index: index, offset: -6), for: conversationID) }
+        if recordingPosition { positionStore.record(.startOfEntry(index), for: conversationID) }
     }
 
     func clearSeekTarget() { seekTargetStorage = nil }

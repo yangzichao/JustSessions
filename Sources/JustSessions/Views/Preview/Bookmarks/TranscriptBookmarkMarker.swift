@@ -18,7 +18,7 @@ extension EnvironmentValues {
 }
 
 struct TranscriptBookmarkMarker: View {
-    @MainActor static var side: CGFloat { min(InterfaceScale.points(16), 20) }
+    @MainActor static var side: CGFloat { min(InterfaceScale.points(16), TranscriptColumnLayout.gutterWidth - gapToText) }
     static let gapToText: CGFloat = 4
 
     let entryID: Int

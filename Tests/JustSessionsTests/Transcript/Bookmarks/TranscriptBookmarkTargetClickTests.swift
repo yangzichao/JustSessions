@@ -11,7 +11,7 @@ struct TranscriptBookmarkTargetClickTests {
     private static func marks(letters: [MessageBookmark]) -> (container: NSView, marks: TranscriptBookmarkTargetMarksView) {
         let container = FlippedView(frame: NSRect(x: 0, y: 0, width: 400, height: 600))
         let marks = TranscriptBookmarkTargetMarksView()
-        marks.frame = NSRect(x: 0, y: 0, width: TranscriptBookmarkTargetMarks.gutterWidth, height: 600)
+        marks.frame = NSRect(x: 0, y: 0, width: TranscriptColumnLayout.gutterWidth, height: 600)
         container.addSubview(marks)
         marks.style = TranscriptBookmarkTargetMarkView.Style(
             color: .secondaryLabelColor, letters: TranscriptBookmarkLetters(letters), side: 16)

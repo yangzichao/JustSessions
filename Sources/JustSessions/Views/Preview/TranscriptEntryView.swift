@@ -38,8 +38,11 @@ struct TranscriptEntryView: View {
         case .toolCalls(let summaries):
             TranscriptToolCallsView(summaries: summaries)
         case .note(let text):
-            TranscriptTextBlock(source: AttributedString(text), style: TranscriptTextStyle(fontSize: 10, lineSpacing: 0, tone: .tertiary))
-                .frame(maxWidth: .infinity)
+            TranscriptTextBlock(
+                source: AttributedString(text),
+                style: TranscriptTextStyle(fontSize: ThemeFont.DefaultPointSize.caption, lineSpacing: 0, tone: .tertiary)
+            )
+            .frame(maxWidth: .infinity)
         case .userImage(let image), .toolResultImage(let image):
             TranscriptImageView(image: image)
         }

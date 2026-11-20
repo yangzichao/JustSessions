@@ -94,7 +94,7 @@ struct SessionReadingWindowTests {
         #expect(requests.pendingNavigation == .bookmark(bookmarks[2]))
 
         _ = requests.takeNavigation()
-        requests.requestAdjacentBookmark(forward: true, in: bookmarks, from: .entry(index: bookmarks[0].entryID + 1, offset: -6))
+        requests.requestAdjacentBookmark(forward: true, in: bookmarks, from: .startOfEntry(bookmarks[0].entryID + 1))
         #expect(requests.pendingNavigation == .bookmark(bookmarks[1]))
         _ = requests.takeNavigation()
         requests.requestAdjacentBookmark(forward: false, in: bookmarks, from: .bottom)
@@ -126,7 +126,7 @@ struct SessionReadingWindowTests {
         defer { window.close() }
         let controller = try #require(window.windowController as? SessionReadingWindowController)
 
-        #expect(controller.readingPositionStore.position(for: conversation.id) == .entry(index: entryID, offset: -6))
+        #expect(controller.readingPositionStore.position(for: conversation.id) == .startOfEntry(entryID))
         #expect(controller.requests.pendingNavigation == .entry(entryID))
         #expect(store.selectedTerminalID == tab.id)
     }

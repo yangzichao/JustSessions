@@ -24,7 +24,7 @@ extension TranscriptScrollPositionController {
         }
         let clipView = scrollView.contentView
         let matchFrame = textView.convert(matchRect, to: clipView)
-        restore(.entry(index: entryIndex, offset: max(-6, matchFrame.minY - entryFrame.minY - 60)))
+        restore(.entry(index: entryIndex, offset: max(-TranscriptColumnLayout.topPadding, matchFrame.minY - entryFrame.minY - 60)))
         return true
     }
 }

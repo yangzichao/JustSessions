@@ -7,8 +7,10 @@ struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
 
     private let minimumDetailWidth: CGFloat = 600
     private let dividerWidth: CGFloat = 1
+    private let minimumSidebarWidthAtDefaultInterfaceSize: CGFloat = 200
+    private let maximumSidebarWidthAtDefaultInterfaceSize: CGFloat = 480
 
-    @AppStorage("conversationSidebarWidth") private var savedSidebarWidth = 248.0
+    @AppStorage("conversationSidebarWidth") private var savedSidebarWidthAtDefaultInterfaceSize = 248.0
     @State private var draggingSidebarWidth: CGFloat?
 
     init(
@@ -23,14 +25,17 @@ struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let interfaceScale = max(InterfaceScale.factor, 1)
-            let minimumSidebarWidth = 200 * interfaceScale
+            let sidebarScaleNeverBelowDefaultSize = max(InterfaceScale.factor, CGFloat(InterfaceSizeStore.defaultScale))
+            let minimumSidebarWidth = minimumSidebarWidthAtDefaultInterfaceSize * sidebarScaleNeverBelowDefaultSize
             let maximumSidebarWidth = max(
                 minimumSidebarWidth,
-                min(480 * interfaceScale, geometry.size.width - minimumDetailWidth - dividerWidth)
+                min(
+                    maximumSidebarWidthAtDefaultInterfaceSize * sidebarScaleNeverBelowDefaultSize,
+                    geometry.size.width - minimumDetailWidth - dividerWidth)
             )
+            let savedSidebarWidth = CGFloat(savedSidebarWidthAtDefaultInterfaceSize) * sidebarScaleNeverBelowDefaultSize
             let sidebarWidth = min(
-                max((draggingSidebarWidth ?? CGFloat(savedSidebarWidth) * interfaceScale).rounded(), minimumSidebarWidth),
+                max((draggingSidebarWidth ?? savedSidebarWidth).rounded(), minimumSidebarWidth),
                 maximumSidebarWidth
             ).rounded(.down)
 
@@ -61,7 +66,7 @@ struct ResizableSidebarLayout<Sidebar: View, Detail: View>: View {
                         maximumWidth: maximumSidebarWidth,
                         onChange: { draggingSidebarWidth = $0 },
                         onCommit: { newWidth in
-                            savedSidebarWidth = Double(newWidth / interfaceScale)
+                            savedSidebarWidthAtDefaultInterfaceSize = Double(newWidth / sidebarScaleNeverBelowDefaultSize)
                             draggingSidebarWidth = nil
                         }
                     )

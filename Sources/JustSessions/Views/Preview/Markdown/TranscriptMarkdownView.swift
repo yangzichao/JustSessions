@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct TranscriptMarkdownView: View {
+    private static let quoteBarWidth: CGFloat = 3
+    private static let listMarkerMinimumWidth: CGFloat = 18
+    private static let spacingAfterQuoteBarOrListMarker: CGFloat = 10
+    private static let indentationPerNestedListLevel: CGFloat = 20
+
     @Environment(\.transcriptReadingFontSize) private var fontSize
     private let markdown: PreparedTranscriptMarkdown
 
@@ -33,19 +38,19 @@ struct TranscriptMarkdownView: View {
     private var structuredBlocks: some View {
         VStack(alignment: .leading, spacing: 12) {
             ForEach(blocks) { block in
-                HStack(alignment: .top, spacing: 10) {
+                HStack(alignment: .top, spacing: Self.spacingAfterQuoteBarOrListMarker) {
                     if block.quoteDepth > 0 {
-                        Capsule().fill(ThemePalette.hairline).frame(width: 3)
+                        Capsule().fill(ThemePalette.hairline).frame(width: Self.quoteBarWidth)
                     }
                     if block.listDepth > 0 {
                         Text(block.listMarker ?? "")
                             .foregroundStyle(ThemePalette.secondaryText)
-                            .frame(minWidth: 18, alignment: .trailing)
+                            .frame(minWidth: Self.listMarkerMinimumWidth, alignment: .trailing)
                     }
                     blockContent(block, segmentIndex: segmentStarts[block.id] ?? 0)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.leading, CGFloat(max(0, block.listDepth - 1)) * 20)
+                .padding(.leading, nestedListIndentation(of: block))
             }
         }
     }
@@ -62,14 +67,20 @@ struct TranscriptMarkdownView: View {
         case .code(let text, let language):
             TranscriptCodeBlock(text: text, language: language, segmentIndex: segmentIndex)
         case .table(let table):
-            TranscriptMarkdownTableView(table: table, segmentIndex: segmentIndex, indentation: indentation(of: block))
+            TranscriptMarkdownTableView(table: table, segmentIndex: segmentIndex, indentation: contentIndentation(of: block))
         case .divider:
             ThemeDivider().padding(.vertical, 4)
         }
     }
 
-    private func indentation(of block: TranscriptMarkdownBlock) -> CGFloat {
-        (block.quoteDepth > 0 ? 3 + 10 : 0) + (block.listDepth > 0 ? 18 + 10 : 0) + CGFloat(max(0, block.listDepth - 1)) * 20
+    private func nestedListIndentation(of block: TranscriptMarkdownBlock) -> CGFloat {
+        CGFloat(max(0, block.listDepth - 1)) * Self.indentationPerNestedListLevel
+    }
+
+    private func contentIndentation(of block: TranscriptMarkdownBlock) -> CGFloat {
+        let quoteBarRoom = block.quoteDepth > 0 ? Self.quoteBarWidth + Self.spacingAfterQuoteBarOrListMarker : 0
+        let listMarkerRoom = block.listDepth > 0 ? Self.listMarkerMinimumWidth + Self.spacingAfterQuoteBarOrListMarker : 0
+        return quoteBarRoom + listMarkerRoom + nestedListIndentation(of: block)
     }
 
     private func copyRole(of block: TranscriptMarkdownBlock) -> TranscriptTextCopyRole {

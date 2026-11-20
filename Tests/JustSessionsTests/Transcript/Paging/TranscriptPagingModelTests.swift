@@ -9,7 +9,7 @@ struct TranscriptPagingModelTests {
         let fixture = try TranscriptPagingFixture(count: 200)
         defer { fixture.remove() }
         let model = TranscriptPagingModel()
-        model.refresh(fixture.conversation, position: .entry(index: 0, offset: -6))
+        model.refresh(fixture.conversation, position: .startOfEntry(0))
         try await expectEventually { !model.isLoading }
         let position = TranscriptReadingPosition.entry(index: TranscriptPageIdentity.entryID(record: 60, part: 0), offset: 17)
         let text = String(decoding: try Data(contentsOf: fixture.file), as: UTF8.self)
@@ -100,7 +100,7 @@ struct TranscriptPagingModelTests {
         try await expectEventually { !model.isLoading }
         #expect(!model.hasEarlier)
         #expect(model.hasLater)
-        #expect(model.restorationPosition == .entry(index: 0, offset: -6))
+        #expect(model.restorationPosition == .startOfEntry(0))
         model.latest()
         try await expectEventually { !model.isLoading }
         #expect(!model.hasLater)
