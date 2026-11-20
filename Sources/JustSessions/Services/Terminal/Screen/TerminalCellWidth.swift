@@ -4,12 +4,12 @@ enum TerminalCellWidth {
         if firstScalar.properties.isEmojiPresentation || character.unicodeScalars.contains(emojiPresentationSelector) {
             return 2
         }
-        return wideScalarRanges.contains { $0.contains(firstScalar.value) } ? 2 : 1
+        return eastAsianWideAndFullwidthScalarRanges.contains { $0.contains(firstScalar.value) } ? 2 : 1
     }
 
     private static let emojiPresentationSelector: Unicode.Scalar = "\u{FE0F}"
 
-    private static let wideScalarRanges: [ClosedRange<UInt32>] = [
+    private static let eastAsianWideAndFullwidthScalarRanges: [ClosedRange<UInt32>] = [
         0x1100...0x115F,
         0x2E80...0x303E,
         0x3041...0x33FF,

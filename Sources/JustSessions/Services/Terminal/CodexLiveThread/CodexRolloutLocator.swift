@@ -10,12 +10,11 @@ struct CodexRolloutLocator: Sendable {
     }
 
     func sessionID(forThreadIDPrefix threadIDPrefix: String, startedOnOrAfter earliestStart: Date?) -> String? {
-        let earliestDay =
+        let dayBeforeEarliestStart =
             earliestStart
             .flatMap { calendar.date(byAdding: .day, value: -1, to: $0) }
-            .map { calendar.dateComponents([.year, .month, .day], from: $0) }
-            .map { [$0.year ?? 0, $0.month ?? 0, $0.day ?? 0] } ?? [0, 0, 0]
-        for dayDirectory in dayDirectoriesNewestFirst(notBefore: earliestDay) {
+            .map { CodexRolloutDay(of: $0, in: calendar) }
+        for dayDirectory in dayDirectoriesNewestFirst(notBefore: dayBeforeEarliestStart ?? .beforeEveryRollout) {
             guard let fileNames = try? FileManager.default.contentsOfDirectory(atPath: dayDirectory.path) else { continue }
             for fileName in fileNames
             where fileName.hasPrefix("rollout-") && fileName.hasSuffix(".jsonl") && fileName.contains("-\(threadIDPrefix)") {
@@ -29,19 +28,19 @@ struct CodexRolloutLocator: Sendable {
         return nil
     }
 
-    private func dayDirectoriesNewestFirst(notBefore earliestDay: [Int]) -> [URL] {
-        var dayDirectories: [(day: [Int], directory: URL)] = []
-        for (year, yearDirectory) in numberedSubdirectories(of: sessionsDirectory) where year >= earliestDay[0] {
+    private func dayDirectoriesNewestFirst(notBefore earliestDay: CodexRolloutDay) -> [URL] {
+        var dayDirectories: [(day: CodexRolloutDay, directory: URL)] = []
+        for (year, yearDirectory) in numberedSubdirectories(of: sessionsDirectory) where year >= earliestDay.year {
             for (month, monthDirectory) in numberedSubdirectories(of: yearDirectory) {
-                for (day, dayDirectory) in numberedSubdirectories(of: monthDirectory)
-                where !([year, month, day].lexicographicallyPrecedes(earliestDay)) {
-                    dayDirectories.append(([year, month, day], dayDirectory))
+                for (day, dayDirectory) in numberedSubdirectories(of: monthDirectory) {
+                    let rolloutDay = CodexRolloutDay(year: year, month: month, day: day)
+                    if rolloutDay >= earliestDay { dayDirectories.append((rolloutDay, dayDirectory)) }
                 }
             }
         }
         return
             dayDirectories
-            .sorted { $1.day.lexicographicallyPrecedes($0.day) }
+            .sorted { $1.day < $0.day }
             .map(\.directory)
     }
 
