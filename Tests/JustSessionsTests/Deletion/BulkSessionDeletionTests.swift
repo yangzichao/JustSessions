@@ -113,7 +113,7 @@ struct BulkSessionDeletionTests {
 
         #expect(store.deletionProgress.completedCount == 3)
         #expect(store.deletionProgress.totalCount == 5)
-        #expect(storeChanges.count == 0)
+        #expect(storeChanges.mainActorTurnsWithChanges == 0)
         hosts.releaseHeldAttempt()
         try await expectEventually { !store.isDeletingSessions }
 
@@ -203,7 +203,7 @@ struct BulkSessionDeletionTests {
         store.deleteConversations(deleted)
         try await expectEventually { !store.isDeletingSessions }
 
-        #expect(storeChanges.count <= 20)
+        #expect(storeChanges.mainActorTurnsWithChanges <= 20)
         #expect(store.conversations.count == 1_850)
         #expect(!deleted.contains { sandbox.fileExists(for: $0) })
         #expect(store.titleAliases.customTitlesByConversationID == [kept.id: "Custom Session 1999"])

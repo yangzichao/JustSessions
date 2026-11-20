@@ -236,7 +236,7 @@ struct ConversationOutlineModelTests {
             try await Task.sleep(for: .milliseconds(50))
         }
         try await expectEventually { model.outline?.blocks.count == 16 }
-        #expect(changes.count == 0)
+        #expect(changes.mainActorTurnsWithChanges == 0)
     }
 
     static func record(_ number: Int) -> Data {

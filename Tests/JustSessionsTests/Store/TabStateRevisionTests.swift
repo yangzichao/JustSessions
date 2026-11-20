@@ -17,21 +17,21 @@ struct TabStateRevisionTests {
         await settle()
         store.selectTerminal(secondTab.id)
         await settle()
-        #expect(revisions.count == 0)
+        #expect(revisions.mainActorTurnsWithChanges == 0)
 
         firstTab.updateCLIActivity(.needsInput(reason: nil))
         await settle()
-        #expect(revisions.count == 1)
+        #expect(revisions.mainActorTurnsWithChanges == 1)
         firstTab.updateCLIActivity(.needsInput(reason: nil))
         await settle()
-        #expect(revisions.count == 1)
+        #expect(revisions.mainActorTurnsWithChanges == 1)
 
         store.closeTerminal(secondTab.id)
         await settle()
-        let countAfterClosing = revisions.count
+        let countAfterClosing = revisions.mainActorTurnsWithChanges
         secondTab.updateDisplayTitle("Renamed after closing")
         await settle()
-        #expect(revisions.count == countAfterClosing)
+        #expect(revisions.mainActorTurnsWithChanges == countAfterClosing)
     }
 
     private func settle() async {

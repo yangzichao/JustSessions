@@ -23,8 +23,8 @@ struct NotificationBellAcrossWindowsTests {
             firstWindowChanges.cancel()
         }
         sandbox.second.selectTerminal(tab.id)
-        #expect(firstWindowBell.count > 0)
-        #expect(firstWindowChanges.count == 0)
+        #expect(firstWindowBell.mainActorTurnsWithChanges > 0)
+        #expect(firstWindowChanges.mainActorTurnsWithChanges == 0)
         #expect(sandbox.first.notificationBellEntries.isEmpty)
         #expect(sandbox.second.notificationBellEntries.isEmpty)
 

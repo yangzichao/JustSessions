@@ -63,11 +63,11 @@ struct RemoteToolByToolListingTests {
         for provider in [ConversationProvider.antigravity, .kiro, .opencode, .pi] {
             store.applyRemoteHostConversations([], of: Self.step(provider), host: "devbox")
         }
-        #expect(changes.count == 0)
+        #expect(changes.mainActorTurnsWithChanges == 0)
         #expect(store.conversationsRevision == revision)
 
         store.applyRemoteHostConversations([codex.withSuggestedTitle("Renamed"), laterCodex], of: Self.step(.codex), host: "devbox")
-        #expect(changes.count > 0)
+        #expect(changes.mainActorTurnsWithChanges > 0)
         #expect(store.conversations.map(\.suggestedTitle) == ["Later Codex", "Claude", "Renamed"])
         #expect(store.subagentConversations.isEmpty)
     }

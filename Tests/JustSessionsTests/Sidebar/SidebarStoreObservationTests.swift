@@ -19,11 +19,11 @@ struct SidebarStoreObservationTests {
             selections.cancel()
         }
         store.selectTerminal(nil)
-        #expect(selections.count == 0)
+        #expect(selections.mainActorTurnsWithChanges == 0)
         store.replaceConversations(on: .thisMac, with: [first, other])
-        #expect(publications.count == 0)
+        #expect(publications.mainActorTurnsWithChanges == 0)
         store.replaceConversations(on: .thisMac, with: [first.withSuggestedTitle("Changed"), other])
-        #expect(publications.count == 1)
+        #expect(publications.mainActorTurnsWithChanges == 1)
     }
 
     @Test func unchangedTmuxSessionsAndLoginStateDoNotPublish() throws {
@@ -45,10 +45,10 @@ struct SidebarStoreObservationTests {
 
         store.setTmuxSessionNames(["justsessions-claude-a"], on: .ssh("devbox"))
         store.noteLoginState(on: "devbox", refreshProblem: .hostKeyNotTrusted, connections: connections)
-        #expect(publications.count == 0)
+        #expect(publications.mainActorTurnsWithChanges == 0)
 
         store.noteLoginState(on: "devbox", refreshProblem: nil, connections: connections)
-        #expect(publications.count == 1)
+        #expect(publications.mainActorTurnsWithChanges == 1)
         #expect(store.sshHostsNeedingLogIn.isEmpty)
     }
 
@@ -74,11 +74,11 @@ struct SidebarStoreObservationTests {
             bookmarks.cancel()
         }
         store.removeMessageBookmark(MessageBookmark(letter: "a", entryID: entry.id, kind: .user, snippet: "Hello"), in: conversation)
-        #expect(bookmarks.count == 0)
+        #expect(bookmarks.mainActorTurnsWithChanges == 0)
 
         store.toggleMessageBookmark(on: entry, in: conversation)
 
-        #expect(bookmarks.count == 1)
-        #expect(sidebar.count == 0)
+        #expect(bookmarks.mainActorTurnsWithChanges == 1)
+        #expect(sidebar.mainActorTurnsWithChanges == 0)
     }
 }
