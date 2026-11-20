@@ -15,16 +15,13 @@ enum TerminalSymbolsFont {
     /// The font, falling back to the symbols font for icons. SwiftTerm derives its bold and italic fonts from it, and
     /// they keep the fallback.
     static func addingFallback(to font: NSFont) -> NSFont {
-        guard register() else { return font }
+        guard isAvailableAfterRegisteringBundledCopy else { return font }
         let symbols = NSFontDescriptor(fontAttributes: [.name: postScriptName, .characterSet: privateUseAreas])
         let descriptor = font.fontDescriptor.addingAttributes([.cascadeList: [symbols]])
         return NSFont(descriptor: descriptor, size: font.pointSize) ?? font
     }
 
-    @discardableResult
-    static func register() -> Bool { isAvailable }
-
-    private static let isAvailable: Bool = {
+    static let isAvailableAfterRegisteringBundledCopy: Bool = {
         if let url = AppLocalization.resourceBundle.url(
             forResource: "SymbolsNerdFontMono-Regular", withExtension: "ttf", subdirectory: "Fonts")
         {

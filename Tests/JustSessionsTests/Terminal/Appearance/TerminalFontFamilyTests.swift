@@ -103,7 +103,7 @@ struct TerminalFontFamilyTests {
     }
 
     @Test func installedFamiliesAreTheMonospacedOnesWithLettersThatFillTheCells() {
-        TerminalSymbolsFont.register()
+        _ = TerminalSymbolsFont.isAvailableAfterRegisteringBundledCopy
         let families = InstalledMonospacedFontFamilies.load()
 
         #expect(families.fillingCells.contains("Menlo"))
