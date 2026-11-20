@@ -70,7 +70,7 @@ struct CLIActivityReader: Sendable {
             // The registry names the real CLI's process, which a wrapper script starts as its child.
             let tree = processTree ?? .ofRunningProcesses()
             processTree = tree
-            return claudeRegistry.firstRecord(amongProcessIDs: tree.processIDs(rootedAt: probe.processID))?.activity
+            return claudeRegistry.firstRecord(amongProcessIDs: tree.breadthFirstProcessIDs(rootedAt: probe.processID))?.activity
         case .codex:
             if let activity = probe.terminalTitle.flatMap(CodexTitleActivity.activity(inTerminalTitle:)) { return activity }
             guard let sessionFile = probe.sessionFile else { return nil }
@@ -97,7 +97,7 @@ struct CLIActivityReader: Sendable {
             processTree = tree
             return KiroTurnMarkers.activity(
                 processIDsWithATurn: processIDsWithATurn,
-                cliProcessIDs: tree.processIDs(rootedAt: probe.processID)
+                cliProcessIDs: tree.breadthFirstProcessIDs(rootedAt: probe.processID)
             )
         }
     }

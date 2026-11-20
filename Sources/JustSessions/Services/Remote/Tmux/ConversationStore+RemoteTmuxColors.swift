@@ -22,7 +22,7 @@ extension ConversationStore {
         let terminalView = tab.terminalView
         terminalView.reportThemeAfterNextBackgroundQuery()
         let command = RemoteTmuxCommands.reattachClientsCommand(tmuxSessionName, on: destination)
-        tmuxCommandQueues.run(on: tab.host) {
+        tmuxCommandQueues.runAfterEarlierCommands(on: tab.host) {
             guard remoteRunner.run(destination, command, 30)?.exitStatus != 0 else { return }
             Task { @MainActor in terminalView.cancelThemeReportAfterNextBackgroundQuery() }
         }

@@ -106,7 +106,7 @@ final class SelectableTerminalView: LocalProcessTerminalView {
         observeOptionKey(in: .shared)
     }
 
-    static let scrollbackLineCount = 10_000
+    nonisolated static let scrollbackLineCount = 10_000
 
     override func viewDidChangeEffectiveAppearance() {
         super.viewDidChangeEffectiveAppearance()

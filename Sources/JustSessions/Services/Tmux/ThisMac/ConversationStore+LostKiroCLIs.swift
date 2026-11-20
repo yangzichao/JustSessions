@@ -41,7 +41,7 @@ extension ConversationStore {
             guard let paneProcessID = lostPaneProcessIDs[temporaryName],
                 tmuxSessionNamesByHost[.thisMac]?.contains(sessionName) != true
             else { continue }
-            tmuxCommandQueues.run(on: .thisMac) { tmuxServer.renameSession(from: temporaryName, to: sessionName) }
+            tmuxCommandQueues.runAfterEarlierCommands(on: .thisMac) { tmuxServer.renameSession(from: temporaryName, to: sessionName) }
             tmuxSessionNamesByHost[.thisMac, default: []].remove(temporaryName)
             tmuxSessionNamesByHost[.thisMac, default: []].insert(sessionName)
             thisMacTmuxPaneProcessIDs[temporaryName] = nil

@@ -3,7 +3,7 @@ import Darwin
 struct ProcessTree: Sendable {
     let parentProcessIDs: [Int32: Int32]
 
-    func processIDs(rootedAt rootProcessID: Int32) -> [Int32] {
+    func breadthFirstProcessIDs(rootedAt rootProcessID: Int32) -> [Int32] {
         var childProcessIDs: [Int32: [Int32]] = [:]
         for (processID, parentProcessID) in parentProcessIDs where processID != parentProcessID {
             childProcessIDs[parentProcessID, default: []].append(processID)

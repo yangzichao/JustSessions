@@ -101,7 +101,7 @@ extension ConversationStore {
         let queuedCommands = DispatchGroup()
         for store in stores {
             queuedCommands.enter()
-            store.tmuxCommandQueues.run(on: .ssh(host)) { queuedCommands.leave() }
+            store.tmuxCommandQueues.runAfterEarlierCommands(on: .ssh(host)) { queuedCommands.leave() }
         }
         queuedCommands.notify(queue: .global(qos: .utility)) { @Sendable in connections.disconnect(host) }
     }

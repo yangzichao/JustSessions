@@ -49,7 +49,7 @@ struct ConversationOutlineBuilderTests {
     }
 
     @Test func lineWidthsWrapAt80ColumnsAndStopAt24Lines() {
-        let width = ConversationOutlineBuilder.lineWidths(of:maximumLines:)
+        let width = ConversationOutlineBuilder.lineWidthsCountingUTF8LeadBytes(of:maximumLines:)
         #expect(width("a\n\n\n    code\n" + String(repeating: "x", count: 200), 24) == [1, 0, 8, 80, 80, 40])
         #expect(width(Array(repeating: "line", count: 100).joined(separator: "\n"), 24).count == 24)
         #expect(width(String(repeating: "z", count: 80) + "\ny", 24) == [80, 1])

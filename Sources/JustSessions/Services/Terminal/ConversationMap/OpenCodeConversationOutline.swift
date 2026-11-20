@@ -92,76 +92,29 @@ enum OpenCodeConversationOutline {
         OpenCodeDatabase.bind(sessionID, at: 1, in: statement)
         sqlite3_bind_int64(statement, 2, Int64(records.count))
         sqlite3_bind_int64(statement, 3, Int64(records.lowerBound))
-        var input = DigestInput(hasher: hasher)
+        var input = OpenCodeOutlinePrefixDigestInput(hasher: hasher)
         var messageID: String?
         var result = sqlite3_step(statement)
         while result == SQLITE_ROW {
             try Task.checkCancellation()
             let id = OpenCodeDatabase.text(statement, column: 0)
             if id != messageID {
-                if messageID != nil { input.append(3) }
-                input.append(1)
+                if messageID != nil { input.append(.messageEnd) }
+                input.append(.messageStart)
                 input.appendColumn(0, of: statement)
                 input.appendInteger(UInt64(bitPattern: sqlite3_column_int64(statement, 1)))
                 input.appendColumn(2, of: statement)
                 messageID = id
             }
             if sqlite3_column_type(statement, 3) != SQLITE_NULL {
-                input.append(2)
+                input.append(.part)
                 input.appendColumn(3, of: statement)
                 input.appendColumn(4, of: statement)
             }
             result = sqlite3_step(statement)
         }
         guard result == SQLITE_DONE else { throw OpenCodeDatabaseError.unreadable }
-        if messageID != nil { input.append(3) }
+        if messageID != nil { input.append(.messageEnd) }
         hasher = input.finish()
-    }
-
-    private struct DigestInput {
-        static let capacity = 64 << 10
-        var hasher: SHA256
-        private var pending = Data()
-
-        init(hasher: SHA256) {
-            self.hasher = hasher
-            pending.reserveCapacity(Self.capacity)
-        }
-
-        mutating func append(_ marker: UInt8) {
-            if pending.count == Self.capacity { flush() }
-            pending.append(marker)
-        }
-
-        mutating func appendInteger(_ value: UInt64) {
-            var value = value.bigEndian
-            withUnsafeBytes(of: &value) { appendBytes($0) }
-        }
-
-        mutating func appendColumn(_ column: Int32, of statement: OpaquePointer) {
-            let isNull = sqlite3_column_type(statement, column) == SQLITE_NULL
-            let count = Int(sqlite3_column_bytes(statement, column))
-            appendInteger(isNull ? UInt64.max : UInt64(count))
-            if let bytes = sqlite3_column_blob(statement, column), count > 0 {
-                appendBytes(UnsafeRawBufferPointer(start: bytes, count: count))
-            }
-        }
-
-        private mutating func appendBytes(_ bytes: UnsafeRawBufferPointer) {
-            if pending.count + bytes.count > Self.capacity { flush() }
-            if bytes.count > Self.capacity { hasher.update(bufferPointer: bytes) } else { pending.append(contentsOf: bytes) }
-        }
-
-        private mutating func flush() {
-            if !pending.isEmpty {
-                hasher.update(data: pending)
-                pending.removeAll(keepingCapacity: true)
-            }
-        }
-
-        mutating func finish() -> SHA256 {
-            flush()
-            return hasher
-        }
     }
 }

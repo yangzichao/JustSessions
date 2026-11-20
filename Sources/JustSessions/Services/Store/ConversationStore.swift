@@ -114,7 +114,7 @@ final class ConversationStore {
     var pendingTabReopening = PendingTabReopening()
     let tabPersistenceWindowID = UUID()
     var openTabPersistence: OpenTabPersistence?
-    var isRestoringTabBatch = false
+    var isSavingOpenTabsOnceAfterChanges = false
     var isTearingDownWorkspace = false
     var recentlyClosedTabs = RecentlyClosedTabs()
     var isClosingTabsWithoutRemembering = false

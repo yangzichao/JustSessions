@@ -3,6 +3,7 @@ import Foundation
 @MainActor
 final class TerminalOutputCoalescer {
     static let maximumBufferedByteCount = 64 << 10
+    private static let flushIntervalWhileInactive: TimeInterval = 0.125
     private var bytes: [UInt8] = []
     private var scheduledFlush: DispatchWorkItem?
     var isActive = true {
@@ -24,7 +25,7 @@ final class TerminalOutputCoalescer {
         guard scheduledFlush == nil else { return }
         let work = DispatchWorkItem { [weak self] in self?.flush() }
         scheduledFlush = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.125, execute: work)
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.flushIntervalWhileInactive, execute: work)
     }
 
     func flush() {

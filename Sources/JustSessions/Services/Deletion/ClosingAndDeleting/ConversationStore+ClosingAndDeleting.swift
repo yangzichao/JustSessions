@@ -83,13 +83,13 @@ extension ConversationStore {
         case .thisMac:
             for name in tmuxNames { thisMacTmuxPaneProcessIDs[name] = nil }
             let tmuxServer = commandResolver.thisMacTmuxServer()
-            tmuxCommandQueues.run(on: host) {
+            tmuxCommandQueues.runAfterEarlierCommands(on: host) {
                 for name in tmuxNames { tmuxServer?.killSession(named: name) }
                 ProcessExitWaiting.waitUntilExited(thisMacCLIProcessIDs, timeout: TimeInterval(timeoutSeconds))
                 cliExits.leave()
             }
         case .ssh(let destination):
-            tmuxCommandQueues.run(on: host) {
+            tmuxCommandQueues.runAfterEarlierCommands(on: host) {
                 for name in tmuxNames {
                     let command = RemoteTmuxCommands.killSessionWaitingForCLIExitCommand(
                         name, on: destination, timeoutSeconds: timeoutSeconds)

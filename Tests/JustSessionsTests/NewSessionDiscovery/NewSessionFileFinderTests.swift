@@ -13,7 +13,7 @@ struct NewSessionFileFinderTests {
         defer { try? FileManager.default.removeItem(at: root) }
         let sessionID = UUID().uuidString.lowercased()
         try writeClaudeTranscript(sessionID: sessionID, under: root)
-        let tab = claudeTab(processID: 0, preassignedSessionID: sessionID, isRunning: false)
+        let tab = claudeTab(runningCLIProcessID: nil, preassignedSessionID: sessionID)
 
         let sessionFiles = finder(claudeConfigurationDirectory: root)
             .sessionFiles(for: [tab], processTree: ProcessTree(parentProcessIDs: [:]))
@@ -35,7 +35,7 @@ struct NewSessionFileFinderTests {
             atomically: true,
             encoding: .utf8
         )
-        let tab = claudeTab(processID: Self.wrapperProcessID, preassignedSessionID: nil, isRunning: true)
+        let tab = claudeTab(runningCLIProcessID: Self.wrapperProcessID, preassignedSessionID: nil)
         let processTree = ProcessTree(parentProcessIDs: [cliProcessID: Self.wrapperProcessID])
 
         let sessionFiles = finder(claudeConfigurationDirectory: root).sessionFiles(for: [tab], processTree: processTree)
@@ -69,10 +69,9 @@ struct NewSessionFileFinderTests {
         let tab = WaitingNewSessionTab(
             terminalID: UUID(),
             provider: .codex,
-            processID: wrapper.processIdentifier,
+            runningCLIProcessID: wrapper.processIdentifier,
             preassignedSessionID: nil,
-            branchedFromSessionID: nil,
-            isRunning: true
+            branchedFromSessionID: nil
         )
         let finder = finder(claudeConfigurationDirectory: root)
 
@@ -148,17 +147,15 @@ struct NewSessionFileFinderTests {
             idleCLI.waitUntilExit()
         }
         let claude = claudeTab(
-            processID: idleCLI.processIdentifier,
-            preassignedSessionID: UUID().uuidString.lowercased(),
-            isRunning: true
+            runningCLIProcessID: idleCLI.processIdentifier,
+            preassignedSessionID: UUID().uuidString.lowercased()
         )
         let codex = WaitingNewSessionTab(
             terminalID: UUID(),
             provider: .codex,
-            processID: idleCLI.processIdentifier,
+            runningCLIProcessID: idleCLI.processIdentifier,
             preassignedSessionID: nil,
-            branchedFromSessionID: nil,
-            isRunning: true
+            branchedFromSessionID: nil
         )
 
         let sessionFiles = finder(claudeConfigurationDirectory: root)
@@ -174,14 +171,13 @@ struct NewSessionFileFinderTests {
         )
     }
 
-    private func claudeTab(processID: Int32, preassignedSessionID: String?, isRunning: Bool) -> WaitingNewSessionTab {
+    private func claudeTab(runningCLIProcessID: Int32?, preassignedSessionID: String?) -> WaitingNewSessionTab {
         WaitingNewSessionTab(
             terminalID: UUID(),
             provider: .claude,
-            processID: processID,
+            runningCLIProcessID: runningCLIProcessID,
             preassignedSessionID: preassignedSessionID,
-            branchedFromSessionID: nil,
-            isRunning: isRunning
+            branchedFromSessionID: nil
         )
     }
 
@@ -193,10 +189,9 @@ struct NewSessionFileFinderTests {
         WaitingNewSessionTab(
             terminalID: UUID(),
             provider: provider,
-            processID: processID,
+            runningCLIProcessID: processID,
             preassignedSessionID: nil,
-            branchedFromSessionID: branchedFromSessionID,
-            isRunning: true
+            branchedFromSessionID: branchedFromSessionID
         )
     }
 

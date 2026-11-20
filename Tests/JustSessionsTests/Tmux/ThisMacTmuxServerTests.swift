@@ -91,11 +91,13 @@ struct ThisMacTmuxServerTests {
     @Test func paneListingMapsEachSessionToItsCLIProcessLeavingOutDeadPanes() {
         let output =
             "justsessions-claude-abc 4242 0\njustsessions-codex-new-1a2b3c4d 77 0\njustsessions-pi-dead 91 1\nbroken line here now\nno-pid\n"
+            + "my work 55 0\n"
 
         #expect(
             ThisMacTmuxServer.paneProcessIDs(inListOutput: output) == [
                 "justsessions-claude-abc": 4242,
                 "justsessions-codex-new-1a2b3c4d": 77,
+                "my work": 55,
             ])
     }
 

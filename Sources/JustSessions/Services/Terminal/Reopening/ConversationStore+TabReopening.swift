@@ -18,8 +18,7 @@ extension ConversationStore {
         isEnabled: Bool = TabReopeningSettingsStore.shared.reopensTabsAtLaunch
     ) {
         guard openTabPersistence == nil else { return }
-        guard userDefaults.volatileDomain(forName: UserDefaults.argumentDomain)[TabReopeningSettingsStore.userDefaultsKey] as? Bool != false
-        else { return }
+        guard !TabReopeningSettingsStore.isTurnedOffByLaunchArgument(in: userDefaults) else { return }
         let tabs = persistence.take(from: userDefaults)
         openTabPersistence = persistence
         beginReopening(isEnabled ? tabs : [])
@@ -40,29 +39,30 @@ extension ConversationStore {
     }
 
     private func reopenWaitingTabs(where shouldReopen: (ReopenableTerminalTab) -> Bool) {
-        isRestoringTabBatch = true
-        defer {
-            isRestoringTabBatch = false
-            persistOpenTabs()
-        }
-        for waitingTab in pendingTabReopening.takeWaitingTabs(where: shouldReopen) {
-            guard let session = makeReopenedTerminal(for: waitingTab.tab) else {
-                if let conversationID = waitingTab.tab.conversationID,
-                    let conversation = conversation(withID: conversationID),
-                    !terminalSessions.contains(where: { $0.conversation?.id == conversationID }),
-                    runningTerminalInAnotherWindow(for: conversation) == nil
-                {
-                    pendingTabReopening.returnWaitingTab(waitingTab)
-                }
-                continue
+        savingOpenTabsOnceAfter {
+            for waitingTab in pendingTabReopening.takeWaitingTabs(where: shouldReopen) {
+                reopenWaitingTab(waitingTab)
             }
-            let index = pendingTabReopening.insertionIndex(
-                forSavedPosition: waitingTab.savedPosition,
-                amongOpenTabIDs: terminalSessions.map(\.id)
-            )
-            pendingTabReopening.recordReopenedTab(id: session.id, savedPosition: waitingTab.savedPosition)
-            insertReopenedTerminal(session, at: index, selecting: waitingTab.tab.wasSelected && selectedTerminalID == nil)
         }
+    }
+
+    private func reopenWaitingTab(_ waitingTab: PendingTabReopening.WaitingTab) {
+        guard let session = makeReopenedTerminal(for: waitingTab.tab) else {
+            if let conversationID = waitingTab.tab.conversationID,
+                let conversation = conversation(withID: conversationID),
+                !terminalSessions.contains(where: { $0.conversation?.id == conversationID }),
+                runningTerminalInAnotherWindow(for: conversation) == nil
+            {
+                pendingTabReopening.returnWaitingTab(waitingTab)
+            }
+            return
+        }
+        let index = pendingTabReopening.insertionIndex(
+            forSavedPosition: waitingTab.savedPosition,
+            amongOpenTabIDs: terminalSessions.map(\.id)
+        )
+        pendingTabReopening.recordReopenedTab(id: session.id, savedPosition: waitingTab.savedPosition)
+        insertReopenedTerminal(session, at: index, selecting: waitingTab.tab.wasSelected && selectedTerminalID == nil)
     }
 
     private func makeReopenedTerminal(for tab: ReopenableTerminalTab) -> TerminalSession? {

@@ -3,10 +3,9 @@ import Foundation
 actor ConversationOutlineReader {
     static func pageLimits(for provider: ConversationProvider) -> TranscriptPageLimits {
         var limits =
-            switch provider {
-            case .opencode, .antigravity: SessionMessageTextReader.wholeSessionLimits
-            default: TranscriptPageLimits(targetEntryCount: 1_000, maximumRecordCount: 8_192, targetByteCount: 8 << 20)
-            }
+            provider.storesSessionsInSQLite
+            ? SessionMessageTextReader.wholeSessionLimits
+            : TranscriptPageLimits(targetEntryCount: 1_000, maximumRecordCount: 8_192, targetByteCount: 8 << 20)
         limits.maximumMergedToolCallCount = 0
         return limits
     }
@@ -38,7 +37,7 @@ actor ConversationOutlineReader {
     func hasChanged() -> Bool { !hasRead || ConversationOutlineChangeStamp(of: conversation) != readStamp }
 
     func update() async throws -> ConversationOutline? {
-        let stamp = ConversationOutlineChangeStamp(of: conversation)
+        let stampBeforeReading = ConversationOutlineChangeStamp(of: conversation)
         let updated: ReadOutline
         do {
             do {
@@ -57,20 +56,20 @@ actor ConversationOutlineReader {
         } catch is CancellationError {
             throw CancellationError()
         } catch {
-            readStamp = stamp
+            readStamp = stampBeforeReading
             hasRead = true
             throw error
         }
         let isNew = !hasRead || updated.outline.blocks != outline.blocks
         outline = updated.outline
         outlineLineage = updated.lineage
-        readStamp = stamp
+        readStamp = stampBeforeReading
         hasRead = true
         return isNew ? updated.outline : nil
     }
 
     private func extended() async throws -> ReadOutline? {
-        guard conversation.provider != .opencode, conversation.provider != .antigravity else { return nil }
+        guard !conversation.provider.storesSessionsInSQLite else { return nil }
         guard let resume = ConversationOutlineBuilder.resumePoint(in: outline.blocks) else { return nil }
         let anchor = outline.blocks[resume.keptCount]
         var page = try await source.read(

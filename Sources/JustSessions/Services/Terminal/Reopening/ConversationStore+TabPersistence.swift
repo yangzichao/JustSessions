@@ -2,8 +2,17 @@ import Foundation
 
 extension ConversationStore {
     func persistOpenTabs() {
-        guard let openTabPersistence, !isRestoringTabBatch, !isTearingDownWorkspace else { return }
+        guard let openTabPersistence, !isSavingOpenTabsOnceAfterChanges, !isTearingDownWorkspace else { return }
         saveTabsForNextLaunch(to: openTabPersistence)
+    }
+
+    func savingOpenTabsOnceAfter(_ changes: () -> Void) {
+        isSavingOpenTabsOnceAfterChanges = true
+        defer {
+            isSavingOpenTabsOnceAfterChanges = false
+            persistOpenTabs()
+        }
+        changes()
     }
 
     func prepareTabsForTermination(reopensTabs: Bool = TabReopeningSettingsStore.shared.reopensTabsAtLaunch) {
