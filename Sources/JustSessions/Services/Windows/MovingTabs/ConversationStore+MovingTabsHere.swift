@@ -22,7 +22,7 @@ extension ConversationStore {
         }
         let destinationLifecycle = hostLifecycleGeneration(on: conversation.host)
         let sourceLifecycle = otherStore.hostLifecycleGeneration(on: conversation.host)
-        otherStore.tmuxCommandQueues.run(on: tab.host) { [weak self, weak otherStore] in
+        otherStore.tmuxCommandQueues.runAfterEarlierCommands(on: tab.host) { [weak self, weak otherStore] in
             let runsInTmux =
                 remoteRunner.run(destination, RemoteTmuxCommands.hasSessionCommand(tmuxSessionName, on: destination), 30)?.exitStatus == 0
             Task { @MainActor [weak self, weak otherStore] in

@@ -2,8 +2,12 @@ import Foundation
 
 extension TerminalSession {
     var canKeepCLIRunningAfterClose: Bool {
-        !isPlainTerminal && tmuxSessionName != nil && !isWaitingToBeShown && (host != .thisMac || !hasExited)
+        runsCLIInTmux && !isWaitingToBeShown && !tmuxSessionIsKnownToHaveEnded
     }
+
+    private var runsCLIInTmux: Bool { !isPlainTerminal && tmuxSessionName != nil }
+
+    private var tmuxSessionIsKnownToHaveEnded: Bool { host == .thisMac && hasExited }
 
     var closingStopsNothing: Bool {
         hasExited && !canKeepCLIRunningAfterClose && !mayRunPlainTerminalShellOnHost

@@ -21,7 +21,7 @@ struct ThisMacTmuxServer: Sendable {
         ("extended-keys-format", "csi-u"),
         // The tab's terminal gets the title the CLI sets, where a Codex CLI names its thread.
         ("set-titles", "on"),
-        ("set-titles-string", ThisMacTmuxDeadPane.titleFormat),
+        ("set-titles-string", ThisMacTmuxDeadPane.terminalTitleFormat),
         // A CLI that fails keeps its pane, so its tab still shows what it printed. tmux prints no line of its own
         // under it, which would scroll the CLI's first line out of sight.
         ("remain-on-exit", "failed"),
@@ -62,21 +62,13 @@ struct ThisMacTmuxServer: Sendable {
             ? ["/usr/bin/env", command.executablePath]
             : [command.executablePath] + command.arguments
         let sessionArguments = ["-s", sessionName] + sessionEnvironment + ["--"] + program
-        // The target is the session's pane: `set-option` takes a pane, and a bare `=name` is none.
-        let (historyLimitBefore, historyLimitAfter) =
-            historyLimit.map {
-                (
-                    ["set-option", "-gq", "history-limit", "\($0)", ";"],
-                    [
-                        ";", "set-option", "-q", "-t", "=\(sessionName):", "history-limit", "\($0)",
-                        ";", "set-option", "-gq", "history-limit", "\(PlainTerminalTmuxHistoryLimit.tmuxDefaultLineCount)",
-                    ]
-                )
-            } ?? ([], [])
+        let newSessionHistoryLimit = historyLimit.map { ThisMacTmuxNewSessionHistoryLimit(lineCount: $0, sessionName: sessionName) }
         return NativeCLICommand(
             executablePath: executablePath,
-            arguments: serverArguments + optionArguments + historyLimitBefore + ["new-session", "-A"]
-                + sessionArguments.map(Self.escapingCommandSeparator) + historyLimitAfter,
+            arguments: serverArguments + optionArguments
+                + (newSessionHistoryLimit?.raisingServerLimitBeforeNewSession ?? [])
+                + ["new-session", "-A"] + sessionArguments.map(Self.escapingCommandSeparator)
+                + (newSessionHistoryLimit?.keepingItOnTheSessionAndRestoringServerLimitAfterNewSession ?? []),
             workingDirectory: command.workingDirectory,
             // tmux refuses to start a session from inside another one.
             environment: NativeCLICommand.environmentEntries(clientEnvironment.filter { $0.key != "TMUX" && $0.key != "TMUX_PANE" })
@@ -125,9 +117,12 @@ struct ThisMacTmuxServer: Sendable {
     static func paneProcessIDs(inListOutput output: String) -> [String: Int32] {
         var processIDs: [String: Int32] = [:]
         for line in output.split(whereSeparator: \.isNewline) {
-            let fields = line.split(separator: " ")
-            guard fields.count == 3, fields[2] == "0", let processID = Int32(fields[1]), processID > 0 else { continue }
-            processIDs[String(fields[0])] = processID
+            var fields = line.split(separator: " ")
+            guard fields.count >= 3 else { continue }
+            let paneDead = fields.removeLast()
+            let paneProcessID = fields.removeLast()
+            guard paneDead == "0", let processID = Int32(paneProcessID), processID > 0 else { continue }
+            processIDs[fields.joined(separator: " ")] = processID
         }
         return processIDs
     }

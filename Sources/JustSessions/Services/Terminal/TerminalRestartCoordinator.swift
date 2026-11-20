@@ -26,7 +26,7 @@ final class TerminalRestartCoordinator {
         guard cleanups[conversationID] == nil else { return }
         cleanups[conversationID] = Cleanup(tabID: endedTab.id)
         endedTab.close()
-        tmuxCommandQueues.run(on: .thisMac) {
+        tmuxCommandQueues.runAfterEarlierCommands(on: .thisMac) {
             killTmuxSession()
             Task { @MainActor in
                 self.finishCleanup(for: conversationID, replacingEndedTab: replaceEndedTab)

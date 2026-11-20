@@ -20,5 +20,14 @@ struct TmuxSessionNameTests {
         #expect(TmuxSessionName.session(named: "work") == nil)
         #expect(TmuxSessionName.session(named: "justsessions-opencode-01a0cf02-2025-7990-8bb2-80feff2349d4") == nil)
         #expect(TmuxSessionName.session(named: "justsessions-claude-ses_3a9f0c2be1ffe9TNd6Ab7kQ2xM") == nil)
+        #expect(TmuxSessionName.session(named: TmuxSessionName.forNewPlainTerminal()) == nil)
+    }
+
+    @Test func noSessionNameStartsLikeAPlainTerminals() {
+        for provider in ConversationProvider.allCases {
+            let sessionName = TmuxSessionName.forSession(provider: provider, sessionID: "01a0cf02-2025-7990-8bb2-80feff2349d4")
+            #expect(!TmuxSessionName.isPlainTerminal(named: sessionName))
+            #expect(!TmuxSessionName.isPlainTerminal(named: TmuxSessionName.unique(for: provider)))
+        }
     }
 }

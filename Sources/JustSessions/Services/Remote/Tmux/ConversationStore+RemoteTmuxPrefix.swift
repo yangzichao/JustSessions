@@ -17,7 +17,7 @@ extension ConversationStore {
         remoteHostsUsingTmuxPrefix.save(to: userDefaults)
         remakeTabsWaitingToBeShown(on: .ssh(host))
         let command = RemoteTmuxCommands.setPrefixOptionsCommand(usingHostPrefix: usesTmuxPrefix, on: host)
-        tmuxCommandQueues.run(on: .ssh(host)) { _ = remoteRunner.run(host, command, 30) }
+        tmuxCommandQueues.runAfterEarlierCommands(on: .ssh(host)) { _ = remoteRunner.run(host, command, 30) }
     }
 
     func remakeTabsWaitingToBeShown(on host: SessionHost) {

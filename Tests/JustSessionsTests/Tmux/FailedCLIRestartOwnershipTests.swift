@@ -17,10 +17,10 @@ struct FailedCLIRestartOwnershipTests {
             beforeCleanup.release()
             afterCleanup.release()
         }
-        fixture.store.tmuxCommandQueues.run(on: .thisMac) { beforeCleanup.block() }
+        fixture.store.tmuxCommandQueues.runAfterEarlierCommands(on: .thisMac) { beforeCleanup.block() }
         try await expectEventually { beforeCleanup.hasStarted }
         fixture.store.launch(fixture.conversation, action: .resume)
-        fixture.store.tmuxCommandQueues.run(on: .thisMac) { afterCleanup.block() }
+        fixture.store.tmuxCommandQueues.runAfterEarlierCommands(on: .thisMac) { afterCleanup.block() }
         fixture.store.launch(fixture.conversation, action: .resume)
         beforeCleanup.release()
         try await expectEventually { afterCleanup.hasStarted }
@@ -42,7 +42,7 @@ struct FailedCLIRestartOwnershipTests {
         let failed = try await fixture.startFailedCLI()
         let gate = RestartQueueGate()
         defer { gate.release() }
-        fixture.store.tmuxCommandQueues.run(on: .thisMac) { gate.block() }
+        fixture.store.tmuxCommandQueues.runAfterEarlierCommands(on: .thisMac) { gate.block() }
         try await expectEventually { gate.hasStarted }
         fixture.store.launch(fixture.conversation, action: .resume)
         fixture.store.launch(fixture.conversation, action: .resume)
@@ -70,7 +70,7 @@ struct FailedCLIRestartOwnershipTests {
         other.selectTerminal(nil)
         let gate = RestartQueueGate()
         defer { gate.release() }
-        fixture.store.tmuxCommandQueues.run(on: .thisMac) { gate.block() }
+        fixture.store.tmuxCommandQueues.runAfterEarlierCommands(on: .thisMac) { gate.block() }
         try await expectEventually { gate.hasStarted }
         fixture.store.launch(fixture.conversation, action: .resume)
 
@@ -95,7 +95,7 @@ struct FailedCLIRestartOwnershipTests {
         defer { if target !== fixture.store { target.closeAllTerminals() } }
         let gate = RestartQueueGate()
         defer { gate.release() }
-        fixture.store.tmuxCommandQueues.run(on: .thisMac) { gate.block() }
+        fixture.store.tmuxCommandQueues.runAfterEarlierCommands(on: .thisMac) { gate.block() }
         try await expectEventually { gate.hasStarted }
         fixture.store.launch(fixture.conversation, action: .resume)
         fixture.store.closeTerminal(failed.id)
@@ -128,7 +128,7 @@ struct FailedCLIRestartOwnershipTests {
         other.openTerminal(older)
         let gate = RestartQueueGate()
         defer { gate.release() }
-        fixture.store.tmuxCommandQueues.run(on: .thisMac) { gate.block() }
+        fixture.store.tmuxCommandQueues.runAfterEarlierCommands(on: .thisMac) { gate.block() }
         try await expectEventually { gate.hasStarted }
         fixture.store.launch(fixture.conversation, action: .resume)
         fixture.store.closeTerminal(failed.id)
@@ -209,7 +209,7 @@ struct FailedCLIRestartOwnershipTests {
 
         func drainCommands() async {
             await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-                store.tmuxCommandQueues.run(on: .thisMac) { Task { @MainActor in continuation.resume() } }
+                store.tmuxCommandQueues.runAfterEarlierCommands(on: .thisMac) { Task { @MainActor in continuation.resume() } }
             }
             for _ in 0..<5 { await Task.yield() }
         }

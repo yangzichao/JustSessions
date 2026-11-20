@@ -29,6 +29,7 @@ enum TmuxSessionName {
     }
 
     static func session(named name: String) -> (provider: ConversationProvider, sessionID: String)? {
+        guard !isPlainTerminal(named: name) else { return nil }
         for provider in ConversationProvider.allCases {
             let providerPrefix = "\(prefix)\(provider.executableName)-"
             guard name.hasPrefix(providerPrefix) else { continue }

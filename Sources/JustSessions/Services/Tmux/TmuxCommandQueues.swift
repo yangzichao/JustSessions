@@ -4,7 +4,7 @@ import Foundation
 final class TmuxCommandQueues {
     private var queuesByHost: [SessionHost: DispatchQueue] = [:]
 
-    func run(on host: SessionHost, _ command: @escaping @Sendable () -> Void) {
+    func runAfterEarlierCommands(on host: SessionHost, _ command: @escaping @Sendable () -> Void) {
         queue(for: host).async(execute: command)
     }
 
