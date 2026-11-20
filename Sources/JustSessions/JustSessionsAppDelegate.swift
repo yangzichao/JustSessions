@@ -10,10 +10,14 @@ final class JustSessionsAppDelegate: NSObject, NSApplicationDelegate {
     /// the menu items.
     func applicationWillFinishLaunching(_ notification: Notification) {
         NSWindow.allowsAutomaticWindowTabbing = false
-        _ = OnboardingTipsStore.shared
-        _ = RandomTipsStore.shared
+        decideTipsFromSettingsSavedBeforeThisLaunch()
         AppAppearanceStore.shared.applyToApplication()
         SessionNotificationCenter.shared.startHandlingClicks()
+    }
+
+    @MainActor private func decideTipsFromSettingsSavedBeforeThisLaunch() {
+        _ = OnboardingTipsStore.shared
+        _ = RandomTipsStore.shared
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
