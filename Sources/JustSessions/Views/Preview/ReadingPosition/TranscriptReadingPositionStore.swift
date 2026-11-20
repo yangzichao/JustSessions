@@ -4,6 +4,10 @@ enum TranscriptReadingPosition: Equatable {
     case bottom
     case entry(index: Int, offset: CGFloat)
 
+    static func startOfEntry(_ index: Int) -> TranscriptReadingPosition {
+        .entry(index: index, offset: -TranscriptColumnLayout.topPadding)
+    }
+
     func resolved(in transcript: TranscriptContent) -> TranscriptReadingPosition {
         guard case .entry(let index, let offset) = self,
             let firstIndex = transcript.positionIDs.first, let lastIndex = transcript.positionIDs.last

@@ -270,7 +270,7 @@ struct TerminalTabBookmarksTests {
         defer { controller.readingWindow.close() }
         let expected = forward ? bookmarks[0] : bookmarks[1]
         #expect(controller.requests.pendingNavigation == .bookmark(expected))
-        #expect(controller.readingPositionStore.position(for: files.conversation.id) == .entry(index: expected.entryID, offset: -6))
+        #expect(controller.readingPositionStore.position(for: files.conversation.id) == .startOfEntry(expected.entryID))
         #expect(harness.store.selectedTerminalID == harness.tab.id)
         #expect(harness.tab.bookmarkNotices.notice == nil)
     }
@@ -302,7 +302,7 @@ struct TerminalTabBookmarksTests {
         harness.store.replaceConversations(on: .thisMac, with: [files.conversation])
         let window = harness.readingWindows.open(
             files.conversation, store: harness.store,
-            initialPosition: .entry(index: id(500), offset: -6))
+            initialPosition: .startOfEntry(id(500)))
         defer { window.close() }
         let controller = try #require(window.windowController as? SessionReadingWindowController)
         try await expectEventually { Self.showsAtTop(id(500), in: window) }

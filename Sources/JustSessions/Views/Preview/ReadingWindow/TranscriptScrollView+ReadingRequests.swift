@@ -30,7 +30,7 @@ extension TranscriptScrollView {
         if searchState.isPresented { searchState.close() }
         bookmarkState.startLoadingEntryJump(entryID)
         positionController.setSeekTarget(entryID)
-        paging.refresh(conversation, position: .entry(index: entryID, offset: -6))
+        paging.refresh(conversation, position: .startOfEntry(entryID))
     }
 
     func settleEntryJump() {

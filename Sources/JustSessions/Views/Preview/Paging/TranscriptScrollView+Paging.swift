@@ -8,7 +8,7 @@ extension TranscriptScrollView {
             return
         }
         guard let index = displayedEntryIndices.first else { return }
-        positionController.restore(.entry(index: index, offset: -6))
+        positionController.restore(.startOfEntry(index))
     }
 
     func showLatestMessage() {

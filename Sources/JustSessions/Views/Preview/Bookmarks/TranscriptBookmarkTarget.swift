@@ -23,7 +23,6 @@ final class TranscriptBookmarkTarget {
 
 struct TranscriptBookmarkTargetMarks: NSViewRepresentable {
     let target: TranscriptBookmarkTarget
-    static let gutterWidth: CGFloat = 24
 
     func makeNSView(context: Context) -> TranscriptBookmarkTargetMarksView {
         TranscriptBookmarkTargetMarksView()
@@ -75,7 +74,7 @@ final class TranscriptBookmarkTargetMarksView: NSView {
             mark.isHidden = true
             return
         }
-        let slotX = TranscriptBookmarkTargetMarks.gutterWidth - style.side - TranscriptBookmarkMarker.gapToText
+        let slotX = TranscriptColumnLayout.gutterWidth - style.side - TranscriptBookmarkMarker.gapToText
         let top = shown.frame.minY + shown.topPadding
         let frame = CGRect(x: slotX, y: top, width: style.side, height: max(style.side, shown.frame.maxY - 4 - top))
         let content = TranscriptBookmarkTargetMarkView.Content(
