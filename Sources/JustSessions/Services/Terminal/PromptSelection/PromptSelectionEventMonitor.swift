@@ -10,12 +10,12 @@ final class PromptSelectionEventMonitor {
     @MainActor
     init(
         matching mask: NSEvent.EventTypeMask,
-        handleEvent: @escaping @MainActor (NSEvent) -> Bool,
+        handleEvent: @escaping @MainActor (NSEvent) -> PromptSelectionEventHandling,
         handleMenuAction: @escaping @MainActor (String) -> Void
     ) {
         monitor = NSEvent.addLocalMonitorForEvents(matching: mask) { event in
-            let goesOn = MainActor.assumeIsolated { handleEvent(event) }
-            return goesOn ? event : nil
+            let handling = MainActor.assumeIsolated { handleEvent(event) }
+            return handling == .goesOnAsUsual ? event : nil
         }
         menuActionObserver = NotificationCenter.default.addObserver(
             forName: NSMenu.willSendActionNotification, object: nil, queue: .main
