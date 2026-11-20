@@ -30,7 +30,7 @@ struct KiroSessionLock: Equatable, Sendable {
     }
 
     init?(file: URL) {
-        guard (try? file.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
+        guard file.isPlainFileNotLinkOrPipe,
             let handle = try? FileHandle(forReadingFrom: file)
         else { return nil }
         defer { try? handle.close() }

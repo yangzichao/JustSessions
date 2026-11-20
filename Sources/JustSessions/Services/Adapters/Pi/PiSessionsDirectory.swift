@@ -43,7 +43,7 @@ enum PiSessionsDirectory {
             )
         else { return [] }
         return entries.flatMap { entry -> [URL] in
-            if entry.pathExtension == "jsonl" { return isRegularFile(entry) ? [entry] : [] }
+            if entry.pathExtension == "jsonl" { return entry.isPlainFileNotLinkOrPipe ? [entry] : [] }
             guard (try? entry.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true else { return [] }
             let projectFiles =
                 (try? fileManager.contentsOfDirectory(
@@ -51,13 +51,8 @@ enum PiSessionsDirectory {
                     includingPropertiesForKeys: [.isRegularFileKey, .contentModificationDateKey],
                     options: [.skipsHiddenFiles]
                 )) ?? []
-            return projectFiles.filter { $0.pathExtension == "jsonl" && isRegularFile($0) }
+            return projectFiles.filter { $0.pathExtension == "jsonl" && $0.isPlainFileNotLinkOrPipe }
         }
-    }
-
-    /// Describes the item itself, so a symbolic link to a file is not a regular file.
-    private static func isRegularFile(_ url: URL) -> Bool {
-        (try? url.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true
     }
 
     private static func settingsSessionDirectory(in agentDirectory: URL, settingsData: (URL) -> Data?) -> String? {

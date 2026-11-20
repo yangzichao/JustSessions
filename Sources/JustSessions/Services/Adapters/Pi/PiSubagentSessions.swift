@@ -55,7 +55,7 @@ enum PiSubagentSessions {
             )
         else { return }
         var sessionIDsByFolderName: [String: String] = [:]
-        for file in entries where file.pathExtension == "jsonl" && isRegularFile(file) {
+        for file in entries where file.pathExtension == "jsonl" && file.isPlainFileNotLinkOrPipe {
             guard let session = read(file) else { continue }
             found.append(Found(file: file, session: session, parentSessionID: parentSessionID))
             sessionIDsByFolderName[file.deletingPathExtension().lastPathComponent] = session.sessionID
@@ -69,11 +69,6 @@ enum PiSubagentSessions {
                 into: &found
             )
         }
-    }
-
-    /// Describes the item itself, so a symbolic link is neither a regular file nor a folder.
-    private static func isRegularFile(_ url: URL) -> Bool {
-        (try? url.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true
     }
 
     private static func isDirectory(_ url: URL) -> Bool {
