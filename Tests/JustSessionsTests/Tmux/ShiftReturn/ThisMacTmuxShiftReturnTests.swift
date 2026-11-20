@@ -23,7 +23,11 @@ struct ThisMacTmuxShiftReturnTests {
             displayTitle: "New claude session",
             command: sandbox.server.command(
                 attachingTo: tmuxSessionName,
-                running: sandbox.cliCommand(cli, extraEnvironment: ["KEY_LOG": keyLog.path, "READY_MARKER": readyMarker.path])
+                running: sandbox.cliCommand(
+                    cli,
+                    extraEnvironment: [
+                        "KEY_LOG": keyLog.path, "READY_MARKER": readyMarker.path, "KEY_BYTE_COUNT": "15",
+                    ])
             ),
             tmuxSessionName: tmuxSessionName
         )
@@ -46,11 +50,12 @@ struct ThisMacTmuxShiftReturnTests {
             }, "\(sandbox.launchDiagnostics(for: tab))")
         _ = sandbox.tmuxOutput(["send-keys", "-t", "=\(tmuxSessionName):", "-l", "\u{1b}[?65;4;6;18;22c"])
         tab.terminalView.keyDown(with: returnKeyEvent(modifiers: .shift, windowNumber: window.windowNumber))
+        tab.terminalView.keyDown(with: keypadEnterKeyEvent(modifiers: .shift, windowNumber: window.windowNumber))
         tab.terminalView.keyDown(with: returnKeyEvent(modifiers: [], windowNumber: window.windowNumber))
 
-        try #require(await sandbox.waitUntil { (try? Data(contentsOf: keyLog))?.count == 8 })
+        try #require(await sandbox.waitUntil { (try? Data(contentsOf: keyLog))?.count == 15 })
         let recordedKeys = String(decoding: try Data(contentsOf: keyLog), as: UTF8.self)
-        #expect(recordedKeys == "\u{1b}[13;2u\r", "Received bytes: \(Array(recordedKeys.utf8))")
+        #expect(recordedKeys == "\u{1b}[13;2u\u{1b}[13;2u\r", "Received bytes: \(Array(recordedKeys.utf8))")
     }
 
     @Test(arguments: TerminalEngine.allCases)
@@ -74,6 +79,21 @@ struct ThisMacTmuxShiftReturnTests {
         #expect(!tab(host: .thisMac, tmuxSessionName: nil).terminalView.cliRunsInTmux)
         #expect(tab(host: .ssh("devbox"), tmuxSessionName: "justsessions-claude-abc").terminalView.cliRunsInTmux)
         #expect(!tab(host: .ssh("devbox"), tmuxSessionName: nil).terminalView.cliRunsInTmux)
+    }
+
+    private func keypadEnterKeyEvent(modifiers: NSEvent.ModifierFlags, windowNumber: Int) -> NSEvent {
+        NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: modifiers.union(.numericPad),
+            timestamp: 0,
+            windowNumber: windowNumber,
+            context: nil,
+            characters: "\u{3}",
+            charactersIgnoringModifiers: "\u{3}",
+            isARepeat: false,
+            keyCode: UInt16(kVK_ANSI_KeypadEnter)
+        )!
     }
 
     private func returnKeyEvent(modifiers: NSEvent.ModifierFlags, windowNumber: Int) -> NSEvent {

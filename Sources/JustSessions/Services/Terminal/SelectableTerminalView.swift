@@ -153,15 +153,14 @@ final class SelectableTerminalView: LocalProcessTerminalView {
         return super.validateUserInterfaceItem(item)
     }
 
-    /// SwiftTerm's `keyDown` hands Return here; while an input method composes text, Return belongs to it.
-    override func interpretKeyEvents(_ eventArray: [NSEvent]) {
-        if cliRunsInTmux, terminal.keyboardEnhancementFlags.isEmpty, !hasMarkedText(),
-            eventArray.count == 1, let event = eventArray.first, ShiftReturnKey.matches(event)
-        {
+    /// While an input method composes text, Return belongs to it.
+    override func keyDown(with event: NSEvent) {
+        if cliRunsInTmux, terminal.keyboardEnhancementFlags.isEmpty, !hasMarkedText(), ShiftReturnKey.matches(event) {
+            selection.active = false
             send(txt: ShiftReturnKey.csiUSequence)
             return
         }
-        super.interpretKeyEvents(eventArray)
+        super.keyDown(with: event)
     }
 
     private func observeAppearance(in store: TerminalAppearanceStore, themeStore: AppThemeStore) {
