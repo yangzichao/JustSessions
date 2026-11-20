@@ -5,6 +5,7 @@ import Foundation
 enum CodexRolloutModel {
     static let chunkByteCount = 1 << 20
     private static let marker = Data(#""type":"turn_context""#.utf8)
+    private static let overlapFindingMarkerCutByChunkBoundary = UInt64(marker.count)
     private static let newline = UInt8(ascii: "\n")
 
     static func latest(in file: URL) -> SessionModel? {
@@ -14,7 +15,7 @@ enum CodexRolloutModel {
         var searchEnd = size
         while searchEnd > 0 {
             let chunkStart = searchEnd > UInt64(chunkByteCount) ? searchEnd - UInt64(chunkByteCount) : 0
-            let readEnd = min(size, searchEnd + UInt64(marker.count))
+            let readEnd = min(size, searchEnd + overlapFindingMarkerCutByChunkBoundary)
             guard let chunk = read(handle, from: chunkStart, to: readEnd) else { return nil }
             var rangeEnd = chunk.endIndex
             while let found = chunk.range(of: marker, options: .backwards, in: chunk.startIndex..<rangeEnd) {
