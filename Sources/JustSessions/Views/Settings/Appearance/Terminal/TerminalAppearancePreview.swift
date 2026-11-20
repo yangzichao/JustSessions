@@ -5,9 +5,11 @@ struct TerminalAppearancePreview: NSViewRepresentable {
     let appearanceStore: TerminalAppearanceStore
     let themeStore: AppThemeStore
 
+    private static let powerlineBranchGlyphDrawnByTheBundledNerdFontSymbols = "\u{E0A0}"
+
     private static let sampleText = [
         " JustSessions",
-        " \u{E0A0} main $ run project",
+        " \(powerlineBranchGlyphDrawnByTheBundledNerdFontSymbols) main $ run project",
         " \u{1B}[32mReady\u{1B}[0m to work",
         " \u{1B}[33mWarning\u{1B}[0m · review changes",
         " \u{1B}[31mError\u{1B}[0m · sample message",
