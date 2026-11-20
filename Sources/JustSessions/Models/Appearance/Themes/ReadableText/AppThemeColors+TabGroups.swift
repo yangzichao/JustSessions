@@ -1,14 +1,16 @@
 extension AppThemeColors {
-    static func tabGroupColors(ansiColors: [UInt32], labelSurfaces: [UInt32]) -> [UInt32] {
+    static func tabGroupColors(terminal: TerminalColorScheme, labelSurfaces: [UInt32]) -> [UInt32] {
+        let pink = ThemeColorContrast.blend(terminal.ansiRed, with: terminal.ansiMagenta, fraction: 0.5)
+        let orange = ThemeColorContrast.blend(terminal.ansiRed, with: terminal.ansiYellow, fraction: 0.5)
         let candidateColors = [
-            ansiColors[4],
-            ansiColors[1],
-            ansiColors[3],
-            ansiColors[2],
-            ThemeColorContrast.blend(ansiColors[1], with: ansiColors[5], fraction: 0.5),
-            ansiColors[5],
-            ansiColors[6],
-            ThemeColorContrast.blend(ansiColors[1], with: ansiColors[3], fraction: 0.5),
+            terminal.ansiBlue,
+            terminal.ansiRed,
+            terminal.ansiYellow,
+            terminal.ansiGreen,
+            pink,
+            terminal.ansiMagenta,
+            terminal.ansiCyan,
+            orange,
         ]
         return candidateColors.map { candidateColor in
             ThemeColorContrast.readableAccent(candidateColor, on: labelSurfaces)
