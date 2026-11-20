@@ -65,41 +65,40 @@ extension ConversationStore {
         switch session.host {
         case .thisMac:
             guard !isThisMacScanUnderWay else { return }
-            if let requestedAt = unlisted.refreshRequestedAt {
-                guard now.timeIntervalSince(requestedAt) >= Self.refreshIntervalWhileWaitingForAppearingSession
-                else { return }
-                let transcript = linkedConversation.sourceFile.deletingLastPathComponent()
-                    .appendingPathComponent("\(unlisted.sessionID).jsonl")
-                guard ConversationMetadata.fileModificationDate(transcript) > requestedAt else { return }
-            }
+            let transcript = linkedConversation.sourceFile.deletingLastPathComponent()
+                .appendingPathComponent("\(unlisted.sessionID).jsonl")
+            guard
+                UnlistedClaudeSessionRefreshPolicy.shouldRefreshThisMac(
+                    for: unlisted,
+                    transcriptModificationDate: { ConversationMetadata.fileModificationDate(transcript) },
+                    now: now
+                )
+            else { return }
             unlisted.refreshRequestedAt = now
             refreshThisMac()
         case .ssh(let destination):
             let windows = [self] + otherWindowStores
-            guard remoteHostList.hosts.contains(destination), !isDisconnected(destination),
-                !windows.contains(where: { $0.sshHostsNeedingLogIn.contains(destination) }),
-                SSHHostReachability.shared.recentFailureOutput(on: destination) == nil,
-                !windows.contains(where: { $0.hostRefreshStatuses[session.host] == .refreshing })
-            else { return }
+            guard canAskForUnlistedSessionCopy(of: destination, among: windows) else { return }
             let copies = RemoteHostCopies.combined(windows.map { $0.remoteHostCopies.copies(of: destination) })
-            if let startedAt = copies.lastStartedAt, startedAt >= unlisted.movedAt, let endedAt = copies.lastEndedAt {
-                guard now.timeIntervalSince(endedAt) >= Self.waitBeforeCopyingAgainForUnlistedSession(after: copies)
-                else { return }
-                if copies.failuresInARow == 0, session.terminalTitle == unlisted.terminalTitleAtRequest { return }
-            }
+            guard
+                UnlistedClaudeSessionRefreshPolicy.shouldCopyRemoteHost(
+                    for: unlisted,
+                    copies: copies,
+                    terminalTitle: session.terminalTitle,
+                    now: now
+                )
+            else { return }
             unlisted.refreshRequestedAt = now
             unlisted.terminalTitleAtRequest = session.terminalTitle
             refreshRemoteHost(destination)
         }
     }
 
-    static let failedCopiesBeforeWaitingLonger = 3
-
-    static func waitBeforeCopyingAgainForUnlistedSession(after copies: RemoteHostCopies.Copies) -> TimeInterval {
-        guard copies.failuresInARow >= failedCopiesBeforeWaitingLonger else {
-            return refreshIntervalWhileWaitingForRemoteSession
-        }
-        return HostAutoRefreshSchedule.wait(afterFailuresInARow: copies.failuresInARow - failedCopiesBeforeWaitingLonger + 1)
+    private func canAskForUnlistedSessionCopy(of destination: String, among windows: [ConversationStore]) -> Bool {
+        remoteHostList.hosts.contains(destination) && !isDisconnected(destination)
+            && !windows.contains(where: { $0.sshHostsNeedingLogIn.contains(destination) })
+            && SSHHostReachability.shared.recentFailureOutput(on: destination) == nil
+            && !windows.contains(where: { $0.hostRefreshStatuses[.ssh(destination)] == .refreshing })
     }
 
     func stopWaitingForUnlistedSession(of session: TerminalSession) {
