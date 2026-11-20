@@ -16,13 +16,25 @@ final class TerminalRestartCoordinator {
         return true
     }
 
-    func beginCleanup(for conversationID: String, tabID: UUID) -> Bool {
-        guard cleanups[conversationID] == nil else { return false }
-        cleanups[conversationID] = Cleanup(tabID: tabID)
-        return true
+    func replaceEndedTab(
+        _ endedTab: TerminalSession,
+        of conversationID: String,
+        afterKillingItsTmuxSession killTmuxSession: @escaping @Sendable () -> Void,
+        on tmuxCommandQueues: TmuxCommandQueues,
+        with replaceEndedTab: @escaping @Sendable @MainActor () -> Void
+    ) {
+        guard cleanups[conversationID] == nil else { return }
+        cleanups[conversationID] = Cleanup(tabID: endedTab.id)
+        endedTab.close()
+        tmuxCommandQueues.run(on: .thisMac) {
+            killTmuxSession()
+            Task { @MainActor in
+                self.finishCleanup(for: conversationID, replacingEndedTab: replaceEndedTab)
+            }
+        }
     }
 
-    func finishCleanup(for conversationID: String, replacingEndedTab: () -> Void) {
+    private func finishCleanup(for conversationID: String, replacingEndedTab: () -> Void) {
         let resumes = cleanups.removeValue(forKey: conversationID)?.resumes ?? []
         replacingEndedTab()
         for resume in resumes { resume() }
