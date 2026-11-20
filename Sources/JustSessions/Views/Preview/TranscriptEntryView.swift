@@ -40,7 +40,8 @@ struct TranscriptEntryView: View {
         case .note(let text):
             TranscriptTextBlock(
                 source: AttributedString(text),
-                style: TranscriptTextStyle(fontSize: ThemeFont.DefaultPointSize.caption, lineSpacing: 0, tone: .tertiary)
+                style: TranscriptTextStyle(
+                    fontSize: TranscriptReadingTextSize.noteSize(forReadingSize: fontSize), lineSpacing: 0, tone: .tertiary)
             )
             .frame(maxWidth: .infinity)
         case .userImage(let image), .toolResultImage(let image):

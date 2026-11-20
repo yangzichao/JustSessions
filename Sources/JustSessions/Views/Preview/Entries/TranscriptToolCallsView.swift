@@ -5,6 +5,7 @@ struct TranscriptToolCallsView: View {
     @State private var isExpanded = false
     @Environment(\.transcriptSearchContext) private var searchContext
     @Environment(\.transcriptSearchEntryIndex) private var entryIndex
+    @Environment(\.transcriptReadingFontSize) private var readingFontSize
 
     var body: some View {
         DisclosureGroup(isExpanded: $isExpanded) {
@@ -13,7 +14,8 @@ struct TranscriptToolCallsView: View {
                     TranscriptTextBlock(
                         source: AttributedString(summary), segmentIndex: segmentIndex,
                         style: TranscriptTextStyle(
-                            fontSize: ThemeFont.DefaultPointSize.callout, isMonospaced: true, lineSpacing: 0, tone: .secondary),
+                            fontSize: TranscriptReadingTextSize.toolCallSummarySize(forReadingSize: readingFontSize), isMonospaced: true,
+                            lineSpacing: 0, tone: .secondary),
                         copyRole: .line
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
