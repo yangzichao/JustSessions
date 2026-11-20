@@ -14,6 +14,10 @@ final class TabReopeningSettingsStore: ObservableObject {
         reopensTabsAtLaunch = userDefaults.object(forKey: Self.userDefaultsKey) as? Bool ?? true
     }
 
+    static func isTurnedOffByLaunchArgument(in userDefaults: UserDefaults) -> Bool {
+        userDefaults.volatileDomain(forName: UserDefaults.argumentDomain)[userDefaultsKey] as? Bool == false
+    }
+
     func setReopensTabsAtLaunch(_ isOn: Bool) {
         guard isOn != reopensTabsAtLaunch else { return }
         userDefaults.set(isOn, forKey: Self.userDefaultsKey)
