@@ -78,20 +78,26 @@ enum BoundedProcessRunner {
         let finished = DispatchSemaphore(value: 0)
         process.terminationHandler = { _ in finished.signal() }
         do { try process.run() } catch { return nil }
-        let processID = process.processIdentifier
-        let ownsProcessGroup = getpgid(processID) == processID
+        let leadsItsOwnProcessGroup = getpgid(process.processIdentifier) == process.processIdentifier
         let stopped = !waitForExit(finished, timeout: timeout, cancelsWithTask: cancelsWithTask)
         if stopped {
-            if ownsProcessGroup {
-                kill(-processID, SIGKILL)
-            } else if process.isRunning {
-                kill(processID, SIGKILL)
-            }
-            _ = finished.wait(timeout: .now() + 5)
+            killWithTheChildrenItStarted(process, leadsItsOwnProcessGroup: leadsItsOwnProcessGroup)
+            _ = finished.wait(timeout: .now() + longestWaitForTheKilledProcessToBeReaped)
         }
 
         guard let data = try? Data(contentsOf: outputFile) else { return nil }
         return (stopped ? nil : process.terminationStatus, String(decoding: data, as: UTF8.self))
+    }
+
+    private static let longestWaitForTheKilledProcessToBeReaped: DispatchTimeInterval = .seconds(5)
+
+    private static func killWithTheChildrenItStarted(_ process: Process, leadsItsOwnProcessGroup: Bool) {
+        let processID = process.processIdentifier
+        if leadsItsOwnProcessGroup {
+            kill(-processID, SIGKILL)
+        } else if process.isRunning {
+            kill(processID, SIGKILL)
+        }
     }
 
     private static func waitForExit(_ finished: DispatchSemaphore, timeout: TimeInterval, cancelsWithTask: Bool) -> Bool {
