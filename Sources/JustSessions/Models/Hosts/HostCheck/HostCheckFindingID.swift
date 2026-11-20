@@ -34,6 +34,13 @@ enum HostCheckFindingID: Hashable, Sendable, Codable, RawRepresentable {
         }
     }
 
+    var isAboutOneSessionRatherThanTheHost: Bool {
+        switch self {
+        case .folder: true
+        case .connection, .shellStartup, .script, .loginShell, .system, .rsync, .tmux, .cli, .otherCLIs, .python3: false
+        }
+    }
+
     init?(rawValue: String) {
         guard let id = Self.all.first(where: { $0.rawValue == rawValue }) else { return nil }
         self = id
