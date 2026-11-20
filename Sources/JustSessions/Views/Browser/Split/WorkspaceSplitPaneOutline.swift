@@ -16,9 +16,14 @@ enum WorkspaceSplitPaneMetrics {
 }
 
 struct WorkspaceSplitPaneOutlineShape: Shape {
-    var toolbarSize: CGSize
+    var miniToolbarSize: CGSize?
     var lineWidth = WorkspaceSplitPaneMetrics.outlineWidth
     var cornerRadius = WorkspaceSplitPaneMetrics.outlineCornerRadius
+
+    private var miniToolbarSizeToNotchAround: CGSize? {
+        guard let miniToolbarSize, miniToolbarSize.width > 0, miniToolbarSize.height > 0 else { return nil }
+        return miniToolbarSize
+    }
 
     func path(in rect: CGRect) -> Path {
         let bounds = rect.insetBy(dx: lineWidth / 2, dy: lineWidth / 2)
@@ -30,10 +35,7 @@ struct WorkspaceSplitPaneOutlineShape: Shape {
             tangent1End: CGPoint(x: bounds.minX, y: bounds.minY), tangent2End: CGPoint(x: bounds.maxX, y: bounds.minY), radius: radius)
         path.addArc(
             tangent1End: CGPoint(x: bounds.maxX, y: bounds.minY), tangent2End: CGPoint(x: bounds.maxX, y: bounds.maxY), radius: radius)
-        if toolbarSize.width <= 0 || toolbarSize.height <= 0 {
-            path.addArc(
-                tangent1End: CGPoint(x: bounds.maxX, y: bounds.maxY), tangent2End: CGPoint(x: bounds.minX, y: bounds.maxY), radius: radius)
-        } else {
+        if let toolbarSize = miniToolbarSizeToNotchAround {
             let toolbarTop = bounds.maxY - toolbarSize.height
             let toolbarLeading = bounds.maxX - toolbarSize.width
             path.addLine(to: CGPoint(x: bounds.maxX, y: toolbarTop))
@@ -52,6 +54,9 @@ struct WorkspaceSplitPaneOutlineShape: Shape {
                 tangent2End: CGPoint(x: bounds.minX, y: bounds.maxY),
                 radius: notchRadius
             )
+        } else {
+            path.addArc(
+                tangent1End: CGPoint(x: bounds.maxX, y: bounds.maxY), tangent2End: CGPoint(x: bounds.minX, y: bounds.maxY), radius: radius)
         }
         path.addArc(
             tangent1End: CGPoint(x: bounds.minX, y: bounds.maxY), tangent2End: CGPoint(x: bounds.minX, y: bounds.minY), radius: radius)
