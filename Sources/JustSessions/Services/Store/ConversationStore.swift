@@ -349,7 +349,13 @@ final class ConversationStore {
 
     @discardableResult
     func toggleMessageBookmark(on entry: TranscriptEntry, in conversation: Conversation) -> MessageBookmarkToggle? {
-        guard let kind = MessageBookmark.Kind(entry.content) else { return nil }
+        guard let message = BookmarkableMessage(entry) else { return nil }
+        return toggleMessageBookmark(on: message, in: conversation)
+    }
+
+    @discardableResult
+    func toggleMessageBookmark(on message: BookmarkableMessage, in conversation: Conversation) -> MessageBookmarkToggle {
+        let entry = message.entry
         let shown = messageBookmarks.bookmarks(forConversationID: conversation.id).first { $0.entryID == entry.id }
         let snippet = MessageBookmarkNavigation.snippet(of: entry) ?? ""
         var toggle = MessageBookmarkToggle.allLettersInUse
@@ -358,7 +364,7 @@ final class ConversationStore {
             switch (shown, saved) {
             case (nil, let saved?): toggle = .added(saved)
             case (let shown?, nil): toggle = .removed(shown)
-            default: toggle = bookmarks.toggle(entryID: entry.id, kind: kind, snippet: snippet, conversationID: conversation.id)
+            default: toggle = bookmarks.toggle(entryID: entry.id, kind: message.kind, snippet: snippet, conversationID: conversation.id)
             }
         }
         return toggle
@@ -379,11 +385,16 @@ final class ConversationStore {
     }
 
     func ensureMessageBookmark(on entry: TranscriptEntry, in conversation: Conversation) -> MessageBookmarkEnsuring? {
-        guard let kind = MessageBookmark.Kind(entry.content) else { return nil }
+        guard let message = BookmarkableMessage(entry) else { return nil }
+        return ensureMessageBookmark(on: message, in: conversation)
+    }
+
+    func ensureMessageBookmark(on message: BookmarkableMessage, in conversation: Conversation) -> MessageBookmarkEnsuring {
+        let entry = message.entry
         let snippet = MessageBookmarkNavigation.snippet(of: entry) ?? ""
         var ensuring = MessageBookmarkEnsuring.allLettersInUse
         changeSavedCustomization(\.messageBookmarks) {
-            ensuring = $0.ensure(entryID: entry.id, kind: kind, snippet: snippet, conversationID: conversation.id)
+            ensuring = $0.ensure(entryID: entry.id, kind: message.kind, snippet: snippet, conversationID: conversation.id)
         }
         return ensuring
     }

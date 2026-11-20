@@ -27,7 +27,7 @@ struct ConversationOutlineReaderTests {
         let original = String(decoding: try Data(contentsOf: fixture.file), as: UTF8.self)
         let replacement = Data(original.replacingOccurrences(of: "Message 0,", with: "Rewritten first message 0,").utf8)
         try replacement.write(to: fixture.file, options: atomic ? .atomic : [])
-        #expect(try await reader.latestMessage()?.id == TranscriptPageIdentity.entryID(record: 599, part: 0))
+        #expect(try await reader.latestMessage()?.entry.id == TranscriptPageIdentity.entryID(record: 599, part: 0))
         let updated = try #require(try await reader.update())
         #expect(updated.blocks.first?.snippet.hasPrefix("Rewritten first message 0") == true)
         #expect(updated == (try await Self.fullRead(fixture.conversation)))
@@ -239,8 +239,8 @@ struct ConversationOutlineReaderTests {
         let latest = try #require(try await ConversationOutlineReader(fixture.conversation).latestMessage())
         let readers = try await TranscriptPageSource(file: fixture.file, provider: .codex).read(.latest)
         #expect(readers.entries.last.map { MessageBookmark.Kind($0.content) } == .some(nil))
-        #expect(latest.content == .assistantMessage("Done. 完成 ✅"))
-        #expect(latest.id == readers.entries.first { $0.content == latest.content }?.id)
+        #expect(latest.entry.content == .assistantMessage("Done. 完成 ✅"))
+        #expect(latest.entry.id == readers.entries.first { $0.content == latest.entry.content }?.id)
     }
 
     @Test func theLatestMessagePagesBackPastALongToolRun() async throws {
@@ -249,8 +249,8 @@ struct ConversationOutlineReaderTests {
         let codex = SampleTranscriptLines.codex
         try SampleTranscriptLines.fileContents([codex[1], codex[6]] + Array(repeating: codex[2], count: 600)).write(to: fixture.file)
         let latest = try await ConversationOutlineReader(fixture.conversation).latestMessage()
-        #expect(latest?.content == .assistantMessage("Done. 完成 ✅"))
-        #expect(latest?.id == TranscriptPageIdentity.entryID(record: 1, part: 0))
+        #expect(latest?.entry.content == .assistantMessage("Done. 完成 ✅"))
+        #expect(latest?.entry.id == TranscriptPageIdentity.entryID(record: 1, part: 0))
     }
 
     @Test func aSessionWithoutMessagesHasNoLatestMessage() async throws {
