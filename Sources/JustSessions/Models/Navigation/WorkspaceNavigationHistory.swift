@@ -29,7 +29,7 @@ struct WorkspaceNavigationHistory: Equatable {
         return (currentIndex + 1..<entries.count).filter { isDestination(at: $0, shown: shown, canShow: canShow) }
     }
 
-    mutating func move(to index: Int) {
+    mutating func moveBeforeShowing(entryAt index: Int) {
         guard entries.indices.contains(index) else { return }
         currentIndex = index
     }

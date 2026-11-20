@@ -46,7 +46,7 @@ struct WorkspaceNavigationControls: ViewModifier {
     }
 
     private func show(_ destination: WorkspaceNavigation.Destination) {
-        history.move(to: destination.entryIndex)
+        history.moveBeforeShowing(entryAt: destination.entryIndex)
         switch destination.location {
         case .tab(let tabID):
             store.selectTerminal(tabID)

@@ -16,7 +16,7 @@ struct WorkspaceNavigationHistoryTests {
         #expect(history.backEntryIndices(shown: tabB, canShow: canShowAll) == [1, 0])
         #expect(history.forwardEntryIndices(shown: tabB, canShow: canShowAll).isEmpty)
 
-        history.move(to: 1)
+        history.moveBeforeShowing(entryAt: 1)
         history.record(sessionC)
         #expect(history.entries == [tabA, sessionC, tabB])
         #expect(history.backEntryIndices(shown: sessionC, canShow: canShowAll) == [0])
@@ -26,7 +26,7 @@ struct WorkspaceNavigationHistoryTests {
     @Test func showingANewPlaceAfterGoingBackDropsTheForwardEntries() {
         var history = WorkspaceNavigationHistory()
         for location in [tabA, sessionC, tabB] { history.record(location) }
-        history.move(to: 0)
+        history.moveBeforeShowing(entryAt: 0)
         history.record(tabA)
 
         history.record(sessionD)
@@ -50,7 +50,7 @@ struct WorkspaceNavigationHistoryTests {
         #expect(history.entries == [tabA])
 
         history.record(sessionC)
-        history.move(to: 0)
+        history.moveBeforeShowing(entryAt: 0)
         history.replaceCurrent(with: tabB)
 
         #expect(history.entries == [tabB, sessionC])
@@ -65,7 +65,7 @@ struct WorkspaceNavigationHistoryTests {
 
         #expect(history.backEntryIndices(shown: sessionC, canShow: tabBClosed) == [2, 0])
 
-        history.move(to: 2)
+        history.moveBeforeShowing(entryAt: 2)
         history.record(tabA)
         #expect(history.backEntryIndices(shown: tabA, canShow: tabBClosed).isEmpty)
         #expect(history.forwardEntryIndices(shown: tabA, canShow: tabBClosed) == [3])
@@ -82,7 +82,7 @@ struct WorkspaceNavigationHistoryTests {
         var history = WorkspaceNavigationHistory()
         #expect(history.backEntryIndices(shown: nil, canShow: canShowAll).isEmpty)
         #expect(history.forwardEntryIndices(shown: nil, canShow: canShowAll).isEmpty)
-        history.move(to: 0)
+        history.moveBeforeShowing(entryAt: 0)
         #expect(history.currentIndex == nil)
     }
 
