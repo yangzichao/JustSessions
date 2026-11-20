@@ -24,8 +24,13 @@ struct ProjectHoverActions<MenuItems: View>: View {
         }
     }
 
+    private static var hoverMenuCount: CGFloat { 2 }
+
     static var placeholder: some View {
         Color.clear
-            .frame(width: InterfaceScale.points(40), height: InterfaceScale.points(14))
+            .frame(
+                width: InterfaceScale.points(hoverMenuCount * SidebarRowMenuLabelMetrics.glyphSideBeforeInterfaceScale),
+                height: InterfaceScale.points(SidebarRowMenuLabelMetrics.fixedSizeBorderlessMenuHeightBeforeInterfaceScale)
+            )
     }
 }

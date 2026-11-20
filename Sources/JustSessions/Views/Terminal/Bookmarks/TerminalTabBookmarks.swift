@@ -16,44 +16,39 @@ struct TerminalTabBookmarks {
 
     @discardableResult
     func toggleLatestMessage(in tab: TerminalSession) -> Task<Void, Never>? {
-        actOnLatestMessage(in: tab) { entry, conversation in
+        actOnLatestMessage(in: tab) { message, conversation in
             let name = conversation.provider.rawValue
-            switch store.toggleMessageBookmark(on: entry, in: conversation) {
+            switch store.toggleMessageBookmark(on: message, in: conversation) {
             case .added(let bookmark): tab.bookmarkNotices.show(.added(bookmark, assistantName: name))
             case .removed(let bookmark): tab.bookmarkNotices.show(.removed(bookmark, assistantName: name))
             case .allLettersInUse: tab.bookmarkNotices.show(.allLettersInUse)
-            case nil: tab.bookmarkNotices.show(.noMessagesYet)
             }
         }
     }
 
     @discardableResult
     func editLatestMessage(in tab: TerminalSession) -> Task<Void, Never>? {
-        actOnLatestMessage(in: tab) { entry, conversation in
-            switch store.ensureMessageBookmark(on: entry, in: conversation) {
+        actOnLatestMessage(in: tab) { message, conversation in
+            switch store.ensureMessageBookmark(on: message, in: conversation) {
             case .existing(let bookmark), .added(let bookmark):
                 tab.bookmarkNotices.dismiss()
                 tab.bookmarkNotices.editor.open(bookmark, in: conversation)
             case .allLettersInUse: tab.bookmarkNotices.show(.allLettersInUse)
-            case nil: tab.bookmarkNotices.show(.noMessagesYet)
             }
         }
     }
 
     private func actOnLatestMessage(
         in tab: TerminalSession,
-        _ act: @escaping @MainActor (TranscriptEntry, Conversation) -> Void
+        _ act: @escaping @MainActor (BookmarkableMessage, Conversation) -> Void
     ) -> Task<Void, Never>? {
         guard let conversation = linkedConversation(of: tab) else { return nil }
         return tab.bookmarkNotices.enqueue {
-            let finding = Task { @MainActor in
-                try? await Task.sleep(for: Self.findingNoticeDelay)
-                if !Task.isCancelled { tab.bookmarkNotices.show(.findingLatestMessage) }
-            }
-            defer { finding.cancel() }
-            let entry: TranscriptEntry?
+            let findingNoticeCancelledBeforeAnythingYieldsAfterTheRead = showFindingNoticeAfterADelayUnlessCancelled(in: tab)
+            defer { findingNoticeCancelledBeforeAnythingYieldsAfterTheRead.cancel() }
+            let message: BookmarkableMessage?
             do {
-                entry = try await tab.conversationOutline.latestMessage(of: conversation)
+                message = try await tab.conversationOutline.latestMessage(of: conversation)
             } catch is CancellationError {
                 tab.bookmarkNotices.dismiss()
                 return
@@ -61,11 +56,18 @@ struct TerminalTabBookmarks {
                 tab.bookmarkNotices.show(.couldNotRead)
                 return
             }
-            guard let entry else {
+            guard let message else {
                 tab.bookmarkNotices.show(.noMessagesYet)
                 return
             }
-            act(entry, conversation)
+            act(message, conversation)
+        }
+    }
+
+    private func showFindingNoticeAfterADelayUnlessCancelled(in tab: TerminalSession) -> Task<Void, Never> {
+        Task { @MainActor in
+            try? await Task.sleep(for: Self.findingNoticeDelay)
+            if !Task.isCancelled { tab.bookmarkNotices.show(.findingLatestMessage) }
         }
     }
 

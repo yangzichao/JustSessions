@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 final class TabDragBetweenWindows {
     static let shared = TabDragBetweenWindows()
+    private static let howLongALetGoDragWaitsForItsCarrierWindowToOpen = DispatchTimeInterval.seconds(2)
 
     @MainActor
     private enum ShownDrag {
@@ -75,12 +76,12 @@ final class TabDragBetweenWindows {
         var pointer: CGPoint
         var stage = Stage.inStartingBar
         var carrier: Workspace?
-        var isReleased = false
+        var isLetGoWhileWaitingForCarrier = false
     }
 
     private var drag: Drag?
     private var eventMonitor: Any?
-    private var isLayoutFollowUpScheduled = false
+    private var isPointerFollowUpAfterLayoutUpdateScheduled = false
 
     private init() {
         layouts.onChange = { [weak self] store in self?.followLayoutChange(in: store) }
@@ -217,7 +218,7 @@ final class TabDragBetweenWindows {
         drag.stage = .carried
         self.drag = drag
         followPointer()
-        if drag.isReleased { dropTabs() }
+        if drag.isLetGoWhileWaitingForCarrier { dropTabs() }
     }
 
     private func followPointer() {
@@ -286,15 +287,19 @@ final class TabDragBetweenWindows {
     }
 
     private func followLayoutChange(in store: ConversationStore) {
-        guard let drag, !isLayoutFollowUpScheduled else { return }
+        guard let drag, !isPointerFollowUpAfterLayoutUpdateScheduled else { return }
         switch drag.stage {
         case .carried where drag.carrier?.store === store: break
         case .inTabBar(let holdingStore) where holdingStore === store: break
         default: return
         }
-        isLayoutFollowUpScheduled = true
+        followPointerAfterTheViewUpdateThatMeasuredTheNewLayout()
+    }
+
+    private func followPointerAfterTheViewUpdateThatMeasuredTheNewLayout() {
+        isPointerFollowUpAfterLayoutUpdateScheduled = true
         DispatchQueue.main.async { [weak self] in
-            self?.isLayoutFollowUpScheduled = false
+            self?.isPointerFollowUpAfterLayoutUpdateScheduled = false
             self?.followPointer()
         }
     }
@@ -305,14 +310,19 @@ final class TabDragBetweenWindows {
         case .inStartingBar:
             return
         case .waitingForCarrier:
-            self.drag?.isReleased = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-                guard let self, let drag = self.drag, drag.isReleased, case .waitingForCarrier = drag.stage else { return }
-                drag.registry.cancelWindowHandOvers()
-                self.endDrag()
-            }
+            self.drag?.isLetGoWhileWaitingForCarrier = true
+            leaveTabsWhereTheyWereIfTheCarrierWindowNeverOpens()
         case .carried, .inTabBar, .overTerminals:
             dropTabs()
+        }
+    }
+
+    private func leaveTabsWhereTheyWereIfTheCarrierWindowNeverOpens() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.howLongALetGoDragWaitsForItsCarrierWindowToOpen) { [weak self] in
+            guard let self, let drag = self.drag, drag.isLetGoWhileWaitingForCarrier, case .waitingForCarrier = drag.stage
+            else { return }
+            drag.registry.cancelWindowHandOvers()
+            self.endDrag()
         }
     }
 

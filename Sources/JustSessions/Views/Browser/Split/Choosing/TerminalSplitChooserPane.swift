@@ -31,7 +31,7 @@ struct TerminalSplitChooserPane: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
-            WorkspaceSplitPaneOutlineShape(toolbarSize: .zero)
+            WorkspaceSplitPaneOutlineShape(miniToolbarSize: nil)
                 .stroke(terminalPalette.splitPaneOutlineColor(isSelected: isSelected), lineWidth: WorkspaceSplitPaneMetrics.outlineWidth)
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)

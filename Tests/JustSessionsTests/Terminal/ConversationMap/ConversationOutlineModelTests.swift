@@ -117,7 +117,7 @@ struct ConversationOutlineModelTests {
         try await expectEventually { watch.hasEnded }
         #expect(model.outline == nil)
         let latest = try await model.latestMessage(of: fixture.conversation)
-        #expect(latest?.id == TranscriptPageIdentity.entryID(record: 9, part: 0))
+        #expect(latest?.entry.id == TranscriptPageIdentity.entryID(record: 9, part: 0))
     }
 
     @Test func aCancelledReadDoesNotDelayTheNext() async throws {
@@ -213,7 +213,7 @@ struct ConversationOutlineModelTests {
         defer { watch.cancel() }
         try await expectEventually { model.outline?.blocks.count == 5 }
         let latest = try await model.latestMessage(of: left.conversation)
-        #expect(latest?.id == TranscriptPageIdentity.entryID(record: 9, part: 0))
+        #expect(latest?.entry.id == TranscriptPageIdentity.entryID(record: 9, part: 0))
         #expect(model.outline?.blocks.count == 5)
         try shown.append(Self.record(5))
         try await expectEventually(timeout: .seconds(5)) { model.outline?.blocks.count == 6 }

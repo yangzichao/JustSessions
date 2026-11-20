@@ -19,7 +19,7 @@ struct TerminalTabGroupLabel: View {
     }
 
     var body: some View {
-        Button(action: toggleOnFirstClick) {
+        Button(action: toggleCollapsedUnlessThisIsADoubleClicksSecondClick) {
             HStack(spacing: 5) {
                 if location.host != .thisMac {
                     Image(systemName: location.host.symbolName)
@@ -53,8 +53,13 @@ struct TerminalTabGroupLabel: View {
         .contextMenu { menuItems }
     }
 
-    private func toggleOnFirstClick() {
-        if let event = NSApp.currentEvent, event.type == .leftMouseUp, event.clickCount > 1 { return }
+    private func toggleCollapsedUnlessThisIsADoubleClicksSecondClick() {
+        if isTheSecondClickOfADoubleClick { return }
         onToggleCollapsed()
+    }
+
+    private var isTheSecondClickOfADoubleClick: Bool {
+        guard let mouseUpThatPressedTheButton = NSApp.currentEvent, mouseUpThatPressedTheButton.type == .leftMouseUp else { return false }
+        return mouseUpThatPressedTheButton.clickCount > 1
     }
 }

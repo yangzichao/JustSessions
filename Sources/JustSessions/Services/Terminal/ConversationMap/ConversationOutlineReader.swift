@@ -105,11 +105,11 @@ actor ConversationOutlineReader {
         return ReadOutline(outline: ConversationOutline(blocks: builder.blocks), lineage: lineage)
     }
 
-    func latestMessage() async throws -> TranscriptEntry? {
+    func latestMessage() async throws -> BookmarkableMessage? {
         var page = try await source.read(.latest, refreshIndex: true, limits: TranscriptPageLimits(), preparesMarkdown: false)
         var pagesBack = 0
         while true {
-            if let message = page.entries.last(where: { MessageBookmark.Kind($0.content) != nil }) { return message }
+            if let message = page.entries.reversed().lazy.compactMap(BookmarkableMessage.init).first { return message }
             guard page.hasEarlier, pagesBack < Self.latestMessagePagesBack else { return nil }
             pagesBack += 1
             page = try await source.read(.before(page.records.lowerBound), limits: limits, preparesMarkdown: false)

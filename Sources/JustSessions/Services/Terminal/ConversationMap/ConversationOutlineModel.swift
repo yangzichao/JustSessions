@@ -43,7 +43,7 @@ final class ConversationOutlineModel {
         }
     }
 
-    func latestMessage(of conversation: Conversation) async throws -> TranscriptEntry? {
+    func latestMessage(of conversation: Conversation) async throws -> BookmarkableMessage? {
         if isNewestWatchRunning, Self.key(of: conversation) != sourceKey {
             return try await ConversationOutlineReader(conversation).latestMessage()
         }
