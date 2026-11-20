@@ -32,7 +32,7 @@ enum PiSubagentSessions {
         let parentSessionID: String
     }
 
-    static let maximumFolderDepth = 12
+    private static let folderDepthNoExtensionReaches = 12
 
     static func find(startedBy sessionFile: URL, sessionID: String, read: (URL) -> PiSubagentSession?) -> [Found] {
         var found: [Found] = []
@@ -47,7 +47,7 @@ enum PiSubagentSessions {
         read: (URL) -> PiSubagentSession?,
         into found: inout [Found]
     ) {
-        guard depth < maximumFolderDepth,
+        guard depth < folderDepthNoExtensionReaches,
             let entries = try? FileManager.default.contentsOfDirectory(
                 at: folder,
                 includingPropertiesForKeys: [.isRegularFileKey, .isDirectoryKey, .contentModificationDateKey, .fileSizeKey],
