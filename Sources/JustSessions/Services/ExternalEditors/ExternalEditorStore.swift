@@ -7,18 +7,18 @@ final class ExternalEditorStore: ObservableObject {
 
     @Published private(set) var installedEditors: [InstalledExternalEditor] = []
     private let applicationURLForBundleIdentifier: @MainActor (String) -> URL?
-    private let sshFolderCommandLineToolForApplication: @MainActor (URL) -> URL?
+    private let vsCodeFamilyCommandLineToolForApplication: @MainActor (URL) -> URL?
 
     init(
         applicationURLForBundleIdentifier: @escaping @MainActor (String) -> URL? = {
             NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0)
         },
-        sshFolderCommandLineToolForApplication: @escaping @MainActor (URL) -> URL? = {
+        vsCodeFamilyCommandLineToolForApplication: @escaping @MainActor (URL) -> URL? = {
             RemoteSSHCommandLineTool.find(inApplicationAt: $0)
         }
     ) {
         self.applicationURLForBundleIdentifier = applicationURLForBundleIdentifier
-        self.sshFolderCommandLineToolForApplication = sshFolderCommandLineToolForApplication
+        self.vsCodeFamilyCommandLineToolForApplication = vsCodeFamilyCommandLineToolForApplication
         refresh()
     }
 
@@ -32,7 +32,7 @@ final class ExternalEditorStore: ObservableObject {
             return InstalledExternalEditor(
                 name: editor.name,
                 applicationURL: applicationURL,
-                sshFolderCommandLineToolURL: sshFolderCommandLineToolForApplication(applicationURL)
+                vsCodeFamilyCommandLineToolURL: vsCodeFamilyCommandLineToolForApplication(applicationURL)
             )
         }
         if foundEditors != installedEditors { installedEditors = foundEditors }
@@ -41,7 +41,7 @@ final class ExternalEditorStore: ObservableObject {
     func editors(opening host: SessionHost) -> [InstalledExternalEditor] {
         switch host {
         case .thisMac: installedEditors
-        case .ssh: installedEditors.filter { $0.sshFolderCommandLineToolURL != nil }
+        case .ssh: installedEditors.filter { $0.vsCodeFamilyCommandLineToolURL != nil }
         }
     }
 
@@ -55,7 +55,7 @@ final class ExternalEditorStore: ObservableObject {
                 configuration: NSWorkspace.OpenConfiguration()
             )
         case .ssh(let destination):
-            guard let toolURL = editor.sshFolderCommandLineToolURL else {
+            guard let toolURL = editor.vsCodeFamilyCommandLineToolURL else {
                 throw RemoteSSHFolderOpenError.editorCannotOpenSSHFolders
             }
             try await RemoteSSHFolderOpener.open(path: location.path, on: destination, withCommandLineToolAt: toolURL)

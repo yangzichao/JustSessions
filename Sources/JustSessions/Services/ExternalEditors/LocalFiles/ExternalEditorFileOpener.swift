@@ -5,7 +5,7 @@ enum ExternalEditorFileOpener {
     nonisolated static let timeout: TimeInterval = 30
 
     static func open(_ item: TerminalLinkLocalItem, in editor: InstalledExternalEditor) async throws {
-        if item.kind == .file, item.lineNumber != nil, let toolURL = editor.sshFolderCommandLineToolURL {
+        if item.kind == .file, item.lineNumber != nil, let toolURL = editor.vsCodeFamilyCommandLineToolURL {
             try await goTo(item, withCommandLineToolAt: toolURL)
             return
         }

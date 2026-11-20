@@ -53,12 +53,12 @@ struct ExternalEditorStoreTests {
         let installedApplications = ["com.microsoft.VSCode": vscode, "dev.zed.Zed": zed]
         let editorStore = ExternalEditorStore(
             applicationURLForBundleIdentifier: { installedApplications[$0] },
-            sshFolderCommandLineToolForApplication: { $0 == vscode ? codeTool : nil }
+            vsCodeFamilyCommandLineToolForApplication: { $0 == vscode ? codeTool : nil }
         )
 
         #expect(editorStore.editors(opening: .thisMac).map(\.name) == ["Visual Studio Code", "Zed"])
         #expect(editorStore.editors(opening: .ssh("devbox")).map(\.name) == ["Visual Studio Code"])
-        #expect(editorStore.editors(opening: .ssh("devbox")).first?.sshFolderCommandLineToolURL == codeTool)
+        #expect(editorStore.editors(opening: .ssh("devbox")).first?.vsCodeFamilyCommandLineToolURL == codeTool)
     }
 
     @Test func catalogNamesAndBundleIdentifiersAreUnique() {
