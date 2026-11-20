@@ -26,7 +26,7 @@ actor HostSessionWorkCoordinator {
             try Task.checkCancellation()
             try await withCheckedThrowingContinuation { continuation in
                 waiters.append(Waiter(id: id, hosts: hosts, continuation: continuation))
-                resumeAvailableWaiters()
+                resumeWaitersFirstComeFirstServedPerHost()
             }
         } onCancel: {
             Task { await self.cancelWaiter(id) }
@@ -36,25 +36,25 @@ actor HostSessionWorkCoordinator {
     private func cancelWaiter(_ id: UUID) {
         guard let index = waiters.firstIndex(where: { $0.id == id }) else { return }
         waiters.remove(at: index).continuation.resume(throwing: CancellationError())
-        resumeAvailableWaiters()
+        resumeWaitersFirstComeFirstServedPerHost()
     }
 
     private func release(_ id: UUID) {
         reservations.removeValue(forKey: id)
-        resumeAvailableWaiters()
+        resumeWaitersFirstComeFirstServedPerHost()
     }
 
-    private func resumeAvailableWaiters() {
-        var occupied = reservations.values.reduce(into: Set<SessionHost>()) { $0.formUnion($1) }
+    private func resumeWaitersFirstComeFirstServedPerHost() {
+        var hostsHeldOrAwaitedByEarlierRequests = reservations.values.reduce(into: Set<SessionHost>()) { $0.formUnion($1) }
         var remaining: [Waiter] = []
         for waiter in waiters {
-            if occupied.isDisjoint(with: waiter.hosts) {
+            if hostsHeldOrAwaitedByEarlierRequests.isDisjoint(with: waiter.hosts) {
                 reservations[waiter.id] = waiter.hosts
                 waiter.continuation.resume()
             } else {
                 remaining.append(waiter)
             }
-            occupied.formUnion(waiter.hosts)
+            hostsHeldOrAwaitedByEarlierRequests.formUnion(waiter.hosts)
         }
         waiters = remaining
     }
