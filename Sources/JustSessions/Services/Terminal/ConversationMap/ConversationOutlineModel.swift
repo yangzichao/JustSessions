@@ -29,16 +29,14 @@ final class ConversationOutlineModel {
 
     func watch(_ conversation: Conversation) async {
         let reader = prepare(for: conversation)
-        watchGeneration += 1
-        let generation = watchGeneration
-        runningWatch = generation
+        let generation = startNewestWatch()
         defer { if runningWatch == generation { runningWatch = nil } }
         let interval = checkIntervalOverride ?? Self.checkInterval(on: conversation.host)
-        while !Task.isCancelled, generation == watchGeneration {
+        while !Task.isCancelled, isNewestWatch(generation) {
             if await reader.hasChanged() {
                 let wait = nextReadAt - .now
                 if wait > .zero { try? await Task.sleep(for: wait) }
-                guard !Task.isCancelled, generation == watchGeneration else { return }
+                guard !Task.isCancelled, isNewestWatch(generation) else { return }
                 await read(with: reader)
             }
             try? await Task.sleep(for: interval)
@@ -46,19 +44,31 @@ final class ConversationOutlineModel {
     }
 
     func latestMessage(of conversation: Conversation) async throws -> TranscriptEntry? {
-        if runningWatch == watchGeneration, Self.key(of: conversation) != sourceKey {
+        if isNewestWatchRunning, Self.key(of: conversation) != sourceKey {
             return try await ConversationOutlineReader(conversation).latestMessage()
         }
         return try await prepare(for: conversation).latestMessage()
     }
 
     func release() {
-        watchGeneration += 1
+        endEveryWatch()
         reader = nil
         sourceKey = nil
         if outline != nil { outline = nil }
         if couldNotRead { couldNotRead = false }
     }
+
+    private func startNewestWatch() -> Int {
+        watchGeneration += 1
+        runningWatch = watchGeneration
+        return watchGeneration
+    }
+
+    private func isNewestWatch(_ generation: Int) -> Bool { generation == watchGeneration }
+
+    private var isNewestWatchRunning: Bool { runningWatch == watchGeneration }
+
+    private func endEveryWatch() { watchGeneration += 1 }
 
     private func read(with reader: ConversationOutlineReader) async {
         guard readingReader !== reader else { return }

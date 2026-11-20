@@ -16,8 +16,7 @@ struct ConversationOutlineChangeStamp: Equatable, Sendable {
     init(of conversation: Conversation) {
         file = Self.stamp(atPath: conversation.sourceFile.path)
         writeAheadLog =
-            conversation.provider == .opencode || conversation.provider == .antigravity
-            ? Self.stamp(atPath: conversation.sourceFile.path + "-wal") : nil
+            conversation.provider.storesSessionsInSQLite ? Self.stamp(atPath: conversation.sourceFile.path + "-wal") : nil
     }
 
     static func stamp(atPath path: String) -> FileStamp? {

@@ -8,6 +8,7 @@ enum MessageBookmarkLocation: Equatable {
 
 enum MessageBookmarkNavigation {
     static let snippetLength = 80
+    private static let snippetPrefixKeptAsAReplyGrows = 40
     static let minimumVisibleHeight: CGFloat = 16
 
     static func snippet(of entry: TranscriptEntry) -> String? {
@@ -23,7 +24,11 @@ enum MessageBookmarkNavigation {
 
     static func matches(_ bookmark: MessageBookmark, _ entry: TranscriptEntry) -> Bool {
         guard MessageBookmark.Kind(entry.content) == bookmark.kind, let current = snippet(of: entry) else { return false }
-        return current.lowercased().hasPrefix(bookmark.snippet.prefix(40).lowercased())
+        return snippet(current, stillStartsLike: bookmark.snippet)
+    }
+
+    static func snippet(_ current: String, stillStartsLike saved: String) -> Bool {
+        current.lowercased().hasPrefix(saved.prefix(snippetPrefixKeptAsAReplyGrows).lowercased())
     }
 
     static func locate(_ bookmark: MessageBookmark, in entries: [TranscriptEntry], hasEarlier: Bool, hasLater: Bool)

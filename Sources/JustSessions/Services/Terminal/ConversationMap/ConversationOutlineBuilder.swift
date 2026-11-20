@@ -5,6 +5,7 @@ struct ConversationOutlineBuilder {
     static let maximumLinesPerMessage = 24
     static let maximumLinesPerToolRun = 4
     static let snippetSourceLength = 400
+    private static let maximumUTF8BytesPerScalar = 4
     typealias Block = ConversationOutline.Block
 
     private(set) var blocks: [Block]
@@ -34,7 +35,8 @@ struct ConversationOutlineBuilder {
             Block(
                 entryID: entry.id, lastRecord: record, kind: kind, timestamp: entry.timestamp,
                 snippet: Self.snippet(of: entry),
-                lineWidths: Self.lineWidths(of: text, maximumLines: Self.maximumLinesPerMessage), toolCallCount: 0))
+                lineWidths: Self.lineWidthsCountingUTF8LeadBytes(of: text, maximumLines: Self.maximumLinesPerMessage),
+                toolCallCount: 0))
     }
 
     private mutating func appendToolCalls(_ summaries: [String], _ entry: TranscriptEntry, _ record: Int) {
@@ -43,16 +45,18 @@ struct ConversationOutlineBuilder {
             blocks[last].toolCallCount += summaries.count
             blocks[last].lastRecord = record
             blocks[last].lineWidths = Array((blocks[last].lineWidths + widths).prefix(Self.maximumLinesPerToolRun))
-            if blocks[last].snippet.isEmpty, let first = summaries.first {
-                blocks[last].snippet = String(first.prefix(MessageBookmarkNavigation.snippetLength))
-            }
+            if blocks[last].snippet.isEmpty { blocks[last].snippet = Self.toolRunSnippet(of: summaries) }
         } else {
             blocks.append(
                 Block(
                     entryID: entry.id, lastRecord: record, kind: .toolRun, timestamp: entry.timestamp,
-                    snippet: summaries.first.map { String($0.prefix(MessageBookmarkNavigation.snippetLength)) } ?? "",
+                    snippet: Self.toolRunSnippet(of: summaries),
                     lineWidths: widths.isEmpty ? [8] : widths, toolCallCount: summaries.count))
         }
+    }
+
+    private static func toolRunSnippet(of summaries: [String]) -> String {
+        summaries.first.map { String($0.prefix(MessageBookmarkNavigation.snippetLength)) } ?? ""
     }
 
     static func snippet(of entry: TranscriptEntry) -> String {
@@ -77,11 +81,11 @@ struct ConversationOutlineBuilder {
             var atLineStart = true
             var leadingSpaces = 0
             var trailingSpaces = 0
-            var previous: UInt8 = 0
+            var lastByteOtherThanSpaceOrNewline: UInt8 = 0
             for byte in bytes {
                 switch byte {
                 case UInt8(ascii: "\n"):
-                    if trailingSpaces > 0, previous >= 0x80 { return false }
+                    if trailingSpaces > 0, lastByteOtherThanSpaceOrNewline >= 0x80 { return false }
                     atLineStart = true
                     leadingSpaces = 0
                     trailingSpaces = 0
@@ -96,28 +100,29 @@ struct ConversationOutlineBuilder {
                 case UInt8(ascii: "+"), UInt8(ascii: "-"), UInt8(ascii: "="), UInt8(ascii: ":"), UInt8(ascii: "0")...UInt8(ascii: "9"):
                     if atLineStart { return false }
                 case 0x80...:
-                    if atLineStart && leadingSpaces > 0 || previous == 0xEF && byte == 0xBB { return false }
+                    if atLineStart && leadingSpaces > 0 || lastByteOtherThanSpaceOrNewline == 0xEF && byte == 0xBB { return false }
                 default: break
                 }
                 atLineStart = false
                 trailingSpaces = 0
-                previous = byte
+                lastByteOtherThanSpaceOrNewline = byte
             }
-            return trailingSpaces == 0 || previous < 0x80
+            return trailingSpaces == 0 || lastByteOtherThanSpaceOrNewline < 0x80
         } ?? false
     }
 
-    static func lineWidths(of text: String, maximumLines: Int) -> [UInt8] {
+    static func lineWidthsCountingUTF8LeadBytes(of text: String, maximumLines: Int) -> [UInt8] {
         var widths: [UInt8] = []
         var column = 0
         var hasText = false
         var endsWrapped = false
-        for byte in text.utf8.prefix(maximumLines * columns * 4) {
+        for byte in text.utf8.prefix(maximumLines * columns * maximumUTF8BytesPerScalar) {
+            let isUTF8LeadByte = byte & 0xC0 != 0x80
             if byte == UInt8(ascii: "\n") {
                 if hasText, !endsWrapped, !(column == 0 && widths.last == 0) { widths.append(UInt8(column)) }
                 column = 0
                 endsWrapped = false
-            } else if byte & 0xC0 != 0x80, byte != UInt8(ascii: "\r") {
+            } else if isUTF8LeadByte, byte != UInt8(ascii: "\r") {
                 hasText = true
                 endsWrapped = false
                 column += 1
@@ -148,6 +153,6 @@ struct ConversationOutlineBuilder {
 
     static func startsLike(_ block: Block, _ entry: TranscriptEntry) -> Bool {
         guard TranscriptPageIdentity.record(for: entry.id) == block.record, Block.Kind(entry.content) == block.kind else { return false }
-        return !block.isMessage || snippet(of: entry).lowercased().hasPrefix(block.snippet.prefix(40).lowercased())
+        return !block.isMessage || MessageBookmarkNavigation.snippet(snippet(of: entry), stillStartsLike: block.snippet)
     }
 }
