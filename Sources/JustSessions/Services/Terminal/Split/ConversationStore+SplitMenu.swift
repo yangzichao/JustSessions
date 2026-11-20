@@ -25,7 +25,7 @@ extension ConversationStore {
     func performSplitAction(_ action: TerminalTabSplitAction, fromTab tabID: UUID, closeTab: (UUID) -> Void) {
         switch action {
         case .newSplitWithSelectedTab(let orientation):
-            splitSelectedTerminal(with: tabID, on: orientation == .stacked ? .right : nil, orientation: orientation)
+            splitSelectedTerminal(with: tabID, on: orientation == .stacked ? .right : .sideItCameFrom, orientation: orientation)
         case .addToNewSplit(let otherTabID, let orientation):
             splitSelectedTerminal(with: otherTabID, on: .right, orientation: orientation)
         case .openInNewSplit(let newTab, let orientation):

@@ -54,13 +54,13 @@ extension ConversationStore {
         guard let shownTabID, let newTabID = selectedTerminalID, newTabID != shownTabID,
             !isInSplitOrChooser(shownTabID), !isInSplitOrChooser(newTabID)
         else { return }
-        splitTerminal(shownTabID, with: newTabID, on: side, orientation: orientation)
+        splitTerminal(shownTabID, with: newTabID, on: .fixed(side), orientation: orientation)
     }
 
     func splitTerminal(
         _ tabID: UUID,
         with id: UUID,
-        on side: TerminalSplit.Side?,
+        on side: TerminalSplit.JoiningSide,
         orientation: TerminalSplit.Orientation
     ) {
         guard let joiningTab = terminalSessions.first(where: { $0.id == id }),

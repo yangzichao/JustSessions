@@ -57,7 +57,7 @@ extension ConversationStore {
             strip.addSplit(
                 joining: tabID,
                 beside: chooser.tabID,
-                on: chooser.side,
+                on: .fixed(chooser.side),
                 splitID: chooser.id,
                 orientation: chooser.orientation
             ) != nil

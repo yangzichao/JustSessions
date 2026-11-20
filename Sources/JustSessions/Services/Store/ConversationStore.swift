@@ -844,7 +844,7 @@ final class ConversationStore {
 
     func splitSelectedTerminal(
         with id: UUID,
-        on side: TerminalSplit.Side? = nil,
+        on side: TerminalSplit.JoiningSide = .sideItCameFrom,
         orientation: TerminalSplit.Orientation = .sideBySide
     ) {
         guard let selectedTerminalID else { return }
