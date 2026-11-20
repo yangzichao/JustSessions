@@ -104,18 +104,15 @@ extension ConversationStore {
             replaceEndedTerminal(endedTab, with: session)
             return
         }
-        let restarts = windowRegistry.terminalRestarts
-        let conversationID = session.conversation?.id ?? endedTab.conversation?.id
-        guard let conversationID, restarts.beginCleanup(for: conversationID, tabID: endedTab.id) else { return }
-        endedTab.close()
-        tmuxCommandQueues.run(on: .thisMac) { [weak self] in
-            tmuxServer.killSession(named: keptSessionName)
-            Task { @MainActor [weak self] in
-                restarts.finishCleanup(for: conversationID) {
-                    guard let self, !self.isTearingDownWorkspace else { return }
-                    self.replaceEndedTerminal(endedTab, with: session)
-                }
-            }
+        guard let conversationID = session.conversation?.id ?? endedTab.conversation?.id else { return }
+        windowRegistry.terminalRestarts.replaceEndedTab(
+            endedTab,
+            of: conversationID,
+            afterKillingItsTmuxSession: { tmuxServer.killSession(named: keptSessionName) },
+            on: tmuxCommandQueues
+        ) { [weak self] in
+            guard let self, !self.isTearingDownWorkspace else { return }
+            self.replaceEndedTerminal(endedTab, with: session)
         }
     }
 

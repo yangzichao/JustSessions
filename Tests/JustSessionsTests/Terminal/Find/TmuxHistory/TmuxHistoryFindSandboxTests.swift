@@ -22,7 +22,7 @@ struct TmuxHistoryFindSandboxTests {
             #expect(session.paneValue("#{copy_cursor_line}").hasPrefix(line), sourceLocation: sourceLocation)
         }
 
-        _ = finder.findText("NEEDLE")
+        finder.findText("NEEDLE")
         try await expectEventually { outcomes.count == 1 }
         expectSelected(1, onLine: "Needle 3")
         let steps: [(TerminalFindDirection, Int, String)] = [
@@ -34,7 +34,7 @@ struct TmuxHistoryFindSandboxTests {
         ]
         for (direction, number, line) in steps {
             let reportCount = outcomes.count
-            _ = finder.findTextAgain("NEEDLE", direction: direction)
+            finder.findTextAgain("NEEDLE", direction: direction)
             try await expectEventually { outcomes.count == reportCount + 1 }
             expectSelected(number, onLine: line)
         }
@@ -50,11 +50,11 @@ struct TmuxHistoryFindSandboxTests {
         var outcomes: [TmuxHistorySearchOutcome] = []
         finder.onStepFinished = { outcomes.append($0) }
 
-        _ = finder.findText("École")
+        finder.findText("École")
         try await expectEventually { outcomes.count == 1 }
         #expect(outcomes.last == .searched(TerminalFindMatchCount(total: 1, selectedNumber: 1, exceedsCountLimit: false)))
 
-        _ = finder.findText("absent")
+        finder.findText("absent")
         try await expectEventually { outcomes.count == 2 }
         #expect(outcomes.last == .searched(TerminalFindMatchCount.none))
     }

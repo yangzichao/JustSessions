@@ -224,24 +224,30 @@ struct RemoteClaudeLiveNameTests {
         standIn.failNextRefreshes(100)
 
         try await fixture.followTheCLI(on: standIn)
-        for _ in 1..<ConversationStore.failedCopiesBeforeWaitingLonger {
+        for _ in 1..<UnlistedClaudeSessionRefreshPolicy.failedCopiesBeforeWaitingLonger {
             fixture.clock.advance(by: ConversationStore.refreshIntervalWhileWaitingForRemoteSession)
             try await fixture.followTheCLI(on: standIn)
         }
-        #expect(standIn.refreshesThatReadTheHost == 1 + ConversationStore.failedCopiesBeforeWaitingLonger)
+        #expect(standIn.refreshesThatReadTheHost == 1 + UnlistedClaudeSessionRefreshPolicy.failedCopiesBeforeWaitingLonger)
         fixture.clock.advance(by: ConversationStore.refreshIntervalWhileWaitingForRemoteSession)
         try await fixture.followTheCLI(on: standIn)
-        #expect(standIn.refreshesThatReadTheHost == 1 + ConversationStore.failedCopiesBeforeWaitingLonger, "It waits longer now")
+        #expect(
+            standIn.refreshesThatReadTheHost == 1 + UnlistedClaudeSessionRefreshPolicy.failedCopiesBeforeWaitingLonger,
+            "It waits longer now")
         fixture.clock.advance(by: HostAutoRefreshSchedule.wait(afterFailuresInARow: 1))
         try await fixture.followTheCLI(on: standIn)
-        #expect(standIn.refreshesThatReadTheHost == 2 + ConversationStore.failedCopiesBeforeWaitingLonger, "As the auto refresh does")
+        #expect(
+            standIn.refreshesThatReadTheHost == 2 + UnlistedClaudeSessionRefreshPolicy.failedCopiesBeforeWaitingLonger,
+            "As the auto refresh does")
 
         let otherWindow = fixture.makeWindow(listing: standIn)
         otherWindow.sshHostsNeedingLogIn.insert(standIn.host)
         standIn.failNextRefreshes(0)
         fixture.clock.advance(by: HostAutoRefreshSchedule.longestSSHHostWait)
         try await fixture.followTheCLI(on: standIn)
-        #expect(standIn.refreshesThatReadTheHost == 2 + ConversationStore.failedCopiesBeforeWaitingLonger, "Connect… refreshes it")
+        #expect(
+            standIn.refreshesThatReadTheHost == 2 + UnlistedClaudeSessionRefreshPolicy.failedCopiesBeforeWaitingLonger,
+            "Connect… refreshes it")
         #expect(tab.conversation?.id == parent.id)
         otherWindow.sshHostsNeedingLogIn.remove(standIn.host)
         try await fixture.followTheCLI(on: standIn)
@@ -262,7 +268,7 @@ struct RemoteClaudeLiveNameTests {
         standIn.failNextRefreshes(as: .outOfReach)
         try await fixture.followTheCLI(on: standIn)
         #expect(SSHHostReachability.shared.recentFailureOutput(on: standIn.host) != nil)
-        for _ in 1...ConversationStore.failedCopiesBeforeWaitingLonger {
+        for _ in 1...UnlistedClaudeSessionRefreshPolicy.failedCopiesBeforeWaitingLonger {
             fixture.clock.advance(by: ConversationStore.refreshIntervalWhileWaitingForRemoteSession)
             try await fixture.followTheCLI(on: standIn)
         }

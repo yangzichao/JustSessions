@@ -28,7 +28,7 @@ struct GhosttySymbolsFallback {
     }
 
     private static func makeFallback(fallbackFamilies: [String], terminalFamily: String) -> GhosttySymbolsFallback {
-        guard TerminalSymbolsFont.register(),
+        guard TerminalSymbolsFont.isAvailableAfterRegisteringBundledCopy,
             let symbolsFont = NSFont(name: TerminalSymbolsFont.postScriptName, size: NSFont.systemFontSize)
         else {
             return GhosttySymbolsFallback(fallbackFamilies: fallbackFamilies, codepointMaps: [])

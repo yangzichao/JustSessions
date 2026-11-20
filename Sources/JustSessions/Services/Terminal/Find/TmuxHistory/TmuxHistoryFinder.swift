@@ -2,7 +2,7 @@ import Foundation
 import os
 
 @MainActor
-final class TmuxHistoryFinder: TerminalTextFinding {
+final class TmuxHistoryFinder {
     var onStepFinished: ((TmuxHistorySearchOutcome) -> Void)?
 
     private let history: TmuxHistory
@@ -19,21 +19,22 @@ final class TmuxHistoryFinder: TerminalTextFinding {
         self.history = history
     }
 
-    func findText(_ query: String) -> TerminalFindMatchCount? {
+    func findText(_ query: String) {
         guard !query.isEmpty else {
             endTextFind()
-            return nil
+            return
         }
         startGeneration()
         hasStartedSearch = true
         run(TmuxHistorySearchCommands.startingSearch(for: query, inSession: history.sessionName), step: .start)
-        return nil
     }
 
-    func findTextAgain(_ query: String, direction: TerminalFindDirection) -> TerminalFindMatchCount? {
-        guard hasStartedSearch else { return findText(query) }
+    func findTextAgain(_ query: String, direction: TerminalFindDirection) {
+        guard hasStartedSearch else {
+            findText(query)
+            return
+        }
         run(TmuxHistorySearchCommands.movingSearch(direction, for: query, inSession: history.sessionName), step: .move(direction))
-        return nil
     }
 
     func endTextFind() {

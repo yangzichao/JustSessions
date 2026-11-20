@@ -111,10 +111,12 @@ final class TerminalSession: ObservableObject, Identifiable {
         self.isWaitingToBeShown = startsOnceShown
         let terminalView = engine.makeTabTerminalView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
         self.terminalView = terminalView
-        self.findState = TerminalFindState(
-            finder: tmuxHistory.map { tmuxHistory in
-                PlainTerminalFinder(terminalFinder: terminalView, tmuxHistory: tmuxHistory) { terminalView.isOnAlternateScreen }
-            } ?? terminalView)
+        if let tmuxHistory {
+            self.findState = TerminalFindState(
+                finder: PlainTerminalFinder(terminalFinder: terminalView, tmuxHistory: tmuxHistory) { terminalView.isOnAlternateScreen })
+        } else {
+            self.findState = TerminalFindState(finder: terminalView)
+        }
         self.conversationOutline = ConversationOutlineModel()
         self.bookmarkNotices = TerminalBookmarkNoticeState()
         self.processObserver = TerminalProcessObserver()
@@ -155,14 +157,12 @@ final class TerminalSession: ObservableObject, Identifiable {
 
     func processFinished(exitCode: Int32?) {
         hasProcessExited = true
-        guard !isClosed, !hasExited else { return }
-        cliEnded(exitCode: exitCode)
+        endCLIUnlessItAlreadyEnded(exitCode: exitCode)
     }
 
     func updateTerminalTitle(_ title: String) {
         if host == .thisMac, tmuxSessionName != nil, let deadPane = ThisMacTmuxDeadPane(terminalTitle: title) {
-            guard !isClosed, !hasExited else { return }
-            cliEnded(exitCode: deadPane.exitCode)
+            endCLIUnlessItAlreadyEnded(exitCode: deadPane.exitCode)
             return
         }
         terminalTitle = title
@@ -183,7 +183,8 @@ final class TerminalSession: ObservableObject, Identifiable {
         terminalView.typeDroppedPaths(hostPaths)
     }
 
-    private func cliEnded(exitCode: Int32?) {
+    private func endCLIUnlessItAlreadyEnded(exitCode: Int32?) {
+        guard !isClosed, !hasExited else { return }
         sshFileDrop?.cancel()
         self.exitCode = exitCode
         exitedAt = Date()

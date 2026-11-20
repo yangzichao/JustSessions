@@ -47,8 +47,13 @@ struct HardWrappedLink {
     }
 
     func resolved(engineLink: String?) -> String {
-        guard let engineLink, !engineLink.isEmpty, !clickedRowText.contains(engineLink) else { return text }
+        guard let engineLink, isOSC8HyperlinkTarget(engineLink) else { return text }
         return engineLink
+    }
+
+    private func isOSC8HyperlinkTarget(_ engineLink: String) -> Bool {
+        let rowShowsTheLinkItself = clickedRowText.contains(engineLink)
+        return !engineLink.isEmpty && !rowShowsTheLinkItself
     }
 
     private static func runsToEdge(_ row: TerminalScreenRow, columns: Int) -> Bool {

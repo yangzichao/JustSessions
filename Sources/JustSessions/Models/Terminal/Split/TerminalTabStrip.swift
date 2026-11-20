@@ -49,7 +49,7 @@ struct TerminalTabStrip: Equatable {
     mutating func addSplit(
         joining joiningID: UUID,
         beside pivotID: UUID,
-        on joiningSide: TerminalSplit.Side? = nil,
+        on joiningSide: TerminalSplit.JoiningSide = .sideItCameFrom,
         splitID: UUID = UUID(),
         orientation: TerminalSplit.Orientation = .sideBySide
     ) -> TerminalSplit? {
@@ -67,7 +67,11 @@ struct TerminalTabStrip: Equatable {
         let split = TerminalSplit(id: splitID, tabIDs: (pivotID, joiningID), groupKey: groupKey, orientation: orientation)
         let joiningTab = tabs.remove(at: joiningIndex)
         let pivotIndexAfterRemoval = joiningIndex < pivotIndex ? pivotIndex - 1 : pivotIndex
-        let side = joiningSide ?? (joiningIndex < pivotIndex ? .left : .right)
+        let side: TerminalSplit.Side =
+            switch joiningSide {
+            case .fixed(let side): side
+            case .sideItCameFrom: joiningIndex < pivotIndex ? .left : .right
+            }
         tabs.insert(joiningTab, at: side == .left ? pivotIndexAfterRemoval : pivotIndexAfterRemoval + 1)
         splits.append(split)
         if split.spansProjects { move(split, afterGroupOf: pivotProjectKey) }

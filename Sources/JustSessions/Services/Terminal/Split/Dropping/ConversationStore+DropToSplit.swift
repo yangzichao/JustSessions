@@ -21,7 +21,7 @@ extension ConversationStore {
         if isSplitViewShown {
             moveIntoShownSplitView(tabID, on: side)
         } else {
-            splitSelectedTerminal(with: tabID, on: side, orientation: orientation)
+            splitSelectedTerminal(with: tabID, on: .fixed(side), orientation: orientation)
         }
         selectTerminal(tabID)
     }

@@ -37,7 +37,8 @@ final class ConversationStore {
         didSet {
             windowRegistry.tabsChanged(in: self)
             followTabStateChanges()
-            forgetClosedTabsInSplitChoosers()
+            closeSplitChoosersOfTabsThatClosedOrJoinedASplit()
+            forgetWhenClosedTabsWereSelected()
         }
     }
     @ObservationIgnored private var tabStateSubscriptions: [UUID: [AnyCancellable]] = [:]
@@ -64,7 +65,8 @@ final class ConversationStore {
     private(set) var terminalSplits: [TerminalSplit] = [] {
         didSet {
             markTerminalsOnScreenSeen()
-            forgetClosedTabsInSplitChoosers()
+            closeSplitChoosersOfTabsThatClosedOrJoinedASplit()
+            forgetWhenClosedTabsWereSelected()
         }
     }
     var terminalSplitChoosers: [TerminalSplitChooser] = [] {
@@ -844,7 +846,7 @@ final class ConversationStore {
 
     func splitSelectedTerminal(
         with id: UUID,
-        on side: TerminalSplit.Side? = nil,
+        on side: TerminalSplit.JoiningSide = .sideItCameFrom,
         orientation: TerminalSplit.Orientation = .sideBySide
     ) {
         guard let selectedTerminalID else { return }
@@ -883,12 +885,16 @@ final class ConversationStore {
         incomingTab.startNowThatItIsShown()
     }
 
-    private func forgetClosedTabsInSplitChoosers() {
+    private func closeSplitChoosersOfTabsThatClosedOrJoinedASplit() {
         let openTabIDs = Set(terminalSessionsStorage.map(\.id))
         let keptChoosers = terminalSplitChoosers.filter { chooser in
             openTabIDs.contains(chooser.tabID) && !terminalSplits.contains { $0.contains(chooser.tabID) }
         }
         if keptChoosers != terminalSplitChoosers { terminalSplitChoosers = keptChoosers }
+    }
+
+    private func forgetWhenClosedTabsWereSelected() {
+        let openTabIDs = Set(terminalSessionsStorage.map(\.id))
         if tabIDsByLastSelected.contains(where: { !openTabIDs.contains($0) }) {
             tabIDsByLastSelected.removeAll { !openTabIDs.contains($0) }
         }

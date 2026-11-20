@@ -25,8 +25,7 @@ extension ConversationStore {
         case (.session(let conversation), .wholeArea):
             resume(conversation)
         case (.session(let conversation), .split(let side, let orientation)):
-            unarchiveResumableSessions([conversation])
-            showDroppedSessionInSplit(conversation, on: side, orientation: orientation)
+            resumeDroppedSessionInSplit(conversation, on: side, orientation: orientation)
         }
     }
 
@@ -39,19 +38,22 @@ extension ConversationStore {
         runningTerminal(for: conversation) ?? terminalSessions.first { $0.conversation?.id == conversation.id }
     }
 
-    private func showDroppedSessionInSplit(
+    private func resumeDroppedSessionInSplit(
         _ conversation: Conversation,
         on side: TerminalSplit.Side,
         orientation: TerminalSplit.Orientation
     ) {
+        unarchiveResumableSessions([conversation])
         if let tab = openTab(of: conversation) {
             showDroppedTabInSplit(tab.id, on: side, orientation: orientation)
             return
         }
-        guard let shownTabID = selectedTerminalID else { return }
+        guard let tabShownBeforeTheDrop = selectedTerminalID else { return }
         launch(conversation, action: .resume)
-        guard let resumedTab = runningTerminal(for: conversation), resumedTab.id != shownTabID else { return }
-        selectTerminal(shownTabID)
-        showDroppedTabInSplit(resumedTab.id, on: side, orientation: orientation)
+        guard let resumedTabSelectedOnItsOwn = runningTerminal(for: conversation),
+            resumedTabSelectedOnItsOwn.id != tabShownBeforeTheDrop
+        else { return }
+        selectTerminal(tabShownBeforeTheDrop)
+        showDroppedTabInSplit(resumedTabSelectedOnItsOwn.id, on: side, orientation: orientation)
     }
 }
