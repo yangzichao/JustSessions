@@ -57,7 +57,7 @@ enum CLISearchDirectories {
 
     static func bundledExecutablePaths(named executableName: String) -> [String] {
         switch executableName {
-        case "codex": ["/Applications/ChatGPT.app/Contents/Resources/codex"]
+        case "codex": ["/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex"]
         default: []
         }
     }
