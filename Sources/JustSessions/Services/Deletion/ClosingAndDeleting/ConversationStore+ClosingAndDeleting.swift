@@ -48,7 +48,7 @@ extension ConversationStore {
             MainActor.assumeIsolated {
                 guard let self else { return }
                 Task {
-                    await self.waitForRefreshes(forgetting: endedTmuxNamesByHost)
+                    await self.waitForRefreshesStartedBeforeTheCLIsEnded(thenForget: endedTmuxNamesByHost)
                     delete(self)
                 }
             }
@@ -69,13 +69,7 @@ extension ConversationStore {
             : []
         let tmuxNames = Set(tabs.compactMap(\.tmuxSessionName) + tmuxNameWithoutTab)
         guard !tabs.isEmpty || !tmuxNames.isEmpty else { return [] }
-        let thisMacCLIProcessIDs: Set<Int32> =
-            host == .thisMac
-            ? Set(tabs.map(\.cliProcessID) + tmuxNames.compactMap { thisMacTmuxPaneProcessIDs[$0] }).filter { $0 > 0 }
-            : []
-        closingTabsWithoutRemembering {
-            for tab in tabs { closeTerminal(tab.id) }
-        }
+        let thisMacCLIProcessIDs = readThisMacCLIProcessIDsThenClose(tabs, alongWith: tmuxNames, on: host)
         tmuxSessionNamesByHost[host]?.subtract(tmuxNames)
         let timeoutSeconds = Self.cliExitTimeoutBeforeDeletion
         cliExits.enter()
@@ -101,9 +95,24 @@ extension ConversationStore {
         return tmuxNames
     }
 
-    private func waitForRefreshes(forgetting endedTmuxNamesByHost: [SessionHost: Set<String>]) async {
+    private func readThisMacCLIProcessIDsThenClose(
+        _ tabs: [TerminalSession], alongWith tmuxNames: Set<String>, on host: SessionHost
+    ) -> Set<Int32> {
+        let thisMacCLIProcessIDs: Set<Int32> =
+            host == .thisMac
+            ? Set(tabs.map(\.cliProcessID) + tmuxNames.compactMap { thisMacTmuxPaneProcessIDs[$0] }).filter { $0 > 0 }
+            : []
+        closingTabsWithoutRemembering {
+            for tab in tabs { closeTerminal(tab.id) }
+        }
+        return thisMacCLIProcessIDs
+    }
+
+    private static let unfinishedRefreshPollInterval: Duration = .milliseconds(100)
+
+    private func waitForRefreshesStartedBeforeTheCLIsEnded(thenForget endedTmuxNamesByHost: [SessionHost: Set<String>]) async {
         while endedTmuxNamesByHost.keys.contains(where: { hostRefreshStatuses[$0] == .refreshing }) {
-            try? await Task.sleep(for: .milliseconds(100))
+            try? await Task.sleep(for: Self.unfinishedRefreshPollInterval)
         }
         for (host, endedTmuxNames) in endedTmuxNamesByHost {
             tmuxSessionNamesByHost[host]?.subtract(endedTmuxNames)

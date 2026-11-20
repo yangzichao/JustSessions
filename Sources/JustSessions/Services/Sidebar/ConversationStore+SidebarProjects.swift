@@ -30,7 +30,7 @@ extension ConversationStore {
             waiting: sessionsWaitingForYou,
             searchText: searchText,
             messageMatchConversationIDs: messageMatchConversationIDs,
-            recencyNow: Date(timeIntervalSinceReferenceDate: (Date.now.timeIntervalSinceReferenceDate / 60).rounded(.down) * 60)
+            recencyNowToTheMinute: FilteredSidebarProjection.Inputs.roundedDownToTheMinuteSoRendersReuseTheCache(.now)
         )
         if let cachedFilteredSidebarProjection, cachedFilteredSidebarProjection.inputs == inputs {
             return cachedFilteredSidebarProjection

@@ -15,7 +15,7 @@ struct InstalledCLIsTests {
 
         let resolver = NativeCLICommandResolver(searchDirectories: [binaryDirectory.path])
 
-        #expect(InstalledCLIs.onThisMac(commandResolver: resolver) == [.kiro, .pi])
+        #expect(try InstalledCLIs.onThisMac(commandResolver: resolver, cancellation: .never) == [.kiro, .pi])
     }
 
     @Test func newSessionsOfferEveryToolUntilTheHostIsCheckedThenOnlyInstalledOnes() throws {

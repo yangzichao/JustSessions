@@ -1,10 +1,6 @@
 import Foundation
 
 enum InstalledCLIs {
-    static func onThisMac(commandResolver: NativeCLICommandResolver) -> Set<ConversationProvider> {
-        (try? onThisMac(commandResolver: commandResolver, cancellation: .never)) ?? []
-    }
-
     static func onThisMac(
         commandResolver: NativeCLICommandResolver,
         cancellation: ConversationDiscoveryCancellation

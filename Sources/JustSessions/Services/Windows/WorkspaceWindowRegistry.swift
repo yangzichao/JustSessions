@@ -54,11 +54,15 @@ final class WorkspaceWindowRegistry {
         workspaces.removeAll { $0.store == nil || $0.store === store }
     }
 
-    func setWindow(_ window: NSWindow?, for store: ConversationStore) {
+    func setWindowHandingOverItsFirstWindow(_ window: NSWindow?, for store: ConversationStore) {
         guard let index = workspaces.firstIndex(where: { $0.store === store }) else { return }
         workspaces[index].window = window
         guard let window, !workspaces[index].hasHadWindow else { return }
         workspaces[index].hasHadWindow = true
+        handOverOutOfSightToTheOldestWaitingHandOver(firstWindow: window, of: store)
+    }
+
+    private func handOverOutOfSightToTheOldestWaitingHandOver(firstWindow window: NSWindow, of store: ConversationStore) {
         guard !windowHandOvers.isEmpty else { return }
         let handOver = windowHandOvers.removeFirst()
         let animationBehavior = window.animationBehavior

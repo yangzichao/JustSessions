@@ -24,7 +24,7 @@ final class WorkspaceWindowRegistrationView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         guard let store else { return }
-        store.windowRegistry.setWindow(window, for: store)
+        store.windowRegistry.setWindowHandingOverItsFirstWindow(window, for: store)
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? { nil }

@@ -15,16 +15,16 @@ actor SessionMessageIndex {
         self.cache = cache
     }
 
-    func sessionsToRead(
-        among conversations: [Conversation], generation proposedGeneration: Int
+    func keepOnlyListedSessionsReturningThoseToRead(
+        _ listedConversations: [Conversation], generation proposedGeneration: Int
     ) -> [(Conversation, SessionMessageTextFingerprint)] {
         guard proposedGeneration >= generation else { return [] }
         generation = proposedGeneration
         expectedFingerprints = Dictionary(
-            uniqueKeysWithValues: conversations.map { ($0.id, SessionMessageTextFingerprint($0)) }
+            uniqueKeysWithValues: listedConversations.map { ($0.id, SessionMessageTextFingerprint($0)) }
         )
         sessions = sessions.filter { expectedFingerprints[$0.key] == $0.value.fingerprint }
-        return conversations.compactMap { conversation in
+        return listedConversations.compactMap { conversation in
             guard let fingerprint = expectedFingerprints[conversation.id] else { return nil }
             return sessions[conversation.id]?.fingerprint == fingerprint ? nil : (conversation, fingerprint)
         }

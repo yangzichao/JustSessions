@@ -192,7 +192,7 @@ private final class Scenario {
         ]
         return ExternalEditorStore(
             applicationURLForBundleIdentifier: { installedApplications[$0] },
-            sshFolderCommandLineToolForApplication: { _ in nil }
+            vsCodeFamilyCommandLineToolForApplication: { _ in nil }
         )
     }
 }

@@ -5,21 +5,21 @@ struct InstalledExternalEditor: Identifiable, Equatable {
 
     let name: String
     let applicationURL: URL
-    let sshFolderCommandLineToolURL: URL?
+    let vsCodeFamilyCommandLineToolURL: URL?
     let icon: NSImage
 
     var id: URL { applicationURL }
 
-    init(name: String, applicationURL: URL, sshFolderCommandLineToolURL: URL? = nil) {
+    init(name: String, applicationURL: URL, vsCodeFamilyCommandLineToolURL: URL? = nil) {
         self.name = name
         self.applicationURL = applicationURL
-        self.sshFolderCommandLineToolURL = sshFolderCommandLineToolURL
+        self.vsCodeFamilyCommandLineToolURL = vsCodeFamilyCommandLineToolURL
         icon = NSWorkspace.shared.icon(forFile: applicationURL.path)
         icon.size = Self.menuIconSize
     }
 
     static func == (lhs: InstalledExternalEditor, rhs: InstalledExternalEditor) -> Bool {
         lhs.name == rhs.name && lhs.applicationURL == rhs.applicationURL
-            && lhs.sshFolderCommandLineToolURL == rhs.sshFolderCommandLineToolURL
+            && lhs.vsCodeFamilyCommandLineToolURL == rhs.vsCodeFamilyCommandLineToolURL
     }
 }

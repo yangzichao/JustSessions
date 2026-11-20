@@ -7,6 +7,8 @@ struct SearchableSessionText: Sendable {
         let segment: Int
     }
 
+    private static let segmentSeparatorNoTypedQueryHolds: UInt8 = 0
+
     let text: SessionMessageText
     private let foldedBytes: [UInt8]
     private let segmentStarts: [Int]
@@ -22,7 +24,7 @@ struct SearchableSessionText: Sendable {
                 segmentStarts.append(foldedBytes.count)
                 segmentPositions.append(SegmentPosition(entry: entryIndex, segment: segmentIndex))
                 foldedBytes += SessionMessageQuery.folded(segment).utf8
-                foldedBytes.append(0)
+                foldedBytes.append(Self.segmentSeparatorNoTypedQueryHolds)
             }
         }
         self.foldedBytes = foldedBytes

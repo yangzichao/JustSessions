@@ -79,7 +79,7 @@ struct MessageBookmarkEditorPresenterTests {
         let window = onScreenWindow(showing: Color.clear.modifier(AllBookmarksPresenter(store: store)))
         defer { close(window) }
         registry.add(store)
-        registry.setWindow(window, for: store)
+        registry.setWindowHandingOverItsFirstWindow(window, for: store)
 
         AllBookmarksCommand.show(registry: registry)
 
