@@ -5,7 +5,9 @@ import Testing
 @testable import JustSessions
 
 struct TerminalSplitDropAreaTests {
-    private let terminalFrame = CGRect(x: 200, y: 40, width: 1026, height: 600)
+    private static let sidebarWidth: CGFloat = 200
+    private static let tabBarHeight: CGFloat = 40
+    private let terminalFrame = CGRect(x: sidebarWidth, y: tabBarHeight, width: 1026, height: 600)
 
     @Test func withNoSplitShownEitherEdgesThirdSplitsAndTheMiddleShowsTheTabOnItsOwn() {
         let area = TerminalSplitDropArea(frameInWindow: terminalFrame, shownSplit: nil)
@@ -31,9 +33,9 @@ struct TerminalSplitDropAreaTests {
     @Test func withASplitShownTheResizeAreaPartsThePanesWhereverItWasDragged() {
         let area = TerminalSplitDropArea(frameInWindow: terminalFrame, shownSplit: .init(fraction: 0.3, orientation: .sideBySide))
 
-        #expect(area.place(at: CGPoint(x: 200 + 312, y: 300)) == .split(.left, .sideBySide))
-        #expect(area.place(at: CGPoint(x: 200 + 313, y: 300)) == .split(.right, .sideBySide))
-        #expect(area.place(at: CGPoint(x: 200 + 513, y: 300)) == .split(.right, .sideBySide))
+        #expect(area.place(at: CGPoint(x: Self.sidebarWidth + 312, y: 300)) == .split(.left, .sideBySide))
+        #expect(area.place(at: CGPoint(x: Self.sidebarWidth + 313, y: 300)) == .split(.right, .sideBySide))
+        #expect(area.place(at: CGPoint(x: Self.sidebarWidth + 513, y: 300)) == .split(.right, .sideBySide))
     }
 
     @Test func theHighlightedPaneIsThePaneTheTabWouldTake() {
@@ -73,8 +75,8 @@ struct TerminalSplitDropAreaTests {
     @Test func withAStackedSplitShownTheResizeAreaPartsTheTopAndBottomPanes() {
         let area = TerminalSplitDropArea(frameInWindow: terminalFrame, shownSplit: .init(fraction: 0.5, orientation: .stacked))
 
-        #expect(area.place(at: CGPoint(x: 210, y: 40 + 299)) == .split(.left, .stacked))
-        #expect(area.place(at: CGPoint(x: 210, y: 40 + 300)) == .split(.right, .stacked))
+        #expect(area.place(at: CGPoint(x: 210, y: Self.tabBarHeight + 299)) == .split(.left, .stacked))
+        #expect(area.place(at: CGPoint(x: 210, y: Self.tabBarHeight + 300)) == .split(.right, .stacked))
         #expect(area.place(at: CGPoint(x: 201, y: 600)) == .split(.right, .stacked))
         #expect(area.frame(of: .split(.left, .stacked)) == CGRect(x: 8, y: 8, width: 1010, height: 287))
         #expect(area.frame(of: .split(.right, .stacked)) == CGRect(x: 8, y: 305, width: 1010, height: 287))
