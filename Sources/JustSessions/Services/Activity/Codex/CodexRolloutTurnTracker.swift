@@ -1,22 +1,22 @@
 import Foundation
+import os
 
-final class CodexRolloutTurnTracker: @unchecked Sendable {
+final class CodexRolloutTurnTracker: Sendable {
     static let largestReadByteCount: UInt64 = 16 << 20
     static let firstLookByteCounts: [UInt64] = [1 << 20, 4 << 20, largestReadByteCount]
     private static let newline = UInt8(ascii: "\n")
 
-    private struct FollowedFile {
+    private struct FollowedFile: Sendable {
         let fileNumber: UInt64
         var readOffset: UInt64 = 0
         var unfinishedLine = Data()
         var turnState: CodexTurnState?
     }
 
-    private let lock = NSLock()
-    private var followedFilesByPath: [String: FollowedFile] = [:]
+    private let followedFilesByPath = OSAllocatedUnfairLock<[String: FollowedFile]>(initialState: [:])
 
     func turnState(ofRolloutFile file: URL) -> CodexTurnState? {
-        lock.withLock {
+        followedFilesByPath.withLock { followedFilesByPath in
             let path = file.path
             guard let attributes = try? FileManager.default.attributesOfItem(atPath: path),
                 let size = (attributes[.size] as? NSNumber)?.uint64Value,
@@ -42,7 +42,9 @@ final class CodexRolloutTurnTracker: @unchecked Sendable {
     }
 
     func stopFollowingFiles(otherThan paths: Set<String>) {
-        lock.withLock { followedFilesByPath = followedFilesByPath.filter { paths.contains($0.key) } }
+        followedFilesByPath.withLock { followedFilesByPath in
+            followedFilesByPath = followedFilesByPath.filter { paths.contains($0.key) }
+        }
     }
 
     private static func firstLook(at handle: FileHandle, size: UInt64, fileNumber: UInt64) -> FollowedFile {
@@ -69,8 +71,13 @@ final class CodexRolloutTurnTracker: @unchecked Sendable {
         else { return }
         followedFile.readOffset += UInt64(appended.count)
         let (wholeLines, unfinishedLine) = splitAfterLastNewline(followedFile.unfinishedLine + appended)
-        followedFile.unfinishedLine = UInt64(unfinishedLine.count) > largestReadByteCount ? Data() : unfinishedLine
+        followedFile.unfinishedLine = droppingLineTooLongToBeATurnEvent(unfinishedLine)
         if let turnState = CodexTurnState.afterLastTurnEvent(in: wholeLines) { followedFile.turnState = turnState }
+    }
+
+    private static func droppingLineTooLongToBeATurnEvent(_ unfinishedLine: Data) -> Data {
+        let isTooLongToBeATurnEvent = UInt64(unfinishedLine.count) > largestReadByteCount
+        return isTooLongToBeATurnEvent ? Data() : unfinishedLine
     }
 
     private static func splitAfterLastNewline(_ text: Data) -> (wholeLines: Data, rest: Data) {
