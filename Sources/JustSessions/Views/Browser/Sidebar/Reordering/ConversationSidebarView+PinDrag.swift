@@ -12,7 +12,7 @@ extension ConversationSidebarView {
     }
 
     private func followPinDrag(
-        of rowID: String,
+        of rowID: SidebarRowID,
         in scope: SidebarPinDrag.Scope,
         scopeRows: () -> [SidebarPinDrag.Row],
         pointer: CGPoint

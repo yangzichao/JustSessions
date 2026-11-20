@@ -1,30 +1,30 @@
 enum RandomTip: String, CaseIterable {
-    case resumeSession
-    case newSessionAnyCLI
-    case readWithoutRunning
-    case keepRunning
-    case reopenTabs
-    case unseenTurn
-    case sshHosts
-    case checkSSHHost
-    case splitView
-    case dragIntoSplitView
-    case selectSeveralSessions
-    case branch
-    case waitingForYouFilter
-    case notifications
-    case readingWindow
-    case pin
-    case openProjectInEditor
-    case archiveProject
-    case showSubagents
-    case dragTabToNewWindow
-    case collapseTabGroup
-    case backAndForward
-    case tabByPosition
-    case hideSidebar
-    case textSize
-    case dropFiles
-    case ghosttyEngine
-    case computerUse
+    case resumeSession = "resumeSession"
+    case newSessionAnyCLI = "newSessionAnyCLI"
+    case readWithoutRunning = "readWithoutRunning"
+    case keepRunning = "keepRunning"
+    case reopenTabs = "reopenTabs"
+    case unseenTurn = "unseenTurn"
+    case sshHosts = "sshHosts"
+    case checkSSHHost = "checkSSHHost"
+    case splitView = "splitView"
+    case dragIntoSplitView = "dragIntoSplitView"
+    case selectSeveralSessions = "selectSeveralSessions"
+    case branch = "branch"
+    case waitingForYouFilter = "waitingForYouFilter"
+    case notifications = "notifications"
+    case readingWindow = "readingWindow"
+    case pin = "pin"
+    case openProjectInEditor = "openProjectInEditor"
+    case archiveProject = "archiveProject"
+    case showSubagents = "showSubagents"
+    case dragTabToNewWindow = "dragTabToNewWindow"
+    case collapseTabGroup = "collapseTabGroup"
+    case backAndForward = "backAndForward"
+    case tabByPosition = "tabByPosition"
+    case hideSidebar = "hideSidebar"
+    case textSize = "textSize"
+    case dropFiles = "dropFiles"
+    case ghosttyEngine = "ghosttyEngine"
+    case computerUse = "computerUse"
 }

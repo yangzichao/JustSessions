@@ -70,7 +70,7 @@ struct AppThemeColors: Equatable, Sendable {
                 (provider, readable(provider.tintHexColor.value(isDark: isDark)))
             })
         tabGroupHexColors = Self.tabGroupColors(
-            ansiColors: seeds.terminal.ansiHexColors, labelSurfaces: [contentSurface, sidebarSurface]
+            terminal: seeds.terminal, labelSurfaces: [contentSurface, sidebarSurface]
         )
     }
 }

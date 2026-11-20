@@ -64,14 +64,16 @@ struct ConversationOutline: Sendable, Equatable {
 
     func blockIndex(for bookmark: MessageBookmark) -> Int? {
         let kind: Block.Kind = bookmark.kind == .user ? .user : .assistant
-        let head = bookmark.snippet.prefix(40).lowercased()
+        func stillStartsLikeBookmark(_ index: Int) -> Bool {
+            MessageBookmarkNavigation.snippet(blocks[index].snippet, stillStartsLike: bookmark.snippet)
+        }
         let record = TranscriptPageIdentity.record(for: bookmark.entryID)
         let exact = firstBlockIndex(atOrAfter: bookmark.entryID)
         let exactKind = exact < blocks.count && blocks[exact].entryID == bookmark.entryID && blocks[exact].kind == kind
-        if exactKind, blocks[exact].snippet.lowercased().hasPrefix(head) { return exact }
+        if exactKind, stillStartsLikeBookmark(exact) { return exact }
         let first = firstBlockIndex(atOrAfter: TranscriptPageIdentity.entryID(record: record, part: 0))
         let inRecord = blocks[first...].prefix { $0.record == record }.indices.filter { blocks[$0].kind == kind }
-        return inRecord.first { blocks[$0].snippet.lowercased().hasPrefix(head) } ?? (exactKind ? exact : inRecord.first)
+        return inRecord.first(where: stillStartsLikeBookmark) ?? (exactKind ? exact : inRecord.first)
     }
 
     func targetEntryID(forBlockAt index: Int) -> Int? {

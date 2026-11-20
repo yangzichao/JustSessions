@@ -50,9 +50,9 @@ struct ListedProjectSessionRowsTests {
 
         #expect(
             listed.rows.map(\.id) == [
-                "conversation:\(pinned.id)",
-                "pending:\(newSession.id.uuidString)",
-            ] + unpinned.prefix(3).map { "conversation:\($0.id)" })
+                .conversation(id: pinned.id),
+                .pendingNewSession(id: newSession.id),
+            ] + unpinned.prefix(3).map { .conversation(id: $0.id) })
         #expect(listed.hiddenSessionCount == 12)
     }
 

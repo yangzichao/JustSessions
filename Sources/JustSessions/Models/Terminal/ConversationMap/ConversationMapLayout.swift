@@ -34,6 +34,8 @@ struct ConversationMapLayout: Equatable {
         let chipY: CGFloat
     }
 
+    private static let overflowRoundingOfAFittedPitchThatStillFits: CGFloat = 0.5
+
     let pitch: CGFloat
     let top: CGFloat
     let rowCount: Int
@@ -51,7 +53,7 @@ struct ConversationMapLayout: Equatable {
         let fitted = rowCount == 0 ? naturalPitch : min(naturalPitch, available / CGFloat(rowCount))
         pitch = max(fitted, min(minimumPitch, naturalPitch))
         let overflow = 2 * verticalInset + CGFloat(rowCount) * pitch - self.height
-        maximumScrollOffset = overflow > 0.5 ? overflow : 0
+        maximumScrollOffset = overflow > Self.overflowRoundingOfAFittedPitchThatStillFits ? overflow : 0
         scrollOffset = min(max(0, offsetFromTop ?? maximumScrollOffset), maximumScrollOffset)
         top = verticalInset - scrollOffset
     }

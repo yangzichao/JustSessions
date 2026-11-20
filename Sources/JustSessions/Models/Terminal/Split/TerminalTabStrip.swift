@@ -134,6 +134,11 @@ struct TerminalTabStrip: Equatable {
         }
     }
 
+    mutating func removeTabsWithoutRegrouping(_ tabIDs: Set<UUID>) {
+        tabs.removeAll { tabIDs.contains($0.id) }
+        splits.removeAll { split in tabIDs.contains(where: split.contains) }
+    }
+
     private func index(of tabID: UUID) -> Int? {
         tabs.firstIndex { $0.id == tabID }
     }

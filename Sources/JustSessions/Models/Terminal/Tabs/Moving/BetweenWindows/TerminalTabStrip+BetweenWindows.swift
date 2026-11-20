@@ -8,8 +8,7 @@ extension TerminalTabStrip {
         guard Set(touchedUnits.joined()) == Set(tabIDs) else { return nil }
         let leavingTabs = tabs.filter { tabIDs.contains($0.id) }
         let leavingSplits = splits.filter { split in leavingTabs.contains { split.contains($0.id) } }
-        self = TerminalTabStrip(tabs: tabs, splits: splits.filter { !leavingSplits.contains($0) })
-        for tab in leavingTabs { removeTab(tab.id) }
+        removeTabsWithoutRegrouping(Set(tabIDs))
         return DetachedTabStripUnit(tabs: leavingTabs, splits: leavingSplits, groupKey: groupKey)
     }
 

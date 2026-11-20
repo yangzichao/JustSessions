@@ -33,11 +33,8 @@ struct MessageBookmarks: Equatable {
             set(bookmarks, forConversationID: conversationID)
             return .removed(removed)
         }
-        guard let letter = Self.letters.first(where: { letter in !bookmarks.contains { $0.letter == letter } }) else {
-            return .allLettersInUse
-        }
-        let added = MessageBookmark(letter: letter, entryID: entryID, kind: kind, snippet: snippet)
-        set(bookmarks + [added], forConversationID: conversationID)
+        guard let added = addWithLowestFreeLetter(entryID: entryID, kind: kind, snippet: snippet, conversationID: conversationID)
+        else { return .allLettersInUse }
         return .added(added)
     }
 
@@ -45,10 +42,19 @@ struct MessageBookmarks: Equatable {
         if let existing = bookmarks(forConversationID: conversationID).first(where: { $0.entryID == entryID }) {
             return .existing(existing)
         }
-        switch toggle(entryID: entryID, kind: kind, snippet: snippet, conversationID: conversationID) {
-        case .added(let added): return .added(added)
-        case .removed, .allLettersInUse: return .allLettersInUse
-        }
+        guard let added = addWithLowestFreeLetter(entryID: entryID, kind: kind, snippet: snippet, conversationID: conversationID)
+        else { return .allLettersInUse }
+        return .added(added)
+    }
+
+    private mutating func addWithLowestFreeLetter(
+        entryID: Int, kind: MessageBookmark.Kind, snippet: String, conversationID: String
+    ) -> MessageBookmark? {
+        let bookmarks = bookmarks(forConversationID: conversationID)
+        guard let letter = Self.letters.first(where: { letter in !bookmarks.contains { $0.letter == letter } }) else { return nil }
+        let added = MessageBookmark(letter: letter, entryID: entryID, kind: kind, snippet: snippet)
+        set(bookmarks + [added], forConversationID: conversationID)
+        return added
     }
 
     @discardableResult

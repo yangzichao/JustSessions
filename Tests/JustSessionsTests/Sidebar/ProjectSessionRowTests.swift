@@ -24,10 +24,10 @@ struct ProjectSessionRowTests {
 
         #expect(
             rows.map(\.id) == [
-                "conversation:\(pinnedOlder.id)",
-                "pending:\(newSession.id.uuidString)",
-                "conversation:\(unpinnedNewest.id)",
-                "conversation:\(unpinnedOlder.id)",
+                .conversation(id: pinnedOlder.id),
+                .pendingNewSession(id: newSession.id),
+                .conversation(id: unpinnedNewest.id),
+                .conversation(id: unpinnedOlder.id),
             ])
     }
 
@@ -41,7 +41,7 @@ struct ProjectSessionRowTests {
 
         let rows = ProjectSessionRow.ordered(conversations: [saved], pendingNewSessions: [newSession], pinnedItems: PinnedItems())
 
-        #expect(rows.map(\.id) == ["pending:\(newSession.id.uuidString)", "conversation:\(saved.id)"])
+        #expect(rows.map(\.id) == [.pendingNewSession(id: newSession.id), .conversation(id: saved.id)])
     }
 
     private func conversation(id: String, project: String, time: TimeInterval) -> Conversation {
