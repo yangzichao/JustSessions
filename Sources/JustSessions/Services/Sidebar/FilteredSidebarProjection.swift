@@ -13,7 +13,11 @@ struct FilteredSidebarProjection {
         let waiting: SessionsWaitingForYou
         let searchText: String
         let messageMatchConversationIDs: Set<String>
-        let recencyNow: Date
+        let recencyNowToTheMinute: Date
+
+        static func roundedDownToTheMinuteSoRendersReuseTheCache(_ now: Date) -> Date {
+            Date(timeIntervalSinceReferenceDate: (now.timeIntervalSinceReferenceDate / 60).rounded(.down) * 60)
+        }
     }
 
     let inputs: Inputs
@@ -33,7 +37,7 @@ struct FilteredSidebarProjection {
         allSessionCount = countedConversations.count
         recentSessionCount =
             countedConversations
-            .filter { SessionRecencyFilter.recent.includes($0, now: inputs.recencyNow) }
+            .filter { SessionRecencyFilter.recent.includes($0, now: inputs.recencyNowToTheMinute) }
             .count
         runningSessionCount = countedConversations.filter { inputs.running.conversationIDs.contains($0.id) }.count
         waitingSessionCount = countedConversations.filter { inputs.waiting.conversationIDs.contains($0.id) }.count
@@ -46,7 +50,7 @@ struct FilteredSidebarProjection {
             archived: inputs.archived,
             running: inputs.running,
             waiting: inputs.waiting,
-            now: inputs.recencyNow
+            now: inputs.recencyNowToTheMinute
         )
         projects = SidebarProjectFiltering.projects(
             filteredProjects,
