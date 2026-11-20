@@ -2,7 +2,7 @@ import Foundation
 
 extension ConversationStore {
     func startLiveSessionFollowing(interval: Duration = .seconds(1), sources: [any LiveSessionSource] = LiveSessionSources.thisMac()) {
-        LiveSessionReporting.thisApp?.removeReportsOfExitedProcessesInBackground()
+        LiveSessionReporting.ofThePackagedApp?.removeReportsOfExitedProcessesInBackground()
         runPeriodically(every: interval) { await $0.followLiveSessions(sources: sources) }
     }
 
@@ -12,7 +12,7 @@ extension ConversationStore {
             guard tab.host == .thisMac, tab.isRunning, let provider = tab.provider,
                 sources.contains(where: { $0.provider == provider })
             else { return nil }
-            return LiveSessionLookup(tabID: tab.id, provider: provider, processID: tab.cliProcessID)
+            return LiveSessionLookup(tabID: tab.id, provider: provider, cliProcessID: tab.knownCLIProcessID)
         }
         guard !lookups.isEmpty else { return }
         let lookedUpProviders = Set(lookups.map(\.provider))
@@ -23,11 +23,15 @@ extension ConversationStore {
 
         let foundSessions = await Task.detached(priority: .utility) {
             lookups.compactMap { lookup -> FoundLiveSession? in
-                guard let source = sources.first(where: { $0.provider == lookup.provider }),
-                    let session = source.currentSession(ofCLIProcessID: lookup.processID)
+                guard let cliProcessID = lookup.cliProcessID,
+                    let source = sources.first(where: { $0.provider == lookup.provider }),
+                    let session = source.currentSession(ofCLIProcessID: cliProcessID)
                 else { return nil }
                 let isListed = listedSessionIDs[lookup.provider]?.contains(session.sessionID) == true
-                return FoundLiveSession(tabID: lookup.tabID, sessionID: session.sessionID, isSaved: !isListed && source.isSaved(session))
+                return FoundLiveSession(
+                    tabID: lookup.tabID, sessionID: session.sessionID,
+                    isSavedButNotYetListed: !isListed && source.isSaved(session)
+                )
             }
         }.value
 
@@ -42,7 +46,7 @@ extension ConversationStore {
                 $0.provider == tab.provider && $0.host == .thisMac && $0.sessionID == foundSession.sessionID
             }) {
                 link(tab, to: conversation)
-            } else if foundSession.isSaved, tab.cliSessionIDRefreshedFor != foundSession.sessionID {
+            } else if foundSession.isSavedButNotYetListed, tab.cliSessionIDRefreshedFor != foundSession.sessionID {
                 tab.cliSessionIDRefreshedFor = foundSession.sessionID
                 hasSessionToList = true
             }
@@ -54,11 +58,11 @@ extension ConversationStore {
 private struct LiveSessionLookup: Sendable {
     let tabID: UUID
     let provider: ConversationProvider
-    let processID: Int32
+    let cliProcessID: Int32?
 }
 
 private struct FoundLiveSession: Sendable {
     let tabID: UUID
     let sessionID: String
-    let isSaved: Bool
+    let isSavedButNotYetListed: Bool
 }
