@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SidebarResizeHandle: View {
     private static let grabAreaWidth: CGFloat = 8
+    private static var coordinateSpaceThatDoesNotMoveWithTheHandle: some CoordinateSpaceProtocol { .global }
 
     let width: CGFloat
     let minimumWidth: CGFloat
@@ -24,14 +25,14 @@ struct SidebarResizeHandle: View {
             .columnResizeCursor(canShrink: width > minimumWidth, canGrow: width < maximumWidth)
             .onHover { isHovering = $0 }
             .gesture(
-                DragGesture(minimumDistance: 1, coordinateSpace: .global)
+                DragGesture(minimumDistance: 1, coordinateSpace: Self.coordinateSpaceThatDoesNotMoveWithTheHandle)
                     .onChanged { gesture in
                         let startingWidth = dragStartWidth ?? width
                         if dragStartWidth == nil { dragStartWidth = startingWidth }
-                        onChange(clamped(startingWidth + gesture.translation.width))
+                        onChange(wholePointWidthInRange(startingWidth + gesture.translation.width))
                     }
                     .onEnded { gesture in
-                        onCommit(clamped((dragStartWidth ?? width) + gesture.translation.width))
+                        onCommit(wholePointWidthInRange((dragStartWidth ?? width) + gesture.translation.width))
                         dragStartWidth = nil
                     }
             )
@@ -40,14 +41,14 @@ struct SidebarResizeHandle: View {
             .accessibilityValue("\(Int(width)) points")
             .accessibilityAdjustableAction { direction in
                 switch direction {
-                case .increment: onCommit(clamped(width + 20))
-                case .decrement: onCommit(clamped(width - 20))
+                case .increment: onCommit(wholePointWidthInRange(width + 20))
+                case .decrement: onCommit(wholePointWidthInRange(width - 20))
                 @unknown default: break
                 }
             }
     }
 
-    private func clamped(_ proposedWidth: CGFloat) -> CGFloat {
+    private func wholePointWidthInRange(_ proposedWidth: CGFloat) -> CGFloat {
         min(max(proposedWidth.rounded(), minimumWidth), maximumWidth)
     }
 }
