@@ -86,6 +86,7 @@ struct TabDragBetweenWindowsGeometryTests {
     }
 
     private static let tabIDs = (0..<5).map { _ in UUID() }
+    private static let groupLabelWidth: CGFloat = 40
 
     private func tabID(_ index: Int) -> UUID { Self.tabIDs[index] }
 
@@ -105,20 +106,24 @@ struct TabDragBetweenWindowsGeometryTests {
         in layout: TabBarLayout,
         _ strip: TerminalTabStrip
     ) -> TabStripPlacement {
-        layout.placement(forTabsOfGroup: groupKey, leadingEdgeAt: tabsLeadingEdge, tabsDistanceFromGroupLeadingEdge: 40, in: strip)
+        layout.placement(
+            forTabsOfGroup: groupKey, leadingEdgeAt: tabsLeadingEdge, tabsDistanceFromGroupLeadingEdge: Self.groupLabelWidth, in: strip)
     }
 
     private func makeLayout() -> TabBarLayout {
-        TabBarLayout(
+        let groupALeadingEdge: CGFloat = 200
+        let groupAWidth = Self.groupLabelWidth + 3 * 100
+        return TabBarLayout(
             groupSpans: [
-                "/a": TabBarLayout.Span(minX: 200, width: 340),
-                "/b": TabBarLayout.Span(minX: 554, width: 240),
+                "/a": TabBarLayout.Span(minX: groupALeadingEdge, width: groupAWidth),
+                "/b": TabBarLayout.Span(
+                    minX: groupALeadingEdge + groupAWidth + WorkspaceTabMetrics.groupSpacing, width: Self.groupLabelWidth + 200),
             ],
             tabSpansInGroups: [
-                tabID(0): TabBarLayout.Span(minX: 40, width: 100),
-                tabID(1): TabBarLayout.Span(minX: 140, width: 100),
-                tabID(2): TabBarLayout.Span(minX: 240, width: 100),
-                tabID(3): TabBarLayout.Span(minX: 40, width: 200),
+                tabID(0): TabBarLayout.Span(minX: Self.groupLabelWidth, width: 100),
+                tabID(1): TabBarLayout.Span(minX: Self.groupLabelWidth + 100, width: 100),
+                tabID(2): TabBarLayout.Span(minX: Self.groupLabelWidth + 200, width: 100),
+                tabID(3): TabBarLayout.Span(minX: Self.groupLabelWidth, width: 200),
             ]
         )
     }

@@ -34,7 +34,7 @@ struct WaitingForYouStartTimesSyncTests {
         defer { publications.cancel() }
 
         await store.synchronizeCLIActivity(claudeRegistry: registry)
-        #expect(publications.count == 1)
+        #expect(publications.mainActorTurnsWithChanges == 1)
         let entry = try #require(store.notificationBellEntries.first)
         #expect(entry.source == .detachedTmux(conversationID: conversation.id))
         #expect(entry.reason == .needsInput(reason: "input needed"))
@@ -42,7 +42,7 @@ struct WaitingForYouStartTimesSyncTests {
 
         await store.synchronizeCLIActivity(claudeRegistry: registry)
         await store.synchronizeCLIActivity(claudeRegistry: registry)
-        #expect(publications.count == 1)
+        #expect(publications.mainActorTurnsWithChanges == 1)
         #expect(store.notificationBellEntries.first?.waitingSince == entry.waitingSince)
     }
 }

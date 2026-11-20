@@ -5,7 +5,7 @@ import Observation
 
 @MainActor
 final class StoreChangeCounter {
-    private(set) var count = 0
+    private(set) var mainActorTurnsWithChanges = 0
     private let store: ConversationStore
     private let read: (ConversationStore) -> Void
     private var isCounting = true
@@ -31,7 +31,7 @@ final class StoreChangeCounter {
         } onChange: { [weak self] in
             MainActor.assumeIsolated {
                 guard let self, self.isCounting else { return }
-                self.count += 1
+                self.mainActorTurnsWithChanges += 1
                 Task { @MainActor in self.observe() }
             }
         }

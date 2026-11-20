@@ -58,15 +58,20 @@ final class TranscriptScrollViewFixture {
         descendants(ofType: TranscriptTextView.self, in: hostingView)
     }
 
+    static let fixedSettleLayoutPassCount = 8
+    static let fixedPauseAfterEachSettleLayoutPass: Duration = .milliseconds(25)
+    static let conditionHoldsLongEnoughToBeSettled: Duration = .milliseconds(150)
+
     func settleLayout() async throws {
-        for _ in 0..<8 {
+        for _ in 0..<Self.fixedSettleLayoutPassCount {
             hostingView.layoutSubtreeIfNeeded()
-            try await Task.sleep(for: .milliseconds(25))
+            try await Task.sleep(for: Self.fixedPauseAfterEachSettleLayoutPass)
         }
     }
 
     func waitUntil(
-        stableFor stableDuration: Duration = .milliseconds(150), timeout: Duration = .seconds(120),
+        stableFor stableDuration: Duration = conditionHoldsLongEnoughToBeSettled,
+        timeout: Duration = conditionTimeoutForASlowFullRun,
         _ condition: () -> Bool
     ) async throws {
         let clock = ContinuousClock()

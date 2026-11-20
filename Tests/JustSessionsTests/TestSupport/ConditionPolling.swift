@@ -1,8 +1,10 @@
 import Testing
 
+let conditionTimeoutForASlowFullRun: Duration = .seconds(120)
+
 @MainActor
 func expectEventually(
-    timeout: Duration = .seconds(120),
+    timeout: Duration = conditionTimeoutForASlowFullRun,
     _ condition: () -> Bool,
     sourceLocation: SourceLocation = #_sourceLocation
 ) async throws {

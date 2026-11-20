@@ -11,20 +11,20 @@ final class KeyRecordingTerminalFixture {
     let window: NSWindow
     private let folder: URL
     private let settings: IsolatedUserDefaults
-    private let optionKeyStore: TerminalOptionKeyStore
+    private let optionKeyStoreTheGhosttyControllerHoldsWeakly: TerminalOptionKeyStore
 
     init(engine: TerminalEngine, optionIsMeta: Bool = TerminalOptionKeyStore.defaultOptionIsMeta) throws {
         _ = NSApplication.shared
         settings = try IsolatedUserDefaults()
         folder = try makeTemporaryDirectory()
         let frame = NSRect(x: 0, y: 0, width: 640, height: 400)
-        optionKeyStore = TerminalOptionKeyStore(userDefaults: settings.userDefaults)
-        optionKeyStore.setOptionIsMeta(optionIsMeta)
+        optionKeyStoreTheGhosttyControllerHoldsWeakly = TerminalOptionKeyStore(userDefaults: settings.userDefaults)
+        optionKeyStoreTheGhosttyControllerHoldsWeakly.setOptionIsMeta(optionIsMeta)
         terminalView = engine.makeTabTerminalView(
             frame: frame,
             appearanceStore: TerminalAppearanceStore(userDefaults: settings.userDefaults),
             themeStore: AppThemeStore(userDefaults: settings.userDefaults),
-            optionKeyStore: optionKeyStore
+            optionKeyStore: optionKeyStoreTheGhosttyControllerHoldsWeakly
         )
         window = NSWindow(contentRect: frame, styleMask: [.titled], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false

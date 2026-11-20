@@ -66,7 +66,7 @@ struct RemoteClaudeLiveNameTests {
         let transcripts = try ClaudeBranchCommandTranscripts()
         defer { transcripts.remove() }
         let standIn = try fixture.standIn(forHostWith: transcripts)
-        defer { standIn.remove() }
+        defer { standIn.releaseAndForgetInSharedReachability() }
         let (tab, parent) = try await fixture.openTabOnTheSessionToBranch(transcripts, on: standIn)
         standIn.holdNextRefresh()
         fixture.store.refreshRemoteHost(standIn.host)
@@ -97,7 +97,7 @@ struct RemoteClaudeLiveNameTests {
         let transcripts = try ClaudeBranchCommandTranscripts()
         defer { transcripts.remove() }
         let standIn = try fixture.standIn(forHostWith: transcripts)
-        defer { standIn.remove() }
+        defer { standIn.releaseAndForgetInSharedReachability() }
         let (tab, parent) = try await fixture.openTabOnTheSessionToBranch(transcripts, on: standIn)
 
         try transcripts.branch()
@@ -126,7 +126,7 @@ struct RemoteClaudeLiveNameTests {
         let transcripts = try ClaudeBranchCommandTranscripts()
         defer { transcripts.remove() }
         let standIn = try fixture.standIn(forHostWith: transcripts)
-        defer { standIn.remove() }
+        defer { standIn.releaseAndForgetInSharedReachability() }
         let (tab, parent) = try await fixture.openTabOnTheSessionToBranch(transcripts, on: standIn)
         let clearedID = UUID().uuidString.lowercased()
         tab.updateTerminalTitle(try Self.title(sessionID: clearedID, name: "kept-name"))
@@ -173,7 +173,7 @@ struct RemoteClaudeLiveNameTests {
                 #"{"parentUuid":null,"type":"user","message":{"role":"user","content":"Other session"},"uuid":"\#(UUID().uuidString.lowercased())","timestamp":"2026-10-21T19:00:00.000Z","cwd":"/Users/me/project","sessionId":"\#(otherSessionID)","version":"2.1.306"}"#
             ])
         let standIn = try fixture.standIn(forHostWith: transcripts)
-        defer { standIn.remove() }
+        defer { standIn.releaseAndForgetInSharedReachability() }
         let otherWindow = fixture.makeWindow(listing: standIn)
         let (tab, parent) = try await fixture.openTabOnTheSessionToBranch(transcripts, on: standIn)
         try await expectEventually { otherWindow.conversations.contains { $0.sessionID == otherSessionID } }
@@ -217,7 +217,7 @@ struct RemoteClaudeLiveNameTests {
         let transcripts = try ClaudeBranchCommandTranscripts()
         defer { transcripts.remove() }
         let standIn = try fixture.standIn(forHostWith: transcripts)
-        defer { standIn.remove() }
+        defer { standIn.releaseAndForgetInSharedReachability() }
         let (tab, parent) = try await fixture.openTabOnTheSessionToBranch(transcripts, on: standIn)
         try transcripts.branch()
         tab.updateTerminalTitle(try transcripts.relayTitle(at: .branched))
@@ -260,7 +260,7 @@ struct RemoteClaudeLiveNameTests {
         let transcripts = try ClaudeBranchCommandTranscripts()
         defer { transcripts.remove() }
         let standIn = try fixture.standIn(forHostWith: transcripts)
-        defer { standIn.remove() }
+        defer { standIn.releaseAndForgetInSharedReachability() }
         let (tab, parent) = try await fixture.openTabOnTheSessionToBranch(transcripts, on: standIn)
         try transcripts.branch()
         tab.updateTerminalTitle(try transcripts.relayTitle(at: .branched))
@@ -289,7 +289,7 @@ struct RemoteClaudeLiveNameTests {
         let transcripts = try ClaudeBranchCommandTranscripts()
         defer { transcripts.remove() }
         let standIn = try fixture.standIn(forHostWith: transcripts)
-        defer { standIn.remove() }
+        defer { standIn.releaseAndForgetInSharedReachability() }
         let (tab, _) = try await fixture.openTabOnTheSessionToBranch(transcripts, on: standIn)
         try transcripts.branch()
         tab.updateTerminalTitle(try transcripts.relayTitle(at: .branched))
@@ -340,7 +340,7 @@ struct RemoteClaudeLiveNameTests {
         let store: ConversationStore
         let settings: IsolatedUserDefaults
         let windows = WorkspaceWindowRegistry()
-        let clock = StandInClock()
+        let clock = StandInClock(startingAt: .now)
 
         init() throws {
             directory = try makeTemporaryDirectory()
@@ -401,7 +401,7 @@ struct RemoteClaudeLiveNameTests {
         func waitForTheRefresh(of standIn: ClaudeHostStandIn, in window: ConversationStore? = nil) async throws {
             let window = window ?? store
             try await expectEventually { window.hostRefreshStatuses[.ssh(standIn.host)] != .refreshing }
-            standIn.forgetStatusLookupFailure()
+            standIn.forgetSharedReachabilityOutOfReachThatSkippedTheStatusLookup()
         }
 
         func followTheCLI(on standIn: ClaudeHostStandIn) async throws {

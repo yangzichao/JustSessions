@@ -35,8 +35,10 @@ enum TerminalClick {
         try event(.rightMouseDown, at: location, in: view, modifierFlags: [])
     }
 
+    private static let approximateDefaultFontCellWidthInBothEngines: CGFloat = 7.5
+
     private static func firstRowLocation(in view: NSView, column: Int) -> CGPoint {
-        CGPoint(x: (CGFloat(column) + 0.5) * 7.5, y: view.bounds.height - 4)
+        CGPoint(x: (CGFloat(column) + 0.5) * approximateDefaultFontCellWidthInBothEngines, y: view.bounds.height - 4)
     }
 
     private static func event(

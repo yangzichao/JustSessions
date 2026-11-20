@@ -205,7 +205,7 @@ final class SidebarPerfHarness {
         _ = NSApplication.shared
         hostingView = NSHostingView(
             rootView: AnyView(
-                SidebarPerfBrowserHarness(store: store, controls: controls)
+                SidebarPerfBrowserLayoutWithoutSparkleUpdater(store: store, controls: controls)
                     .defaultAppStorage(sandbox.userDefaults)
             ))
         window = PointerClearWindow(
@@ -269,7 +269,7 @@ final class SidebarPerfHarness {
             total: total,
             longestGap: heartbeat.longestGap,
             stalled: heartbeat.stalledTime,
-            storeChanges: storeChangeCounter.count,
+            storeChanges: storeChangeCounter.mainActorTurnsWithChanges,
             extras: extras
         )
     }
@@ -466,7 +466,7 @@ final class SidebarPerfControls: ObservableObject {
     @Published var sessionSelection = SessionMultiSelection()
 }
 
-private struct SidebarPerfBrowserHarness: View {
+private struct SidebarPerfBrowserLayoutWithoutSparkleUpdater: View {
     let store: ConversationStore
     @ObservedObject var controls: SidebarPerfControls
 
