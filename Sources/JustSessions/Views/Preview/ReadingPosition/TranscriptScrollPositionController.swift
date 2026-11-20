@@ -9,6 +9,8 @@ final class TranscriptScrollPositionController {
         let entryFrame: NSRect?
     }
 
+    private static let delayForSwiftUIToCommitRowMeasurements: TimeInterval = 0.016
+
     private let conversationID: String
     private let positionStore: TranscriptReadingPositionStore
     private var pendingRestoration: TranscriptReadingPosition?
