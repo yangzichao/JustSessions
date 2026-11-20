@@ -103,7 +103,7 @@ final class SessionMessageIndexer: ObservableObject {
         desiredConversations = conversations
         desiredGeneration &+= 1
         let generation = desiredGeneration
-        let sessions = await index.sessionsToRead(among: conversations, generation: generation)
+        let sessions = await index.keepOnlyListedSessionsReturningThoseToRead(conversations, generation: generation)
         guard generation == desiredGeneration, !users.isEmpty else { return }
         guard updateTask == nil else { return }
         startUpdate(sessions, conversations: conversations, generation: generation)
@@ -150,7 +150,7 @@ final class SessionMessageIndexer: ObservableObject {
         guard generation == desiredGeneration, conversations == desiredConversations else {
             let nextGeneration = desiredGeneration
             let nextConversations = desiredConversations
-            let sessions = await index.sessionsToRead(among: nextConversations, generation: nextGeneration)
+            let sessions = await index.keepOnlyListedSessionsReturningThoseToRead(nextConversations, generation: nextGeneration)
             guard nextGeneration == desiredGeneration, !users.isEmpty, updateTask == nil else { return }
             startUpdate(sessions, conversations: nextConversations, generation: nextGeneration)
             return
@@ -176,7 +176,7 @@ final class SessionMessageIndexer: ObservableObject {
             else { return }
             self.retryTask = nil
             let conversations = self.desiredConversations
-            let sessions = await self.index.sessionsToRead(among: conversations, generation: generation)
+            let sessions = await self.index.keepOnlyListedSessionsReturningThoseToRead(conversations, generation: generation)
             guard !Task.isCancelled, generation == self.desiredGeneration, self.updateTask == nil else { return }
             self.startUpdate(sessions, conversations: conversations, generation: generation)
         }
