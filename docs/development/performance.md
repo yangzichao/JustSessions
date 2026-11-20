@@ -184,6 +184,30 @@ No difference stands out from the load's noise:
 - **Frames:** every SwiftTerm repaint drew 147–150 frames on both.
 - **Metal, off:** it still draws hidden tabs, 470–484 frames with 10 tabs on both, so it stays off (PERF-84).
 
+**The SwiftTerm fork's overridable `keyDown`, 20 November 2026.** The pin moved to the fork's `1.20.0-justsessions.3`; see [SwiftTerm fork](build-and-release.md#swiftterm-fork). It changes only `keyDown(with:)` from `public` to `open`, so `SelectableTerminalView` can send Shift with the keypad's Enter as CSI u (TRM-61). The override runs when a key is pressed; these workloads press no key. `TerminalEngineMeasurements` (repaint, bulk, and hidden tabs) ran on the base (`1cf8e11`, `1.20.0-justsessions.2`) and on the branch (`3630609`), alternating base, branch, base, branch.
+
+**Method:**
+- **Machine:** Apple M4 Max, 14 cores, 36 GB, macOS 27.0.1.
+- **Build:** release build from `swift test -c release`, Xcode 27.0, Swift 6.4.
+- **Load:** other sessions were running. The load average was 4.0–6.8 between rounds, and 20.9 as the first round started. The display was kept awake with `caffeinate -d -i`.
+- **Runs:** each figure below is the median of the test's three runs in that round.
+
+| SwiftTerm | Base, round 1 / 2 | Branch, round 1 / 2 |
+| --- | --- | --- |
+| Repaint, 1 tab: process CPU | 10.3% / 10.3% | 10.6% / 10.8% |
+| Repaint, 1 tab: main thread | 7.6% / 7.4% | 7.4% / 7.4% |
+| Repaint, 1 tab: longest main-thread gap | 36.4 / 29.2 ms | 29.1 / 30.3 ms |
+| Repaint, 5 tabs, 1 shown: process CPU | 12.2% / 12.5% | 13.0% / 12.1% |
+| Repaint, 10 tabs, 1 shown: process CPU | 15.2% / 14.1% | 14.7% / 14.8% |
+| Bulk 20 MB: time | 0.73 / 0.70 s | 0.70 / 0.70 s |
+| Bulk 20 MB: process CPU | 121.6% / 123.6% | 123.4% / 122.9% |
+
+No difference stands out from the noise:
+- **CPU and bulk:** the medians are within 0.9 points of a core, with no direction across cases. Bulk took 0.70–0.73 s on the base and 0.70 s on the branch.
+- **Longest gap:** in these four rounds Ghostty's gap, whose library didn't change, was 24.2–24.9 ms on the base and 27.6–45.8 ms on the branch. Five more repaint and hidden-tab runs followed: base with only the pin moved, the base, the branch, the pin-only build, the base. Ghostty's gap was 23.5–25.0 ms in the first base run and 28.6–29.9 ms in the second, and 24.7–29.9 ms in the pin-only runs. The gap moves between about 24 and 29 ms from run to run, whichever pin is built.
+- **Metal, 10 tabs:** 21.4% / 21.7% on the base against 24.2% / 24.3% on the branch; in the five later runs the base gave 15.3% and 22.0%, and the pin-only build 23.8% and 22.0%.
+- **Frames:** every SwiftTerm repaint drew 149–150 frames on both.
+
 ## Work items
 
 | # | Item | Status |
