@@ -165,19 +165,19 @@ struct TabDraggingBetweenWindowsTests {
         let registry = sandbox.windowRegistry
         let openWindow = NSWindow()
         openWindow.isReleasedWhenClosed = false
-        registry.setWindow(openWindow, for: sandbox.first)
+        registry.setWindowHandingOverItsFirstWindow(openWindow, for: sandbox.first)
         var openedStores: [ConversationStore] = []
         registry.openWorkspaceWindow = { openedStores.append(sandbox.second) }
         var handedOver: [(ConversationStore, NSWindow)] = []
 
         #expect(registry.openWindow { handedOver.append(($0, $1)) })
         #expect(openedStores.count == 1)
-        registry.setWindow(nil, for: sandbox.first)
-        registry.setWindow(openWindow, for: sandbox.first)
+        registry.setWindowHandingOverItsFirstWindow(nil, for: sandbox.first)
+        registry.setWindowHandingOverItsFirstWindow(openWindow, for: sandbox.first)
         let newWindow = NSWindow()
         newWindow.isReleasedWhenClosed = false
         newWindow.animationBehavior = .documentWindow
-        registry.setWindow(newWindow, for: sandbox.second)
+        registry.setWindowHandingOverItsFirstWindow(newWindow, for: sandbox.second)
         #expect(handedOver.isEmpty)
         #expect(newWindow.alphaValue == 0)
         #expect(newWindow.animationBehavior == .none)
