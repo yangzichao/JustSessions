@@ -19,7 +19,7 @@ struct TerminalPromptSelectionTests {
         #expect(!fixture.terminalView.selectionActive)
         #expect(fixture.terminalView.subviews.contains { $0 is TerminalPromptSelectionOverlay })
 
-        #expect(fixture.promptSelection.handleKeyDown(Key.command("c", windowNumber: fixture.windowNumber)))
+        #expect(fixture.promptSelection.handleKeyDown(Key.command("c", windowNumber: fixture.windowNumber)) == .handledBySelection)
         #expect(fixture.pasteboard.string(forType: .string) == "kiwi mango\nsecond line")
         #expect(fixture.promptSelection.isActive)
         try await Task.sleep(for: .milliseconds(100))
@@ -34,7 +34,7 @@ struct TerminalPromptSelectionTests {
         #expect(fixture.terminalView.performKeyEquivalent(with: fixture.commandA))
         let prompt = try #require(fixture.promptSelection.selectedPrompt)
 
-        #expect(fixture.promptSelection.handleKeyDown(Key.delete(windowNumber: fixture.windowNumber)))
+        #expect(fixture.promptSelection.handleKeyDown(Key.delete(windowNumber: fixture.windowNumber)) == .handledBySelection)
 
         #expect(!fixture.promptSelection.isActive)
         #expect(!fixture.terminalView.subviews.contains { $0 is TerminalPromptSelectionOverlay })
@@ -52,7 +52,7 @@ struct TerminalPromptSelectionTests {
         let prompt = try #require(fixture.promptSelection.selectedPrompt)
         let typedKey = Key.typing("k", windowNumber: fixture.windowNumber)
 
-        #expect(!fixture.promptSelection.handleKeyDown(typedKey))
+        #expect(fixture.promptSelection.handleKeyDown(typedKey) == .goesOnAsUsual)
         fixture.terminalView.keyDown(with: typedKey)
 
         try await fixture.expectInput(CLIPromptEditingKeys.clearing(prompt) + "k")
@@ -66,7 +66,7 @@ struct TerminalPromptSelectionTests {
         #expect(fixture.terminalView.performKeyEquivalent(with: fixture.commandA))
         let prompt = try #require(fixture.promptSelection.selectedPrompt)
 
-        #expect(fixture.promptSelection.handleKeyDown(Key.leftArrow(windowNumber: fixture.windowNumber)))
+        #expect(fixture.promptSelection.handleKeyDown(Key.leftArrow(windowNumber: fixture.windowNumber)) == .handledBySelection)
 
         try await fixture.expectInput(CLIPromptEditingKeys.movingToStart(of: prompt))
     }
@@ -108,7 +108,7 @@ struct TerminalPromptSelectionTests {
         try fixture.drawClaudeCodePrompt(["kiwi mango"])
         #expect(fixture.terminalView.performKeyEquivalent(with: fixture.commandA))
 
-        #expect(!fixture.promptSelection.handleKeyDown(Key.upArrow(windowNumber: fixture.windowNumber)))
+        #expect(fixture.promptSelection.handleKeyDown(Key.upArrow(windowNumber: fixture.windowNumber)) == .goesOnAsUsual)
 
         #expect(!fixture.promptSelection.isActive)
         try await Task.sleep(for: .milliseconds(100))

@@ -12,6 +12,10 @@
 /// OpenCode shows `Ask anything… "…"` while the prompt is empty.
 enum OpenCodePromptRecognizer {
     static let placeholderPrefix = "Ask anything… \""
+    private static let emptyRowsAtTheBoxTop = 1
+    private static let rowsBetweenThePromptAndTheBottomBorder = 2
+    private static let cellsFromTheLeftBorderToTheText = 3
+    private static let freeCellsBeforeTheRightEdge = 2
 
     static func prompt(on screen: TerminalScreen) -> CLIPrompt? {
         let rows = screen.rows
@@ -21,12 +25,12 @@ enum OpenCodePromptRecognizer {
         else { return nil }
         let borderColumn = rows[bottomRow].startColumn(ofCharacterAt: borderIndex)
         let topRow = rows[..<bottomRow].lastIndex { $0.character(atColumn: borderColumn) != "┃" }.map { $0 + 1 } ?? 0
-        let promptRows = (topRow + 1)..<(bottomRow - 2)
+        let promptRows = (topRow + emptyRowsAtTheBoxTop)..<(bottomRow - rowsBetweenThePromptAndTheBottomBorder)
         guard promptRows.contains(caretRow) else { return nil }
-        let textStartColumn = borderColumn + 3
+        let textStartColumn = borderColumn + cellsFromTheLeftBorderToTheText
         return CLIPrompt(
             lines: promptRows.map { CLIPromptLine(row: $0, of: screen, startColumn: textStartColumn) },
-            wrapWidth: rows[bottomRow].textWidth - textStartColumn - 2,
+            wrapWidth: rows[bottomRow].textWidth - textStartColumn - freeCellsBeforeTheRightEdge,
             caret: screen.cursor,
             isPlaceholder: { $0.hasPrefix(placeholderPrefix) }
         )

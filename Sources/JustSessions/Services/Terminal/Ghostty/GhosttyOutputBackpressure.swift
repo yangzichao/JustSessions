@@ -9,7 +9,7 @@ import GhosttyTerminal
 final class GhosttyOutputBackpressure: @unchecked Sendable {
     static let defaultHighWaterByteCount = 4 << 20
     static let defaultLowWaterByteCount = 1 << 20
-    private static let waitSlice = DispatchTimeInterval.milliseconds(100)
+    private static let recheckIntervalInCaseAWakeWasMissed = DispatchTimeInterval.milliseconds(100)
 
     let highWaterByteCount: Int
     let lowWaterByteCount: Int
@@ -41,17 +41,21 @@ final class GhosttyOutputBackpressure: @unchecked Sendable {
         lock.withLock { isWaiting }
     }
 
-    func waitForRoom() {
+    func waitOffTheMainThreadUntilThereIsRoom() {
         guard unparsedByteCount >= highWaterByteCount else { return }
         while true {
-            let hasStopped = lock.withLock {
-                isWaiting = true
-                return self.hasStopped
-            }
+            let hasStopped = markWaitingBeforeReadingTheCountSoAWakeInBetweenIsKept()
             if hasStopped || unparsedByteCount <= lowWaterByteCount { break }
-            _ = caughtUp.wait(timeout: .now() + Self.waitSlice)
+            _ = caughtUp.wait(timeout: .now() + Self.recheckIntervalInCaseAWakeWasMissed)
         }
         lock.withLock { isWaiting = false }
+    }
+
+    private func markWaitingBeforeReadingTheCountSoAWakeInBetweenIsKept() -> Bool {
+        lock.withLock {
+            isWaiting = true
+            return hasStopped
+        }
     }
 
     func outputHandedToMainThread(byteCount: Int) {

@@ -26,53 +26,53 @@ final class TerminalPromptSelection {
         show(prompt)
         eventMonitor = PromptSelectionEventMonitor(
             matching: [.keyDown, .leftMouseDown, .otherMouseDown, .scrollWheel],
-            handleEvent: { [weak self] event in self?.letsGoOn(event) ?? true },
+            handleEvent: { [weak self] event in self?.handleMonitoredEvent(event) ?? .goesOnAsUsual },
             handleMenuAction: { [weak self] actionName in self?.menuWillSend(actionName) }
         )
         return true
     }
 
-    func handleKeyDown(_ event: NSEvent) -> Bool {
-        guard let selectedPrompt, let terminal else { return false }
+    func handleKeyDown(_ event: NSEvent) -> PromptSelectionEventHandling {
+        guard let selectedPrompt, let terminal else { return .goesOnAsUsual }
         guard terminal.window?.firstResponder === terminal, !terminal.selectionActive else {
             cancel()
-            return false
+            return .goesOnAsUsual
         }
         switch PromptSelectionKeyAction(event) {
         case .copy:
             copy(selectedPrompt)
-            return true
+            return .handledBySelection
         case .cut:
             copy(selectedPrompt)
             cancel()
             terminal.typeForPromptSelection(CLIPromptEditingKeys.clearing(selectedPrompt))
-            return true
+            return .handledBySelection
         case .delete:
             cancel()
             terminal.typeForPromptSelection(CLIPromptEditingKeys.clearing(selectedPrompt))
-            return true
+            return .handledBySelection
         case .replace:
             cancel()
             terminal.typeForPromptSelection(CLIPromptEditingKeys.clearing(selectedPrompt))
-            return false
+            return .goesOnAsUsual
         case .moveToStart:
             cancel()
             terminal.typeForPromptSelection(CLIPromptEditingKeys.movingToStart(of: selectedPrompt))
-            return true
+            return .handledBySelection
         case .moveToEnd:
             cancel()
             terminal.typeForPromptSelection(CLIPromptEditingKeys.movingToEnd(of: selectedPrompt))
-            return true
+            return .handledBySelection
         case .selectAllTerminalText:
             cancel()
             terminal.selectAllTerminalText()
-            return true
+            return .handledBySelection
         case .dismiss:
             cancel()
-            return true
+            return .handledBySelection
         case .passThrough:
             cancel()
-            return false
+            return .goesOnAsUsual
         }
     }
 
@@ -152,17 +152,17 @@ final class TerminalPromptSelection {
         overlay.show(lineFrames: lineFrames, glyphs: glyphs, style: terminal.promptSelectionTextStyle)
     }
 
-    private func letsGoOn(_ event: NSEvent) -> Bool {
-        guard let terminal, event.window === terminal.window else { return true }
+    private func handleMonitoredEvent(_ event: NSEvent) -> PromptSelectionEventHandling {
+        guard let terminal, event.window === terminal.window else { return .goesOnAsUsual }
         switch event.type {
         case .keyDown:
-            return !handleKeyDown(event)
+            return handleKeyDown(event)
         case .scrollWheel:
             if terminal.bounds.contains(terminal.convert(event.locationInWindow, from: nil)) { cancel() }
-            return true
+            return .goesOnAsUsual
         default:
             cancel()
-            return true
+            return .goesOnAsUsual
         }
     }
 

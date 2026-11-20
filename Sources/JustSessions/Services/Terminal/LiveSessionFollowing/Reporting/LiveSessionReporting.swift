@@ -5,7 +5,7 @@ struct LiveSessionReporting: Sendable {
 
     let directory: URL
 
-    static var thisApp: LiveSessionReporting? {
+    static var ofThePackagedApp: LiveSessionReporting? {
         guard Bundle.main.bundleURL.pathExtension == "app" else { return nil }
         return LiveSessionReporting(
             directory: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]

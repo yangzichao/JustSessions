@@ -11,7 +11,7 @@ struct NativeCLICommandResolver: Sendable {
         searchDirectories: [String]? = nil,
         inheritedEnvironment: [String: String] = ProcessInfo.processInfo.environment,
         bundledTmuxDirectory: URL? = BundledTmuxRuntime.appBundleDirectory,
-        liveSessionReporting: LiveSessionReporting? = .thisApp
+        liveSessionReporting: LiveSessionReporting? = .ofThePackagedApp
     ) {
         self.inheritedEnvironment = inheritedEnvironment
         self.bundledTmuxRuntime = bundledTmuxDirectory.map { BundledTmuxRuntime(directory: $0) }

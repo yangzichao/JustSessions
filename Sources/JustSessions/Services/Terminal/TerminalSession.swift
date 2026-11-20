@@ -51,6 +51,7 @@ final class TerminalSession: ObservableObject, Identifiable {
     var cliProcessID: Int32 {
         tmuxSessionName == nil ? processID : tmuxPaneProcessID ?? 0
     }
+    var knownCLIProcessID: Int32? { cliProcessID > 0 ? cliProcessID : nil }
     var isPlainTerminal: Bool { provider == nil }
     static let endedSoonAfterStartingInterval: TimeInterval = 30
     var endedWithErrorSoonAfterStarting: Bool {
