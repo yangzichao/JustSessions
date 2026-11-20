@@ -102,6 +102,12 @@ struct ThisMacTmuxSandbox {
     }
 
     @MainActor
+    func checkTmuxVersionSoTabsRunInTmux(in store: ConversationStore) async -> Bool {
+        store.refreshThisMac()
+        return await waitUntil { !store.isScanningThisMac }
+    }
+
+    @MainActor
     func waitForPaneProcess(in store: ConversationStore, for tab: TerminalSession) async -> Bool {
         let deadline = ContinuousClock.now + .seconds(120)
         while ContinuousClock.now < deadline {

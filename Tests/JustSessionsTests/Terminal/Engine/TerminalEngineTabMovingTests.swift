@@ -76,8 +76,7 @@ struct TerminalEngineTabMovingTests {
             second.closeAllTerminals()
         }
         for store in [first, second] {
-            store.refreshThisMac()
-            #expect(await sandbox.waitUntil { !store.isScanningThisMac })
+            #expect(await sandbox.checkTmuxVersionSoTabsRunInTmux(in: store))
         }
         let tmuxSessionName = TmuxSessionName.forConversation(conversation)
         first.launch(conversation, action: .resume)

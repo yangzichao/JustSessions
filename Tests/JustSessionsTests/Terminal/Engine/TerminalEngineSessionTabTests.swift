@@ -119,8 +119,7 @@ struct TerminalEngineSessionTabTests {
             startsBackgroundPolling: false
         )
         defer { store.closeAllTerminals() }
-        store.refreshThisMac()
-        #expect(await sandbox.waitUntil { !store.isScanningThisMac })
+        #expect(await sandbox.checkTmuxVersionSoTabsRunInTmux(in: store))
         let tmuxSessionName = TmuxSessionName.forConversation(conversation)
 
         store.launch(conversation, action: .resume)

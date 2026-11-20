@@ -84,8 +84,7 @@ struct LiveCLIEvidence {
             startsBackgroundPolling: false
         )
         defer { store.closeAllTerminals() }
-        store.refreshThisMac()
-        try #require(await sandbox.waitUntil { !store.isScanningThisMac })
+        try #require(await sandbox.checkTmuxVersionSoTabsRunInTmux(in: store))
         try #require(store.commandResolver.thisMacTmuxServer()?.executablePath == sandbox.server.executablePath)
 
         try store.launchNewSession(provider: .claude, in: ProjectLocation(host: .thisMac, path: run.project.path))
