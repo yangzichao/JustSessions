@@ -3,16 +3,28 @@ import Foundation
 @testable import JustSessions
 
 final class SimulatedSSHHosts: @unchecked Sendable {
-    typealias Answer = @Sendable (_ host: String, _ attempt: Int) -> (exitStatus: Int32, output: String)?
+    enum Reply: Sendable {
+        case finished(exitStatus: Int32, output: String)
+        case noResultWithinTheTimeout
 
-    static let connectionFailure: (exitStatus: Int32, output: String) = (
-        RemoteHostCommandRunner.connectionFailureExitStatus,
-        "ssh: Could not resolve hostname devbox: nodename nor servname provided, or not known\n"
+        var runnerResult: (exitStatus: Int32, output: String)? {
+            switch self {
+            case .finished(let exitStatus, let output): (exitStatus, output)
+            case .noResultWithinTheTimeout: nil
+            }
+        }
+    }
+
+    typealias Answer = @Sendable (_ host: String, _ attempt: Int) -> Reply
+
+    static let connectionFailure = Reply.finished(
+        exitStatus: RemoteHostCommandRunner.connectionFailureExitStatus,
+        output: "ssh: Could not resolve hostname devbox: nodename nor servname provided, or not known\n"
     )
-    static let connectionLost: (exitStatus: Int32, output: String) =
-        (RemoteHostCommandRunner.connectionFailureExitStatus, "Timeout, server devbox not responding.\r\n")
-    static let alreadyGone: (exitStatus: Int32, output: String) = (RemoteConversationDeletion.missingTranscriptExitStatus, "")
-    static let deleted: (exitStatus: Int32, output: String) = (0, "")
+    static let connectionLost = Reply.finished(
+        exitStatus: RemoteHostCommandRunner.connectionFailureExitStatus, output: "Timeout, server devbox not responding.\r\n")
+    static let alreadyGone = Reply.finished(exitStatus: RemoteConversationDeletion.missingTranscriptExitStatus, output: "")
+    static let deleted = Reply.finished(exitStatus: 0, output: "")
 
     private let lock = NSLock()
     private var attemptsByHost: [String: Int] = [:]
@@ -45,7 +57,7 @@ final class SimulatedSSHHosts: @unchecked Sendable {
                     return (self.attemptsByHost[host] ?? 0, self.attemptsByHost.values.reduce(0, +))
                 }
                 if totalAttempts == self.heldAttempt { self.heldAttemptRelease.wait() }
-                return self.answer(host, attempt)
+                return self.answer(host, attempt).runnerResult
             })
     }
 }

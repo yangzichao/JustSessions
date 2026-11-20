@@ -71,7 +71,7 @@ struct BulkSessionDeletionTests {
         let sessions = try (0..<3).map {
             try sandbox.savedConversation(onHost: "devbox", updatedAt: Date.now.addingTimeInterval(-Double($0) * 60))
         }
-        let hosts = SimulatedSSHHosts { _, _ in nil }
+        let hosts = SimulatedSSHHosts { _, _ in .noResultWithinTheTimeout }
         let store = sandbox.makeStore(listing: sessions, remoteDeletion: hosts.deletion)
 
         store.deleteConversations(sessions)
