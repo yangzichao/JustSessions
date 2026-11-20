@@ -49,7 +49,7 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
     private var appearanceSubscription: AnyCancellable?
     private(set) var appliedPalette: TerminalPalette?
     private var themeReporting = TerminalThemeReporting()
-    private var themeReportAfterBackgroundAnswer: String?
+    private var themeReportWaitingForGhosttysBackgroundAnswer: String?
     private(set) var outputModeScanner = TerminalOutputModeScanner()
 
     override convenience init(frame: NSRect) {
@@ -65,13 +65,13 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         outputLowWaterByteCount: Int = GhosttyOutputBackpressure.defaultLowWaterByteCount
     ) {
         // Ghostty calls these on its IO thread; the view handles them on the main thread, in the order they came.
-        let callbackTarget = MainThreadCallbackTarget()
+        let viewForSessionCallbacks = ViewForCallbacksMadeBeforeTheView()
         inMemorySession = InMemoryTerminalSession(
             write: { data in
-                DispatchQueue.main.async { MainActor.assumeIsolated { callbackTarget.view?.sendToProcess(data) } }
+                DispatchQueue.main.async { MainActor.assumeIsolated { viewForSessionCallbacks.view?.sendGhosttysWritesToProcess(data) } }
             },
             resize: { viewport in
-                DispatchQueue.main.async { MainActor.assumeIsolated { callbackTarget.view?.resizeProcessTerminal(to: viewport) } }
+                DispatchQueue.main.async { MainActor.assumeIsolated { viewForSessionCallbacks.view?.resizeProcessTerminal(to: viewport) } }
             }
         )
         outputBackpressure = GhosttyOutputBackpressure(
@@ -81,7 +81,7 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         )
         processDelegate = GhosttyProcessDelegate(outputBackpressure: outputBackpressure)
         super.init(frame: frame)
-        callbackTarget.view = self
+        viewForSessionCallbacks.view = self
         processDelegate.view = self
         delegate = self
         configuration = TerminalSurfaceOptions(backend: .inMemory(inMemorySession))
@@ -110,9 +110,13 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
     var processID: Int32 { process.shellPid }
 
     func terminate() {
-        outputBackpressure.stop()
         let process = process
-        processQueue.sync { process.terminate() }
+        onTheQueueThatReportsTheExitOnceNoReadWaitsForRoom { process.terminate() }
+    }
+
+    private func onTheQueueThatReportsTheExitOnceNoReadWaitsForRoom(_ work: () -> Void) {
+        outputBackpressure.stop()
+        processQueue.sync(execute: work)
     }
 
     deinit {
@@ -190,27 +194,28 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         updateMarginColor()
     }
 
-    private func sendToProcess(_ data: Data) {
+    private func sendGhosttysWritesToProcess(_ data: Data) {
         let bytes = Array(GhosttyThemeReportFilter.removingThemeReports(from: data))
         guard !bytes.isEmpty else { return }
-        guard let report = themeReportAfterBackgroundAnswer,
-            let answerEnd = GhosttyBackgroundColorAnswer.endIndex(in: bytes)
+        guard let waitingThemeReport = themeReportWaitingForGhosttysBackgroundAnswer,
+            let backgroundAnswerEnd = GhosttyBackgroundColorAnswer.endIndex(in: bytes)
         else {
             process.send(data: bytes[...])
             return
         }
-        themeReportAfterBackgroundAnswer = nil
-        process.send(data: bytes[..<answerEnd])
-        sendTerminalReport(report)
-        if answerEnd < bytes.endIndex { process.send(data: bytes[answerEnd...]) }
+        themeReportWaitingForGhosttysBackgroundAnswer = nil
+        process.send(data: bytes[..<backgroundAnswerEnd])
+        sendTerminalReport(waitingThemeReport)
+        if backgroundAnswerEnd < bytes.endIndex { process.send(data: bytes[backgroundAnswerEnd...]) }
     }
 
     private func consumeOutput(_ bytes: ArraySlice<UInt8>) {
-        let owedReportAfterBackgroundQuery = themeReporting.reportsAfterNextBackgroundQuery
+        let wasOwedReportAfterBackgroundQuery = themeReporting.reportsAfterNextBackgroundQuery
         var themeReportsToSendAfterFeeding = themeReporting.reportsToSendAfterTheTerminalReads(
             bytes, isDark: appliedPalette?.isDark ?? false)
-        if owedReportAfterBackgroundQuery, !themeReporting.reportsAfterNextBackgroundQuery {
-            themeReportAfterBackgroundAnswer = themeReportsToSendAfterFeeding.popLast()
+        let backgroundQueryWasInThisOutput = wasOwedReportAfterBackgroundQuery && !themeReporting.reportsAfterNextBackgroundQuery
+        if backgroundQueryWasInThisOutput {
+            themeReportWaitingForGhosttysBackgroundAnswer = themeReportsToSendAfterFeeding.popLast()
         }
         outputModeScanner.scan(bytes)
         inMemorySession.receive(Data(bytes))
@@ -395,6 +400,6 @@ private enum PageKey {
     }
 }
 
-private final class MainThreadCallbackTarget: @unchecked Sendable {
-    weak var view: GhosttyTabTerminalView?
+private final class ViewForCallbacksMadeBeforeTheView: @unchecked Sendable {
+    @MainActor weak var view: GhosttyTabTerminalView?
 }
