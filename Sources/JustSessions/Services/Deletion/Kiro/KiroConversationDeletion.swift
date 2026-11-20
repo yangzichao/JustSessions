@@ -48,8 +48,8 @@ struct KiroConversationDeletion {
         guard fileManager.fileExists(atPath: sourceFile.path), fileManager.fileExists(atPath: metadataFile.path) else {
             throw ConversationDeletionError.missingSource
         }
-        guard (try? sourceFile.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
-            (try? metadataFile.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
+        guard sourceFile.isPlainFileNotLinkOrPipe,
+            metadataFile.isPlainFileNotLinkOrPipe,
             let metadata = KiroSessionMetadata(file: metadataFile),
             metadata.sessionID == conversation.sessionID,
             metadata.projectPath.hasPrefix("/"),
@@ -84,7 +84,7 @@ struct KiroConversationDeletion {
         guard fileManager.fileExists(atPath: sourceFile.path), fileManager.fileExists(atPath: metadataFile.path) else {
             throw ConversationDeletionError.missingSource
         }
-        guard (try? sourceFile.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true,
+        guard sourceFile.isPlainFileNotLinkOrPipe,
             let metadata = KiroV3SessionMetadata(file: metadataFile),
             metadata.sessionID == conversation.sessionID,
             metadata.projectPath == conversation.projectPath,
@@ -109,10 +109,7 @@ struct KiroConversationDeletion {
     private func removeLeftovers(of conversation: Conversation, named fileExtensions: [String]) {
         for fileExtension in fileExtensions {
             let file = sessionsDirectory.appendingPathComponent("\(conversation.sessionID).\(fileExtension)")
-            guard
-                (try? file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey]))
-                    .map({ $0.isRegularFile == true && $0.isSymbolicLink != true }) == true
-            else { continue }
+            guard file.isPlainFileNotLinkOrPipe else { continue }
             try? fileManager.removeItem(at: file)
         }
     }
