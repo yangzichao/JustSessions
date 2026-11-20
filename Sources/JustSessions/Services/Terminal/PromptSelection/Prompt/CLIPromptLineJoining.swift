@@ -4,18 +4,41 @@ enum CLIPromptLineJoining {
     static func text(of lines: [CLIPromptLine], wrapWidth: Int) -> String {
         guard var text = lines.first?.text else { return "" }
         for (previousLine, line) in zip(lines, lines.dropFirst()) {
-            text += separator(after: previousLine, before: line, wrapWidth: wrapWidth)
+            text += rowEnd(of: previousLine, before: line, wrapWidth: wrapWidth).separator
             text += line.text
         }
         return text
     }
 
-    private static func separator(after previousLine: CLIPromptLine, before line: CLIPromptLine, wrapWidth: Int) -> String {
-        guard let firstCharacter = line.text.first, !previousLine.text.isEmpty, !firstCharacter.isWhitespace else {
-            return "\n"
+    private static func rowEnd(of previousLine: CLIPromptLine, before line: CLIPromptLine, wrapWidth: Int) -> PromptRowEnd {
+        let nextRowIsEmptyOrIndented = line.text.first?.isWhitespace ?? true
+        if previousLine.text.isEmpty || nextRowIsEmptyOrIndented
+            || nextRowsFirstWord(of: line, wouldHaveFitAfter: previousLine, wrapWidth: wrapWidth)
+        {
+            return .lineYouBroke
         }
+        return previousLine.cellCount >= wrapWidth ? .wrapInsideAWord : .wrapAtASpace
+    }
+
+    private static func nextRowsFirstWord(
+        of line: CLIPromptLine, wouldHaveFitAfter previousLine: CLIPromptLine, wrapWidth: Int
+    ) -> Bool {
         let firstWordCellCount = TerminalScreenRow(String(line.text.prefix { !$0.isWhitespace })).textWidth
-        if previousLine.cellCount + 1 + firstWordCellCount <= wrapWidth { return "\n" }
-        return previousLine.cellCount >= wrapWidth ? "" : " "
+        let spaceBeforeTheWord = 1
+        return previousLine.cellCount + spaceBeforeTheWord + firstWordCellCount <= wrapWidth
+    }
+}
+
+private enum PromptRowEnd {
+    case lineYouBroke
+    case wrapInsideAWord
+    case wrapAtASpace
+
+    var separator: String {
+        switch self {
+        case .lineYouBroke: "\n"
+        case .wrapInsideAWord: ""
+        case .wrapAtASpace: " "
+        }
     }
 }
