@@ -8,13 +8,8 @@ struct SidebarSearchScopePicker: View {
             scopeButton(.everything, title: "All")
             scopeButton(.namesOnly, title: "Names only")
         }
-        .accessibilityRepresentation {
-            Picker("Search in", selection: $selection) {
-                Text("All").tag(SidebarSearchScope.everything)
-                Text("Names only").tag(SidebarSearchScope.namesOnly)
-            }
-            .pickerStyle(.segmented)
-        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Search in")
     }
 
     private func scopeButton(_ scope: SidebarSearchScope, title: LocalizedStringKey) -> some View {
@@ -37,5 +32,8 @@ struct SidebarSearchScopePicker: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(ThemePlainButtonStyle(cornerRadius: .small))
+        .accessibilityLabel(Text(title))
+        .accessibilityIdentifier("sidebar.searchScope.\(scope.rawValue)")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
