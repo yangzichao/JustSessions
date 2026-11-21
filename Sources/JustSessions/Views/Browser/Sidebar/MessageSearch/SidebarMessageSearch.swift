@@ -8,10 +8,6 @@ final class SidebarMessageSearch {
     let indexerUserID = UUID()
     static let typingPause: Duration = .milliseconds(120)
 
-    func match(for conversationID: String) -> SessionMessageMatch? {
-        results.matchesByConversationID[conversationID]
-    }
-
     func run(typedQuery: String, conversations: [Conversation], indexer: SessionMessageIndexer) async {
         guard let query = SessionMessageQuery(typedQuery) else {
             results = .none

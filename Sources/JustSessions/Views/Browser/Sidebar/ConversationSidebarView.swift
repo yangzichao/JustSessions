@@ -3,6 +3,7 @@ import SwiftUI
 struct ConversationSidebarView: View {
     let store: ConversationStore
     @Binding var searchText: String
+    @Binding var searchScope: SidebarSearchScope
     @Binding var recencyFilter: SessionRecencyFilter
     @Binding var providerFilter: ConversationProviderFilter
     @Binding var statusFilter: SessionStatusFilter
@@ -97,6 +98,7 @@ struct ConversationSidebarView: View {
             SidebarHeader(
                 store: store,
                 searchText: contentMode == .projects ? $searchText : $openTabSearchText,
+                searchScope: contentMode == .projects ? $searchScope : nil,
                 contentMode: contentMode,
                 onNewSession: onNewSession
             )

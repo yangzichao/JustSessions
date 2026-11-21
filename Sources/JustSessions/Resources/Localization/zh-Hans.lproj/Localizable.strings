@@ -214,6 +214,8 @@
 	<string>添加标签 %@</string>
 	<key>Adjusted to stay readable</key>
 	<string>已调整为易读的颜色</string>
+	<key>All</key>
+	<string>全部</string>
 	<key>All 26 letters are in use. Remove a bookmark to add another.</key>
 	<string>26 个字母都已用完。请先移除一个书签，再添加新的。</string>
 	<key>All Bookmarks</key>
@@ -1024,6 +1026,8 @@
 	<string>移动到</string>
 	<key>Name</key>
 	<string>名称</string>
+	<key>Names only</key>
+	<string>仅名称</string>
 	<key>Needs my input, such as a permission prompt</key>
 	<string>需要我的输入，例如权限确认</string>
 	<key>Needs your input</key>
@@ -1440,14 +1444,20 @@
 	<string>搜索书签</string>
 	<key>Search covers the entries shown in this preview.</key>
 	<string>搜索范围为此预览中显示的记录。</string>
+	<key>Search in</key>
+	<string>搜索范围</string>
 	<key>Search labels, tags, and messages, or type #tag. Choose a bookmark to read it.</key>
 	<string>可搜索名称、标签和消息，或输入 #标签。选择书签即可阅读。</string>
 	<key>Search open tabs</key>
 	<string>搜索已打开的标签</string>
 	<key>Search open tabs by title, project, or host</key>
 	<string>按标题、项目或主机搜索已打开的标签</string>
+	<key>Search project and session names</key>
+	<string>搜索项目和会话名称</string>
 	<key>Search projects and sessions</key>
 	<string>搜索项目和会话</string>
+	<key>Search projects by name or path and sessions by title or ID</key>
+	<string>按名称或路径搜索项目，按标题或 ID 搜索会话</string>
 	<key>Search projects by name or path and sessions by title, ID, or message text</key>
 	<string>按名称或路径搜索项目，按标题、ID 或消息内容搜索会话</string>
 	<key>Search projects by name or path, and sessions by title, ID, or message text.</key>
