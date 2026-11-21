@@ -1253,6 +1253,16 @@
         }
       }
     },
+    "All": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部"
+          }
+        }
+      }
+    },
     "All 26 letters are in use. Remove a bookmark to add another.": {
       "localizations": {
         "zh-Hans": {
@@ -5555,6 +5565,16 @@
         }
       }
     },
+    "Names only": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅名称"
+          }
+        }
+      }
+    },
     "Needs my input, such as a permission prompt": {
       "localizations": {
         "zh-Hans": {
@@ -7665,6 +7685,16 @@
         }
       }
     },
+    "Search in": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索范围"
+          }
+        }
+      }
+    },
     "Search labels, tags, and messages, or type #tag. Choose a bookmark to read it.": {
       "localizations": {
         "zh-Hans": {
@@ -7695,12 +7725,32 @@
         }
       }
     },
+    "Search project and session names": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索项目和会话名称"
+          }
+        }
+      }
+    },
     "Search projects and sessions": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "搜索项目和会话"
+          }
+        }
+      }
+    },
+    "Search projects by name or path and sessions by title or ID": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按名称或路径搜索项目，按标题或 ID 搜索会话"
           }
         }
       }

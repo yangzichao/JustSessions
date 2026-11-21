@@ -13,7 +13,7 @@ extension ConversationSidebarView {
                 onDismissSelection: dismissSidebarSelection
             ) {
                 LazyVStack(alignment: .leading, spacing: SidebarIndentGuide.rowSpacing) {
-                    if isSearching {
+                    if isSearching, searchScope.searchesMessagesAndBookmarks {
                         SidebarMessageSearchProgress(indexer: store.messageIndexer)
                     }
                     ForEach(hostSections) { section in

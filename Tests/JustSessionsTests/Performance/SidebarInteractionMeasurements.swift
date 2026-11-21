@@ -480,6 +480,7 @@ private struct SidebarPerfBrowserLayoutWithoutSparkleUpdater: View {
             ConversationSidebarView(
                 store: store,
                 searchText: $controls.searchText,
+                searchScope: .constant(.everything),
                 recencyFilter: $controls.recencyFilter,
                 providerFilter: $controls.providerFilter,
                 statusFilter: .constant(.all),

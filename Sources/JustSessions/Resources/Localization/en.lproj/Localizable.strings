@@ -204,6 +204,8 @@
 	<string>Add tag %@</string>
 	<key>Adjusted to stay readable</key>
 	<string>Adjusted to stay readable</string>
+	<key>All</key>
+	<string>All</string>
 	<key>All 26 letters are in use. Remove a bookmark to add another.</key>
 	<string>All 26 letters are in use. Remove a bookmark to add another.</string>
 	<key>All Bookmarks</key>
@@ -986,6 +988,8 @@
 	<string>Move to</string>
 	<key>Name</key>
 	<string>Name</string>
+	<key>Names only</key>
+	<string>Names only</string>
 	<key>Needs my input, such as a permission prompt</key>
 	<string>Needs my input, such as a permission prompt</string>
 	<key>Needs your input</key>
@@ -1396,14 +1400,20 @@
 	<string>Search bookmarks</string>
 	<key>Search covers the entries shown in this preview.</key>
 	<string>Search covers the entries shown in this preview.</string>
+	<key>Search in</key>
+	<string>Search in</string>
 	<key>Search labels, tags, and messages, or type #tag. Choose a bookmark to read it.</key>
 	<string>Search labels, tags, and messages, or type #tag. Choose a bookmark to read it.</string>
 	<key>Search open tabs</key>
 	<string>Search open tabs</string>
 	<key>Search open tabs by title, project, or host</key>
 	<string>Search open tabs by title, project, or host</string>
+	<key>Search project and session names</key>
+	<string>Search project and session names</string>
 	<key>Search projects and sessions</key>
 	<string>Search projects and sessions</string>
+	<key>Search projects by name or path and sessions by title or ID</key>
+	<string>Search projects by name or path and sessions by title or ID</string>
 	<key>Search projects by name or path and sessions by title, ID, or message text</key>
 	<string>Search projects by name or path and sessions by title, ID, or message text</string>
 	<key>Search projects by name or path, and sessions by title, ID, or message text.</key>

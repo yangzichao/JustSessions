@@ -20,31 +20,45 @@ struct ConversationBrowserView: View {
     @State private var closingTerminalID: UUID?
     @State private var closingSeveralTabs: SeveralTabsClosingRequest?
     @SceneStorage("isSidebarHidden") private var isSidebarHidden = false
+    @AppStorage(SidebarSearchScope.userDefaultsKey) private var searchScope: SidebarSearchScope = .everything
     @StateObject private var updateManager = SparkleUpdateManager()
     @StateObject private var onboardingTour = OnboardingTour()
 
     private var bookmarkMatches: [String: [MessageBookmark]] {
-        guard !searchText.isEmpty, let query = MessageBookmarkQuery(searchText) else { return [:] }
+        guard !searchText.isEmpty, searchScope.searchesMessagesAndBookmarks, let query = MessageBookmarkQuery(searchText)
+        else { return [:] }
         return store.messageBookmarks.matches(for: query, includingSnippets: false)
     }
 
-    private func makeFilteredProjection(bookmarkMatches: [String: [MessageBookmark]]) -> FilteredSidebarProjection {
+    private var messageMatches: [String: SessionMessageMatch] {
+        guard !searchText.isEmpty, searchScope.searchesMessagesAndBookmarks else { return [:] }
+        return messageSearch.results.matchesByConversationID
+    }
+
+    private func makeFilteredProjection(
+        bookmarkMatches: [String: [MessageBookmark]],
+        messageMatches: [String: SessionMessageMatch]
+    ) -> FilteredSidebarProjection {
         store.filteredSidebarProjection(
             providerFilter: providerFilter,
             recencyFilter: recencyFilter,
             statusFilter: statusFilter,
             archiveFilter: archiveFilter,
             searchText: searchText,
-            messageMatchConversationIDs: Set(messageSearch.results.matchesByConversationID.keys).union(bookmarkMatches.keys)
+            messageMatchConversationIDs: Set(messageMatches.keys).union(bookmarkMatches.keys)
         )
     }
 
-    private func selectConversation(_ conversation: Conversation, bookmarkMatches: [String: [MessageBookmark]]) {
+    private func selectConversation(
+        _ conversation: Conversation,
+        bookmarkMatches: [String: [MessageBookmark]],
+        messageMatches: [String: SessionMessageMatch]
+    ) {
         if !searchText.isEmpty, let bookmark = bookmarkMatches[conversation.id]?.first {
             sessionSelection.selectOnly(conversation.id)
             store.selectTerminal(nil)
             transcriptMatchReveal = TranscriptMatchReveal(conversationID: conversation.id, entryID: bookmark.entryID, query: "")
-        } else if !searchText.isEmpty, let match = messageSearch.match(for: conversation.id) {
+        } else if let match = messageMatches[conversation.id] {
             sessionSelection.selectOnly(conversation.id)
             store.selectTerminal(nil)
             transcriptMatchReveal = TranscriptMatchReveal(
@@ -69,12 +83,14 @@ struct ConversationBrowserView: View {
 
     var body: some View {
         let bookmarkMatches = bookmarkMatches
-        let filteredProjection = makeFilteredProjection(bookmarkMatches: bookmarkMatches)
+        let messageMatches = messageMatches
+        let filteredProjection = makeFilteredProjection(bookmarkMatches: bookmarkMatches, messageMatches: messageMatches)
 
         ResizableSidebarLayout(isSidebarHidden: isSidebarHidden) {
             ConversationSidebarView(
                 store: store,
                 searchText: $searchText,
+                searchScope: $searchScope,
                 recencyFilter: $recencyFilter,
                 providerFilter: $providerFilter,
                 statusFilter: $statusFilter,
@@ -86,10 +102,12 @@ struct ConversationBrowserView: View {
                 runningSessionCount: filteredProjection.runningSessionCount,
                 waitingSessionCount: filteredProjection.waitingSessionCount,
                 archivedSessionCount: filteredProjection.archivedSessionCount,
-                messageMatches: searchText.isEmpty ? [:] : messageSearch.results.matchesByConversationID,
+                messageMatches: messageMatches,
                 bookmarkMatches: bookmarkMatches,
                 onNewSession: { newSessionSheetHost = defaultNewSessionHost },
-                onSelectConversation: { selectConversation($0, bookmarkMatches: bookmarkMatches) },
+                onSelectConversation: {
+                    selectConversation($0, bookmarkMatches: bookmarkMatches, messageMatches: messageMatches)
+                },
                 onRenameConversation: onRename,
                 onRenameProject: onRenameProject,
                 onRequestDeletion: onRequestDeletion,
@@ -118,7 +136,7 @@ struct ConversationBrowserView: View {
             SidebarMessageSearchDriver(
                 indexer: store.messageIndexer,
                 search: messageSearch,
-                typedQuery: searchText,
+                typedQuery: searchScope.messageSearchQuery(typedQuery: searchText),
                 conversations: store.sidebarConversations,
                 conversationsRevision: store.conversationsRevision,
                 hiddenProviders: store.hiddenConversationProviders
