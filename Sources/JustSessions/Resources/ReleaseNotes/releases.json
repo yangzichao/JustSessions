@@ -1,5 +1,41 @@
 [
   {
+    "version": "1.4.3",
+    "publishedOn": "2026-11-20",
+    "title": {
+      "en": "Codex from ChatGPT.app",
+      "zh-Hans": "ChatGPT 应用自带的 Codex"
+    },
+    "sections": [
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Tool call summaries and notes in conversations follow the reading text size.",
+            "zh-Hans": "对话中的工具调用摘要和备注随阅读字号缩放。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Fixed the Codex CLI bundled with current ChatGPT.app not being found when codex isn't installed elsewhere.",
+            "zh-Hans": "修复了未另装 codex 时找不到新版 ChatGPT.app 自带 Codex CLI 的问题。"
+          },
+          {
+            "en": "Fixed ⇧ with the keypad's Enter sending the prompt instead of adding a line in SwiftTerm tabs with tmux.",
+            "zh-Hans": "修复了使用 tmux 的 SwiftTerm 标签页中 ⇧ 加小键盘 Enter 会发送提示词而不是换行的问题。"
+          },
+          {
+            "en": "Fixed untitled OpenCode child sessions showing “Child session” and a time as their title.",
+            "zh-Hans": "修复了未命名的 OpenCode 子会话以“Child session”加时间作为标题的问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.4.2",
     "publishedOn": "2026-11-19",
     "title": {
