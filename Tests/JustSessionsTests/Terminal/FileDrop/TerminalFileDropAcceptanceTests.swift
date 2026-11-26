@@ -48,6 +48,20 @@ struct TerminalFileDropAcceptanceTests {
         #expect(terminalView.registeredDraggedTypes.isEmpty)
     }
 
+    @Test(arguments: TerminalEngine.allCases)
+    func onlyAShownTabTakesDroppedFiles(_ engine: TerminalEngine) {
+        var terminalView = engine.makeTabTerminalView(frame: NSRect(x: 0, y: 0, width: 600, height: 400))
+        terminalView.acceptsDroppedFiles = true
+
+        terminalView.setWorkspaceActive(false)
+        let hiddenTakesFiles = terminalView.registeredDraggedTypes.contains(.fileURL) && !terminalView.isHidden
+        terminalView.setWorkspaceActive(true)
+
+        #expect(!hiddenTakesFiles)
+        #expect(terminalView.registeredDraggedTypes.contains(.fileURL))
+        #expect(!terminalView.isHidden)
+    }
+
     private func makeTab(
         engine: TerminalEngine,
         provider: ConversationProvider?,

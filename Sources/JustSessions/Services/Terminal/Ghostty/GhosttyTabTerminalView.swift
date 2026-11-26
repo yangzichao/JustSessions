@@ -19,10 +19,12 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
     var hoveredLink: String?
     var pendingHardWrappedLink: HardWrappedLink?
     var acceptsDroppedFiles = false {
-        didSet {
-            guard acceptsDroppedFiles != oldValue else { return }
-            if acceptsDroppedFiles { registerForDraggedTypes([.fileURL]) } else { unregisterDraggedTypes() }
-        }
+        didSet { updateDraggedTypes() }
+    }
+    /// A hidden tab's view stays in the window, only faded out, so AppKit would hand a drop to the topmost tab
+    /// unless the views of hidden tabs stop taking files.
+    private var isWorkspaceShown = true {
+        didSet { updateDraggedTypes() }
     }
     var copyDroppedFilesToHost: ((_ fileURLs: [URL]) -> Bool)?
     let imagePaste = TerminalImagePaste()
@@ -95,6 +97,13 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         outputCoalescer.isActive = isActive
         if !isActive { promptSelection.cancel() }
         setSurfaceVisible(isActive)
+        isWorkspaceShown = isActive
+    }
+
+    private func updateDraggedTypes() {
+        let takesFiles = acceptsDroppedFiles && isWorkspaceShown
+        guard takesFiles != registeredDraggedTypes.contains(.fileURL) else { return }
+        if takesFiles { registerForDraggedTypes([.fileURL]) } else { unregisterDraggedTypes() }
     }
 
     func startProcess(executable: String, args: [String], environment: [String]?, execName: String?, currentDirectory: String?) {
