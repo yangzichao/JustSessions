@@ -1,5 +1,33 @@
 [
   {
+    "version": "1.4.4",
+    "publishedOn": "2026-11-25",
+    "title": {
+      "en": "Search names only",
+      "zh-Hans": "仅按名称搜索"
+    },
+    "sections": [
+      {
+        "kind": "improved",
+        "items": [
+          {
+            "en": "Choose Names only under the sidebar search field to match project and session names, not messages.",
+            "zh-Hans": "在侧边栏搜索框下选择「仅名称」，只匹配项目和会话名称，不搜索消息。"
+          }
+        ]
+      },
+      {
+        "kind": "fixed",
+        "items": [
+          {
+            "en": "Fixed files dropped on a Ghostty tab going to another open tab instead of the one under the pointer.",
+            "zh-Hans": "修复了拖到 Ghostty 标签页的文件进入另一个已打开标签页的问题。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.4.3",
     "publishedOn": "2026-11-20",
     "title": {
