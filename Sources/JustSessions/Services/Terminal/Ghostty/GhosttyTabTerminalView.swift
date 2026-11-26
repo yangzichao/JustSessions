@@ -19,12 +19,10 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
     var hoveredLink: String?
     var pendingHardWrappedLink: HardWrappedLink?
     var acceptsDroppedFiles = false {
-        didSet { updateDraggedTypes() }
+        didSet { registerForDroppedFilesOnlyWhileShown() }
     }
-    /// A hidden tab's view stays in the window, only faded out, so AppKit would hand a drop to the topmost tab
-    /// unless the views of hidden tabs stop taking files.
-    private var isWorkspaceShown = true {
-        didSet { updateDraggedTypes() }
+    private var isShownInWorkspace = true {
+        didSet { registerForDroppedFilesOnlyWhileShown() }
     }
     var copyDroppedFilesToHost: ((_ fileURLs: [URL]) -> Bool)?
     let imagePaste = TerminalImagePaste()
@@ -97,13 +95,15 @@ final class GhosttyTabTerminalView: AppTerminalView, TabTerminalView {
         outputCoalescer.isActive = isActive
         if !isActive { promptSelection.cancel() }
         setSurfaceVisible(isActive)
-        isWorkspaceShown = isActive
+        isShownInWorkspace = isActive
     }
 
-    private func updateDraggedTypes() {
-        let takesFiles = acceptsDroppedFiles && isWorkspaceShown
-        guard takesFiles != registeredDraggedTypes.contains(.fileURL) else { return }
-        if takesFiles { registerForDraggedTypes([.fileURL]) } else { unregisterDraggedTypes() }
+    /// AppKit picks a drop's view from those registered for the drag without SwiftUI's hit testing, so a hidden tab's
+    /// view, kept in the window at zero opacity, would take a drop meant for the tab shown under it.
+    private func registerForDroppedFilesOnlyWhileShown() {
+        let takesDroppedFiles = acceptsDroppedFiles && isShownInWorkspace
+        guard takesDroppedFiles != registeredDraggedTypes.contains(.fileURL) else { return }
+        if takesDroppedFiles { registerForDraggedTypes([.fileURL]) } else { unregisterDraggedTypes() }
     }
 
     func startProcess(executable: String, args: [String], environment: [String]?, execName: String?, currentDirectory: String?) {
